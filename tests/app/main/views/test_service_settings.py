@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from functools import partial
-from unittest.mock import Mock, PropertyMock, call
+from unittest.mock import ANY, Mock, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
 from uuid import UUID, uuid4
 
@@ -10,6 +10,9 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
+from notifications_utils.clients.zendesk.zendesk_client import (
+    NotifySupportTicket,
+)
 
 import app
 from app.formatters import email_safe
@@ -1717,11 +1720,7 @@ def test_should_redirect_after_request_to_go_live(
             new_callable=PropertyMock,
             return_value=volume,
         )
-    mock_ticket = mocker.patch(
-        'app.main.views.service_settings.NotifySupportTicket',
-        return_value='go_live_ticket',
-    )
-    mock_ticket.TYPE_QUESTION = 'question'
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
     mock_send_ticket_to_zendesk = mocker.patch(
         'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
         autospec=True,
@@ -1753,7 +1752,8 @@ def test_should_redirect_after_request_to_go_live(
         service_id=SERVICE_ONE_ID,
         formatted_displayed_volumes=formatted_displayed_volumes,
     )
-    mock_ticket.assert_called_once_with(
+    mock_create_ticket.assert_called_once_with(
+        ANY,
         subject='Request to go live - service one',
         message=expected_message,
         ticket_type='question',
@@ -1764,7 +1764,7 @@ def test_should_redirect_after_request_to_go_live(
         org_type='central',
         service_id=SERVICE_ONE_ID,
     )
-    mock_send_ticket_to_zendesk.assert_called_once_with('go_live_ticket')
+    mock_send_ticket_to_zendesk.assert_called_once()
 
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your request to go live. We’ll get back to you within one working day.'
@@ -1803,11 +1803,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
             request_to_go_live_notes=go_live_note,
         )
     )
-    mock_ticket = mocker.patch(
-        'app.main.views.service_settings.NotifySupportTicket',
-        return_value='go_live_ticket',
-    )
-    mock_ticket.TYPE_QUESTION = 'question'
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
     mock_send_ticket_to_zendesk = mocker.patch(
         'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
         autospec=True,
@@ -1842,7 +1838,8 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         go_live_note=go_live_note
     )
 
-    mock_ticket.assert_called_once_with(
+    mock_create_ticket.assert_called_once_with(
+        ANY,
         subject='Request to go live - service one',
         message=expected_message,
         ticket_type='question',
@@ -1853,7 +1850,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         org_type='central',
         service_id=SERVICE_ONE_ID
     )
-    mock_send_ticket_to_zendesk.assert_called_once_with('go_live_ticket')
+    mock_send_ticket_to_zendesk.assert_called_once()
 
 
 def test_should_be_able_to_request_to_go_live_with_no_organisation(
@@ -5063,18 +5060,21 @@ def test_submit_email_branding_request(
     expected_organisation,
 ):
     service_one['email_branding'] = sample_uuid()
+    organisation_id = ORGANISATION_ID if org_name else None
+
     mocker.patch(
         'app.models.service.Service.organisation_id',
         new_callable=PropertyMock,
-        return_value=ORGANISATION_ID if org_name else None,
+        return_value=organisation_id,
     )
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json(name=org_name),
     )
 
-    zendesk = mocker.patch(
-        'app.main.views.service_settings.zendesk_client.create_ticket',
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_send_ticket_to_zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
         autospec=True,
     )
 
@@ -5084,7 +5084,8 @@ def test_submit_email_branding_request(
         _follow_redirects=True,
     )
 
-    zendesk.assert_called_once_with(
+    mock_create_ticket.assert_called_once_with(
+        ANY,
         message='\n'.join([
             'Organisation: {}',
             'Service: service one',
@@ -5096,10 +5097,13 @@ def test_submit_email_branding_request(
         ]).format(expected_organisation, requested_branding),
         subject='Email branding request - service one',
         ticket_type='question',
-        user_email='test@user.gov.uk',
         user_name='Test User',
-        tags=['notify_action', 'notify_branding'],
+        user_email='test@user.gov.uk',
+        org_id=organisation_id,
+        org_type='central',
+        service_id=SERVICE_ONE_ID
     )
+    mock_send_ticket_to_zendesk.assert_called_once()
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your branding request. We’ll get back to you '
         'within one working day.'
@@ -5146,19 +5150,21 @@ def test_submit_letter_branding_request(
     expected_organisation,
 ):
     service_one['letter_branding'] = sample_uuid()
+    organisation_id = ORGANISATION_ID if org_name else None
 
     mocker.patch(
         'app.models.service.Service.organisation_id',
         new_callable=PropertyMock,
-        return_value=ORGANISATION_ID if org_name else None,
+        return_value=organisation_id,
     )
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json(name=org_name),
     )
 
-    zendesk = mocker.patch(
-        'app.main.views.service_settings.zendesk_client.create_ticket',
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_send_ticket_to_zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
         autospec=True,
     )
 
@@ -5168,7 +5174,8 @@ def test_submit_letter_branding_request(
         _follow_redirects=True,
     )
 
-    zendesk.assert_called_once_with(
+    mock_create_ticket.assert_called_once_with(
+        ANY,
         message='\n'.join([
             'Organisation: {}',
             'Service: service one',
@@ -5180,10 +5187,13 @@ def test_submit_letter_branding_request(
         ]).format(expected_organisation, requested_branding),
         subject='Letter branding request - service one',
         ticket_type='question',
-        user_email='test@user.gov.uk',
         user_name='Test User',
-        tags=['notify_action', 'notify_branding'],
+        user_email='test@user.gov.uk',
+        org_id=organisation_id,
+        org_type='central',
+        service_id=SERVICE_ONE_ID
     )
+    mock_send_ticket_to_zendesk.assert_called_once()
     assert normalize_spaces(page.select_one('.banner-default').text) == (
         'Thanks for your branding request. We’ll get back to you '
         'within one working day.'
@@ -5208,7 +5218,7 @@ def test_submit_letter_branding_request_redirects_if_from_template_is_set(
     branding_type,
 
 ):
-    mocker.patch('app.main.views.service_settings.zendesk_client.create_ticket', autospec=True)
+    mocker.patch('app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk', autospec=True)
     data = {'options': 'something_else', 'something_else': 'Homer Simpson'}
 
     if from_template:
@@ -5240,8 +5250,9 @@ def test_submit_branding_when_something_else_is_only_option(
     branding_type,
     current_branding,
 ):
-    zendesk = mocker.patch(
-        'app.main.views.service_settings.zendesk_client.create_ticket',
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
         autospec=True,
     )
 
@@ -5258,7 +5269,7 @@ def test_submit_branding_when_something_else_is_only_option(
         'Branding requested: Something else\n'
         '\n'
         'Homer Simpson'.format(current_branding)
-    ) in zendesk.call_args_list[0][1]['message']
+    ) in mock_create_ticket.call_args_list[0][1]['message']
 
 
 def test_service_settings_links_to_branding_request_page_for_letters(
