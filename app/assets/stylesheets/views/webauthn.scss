@@ -26,15 +26,15 @@
 
 .webauthn-illustration {
 
-  @include govuk-media-query($from: tablet) {
-    margin: govuk-spacing(9) auto 0 auto;
-    padding: 0;
-  }
-
   box-sizing: border-box;
   width: 100%;
   height: 100%;
   margin: govuk-spacing(6) auto 0 auto;
   padding: 0 govuk-spacing(9) 0 govuk-spacing(9);
+
+  @include govuk-media-query($from: tablet) {
+    margin: govuk-spacing(9) auto 0 auto;
+    padding: 0;
+  }
 
 }
