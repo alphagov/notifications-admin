@@ -13,9 +13,11 @@ from app.utils.login import (
     log_in_user,
     redirect_to_sign_in,
 )
+from app.utils.user import user_is_logged_in
 
 
 @main.route('/webauthn/register')
+@user_is_logged_in
 def webauthn_begin_register():
     if not current_user.can_use_webauthn:
         abort(403)
@@ -38,6 +40,7 @@ def webauthn_begin_register():
 
 
 @main.route('/webauthn/register', methods=['POST'])
+@user_is_logged_in
 def webauthn_complete_register():
     if 'webauthn_registration_state' not in session:
         return cbor.encode("No registration in progress"), 400
