@@ -11,12 +11,13 @@
 {% block content_column_content %}
 
   <h1 class="heading-large">Pricing</h1>
-  <p class="govuk-body">To use GOV.UK Notify, there’s:</p>
+  <p class="govuk-body">GOV.UK Notify is free to use unless you:</p>
   <ul class="list list-bullet">
-    <li>no monthly charge</li>
-    <li>no setup fee</li>
-    <li>no procurement cost</li>
+    <li>exceed your <a class="govuk-link govuk-link--no-visited-state" href="#text-messages">free text message allowance</a></li>
+    <li>send <a class="govuk-link govuk-link--no-visited-state" href="#letters">letters</a></li>
   </ul>
+
+  <p class="govuk-body">You’ll only pay for the additional text messages or letters that you send. There’s no monthly charge, no setup fee and no procurement cost.</p>
 
   <p class="govuk-body">
     {% if not current_user.is_authenticated %}
