@@ -56,7 +56,7 @@ test: ## Run tests
 
 .PHONY: fix-imports
 fix-imports: ## Fix imports using isort
-	isort -rc ./app ./tests
+	isort ./app ./tests
 
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
