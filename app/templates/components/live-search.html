@@ -19,7 +19,7 @@
     {% if show %}
         <div class="live-search js-header" data-module="live-search" data-targets="{{ target_selector }}">
           {{ form.search(param_extensions=param_extensions) }}
-          <div role="region" aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
+          <div aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
         </div>
     {% endif %}
 {% endmacro %}
