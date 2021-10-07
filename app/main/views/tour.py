@@ -1,6 +1,6 @@
 from flask import abort, redirect, render_template, session
 
-from app import current_service, current_user, url_for
+from app import current_service, current_user, service_api_client, url_for
 from app.main import main
 from app.main.views.send import (
     all_placeholders_in_session,
@@ -148,4 +148,15 @@ def check_tour_notification(service_id, template_id):
         template=template,
         back_link=back_link,
         help='2',
+    )
+
+
+@main.route("/services/<uuid:service_id>/end-tour/<uuid:example_template_id>")
+@user_has_permissions('manage_templates')
+def go_to_dashboard_after_tour(service_id, example_template_id):
+
+    service_api_client.delete_service_template(service_id, example_template_id)
+
+    return redirect(
+        url_for('main.service_dashboard', service_id=service_id)
     )

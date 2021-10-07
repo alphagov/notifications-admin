@@ -815,17 +815,6 @@ def start_job(service_id, upload_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/end-tour/<uuid:example_template_id>")
-@user_has_permissions('manage_templates')
-def go_to_dashboard_after_tour(service_id, example_template_id):
-
-    service_api_client.delete_service_template(service_id, example_template_id)
-
-    return redirect(
-        url_for('main.service_dashboard', service_id=service_id)
-    )
-
-
 def fields_to_fill_in(template, prefill_current_user=False):
 
     if 'letter' == template.template_type:
