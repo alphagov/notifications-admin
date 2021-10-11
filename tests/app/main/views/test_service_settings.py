@@ -1896,7 +1896,7 @@ def test_request_to_go_live_displays_mou_signatories(
         '\n'
         '---\n'
         'Organisation type: Central government\n'
-        'Agreement signed: Yes, on behalf of Org 1.\n'
+        'Agreement signed: Yes, for Org 1.\n'
         'Agreement signed by: test@user.gov.uk\n'
         'Agreement signed on behalf of: bigdog@example.gov.uk\n'
         '\n'
