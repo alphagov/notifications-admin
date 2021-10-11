@@ -1,0 +1,18 @@
+Service: {{ current_service.name }}
+{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+
+---
+Organisation type: {{ current_service.organisation_type_label }}
+Agreement signed: {{ current_service.organisation.as_agreement_statement_for_go_live_request(current_user.email_domain) }}
+
+Emails in next year: {{ current_service.volume_email|format_thousands }}
+Text messages in next year: {{ current_service.volume_sms|format_thousands }}
+Letters in next year: {{ current_service.volume_letter|format_thousands }}
+
+Consent to research: {{ "Yes" if current_service.consent_to_research else "No" }}
+Other live services for that user: {{ "Yes" if current_user.live_services else "No" }}
+
+Service reply-to address: {{ current_service.default_email_reply_to_address or "not set" }}
+
+---
+Request sent by {{ current_user.email_address }}
