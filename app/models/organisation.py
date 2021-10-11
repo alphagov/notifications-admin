@@ -204,6 +204,12 @@ class Organisation(JSONModel):
                 self.letter_branding_id
             )
 
+    @cached_property
+    def agreement_signed_by(self):
+        if self.agreement_signed_by_id:
+            from app.models.user import User
+            return User.from_id(self.agreement_signed_by_id)
+
     def update(self, delete_services_cache=False, **kwargs):
         response = organisations_client.update_organisation(
             self.id,

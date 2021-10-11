@@ -4,6 +4,12 @@ Service: {{ current_service.name }}
 ---
 Organisation type: {{ current_service.organisation_type_label }}
 Agreement signed: {{ current_service.organisation.as_agreement_statement_for_go_live_request(current_user.email_domain) }}
+{%- if current_service.organisation.agreement_signed_by %}
+Agreement signed by: {{ current_service.organisation.agreement_signed_by.email_address }}
+{% endif -%}
+{%- if current_service.organisation.agreement_signed_on_behalf_of_email_address -%}
+Agreement signed on behalf of: {{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}
+{%- endif %}
 
 Emails in next year: {{ current_service.volume_email|format_thousands }}
 Text messages in next year: {{ current_service.volume_sms|format_thousands }}
