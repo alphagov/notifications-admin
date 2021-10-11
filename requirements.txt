@@ -29,7 +29,7 @@ cachetools==4.2.4
     # via notifications-utils
 certifi==2021.10.8
     # via requests
-cffi==1.14.5
+cffi==1.14.6
     # via cryptography
 chardet==4.0.0
     # via requests
