@@ -518,3 +518,7 @@ def format_mobile_network(network):
 
 def format_billions(count):
     return humanize.intword(count)
+
+
+def format_yes_no(value):
+    return 'Yes' if value else 'No'

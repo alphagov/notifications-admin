@@ -9,8 +9,8 @@ Emails in next year: {{ current_service.volume_email|format_thousands }}
 Text messages in next year: {{ current_service.volume_sms|format_thousands }}
 Letters in next year: {{ current_service.volume_letter|format_thousands }}
 
-Consent to research: {{ "Yes" if current_service.consent_to_research else "No" }}
-Other live services for that user: {{ "Yes" if current_user.live_services else "No" }}
+Consent to research: {{ current_service.consent_to_research|format_yes_no }}
+Other live services for that user: {{ current_user.live_services|format_yes_no }}
 
 Service reply-to address: {{ current_service.default_email_reply_to_address or "not set" }}
 
