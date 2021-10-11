@@ -520,5 +520,7 @@ def format_billions(count):
     return humanize.intword(count)
 
 
-def format_yes_no(value):
-    return 'Yes' if value else 'No'
+def format_yes_no(value, yes='Yes', no='No', none='No'):
+    if value is None:
+        return none
+    return yes if value else no

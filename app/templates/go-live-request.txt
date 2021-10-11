@@ -5,7 +5,7 @@ Service: {{ current_service.name }}
 Organisation type: {{ current_service.organisation_type_label }}
 Agreement signed:
 {%- if current_service.organisation.agreement_signed %} Yes, on behalf of {{ current_service.organisation.name }}.
-{%- elif current_service.organisation.name %} {{ current_service.organisation.as_agreement_statement_for_go_live_request }}
+{%- elif current_service.organisation.name %} {{ current_service.organisation.agreement_signed|format_yes_no(none='Can’t tell') }} (organisation is {{ current_service.organisation.name }}, {{ current_service.organisation.crown|format_yes_no(yes='a crown body', no='a non-crown body', none='crown status unknown') }}).
 {%- else %} Can’t tell (domain is {{ current_user.email_domain }}).
 {%- endif %}
 {%- if current_service.organisation.request_to_go_live_notes %} {{ current_service.organisation.request_to_go_live_notes }}{% endif %}
