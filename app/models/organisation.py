@@ -103,9 +103,9 @@ class Organisation(JSONModel):
 
     def as_agreement_statement_for_go_live_request(self, fallback_domain):
         if self.agreement_signed:
-            agreement_statement = 'Yes, on behalf of {}.'.format(self.name)
-        elif self.name:
-            agreement_statement = '{} (organisation is {}, {}).'.format(
+            return 'Yes, on behalf of {}.'.format(self.name)
+        if self.name:
+            return '{} (organisation is {}, {}).'.format(
                 {
                     False: 'No',
                     None: 'Can’t tell',
@@ -117,13 +117,7 @@ class Organisation(JSONModel):
                     None: 'crown status unknown',
                 }.get(self.crown),
             )
-        else:
-            agreement_statement = 'Can’t tell (domain is {}).'.format(fallback_domain)
-
-        if self.request_to_go_live_notes:
-            agreement_statement = agreement_statement + ' ' + self.request_to_go_live_notes
-
-        return agreement_statement
+        return 'Can’t tell (domain is {}).'.format(fallback_domain)
 
     def as_info_for_branding_request(self, fallback_domain):
         return self.name or 'Can’t tell (domain is {})'.format(fallback_domain)
