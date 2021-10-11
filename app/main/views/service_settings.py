@@ -232,7 +232,7 @@ def submit_request_to_go_live(service_id):
         ).format(
             service_name=current_service.name,
             service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
-            organisation_type=str(current_service.organisation_type).title(),
+            organisation_type=current_service.organisation_type_label,
             agreement=current_service.organisation.as_agreement_statement_for_go_live_request(
                 current_user.email_domain
             ),
