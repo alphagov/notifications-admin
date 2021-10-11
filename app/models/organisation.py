@@ -101,21 +101,20 @@ class Organisation(JSONModel):
             self.request_to_go_live_notes = None
             self.email_branding_id = None
 
-    def as_agreement_statement_for_go_live_request(self, fallback_domain):
-        if self.name:
-            return '{} (organisation is {}, {}).'.format(
-                {
-                    False: 'No',
-                    None: 'Can’t tell',
-                }.get(self.agreement_signed),
-                self.name,
-                {
-                    True: 'a crown body',
-                    False: 'a non-crown body',
-                    None: 'crown status unknown',
-                }.get(self.crown),
-            )
-        return 'Can’t tell (domain is {}).'.format(fallback_domain)
+    @property
+    def as_agreement_statement_for_go_live_request(self):
+        return '{} (organisation is {}, {}).'.format(
+            {
+                False: 'No',
+                None: 'Can’t tell',
+            }.get(self.agreement_signed),
+            self.name,
+            {
+                True: 'a crown body',
+                False: 'a non-crown body',
+                None: 'crown status unknown',
+            }.get(self.crown),
+        )
 
     def as_info_for_branding_request(self, fallback_domain):
         return self.name or 'Can’t tell (domain is {})'.format(fallback_domain)

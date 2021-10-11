@@ -3,10 +3,10 @@ Service: {{ current_service.name }}
 
 ---
 Organisation type: {{ current_service.organisation_type_label }}
-{% if current_service.organisation.agreement_signed -%}
-Agreement signed: Yes, on behalf of {{ current_service.organisation.name }}.
-{%- else -%}
-Agreement signed: {{ current_service.organisation.as_agreement_statement_for_go_live_request(current_user.email_domain) }}
+Agreement signed:
+{%- if current_service.organisation.agreement_signed %} Yes, on behalf of {{ current_service.organisation.name }}.
+{%- elif current_service.organisation.name %} {{ current_service.organisation.as_agreement_statement_for_go_live_request }}
+{%- else %} Can’t tell (domain is {{ current_user.email_domain }}).
 {%- endif %}
 {%- if current_service.organisation.request_to_go_live_notes %} {{ current_service.organisation.request_to_go_live_notes }}{% endif %}
 {%- if current_service.organisation.agreement_signed_by %}
