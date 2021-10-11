@@ -102,8 +102,6 @@ class Organisation(JSONModel):
             self.email_branding_id = None
 
     def as_agreement_statement_for_go_live_request(self, fallback_domain):
-        if self.agreement_signed:
-            return 'Yes, on behalf of {}.'.format(self.name)
         if self.name:
             return '{} (organisation is {}, {}).'.format(
                 {
