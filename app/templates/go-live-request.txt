@@ -1,29 +1,33 @@
-Service: {{ current_service.name }}
-{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+{% set service = current_service -%}
+{% set organisation = service.organisation -%}
+{% set user = current_user -%}
+
+Service: {{ service.name }}
+{{ url_for('main.service_dashboard', service_id=service.id, _external=True) }}
 
 ---
-Organisation type: {{ current_service.organisation_type_label }}
-Agreement signed: {{ current_service.organisation.agreement_signed|format_yes_no(none='Can’t tell') }}
-{%- if current_service.organisation.agreement_signed %}, on behalf of {{ current_service.organisation.name }}
-{%- elif current_service.organisation.name %} (organisation is {{ current_service.organisation.name }}, {{ current_service.organisation.crown|format_yes_no(yes='a crown body', no='a non-crown body', none='crown status unknown') }})
-{%- else %} (domain is {{ current_user.email_domain }})
+Organisation type: {{ service.organisation_type_label }}
+Agreement signed: {{ organisation.agreement_signed|format_yes_no(none='Can’t tell') }}
+{%- if organisation.agreement_signed %}, on behalf of {{ current_service.organisation.name }}
+{%- elif organisation.name %} (organisation is {{ organisation.name }}, {{ organisation.crown|format_yes_no(yes='a crown body', no='a non-crown body', none='crown status unknown') }})
+{%- else %} (domain is {{ user.email_domain }})
 {%- endif %}.
-{%- if current_service.organisation.request_to_go_live_notes %} {{ current_service.organisation.request_to_go_live_notes }}{% endif %}
-{%- if current_service.organisation.agreement_signed_by %}
-Agreement signed by: {{ current_service.organisation.agreement_signed_by.email_address }}
+{%- if organisation.request_to_go_live_notes %} {{ organisation.request_to_go_live_notes }}{% endif %}
+{%- if organisation.agreement_signed_by %}
+Agreement signed by: {{ organisation.agreement_signed_by.email_address }}
 {% endif -%}
-{%- if current_service.organisation.agreement_signed_on_behalf_of_email_address -%}
-Agreement signed on behalf of: {{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}
+{%- if organisation.agreement_signed_on_behalf_of_email_address -%}
+Agreement signed on behalf of: {{ organisation.agreement_signed_on_behalf_of_email_address }}
 {%- endif %}
 
-Emails in next year: {{ current_service.volume_email|format_thousands }}
-Text messages in next year: {{ current_service.volume_sms|format_thousands }}
-Letters in next year: {{ current_service.volume_letter|format_thousands }}
+Emails in next year: {{ service.volume_email|format_thousands }}
+Text messages in next year: {{ service.volume_sms|format_thousands }}
+Letters in next year: {{ service.volume_letter|format_thousands }}
 
-Consent to research: {{ current_service.consent_to_research|format_yes_no }}
-Other live services for that user: {{ current_user.live_services|format_yes_no }}
+Consent to research: {{ service.consent_to_research|format_yes_no }}
+Other live services for that user: {{ user.live_services|format_yes_no }}
 
-Service reply-to address: {{ current_service.default_email_reply_to_address or "not set" }}
+Service reply-to address: {{ service.default_email_reply_to_address or "not set" }}
 
 ---
 Request sent by {{ current_user.email_address }}
