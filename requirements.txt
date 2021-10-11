@@ -41,6 +41,8 @@ cryptography==3.3.2
     # via
     #   -r requirements.in
     #   fido2
+dataclasses==0.8
+    # via werkzeug
 dnspython==1.16.0
     # via eventlet
 docopt==0.6.2
@@ -216,8 +218,10 @@ urllib3==1.26.5
     #   requests
 webencodings==0.5.1
     # via bleach
-werkzeug==1.0.1
-    # via flask
+werkzeug==2.0.2
+    # via
+    #   -r requirements.in
+    #   flask
 wtforms==2.3.3
     # via flask-wtf
 xlrd==1.2.0

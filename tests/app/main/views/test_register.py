@@ -2,9 +2,9 @@ from unittest.mock import ANY
 
 import pytest
 from bs4 import BeautifulSoup
-from flask import session, url_for
-from flask_login import current_user
+from flask import url_for
 
+from app.models.user import User
 from tests.conftest import normalize_spaces
 
 
@@ -145,7 +145,8 @@ def test_should_add_user_details_to_session(
         },
     )
     assert response.status_code == 302
-    assert session['user_details']['email'] == email_address
+    with client.session_transaction() as session:
+        assert session['user_details']['email'] == email_address
 
 
 def test_should_return_200_if_password_is_on_list_of_commonly_used_passwords(
@@ -334,11 +335,11 @@ def test_register_from_email_auth_invite(
     fake_uuid,
     mocker,
 ):
+    mock_login_user = mocker.patch('app.models.user.login_user')
     sample_invite['auth_type'] = 'email_auth'
     sample_invite['email_address'] = invite_email_address
     with client.session_transaction() as session:
         session['invited_user_id'] = sample_invite['id']
-    assert not current_user.is_authenticated
 
     data = {
         'name': 'invited user',
@@ -367,9 +368,18 @@ def test_register_from_email_auth_invite(
     # this is actually called twice, at the beginning of the function and then by the activate_user function
     mock_get_invited_user_by_id.assert_called_with(sample_invite['id'])
     mock_accept_invite.assert_called_once_with(sample_invite['service'], sample_invite['id'])
+
     # just logs them in
-    assert current_user.is_authenticated
-    assert mock_add_user_to_service.called
+    mock_login_user.assert_called_once_with(User({
+        'id': fake_uuid,  # This ID matches the return value of mock_register_user
+        'platform_admin': False
+    }))
+    mock_add_user_to_service.assert_called_once_with(
+        sample_invite['service'],
+        fake_uuid,  # This ID matches the return value of mock_register_user
+        {'manage_api_keys', 'manage_service', 'send_messages', 'view_activity'},
+        [],
+    )
 
     with client.session_transaction() as session:
         # invited user details are still there so they can get added to the service

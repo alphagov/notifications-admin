@@ -1,5 +1,5 @@
 import pytest
-from flask import session, url_for
+from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
@@ -170,7 +170,8 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         ),
         101,
     )
-    assert session['service_id'] == 101
+    with client_request.session_transaction() as session:
+        assert session['service_id'] == 101
 
 
 def test_add_service_has_to_choose_org_type(
@@ -283,7 +284,8 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
         email_from='testing.the.post',
     )
     assert len(mock_create_service_template.call_args_list) == 0
-    assert session['service_id'] == 101
+    with client_request.session_transaction() as session:
+        assert session['service_id'] == 101
 
 
 @pytest.mark.parametrize('name, error_message', [
