@@ -340,6 +340,8 @@ def test_register_from_email_auth_invite(
     sample_invite['email_address'] = invite_email_address
     with client.session_transaction() as session:
         session['invited_user_id'] = sample_invite['id']
+        # Prove that the user isn’t already signed in
+        assert 'user_id' not in session
 
     data = {
         'name': 'invited user',
@@ -382,6 +384,8 @@ def test_register_from_email_auth_invite(
     )
 
     with client.session_transaction() as session:
+        # The user is signed in
+        assert 'user_id' in session
         # invited user details are still there so they can get added to the service
         assert session['invited_user_id'] == sample_invite['id']
 
