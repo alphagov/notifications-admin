@@ -209,7 +209,7 @@ def request_to_go_live(service_id):
 @user_has_permissions('manage_service')
 @user_is_gov_user
 def submit_request_to_go_live(service_id):
-    ticket_message = render_template('go-live-request.txt') + '\n'
+    ticket_message = render_template('support-tickets/go-live-request.txt') + '\n'
 
     ticket = NotifySupportTicket(
         subject=f'Request to go live - {current_service.name}',
