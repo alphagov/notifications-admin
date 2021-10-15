@@ -1736,7 +1736,7 @@ def test_should_redirect_after_request_to_go_live(
         'http://localhost/services/{service_id}\n'
         '\n'
         '---\n'
-        'Organisation type: Central\n'
+        'Organisation type: Central government\n'
         'Agreement signed: Can’t tell (domain is user.gov.uk).\n'
         '\n'
         '{formatted_displayed_volumes}'
@@ -1819,7 +1819,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         'http://localhost/services/{service_id}\n'
         '\n'
         '---\n'
-        'Organisation type: Central\n'
+        'Organisation type: Central government\n'
         'Agreement signed: No (organisation is Org 1, a crown body). {go_live_note}\n'
         '\n'
         'Emails in next year: 111,111\n'
@@ -1851,6 +1851,53 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         service_id=SERVICE_ONE_ID
     )
     mock_send_ticket_to_zendesk.assert_called_once()
+
+
+def test_request_to_go_live_displays_mou_signatories(
+    client_request,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_organisations_and_services_for_user,
+    single_sms_sender,
+    mock_get_service_organisation,
+    mock_get_service_settings_page_common,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    mock_update_service,
+    mock_get_invites_without_manage_permission,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            ORGANISATION_ID,
+            'Org 1',
+            agreement_signed=True,
+            agreement_signed_by_id=fake_uuid,
+            agreement_signed_on_behalf_of_email_address='bigdog@example.gov.uk',
+        )
+    )
+    mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        autospec=True,
+    )
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    client_request.post(
+        'main.request_to_go_live',
+        service_id=SERVICE_ONE_ID,
+        _follow_redirects=True
+    )
+
+    assert (
+        'Organisation type: Central government\n'
+        'Agreement signed: Yes, for Org 1.\n'
+        'Agreement signed by: test@user.gov.uk\n'
+        'Agreement signed on behalf of: bigdog@example.gov.uk\n'
+        '\n'
+        'Emails in next year: 111,111\n'
+    ) in mock_create_ticket.call_args[1]['message']
 
 
 def test_should_be_able_to_request_to_go_live_with_no_organisation(

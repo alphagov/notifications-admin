@@ -101,30 +101,6 @@ class Organisation(JSONModel):
             self.request_to_go_live_notes = None
             self.email_branding_id = None
 
-    def as_agreement_statement_for_go_live_request(self, fallback_domain):
-        if self.agreement_signed:
-            agreement_statement = 'Yes, on behalf of {}.'.format(self.name)
-        elif self.name:
-            agreement_statement = '{} (organisation is {}, {}).'.format(
-                {
-                    False: 'No',
-                    None: 'Can’t tell',
-                }.get(self.agreement_signed),
-                self.name,
-                {
-                    True: 'a crown body',
-                    False: 'a non-crown body',
-                    None: 'crown status unknown',
-                }.get(self.crown),
-            )
-        else:
-            agreement_statement = 'Can’t tell (domain is {}).'.format(fallback_domain)
-
-        if self.request_to_go_live_notes:
-            agreement_statement = agreement_statement + ' ' + self.request_to_go_live_notes
-
-        return agreement_statement
-
     def as_info_for_branding_request(self, fallback_domain):
         return self.name or 'Can’t tell (domain is {})'.format(fallback_domain)
 
@@ -203,6 +179,12 @@ class Organisation(JSONModel):
             return letter_branding_client.get_letter_branding(
                 self.letter_branding_id
             )
+
+    @cached_property
+    def agreement_signed_by(self):
+        if self.agreement_signed_by_id:
+            from app.models.user import User
+            return User.from_id(self.agreement_signed_by_id)
 
     def update(self, delete_services_cache=False, **kwargs):
         response = organisations_client.update_organisation(

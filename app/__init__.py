@@ -62,6 +62,7 @@ from app.formatters import (
     format_number_in_pounds_as_currency,
     format_thousands,
     format_time,
+    format_yes_no,
     id_safe,
     iteration_count,
     linkable_name,
@@ -567,6 +568,7 @@ def add_template_filters(application):
         message_count,
         message_count_noun,
         format_mobile_network,
+        format_yes_no,
     ]:
         application.add_template_filter(fn)
 

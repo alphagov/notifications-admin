@@ -23,7 +23,6 @@ from app import (
     billing_api_client,
     current_service,
     email_branding_client,
-    format_thousands,
     inbound_number_client,
     letter_branding_client,
     notification_api_client,
@@ -210,40 +209,7 @@ def request_to_go_live(service_id):
 @user_has_permissions('manage_service')
 @user_is_gov_user
 def submit_request_to_go_live(service_id):
-    ticket_message = (
-            'Service: {service_name}\n'
-            '{service_dashboard}\n'
-            '\n---'
-            '\nOrganisation type: {organisation_type}'
-            '\nAgreement signed: {agreement}'
-            '\n'
-            '\nEmails in next year: {volume_email_formatted}'
-            '\nText messages in next year: {volume_sms_formatted}'
-            '\nLetters in next year: {volume_letter_formatted}'
-            '\n'
-            '\nConsent to research: {research_consent}'
-            '\nOther live services for that user: {existing_live}'
-            '\n'
-            '\nService reply-to address: {email_reply_to}'
-            '\n'
-            '\n---'
-            '\nRequest sent by {email_address}'
-            '\n'
-        ).format(
-            service_name=current_service.name,
-            service_dashboard=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
-            organisation_type=str(current_service.organisation_type).title(),
-            agreement=current_service.organisation.as_agreement_statement_for_go_live_request(
-                current_user.email_domain
-            ),
-            volume_email_formatted=format_thousands(current_service.volume_email),
-            volume_sms_formatted=format_thousands(current_service.volume_sms),
-            volume_letter_formatted=format_thousands(current_service.volume_letter),
-            research_consent='Yes' if current_service.consent_to_research else 'No',
-            existing_live='Yes' if current_user.live_services else 'No',
-            email_address=current_user.email_address,
-            email_reply_to=current_service.default_email_reply_to_address or 'not set',
-        )
+    ticket_message = render_template('support-tickets/go-live-request.txt') + '\n'
 
     ticket = NotifySupportTicket(
         subject=f'Request to go live - {current_service.name}',
