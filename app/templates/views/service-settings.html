@@ -331,7 +331,7 @@
 
           {% call row() %}
             {{ text_field('Count in list of live services')}}
-            {{ text_field('Yes' if current_service.count_as_live else 'No') }}
+            {{ text_field(current_service.count_as_live|format_yes_no) }}
             {{ edit_field('Change', url_for('.service_switch_count_as_live', service_id=current_service.id), suffix='if service is counted in list of live services') }}
           {% endcall %}
           {% call row() %}
