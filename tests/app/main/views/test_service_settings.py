@@ -1890,28 +1890,14 @@ def test_request_to_go_live_displays_mou_signatories(
         _follow_redirects=True
     )
 
-    assert mock_create_ticket.call_args[1]['message'] == (
-        'Service: service one\n'
-        f'http://localhost/services/{SERVICE_ONE_ID}\n'
-        '\n'
-        '---\n'
+    assert (
         'Organisation type: Central government\n'
         'Agreement signed: Yes, for Org 1.\n'
         'Agreement signed by: test@user.gov.uk\n'
         'Agreement signed on behalf of: bigdog@example.gov.uk\n'
         '\n'
         'Emails in next year: 111,111\n'
-        'Text messages in next year: 222,222\n'
-        'Letters in next year: 333,333\n'
-        '\n'
-        'Consent to research: Yes\n'
-        'Other live services for that user: No\n'
-        '\n'
-        'Service reply-to address: test@example.com\n'
-        '\n'
-        '---\n'
-        'Request sent by test@user.gov.uk\n'
-    )
+    ) in mock_create_ticket.call_args[1]['message']
 
 
 def test_should_be_able_to_request_to_go_live_with_no_organisation(
