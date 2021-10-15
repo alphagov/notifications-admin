@@ -154,6 +154,8 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 // Map attribution links
 .leaflet-control-attribution {
   & a {
+    text-decoration: underline;
+
     &:focus {
       // Link focus is shown by a change in background colour.
       // When colours are overridden, for example when users have Windows high
@@ -163,11 +165,6 @@ $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
       color: $govuk-focus-text-colour;
       background: $govuk-focus-colour;
       box-shadow: 0 -2px $govuk-focus-colour, 0 4px $govuk-focus-text-colour;
-    }
-
-    // use an extra prefix class to override LeafletJS CSS
-    .leaflet-bottom &:hover {
-      text-decoration: none;
     }
   }
 }
