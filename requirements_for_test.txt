@@ -1,13 +1,13 @@
 -r requirements.txt
-isort==5.8.0
-pytest==6.2.4
+isort==5.9.3
+pytest==6.2.5
 pytest-env==0.6.2
 pytest-mock==3.6.1
-pytest-xdist==2.2.1
-beautifulsoup4==4.9.3
+pytest-xdist==2.4.0
+beautifulsoup4==4.10.0
 freezegun==1.1.0
-flake8==3.9.2
-flake8-bugbear==21.4.3
+flake8==4.0.1
+flake8-bugbear==21.9.2
 flake8-print==4.0.0
 requests-mock==1.9.3
 # used for creating manifest file locally
