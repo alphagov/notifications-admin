@@ -43,7 +43,7 @@ cryptography==35.0.0
     #   fido2
 dataclasses==0.8
     # via werkzeug
-dnspython==1.16.0
+dnspython==2.1.0
     # via eventlet
 docopt==0.6.2
     # via notifications-python-client
