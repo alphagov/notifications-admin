@@ -153,7 +153,7 @@ pyexcel-io==0.6.5
     #   pyexcel-xlsx
 pyexcel-ods3==0.6.0
     # via -r requirements.in
-pyexcel-xls==0.6.2
+pyexcel-xls==0.7.0
     # via -r requirements.in
 pyexcel-xlsx==0.6.0
     # via -r requirements.in
