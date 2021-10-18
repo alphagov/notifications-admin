@@ -144,7 +144,7 @@ pyexcel==0.6.7
     # via -r requirements.in
 pyexcel-ezodf==0.3.4
     # via pyexcel-ods3
-pyexcel-io==0.6.4
+pyexcel-io==0.6.5
     # via
     #   -r requirements.in
     #   pyexcel
