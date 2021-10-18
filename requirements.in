@@ -11,7 +11,7 @@ werkzeug==2.0.2
 
 blinker==1.4
 pyexcel==0.6.7
-pyexcel-io==0.6.4
+pyexcel-io==0.6.5
 pyexcel-xls==0.6.2
 pyexcel-xlsx==0.6.0
 pyexcel-ods3==0.6.0
