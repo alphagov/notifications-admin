@@ -712,8 +712,10 @@ def test_write_new_broadcast_page(
     assert form['method'] == 'post'
     assert 'action' not in form
 
+    assert normalize_spaces(page.select_one('label[for=name]').text) == 'Reference'
     assert page.select_one('input[type=text]')['name'] == 'name'
 
+    assert normalize_spaces(page.select_one('label[for=template_content]').text) == 'Message'
     assert page.select_one('textarea')['name'] == 'template_content'
     assert page.select_one('textarea')['data-module'] == 'enhanced-textbox'
     assert page.select_one('textarea')['data-highlight-placeholders'] == 'false'
