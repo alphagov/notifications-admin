@@ -49,11 +49,11 @@
 
       this.$textbox
         .attr(
-          'aria-described-by',
+          'aria-describedby',
           (
-            this.$textbox.attr('aria-described-by') || ''
+            this.$textbox.attr('aria-describedby') || ''
           ) + (
-            this.$textbox.attr('aria-described-by') ? ' ' : ''
+            this.$textbox.attr('aria-describedby') ? ' ' : ''
           ) + id
         )
         .on('input', throttle(this.update, 150))

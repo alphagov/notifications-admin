@@ -923,7 +923,7 @@ def test_preview_broadcast_areas_page(
 
     assert [
         normalize_spaces(item.text)
-        for item in page.select('ul li.area-list-key')
+        for item in page.select('.area-list-key')
     ] == estimates
 
 
@@ -998,7 +998,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
 
     assert [
         normalize_spaces(item.text)
-        for item in page.select('ul li.area-list-key')
+        for item in page.select('.area-list-key')
     ] == expected_list_items
 
 

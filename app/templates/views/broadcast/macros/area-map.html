@@ -1,15 +1,14 @@
 {% macro map(broadcast_message) %}
   <div id="area-list-map"></div>
-  <ul>
-    <li class="area-list-key area-list-key--certain">
+    <p class="area-list-key area-list-key--certain">
       <span class="visually-hidden">
         An area of {{ (broadcast_message.simple_polygons.estimated_area)|round_to_significant_figures(1)|format_thousands }} square miles
       </span>
       Will get
       <span class="visually-hidden">the</span>
       alert
-    </li>
-    <li class="area-list-key area-list-key--likely">
+    </p>
+    <p class="area-list-key area-list-key--likely">
       <span class="visually-hidden">
         An extra area of {{ (broadcast_message.simple_polygons_with_bleed.estimated_area - broadcast_message.simple_polygons.estimated_area)|round_to_significant_figures(1)|format_thousands }} square miles is
       </span>
@@ -18,8 +17,8 @@
         the
       </span>
       alert
-    </li>
-    <li class="area-list-key area-list-key--phone-estimate">
+    </p>
+    <p class="area-list-key area-list-key--phone-estimate">
       {% if broadcast_message.count_of_phones == 0 %}
         Unknown number of phones
       {% elif broadcast_message.count_of_phones == broadcast_message.count_of_phones_likely %}
@@ -27,6 +26,5 @@
       {% else %}
         {{ broadcast_message.count_of_phones|format_thousands }} to {{ broadcast_message.count_of_phones_likely|format_thousands }} phones
       {% endif %}
-    </li>
-  </ul>
+    </p>
 {% endmacro %}

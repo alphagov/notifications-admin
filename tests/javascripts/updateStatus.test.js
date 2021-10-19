@@ -46,7 +46,7 @@ describe('Update content', () => {
         <input type="hidden" name="csrf_token" value="abc123" />
         <label for="template_content" id="template-content-label">Template content<label>
         <span id="example-hint-text">Example hint text</span>
-        <textarea name="template_content" id="template_content" aria-described-by="example-hint-text">Content of message</textarea>
+        <textarea name="template_content" id="template_content" aria-describedby="example-hint-text">Content of message</textarea>
       </form>
       <div data-module="update-status" data-updates-url="${updatesURL}" data-target="template_content">
         Initial content
@@ -78,21 +78,21 @@ describe('Update content', () => {
     );
 
     expect(
-      document.getElementById('template_content').getAttribute('aria-described-by')
+      document.getElementById('template_content').getAttribute('aria-describedby')
     ).toEqual(
       "example-hint-text update-status"
     );
 
   });
 
-  test("It should handle a textarea without an aria-described-by attribute", () => {
+  test("It should handle a textarea without an aria-describedby attribute", () => {
 
-    document.getElementById('template_content').removeAttribute('aria-described-by');
+    document.getElementById('template_content').removeAttribute('aria-describedby');
 
     window.GOVUK.modules.start();
 
     expect(
-      document.getElementById('template_content').getAttribute('aria-described-by')
+      document.getElementById('template_content').getAttribute('aria-describedby')
     ).toEqual(
       "update-status"
     );
