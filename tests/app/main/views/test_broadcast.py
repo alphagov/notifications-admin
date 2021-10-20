@@ -1811,12 +1811,19 @@ def test_view_broadcast_message_shows_correct_highlighted_navigation(
     )
 
 
+@pytest.mark.parametrize('extra_broadcast_json_fields', (
+    # These should be ignored for broadcasts with a template
+    {'reference': 'foo'},
+    {'cap_event': 'bar'},
+    {},
+))
 def test_view_pending_broadcast(
     mocker,
     client_request,
     service_one,
     fake_uuid,
     active_user_approve_broadcasts_permission,
+    extra_broadcast_json_fields,
 ):
     broadcast_creator = create_active_user_create_broadcasts_permissions(with_unique_id=True)
     mocker.patch(
@@ -1828,6 +1835,7 @@ def test_view_pending_broadcast(
             created_by_id=broadcast_creator['id'],
             finishes_at=None,
             status='pending-approval',
+            **extra_broadcast_json_fields
         ),
     )
     client_request.login(active_user_approve_broadcasts_permission)
@@ -1866,12 +1874,31 @@ def test_view_pending_broadcast(
     )
 
 
+@pytest.mark.parametrize('extra_broadcast_json_fields, expected_banner_text', (
+    ({'reference': 'No template test'}, (
+        'Test User Create Broadcasts Permission wants to broadcast No template test '
+        'No phones will get this alert. '
+        'Start broadcasting now Reject this alert'
+    )),
+    ({'cap_event': 'No template test'}, (
+        'Test User Create Broadcasts Permission wants to broadcast No template test '
+        'No phones will get this alert. '
+        'Start broadcasting now Reject this alert'
+    )),
+    ({'cap_event': 'EVENT', 'reference': 'REFERENCE'}, (
+        'Test User Create Broadcasts Permission wants to broadcast EVENT '
+        'No phones will get this alert. '
+        'Start broadcasting now Reject this alert'
+    )),
+))
 def test_view_pending_broadcast_without_template(
     mocker,
     client_request,
     service_one,
     fake_uuid,
     active_user_approve_broadcasts_permission,
+    extra_broadcast_json_fields,
+    expected_banner_text,
 ):
     broadcast_creator = create_active_user_create_broadcasts_permissions(with_unique_id=True)
     mocker.patch(
@@ -1883,8 +1910,8 @@ def test_view_pending_broadcast_without_template(
             created_by_id=broadcast_creator['id'],
             finishes_at=None,
             status='pending-approval',
-            reference='No template test',
             content='Uh-oh',
+            **extra_broadcast_json_fields,
         ),
     )
     client_request.login(active_user_approve_broadcasts_permission)
@@ -1902,11 +1929,8 @@ def test_view_pending_broadcast_without_template(
 
     assert (
         normalize_spaces(page.select_one('.banner').text)
-    ) == (
-        'Test User Create Broadcasts Permission wants to broadcast No template test '
-        'No phones will get this alert. '
-        'Start broadcasting now Reject this alert'
-    )
+    ) == expected_banner_text
+
     assert (
         normalize_spaces(page.select_one('.broadcast-message-wrapper').text)
     ) == (

@@ -684,6 +684,7 @@ def broadcast_message_json(
     simple_polygons=None,
     content=None,
     reference=None,
+    cap_event=None,
     template_name='Example template',
 ):
     return {
@@ -696,6 +697,7 @@ def broadcast_message_json(
         'template_name': template_name,
         'content': content or 'This is a test',
         'reference': reference,
+        'cap_event': cap_event,
 
         'personalisation': {},
         'areas': areas or {

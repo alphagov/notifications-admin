@@ -162,7 +162,7 @@ class BroadcastMessage(JSONModel):
     def reference(self):
         if self.template_id:
             return self._dict['template_name']
-        return self._dict['reference']
+        return self._dict['cap_event'] or self._dict['reference']
 
     @property
     def template(self):
