@@ -32,7 +32,9 @@ certifi==2021.5.30
 cffi==1.14.5
     # via cryptography
 chardet==4.0.0
-    # via requests
+    # via
+    #   pyexcel
+    #   requests
 click==8.0.1
     # via flask
 colorama==0.4.3
@@ -83,7 +85,7 @@ greenlet==1.1.0
     # via eventlet
 gunicorn==20.1.0
     # via -r requirements.in
-humanize==3.6.0
+humanize==3.12.0
     # via -r requirements.in
 idna==2.10
     # via requests
@@ -91,6 +93,7 @@ importlib-metadata==4.2.0
     # via
     #   -r requirements.in
     #   click
+    #   humanize
 itsdangerous==1.1.0
     # via
     #   -r requirements.in
@@ -140,11 +143,11 @@ pyasn1==0.4.8
     # via rsa
 pycparser==2.20
     # via cffi
-pyexcel==0.6.6
+pyexcel==0.6.7
     # via -r requirements.in
 pyexcel-ezodf==0.3.4
     # via pyexcel-ods3
-pyexcel-io==0.6.4
+pyexcel-io==0.6.5
     # via
     #   -r requirements.in
     #   pyexcel
@@ -153,7 +156,7 @@ pyexcel-io==0.6.4
     #   pyexcel-xlsx
 pyexcel-ods3==0.6.0
     # via -r requirements.in
-pyexcel-xls==0.6.2
+pyexcel-xls==0.7.0
     # via -r requirements.in
 pyexcel-xlsx==0.6.0
     # via -r requirements.in
@@ -169,7 +172,7 @@ python-dateutil==2.8.1
     #   botocore
 python-json-logger==2.0.1
     # via notifications-utils
-pytz==2021.1
+pytz==2021.3
     # via
     #   -r requirements.in
     #   notifications-utils
