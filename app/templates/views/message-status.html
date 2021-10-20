@@ -36,7 +36,7 @@
       {% endfor %}
     {% endcall %}
   </div>
-  
+
   <h3 id="spam" class="heading-small">Spam</h3>
   <p class="govuk-body">If an email is marked as spam, Notify receives a ‘complaint’ from the email provider. We’ll contact you if we receive a complaint about any of your emails. When this happens you should remove the recipient’s email address from your list.</p>
 
@@ -55,7 +55,7 @@
         ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient for up to 72 hours. Notify is waiting for delivery information.'),
         ('Sent to an international number', 'The mobile networks in some countries do not provide any more delivery information.'),
         ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
-        ('Not delivered', 'The provider could not deliver the message. This can happen if the phone number was wrong or if the network operator rejects the message. If you’re sure that these phone numbers are correct, you should <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(".support") }}">contact us</a>. If not, you should remove them from your database. You’ll still be charged for text messages that cannot be delivered.'|safe),
+        ('Not delivered', ('The provider could not deliver the message. This can happen if the phone number was wrong or if the network operator rejects the message. If you’re sure that these phone numbers are correct, you should <a class="govuk-link govuk-link--no-visited-state" href="' + url_for(".support") + '">contact us</a>. If not, you should remove them from your database. You’ll still be charged for text messages that cannot be delivered.')|safe),
         ('Phone not accepting messages right now', 'The provider could not deliver the message. This can happen when the recipient’s phone is off, has no signal, or their text message inbox is full. You can try to send the message again. You’ll still be charged for text messages to phones that are not accepting messages.'),
         ('Technical failure', 'Your message was not sent because there was a problem between Notify and the provider. You’ll have to try sending your messages again. You will not be charged for text messages that are affected by a technical failure.'),
       ] %}
@@ -77,7 +77,7 @@
     ) %}
       {% for message_length, charge in [
         ('Sent', 'Notify has sent the letter to the provider to be printed.'),
-        ('Printed', 'The provider has printed the letter. Letters are printed at 5:30pm and dispatched the next working day.'), 
+        ('Printed', 'The provider has printed the letter. Letters are printed at 5:30pm and dispatched the next working day.'),
         ('Cancelled', 'Sending cancelled. Your letter will not be printed or dispatched.'),
         ('Technical failure', 'Notify had an unexpected error while sending the letter to our printing provider.'),
         ('Permanent failure', 'The provider cannot print the letter. Your letter will not be dispatched.')
