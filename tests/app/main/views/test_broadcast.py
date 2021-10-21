@@ -832,8 +832,8 @@ def test_broadcast_page(
         'ctry19-E92000001',
         'ctry19-S92000003',
     ], [
-        'England remove',
-        'Scotland remove',
+        'England Remove England',
+        'Scotland Remove Scotland',
     ], [
         'An area of 200,000 square miles Will get the alert',
         'An extra area of 8,000 square miles is Likely to get the alert',
@@ -846,11 +846,11 @@ def test_broadcast_page(
         'wd20-E05003228',
         'wd20-E05003229',
     ], [
-        'Penrith Carleton remove',
-        'Penrith East remove',
-        'Penrith Pategill remove',
-        'Penrith South remove',
-        'Penrith West remove',
+        'Penrith Carleton Remove Penrith Carleton',
+        'Penrith East Remove Penrith East',
+        'Penrith Pategill Remove Penrith Pategill',
+        'Penrith South Remove Penrith South',
+        'Penrith West Remove Penrith West',
     ], [
         'An area of 6 square miles Will get the alert',
         'An extra area of 20 square miles is Likely to get the alert',
@@ -859,7 +859,7 @@ def test_broadcast_page(
     ([
         'lad20-E09000019',
     ], [
-        'Islington remove',
+        'Islington Remove Islington',
     ], [
         'An area of 10 square miles Will get the alert',
         'An extra area of 5 square miles is Likely to get the alert',
@@ -868,7 +868,7 @@ def test_broadcast_page(
     ([
         'ctyua19-E10000019',
     ], [
-        'Lincolnshire remove',
+        'Lincolnshire Remove Lincolnshire',
     ], [
         'An area of 4,000 square miles Will get the alert',
         'An extra area of 700 square miles is Likely to get the alert',
@@ -878,7 +878,7 @@ def test_broadcast_page(
         'ctyua19-E10000019',
         'ctyua19-E10000023'
     ], [
-        'Lincolnshire remove', 'North Yorkshire remove',
+        'Lincolnshire Remove Lincolnshire', 'North Yorkshire Remove North Yorkshire',
     ], [
         'An area of 10,000 square miles Will get the alert',
         'An extra area of 2,000 square miles is Likely to get the alert',
@@ -991,7 +991,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         normalize_spaces(item.text)
         for item in page.select('ul.area-list li.area-list-item')
     ] == [
-        'Area one remove', 'Area two remove', 'Area three remove',
+        'Area one Remove Area one', 'Area two Remove Area two', 'Area three Remove Area three',
     ]
 
     assert len(page.select('#area-list-map')) == 1

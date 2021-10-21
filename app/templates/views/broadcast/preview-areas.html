@@ -30,7 +30,16 @@
       <ul class="area-list">
     {% endif %}
         <li class="area-list-item">
-          {{ area.name }} <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, area_slug=area.id) }}">remove</a>
+          {{ area.name }}
+          <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, area_slug=area.id) }}">
+            <svg id="area-list-item-remove__icon" width="12" height="12" viewbox="0 0 12 12" aria-labelledby="area__{{ loop.index }}" role="img" xmlns="http://www.w3.org/2000/svg"> <g>
+              <title id="area__{{ loop.index }}">Remove {{ area.name }}</title>
+              <g transform="rotate(45),translate(1, -7.5)">
+                <line stroke-width="2" id="svg_1" y2="0" x2="7.5" y1="15" x1="7.5" stroke="currentColor" fill="none"/>
+                <line stroke-width="2" id="svg_3" y2="7.5" x2="0" y1="7.5" x1="15" stroke="currentColor" fill="none"/>
+              </g>
+            </svg>
+          </a>
         </li>
     {% if loop.last %}
       </ul>
