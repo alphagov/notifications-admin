@@ -19,51 +19,58 @@
       right: -2px; // cover list-item border-right
       bottom: -2px; // cover list-item border-bottom
       width: 35px;
-      background: $govuk-blue;
-      color: $white;
-      box-shadow: -2px 0 0 0 $black, inset 1px 0 0 0 rgba($white, 0.1);
       padding: (govuk-spacing(1) + 1px) 0 govuk-spacing(1); 
       border: 2px solid $govuk-blue;
       border-left: none;
       text-align: center;
       text-decoration: none;
+      font-size: inherit; // counter govuk-button styles
+      line-height: inherit; // counter govuk-button styles
 
-      // The box-shadow that separates the remove link from the list item is hidden in
-      // high contrast mode. Remake using a border instead
-      @media (-ms-high-contrast: active), (forced-colors: active) {
-        & {
-          border-left: 2px solid $govuk-blue;
-        }
+      // set styles so they don't get overriden by govuk-button styles
+      &,
+      &:hover {
+        background: $govuk-blue;
       }
 
-      &:hover,
-      &:focus {
+      &:hover {
         color: $light-blue-25;
       }
 
+      // The box-shadow that separates the remove link from the list item is hidden in
+      // high contrast mode. Remake using a border instead
+      // Also sets text colour to match govuk-button
       @media (-ms-high-contrast: active), (forced-colors: active) {
-        &,
+
+        &:link,
+        &:active,
         &:hover,
-        &:focus {
-          color: CanvasText;
+        &:focus:not(:active):not(:hover) {
+          border-left: 2px solid $govuk-blue;
+          color: LinkText;
         }
+
       }
 
-      &:focus {
+      // set styles so they don't get overriden by govuk-button styles
+      &,
+      &:focus:not(:active):not(:hover) {
+        box-shadow: -2px 0 0 0 $black, inset 1px 0 0 0 rgba($white, 0.1);
+      }
 
-        outline: none;
-        background: $govuk-focus-colour;
-        color: $black;
+      // set styles so they don't get overriden by govuk-button styles
+      &:focus:not(:active):not(:hover) {
         border-color: $black;
-
       }
 
-      // counter background colours being overridden
+      // show outline to make focus visible when background colours are overridden
       @media (-ms-high-contrast: active), (forced-colors: active) {
-        &:focus {
+
+        // set styles so they don't get overriden by govuk-button styles
+        &:focus:not(:active):not(:hover) {
           outline: 3px solid transparent;
-          color: CanvasText;
         }
+
       }
     }
 
@@ -86,7 +93,7 @@
 
   }
 
-  .govuk-button {
+  .govuk-button--secondary {
     margin-left: 3px;
   }
 
