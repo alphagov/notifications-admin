@@ -31,7 +31,7 @@
     {% endif %}
         <li class="area-list-item">
           {{ area.name }}
-          <a class="area-list-item-remove" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, area_slug=area.id) }}">
+          <a class="area-list-item-remove govuk-button" data-module="govuk-button" role="button" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, area_slug=area.id) }}">
             <svg id="area-list-item-remove__icon" width="12" height="12" viewbox="0 0 12 12" aria-labelledby="area__{{ loop.index }}" role="img" xmlns="http://www.w3.org/2000/svg"> <g>
               <title id="area__{{ loop.index }}">Remove {{ area.name }}</title>
               <g transform="rotate(45),translate(1, -7.5)">
