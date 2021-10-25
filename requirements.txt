@@ -94,7 +94,7 @@ importlib-metadata==4.8.1
     #   -r requirements.in
     #   click
     #   humanize
-itsdangerous==1.1.0
+itsdangerous==2.0.1
     # via
     #   -r requirements.in
     #   flask
