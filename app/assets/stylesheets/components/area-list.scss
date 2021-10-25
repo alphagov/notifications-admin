@@ -7,25 +7,28 @@
     display: inline-block;
     border: 2px solid $black;
     // Create space for the remove link on the right of the list item (including borders)
-    padding: (govuk-spacing(1) + 1px) (govuk-spacing(2) + 35px + (2 * 2px)) govuk-spacing(1) govuk-spacing(2);
+    padding: (govuk-spacing(1) + 1px) (govuk-spacing(2) + 37px) govuk-spacing(1) govuk-spacing(2);
     margin: 0 govuk-spacing(1) govuk-spacing(2) 0;
     position: relative;
 
     &-remove {
 
-      display: block;
+      display: block; // fallback for browsers that don't support flexbox
+      display: flex;
+      // center SVG vertically and horizontally
+      align-items: center;
+      justify-content: center;
       position: absolute;
       top: -2px; // cover list-item border-top
       right: -2px; // cover list-item border-right
       bottom: -2px; // cover list-item border-bottom
-      width: 35px;
-      padding: (govuk-spacing(1) + 1px) 0 govuk-spacing(1); 
+      width: 37px;
+      padding: 0;
       border: 2px solid $govuk-blue;
       border-left: none;
       text-align: center;
-      text-decoration: none;
       font-size: inherit; // counter govuk-button styles
-      line-height: inherit; // counter govuk-button styles
+      line-height: 36px; // match area-list-item for browsers that don't support flexbox
 
       // set styles so they don't get overriden by govuk-button styles
       &,
@@ -54,13 +57,20 @@
 
       // set styles so they don't get overriden by govuk-button styles
       &,
+      &:focus,
       &:focus:not(:active):not(:hover) {
         box-shadow: -2px 0 0 0 $black, inset 1px 0 0 0 rgba($white, 0.1);
       }
 
       // set styles so they don't get overriden by govuk-button styles
+      &:focus,
       &:focus:not(:active):not(:hover) {
         border-color: $black;
+      }
+
+      &:focus:hover {
+        background-color: $govuk-focus-colour;
+        color: $black;
       }
 
       // show outline to make focus visible when background colours are overridden
@@ -69,6 +79,14 @@
         // set styles so they don't get overriden by govuk-button styles
         &:focus:not(:active):not(:hover) {
           outline: 3px solid transparent;
+        }
+
+        // override hover styles when focused, to preserve dimensions and outline
+        &:focus:hover {
+          top: -2px;
+          right: -2px;
+          bottom: -2px;
+          width: 37px;
         }
 
       }
