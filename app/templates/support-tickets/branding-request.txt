@@ -1,0 +1,10 @@
+Organisation: {{ current_service.organisation.as_info_for_branding_request(current_user.email_domain) }}
+Service: {{ current_service.name }}
+{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+
+---
+Current branding: {{ current_branding }}
+Branding requested: {{ branding_requested }}
+{% if detail %}
+{{ detail }}
+{% endif %}

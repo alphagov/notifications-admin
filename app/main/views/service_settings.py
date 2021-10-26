@@ -1173,27 +1173,15 @@ def branding_request(service_id, branding_type):
     elif branding_type == "letter":
         branding_name = current_service.letter_branding_name
     if form.validate_on_submit():
+        ticket_message = render_template(
+            'support-tickets/branding-request.txt',
+            current_branding=branding_name,
+            branding_requested=dict(form.options.choices)[form.options.data],
+            detail=form.something_else.data,
+        )
         ticket = NotifySupportTicket(
             subject=f'{branding_type.capitalize()} branding request - {current_service.name}',
-            message=(
-                'Organisation: {organisation}\n'
-                'Service: {service_name}\n'
-                '{dashboard_url}\n'
-                '\n---'
-                '\nCurrent branding: {current_branding}'
-                '\nBranding requested: {branding_requested}'
-                '{new_paragraph}'
-                '{detail}'
-                '\n'
-            ).format(
-                organisation=current_service.organisation.as_info_for_branding_request(current_user.email_domain),
-                service_name=current_service.name,
-                dashboard_url=url_for('main.service_dashboard', service_id=current_service.id, _external=True),
-                current_branding=branding_name,
-                branding_requested=dict(form.options.choices)[form.options.data],
-                new_paragraph='\n\n' if form.something_else.data else '',
-                detail=form.something_else.data or ''
-            ),
+            message=ticket_message,
             ticket_type=NotifySupportTicket.TYPE_QUESTION,
             user_name=current_user.name,
             user_email=current_user.email_address,
