@@ -101,9 +101,6 @@ class Organisation(JSONModel):
             self.request_to_go_live_notes = None
             self.email_branding_id = None
 
-    def as_info_for_branding_request(self, fallback_domain):
-        return self.name or 'Can’t tell (domain is {})'.format(fallback_domain)
-
     @property
     def organisation_type_label(self):
         return dict(self.TYPES).get(self.organisation_type)
