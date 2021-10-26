@@ -86,8 +86,11 @@ def test_choose_account_should_show_choose_accounts_page(
 
     assert normalize_spaces(page.h1.text) == 'Choose service'
     outer_list_items = page.select('nav ul')[0].select('li')
+    headings = page.select('main h2')
 
     assert len(outer_list_items) == 8
+
+    assert normalize_spaces(headings[0].text) == 'Live services'
 
     # first org
     assert outer_list_items[0].a.text == 'Org 1'
@@ -122,6 +125,8 @@ def test_choose_account_should_show_choose_accounts_page(
     assert outer_list_items[7].a.text == 'service two (org 2)'
     assert outer_list_items[7].a['href'] == url_for('.service_dashboard', service_id='67890')
 
+    assert normalize_spaces(headings[1].text) == 'Trial mode services'
+
     # trial services
     trial_services_list_items = page.select('nav ul')[1].select('li')
     assert len(trial_services_list_items) == 3
@@ -151,9 +156,47 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     add_service_link = links[0]
     assert normalize_spaces(page.h1.text) == 'Choose service'
     assert normalize_spaces(add_service_link.text) == 'Add a new service'
+    assert not page.select('main h2')
     assert add_service_link['href'] == url_for('main.add_service')
 
 
+@pytest.mark.parametrize('orgs_and_services, expected_headings', (
+    ({
+        'organisations': [],
+        'services': []
+    }, [
+        'Platform admin',
+    ]),
+    (SAMPLE_DATA, [
+        'Platform admin',
+        'Live services',
+        'Trial mode services',
+    ]),
+    ({
+        'organisations': [],
+        'services': [{
+            'name': 'Live service',
+            'id': OS2,
+            'restricted': False,
+            'organisation': None,
+        }],
+    }, [
+        'Platform admin',
+        'Live services',
+    ]),
+    ({
+        'organisations': [],
+        'services': [{
+            'name': 'Trial service',
+            'id': OS2,
+            'restricted': True,
+            'organisation': None,
+        }],
+    }, [
+        'Platform admin',
+        'Trial mode services',
+    ]),
+))
 def test_choose_account_should_should_organisations_link_for_platform_admin(
     client_request,
     platform_admin_user,
@@ -161,7 +204,10 @@ def test_choose_account_should_should_organisations_link_for_platform_admin(
     mock_get_orgs_and_services,
     mock_get_organisation_services,
     mock_get_service_and_organisation_counts,
+    orgs_and_services,
+    expected_headings,
 ):
+    mock_get_orgs_and_services.return_value = orgs_and_services
     client_request.login(platform_admin_user)
 
     page = client_request.get('main.choose_account')
@@ -172,6 +218,10 @@ def test_choose_account_should_should_organisations_link_for_platform_admin(
     assert first_link.text == 'All organisations'
     assert first_link['href'] == url_for('main.organisations')
     assert normalize_spaces(first_hint.text) == '3 organisations, 9,999 live services'
+
+    assert [
+        normalize_spaces(h2.text) for h2 in page.select('main h2')
+    ] == expected_headings
 
 
 def test_choose_account_should_show_back_to_service_link(
