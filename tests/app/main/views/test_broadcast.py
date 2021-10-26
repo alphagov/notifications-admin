@@ -1880,11 +1880,6 @@ def test_view_pending_broadcast(
         'No phones will get this alert. '
         'Start broadcasting now Reject this alert'
     )),
-    ({'cap_event': 'Severe flood warning'}, (
-        'Test User Create Broadcasts Permission wants to broadcast Severe flood warning '
-        'No phones will get this alert. '
-        'Start broadcasting now Reject this alert'
-    )),
     ({'cap_event': 'Severe flood warning', 'reference': 'ABC123'}, (
         'Test User Create Broadcasts Permission wants to broadcast Severe flood warning '
         'No phones will get this alert. '
