@@ -1875,18 +1875,18 @@ def test_view_pending_broadcast(
 
 
 @pytest.mark.parametrize('extra_broadcast_json_fields, expected_banner_text', (
-    ({'reference': 'No template test'}, (
-        'Test User Create Broadcasts Permission wants to broadcast No template test '
+    ({'reference': 'ABC123'}, (
+        'Test User Create Broadcasts Permission wants to broadcast ABC123 '
         'No phones will get this alert. '
         'Start broadcasting now Reject this alert'
     )),
-    ({'cap_event': 'No template test'}, (
-        'Test User Create Broadcasts Permission wants to broadcast No template test '
+    ({'cap_event': 'Severe flood warning'}, (
+        'Test User Create Broadcasts Permission wants to broadcast Severe flood warning '
         'No phones will get this alert. '
         'Start broadcasting now Reject this alert'
     )),
-    ({'cap_event': 'EVENT', 'reference': 'REFERENCE'}, (
-        'Test User Create Broadcasts Permission wants to broadcast EVENT '
+    ({'cap_event': 'Severe flood warning', 'reference': 'ABC123'}, (
+        'Test User Create Broadcasts Permission wants to broadcast Severe flood warning '
         'No phones will get this alert. '
         'Start broadcasting now Reject this alert'
     )),
