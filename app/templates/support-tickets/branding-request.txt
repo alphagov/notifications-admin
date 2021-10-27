@@ -1,0 +1,14 @@
+Organisation: {% if current_service.organisation -%}
+  {{ current_service.organisation.name }}
+{%- else -%}
+  Can’t tell (domain is {{ current_user.email_domain }})
+{%- endif %}
+Service: {{ current_service.name }}
+{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+
+---
+Current branding: {{ current_branding }}
+Branding requested: {{ branding_requested }}
+{% if detail %}
+{{ detail }}
+{% endif %}
