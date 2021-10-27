@@ -1811,19 +1811,12 @@ def test_view_broadcast_message_shows_correct_highlighted_navigation(
     )
 
 
-@pytest.mark.parametrize('extra_broadcast_json_fields', (
-    # These should be ignored for broadcasts with a template
-    {'reference': 'foo'},
-    {'cap_event': 'bar'},
-    {},
-))
 def test_view_pending_broadcast(
     mocker,
     client_request,
     service_one,
     fake_uuid,
     active_user_approve_broadcasts_permission,
-    extra_broadcast_json_fields,
 ):
     broadcast_creator = create_active_user_create_broadcasts_permissions(with_unique_id=True)
     mocker.patch(
@@ -1835,7 +1828,6 @@ def test_view_pending_broadcast(
             created_by_id=broadcast_creator['id'],
             finishes_at=None,
             status='pending-approval',
-            **extra_broadcast_json_fields
         ),
     )
     client_request.login(active_user_approve_broadcasts_permission)
