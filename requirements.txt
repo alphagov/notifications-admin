@@ -12,7 +12,7 @@ awscli==1.19.84
     #   notifications-utils
 awscli-cwlogs==1.4.6
     # via -r requirements.in
-bleach==3.3.0
+bleach==4.1.0
     # via notifications-utils
 blinker==1.4
     # via
@@ -125,7 +125,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==6.3.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@46.1.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@47.0.1
     # via -r requirements.in
 openpyxl==3.0.7
     # via pyexcel-xlsx
