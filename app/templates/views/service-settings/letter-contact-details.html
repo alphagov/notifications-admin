@@ -58,7 +58,7 @@
           </div>
         </div>
         {% if letter_contact_details|length  > 1 %}
-          {% set first_line_of_contact_block = item.contact_block|normalise_lines|first %}
+          {% set first_line_of_contact_block = item.contact_block|get_lines_with_normalised_whitespace|first %}
           {{ copy_to_clipboard(item.id, name=first_line_of_contact_block, thing="ID") }}
         {% endif %}
       </div>

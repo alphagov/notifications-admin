@@ -2295,8 +2295,8 @@ def test_send_one_off_letter_address_shows_form(
     }),
     # it ignores empty lines and strips whitespace from each line.
     # It also strips extra whitespace from the middle of lines.
-    ('\n  a\ta  \n\n\n      \n\n\n\nb  b   \r\n sw1a1aa \n\n', {
-        'address_line_1': 'a\ta',
+    ('\n  a\ta  \n\n\n      \n\n\n\nb  b   \r\n sw1a\u00A01aa \n\n', {
+        'address_line_1': 'a a',
         'address_line_2': 'b b',
         'address_line_3': '',
         'address_line_4': '',
