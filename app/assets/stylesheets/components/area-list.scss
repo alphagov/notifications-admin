@@ -40,6 +40,11 @@
         color: $light-blue-25;
       }
 
+      // set styles so they don't get overriden by govuk-button styles
+      &:active {
+        top: -2px;
+      }
+
       // The box-shadow that separates the remove link from the list item is hidden in
       // high contrast mode. Remake using a border instead
       // Also sets text colour to match govuk-button
