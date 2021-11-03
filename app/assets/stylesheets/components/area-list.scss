@@ -6,55 +6,95 @@
 
     display: inline-block;
     border: 2px solid $black;
-    padding: (govuk-spacing(1) + 1px) (govuk-spacing(2) + 35px) govuk-spacing(1) govuk-spacing(2);
+    // Create space for the remove link on the right of the list item (including borders)
+    padding: (govuk-spacing(1) + 1px) (govuk-spacing(2) + 37px) govuk-spacing(1) govuk-spacing(2);
     margin: 0 govuk-spacing(1) govuk-spacing(2) 0;
     position: relative;
 
     &-remove {
 
-      font-size: 0;
+      display: block; // fallback for browsers that don't support flexbox
+      display: flex;
+      // center SVG vertically and horizontally
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: -2px; // cover list-item border-top
+      right: -2px; // cover list-item border-right
+      bottom: -2px; // cover list-item border-bottom
+      width: 37px;
+      padding: 0;
+      border: 2px solid $govuk-blue;
+      border-left: none;
+      text-align: center;
+      font-size: inherit; // counter govuk-button styles
+      line-height: 36px; // match area-list-item for browsers that don't support flexbox
 
-      &:before {
-        content: "×";
-        display: block;
-        position: absolute;
-        top: -2px;
-        right: -2px;
-        bottom: -2px;
-        width: 35px;
+      // set styles so they don't get overriden by govuk-button styles
+      &,
+      &:hover {
         background: $govuk-blue;
-        color: $white;
+      }
+
+      &:hover {
+        color: $light-blue-25;
+      }
+
+      // set styles so they don't get overriden by govuk-button styles
+      &:active {
+        top: -2px;
+      }
+
+      // The box-shadow that separates the remove link from the list item is hidden in
+      // high contrast mode. Remake using a border instead
+      // Also sets text colour to match govuk-button
+      @media (-ms-high-contrast: active), (forced-colors: active) {
+
+        &:link,
+        &:active,
+        &:hover,
+        &:focus:not(:active):not(:hover) {
+          border-left: 2px solid $govuk-blue;
+          color: LinkText;
+        }
+
+      }
+
+      // set styles so they don't get overriden by govuk-button styles
+      &,
+      &:focus,
+      &:focus:not(:active):not(:hover) {
         box-shadow: -2px 0 0 0 $black, inset 1px 0 0 0 rgba($white, 0.1);
-        border: 2px solid $govuk-blue;
-        border-left: none;
-        font-size: 24px;
-        font-weight: normal;
-        line-height: 40px;
-        text-align: center;
-        text-decoration: none;
       }
 
-      &:hover,
-      &:focus {
+      // set styles so they don't get overriden by govuk-button styles
+      &:focus,
+      &:focus:not(:active):not(:hover) {
+        border-color: $black;
+      }
 
-        &:before {
-          color: $light-blue-25;
+      &:focus:hover {
+        background-color: $govuk-focus-colour;
+        color: $black;
+      }
+
+      // show outline to make focus visible when background colours are overridden
+      @media (-ms-high-contrast: active), (forced-colors: active) {
+
+        // set styles so they don't get overriden by govuk-button styles
+        &:focus:not(:active):not(:hover) {
+          outline: 3px solid transparent;
+        }
+
+        // override hover styles when focused, to preserve dimensions and outline
+        &:focus:hover {
+          top: -2px;
+          right: -2px;
+          bottom: -2px;
+          width: 37px;
         }
 
       }
-
-      &:focus {
-
-        outline: none;
-
-        &:before {
-          background: $govuk-focus-colour;
-          color: $black;
-          border-color: $black;
-        }
-
-      }
-
     }
 
     &:last-child {
@@ -76,7 +116,7 @@
 
   }
 
-  .govuk-button {
+  .govuk-button--secondary {
     margin-left: 3px;
   }
 
