@@ -137,17 +137,10 @@
   padding-left: govuk-spacing(8);
   line-height: govuk-spacing(7);
 
-  &:before {
-    content: "";
-    display: block;
+  &__icon {
     position: absolute;
-    top: 3px;
-    left: govuk-spacing(1);
-    width: govuk-spacing(6);
-    height: govuk-spacing(6);
-    box-sizing: border-box;
-    margin-right: govuk-spacing(1);
-    transform: rotate(45deg);
+    left: -5px;
+    top: -7px;
   }
 
   &--certain {
