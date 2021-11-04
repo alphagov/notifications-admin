@@ -10,7 +10,16 @@
       // is still where users intend to start
       if (($(window).scrollTop() > 0) && !forceFocus) { return; }
 
-      $component.filter('input, textarea, select').eq(0).trigger('focus');
+      // See if the component itself is something we want to send focus to
+      var target = $component.filter('input, textarea, select');
+
+      // Otherwise look inside the component to see if there are any elements
+      // we want to send focus to
+      if (target.length === 0) {
+        target = $('input, textarea, select', $component);
+      }
+
+      target.eq(0).trigger('focus');
 
     };
   };
