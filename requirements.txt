@@ -95,8 +95,9 @@ itsdangerous==1.1.0
     #   flask
     #   flask-wtf
     #   notifications-utils
-jinja2==2.11.3
+jinja2==3.0.2
     # via
+    #   -r requirements.in
     #   flask
     #   govuk-frontend-jinja
     #   notifications-utils
