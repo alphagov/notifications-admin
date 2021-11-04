@@ -33,6 +33,51 @@ def test_view_team_members(
     ) == 'Cancel invitation'
 
 
+@pytest.mark.parametrize('number_of_users', (
+    pytest.param(7, marks=pytest.mark.xfail),
+    pytest.param(8),
+))
+def test_should_show_live_search_if_more_than_7_users(
+    client_request,
+    mocker,
+    mock_get_organisation,
+    active_user_with_permissions,
+    number_of_users,
+):
+    mocker.patch(
+        'app.models.user.OrganisationInvitedUsers.client_method',
+        return_value=[],
+    )
+    mocker.patch(
+        'app.models.user.OrganisationUsers.client_method',
+        return_value=[active_user_with_permissions] * number_of_users,
+    )
+
+    page = client_request.get(
+        '.manage_org_users',
+        org_id=ORGANISATION_ID,
+    )
+
+    assert page.select_one('div[data-module=live-search]')['data-targets'] == (
+        ".user-list-item"
+    )
+    assert len(page.select('.user-list-item')) == number_of_users
+
+    textbox = page.select_one('[data-module=autofocus] .govuk-input')
+    assert 'value' not in textbox
+    assert textbox['name'] == 'search'
+    # data-module=autofocus is set on a containing element so it
+    # shouldn’t also be set on the textbox itself
+    assert 'data-module' not in textbox
+    assert not page.select_one('[data-force-focus]')
+    assert textbox['class'] == [
+        'govuk-input', 'govuk-!-width-full',
+    ]
+    assert normalize_spaces(
+        page.select_one('label[for=search]').text
+    ) == 'Search by name or email address'
+
+
 def test_invite_org_user(
     client_request,
     mocker,
