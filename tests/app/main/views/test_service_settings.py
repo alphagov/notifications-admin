@@ -2881,23 +2881,20 @@ def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_
     assert mock_update_reply_to_email_address.called is False
 
 
-@pytest.mark.parametrize('reply_to_address, expected_link_text, partial_href', [
+@pytest.mark.parametrize('reply_to_address, default_choice_and_delete_link_expected', [
     (
         create_reply_to_email_address(is_default=False),
-        'Delete',
-        partial(url_for, 'main.service_confirm_delete_email_reply_to', reply_to_email_id=sample_uuid()),
+        True,
     ),
     (
         create_reply_to_email_address(is_default=True),
-        None,
-        None,
+        False,
     ),
 ])
 def test_shows_delete_link_for_get_request_for_edit_email_reply_to_address(
     mocker,
     reply_to_address,
-    expected_link_text,
-    partial_href,
+    default_choice_and_delete_link_expected,
     fake_uuid,
     client_request,
 ):
@@ -2915,10 +2912,16 @@ def test_shows_delete_link_for_get_request_for_edit_email_reply_to_address(
         service_id=SERVICE_ONE_ID,
     )
 
-    if expected_link_text:
+    if default_choice_and_delete_link_expected:
         link = page.select_one('.page-footer a')
-        assert normalize_spaces(link.text) == expected_link_text
-        assert link['href'] == partial_href(service_id=SERVICE_ONE_ID)
+        assert normalize_spaces(link.text) == 'Delete'
+        assert link['href'] == url_for(
+            'main.service_confirm_delete_email_reply_to',
+            service_id=SERVICE_ONE_ID,
+            reply_to_email_id=sample_uuid()
+        )
+        assert not page.select_one('input#is_default').has_attr('checked')
+
     else:
         assert not page.select('.page-footer a')
 
