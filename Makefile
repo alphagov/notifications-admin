@@ -28,6 +28,10 @@ bootstrap: generate-version-file ## Set up everything to run the app
 	npm install
 	. environment.sh; npm run build
 
+.PHONY: watch-frontend
+watch-frontend:  ## Build frontend and watch for changes
+	. environment.sh; npm run watch
+
 .PHONY: run-flask
 run-flask:  ## Run flask
 	. environment.sh && flask run -p 6012
