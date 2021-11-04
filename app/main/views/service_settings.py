@@ -617,9 +617,13 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
 def service_edit_email_reply_to(service_id, reply_to_email_id):
     form = ServiceReplyToEmailForm()
     reply_to_email_address = current_service.get_email_reply_to_address(reply_to_email_id)
+
     if request.method == 'GET':
         form.email_address.data = reply_to_email_address['email_address']
         form.is_default.data = reply_to_email_address['is_default']
+
+    show_choice_of_default_checkbox = not reply_to_email_address['is_default']
+
     if form.validate_on_submit():
         if form.email_address.data == reply_to_email_address["email_address"] or current_user.platform_admin:
             service_api_client.update_reply_to_email_address(
@@ -653,6 +657,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         'views/service-settings/email-reply-to/edit.html',
         form=form,
         reply_to_email_address_id=reply_to_email_id,
+        show_choice_of_default_checkbox=show_choice_of_default_checkbox
     )
 
 

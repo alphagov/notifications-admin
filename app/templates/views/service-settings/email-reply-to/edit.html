@@ -23,7 +23,7 @@
         },
         error_message_with_html=True
     ) }}
-    {% if form.is_default.data %}
+    {% if not show_choice_of_default_checkbox %}
       <p class="form-group">
         This is the default reply-to address for {{ current_service.name }} emails
       </p>
