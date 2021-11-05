@@ -11,7 +11,7 @@ from flask_wtf.file import FileAllowed
 from flask_wtf.file import FileField as FileField_wtf
 from notifications_utils.columns import Columns
 from notifications_utils.countries.data import Postage
-from notifications_utils.formatters import strip_whitespace
+from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import (
     InvalidPhoneError,
@@ -551,7 +551,7 @@ class StripWhitespaceForm(Form):
             # FieldList simply doesn't support filters.
             # @see: https://github.com/wtforms/wtforms/issues/148
             no_filter_fields = (FieldList, PasswordField, GovukPasswordField)
-            filters = [strip_whitespace] if not issubclass(unbound_field.field_class, no_filter_fields) else []
+            filters = [strip_all_whitespace] if not issubclass(unbound_field.field_class, no_filter_fields) else []
             filters += unbound_field.kwargs.get('filters', [])
             bound = unbound_field.bind(form=form, filters=filters, **options)
             bound.get_form = weakref.ref(form)  # GC won't collect the form if we don't use a weakref
@@ -567,7 +567,7 @@ class StripWhitespaceStringField(GovukTextInputField):
         kwargs['filters'] = tuple(chain(
             kwargs.get('filters', ()),
             (
-                strip_whitespace,
+                strip_all_whitespace,
             ),
         ))
         super(GovukTextInputField, self).__init__(label, **kwargs)

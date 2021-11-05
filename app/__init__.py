@@ -24,7 +24,10 @@ from govuk_frontend_jinja.flask_ext import init_govuk_frontend
 from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging, request_helper
-from notifications_utils.formatters import formatted_list, normalise_lines
+from notifications_utils.formatters import (
+    formatted_list,
+    get_lines_with_normalised_whitespace,
+)
 from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.sanitise_text import SanitiseASCII
 from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
@@ -553,7 +556,7 @@ def add_template_filters(application):
         format_notification_status_as_url,
         format_number_in_pounds_as_currency,
         formatted_list,
-        normalise_lines,
+        get_lines_with_normalised_whitespace,
         nl2br,
         format_phone_number_human_readable,
         format_thousands,

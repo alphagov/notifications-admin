@@ -2,7 +2,7 @@ from functools import partial
 from os import path
 
 from flask import abort, current_app
-from notifications_utils.formatters import strip_whitespace
+from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.recipients import RecipientCSV
 from werkzeug.utils import cached_property
 
@@ -56,7 +56,7 @@ class ContactList(JSONModel):
 
     @staticmethod
     def download(service_id, upload_id):
-        return strip_whitespace(s3download(
+        return strip_all_whitespace(s3download(
             service_id,
             upload_id,
             bucket=ContactList.get_bucket_name(),
