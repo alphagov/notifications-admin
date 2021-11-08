@@ -137,7 +137,7 @@ prometheus-client==0.12.0
     #   gds-metrics
 pyasn1==0.4.8
     # via rsa
-pycparser==2.20
+pycparser==2.21
     # via cffi
 pyexcel==0.6.7
     # via -r requirements.in
