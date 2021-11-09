@@ -2253,8 +2253,14 @@ def test_send_one_off_letter_address_shows_form(
 
     form = page.select_one('form')
 
+    assert form['data-module'] == 'autofocus'
+    assert form['data-force-focus'] == 'True'
+
     assert form.select_one('label').text.strip() == 'Address'
-    assert form.select_one('textarea').attrs['name'] == 'address'
+    assert form.select_one('textarea')['name'] == 'address'
+    assert form.select_one('textarea')['data-module'] == 'enhanced-textbox'
+    assert form.select_one('textarea')['data-highlight-placeholders'] == 'false'
+    assert form.select_one('textarea')['rows'] == '4'
 
     upload_link = form.select_one('a')
 

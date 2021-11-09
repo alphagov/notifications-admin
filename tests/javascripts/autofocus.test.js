@@ -20,7 +20,7 @@ describe('Autofocus', () => {
 
     // set up DOM
     document.body.innerHTML =
-      `<div>
+      `<div id="wrapper">
         <label class="form-label" for="search">
           ${labelText}
         </label>
@@ -42,6 +42,18 @@ describe('Autofocus', () => {
   });
 
   test('is focused when modules start', () => {
+
+    // start module
+    window.GOVUK.modules.start();
+
+    expect(focusHandler).toHaveBeenCalled();
+
+  });
+
+  test('is focused when attribute is set on outer element', () => {
+
+    document.getElementById('search').removeAttribute('data-module');
+    document.getElementById('wrapper').setAttribute('data-module', 'autofocus');
 
     // start module
     window.GOVUK.modules.start();

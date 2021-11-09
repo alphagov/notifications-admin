@@ -151,6 +151,49 @@ def test_should_show_overview_page(
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize('number_of_users', (
+    pytest.param(7, marks=pytest.mark.xfail),
+    pytest.param(8),
+))
+def test_should_show_live_search_if_more_than_7_users(
+    client_request,
+    mocker,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    mock_has_no_jobs,
+    active_user_with_permissions,
+    active_user_view_permissions,
+    number_of_users,
+):
+    mocker.patch('app.user_api_client.get_user', return_value=active_user_with_permissions)
+    mocker.patch('app.models.user.InvitedUsers.client_method', return_value=[])
+    mocker.patch(
+        'app.models.user.Users.client_method',
+        return_value=[active_user_with_permissions] * number_of_users
+    )
+
+    page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
+
+    assert page.select_one('div[data-module=live-search]')['data-targets'] == (
+        ".user-list-item"
+    )
+    assert len(page.select('.user-list-item')) == number_of_users
+
+    textbox = page.select_one('[data-module=autofocus] .govuk-input')
+    assert 'value' not in textbox
+    assert textbox['name'] == 'search'
+    # data-module=autofocus is set on a containing element so it
+    # shouldn’t also be set on the textbox itself
+    assert 'data-module' not in textbox
+    assert not page.select_one('[data-force-focus]')
+    assert textbox['class'] == [
+        'govuk-input', 'govuk-!-width-full',
+    ]
+    assert normalize_spaces(
+        page.select_one('label[for=search]').text
+    ) == 'Search by name or email address'
+
+
 def test_should_show_caseworker_on_overview_page(
     client_request,
     mocker,
