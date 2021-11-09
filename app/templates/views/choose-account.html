@@ -7,7 +7,7 @@
   organisations=[],
   services=[]
 ) %}
-  {% if show_heading %}
+  {% if show_heading and (services or organisations) %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-quarter">
         <h2>
@@ -33,7 +33,7 @@
       <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
     </li>
   {% endfor %}
-  {% if show_heading %}
+  {% if show_heading and (services or organisations) %}
         </ul>
       </div>
     </div>
@@ -77,14 +77,14 @@
     {% if current_user.organisations %}
       {{ service_list(
         heading='Live services',
-        show_heading=current_user.trial_mode_services,
+        show_heading=current_user.trial_mode_services or current_user.platform_admin,
         organisations=current_user.organisations,
         services=current_user.live_services
       ) }}
     {% else %}
       {{ service_list(
         heading='Live services',
-        show_heading=(current_user.trial_mode_services and current_user.live_services),
+        show_heading=(current_user.trial_mode_services and current_user.live_services) or current_user.platform_admin,
         services=current_user.live_services
       ) }}
     {% endif %}
@@ -92,7 +92,7 @@
     {% if current_user.trial_mode_services %}
       {{ service_list(
         heading='Trial mode services',
-        show_heading=(current_user.organisations or current_user.live_services),
+        show_heading=(current_user.organisations or current_user.live_services or current_user.platform_admin),
         services=current_user.trial_mode_services
       ) }}
     {% endif %}
