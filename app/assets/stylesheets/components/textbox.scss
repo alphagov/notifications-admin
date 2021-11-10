@@ -39,6 +39,11 @@
     padding-bottom: govuk-spacing(3);
     z-index: 10;
 
+    // transparent borders become visible in high contrast modes so set to match background
+    @media (-ms-high-contrast: active), (forced-colors: active) {
+      border-color: Canvas;
+    }
+
     .placeholder,
     .placeholder-conditional {
       color: transparent;
