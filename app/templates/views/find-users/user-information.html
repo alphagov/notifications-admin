@@ -17,7 +17,7 @@
       <nav class="browse-list">
         {% if user.live_services %}
           <ul>
-          {% for service in user.live_services %}
+          {% for service in user.live_services|sort %}
             <li class="browse-list-item">
               <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
             </li>
@@ -33,7 +33,7 @@
       <nav class="browse-list">
         {% if user.trial_mode_services %}
           <ul>
-          {% for service in user.trial_mode_services %}
+          {% for service in user.trial_mode_services|sort %}
             <li class="browse-list-item">
               <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href={{url_for('.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
             </li>
