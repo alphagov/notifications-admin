@@ -116,7 +116,7 @@ def add_organisation_from_nhs_local_service(service_id):
 
     form = AddNHSLocalOrganisationForm(organisation_choices=[
         (organisation.id, organisation.name)
-        for organisation in AllOrganisations()
+        for organisation in sorted(AllOrganisations())
         if organisation.organisation_type == Organisation.TYPE_NHS_LOCAL
     ])
 

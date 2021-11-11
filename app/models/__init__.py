@@ -60,3 +60,9 @@ class PaginatedModelList(ModelList):
         self.items = response[self.response_key]
         self.prev_page = response.get('links', {}).get('prev', None)
         self.next_page = response.get('links', {}).get('next', None)
+
+
+class SortByNameMixin():
+
+    def __lt__(self, other):
+        return self.name.lower() < other.name.lower()

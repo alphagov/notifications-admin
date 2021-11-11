@@ -20,9 +20,9 @@ def test_organisation_page_shows_all_organisations(
     mocker
 ):
     orgs = [
-        {'id': '1', 'name': 'Test 1', 'active': True, 'count_of_live_services': 0},
-        {'id': '2', 'name': 'Test 2', 'active': True, 'count_of_live_services': 1},
-        {'id': '3', 'name': 'Test 3', 'active': False, 'count_of_live_services': 2},
+        {'id': 'A3', 'name': 'Test 3', 'active': True, 'count_of_live_services': 0},
+        {'id': 'B1', 'name': 'Test 1', 'active': True, 'count_of_live_services': 1},
+        {'id': 'C2', 'name': 'Test 2', 'active': False, 'count_of_live_services': 2},
     ]
 
     get_organisations = mocker.patch(
@@ -39,15 +39,31 @@ def test_organisation_page_shows_all_organisations(
         page.select_one('h1').text
     ) == "Organisations"
 
-    expected_hints = ('0 live services', '1 live service', '2 live services')
-
-    for index, org in enumerate(orgs):
-        assert page.select('.browse-list-item a')[index].text == org['name']
-        if not org['active']:
-            assert page.select_one('.table-field-status-default,heading-medium').text == '- archived'
-        assert normalize_spaces(page.select('.browse-list-hint')[index].text) == (
-            expected_hints[index]
+    assert [
+        (
+            normalize_spaces(link.text),
+            normalize_spaces(hint.text),
+            link['href'],
+        ) for link, hint in zip(
+            page.select('.browse-list-item a'),
+            page.select('.browse-list-item .browse-list-hint'),
         )
+    ] == [
+        ('Test 1', '1 live service', url_for(
+            'main.organisation_dashboard', org_id='B1'
+        )),
+        ('Test 2', '2 live services', url_for(
+            'main.organisation_dashboard', org_id='C2'
+        )),
+        ('Test 3', '0 live services', url_for(
+            'main.organisation_dashboard', org_id='A3'
+        )),
+    ]
+
+    archived = page.select_one('.table-field-status-default.heading-medium')
+    assert normalize_spaces(archived.text) == '- archived'
+    assert normalize_spaces(archived.parent.text) == 'Test 2 - archived 2 live services'
+
     assert normalize_spaces(
         page.select_one('a.govuk-button--secondary').text
     ) == 'New organisation'
@@ -276,8 +292,8 @@ def test_nhs_local_can_create_own_organisations(
     mocker.patch(
         'app.models.organisation.AllOrganisations.client_method',
         return_value=[
-            organisation_json('t1', 'Trust 1', organisation_type='nhs_local'),
             organisation_json('t2', 'Trust 2', organisation_type='nhs_local'),
+            organisation_json('t1', 'Trust 1', organisation_type='nhs_local'),
             organisation_json('gp1', 'GP 1', organisation_type='nhs_gp'),
             organisation_json('c1', 'Central 1'),
         ],

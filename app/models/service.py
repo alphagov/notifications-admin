@@ -2,7 +2,7 @@ from flask import abort, current_app
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel
+from app.models import JSONModel, SortByNameMixin
 from app.models.contact_list import ContactLists
 from app.models.job import (
     ImmediateJobs,
@@ -27,7 +27,7 @@ from app.notify_client.template_folder_api_client import (
 from app.utils import get_default_sms_sender
 
 
-class Service(JSONModel):
+class Service(JSONModel, SortByNameMixin):
 
     ALLOWED_PROPERTIES = {
         'active',
@@ -77,9 +77,6 @@ class Service(JSONModel):
     @classmethod
     def from_id(cls, service_id):
         return cls(service_api_client.get_service(service_id)['data'])
-
-    def __lt__(self, other):
-        return self.name.lower() < other.name.lower()
 
     @property
     def permissions(self):
