@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from datetime import datetime
 from functools import partial
 
 from flask import flash, redirect, render_template, request, session, url_for
@@ -43,6 +44,7 @@ from app.main.views.dashboard import (
 from app.main.views.service_settings import get_branding_as_value_and_label
 from app.models.organisation import Organisation, Organisations
 from app.models.user import InvitedOrgUser, User
+from app.utils.csv import Spreadsheet
 from app.utils.user import user_has_permissions, user_is_platform_admin
 
 
@@ -158,16 +160,46 @@ def organisation_dashboard(org_id):
             for key in ('emails_sent', 'sms_cost', 'letter_cost')
         },
         download_link=url_for(
-            '.download_services_report_for_org',
+            '.download_organisation_usage_report',
             org_id=org_id,
+            selected_year=year
         )
     )
 
 
-@main.route("/organisations/<uuid:org_id>", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>/download-usage-report.csv", methods=['GET'])
 @user_has_permissions()
-def download_services_report_for_org(org_id):
-    pass
+def download_organisation_usage_report(org_id):
+    selected_year = request.args.get('selected_year')
+    services_usage = current_organisation.services_and_usage(
+        financial_year=selected_year
+    )['services']
+
+    column_names = OrderedDict([
+        ('service_id', 'Service ID'),
+        ('service_name', 'Service Name'),
+        ('emails_sent', 'Emails sent'),
+        ('sms_remainder', 'Free text message allowance remaining'),
+        ('sms_cost', 'Spent on text messages (£)'),
+        ('letter_cost', 'Spent on letters (£)')
+    ])
+
+    org_usage_data = [[x for x in column_names.values()]]
+
+    for service in services_usage:
+        org_usage_data.append([service[attribute] for attribute in column_names.keys()])
+
+    return Spreadsheet.from_rows(org_usage_data).as_csv_data, 200, {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': (
+            'inline;'
+            'filename="{} organisation usage report for year {}'
+            ' - generated on {}.csv"'.format(
+                current_organisation.name,
+                selected_year,
+                datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            ))
+    }
 
 
 @main.route("/organisations/<uuid:org_id>/trial-services", methods=['GET'])
