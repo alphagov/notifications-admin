@@ -156,8 +156,18 @@ def organisation_dashboard(org_id):
         **{
             f'total_{key}': sum(service[key] for service in services)
             for key in ('emails_sent', 'sms_cost', 'letter_cost')
-        }
+        },
+        download_link=url_for(
+            '.download_services_report_for_org',
+            org_id=org_id,
+        )
     )
+
+
+@main.route("/organisations/<uuid:org_id>", methods=['GET'])
+@user_has_permissions()
+def download_services_report_for_org(org_id):
+    pass
 
 
 @main.route("/organisations/<uuid:org_id>/trial-services", methods=['GET'])

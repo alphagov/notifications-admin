@@ -624,6 +624,36 @@ def test_organisation_services_hides_search_bar_for_7_or_fewer_services(
     assert not page.select_one('.live-search')
 
 
+def test_organisation_services_links_to_downloadable_report(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {
+                'service_id': SERVICE_ONE_ID,
+                'service_name': 'Service 1',
+                'chargeable_billable_sms': 250122,
+                'emails_sent': 13000,
+                'free_sms_limit': 250000,
+                'letter_cost': 30.50,
+                'sms_billable_units': 122,
+                'sms_cost': 1.93,
+                'sms_remainder': None
+            },
+        ] * 2}
+    )
+    client_request.login(active_user_with_permissions)
+    page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
+
+    link_to_report = page.find('a', text="Download this report")
+    assert link_to_report.attrs["href"] == url_for('.download_services_report_for_org', org_id=ORGANISATION_ID)
+
+
 def test_organisation_trial_mode_services_shows_all_non_live_services(
     client_request,
     platform_admin_user,
