@@ -1,13 +1,18 @@
 from flask import abort
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel, ModelList
+from app.models import (
+    JSONModel,
+    ModelList,
+    SerialisedModelCollection,
+    SortByNameMixin,
+)
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
 
 
-class Organisation(JSONModel):
+class Organisation(JSONModel, SortByNameMixin):
 
     TYPE_CENTRAL = 'central'
     TYPE_LOCAL = 'local'
@@ -58,6 +63,9 @@ class Organisation(JSONModel):
         if not org_id:
             return cls({})
         return cls(organisations_client.get_organisation(org_id))
+
+    def __lt__(self, other):
+        return self.name.lower() < other.name.lower()
 
     @classmethod
     def from_domain(cls, domain):
@@ -201,6 +209,9 @@ class Organisation(JSONModel):
         return organisations_client.get_services_and_usage(self.id, financial_year)
 
 
-class Organisations(ModelList):
-    client_method = organisations_client.get_organisations
+class Organisations(SerialisedModelCollection):
     model = Organisation
+
+
+class AllOrganisations(ModelList, Organisations):
+    client_method = organisations_client.get_organisations

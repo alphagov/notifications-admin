@@ -11,7 +11,7 @@ from app.event_handlers import (
     create_set_user_permissions_event,
 )
 from app.models import JSONModel, ModelList
-from app.models.organisation import Organisation
+from app.models.organisation import Organisation, Organisations
 from app.models.webauthn_credential import WebAuthnCredentials
 from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
@@ -290,16 +290,10 @@ class User(JSONModel, UserMixin):
     def orgs_and_services(self):
         return user_api_client.get_organisations_and_services_for_user(self.id)
 
-    @staticmethod
-    def sort_services(services):
-        return sorted(services, key=lambda service: service.name.lower())
-
     @property
     def services(self):
-        from app.models.service import Service
-        return self.sort_services([
-            Service(service) for service in self.orgs_and_services['services']
-        ])
+        from app.models.service import Services
+        return Services(self.orgs_and_services['services'])
 
     @property
     def services_with_organisation(self):
@@ -326,10 +320,7 @@ class User(JSONModel, UserMixin):
 
     @property
     def organisations(self):
-        return [
-            Organisation(organisation)
-            for organisation in self.orgs_and_services['organisations']
-        ]
+        return Organisations(self.orgs_and_services['organisations'])
 
     @property
     def organisation_ids(self):
