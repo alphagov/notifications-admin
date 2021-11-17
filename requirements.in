@@ -24,6 +24,7 @@ Shapely==1.7.1
 rtreelib==0.2.0
 fido2==0.9.1
 importlib-metadata==4.2.0
+pyproj==3.2.1
 
 # PaaS
 awscli-cwlogs>=1.4,<1.5
