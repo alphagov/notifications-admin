@@ -122,7 +122,8 @@
 
     display: block;
     text-align: left;
-    padding: 10px govuk-spacing(3);
+    padding: 9px (govuk-spacing(3) - 1);
+    border: 1px solid transparent;
     text-align: center;
 
     &:link,
