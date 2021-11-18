@@ -28,7 +28,9 @@ botocore==1.20.84
 cachetools==4.2.2
     # via notifications-utils
 certifi==2021.5.30
-    # via requests
+    # via
+    #   pyproj
+    #   requests
 cffi==1.14.5
     # via cryptography
 chardet==4.0.0
@@ -162,6 +164,8 @@ pyparsing==2.4.7
     # via packaging
 pypdf2==1.26.0
     # via notifications-utils
+pyproj==3.2.1
+    # via -r requirements.in
 python-dateutil==2.8.1
     # via
     #   awscli-cwlogs
