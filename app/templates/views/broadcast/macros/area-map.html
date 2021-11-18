@@ -1,19 +1,29 @@
 {% macro map(broadcast_message) %}
   <div id="area-list-map"></div>
     <p class="area-list-key area-list-key--certain">
-      <span class="visually-hidden">
-        An area of {{ (broadcast_message.simple_polygons.estimated_area)|round_to_significant_figures(1)|format_thousands }} square miles
+      <svg class="area-list-key__icon" width="50" height="50" viewbox="0 0 50 50" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="100%" height="100%" fill="#FFFFFF" />
+        <polygon points="25 5, 45 25, 25 45, 5 25" stroke="#0B0B0C" stroke-width="2" fill="#96C6E2" />
+      </svg>
+      <span class="govuk-visually-hidden">
+        An area of {{ (broadcast_message.simple_polygons.estimated_area)|round_to_significant_figures(1)|format_thousands }} square miles&nbsp;
       </span>
       Will get
-      <span class="visually-hidden">the</span>
+      <span class="govuk-visually-hidden">
+        the
+      </span>
       alert
     </p>
     <p class="area-list-key area-list-key--likely">
-      <span class="visually-hidden">
-        An extra area of {{ (broadcast_message.simple_polygons_with_bleed.estimated_area - broadcast_message.simple_polygons.estimated_area)|round_to_significant_figures(1)|format_thousands }} square miles is
+      <svg class="area-list-key__icon" width="50" height="50" viewbox="0 0 50 50" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="100%" height="100%" fill="#FFFFFF" />
+        <polygon points="25 5, 45 25, 25 45, 5 25" stroke="#005ea5" stroke-opacity="1" stroke-width="2" stroke-linecap="square" stroke-linejoin="round" stroke-dasharray="4,7.5,5,7.5,8,8,5,8,7.5,8,5,8,7,8,5,8,4" fill="#2B8CC4" fill-opacity="0.15" />
+      </svg>
+      <span class="govuk-visually-hidden">
+        An extra area of {{ (broadcast_message.simple_polygons_with_bleed.estimated_area - broadcast_message.simple_polygons.estimated_area)|round_to_significant_figures(1)|format_thousands }} square miles is&nbsp;
       </span>
       Likely to get
-      <span class="visually-hidden">
+      <span class="govuk-visually-hidden">
         the
       </span>
       alert
