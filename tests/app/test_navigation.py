@@ -89,6 +89,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'documentation',
     'download_contact_list',
     'download_notifications_csv',
+    'download_organisation_usage_report',
     'edit_and_format_messages',
     'edit_data_retention',
     'edit_organisation_agreement',

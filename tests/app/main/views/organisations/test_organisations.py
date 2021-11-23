@@ -640,6 +640,92 @@ def test_organisation_services_hides_search_bar_for_7_or_fewer_services(
     assert not page.select_one('.live-search')
 
 
+@freeze_time("2021-11-12 11:09:00.061258")
+def test_organisation_services_links_to_downloadable_report(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {
+                'service_id': SERVICE_ONE_ID,
+                'service_name': 'Service 1',
+                'chargeable_billable_sms': 250122,
+                'emails_sent': 13000,
+                'free_sms_limit': 250000,
+                'letter_cost': 30.50,
+                'sms_billable_units': 122,
+                'sms_cost': 1.93,
+                'sms_remainder': None
+            },
+        ] * 2}
+    )
+    client_request.login(active_user_with_permissions)
+    page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
+
+    link_to_report = page.find('a', text="Download this report")
+    assert link_to_report.attrs["href"] == url_for(
+        '.download_organisation_usage_report',
+        org_id=ORGANISATION_ID,
+        selected_year=2021
+    )
+
+
+@freeze_time("2021-11-12 11:09:00.061258")
+def test_download_organisation_usage_report(
+    client_request,
+    mock_get_organisation,
+    mocker,
+    active_user_with_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        'app.organisations_client.get_services_and_usage',
+        return_value={"services": [
+            {
+                'service_id': SERVICE_ONE_ID,
+                'service_name': 'Service 1',
+                'chargeable_billable_sms': 22,
+                'emails_sent': 13000,
+                'free_sms_limit': 100,
+                'letter_cost': 30.50,
+                'sms_billable_units': 122,
+                'sms_cost': 1.93,
+                'sms_remainder': None
+            },
+            {
+                'service_id': SERVICE_TWO_ID,
+                'service_name': 'Service 1',
+                'chargeable_billable_sms': 222,
+                'emails_sent': 23000,
+                'free_sms_limit': 250000,
+                'letter_cost': 60.50,
+                'sms_billable_units': 322,
+                'sms_cost': 3.93,
+                'sms_remainder': None
+            },
+        ]}
+    )
+    client_request.login(active_user_with_permissions)
+    csv_report = client_request.get(
+        '.download_organisation_usage_report',
+        org_id=ORGANISATION_ID,
+        selected_year=2021,
+        _test_page_title=False
+    )
+
+    assert csv_report.string == (
+        "Service ID,Service Name,Emails sent,Free text message allowance remaining,"
+        "Spent on text messages (£),Spent on letters (£)"
+        "\r\n596364a0-858e-42c8-9062-a8fe822260eb,Service 1,13000,,1.93,30.5"
+        "\r\n147ad62a-2951-4fa1-9ca0-093cd1a52c52,Service 1,23000,,3.93,60.5\r\n"
+    )
+
+
 def test_organisation_trial_mode_services_shows_all_non_live_services(
     client_request,
     platform_admin_user,
