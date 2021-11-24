@@ -33,7 +33,7 @@ def test_sets_value_in_cache(mocker):
     mock_redis_set.assert_called_once_with(
         'live-service-and-organisation-counts',
         '{"data_from": "api"}',
-        ex=604800
+        ex=3600
     )
 
 
