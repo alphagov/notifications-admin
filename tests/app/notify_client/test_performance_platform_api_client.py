@@ -54,7 +54,7 @@ def test_sets_value_in_cache(mocker):
         call(
             'performance-stats-2021-01-01-to-2022-02-02',
             '{"data_from": "api"}',
-            ex=604800,
+            ex=3600,
         ),
     ]
 

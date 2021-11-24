@@ -3,7 +3,7 @@ from app.notify_client import NotifyAdminAPIClient, cache
 
 class PerformanceDashboardAPIClient(NotifyAdminAPIClient):
 
-    @cache.set('performance-stats-{start_date}-to-{end_date}')
+    @cache.set('performance-stats-{start_date}-to-{end_date}', ttl_in_seconds=3600)
     def get_performance_dashboard_stats(
         self,
         *,
