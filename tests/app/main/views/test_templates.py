@@ -867,12 +867,17 @@ def test_edit_letter_templates_postage_updates_postage(
     ),
     (
         ['manage_templates'],
-        ['.edit_service_template'],
+        [
+            ('.edit_service_template', 'Edit'),
+        ],
         None,
     ),
     (
         ['send_messages', 'manage_templates'],
-        ['.set_sender', '.edit_service_template'],
+        [
+            ('.set_sender', 'Get ready to send a message using this template'),
+            ('.edit_service_template', 'Edit'),
+        ],
         None,
     ),
 ])
@@ -904,16 +909,17 @@ def test_should_be_able_to_view_a_template_with_links(
         'Two week reminder – Templates – service one – GOV.UK Notify'
     )
 
-    links_in_page = page.select('.pill-separate-item')
-
-    assert len(links_in_page) == len(links_to_be_shown)
-
-    for index, link_to_be_shown in enumerate(links_to_be_shown):
-        assert links_in_page[index]['href'] == url_for(
-            link_to_be_shown,
+    assert [
+        (link['href'], normalize_spaces(link.text))
+        for link in page.select('.pill-separate-item')
+    ] == [
+        (url_for(
+            endpoint,
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-        )
+        ), text)
+        for endpoint, text in links_to_be_shown
+    ]
 
     assert normalize_spaces(page.select_one('main p').text) == (
         permissions_warning_to_be_shown or 'To: phone number'
