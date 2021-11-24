@@ -23,7 +23,7 @@
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not letter_too_long %}
             <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
-                Send<span class="govuk-visually-hidden"> a message using this template</span>
+                Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
               </a>
             </div>
           {% endif %}
@@ -46,7 +46,7 @@
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
             <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state pill-separate-item">
-                Send<span class="govuk-visually-hidden"> a message using this template</span>
+                Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
               </a>
             </div>
           {% endif %}
