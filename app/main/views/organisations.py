@@ -175,14 +175,21 @@ def download_organisation_usage_report(org_id):
         financial_year=selected_year
     )['services']
 
-    column_names = OrderedDict([
+    unit_column_names = OrderedDict([
         ('service_id', 'Service ID'),
         ('service_name', 'Service Name'),
         ('emails_sent', 'Emails sent'),
         ('sms_remainder', 'Free text message allowance remaining'),
+    ])
+
+    monetary_column_names = OrderedDict([
         ('sms_cost', 'Spent on text messages (£)'),
         ('letter_cost', 'Spent on letters (£)')
     ])
+
+    column_names = OrderedDict(
+        list(unit_column_names.items()) + list(monetary_column_names.items())
+    )
 
     org_usage_data = [[x for x in column_names.values()]]
 
