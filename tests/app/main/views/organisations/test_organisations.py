@@ -692,9 +692,9 @@ def test_download_organisation_usage_report(
                 'chargeable_billable_sms': 22,
                 'emails_sent': 13000,
                 'free_sms_limit': 100,
-                'letter_cost': 30.50,
+                'letter_cost': 30.5,
                 'sms_billable_units': 122,
-                'sms_cost': 1.93,
+                'sms_cost': 1.934,
                 'sms_remainder': None
             },
             {
@@ -703,9 +703,9 @@ def test_download_organisation_usage_report(
                 'chargeable_billable_sms': 222,
                 'emails_sent': 23000,
                 'free_sms_limit': 250000,
-                'letter_cost': 60.50,
+                'letter_cost': 60.5,
                 'sms_billable_units': 322,
-                'sms_cost': 3.93,
+                'sms_cost': 3.935,
                 'sms_remainder': None
             },
         ]}
@@ -721,8 +721,8 @@ def test_download_organisation_usage_report(
     assert csv_report.string == (
         "Service ID,Service Name,Emails sent,Free text message allowance remaining,"
         "Spent on text messages (£),Spent on letters (£)"
-        "\r\n596364a0-858e-42c8-9062-a8fe822260eb,Service 1,13000,,1.93,30.5"
-        "\r\n147ad62a-2951-4fa1-9ca0-093cd1a52c52,Service 1,23000,,3.93,60.5\r\n"
+        "\r\n596364a0-858e-42c8-9062-a8fe822260eb,Service 1,13000,,1.93,30.50"
+        "\r\n147ad62a-2951-4fa1-9ca0-093cd1a52c52,Service 1,23000,,3.94,60.50\r\n"
     )
 
 

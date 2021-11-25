@@ -175,19 +175,28 @@ def download_organisation_usage_report(org_id):
         financial_year=selected_year
     )['services']
 
-    column_names = OrderedDict([
+    unit_column_names = OrderedDict([
         ('service_id', 'Service ID'),
         ('service_name', 'Service Name'),
         ('emails_sent', 'Emails sent'),
         ('sms_remainder', 'Free text message allowance remaining'),
+    ])
+
+    monetary_column_names = OrderedDict([
         ('sms_cost', 'Spent on text messages (£)'),
         ('letter_cost', 'Spent on letters (£)')
     ])
 
-    org_usage_data = [[x for x in column_names.values()]]
-
-    for service in services_usage:
-        org_usage_data.append([service[attribute] for attribute in column_names.keys()])
+    org_usage_data = [
+        list(unit_column_names.values()) + list(monetary_column_names.values())
+    ] + [
+        [
+            service[attribute] for attribute in unit_column_names.keys()
+        ] + [
+            '{:,.2f}'.format(service[attribute]) for attribute in monetary_column_names.keys()
+        ]
+        for service in services_usage
+    ]
 
     return Spreadsheet.from_rows(org_usage_data).as_csv_data, 200, {
         'Content-Type': 'text/csv; charset=utf-8',
