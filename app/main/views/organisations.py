@@ -191,10 +191,14 @@ def download_organisation_usage_report(org_id):
         list(unit_column_names.items()) + list(monetary_column_names.items())
     )
 
-    org_usage_data = [[x for x in column_names.values()]]
-
-    for service in services_usage:
-        org_usage_data.append([service[attribute] for attribute in column_names.keys()])
+    org_usage_data = [
+        list(column_names.values())
+    ] + [
+        [
+            service[attribute] for attribute in column_names.keys()
+        ]
+        for service in services_usage
+    ]
 
     return Spreadsheet.from_rows(org_usage_data).as_csv_data, 200, {
         'Content-Type': 'text/csv; charset=utf-8',
