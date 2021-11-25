@@ -47,31 +47,31 @@ def _get_example_performance_data():
       "processing_time": [
         {
           "date": "2021-02-21",
-          "percentage_under_10_seconds": 99.2
+          "percentage_under_10_seconds": 99.25
         },
         {
           "date": "2021-02-22",
-          "percentage_under_10_seconds": 95.3
+          "percentage_under_10_seconds": 95.30
         },
         {
           "date": "2021-02-23",
-          "percentage_under_10_seconds": 95.6
+          "percentage_under_10_seconds": 95.0
         },
         {
           "date": "2021-02-24",
-          "percentage_under_10_seconds": 96.7
+          "percentage_under_10_seconds": 100.0
         },
         {
           "date": "2021-02-25",
-          "percentage_under_10_seconds": 95.7
+          "percentage_under_10_seconds": 99.99
         },
         {
           "date": "2021-02-26",
-          "percentage_under_10_seconds": 96.5
+          "percentage_under_10_seconds": 100.0
         },
         {
           "date": "2021-02-27",
-          "percentage_under_10_seconds": 98.6
+          "percentage_under_10_seconds": 98.60
         },
       ],
       "services_using_notify": [
@@ -144,16 +144,16 @@ def test_should_render_performance_page(
         'Only showing the last 7 days '
         ''
         'Messages sent within 10 seconds '
-        '96.8% on average '
+        '98.31% on average '
         'Messages sent within 10 seconds '
         'Date Percentage '
-        '27 February 2021 98.6% '
-        '26 February 2021 96.5% '
-        '25 February 2021 95.7% '
-        '24 February 2021 96.7% '
-        '23 February 2021 95.6% '
-        '22 February 2021 95.3% '
-        '21 February 2021 99.2% '
+        '27 February 2021 98.60% '
+        '26 February 2021 100.00% '
+        '25 February 2021 99.99% '
+        '24 February 2021 100.00% '
+        '23 February 2021 95.00% '
+        '22 February 2021 95.30% '
+        '21 February 2021 99.25% '
         'Only showing the last 7 days '
         ''
         'Organisations using Notify '

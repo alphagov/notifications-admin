@@ -88,7 +88,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
       {{ big_number(
-        '{:.1f}%'.format(average_percentage_under_10_seconds),
+        '{:.2f}%'.format(average_percentage_under_10_seconds),
         label='on average',
       ) }}
     </div>
@@ -107,7 +107,7 @@
         {{ item.date | format_date_normal }}
       {% endcall %}
       {% call field() %}
-        {{ item.percentage_under_10_seconds }}%
+        {{ '{:.2f}%'.format(item.percentage_under_10_seconds) }}
       {% endcall %}
     {% endcall %}
     <p class="table-show-more-link">
