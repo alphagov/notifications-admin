@@ -187,15 +187,13 @@ def download_organisation_usage_report(org_id):
         ('letter_cost', 'Spent on letters (£)')
     ])
 
-    column_names = OrderedDict(
-        list(unit_column_names.items()) + list(monetary_column_names.items())
-    )
-
     org_usage_data = [
-        list(column_names.values())
+        list(unit_column_names.values()) + list(monetary_column_names.values())
     ] + [
         [
-            service[attribute] for attribute in column_names.keys()
+            service[attribute] for attribute in unit_column_names.keys()
+        ] + [
+            '{:,.2f}'.format(service[attribute]) for attribute in monetary_column_names.keys()
         ]
         for service in services_usage
     ]
