@@ -179,7 +179,8 @@ def download_organisation_usage_report(org_id):
         ('service_id', 'Service ID'),
         ('service_name', 'Service Name'),
         ('emails_sent', 'Emails sent'),
-        ('sms_remainder', 'Free text message allowance remaining'),
+        # TODO: reinstate this once the API is returning correct data
+        # ('sms_remainder', 'Free text message allowance remaining'),
     ])
 
     monetary_column_names = OrderedDict([
