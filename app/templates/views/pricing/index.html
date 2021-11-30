@@ -21,9 +21,9 @@
 
   <p class="govuk-body">
     {% if not current_user.is_authenticated %}
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> then add as many different services as you need to.</p>
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> then add as many unique services as you need to.</p>
     {% else %}
-      You can add as many different services as you need to.
+      You can add as many unique services as you need to.
     {% endif %}
   </p>
 
@@ -33,25 +33,31 @@
   <p class="govuk-body">It’s free to send emails through Notify.</p>
 
   <h2 class="heading-medium" id="text-messages">Text messages</h2>
-  <p class="govuk-body">Every service you add has an annual allowance of free text messages.</p>
-  <p class="govuk-body">If your organisation has more than one service on Notify, they each have a separate allowance.</p>
-  <p class="govuk-body">You will only start paying for text messages when a service has used its free allowance for the year.</p>
+  <p class="govuk-body">Each unique service you add has an annual allowance of free text messages.</p>
+  <p class="govuk-body">When a service has used its annual allowance, it costs 1.6 pence (plus VAT) for each additional text message you send.</p>
+  <p class="govuk-body">The actual number of text messages we charge you for will depend on whether you:</p>
+  <ul class="list list-bullet">
+    <li>send long messages</li>
+    <li>use certain signs and symbols</li>
+    <li>use accents and accented letters</li>
+    <li>send text messages to international numbers</li>
+  </ul>
+
+  <p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.how_to_pay') }}">how to pay</a>.
+
+  <h3 class="heading-small" id="free-text-message-allowance">Free text message allowance</h3>
+
   <p class="govuk-body">The current allowance is:</p>
   <ul class="list list-bullet">
     <li>150,000 free text messages for national services</li>
     <li>25,000 free text messages for regional services</li>
     <li>10,000 free text messages for state-funded schools and GP practices</li>
   </ul>
-  <h3 class="heading-small" id="paying-for-additional-text-messages">Paying for additional text messages</h3>
-  <p class="govuk-body">When you’ve used your annual allowance of free text messages, it costs 1.6 pence (plus VAT) for each additional text message you send.</p>
-  <p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.how_to_pay') }}">how to pay</a>.
+  <p class="govuk-body">If your organisation has more than one service on Notify, they each have a separate allowance.</p>
+  <p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.who_can_use_notify') }}">who can use Notify</a>.</p>
 
   <h3 class="heading-small" id="long-text-messages">Long text messages</h3>
-  <p class="govuk-body">If a text message is longer than 160 characters (including spaces), it’ll be charged as more than one message.</p>
-  <p class="govuk-body">
-    The following characters are charged as 2 characters each:<br />
-    <span class="extended-gsm-characters">[]{}^\|~€</span>
-  </p>
+  <p class="govuk-body">If a text message is longer than 160 characters (including spaces), it counts as more than one message.</p>
 
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
@@ -75,9 +81,19 @@
       {% endfor %}
     {% endcall %}
   </div>
+
+  <h3 class="heading-small" id="symbols">Signs and symbols</h3>
+
+  <p class="govuk-body">
+    The following signs and symbols count as 2 characters each:<br />
+    <span class="extended-gsm-characters">[]{}^\|~€</span>
+  </p>
+
+  <p class="govuk-body">Using them can increase the cost of sending text messages.</p>
+
   <h3 class="heading-small" id="accents">Accents and accented characters</h3>
   <p class="govuk-body">Some languages, such as Welsh, use accented characters.</p>
-  <p class="govuk-body">Text messages containing the following accented characters are charged at the normal rate: Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü.</p>
+  <p class="govuk-body">The following accented characters do not affect the cost of sending text messages: Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü.</p>
   <p class="govuk-body">Using other accented characters can increase the cost of sending text messages.<p class="govuk-body">
   {% set accentedChars %}
     <div class="bottom-gutter-3-2">
