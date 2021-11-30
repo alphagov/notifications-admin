@@ -22,6 +22,7 @@ from werkzeug.utils import cached_property
 from wtforms import (
     BooleanField,
     DateField,
+    EmailField,
     FieldList,
     FileField,
     HiddenField,
@@ -30,13 +31,14 @@ from wtforms import (
 )
 from wtforms import RadioField as WTFormsRadioField
 from wtforms import (
+    SearchField,
     SelectMultipleField,
     StringField,
+    TelField,
     TextAreaField,
     ValidationError,
     validators,
 )
-from wtforms.fields.html5 import EmailField, SearchField, TelField
 from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
 
 from app.formatters import format_thousands, guess_name_from_email_address
@@ -542,7 +544,7 @@ class RadioFieldWithRequiredMessage(RadioField):
         try:
             return super().pre_validate(form)
         except ValueError:
-            raise ValueError(self.required_message)
+            raise ValidationError(self.required_message)
 
 
 class StripWhitespaceForm(Form):
