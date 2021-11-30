@@ -58,7 +58,7 @@ class ValidEmail:
 
     def __call__(self, form, field):
 
-        if field.data == '':
+        if not field.data:
             return
 
         try:
