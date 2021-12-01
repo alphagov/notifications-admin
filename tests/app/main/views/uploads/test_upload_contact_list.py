@@ -276,6 +276,22 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
     )
 
 
+def test_upload_csv_shows_error_with_invalid_extension(
+    client_request,
+):
+
+    page = client_request.post(
+        'main.upload_contact_list',
+        service_id=SERVICE_ONE_ID,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'invalid.txt')},
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one('.file-upload-label .error-message').text) == (
+        "invalid.txt is not a spreadsheet that Notify can read"
+    )
+
+
 def test_upload_csv_file_sanitises_and_truncates_file_name_in_metadata(
     client_request,
     mocker,
