@@ -9,29 +9,44 @@
 
   <h1 class="heading-large">Roadmap</h1>
 
-  <p class="govuk-body">The GOV.UK Notify roadmap shows the things we’re working on and when we hope to have them ready for you to use.</p>
-  <p class="govuk-body">The roadmap is a guide to what we have planned, but some things might change.</p>
+  <p class="govuk-body">The GOV.UK Notify roadmap shows what we’re working on and some of the <a class="govuk-link govuk-link--no-visited-state" href="#things-we-have-done">things we’ve done</a>.</p>
+  <p class="govuk-body">The roadmap is only a guide. It does not cover everything we do, and some things may change.</p>
+  <div class="govuk-inset-text">We review this page every 3 months. It was last updated on 30 November 2021.</div>
   <p class="govuk-body">You can <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('.support')}}">contact us</a> if you have any questions about the roadmap or suggestions for new features.</p>
 
-  <h2 class="heading-medium">July to December 2021</h2>
+  <h2 class="heading-medium">Things we’re working on</h2>
+
+<h3 class="heading-small">Now</h3>
 
   <ul class="list list-bullet">
     
-    <li>Help teams to write better messages (private alpha)</li>
-    <li>Investigate additional letter formats</li>
-    <li>Start sending emails from nhs.uk, gov.scot and parliament.uk email addresses</li>
-    
+    <li>Meet our targets for <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.accessibility_statement')}}">accessibility</a></li>
+    <li>Explore how we can make it easier for new teams to <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.get_started')}}">start using Notify</a></li>
+    <li>Explore ways to improve the quarterly <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.how_to_pay')}}">billing and invoicing</a> process</li>
+    <li>Help teams understand how their organisation uses Notify</li>    
   </ul>
 
-  <h2 class="heading-medium">January to March 2022</h2>
+  <h3 class="heading-small">Next</h3>
 
+  <ul class="list list-bullet">
+    <li>Design a way for services to upload their own logo and <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.branding_and_customisation')}}">branding for emails and letters</a></li>
+    <li>Explore ways to improve our daily letter printing capability</li>
+    <li>Prototype new ways to <a class="govuk-link govuk-link--no-visited-state" href="https://gds.blog.gov.uk/2020/08/18/can-gov-uk-notify-help-the-public-sector-write-better-emails-text-messages-and-letters/">help teams write cheaper, more effective messages</a></li>
+  </ul>
+
+  <h3 class="heading-small">Later</h3>
 
   <ul class="list list-bullet">
 
-    <li>Help teams to write better messages (public beta)</li>
-    <li>Let teams add forms and attachments to letter templates</li>
-    <li>Explore ways to shorten links in emails and text messages</li>
+    <li>Test our current capacity limits and rate limits</li>
+    <li>Test some new ways to help teams to write better messages</li>
 
   </ul>
+
+  <h2 class="heading-medium" id="things-we-have-done">Things we’ve done</h2>
+
+  <p class="govuk-body">Since January 2021 we’ve sent 1 billion messages for services that were set up in response to the coronavirus (COVID-19) pandemic. This includes 4.5 million <a class="govuk-link govuk-link--no-visited-state" href="https://www.nhs.uk/conditions/coronavirus-covid-19/coronavirus-vaccination/book-coronavirus-vaccination/">vaccination</a> invitation letters and 700 million <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/get-coronavirus-test">test results</a>.</p>
+
+  <p class="govuk-body">More recently, we’ve upgraded some of the software we use to more recent versions.</p>
 
 {% endblock %}
