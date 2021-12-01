@@ -15,7 +15,6 @@ from notifications_utils.clients.zendesk.zendesk_client import (
 )
 
 import app
-from app.formatters import email_safe
 from tests import (
     find_element_by_tag_and_partial_text,
     invite_json,
@@ -542,26 +541,6 @@ def test_should_show_service_name_with_no_prefixing(
     ).text == 'Your service name should tell users what the message is about as well as who it’s from.'
 
 
-def test_should_redirect_after_change_service_name(
-    client_request,
-    mock_update_service,
-    mock_service_name_is_unique,
-):
-    client_request.post(
-        'main.service_name_change',
-        service_id=SERVICE_ONE_ID,
-        _data={'name': "new name"},
-        _expected_status=302,
-        _expected_redirect=url_for(
-            'main.service_name_change_confirm',
-            service_id=SERVICE_ONE_ID,
-            _external=True,
-        )
-    )
-
-    assert mock_service_name_is_unique.called is True
-
-
 def test_should_not_hit_api_if_service_name_hasnt_changed(
     client_request,
     mock_update_service,
@@ -578,7 +557,6 @@ def test_should_not_hit_api_if_service_name_hasnt_changed(
             _external=True,
         ),
     )
-    assert not mock_service_name_is_unique.called
     assert not mock_update_service.called
 
 
@@ -590,7 +568,6 @@ def test_should_not_hit_api_if_service_name_hasnt_changed(
 def test_service_name_change_fails_if_new_name_fails_validation(
     client_request,
     mock_update_service,
-    mock_service_name_is_unique,
     name,
     error_message,
 ):
@@ -600,7 +577,6 @@ def test_service_name_change_fails_if_new_name_fails_validation(
         _data={'name': name},
         _expected_status=200,
     )
-    assert not mock_service_name_is_unique.called
     assert not mock_update_service.called
     assert error_message in page.find("span", {"class": "govuk-error-message"}).text
 
@@ -796,9 +772,9 @@ def test_switch_service_to_count_as_live(
     )
 
 
-def test_should_not_allow_duplicate_names(
+def test_should_not_allow_duplicate_service_names(
     client_request,
-    mock_service_name_is_not_unique,
+    mock_update_service_raise_httperror_duplicate_name,
     service_one,
 ):
     page = client_request.post(
@@ -809,39 +785,18 @@ def test_should_not_allow_duplicate_names(
     )
 
     assert 'This service name is already in use' in page.text
-    app.service_api_client.is_service_name_unique.assert_called_once_with(
-        SERVICE_ONE_ID,
-        'SErvICE TWO',
-        'service.two',
-    )
-
-
-def test_should_show_service_name_confirmation(
-    client_request,
-):
-    service_new_name = 'New Name'
-    with client_request.session_transaction() as session:
-        session['service_name_change'] = service_new_name
-    page = client_request.get(
-        'main.service_name_change_confirm',
-        service_id=SERVICE_ONE_ID,
-    )
-    assert 'Change your service name' in page.text
-    app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
 def test_should_redirect_after_service_name_confirmation(
     client_request,
     mock_update_service,
-    mock_verify_password,
-    mock_get_inbound_number_for_service,
 ):
-    service_new_name = 'New Name'
-    with client_request.session_transaction() as session:
-        session['service_name_change'] = service_new_name
     client_request.post(
-        'main.service_name_change_confirm',
+        'main.service_name_change',
         service_id=SERVICE_ONE_ID,
+        _data={
+            'name': 'New Name'
+        },
         _expected_status=302,
         _expected_redirect=url_for(
             'main.service_settings',
@@ -852,47 +807,9 @@ def test_should_redirect_after_service_name_confirmation(
 
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        name=service_new_name,
-        email_from=email_safe(service_new_name)
+        name='New Name',
+        email_from='new.name',
     )
-    assert mock_verify_password.called is True
-
-
-def test_should_raise_duplicate_name_handled(
-    client_request,
-    mock_update_service_raise_httperror_duplicate_name,
-    mock_verify_password,
-):
-    with client_request.session_transaction() as session:
-        session['service_name_change'] = 'New Name'
-
-    client_request.post(
-        'main.service_name_change_confirm',
-        service_id=SERVICE_ONE_ID,
-        _expected_status=302,
-        _expected_redirect=url_for(
-            'main.service_name_change',
-            service_id=SERVICE_ONE_ID,
-            _external=True,
-        ),
-    )
-
-    assert mock_update_service_raise_httperror_duplicate_name.called
-    assert mock_verify_password.called
-
-
-def test_service_name_change_confirm_handles_expired_session(
-    client_request, mock_verify_password, mock_update_service
-):
-    page = client_request.post(
-        'main.service_name_change_confirm',
-        service_id=SERVICE_ONE_ID,
-        _follow_redirects=True
-    )
-    assert mock_verify_password.called is False
-    assert mock_update_service.called is False
-
-    assert page.find('div', 'banner-dangerous').text.strip() == "The change you made was not saved. Please try again."
 
 
 @pytest.mark.parametrize('volumes, consent_to_research, expected_estimated_volumes_item', [
@@ -2092,7 +2009,6 @@ def test_ready_to_go_live(
 @pytest.mark.parametrize('route', [
     'main.service_settings',
     'main.service_name_change',
-    'main.service_name_change_confirm',
     'main.request_to_go_live',
     'main.submit_request_to_go_live',
     'main.archive_service'
@@ -2127,7 +2043,6 @@ def test_route_permissions(
 @pytest.mark.parametrize('route', [
     'main.service_settings',
     'main.service_name_change',
-    'main.service_name_change_confirm',
     'main.request_to_go_live',
     'main.submit_request_to_go_live',
     'main.service_switch_live',
@@ -2157,7 +2072,6 @@ def test_route_invalid_permissions(
 @pytest.mark.parametrize('route', [
     'main.service_settings',
     'main.service_name_change',
-    'main.service_name_change_confirm',
     'main.request_to_go_live',
     'main.submit_request_to_go_live',
 ])

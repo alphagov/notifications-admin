@@ -239,7 +239,6 @@ class MainNavigation(Navigation):
             'service_letter_contact_details',
             'service_make_blank_default_letter_contact',
             'service_name_change',
-            'service_name_change_confirm',
             'service_preview_email_branding',
             'service_preview_letter_branding',
             'service_set_auth_type',
