@@ -212,6 +212,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'roadmap',
     'save_contact_list',
     'security',
+    'security_policy',
     'send_files_by_email',
     'send_files_by_email_contact_details',
     'send_from_contact_list',
