@@ -32,7 +32,7 @@ awscli-cwlogs>=1.4,<1.5
 itsdangerous==1.1.0  # pyup: <2
 
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@48.0.0
-govuk-frontend-jinja @ git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha
+govuk-frontend-jinja==1.5.1
 
 # cryptography 3.4+ incorporates Rust code, which isn't supported on PaaS
 # e.g. https://github.com/alphagov/notifications-api/pull/3126
