@@ -91,3 +91,43 @@ def test_areas_treats_missing_ids_as_custom_broadcast(notify_admin):
 
     assert len(list(broadcast_message.areas)) == 2
     assert type(broadcast_message.areas) == CustomBroadcastAreas
+
+
+@pytest.mark.parametrize('area_ids, approx_bounds', (
+    ([
+        'ctry19-N92000002',  # Northern Ireland (UTM zone 29N)
+        'ctry19-W92000004',  # Wales (UTM zone 30N)
+    ], [
+        -8.2, 51.5, -2.1, 55.1
+    ]),
+    ([
+        'lad20-E06000031',  # Peterborough (UTM zone 30N)
+        'lad20-E07000146',  # Kings Lyn and West Norfolk (UTM zone 31N)
+    ], [
+        -0.5, 52.5, 0.8, 53.0
+    ]),
+    ([
+        'wd20-E05009372',  # Hackney Central (UTM zone 30N)
+        'wd20-E05009374',  # Hackney Wick (UTM zone 30N)
+    ], [
+        -0.1, 51.5, -0.0, 51.6
+    ]),
+    ([
+        'wd20-E05009372',  # Hackney Central (UTM zone 30N)
+        'test-santa-claus-village-rovaniemi-a',  # (UTM zone 35N)
+    ], [
+        -0.1, 51.5, 25.9, 66.6
+    ]),
+))
+def test_combining_multiple_areas_keeps_same_bounds(area_ids, approx_bounds):
+    broadcast_message = BroadcastMessage(broadcast_message_json(
+        areas={'ids': area_ids}
+    ))
+
+    assert [
+        round(coordinate, 1) for coordinate in broadcast_message.polygons.bounds
+    ] == [
+        round(coordinate, 1) for coordinate in broadcast_message.simple_polygons.bounds
+    ] == (
+        approx_bounds
+    )
