@@ -9,7 +9,6 @@ from flask import (
     redirect,
     render_template,
     request,
-    session,
     url_for,
 )
 from flask_login import current_user
@@ -28,7 +27,6 @@ from app import (
     notification_api_client,
     organisations_client,
     service_api_client,
-    user_api_client,
 )
 from app.event_handlers import (
     create_archive_service_event,
@@ -42,7 +40,6 @@ from app.main import main
 from app.main.forms import (
     BillingDetailsForm,
     BrandingOptions,
-    ConfirmPasswordForm,
     EditNotesForm,
     EstimateUsageForm,
     FreeSMSAllowance,
@@ -95,24 +92,28 @@ def service_settings(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/name", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def service_name_change(service_id):
-    form = RenameServiceForm()
-
-    if request.method == 'GET':
-        form.name.data = current_service.name
+    form = RenameServiceForm(name=current_service.name)
 
     if form.validate_on_submit():
 
         if form.name.data == current_service.name:
             return redirect(url_for('.service_settings', service_id=service_id))
 
-        unique_name = service_api_client.is_service_name_unique(service_id, form.name.data, email_safe(form.name.data))
-
-        if not unique_name:
-            form.name.errors.append("This service name is already in use")
-            return render_template('views/service-settings/name.html', form=form)
-
-        session['service_name_change'] = form.name.data
-        return redirect(url_for('.service_name_change_confirm', service_id=service_id))
+        try:
+            current_service.update(
+                name=form.name.data,
+                email_from=email_safe(form.name.data),
+            )
+        except HTTPError as http_error:
+            if http_error.status_code == 400 and any(
+                name_error_message.startswith('Duplicate service name')
+                for name_error_message in http_error.message['name']
+            ):
+                form.name.errors.append('This service name is already in use')
+            else:
+                raise http_error
+        else:
+            return redirect(url_for('.service_settings', service_id=service_id))
 
     if current_service.organisation_type == 'local':
         return render_template(
@@ -124,42 +125,6 @@ def service_name_change(service_id):
         'views/service-settings/name.html',
         form=form,
     )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/name/confirm", methods=['GET', 'POST'])
-@user_has_permissions('manage_service')
-def service_name_change_confirm(service_id):
-    if 'service_name_change' not in session:
-        flash("The change you made was not saved. Please try again.", 'error')
-        return redirect(url_for('main.service_name_change', service_id=service_id))
-
-    # Validate password for form
-    def _check_password(pwd):
-        return user_api_client.verify_password(current_user.id, pwd)
-
-    form = ConfirmPasswordForm(_check_password)
-
-    if form.validate_on_submit():
-        try:
-            current_service.update(
-                name=session['service_name_change'],
-                email_from=email_safe(session['service_name_change'])
-            )
-        except HTTPError as e:
-            error_msg = "Duplicate service name '{}'".format(session['service_name_change'])
-            if e.status_code == 400 and error_msg in e.message['name']:
-                # Redirect the user back to the change service name screen
-                flash('This service name is already in use', 'error')
-                return redirect(url_for('main.service_name_change', service_id=service_id))
-            else:
-                raise e
-        else:
-            session.pop('service_name_change')
-            return redirect(url_for('.service_settings', service_id=service_id))
-    return render_template(
-        'views/service-settings/confirm.html',
-        heading='Change your service name',
-        form=form)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/request-to-go-live/estimate-usage", methods=['GET', 'POST'])
