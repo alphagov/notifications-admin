@@ -218,12 +218,33 @@ class BroadcastMessage(JSONModel):
         )
 
     def get_polygons_from_areas(self, area_attribute):
-        polygons = Polygons(
-            list(itertools.chain(*(
-                getattr(area, area_attribute) for area in self.areas
-            ))),
-            utm_crs=self.areas[0].simple_polygons.utm_polygons.utm_crs,
-        )
+        areas_polygons = [
+            getattr(area, area_attribute) for area in self.areas
+        ]
+        coordinate_reference_systems = {
+            polygons.utm_crs for polygons in areas_polygons
+        }
+
+        if len(coordinate_reference_systems) == 1:
+            # All our polygons are defined in the same coordinate
+            # reference system so we just have to flatten the list and
+            # say which coordinate reference system we are using
+            polygons = Polygons(
+                list(itertools.chain(*areas_polygons)),
+                utm_crs=next(iter(coordinate_reference_systems)),
+            )
+        else:
+            # Our polygons are in different coordinate reference systems
+            # We need to convert them back to degrees and make a new
+            # instance of `Polygons` which will determine a common
+            # coordinate reference system
+            polygons = Polygons(
+                list(itertools.chain(*(
+                    area_polygon.as_wgs84_coordinates
+                    for area_polygon in areas_polygons
+                )))
+            )
+
         if area_attribute != 'polygons' and len(self.areas) > 1:
             # We’re combining simplified polygons from multiple areas so we
             # need to re-simplify the combined polygons to keep the point
