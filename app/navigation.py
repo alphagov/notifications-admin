@@ -349,5 +349,8 @@ class OrgNavigation(Navigation):
         },
         'trial-services': {
             'organisation_trial_mode_services',
+        },
+        'billing': {
+            'organisation_billing',
         }
     }

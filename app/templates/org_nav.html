@@ -5,6 +5,7 @@
     {% if current_user.platform_admin %}
     <li><a class="govuk-link govuk-link--no-visited-state{{ org_navigation.is_selected('settings') }}" href="{{ url_for('.organisation_settings', org_id=current_org.id) }}">Settings</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state{{ org_navigation.is_selected('trial-services') }}" href="{{ url_for('.organisation_trial_mode_services', org_id=current_org.id) }}">Trial mode services</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state{{ org_navigation.is_selected('billing') }}" href="{{ url_for('.organisation_billing', org_id=current_org.id) }}">Billing</a></li>
     {% endif %}
   </ul>
 </nav>

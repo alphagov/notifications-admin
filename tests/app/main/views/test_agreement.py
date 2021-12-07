@@ -10,7 +10,7 @@ from tests import organisation_json
 from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, normalize_spaces
 
 
-class _MockS3Object():
+class MockS3Object():
 
     def __init__(self, data=None):
         self.data = data or b''
@@ -157,7 +157,7 @@ def test_download_service_agreement(
     )
     mock_get_s3_object = mocker.patch(
         'app.s3_client.s3_mou_client.get_s3_object',
-        return_value=_MockS3Object(b'foo')
+        return_value=MockS3Object(b'foo')
     )
 
     response = logged_in_client.get(url_for(
@@ -506,7 +506,7 @@ def test_show_public_agreement_page(
 ):
     mocker.patch(
         'app.s3_client.s3_mou_client.get_s3_object',
-        return_value=_MockS3Object()
+        return_value=MockS3Object()
     )
     response = client.get(url_for(
         endpoint,

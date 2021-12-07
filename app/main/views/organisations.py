@@ -2,7 +2,15 @@ from collections import OrderedDict
 from datetime import datetime
 from functools import partial
 
-from flask import flash, redirect, render_template, request, session, url_for
+from flask import (
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    session,
+    url_for,
+)
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from werkzeug.exceptions import abort
@@ -44,6 +52,7 @@ from app.main.views.dashboard import (
 from app.main.views.service_settings import get_branding_as_value_and_label
 from app.models.organisation import AllOrganisations, Organisation
 from app.models.user import InvitedOrgUser, User
+from app.s3_client.s3_mou_client import get_mou
 from app.utils.csv import Spreadsheet
 from app.utils.user import user_has_permissions, user_is_platform_admin
 
@@ -640,3 +649,19 @@ def edit_organisation_billing_details(org_id):
         'views/organisations/organisation/settings/edit-organisation-billing-details.html',
         form=form,
     )
+
+
+@main.route("/organisations/<uuid:org_id>/billing")
+@user_is_platform_admin
+def organisation_billing(org_id):
+    return render_template(
+        'views/organisations/organisation/billing.html'
+    )
+
+
+@main.route('/organisations/<uuid:org_id>/agreement.pdf')
+@user_is_platform_admin
+def organisation_download_agreement(org_id):
+    return send_file(**get_mou(
+        current_organisation.crown_status_or_404
+    ))
