@@ -9,6 +9,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
 from flask_wtf.file import FileField as FileField_wtf
+from flask_wtf.file import FileSize
 from notifications_utils.columns import Columns
 from notifications_utils.countries.data import Postage
 from notifications_utils.formatters import strip_all_whitespace
@@ -1512,8 +1513,14 @@ class ChangePasswordForm(StripWhitespaceForm):
 
 
 class CsvUploadForm(StripWhitespaceForm):
-    file = FileField('Add recipients', validators=[DataRequired(
-        message='Please pick a file'), CsvFileValidator()])
+    file = FileField('Add recipients', validators=[
+        DataRequired(message='Please pick a file'),
+        CsvFileValidator(),
+        FileSize(
+            max_size=10e6,  # 10Mb
+            message='File must be smaller than 10Mb'
+        )
+    ])
 
 
 class ChangeNameForm(StripWhitespaceForm):

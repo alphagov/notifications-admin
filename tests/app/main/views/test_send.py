@@ -5,6 +5,7 @@ from glob import glob
 from io import BytesIO
 from itertools import repeat
 from os import path
+from random import randbytes
 from unittest.mock import ANY
 from uuid import uuid4
 from zipfile import BadZipFile
@@ -964,6 +965,25 @@ def test_upload_csv_invalid_extension(
 
     assert resp.status_code == 200
     assert "invalid.txt is not a spreadsheet that Notify can read" in resp.get_data(as_text=True)
+
+
+def test_upload_csv_size_too_big(
+    logged_in_client,
+    mock_login,
+    service_one,
+    mock_get_service_template,
+    fake_uuid,
+):
+
+    resp = logged_in_client.post(
+        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
+        data={'file': (BytesIO(randbytes(11_000_000)), 'invalid.csv')},
+        content_type='multipart/form-data',
+        follow_redirects=True
+    )
+
+    assert resp.status_code == 200
+    assert "File must be smaller than 10Mb" in resp.get_data(as_text=True)
 
 
 def test_upload_valid_csv_redirects_to_check_page(
