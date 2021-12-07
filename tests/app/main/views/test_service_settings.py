@@ -787,7 +787,7 @@ def test_should_not_allow_duplicate_service_names(
     assert 'This service name is already in use' in page.text
 
 
-def test_should_redirect_after_service_name_confirmation(
+def test_should_redirect_after_service_name_change(
     client_request,
     mock_update_service,
 ):
