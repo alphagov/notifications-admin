@@ -7,6 +7,8 @@ from notifications_utils.serialised_model import SerialisedModelCollection
 from rtreelib import Rect
 from werkzeug.utils import cached_property
 
+from app.formatters import square_metres_to_square_miles
+
 from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository, rtree_index
 
@@ -55,13 +57,13 @@ class BaseBroadcastArea(ABC):
 
     @cached_property
     def simple_polygons_with_bleed(self):
-        return self.simple_polygons.bleed_by(self.estimated_bleed_in_degrees)
+        return self.simple_polygons.bleed_by(self.estimated_bleed_in_m)
 
     @cached_property
     def phone_density(self):
-        if not self.polygons.estimated_area:
+        if not self.simple_polygons.estimated_area:
             return 0
-        return self.count_of_phones / self.polygons.estimated_area
+        return self.count_of_phones / square_metres_to_square_miles(self.simple_polygons.estimated_area)
 
     @property
     def estimated_bleed_in_m(self):
@@ -72,13 +74,9 @@ class BaseBroadcastArea(ABC):
         range masts, so the typical bleed will be high (up to 5,000m).
         '''
         if self.phone_density < 1:
-            return Polygons.approx_bleed_in_degrees * Polygons.approx_metres_to_degree
+            return Polygons.approx_bleed_in_m
         estimated_bleed = 5_900 - (math.log(self.phone_density, 10) * 1_250)
         return max(500, min(estimated_bleed, 5000))
-
-    @property
-    def estimated_bleed_in_degrees(self):
-        return self.estimated_bleed_in_m / Polygons.approx_metres_to_degree
 
 
 class BroadcastArea(BaseBroadcastArea, SortableMixin):
@@ -97,20 +95,27 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
     @classmethod
     def from_row_with_simple_polygons(cls, row):
         instance = cls(row[:4])
-        instance.simple_polygons = Polygons(row[4])
+        instance.simple_polygons = Polygons(
+            row[4],
+            utm_crs=row[5],
+        )
         return instance
 
     @cached_property
     def polygons(self):
+        polygons, utm_crs = BroadcastAreasRepository().get_polygons_for_area(self.id)
         return Polygons(
-            BroadcastAreasRepository().get_polygons_for_area(self.id)
+            polygons, utm_crs=utm_crs
         )
 
     @cached_property
     def simple_polygons(self):
-        return Polygons(
+        simple_polygons, utm_crs = (
             BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
         )
+        return Polygons(
+            simple_polygons, utm_crs=utm_crs
+        ).utm_polygons
 
     @cached_property
     def sub_areas(self):
@@ -123,7 +128,7 @@ class BroadcastArea(BaseBroadcastArea, SortableMixin):
     def count_of_phones(self):
         if self.id.endswith(CITY_OF_LONDON.WARDS):
             return CITY_OF_LONDON.DAYTIME_POPULATION * (
-                self.polygons.estimated_area / CITY_OF_LONDON.AREA_SQUARE_MILES
+                self.polygons.estimated_area / CITY_OF_LONDON.AREA_SQUARE_METRES
             )
         if self.sub_areas:
             return sum(area.count_of_phones for area in self.sub_areas)
@@ -162,14 +167,19 @@ class CustomBroadcastArea(BaseBroadcastArea):
 
     @classmethod
     def from_polygon_objects(cls, polygon_objects):
-        return cls(name=None, polygons=polygon_objects.as_coordinate_pairs_lat_long)
+        instance = cls(name=None)
+        instance.polygons = polygon_objects
+        return instance
 
-    @property
+    @cached_property
     def polygons(self):
         return Polygons(
             # Polygons in the DB are stored with the coordinate pair
             # order flipped – this flips them back again
-            Polygons(self._polygons).as_coordinate_pairs_lat_long
+            [
+                [[lat, long] for long, lat in polygon]
+                for polygon in self._polygons
+            ]
         )
 
     simple_polygons = polygons
@@ -188,7 +198,7 @@ class CustomBroadcastArea(BaseBroadcastArea):
         return broadcast_area_libraries.get_areas_with_simple_polygons([
             # We only index electoral wards in the RTree
             overlap.data for overlap in rtree_index.query(
-                Rect(*self.polygons.bounds)
+                Rect(*self.simple_polygons.bounds)
             )
         ])
 

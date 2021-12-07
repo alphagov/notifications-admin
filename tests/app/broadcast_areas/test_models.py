@@ -5,7 +5,7 @@ from tests.app.broadcast_areas.custom_polygons import BRISTOL, SANTA_A, SKYE
 
 
 @pytest.mark.parametrize(('simple_polygon', 'expected_wards_length'), [
-    (SKYE, 2),
+    (SKYE, 1),
     (BRISTOL, 12),
     (SANTA_A, 0)  # does not overlap with UK
 ])

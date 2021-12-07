@@ -31,8 +31,9 @@ class CITY_OF_LONDON:
     )
     # https://data.london.gov.uk/blog/daytime-population-of-london-2014/
     DAYTIME_POPULATION = 553_000
-    # Approx area of the polygons we’re storing, not the actual area
-    AREA_SQUARE_MILES = 1.78
+    # Exact area of the polygons we’re storing, which matches the 2.9km²
+    # given by https://en.wikipedia.org/wiki/City_of_London
+    AREA_SQUARE_METRES = 2_885_598
 
 
 class BRYHER:

@@ -88,7 +88,7 @@ class BroadcastMessage(JSONModel):
             broadcast_message_id=broadcast_message_id,
         ))
 
-    @property
+    @cached_property
     def areas(self):
         if 'ids' in self._dict['areas']:
             library_areas = self.get_areas(self.area_ids)
@@ -221,7 +221,8 @@ class BroadcastMessage(JSONModel):
         polygons = Polygons(
             list(itertools.chain(*(
                 getattr(area, area_attribute) for area in self.areas
-            )))
+            ))),
+            utm_crs=self.areas[0].simple_polygons.utm_polygons.utm_crs,
         )
         if area_attribute != 'polygons' and len(self.areas) > 1:
             # We’re combining simplified polygons from multiple areas so we
