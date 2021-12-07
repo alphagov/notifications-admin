@@ -33,6 +33,7 @@ from app.main.views import (  # noqa isort:skip
     providers,
     register,
     returned_letters,
+    security_policy,
     send,
     service_settings,
     sign_in,
