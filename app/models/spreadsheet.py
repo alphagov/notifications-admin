@@ -1,9 +1,8 @@
 import csv
-from io import BytesIO, StringIO
+from io import StringIO
 from os import path
 
 import pyexcel
-import pyexcel_xlsx
 
 
 class Spreadsheet():
@@ -87,19 +86,3 @@ class Spreadsheet():
             form.file.data,
             filename=form.file.data.filename,
         )
-
-    @property
-    def as_rows(self):
-        if not self._rows:
-            self._rows = list(csv.reader(
-                StringIO(self._csv_data),
-                quoting=csv.QUOTE_MINIMAL,
-                skipinitialspace=True,
-            ))
-        return self._rows
-
-    @property
-    def as_excel_file(self):
-        io = BytesIO()
-        pyexcel_xlsx.save_data(io, {'Sheet 1': self.as_rows})
-        return io.getvalue()
