@@ -1,5 +1,4 @@
 from datetime import date
-from unittest.mock import call
 
 from app.notify_client.performance_dashboard_api_client import (
     PerformanceDashboardAPIClient,
@@ -42,21 +41,15 @@ def test_sets_value_in_cache(mocker):
         end_date=date(2022, 2, 2),
     ) == {'data_from': 'api'}
 
-    assert mock_redis_get.call_args_list == [
-        call('performance-stats-2021-01-01-to-2022-02-02'),
-    ]
-    assert mock_api_get.call_args_list == [
-        call('/performance-dashboard', params={
+    mock_redis_get.assert_called_once_with('performance-stats-2021-01-01-to-2022-02-02')
+    mock_api_get.assert_called_once_with('/performance-dashboard', params={
             'start_date': '2021-01-01', 'end_date': '2022-02-02'
-        }),
-    ]
-    assert mock_redis_set.call_args_list == [
-        call(
-            'performance-stats-2021-01-01-to-2022-02-02',
-            '{"data_from": "api"}',
-            ex=3600,
-        ),
-    ]
+        })
+    mock_redis_set.assert_called_once_with(
+        'performance-stats-2021-01-01-to-2022-02-02',
+        '{"data_from": "api"}',
+        ex=3600,
+    )
 
 
 def test_returns_value_from_cache(mocker):
@@ -78,8 +71,6 @@ def test_returns_value_from_cache(mocker):
         end_date=date(2022, 2, 2),
     ) == {'data_from': 'cache'}
 
-    assert mock_redis_get.call_args_list == [
-        call('performance-stats-2021-01-01-to-2022-02-02'),
-    ]
+    mock_redis_get.assert_called_once_with('performance-stats-2021-01-01-to-2022-02-02')
     assert mock_api_get.called is False
     assert mock_redis_set.called is False
