@@ -279,7 +279,6 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
 def test_upload_csv_shows_error_with_invalid_extension(
     client_request,
 ):
-
     page = client_request.post(
         'main.upload_contact_list',
         service_id=SERVICE_ONE_ID,
@@ -287,7 +286,7 @@ def test_upload_csv_shows_error_with_invalid_extension(
         _follow_redirects=True,
     )
 
-    assert normalize_spaces(page.select_one('.file-upload-label .error-message').text) == (
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         "invalid.txt is not a spreadsheet that Notify can read"
     )
 
