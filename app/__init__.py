@@ -28,7 +28,10 @@ from notifications_utils.formatters import (
     formatted_list,
     get_lines_with_normalised_whitespace,
 )
-from notifications_utils.recipients import format_phone_number_human_readable
+from notifications_utils.recipients import (
+    CSVTooBigError,
+    format_phone_number_human_readable,
+)
 from notifications_utils.sanitise_text import SanitiseASCII
 from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
@@ -441,6 +444,10 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     @application.errorhandler(401)
     def handle_no_permissions(error):
         return _error_response(401)
+
+    @application.errorhandler(CSVTooBigError)
+    def handle_csv_too_big(error):
+        return _error_response(413)
 
     @application.errorhandler(BadSignature)
     def handle_bad_token(error):

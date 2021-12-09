@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from flask import Response, url_for
 from flask_wtf.csrf import CSRFError
 from notifications_python_client.errors import HTTPError
+from notifications_utils.recipients import CSVTooBigError
 
 
 def test_bad_url_returns_page_not_found(client):
@@ -72,3 +73,15 @@ def test_405_returns_something_went_wrong_page(client, mocker):
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'Sorry, there’s a problem with GOV.UK Notify'
     assert page.title.string.strip() == 'Sorry, there’s a problem with the service – GOV.UK Notify'
+
+
+def test_csv_too_big_returns_413(client, mocker):
+    csv_error = CSVTooBigError()
+    # a more realistic view would be "send.check_messages", but using one that
+    # doesn't require lots of params is sufficient for this test.
+    mocker.patch('app.main.views.index.render_template', side_effect=csv_error)
+    response = client.get('/cookies')
+
+    assert response.status_code == 413
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    assert page.h1.string.strip() == 'The file you uploaded was too big'
