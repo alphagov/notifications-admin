@@ -21,19 +21,23 @@
     position: absolute;
     top: -1px;
     left: -1px;
-    padding: govuk-spacing(2) + 1px govuk-spacing(3) (govuk-spacing(2) - 1px) 46px;
+    padding: govuk-spacing(2) + 1px govuk-spacing(3) (govuk-spacing(2) - 1px) 15px;
     border: solid 1px transparent; // to show it's area in high contrast mode
     width: calc(100% + 2px); // grow to overlap wrapper's border (when combined with top and left)
     box-sizing: border-box;
     font-weight: bold;
-    background: $grey-1 file-url('exclamation.svg');
+    background: $grey-1;
     color: $white;
-    background-size: 22px;
-    background-repeat: no-repeat;
-    background-position: govuk-spacing(3) 11px;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
     box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
+
+    &__icon {
+      padding-right: 6px;
+      // user agents set this to 'none' by default for svgs so set as 'auto' to allow
+      // colours to be overridden in forced-color modes like Windows high contrast mode
+      forced-color-adjust: auto;
+    }
   }
 
 }
