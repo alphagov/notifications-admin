@@ -103,7 +103,7 @@ class JobApiClient(NotifyAdminAPIClient):
         redis_client.set(
             'has_jobs-{}'.format(service_id),
             b'true',
-            ex=cache.DEFAULT_TTL,
+            ex=int(cache.DEFAULT_TTL),
         )
 
         return job
