@@ -231,7 +231,7 @@ def govuk_text_input_field_widget(self, field, type=None, param_extensions=None,
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name
             },
-            error_message_format: " ".join(field.errors).strip()
+            error_message_format: field.errors[0]
         }
 
     # convert to parameters that govuk understands

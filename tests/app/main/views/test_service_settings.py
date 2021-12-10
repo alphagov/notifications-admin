@@ -2361,6 +2361,27 @@ def test_incorrect_sms_sender_input(
         assert count_of_api_calls == 0
 
 
+def test_incorrect_sms_sender_input_with_multiple_errors_only_shows_the_first(
+    client_request,
+    no_sms_senders,
+    mock_add_sms_sender,
+):
+    # There are two errors with the SMS sender - the length and characters used. Only one
+    # should be displayed on the page.
+    page = client_request.post(
+        'main.service_add_sms_sender',
+        service_id=SERVICE_ONE_ID,
+        _data={'sms_sender': '{}'},
+        _expected_status=200
+    )
+
+    error_message = page.select_one('.govuk-error-message')
+    count_of_api_calls = len(mock_add_sms_sender.call_args_list)
+
+    assert normalize_spaces(error_message.text) == 'Error: Enter 3 characters or more'
+    assert count_of_api_calls == 0
+
+
 @pytest.mark.parametrize('reply_to_addresses, data, api_default_args', [
     ([], {}, True),
     (create_multiple_email_reply_to_addresses(), {}, False),
