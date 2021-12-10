@@ -657,7 +657,7 @@ def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name
             },
-            "text": " ".join(field.errors).strip()
+            "text": field.errors[0]
         }
 
     params = {
@@ -710,7 +710,7 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name
             },
-            "text": " ".join(field.errors).strip()
+            "text": field.errors[0]
         }
 
     # returns either a list or a hierarchy of lists
@@ -765,7 +765,7 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name
             },
-            "text": " ".join(field.errors).strip()
+            "text": field.errors[0]
         }
 
     # returns either a list or a hierarchy of lists
