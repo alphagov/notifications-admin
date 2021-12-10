@@ -5,6 +5,7 @@ from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 from tests import organisation_json, service_json
+from tests.app.main.views.test_agreement import MockS3Object
 from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
@@ -1583,3 +1584,144 @@ def test_update_organisation_billing_details_errors_when_user_not_platform_admin
         _data={'notes': "Very fluffy"},
         _expected_status=403,
     )
+
+
+def test_organisation_billing_page_not_accessible_if_not_platform_admin(
+    client_request,
+    mock_get_organisation,
+):
+    client_request.get(
+        '.organisation_billing',
+        org_id=ORGANISATION_ID,
+        _expected_status=403
+    )
+
+
+@pytest.mark.parametrize('signed_by_id, signed_by_name, expected_signatory', [
+    ('1234', None, 'Test User'),
+    (None, 'The Org Manager', 'The Org Manager'),
+])
+def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_person(
+    organisation_one,
+    platform_admin_client,
+    api_user_active,
+    mocker,
+    platform_admin_user,
+    signed_by_id,
+    signed_by_name,
+    expected_signatory,
+):
+    api_user_active['id'] = '1234'
+
+    organisation_one['agreement_signed'] = True
+    organisation_one['agreement_signed_version'] = 2.5
+    organisation_one['agreement_signed_by_id'] = signed_by_id
+    organisation_one['agreement_signed_on_behalf_of_name'] = signed_by_name
+    organisation_one['agreement_signed_at'] = 'Thu, 20 Feb 2020 00:00:00 GMT'
+
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+    mocker.patch('app.user_api_client.get_user', side_effect=[platform_admin_user, api_user_active])
+
+    response = platform_admin_client.get(
+        url_for('.organisation_billing', org_id=ORGANISATION_ID)
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.h1.string == 'Billing'
+    assert '2.5 of the GOV.UK Notify data sharing and financial agreement on 20 February 2020' in normalize_spaces(
+        page.text)
+    assert f'{expected_signatory} signed' in page.text
+    assert page.select_one('main a')['href'] == url_for('.organisation_download_agreement', org_id=ORGANISATION_ID)
+
+
+def test_organisation_billing_page_when_the_agreement_is_signed_by_an_unknown_person(
+    organisation_one,
+    platform_admin_client,
+    mocker,
+):
+    organisation_one['agreement_signed'] = True
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+
+    response = platform_admin_client.get(
+        url_for('.organisation_billing', org_id=ORGANISATION_ID)
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.h1.string == 'Billing'
+    assert (f'{organisation_one["name"]} has accepted the GOV.UK Notify data '
+            'sharing and financial agreement.') in page.text
+    assert page.select_one('main a')['href'] == url_for('.organisation_download_agreement', org_id=ORGANISATION_ID)
+
+
+@pytest.mark.parametrize('agreement_signed, expected_content', [
+    (False, 'needs to accept'),
+    (None, 'has not accepted'),
+])
+def test_organisation_billing_page_when_the_agreement_is_not_signed(
+    organisation_one,
+    platform_admin_client,
+    mocker,
+    agreement_signed,
+    expected_content,
+):
+    organisation_one['agreement_signed'] = agreement_signed
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+
+    response = platform_admin_client.get(
+        url_for('.organisation_billing', org_id=ORGANISATION_ID)
+    )
+    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
+    assert page.h1.string == 'Billing'
+    assert f'{organisation_one["name"]} {expected_content}' in page.text
+
+
+@pytest.mark.parametrize('crown, expected_status, expected_file_fetched, expected_file_served', (
+    (
+        True, 200, 'crown.pdf',
+        'GOV.UK Notify data sharing and financial agreement.pdf',
+    ),
+    (
+        False, 200, 'non-crown.pdf',
+        'GOV.UK Notify data sharing and financial agreement (non-crown).pdf',
+    ),
+    (
+        None, 404, None,
+        None,
+    ),
+))
+def test_download_organisation_agreement(
+    platform_admin_client,
+    mocker,
+    crown,
+    expected_status,
+    expected_file_fetched,
+    expected_file_served,
+):
+    mocker.patch(
+        'app.models.organisation.organisations_client.get_organisation',
+        return_value=organisation_json(
+            crown=crown
+        )
+    )
+    mock_get_s3_object = mocker.patch(
+        'app.s3_client.s3_mou_client.get_s3_object',
+        return_value=MockS3Object(b'foo')
+    )
+
+    response = platform_admin_client.get(url_for(
+        'main.organisation_download_agreement',
+        org_id=ORGANISATION_ID,
+    ))
+    assert response.status_code == expected_status
+
+    if expected_file_served:
+        assert response.get_data() == b'foo'
+        assert response.headers['Content-Type'] == 'application/pdf'
+        assert response.headers['Content-Disposition'] == (
+            f'attachment; filename="{expected_file_served}"'
+        )
+        mock_get_s3_object.assert_called_once_with('test-mou', expected_file_fetched)
+    else:
+        assert not expected_file_fetched
+        assert mock_get_s3_object.called is False

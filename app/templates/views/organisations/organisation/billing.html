@@ -1,0 +1,50 @@
+{% extends "org_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% block org_page_title %}
+  Billing
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header("Billing", size="medium") }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <h2 class="heading-small">
+        Data sharing and financial agreement
+      </h2>
+
+      {% if current_org.agreement_signed_at %}
+        <p class="govuk-body">
+          Your organisation accepted version {{ current_org.agreement_signed_version }} of the GOV.UK Notify data sharing
+          and financial agreement on {{ current_org.agreement_signed_at | format_date_normal }}.
+        </p>
+        <p class="govuk-body">
+          {{ current_org.agreement_signed_by.name or current_org.agreement_signed_on_behalf_of_name }} signed the agreement
+          on behalf of {{ current_org.name}}.
+        </p>
+        <p class="govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state"
+             href="{{ url_for('.organisation_download_agreement', org_id=current_org.id) }}">Download the current version of the agreement
+          </a>
+        </p>
+      {% elif current_org.agreement_signed %}
+        <p class="govuk-body">
+          {{ current_org.name}} has accepted the GOV.UK Notify data sharing and financial agreement.
+        </p>
+        <p class="govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state"
+             href="{{ url_for('.organisation_download_agreement', org_id=current_org.id) }}">Download the current version of the agreement
+          </a>
+        </p>
+      {% elif current_org.agreement_signed is false %}
+        <p class="govuk-body">
+          {{ current_org.name}} needs to accept the GOV.UK Notify data sharing and financial agreement.
+        </p>
+      {% elif current_org.agreement_signed is none %}
+        <p class="govuk-body">
+          {{ current_org.name}} has not accepted the GOV.UK Notify data sharing and financial agreement, but we have some service-specific agreements in place.
+        </p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
