@@ -652,7 +652,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         template=template,
         max_initial_rows_shown=50,
         max_errors_shown=50,
-        whitelist=itertools.chain.from_iterable(
+        guestlist=itertools.chain.from_iterable(
             [user.name, user.mobile_number, user.email_address] for user in Users(service_id)
         ) if current_service.trial_mode else None,
         remaining_messages=remaining_messages,
