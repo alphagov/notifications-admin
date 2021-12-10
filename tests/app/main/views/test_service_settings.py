@@ -1665,9 +1665,11 @@ def test_should_redirect_after_request_to_go_live(
         '\n'
         '---\n'
         'Request sent by test@user.gov.uk\n'
+        'Requester’s user page: http://localhost/users/{user_id}\n'
     ).format(
         service_id=SERVICE_ONE_ID,
         formatted_displayed_volumes=formatted_displayed_volumes,
+        user_id=active_user_with_permissions['id'],
     )
     mock_create_ticket.assert_called_once_with(
         ANY,
@@ -1750,9 +1752,11 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         '\n'
         '---\n'
         'Request sent by test@user.gov.uk\n'
+        'Requester’s user page: http://localhost/users/{user_id}\n'
     ).format(
         service_id=SERVICE_ONE_ID,
-        go_live_note=go_live_note
+        go_live_note=go_live_note,
+        user_id=active_user_with_permissions['id'],
     )
 
     mock_create_ticket.assert_called_once_with(
