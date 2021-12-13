@@ -451,7 +451,7 @@ def check_contact_list(service_id, upload_id):
     recipients = RecipientCSV(
         contents,
         template=get_sample_template(template_type or 'sms'),
-        whitelist=itertools.chain.from_iterable(
+        guestlist=itertools.chain.from_iterable(
             [user.name, user.mobile_number, user.email_address]
             for user in current_service.active_users
         ) if current_service.trial_mode else None,
