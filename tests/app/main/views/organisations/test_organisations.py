@@ -1600,6 +1600,7 @@ def test_organisation_billing_page_not_accessible_if_not_platform_admin(
 @pytest.mark.parametrize('signed_by_id, signed_by_name, expected_signatory', [
     ('1234', None, 'Test User'),
     (None, 'The Org Manager', 'The Org Manager'),
+    ('1234', 'The Org Manager', 'The Org Manager'),
 ])
 def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_person(
     organisation_one,
