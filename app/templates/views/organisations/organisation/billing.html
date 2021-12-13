@@ -19,7 +19,7 @@
           and financial agreement on {{ current_org.agreement_signed_at | format_date_normal }}.
         </p>
         <p class="govuk-body">
-          {{ current_org.agreement_signed_by.name or current_org.agreement_signed_on_behalf_of_name }} signed the agreement
+          {{ current_org.agreement_signed_on_behalf_of_name or current_org.agreement_signed_by.name }} signed the agreement
           on behalf of {{ current_org.name}}.
         </p>
         <p class="govuk-body">
