@@ -74,7 +74,6 @@ def test_should_show_name_page(
 def test_should_redirect_after_name_change(
     client_request,
     mock_update_user_attribute,
-    mock_email_is_not_already_in_use
 ):
     client_request.post(
         'main.user_profile_name',
@@ -108,6 +107,30 @@ def test_should_redirect_after_email_change(
             _external=True,
         )
     )
+
+    assert mock_email_is_not_already_in_use.called
+
+
+@pytest.mark.parametrize('email_address,error_message', [
+    ('me@example.com', 'Enter a public sector email address or find out who can use Notify'),
+    ('not_valid', 'Enter a valid email address')  # 2 errors with email address, only first error shown
+])
+def test_should_show_errors_if_new_email_address_does_not_validate(
+    client_request,
+    mock_email_is_not_already_in_use,
+    mock_get_organisations,
+    email_address,
+    error_message,
+):
+    page = client_request.post(
+        'main.user_profile_email',
+        _data={'email_address': email_address},
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.find('span', class_='govuk-error-message').text) == f'Error: {error_message}'
+    # We only call API to check if the email address is already in use if there are no other errors
+    assert not mock_email_is_not_already_in_use.called
 
 
 def test_should_show_authenticate_after_email_change(

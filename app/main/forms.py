@@ -231,7 +231,7 @@ def govuk_text_input_field_widget(self, field, type=None, param_extensions=None,
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name
             },
-            error_message_format: " ".join(field.errors).strip()
+            error_message_format: field.errors[0]
         }
 
     # convert to parameters that govuk understands
@@ -657,7 +657,7 @@ def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name
             },
-            "text": " ".join(field.errors).strip()
+            "text": field.errors[0]
         }
 
     params = {
@@ -710,7 +710,7 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name
             },
-            "text": " ".join(field.errors).strip()
+            "text": field.errors[0]
         }
 
     # returns either a list or a hierarchy of lists
@@ -765,7 +765,7 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name
             },
-            "text": " ".join(field.errors).strip()
+            "text": field.errors[0]
         }
 
     # returns either a list or a hierarchy of lists
@@ -1535,6 +1535,12 @@ class ChangeEmailForm(StripWhitespaceForm):
     email_address = email_address()
 
     def validate_email_address(self, field):
+        # The validate_email_func can be used to call API to check if the email address is already in
+        # use. We don't want to run that check for invalid email addresses, since that will cause an error.
+        # If there are any other validation errors on the email_address, we should skip this check.
+        if self.email_address.errors:
+            return
+
         is_valid = self.validate_email_func(field.data)
         if is_valid:
             raise ValidationError("The email address is already in use")
