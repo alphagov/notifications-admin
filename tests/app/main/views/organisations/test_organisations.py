@@ -92,6 +92,7 @@ def test_view_organisation_shows_the_correct_organisation(
     assert normalize_spaces(page.select_one('.govuk-hint').text) == (
         'Test 1 has no live services on GOV.UK Notify'
     )
+    assert not page.select('a[download]')
 
 
 def test_page_to_create_new_organisation(
@@ -668,7 +669,8 @@ def test_organisation_services_links_to_downloadable_report(
     client_request.login(active_user_with_permissions)
     page = client_request.get('.organisation_dashboard', org_id=ORGANISATION_ID)
 
-    link_to_report = page.find('a', text="Download this report")
+    link_to_report = page.select_one('a[download]')
+    assert normalize_spaces(link_to_report.text) == 'Download this report'
     assert link_to_report.attrs["href"] == url_for(
         '.download_organisation_usage_report',
         org_id=ORGANISATION_ID,

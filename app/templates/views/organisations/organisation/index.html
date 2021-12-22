@@ -110,12 +110,12 @@
       {{ current_org.name }} has no live services on GOV.UK Notify
     </p>
     <div class="keyline-block govuk-!-margin-top-2"></div>
+  {% else %}
+    <div class="js-stick-at-bottom-when-scrolling">
+      <p class="govuk-!-margin-bottom-1">
+        <a href="{{ download_link }}" download="download" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">Download this report</a>
+      </p>
+    </div>
   {% endif %}
-
-  <div class="js-stick-at-bottom-when-scrolling">
-    <p class="govuk-!-margin-bottom-1">
-      <a href="{{ download_link }}" download="download" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">Download this report</a>
-    </p>
-  </div>
 
 {% endblock %}
