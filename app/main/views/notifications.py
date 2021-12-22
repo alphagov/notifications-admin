@@ -18,6 +18,7 @@ from flask import (
     url_for,
 )
 from notifications_python_client.errors import APIError, HTTPError
+from notifications_utils import LETTER_MAX_PAGE_COUNT
 from notifications_utils.letter_timings import (
     get_letter_timings,
     letter_can_be_cancelled,
@@ -79,6 +80,13 @@ def view_notification(service_id, notification_id):
             )
     else:
         page_count = get_page_count_for_letter(notification['template'], values=personalisation)
+        if page_count and page_count > LETTER_MAX_PAGE_COUNT:
+            # when a templated letter is sent via the api and the personalisation pushes
+            # the page count over 10 we need to validate that. The letter is not in validation failed,
+            # this will enable us to show the error. Perhaps there is a better way to do this.
+            error_message = get_letter_validation_error(
+                "letter-too-long", [1], page_count
+            )
 
     if notification.get('postage'):
         if notification["status"] == "validation-failed":
