@@ -160,7 +160,7 @@ pyexcel-xlsx==0.6.0
     # via -r requirements.in
 pyjwt==2.3.0
     # via notifications-python-client
-pyparsing==2.4.7
+pyparsing==3.0.6
     # via packaging
 pypdf2==1.26.0
     # via notifications-utils
