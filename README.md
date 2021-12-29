@@ -72,10 +72,7 @@ npm run test-watch
 
 To run a specific JavaScript test, you'll need to copy the full command from `package.json`.
 
-## To update application dependencies
-
-`requirements.txt` is generated from the `requirements.in` in order to pin versions of all nested dependencies. If `requirements.in` has been changed, run `make freeze-requirements` to regenerate it.
-
 ## Further docs
 
 - [Working with static assets](docs/static-assets.md)
+- [Updating dependencies](https://github.com/alphagov/notifications-manuals/wiki/Dependencies)
