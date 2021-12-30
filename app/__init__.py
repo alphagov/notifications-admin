@@ -292,6 +292,12 @@ def init_app(application):
     application.url_map.converters['letter_file_extension'] = LetterFileExtensionConverter
     application.url_map.converters['simple_date'] = SimpleDateTypeConverter
 
+    @application.route('/test')
+    def test():
+        application.logger.error('error me')
+        application.logger.warning('warn me')
+        1/0
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.from_id(user_id)
