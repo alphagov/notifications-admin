@@ -75,7 +75,7 @@ gds-metrics==0.2.4
     # via -r requirements.in
 geojson==2.5.0
     # via notifications-utils
-govuk-bank-holidays==0.8
+govuk-bank-holidays==0.10
     # via
     #   -r requirements.in
     #   notifications-utils
@@ -209,7 +209,6 @@ six==1.16.0
     #   cryptography
     #   eventlet
     #   fido2
-    #   govuk-bank-holidays
     #   python-dateutil
 smartypants==2.0.1
     # via notifications-utils
