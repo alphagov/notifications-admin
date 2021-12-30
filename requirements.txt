@@ -111,7 +111,7 @@ lml==0.1.0
     # via
     #   pyexcel
     #   pyexcel-io
-lxml==4.6.3
+lxml==4.6.5
     # via
     #   pyexcel-ezodf
     #   pyexcel-ods3
