@@ -154,6 +154,20 @@ navigation = {
 }
 
 
+# TEMPORARY: testing Sentry
+import sentry_sdk
+from flask import Flask
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+sentry_sdk.init(
+    dsn=os.environ['SENTRY_DSN'],
+    integrations=[FlaskIntegration()],
+    environment=os.environ['NOTIFY_ENVIRONMENT'],
+    attach_stacktrace=True,
+    traces_sample_rate=0.00005  # avoid exceeding rate limits in Production
+)
+sentry_sdk.set_level('error')  # only record error logs or exceptions
+
 def create_app(application):
     notify_environment = os.environ['NOTIFY_ENVIRONMENT']
 
@@ -277,7 +291,6 @@ def init_app(application):
     application.url_map.converters['ticket_type'] = TicketTypeConverter
     application.url_map.converters['letter_file_extension'] = LetterFileExtensionConverter
     application.url_map.converters['simple_date'] = SimpleDateTypeConverter
-
 
 @login_manager.user_loader
 def load_user(user_id):
