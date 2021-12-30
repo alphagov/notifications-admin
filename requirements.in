@@ -2,7 +2,7 @@
 # with package version changes made in requirements-app.txt
 
 ago==0.0.93
-govuk-bank-holidays==0.8
+govuk-bank-holidays==0.10
 humanize==3.12.0
 Flask==1.1.2  # pyup: <2
 Flask-WTF==1.0.0
