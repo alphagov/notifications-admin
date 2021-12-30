@@ -1083,7 +1083,7 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
 
 
 def test_should_show_page_template_with_priority_select_if_platform_admin(
-    platform_admin_client,
+    client_request,
     platform_admin_user,
     mocker,
     mock_get_service_template,
@@ -1092,16 +1092,16 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
 ):
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[platform_admin_user])
     template_id = fake_uuid
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    page = client_request.get(
         '.edit_service_template',
         service_id=service_one['id'],
         template_id=template_id,
-    ))
+    )
 
-    assert response.status_code == 200
-    assert "Two week reminder" in response.get_data(as_text=True)
-    assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
-    assert "Use priority queue?" in response.get_data(as_text=True)
+    assert page.select_one('input[name=name]')['value'] == "Two week reminder"
+    assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in str(page.select_one('textarea'))
+    assert "Use priority queue?" in page.text
     mock_get_service_template.assert_called_with(service_one['id'], template_id, None)
 
 
@@ -1167,7 +1167,8 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 ])
 def test_letter_branding_preview_image(
     mocker,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     original_filename,
     new_filename,
 ):
@@ -1175,8 +1176,11 @@ def test_letter_branding_preview_image(
         'app.main.views.templates.TemplatePreview.from_example_template',
         return_value='foo'
     )
-    resp = platform_admin_client.get(
-        url_for('no_cookie.letter_branding_preview_image', filename=original_filename)
+    client_request.login(platform_admin_user)
+    resp = client_request.get(
+        'no_cookie.letter_branding_preview_image',
+        filename=original_filename,
+        _raw_response=True,
     )
 
     mocked_preview.assert_called_with(

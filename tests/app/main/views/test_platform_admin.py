@@ -5,7 +5,6 @@ from functools import partial
 from unittest.mock import ANY, call
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
@@ -52,14 +51,14 @@ def test_should_403_if_not_platform_admin(
     ('main.trial_services', 1),
 ])
 def test_should_render_platform_admin_page(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_detailed_services,
     endpoint,
     expected_services_shown
 ):
-    response = platform_admin_client.get(url_for(endpoint))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(endpoint)
     assert [
         normalize_spaces(column.text)
         for column in page.select('tbody tr')[1].select('td')
@@ -82,14 +81,14 @@ def test_should_render_platform_admin_page(
 ])
 def test_live_trial_services_toggle_including_from_test_key(
     partial_url_for,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_detailed_services,
     endpoint,
     inc
 ):
-    response = platform_admin_client.get(partial_url_for(endpoint))
-
-    assert response.status_code == 200
+    client_request.login(platform_admin_user)
+    client_request.get_url(partial_url_for(endpoint))
     mock_get_detailed_services.assert_called_once_with({
         'detailed': True,
         'only_active': False,
@@ -102,15 +101,19 @@ def test_live_trial_services_toggle_including_from_test_key(
     'main.trial_services'
 ])
 def test_live_trial_services_with_date_filter(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_detailed_services,
     endpoint
 ):
-    response = platform_admin_client.get(url_for(endpoint, start_date='2016-12-20', end_date='2016-12-28'))
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        endpoint,
+        start_date='2016-12-20',
+        end_date='2016-12-28',
+    )
 
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Platform admin' in resp_data
+    assert 'Platform admin' in page.text
     mock_get_detailed_services.assert_called_once_with({
         'include_from_test_key': False,
         'end_date': datetime.date(2016, 12, 28),
@@ -137,7 +140,8 @@ def test_live_trial_services_with_date_filter(
     ),
 ])
 def test_should_show_total_on_live_trial_services_pages(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_detailed_services,
     endpoint,
     fake_uuid,
@@ -173,9 +177,9 @@ def test_should_show_total_on_live_trial_services_pages(
 
     mock_get_detailed_services.return_value = {'data': services}
 
-    response = platform_admin_client.get(url_for(endpoint))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(endpoint)
+
     assert (
         normalize_spaces(page.select('.big-number-with-status')[0].text),
         normalize_spaces(page.select('.big-number-with-status')[1].text),
@@ -290,7 +294,8 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     endpoint,
     restricted,
     research_mode,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_detailed_services,
     fake_uuid,
 ):
@@ -305,13 +310,12 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     )
 
     mock_get_detailed_services.return_value = {'data': services}
-    response = platform_admin_client.get(url_for(endpoint))
+    client_request.login(platform_admin_user)
+    page = client_request.get(endpoint)
 
-    assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True,
                                                         'include_from_test_key': True,
                                                         'only_active': ANY})
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_body = page.find_all('table')[0].find_all('tbody')[0]
     service_row_group = table_body.find_all('tbody')[0].find_all('tr')
@@ -328,7 +332,8 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
 ], ids=['live', 'trial'])
 def test_should_show_archived_services_last(
     endpoint,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_detailed_services,
     restricted,
 ):
@@ -342,13 +347,12 @@ def test_should_show_archived_services_last(
     services[2]['statistics'] = create_stats()
 
     mock_get_detailed_services.return_value = {'data': services}
-    response = platform_admin_client.get(url_for(endpoint))
+    client_request.login(platform_admin_user)
+    page = client_request.get(endpoint)
 
-    assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True,
                                                         'include_from_test_key': True,
                                                         'only_active': ANY})
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_body = page.find_all('table')[0].find_all('tbody')[0]
     services = [service.tr for service in table_body.find_all('tbody')]
@@ -366,7 +370,8 @@ def test_should_order_services_by_usage_with_inactive_last(
     endpoint,
     restricted,
     research_mode,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_detailed_services,
     fake_uuid,
 ):
@@ -403,13 +408,12 @@ def test_should_order_services_by_usage_with_inactive_last(
     )
 
     mock_get_detailed_services.return_value = {'data': services}
-    response = platform_admin_client.get(url_for(endpoint))
+    client_request.login(platform_admin_user)
+    page = client_request.get(endpoint)
 
-    assert response.status_code == 200
     mock_get_detailed_services.assert_called_once_with({'detailed': True,
                                                         'include_from_test_key': True,
                                                         'only_active': ANY})
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     table_body = page.find_all('table')[0].find_all('tbody')[0]
     services = [service.tr for service in table_body.find_all('tbody')]
@@ -446,7 +450,8 @@ def test_sum_service_usage_with_zeros(fake_uuid):
 
 
 def test_platform_admin_list_complaints(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker
 ):
     complaint = {
@@ -462,15 +467,22 @@ def test_platform_admin_list_complaints(
     mock = mocker.patch('app.complaint_api_client.get_all_complaints',
                         return_value={'complaints': [complaint], 'links': {}})
 
-    response = platform_admin_client.get(url_for('main.platform_admin_list_complaints'))
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.platform_admin_list_complaints'
+    )
 
-    assert response.status_code == 200
-    resp_data = response.get_data(as_text=True)
-    assert 'Email complaints' in resp_data
+    assert 'Email complaints' in page.text
     assert mock.called
 
 
-def test_should_show_complaints_with_next_previous(platform_admin_client, mocker, service_one, fake_uuid):
+def test_should_show_complaints_with_next_previous(
+    client_request,
+    platform_admin_user,
+    mocker,
+    service_one,
+    fake_uuid,
+):
 
     api_response = {
         'complaints': [{'complaint_date': None,
@@ -486,10 +498,11 @@ def test_should_show_complaints_with_next_previous(platform_admin_client, mocker
 
     mocker.patch('app.complaint_api_client.get_all_complaints', return_value=api_response)
 
-    response = platform_admin_client.get(url_for('main.platform_admin_list_complaints', page=2))
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.platform_admin_list_complaints',
+        page=2,
+    )
 
     next_page_link = page.find('a', {'rel': 'next'})
     prev_page_link = page.find('a', {'rel': 'previous'})
@@ -501,13 +514,20 @@ def test_should_show_complaints_with_next_previous(platform_admin_client, mocker
     assert 'page 1' in prev_page_link.text.strip()
 
 
-def test_platform_admin_list_complaints_returns_404_with_invalid_page(platform_admin_client, mocker):
+def test_platform_admin_list_complaints_returns_404_with_invalid_page(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
 
     mocker.patch('app.complaint_api_client.get_all_complaints', return_value={'complaints': [], 'links': {}})
 
-    response = platform_admin_client.get(url_for('main.platform_admin_list_complaints', page='invalid'))
-
-    assert response.status_code == 404
+    client_request.login(platform_admin_user)
+    client_request.get(
+        'main.platform_admin_list_complaints',
+        page='invalid',
+        _expected_status=404,
+    )
 
 
 @pytest.mark.parametrize('number, total, threshold, result', [
@@ -546,7 +566,11 @@ def test_platform_admin_splash_doesnt_talk_to_api(
     )
 
 
-def test_platform_admin_with_start_and_end_dates_provided(mocker, platform_admin_client):
+def test_platform_admin_with_start_and_end_dates_provided(
+    mocker,
+    client_request,
+    platform_admin_user,
+):
     start_date = '2018-01-01'
     end_date = '2018-06-01'
     api_args = {'start_date': datetime.date(2018, 1, 1), 'end_date': datetime.date(2018, 6, 1)}
@@ -556,8 +580,9 @@ def test_platform_admin_with_start_and_end_dates_provided(mocker, platform_admin
         'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
-    platform_admin_client.get(
-        url_for('main.platform_admin', start_date=start_date, end_date=end_date)
+    client_request.login(platform_admin_user)
+    client_request.get(
+        'main.platform_admin', start_date=start_date, end_date=end_date,
     )
 
     aggregate_stats_mock.assert_called_with(api_args)
@@ -565,7 +590,11 @@ def test_platform_admin_with_start_and_end_dates_provided(mocker, platform_admin
 
 
 @freeze_time('2018-6-11')
-def test_platform_admin_with_only_a_start_date_provided(mocker, platform_admin_client):
+def test_platform_admin_with_only_a_start_date_provided(
+    mocker,
+    client_request,
+    platform_admin_user,
+):
     start_date = '2018-01-01'
     api_args = {'start_date': datetime.date(2018, 1, 1), 'end_date': datetime.datetime.utcnow().date()}
 
@@ -574,13 +603,21 @@ def test_platform_admin_with_only_a_start_date_provided(mocker, platform_admin_c
         'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
-    platform_admin_client.get(url_for('main.platform_admin', start_date=start_date))
+    client_request.login(platform_admin_user)
+    client_request.get(
+        'main.platform_admin',
+        start_date=start_date,
+    )
 
     aggregate_stats_mock.assert_called_with(api_args)
     complaint_count_mock.assert_called_with(api_args)
 
 
-def test_platform_admin_without_dates_provided(mocker, platform_admin_client):
+def test_platform_admin_without_dates_provided(
+    mocker,
+    client_request,
+    platform_admin_user,
+):
     api_args = {}
 
     mocker.patch('app.main.views.platform_admin.make_columns')
@@ -588,7 +625,8 @@ def test_platform_admin_without_dates_provided(mocker, platform_admin_client):
         'app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats')
     complaint_count_mock = mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count')
 
-    platform_admin_client.get(url_for('main.platform_admin'))
+    client_request.login(platform_admin_user)
+    client_request.get('main.platform_admin')
 
     aggregate_stats_mock.assert_called_with(api_args)
     complaint_count_mock.assert_called_with(api_args)
@@ -596,7 +634,8 @@ def test_platform_admin_without_dates_provided(mocker, platform_admin_client):
 
 def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
     mocker,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
 ):
     platform_stats = {
         'email': {'failures':
@@ -616,8 +655,8 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
                  return_value=platform_stats)
     mocker.patch('app.main.views.platform_admin.complaint_api_client.get_complaint_count', return_value=15)
 
-    response = platform_admin_client.get(url_for('main.platform_admin'))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.platform_admin')
 
     # Email permanent failure status box - number is correct
     assert '3 permanent failures' in page.find_all(
@@ -637,14 +676,23 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
         'div', class_='big-number-status-failing').text
 
 
-def test_platform_admin_submit_returned_letters(mocker, platform_admin_client):
+def test_platform_admin_submit_returned_letters(
+    mocker,
+    client_request,
+    platform_admin_user,
+):
 
     redis = mocker.patch('app.main.views.platform_admin.redis_client')
     mock_client = mocker.patch('app.letter_jobs_client.submit_returned_letters')
 
-    response = platform_admin_client.post(
-        url_for('main.platform_admin_returned_letters'),
-        data={'references': ' NOTIFY000REF1 \n NOTIFY002REF2 '}
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.platform_admin_returned_letters',
+        _data={'references': ' NOTIFY000REF1 \n NOTIFY002REF2 '},
+        _expected_redirect=url_for(
+            'main.platform_admin_returned_letters',
+            _external=True,
+        )
     )
 
     mock_client.assert_called_once_with(['REF1', 'REF2'])
@@ -652,26 +700,33 @@ def test_platform_admin_submit_returned_letters(mocker, platform_admin_client):
         call('service-????????-????-????-????-????????????-returned-letters-statistics'),
         call('service-????????-????-????-????-????????????-returned-letters-summary'),
     ]
-    assert response.status_code == 302
-    assert response.location == url_for('main.platform_admin_returned_letters', _external=True)
 
 
-def test_platform_admin_submit_empty_returned_letters(mocker, platform_admin_client):
+def test_platform_admin_submit_empty_returned_letters(
+    mocker,
+    client_request,
+    platform_admin_user,
+):
 
     mock_client = mocker.patch('app.letter_jobs_client.submit_returned_letters')
 
-    response = platform_admin_client.post(
-        url_for('main.platform_admin_returned_letters'),
-        data={'references': '  \n  '}
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.platform_admin_returned_letters',
+        _data={'references': '  \n  '},
+        _expected_status=200,
     )
 
     assert not mock_client.called
 
-    assert response.status_code == 200
-    assert "Cannot be empty" in response.get_data(as_text=True)
+    assert "Cannot be empty" in page.text
 
 
-def test_clear_cache_shows_form(client_request, platform_admin_user, mocker):
+def test_clear_cache_shows_form(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
     redis = mocker.patch('app.main.views.platform_admin.redis_client')
     client_request.login(platform_admin_user)
 
@@ -737,7 +792,11 @@ def test_clear_cache_submits_and_tells_you_how_many_things_were_deleted(
     assert flash_banner.text.strip() == expected_confirmation
 
 
-def test_clear_cache_requires_option(client_request, platform_admin_user, mocker):
+def test_clear_cache_requires_option(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
     redis = mocker.patch('app.main.views.platform_admin.redis_client')
     client_request.login(platform_admin_user)
 
@@ -748,13 +807,12 @@ def test_clear_cache_requires_option(client_request, platform_admin_user, mocker
 
 
 def test_reports_page(
-    platform_admin_client
+    client_request,
+    platform_admin_user,
 ):
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.platform_admin_reports')
 
-    response = platform_admin_client.get(url_for('main.platform_admin_reports'))
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find(
         'a', text="Download live services csv report"
     ).attrs['href'] == '/platform-admin/reports/live-services.csv'
@@ -764,7 +822,11 @@ def test_reports_page(
     ).attrs['href'] == url_for('main.notifications_sent_by_service')
 
 
-def test_get_live_services_report(platform_admin_client, mocker):
+def test_get_live_services_report(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
 
     mocker.patch(
         'app.service_api_client.get_live_services_data',
@@ -783,8 +845,11 @@ def test_get_live_services_report(platform_admin_client, mocker):
                 'free_sms_fragment_limit': 200},
         ]}
     )
-    response = platform_admin_client.get(url_for('main.live_services_csv'))
-    assert response.status_code == 200
+    client_request.login(platform_admin_user)
+    response = client_request.get(
+        'main.live_services_csv',
+        _raw_response=True,
+    )
     report = response.get_data(as_text=True)
     assert report.strip() == (
         'Service ID,Organisation,Organisation type,Service name,Consent to research,Main contact,Contact email,'
@@ -798,7 +863,10 @@ def test_get_live_services_report(platform_admin_client, mocker):
     )
 
 
-def test_get_notifications_sent_by_service_shows_date_form(client_request, platform_admin_user):
+def test_get_notifications_sent_by_service_shows_date_form(
+    client_request,
+    platform_admin_user,
+):
     client_request.login(platform_admin_user)
     page = client_request.get('main.notifications_sent_by_service')
 
@@ -812,7 +880,11 @@ def test_get_notifications_sent_by_service_shows_date_form(client_request, platf
     ]
 
 
-def test_get_notifications_sent_by_service_validates_form(mocker, client_request, platform_admin_user):
+def test_get_notifications_sent_by_service_validates_form(
+    mocker,
+    client_request,
+    platform_admin_user,
+):
     mock_get_stats_from_api = mocker.patch('app.main.views.platform_admin.notification_api_client')
 
     client_request.login(platform_admin_user)
@@ -846,7 +918,11 @@ def test_get_billing_report_when_no_results_for_date(client_request, platform_ad
     assert normalize_spaces(error.text) == 'No results for dates'
 
 
-def test_get_billing_report_when_calls_api_and_download_data(platform_admin_client, mocker):
+def test_get_billing_report_when_calls_api_and_download_data(
+    client_request,
+    platform_admin_user,
+    mocker
+):
     mocker.patch(
         "app.main.views.platform_admin.billing_api_client.get_data_for_billing_report",
         return_value=[{
@@ -866,10 +942,14 @@ def test_get_billing_report_when_calls_api_and_download_data(platform_admin_clie
         }]
     )
 
-    response = platform_admin_client.post(url_for('main.get_billing_report'),
-                                          data={'start_date': '2019-01-01', 'end_date': '2019-03-31'})
+    client_request.login(platform_admin_user)
+    response = client_request.post(
+        'main.get_billing_report',
+        _data={'start_date': '2019-01-01', 'end_date': '2019-03-31'},
+        _expected_status=200,
+        _raw_response=True,
+    )
 
-    assert response.status_code == 200
     assert response.content_type == 'text/csv; charset=utf-8'
     assert response.headers['Content-Disposition'] == (
         'attachment; filename="Billing Report from {} to {}.csv"'.format('2019-01-01', '2019-03-31')
@@ -900,7 +980,8 @@ def test_get_billing_report_when_calls_api_and_download_data(platform_admin_clie
 
 def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     mocker,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     service_two,
 ):
@@ -914,12 +995,14 @@ def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     start_date = datetime.date(2019, 1, 1)
     end_date = datetime.date(2019, 1, 31)
 
-    response = platform_admin_client.post(
-        url_for('main.notifications_sent_by_service'),
-        data={'start_date': start_date, 'end_date': end_date}
+    client_request.login(platform_admin_user)
+    response = client_request.post(
+        'main.notifications_sent_by_service',
+        _data={'start_date': start_date, 'end_date': end_date},
+        _expected_status=200,
+        _raw_response=True,
     )
 
-    assert response.status_code == 200
     assert response.content_type == 'text/csv; charset=utf-8'
     assert response.headers['Content-Disposition'] == (
         'attachment; filename="{} to {} notification status per service report.csv"'.format(start_date, end_date)

@@ -1724,7 +1724,8 @@ def test_send_one_off_redirects_to_end_if_step_out_of_bounds(
     create_active_caseworking_user(),
 ))
 def test_send_one_off_redirects_to_start_if_you_skip_steps(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     fake_uuid,
     mock_get_service_letter_template,
@@ -1737,21 +1738,21 @@ def test_send_one_off_redirects_to_start_if_you_skip_steps(
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user)
 
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['placeholders'] = {'address_line_1': 'foo'}
 
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    client_request.get(
         'main.send_one_off_step',
         service_id=service_one['id'],
         template_id=fake_uuid,
         step_index=7,  # letter template has 7 placeholders – we’re at the end
-    ))
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.send_one_off',
-        service_id=service_one['id'],
-        template_id=fake_uuid,
-        _external=True,
+        _expected_redirect=url_for(
+            'main.send_one_off',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            _external=True,
+        )
     )
 
 
@@ -1928,7 +1929,8 @@ def test_send_one_off_sms_message_back_link_with_multiple_placeholders(
 
 
 def test_send_one_off_letter_redirects_to_right_url(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     fake_uuid,
     mock_get_service_letter_template,
     mock_s3_upload,
@@ -1937,7 +1939,7 @@ def test_send_one_off_letter_redirects_to_right_url(
     mocker,
 ):
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['recipient'] = ''
         session['placeholders'] = {
             'address line 1': 'foo',
@@ -1949,20 +1951,19 @@ def test_send_one_off_letter_redirects_to_right_url(
             'address line 7': 'SW1 1AA',
         }
 
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    client_request.get(
         'main.send_one_off_step',
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         step_index=7,  # letter template has 7 placeholders – we’re at the end
-    ))
-
-    assert response.status_code == 302
-    assert response.location.startswith(url_for(
-        'main.check_notification',
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        _external=True,
-    ))
+        _expected_redirect=url_for(
+            'main.check_notification',
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _external=True,
+        ),
+    )
 
 
 def test_send_one_off_populates_field_from_session(
@@ -2168,7 +2169,8 @@ def test_send_one_off_sms_message_puts_submitted_data_in_session(
 @pytest.mark.parametrize('filetype', ['pdf', 'png'])
 def test_send_test_works_as_letter_preview(
     filetype,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_service_letter_template,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -2186,20 +2188,19 @@ def test_send_test_works_as_letter_preview(
 
     service_id = service_one['id']
     template_id = fake_uuid
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['placeholders'] = {'address_line_1': 'Jo Lastname'}
-    response = platform_admin_client.get(
-        url_for(
-            'no_cookie.send_test_preview',
-            service_id=service_id,
-            template_id=template_id,
-            filetype=filetype
-        )
+    client_request.login(platform_admin_user)
+    response = client_request.get(
+        'no_cookie.send_test_preview',
+        service_id=service_id,
+        template_id=template_id,
+        filetype=filetype,
+        _raw_response=True,
     )
 
     mock_get_service_letter_template.assert_called_with(service_id, template_id, None)
 
-    assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
     assert mocked_preview.call_args[0][0].id == template_id
     assert type(mocked_preview.call_args[0][0]) == LetterImageTemplate
@@ -2748,12 +2749,13 @@ def test_create_job_should_call_api(
 
 
 def test_can_start_letters_job(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_create_job,
     service_one,
     fake_uuid
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': fake_uuid,
@@ -2762,11 +2764,15 @@ def test_can_start_letters_job(
             }
         }
 
-    response = platform_admin_client.post(
-        url_for('main.start_job', service_id=service_one['id'], upload_id=fake_uuid),
-        data={}
+    client_request.login(platform_admin_user)
+    response = client_request.post(
+        'main.start_job',
+        service_id=service_one['id'],
+        upload_id=fake_uuid,
+        _data={},
+        _expected_status=302,
+        _raw_response=True,
     )
-    assert response.status_code == 302
     assert 'just_sent=yes' in response.location
 
 
@@ -2811,7 +2817,8 @@ def test_can_start_letters_job(
 ])
 def test_should_show_preview_letter_message(
     filetype,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_service_letter_template,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -2847,7 +2854,7 @@ def test_should_show_preview_letter_message(
 
     service_id = service_one['id']
     template_id = fake_uuid
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['file_uploads'] = {
             fake_uuid: {
                 'template_id': fake_uuid,
@@ -2856,20 +2863,19 @@ def test_should_show_preview_letter_message(
             }
         }
 
-    response = platform_admin_client.get(
-        url_for(
-            'no_cookie.check_messages_preview',
-            service_id=service_id,
-            template_id=fake_uuid,
-            upload_id=fake_uuid,
-            filetype=filetype,
-            **extra_args
-        )
+    client_request.login(platform_admin_user)
+    response = client_request.get(
+        'no_cookie.check_messages_preview',
+        service_id=service_id,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        filetype=filetype,
+        _raw_response=True,
+        **extra_args
     )
 
     mock_get_service_letter_template.assert_called_with(service_id, template_id, None)
 
-    assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
     assert mocked_preview.call_args[0][0].id == template_id
     assert type(mocked_preview.call_args[0][0]) == LetterPreviewTemplate

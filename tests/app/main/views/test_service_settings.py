@@ -3807,15 +3807,15 @@ def test_organisation_type_pages_are_platform_admin_only(
 
 
 def test_should_show_page_to_set_sms_allowance(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_free_sms_fragment_limit
 ):
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    page = client_request.get(
         'main.set_free_sms_allowance',
         service_id=SERVICE_ONE_ID
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
 
     assert normalize_spaces(page.select_one('label').text) == 'Numbers of text message fragments per year'
     mock_get_free_sms_fragment_limit.assert_called_once_with(SERVICE_ONE_ID)
@@ -3828,24 +3828,27 @@ def test_should_show_page_to_set_sms_allowance(
     pytest.param('foo', 'foo', marks=pytest.mark.xfail),
 ])
 def test_should_set_sms_allowance(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     given_allowance,
     expected_api_argument,
     mock_get_free_sms_fragment_limit,
     mock_create_or_update_free_sms_fragment_limit,
 ):
 
-    response = platform_admin_client.post(
-        url_for(
-            'main.set_free_sms_allowance',
-            service_id=SERVICE_ONE_ID,
-        ),
-        data={
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.set_free_sms_allowance',
+        service_id=SERVICE_ONE_ID,
+        _data={
             'free_sms_allowance': given_allowance,
         },
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
 
     mock_create_or_update_free_sms_fragment_limit.assert_called_with(
         SERVICE_ONE_ID,
@@ -3854,15 +3857,14 @@ def test_should_set_sms_allowance(
 
 
 def test_should_show_page_to_set_message_limit(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
 ):
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    page = client_request.get(
         'main.set_message_limit',
         service_id=SERVICE_ONE_ID
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
+    )
     assert normalize_spaces(page.select_one('label').text) == (
         'Number of messages the service is allowed to send each day'
     )
@@ -3872,15 +3874,14 @@ def test_should_show_page_to_set_message_limit(
 
 
 def test_should_show_page_to_set_rate_limit(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
 ):
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    page = client_request.get(
         'main.set_rate_limit',
         service_id=SERVICE_ONE_ID
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
+    )
     assert normalize_spaces(page.select_one('label').text) == (
         'Number of messages the service can send in a rolling 60 second window'
     )
@@ -3899,26 +3900,22 @@ def test_should_show_page_to_set_rate_limit(
     pytest.param('foo', 'foo', marks=pytest.mark.xfail),
 ])
 def test_should_set_message_limit(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     new_limit,
     expected_api_argument,
     mock_update_service,
     endpoint,
     field_name,
 ):
-
-    response = platform_admin_client.post(
-        url_for(
-            endpoint,
-            service_id=SERVICE_ONE_ID,
-        ),
-        data={
+    client_request.login(platform_admin_user)
+    client_request.post(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        _data={
             field_name: new_limit,
         },
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
-
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
         **{field_name: expected_api_argument},
@@ -4226,7 +4223,8 @@ def test_archive_service_prompts_user(
 
 
 def test_cant_archive_inactive_service(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -4235,10 +4233,12 @@ def test_cant_archive_inactive_service(
 ):
     service_one['active'] = False
 
-    response = platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.service_settings',
+        service_id=service_one['id'],
+    )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'Delete service' not in {a.text for a in page.find_all('a', class_='button')}
 
 
@@ -4294,7 +4294,8 @@ def test_suspend_service_prompts_user(
 
 
 def test_cant_suspend_inactive_service(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
@@ -4303,10 +4304,12 @@ def test_cant_suspend_inactive_service(
 ):
     service_one['active'] = False
 
-    response = platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.service_settings',
+        service_id=service_one['id'],
+    )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'Suspend service' not in {a.text for a in page.find_all('a', class_='button')}
 
 
@@ -4365,17 +4368,19 @@ def test_resume_service_prompts_user(
 
 
 def test_cant_resume_active_service(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
     single_sms_sender,
     mock_get_service_settings_page_common
 ):
-    response = platform_admin_client.get(url_for('main.service_settings', service_id=service_one['id']))
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.service_settings',
+        service_id=service_one['id'],
+    )
     assert 'Resume service' not in {a.text for a in page.find_all('a', class_='button')}
 
 
@@ -4692,17 +4697,17 @@ def test_updates_sms_prefixing(
 
 
 def test_select_organisation(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     mock_get_organisation,
     mock_get_organisations
 ):
-    response = platform_admin_client.get(
-        url_for('.link_service_to_organisation', service_id=service_one['id']),
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.link_service_to_organisation',
+        service_id=service_one['id'],
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert len(page.select('.govuk-radios__item')) == 3
     for i in range(0, 3):
@@ -4712,37 +4717,38 @@ def test_select_organisation(
 
 
 def test_select_organisation_shows_message_if_no_orgs(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     mock_get_organisation,
     mocker
 ):
     mocker.patch('app.organisations_client.get_organisations', return_value=[])
 
-    response = platform_admin_client.get(
-        url_for('.link_service_to_organisation', service_id=service_one['id']),
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.link_service_to_organisation',
+        service_id=service_one['id'],
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(page.select_one('main p').text) == "No organisations"
     assert not page.select_one('main button')
 
 
 def test_update_service_organisation(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     mock_get_organisation,
     mock_get_organisations,
     mock_update_service_organisation,
 ):
-    response = platform_admin_client.post(
-        url_for('.link_service_to_organisation', service_id=service_one['id']),
-        data={'organisations': '7aa5d4e9-4385-4488-a489-07812ba13384'},
+    client_request.login(platform_admin_user)
+    client_request.post(
+        '.link_service_to_organisation',
+        service_id=service_one['id'],
+        _data={'organisations': '7aa5d4e9-4385-4488-a489-07812ba13384'},
     )
-
-    assert response.status_code == 302
     mock_update_service_organisation.assert_called_once_with(
         service_one['id'],
         '7aa5d4e9-4385-4488-a489-07812ba13384'
@@ -4750,7 +4756,8 @@ def test_update_service_organisation(
 
 
 def test_update_service_organisation_does_not_update_if_same_value(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     mock_get_organisation,
     mock_get_organisations,
@@ -4758,12 +4765,12 @@ def test_update_service_organisation_does_not_update_if_same_value(
 ):
     org_id = "7aa5d4e9-4385-4488-a489-07812ba13383"
     service_one['organisation'] = org_id
-    response = platform_admin_client.post(
-        url_for('.link_service_to_organisation', service_id=service_one['id']),
-        data={'organisations': org_id},
+    client_request.login(platform_admin_user)
+    client_request.post(
+        '.link_service_to_organisation',
+        service_id=service_one['id'],
+        _data={'organisations': org_id},
     )
-
-    assert response.status_code == 302
     assert mock_update_service_organisation.called is False
 
 
@@ -5339,7 +5346,8 @@ def test_service_settings_links_to_branding_request_page_for_letters(
 
 
 def test_show_service_data_retention(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
         mock_get_service_data_retention,
 
@@ -5347,172 +5355,198 @@ def test_show_service_data_retention(
 
     mock_get_service_data_retention.return_value[0]['days_of_retention'] = 5
 
-    response = platform_admin_client.get(url_for('main.data_retention', service_id=service_one['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.data_retention',
+        service_id=service_one['id'],
+    )
+
     rows = page.select('tbody tr')
     assert len(rows) == 1
     assert normalize_spaces(rows[0].text) == 'Email 5 days Change'
 
 
 def test_view_add_service_data_retention(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
 
 ):
-    response = platform_admin_client.get(url_for('main.add_data_retention', service_id=service_one['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.add_data_retention',
+        service_id=service_one['id'],
+    )
     assert normalize_spaces(page.select_one('input')['value']) == "email"
     assert page.find('input', attrs={'name': 'days_of_retention'})
 
 
 def test_add_service_data_retention(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
         mock_create_service_data_retention
 ):
-    response = platform_admin_client.post(url_for(
+    client_request.login(platform_admin_user)
+    client_request.post(
         'main.add_data_retention',
-        service_id=service_one['id']),
-        data={'notification_type': "email", 'days_of_retention': 5}
+        service_id=service_one['id'],
+        _data={'notification_type': "email", 'days_of_retention': 5},
+        _expected_redirect=url_for(
+            'main.data_retention',
+            service_id=service_one['id'],
+            _external=True,
+        ),
     )
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.data_retention', service_id=service_one['id'], _external=True)
-    assert settings_url == response.location
     assert mock_create_service_data_retention.called
 
 
 def test_update_service_data_retention(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
         fake_uuid,
         mock_get_service_data_retention,
         mock_update_service_data_retention,
 ):
-    response = platform_admin_client.post(
-        url_for(
-            'main.edit_data_retention',
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.edit_data_retention',
+        service_id=service_one['id'],
+        data_retention_id=str(fake_uuid),
+        _data={'days_of_retention': 5},
+        _expected_redirect=url_for(
+            'main.data_retention',
             service_id=service_one['id'],
-            data_retention_id=str(fake_uuid)),
-        data={'days_of_retention': 5}
+            _external=True,
+        ),
     )
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.data_retention', service_id=service_one['id'], _external=True)
-    assert settings_url == response.location
     assert mock_update_service_data_retention.called
 
 
 def test_update_service_data_retention_return_validation_error_for_negative_days_of_retention(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
         fake_uuid,
         mock_get_service_data_retention,
         mock_update_service_data_retention,
 ):
-    response = platform_admin_client.post(
-        url_for(
-            'main.edit_data_retention',
-            service_id=service_one['id'],
-            data_retention_id=fake_uuid
-        ),
-        data={'days_of_retention': -5}
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.edit_data_retention',
+        service_id=service_one['id'],
+        data_retention_id=fake_uuid,
+        _data={'days_of_retention': -5},
+        _expected_status=200,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'Must be between 3 and 90' in page.find('span', class_='govuk-error-message').text
     assert mock_get_service_data_retention.called
     assert not mock_update_service_data_retention.called
 
 
 def test_update_service_data_retention_populates_form(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
         fake_uuid,
         mock_get_service_data_retention,
 ):
 
     mock_get_service_data_retention.return_value[0]['days_of_retention'] = 5
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    page = client_request.get(
         'main.edit_data_retention',
         service_id=service_one['id'],
-        data_retention_id=fake_uuid
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        data_retention_id=fake_uuid,
+    )
     assert page.find('input', attrs={'name': 'days_of_retention'})['value'] == '5'
 
 
 def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
     mocker,
     service_one,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
-    response = platform_admin_client.get(url_for(
-        '.service_settings', service_id=SERVICE_ONE_ID
-    ))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
     assert len(page.find_all('a', attrs={'href': '/services/{}/notes'.format(SERVICE_ONE_ID)})) == 1
 
 
 def test_view_edit_service_notes(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
 
 ):
-    response = platform_admin_client.get(url_for('main.edit_service_notes', service_id=SERVICE_ONE_ID))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.edit_service_notes',
+        service_id=SERVICE_ONE_ID,
+    )
     assert page.select_one('h1').text == "Edit service notes"
     assert page.find('label', class_="form-label").text.strip() == "Notes"
     assert page.find('textarea').attrs["name"] == "notes"
 
 
 def test_update_service_notes(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
         mock_update_service
 ):
-    response = platform_admin_client.post(
-        url_for(
-            'main.edit_service_notes',
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.edit_service_notes',
+        service_id=SERVICE_ONE_ID,
+        _data={'notes': "Very fluffy"},
+        _expected_redirect=url_for(
+            'main.service_settings',
             service_id=SERVICE_ONE_ID,
-        ),
-        data={'notes': "Very fluffy"}
+            _external=True,
+        )
     )
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
-    assert settings_url == response.location
     mock_update_service.assert_called_with(SERVICE_ONE_ID, notes="Very fluffy")
 
 
 def test_service_settings_links_to_edit_service_billing_details_page_for_platform_admins(
     mocker,
     service_one,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
     mock_get_service_settings_page_common,
 ):
-    response = platform_admin_client.get(url_for(
-        '.service_settings', service_id=SERVICE_ONE_ID
-    ))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.service_settings',
+        service_id=SERVICE_ONE_ID,
+    )
     assert len(page.find_all('a', attrs={'href': '/services/{}/edit-billing-details'.format(SERVICE_ONE_ID)})) == 1
 
 
 def test_view_edit_service_billing_details(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
 
 ):
-    response = platform_admin_client.get(url_for('main.edit_service_billing_details', service_id=SERVICE_ONE_ID))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.edit_service_billing_details',
+        service_id=SERVICE_ONE_ID,
+    )
+
     assert page.select_one('h1').text == "Change billing details"
     labels = page.find_all('label', class_="form-label")
     labels_list = [
@@ -5539,27 +5573,28 @@ def test_view_edit_service_billing_details(
 
 
 def test_update_service_billing_details(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         service_one,
         mock_update_service
 ):
-    response = platform_admin_client.post(
-        url_for(
-            'main.edit_service_billing_details',
-            service_id=SERVICE_ONE_ID,
-        ),
-        data={
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.edit_service_billing_details',
+        service_id=SERVICE_ONE_ID,
+        _data={
             'billing_contact_email_addresses': 'accounts@fluff.gov.uk',
             'billing_contact_names': 'Flannellette von Fluff',
             'billing_reference': '',
             'purchase_order_number': 'PO1234',
             'notes': 'very fluffy, give extra allowance'
-        }
+        },
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+            _external=True,
+        ),
     )
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
-    assert response.location == settings_url
     mock_update_service.assert_called_with(
         SERVICE_ONE_ID,
         billing_contact_email_addresses='accounts@fluff.gov.uk',
@@ -5571,17 +5606,15 @@ def test_update_service_billing_details(
 
 
 def test_service_set_broadcast_channel(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
 ):
-    response = platform_admin_client.get(
-        url_for(
-            'main.service_set_broadcast_channel',
-            service_id=SERVICE_ONE_ID,
-        )
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.service_set_broadcast_channel',
+        service_id=SERVICE_ONE_ID,
     )
-    assert response.status_code == 200
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('h1').text.strip() == 'Emergency alerts settings'
 
     expected_labels = [
@@ -5602,16 +5635,14 @@ def test_service_set_broadcast_channel(
 
 
 def test_service_set_broadcast_channel_has_no_radio_selected_for_non_broadcast_service(
-    platform_admin_client
+    client_request,
+    platform_admin_user,
 ):
-    response = platform_admin_client.get(
-        url_for(
-            'main.service_set_broadcast_channel',
-            service_id=SERVICE_ONE_ID,
-        )
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.service_set_broadcast_channel',
+        service_id=SERVICE_ONE_ID,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert len(page.select('input[checked]')) == 0
 
 
@@ -5635,7 +5666,8 @@ def test_service_set_broadcast_channel_has_no_radio_selected_for_non_broadcast_s
     ]
 )
 def test_service_set_broadcast_channel_has_radio_selected_for_broadcast_service(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
     service_mode,
     broadcast_channel,
@@ -5652,14 +5684,12 @@ def test_service_set_broadcast_channel_has_radio_selected_for_broadcast_service(
     )
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
-    response = platform_admin_client.get(
-        url_for(
-            'main.service_set_broadcast_channel',
-            service_id=SERVICE_ONE_ID,
-        )
+    client_request.login(platform_admin_user, service_one)
+    page = client_request.get(
+        'main.service_set_broadcast_channel',
+        service_id=SERVICE_ONE_ID,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
     selected_radios = page.select('input[checked]')
     assert len(selected_radios) == 1
 
@@ -5938,7 +5968,8 @@ def test_service_confirm_broadcast_account_type_confirmation_page(
     ]
 )
 def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
     value,
     service_mode,
@@ -5950,15 +5981,17 @@ def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
     set_service_broadcast_settings_mock = mocker.patch('app.service_api_client.set_service_broadcast_settings')
     mock_event_handler = mocker.patch('app.main.views.service_settings.create_broadcast_account_type_change_event')
 
-    response = platform_admin_client.post(
-        url_for(
-            'main.service_confirm_broadcast_account_type',
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.service_confirm_broadcast_account_type',
+        service_id=SERVICE_ONE_ID,
+        account_type=value,
+        _expected_redirect=url_for(
+            'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            account_type=value,
-        )
+            _external=True,
+        ),
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
     set_service_broadcast_settings_mock.assert_called_once_with(
         SERVICE_ONE_ID,
         service_mode=service_mode,
@@ -5981,34 +6014,33 @@ def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
     'live-government-foo'
 ))
 def test_service_confirm_broadcast_account_type_errors_for_unknown_type(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
     account_type,
 ):
     set_service_broadcast_settings_mock = mocker.patch('app.service_api_client.set_service_broadcast_settings')
     mock_event_handler = mocker.patch('app.main.views.service_settings.create_broadcast_account_type_change_event')
 
-    response = platform_admin_client.post(
-        url_for(
-            'main.service_confirm_broadcast_account_type',
-            service_id=SERVICE_ONE_ID,
-            account_type=account_type,
-        )
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.service_confirm_broadcast_account_type',
+        service_id=SERVICE_ONE_ID,
+        account_type=account_type,
+        _expected_status=404,
     )
-    assert response.status_code == 404
     assert not set_service_broadcast_settings_mock.called
     assert not mock_event_handler.called
 
 
 def test_service_set_broadcast_channel_makes_you_choose(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
 ):
-    response = platform_admin_client.post(
-        url_for(
-            'main.service_set_broadcast_channel',
-            service_id=SERVICE_ONE_ID,
-        )
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.service_set_broadcast_channel',
+        service_id=SERVICE_ONE_ID,
+        _expected_status=200,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'Error: Select mode or channel' in page.find("span", {"class": "govuk-error-message"}).text

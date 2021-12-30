@@ -2768,19 +2768,6 @@ def logged_in_client_with_session(
     yield client
 
 
-@pytest.fixture(scope='function')
-def platform_admin_client(
-    client,
-    platform_admin_user,
-    mocker,
-    service_one,
-    mock_login,
-):
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
-    client.login(platform_admin_user, mocker, service_one)
-    yield client
-
-
 @pytest.fixture
 def os_environ():
     """
@@ -2821,6 +2808,7 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
             _test_page_title=True,
             _test_for_elements_without_class=True,
             _optional_args="",
+            _raw_response=False,
             **endpoint_kwargs
         ):
             return ClientRequest.get_url(
@@ -2830,6 +2818,7 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
                 _expected_redirect=_expected_redirect,
                 _test_page_title=_test_page_title,
                 _test_for_elements_without_class=_test_for_elements_without_class,
+                _raw_response=_raw_response,
             )
 
         @staticmethod
@@ -2840,6 +2829,7 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
             _expected_redirect=None,
             _test_page_title=True,
             _test_for_elements_without_class=True,
+            _raw_response=False,
             **endpoint_kwargs
         ):
             resp = logged_in_client.get(
@@ -2854,6 +2844,10 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
 
             if _expected_redirect:
                 assert resp.location == _expected_redirect
+
+            if _raw_response:
+                return resp
+
             page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
             if _test_page_title:
                 count_of_h1s = len(page.select('h1'))
@@ -2890,18 +2884,26 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
             _expected_status=None,
             _follow_redirects=False,
             _expected_redirect=None,
+            _raw_response=False,
+            _content_type=None,
             **endpoint_kwargs
         ):
             if _expected_status is None:
                 _expected_status = 200 if _follow_redirects else 302
+            post_kwargs = {}
+            if _content_type:
+                post_kwargs.update(content_type=_content_type)
             resp = logged_in_client.post(
                 url_for(endpoint, **(endpoint_kwargs or {})),
                 data=_data,
                 follow_redirects=_follow_redirects,
+                **post_kwargs
             )
             assert resp.status_code == _expected_status
             if _expected_redirect:
                 assert_url_expected(resp.location, _expected_redirect)
+            if _raw_response:
+                return resp
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
         @staticmethod

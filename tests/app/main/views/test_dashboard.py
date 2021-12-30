@@ -1693,7 +1693,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     platform_admin_user,
-    platform_admin_client,
+    client_request,
 ):
     service_one_json = service_json(SERVICE_ONE_ID,
                                     users=[platform_admin_user['id']],
@@ -1704,8 +1704,8 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
         id_=ORGANISATION_ID,
     ))
 
-    response = platform_admin_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user, service_one_json)
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
 
     assert page.select_one('.navigation-organisation-link')['href'] == url_for(
         'main.organisation_dashboard',

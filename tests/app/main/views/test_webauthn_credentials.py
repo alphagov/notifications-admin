@@ -46,14 +46,16 @@ def test_begin_register_forbidden_unless_can_use_webauthn(
 def test_begin_register_returns_encoded_options(
     mocker,
     platform_admin_user,
-    platform_admin_client,
+    client_request,
     webauthn_dev_server,
 ):
     mocker.patch('app.models.webauthn_credential.WebAuthnCredentials.client_method', return_value=[])
 
-    response = platform_admin_client.get(url_for('main.webauthn_begin_register'))
-
-    assert response.status_code == 200
+    client_request.login(platform_admin_user)
+    response = client_request.get(
+        'main.webauthn_begin_register',
+        _raw_response=True,
+    )
 
     webauthn_options = cbor.decode(response.data)['publicKey']
     assert webauthn_options['attestation'] == 'direct'
@@ -73,7 +75,8 @@ def test_begin_register_returns_encoded_options(
 
 
 def test_begin_register_includes_existing_credentials(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     webauthn_credential,
     mocker,
 ):
@@ -82,8 +85,10 @@ def test_begin_register_includes_existing_credentials(
         return_value=[webauthn_credential, webauthn_credential]
     )
 
-    response = platform_admin_client.get(
-        url_for('main.webauthn_begin_register')
+    client_request.login(platform_admin_user)
+    response = client_request.get(
+        'main.webauthn_begin_register',
+        _raw_response=True,
     )
 
     webauthn_options = cbor.decode(response.data)['publicKey']
@@ -91,30 +96,33 @@ def test_begin_register_includes_existing_credentials(
 
 
 def test_begin_register_stores_state_in_session(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
 ):
     mocker.patch(
         'app.models.webauthn_credential.WebAuthnCredentials.client_method',
         return_value=[])
 
-    response = platform_admin_client.get(
-        url_for('main.webauthn_begin_register')
+    client_request.login(platform_admin_user)
+    response = client_request.get(
+        'main.webauthn_begin_register',
+        _raw_response=True,
     )
 
     assert response.status_code == 200
 
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['webauthn_registration_state'] is not None
 
 
 def test_complete_register_creates_credential(
     platform_admin_user,
-    platform_admin_client,
+    client_request,
     mock_update_user_attribute,
     mocker,
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['webauthn_registration_state'] = 'state'
 
     user_api_mock = mocker.patch(
@@ -126,12 +134,14 @@ def test_complete_register_creates_credential(
         return_value='cred'
     )
 
-    response = platform_admin_client.post(
-        url_for('main.webauthn_complete_register'),
-        data=cbor.encode('public_key_credential'),
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.webauthn_begin_register',
+        _data=cbor.encode('public_key_credential'),
+        _expected_status=200,
+        _raw_response=True,
     )
 
-    assert response.status_code == 200
     credential_mock.assert_called_once_with('state', 'public_key_credential')
     user_api_mock.assert_called_once_with(platform_admin_user['id'], 'cred')
     mock_update_user_attribute.assert_called_once_with(
@@ -141,21 +151,24 @@ def test_complete_register_creates_credential(
 
 
 def test_complete_register_clears_session(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['webauthn_registration_state'] = 'state'
 
     mocker.patch('app.user_api_client.create_webauthn_credential_for_user')
     mocker.patch('app.models.webauthn_credential.WebAuthnCredential.from_registration')
 
-    platform_admin_client.post(
-        url_for('main.webauthn_complete_register'),
-        data=cbor.encode('public_key_credential'),
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.webauthn_complete_register',
+        _data=cbor.encode('public_key_credential'),
+        _expected_status=200,
     )
 
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'webauthn_registration_state' not in session
         assert session['_flashes'] == [('default_with_tick', (
             'Registration complete. Next time you sign in to Notify '
@@ -164,10 +177,11 @@ def test_complete_register_clears_session(
 
 
 def test_complete_register_handles_library_errors(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['webauthn_registration_state'] = 'state'
 
     mocker.patch(
@@ -175,24 +189,28 @@ def test_complete_register_handles_library_errors(
         side_effect=RegistrationError('error')
     )
 
-    response = platform_admin_client.post(
-        url_for('main.webauthn_complete_register'),
-        data=cbor.encode('public_key_credential'),
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.webauthn_complete_register',
+        _data=cbor.encode('public_key_credential'),
+        _raw_response=True,
+        _expected_status=400,
     )
-
-    assert response.status_code == 400
 
 
 def test_complete_register_handles_missing_state(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
 ):
-    response = platform_admin_client.post(
-        url_for('main.webauthn_complete_register'),
-        data=cbor.encode('public_key_credential'),
+    client_request.login(platform_admin_user)
+    response = client_request.post(
+        'main.webauthn_complete_register',
+        _data=cbor.encode('public_key_credential'),
+        _raw_response=True,
+        _expected_status=400,
     )
 
-    assert response.status_code == 400
     assert cbor.decode(response.data) == 'No registration in progress'
 
 
