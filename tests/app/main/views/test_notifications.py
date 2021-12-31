@@ -690,12 +690,11 @@ def test_should_show_preview_error_image_letter_notification_on_preview_error(
 
     mocker.patch("builtins.open", mock_open(read_data=b"preview error image"))
 
-    response = client_request.get(
+    response = client_request.get_response(
         'main.view_letter_notification_as_preview',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
         filetype='png',
-        _raw_response=True,
     )
 
     assert response.get_data(as_text=True) == 'preview error image'
@@ -893,12 +892,11 @@ def test_should_show_image_of_precompiled_letter_notification(
         }
     )
 
-    response = client_request.get(
+    response = client_request.get_response(
         'main.view_letter_notification_as_preview',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
         filetype="png",
-        _raw_response=True,
     )
 
     assert response.get_data(as_text=True) == 'foo'

@@ -846,9 +846,8 @@ def test_get_live_services_report(
         ]}
     )
     client_request.login(platform_admin_user)
-    response = client_request.get(
+    response = client_request.get_response(
         'main.live_services_csv',
-        _raw_response=True,
     )
     report = response.get_data(as_text=True)
     assert report.strip() == (
@@ -943,11 +942,10 @@ def test_get_billing_report_when_calls_api_and_download_data(
     )
 
     client_request.login(platform_admin_user)
-    response = client_request.post(
+    response = client_request.post_response(
         'main.get_billing_report',
         _data={'start_date': '2019-01-01', 'end_date': '2019-03-31'},
         _expected_status=200,
-        _raw_response=True,
     )
 
     assert response.content_type == 'text/csv; charset=utf-8'
@@ -996,11 +994,10 @@ def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     end_date = datetime.date(2019, 1, 31)
 
     client_request.login(platform_admin_user)
-    response = client_request.post(
+    response = client_request.post_response(
         'main.notifications_sent_by_service',
         _data={'start_date': start_date, 'end_date': end_date},
         _expected_status=200,
-        _raw_response=True,
     )
 
     assert response.content_type == 'text/csv; charset=utf-8'

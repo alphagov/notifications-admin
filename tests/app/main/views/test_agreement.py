@@ -160,12 +160,11 @@ def test_download_service_agreement(
         return_value=MockS3Object(b'foo')
     )
 
-    response = client_request.get(url_for(
+    response = client_request.get_response(
         'main.service_download_agreement',
         service_id=SERVICE_ONE_ID,
         _expected_status=expected_status,
-        _raw_respons=True,
-    ))
+    )
 
     if expected_file_served:
         assert response.get_data() == b'foo'

@@ -2789,7 +2789,6 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             _test_page_title=True,
             _test_for_elements_without_class=True,
             _optional_args="",
-            _raw_response=False,
             **endpoint_kwargs
         ):
             return ClientRequest.get_url(
@@ -2799,7 +2798,6 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
                 _expected_redirect=_expected_redirect,
                 _test_page_title=_test_page_title,
                 _test_for_elements_without_class=_test_for_elements_without_class,
-                _raw_response=_raw_response,
             )
 
         @staticmethod
@@ -2810,7 +2808,6 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             _expected_redirect=None,
             _test_page_title=True,
             _test_for_elements_without_class=True,
-            _raw_response=False,
             **endpoint_kwargs
         ):
             resp = _logged_in_client.get(
@@ -2825,9 +2822,6 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
 
             if _expected_redirect:
                 assert resp.location == _expected_redirect
-
-            if _raw_response:
-                return resp
 
             page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
             if _test_page_title:
@@ -2865,7 +2859,6 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             _expected_status=None,
             _follow_redirects=False,
             _expected_redirect=None,
-            _raw_response=False,
             _content_type=None,
             **endpoint_kwargs
         ):
@@ -2885,7 +2878,6 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             _expected_status=None,
             _follow_redirects=False,
             _expected_redirect=None,
-            _raw_response=False,
             _content_type=None,
         ):
             if _expected_status is None:
@@ -2902,8 +2894,7 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             assert resp.status_code == _expected_status
             if _expected_redirect:
                 assert_url_expected(resp.location, _expected_redirect)
-            if _raw_response:
-                return resp
+
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
         @staticmethod

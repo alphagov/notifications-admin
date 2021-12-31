@@ -1174,10 +1174,9 @@ def test_letter_branding_preview_image(
         return_value='foo'
     )
     client_request.login(platform_admin_user)
-    resp = client_request.get(
+    resp = client_request.get_response(
         'no_cookie.letter_branding_preview_image',
         filename=original_filename,
-        _raw_response=True,
     )
 
     mocked_preview.assert_called_with(

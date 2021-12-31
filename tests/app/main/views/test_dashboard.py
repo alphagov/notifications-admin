@@ -475,10 +475,9 @@ def test_download_inbox_strips_formulae(
             }]
         },
     )
-    response = client_request.get(
+    response = client_request.get_response(
         'main.inbox_download',
         service_id=SERVICE_ONE_ID,
-        _raw_response=True,
     )
     assert expected_cell in response.get_data(as_text=True).split('\r\n')[1]
 

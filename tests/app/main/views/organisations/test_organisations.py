@@ -1724,11 +1724,10 @@ def test_download_organisation_agreement(
     )
 
     client_request.login(platform_admin_user)
-    response = client_request.get(
+    response = client_request.get_response(
         'main.organisation_download_agreement',
         org_id=ORGANISATION_ID,
         _expected_status=expected_status,
-        _raw_response=True
     )
 
     if expected_file_served:

@@ -693,11 +693,10 @@ def test_should_show_updates_for_one_job_as_json(
     mocker,
     fake_uuid,
 ):
-    response = client_request.get(
+    response = client_request.get_response(
         'main.view_job_updates',
         service_id=service_one['id'],
         job_id=fake_uuid,
-        _raw_response=True,
     )
 
     content = json.loads(response.get_data(as_text=True))
@@ -731,11 +730,10 @@ def test_should_show_updates_for_scheduled_job_as_json(
         processing_started='2016-06-01T15:00:00+00:00',
     )})
 
-    response = client_request.get(
+    response = client_request.get_response(
         'main.view_job_updates',
         service_id=service_one['id'],
         job_id=fake_uuid,
-        _raw_response=True,
     )
 
     content = response.json

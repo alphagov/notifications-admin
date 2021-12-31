@@ -2192,12 +2192,11 @@ def test_send_test_works_as_letter_preview(
     with client_request.session_transaction() as session:
         session['placeholders'] = {'address_line_1': 'Jo Lastname'}
     client_request.login(platform_admin_user)
-    response = client_request.get(
+    response = client_request.get_response(
         'no_cookie.send_test_preview',
         service_id=service_id,
         template_id=template_id,
         filetype=filetype,
-        _raw_response=True,
     )
 
     mock_get_service_letter_template.assert_called_with(service_id, template_id, None)
@@ -2463,10 +2462,11 @@ def test_download_example_csv(
     mock_has_permissions,
     fake_uuid
 ):
-    response = client_request.get(
-        url_for('main.get_example_csv', service_id=fake_uuid, template_id=fake_uuid),
+    response = client_request.get_response(
+        'main.get_example_csv',
+        service_id=fake_uuid,
+        template_id=fake_uuid,
         follow_redirects=True,
-        _raw_response=True,
     )
     assert response.get_data(as_text=True) == (
         'phone number,name,date\r\n'
@@ -2766,13 +2766,12 @@ def test_can_start_letters_job(
         }
 
     client_request.login(platform_admin_user)
-    response = client_request.post(
+    response = client_request.post_response(
         'main.start_job',
         service_id=service_one['id'],
         upload_id=fake_uuid,
         _data={},
         _expected_status=302,
-        _raw_response=True,
     )
     assert 'just_sent=yes' in response.location
 
@@ -2865,13 +2864,12 @@ def test_should_show_preview_letter_message(
         }
 
     client_request.login(platform_admin_user)
-    response = client_request.get(
+    response = client_request.get_response(
         'no_cookie.check_messages_preview',
         service_id=service_id,
         template_id=fake_uuid,
         upload_id=fake_uuid,
         filetype=filetype,
-        _raw_response=True,
         **extra_args
     )
 

@@ -52,9 +52,8 @@ def test_begin_register_returns_encoded_options(
     mocker.patch('app.models.webauthn_credential.WebAuthnCredentials.client_method', return_value=[])
 
     client_request.login(platform_admin_user)
-    response = client_request.get(
+    response = client_request.get_response(
         'main.webauthn_begin_register',
-        _raw_response=True,
     )
 
     webauthn_options = cbor.decode(response.data)['publicKey']
@@ -86,9 +85,8 @@ def test_begin_register_includes_existing_credentials(
     )
 
     client_request.login(platform_admin_user)
-    response = client_request.get(
+    response = client_request.get_response(
         'main.webauthn_begin_register',
-        _raw_response=True,
     )
 
     webauthn_options = cbor.decode(response.data)['publicKey']
@@ -105,12 +103,9 @@ def test_begin_register_stores_state_in_session(
         return_value=[])
 
     client_request.login(platform_admin_user)
-    response = client_request.get(
+    client_request.get_response(
         'main.webauthn_begin_register',
-        _raw_response=True,
     )
-
-    assert response.status_code == 200
 
     with client_request.session_transaction() as session:
         assert session['webauthn_registration_state'] is not None
@@ -135,11 +130,10 @@ def test_complete_register_creates_credential(
     )
 
     client_request.login(platform_admin_user)
-    client_request.post(
+    client_request.post_response(
         'main.webauthn_begin_register',
         _data=cbor.encode('public_key_credential'),
         _expected_status=200,
-        _raw_response=True,
     )
 
     credential_mock.assert_called_once_with('state', 'public_key_credential')
@@ -190,10 +184,9 @@ def test_complete_register_handles_library_errors(
     )
 
     client_request.login(platform_admin_user)
-    client_request.post(
+    client_request.post_response(
         'main.webauthn_complete_register',
         _data=cbor.encode('public_key_credential'),
-        _raw_response=True,
         _expected_status=400,
     )
 
@@ -204,10 +197,9 @@ def test_complete_register_handles_missing_state(
     mocker,
 ):
     client_request.login(platform_admin_user)
-    response = client_request.post(
+    response = client_request.post_response(
         'main.webauthn_complete_register',
         _data=cbor.encode('public_key_credential'),
-        _raw_response=True,
         _expected_status=400,
     )
 

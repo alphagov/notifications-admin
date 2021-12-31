@@ -660,11 +660,10 @@ def test_download_contact_list(
         'app.models.contact_list.s3download',
         return_value='phone number\n07900900321'
     )
-    response = client_request.get(
+    response = client_request.get_response(
         'main.download_contact_list',
         service_id=SERVICE_ONE_ID,
         contact_list_id=fake_uuid,
-        _raw_response=True,
     )
     assert response.headers['Content-Type'] == (
         'text/csv; '
