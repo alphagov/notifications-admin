@@ -652,7 +652,7 @@ def test_view_contact_list_404s_for_non_existing_list(
 
 def test_download_contact_list(
     mocker,
-    logged_in_client,
+    client_request,
     fake_uuid,
     mock_get_contact_list,
 ):
@@ -660,12 +660,12 @@ def test_download_contact_list(
         'app.models.contact_list.s3download',
         return_value='phone number\n07900900321'
     )
-    response = logged_in_client.get(url_for(
+    response = client_request.get(
         'main.download_contact_list',
         service_id=SERVICE_ONE_ID,
         contact_list_id=fake_uuid,
-    ))
-    assert response.status_code == 200
+        _raw_response=True,
+    )
     assert response.headers['Content-Type'] == (
         'text/csv; '
         'charset=utf-8'

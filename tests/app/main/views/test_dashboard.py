@@ -103,17 +103,18 @@ stub_template_stats = [
     create_active_caseworking_user(),
 ))
 def test_redirect_from_old_dashboard(
-    logged_in_client,
+    client_request,
     user,
     mocker,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user)
     expected_location = 'http://localhost/services/{}'.format(SERVICE_ONE_ID)
 
-    response = logged_in_client.get('/services/{}/dashboard'.format(SERVICE_ONE_ID))
+    client_request.get_url(
+        '/services/{}/dashboard'.format(SERVICE_ONE_ID),
+        _expected_redirect=expected_location,
+    )
 
-    assert response.status_code == 302
-    assert response.location == expected_location
     assert expected_location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
 
 
@@ -393,7 +394,7 @@ def test_anyone_can_see_inbox(
 
 
 def test_view_inbox_updates(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     mock_get_most_recent_inbound_sms_with_no_messages,
@@ -405,11 +406,10 @@ def test_view_inbox_updates(
         return_value={'messages': 'foo'},
     )
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get_response(
         'main.inbox_updates', service_id=SERVICE_ONE_ID,
-    ))
+    )
 
-    assert response.status_code == 200
     assert json.loads(response.get_data(as_text=True)) == {'messages': 'foo'}
 
     mock_get_partials.assert_called_once_with(SERVICE_ONE_ID)
@@ -417,13 +417,13 @@ def test_view_inbox_updates(
 
 @freeze_time("2016-07-01 13:00")
 def test_download_inbox(
-    logged_in_client,
+    client_request,
     mock_get_inbound_sms,
 ):
-    response = logged_in_client.get(
-        url_for('main.inbox_download', service_id=SERVICE_ONE_ID)
+    response = client_request.get_response(
+        'main.inbox_download',
+        service_id=SERVICE_ONE_ID,
     )
-    assert response.status_code == 200
     assert response.headers['Content-Type'] == (
         'text/csv; '
         'charset=utf-8'
@@ -456,7 +456,7 @@ def test_download_inbox(
 ])
 def test_download_inbox_strips_formulae(
     mocker,
-    logged_in_client,
+    client_request,
     fake_uuid,
     message_content,
     expected_cell,
@@ -475,8 +475,10 @@ def test_download_inbox_strips_formulae(
             }]
         },
     )
-    response = logged_in_client.get(
-        url_for('main.inbox_download', service_id=SERVICE_ONE_ID)
+    response = client_request.get(
+        'main.inbox_download',
+        service_id=SERVICE_ONE_ID,
+        _raw_response=True,
     )
     assert expected_cell in response.get_data(as_text=True).split('\r\n')[1]
 
@@ -1138,12 +1140,16 @@ def test_usage_page_displays_letters_split_by_month_and_postage(
 
 
 def test_usage_page_with_year_argument(
-    logged_in_client,
+    client_request,
     mock_get_usage,
     mock_get_billable_units,
     mock_get_free_sms_fragment_limit,
 ):
-    assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000)).status_code == 200
+    client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+        year=2000,
+    )
     mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2000)
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2000)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2000)

@@ -1114,7 +1114,7 @@ def test_should_show_preview_letter_templates(
     view,
     extra_view_args,
     filetype,
-    logged_in_client,
+    client_request,
     mock_get_service_email_template,
     service_one,
     fake_uuid,
@@ -1127,15 +1127,14 @@ def test_should_show_preview_letter_templates(
 
     service_id, template_id = service_one['id'], fake_uuid
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get_response(
         view,
         service_id=service_id,
         template_id=template_id,
         filetype=filetype,
         **extra_view_args
-    ))
+    )
 
-    assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
     mock_get_service_email_template.assert_called_with(service_id, template_id, extra_view_args.get('version'))
     assert mocked_preview.call_args[0][0]['id'] == template_id
@@ -1144,20 +1143,18 @@ def test_should_show_preview_letter_templates(
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     service_one,
     fake_uuid
 ):
-    resp = logged_in_client.get(
-        url_for(
-            'no_cookie.view_letter_template_preview',
-            service_id=service_one['id'],
-            template_id=fake_uuid,
-            filetype='blah'
-        )
+    client_request.get_response(
+        'no_cookie.view_letter_template_preview',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        filetype='blah',
+        _expected_status=404,
     )
-    assert resp.status_code == 404
     assert mock_get_service_template.called is False
 
 
@@ -2817,7 +2814,7 @@ def test_should_not_create_broadcast_template_with_placeholders(
     ),
 )
 def test_content_count_json_endpoint(
-    logged_in_client,
+    client_request,
     service_one,
     template_type,
     prefix_sms,
@@ -2826,17 +2823,15 @@ def test_content_count_json_endpoint(
     expected_class,
 ):
     service_one['prefix_sms'] = prefix_sms
-    response = logged_in_client.post(
-        url_for(
-            'main.count_content_length',
-            service_id=SERVICE_ONE_ID,
-            template_type=template_type,
-        ),
-        data={
+    response = client_request.post_response(
+        'main.count_content_length',
+        service_id=SERVICE_ONE_ID,
+        template_type=template_type,
+        _data={
             'template_content': content,
         },
+        _expected_status=200,
     )
-    assert response.status_code == 200
 
     html = json.loads(response.get_data(as_text=True))['html']
     snippet = BeautifulSoup(html, 'html.parser').select_one('span')

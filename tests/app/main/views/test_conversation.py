@@ -175,7 +175,7 @@ def test_view_conversation(
 
 
 def test_view_conversation_updates(
-    logged_in_client,
+    client_request,
     mocker,
     fake_uuid,
     mock_get_inbound_sms_by_id_with_no_messages,
@@ -191,13 +191,12 @@ def test_view_conversation_updates(
         return_value={'messages': 'foo'}
     )
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get_response(
         'main.conversation_updates',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
-    ))
+    )
 
-    assert response.status_code == 200
     assert json.loads(response.get_data(as_text=True)) == {'messages': 'foo'}
 
     mock_get_partials.assert_called_once_with(SERVICE_ONE_ID, '07123 456789')

@@ -46,17 +46,16 @@ def test_sign_in_explains_session_timeout(client):
     assert 'We signed you out because you have not used Notify for a while.' in response.get_data(as_text=True)
 
 
-def test_sign_in_explains_other_browser(logged_in_client, api_user_active, mocker):
+def test_sign_in_explains_other_browser(client_request, api_user_active, mocker):
     api_user_active['current_session_id'] = str(uuid.UUID(int=1))
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['current_session_id'] = str(uuid.UUID(int=2))
 
-    response = logged_in_client.get(url_for('main.sign_in', next='/foo'))
+    page = client_request.get('main.sign_in', next='/foo')
 
-    assert response.status_code == 200
-    assert 'We signed you out because you logged in to Notify on another device' in response.get_data(as_text=True)
+    assert 'We signed you out because you logged in to Notify on another device' in page.text
 
 
 def test_doesnt_redirect_to_sign_in_if_no_session_info(
@@ -79,7 +78,7 @@ def test_doesnt_redirect_to_sign_in_if_no_session_info(
     (uuid.UUID(int=1), uuid.UUID(int=2)),  # BAD - this person has just signed in on a different browser
 ])
 def test_redirect_to_sign_in_if_logged_in_from_other_browser(
-    logged_in_client,
+    client_request,
     api_user_active,
     mocker,
     db_sess_id,
@@ -87,12 +86,14 @@ def test_redirect_to_sign_in_if_logged_in_from_other_browser(
 ):
     api_user_active['current_session_id'] = db_sess_id
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['current_session_id'] = str(cookie_sess_id)
 
-    response = logged_in_client.get(url_for('main.choose_account'))
-    assert response.status_code == 302
-    assert response.location == url_for('main.sign_in', next='/accounts', _external=True)
+    client_request.get(
+        'main.choose_account',
+        _expected_status=302,
+        _expected_redirect=url_for('main.sign_in', next='/accounts', _external=True),
+    )
 
 
 def test_logged_in_user_redirects_to_account(

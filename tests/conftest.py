@@ -2745,7 +2745,7 @@ def client(notify_admin):
 
 
 @pytest.fixture(scope='function')
-def logged_in_client(
+def _logged_in_client(
     client,
     active_user_with_permissions,
     mocker,
@@ -2782,22 +2782,22 @@ def os_environ():
 
 
 @pytest.fixture   # noqa (C901 too complex)
-def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too complex)
+def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too complex)
     class ClientRequest:
 
         @staticmethod
         @contextmanager
         def session_transaction():
-            with logged_in_client.session_transaction() as session:
+            with _logged_in_client.session_transaction() as session:
                 yield session
 
         @staticmethod
         def login(user, service=service_one):
-            logged_in_client.login(user, mocker, service)
+            _logged_in_client.login(user, mocker, service)
 
         @staticmethod
         def logout():
-            logged_in_client.logout(None)
+            _logged_in_client.logout(None)
 
         @staticmethod
         def get(
@@ -2832,7 +2832,7 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
             _raw_response=False,
             **endpoint_kwargs
         ):
-            resp = logged_in_client.get(
+            resp = _logged_in_client.get(
                 url,
                 follow_redirects=_follow_redirects,
             )
@@ -2888,13 +2888,32 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
             _content_type=None,
             **endpoint_kwargs
         ):
+            return ClientRequest.post_url(
+                url_for(endpoint, **(endpoint_kwargs or {})),
+                _data=_data,
+                _expected_status=_expected_status,
+                _follow_redirects=_follow_redirects,
+                _expected_redirect=_expected_redirect,
+                _content_type=_content_type,
+            )
+
+        @staticmethod
+        def post_url(
+            url,
+            _data=None,
+            _expected_status=None,
+            _follow_redirects=False,
+            _expected_redirect=None,
+            _raw_response=False,
+            _content_type=None,
+        ):
             if _expected_status is None:
                 _expected_status = 200 if _follow_redirects else 302
             post_kwargs = {}
             if _content_type:
                 post_kwargs.update(content_type=_content_type)
-            resp = logged_in_client.post(
-                url_for(endpoint, **(endpoint_kwargs or {})),
+            resp = _logged_in_client.post(
+                url,
                 data=_data,
                 follow_redirects=_follow_redirects,
                 **post_kwargs
@@ -2913,8 +2932,28 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
             _optional_args="",
             **endpoint_kwargs
         ):
-            resp = logged_in_client.get(
+            resp = _logged_in_client.get(
                 url_for(endpoint, **(endpoint_kwargs or {})) + _optional_args,
+            )
+            assert resp.status_code == _expected_status
+            return resp
+
+        @staticmethod
+        def post_response(
+            endpoint,
+            _data=None,
+            _expected_status=302,
+            _optional_args="",
+            _content_type=None,
+            **endpoint_kwargs
+        ):
+            post_kwargs = {}
+            if _content_type:
+                post_kwargs.update(content_type=_content_type)
+            resp = _logged_in_client.post(
+                url_for(endpoint, **(endpoint_kwargs or {})) + _optional_args,
+                data=_data,
+                **post_kwargs
             )
             assert resp.status_code == _expected_status
             return resp

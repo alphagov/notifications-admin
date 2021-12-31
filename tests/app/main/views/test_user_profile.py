@@ -162,18 +162,20 @@ def test_should_render_change_email_continue_after_authenticate_email(
 
 def test_should_redirect_to_user_profile_when_user_confirms_email_link(
     notify_admin,
-    logged_in_client,
+    client_request,
     api_user_active,
     mock_update_user_attribute,
 ):
 
     token = generate_token(payload=json.dumps({'user_id': api_user_active['id'], 'email': 'new_email@gov.uk'}),
                            secret=notify_admin.config['SECRET_KEY'], salt=notify_admin.config['DANGEROUS_SALT'])
-    response = logged_in_client.get(url_for_endpoint_with_token('main.user_profile_email_confirm',
-                                                                token=token))
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.user_profile', _external=True)
+    client_request.get_url(
+        url_for_endpoint_with_token(
+            'main.user_profile_email_confirm',
+            token=token,
+        ),
+        _expected_redirect=url_for('main.user_profile', _external=True),
+    )
 
 
 def test_should_show_mobile_number_page(

@@ -683,7 +683,7 @@ def test_dont_cancel_letter_job_when_to_early_to_cancel(
 
 @freeze_time("2016-01-01 00:00:00.000001")
 def test_should_show_updates_for_one_job_as_json(
-    logged_in_client,
+    client_request,
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
@@ -693,9 +693,13 @@ def test_should_show_updates_for_one_job_as_json(
     mocker,
     fake_uuid,
 ):
-    response = logged_in_client.get(url_for('main.view_job_updates', service_id=service_one['id'], job_id=fake_uuid))
+    response = client_request.get(
+        'main.view_job_updates',
+        service_id=service_one['id'],
+        job_id=fake_uuid,
+        _raw_response=True,
+    )
 
-    assert response.status_code == 200
     content = json.loads(response.get_data(as_text=True))
     assert 'sending' in content['counts']
     assert 'delivered' in content['counts']
@@ -710,7 +714,7 @@ def test_should_show_updates_for_one_job_as_json(
 
 @freeze_time("2016-01-01 00:00:00.000001")
 def test_should_show_updates_for_scheduled_job_as_json(
-    logged_in_client,
+    client_request,
     service_one,
     active_user_with_permissions,
     mock_get_notifications,
@@ -727,9 +731,13 @@ def test_should_show_updates_for_scheduled_job_as_json(
         processing_started='2016-06-01T15:00:00+00:00',
     )})
 
-    response = logged_in_client.get(url_for('main.view_job_updates', service_id=service_one['id'], job_id=fake_uuid))
+    response = client_request.get(
+        'main.view_job_updates',
+        service_id=service_one['id'],
+        job_id=fake_uuid,
+        _raw_response=True,
+    )
 
-    assert response.status_code == 200
     content = response.json
     assert 'sending' in content['counts']
     assert 'delivered' in content['counts']

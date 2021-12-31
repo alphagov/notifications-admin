@@ -11,7 +11,6 @@ from uuid import uuid4
 from zipfile import BadZipFile
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
@@ -386,14 +385,15 @@ def test_example_spreadsheet_for_letters(
 
 
 @pytest.mark.parametrize(
-    "filename, acceptable_file",
-    list(zip(test_spreadsheet_files, repeat(True))) +
-    list(zip(test_non_spreadsheet_files, repeat(False)))
+    "filename, acceptable_file, expected_status",
+    list(zip(test_spreadsheet_files, repeat(True), repeat(302))) +
+    list(zip(test_non_spreadsheet_files, repeat(False), repeat(200)))
 )
 def test_upload_files_in_different_formats(
     filename,
     acceptable_file,
-    logged_in_client,
+    expected_status,
+    client_request,
     service_one,
     mocker,
     mock_get_service_template,
@@ -402,12 +402,14 @@ def test_upload_files_in_different_formats(
     fake_uuid,
 ):
     with open(filename, 'rb') as uploaded:
-        response = logged_in_client.post(
-            url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-            data={'file': (BytesIO(uploaded.read()), filename)},
-            content_type='multipart/form-data'
+        page = client_request.post(
+            'main.send_messages',
+            service_id=service_one['id'],
+            template_id=fake_uuid,
+            _data={'file': (BytesIO(uploaded.read()), filename)},
+            _content_type='multipart/form-data',
+            _expected_status=expected_status,
         )
-        page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     if acceptable_file:
         assert mock_s3_upload.call_args[0][1]['data'].strip() == (
@@ -429,7 +431,7 @@ def test_upload_files_in_different_formats(
 
 
 def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     mock_get_service_template_with_placeholders,
@@ -442,11 +444,13 @@ def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
 ):
     filename = f"😁{'a' * 2000}.csv"
 
-    logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), filename)},
-        content_type='multipart/form-data',
-        follow_redirects=False
+    client_request.post(
+        'main.send_messages',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), filename)},
+        _content_type='multipart/form-data',
+        _follow_redirects=False,
     )
 
     assert len(
@@ -484,7 +488,7 @@ def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
     )),
 ])
 def test_shows_error_if_parsing_exception(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_service_template,
     exception,
@@ -500,12 +504,14 @@ def test_shows_error_if_parsing_exception(
         side_effect=_raise_exception_or_partial_exception
     )
 
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=SERVICE_ONE_ID, template_id=fake_uuid),
-        data={'file': (BytesIO(b'example'), 'example.xlsx')},
-        content_type='multipart/form-data'
+    page = client_request.post(
+        'main.send_messages',
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(b'example'), 'example.xlsx')},
+        _content_type='multipart/form-data',
+        _expected_status=200,
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
         expected_error_message
@@ -513,7 +519,7 @@ def test_shows_error_if_parsing_exception(
 
 
 def test_upload_csv_file_with_errors_shows_check_page_with_errors(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     mock_get_service_template_with_placeholders,
@@ -536,31 +542,29 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
         """
     )
 
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
+    page = client_request.post(
+        'main.send_messages',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
+        _content_type='multipart/form-data',
+        _follow_redirects=True,
     )
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'file_uploads' not in session
 
-    assert response.status_code == 200
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('input[type=file]').has_attr('accept')
     assert page.select_one('input[type=file]')['accept'] == '.csv,.xlsx,.xls,.ods,.xlsm,.tsv'
 
-    content = response.get_data(as_text=True)
-    assert 'There’s a problem with example.csv' in content
-    assert '+447700900986' in content
-    assert 'Missing' in content
-    assert 'Upload your file again' in content
+    assert 'There’s a problem with example.csv' in page.text
+    assert '+447700900986' in page.text
+    assert 'Missing' in page.text
+    assert 'Upload your file again' in page.text
 
 
 def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     mock_get_empty_service_template_with_optional_placeholder,
@@ -583,18 +587,18 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
         """
     )
 
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
+    page = client_request.post(
+        'main.send_messages',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
+        _content_type='multipart/form-data',
+        _follow_redirects=True,
     )
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'file_uploads' not in session
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == (
@@ -617,7 +621,7 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
 
 
 def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     mock_get_service_template_with_placeholders,
@@ -640,18 +644,18 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
         """
     )
 
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
+    page = client_request.post(
+        'main.send_messages',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
+        _content_type='multipart/form-data',
+        _follow_redirects=True
     )
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'file_uploads' not in session
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == (
@@ -676,7 +680,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
 
 
 def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     mock_get_service_letter_template,
@@ -704,15 +708,15 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         '''
     )
 
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
+    page = client_request.post(
+        'main.send_messages',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
+        _content_type='multipart/form-data',
+        _follow_redirects=True,
     )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == (
@@ -740,7 +744,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
 
 
 def test_upload_csv_file_with_international_letters_permission_shows_appropriate_errors(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     mock_get_service_letter_template,
@@ -766,15 +770,15 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         '''
     )
 
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
+    page = client_request.post(
+        'main.send_messages',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
+        _content_type='multipart/form-data',
+        _follow_redirects=True
     )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == (
@@ -949,41 +953,43 @@ def test_upload_csv_file_with_missing_columns_shows_error(
 
 
 def test_upload_csv_invalid_extension(
-    logged_in_client,
+    client_request,
     mock_login,
     service_one,
     mock_get_service_template,
     fake_uuid,
 ):
 
-    resp = logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO('contents'.encode('utf-8')), 'invalid.txt')},
-        content_type='multipart/form-data',
-        follow_redirects=True
+    page = client_request.post(
+        'main.send_messages',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'file': (BytesIO('contents'.encode('utf-8')), 'invalid.txt')},
+        _content_type='multipart/form-data',
+        _follow_redirects=True,
     )
 
-    assert resp.status_code == 200
-    assert "invalid.txt is not a spreadsheet that Notify can read" in resp.get_data(as_text=True)
+    assert "invalid.txt is not a spreadsheet that Notify can read" in page.text
 
 
 def test_upload_csv_size_too_big(
-    logged_in_client,
+    client_request,
     mock_login,
     service_one,
     mock_get_service_template,
     fake_uuid,
 ):
 
-    resp = logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(randbytes(11_000_000)), 'invalid.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
+    page = client_request.post(
+        'main.send_messages',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(randbytes(11_000_000)), 'invalid.csv')},
+        _content_type='multipart/form-data',
+        _follow_redirects=True,
     )
 
-    assert resp.status_code == 200
-    assert "File must be smaller than 10Mb" in resp.get_data(as_text=True)
+    assert "File must be smaller than 10Mb" in page.text
 
 
 def test_upload_valid_csv_redirects_to_check_page(
@@ -1324,7 +1330,7 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     create_active_caseworking_user(),
 ))
 def test_send_one_off_has_correct_page_title(
-    logged_in_client,
+    client_request,
     service_one,
     mock_has_no_jobs,
     mock_get_no_contact_lists,
@@ -1337,18 +1343,13 @@ def test_send_one_off_has_correct_page_title(
     mocker.patch('app.service_api_client.get_service_template', return_value={'data': template_data})
     mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=9)
 
-    response = logged_in_client.get(
-        url_for(
-            'main.send_one_off',
-            service_id=service_one['id'],
-            template_id=fake_uuid,
-            step_index=0
-        ),
-        follow_redirects=True,
+    page = client_request.get(
+        'main.send_one_off',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        step_index=0,
+        _follow_redirects=True,
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
-    assert response.status_code == 200
     assert page.h1.text.strip() == "Send ‘Two week reminder’"
 
     assert len(page.select('.banner-tour')) == 0
@@ -2453,7 +2454,7 @@ def test_send_one_off_letter_address_goes_to_next_placeholder(client_request, mo
 
 
 def test_download_example_csv(
-    logged_in_client,
+    client_request,
     mocker,
     api_user_active,
     mock_login,
@@ -2462,12 +2463,11 @@ def test_download_example_csv(
     mock_has_permissions,
     fake_uuid
 ):
-
-    response = logged_in_client.get(
+    response = client_request.get(
         url_for('main.get_example_csv', service_id=fake_uuid, template_id=fake_uuid),
-        follow_redirects=True
+        follow_redirects=True,
+        _raw_response=True,
     )
-    assert response.status_code == 200
     assert response.get_data(as_text=True) == (
         'phone number,name,date\r\n'
         '07700 900321,example,example\r\n'
@@ -2476,7 +2476,7 @@ def test_download_example_csv(
 
 
 def test_upload_csvfile_with_valid_phone_shows_all_numbers(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     mock_get_users_by_service,
     mock_get_live_service,
@@ -2497,13 +2497,15 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         ])
     )
     mock_get_notification_count = mocker.patch('app.service_api_client.get_notification_count', return_value=0)
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=service_one['id'], template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True
+    page = client_request.post(
+        'main.send_messages',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
+        _content_type='multipart/form-data',
+        _follow_redirects=True,
     )
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'file_uploads' not in session
 
     assert mock_s3_set_metadata.call_count == 2
@@ -2521,12 +2523,10 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         original_file_name='example.csv',
     )
 
-    content = response.get_data(as_text=True)
-    assert response.status_code == 200
-    assert '07700 900701' in content
-    assert '07700 900749' in content
-    assert '07700 900750' not in content
-    assert 'Only showing the first 50 rows' in content
+    assert '07700 900701' in page.text
+    assert '07700 900749' in page.text
+    assert '07700 900750' not in page.text
+    assert 'Only showing the first 50 rows' in page.text
 
     mock_get_notification_count.assert_called_once_with(service_one['id'])
 
@@ -2538,7 +2538,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
 def test_upload_csvfile_with_international_validates(
     mocker,
     api_user_active,
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     mock_s3_set_metadata,
     mock_s3_get_metadata,
@@ -2565,14 +2565,15 @@ def test_upload_csvfile_with_international_validates(
         )),
     )
 
-    response = logged_in_client.post(
-        url_for('main.send_messages', service_id=fake_uuid, template_id=fake_uuid),
-        data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
-        content_type='multipart/form-data',
-        follow_redirects=True,
+    client_request.post(
+        'main.send_messages',
+        service_id=fake_uuid,
+        template_id=fake_uuid,
+        _data={'file': (BytesIO(''.encode('utf-8')), 'example.csv')},
+        _content_type='multipart/form-data',
+        _follow_redirects=True,
     )
 
-    assert response.status_code == 200
     assert mock_recipients.call_args[1]['allow_international_sms'] == should_allow_international
 
 
@@ -2885,21 +2886,19 @@ def test_should_show_preview_letter_message(
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     service_one,
     fake_uuid
 ):
-    resp = logged_in_client.get(
-        url_for(
-            'no_cookie.check_messages_preview',
-            service_id=service_one['id'],
-            template_id=fake_uuid,
-            upload_id=fake_uuid,
-            filetype='blah'
-        )
+    client_request.get_response(
+        'no_cookie.check_messages_preview',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        filetype='blah',
+        _expected_status=404,
     )
-    assert resp.status_code == 404
     assert mock_get_service_template.called is False
 
 

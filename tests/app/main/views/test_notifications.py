@@ -615,7 +615,7 @@ def test_notification_page_shows_page_for_other_postage_classes(
     create_active_caseworking_user(),
 ])
 def test_should_show_image_of_letter_notification(
-    logged_in_client,
+    client_request,
     fake_uuid,
     mocker,
     filetype,
@@ -633,19 +633,18 @@ def test_should_show_image_of_letter_notification(
         }
     )
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get_response(
         'main.view_letter_notification_as_preview',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
         filetype=filetype
-    ))
+    )
 
-    assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
 
 
 def test_should_show_image_of_letter_notification_that_failed_validation(
-    logged_in_client,
+    client_request,
     fake_uuid,
     mocker
 ):
@@ -665,20 +664,19 @@ def test_should_show_image_of_letter_notification_that_failed_validation(
         }
     )
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get_response(
         'main.view_letter_notification_as_preview',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
         filetype='png',
-        with_metadata=True
-    ))
+        with_metadata=True,
+    )
 
-    assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo', metadata
 
 
 def test_should_show_preview_error_image_letter_notification_on_preview_error(
-    logged_in_client,
+    client_request,
     fake_uuid,
     mocker,
 ):
@@ -692,14 +690,14 @@ def test_should_show_preview_error_image_letter_notification_on_preview_error(
 
     mocker.patch("builtins.open", mock_open(read_data=b"preview error image"))
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get(
         'main.view_letter_notification_as_preview',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
-        filetype='png'
-    ))
+        filetype='png',
+        _raw_response=True,
+    )
 
-    assert response.status_code == 200
     assert response.get_data(as_text=True) == 'preview error image'
 
 
@@ -877,7 +875,7 @@ def test_notification_page_has_expected_template_link_for_letter(
 
 
 def test_should_show_image_of_precompiled_letter_notification(
-    logged_in_client,
+    client_request,
     fake_uuid,
     mocker,
 ):
@@ -895,14 +893,14 @@ def test_should_show_image_of_precompiled_letter_notification(
         }
     )
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get(
         'main.view_letter_notification_as_preview',
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
-        filetype="png"
-    ))
+        filetype="png",
+        _raw_response=True,
+    )
 
-    assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
     assert mock_pdf_page_count.called_once()
 

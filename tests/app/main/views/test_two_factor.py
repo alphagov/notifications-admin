@@ -487,11 +487,10 @@ def test_two_factor_email_link_when_user_is_locked_out(
 
 
 def test_two_factor_email_link_used_when_user_already_logged_in(
-    logged_in_client,
+    client_request,
     valid_token
 ):
-    response = logged_in_client.post(
-        url_for_endpoint_with_token('main.two_factor_email', token=valid_token)
+    client_request.post_url(
+        url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)

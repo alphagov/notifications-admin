@@ -141,7 +141,7 @@ def test_unknown_gps_and_trusts_are_redirected(
     ),
 ))
 def test_download_service_agreement(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_service_organisation,
     crown,
@@ -160,11 +160,12 @@ def test_download_service_agreement(
         return_value=MockS3Object(b'foo')
     )
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get(url_for(
         'main.service_download_agreement',
         service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+        _raw_respons=True,
     ))
-    assert response.status_code == expected_status
 
     if expected_file_served:
         assert response.get_data() == b'foo'

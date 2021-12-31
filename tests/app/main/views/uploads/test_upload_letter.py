@@ -492,7 +492,7 @@ def test_uploaded_letter_preview_redirects_if_file_not_in_s3(
 ))
 def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printable_area_on_a_page(
     mocker,
-    logged_in_client,
+    client_request,
     mock_get_service,
     fake_uuid,
     invalid_pages,
@@ -515,13 +515,11 @@ def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printa
         return_value=make_response('page.html', 200)
     )
 
-    logged_in_client.get(
-        url_for(
-            'main.view_letter_upload_as_preview',
-            file_id=fake_uuid,
-            service_id=SERVICE_ONE_ID,
-            page=page_requested,
-        )
+    client_request.get_response(
+        'main.view_letter_upload_as_preview',
+        file_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        page=page_requested,
     )
 
     if overlay_expected:
@@ -541,7 +539,7 @@ def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printa
 )
 def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outside_printable_area(
     mocker,
-    logged_in_client,
+    client_request,
     mock_get_service,
     metadata,
     fake_uuid,
@@ -554,8 +552,11 @@ def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outsi
         'app.main.views.uploads.TemplatePreview.from_valid_pdf_file',
         return_value=make_response('page.html', 200))
 
-    logged_in_client.get(
-        url_for('main.view_letter_upload_as_preview', file_id=fake_uuid, service_id=SERVICE_ONE_ID, page=1)
+    client_request.get_response(
+        'main.view_letter_upload_as_preview',
+        file_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        page=1,
     )
 
     template_preview_mock.assert_called_once_with('pdf_file', 1)
