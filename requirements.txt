@@ -19,7 +19,7 @@ blinker==1.4
     #   -r requirements.in
     #   gds-metrics
     #   sentry-sdk
-boto3==1.17.84
+boto3==1.20.26
     # via notifications-utils
 botocore==1.20.84
     # via
