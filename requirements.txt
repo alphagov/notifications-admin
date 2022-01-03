@@ -203,7 +203,7 @@ s3transfer==0.4.2
     #   boto3
 sentry-sdk[flask]==1.5.1
     # via -r requirements.in
-shapely==1.7.1
+shapely==1.8.0
     # via
     #   -r requirements.in
     #   notifications-utils
