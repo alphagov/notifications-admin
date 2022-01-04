@@ -2904,9 +2904,17 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             _optional_args="",
             **endpoint_kwargs
         ):
-            resp = _logged_in_client.get(
+            return ClientRequest.get_response_from_url(
                 url_for(endpoint, **(endpoint_kwargs or {})) + _optional_args,
+                _expected_status=_expected_status,
             )
+
+        @staticmethod
+        def get_response_from_url(
+            url,
+            _expected_status=200,
+        ):
+            resp = _logged_in_client.get(url)
             assert resp.status_code == _expected_status
             return resp
 

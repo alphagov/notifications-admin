@@ -1,14 +1,14 @@
 import pytest
-from bs4 import BeautifulSoup
 from flask import Response, url_for
 from flask_wtf.csrf import CSRFError
 from notifications_python_client.errors import HTTPError
 
 
-def test_bad_url_returns_page_not_found(client):
-    response = client.get('/bad_url')
-    assert response.status_code == 404
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+def test_bad_url_returns_page_not_found(client_request):
+    page = client_request.get_url(
+        '/bad_url',
+        _expected_status=404,
+    )
     assert page.h1.string.strip() == 'Page not found'
     assert page.title.string.strip() == 'Page not found – GOV.UK Notify'
 
@@ -55,20 +55,19 @@ def test_csrf_returns_400(client_request, mocker):
     assert page.title.string.strip() == 'Sorry, there’s a problem with the service – GOV.UK Notify'
 
 
-def test_csrf_redirects_to_sign_in_page_if_not_signed_in(client, mocker):
+def test_csrf_redirects_to_sign_in_page_if_not_signed_in(client_request, mocker):
     csrf_err = CSRFError('400 Bad Request: The CSRF tokens do not match.')
     mocker.patch('app.main.views.index.render_template', side_effect=csrf_err)
 
-    response = client.get('/cookies')
+    client_request.logout()
+    client_request.get_url(
+        '/cookies',
+        _expected_redirect=url_for('main.sign_in', next='/cookies', _external=True),
+    )
 
-    assert response.status_code == 302
-    assert response.location == url_for('main.sign_in', next='/cookies', _external=True)
 
+def test_405_returns_something_went_wrong_page(client_request, mocker):
+    page = client_request.post_url('/', _expected_status=405)
 
-def test_405_returns_something_went_wrong_page(client, mocker):
-    response = client.post('/')
-
-    assert response.status_code == 405
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'Sorry, there’s a problem with GOV.UK Notify'
     assert page.title.string.strip() == 'Sorry, there’s a problem with the service – GOV.UK Notify'

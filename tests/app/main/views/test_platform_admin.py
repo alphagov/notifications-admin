@@ -25,12 +25,14 @@ from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
     'main.trial_services',
 ])
 def test_should_redirect_if_not_logged_in(
-    client,
+    client_request,
     endpoint
 ):
-    response = client.get(url_for(endpoint))
-    assert response.status_code == 302
-    assert response.location == url_for('main.sign_in', next=url_for(endpoint), _external=True)
+    client_request.logout()
+    client_request.get(
+        endpoint,
+        _expected_redirect=url_for('main.sign_in', next=url_for(endpoint), _external=True),
+    )
 
 
 @pytest.mark.parametrize('endpoint', [

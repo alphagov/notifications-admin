@@ -2,7 +2,6 @@ import uuid
 from itertools import repeat
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 
 from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
@@ -240,13 +239,12 @@ def test_choose_account_should_show_back_to_service_link(
 
 
 def test_choose_account_should_not_show_back_to_service_link_if_no_service_in_session(
-    client,
     client_request,
     mock_get_orgs_and_services,
     mock_get_organisation,
     mock_get_organisation_services,
 ):
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['service_id'] = None
     page = client_request.get('main.choose_account')
 
@@ -254,13 +252,14 @@ def test_choose_account_should_not_show_back_to_service_link_if_no_service_in_se
 
 
 def test_choose_account_should_not_show_back_to_service_link_if_not_signed_in(
-    client,
+    client_request,
     mock_get_service,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
         session['service_id'] = SERVICE_ONE_ID
-    response = client.get(url_for('main.sign_in'))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get('main.sign_in')
 
     assert page.select_one('h1').text == 'Sign in'  # We’re not signed in
     assert page.select_one('.navigation-service a') is None

@@ -14,10 +14,11 @@ from tests.conftest import SERVICE_ONE_ID, url_for_endpoint_with_token
 def test_should_render_new_password_template(
     mocker,
     notify_admin,
-    client,
+    client_request,
     mock_send_verify_code,
     mock_get_user_by_email_request_password_reset,
 ):
+    client_request.logout()
     user = mock_get_user_by_email_request_password_reset.return_value
     user['password_changed_at'] = '2021-01-01 00:00:00'
     mock_update_user_attribute = mocker.patch(
@@ -28,9 +29,8 @@ def test_should_render_new_password_template(
     token = generate_token(data, notify_admin.config['SECRET_KEY'],
                            notify_admin.config['DANGEROUS_SALT'])
 
-    response = client.get(url_for_endpoint_with_token('.new_password', token=token))
-    assert response.status_code == 200
-    assert 'You can now create a new password for your account.' in response.get_data(as_text=True)
+    page = client_request.get_url(url_for_endpoint_with_token('.new_password', token=token))
+    assert 'You can now create a new password for your account.' in page.text
 
     mock_update_user_attribute.assert_called_once_with(
         user['id'],
@@ -40,13 +40,16 @@ def test_should_render_new_password_template(
 
 def test_should_return_404_when_email_address_does_not_exist(
     notify_admin,
-    client,
+    client_request,
     mock_get_user_by_email_not_found,
 ):
+    client_request.logout()
     data = json.dumps({'email': 'no_user@d.gov.uk', 'created_at': str(datetime.utcnow())})
     token = generate_token(data, notify_admin.config['SECRET_KEY'], notify_admin.config['DANGEROUS_SALT'])
-    response = client.get(url_for_endpoint_with_token('.new_password', token=token))
-    assert response.status_code == 404
+    client_request.get_url(
+        url_for_endpoint_with_token('.new_password', token=token),
+        _expected_status=404,
+    )
 
 
 @pytest.mark.parametrize('redirect_url', [
@@ -55,20 +58,22 @@ def test_should_return_404_when_email_address_does_not_exist(
 ])
 def test_should_redirect_to_two_factor_when_password_reset_is_successful(
     notify_admin,
-    client,
+    client_request,
     mock_get_user_by_email_request_password_reset,
     mock_login,
     mock_send_verify_code,
     mock_reset_failed_login_count,
     redirect_url
 ):
+    client_request.logout()
     user = mock_get_user_by_email_request_password_reset.return_value
     data = json.dumps({'email': user['email_address'], 'created_at': str(datetime.utcnow())})
     token = generate_token(data, notify_admin.config['SECRET_KEY'], notify_admin.config['DANGEROUS_SALT'])
-    response = client.post(url_for_endpoint_with_token('.new_password', token=token, next=redirect_url),
-                           data={'new_password': 'a-new_password'})
-    assert response.status_code == 302
-    assert response.location == url_for('.two_factor_sms', _external=True, next=redirect_url)
+    client_request.post_url(
+        url_for_endpoint_with_token('.new_password', token=token, next=redirect_url),
+        _data={'new_password': 'a-new_password'},
+        _expected_redirect=url_for('.two_factor_sms', _external=True, next=redirect_url),
+    )
     mock_get_user_by_email_request_password_reset.assert_called_once_with(user['email_address'])
 
 
@@ -78,20 +83,22 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(
 ])
 def test_should_redirect_to_two_factor_webauthn_when_password_reset_is_successful(
     notify_admin,
-    client,
+    client_request,
     mock_get_user_by_email_request_password_reset,
     mock_send_verify_code,
     mock_reset_failed_login_count,
     redirect_url
 ):
+    client_request.logout()
     user = mock_get_user_by_email_request_password_reset.return_value
     user['auth_type'] = 'webauthn_auth'
     data = json.dumps({'email': user['email_address'], 'created_at': str(datetime.utcnow())})
     token = generate_token(data, notify_admin.config['SECRET_KEY'], notify_admin.config['DANGEROUS_SALT'])
-    response = client.post(url_for_endpoint_with_token('.new_password', token=token, next=redirect_url),
-                           data={'new_password': 'a-new_password'})
-    assert response.status_code == 302
-    assert response.location == url_for('.two_factor_webauthn', _external=True, next=redirect_url)
+    client_request.post_url(
+        url_for_endpoint_with_token('.new_password', token=token, next=redirect_url),
+        _data={'new_password': 'a-new_password'},
+        _expected_redirect=url_for('.two_factor_webauthn', _external=True, next=redirect_url),
+    )
     mock_get_user_by_email_request_password_reset.assert_called_once_with(user['email_address'])
 
     assert not mock_send_verify_code.called
@@ -100,57 +107,64 @@ def test_should_redirect_to_two_factor_webauthn_when_password_reset_is_successfu
 
 def test_should_redirect_index_if_user_has_already_changed_password(
     notify_admin,
-    client,
+    client_request,
     mock_get_user_by_email_user_changed_password,
     mock_login,
     mock_send_verify_code,
     mock_reset_failed_login_count
 ):
+    client_request.logout()
     user = mock_get_user_by_email_user_changed_password.return_value
     data = json.dumps({'email': user['email_address'], 'created_at': str(datetime.utcnow())})
     token = generate_token(data, notify_admin.config['SECRET_KEY'], notify_admin.config['DANGEROUS_SALT'])
-    response = client.post(url_for_endpoint_with_token('.new_password', token=token),
-                           data={'new_password': 'a-new_password'})
-    assert response.status_code == 302
-    assert response.location == url_for('.index', _external=True)
+    client_request.post_url(
+        url_for_endpoint_with_token('.new_password', token=token),
+        _data={'new_password': 'a-new_password'},
+        _expected_redirect=url_for('.index', _external=True),
+    )
     mock_get_user_by_email_user_changed_password.assert_called_once_with(user['email_address'])
 
 
 def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_expired(
     notify_admin,
-    client,
+    client_request,
     mock_login,
     mocker
 ):
+    client_request.logout()
     mocker.patch('app.main.views.new_password.check_token', side_effect=SignatureExpired('expired'))
     token = generate_token('foo@bar.com', notify_admin.config['SECRET_KEY'], notify_admin.config['DANGEROUS_SALT'])
 
-    response = client.get(url_for_endpoint_with_token('.new_password', token=token))
-
-    assert response.status_code == 302
-    assert response.location == url_for('.forgot_password', _external=True)
+    client_request.get_url(
+        url_for_endpoint_with_token('.new_password', token=token),
+        _expected_redirect=url_for('.forgot_password', _external=True),
+    )
 
 
 def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
+    mocker,
     notify_admin,
-    client,
-    mock_get_user,
+    client_request,
+    api_user_active,
     mock_get_user_by_email_request_password_reset,
     mock_login,
     mock_send_verify_code,
     mock_reset_failed_login_count,
     mock_update_user_password
 ):
+    client_request.logout()
     user = mock_get_user_by_email_request_password_reset.return_value
+    mock_get_user = mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
     user['auth_type'] = 'email_auth'
     data = json.dumps({'email': user['email_address'], 'created_at': str(datetime.utcnow())})
     token = generate_token(data, notify_admin.config['SECRET_KEY'], notify_admin.config['DANGEROUS_SALT'])
 
-    response = client.post(url_for_endpoint_with_token('.new_password', token=token),
-                           data={'new_password': 'a-new_password'})
+    client_request.post_url(
+        url_for_endpoint_with_token('.new_password', token=token),
+        _data={'new_password': 'a-new_password'},
+        _expected_redirect=url_for('.show_accounts_or_dashboard', _external=True),
+    )
 
-    assert response.status_code == 302
-    assert response.location == url_for('.show_accounts_or_dashboard', _external=True)
     assert mock_get_user_by_email_request_password_reset.called
     assert mock_reset_failed_login_count.called
 

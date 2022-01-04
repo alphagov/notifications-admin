@@ -1,23 +1,23 @@
 from unittest.mock import ANY
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 
 from app.models.user import User
 from tests.conftest import normalize_spaces
 
 
-def test_render_register_returns_template_with_form(client):
-    response = client.get('/register')
+def test_render_register_returns_template_with_form(
+    client_request,
+):
+    client_request.logout()
+    page = client_request.get_url('/register')
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('input', attrs={'name': 'auth_type'}).attrs['value'] == 'sms_auth'
     assert page.select_one('#email_address')['spellcheck'] == 'false'
     assert page.select_one('#email_address')['autocomplete'] == 'email'
     assert page.select_one('#password')['autocomplete'] == 'new-password'
-    assert 'Create an account' in response.get_data(as_text=True)
+    assert 'Create an account' in page.text
 
 
 def test_logged_in_user_redirects_to_account(
@@ -39,7 +39,7 @@ def test_logged_in_user_redirects_to_account(
     '   the   quick   brown   fox   ',
 ])
 def test_register_creates_new_user_and_redirects_to_continue_page(
-    client,
+    client_request,
     mock_send_verify_code,
     mock_register_user,
     mock_get_user_by_email_not_found,
@@ -49,6 +49,7 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     phone_number_to_register_with,
     password,
 ):
+    client_request.logout()
     user_data = {'name': 'Some One Valid',
                  'email_address': 'notfound@example.gov.uk',
                  'mobile_number': phone_number_to_register_with,
@@ -56,10 +57,12 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
                  'auth_type': 'sms_auth'
                  }
 
-    response = client.post(url_for('main.register'), data=user_data, follow_redirects=True)
-    assert response.status_code == 200
+    page = client_request.post(
+        'main.register',
+        _data=user_data,
+        _follow_redirects=True,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select('main p')[0].text == 'An email has been sent to notfound@example.gov.uk.'
 
     mock_send_verify_email.assert_called_with(ANY, user_data['email_address'])
@@ -71,28 +74,35 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
 
 
 def test_register_continue_handles_missing_session_sensibly(
-    client,
+    client_request,
 ):
+    client_request.logout()
     # session is not set
-    response = client.get(url_for('main.registration_continue'))
-    assert response.status_code == 302
-    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
+    client_request.get(
+        'main.registration_continue',
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+    )
 
 
 def test_process_register_returns_200_when_mobile_number_is_invalid(
-    client,
+    client_request,
     mock_send_verify_code,
     mock_get_user_by_email_not_found,
     mock_login,
 ):
-    response = client.post(url_for('main.register'),
-                           data={'name': 'Bad Mobile',
-                                 'email_address': 'bad_mobile@example.gov.uk',
-                                 'mobile_number': 'not good',
-                                 'password': 'validPassword!'})
+    client_request.logout()
+    page = client_request.post(
+        'main.register',
+        _data={
+            'name': 'Bad Mobile',
+            'email_address': 'bad_mobile@example.gov.uk',
+            'mobile_number': 'not good',
+            'password': 'validPassword!',
+        },
+        _expected_status=200,
+    )
 
-    assert response.status_code == 200
-    assert 'Must not contain letters or symbols' in response.get_data(as_text=True)
+    assert 'Must not contain letters or symbols' in page.text
 
 
 def test_should_return_200_when_email_is_not_gov_uk(
@@ -125,7 +135,7 @@ def test_should_return_200_when_email_is_not_gov_uk(
     pytest.param('example@ellipsis.com', marks=pytest.mark.xfail(raises=AssertionError)),
 ))
 def test_should_add_user_details_to_session(
-    client,
+    client_request,
     mock_send_verify_code,
     mock_register_user,
     mock_get_user_by_email_not_found,
@@ -135,41 +145,47 @@ def test_should_add_user_details_to_session(
     mock_login,
     email_address,
 ):
-    response = client.post(
-        url_for('main.register'),
-        data={
+    client_request.logout()
+    client_request.post(
+        'main.register',
+        _data={
             'name': 'Test Codes',
             'email_address': email_address,
             'mobile_number': '+4407700900460',
             'password': 'validPassword!'
         },
     )
-    assert response.status_code == 302
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['user_details']['email'] == email_address
 
 
 def test_should_return_200_if_password_is_on_list_of_commonly_used_passwords(
-    client,
+    client_request,
     mock_get_user_by_email,
     mock_login,
 ):
-    response = client.post(url_for('main.register'),
-                           data={'name': 'Bad Mobile',
-                                 'email_address': 'bad_mobile@example.gov.uk',
-                                 'mobile_number': '+44123412345',
-                                 'password': 'password'})
+    client_request.logout()
+    page = client_request.post(
+        'main.register',
+        _data={
+            'name': 'Bad Mobile',
+            'email_address': 'bad_mobile@example.gov.uk',
+            'mobile_number': '+44123412345',
+            'password': 'password',
+        },
+        _expected_status=200,
+    )
 
-    assert response.status_code == 200
-    assert 'Choose a password that’s harder to guess' in response.get_data(as_text=True)
+    assert 'Choose a password that’s harder to guess' in page.text
 
 
 def test_register_with_existing_email_sends_emails(
-    client,
+    client_request,
     api_user_active,
     mock_get_user_by_email,
     mock_send_already_registered_email,
 ):
+    client_request.logout()
     user_data = {
         'name': 'Already Hasaccount',
         'email_address': api_user_active['email_address'],
@@ -177,10 +193,11 @@ def test_register_with_existing_email_sends_emails(
         'password': 'validPassword!'
     }
 
-    response = client.post(url_for('main.register'),
-                           data=user_data)
-    assert response.status_code == 302
-    assert response.location == url_for('main.registration_continue', _external=True)
+    client_request.post(
+        'main.register',
+        _data=user_data,
+        _expected_redirect=url_for('main.registration_continue', _external=True),
+    )
 
 
 @pytest.mark.parametrize('email_address, expected_value', [
@@ -254,7 +271,7 @@ def test_shows_hidden_email_address_on_registration_page_from_invite(
     {'username': 'anythingelse@example.com'},
 ))
 def test_register_from_invite(
-    client,
+    client_request,
     fake_uuid,
     mock_email_is_not_already_in_use,
     mock_register_user,
@@ -264,11 +281,12 @@ def test_register_from_invite(
     sample_invite,
     extra_data,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+    with client_request.session_transaction() as session:
         session['invited_user_id'] = sample_invite['id']
-    response = client.post(
-        url_for('main.register_from_invite'),
-        data=dict(
+    client_request.post(
+        'main.register_from_invite',
+        _data=dict(
             name='Registered in another Browser',
             email_address=sample_invite['email_address'],
             mobile_number='+4407700900460',
@@ -277,9 +295,8 @@ def test_register_from_invite(
             auth_type='sms_auth',
             **extra_data
         ),
+        _expected_redirect=url_for('main.verify', _external=True),
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.verify', _external=True)
     mock_register_user.assert_called_once_with(
         'Registered in another Browser',
         sample_invite['email_address'],
@@ -291,34 +308,34 @@ def test_register_from_invite(
 
 
 def test_register_from_invite_when_user_registers_in_another_browser(
-    client,
+    client_request,
     api_user_active,
     mock_get_user_by_email,
     mock_accept_invite,
     mock_get_invited_user_by_id,
     sample_invite,
 ):
+    client_request.logout()
     sample_invite['email_address'] = api_user_active['email_address']
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['invited_user_id'] = sample_invite['id']
-    response = client.post(
-        url_for('main.register_from_invite'),
-        data={
+    client_request.post(
+        'main.register_from_invite',
+        _data={
             'name': 'Registered in another Browser',
             'email_address': api_user_active['email_address'],
             'mobile_number': api_user_active['mobile_number'],
             'service': sample_invite['service'],
             'password': 'somreallyhardthingtoguess',
             'auth_type': 'sms_auth'
-        }
+        },
+        _expected_redirect=url_for('main.verify', _external=True),
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.verify', _external=True)
 
 
 @pytest.mark.parametrize('invite_email_address', ['gov-user@gov.uk', 'non-gov-user@example.com'])
 def test_register_from_email_auth_invite(
-    client,
+    client_request,
     sample_invite,
     mock_email_is_not_already_in_use,
     mock_register_user,
@@ -335,10 +352,11 @@ def test_register_from_email_auth_invite(
     fake_uuid,
     mocker,
 ):
+    client_request.logout()
     mock_login_user = mocker.patch('app.models.user.login_user')
     sample_invite['auth_type'] = 'email_auth'
     sample_invite['email_address'] = invite_email_address
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['invited_user_id'] = sample_invite['id']
         # Prove that the user isn’t already signed in
         assert 'user_id' not in session
@@ -352,9 +370,15 @@ def test_register_from_email_auth_invite(
         'auth_type': 'email_auth',
     }
 
-    resp = client.post(url_for('main.register_from_invite'), data=data)
-    assert resp.status_code == 302
-    assert resp.location == url_for('main.service_dashboard', service_id=sample_invite['service'], _external=True)
+    client_request.post(
+        'main.register_from_invite',
+        _data=data,
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=sample_invite['service'],
+            _external=True,
+        ),
+    )
 
     # doesn't send any 2fa code
     assert not mock_send_verify_email.called
@@ -383,7 +407,7 @@ def test_register_from_email_auth_invite(
         [],
     )
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         # The user is signed in
         assert 'user_id' in session
         # invited user details are still there so they can get added to the service
@@ -391,7 +415,7 @@ def test_register_from_email_auth_invite(
 
 
 def test_can_register_email_auth_without_phone_number(
-    client,
+    client_request,
     sample_invite,
     mock_email_is_not_already_in_use,
     mock_register_user,
@@ -404,8 +428,9 @@ def test_can_register_email_auth_without_phone_number(
     mock_get_service,
     mock_get_invited_user_by_id,
 ):
+    client_request.logout()
     sample_invite['auth_type'] = 'email_auth'
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['invited_user_id'] = sample_invite['id']
 
     data = {
@@ -417,9 +442,15 @@ def test_can_register_email_auth_without_phone_number(
         'auth_type': 'email_auth'
     }
 
-    resp = client.post(url_for('main.register_from_invite'), data=data)
-    assert resp.status_code == 302
-    assert resp.location == url_for('main.service_dashboard', service_id=sample_invite['service'], _external=True)
+    client_request.post(
+        'main.register_from_invite',
+        _data=data,
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=sample_invite['service'],
+            _external=True,
+        ),
+    )
 
     mock_register_user.assert_called_once_with(
         ANY,
@@ -431,35 +462,38 @@ def test_can_register_email_auth_without_phone_number(
 
 
 def test_cannot_register_with_sms_auth_and_missing_mobile_number(
-    client,
+    client_request,
     mock_send_verify_code,
     mock_get_user_by_email_not_found,
     mock_login,
 ):
-    response = client.post(url_for('main.register'),
-                           data={'name': 'Missing Mobile',
-                                 'email_address': 'missing_mobile@example.gov.uk',
-                                 'password': 'validPassword!'})
+    client_request.logout()
+    page = client_request.post(
+        'main.register',
+        _data={
+            'name': 'Missing Mobile',
+            'email_address': 'missing_mobile@example.gov.uk',
+            'password': 'validPassword!',
+        },
+        _expected_status=200,
+     )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     err = page.select_one('.govuk-error-message')
     assert err.text.strip() == 'Error: Cannot be empty'
     assert err.attrs['data-error-label'] == 'mobile_number'
 
 
 def test_register_from_invite_form_doesnt_show_mobile_number_field_if_email_auth(
-    client,
+    client_request,
     sample_invite,
     mock_get_invited_user_by_id,
 ):
+    client_request.logout()
     sample_invite['auth_type'] = 'email_auth'
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['invited_user_id'] = sample_invite['id']
 
-    response = client.get(url_for('main.register_from_invite'))
+    page = client_request.get('main.register_from_invite')
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.find('input', attrs={'name': 'auth_type'}).attrs['value'] == 'email_auth'
     assert page.find('input', attrs={'name': 'mobile_number'}) is None

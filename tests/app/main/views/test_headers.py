@@ -1,15 +1,15 @@
 
 
 def test_owasp_useful_headers_set(
-    client,
+    client_request,
     mocker,
     mock_get_service_and_organisation_counts,
 ):
+    client_request.logout()
     mocker.patch('app.get_logo_cdn_domain', return_value='static-logos.test.com')
 
-    response = client.get('/')
+    response = client_request.get_response('.index')
 
-    assert response.status_code == 200
     assert response.headers['X-Frame-Options'] == 'deny'
     assert response.headers['X-Content-Type-Options'] == 'nosniff'
     assert response.headers['X-XSS-Protection'] == '1; mode=block'
@@ -31,15 +31,15 @@ def test_owasp_useful_headers_set(
 
 
 def test_headers_non_ascii_characters_are_replaced(
-    client,
+    client_request,
     mocker,
     mock_get_service_and_organisation_counts,
 ):
+    client_request.logout()
     mocker.patch('app.get_logo_cdn_domain', return_value='static-logos€æ.test.com')
 
-    response = client.get('/')
+    response = client_request.get_response('.index')
 
-    assert response.status_code == 200
     assert response.headers['Content-Security-Policy'] == (
         "default-src 'self' static.example.com 'unsafe-inline';"
         "script-src 'self' static.example.com *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"

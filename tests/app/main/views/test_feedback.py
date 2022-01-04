@@ -2,7 +2,6 @@ from functools import partial
 from unittest.mock import ANY, PropertyMock
 
 import pytest
-from bs4 import BeautifulSoup, element
 from flask import url_for
 from freezegun import freeze_time
 from notifications_utils.clients.zendesk.zendesk_client import (
@@ -133,9 +132,13 @@ def test_get_support_as_member_of_public(
     (QUESTION_TICKET_TYPE, 200),
     ('gripe', 404)
 ])
-def test_get_feedback_page(client, ticket_type, expected_status_code):
-    response = client.get(url_for('main.feedback', ticket_type=ticket_type))
-    assert response.status_code == expected_status_code
+def test_get_feedback_page(client_request, ticket_type, expected_status_code):
+    client_request.logout()
+    client_request.get(
+        'main.feedback',
+        ticket_type=ticket_type,
+        _expected_status=expected_status_code,
+    )
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
@@ -144,7 +147,8 @@ def test_get_feedback_page(client, ticket_type, expected_status_code):
     (QUESTION_TICKET_TYPE, 'question'),
     (GENERAL_TICKET_TYPE, 'question'),
 ])
-def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_type, zendesk_ticket_type):
+def test_passed_non_logged_in_user_details_through_flow(client_request, mocker, ticket_type, zendesk_ticket_type):
+    client_request.logout()
     mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
     mock_send_ticket_to_zendesk = mocker.patch(
         'app.main.views.feedback.zendesk_client.send_ticket_to_zendesk',
@@ -153,18 +157,18 @@ def test_passed_non_logged_in_user_details_through_flow(client, mocker, ticket_t
 
     data = {'feedback': 'blah', 'name': 'Anne Example', 'email_address': 'anne@example.com'}
 
-    resp = client.post(
-        url_for('main.feedback', ticket_type=ticket_type),
-        data=data
+    client_request.post(
+        'main.feedback',
+        ticket_type=ticket_type,
+        _data=data,
+        _expected_redirect=url_for(
+            'main.thanks',
+            out_of_hours_emergency=False,
+            email_address_provided=True,
+            _external=True,
+        ),
     )
 
-    assert resp.status_code == 302
-    assert resp.location == url_for(
-        'main.thanks',
-        out_of_hours_emergency=False,
-        email_address_provided=True,
-        _external=True,
-    )
     mock_create_ticket.assert_called_once_with(
         ANY,
         subject='Notify feedback',
@@ -265,7 +269,9 @@ def test_email_address_required_for_problems_and_questions(
         _data=data,
         _expected_status=200
     )
-    assert isinstance(page.find('span', {'class': 'govuk-error-message'}), element.Tag)
+    assert normalize_spaces(page.select_one('.govuk-error-message').text) == (
+        'Error: Cannot be empty'
+    )
 
 
 @freeze_time('2016-12-12 12:00:00.000000')
@@ -273,19 +279,20 @@ def test_email_address_required_for_problems_and_questions(
     PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 ))
 def test_email_address_must_be_valid_if_provided_to_support_form(
-    client,
+    client_request,
     mocker,
     ticket_type,
 ):
-    response = client.post(
-        url_for('main.feedback', ticket_type=ticket_type),
-        data={
+    client_request.logout()
+    page = client_request.post(
+        'main.feedback',
+        ticket_type=ticket_type,
+        _data={
             'feedback': 'blah',
             'email_address': 'not valid',
         },
+        _expected_status=200,
     )
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(page.select_one('span.govuk-error-message').text) == (
         'Error: Enter a valid email address'

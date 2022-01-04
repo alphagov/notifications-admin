@@ -1,7 +1,6 @@
 from unittest.mock import ANY, Mock, call
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
@@ -33,7 +32,7 @@ def mock_check_invite_token(mocker, sample_invite):
 
 @freeze_time('2021-12-12 12:12:12')
 def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
-    client,
+    client_request,
     service_one,
     api_user_active,
     mock_check_invite_token,
@@ -47,10 +46,15 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     mock_get_user,
     mock_update_user_attribute,
 ):
+    client_request.logout()
     expected_service = service_one['id']
     expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
 
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_redirect=url_for('main.service_dashboard', service_id=expected_service, _external=True),
+    )
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
     mock_get_existing_user_by_email.assert_called_with('invited_user@test.gov.uk')
@@ -62,16 +66,13 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
         [],
     )
 
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_dashboard', service_id=expected_service, _external=True)
-
 
 @pytest.mark.parametrize('trial_mode, expected_endpoint', (
     (True, '.broadcast_tour'),
     (False, '.broadcast_tour_live'),
 ))
 def test_broadcast_service_shows_tour(
-    client,
+    client_request,
     service_one,
     mock_check_invite_token,
     mock_get_existing_user_by_email,
@@ -85,6 +86,7 @@ def test_broadcast_service_shows_tour(
     trial_mode,
     expected_endpoint,
 ):
+    client_request.logout()
     service_one['permissions'] = ['broadcast']
     service_one['restricted'] = trial_mode
 
@@ -92,21 +94,20 @@ def test_broadcast_service_shows_tour(
         'data': service_one,
     })
 
-    response = client.get(url_for(
+    client_request.get(
         'main.accept_invite',
-        token='thisisnotarealtoken'
-    ))
-    assert response.status_code == 302
-    assert response.location == url_for(
-        expected_endpoint,
-        service_id=SERVICE_ONE_ID,
-        step_index=1,
-        _external=True,
+        token='thisisnotarealtoken',
+        _expected_redirect=url_for(
+            expected_endpoint,
+            service_id=SERVICE_ONE_ID,
+            step_index=1,
+            _external=True,
+        ),
     )
 
 
 def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
-    client,
+    client_request,
     mocker,
     service_one,
     api_user_active,
@@ -120,34 +121,44 @@ def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
     mock_get_user,
     mock_update_user_attribute,
 ):
+    client_request.logout()
+
     expected_service = service_one['id']
     sample_invite['permissions'] = ''
     expected_permissions = set()
     expected_folder_permissions = []
     mocker.patch('app.invite_api_client.accept_invite', return_value=sample_invite)
 
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_status=302,
+    )
     mock_add_user_to_service.assert_called_with(expected_service,
                                                 api_user_active['id'],
                                                 expected_permissions,
                                                 expected_folder_permissions)
 
-    assert response.status_code == 302
-
 
 def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
-    client,
+    client_request,
     mocker,
     sample_invite,
     mock_check_invite_token,
     mock_get_service,
     mock_update_user_attribute,
 ):
+    client_request.logout()
+    # Logging out updates the current session ID to `None`
+    mock_update_user_attribute.reset_mock()
     sample_invite['status'] = 'accepted'
 
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _follow_redirects=True,
+    )
+
     assert (
         page.h1.string,
         page.select('main p')[0].text.strip(),
@@ -237,7 +248,7 @@ def test_accepting_invite_removes_invite_from_session(
 
 @freeze_time('2021-12-12T12:12:12')
 def test_existing_user_of_service_get_redirected_to_signin(
-    client,
+    client_request,
     mocker,
     api_user_active,
     sample_invite,
@@ -247,12 +258,16 @@ def test_existing_user_of_service_get_redirected_to_signin(
     mock_accept_invite,
     mock_update_user_attribute,
 ):
+    client_request.logout()
     sample_invite['email_address'] = api_user_active['email_address']
     mocker.patch('app.models.user.Users.client_method', return_value=[api_user_active])
 
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _follow_redirects=True,
+    )
+
     assert (
         page.h1.string,
         page.select('main p')[0].text.strip(),
@@ -264,7 +279,7 @@ def test_existing_user_of_service_get_redirected_to_signin(
 
 
 def test_accept_invite_redirects_if_api_raises_an_error_that_they_are_already_part_of_the_service(
-    client,
+    client_request,
     mocker,
     api_user_active,
     sample_invite,
@@ -276,6 +291,8 @@ def test_accept_invite_redirects_if_api_raises_an_error_that_they_are_already_pa
     mock_get_user,
     mock_update_user_attribute,
 ):
+    client_request.logout()
+
     mocker.patch('app.user_api_client.add_user_to_service', side_effect=HTTPError(
         response=Mock(
             status_code=400,
@@ -287,12 +304,16 @@ def test_accept_invite_redirects_if_api_raises_an_error_that_they_are_already_pa
         message=f"User id: {api_user_active['id']} already part of service id: {SERVICE_ONE_ID}"
     ))
 
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=False)
-    assert response.location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _follow_redirects=False,
+        _expected_redirect=url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
+    )
 
 
 def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
-    client,
+    client_request,
     service_one,
     api_user_active,
     sample_invite,
@@ -307,10 +328,15 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
     mock_get_user,
     mock_update_user_attribute,
 ):
+    client_request.logout()
     expected_service = service_one['id']
     expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
 
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+    page = client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _follow_redirects=True,
+    )
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
     mock_get_existing_user_by_email.assert_called_with('invited_user@test.gov.uk')
@@ -319,9 +345,6 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
                                                 expected_permissions,
                                                 sample_invite['folder_permissions'])
     assert mock_accept_invite.call_count == 1
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert (
         page.h1.string,
         page.select('main p')[0].text.strip(),
@@ -332,7 +355,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
 
 
 def test_new_user_accept_invite_calls_api_and_redirects_to_registration(
-    client,
+    client_request,
     service_one,
     mock_check_invite_token,
     mock_dont_get_user_by_email,
@@ -341,19 +364,19 @@ def test_new_user_accept_invite_calls_api_and_redirects_to_registration(
     mock_get_service,
     mocker,
 ):
-    expected_redirect_location = 'http://localhost/register-from-invite'
-
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+    client_request.logout()
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_redirect='http://localhost/register-from-invite',
+    )
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
     mock_dont_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
 
-    assert response.status_code == 302
-    assert response.location == expected_redirect_location
-
 
 def test_new_user_accept_invite_calls_api_and_views_registration_page(
-    client,
+    client_request,
     service_one,
     sample_invite,
     mock_check_invite_token,
@@ -364,14 +387,17 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
     mock_get_service,
     mocker,
 ):
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'), follow_redirects=True)
+    client_request.logout()
+    page = client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _follow_redirects=True,
+    )
 
     mock_check_invite_token.assert_called_with('thisisnotarealtoken')
     mock_dont_get_user_by_email.assert_called_with('invited_user@test.gov.uk')
     mock_get_invited_user_by_id.assert_called_once_with(sample_invite['id'])
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string.strip() == 'Create an account'
 
     assert normalize_spaces(page.select_one('main p').text) == (
@@ -394,19 +420,20 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
 
 
 def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation(
-    client,
+    client_request,
     mock_get_user,
     mock_get_service,
     sample_invite,
     mock_check_invite_token,
     mock_update_user_attribute,
 ):
+    client_request.logout()
+    mock_update_user_attribute.reset_mock()
     sample_invite['status'] = 'cancelled'
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+    page = client_request.get('main.accept_invite', token='thisisnotarealtoken')
 
     app.invite_api_client.check_token.assert_called_with('thisisnotarealtoken')
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
     assert page.h1.string.strip() == 'The invitation you were sent has been cancelled'
     # We don’t let people update `email_access_validated_at` using an
     # cancelled invite
@@ -420,10 +447,11 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
 def test_new_user_accept_invite_with_malformed_token(
     admin_endpoint,
     api_endpoint,
-    client,
+    client_request,
     service_one,
     mocker,
 ):
+    client_request.logout()
     mocker.patch(api_endpoint, side_effect=HTTPError(
         response=Mock(
             status_code=400,
@@ -439,10 +467,7 @@ def test_new_user_accept_invite_with_malformed_token(
         message={'invitation': 'Something’s wrong with this link. Make sure you’ve copied the whole thing.'}
     ))
 
-    response = client.get(url_for(admin_endpoint, token='thisisnotarealtoken'), follow_redirects=True)
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(admin_endpoint, token='thisisnotarealtoken', _follow_redirects=True)
 
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
@@ -450,7 +475,7 @@ def test_new_user_accept_invite_with_malformed_token(
 
 
 def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
-    client,
+    client_request,
     service_one,
     sample_invite,
     api_user_active,
@@ -466,12 +491,15 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
     mock_get_service,
     mocker,
 ):
+    client_request.logout()
     expected_redirect_location = 'http://localhost/register-from-invite'
 
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
-    with client.session_transaction() as session:
-        assert response.status_code == 302
-        assert response.location == expected_redirect_location
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_redirect=expected_redirect_location,
+    )
+    with client_request.session_transaction() as session:
         assert session.get('invited_user_id') == sample_invite['id']
 
     data = {'service': sample_invite['service'],
@@ -484,9 +512,11 @@ def test_new_user_accept_invite_completes_new_registration_redirects_to_verify(
             }
 
     expected_redirect_location = 'http://localhost/verify'
-    response = client.post(url_for('main.register_from_invite'), data=data)
-    assert response.status_code == 302
-    assert response.location == expected_redirect_location
+    client_request.post(
+        'main.register_from_invite',
+        _data=data,
+        _expected_redirect=expected_redirect_location,
+    )
 
     mock_send_verify_code.assert_called_once_with(ANY, 'sms', data['mobile_number'])
     mock_get_invited_user_by_id.assert_called_once_with(sample_invite['id'])
@@ -554,7 +584,7 @@ def test_accept_invite_does_not_treat_email_addresses_as_case_sensitive(
 
 
 def test_new_invited_user_verifies_and_added_to_service(
-    client,
+    client_request,
     service_one,
     sample_invite,
     api_user_active,
@@ -582,10 +612,14 @@ def test_new_invited_user_verifies_and_added_to_service(
     mock_create_event,
     mocker,
 ):
+    client_request.logout()
+
     # visit accept token page
-    response = client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
-    assert response.status_code == 302
-    assert response.location == url_for('main.register_from_invite', _external=True)
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_redirect=url_for('main.register_from_invite', _external=True),
+    )
 
     # get redirected to register from invite
     data = {
@@ -597,19 +631,24 @@ def test_new_invited_user_verifies_and_added_to_service(
         'name': 'Invited User',
         'auth_type': 'sms_auth'
     }
-    response = client.post(url_for('main.register_from_invite'), data=data)
-    assert response.status_code == 302
-    assert response.location == url_for('main.verify', _external=True)
+    client_request.post(
+        'main.register_from_invite',
+        _data=data,
+        _expected_redirect=url_for('main.verify', _external=True),
+    )
 
     # that sends user on to verify
-    response = client.post(url_for('main.verify'), data={'sms_code': '12345'}, follow_redirects=True)
-    assert response.status_code == 200
+    page = client_request.post(
+        'main.verify',
+        _data={'sms_code': '12345'},
+        _follow_redirects=True,
+    )
 
     # when they post codes back to admin user should be added to
     # service and sent on to dash board
     expected_permissions = {'view_activity', 'send_messages', 'manage_service', 'manage_api_keys'}
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'invited_user_id' not in session
         new_user_id = session['user_id']
         mock_add_user_to_service.assert_called_with(data['service'], new_user_id, expected_permissions, [])
@@ -617,8 +656,6 @@ def test_new_invited_user_verifies_and_added_to_service(
         mock_check_verify_code.assert_called_once_with(new_user_id, '12345', 'sms')
         assert service_one['id'] == session['service_id']
 
-    raw_html = response.data.decode('utf-8')
-    page = BeautifulSoup(raw_html, 'html.parser')
     assert page.find('h1').text == 'Dashboard'
 
 
@@ -630,7 +667,7 @@ def test_new_invited_user_verifies_and_added_to_service(
 ))
 def test_new_invited_user_is_redirected_to_correct_place(
     mocker,
-    client,
+    client_request,
     sample_invite,
     mock_check_invite_token,
     mock_check_verify_code,
@@ -645,6 +682,7 @@ def test_new_invited_user_is_redirected_to_correct_place(
     expected_endpoint,
     extra_args,
 ):
+    client_request.logout()
     mocker.patch('app.service_api_client.get_service', return_value={
         'data': service_json(
             sample_invite['service'],
@@ -652,21 +690,27 @@ def test_new_invited_user_is_redirected_to_correct_place(
             permissions=service_permissions,
         )
     })
-    client.get(url_for('main.accept_invite', token='thisisnotarealtoken'))
+    client_request.get(
+        'main.accept_invite',
+        token='thisisnotarealtoken',
+        _expected_status=302,
+    )
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'email': sample_invite['email_address'],
             'id': sample_invite['id'],
         }
 
-    response = client.post(url_for('main.verify'), data={'sms_code': '12345'})
-    assert response.status_code == 302
-    assert response.location == url_for(
-        expected_endpoint,
-        service_id=sample_invite['service'],
-        _external=True,
-        **extra_args
+    client_request.post(
+        'main.verify',
+        _data={'sms_code': '12345'},
+        _expected_redirect=url_for(
+            expected_endpoint,
+            service_id=sample_invite['service'],
+            _external=True,
+            **extra_args
+        )
     )
 
 

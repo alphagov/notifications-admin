@@ -498,7 +498,7 @@ def test_confirm_agreement_page_persists(
     ('foo', 404),
 ))
 def test_show_public_agreement_page(
-    client,
+    client_request,
     mocker,
     endpoint,
     variant,
@@ -508,8 +508,9 @@ def test_show_public_agreement_page(
         'app.s3_client.s3_mou_client.get_s3_object',
         return_value=MockS3Object()
     )
-    response = client.get(url_for(
+    client_request.logout()
+    client_request.get_response(
         endpoint,
         variant=variant,
-    ))
-    assert response.status_code == expected_status
+        _expected_status=expected_status,
+    )

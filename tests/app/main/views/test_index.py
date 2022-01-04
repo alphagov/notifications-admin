@@ -10,13 +10,11 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
 
 
 def test_non_logged_in_user_can_see_homepage(
-    client,
+    client_request,
     mock_get_service_and_organisation_counts,
 ):
-    response = client.get(url_for('main.index'))
-    assert response.status_code == 200
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.logout()
+    page = client_request.get('main.index', _test_page_title=False)
 
     assert page.h1.text.strip() == (
         'Send emails, text messages and letters to your users'
@@ -80,14 +78,16 @@ def test_robots(client_request):
 ))
 @freeze_time('2012-12-12 12:12')  # So we don’t go out of business hours
 def test_hiding_pages_from_search_engines(
-    client,
+    client_request,
     mock_get_service_and_organisation_counts,
     endpoint,
     kwargs,
 ):
-    response = client.get(url_for(f'main.{endpoint}', **kwargs))
+    client_request.logout()
+    response = client_request.get_response(f'main.{endpoint}', **kwargs)
     assert 'X-Robots-Tag' in response.headers
     assert response.headers['X-Robots-Tag'] == 'noindex'
+
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('meta[name=robots]')['content'] == 'noindex'
 
@@ -167,15 +167,18 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
     ('who_its_for', 'who_can_use_notify'),
 ])
 def test_old_static_pages_redirect(
-    client,
+    client_request,
     view,
     expected_view
 ):
-    response = client.get(url_for('main.{}'.format(view)))
-    assert response.status_code == 301
-    assert response.location == url_for(
-        'main.{}'.format(expected_view),
-        _external=True
+    client_request.logout()
+    client_request.get(
+        'main.{}'.format(view),
+        _expected_status=301,
+        _expected_redirect=url_for(
+            'main.{}'.format(expected_view),
+            _external=True,
+        ),
     )
 
 
@@ -306,11 +309,11 @@ def test_letter_template_preview_links_to_the_correct_image(
 
 
 def test_letter_template_preview_headers(
-    client,
+    client_request,
     mock_get_letter_branding_by_id,
 ):
-    response = client.get(
-        url_for('main.letter_template', branding_style='hm-government')
+    response = client_request.get_response(
+        'main.letter_template', branding_style='hm-government'
     )
 
     assert response.headers.get('X-Frame-Options') == 'SAMEORIGIN'

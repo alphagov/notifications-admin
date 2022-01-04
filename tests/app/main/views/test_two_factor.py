@@ -1,5 +1,4 @@
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 
 from tests.conftest import (
@@ -22,16 +21,19 @@ def mock_email_validated_recently(mocker):
     (True, 'Email resent')
 ])
 def test_two_factor_email_sent_page(
-    client,
+    client_request,
     email_resent,
     page_title,
     redirect_url,
     request_url
 ):
-    response = client.get(url_for(f'main.{request_url}', next=redirect_url, email_resent=email_resent))
-    assert response.status_code == 200
+    client_request.logout()
+    page = client_request.get(
+        f'main.{request_url}',
+        next=redirect_url,
+        email_resent=email_resent,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.h1.string == page_title
     # there shouldn't be a form for updating mobile number
     assert page.find('form') is None
@@ -45,22 +47,22 @@ def test_two_factor_email_sent_page(
     f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_should_render_two_factor_page(
-    client,
+    client_request,
     api_user_active,
     mock_get_user_by_email,
     mocker,
     redirect_url
 ):
+    client_request.logout()
     # TODO this lives here until we work out how to
     # reassign the session after it is lost mid register process
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
-    response = client.get(url_for('main.two_factor_sms', next=redirect_url))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get('main.two_factor_sms', next=redirect_url)
+
     assert page.select_one('main p').text.strip() == (
         'We’ve sent you a text message with a security code.'
     )
@@ -76,7 +78,7 @@ def test_should_render_two_factor_page(
 
 
 def test_should_login_user_and_should_redirect_to_next_url(
-    client,
+    client_request,
     api_user_active,
     mock_get_user,
     mock_get_user_by_email,
@@ -84,23 +86,27 @@ def test_should_login_user_and_should_redirect_to_next_url(
     mock_create_event,
     mock_email_validated_recently,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
 
-    response = client.post(url_for('main.two_factor_sms', next='/services/{}'.format(SERVICE_ONE_ID)),
-                           data={'sms_code': '12345'})
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.service_dashboard',
-        service_id=SERVICE_ONE_ID,
-        _external=True
+    client_request.post(
+        'main.two_factor_sms',
+        next='/services/{}'.format(SERVICE_ONE_ID),
+        _data={'sms_code': '12345'},
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=SERVICE_ONE_ID,
+            _external=True
+        ),
     )
 
 
 def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate_email(
-    client,
+    client_request,
     api_user_active,
     mock_get_user,
     mock_check_verify_code,
@@ -108,26 +114,30 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
     mock_send_verify_code,
     mocker
 ):
+    client_request.logout()
+
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
     mocker.patch('app.main.views.two_factor.email_needs_revalidating', return_value=True)
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
-    response = client.post(url_for('main.two_factor_sms', next=f'/services/{SERVICE_ONE_ID}'),
-                           data={'sms_code': '12345'})
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.revalidate_email_sent',
-        _external=True,
-        next=f'/services/{SERVICE_ONE_ID}'
+    client_request.post(
+        'main.two_factor_sms',
+        next=f'/services/{SERVICE_ONE_ID}',
+        _data={'sms_code': '12345'},
+        _expected_redirect=url_for(
+            'main.revalidate_email_sent',
+            _external=True,
+            next=f'/services/{SERVICE_ONE_ID}'
+        ),
     )
+
     mock_send_verify_code.assert_called_with(api_user_active['id'], 'email', None, mocker.ANY)
 
 
 def test_should_login_user_and_not_redirect_to_external_url(
-    client,
+    client_request,
     api_user_active,
     mock_get_user,
     mock_get_user_by_email,
@@ -136,22 +146,26 @@ def test_should_login_user_and_not_redirect_to_external_url(
     mock_create_event,
     mock_email_validated_recently,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
 
-    response = client.post(url_for('main.two_factor_sms', next='http://www.google.com'),
-                           data={'sms_code': '12345'})
-    assert response.status_code == 302
-    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
+    client_request.post(
+        'main.two_factor_sms',
+        next='http://www.google.com',
+        _data={'sms_code': '12345'},
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True)
+    )
 
 
 @pytest.mark.parametrize('platform_admin', (
     True, False,
 ))
 def test_should_login_user_and_redirect_to_show_accounts(
-    client,
+    client_request,
     api_user_active,
     mock_get_user,
     mock_get_user_by_email,
@@ -160,40 +174,46 @@ def test_should_login_user_and_redirect_to_show_accounts(
     mock_email_validated_recently,
     platform_admin,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
     api_user_active['platform_admin'] = platform_admin
 
-    response = client.post(url_for('main.two_factor_sms'),
-                           data={'sms_code': '12345'})
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
+    client_request.post(
+        'main.two_factor_sms',
+        _data={'sms_code': '12345'},
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True)
+    )
 
 
 def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(
-    client,
+    client_request,
     api_user_active,
     mock_get_user_by_email,
     mock_check_verify_code_code_not_found,
     mocker
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
 
-    response = client.post(url_for('main.two_factor_sms'),
-                           data={'sms_code': '23456'})
-    assert response.status_code == 200
-    assert 'Code not found' in response.get_data(as_text=True)
+    page = client_request.post(
+        'main.two_factor_sms',
+        _data={'sms_code': '23456'},
+        _expected_status=200,
+    )
+    assert 'Code not found' in page.text
 
 
 def test_should_login_user_when_multiple_valid_codes_exist(
-    client,
+    client_request,
     api_user_active,
     mock_get_user,
     mock_get_user_by_email,
@@ -202,18 +222,22 @@ def test_should_login_user_when_multiple_valid_codes_exist(
     mock_create_event,
     mock_email_validated_recently,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address']}
 
-    response = client.post(url_for('main.two_factor_sms'),
-                           data={'sms_code': '23456'})
-    assert response.status_code == 302
+    client_request.post(
+        'main.two_factor_sms',
+        _data={'sms_code': '23456'},
+        _expected_status=302,
+    )
 
 
 def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
-    client,
+    client_request,
     api_user_active,
     mock_get_user,
     mock_check_verify_code,
@@ -222,16 +246,19 @@ def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
     mock_create_event,
     mock_email_validated_recently,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_active['id'],
             'email': api_user_active['email_address'],
             'password': 'changedpassword'}
 
-    response = client.post(url_for('main.two_factor_sms'),
-                           data={'sms_code': '12345'})
-    assert response.status_code == 302
-    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
+    client_request.post(
+        'main.two_factor_sms',
+        _data={'sms_code': '12345'},
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+    )
 
     mock_update_user_password.assert_called_once_with(
         api_user_active['id'], 'changedpassword',
@@ -239,21 +266,25 @@ def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
 
 
 def test_two_factor_sms_returns_error_when_user_is_locked(
-    client,
+    client_request,
     api_user_locked,
     mock_get_locked_user,
     mock_check_verify_code_code_not_found,
     mock_get_services_with_one_service
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_locked['id'],
             'email': api_user_locked['email_address'],
         }
-    response = client.post(url_for('main.two_factor_sms'),
-                           data={'sms_code': '12345'})
-    assert response.status_code == 200
-    assert 'Code not found' in response.get_data(as_text=True)
+    page = client_request.post(
+        'main.two_factor_sms',
+        _data={'sms_code': '12345'},
+        _expected_status=200,
+    )
+    assert 'Code not found' in page.text
 
 
 def test_two_factor_sms_post_should_redirect_to_sign_in_if_user_not_in_session(
@@ -278,18 +309,17 @@ def test_two_factor_endpoints_get_should_redirect_to_sign_in_if_user_not_in_sess
 
 
 def test_two_factor_webauthn_should_have_auth_signin_button(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
 ):
+    client_request.logout()
     mock_get_user = mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {'id': platform_admin_user['id'], 'email': platform_admin_user['email_address']}
 
-    response = client.get(url_for('main.two_factor_webauthn'))
+    page = client_request.get('main.two_factor_webauthn')
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     button = page.select_one("button[data-module=authenticate-security-key]")
 
     assert button.text.strip() == 'Check security key'
@@ -299,22 +329,24 @@ def test_two_factor_webauthn_should_have_auth_signin_button(
 
 
 def test_two_factor_webauthn_should_reject_non_webauthn_auth_users(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
 ):
+    client_request.logout()
     platform_admin_user['auth_type'] = 'sms_auth'
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {'id': platform_admin_user['id'], 'email': platform_admin_user['email_address']}
 
-    response = client.get(url_for('main.two_factor_webauthn'))
-
-    assert response.status_code == 403
+    client_request.get(
+        'main.two_factor_webauthn',
+        _expected_status=403,
+    )
 
 
 def test_two_factor_sms_should_activate_pending_user(
-    client,
+    client_request,
     mocker,
     api_user_pending,
     mock_check_verify_code,
@@ -322,14 +354,15 @@ def test_two_factor_sms_should_activate_pending_user(
     mock_activate_user,
     mock_email_validated_recently,
 ):
+    client_request.logout()
     mocker.patch('app.user_api_client.get_user', return_value=api_user_pending)
     mocker.patch('app.service_api_client.get_services', return_value={'data': []})
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': api_user_pending['id'],
             'email_address': api_user_pending['email_address']
         }
-    client.post(url_for('main.two_factor_sms'), data={'sms_code': '12345'})
+    client_request.post('main.two_factor_sms', _data={'sms_code': '12345'})
 
     assert mock_activate_user.called
 
@@ -377,7 +410,7 @@ def test_valid_two_factor_email_link_shows_interstitial(
 
 
 def test_valid_two_factor_email_link_logs_in_user(
-    client,
+    client_request,
     valid_token,
     mock_get_user,
     mock_get_services_with_one_service,
@@ -386,12 +419,10 @@ def test_valid_two_factor_email_link_logs_in_user(
 ):
     mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
 
-    response = client.post(
+    client_request.post_url(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
+        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True)
     )
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.show_accounts_or_dashboard', _external=True)
 
 
 @pytest.mark.parametrize('redirect_url', [
@@ -401,20 +432,18 @@ def test_valid_two_factor_email_link_logs_in_user(
 def test_two_factor_email_link_has_expired(
     notify_admin,
     valid_token,
-    client,
+    client_request,
     mock_send_verify_code,
     fake_uuid,
     redirect_url
 ):
+    client_request.logout()
 
     with set_config(notify_admin, 'EMAIL_2FA_EXPIRY_SECONDS', -1):
-        response = client.post(
+        page = client_request.post_url(
             url_for_endpoint_with_token('main.two_factor_email', token=valid_token, next=redirect_url),
-            follow_redirects=True,
+            _follow_redirects=True,
         )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.h1.text.strip() == 'The link has expired'
     assert page.select_one('a:contains("Sign in again")')['href'] == url_for('main.sign_in', next=redirect_url)
@@ -423,19 +452,20 @@ def test_two_factor_email_link_has_expired(
 
 
 def test_two_factor_email_link_is_invalid(
-    client
+    client_request
 ):
+    client_request.logout()
     token = 12345
-    response = client.post(
-        url_for('main.two_factor_email', token=token),
-        follow_redirects=True
+    page = client_request.post(
+        'main.two_factor_email',
+        token=token,
+        _follow_redirects=True,
+        _expected_status=404,
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == "There’s something wrong with the link you’ve used."
-
-    assert response.status_code == 404
 
 
 @pytest.mark.parametrize('redirect_url', [
@@ -443,22 +473,20 @@ def test_two_factor_email_link_is_invalid(
     f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_two_factor_email_link_is_already_used(
-    client,
+    client_request,
     valid_token,
     mocker,
     mock_send_verify_code,
     redirect_url
 
 ):
+    client_request.logout()
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code has expired'))
 
-    response = client.post(
+    page = client_request.post_url(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token, next=redirect_url),
-        follow_redirects=True
+        _follow_redirects=True,
     )
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert response.status_code == 200
 
     assert page.h1.text.strip() == 'The link has expired'
     assert page.select_one('a:contains("Sign in again")')['href'] == url_for('main.sign_in', next=redirect_url)
@@ -467,20 +495,18 @@ def test_two_factor_email_link_is_already_used(
 
 
 def test_two_factor_email_link_when_user_is_locked_out(
-    client,
+    client_request,
     valid_token,
     mocker,
     mock_send_verify_code
 ):
+    client_request.logout()
     mocker.patch('app.user_api_client.check_verify_code', return_value=(False, 'Code not found'))
 
-    response = client.post(
+    page = client_request.post_url(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
-        follow_redirects=True
+        _follow_redirects=True,
     )
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert response.status_code == 200
 
     assert page.h1.text.strip() == 'The link has expired'
     assert mock_send_verify_code.called is False

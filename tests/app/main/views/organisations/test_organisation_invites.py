@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from unittest.mock import ANY
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
@@ -145,16 +144,21 @@ def test_accepted_invite_when_other_user_already_logged_in(
 
 
 def test_cancelled_invite_opened_by_user(
-    client,
+    mocker,
+    client_request,
+    api_user_active,
     mock_check_org_cancelled_invite_token,
     mock_get_organisation,
-    mock_get_user,
     fake_uuid
 ):
-    response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'), follow_redirects=True)
+    client_request.logout()
+    mock_get_user = mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    page = client_request.get(
+        'main.accept_org_invite',
+        token='thisisnotarealtoken',
+        _follow_redirects=True,
+    )
 
     assert normalize_spaces(
         page.select_one('h1').text
@@ -171,22 +175,24 @@ def test_cancelled_invite_opened_by_user(
 
 
 def test_user_invite_already_accepted(
-    client,
+    client_request,
     mock_check_org_accepted_invite_token
 ):
-    response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.organisation_dashboard',
-        org_id=ORGANISATION_ID,
-        _external=True
+    client_request.logout()
+    client_request.get(
+        'main.accept_org_invite',
+        token='thisisnotarealtoken',
+        _expected_redirect=url_for(
+            'main.organisation_dashboard',
+            org_id=ORGANISATION_ID,
+            _external=True,
+        ),
     )
 
 
 @freeze_time('2021-12-12 12:12:12')
 def test_existing_user_invite_already_is_member_of_organisation(
-    client,
+    client_request,
     mock_check_org_invite_token,
     mock_get_user,
     mock_get_user_by_email,
@@ -196,13 +202,16 @@ def test_existing_user_invite_already_is_member_of_organisation(
     mock_add_user_to_organisation,
     mock_update_user_attribute,
 ):
-    response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.organisation_dashboard',
-        org_id=ORGANISATION_ID,
-        _external=True
+    client_request.logout()
+    mock_update_user_attribute.reset_mock()
+    client_request.get(
+        'main.accept_org_invite',
+        token='thisisnotarealtoken',
+        _expected_redirect=url_for(
+            'main.organisation_dashboard',
+            org_id=ORGANISATION_ID,
+            _external=True
+        ),
     )
 
     mock_check_org_invite_token.assert_called_once_with('thisisnotarealtoken')
@@ -217,7 +226,7 @@ def test_existing_user_invite_already_is_member_of_organisation(
 
 @freeze_time('2021-12-12 12:12:12')
 def test_existing_user_invite_not_a_member_of_organisation(
-    client,
+    client_request,
     api_user_active,
     mock_check_org_invite_token,
     mock_get_user_by_email,
@@ -226,13 +235,16 @@ def test_existing_user_invite_not_a_member_of_organisation(
     mock_add_user_to_organisation,
     mock_update_user_attribute,
 ):
-    response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.organisation_dashboard',
-        org_id=ORGANISATION_ID,
-        _external=True
+    client_request.logout()
+    mock_update_user_attribute.reset_mock()
+    client_request.get(
+        'main.accept_org_invite',
+        token='thisisnotarealtoken',
+        _expected_redirect=url_for(
+            'main.organisation_dashboard',
+            org_id=ORGANISATION_ID,
+            _external=True,
+        ),
     )
 
     mock_check_org_invite_token.assert_called_once_with('thisisnotarealtoken')
@@ -250,15 +262,17 @@ def test_existing_user_invite_not_a_member_of_organisation(
 
 
 def test_user_accepts_invite(
-    client,
+    client_request,
     mock_check_org_invite_token,
     mock_dont_get_user_by_email,
     mock_get_users_for_organisation,
 ):
-    response = client.get(url_for('main.accept_org_invite', token='thisisnotarealtoken'))
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.register_from_org_invite', _external=True)
+    client_request.logout()
+    client_request.get(
+        'main.accept_org_invite',
+        token='thisisnotarealtoken',
+        _expected_redirect=url_for('main.register_from_org_invite', _external=True)
+    )
 
     mock_check_org_invite_token.assert_called_once_with('thisisnotarealtoken')
     mock_dont_get_user_by_email.assert_called_once_with('invited_user@test.gov.uk')
@@ -266,10 +280,13 @@ def test_user_accepts_invite(
 
 
 def test_registration_from_org_invite_404s_if_user_not_in_session(
-    client,
+    client_request,
 ):
-    response = client.get(url_for('main.register_from_org_invite'))
-    assert response.status_code == 404
+    client_request.logout()
+    client_request.get(
+        'main.register_from_org_invite',
+        _expected_status=404,
+    )
 
 
 @pytest.mark.parametrize('data, error', [
@@ -285,19 +302,24 @@ def test_registration_from_org_invite_404s_if_user_not_in_session(
     }, 'Choose a password that’s harder to guess'],
 ])
 def test_registration_from_org_invite_has_bad_data(
-    client,
+    client_request,
     sample_org_invite,
     data,
     error,
     mock_get_invited_org_user_by_id,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
         session['invited_org_user_id'] = sample_org_invite['id']
 
-    response = client.post(url_for('main.register_from_org_invite'), data=data)
+    page = client_request.post(
+        'main.register_from_org_invite',
+        _data=data,
+        _expected_status=200,
+    )
 
-    assert response.status_code == 200
-    assert error in response.get_data(as_text=True)
+    assert error in page.text
 
 
 @pytest.mark.parametrize('diff_data', [
@@ -306,12 +328,13 @@ def test_registration_from_org_invite_has_bad_data(
     ['email_address', 'organisation']
 ])
 def test_registration_from_org_invite_has_different_email_or_organisation(
-    client,
+    client_request,
     sample_org_invite,
     diff_data,
     mock_get_invited_org_user_by_id,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+    with client_request.session_transaction() as session:
         session['invited_org_user_id'] = sample_org_invite['id']
 
     data = {
@@ -324,13 +347,15 @@ def test_registration_from_org_invite_has_different_email_or_organisation(
     for field in diff_data:
         data[field] = 'different'
 
-    response = client.post(url_for('main.register_from_org_invite'), data=data)
-
-    assert response.status_code == 400
+    client_request.post(
+        'main.register_from_org_invite',
+        _data=data,
+        _expected_status=400,
+    )
 
 
 def test_org_user_registers_with_email_already_in_use(
-    client,
+    client_request,
     sample_org_invite,
     mock_get_user_by_email,
     mock_accept_org_invite,
@@ -339,19 +364,21 @@ def test_org_user_registers_with_email_already_in_use(
     mock_register_user,
     mock_get_invited_org_user_by_id,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+    with client_request.session_transaction() as session:
         session['invited_org_user_id'] = sample_org_invite['id']
 
-    response = client.post(url_for('main.register_from_org_invite'), data={
-        'name': 'Test User',
-        'mobile_number': '+4407700900460',
-        'password': 'validPassword!',
-        'email_address': sample_org_invite['email_address'],
-        'organisation': sample_org_invite['organisation']
-    })
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.verify', _external=True)
+    client_request.post(
+        'main.register_from_org_invite',
+        _data={
+            'name': 'Test User',
+            'mobile_number': '+4407700900460',
+            'password': 'validPassword!',
+            'email_address': sample_org_invite['email_address'],
+            'organisation': sample_org_invite['organisation'],
+        },
+        _expected_redirect=url_for('main.verify', _external=True),
+    )
 
     mock_get_user_by_email.assert_called_once_with(
         sample_org_invite['email_address']
@@ -361,7 +388,7 @@ def test_org_user_registers_with_email_already_in_use(
 
 
 def test_org_user_registration(
-    client,
+    client_request,
     sample_org_invite,
     mock_email_is_not_already_in_use,
     mock_register_user,
@@ -372,19 +399,21 @@ def test_org_user_registration(
     mock_add_user_to_organisation,
     mock_get_invited_org_user_by_id,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+    with client_request.session_transaction() as session:
         session['invited_org_user_id'] = sample_org_invite['id']
 
-    response = client.post(url_for('main.register_from_org_invite'), data={
-        'name': 'Test User',
-        'email_address': sample_org_invite['email_address'],
-        'mobile_number': '+4407700900460',
-        'password': 'validPassword!',
-        'organisation': sample_org_invite['organisation']
-    })
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.verify', _external=True)
+    client_request.post(
+        'main.register_from_org_invite',
+        _data={
+            'name': 'Test User',
+            'email_address': sample_org_invite['email_address'],
+            'mobile_number': '+4407700900460',
+            'password': 'validPassword!',
+            'organisation': sample_org_invite['organisation'],
+        },
+        _expected_redirect=url_for('main.verify', _external=True)
+    )
 
     assert mock_get_user_by_email.called is False
     mock_register_user.assert_called_once_with(
@@ -403,24 +432,26 @@ def test_org_user_registration(
 
 
 def test_verified_org_user_redirects_to_dashboard(
-    client,
+    client_request,
     sample_org_invite,
     mock_check_verify_code,
     mock_get_user,
     mock_activate_user,
     mock_login,
 ):
+    client_request.logout()
     invited_org_user = InvitedOrgUser(sample_org_invite).serialize()
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
         session['user_details'] = {"email": invited_org_user['email_address'], "id": invited_org_user['id']}
         session['organisation_id'] = invited_org_user['organisation']
 
-    response = client.post(url_for('main.verify'), data={'sms_code': '12345'})
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        'main.organisation_dashboard',
-        org_id=invited_org_user['organisation'],
-        _external=True
+    client_request.post(
+        'main.verify',
+        _data={'sms_code': '12345'},
+        _expected_redirect=url_for(
+            'main.organisation_dashboard',
+            org_id=invited_org_user['organisation'],
+            _external=True
+        ),
     )
