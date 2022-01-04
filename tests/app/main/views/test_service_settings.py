@@ -6,7 +6,6 @@ from urllib.parse import parse_qs, urlparse
 from uuid import UUID, uuid4
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
@@ -118,7 +117,7 @@ def mock_get_service_settings_page_common(
     ]),
 ])
 def test_should_show_overview(
-        client,
+        client_request,
         mocker,
         api_user_active,
         no_reply_to_email_addresses,
@@ -137,12 +136,11 @@ def test_should_show_overview(
     )
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
-    client.login(user, mocker, service_one)
-    response = client.get(url_for(
+    client_request.login(user, service_one)
+    page = client_request.get(
         'main.service_settings', service_id=SERVICE_ONE_ID
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
+
     assert page.find('h1').text == 'Settings'
     rows = page.select('tr')
     assert len(rows) == len(expected_rows)
@@ -152,7 +150,7 @@ def test_should_show_overview(
 
 
 def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
-        client,
+        client_request,
         mocker,
         api_user_active,
         no_reply_to_email_addresses,
@@ -170,12 +168,11 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
     )
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
-    client.login(create_platform_admin_user(), mocker, service_one)
-    response = client.get(url_for(
+    client_request.login(create_platform_admin_user(), service_one)
+    page = client_request.get(
         'main.service_settings', service_id=SERVICE_ONE_ID
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
+
     assert page.find('h1').text == 'Settings'
     rows = page.select('tr')
 
@@ -212,7 +209,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
     ]
 )
 def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
-        client,
+        client_request,
         mocker,
         api_user_active,
         no_reply_to_email_addresses,
@@ -236,12 +233,11 @@ def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
     )
     mocker.patch('app.service_api_client.get_service', return_value={'data': service_one})
 
-    client.login(create_platform_admin_user(), mocker, service_one)
-    response = client.get(url_for(
+    client_request.login(create_platform_admin_user(), service_one)
+    page = client_request.get(
         'main.service_settings', service_id=SERVICE_ONE_ID
-    ))
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
+
     broadcast_setting_row = page.find(string=re.compile("Emergency alerts")).find_parent('tr')
     broadcast_setting_description = broadcast_setting_row.select('td')[1].text
     assert normalize_spaces(broadcast_setting_description) == expected_text
@@ -398,7 +394,7 @@ def test_send_files_by_email_row_on_settings_page(
     ]),
 ])
 def test_should_show_overview_for_service_with_more_things_set(
-        client,
+        client_request,
         active_user_with_permissions,
         mocker,
         service_one,
@@ -410,13 +406,12 @@ def test_should_show_overview_for_service_with_more_things_set(
         permissions,
         expected_rows
 ):
-    client.login(active_user_with_permissions, mocker, service_one)
+    client_request.login(active_user_with_permissions)
     service_one['permissions'] = permissions
     service_one['email_branding'] = uuid4()
-    response = client.get(url_for(
+    page = client_request.get(
         'main.service_settings', service_id=service_one['id']
-    ))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
     for index, row in enumerate(expected_rows):
         assert row == " ".join(page.find_all('tr')[index + 1].text.split())
 

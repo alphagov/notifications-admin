@@ -1793,7 +1793,7 @@ def test_should_not_allow_template_edits_without_correct_permission(
 
 
 def test_should_403_when_edit_template_with_process_type_of_priority_for_non_platform_admin(
-    client,
+    client_request,
     active_user_with_permissions,
     mocker,
     mock_get_service_template,
@@ -1802,7 +1802,7 @@ def test_should_403_when_edit_template_with_process_type_of_priority_for_non_pla
     service_one,
 ):
     service_one['users'] = [active_user_with_permissions]
-    client.login(active_user_with_permissions, mocker, service_one)
+    client_request.login(active_user_with_permissions)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
     template_id = fake_uuid
     data = {
@@ -1813,16 +1813,18 @@ def test_should_403_when_edit_template_with_process_type_of_priority_for_non_pla
         'service': service_one['id'],
         'process_type': 'priority'
     }
-    response = client.post(url_for(
+    client_request.post(
         '.edit_service_template',
         service_id=service_one['id'],
-        template_id=template_id), data=data)
-    assert response.status_code == 403
+        template_id=template_id,
+        _data=data,
+        _expected_status=403,
+    )
     assert mock_update_service_template.called is False
 
 
 def test_should_403_when_create_template_with_process_type_of_priority_for_non_platform_admin(
-    client,
+    client_request,
     active_user_with_permissions,
     mocker,
     mock_get_service_template,
@@ -1831,7 +1833,7 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     service_one,
 ):
     service_one['users'] = [active_user_with_permissions]
-    client.login(active_user_with_permissions, mocker, service_one)
+    client_request.login(active_user_with_permissions, service_one)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
     template_id = fake_uuid
     data = {
@@ -1842,11 +1844,13 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
         'service': service_one['id'],
         'process_type': 'priority'
     }
-    response = client.post(url_for(
+    client_request.post(
         '.add_service_template',
         service_id=service_one['id'],
-        template_type='sms'), data=data)
-    assert response.status_code == 403
+        template_type='sms',
+        _data=data,
+        _expected_status=403,
+    )
     assert mock_update_service_template.called is False
 
 

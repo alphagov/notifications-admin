@@ -374,7 +374,7 @@ ids, params = zip(*[
     params, ids=ids
 )
 def test_redirects_to_triage(
-    client,
+    client_request,
     api_user_active,
     mocker,
     mock_get_user,
@@ -391,12 +391,15 @@ def test_redirects_to_triage(
         return_value=[{}, {}] if has_live_services else [],
     )
     mocker.patch('app.main.views.feedback.in_business_hours', return_value=is_in_business_hours)
-    if logged_in:
-        client.login(api_user_active)
+    if not logged_in:
+        client_request.logout()
 
-    response = client.get(url_for('main.feedback', ticket_type=ticket_type))
-    assert response.status_code == expected_status
-    assert response.location == expected_redirect(_external=True)
+    client_request.get(
+        'main.feedback',
+        ticket_type=ticket_type,
+        _expected_status=expected_status,
+        _expected_redirect=expected_redirect(_external=True),
+    )
 
 
 @pytest.mark.parametrize('ticket_type, expected_h1', (
@@ -573,7 +576,7 @@ def test_back_link_from_form(
     ]
 )
 def test_should_be_shown_the_bat_email(
-    client,
+    client_request,
     active_user_with_permissions,
     mocker,
     service_one,
@@ -590,16 +593,20 @@ def test_should_be_shown_the_bat_email(
 
     feedback_page = url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe=severe)
 
-    response = client.get(feedback_page)
-
-    assert response.status_code == expected_status_code
-    assert response.location == expected_redirect(_external=True)
+    client_request.logout()
+    client_request.get_url(
+        feedback_page,
+        _expected_status=expected_status_code,
+        _expected_redirect=expected_redirect(_external=True),
+    )
 
     # logged in users should never be redirected to the bat email page
-    client.login(active_user_with_permissions, mocker, service_one)
-    logged_in_response = client.get(feedback_page)
-    assert logged_in_response.status_code == expected_status_code_when_logged_in
-    assert logged_in_response.location == expected_redirect_when_logged_in(_external=True)
+    client_request.login(active_user_with_permissions)
+    client_request.get_url(
+        feedback_page,
+        _expected_status=expected_status_code_when_logged_in,
+        _expected_redirect=expected_redirect_when_logged_in(_external=True),
+    )
 
 
 @pytest.mark.parametrize(
@@ -625,7 +632,7 @@ def test_should_be_shown_the_bat_email(
     ]
 )
 def test_should_be_shown_the_bat_email_for_general_questions(
-    client,
+    client_request,
     active_user_with_permissions,
     mocker,
     service_one,
@@ -641,42 +648,45 @@ def test_should_be_shown_the_bat_email_for_general_questions(
 
     feedback_page = url_for('main.feedback', ticket_type=GENERAL_TICKET_TYPE, severe=severe)
 
-    response = client.get(feedback_page)
-
-    assert response.status_code == expected_status_code
-    assert response.location == expected_redirect(_external=True)
+    client_request.logout()
+    client_request.get_url(
+        feedback_page,
+        _expected_status=expected_status_code,
+        _expected_redirect=expected_redirect(_external=True),
+    )
 
     # logged in users should never be redirected to the bat email page
-    client.login(active_user_with_permissions, mocker, service_one)
-    logged_in_response = client.get(feedback_page)
-    assert logged_in_response.status_code == expected_status_code_when_logged_in
-    assert logged_in_response.location == expected_redirect_when_logged_in(_external=True)
+    client_request.login(active_user_with_permissions)
+    client_request.get_url(
+        feedback_page,
+        _expected_status=expected_status_code_when_logged_in,
+        _expected_redirect=expected_redirect_when_logged_in(_external=True),
+    )
 
 
 def test_bat_email_page(
-    client,
+    client_request,
     active_user_with_permissions,
     mocker,
     service_one,
 ):
-    bat_phone_page = url_for('main.bat_phone')
+    bat_phone_page = 'main.bat_phone'
 
-    response = client.get(bat_phone_page)
-    assert response.status_code == 200
+    client_request.logout()
+    page = client_request.get(bat_phone_page)
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('.govuk-back-link').text == 'Back'
     assert page.select_one('.govuk-back-link')['href'] == url_for('main.support')
     assert page.select('main a')[1].text == 'Fill in this form'
     assert page.select('main a')[1]['href'] == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, severe='no')
-    next_page_response = client.get(page.select('main a')[1]['href'])
-    next_page = BeautifulSoup(next_page_response.data.decode('utf-8'), 'html.parser')
+    next_page = client_request.get_url(page.select('main a')[1]['href'])
     assert next_page.h1.text.strip() == 'Report a problem'
 
-    client.login(active_user_with_permissions, mocker, service_one)
-    logged_in_response = client.get(bat_phone_page)
-    assert logged_in_response.status_code == 302
-    assert logged_in_response.location == url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, _external=True)
+    client_request.login(active_user_with_permissions)
+    client_request.get(
+        bat_phone_page,
+        _expected_redirect=url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, _external=True)
+    )
 
 
 @pytest.mark.parametrize('out_of_hours_emergency, email_address_provided, out_of_hours, message', (

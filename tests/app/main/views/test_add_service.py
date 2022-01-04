@@ -9,17 +9,16 @@ from tests.conftest import normalize_spaces
 
 
 def test_non_gov_user_cannot_see_add_service_button(
-    client,
+    client_request,
     mock_login,
     mock_get_non_govuser,
     api_nongov_user_active,
     mock_get_organisations,
     mock_get_organisations_and_services_for_user,
 ):
-    client.login(api_nongov_user_active)
-    response = client.get(url_for('main.choose_account'))
-    assert 'Add a new service' not in response.get_data(as_text=True)
-    assert response.status_code == 200
+    client_request.login(api_nongov_user_active)
+    page = client_request.get('main.choose_account')
+    assert 'Add a new service' not in page.text
 
 
 @pytest.mark.parametrize('org_json', (

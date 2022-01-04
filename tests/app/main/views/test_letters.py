@@ -34,7 +34,7 @@ def test_letters_access_restricted(
 
 @pytest.mark.parametrize('url', letters_urls)
 def test_letters_lets_in_without_permission(
-    client,
+    client_request,
     mocker,
     mock_login,
     mock_has_permissions,
@@ -46,11 +46,10 @@ def test_letters_lets_in_without_permission(
     service_one['permissions'] = ['letter']
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
 
-    client.login(api_user_active)
-    response = client.get(url(service_id=service_one['id']))
+    client_request.login(api_user_active)
+    client_request.get_url(url(service_id=service_one['id']))
 
     assert api_user_active['permissions'] == {}
-    assert response.status_code == 200
 
 
 @pytest.mark.parametrize('permissions, choices', [
