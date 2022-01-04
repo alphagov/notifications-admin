@@ -2732,21 +2732,27 @@ def mock_send_notification(mocker, fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def client(notify_admin):
+def _client(notify_admin):
+    """
+    Do not use this fixture directly – use `client_request` instead
+    """
     with notify_admin.test_request_context(), notify_admin.test_client() as client:
         yield client
 
 
 @pytest.fixture(scope='function')
 def _logged_in_client(
-    client,
+    _client,
     active_user_with_permissions,
     mocker,
     service_one,
     mock_login
 ):
-    client.login(active_user_with_permissions, mocker, service_one)
-    yield client
+    """
+    Do not use this fixture directly – use `client_request` instead
+    """
+    _client.login(active_user_with_permissions, mocker, service_one)
+    yield _client
 
 
 @pytest.fixture
