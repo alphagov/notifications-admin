@@ -1140,13 +1140,6 @@ def active_user_approve_broadcasts_permission():
 
 
 @pytest.fixture(scope='function')
-def active_user_with_session(fake_uuid):
-    return create_service_one_admin(
-        id=fake_uuid,
-    )
-
-
-@pytest.fixture(scope='function')
 def active_user_with_permission_to_two_services(fake_uuid):
     permissions = [
         'send_texts',
@@ -2753,18 +2746,6 @@ def _logged_in_client(
     mock_login
 ):
     client.login(active_user_with_permissions, mocker, service_one)
-    yield client
-
-
-@pytest.fixture(scope='function')
-def logged_in_client_with_session(
-    client,
-    active_user_with_session,
-    mocker,
-    service_one,
-    mock_login
-):
-    client.login(active_user_with_session, mocker, service_one)
     yield client
 
 
