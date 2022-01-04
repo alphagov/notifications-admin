@@ -19,7 +19,6 @@ class NotificationApiClient(NotifyAdminAPIClient):
         to=None,
         include_one_off=None,
     ):
-        # TODO: if "to" is included, this should be a POST
         params = {
             'page': page,
             'page_size': page_size,
@@ -35,17 +34,22 @@ class NotificationApiClient(NotifyAdminAPIClient):
 
         params = {k: v for k, v in params.items() if v is not None}
 
+        # if `to` is set it is likely PII like an email address or mobile which
+        # we do not want in our logs, so we do a POST request instead of a GET
+        method = self.post if to else self.get
+        kwargs = {'data': params} if to else {'params': params}
+
         if job_id:
-            return self.get(
+            return method(
                 url='/service/{}/job/{}/notifications'.format(service_id, job_id),
-                params=params
+                **kwargs
             )
         else:
             if limit_days is not None:
                 params['limit_days'] = limit_days
-            return self.get(
+            return method(
                 url='/service/{}/notifications'.format(service_id),
-                params=params
+                **kwargs
             )
 
     def send_notification(self, service_id, *, template_id, recipient, personalisation, sender_id):
