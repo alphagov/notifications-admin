@@ -9,9 +9,9 @@ from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 
 
 @pytest.fixture
-def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client):
+def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client_request):
 
-    _set_up_webauthn_session(fake_uuid, client)
+    _set_up_webauthn_session(fake_uuid, client_request)
 
     credential_id = WebAuthnCredential(webauthn_credential).to_credential_data().credential_id
 

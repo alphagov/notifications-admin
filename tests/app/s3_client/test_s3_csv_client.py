@@ -3,7 +3,7 @@ from unittest.mock import Mock
 from app.s3_client.s3_csv_client import set_metadata_on_csv_upload
 
 
-def test_sets_metadata(client, mocker):
+def test_sets_metadata(client_request, mocker):
     mocked_s3_object = Mock()
     mocked_get_s3_object = mocker.patch(
         'app.s3_client.s3_csv_client.get_csv_upload',

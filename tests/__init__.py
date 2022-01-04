@@ -651,9 +651,9 @@ def validate_route_permission_with_client(mocker,
     client.login(usr)
     resp = None
     if method == 'GET':
-        resp = client.get(route)
+        resp = client.get_response_from_url(route, _expected_status=response_code)
     elif method == 'POST':
-        resp = client.post(route)
+        resp = client.post_response_from_url(route, _expected_status=response_code)
     else:
         pytest.fail("Invalid method call {}".format(method))
     if resp.status_code != response_code:

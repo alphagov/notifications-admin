@@ -577,7 +577,7 @@ STATISTICS = {
 }
 
 
-def test_get_status_filters_calculates_stats(client):
+def test_get_status_filters_calculates_stats(client_request):
     ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     assert {label: count for label, _option, _link, count in ret} == {
@@ -588,7 +588,7 @@ def test_get_status_filters_calculates_stats(client):
     }
 
 
-def test_get_status_filters_in_right_order(client):
+def test_get_status_filters_in_right_order(client_request):
     ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     assert [label for label, _option, _link, _count in ret] == [
@@ -596,7 +596,7 @@ def test_get_status_filters_in_right_order(client):
     ]
 
 
-def test_get_status_filters_constructs_links(client):
+def test_get_status_filters_constructs_links(client_request):
     ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     link = ret[0][2]

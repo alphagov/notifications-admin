@@ -370,7 +370,7 @@ def test_inbox_not_accessible_to_service_without_permissions(
 
 
 def test_anyone_can_see_inbox(
-    client,
+    client_request,
     api_user_active,
     service_one,
     mocker,
@@ -382,7 +382,7 @@ def test_anyone_can_see_inbox(
 
     validate_route_permission_with_client(
         mocker,
-        client,
+        client_request,
         'GET',
         200,
         url_for('main.inbox', service_id=service_one['id']),
@@ -747,7 +747,7 @@ def test_should_show_monthly_breakdown_of_template_usage(
 
 
 def test_anyone_can_see_monthly_breakdown(
-    client,
+    client_request,
     api_user_active,
     service_one,
     mocker,
@@ -755,7 +755,7 @@ def test_anyone_can_see_monthly_breakdown(
 ):
     validate_route_permission_with_client(
         mocker,
-        client,
+        client_request,
         'GET',
         200,
         url_for('main.monthly', service_id=service_one['id']),
@@ -1605,7 +1605,6 @@ def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
 
 def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
     mocker,
-    client,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
     active_caseworking_user,

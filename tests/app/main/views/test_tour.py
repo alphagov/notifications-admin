@@ -103,7 +103,7 @@ def test_should_404_if_no_mobile_number_for_tour_start(
 def test_should_403_if_user_does_not_have_send_permissions_for_tour_start(
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     mock_get_service_template_with_multiple_placeholders,
     service_one,
@@ -258,7 +258,7 @@ def test_should_404_for_get_tour_step_0(
 def test_should_403_if_user_does_not_have_send_permissions_for_tour_step(
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     mock_get_service_template_with_multiple_placeholders,
     service_one,

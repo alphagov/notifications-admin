@@ -42,7 +42,7 @@ def letter_upload_filename(fake_uuid):
     )
 
 
-def test_upload_email_logo_calls_correct_args(client, mocker, fake_uuid, upload_filename):
+def test_upload_email_logo_calls_correct_args(client_request, mocker, fake_uuid, upload_filename):
     mocker.patch('uuid.uuid4', return_value=upload_id)
     mocker.patch.dict('flask.current_app.config', {'LOGO_UPLOAD_BUCKET_NAME': bucket})
     mocked_s3_upload = mocker.patch('app.s3_client.s3_logo_client.utils_s3upload')
@@ -75,7 +75,7 @@ def test_upload_letter_temp_logo_calls_correct_args(mocker, fake_uuid, letter_up
     assert new_filename == 'letters/static/images/letter-template/temp-{}_test_uuid-test.svg'.format(fake_uuid)
 
 
-def test_persist_logo(client, mocker, fake_uuid, upload_filename):
+def test_persist_logo(client_request, mocker, fake_uuid, upload_filename):
     mocker.patch.dict('flask.current_app.config', {'LOGO_UPLOAD_BUCKET_NAME': bucket})
     mocked_get_s3_object = mocker.patch('app.s3_client.s3_logo_client.get_s3_object')
     mocked_delete_s3_object = mocker.patch('app.s3_client.s3_logo_client.delete_s3_object')
@@ -88,7 +88,7 @@ def test_persist_logo(client, mocker, fake_uuid, upload_filename):
     mocked_delete_s3_object.assert_called_once_with(upload_filename)
 
 
-def test_persist_logo_returns_if_not_temp(client, mocker, fake_uuid):
+def test_persist_logo_returns_if_not_temp(client_request, mocker, fake_uuid):
     filename = 'logo.png'
     persist_logo(filename, filename)
 
@@ -122,7 +122,7 @@ def test_letter_filename_for_db_when_file_does_not_have_a_temp_tag(fake_uuid):
     assert letter_filename_for_db(filename, fake_uuid) == '{}-test'.format(fake_uuid)
 
 
-def test_delete_email_temp_files_created_by_user(client, mocker, fake_uuid):
+def test_delete_email_temp_files_created_by_user(client_request, mocker, fake_uuid):
     obj = namedtuple("obj", ["key"])
     objs = [obj(key='test1'), obj(key='test2')]
 
@@ -148,7 +148,7 @@ def test_delete_letter_temp_files_created_by_user(mocker, fake_uuid):
         assert arg == call(objs[index].key)
 
 
-def test_delete_single_email_temp_file(client, mocker, upload_filename):
+def test_delete_single_email_temp_file(client_request, mocker, upload_filename):
     mocked_delete_s3_object = mocker.patch('app.s3_client.s3_logo_client.delete_s3_object')
 
     delete_email_temp_file(upload_filename)
@@ -156,7 +156,7 @@ def test_delete_single_email_temp_file(client, mocker, upload_filename):
     mocked_delete_s3_object.assert_called_with(upload_filename)
 
 
-def test_does_not_delete_non_temp_email_file(client, mocker):
+def test_does_not_delete_non_temp_email_file(client_request, mocker):
     filename = 'logo.png'
     mocked_delete_s3_object = mocker.patch('app.s3_client.s3_logo_client.delete_s3_object')
 

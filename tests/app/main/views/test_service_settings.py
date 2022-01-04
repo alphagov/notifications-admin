@@ -2015,7 +2015,7 @@ def test_ready_to_go_live(
 def test_route_permissions(
         mocker,
         notify_admin,
-        client,
+        client_request,
         api_user_active,
         service_one,
         single_reply_to_email_address,
@@ -2050,7 +2050,7 @@ def test_route_permissions(
 def test_route_invalid_permissions(
         mocker,
         notify_admin,
-        client,
+        client_request,
         api_user_active,
         service_one,
         route,
@@ -2077,7 +2077,7 @@ def test_route_invalid_permissions(
 def test_route_for_platform_admin(
         mocker,
         notify_admin,
-        client,
+        client_request,
         platform_admin_user,
         service_one,
         single_reply_to_email_address,

@@ -63,7 +63,9 @@ def test_activate_user_already_active(notify_admin, api_user_active, mock_activa
     (False, False, False),
     (False, None, False),
 ])
-def test_platform_admin_flag_set_in_session(client, mocker, is_platform_admin, value_in_session, expected_result):
+def test_platform_admin_flag_set_in_session(
+    client_request, mocker, is_platform_admin, value_in_session, expected_result
+):
     session_dict = {}
     if value_in_session is not None:
         session_dict['disable_platform_admin_view'] = value_in_session
@@ -109,7 +111,7 @@ def test_has_live_services_when_service_is_not_live(
     }).live_services == []
 
 
-def test_invited_user_from_session_uses_id(client, mocker, mock_get_invited_user_by_id):
+def test_invited_user_from_session_uses_id(client_request, mocker, mock_get_invited_user_by_id):
     session_dict = {'invited_user_id': USER_ONE_ID}
     mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
 
@@ -118,12 +120,14 @@ def test_invited_user_from_session_uses_id(client, mocker, mock_get_invited_user
     mock_get_invited_user_by_id.assert_called_once_with(USER_ONE_ID)
 
 
-def test_invited_user_from_session_returns_none_if_nothing_present(client, mocker):
+def test_invited_user_from_session_returns_none_if_nothing_present(client_request, mocker):
     mocker.patch.dict('app.models.user.session', values={}, clear=True)
     assert InvitedUser.from_session() is None
 
 
-def test_invited_org_user_from_session_uses_id(client, mocker, mock_get_invited_org_user_by_id, sample_org_invite):
+def test_invited_org_user_from_session_uses_id(
+    client_request, mocker, mock_get_invited_org_user_by_id, sample_org_invite
+):
     session_dict = {'invited_org_user_id': sample_org_invite['id']}
     mocker.patch.dict('app.models.user.session', values=session_dict, clear=True)
 
@@ -132,12 +136,12 @@ def test_invited_org_user_from_session_uses_id(client, mocker, mock_get_invited_
     mock_get_invited_org_user_by_id.assert_called_once_with(sample_org_invite['id'])
 
 
-def test_invited_org_user_from_session_returns_none_if_nothing_present(client, mocker):
+def test_invited_org_user_from_session_returns_none_if_nothing_present(client_request, mocker):
     mocker.patch.dict('app.models.user.session', values={}, clear=True)
     assert InvitedOrgUser.from_session() is None
 
 
-def test_set_permissions(client, mocker, active_user_view_permissions, fake_uuid):
+def test_set_permissions(client_request, mocker, active_user_view_permissions, fake_uuid):
     mock_api = mocker.patch('app.models.user.user_api_client.set_user_permissions')
     mock_event = mocker.patch('app.models.user.create_set_user_permissions_event')
 
@@ -158,7 +162,7 @@ def test_set_permissions(client, mocker, active_user_view_permissions, fake_uuid
     )
 
 
-def test_add_to_service(client, mocker, api_user_active, fake_uuid):
+def test_add_to_service(client_request, mocker, api_user_active, fake_uuid):
     mock_api = mocker.patch('app.models.user.user_api_client.add_user_to_service')
     mock_event = mocker.patch('app.models.user.create_add_user_to_service_event')
 

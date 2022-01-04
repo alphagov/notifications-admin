@@ -2908,7 +2908,7 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 def test_route_permissions(
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     service_one,
     mock_get_service_template,
@@ -2943,7 +2943,7 @@ def test_route_permissions(
 def test_route_permissions_send_check_notifications(
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     service_one,
     mock_send_notification,
@@ -2953,12 +2953,12 @@ def test_route_permissions_send_check_notifications(
     response_code,
     method
 ):
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['recipient'] = '07700900001'
         session['placeholders'] = {'name': 'a'}
     validate_route_permission_with_client(
         mocker,
-        client,
+        client_request,
         method,
         response_code,
         url_for(
@@ -2980,7 +2980,7 @@ def test_route_permissions_send_check_notifications(
 def test_route_permissions_sending(
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     service_one,
     mock_get_service_template,

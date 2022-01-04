@@ -2927,11 +2927,25 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             _content_type=None,
             **endpoint_kwargs
         ):
+            return ClientRequest.post_response_from_url(
+                url_for(endpoint, **(endpoint_kwargs or {})) + _optional_args,
+                _data=_data,
+                _content_type=_content_type,
+                _expected_status=_expected_status,
+            )
+
+        @staticmethod
+        def post_response_from_url(
+            url,
+            _data=None,
+            _expected_status=302,
+            _content_type=None,
+        ):
             post_kwargs = {}
             if _content_type:
                 post_kwargs.update(content_type=_content_type)
             resp = _logged_in_client.post(
-                url_for(endpoint, **(endpoint_kwargs or {})) + _optional_args,
+                url,
                 data=_data,
                 **post_kwargs
             )
