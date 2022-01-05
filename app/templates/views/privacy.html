@@ -1,4 +1,5 @@
 {% extends "withoutnav_template.html" %}
+{% from "components/content-metadata.html" import content_metadata %}
 
 {% block per_page_title %}
   Privacy notice: how we use your data
@@ -10,7 +11,11 @@
   <div class="govuk-grid-column-two-thirds">
     <h1 class="heading-large">Privacy notice: how we use your data</h1>
 
-    <p class="govuk-body">Last update: 1 October 2021</p>
+    {{ content_metadata(
+      data={
+        "Last updated": "1 October 2021"
+      }
+    ) }}
 
     <h2 class="heading-medium">Who we are</h2>
 

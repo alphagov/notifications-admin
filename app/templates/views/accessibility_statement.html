@@ -1,5 +1,6 @@
 {% extends "content_template.html" %}
 {% from "components/service-link.html" import service_link %}
+{% from "components/content-metadata.html" import content_metadata %}
 
 {% block per_page_title %}
   Accessibility statement
@@ -8,6 +9,14 @@
 {% block content_column_content %}
 
   <h1 class="heading-large">Accessibility statement</h1>
+
+  {{ content_metadata(
+    data={
+      "Published": "23 September 2020",
+      "Last updated": "27 October 2021"
+    },
+    suffix="We review this page every 3 months"
+  ) }}
 
   <p class="govuk-body">
     This accessibility statement applies to the www.notifications.service.gov.uk domain. It does not apply to the <a class="govuk-link govuk-link--no-visited-state" href="https://docs.notifications.service.gov.uk">GOV.UK Notify API documentation subdomain</a>.
@@ -203,9 +212,5 @@
 
   <p class="govuk-body">
     We decided which pages to test based on the most common tasks that GOV.UK Notify users need to complete. We also tested a sample of pages with common user interface components.
-  </p>
-
-  <p class="govuk-body">
-    This statement was prepared on 23 September 2020. It was last reviewed on 27 October 2021.
   </p>
 {% endblock %}

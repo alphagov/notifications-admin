@@ -1,5 +1,6 @@
-{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
 {% extends "content_template.html" %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, field with context %}
+{% from "components/content-metadata.html" import content_metadata %}
 
 {% block per_page_title %}
   Roadmap
@@ -9,9 +10,15 @@
 
   <h1 class="heading-large">Roadmap</h1>
 
+  {{ content_metadata(
+    data={
+      "Last updated": "30 November 2021"
+    },
+    suffix="We review this page every 3 months"
+  ) }}
+
   <p class="govuk-body">The GOV.UK Notify roadmap shows what we’re working on and some of the <a class="govuk-link govuk-link--no-visited-state" href="#things-we-have-done">things we’ve done</a>.</p>
   <p class="govuk-body">The roadmap is only a guide. It does not cover everything we do, and some things may change.</p>
-  <div class="govuk-inset-text">We review this page every 3 months. It was last updated on 30 November 2021.</div>
   <p class="govuk-body">You can <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('.support')}}">contact us</a> if you have any questions about the roadmap or suggestions for new features.</p>
 
   <h2 class="heading-medium">Things we’re working on</h2>
