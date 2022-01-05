@@ -1,0 +1,13 @@
+{% macro content_metadata(data, suffix=False) %}
+<div class="content-metadata">
+  <dl>
+  {% for key, value in data.items() %}
+    <dt class="content-metadata__term">{{ key }}</dt>
+    <dd class="content-metadata__definition">{{ value }}</dd>
+  {% endfor %}
+  </dl>
+  {% if suffix %}
+  <p class="content-metadata__suffix">{{ suffix }}</p>
+  {% endif %}
+</div>
+{% endmacro %}

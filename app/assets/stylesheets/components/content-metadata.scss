@@ -1,0 +1,43 @@
+.content-metadata {
+  @include govuk-font(16);
+  @include govuk-clearfix;
+  @include govuk-responsive-margin(5, "bottom");
+  color: $govuk-text-colour;
+  margin-top: 15px;
+
+  .content-metadata__term,
+  .content-metadata__definition {
+    line-height: 1.4;
+  }
+
+  .content-metadata__term {
+    margin-top: .5em;
+
+    @include govuk-media-query($from: tablet) {
+      box-sizing: border-box;
+      float: left;
+      clear: left;
+      padding-right: govuk-spacing(1);
+      margin-top: 0;
+    }
+  }
+
+  .content-metadata__definition {
+    margin: 0;
+
+    @include govuk-media-query($from: tablet) {
+      &:not(:last-of-type) {
+        margin-bottom: govuk-spacing(1);
+      }
+    }
+  }
+
+  .content-metadata__suffix {
+    margin-top: 0.628em;
+    margin-bottom: 0;
+
+    @include govuk-media-query($from: tablet) {
+      margin-top: 6px;
+    }
+  }
+}
