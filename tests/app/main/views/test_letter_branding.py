@@ -2,6 +2,7 @@ from io import BytesIO
 from unittest.mock import Mock, call
 from uuid import UUID
 
+import pytest
 from botocore.exceptions import ClientError as BotoClientError
 from bs4 import BeautifulSoup
 from flask import url_for
@@ -348,10 +349,21 @@ def test_create_letter_branding_when_uploading_valid_file(
     assert mock_delete_temp_files.called is False
 
 
-def test_create_letter_branding_fails_validation_when_uploading_SVG_with_embedded_image(
+@pytest.mark.parametrize('svg_contents, expected_error', (
+    (
+        '''
+            <svg height="100" width="100">
+            <image href="someurlgoeshere" x="0" y="0" height="100" width="100"></image></svg>
+        ''',
+        'This SVG has an embedded raster image in it and will not render well',
+    ),
+))
+def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_element(
     mocker,
     platform_admin_client,
-    fake_uuid
+    fake_uuid,
+    svg_contents,
+    expected_error,
 ):
     filename = 'test.svg'
 
@@ -359,18 +371,14 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_embedde
 
     response = platform_admin_client.post(
         url_for('.create_letter_branding'),
-        data={'file': (BytesIO("""
-            <svg height="100" width="100">
-            <image href="someurlgoeshere" x="0" y="0" height="100" width="100"></image></svg>
-        """.encode('utf-8')), filename)},
+        data={'file': (BytesIO(svg_contents.encode('utf-8')), filename)},
         follow_redirects=True,
     )
 
     page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(page.find('h1').text) == "Add letter branding"
-    message = 'This SVG has an embedded raster image in it and will not render well'
-    assert normalize_spaces(page.find("span", {"class": "error-message"}).text) == message
+    assert normalize_spaces(page.select_one(".error-message").text) == expected_error
 
     assert page.findAll('div', {'id': 'logo-img'}) == []
 
