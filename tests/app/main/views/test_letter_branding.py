@@ -368,7 +368,8 @@ def test_create_letter_branding_when_uploading_valid_file(
 ))
 def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_element(
     mocker,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     fake_uuid,
     svg_contents,
     expected_error,
@@ -377,13 +378,12 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_ele
 
     mock_s3_upload = mocker.patch('app.s3_client.s3_logo_client.utils_s3upload')
 
-    response = platform_admin_client.post(
-        url_for('.create_letter_branding'),
-        data={'file': (BytesIO(svg_contents.encode('utf-8')), filename)},
-        follow_redirects=True,
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.create_letter_branding',
+        _data={'file': (BytesIO(svg_contents.encode('utf-8')), filename)},
+        _follow_redirects=True,
     )
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(page.find('h1').text) == "Add letter branding"
     assert normalize_spaces(page.select_one(".error-message").text) == expected_error
