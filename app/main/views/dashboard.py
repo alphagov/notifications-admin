@@ -15,6 +15,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
+from notifications_utils.recipients import format_phone_number_human_readable
 from werkzeug.utils import redirect
 
 from app import (
@@ -202,7 +203,7 @@ def inbox_download(service_id):
                 'Message',
                 'Received',
             ]] + [[
-                message['user_number'],
+                format_phone_number_human_readable(message['user_number']),
                 message['content'].lstrip(('=+-@')),
                 format_datetime_numeric(message['created_at']),
             ] for message in service_api_client.get_inbound_sms(service_id)['data']]

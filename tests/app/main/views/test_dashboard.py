@@ -268,10 +268,10 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
     '07900 900000 message-2 1 hour ago',
     '07900 900000 message-3 1 hour ago',
     '07900 900002 message-4 3 hours ago',
-    '07900 900004 message-5 5 hours ago',
-    '07900 900006 message-6 7 hours ago',
-    '07900 900008 message-7 9 hours ago',
-    '07900 900008 message-8 9 hours ago',
+    '+33 1 12 34 56 78 message-5 5 hours ago',
+    '+1 202-555-0104 message-6 7 hours ago',
+    '+1 202-555-0104 message-7 9 hours ago',
+    '+682 12345 message-8 9 hours ago',
 ]))
 def test_inbox_showing_inbound_messages(
     client_request,
@@ -434,14 +434,14 @@ def test_download_inbox(
     )
     assert response.get_data(as_text=True) == (
         'Phone number,Message,Received\r\n'
-        '07900900000,message-1,2016-07-01 13:00\r\n'
-        '07900900000,message-2,2016-07-01 12:59\r\n'
-        '07900900000,message-3,2016-07-01 12:59\r\n'
-        '07900900002,message-4,2016-07-01 10:59\r\n'
-        '07900900004,message-5,2016-07-01 08:59\r\n'
-        '07900900006,message-6,2016-07-01 06:59\r\n'
-        '07900900008,message-7,2016-07-01 04:59\r\n'
-        '07900900008,message-8,2016-07-01 04:59\r\n'
+        '07900 900000,message-1,2016-07-01 13:00\r\n'
+        '07900 900000,message-2,2016-07-01 12:59\r\n'
+        '07900 900000,message-3,2016-07-01 12:59\r\n'
+        '07900 900002,message-4,2016-07-01 10:59\r\n'
+        '+33 1 12 34 56 78,message-5,2016-07-01 08:59\r\n'
+        '+1 202-555-0104,message-6,2016-07-01 06:59\r\n'
+        '+1 202-555-0104,message-7,2016-07-01 04:59\r\n'
+        '+682 12345,message-8,2016-07-01 04:59\r\n'
     )
 
 
