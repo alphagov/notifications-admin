@@ -357,6 +357,14 @@ def test_create_letter_branding_when_uploading_valid_file(
         ''',
         'This SVG has an embedded raster image in it and will not render well',
     ),
+    (
+        '''
+            <svg height="100" width="100">
+                <text>Will render differently depending on fonts installed</text>
+            </svg>
+        ''',
+        'This SVG has text which has not been converted to paths and may not render well',
+    ),
 ))
 def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_element(
     mocker,

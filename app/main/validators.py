@@ -102,6 +102,11 @@ class NoEmbeddedImagesInSVG(NoElementInSVG):
     message = 'This SVG has an embedded raster image in it and will not render well'
 
 
+class NoTextInSVG(NoElementInSVG):
+    element = 'text'
+    message = 'This SVG has text which has not been converted to paths and may not render well'
+
+
 class OnlySMSCharacters:
 
     def __init__(self, *args, template_type, **kwargs):
