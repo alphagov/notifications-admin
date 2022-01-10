@@ -1,4 +1,5 @@
 import re
+from abc import ABC, abstractmethod
 
 from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
@@ -77,16 +78,33 @@ class NoCommasInPlaceHolders:
             raise ValidationError(self.message)
 
 
-class NoEmbeddedImagesInSVG:
+class NoElementInSVG(ABC):
 
-    def __init__(self, message='This SVG has an embedded raster image in it and will not render well'):
-        self.message = message
+    @property
+    @abstractmethod
+    def element(self):
+        pass
+
+    @property
+    @abstractmethod
+    def message(self):
+        pass
 
     def __call__(self, form, field):
-        is_image_embedded = '<image' in field.data.stream.read().decode("utf-8")
+        svg_contents = field.data.stream.read().decode("utf-8")
         field.data.stream.seek(0)
-        if is_image_embedded:
+        if f'<{self.element}' in svg_contents.lower():
             raise ValidationError(self.message)
+
+
+class NoEmbeddedImagesInSVG(NoElementInSVG):
+    element = 'image'
+    message = 'This SVG has an embedded raster image in it and will not render well'
+
+
+class NoTextInSVG(NoElementInSVG):
+    element = 'text'
+    message = 'This SVG has text which has not been converted to paths and may not render well'
 
 
 class OnlySMSCharacters:
