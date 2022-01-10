@@ -41,5 +41,3 @@ cryptography<3.4 # pyup: ignore
 # version 0.10.0 introduced exceptions when workers crashed due to deprecating lower case `prometheus_multiproc_dir`.
 prometheus-client>=0.9.0,!=0.10.0
 gds-metrics==0.2.4
-
-sentry-sdk[flask]
