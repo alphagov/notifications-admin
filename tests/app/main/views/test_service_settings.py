@@ -539,7 +539,6 @@ def test_should_show_service_name_with_no_prefixing(
 def test_should_not_hit_api_if_service_name_hasnt_changed(
     client_request,
     mock_update_service,
-    mock_service_name_is_unique,
 ):
     client_request.post(
         'main.service_name_change',

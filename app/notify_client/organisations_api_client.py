@@ -81,12 +81,6 @@ class OrganisationsClient(NotifyAdminAPIClient):
         data = _attach_current_user({})
         return self.delete(endpoint, data)
 
-    def is_organisation_name_unique(self, org_id, name):
-        return self.get(
-            url="/organisations/unique",
-            params={"org_id": org_id, "name": name}
-        )["result"]
-
     def get_services_and_usage(self, org_id, year):
         return self.get(
             url=f"/organisations/{org_id}/services-with-usage",
