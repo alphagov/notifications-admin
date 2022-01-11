@@ -1315,6 +1315,25 @@ def test_confirm_update_organisation_with_incorrect_password(
     ) == 'Error: Invalid password'
 
 
+def test_confirm_update_organisation_with_existing_name(
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+    mock_get_organisation,
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        '.edit_organisation_name',
+        org_id=fake_uuid,
+        _data={'name': 'Test organisation'},
+        _expected_redirect=url_for(
+            '.organisation_settings',
+            org_id=fake_uuid,
+            _external=True,
+        )
+    )
+
+
 def test_confirm_update_organisation_with_name_already_in_use(
     client_request,
     platform_admin_user,
