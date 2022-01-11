@@ -801,6 +801,51 @@ def test_manage_org_users_shows_correct_link_next_to_each_user(
     assert users[2].a['href'] == url_for('.edit_organisation_user', org_id=ORGANISATION_ID, user_id='5678')
 
 
+@pytest.mark.parametrize('number_of_users', (
+    pytest.param(7, marks=pytest.mark.xfail),
+    pytest.param(8),
+))
+def test_manage_org_users_should_show_live_search_if_more_than_7_users(
+    client_request,
+    mocker,
+    mock_get_organisation,
+    active_user_with_permissions,
+    number_of_users,
+):
+    mocker.patch(
+        'app.models.user.OrganisationInvitedUsers.client_method',
+        return_value=[],
+    )
+    mocker.patch(
+        'app.models.user.OrganisationUsers.client_method',
+        return_value=[active_user_with_permissions] * number_of_users,
+    )
+
+    page = client_request.get(
+        '.manage_org_users',
+        org_id=ORGANISATION_ID,
+    )
+
+    assert page.select_one('div[data-module=live-search]')['data-targets'] == (
+        ".user-list-item"
+    )
+    assert len(page.select('.user-list-item')) == number_of_users
+
+    textbox = page.select_one('[data-module=autofocus] .govuk-input')
+    assert 'value' not in textbox
+    assert textbox['name'] == 'search'
+    # data-module=autofocus is set on a containing element so it
+    # shouldn’t also be set on the textbox itself
+    assert 'data-module' not in textbox
+    assert not page.select_one('[data-force-focus]')
+    assert textbox['class'] == [
+        'govuk-input', 'govuk-!-width-full',
+    ]
+    assert normalize_spaces(
+        page.select_one('label[for=search]').text
+    ) == 'Search by name or email address'
+
+
 def test_edit_organisation_user_shows_the_delete_confirmation_banner(
     client_request,
     mock_get_organisation,
@@ -844,34 +889,6 @@ def test_remove_user_from_organisation_makes_api_request_to_remove_user(
     )
 
     mock_remove_user.assert_called_with(ORGANISATION_ID, fake_uuid)
-
-
-def test_cancel_invited_org_user_cancels_user_invitations(
-    client_request,
-    mock_get_invites_for_organisation,
-    sample_org_invite,
-    mock_get_organisation,
-    mock_get_users_for_organisation,
-    mocker,
-):
-    mock_cancel = mocker.patch('app.org_invite_api_client.cancel_invited_user')
-    mocker.patch('app.org_invite_api_client.get_invited_user_for_org', return_value=sample_org_invite)
-
-    page = client_request.get(
-        'main.cancel_invited_org_user',
-        org_id=ORGANISATION_ID,
-        invited_user_id=sample_org_invite['id'],
-        _follow_redirects=True
-    )
-    assert normalize_spaces(page.h1.text) == 'Team members'
-    flash_banner = normalize_spaces(
-        page.find('div', class_='banner-default-with-tick').text
-    )
-    assert flash_banner == f"Invitation cancelled for {sample_org_invite['email_address']}"
-    mock_cancel.assert_called_once_with(
-        org_id=ORGANISATION_ID,
-        invited_user_id=sample_org_invite['id'],
-    )
 
 
 def test_organisation_settings_platform_admin_only(
