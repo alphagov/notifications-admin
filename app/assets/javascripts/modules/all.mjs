@@ -6,6 +6,7 @@
 //
 // Exported items will be added to the window.GOVUK namespace.
 // For example, `export { Frontend }` will assign `Frontend` to `window.Frontend`
+import './polyfills-for-diffdom.js';
 import Header from 'govuk-frontend/components/header/header';
 import Details from 'govuk-frontend/components/details/details';
 import Button from 'govuk-frontend/components/button/button';
