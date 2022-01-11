@@ -786,7 +786,9 @@ def test_manage_org_users_shows_correct_link_next_to_each_user(
 
     # The first user is an invited user, so has the link to cancel the invitation.
     # The second two users are active users, so have the link to be removed from the org
-    assert normalize_spaces(users[0].text) == 'invited_user@test.gov.uk (invited) Cancel invitation'
+    assert normalize_spaces(
+        users[0].text
+    ) == 'invited_user@test.gov.uk (invited) Cancel invitation for invited_user@test.gov.uk'
     assert normalize_spaces(users[1].text) == 'Test User 1 test@gov.uk Remove Test User 1 test@gov.uk'
     assert normalize_spaces(users[2].text) == 'Test User 2 testt@gov.uk Remove Test User 2 testt@gov.uk'
 
