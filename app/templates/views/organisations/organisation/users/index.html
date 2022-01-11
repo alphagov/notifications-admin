@@ -10,6 +10,15 @@
 
 {% block maincolumn_content %}
 
+  {% if user_to_remove %}
+    {{ banner(
+      'Are you sure you want to remove {}?'.format(user_to_remove.name),
+      type='dangerous',
+      delete_button='Yes, remove',
+      action=url_for('.remove_user_from_organisation', org_id=current_org.id, user_id=user_to_remove.id)
+    ) }}
+  {% endif %}
+
   <h1 class="heading-medium">
     Team members
   </h1>
@@ -45,6 +54,8 @@
           <div class="govuk-grid-column-one-quarter">
             {% if user.status == 'pending' %}
               <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation</a>
+            {% else %}
+              <a class="govuk-link govuk-link--destructive user-list-edit-link" href="{{ url_for('.edit_organisation_user', org_id=current_org.id, user_id=user.id)}}">Remove<span class="govuk-visually-hidden"> {{ user.name }} {{ user.email_address }}</span></a>
             {% endif %}
           </div>
         </div>

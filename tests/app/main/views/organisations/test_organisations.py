@@ -768,6 +768,82 @@ def test_organisation_trial_mode_services_doesnt_work_if_not_platform_admin(
     )
 
 
+def test_manage_org_users_shows_correct_link_next_to_each_user(
+    client_request,
+    mock_get_organisation,
+    mock_get_users_for_organisation,
+    mock_get_invited_users_for_organisation,
+):
+    page = client_request.get(
+        '.manage_org_users',
+        org_id=ORGANISATION_ID,
+    )
+
+    # No banner confirming a user to be deleted shown
+    assert not page.select_one('.banner-dangerous')
+
+    users = page.find_all(class_='user-list-item')
+
+    # The first user is an invited user, so has the link to cancel the invitation.
+    # The second two users are active users, so have the link to be removed from the org
+    assert normalize_spaces(users[0].text) == 'invited_user@test.gov.uk (invited) Cancel invitation'
+    assert normalize_spaces(users[1].text) == 'Test User 1 test@gov.uk Remove Test User 1 test@gov.uk'
+    assert normalize_spaces(users[2].text) == 'Test User 2 testt@gov.uk Remove Test User 2 testt@gov.uk'
+
+    assert users[0].a['href'] == url_for(
+        '.cancel_invited_org_user',
+        org_id=ORGANISATION_ID,
+        invited_user_id='73616d70-6c65-4f6f-b267-5f696e766974'
+    )
+    assert users[1].a['href'] == url_for('.edit_organisation_user', org_id=ORGANISATION_ID, user_id='1234')
+    assert users[2].a['href'] == url_for('.edit_organisation_user', org_id=ORGANISATION_ID, user_id='5678')
+
+
+def test_edit_organisation_user_shows_the_delete_confirmation_banner(
+    client_request,
+    mock_get_organisation,
+    mock_get_invites_for_organisation,
+    mock_get_users_for_organisation,
+    active_user_with_permissions,
+):
+    page = client_request.get(
+        '.edit_organisation_user',
+        org_id=ORGANISATION_ID,
+        user_id=active_user_with_permissions['id']
+    )
+
+    assert normalize_spaces(page.h1) == 'Team members'
+
+    banner = page.select_one('.banner-dangerous')
+    assert "Are you sure you want to remove Test User?" in normalize_spaces(banner.contents[0])
+    assert banner.form.attrs['action'] == url_for(
+        'main.remove_user_from_organisation',
+        org_id=ORGANISATION_ID,
+        user_id=active_user_with_permissions['id']
+    )
+
+
+def test_remove_user_from_organisation_makes_api_request_to_remove_user(
+    client_request,
+    mocker,
+    mock_get_organisation,
+    fake_uuid,
+):
+    mock_remove_user = mocker.patch('app.organisations_client.remove_user_from_organisation')
+
+    client_request.post(
+        '.remove_user_from_organisation',
+        org_id=ORGANISATION_ID,
+        user_id=fake_uuid,
+        _expected_redirect=url_for(
+            'main.show_accounts_or_dashboard',
+            _external=True,
+        ),
+    )
+
+    mock_remove_user.assert_called_with(ORGANISATION_ID, fake_uuid)
+
+
 def test_cancel_invited_org_user_cancels_user_invitations(
     client_request,
     mock_get_invites_for_organisation,

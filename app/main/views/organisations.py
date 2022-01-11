@@ -253,42 +253,28 @@ def invite_org_user(org_id):
     )
 
 
-@main.route("/organisations/<uuid:org_id>/users/<uuid:user_id>", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/users/<uuid:user_id>", methods=['GET'])
 @user_has_permissions()
-def edit_user_org_permissions(org_id, user_id):
+def edit_organisation_user(org_id, user_id):
+    # The only action that can be done to an org user is to remove them from the org.
+    # This endpoint is used to get the ID of the user to delete without passing it as a
+    # query string, but it uses the template for all org team members in order to avoid
+    # having a page containing a single link.
     return render_template(
-        'views/organisations/organisation/users/user/index.html',
-        user=User.from_id(user_id)
+        'views/organisations/organisation/users/index.html',
+        users=current_organisation.team_members,
+        show_search_box=(len(current_organisation.team_members) > 7),
+        form=SearchUsersForm(),
+        user_to_remove=User.from_id(user_id)
     )
 
 
-@main.route("/organisations/<uuid:org_id>/users/<uuid:user_id>/delete", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/users/<uuid:user_id>/delete", methods=['POST'])
 @user_has_permissions()
 def remove_user_from_organisation(org_id, user_id):
-    user = User.from_id(user_id)
-    if request.method == 'POST':
-        try:
-            organisations_client.remove_user_from_organisation(org_id, user_id)
-        except HTTPError as e:
-            msg = "You cannot remove the only user for a service"
-            if e.status_code == 400 and msg in e.message:
-                flash(msg, 'info')
-                return redirect(url_for(
-                    '.manage_org_users',
-                    org_id=org_id))
-            else:
-                abort(500, e)
+    organisations_client.remove_user_from_organisation(org_id, user_id)
 
-        return redirect(url_for(
-            '.manage_org_users',
-            org_id=org_id
-        ))
-
-    flash('Are you sure you want to remove {}?'.format(user.name), 'remove')
-    return render_template(
-        'views/organisations/organisation/users/user/index.html',
-        user=user,
-    )
+    return redirect(url_for('.show_accounts_or_dashboard'))
 
 
 @main.route("/organisations/<uuid:org_id>/cancel-invited-user/<uuid:invited_user_id>", methods=['GET'])
