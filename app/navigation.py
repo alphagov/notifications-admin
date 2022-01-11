@@ -324,7 +324,6 @@ class OrgNavigation(Navigation):
             'organisation_dashboard',
         },
         'settings': {
-            'confirm_edit_organisation_name',
             'edit_organisation_agreement',
             'edit_organisation_billing_details',
             'edit_organisation_crown_status',
