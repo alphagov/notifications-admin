@@ -56,11 +56,10 @@ class OrganisationsClient(NotifyAdminAPIClient):
         if cached_service_ids:
             redis_client.delete(*map('service-{}'.format, cached_service_ids))
 
-        return api_response
+        if 'name' in kwargs:
+            redis_client.delete(f'organisation-{org_id}-name')
 
-    @cache.delete('organisation-{org_id}-name')
-    def update_organisation_name(self, org_id, name):
-        return self.update_organisation(org_id, name=name)
+        return api_response
 
     @cache.delete('service-{service_id}')
     @cache.delete('live-service-and-organisation-counts')

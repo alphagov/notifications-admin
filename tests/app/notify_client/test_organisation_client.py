@@ -140,17 +140,34 @@ def test_deletes_domain_cache(
     assert len(mock_request.call_args_list) == 1
 
 
-def test_update_organisation_when_not_updating_org_type(mocker, fake_uuid):
+@pytest.mark.parametrize('post_data, expected_cache_delete_calls', (
+    ({'foo': 'bar'}, [
+        call('organisations'),
+        call('domains'),
+    ]),
+    ({'name': 'new name'}, [
+        call('organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-name'),
+        call('organisations'),
+        call('domains'),
+    ]),
+))
+def test_update_organisation_when_not_updating_org_type(
+    mocker,
+    fake_uuid,
+    post_data,
+    expected_cache_delete_calls,
+):
+
     mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
     mock_post = mocker.patch('app.notify_client.organisations_api_client.OrganisationsClient.post')
 
-    organisations_client.update_organisation(fake_uuid, foo='bar')
+    organisations_client.update_organisation(fake_uuid, **post_data)
 
     mock_post.assert_called_with(
         url='/organisations/{}'.format(fake_uuid),
-        data={'foo': 'bar'}
+        data=post_data
     )
-    assert mock_redis_delete.call_args_list == [call('organisations'), call('domains')]
+    assert mock_redis_delete.call_args_list == expected_cache_delete_calls
 
 
 def test_update_organisation_when_updating_org_type_and_org_has_services(mocker, fake_uuid):
