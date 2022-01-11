@@ -323,10 +323,7 @@ def organisation_settings(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/edit-name", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_name(org_id):
-    form = RenameOrganisationForm()
-
-    if request.method == 'GET':
-        form.name.data = current_organisation.name
+    form = RenameOrganisationForm(name=current_organisation.name)
 
     if form.validate_on_submit():
 
