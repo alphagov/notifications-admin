@@ -332,7 +332,7 @@ def edit_organisation_name(org_id):
             return redirect(url_for('.organisation_settings', org_id=org_id))
 
     return render_template(
-        'views/organisations/organisation/settings/edit-name/index.html',
+        'views/organisations/organisation/settings/edit-name.html',
         form=form,
     )
 
