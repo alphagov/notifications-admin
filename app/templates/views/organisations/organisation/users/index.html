@@ -54,7 +54,7 @@
           <div class="govuk-grid-column-one-quarter">
             {% if user.status == 'pending' %}
               <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation<span class="govuk-visually-hidden"> for {{ user.email_address }}</span></a>
-            {% else %}
+            {% elif user.status != 'cancelled' %}
               <a class="govuk-link govuk-link--destructive user-list-edit-link" href="{{ url_for('.edit_organisation_user', org_id=current_org.id, user_id=user.id)}}">Remove<span class="govuk-visually-hidden"> {{ user.name }} {{ user.email_address }}</span></a>
             {% endif %}
           </div>

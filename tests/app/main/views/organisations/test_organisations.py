@@ -801,6 +801,26 @@ def test_manage_org_users_shows_correct_link_next_to_each_user(
     assert users[2].a['href'] == url_for('.edit_organisation_user', org_id=ORGANISATION_ID, user_id='5678')
 
 
+def test_manage_org_users_shows_no_link_for_cancelled_users(
+    client_request,
+    mock_get_organisation,
+    mock_get_users_for_organisation,
+    sample_org_invite,
+    mocker,
+):
+    sample_org_invite['status'] = 'cancelled'
+    mocker.patch('app.models.user.OrganisationInvitedUsers.client_method', return_value=[sample_org_invite])
+
+    page = client_request.get(
+        '.manage_org_users',
+        org_id=ORGANISATION_ID,
+    )
+    users = page.find_all(class_='user-list-item')
+
+    assert normalize_spaces(users[0].text) == 'invited_user@test.gov.uk (cancelled invite)'
+    assert not users[0].a
+
+
 @pytest.mark.parametrize('number_of_users', (
     pytest.param(7, marks=pytest.mark.xfail),
     pytest.param(8),
