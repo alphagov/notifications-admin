@@ -536,24 +536,6 @@ def test_should_show_service_name_with_no_prefixing(
     ).text == 'Your service name should tell users what the message is about as well as who it’s from.'
 
 
-def test_should_not_hit_api_if_service_name_hasnt_changed(
-    client_request,
-    mock_update_service,
-):
-    client_request.post(
-        'main.service_name_change',
-        service_id=SERVICE_ONE_ID,
-        _data={'name': 'service one'},
-        _expected_status=302,
-        _expected_redirect=url_for(
-            'main.service_settings',
-            service_id=SERVICE_ONE_ID,
-            _external=True,
-        ),
-    )
-    assert not mock_update_service.called
-
-
 @pytest.mark.parametrize('name, error_message', [
     ('', 'Cannot be empty'),
     ('.', 'Must include at least two alphanumeric characters'),

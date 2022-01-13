@@ -1275,25 +1275,6 @@ def test_update_organisation_with_non_unique_name(
     assert 'This organisation name is already in use' in page.select_one('.govuk-error-message').text
 
 
-def test_confirm_update_organisation_with_existing_name(
-    client_request,
-    platform_admin_user,
-    fake_uuid,
-    mock_get_organisation,
-):
-    client_request.login(platform_admin_user)
-    client_request.post(
-        '.edit_organisation_name',
-        org_id=fake_uuid,
-        _data={'name': 'Test organisation'},
-        _expected_redirect=url_for(
-            '.organisation_settings',
-            org_id=fake_uuid,
-            _external=True,
-        )
-    )
-
-
 def test_get_edit_organisation_go_live_notes_page(
     client_request,
     platform_admin_user,

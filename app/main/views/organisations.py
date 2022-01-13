@@ -317,9 +317,6 @@ def edit_organisation_name(org_id):
 
     if form.validate_on_submit():
 
-        if form.name.data == current_organisation.name:
-            return redirect(url_for('.organisation_settings', org_id=current_organisation.id))
-
         try:
             current_organisation.update(name=form.name.data)
         except HTTPError as http_error:
