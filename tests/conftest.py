@@ -550,16 +550,6 @@ def mock_get_detailed_services(mocker, fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def mock_service_name_is_not_unique(mocker):
-    return mocker.patch('app.service_api_client.is_service_name_unique', return_value=False)
-
-
-@pytest.fixture(scope='function')
-def mock_service_name_is_unique(mocker):
-    return mocker.patch('app.service_api_client.is_service_name_unique', return_value=True)
-
-
-@pytest.fixture(scope='function')
 def mock_get_live_service(mocker, api_user_active):
     def _get(service_id):
         service = service_json(
@@ -3346,16 +3336,6 @@ def mock_add_user_to_organisation(mocker, organisation_one, api_user_active):
         return api_user_active
 
     return mocker.patch('app.user_api_client.add_user_to_organisation', side_effect=_add_user)
-
-
-@pytest.fixture(scope='function')
-def mock_organisation_name_is_not_unique(mocker):
-    return mocker.patch('app.organisations_client.is_organisation_name_unique', return_value=False)
-
-
-@pytest.fixture(scope='function')
-def mock_organisation_name_is_unique(mocker):
-    return mocker.patch('app.organisations_client.is_organisation_name_unique', return_value=True)
 
 
 @pytest.fixture(scope='function')

@@ -1202,22 +1202,26 @@ def test_update_organisation_domains_when_domain_already_exists(
 def test_update_organisation_name(
     client_request,
     platform_admin_user,
-    organisation_one,
+    fake_uuid,
     mock_get_organisation,
-    mock_organisation_name_is_unique
+    mock_update_organisation,
 ):
     client_request.login(platform_admin_user)
     client_request.post(
         '.edit_organisation_name',
-        org_id=organisation_one['id'],
+        org_id=fake_uuid,
         _data={'name': 'TestNewOrgName'},
         _expected_redirect=url_for(
-            '.confirm_edit_organisation_name',
-            org_id=organisation_one['id'],
+            '.organisation_settings',
+            org_id=fake_uuid,
             _external=True,
-        ),
+        )
     )
-    assert mock_organisation_name_is_unique.called
+    mock_update_organisation.assert_called_once_with(
+        fake_uuid,
+        name='TestNewOrgName',
+        cached_service_ids=None,
+    )
 
 
 @pytest.mark.parametrize('name, error_message', [
@@ -1246,107 +1250,29 @@ def test_update_organisation_with_incorrect_input(
 def test_update_organisation_with_non_unique_name(
     client_request,
     platform_admin_user,
-    organisation_one,
+    fake_uuid,
     mock_get_organisation,
-    mock_organisation_name_is_not_unique
+    mocker,
 ):
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        '.edit_organisation_name',
-        org_id=organisation_one['id'],
-        _data={'name': 'TestNewOrgName'},
-        _expected_status=200,
-    )
-    assert 'This organisation name is already in use' in page.select_one('.govuk-error-message').text
-    assert mock_organisation_name_is_not_unique.called
-
-
-def test_confirm_update_organisation(
-    client_request,
-    platform_admin_user,
-    organisation_one,
-    mock_get_organisation,
-    mock_verify_password,
-    mock_update_organisation,
-    mocker
-):
-    with client_request.session_transaction() as session:
-        session['organisation_name_change'] = 'newName'
-
-    client_request.login(platform_admin_user)
-    client_request.post(
-        '.confirm_edit_organisation_name',
-        org_id=organisation_one['id'],
-        _data={'password': 'validPassword'},
-        _expected_redirect=url_for(
-            '.organisation_settings',
-            org_id=organisation_one['id'],
-            _external=True,
-        ),
-    )
-
-    mock_update_organisation.assert_called_with(
-        organisation_one['id'],
-        name=session['organisation_name_change']
-    )
-
-
-def test_confirm_update_organisation_with_incorrect_password(
-    client_request,
-    platform_admin_user,
-    organisation_one,
-    mock_get_organisation,
-    mocker
-):
-    with client_request.session_transaction() as session:
-        session['organisation_name_change'] = 'newName'
-
-    mocker.patch('app.user_api_client.verify_password', return_value=False)
-
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        '.confirm_edit_organisation_name',
-        org_id=organisation_one['id'],
-        _expected_status=200,
-    )
-
-    assert normalize_spaces(
-        page.select_one('.govuk-error-message').text
-    ) == 'Error: Invalid password'
-
-
-def test_confirm_update_organisation_with_name_already_in_use(
-    client_request,
-    platform_admin_user,
-    organisation_one,
-    mock_get_organisation,
-    mock_verify_password,
-    mocker
-):
-    with client_request.session_transaction() as session:
-        session['organisation_name_change'] = 'newName'
-
     mocker.patch(
-        'app.organisations_client.update_organisation_name',
+        'app.organisations_client.update_organisation',
         side_effect=HTTPError(
             response=mocker.Mock(
                 status_code=400,
                 json={'result': 'error', 'message': 'Organisation name already exists'}
             ),
-            message="Organisation name already exists"
+            message='Organisation name already exists',
         )
     )
-
     client_request.login(platform_admin_user)
-    client_request.post(
-        '.confirm_edit_organisation_name',
-        org_id=organisation_one['id'],
-        _expected_redirect=url_for(
-            'main.edit_organisation_name',
-            org_id=organisation_one['id'],
-            _external=True,
-        ),
+    page = client_request.post(
+        '.edit_organisation_name',
+        org_id=fake_uuid,
+        _data={'name': 'TestNewOrgName'},
+        _expected_status=200,
     )
+
+    assert 'This organisation name is already in use' in page.select_one('.govuk-error-message').text
 
 
 def test_get_edit_organisation_go_live_notes_page(

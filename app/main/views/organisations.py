@@ -2,15 +2,7 @@ from collections import OrderedDict
 from datetime import datetime
 from functools import partial
 
-from flask import (
-    flash,
-    redirect,
-    render_template,
-    request,
-    send_file,
-    session,
-    url_for,
-)
+from flask import flash, redirect, render_template, request, send_file, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from werkzeug.exceptions import abort
@@ -22,14 +14,12 @@ from app import (
     letter_branding_client,
     org_invite_api_client,
     organisations_client,
-    user_api_client,
 )
 from app.main import main
 from app.main.forms import (
     AddGPOrganisationForm,
     AddNHSLocalOrganisationForm,
     BillingDetailsForm,
-    ConfirmPasswordForm,
     EditNotesForm,
     GoLiveNotesForm,
     InviteOrgUserForm,
@@ -323,21 +313,23 @@ def organisation_settings(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/edit-name", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_name(org_id):
-    form = RenameOrganisationForm()
-
-    if request.method == 'GET':
-        form.name.data = current_organisation.name
+    form = RenameOrganisationForm(name=current_organisation.name)
 
     if form.validate_on_submit():
-        unique_name = organisations_client.is_organisation_name_unique(org_id, form.name.data)
-        if not unique_name:
-            form.name.errors.append("This organisation name is already in use")
-            return render_template('views/organisations/organisation/settings/edit-name/index.html', form=form)
-        session['organisation_name_change'] = form.name.data
-        return redirect(url_for('.confirm_edit_organisation_name', org_id=org_id))
+
+        try:
+            current_organisation.update(name=form.name.data)
+        except HTTPError as http_error:
+            error_msg = 'Organisation name already exists'
+            if http_error.status_code == 400 and error_msg in http_error.message:
+                form.name.errors.append('This organisation name is already in use')
+            else:
+                raise http_error
+        else:
+            return redirect(url_for('.organisation_settings', org_id=org_id))
 
     return render_template(
-        'views/organisations/organisation/settings/edit-name/index.html',
+        'views/organisations/organisation/settings/edit-name.html',
         form=form,
     )
 
@@ -546,38 +538,6 @@ def edit_organisation_domains(org_id):
         'views/organisations/organisation/settings/edit-domains.html',
         form=form,
     )
-
-
-@main.route("/organisations/<uuid:org_id>/settings/edit-name/confirm", methods=['GET', 'POST'])
-@user_has_permissions()
-def confirm_edit_organisation_name(org_id):
-    # Validate password for form
-    def _check_password(pwd):
-        return user_api_client.verify_password(current_user.id, pwd)
-
-    form = ConfirmPasswordForm(_check_password)
-
-    if form.validate_on_submit():
-        try:
-            organisations_client.update_organisation_name(
-                current_organisation.id,
-                name=session['organisation_name_change'],
-            )
-        except HTTPError as e:
-            error_msg = "Organisation name already exists"
-            if e.status_code == 400 and error_msg in e.message:
-                # Redirect the user back to the change organisation name screen
-                flash('This organisation name is already in use', 'error')
-                return redirect(url_for('main.edit_organisation_name', org_id=org_id))
-            else:
-                raise e
-        else:
-            session.pop('organisation_name_change')
-            return redirect(url_for('.organisation_settings', org_id=org_id))
-    return render_template(
-        'views/organisations/organisation/settings/edit-name/confirm.html',
-        new_name=session['organisation_name_change'],
-        form=form)
 
 
 @main.route("/organisations/<uuid:org_id>/settings/edit-go-live-notes", methods=['GET', 'POST'])

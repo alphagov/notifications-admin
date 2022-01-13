@@ -319,14 +319,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         self._delete_template_cache_for_service(service_id)
         return self.post(endpoint, data=data)
 
-    def is_service_name_unique(self, service_id, name, email_from):
-        """
-        Check that the service name or email from are unique across all services.
-        """
-        endpoint = "/service/unique"
-        params = {"service_id": service_id, "name": name, "email_from": email_from}
-        return self.get(url=endpoint, params=params)["result"]
-
     # Temp access of service history data. Includes service and api key history
     def get_service_history(self, service_id):
         return self.get('/service/{0}/history'.format(service_id))['data']

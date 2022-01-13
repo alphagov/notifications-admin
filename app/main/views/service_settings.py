@@ -96,9 +96,6 @@ def service_name_change(service_id):
 
     if form.validate_on_submit():
 
-        if form.name.data == current_service.name:
-            return redirect(url_for('.service_settings', service_id=service_id))
-
         try:
             current_service.update(
                 name=form.name.data,

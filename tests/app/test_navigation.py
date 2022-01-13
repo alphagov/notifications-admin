@@ -63,7 +63,6 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'choose_template',
     'choose_template_to_copy',
     'clear_cache',
-    'confirm_edit_organisation_name',
     'confirm_edit_user_email',
     'confirm_edit_user_mobile_number',
     'confirm_redact_template',
