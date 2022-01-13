@@ -341,7 +341,7 @@ class OrgNavigation(Navigation):
 
         },
         'team-members': {
-            'edit_user_org_permissions',
+            'edit_organisation_user',
             'invite_org_user',
             'manage_org_users',
             'remove_user_from_organisation',

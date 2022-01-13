@@ -229,3 +229,19 @@ def test_update_service_organisation_deletes_cache(mocker, fake_uuid):
         url='/organisations/{}/service'.format(fake_uuid),
         data=ANY
     )
+
+
+def test_remove_user_from_organisation_deletes_user_cache(mocker):
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+    mock_delete = mocker.patch('app.notify_client.organisations_api_client.OrganisationsClient.delete')
+
+    org_id = 'abcd-1234'
+    user_id = 'efgh-5678'
+
+    organisations_client.remove_user_from_organisation(
+        org_id=org_id,
+        user_id=user_id,
+    )
+
+    assert mock_redis_delete.call_args_list == [call(f'user-{user_id}')]
+    mock_delete.assert_called_with(f'/organisations/{org_id}/users/{user_id}')

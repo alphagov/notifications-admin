@@ -3,7 +3,7 @@ from itertools import chain
 from notifications_python_client.errors import HTTPError
 
 from app.extensions import redis_client
-from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
+from app.notify_client import NotifyAdminAPIClient, cache
 
 
 class OrganisationsClient(NotifyAdminAPIClient):
@@ -76,10 +76,9 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def get_organisation_services(self, org_id):
         return self.get(url="/organisations/{}/services".format(org_id))
 
+    @cache.delete('user-{user_id}')
     def remove_user_from_organisation(self, org_id, user_id):
-        endpoint = '/organisations/{}/users/{}'.format(org_id, user_id)
-        data = _attach_current_user({})
-        return self.delete(endpoint, data)
+        return self.delete(f'/organisations/{org_id}/users/{user_id}')
 
     def get_services_and_usage(self, org_id, year):
         return self.get(
