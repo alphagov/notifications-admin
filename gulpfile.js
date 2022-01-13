@@ -8,6 +8,7 @@
 const { src, pipe, dest, series, parallel, watch } = require('gulp');
 const rollupPluginCommonjs = require('rollup-plugin-commonjs');
 const rollupPluginNodeResolve = require('rollup-plugin-node-resolve');
+const rollupPluginBabel = require('@rollup/plugin-babel');
 const streamqueue = require('streamqueue');
 const stylish = require('jshint-stylish');
 
@@ -133,6 +134,9 @@ const javascripts = () => {
           // this adds node_modules to the require path so it can find the GOVUK Frontend modules
           rollupPluginCommonjs({
             include: 'node_modules/**'
+          }),
+          rollupPluginBabel.babel({
+            babelHelpers: 'bundled'
           })
         ]
       },
@@ -146,7 +150,7 @@ const javascripts = () => {
       paths.npm + 'hogan.js/dist/hogan-3.0.2.js',
       paths.npm + 'jquery/dist/jquery.min.js',
       paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
-      paths.npm + 'domdiff/min.js',
+      paths.npm + 'diff-dom/dist/index.js',
       paths.npm + 'timeago/jquery.timeago.js',
       paths.npm + 'textarea-caret/index.js',
       paths.npm + 'cbor-js/cbor.js'

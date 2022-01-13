@@ -31,13 +31,9 @@ beforeAll(() => {
 
   $.ajax.mockImplementation(() => jqueryAJAXReturnObj);
 
-  // using require to execute the version we use in our our frontend build here can't add
-  // the domdiff variable to this scope like it does when executed in browsers because
-  // that version doesn't export it
-  // we use CommonJS version instead because it does (as the default property)
-  // see https://nodejs.org/en/knowledge/getting-started/what-is-require/ for more info
-  // also, we're not a browser so we need to manually attach domdiff to window
-  window.domdiff = require('domdiff/cjs').default;
+  window.GOVUK.vendor = {
+    DiffDOM: require('diff-dom').DiffDOM
+  };
   require('../../app/assets/javascripts/updateContent.js');
 
 });
