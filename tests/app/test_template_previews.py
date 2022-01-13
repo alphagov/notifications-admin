@@ -52,7 +52,7 @@ def test_from_utils_template_calls_through(
 ])
 def test_from_database_object_makes_request(
     mocker,
-    client,
+    client_request,
     partial_call,
     expected_url,
     letter_branding,

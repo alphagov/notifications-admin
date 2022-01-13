@@ -3,7 +3,11 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Sign in
+  {% if again %}
+    You need to sign in again
+  {% else %}
+    Sign in
+  {% endif %}
 {% endblock %}
 
 {% block maincolumn_content %}

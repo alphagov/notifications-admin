@@ -1083,7 +1083,7 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
 
 
 def test_should_show_page_template_with_priority_select_if_platform_admin(
-    platform_admin_client,
+    client_request,
     platform_admin_user,
     mocker,
     mock_get_service_template,
@@ -1092,16 +1092,16 @@ def test_should_show_page_template_with_priority_select_if_platform_admin(
 ):
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[platform_admin_user])
     template_id = fake_uuid
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    page = client_request.get(
         '.edit_service_template',
         service_id=service_one['id'],
         template_id=template_id,
-    ))
+    )
 
-    assert response.status_code == 200
-    assert "Two week reminder" in response.get_data(as_text=True)
-    assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in response.get_data(as_text=True)
-    assert "Use priority queue?" in response.get_data(as_text=True)
+    assert page.select_one('input[name=name]')['value'] == "Two week reminder"
+    assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in str(page.select_one('textarea'))
+    assert "Use priority queue?" in page.text
     mock_get_service_template.assert_called_with(service_one['id'], template_id, None)
 
 
@@ -1114,7 +1114,7 @@ def test_should_show_preview_letter_templates(
     view,
     extra_view_args,
     filetype,
-    logged_in_client,
+    client_request,
     mock_get_service_email_template,
     service_one,
     fake_uuid,
@@ -1127,15 +1127,14 @@ def test_should_show_preview_letter_templates(
 
     service_id, template_id = service_one['id'], fake_uuid
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get_response(
         view,
         service_id=service_id,
         template_id=template_id,
         filetype=filetype,
         **extra_view_args
-    ))
+    )
 
-    assert response.status_code == 200
     assert response.get_data(as_text=True) == 'foo'
     mock_get_service_email_template.assert_called_with(service_id, template_id, extra_view_args.get('version'))
     assert mocked_preview.call_args[0][0]['id'] == template_id
@@ -1144,20 +1143,18 @@ def test_should_show_preview_letter_templates(
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(
-    logged_in_client,
+    client_request,
     mock_get_service_template,
     service_one,
     fake_uuid
 ):
-    resp = logged_in_client.get(
-        url_for(
-            'no_cookie.view_letter_template_preview',
-            service_id=service_one['id'],
-            template_id=fake_uuid,
-            filetype='blah'
-        )
+    client_request.get_response(
+        'no_cookie.view_letter_template_preview',
+        service_id=service_one['id'],
+        template_id=fake_uuid,
+        filetype='blah',
+        _expected_status=404,
     )
-    assert resp.status_code == 404
     assert mock_get_service_template.called is False
 
 
@@ -1167,7 +1164,8 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 ])
 def test_letter_branding_preview_image(
     mocker,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     original_filename,
     new_filename,
 ):
@@ -1175,8 +1173,10 @@ def test_letter_branding_preview_image(
         'app.main.views.templates.TemplatePreview.from_example_template',
         return_value='foo'
     )
-    resp = platform_admin_client.get(
-        url_for('no_cookie.letter_branding_preview_image', filename=original_filename)
+    client_request.login(platform_admin_user)
+    resp = client_request.get_response(
+        'no_cookie.letter_branding_preview_image',
+        filename=original_filename,
     )
 
     mocked_preview.assert_called_with(
@@ -1793,7 +1793,7 @@ def test_should_not_allow_template_edits_without_correct_permission(
 
 
 def test_should_403_when_edit_template_with_process_type_of_priority_for_non_platform_admin(
-    client,
+    client_request,
     active_user_with_permissions,
     mocker,
     mock_get_service_template,
@@ -1802,7 +1802,7 @@ def test_should_403_when_edit_template_with_process_type_of_priority_for_non_pla
     service_one,
 ):
     service_one['users'] = [active_user_with_permissions]
-    client.login(active_user_with_permissions, mocker, service_one)
+    client_request.login(active_user_with_permissions)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
     template_id = fake_uuid
     data = {
@@ -1813,16 +1813,18 @@ def test_should_403_when_edit_template_with_process_type_of_priority_for_non_pla
         'service': service_one['id'],
         'process_type': 'priority'
     }
-    response = client.post(url_for(
+    client_request.post(
         '.edit_service_template',
         service_id=service_one['id'],
-        template_id=template_id), data=data)
-    assert response.status_code == 403
+        template_id=template_id,
+        _data=data,
+        _expected_status=403,
+    )
     assert mock_update_service_template.called is False
 
 
 def test_should_403_when_create_template_with_process_type_of_priority_for_non_platform_admin(
-    client,
+    client_request,
     active_user_with_permissions,
     mocker,
     mock_get_service_template,
@@ -1831,7 +1833,7 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
     service_one,
 ):
     service_one['users'] = [active_user_with_permissions]
-    client.login(active_user_with_permissions, mocker, service_one)
+    client_request.login(active_user_with_permissions, service_one)
     mocker.patch('app.user_api_client.get_users_for_service', return_value=[active_user_with_permissions])
     template_id = fake_uuid
     data = {
@@ -1842,11 +1844,13 @@ def test_should_403_when_create_template_with_process_type_of_priority_for_non_p
         'service': service_one['id'],
         'process_type': 'priority'
     }
-    response = client.post(url_for(
+    client_request.post(
         '.add_service_template',
         service_id=service_one['id'],
-        template_type='sms'), data=data)
-    assert response.status_code == 403
+        template_type='sms',
+        _data=data,
+        _expected_status=403,
+    )
     assert mock_update_service_template.called is False
 
 
@@ -2228,7 +2232,7 @@ def test_route_permissions(
     route,
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     service_one,
     mock_get_service_template,
@@ -2255,7 +2259,7 @@ def test_route_permissions(
 def test_route_permissions_for_choose_template(
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     mock_get_template_folders,
     service_one,
@@ -2286,7 +2290,7 @@ def test_route_invalid_permissions(
     route,
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     service_one,
     mock_get_service_template,
@@ -2813,7 +2817,7 @@ def test_should_not_create_broadcast_template_with_placeholders(
     ),
 )
 def test_content_count_json_endpoint(
-    logged_in_client,
+    client_request,
     service_one,
     template_type,
     prefix_sms,
@@ -2822,17 +2826,15 @@ def test_content_count_json_endpoint(
     expected_class,
 ):
     service_one['prefix_sms'] = prefix_sms
-    response = logged_in_client.post(
-        url_for(
-            'main.count_content_length',
-            service_id=SERVICE_ONE_ID,
-            template_type=template_type,
-        ),
-        data={
+    response = client_request.post_response(
+        'main.count_content_length',
+        service_id=SERVICE_ONE_ID,
+        template_type=template_type,
+        _data={
             'template_content': content,
         },
+        _expected_status=200,
     )
-    assert response.status_code == 200
 
     html = json.loads(response.get_data(as_text=True))['html']
     snippet = BeautifulSoup(html, 'html.parser').select_one('span')

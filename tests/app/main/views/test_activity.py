@@ -89,7 +89,6 @@ from tests.conftest import (
 @freeze_time('2020-01-01 01:00')
 def test_can_show_notifications(
     client_request,
-    logged_in_client,
     service_one,
     mock_get_notifications,
     mock_get_service_statistics,
@@ -183,12 +182,12 @@ def test_can_show_notifications(
         to=expected_to_argument,
     )
 
-    json_response = logged_in_client.get(url_for(
+    json_response = client_request.get_response(
         'main.get_notifications_as_json',
         service_id=service_one['id'],
         status=status_argument,
         **extra_args
-    ))
+    )
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {'counts', 'notifications', 'service_data_retention_days'}
 
@@ -578,7 +577,7 @@ STATISTICS = {
 }
 
 
-def test_get_status_filters_calculates_stats(client):
+def test_get_status_filters_calculates_stats(client_request):
     ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     assert {label: count for label, _option, _link, count in ret} == {
@@ -589,7 +588,7 @@ def test_get_status_filters_calculates_stats(client):
     }
 
 
-def test_get_status_filters_in_right_order(client):
+def test_get_status_filters_in_right_order(client_request):
     ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     assert [label for label, _option, _link, _count in ret] == [
@@ -597,7 +596,7 @@ def test_get_status_filters_in_right_order(client):
     ]
 
 
-def test_get_status_filters_constructs_links(client):
+def test_get_status_filters_constructs_links(client_request):
     ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     link = ret[0][2]

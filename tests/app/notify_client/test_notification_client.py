@@ -76,7 +76,7 @@ def test_client_gets_notifications_for_service_and_job_by_page_posts_for_to(mock
     mock_post.assert_called_once_with(**expected_call)
 
 
-def test_send_notification(mocker, logged_in_client, active_user_with_permissions):
+def test_send_notification(mocker, client_request, active_user_with_permissions):
     mock_post = mocker.patch('app.notify_client.notification_api_client.NotificationApiClient.post')
     NotificationApiClient().send_notification(
         'foo',
@@ -96,7 +96,7 @@ def test_send_notification(mocker, logged_in_client, active_user_with_permission
     )
 
 
-def test_send_precompiled_letter(mocker, logged_in_client, active_user_with_permissions):
+def test_send_precompiled_letter(mocker, client_request, active_user_with_permissions):
     mock_post = mocker.patch('app.notify_client.notification_api_client.NotificationApiClient.post')
     NotificationApiClient().send_precompiled_letter(
         'abcd-1234',

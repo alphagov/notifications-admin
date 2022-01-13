@@ -25,7 +25,7 @@ def event_dict(**extra):
     }
 
 
-def test_on_user_logged_in_calls_events_api(client, api_user_active, mock_events):
+def test_on_user_logged_in_calls_events_api(client_request, api_user_active, mock_events):
     on_user_logged_in('_notify_admin', User(api_user_active))
 
     mock_events.assert_called_with('sucessful_login', event_dict(
@@ -33,7 +33,7 @@ def test_on_user_logged_in_calls_events_api(client, api_user_active, mock_events
     ))
 
 
-def test_create_email_change_event_calls_events_api(client, mock_events):
+def test_create_email_change_event_calls_events_api(client_request, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "updated_by_id": str(uuid.uuid4()),
@@ -45,7 +45,7 @@ def test_create_email_change_event_calls_events_api(client, mock_events):
     mock_events.assert_called_with('update_user_email', event_dict(**kwargs))
 
 
-def test_create_add_user_to_service_event_calls_events_api(client, mock_events):
+def test_create_add_user_to_service_event_calls_events_api(client_request, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "invited_by_id": str(uuid.uuid4()),
@@ -57,7 +57,7 @@ def test_create_add_user_to_service_event_calls_events_api(client, mock_events):
     mock_events.assert_called_with('add_user_to_service', event_dict(**kwargs))
 
 
-def test_create_remove_user_from_service_event_calls_events_api(client, mock_events):
+def test_create_remove_user_from_service_event_calls_events_api(client_request, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "removed_by_id": str(uuid.uuid4()),
@@ -68,7 +68,7 @@ def test_create_remove_user_from_service_event_calls_events_api(client, mock_eve
     mock_events.assert_called_with('remove_user_from_service', event_dict(**kwargs))
 
 
-def test_create_mobile_number_change_event_calls_events_api(client, mock_events):
+def test_create_mobile_number_change_event_calls_events_api(client_request, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "updated_by_id": str(uuid.uuid4()),
@@ -80,7 +80,7 @@ def test_create_mobile_number_change_event_calls_events_api(client, mock_events)
     mock_events.assert_called_with('update_user_mobile_number', event_dict(**kwargs))
 
 
-def test_create_archive_user_event_calls_events_api(client, mock_events):
+def test_create_archive_user_event_calls_events_api(client_request, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "archived_by_id": str(uuid.uuid4())
@@ -90,7 +90,7 @@ def test_create_archive_user_event_calls_events_api(client, mock_events):
     mock_events.assert_called_with('archive_user', event_dict(**kwargs))
 
 
-def test_create_broadcast_account_type_change_event(client, mock_events):
+def test_create_broadcast_account_type_change_event(client_request, mock_events):
     kwargs = {
         "service_id": str(uuid.uuid4()),
         "changed_by_id": str(uuid.uuid4()),
@@ -103,7 +103,7 @@ def test_create_broadcast_account_type_change_event(client, mock_events):
     mock_events.assert_called_with('change_broadcast_account_type', event_dict(**kwargs))
 
 
-def test_suspend_service(client, mock_events):
+def test_suspend_service(client_request, mock_events):
     kwargs = {
         "service_id": str(uuid.uuid4()),
         "suspended_by_id": str(uuid.uuid4())
@@ -113,7 +113,7 @@ def test_suspend_service(client, mock_events):
     mock_events.assert_called_with('suspend_service', event_dict(**kwargs))
 
 
-def test_archive_service(client, mock_events):
+def test_archive_service(client_request, mock_events):
     kwargs = {
         "service_id": str(uuid.uuid4()),
         "archived_by_id": str(uuid.uuid4())
@@ -123,7 +123,7 @@ def test_archive_service(client, mock_events):
     mock_events.assert_called_with('archive_service', event_dict(**kwargs))
 
 
-def test_resume_service(client, mock_events):
+def test_resume_service(client_request, mock_events):
     kwargs = {
         "service_id": str(uuid.uuid4()),
         "resumed_by_id": str(uuid.uuid4())
@@ -133,7 +133,7 @@ def test_resume_service(client, mock_events):
     mock_events.assert_called_with('resume_service', event_dict(**kwargs))
 
 
-def test_set_user_permissions(client, mock_events):
+def test_set_user_permissions(client_request, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "service_id": str(uuid.uuid4()),

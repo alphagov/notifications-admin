@@ -16,7 +16,7 @@ from app.main.validators import (
     'govuknotify', '11111111', 'kittykat', 'blackbox'
 ])
 def test_should_raise_validation_error_for_password(
-    client,
+    client_request,
     mock_get_user_by_email,
     password,
 ):
@@ -31,7 +31,7 @@ def test_should_raise_validation_error_for_password(
 
 
 def test_valid_email_not_in_valid_domains(
-    client,
+    client_request,
     mock_get_organisations,
 ):
     form = RegisterUserForm(email_address="test@test.com", mobile_number='441231231231')
@@ -40,7 +40,7 @@ def test_valid_email_not_in_valid_domains(
 
 
 def test_valid_email_in_valid_domains(
-    client
+    client_request,
 ):
     form = RegisterUserForm(
         name="test",
@@ -52,7 +52,7 @@ def test_valid_email_in_valid_domains(
 
 
 def test_invalid_email_address_error_message(
-    client,
+    client_request,
     mock_get_organisations,
 ):
     form = RegisterUserForm(
@@ -93,7 +93,7 @@ def _gen_mock_field(x):
     'test@example.sch.uk',
 ])
 def test_valid_list_of_white_list_email_domains(
-    client,
+    client_request,
     email,
 ):
     email_domain_validators = ValidGovEmail()
@@ -128,7 +128,7 @@ def test_valid_list_of_white_list_email_domains(
     'test@123bl.uk',
 ])
 def test_invalid_list_of_white_list_email_domains(
-    client,
+    client_request,
     email,
     mock_get_organisations,
 ):
@@ -138,7 +138,7 @@ def test_invalid_list_of_white_list_email_domains(
 
 
 def test_for_commas_in_placeholders(
-    client
+    client_request,
 ):
     with pytest.raises(ValidationError) as error:
         NoCommasInPlaceHolders()(None, _gen_mock_field('Hello ((name,date))'))
@@ -147,7 +147,7 @@ def test_for_commas_in_placeholders(
 
 
 @pytest.mark.parametrize('msg', ['The quick brown fox', 'Thé “quick” bröwn fox\u200B'])
-def test_sms_character_validation(client, msg):
+def test_sms_character_validation(client_request, msg):
     OnlySMSCharacters(template_type='sms')(None, _gen_mock_field(msg))
 
 
@@ -167,7 +167,7 @@ def test_sms_character_validation(client, msg):
         )
     ),
 ])
-def test_non_sms_character_validation(data, err_msg, client):
+def test_non_sms_character_validation(data, err_msg, client_request):
     with pytest.raises(ValidationError) as error:
         OnlySMSCharacters(template_type='sms')(None, _gen_mock_field(data))
 
@@ -203,7 +203,7 @@ def test_if_string_contains_alphanumeric_characters_does_not_raise(string):
     ]
 )
 def test_sms_sender_form_validation(
-    client,
+    client_request,
     mock_get_user_by_email,
     sms_sender,
     error_expected,

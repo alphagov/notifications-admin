@@ -1,10 +1,8 @@
 import copy
-import re
 from datetime import datetime
 from unittest.mock import call
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
@@ -146,15 +144,14 @@ stub_provider_history = {
 
 
 def test_should_show_all_providers(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
 ):
     mocker.patch('app.provider_client.get_all_providers', return_value=copy.deepcopy(stub_providers))
 
-    client.login(platform_admin_user, mocker)
-    response = client.get(url_for('main.view_providers'))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.view_providers')
 
     h1 = [header.text.strip() for header in page.find_all('h1')]
 
@@ -259,17 +256,15 @@ def test_add_monthly_traffic():
 
 
 def test_should_show_edit_provider_form(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
     fake_uuid,
 ):
     mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
-    client.login(platform_admin_user, mocker)
-    response = client.get(url_for('main.edit_provider', provider_id=fake_uuid))
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.edit_provider', provider_id=fake_uuid)
 
     h1 = [header.text.strip() for header in page.find_all('h1')]
 
@@ -283,110 +278,121 @@ def test_should_show_edit_provider_form(
 
 
 def test_should_show_error_on_bad_provider_priority(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
 ):
     mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
-    client.login(platform_admin_user, mocker)
-    response = client.post(
-        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
-        data={'priority': "not valid"})
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.edit_provider',
+        provider_id=stub_provider['provider_details']['id'],
+        _data={'priority': "not valid"},
+        _expected_status=200,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert response.status_code == 200
-    assert "Not a valid integer value" in str(page.find_all("span", {"class": re.compile(r"error-message")})[0])
+    assert normalize_spaces(
+        page.select_one('.govuk-error-message').text
+    ) == "Error: Not a valid integer value."
 
 
 def test_should_show_error_on_negative_provider_priority(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
 ):
     mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
-    client.login(platform_admin_user, mocker)
-    response = client.post(
-        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
-        data={'priority': -1})
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.edit_provider',
+        provider_id=stub_provider['provider_details']['id'],
+        _data={'priority': -1},
+        _expected_status=200,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert response.status_code == 200
-    assert "Must be between 1 and 100" in str(page.find_all("span", {"class": re.compile(r"error-message")})[0])
+    assert normalize_spaces(
+        page.select_one('.govuk-error-message').text
+    ) == "Error: Must be between 1 and 100"
 
 
 def test_should_show_error_on_too_big_provider_priority(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
 ):
     mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
-    client.login(platform_admin_user, mocker)
-    response = client.post(
-        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
-        data={'priority': 101})
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.edit_provider',
+        provider_id=stub_provider['provider_details']['id'],
+        _data={'priority': 101},
+        _expected_status=200,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert response.status_code == 200
-    assert "Must be between 1 and 100" in str(page.find_all("span", {"class": re.compile(r"error-message")})[0])
+    assert normalize_spaces(
+        page.select_one('.govuk-error-message').text
+    ) == "Error: Must be between 1 and 100"
 
 
 def test_should_show_error_on_too_little_provider_priority(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
 ):
     mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
 
-    client.login(platform_admin_user, mocker)
-    response = client.post(
-        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
-        data={'priority': 0})
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.edit_provider',
+        provider_id=stub_provider['provider_details']['id'],
+        _data={'priority': 0},
+        _expected_status=200,
+    )
 
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-    assert response.status_code == 200
-    assert "Must be between 1 and 100" in str(page.find_all("span", {"class": re.compile(r"error-message")})[0])
+    assert normalize_spaces(
+        page.select_one('.govuk-error-message').text
+    ) == "Error: Must be between 1 and 100"
 
 
 def test_should_update_provider_priority(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
 ):
     mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
     mocker.patch('app.provider_client.update_provider', return_value=copy.deepcopy(stub_provider))
 
-    client.login(platform_admin_user, mocker)
-    response = client.post(
-        url_for('main.edit_provider', provider_id=stub_provider['provider_details']['id']),
-        data={'priority': 2})
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.edit_provider',
+        provider_id=stub_provider['provider_details']['id'],
+        _data={'priority': 2},
+        _expected_redirect='http://localhost/providers',
+    )
 
     app.provider_client.update_provider.assert_called_with(stub_provider['provider_details']['id'], 2)
-    assert response.status_code == 302
-    assert response.location == 'http://localhost/providers'
 
 
 def test_should_show_provider_version_history(
-    client,
+    client_request,
     platform_admin_user,
     mocker
 ):
     mocker.patch('app.provider_client.get_provider_versions', return_value=copy.deepcopy(stub_provider_history))
 
-    client.login(platform_admin_user, mocker)
-    response = client.get(
-        url_for('main.view_provider', provider_id=stub_provider_history['data'][0]['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.view_provider', provider_id=stub_provider_history['data'][0]['id']
+    )
 
     table = page.find('table')
     table_rows = table.find_all('tr')
     table_headings = table_rows[0].find_all('th')
     first_row = table_rows[1].find_all('td')
     second_row = table_rows[2].find_all('td')
-
-    assert response.status_code == 200
 
     assert page.find_all('h1')[0].text.strip() == stub_provider_history['data'][0]["display_name"]
     assert len(table_rows) == 3

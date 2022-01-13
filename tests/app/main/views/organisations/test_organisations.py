@@ -1,5 +1,4 @@
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
@@ -17,7 +16,8 @@ from tests.conftest import (
 
 
 def test_organisation_page_shows_all_organisations(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker
 ):
     orgs = [
@@ -29,12 +29,8 @@ def test_organisation_page_shows_all_organisations(
     get_organisations = mocker.patch(
         'app.models.organisation.AllOrganisations.client_method', return_value=orgs
     )
-    response = platform_admin_client.get(
-        url_for('.organisations')
-    )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get('.organisations')
 
     assert normalize_spaces(
         page.select_one('h1').text
@@ -1204,21 +1200,22 @@ def test_update_organisation_domains_when_domain_already_exists(
 
 
 def test_update_organisation_name(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     organisation_one,
     mock_get_organisation,
     mock_organisation_name_is_unique
 ):
-    response = platform_admin_client.post(
-        url_for('.edit_organisation_name', org_id=organisation_one['id']),
-        data={'name': 'TestNewOrgName'}
-    )
-
-    assert response.status_code == 302
-    assert response.location == url_for(
-        '.confirm_edit_organisation_name',
+    client_request.login(platform_admin_user)
+    client_request.post(
+        '.edit_organisation_name',
         org_id=organisation_one['id'],
-        _external=True
+        _data={'name': 'TestNewOrgName'},
+        _expected_redirect=url_for(
+            '.confirm_edit_organisation_name',
+            org_id=organisation_one['id'],
+            _external=True,
+        ),
     )
     assert mock_organisation_name_is_unique.called
 
@@ -1229,63 +1226,64 @@ def test_update_organisation_name(
     ('a' * 256, 'Organisation name must be 255 characters or fewer'),
 ])
 def test_update_organisation_with_incorrect_input(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     organisation_one,
     mock_get_organisation,
     name,
     error_message
 ):
-    response = platform_admin_client.post(
-        url_for('.edit_organisation_name', org_id=organisation_one['id']),
-        data={'name': name}
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.edit_organisation_name',
+        org_id=organisation_one['id'],
+        _data={'name': name},
+        _expected_status=200,
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
     assert error_message in page.select_one('.govuk-error-message').text
 
 
 def test_update_organisation_with_non_unique_name(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     organisation_one,
     mock_get_organisation,
     mock_organisation_name_is_not_unique
 ):
-    response = platform_admin_client.post(
-        url_for('.edit_organisation_name', org_id=organisation_one['id']),
-        data={'name': 'TestNewOrgName'}
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.edit_organisation_name',
+        org_id=organisation_one['id'],
+        _data={'name': 'TestNewOrgName'},
+        _expected_status=200,
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
     assert 'This organisation name is already in use' in page.select_one('.govuk-error-message').text
-
     assert mock_organisation_name_is_not_unique.called
 
 
 def test_confirm_update_organisation(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     organisation_one,
     mock_get_organisation,
     mock_verify_password,
     mock_update_organisation,
     mocker
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['organisation_name_change'] = 'newName'
 
-    response = platform_admin_client.post(
-        url_for(
-            '.confirm_edit_organisation_name',
+    client_request.login(platform_admin_user)
+    client_request.post(
+        '.confirm_edit_organisation_name',
+        org_id=organisation_one['id'],
+        _data={'password': 'validPassword'},
+        _expected_redirect=url_for(
+            '.organisation_settings',
             org_id=organisation_one['id'],
-            data={'password', 'validPassword'}
-        )
+            _external=True,
+        ),
     )
-
-    assert response.status_code == 302
-    assert response.location == url_for('.organisation_settings', org_id=organisation_one['id'], _external=True)
 
     mock_update_organisation.assert_called_with(
         organisation_one['id'],
@@ -1294,25 +1292,23 @@ def test_confirm_update_organisation(
 
 
 def test_confirm_update_organisation_with_incorrect_password(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     organisation_one,
     mock_get_organisation,
     mocker
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['organisation_name_change'] = 'newName'
 
     mocker.patch('app.user_api_client.verify_password', return_value=False)
 
-    response = platform_admin_client.post(
-        url_for(
-            '.confirm_edit_organisation_name',
-            org_id=organisation_one['id']
-        )
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.confirm_edit_organisation_name',
+        org_id=organisation_one['id'],
+        _expected_status=200,
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(
         page.select_one('.govuk-error-message').text
@@ -1320,13 +1316,14 @@ def test_confirm_update_organisation_with_incorrect_password(
 
 
 def test_confirm_update_organisation_with_name_already_in_use(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     organisation_one,
     mock_get_organisation,
     mock_verify_password,
     mocker
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['organisation_name_change'] = 'newName'
 
     mocker.patch(
@@ -1340,32 +1337,29 @@ def test_confirm_update_organisation_with_name_already_in_use(
         )
     )
 
-    response = platform_admin_client.post(
-        url_for(
-            '.confirm_edit_organisation_name',
-            org_id=organisation_one['id']
-        )
+    client_request.login(platform_admin_user)
+    client_request.post(
+        '.confirm_edit_organisation_name',
+        org_id=organisation_one['id'],
+        _expected_redirect=url_for(
+            'main.edit_organisation_name',
+            org_id=organisation_one['id'],
+            _external=True,
+        ),
     )
-
-    assert response.status_code == 302
-    assert response.location == url_for('main.edit_organisation_name', org_id=organisation_one['id'], _external=True)
 
 
 def test_get_edit_organisation_go_live_notes_page(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_organisation,
     organisation_one,
 ):
-    response = platform_admin_client.get(
-        url_for(
-            '.edit_organisation_go_live_notes',
-            org_id=organisation_one['id']
-        )
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.edit_organisation_go_live_notes',
+        org_id=organisation_one['id'],
     )
-
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
-
     assert page.find('textarea', id='request_to_go_live_notes')
 
 
@@ -1374,30 +1368,28 @@ def test_get_edit_organisation_go_live_notes_page(
     ('  ', None)
 ])
 def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mock_get_organisation,
     mock_update_organisation,
     organisation_one,
     input_note,
     saved_note,
 ):
-    response = platform_admin_client.post(
-        url_for(
-            '.edit_organisation_go_live_notes',
+    client_request.login(platform_admin_user)
+    client_request.post(
+        '.edit_organisation_go_live_notes',
+        org_id=organisation_one['id'],
+        _data={'request_to_go_live_notes': input_note},
+        _expected_redirect=url_for(
+            '.organisation_settings',
             org_id=organisation_one['id'],
+            _external=True,
         ),
-        data={'request_to_go_live_notes': input_note}
     )
-
     mock_update_organisation.assert_called_once_with(
         organisation_one['id'],
         request_to_go_live_notes=saved_note
-    )
-    assert response.status_code == 302
-    assert response.location == url_for(
-        '.organisation_settings',
-        org_id=organisation_one['id'],
-        _external=True
     )
 
 
@@ -1405,46 +1397,52 @@ def test_organisation_settings_links_to_edit_organisation_notes_page(
     mocker,
     mock_get_organisation,
     organisation_one,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
 ):
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    page = client_request.get(
         '.organisation_settings', org_id=organisation_one['id']
-    ))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
     assert len(page.find_all(
         'a', attrs={'href': '/organisations/{}/settings/notes'.format(organisation_one['id'])}
     )) == 1
 
 
 def test_view_edit_organisation_notes(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         organisation_one,
         mock_get_organisation,
 ):
-    response = platform_admin_client.get(url_for('main.edit_organisation_notes', org_id=organisation_one['id']))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.edit_organisation_notes',
+        org_id=organisation_one['id'],
+    )
     assert page.select_one('h1').text == "Edit organisation notes"
     assert page.find('label', class_="form-label").text.strip() == "Notes"
     assert page.find('textarea').attrs["name"] == "notes"
 
 
 def test_update_organisation_notes(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         organisation_one,
         mock_get_organisation,
         mock_update_organisation,
 ):
-    response = platform_admin_client.post(
-        url_for(
-            'main.edit_organisation_notes',
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.edit_organisation_notes',
+        org_id=organisation_one['id'],
+        _data={'notes': "Very fluffy"},
+        _expected_redirect=url_for(
+            'main.organisation_settings',
             org_id=organisation_one['id'],
+            _external=True,
         ),
-        data={'notes': "Very fluffy"}
     )
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.organisation_settings', org_id=organisation_one['id'], _external=True)
-    assert settings_url == response.location
     mock_update_organisation.assert_called_with(
         organisation_one['id'],
         cached_service_ids=None,
@@ -1467,7 +1465,8 @@ def test_update_organisation_notes_errors_when_user_not_platform_admin(
 
 
 def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         organisation_one,
         mock_update_organisation,
         mocker
@@ -1477,17 +1476,17 @@ def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
         name="Test Org",
         notes="Very fluffy"
     ))
-    response = platform_admin_client.post(
-        url_for(
-            'main.edit_organisation_notes',
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.edit_organisation_notes',
+        org_id=organisation_one['id'],
+        _data={'notes': "Very fluffy"},
+        _expected_redirect=url_for(
+            'main.organisation_settings',
             org_id=organisation_one['id'],
+            _external=True,
         ),
-        data={'notes': "Very fluffy"}
     )
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.organisation_settings', org_id=organisation_one['id'], _external=True)
-    assert response.location == settings_url
     assert not mock_update_organisation.called
 
 
@@ -1495,26 +1494,29 @@ def test_organisation_settings_links_to_edit_organisation_billing_details_page(
     mocker,
     mock_get_organisation,
     organisation_one,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
 ):
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    page = client_request.get(
         '.organisation_settings', org_id=organisation_one['id']
-    ))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    )
     assert len(page.find_all(
         'a', attrs={'href': '/organisations/{}/settings/edit-billing-details'.format(organisation_one['id'])}
     )) == 1
 
 
 def test_view_edit_organisation_billing_details(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         organisation_one,
         mock_get_organisation,
 ):
-    response = platform_admin_client.get(
-        url_for('main.edit_organisation_billing_details', org_id=organisation_one['id'])
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.edit_organisation_billing_details',
+        org_id=organisation_one['id'],
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert page.select_one('h1').text == "Edit organisation billing details"
     labels = page.find_all('label', class_="form-label")
     labels_list = [
@@ -1541,28 +1543,29 @@ def test_view_edit_organisation_billing_details(
 
 
 def test_update_organisation_billing_details(
-        platform_admin_client,
+        client_request,
+        platform_admin_user,
         organisation_one,
         mock_get_organisation,
         mock_update_organisation,
 ):
-    response = platform_admin_client.post(
-        url_for(
-            'main.edit_organisation_billing_details',
-            org_id=organisation_one['id'],
-        ),
-        data={
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.edit_organisation_billing_details',
+        org_id=organisation_one['id'],
+        _data={
             'billing_contact_email_addresses': 'accounts@fluff.gov.uk',
             'billing_contact_names': 'Flannellette von Fluff',
             'billing_reference': '',
             'purchase_order_number': 'PO1234',
             'notes': 'very fluffy, give extra allowance'
-        }
+        },
+        _expected_redirect=url_for(
+            'main.organisation_settings',
+            org_id=organisation_one['id'],
+            _external=True,
+        )
     )
-    assert response.status_code == 302
-    settings_url = url_for(
-        'main.organisation_settings', org_id=organisation_one['id'], _external=True)
-    assert settings_url == response.location
     mock_update_organisation.assert_called_with(
         organisation_one['id'],
         cached_service_ids=None,
@@ -1606,7 +1609,7 @@ def test_organisation_billing_page_not_accessible_if_not_platform_admin(
 ])
 def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_person(
     organisation_one,
-    platform_admin_client,
+    client_request,
     api_user_active,
     mocker,
     platform_admin_user,
@@ -1623,12 +1626,15 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_perso
     organisation_one['agreement_signed_at'] = 'Thu, 20 Feb 2020 00:00:00 GMT'
 
     mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+
+    client_request.login(platform_admin_user)
+
     mocker.patch('app.user_api_client.get_user', side_effect=[platform_admin_user, api_user_active])
 
-    response = platform_admin_client.get(
-        url_for('.organisation_billing', org_id=ORGANISATION_ID)
+    page = client_request.get(
+        '.organisation_billing',
+        org_id=ORGANISATION_ID,
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.h1.string == 'Billing'
     assert '2.5 of the GOV.UK Notify data sharing and financial agreement on 20 February 2020' in normalize_spaces(
@@ -1639,16 +1645,18 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_perso
 
 def test_organisation_billing_page_when_the_agreement_is_signed_by_an_unknown_person(
     organisation_one,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
 ):
     organisation_one['agreement_signed'] = True
     mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
 
-    response = platform_admin_client.get(
-        url_for('.organisation_billing', org_id=ORGANISATION_ID)
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.organisation_billing',
+        org_id=ORGANISATION_ID,
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.h1.string == 'Billing'
     assert (f'{organisation_one["name"]} has accepted the GOV.UK Notify data '
@@ -1662,7 +1670,8 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_an_unknown_pe
 ])
 def test_organisation_billing_page_when_the_agreement_is_not_signed(
     organisation_one,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
     agreement_signed,
     expected_content,
@@ -1670,10 +1679,11 @@ def test_organisation_billing_page_when_the_agreement_is_not_signed(
     organisation_one['agreement_signed'] = agreement_signed
     mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
 
-    response = platform_admin_client.get(
-        url_for('.organisation_billing', org_id=ORGANISATION_ID)
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.organisation_billing',
+        org_id=ORGANISATION_ID,
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert page.h1.string == 'Billing'
     assert f'{organisation_one["name"]} {expected_content}' in page.text
@@ -1694,7 +1704,8 @@ def test_organisation_billing_page_when_the_agreement_is_not_signed(
     ),
 ))
 def test_download_organisation_agreement(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
     crown,
     expected_status,
@@ -1712,11 +1723,12 @@ def test_download_organisation_agreement(
         return_value=MockS3Object(b'foo')
     )
 
-    response = platform_admin_client.get(url_for(
+    client_request.login(platform_admin_user)
+    response = client_request.get_response(
         'main.organisation_download_agreement',
         org_id=ORGANISATION_ID,
-    ))
-    assert response.status_code == expected_status
+        _expected_status=expected_status,
+    )
 
     if expected_file_served:
         assert response.get_data() == b'foo'

@@ -32,7 +32,7 @@ from app.formatters import (
     ('received', 'letter', lambda: None),
 ))
 def test_format_notification_status_as_url(
-    client,
+    client_request,
     status,
     notification_type,
     expected,

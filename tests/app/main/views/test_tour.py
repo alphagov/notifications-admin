@@ -103,7 +103,7 @@ def test_should_404_if_no_mobile_number_for_tour_start(
 def test_should_403_if_user_does_not_have_send_permissions_for_tour_start(
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     mock_get_service_template_with_multiple_placeholders,
     service_one,
@@ -258,7 +258,7 @@ def test_should_404_for_get_tour_step_0(
 def test_should_403_if_user_does_not_have_send_permissions_for_tour_step(
     mocker,
     notify_admin,
-    client,
+    client_request,
     api_user_active,
     mock_get_service_template_with_multiple_placeholders,
     service_one,
@@ -669,7 +669,7 @@ def test_shows_link_to_end_tour(
 
 
 def test_go_to_dashboard_after_tour_link(
-    logged_in_client,
+    client_request,
     mocker,
     api_user_active,
     mock_login,
@@ -678,11 +678,15 @@ def test_go_to_dashboard_after_tour_link(
     mock_delete_service_template,
     fake_uuid
 ):
-
-    resp = logged_in_client.get(
-        url_for('main.go_to_dashboard_after_tour', service_id=fake_uuid, example_template_id=fake_uuid)
+    client_request.get(
+        'main.go_to_dashboard_after_tour',
+        service_id=fake_uuid,
+        example_template_id=fake_uuid,
+        _expected_redirect=url_for(
+            "main.service_dashboard",
+            service_id=fake_uuid,
+            _external=True,
+        )
     )
 
-    assert resp.status_code == 302
-    assert resp.location == url_for("main.service_dashboard", service_id=fake_uuid, _external=True)
     mock_delete_service_template.assert_called_once_with(fake_uuid, fake_uuid)

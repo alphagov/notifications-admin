@@ -555,17 +555,15 @@ def test_broadcast_dashboard_has_new_alert_button_if_user_has_permission_to_crea
 
 @freeze_time('2020-02-20 02:20')
 def test_broadcast_dashboard_json(
-    logged_in_client,
+    client_request,
     service_one,
     mock_get_broadcast_messages,
 ):
     service_one['permissions'] += ['broadcast']
-    response = logged_in_client.get(url_for(
+    response = client_request.get_response(
         '.broadcast_dashboard_updates',
         service_id=SERVICE_ONE_ID,
-    ))
-
-    assert response.status_code == 200
+    )
 
     json_response = json.loads(response.get_data(as_text=True))
 

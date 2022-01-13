@@ -92,7 +92,8 @@ def test_service_set_permission_does_not_exist_for_broadcast_permission(
 ])
 def test_service_set_permission(
     mocker,
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     service_one,
     mock_get_inbound_number_for_service,
     mock_update_service_organisation,
@@ -103,12 +104,18 @@ def test_service_set_permission(
 ):
     service_one['permissions'] = initial_permissions
     mock_update_service = mocker.patch('app.service_api_client.update_service')
-    response = platform_admin_client.post(
-        url_for('main.service_set_permission', service_id=service_one['id'], permission=permission),
-        data={'enabled': form_data}
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.service_set_permission',
+        service_id=service_one['id'],
+        permission=permission,
+        _data={'enabled': form_data},
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=service_one['id'],
+            _external=True,
+        )
     )
-    assert response.status_code == 302
-    assert response.location == url_for('main.service_settings', service_id=service_one['id'], _external=True)
 
     assert mock_update_service.call_args[0][0] == service_one['id']
     new_permissions = mock_update_service.call_args[1]['permissions']

@@ -1140,13 +1140,6 @@ def active_user_approve_broadcasts_permission():
 
 
 @pytest.fixture(scope='function')
-def active_user_with_session(fake_uuid):
-    return create_service_one_admin(
-        id=fake_uuid,
-    )
-
-
-@pytest.fixture(scope='function')
 def active_user_with_permission_to_two_services(fake_uuid):
     permissions = [
         'send_texts',
@@ -2739,46 +2732,27 @@ def mock_send_notification(mocker, fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def client(notify_admin):
+def _client(notify_admin):
+    """
+    Do not use this fixture directly – use `client_request` instead
+    """
     with notify_admin.test_request_context(), notify_admin.test_client() as client:
         yield client
 
 
 @pytest.fixture(scope='function')
-def logged_in_client(
-    client,
+def _logged_in_client(
+    _client,
     active_user_with_permissions,
     mocker,
     service_one,
     mock_login
 ):
-    client.login(active_user_with_permissions, mocker, service_one)
-    yield client
-
-
-@pytest.fixture(scope='function')
-def logged_in_client_with_session(
-    client,
-    active_user_with_session,
-    mocker,
-    service_one,
-    mock_login
-):
-    client.login(active_user_with_session, mocker, service_one)
-    yield client
-
-
-@pytest.fixture(scope='function')
-def platform_admin_client(
-    client,
-    platform_admin_user,
-    mocker,
-    service_one,
-    mock_login,
-):
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
-    client.login(platform_admin_user, mocker, service_one)
-    yield client
+    """
+    Do not use this fixture directly – use `client_request` instead
+    """
+    _client.login(active_user_with_permissions, mocker, service_one)
+    yield _client
 
 
 @pytest.fixture
@@ -2795,22 +2769,22 @@ def os_environ():
 
 
 @pytest.fixture   # noqa (C901 too complex)
-def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too complex)
+def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too complex)
     class ClientRequest:
 
         @staticmethod
         @contextmanager
         def session_transaction():
-            with logged_in_client.session_transaction() as session:
+            with _logged_in_client.session_transaction() as session:
                 yield session
 
         @staticmethod
         def login(user, service=service_one):
-            logged_in_client.login(user, mocker, service)
+            _logged_in_client.login(user, mocker, service)
 
         @staticmethod
         def logout():
-            logged_in_client.logout(None)
+            _logged_in_client.logout(None)
 
         @staticmethod
         def get(
@@ -2842,7 +2816,7 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
             _test_for_elements_without_class=True,
             **endpoint_kwargs
         ):
-            resp = logged_in_client.get(
+            resp = _logged_in_client.get(
                 url,
                 follow_redirects=_follow_redirects,
             )
@@ -2854,6 +2828,7 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
 
             if _expected_redirect:
                 assert resp.location == _expected_redirect
+
             page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
             if _test_page_title:
                 count_of_h1s = len(page.select('h1'))
@@ -2890,18 +2865,42 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
             _expected_status=None,
             _follow_redirects=False,
             _expected_redirect=None,
+            _content_type=None,
             **endpoint_kwargs
+        ):
+            return ClientRequest.post_url(
+                url_for(endpoint, **(endpoint_kwargs or {})),
+                _data=_data,
+                _expected_status=_expected_status,
+                _follow_redirects=_follow_redirects,
+                _expected_redirect=_expected_redirect,
+                _content_type=_content_type,
+            )
+
+        @staticmethod
+        def post_url(
+            url,
+            _data=None,
+            _expected_status=None,
+            _follow_redirects=False,
+            _expected_redirect=None,
+            _content_type=None,
         ):
             if _expected_status is None:
                 _expected_status = 200 if _follow_redirects else 302
-            resp = logged_in_client.post(
-                url_for(endpoint, **(endpoint_kwargs or {})),
+            post_kwargs = {}
+            if _content_type:
+                post_kwargs.update(content_type=_content_type)
+            resp = _logged_in_client.post(
+                url,
                 data=_data,
                 follow_redirects=_follow_redirects,
+                **post_kwargs
             )
             assert resp.status_code == _expected_status
             if _expected_redirect:
                 assert_url_expected(resp.location, _expected_redirect)
+
             return BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
 
         @staticmethod
@@ -2911,8 +2910,50 @@ def client_request(logged_in_client, mocker, service_one):  # noqa (C901 too com
             _optional_args="",
             **endpoint_kwargs
         ):
-            resp = logged_in_client.get(
+            return ClientRequest.get_response_from_url(
                 url_for(endpoint, **(endpoint_kwargs or {})) + _optional_args,
+                _expected_status=_expected_status,
+            )
+
+        @staticmethod
+        def get_response_from_url(
+            url,
+            _expected_status=200,
+        ):
+            resp = _logged_in_client.get(url)
+            assert resp.status_code == _expected_status
+            return resp
+
+        @staticmethod
+        def post_response(
+            endpoint,
+            _data=None,
+            _expected_status=302,
+            _optional_args="",
+            _content_type=None,
+            **endpoint_kwargs
+        ):
+            return ClientRequest.post_response_from_url(
+                url_for(endpoint, **(endpoint_kwargs or {})) + _optional_args,
+                _data=_data,
+                _content_type=_content_type,
+                _expected_status=_expected_status,
+            )
+
+        @staticmethod
+        def post_response_from_url(
+            url,
+            _data=None,
+            _expected_status=302,
+            _content_type=None,
+        ):
+            post_kwargs = {}
+            if _content_type:
+                post_kwargs.update(content_type=_content_type)
+            resp = _logged_in_client.post(
+                url,
+                data=_data,
+                **post_kwargs
             )
             assert resp.status_code == _expected_status
             return resp

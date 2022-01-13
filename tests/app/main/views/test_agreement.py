@@ -141,7 +141,7 @@ def test_unknown_gps_and_trusts_are_redirected(
     ),
 ))
 def test_download_service_agreement(
-    logged_in_client,
+    client_request,
     mocker,
     mock_get_service_organisation,
     crown,
@@ -160,11 +160,11 @@ def test_download_service_agreement(
         return_value=MockS3Object(b'foo')
     )
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get_response(
         'main.service_download_agreement',
         service_id=SERVICE_ONE_ID,
-    ))
-    assert response.status_code == expected_status
+        _expected_status=expected_status,
+    )
 
     if expected_file_served:
         assert response.get_data() == b'foo'
@@ -498,7 +498,7 @@ def test_confirm_agreement_page_persists(
     ('foo', 404),
 ))
 def test_show_public_agreement_page(
-    client,
+    client_request,
     mocker,
     endpoint,
     variant,
@@ -508,8 +508,9 @@ def test_show_public_agreement_page(
         'app.s3_client.s3_mou_client.get_s3_object',
         return_value=MockS3Object()
     )
-    response = client.get(url_for(
+    client_request.logout()
+    client_request.get_response(
         endpoint,
         variant=variant,
-    ))
-    assert response.status_code == expected_status
+        _expected_status=expected_status,
+    )

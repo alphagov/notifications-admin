@@ -1,6 +1,3 @@
-from bs4 import BeautifulSoup
-from flask import url_for
-
 sample_inbound_sms = {'data': [{"id": "activated",
                                 "number": "0784121212",
                                 "provider": "provider_one",
@@ -25,10 +22,12 @@ sample_inbound_sms = {'data': [{"id": "activated",
                                ]}
 
 
-def test_inbound_sms_admin(platform_admin_client, mocker):
+def test_inbound_sms_admin(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
     mocker.patch("app.inbound_number_client.get_all_inbound_sms_number_service", return_value=sample_inbound_sms)
-    response = platform_admin_client.get(url_for("main.inbound_sms_admin"))
-    assert response.status_code == 200
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user)
+    page = client_request.get("main.inbound_sms_admin")
     assert page.h1.string.strip() == "Inbound SMS"

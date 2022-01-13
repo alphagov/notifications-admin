@@ -9,7 +9,7 @@ from app.main.forms import CreateKeyForm
     ('2001-01-01 01:01:01', None),
 ))
 def test_return_validation_error_when_key_name_exists(
-    client,
+    client_request,
     expiry_date,
     expected_errors,
 ):
@@ -40,7 +40,7 @@ def test_return_validation_error_when_key_name_exists(
         ('invalid', 'Select the type of key')
     ]
 )
-def test_return_validation_error_when_key_type_not_chosen(client, key_type, expected_error):
+def test_return_validation_error_when_key_type_not_chosen(client_request, key_type, expected_error):
 
     form = CreateKeyForm(
         [],

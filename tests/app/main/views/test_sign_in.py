@@ -40,23 +40,22 @@ def test_render_sign_in_template_with_next_link_for_password_reset(
     assert forgot_password_link['href'] == url_for('main.forgot_password', next=f'/services/{SERVICE_ONE_ID}/templates')
 
 
-def test_sign_in_explains_session_timeout(client):
-    response = client.get(url_for('main.sign_in', next='/foo'))
-    assert response.status_code == 200
-    assert 'We signed you out because you have not used Notify for a while.' in response.get_data(as_text=True)
+def test_sign_in_explains_session_timeout(client_request):
+    client_request.logout()
+    page = client_request.get('main.sign_in', next='/foo')
+    assert 'We signed you out because you have not used Notify for a while.' in page.text
 
 
-def test_sign_in_explains_other_browser(logged_in_client, api_user_active, mocker):
+def test_sign_in_explains_other_browser(client_request, api_user_active, mocker):
     api_user_active['current_session_id'] = str(uuid.UUID(int=1))
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
 
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['current_session_id'] = str(uuid.UUID(int=2))
 
-    response = logged_in_client.get(url_for('main.sign_in', next='/foo'))
+    page = client_request.get('main.sign_in', next='/foo')
 
-    assert response.status_code == 200
-    assert 'We signed you out because you logged in to Notify on another device' in response.get_data(as_text=True)
+    assert 'We signed you out because you logged in to Notify on another device' in page.text
 
 
 def test_doesnt_redirect_to_sign_in_if_no_session_info(
@@ -79,7 +78,7 @@ def test_doesnt_redirect_to_sign_in_if_no_session_info(
     (uuid.UUID(int=1), uuid.UUID(int=2)),  # BAD - this person has just signed in on a different browser
 ])
 def test_redirect_to_sign_in_if_logged_in_from_other_browser(
-    logged_in_client,
+    client_request,
     api_user_active,
     mocker,
     db_sess_id,
@@ -87,12 +86,14 @@ def test_redirect_to_sign_in_if_logged_in_from_other_browser(
 ):
     api_user_active['current_session_id'] = db_sess_id
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active)
-    with logged_in_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['current_session_id'] = str(cookie_sess_id)
 
-    response = logged_in_client.get(url_for('main.choose_account'))
-    assert response.status_code == 302
-    assert response.location == url_for('main.sign_in', next='/accounts', _external=True)
+    client_request.get(
+        'main.choose_account',
+        _expected_status=302,
+        _expected_redirect=url_for('main.sign_in', next='/accounts', _external=True),
+    )
 
 
 def test_logged_in_user_redirects_to_account(
@@ -136,7 +137,7 @@ def test_logged_in_user_doesnt_do_evil_redirect(
     (' valid@example.gov.uk  ', '  val1dPassw0rd!  '),
 ])
 def test_process_sms_auth_sign_in_return_2fa_template(
-    client,
+    client_request,
     api_user_active,
     mock_send_verify_code,
     mock_get_user,
@@ -146,12 +147,16 @@ def test_process_sms_auth_sign_in_return_2fa_template(
     password,
     redirect_url
 ):
-    response = client.post(
-        url_for('main.sign_in', next=redirect_url), data={
+    client_request.logout()
+    client_request.post(
+        'main.sign_in',
+        next=redirect_url,
+        _data={
             'email_address': email_address,
-            'password': password})
-    assert response.status_code == 302
-    assert response.location == url_for('.two_factor_sms', next=redirect_url, _external=True)
+            'password': password,
+        },
+        _expected_redirect=url_for('.two_factor_sms', next=redirect_url, _external=True),
+    )
     mock_verify_password.assert_called_with(api_user_active['id'], password)
     mock_get_user_by_email.assert_called_with('valid@example.gov.uk')
 
@@ -161,22 +166,27 @@ def test_process_sms_auth_sign_in_return_2fa_template(
     f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_process_email_auth_sign_in_return_2fa_template(
-    client,
+    client_request,
     api_user_active_email_auth,
     mock_send_verify_code,
     mock_verify_password,
     mocker,
     redirect_url
 ):
+    client_request.logout()
     mocker.patch('app.user_api_client.get_user', return_value=api_user_active_email_auth)
     mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_active_email_auth)
 
-    response = client.post(
-        url_for('main.sign_in', next=redirect_url), data={
+    client_request.post(
+        'main.sign_in',
+        next=redirect_url,
+        _data={
             'email_address': 'valid@example.gov.uk',
-            'password': 'val1dPassw0rd!'})
-    assert response.status_code == 302
-    assert response.location == url_for('.two_factor_email_sent', _external=True, next=redirect_url)
+            'password': 'val1dPassw0rd!',
+        },
+        _expected_redirect=url_for('.two_factor_email_sent', _external=True, next=redirect_url),
+    )
+
     mock_send_verify_code.assert_called_with(api_user_active_email_auth['id'], 'email', None, redirect_url)
     mock_verify_password.assert_called_with(api_user_active_email_auth['id'], 'val1dPassw0rd!')
 
@@ -186,68 +196,78 @@ def test_process_email_auth_sign_in_return_2fa_template(
     f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_process_webauthn_auth_sign_in_redirects_to_webauthn_with_next_redirect(
-    client,
+    client_request,
     api_user_active,
     mocker,
     mock_verify_password,
     redirect_url
 ):
+    client_request.logout()
     api_user_active['auth_type'] = 'webauthn_auth'
     mock_get_user_by_email = mocker.patch('app.user_api_client.get_user_by_email', return_value=api_user_active)
 
-    response = client.post(
-        url_for(
-            'main.sign_in', next=redirect_url
-        ),
-        data={
+    client_request.post(
+        'main.sign_in',
+        next=redirect_url,
+        _data={
             'email_address': 'valid@example.gov.uk',
-            'password': 'val1dPassw0rd!'
-        }
+            'password': 'val1dPassw0rd!',
+        },
+        _expected_redirect=url_for('.two_factor_webauthn', _external=True, next=redirect_url)
     )
+
     mock_get_user_by_email.assert_called_once_with('valid@example.gov.uk')
-    assert response.status_code == 302
-    assert response.location == url_for('.two_factor_webauthn', _external=True, next=redirect_url)
 
 
 def test_should_return_locked_out_true_when_user_is_locked(
-    client,
+    client_request,
     mock_get_user_by_email_locked,
 ):
-    resp = client.post(
-        url_for('main.sign_in'), data={
+    client_request.logout()
+    page = client_request.post(
+        'main.sign_in',
+        _data={
             'email_address': 'valid@example.gov.uk',
-            'password': 'whatIsMyPassword!'})
-    assert resp.status_code == 200
-    assert 'The email address or password you entered is incorrect' in resp.get_data(as_text=True)
+            'password': 'whatIsMyPassword!',
+        },
+        _expected_status=200,
+    )
+    assert 'The email address or password you entered is incorrect' in page.text
 
 
 def test_should_return_200_when_user_does_not_exist(
-    client,
+    client_request,
     mock_get_user_by_email_not_found,
 ):
-    response = client.post(
-        url_for('main.sign_in'), data={
+    client_request.logout()
+    page = client_request.post(
+        'main.sign_in',
+        _data={
             'email_address': 'notfound@gov.uk',
-            'password': 'doesNotExist!'})
-    assert response.status_code == 200
-    assert 'The email address or password you entered is incorrect' in response.get_data(as_text=True)
+            'password': 'doesNotExist!'
+        },
+        _expected_status=200,
+    )
+
+    assert 'The email address or password you entered is incorrect' in page.text
 
 
 def test_should_return_redirect_when_user_is_pending(
-    client,
+    client_request,
     mock_get_user_by_email_pending,
     api_user_pending,
     mock_verify_password,
 ):
-    response = client.post(
-        url_for('main.sign_in'),
-        data={
+    client_request.logout()
+    client_request.post(
+        'main.sign_in',
+        _data={
             'email_address': 'pending_user@example.gov.uk',
             'password': 'val1dPassw0rd!'
-        }
+        },
+        _expected_redirect=url_for('main.resend_email_verification', _external=True),
     )
-    assert response.location == url_for('main.resend_email_verification', _external=True)
-    with client.session_transaction() as s:
+    with client_request.session_transaction() as s:
         assert s['user_details'] == {
             'email': api_user_pending['email_address'],
             'id': api_user_pending['id']
@@ -259,21 +279,25 @@ def test_should_return_redirect_when_user_is_pending(
     f'/services/{SERVICE_ONE_ID}/templates',
 ])
 def test_should_attempt_redirect_when_user_is_pending(
-    client,
+    client_request,
     mock_get_user_by_email_pending,
     mock_verify_password,
     redirect_url
 ):
-    response = client.post(
-        url_for('main.sign_in', next=redirect_url), data={
+    client_request.logout()
+    client_request.post(
+        'main.sign_in',
+        next=redirect_url,
+        _data={
             'email_address': 'pending_user@example.gov.uk',
-            'password': 'val1dPassw0rd!'})
-    assert response.location == url_for('main.resend_email_verification', _external=True, next=redirect_url)
-    assert response.status_code == 302
+            'password': 'val1dPassw0rd!'
+        },
+        _expected_redirect=url_for('main.resend_email_verification', _external=True, next=redirect_url)
+    )
 
 
 def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_user(
-    client,
+    client_request,
     mocker,
     mock_verify_password,
     api_user_active,
@@ -282,6 +306,7 @@ def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_
     mock_send_verify_code,
     mock_get_invited_user_by_id,
 ):
+    client_request.logout()
     sample_invite['email_address'] = 'TEST@user.gov.uk'
 
     mocker.patch(
@@ -289,16 +314,18 @@ def test_email_address_is_treated_case_insensitively_when_signing_in_as_invited_
         return_value=User(api_user_active),
     )
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['invited_user_id'] = sample_invite['id']
 
-    response = client.post(
-        url_for('main.sign_in'), data={
+    client_request.post(
+        'main.sign_in',
+        _data={
             'email_address': 'test@user.gov.uk',
-            'password': 'val1dPassw0rd!'})
+            'password': 'val1dPassw0rd!'
+        },
+    )
 
     assert mock_accept_invite.called
-    assert response.status_code == 302
     assert mock_send_verify_code.called
     mock_get_invited_user_by_id.assert_called_once_with(sample_invite['id'])
 

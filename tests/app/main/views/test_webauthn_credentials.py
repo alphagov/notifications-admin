@@ -9,19 +9,9 @@ from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 
 
 @pytest.fixture
-def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client):
-    """
-    Sets up session, challenge, etc as if a user with uuid `fake_uuid` has logged in and touched the webauthn token
-    as found in the `webauthn_credential` fixture. Sets up the session as if `begin_authentication` had been called
-    so that the challenge matches and the credential will validate (provided that the key belongs to the user referenced
-    in the session).
-    """
-    with client.session_transaction() as session:
-        session['user_details'] = {'id': fake_uuid}
-        session['webauthn_authentication_state'] = {
-            "challenge": "e-g-nXaRxMagEiqTJSyD82RsEc5if_6jyfJDy8bNKlw",
-            "user_verification": None
-        }
+def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client_request):
+
+    _set_up_webauthn_session(fake_uuid, client_request)
 
     credential_id = WebAuthnCredential(webauthn_credential).to_credential_data().credential_id
 
@@ -31,6 +21,21 @@ def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client):
         'clientDataJSON': b'{"challenge":"e-g-nXaRxMagEiqTJSyD82RsEc5if_6jyfJDy8bNKlw","origin":"https://webauthn.io","type":"webauthn.get"}',  # noqa
         'signature': bytes.fromhex('304502204a76f05cd52a778cdd4df1565e0004e5cc1ead360419d0f5c3a0143bf37e7f15022100932b5c308a560cfe4f244214843075b904b3eda64e85d64662a81198c386cdde'),  # noqa
     })
+
+
+def _set_up_webauthn_session(user_id, client):
+    """
+    Sets up session, challenge, etc as if a user with uuid `fake_uuid` has logged in and touched the webauthn token
+    as found in the `webauthn_credential` fixture. Sets up the session as if `begin_authentication` had been called
+    so that the challenge matches and the credential will validate (provided that the key belongs to the user referenced
+    in the session).
+    """
+    with client.session_transaction() as session:
+        session['user_details'] = {'id': user_id}
+        session['webauthn_authentication_state'] = {
+            "challenge": "e-g-nXaRxMagEiqTJSyD82RsEc5if_6jyfJDy8bNKlw",
+            "user_verification": None
+        }
 
 
 def test_begin_register_forbidden_unless_can_use_webauthn(
@@ -46,14 +51,15 @@ def test_begin_register_forbidden_unless_can_use_webauthn(
 def test_begin_register_returns_encoded_options(
     mocker,
     platform_admin_user,
-    platform_admin_client,
+    client_request,
     webauthn_dev_server,
 ):
     mocker.patch('app.models.webauthn_credential.WebAuthnCredentials.client_method', return_value=[])
 
-    response = platform_admin_client.get(url_for('main.webauthn_begin_register'))
-
-    assert response.status_code == 200
+    client_request.login(platform_admin_user)
+    response = client_request.get_response(
+        'main.webauthn_begin_register',
+    )
 
     webauthn_options = cbor.decode(response.data)['publicKey']
     assert webauthn_options['attestation'] == 'direct'
@@ -73,7 +79,8 @@ def test_begin_register_returns_encoded_options(
 
 
 def test_begin_register_includes_existing_credentials(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     webauthn_credential,
     mocker,
 ):
@@ -82,8 +89,9 @@ def test_begin_register_includes_existing_credentials(
         return_value=[webauthn_credential, webauthn_credential]
     )
 
-    response = platform_admin_client.get(
-        url_for('main.webauthn_begin_register')
+    client_request.login(platform_admin_user)
+    response = client_request.get_response(
+        'main.webauthn_begin_register',
     )
 
     webauthn_options = cbor.decode(response.data)['publicKey']
@@ -91,30 +99,30 @@ def test_begin_register_includes_existing_credentials(
 
 
 def test_begin_register_stores_state_in_session(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
 ):
     mocker.patch(
         'app.models.webauthn_credential.WebAuthnCredentials.client_method',
         return_value=[])
 
-    response = platform_admin_client.get(
-        url_for('main.webauthn_begin_register')
+    client_request.login(platform_admin_user)
+    client_request.get_response(
+        'main.webauthn_begin_register',
     )
 
-    assert response.status_code == 200
-
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['webauthn_registration_state'] is not None
 
 
 def test_complete_register_creates_credential(
     platform_admin_user,
-    platform_admin_client,
+    client_request,
     mock_update_user_attribute,
     mocker,
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['webauthn_registration_state'] = 'state'
 
     user_api_mock = mocker.patch(
@@ -126,12 +134,13 @@ def test_complete_register_creates_credential(
         return_value='cred'
     )
 
-    response = platform_admin_client.post(
-        url_for('main.webauthn_complete_register'),
-        data=cbor.encode('public_key_credential'),
+    client_request.login(platform_admin_user)
+    client_request.post_response(
+        'main.webauthn_begin_register',
+        _data=cbor.encode('public_key_credential'),
+        _expected_status=200,
     )
 
-    assert response.status_code == 200
     credential_mock.assert_called_once_with('state', 'public_key_credential')
     user_api_mock.assert_called_once_with(platform_admin_user['id'], 'cred')
     mock_update_user_attribute.assert_called_once_with(
@@ -141,21 +150,24 @@ def test_complete_register_creates_credential(
 
 
 def test_complete_register_clears_session(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['webauthn_registration_state'] = 'state'
 
     mocker.patch('app.user_api_client.create_webauthn_credential_for_user')
     mocker.patch('app.models.webauthn_credential.WebAuthnCredential.from_registration')
 
-    platform_admin_client.post(
-        url_for('main.webauthn_complete_register'),
-        data=cbor.encode('public_key_credential'),
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.webauthn_complete_register',
+        _data=cbor.encode('public_key_credential'),
+        _expected_status=200,
     )
 
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'webauthn_registration_state' not in session
         assert session['_flashes'] == [('default_with_tick', (
             'Registration complete. Next time you sign in to Notify '
@@ -164,10 +176,11 @@ def test_complete_register_clears_session(
 
 
 def test_complete_register_handles_library_errors(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
 ):
-    with platform_admin_client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['webauthn_registration_state'] = 'state'
 
     mocker.patch(
@@ -175,49 +188,59 @@ def test_complete_register_handles_library_errors(
         side_effect=RegistrationError('error')
     )
 
-    response = platform_admin_client.post(
-        url_for('main.webauthn_complete_register'),
-        data=cbor.encode('public_key_credential'),
+    client_request.login(platform_admin_user)
+    client_request.post_response(
+        'main.webauthn_complete_register',
+        _data=cbor.encode('public_key_credential'),
+        _expected_status=400,
     )
-
-    assert response.status_code == 400
 
 
 def test_complete_register_handles_missing_state(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     mocker,
 ):
-    response = platform_admin_client.post(
-        url_for('main.webauthn_complete_register'),
-        data=cbor.encode('public_key_credential'),
+    client_request.login(platform_admin_user)
+    response = client_request.post_response(
+        'main.webauthn_complete_register',
+        _data=cbor.encode('public_key_credential'),
+        _expected_status=400,
     )
 
-    assert response.status_code == 400
     assert cbor.decode(response.data) == 'No registration in progress'
 
 
-def test_begin_authentication_forbidden_for_users_without_webauthn(client, mocker, platform_admin_user):
+def test_begin_authentication_forbidden_for_users_without_webauthn(client_request, mocker, platform_admin_user):
     platform_admin_user['auth_type'] = 'sms_auth'
+    client_request.logout()
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {'id': '1'}
 
-    response = client.get(url_for('main.webauthn_begin_authentication'))
-    assert response.status_code == 403
+    client_request.get(
+        'main.webauthn_begin_authentication',
+        _expected_status=403,
+    )
 
 
-def test_begin_authentication_returns_encoded_options(client, mocker, webauthn_credential, platform_admin_user):
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+def test_begin_authentication_returns_encoded_options(
+    client_request,
+    mocker,
+    webauthn_credential,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {'id': platform_admin_user['id']}
 
     get_creds_mock = mocker.patch(
         'app.models.webauthn_credential.WebAuthnCredentials.client_method',
         return_value=[webauthn_credential]
     )
-    response = client.get(url_for('main.webauthn_begin_authentication'))
+    response = client_request.get_response('main.webauthn_begin_authentication')
 
     decoded_data = cbor.decode(response.data)
     allowed_credentials = decoded_data['publicKey']['allowCredentials']
@@ -227,24 +250,29 @@ def test_begin_authentication_returns_encoded_options(client, mocker, webauthn_c
     get_creds_mock.assert_called_once_with(platform_admin_user['id'])
 
 
-def test_begin_authentication_stores_state_in_session(client, mocker, webauthn_credential, platform_admin_user):
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+def test_begin_authentication_stores_state_in_session(
+    client_request,
+    mocker,
+    webauthn_credential,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {'id': platform_admin_user['id']}
 
     mocker.patch(
         'app.models.webauthn_credential.WebAuthnCredentials.client_method',
         return_value=[webauthn_credential]
     )
-    client.get(url_for('main.webauthn_begin_authentication'))
+    client_request.get_response('main.webauthn_begin_authentication')
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'challenge' in session['webauthn_authentication_state']
 
 
 def test_complete_authentication_checks_credentials(
-    client,
+    client_request,
     mocker,
     webauthn_credential,
     webauthn_dev_server,
@@ -252,6 +280,9 @@ def test_complete_authentication_checks_credentials(
     webauthn_authentication_post_data,
     platform_admin_user
 ):
+    client_request.logout()
+    _set_up_webauthn_session(platform_admin_user['id'], client_request)
+
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.models.webauthn_credential.WebAuthnCredentials.client_method', return_value=[webauthn_credential])
     mocker.patch(
@@ -259,30 +290,39 @@ def test_complete_authentication_checks_credentials(
         return_value=Mock(location='/foo')
     )
 
-    response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
+    response = client_request.post_response(
+        'main.webauthn_complete_authentication',
+        _data=webauthn_authentication_post_data,
+        _expected_status=200,
+    )
 
-    assert response.status_code == 200
     assert cbor.decode(response.data) == {'redirect_url': '/foo'}
 
 
 def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
-    client,
+    client_request,
     mocker,
     webauthn_credential,
     webauthn_dev_server,
     webauthn_authentication_post_data,
     platform_admin_user
 ):
+    client_request.logout()
+    _set_up_webauthn_session(platform_admin_user['id'], client_request)
+
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     # user has no keys in the database
     mocker.patch('app.models.webauthn_credential.WebAuthnCredentials.client_method', return_value=[])
     mock_verify_webauthn_login = mocker.patch('app.main.views.webauthn_credentials._complete_webauthn_login_attempt')
     mock_unsuccesful_login_api_call = mocker.patch('app.user_api_client.complete_webauthn_login_attempt')
 
-    response = client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
-    assert response.status_code == 403
+    client_request.post_response(
+        'main.webauthn_complete_authentication',
+        _data=webauthn_authentication_post_data,
+        _expected_status=403,
+    )
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert session['user_details']['id'] == platform_admin_user['id']
         # user not logged in
         assert 'user_id' not in session
@@ -295,7 +335,7 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
 
 
 def test_complete_authentication_clears_session(
-    client,
+    client_request,
     mocker,
     webauthn_credential,
     webauthn_dev_server,
@@ -303,6 +343,7 @@ def test_complete_authentication_clears_session(
     mock_create_event,
     platform_admin_user
 ):
+    client_request.logout()
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     mocker.patch('app.user_api_client.get_webauthn_credentials_for_user', return_value=[webauthn_credential])
     mocker.patch(
@@ -310,9 +351,9 @@ def test_complete_authentication_clears_session(
         return_value=Mock(location='/foo')
     )
 
-    client.post(url_for('main.webauthn_complete_authentication'), data=webauthn_authentication_post_data)
+    client_request.post('main.webauthn_complete_authentication', _data=webauthn_authentication_post_data)
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         # it's important that we clear the session to ensure that we don't re-use old login artifacts in future
         assert 'webauthn_authentication_state' not in session
 
@@ -322,56 +363,61 @@ def test_complete_authentication_clears_session(
     ({'next': '/bar'}, '/bar'),
 ])
 def test_verify_webauthn_login_signs_user_in(
-    client,
+    client_request,
     mocker,
     mock_create_event,
     platform_admin_user,
     url_kwargs,
     expected_redirect,
 ):
-    with client.session_transaction() as session:
+    client_request.logout()
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': platform_admin_user['id'],
             'email': platform_admin_user['email_address']
         }
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    client_request.login(platform_admin_user)
     mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_authentication')
     mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(True, None))
     mocker.patch('app.main.views.webauthn_credentials.email_needs_revalidating', return_value=False)
 
-    resp = client.post(url_for('main.webauthn_complete_authentication', **url_kwargs))
+    resp = client_request.post_response(
+        'main.webauthn_complete_authentication',
+        _expected_status=200,
+        **url_kwargs
+    )
 
-    assert resp.status_code == 200
     assert cbor.decode(resp.data)['redirect_url'] == expected_redirect
     # removes stuff from session
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         assert 'user_details' not in session
 
     mock_create_event.assert_called_once_with('sucessful_login', ANY)
 
 
 def test_verify_webauthn_login_signs_user_in_doesnt_sign_user_in_if_api_rejects(
-    client,
+    client_request,
     mocker,
     platform_admin_user,
 ):
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = {
             'id': platform_admin_user['id'],
             'email': platform_admin_user['email_address']
         }
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
+    client_request.login(platform_admin_user)
     mocker.patch('app.main.views.webauthn_credentials._verify_webauthn_authentication')
     mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(False, None))
 
-    resp = client.post(url_for('main.webauthn_complete_authentication'))
-
-    assert resp.status_code == 403
+    client_request.post(
+        'main.webauthn_complete_authentication',
+        _expected_status=403,
+    )
 
 
 def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
-    client,
+    client_request,
     mocker,
     mock_send_verify_code,
     platform_admin_user,
@@ -381,7 +427,7 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
         'email': platform_admin_user['email_address']
     }
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         session['user_details'] = user_details
 
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
@@ -389,12 +435,14 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
     mocker.patch('app.user_api_client.complete_webauthn_login_attempt', return_value=(True, None))
     mocker.patch('app.main.views.webauthn_credentials.email_needs_revalidating', return_value=True)
 
-    resp = client.post(url_for('main.webauthn_complete_authentication'))
+    resp = client_request.post_response(
+        'main.webauthn_complete_authentication',
+        _expected_status=200,
+    )
 
-    assert resp.status_code == 200
     assert cbor.decode(resp.data)['redirect_url'] == url_for('main.revalidate_email_sent')
 
-    with client.session_transaction() as session:
+    with client_request.session_transaction() as session:
         # stuff stays in session so we can log them in later when they validate their email
         assert session['user_details'] == user_details
 

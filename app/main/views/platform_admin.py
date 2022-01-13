@@ -331,7 +331,6 @@ def platform_admin_list_complaints():
     return render_template(
         'views/platform-admin/complaints.html',
         complaints=response['complaints'],
-        page_title='All Complaints',
         page=page,
         prev_page=prev_page,
         next_page=next_page,

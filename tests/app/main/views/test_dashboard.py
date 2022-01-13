@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
@@ -103,17 +102,18 @@ stub_template_stats = [
     create_active_caseworking_user(),
 ))
 def test_redirect_from_old_dashboard(
-    logged_in_client,
+    client_request,
     user,
     mocker,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user)
     expected_location = 'http://localhost/services/{}'.format(SERVICE_ONE_ID)
 
-    response = logged_in_client.get('/services/{}/dashboard'.format(SERVICE_ONE_ID))
+    client_request.get_url(
+        '/services/{}/dashboard'.format(SERVICE_ONE_ID),
+        _expected_redirect=expected_location,
+    )
 
-    assert response.status_code == 302
-    assert response.location == expected_location
     assert expected_location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
 
 
@@ -370,7 +370,7 @@ def test_inbox_not_accessible_to_service_without_permissions(
 
 
 def test_anyone_can_see_inbox(
-    client,
+    client_request,
     api_user_active,
     service_one,
     mocker,
@@ -382,7 +382,7 @@ def test_anyone_can_see_inbox(
 
     validate_route_permission_with_client(
         mocker,
-        client,
+        client_request,
         'GET',
         200,
         url_for('main.inbox', service_id=service_one['id']),
@@ -393,7 +393,7 @@ def test_anyone_can_see_inbox(
 
 
 def test_view_inbox_updates(
-    logged_in_client,
+    client_request,
     service_one,
     mocker,
     mock_get_most_recent_inbound_sms_with_no_messages,
@@ -405,11 +405,10 @@ def test_view_inbox_updates(
         return_value={'messages': 'foo'},
     )
 
-    response = logged_in_client.get(url_for(
+    response = client_request.get_response(
         'main.inbox_updates', service_id=SERVICE_ONE_ID,
-    ))
+    )
 
-    assert response.status_code == 200
     assert json.loads(response.get_data(as_text=True)) == {'messages': 'foo'}
 
     mock_get_partials.assert_called_once_with(SERVICE_ONE_ID)
@@ -417,13 +416,13 @@ def test_view_inbox_updates(
 
 @freeze_time("2016-07-01 13:00")
 def test_download_inbox(
-    logged_in_client,
+    client_request,
     mock_get_inbound_sms,
 ):
-    response = logged_in_client.get(
-        url_for('main.inbox_download', service_id=SERVICE_ONE_ID)
+    response = client_request.get_response(
+        'main.inbox_download',
+        service_id=SERVICE_ONE_ID,
     )
-    assert response.status_code == 200
     assert response.headers['Content-Type'] == (
         'text/csv; '
         'charset=utf-8'
@@ -456,7 +455,7 @@ def test_download_inbox(
 ])
 def test_download_inbox_strips_formulae(
     mocker,
-    logged_in_client,
+    client_request,
     fake_uuid,
     message_content,
     expected_cell,
@@ -475,8 +474,9 @@ def test_download_inbox_strips_formulae(
             }]
         },
     )
-    response = logged_in_client.get(
-        url_for('main.inbox_download', service_id=SERVICE_ONE_ID)
+    response = client_request.get_response(
+        'main.inbox_download',
+        service_id=SERVICE_ONE_ID,
     )
     assert expected_cell in response.get_data(as_text=True).split('\r\n')[1]
 
@@ -747,7 +747,7 @@ def test_should_show_monthly_breakdown_of_template_usage(
 
 
 def test_anyone_can_see_monthly_breakdown(
-    client,
+    client_request,
     api_user_active,
     service_one,
     mocker,
@@ -755,7 +755,7 @@ def test_anyone_can_see_monthly_breakdown(
 ):
     validate_route_permission_with_client(
         mocker,
-        client,
+        client_request,
         'GET',
         200,
         url_for('main.monthly', service_id=service_one['id']),
@@ -1138,12 +1138,16 @@ def test_usage_page_displays_letters_split_by_month_and_postage(
 
 
 def test_usage_page_with_year_argument(
-    logged_in_client,
+    client_request,
     mock_get_usage,
     mock_get_billable_units,
     mock_get_free_sms_fragment_limit,
 ):
-    assert logged_in_client.get(url_for('main.usage', service_id=SERVICE_ONE_ID, year=2000)).status_code == 200
+    client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+        year=2000,
+    )
     mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2000)
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2000)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2000)
@@ -1178,21 +1182,20 @@ def test_future_usage_page(
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2014)
 
 
-def _test_dashboard_menu(mocker, notify_admin, usr, service, permissions):
-    with notify_admin.test_request_context():
-        with notify_admin.test_client() as client:
-            usr['permissions'][str(service['id'])] = permissions
-            usr['services'] = [service['id']]
-            mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
-            mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
-            mocker.patch('app.user_api_client.get_user', return_value=usr)
-            mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
-            mocker.patch('app.service_api_client.get_service', return_value={'data': service})
-            client.login(usr)
-            return client.get(url_for('main.service_dashboard', service_id=service['id']))
+def _test_dashboard_menu(client_request, mocker, usr, service, permissions):
+    usr['permissions'][str(service['id'])] = permissions
+    usr['services'] = [service['id']]
+    mocker.patch('app.user_api_client.check_verify_code', return_value=(True, ''))
+    mocker.patch('app.service_api_client.get_services', return_value={'data': [service]})
+    mocker.patch('app.user_api_client.get_user', return_value=usr)
+    mocker.patch('app.user_api_client.get_user_by_email', return_value=usr)
+    mocker.patch('app.service_api_client.get_service', return_value={'data': service})
+    client_request.login(usr)
+    return client_request.get('main.service_dashboard', service_id=service['id'])
 
 
 def test_menu_send_messages(
+    client_request,
     mocker,
     notify_admin,
     api_user_active,
@@ -1208,29 +1211,29 @@ def test_menu_send_messages(
 ):
     service_one['permissions'] = ['email', 'sms', 'letter', 'upload_letters']
 
-    with notify_admin.test_request_context():
-        resp = _test_dashboard_menu(
-            mocker,
-            notify_admin,
-            api_user_active,
-            service_one,
-            ['view_activity', 'send_texts', 'send_emails', 'send_letters'])
-        page = resp.get_data(as_text=True)
-        assert url_for(
-            'main.choose_template',
-            service_id=service_one['id'],
-        ) in page
-        assert url_for('main.uploads', service_id=service_one['id']) in page
-        assert url_for('main.manage_users', service_id=service_one['id']) in page
+    page = _test_dashboard_menu(
+        client_request,
+        mocker,
+        api_user_active,
+        service_one,
+        ['view_activity', 'send_texts', 'send_emails', 'send_letters']
+    )
+    page = str(page)
+    assert url_for(
+        'main.choose_template',
+        service_id=service_one['id'],
+    ) in page
+    assert url_for('main.uploads', service_id=service_one['id']) in page
+    assert url_for('main.manage_users', service_id=service_one['id']) in page
 
-        assert url_for('main.service_settings', service_id=service_one['id']) not in page
-        assert url_for('main.api_keys', service_id=service_one['id']) not in page
-        assert url_for('main.view_providers') not in page
+    assert url_for('main.service_settings', service_id=service_one['id']) not in page
+    assert url_for('main.api_keys', service_id=service_one['id']) not in page
+    assert url_for('main.view_providers') not in page
 
 
 def test_menu_send_messages_when_service_does_not_have_upload_letters_permission(
+    client_request,
     mocker,
-    notify_admin,
     api_user_active,
     service_one,
     mock_get_service_templates,
@@ -1242,21 +1245,20 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
 ):
-    with notify_admin.test_request_context():
-        resp = _test_dashboard_menu(
-            mocker,
-            notify_admin,
-            api_user_active,
-            service_one,
-            ['view_activity', 'send_texts', 'send_emails', 'send_letters'])
-        page = BeautifulSoup(resp.data.decode('utf-8'), 'html.parser')
-        assert page.select_one('.navigation')
-        assert url_for('main.uploads', service_id=service_one['id']) not in page.select_one('.navigation')
+    page = _test_dashboard_menu(
+        client_request,
+        mocker,
+        api_user_active,
+        service_one,
+        ['view_activity', 'send_texts', 'send_emails', 'send_letters'])
+
+    assert page.select_one('.navigation')
+    assert url_for('main.uploads', service_id=service_one['id']) not in page.select_one('.navigation')
 
 
 def test_menu_manage_service(
+    client_request,
     mocker,
-    notify_admin,
     api_user_active,
     service_one,
     mock_get_service_templates,
@@ -1268,27 +1270,26 @@ def test_menu_manage_service(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
 ):
-    with notify_admin.test_request_context():
-        resp = _test_dashboard_menu(
-            mocker,
-            notify_admin,
-            api_user_active,
-            service_one,
-            ['view_activity', 'manage_templates', 'manage_users', 'manage_settings'])
-        page = resp.get_data(as_text=True)
-        assert url_for(
-            'main.choose_template',
-            service_id=service_one['id'],
-        ) in page
-        assert url_for('main.manage_users', service_id=service_one['id']) in page
-        assert url_for('main.service_settings', service_id=service_one['id']) in page
+    page = _test_dashboard_menu(
+        client_request,
+        mocker,
+        api_user_active,
+        service_one,
+        ['view_activity', 'manage_templates', 'manage_users', 'manage_settings'])
+    page = str(page)
+    assert url_for(
+        'main.choose_template',
+        service_id=service_one['id'],
+    ) in page
+    assert url_for('main.manage_users', service_id=service_one['id']) in page
+    assert url_for('main.service_settings', service_id=service_one['id']) in page
 
-        assert url_for('main.api_keys', service_id=service_one['id']) not in page
+    assert url_for('main.api_keys', service_id=service_one['id']) not in page
 
 
 def test_menu_manage_api_keys(
+    client_request,
     mocker,
-    notify_admin,
     api_user_active,
     service_one,
     mock_get_service_templates,
@@ -1300,25 +1301,24 @@ def test_menu_manage_api_keys(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
 ):
-    with notify_admin.test_request_context():
-        resp = _test_dashboard_menu(
-            mocker,
-            notify_admin,
-            api_user_active,
-            service_one,
-            ['view_activity', 'manage_api_keys'])
+    page = _test_dashboard_menu(
+        client_request,
+        mocker,
+        api_user_active,
+        service_one,
+        ['view_activity', 'manage_api_keys'])
 
-        page = resp.get_data(as_text=True)
+    page = str(page)
 
-        assert url_for('main.choose_template', service_id=service_one['id'],) in page
-        assert url_for('main.manage_users', service_id=service_one['id']) in page
-        assert url_for('main.service_settings', service_id=service_one['id']) in page
-        assert url_for('main.api_integration', service_id=service_one['id']) in page
+    assert url_for('main.choose_template', service_id=service_one['id'],) in page
+    assert url_for('main.manage_users', service_id=service_one['id']) in page
+    assert url_for('main.service_settings', service_id=service_one['id']) in page
+    assert url_for('main.api_integration', service_id=service_one['id']) in page
 
 
 def test_menu_all_services_for_platform_admin_user(
+    client_request,
     mocker,
-    notify_admin,
     platform_admin_user,
     service_one,
     mock_get_service_templates,
@@ -1330,20 +1330,19 @@ def test_menu_all_services_for_platform_admin_user(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
 ):
-    with notify_admin.test_request_context():
-        resp = _test_dashboard_menu(
-            mocker,
-            notify_admin,
-            platform_admin_user,
-            service_one,
-            [])
-        page = resp.get_data(as_text=True)
-        assert url_for('main.choose_template', service_id=service_one['id']) in page
-        assert url_for('main.manage_users', service_id=service_one['id']) in page
-        assert url_for('main.service_settings', service_id=service_one['id']) in page
-        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='email') in page
-        assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms') in page
-        assert url_for('main.api_keys', service_id=service_one['id']) not in page
+    page = _test_dashboard_menu(
+        client_request,
+        mocker,
+        platform_admin_user,
+        service_one,
+        [])
+    page = str(page)
+    assert url_for('main.choose_template', service_id=service_one['id']) in page
+    assert url_for('main.manage_users', service_id=service_one['id']) in page
+    assert url_for('main.service_settings', service_id=service_one['id']) in page
+    assert url_for('main.view_notifications', service_id=service_one['id'], message_type='email') in page
+    assert url_for('main.view_notifications', service_id=service_one['id'], message_type='sms') in page
+    assert url_for('main.api_keys', service_id=service_one['id']) not in page
 
 
 def test_route_for_service_permissions(
@@ -1606,7 +1605,6 @@ def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
 
 def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
     mocker,
-    client,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
     active_caseworking_user,
@@ -1693,7 +1691,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     platform_admin_user,
-    platform_admin_client,
+    client_request,
 ):
     service_one_json = service_json(SERVICE_ONE_ID,
                                     users=[platform_admin_user['id']],
@@ -1704,8 +1702,8 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
         id_=ORGANISATION_ID,
     ))
 
-    response = platform_admin_client.get(url_for('main.service_dashboard', service_id=SERVICE_ONE_ID))
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+    client_request.login(platform_admin_user, service_one_json)
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
 
     assert page.select_one('.navigation-organisation-link')['href'] == url_for(
         'main.organisation_dashboard',

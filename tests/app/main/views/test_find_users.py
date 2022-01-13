@@ -1,9 +1,7 @@
 import uuid
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
-from lxml import html
 from notifications_python_client.errors import HTTPError
 
 from tests import user_json
@@ -92,11 +90,12 @@ def test_find_users_by_email_validates_against_empty_search_submission(
 
 
 def test_user_information_page_shows_information_about_user(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
     fake_uuid,
 ):
+    client_request.login(platform_admin_user)
     user_service_one = uuid.uuid4()
     user_service_two = uuid.uuid4()
     mocker.patch('app.user_api_client.get_user', side_effect=[
@@ -112,32 +111,43 @@ def test_user_information_page_shows_information_about_user(
         ]},
         autospec=True
     )
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.user_information', user_id=fake_uuid))
-    assert response.status_code == 200
+    page = client_request.get('main.user_information', user_id=fake_uuid)
 
-    document = html.fromstring(response.get_data(as_text=True))
+    assert normalize_spaces(page.select_one('h1').text) == 'Apple Bloom'
 
-    assert document.xpath("//h1/text()[normalize-space()='Apple Bloom']")
-    assert document.xpath("//p/text()[normalize-space()='test@gov.uk']")
-    assert document.xpath("//p/text()[normalize-space()='+447700900986']")
+    assert [
+        normalize_spaces(p.text) for p in page.select('main p')
+    ] == [
+        'test@gov.uk',
+        '+447700900986',
+        'Last logged in just now',
+    ]
 
-    assert document.xpath("//h2/text()[normalize-space()='Live services']")
-    assert document.xpath("//a/text()[normalize-space()='Nature Therapy']")
+    assert '0 failed login attempts' not in page.text
 
-    assert document.xpath("//h2/text()[normalize-space()='Trial mode services']")
-    assert document.xpath("//a/text()[normalize-space()='Fresh Orchard Juice']")
+    assert [
+        normalize_spaces(h2.text) for h2 in page.select('main h2')
+    ] == [
+        'Live services',
+        'Trial mode services',
+        'Last login',
+    ]
 
-    assert document.xpath("//h2/text()[normalize-space()='Last login']")
-    assert not document.xpath("//p/text()[normalize-space()='0 failed login attempts']")
+    assert [
+        normalize_spaces(a.text) for a in page.select('main li a')
+    ] == [
+        'Nature Therapy',
+        'Fresh Orchard Juice',
+    ]
 
 
 def test_user_information_page_displays_if_there_are_failed_login_attempts(
-    client,
+    client_request,
     platform_admin_user,
     mocker,
     fake_uuid,
 ):
+    client_request.login(platform_admin_user)
     mocker.patch('app.user_api_client.get_user', side_effect=[
         platform_admin_user,
         user_json(name="Apple Bloom", failed_login_count=2)
@@ -148,23 +158,23 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
         return_value={'organisations': [], 'services': []},
         autospec=True
     )
-    client.login(platform_admin_user)
-    response = client.get(url_for('main.user_information', user_id=fake_uuid))
-    assert response.status_code == 200
+    page = client_request.get('main.user_information', user_id=fake_uuid)
 
-    document = html.fromstring(response.get_data(as_text=True))
-    assert document.xpath("//p/text()[normalize-space()='2 failed login attempts']")
+    assert normalize_spaces(page.select('main p')[-1].text) == (
+        '2 failed login attempts'
+    )
 
 
 def test_user_information_page_shows_archive_link_for_active_users(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     api_user_active,
     mock_get_organisations_and_services_for_user,
 ):
-    response = platform_admin_client.get(
-        url_for('main.user_information', user_id=api_user_active['id'])
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.user_information', user_id=api_user_active['id']
     )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     archive_url = url_for('main.archive_user', user_id=api_user_active['id'])
 
     link = page.find('a', {'href': archive_url})
@@ -173,57 +183,64 @@ def test_user_information_page_shows_archive_link_for_active_users(
 
 def test_user_information_page_does_not_show_archive_link_for_inactive_users(
     mocker,
-    client,
+    client_request,
     platform_admin_user,
     mock_get_organisations_and_services_for_user,
 ):
-    inactive_user = user_json(state='inactive')
+    inactive_user_id = uuid.uuid4()
+    inactive_user = user_json(id_=inactive_user_id, state='inactive')
+    client_request.login(platform_admin_user)
     mocker.patch('app.user_api_client.get_user', side_effect=[platform_admin_user, inactive_user], autospec=True)
-    client.login(platform_admin_user)
-    response = client.get(
-        url_for('main.user_information', user_id=inactive_user['id'])
-    )
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
-    archive_url = url_for('main.archive_user', user_id=inactive_user['id'])
+    page = client_request.get(
+        'main.user_information', user_id=inactive_user_id
+    )
+
+    archive_url = url_for('main.archive_user', user_id=inactive_user_id)
     assert not page.find('a', {'href': archive_url})
 
 
 def test_archive_user_prompts_for_confirmation(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     api_user_active,
     mock_get_organisations_and_services_for_user,
 ):
-    response = platform_admin_client.get(
-        url_for('main.archive_user', user_id=api_user_active['id'])
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.archive_user', user_id=api_user_active['id']
     )
 
-    assert response.status_code == 200
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
     assert 'Are you sure you want to archive this user?' in page.find('div', class_='banner-dangerous').text
 
 
 def test_archive_user_posts_to_user_client(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     api_user_active,
     mocker,
     mock_events,
 ):
     mock_user_client = mocker.patch('app.user_api_client.post')
 
-    response = platform_admin_client.post(
-        url_for('main.archive_user', user_id=api_user_active['id'])
+    client_request.login(platform_admin_user)
+    client_request.post(
+        'main.archive_user', user_id=api_user_active['id'],
+        _expected_redirect=url_for(
+            'main.user_information',
+            user_id=api_user_active['id'],
+            _external=True,
+        ),
     )
 
-    assert response.status_code == 302
-    assert response.location == url_for('main.user_information', user_id=api_user_active['id'], _external=True)
     mock_user_client.assert_called_once_with('/user/{}/archive'.format(api_user_active['id']), data=None)
 
     assert mock_events.called
 
 
 def test_archive_user_shows_error_message_if_user_cannot_be_archived(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     api_user_active,
     mocker,
     mock_get_non_empty_organisations_and_services_for_user,
@@ -242,12 +259,12 @@ def test_archive_user_shows_error_message_if_user_cannot_be_archived(
         )
     )
 
-    response = platform_admin_client.post(
-        url_for('main.archive_user', user_id=api_user_active['id']),
-        follow_redirects=True
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.archive_user',
+        user_id=api_user_active['id'],
+        _follow_redirects=True,
     )
-
-    page = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
 
     assert normalize_spaces(page.find('h1').text) == 'Platform admin user'
     assert normalize_spaces(
@@ -256,14 +273,16 @@ def test_archive_user_shows_error_message_if_user_cannot_be_archived(
 
 
 def test_archive_user_does_not_create_event_if_user_client_raises_unexpected_exception(
-    platform_admin_client,
+    client_request,
+    platform_admin_user,
     api_user_active,
     mocker,
     mock_events,
 ):
     with pytest.raises(Exception):
-        platform_admin_client.post(
-            url_for('main.archive_user', user_id=api_user_active.id)
+        client_request.login(platform_admin_user)
+        client_request.post(
+            'main.archive_user', user_id=api_user_active.id,
         )
 
     assert not mock_events.called

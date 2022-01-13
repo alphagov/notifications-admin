@@ -171,21 +171,19 @@ def test_api_documentation_page_should_redirect(
 
 
 def test_should_show_empty_api_keys_page(
-    client,
+    client_request,
     api_user_active,
     mock_login,
     mock_get_no_api_keys,
     mock_get_service,
     mock_has_permissions,
 ):
-    client.login(api_user_active)
-    service_id = str(uuid.uuid4())
-    response = client.get(url_for('main.api_keys', service_id=service_id))
+    client_request.login(api_user_active)
+    page = client_request.get('main.api_keys', service_id=SERVICE_ONE_ID)
 
-    assert response.status_code == 200
-    assert 'You have not created any API keys yet' in response.get_data(as_text=True)
-    assert 'Create an API key' in response.get_data(as_text=True)
-    mock_get_no_api_keys.assert_called_once_with(service_id)
+    assert 'You have not created any API keys yet' in page.text
+    assert 'Create an API key' in page.text
+    mock_get_no_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
 def test_should_show_api_keys_page(
