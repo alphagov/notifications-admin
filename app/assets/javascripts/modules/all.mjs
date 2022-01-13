@@ -10,6 +10,7 @@ import Header from 'govuk-frontend/components/header/header';
 import Details from 'govuk-frontend/components/details/details';
 import Button from 'govuk-frontend/components/button/button';
 import Radios from 'govuk-frontend/components/radios/radios';
+import {DiffDOM} from 'diff-dom';
 
 /**
  * TODO: Ideally this would be a NodeList.prototype.forEach polyfill
@@ -62,6 +63,11 @@ var Frontend = {
   "initAll": initAll
 }
 
+var vendor = {
+  "DiffDOM": DiffDOM
+}
+
 export {
-  Frontend
+  Frontend,
+  vendor
 }

@@ -2,7 +2,7 @@
   "use strict";
 
   var queues = {};
-  var dd = new global.diffDOM();
+  var dd = new global.GOVUK.vendor.DiffDOM();
   var defaultInterval = 2000;
   var interval = 0;
 
