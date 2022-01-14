@@ -107,7 +107,7 @@ class Job(JSONModel):
     @property
     def still_processing(self):
         return (
-            self.percentage_complete < 100 and self.status != 'finished'
+            self.status != 'finished' or self.percentage_complete < 100
         )
 
     @cached_property
