@@ -1130,6 +1130,29 @@ def link_service_to_organisation(service_id):
     )
 
 
+def get_email_branding_options(service):
+    return dict(BrandingOptions.get_available_choices(
+        current_service,
+        branding_type='email',
+    ))
+
+
+def get_email_branding_name(service, branding_option):
+    branding_options = get_email_branding_options(service)
+    return branding_options[branding_option]
+
+
+def get_email_branding_id(service, branding_option):
+    option_name = get_email_branding_name(service, branding_option)
+
+    email_branding = email_branding_client.get_all_email_branding()
+
+    return next((
+        email_brand['id'] for email_brand in email_branding
+        if email_safe(email_brand['name']) == email_safe(option_name)
+    ), None)
+
+
 @main.route("/services/<uuid:service_id>/branding-request/<branding_type>", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def branding_request(service_id, branding_type):
@@ -1140,37 +1163,63 @@ def branding_request(service_id, branding_type):
     elif branding_type == "letter":
         branding_name = current_service.letter_branding_name
     if form.validate_on_submit():
-        ticket_message = render_template(
-            'support-tickets/branding-request.txt',
-            current_branding=branding_name,
-            branding_requested=dict(form.options.choices)[form.options.data],
-            detail=form.something_else.data,
-        )
-        ticket = NotifySupportTicket(
-            subject=f'{branding_type.capitalize()} branding request - {current_service.name}',
-            message=ticket_message,
-            ticket_type=NotifySupportTicket.TYPE_QUESTION,
-            user_name=current_user.name,
-            user_email=current_user.email_address,
-            org_id=current_service.organisation_id,
-            org_type=current_service.organisation_type,
-            service_id=current_service.id
-        )
-        zendesk_client.send_ticket_to_zendesk(ticket)
-        flash((
-            'Thanks for your branding request. We’ll get back to you '
-            'within one working day.'
-        ), 'default')
         return redirect(url_for(
-            '.view_template', service_id=current_service.id, template_id=from_template
-        ) if from_template else url_for('.service_settings', service_id=current_service.id))
+            '.branding_request_preview',
+            service_id=current_service.id,
+            branding_type=branding_type,
+            branding_option=form.options.data,
+        ))
 
     return render_template(
         'views/service-settings/branding/branding-options.html',
         form=form,
         branding_type=branding_type,
         branding_name=branding_name,
-        from_template=from_template
+        from_template=from_template,
+        selected_email_branding_id=current_service.email_branding_id,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/<branding_type>/preview/something_else", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_something_else(service_id, branding_type):
+
+    form = BrandingOptions(
+        None,
+        branding_type=branding_type,
+    )
+
+    if form.validate_on_submit():
+        flash('Your new email branding has been applied', 'default')
+        return redirect(url_for(
+            '.service_settings',
+            service_id=current_service.id,
+        ))
+
+    return render_template(
+        'views/service-settings/branding/branding-options-something-else.html',
+        branding_type=branding_type,
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/<branding_type>/preview/<branding_option>", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_preview(service_id, branding_type, branding_option):
+
+    if request.method == 'POST':
+        flash('Your new email branding has been applied', 'default')
+        return redirect(url_for(
+            '.service_settings',
+            service_id=current_service.id,
+        ))
+
+    return render_template(
+        'views/service-settings/branding/branding-options-preview.html',
+        branding_type=branding_type,
+        branding_option=branding_option,
+        option_name=get_email_branding_name(current_service, branding_option),
+        selected_email_branding_id=get_email_branding_id(current_service, branding_option),
     )
 
 

@@ -1,0 +1,38 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radio, conditional_radio_panel %}
+{% from "components/select-input.html" import select_wrapper %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block service_page_title %}
+  Preview
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    'href': url_for('.branding_request', service_id=current_service.id, branding_type=branding_type)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Preview of {}'.format(option_name)) }}
+
+  <p class="govuk-body">
+    This is how your emails will look
+  </p>
+
+  <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview"></iframe>
+
+  <p class="govuk-body">
+    What happens next
+  </p>
+
+  {% call form_wrapper() %}
+    {{ page_footer('Request new branding') }}
+  {% endcall %}
+
+{% endblock %}

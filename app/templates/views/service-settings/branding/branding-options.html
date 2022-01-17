@@ -25,6 +25,8 @@
     Your {{ branding_type }}s currently have {{ branding_name }} branding.
   </p>
 
+  <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview"></iframe>
+
   {% if current_service.needs_to_change_email_branding and branding_type == "email" %}
     <p class="govuk-body">
       You should be using your own branding instead. We can help you to set this up.
@@ -41,23 +43,11 @@
     {% else %}
       {% call select_wrapper(form.options) %}
         {% for option in form.options %}
-          {{ radio(option, data_target='panel-something-else' if option.data == form.FALLBACK_OPTION_VALUE else '') }}
+          {{ radio(option) }}
         {% endfor %}
       {% endcall %}
-      {% call conditional_radio_panel('panel-something-else') %}
-        {{ textbox(
-          form.something_else,
-          hint='Include links to your brand guidelines or examples of how to use your branding',
-          width='1-1',
-          autosize=True,
-        ) }}
-      {% endcall %}
     {% endif %}
-    <p class="form-group">
-      We’ll email you once your branding’s ready to use, or if we need any
-      more information.
-    </p>
-    {{ page_footer('Request new branding') }}
+    {{ page_footer('Continue to preview') }}
   {% endcall %}
 
 {% endblock %}
