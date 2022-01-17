@@ -125,7 +125,7 @@ notifications-python-client==6.3.0
     # via -r requirements.in
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@51.2.1
     # via -r requirements.in
-openpyxl==3.0.7
+openpyxl==3.0.9
     # via pyexcel-xlsx
 orderedset==2.0.3
     # via notifications-utils
