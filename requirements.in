@@ -23,7 +23,7 @@ eventlet==0.30.2 # pyup: ignore
 notifications-python-client==6.3.0
 Shapely==1.8.0
 rtreelib==0.2.0
-fido2==0.9.1
+fido2==0.9.3
 importlib-metadata==4.2.0
 pyproj==3.2.1
 
