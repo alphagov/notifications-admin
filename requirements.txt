@@ -57,7 +57,7 @@ eventlet==0.30.2 # pyup: ignore
     # via -r requirements.in
 fido2==0.9.3
     # via -r requirements.in
-flask==1.1.2
+flask==2.0.2
     # via
     #   -r requirements.in
     #   flask-login
