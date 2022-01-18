@@ -279,8 +279,8 @@ def get_billing_report():
         end_date = form.end_date.data
         headers = [
             "organisation_id", "organisation_name", "service_id", "service_name",
-            "sms_cost", "sms_fragments", "total_letters", "letter_cost", "letter_breakdown", "purchase_order_number",
-            "contact_names", "contact_email_addresses", "billing_reference"
+            "sms_cost", "sms_chargeable_units", "total_letters", "letter_cost", "letter_breakdown",
+            "purchase_order_number", "contact_names", "contact_email_addresses", "billing_reference"
         ]
         try:
             result = billing_api_client.get_data_for_billing_report(start_date, end_date)
@@ -294,7 +294,7 @@ def get_billing_report():
         rows = [
             [
                 r["organisation_id"], r["organisation_name"], r["service_id"], r["service_name"],
-                r["sms_cost"], r["sms_fragments"], r["total_letters"], r["letter_cost"], r["letter_breakdown"].strip(),
+                r["sms_cost"], r["sms_chargeable_units"], r["total_letters"], r["letter_cost"], r["letter_breakdown"].strip(),
                 r.get("purchase_order_number"), r.get("contact_names"), r.get("contact_email_addresses"),
                 r.get("billing_reference")
             ]
