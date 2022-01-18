@@ -1695,6 +1695,15 @@ def test_start_broadcasting(
         'Created by Alice and approved by Bob.',
         'Stopped by Carol yesterday at 9:21pm.',
     ]),
+    ('.view_previous_broadcast', False, {
+        'status': 'cancelled',
+        'cancelled_by_id': None,
+        'cancelled_at': '2020-02-21T21:21:21.000000',
+    }, [
+        'Sent on 20 February at 8:20pm.',
+        'Created by Alice and approved by Bob.',
+        'Stopped by an API call yesterday at 9:21pm.',
+    ]),
     ('.view_rejected_broadcast', False, {
         'status': 'rejected',
         'updated_at': '2020-02-21T21:21:21.000000',

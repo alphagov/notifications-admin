@@ -181,7 +181,9 @@ class BroadcastMessage(JSONModel):
 
     @cached_property
     def cancelled_by(self):
-        return User.from_id(self.cancelled_by_id)
+        if not self.cancelled_by_id:
+            return "an API call"
+        return User.from_id(self.cancelled_by_id).name
 
     @cached_property
     def count_of_phones(self):
