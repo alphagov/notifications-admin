@@ -41,10 +41,8 @@ click==8.0.1
     # via flask
 colorama==0.4.3
     # via awscli
-cryptography==3.3.2
-    # via
-    #   -r requirements.in
-    #   fido2
+cryptography==36.0.1
+    # via fido2
 dnspython==1.16.0
     # via eventlet
 docopt==0.6.2
@@ -53,9 +51,9 @@ docutils==0.15.2
     # via awscli
 et-xmlfile==1.1.0
     # via openpyxl
-eventlet==0.30.2 # pyup: ignore
+eventlet==0.30.2
     # via -r requirements.in
-fido2==0.9.1
+fido2==0.9.3
     # via -r requirements.in
 flask==1.1.2
     # via
@@ -206,7 +204,6 @@ six==1.16.0
     # via
     #   awscli-cwlogs
     #   bleach
-    #   cryptography
     #   eventlet
     #   fido2
     #   python-dateutil
