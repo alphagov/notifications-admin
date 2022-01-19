@@ -65,7 +65,7 @@
 <div class="govuk-grid-column-full template-container">
   {% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %}
     {% if not current_service.letter_branding_id %}
-      <a href="{{ url_for(".branding_request", service_id=current_service.id, branding_type="letter", from_template=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-branding">Add logo</a>
+      <a href="{{ url_for(".letter_branding_request", service_id=current_service.id, from_template=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-branding">Add logo</a>
     {% endif %}
     <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-postage">Change<span class="govuk-visually-hidden"> postage</span></a>
     <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> letter template</span></a>

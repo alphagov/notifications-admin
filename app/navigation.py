@@ -219,8 +219,9 @@ class MainNavigation(Navigation):
         'settings': {
             'add_organisation_from_gp_service',
             'add_organisation_from_nhs_local_service',
-            'branding_request',
+            'email_branding_request',
             'estimate_usage',
+            'letter_branding_request',
             'link_service_to_organisation',
             'request_to_go_live',
             'service_add_email_reply_to',

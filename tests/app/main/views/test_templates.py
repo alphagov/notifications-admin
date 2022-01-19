@@ -677,8 +677,8 @@ def test_user_with_only_send_and_view_sees_letter_page(
     (
         None,
         partial(
-            url_for, 'main.branding_request',
-            service_id=SERVICE_ONE_ID, branding_type="letter", from_template=TEMPLATE_ONE_ID
+            url_for, 'main.letter_branding_request',
+            service_id=SERVICE_ONE_ID, from_template=TEMPLATE_ONE_ID
         ),
         'Add logo',
     ),

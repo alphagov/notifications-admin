@@ -97,7 +97,7 @@
             {{ text_field(current_service.email_branding_name) }}
             {{ edit_field(
               'Change',
-              url_for('.branding_request', service_id=current_service.id, branding_type="email"),
+              url_for('.email_branding_request', service_id=current_service.id),
               permissions=['manage_service'],
               suffix='email branding',
             )}}
@@ -257,7 +257,7 @@
             {{ optional_text_field(current_service.letter_branding.name) }}
             {{ edit_field(
               'Change',
-              url_for('.branding_request', service_id=current_service.id, branding_type="letter"),
+              url_for('.letter_branding_request', service_id=current_service.id),
               permissions=['manage_service'],
               suffix='letter branding',
             )}}

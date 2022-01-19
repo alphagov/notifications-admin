@@ -4783,7 +4783,7 @@ def test_show_branding_request_page_when_no_branding_is_set(
     service_one['organisation_type'] = organisation_type
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
+        f'.{branding_type}_branding_request', service_id=SERVICE_ONE_ID
     )
 
     assert mock_get_email_branding.called is False
@@ -4856,7 +4856,7 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
     )
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
+        f'.{branding_type}_branding_request', service_id=SERVICE_ONE_ID
     )
 
     assert mock_get_email_branding.called is False
@@ -4900,7 +4900,7 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
     )
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
+        f'.{branding_type}_branding_request', service_id=SERVICE_ONE_ID
     )
 
     assert mock_get_email_branding.called is False
@@ -4930,7 +4930,7 @@ def test_show_email_branding_request_page_when_email_branding_is_set(
     )
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID, branding_type="email"
+        '.email_branding_request', service_id=SERVICE_ONE_ID
     )
     assert [
         (
@@ -4961,7 +4961,7 @@ def test_show_letter_branding_request_page_when_letter_branding_is_set(
     )
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter"
+        '.letter_branding_request', service_id=SERVICE_ONE_ID
     )
     assert [
         (
@@ -4975,29 +4975,33 @@ def test_show_letter_branding_request_page_when_letter_branding_is_set(
     ]
 
 
-@pytest.mark.parametrize('branding_type', ['email', 'letter'])
+def test_back_link_on_email_branding_request_page(
+    client_request,
+):
+    page = client_request.get(
+        '.email_branding_request', service_id=SERVICE_ONE_ID
+    )
+
+    back_link = page.select('a[class=govuk-back-link]')
+    assert back_link[0].attrs['href'] == url_for('.service_settings', service_id=SERVICE_ONE_ID)
+
+
 @pytest.mark.parametrize('from_template,back_link_url', [
     (None, '/services/{}/service-settings'.format(SERVICE_ONE_ID),),
     (TEMPLATE_ONE_ID, '/services/{}/templates/{}'.format(SERVICE_ONE_ID, TEMPLATE_ONE_ID),)
 ])
-def test_back_link_on_branding_request_page(
-    mocker,
-    service_one,
+def test_back_link_on_letter_branding_request_page(
     client_request,
-    mock_get_email_branding,
-    mock_get_letter_branding_by_id,
-    active_user_with_permissions,
     from_template,
     back_link_url,
-    branding_type,
 ):
     if from_template:
         page = client_request.get(
-            '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type, from_template=from_template
+            '.letter_branding_request', service_id=SERVICE_ONE_ID, from_template=from_template
         )
     else:
         page = client_request.get(
-            '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
+            '.letter_branding_request', service_id=SERVICE_ONE_ID
         )
 
     back_link = page.select('a[class=govuk-back-link]')
@@ -5028,7 +5032,7 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
         )
 
     page = client_request.get(
-        '.branding_request', service_id=SERVICE_ONE_ID, branding_type=branding_type
+        f'.{branding_type}_branding_request', service_id=SERVICE_ONE_ID
     )
 
     # Central government organisations who have their own default
@@ -5111,7 +5115,8 @@ def test_submit_email_branding_request(
     )
 
     page = client_request.post(
-        '.branding_request', service_id=SERVICE_ONE_ID, branding_type="email",
+        '.email_branding_request',
+        service_id=SERVICE_ONE_ID,
         _data=data,
         _follow_redirects=True,
     )
@@ -5201,7 +5206,7 @@ def test_submit_letter_branding_request(
     )
 
     page = client_request.post(
-        '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter",
+        '.letter_branding_request', service_id=SERVICE_ONE_ID,
         _data=data,
         _follow_redirects=True,
     )
@@ -5232,7 +5237,6 @@ def test_submit_letter_branding_request(
     )
 
 
-@pytest.mark.parametrize('branding_type', ['email', 'letter'])
 @pytest.mark.parametrize('from_template', [
     None,
     TEMPLATE_ONE_ID
@@ -5242,12 +5246,7 @@ def test_submit_letter_branding_request_redirects_if_from_template_is_set(
     service_one,
     mocker,
     mock_get_service_settings_page_common,
-    mock_get_letter_branding_by_id,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
     from_template,
-    branding_type,
 
 ):
     mocker.patch('app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk', autospec=True)
@@ -5255,7 +5254,7 @@ def test_submit_letter_branding_request_redirects_if_from_template_is_set(
 
     if from_template:
         client_request.post(
-            '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter", from_template=from_template,
+            '.letter_branding_request', service_id=SERVICE_ONE_ID, from_template=from_template,
             _data=data,
             _expected_redirect=url_for(
                 'main.view_template', service_id=SERVICE_ONE_ID, template_id=from_template, _external=True
@@ -5263,7 +5262,7 @@ def test_submit_letter_branding_request_redirects_if_from_template_is_set(
         )
     else:
         client_request.post(
-            '.branding_request', service_id=SERVICE_ONE_ID, branding_type="letter",
+            '.letter_branding_request', service_id=SERVICE_ONE_ID,
             _data=data,
             _expected_redirect=url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
         )
@@ -5289,8 +5288,8 @@ def test_submit_branding_when_something_else_is_only_option(
     )
 
     client_request.post(
-        '.branding_request',
-        service_id=SERVICE_ONE_ID, branding_type=branding_type,
+        f'.{branding_type}_branding_request',
+        service_id=SERVICE_ONE_ID,
         _data={
             'something_else': 'Homer Simpson',
         },

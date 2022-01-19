@@ -1130,15 +1130,11 @@ def link_service_to_organisation(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/branding-request/<branding_type>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/branding-request/email", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-def branding_request(service_id, branding_type):
-    form = BrandingOptions(current_service, branding_type=branding_type)
-    from_template = request.args.get('from_template')
-    if branding_type == "email":
-        branding_name = current_service.email_branding_name
-    elif branding_type == "letter":
-        branding_name = current_service.letter_branding_name
+def email_branding_request(service_id):
+    form = BrandingOptions(current_service, branding_type='email')
+    branding_name = current_service.email_branding_name
     if form.validate_on_submit():
         ticket_message = render_template(
             'support-tickets/branding-request.txt',
@@ -1147,7 +1143,45 @@ def branding_request(service_id, branding_type):
             detail=form.something_else.data,
         )
         ticket = NotifySupportTicket(
-            subject=f'{branding_type.capitalize()} branding request - {current_service.name}',
+            subject=f'Email branding request - {current_service.name}',
+            message=ticket_message,
+            ticket_type=NotifySupportTicket.TYPE_QUESTION,
+            user_name=current_user.name,
+            user_email=current_user.email_address,
+            org_id=current_service.organisation_id,
+            org_type=current_service.organisation_type,
+            service_id=current_service.id
+        )
+        zendesk_client.send_ticket_to_zendesk(ticket)
+        flash((
+            'Thanks for your branding request. We’ll get back to you '
+            'within one working day.'
+        ), 'default')
+        return redirect(url_for('.service_settings', service_id=current_service.id))
+
+    return render_template(
+        'views/service-settings/branding/branding-options.html',
+        form=form,
+        branding_type='email',
+        branding_name=branding_name,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/letter", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def letter_branding_request(service_id):
+    form = BrandingOptions(current_service, branding_type='letter')
+    from_template = request.args.get('from_template')
+    branding_name = current_service.letter_branding_name
+    if form.validate_on_submit():
+        ticket_message = render_template(
+            'support-tickets/branding-request.txt',
+            current_branding=branding_name,
+            branding_requested=dict(form.options.choices)[form.options.data],
+            detail=form.something_else.data,
+        )
+        ticket = NotifySupportTicket(
+            subject=f'Letter branding request - {current_service.name}',
             message=ticket_message,
             ticket_type=NotifySupportTicket.TYPE_QUESTION,
             user_name=current_user.name,
@@ -1168,7 +1202,7 @@ def branding_request(service_id, branding_type):
     return render_template(
         'views/service-settings/branding/branding-options.html',
         form=form,
-        branding_type=branding_type,
+        branding_type='letter',
         branding_name=branding_name,
         from_template=from_template
     )
