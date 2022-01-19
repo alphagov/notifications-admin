@@ -1160,9 +1160,8 @@ def email_branding_request(service_id):
         return redirect(url_for('.service_settings', service_id=current_service.id))
 
     return render_template(
-        'views/service-settings/branding/branding-options.html',
+        'views/service-settings/branding/email-branding-options.html',
         form=form,
-        branding_type='email',
         branding_name=branding_name,
     )
 
@@ -1200,9 +1199,8 @@ def letter_branding_request(service_id):
         ) if from_template else url_for('.service_settings', service_id=current_service.id))
 
     return render_template(
-        'views/service-settings/branding/branding-options.html',
+        'views/service-settings/branding/letter-branding-options.html',
         form=form,
-        branding_type='letter',
         branding_name=branding_name,
         from_template=from_template
     )

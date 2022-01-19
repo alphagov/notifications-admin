@@ -1,0 +1,57 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radio, conditional_radio_panel %}
+{% from "components/select-input.html" import select_wrapper %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block service_page_title %}
+  Change letter branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('.view_template', service_id=current_service.id, template_id=from_template) if from_template else url_for('.service_settings', service_id=current_service.id)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Change letter branding') }}
+
+  <p class="govuk-body">
+    Your letters currently have {{ branding_name }} branding.
+  </p>
+
+  {% call form_wrapper() %}
+    {% if form.something_else_is_only_option %}
+      {{ textbox(
+        form.something_else,
+        hint='Include links to your brand guidelines or examples of how to use your branding',
+        width='1-1',
+      ) }}
+    {% else %}
+      {% call select_wrapper(form.options) %}
+        {% for option in form.options %}
+          {{ radio(option, data_target='panel-something-else' if option.data == form.FALLBACK_OPTION_VALUE else '') }}
+        {% endfor %}
+      {% endcall %}
+      {% call conditional_radio_panel('panel-something-else') %}
+        {{ textbox(
+          form.something_else,
+          hint='Include links to your brand guidelines or examples of how to use your branding',
+          width='1-1',
+          autosize=True,
+        ) }}
+      {% endcall %}
+    {% endif %}
+    <p class="form-group">
+      We’ll email you once your branding’s ready to use, or if we need any
+      more information.
+    </p>
+    {{ page_footer('Request new branding') }}
+  {% endcall %}
+
+{% endblock %}

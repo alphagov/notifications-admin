@@ -8,24 +8,24 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
-  Change {{ branding_type }} branding
+  Change email branding
 {% endblock %}
 
 {% block backLink %}
   {{ govukBackLink({
-    "href": url_for('.view_template', service_id=current_service.id, template_id=from_template) if from_template else url_for('.service_settings', service_id=current_service.id)
+    "href": url_for('.service_settings', service_id=current_service.id)
   }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change {} branding'.format(branding_type)) }}
+  {{ page_header('Change email branding') }}
 
   <p class="govuk-body">
-    Your {{ branding_type }}s currently have {{ branding_name }} branding.
+    Your emails currently have {{ branding_name }} branding.
   </p>
 
-  {% if current_service.needs_to_change_email_branding and branding_type == "email" %}
+  {% if current_service.needs_to_change_email_branding %}
     <p class="govuk-body">
       You should be using your own branding instead. We can help you to set this up.
     </p>
