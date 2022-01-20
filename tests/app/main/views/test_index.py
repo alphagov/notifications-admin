@@ -188,12 +188,12 @@ def test_message_status_page_contains_message_status_ids(client_request):
     page = client_request.get('main.message_status')
 
     assert page.find(id='email-statuses')
-    assert page.find(id='sms-statuses')
+    assert page.find(id='text-message-statuses')
 
 
 def test_message_status_page_contains_link_to_support(client_request):
     page = client_request.get('main.message_status')
-    sms_status_table = page.find(id='sms-statuses').findNext('tbody')
+    sms_status_table = page.find(id='text-message-statuses').findNext('tbody')
 
     temp_fail_details_cell = sms_status_table.select_one('tr:nth-child(4) > td:nth-child(2)')
     assert temp_fail_details_cell.find('a').attrs['href'] == url_for('main.support')
