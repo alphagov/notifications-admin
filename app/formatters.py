@@ -285,7 +285,7 @@ def format_notification_status_as_url(status, notification_type):
 
     return {
         'email': url(_anchor='email-statuses'),
-        'sms': url(_anchor='sms-statuses')
+        'sms': url(_anchor='text-message-statuses')
     }.get(notification_type)
 
 

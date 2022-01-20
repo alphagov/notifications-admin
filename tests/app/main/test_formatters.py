@@ -22,9 +22,9 @@ from app.formatters import (
     ('temporary-failure', 'email', partial(url_for, 'main.message_status', _anchor='email-statuses')),
     ('permanent-failure', 'email', partial(url_for, 'main.message_status', _anchor='email-statuses')),
     ('technical-failure', 'email', partial(url_for, 'main.message_status', _anchor='email-statuses')),
-    ('temporary-failure', 'sms', partial(url_for, 'main.message_status', _anchor='sms-statuses')),
-    ('permanent-failure', 'sms', partial(url_for, 'main.message_status', _anchor='sms-statuses')),
-    ('technical-failure', 'sms', partial(url_for, 'main.message_status', _anchor='sms-statuses')),
+    ('temporary-failure', 'sms', partial(url_for, 'main.message_status', _anchor='text-message-statuses')),
+    ('permanent-failure', 'sms', partial(url_for, 'main.message_status', _anchor='text-message-statuses')),
+    ('technical-failure', 'sms', partial(url_for, 'main.message_status', _anchor='text-message-statuses')),
     # Letter statuses are never linked
     ('technical-failure', 'letter', lambda: None),
     ('cancelled', 'letter', lambda: None),
