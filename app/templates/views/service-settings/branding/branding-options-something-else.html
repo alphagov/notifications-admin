@@ -22,11 +22,16 @@
   {{ page_header('Something else') }}
 
   <p class="govuk-body">
-    —
+    Should we make an ‘upload’ here?
   </p>
 
   {% call form_wrapper() %}
-    {{ form.something_else }}
+    {{ textbox(
+      form.something_else,
+      hint='Include links to your brand guidelines or examples of how to use your branding',
+      width='1-1',
+      autosize=True,
+    ) }}
     {{ page_footer('Request new branding') }}
   {% endcall %}
 
