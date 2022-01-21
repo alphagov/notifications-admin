@@ -212,7 +212,7 @@
     </p>
   {% elif broadcast_message.status == 'cancelled' %}
     <p class="govuk-body">
-      Stopped by {{ broadcast_message.cancelled_by.name }}
+      Stopped by {{ broadcast_message.cancelled_by }}
       {{ broadcast_message.cancelled_at|format_datetime_human }}.
     </p>
   {% elif broadcast_message.status == 'completed' %}
