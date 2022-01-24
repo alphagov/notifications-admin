@@ -45,6 +45,8 @@ from app.main.forms import (
     FreeSMSAllowance,
     LinkOrganisationsForm,
     MessageLimit,
+    NewBrandingOptionsEmail,
+    PNGFileUpload,
     PreviewBranding,
     RateLimit,
     RenameServiceForm,
@@ -1142,14 +1144,12 @@ def get_email_branding_name(service, branding_option):
     return branding_options[branding_option]
 
 
-def get_email_branding_id(service, branding_option):
-    option_name = get_email_branding_name(service, branding_option)
-
+def get_email_branding_id(branding_name):
     email_branding = email_branding_client.get_all_email_branding()
 
     return next((
         email_brand['id'] for email_brand in email_branding
-        if email_safe(email_brand['name']) == email_safe(option_name)
+        if email_safe(email_brand['name']) == email_safe(branding_name)
     ), None)
 
 
@@ -1162,13 +1162,30 @@ def branding_request(service_id, branding_type):
         branding_name = current_service.email_branding_name
     elif branding_type == "letter":
         branding_name = current_service.letter_branding_name
+
     if form.validate_on_submit():
-        return redirect(url_for(
-            '.branding_request_preview',
-            service_id=current_service.id,
-            branding_type=branding_type,
-            branding_option=form.options.data,
-        ))
+        if form.options.data == 'something_else':
+            return redirect(url_for(
+                '.branding_request_something_else',
+                service_id=service_id,
+                branding_type=branding_type,
+            ))
+        if form.options.data == 'organisation':
+            guessed_branding_id = get_email_branding_id(current_service.organisation.name)
+
+            if guessed_branding_id:
+                return redirect(url_for(
+                    '.branding_request_preview',
+                    service_id=current_service.id,
+                    branding_type=branding_type,
+                    branding_id=guessed_branding_id,
+                ))
+            else:
+                return redirect(url_for(
+                    '.branding_request_not_on_file',
+                    branding_type='email',
+                    service_id=current_service.id,
+                ))
 
     return render_template(
         'views/service-settings/branding/branding-options.html',
@@ -1190,7 +1207,7 @@ def branding_request_something_else(service_id, branding_type):
     )
 
     if form.validate_on_submit():
-        flash('Your new email branding has been applied', 'default')
+        flash('We’ll be in touch', 'default')
         return redirect(url_for(
             '.service_settings',
             service_id=current_service.id,
@@ -1203,12 +1220,14 @@ def branding_request_something_else(service_id, branding_type):
     )
 
 
-@main.route("/services/<uuid:service_id>/branding-request/<branding_type>/preview/<branding_option>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/branding-request/<branding_type>/preview/<uuid:branding_id>", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-def branding_request_preview(service_id, branding_type, branding_option):
+def branding_request_preview(service_id, branding_type, branding_id):
+
+    email_branding = email_branding_client.get_email_branding(branding_id)
 
     if request.method == 'POST':
-        flash('Your new email branding has been applied', 'default')
+        flash('Your new email branding has been applied', 'default_with_tick')
         return redirect(url_for(
             '.service_settings',
             service_id=current_service.id,
@@ -1217,9 +1236,41 @@ def branding_request_preview(service_id, branding_type, branding_option):
     return render_template(
         'views/service-settings/branding/branding-options-preview.html',
         branding_type=branding_type,
-        branding_option=branding_option,
-        option_name=get_email_branding_name(current_service, branding_option),
-        selected_email_branding_id=get_email_branding_id(current_service, branding_option),
+        option_name=current_service.organisation.name,
+        selected_email_branding_id=email_branding['email_branding']['id'],
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/<branding_type>/not-on-file", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_not_on_file(service_id, branding_type):
+    form = NewBrandingOptionsEmail()
+    if form.validate_on_submit():
+        return redirect(url_for(
+            'main.branding_request_upload',
+            service_id=current_service.id,
+            branding_style=form.options.data,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/upload/<branding_style>", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_upload(service_id, branding_style):
+    form = PNGFileUpload()
+    if form.validate_on_submit():
+        return redirect(url_for(
+            'main.branding_request_preview',
+            branding_type='email',
+            branding_id=get_email_branding_id('Fake local gov brand for research'),
+            service_id=current_service.id,
+        ))
+    return render_template(
+        'views/service-settings/branding/upload.html',
+        form=form,
     )
 
 

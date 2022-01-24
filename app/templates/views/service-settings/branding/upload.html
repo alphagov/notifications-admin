@@ -6,33 +6,30 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/file-upload.html" import file_upload %}
 
 {% block service_page_title %}
-  Preview
+  Create branding
 {% endblock %}
 
 {% block backLink %}
   {{ govukBackLink({
-    'href': url_for('.branding_request', service_id=current_service.id, branding_type=branding_type)
+    "href": url_for('.view_template', service_id=current_service.id, template_id=from_template) if from_template else url_for('.service_settings', service_id=current_service.id)
   }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('Preview of {}'.format(option_name)) }}
+  {{ page_header('Create branding') }}
 
   <p class="govuk-body">
-    This is how your emails will look
+    Upload
   </p>
 
-  <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview"></iframe>
-
-  <p class="govuk-body">
-    What happens next
-  </p>
-
-  {% call form_wrapper() %}
-    {{ page_footer('Apply branding') }}
-  {% endcall %}
+  {{ file_upload(
+    form.file,
+    allowed_file_extensions=['png'],
+    button_text='Choose an image'
+  ) }}
 
 {% endblock %}

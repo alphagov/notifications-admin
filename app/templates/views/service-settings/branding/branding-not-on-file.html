@@ -22,32 +22,32 @@
   {{ page_header('Change {} branding'.format(branding_type)) }}
 
   <p class="govuk-body">
-    Your {{ branding_type }}s currently have {{ branding_name }} branding:
+    We don’t have the branding for {{ current_service.organisation.name }} set up yet.
   </p>
 
-  <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview"></iframe>
-
-  {% if current_service.needs_to_change_email_branding and branding_type == "email" %}
-    <p class="govuk-body">
-      You should be using your own branding instead. We can help you to set this up.
-    </p>
-  {% endif %}
-
   {% call form_wrapper() %}
-    {% if form.something_else_is_only_option %}
-      {{ textbox(
-        form.something_else,
-        hint='Include links to your brand guidelines or examples of how to use your branding',
-        width='1-1',
-      ) }}
-    {% else %}
-      {% call select_wrapper(form.options) %}
+    <fieldset class="form-group {% if form.options.errors %}form-group-error{% endif %} top-gutter">
+      <legend class="bottom-gutter-2-3">
+        Tell us what it looks like
+      </legend>
+      {% if form.options.errors %}
+        <span class="error-message" data-module="track-error" data-error-type="Can’t be empty" data-error-label="{{ form.options.name }}">
+          You need to choose an option
+        </span>
+      {% endif %}
+      <div class="govuk-grid-row">
         {% for option in form.options %}
-          {{ radio(option) }}
+          <div class="govuk-grid-column-one-third">
+            <label for="{{ option.id }}">
+              <img src="{{ asset_url('images/branding/{}.png'.format(option.data)) }}" alt="" class="bordered-image bottom-gutter-1-3">
+            </label>
+            {{ radio(option) }}
+          </div>
         {% endfor %}
-      {% endcall %}
-    {% endif %}
-    {{ page_footer('Continue to preview') }}
+      </div>
+    </fieldset>
+    {{ page_footer('Continue') }}
+
   {% endcall %}
 
 {% endblock %}

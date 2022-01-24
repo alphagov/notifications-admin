@@ -1879,6 +1879,14 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
             raise ValidationError('This field is required')
 
 
+class PNGFileUpload(StripWhitespaceForm):
+    file = FileField_wtf(
+        'Upload a PNG file',
+        validators=[
+            DataRequired(message="You need to upload a file to submit"),
+        ]
+    )
+
 class SVGFileUpload(StripWhitespaceForm):
     file = FileField_wtf(
         'Upload an SVG logo',
@@ -2115,6 +2123,25 @@ class LinkOrganisationsForm(StripWhitespaceForm):
     )
 
 
+branding_options = (
+    ('single_identity', 'Crest with stripe'),
+    ('org', 'Your logo'),
+    ('org_banner', 'Your logo on a colour'),
+)
+branding_options_dict = dict(branding_options)
+
+
+class NewBrandingOptionsEmail(StripWhitespaceForm):
+
+    options = RadioField(
+        'Branding options',
+        choices=branding_options,
+        validators=[
+            DataRequired()
+        ],
+    )
+
+
 class BrandingOptions(StripWhitespaceForm):
 
     FALLBACK_OPTION_VALUE = 'something_else'
@@ -2147,13 +2174,15 @@ class BrandingOptions(StripWhitespaceForm):
             service_branding_name = service.letter_branding_name
 
         if (
-            service_branding_id is not None
+            service.organisation_type == Organisation.TYPE_CENTRAL
+            and service_branding_id is not None
             and branding_type == "email"
         ):
             yield ('govuk', 'GOV.UK')
 
         if (
-            service.organisation
+            service.organisation_type == Organisation.TYPE_CENTRAL
+            and service.organisation
             and service_branding_name.lower() != 'GOV.UK and {}'.format(service.organisation.name).lower()
             and branding_type == "email"
         ):
