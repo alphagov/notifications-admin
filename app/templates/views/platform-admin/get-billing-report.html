@@ -17,4 +17,22 @@
     {{ page_footer('Download report') }}
   {% endcall %}
 
+  <h2 class="heading-medium">
+    Guidance for interpreting the report
+  </h2>
+  <p class="govuk-body">
+    Billing report shows data for period between start date and end date, inclusive of both dates.
+  </p>
+  <p class="govuk-body">
+    Explanation for more confusing column names in the report:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>sms cost - cost accrued by a service through sending text messages after they run out of free allowance</li>
+    <li>sms chargeable units - sms fragments that go over free allowance multiplied by rate multiplier (so higher costs of sending international SMS are taken into consideration)</li>
+    <li>letter cost - cost accrued by a service through sending letters (number of letters * numbers of paper sheets * postage)</li>
+    <li>letter breakdown - amount and cost of letters sent by a service for each postage class</li>
+    <li> purchase order number, contact names, contact email addresses, billing reference - this data is manually filled in by us based on the information we get from services. You can help by filling it in (on Service Settings page)</li>
+
+  </ul>
+
 {% endblock %}
