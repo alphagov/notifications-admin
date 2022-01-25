@@ -153,6 +153,7 @@ class Test(Development):
 
 
 class Preview(Config):
+    ADMIN_BASE_URL = "https://notify-admin-prototype-preview.cloudapps.digital"
     HTTP_PROTOCOL = "https"
     HEADER_COLOUR = "#F499BE"  # $baby-pink
     CSV_UPLOAD_BUCKET_NAME = "preview-notifications-csv-upload"
@@ -188,6 +189,7 @@ class Staging(Config):
 
 
 class Production(Config):
+    ADMIN_BASE_URL = "https://notify-admin-prototype-production.cloudapps.digital"
     HEADER_COLOUR = "#1d70b8"  # $govuk-blue
     HTTP_PROTOCOL = "https"
     CSV_UPLOAD_BUCKET_NAME = "live-notifications-csv-upload"
