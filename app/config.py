@@ -142,6 +142,7 @@ class Test(Development):
 
 
 class Preview(Config):
+    ADMIN_BASE_URL = 'https://notify-admin-prototype-preview.cloudapps.digital'
     HTTP_PROTOCOL = 'https'
     HEADER_COLOUR = '#F499BE'  # $baby-pink
     CSV_UPLOAD_BUCKET_NAME = 'preview-notifications-csv-upload'
@@ -154,7 +155,6 @@ class Preview(Config):
     NOTIFY_ENVIRONMENT = 'preview'
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = 'static.notify.works'
-    ASSET_PATH = 'https://static.notify.works/'
 
     # On preview, extend the validation timeout to allow more leniency when running functional tests
     REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT = 120
@@ -177,6 +177,7 @@ class Staging(Config):
 
 
 class Live(Config):
+    ADMIN_BASE_URL = 'https://notify-admin-prototype-production.cloudapps.digital'
     HEADER_COLOUR = '#005EA5'  # $govuk-blue
     HTTP_PROTOCOL = 'https'
     CSV_UPLOAD_BUCKET_NAME = 'live-notifications-csv-upload'
@@ -189,7 +190,6 @@ class Live(Config):
     NOTIFY_ENVIRONMENT = 'live'
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = 'static.notifications.service.gov.uk'
-    ASSET_PATH = 'https://static.notifications.service.gov.uk/'
 
 
 class CloudFoundryConfig(Config):
