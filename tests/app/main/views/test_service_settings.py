@@ -5064,18 +5064,6 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
         },
         'Something else\n\nHomer Simpson'
     ),
-    pytest.param(
-        {
-            'options': 'something_else',
-        },
-        '[Missing details]',
-        marks=pytest.mark.xfail(raises=AssertionError),
-    ),
-    pytest.param(
-        {'options': 'foo'},
-        'Nope',
-        marks=pytest.mark.xfail(raises=AssertionError),
-    ),
 ))
 @pytest.mark.parametrize('org_name, expected_organisation', (
     (None, 'Can’t tell (domain is user.gov.uk)'),
@@ -5147,27 +5135,28 @@ def test_submit_email_branding_request(
     )
 
 
-@pytest.mark.parametrize('data, requested_branding', (
-    (
-        {
-            'options': 'something_else',
-            'something_else': 'Homer Simpson'
-        },
-        'Something else\n\nHomer Simpson'
-    ),
-    pytest.param(
-        {
-            'options': 'something_else',
-        },
-        '[Missing details]',
-        marks=pytest.mark.xfail(raises=AssertionError),
-    ),
-    pytest.param(
-        {'options': 'foo'},
-        'Nope',
-        marks=pytest.mark.xfail(raises=AssertionError),
-    ),
+@pytest.mark.parametrize('data, error_message', (
+    ({'options': 'something_else'}, 'Cannot be empty'),  # no data in 'something_else' textbox
+    ({'options': 'foo'}, 'Select an option'),  # no radio button selected
 ))
+def test_submit_email_branding_request_when_form_has_missing_data(
+    client_request,
+    service_one,
+    data,
+    error_message,
+    mock_get_email_branding,
+):
+    service_one['email_branding'] = sample_uuid()
+
+    page = client_request.post(
+        '.email_branding_request', service_id=SERVICE_ONE_ID,
+        _data=data,
+        _follow_redirects=True,
+    )
+    assert page.h1.text == 'Change email branding'
+    assert normalize_spaces(page.select_one('.error-message').text) == error_message
+
+
 @pytest.mark.parametrize('org_name, expected_organisation', (
     (None, 'Can’t tell (domain is user.gov.uk)'),
     ('Test Organisation', 'Test Organisation'),
@@ -5176,8 +5165,6 @@ def test_submit_letter_branding_request(
     client_request,
     service_one,
     mocker,
-    data,
-    requested_branding,
     mock_get_service_settings_page_common,
     mock_get_letter_branding_by_id,
     no_reply_to_email_addresses,
@@ -5207,7 +5194,10 @@ def test_submit_letter_branding_request(
 
     page = client_request.post(
         '.letter_branding_request', service_id=SERVICE_ONE_ID,
-        _data=data,
+        _data={
+            'options': 'something_else',
+            'something_else': 'Homer Simpson',
+        },
         _follow_redirects=True,
     )
 
@@ -5220,8 +5210,8 @@ def test_submit_letter_branding_request(
             '',
             '---',
             'Current branding: HM Government',
-            'Branding requested: {}\n',
-        ]).format(expected_organisation, requested_branding),
+            'Branding requested: Something else\n\nHomer Simpson\n',
+        ]).format(expected_organisation),
         subject='Letter branding request - service one',
         ticket_type='question',
         user_name='Test User',
@@ -5235,6 +5225,35 @@ def test_submit_letter_branding_request(
         'Thanks for your branding request. We’ll get back to you '
         'within one working day.'
     )
+
+
+@pytest.mark.parametrize('data, error_message', (
+    ({'options': 'something_else'}, 'Cannot be empty'),  # no data in 'something_else' textbox
+    ({'options': ''}, 'Select an option'),  # no radio button selected
+))
+def test_submit_letter_branding_request_when_form_has_missing_data(
+    client_request,
+    mocker,
+    service_one,
+    organisation_one,
+    data,
+    error_message,
+    mock_get_letter_branding_by_id,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+    service_one['letter_branding'] = sample_uuid()
+    service_one['organisation'] = organisation_one
+
+    page = client_request.post(
+        '.letter_branding_request', service_id=SERVICE_ONE_ID,
+        _data=data,
+        _follow_redirects=True,
+    )
+    assert page.h1.text == 'Change letter branding'
+    assert normalize_spaces(page.select_one('.error-message').text) == error_message
 
 
 @pytest.mark.parametrize('from_template', [
