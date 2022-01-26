@@ -1,8 +1,7 @@
 from functools import wraps
 from itertools import chain
-from urllib.parse import urlparse
 
-from flask import abort, current_app, g, make_response, request
+from flask import abort, g, make_response, request
 from flask_login import current_user
 from notifications_utils.field import Field
 from orderedset._orderedset import OrderedSet
@@ -34,18 +33,6 @@ def service_has_permission(permission):
 
 def get_help_argument():
     return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None
-
-
-def get_logo_cdn_domain():
-    parsed_uri = urlparse(current_app.config['ADMIN_BASE_URL'])
-
-    if parsed_uri.netloc.startswith('localhost'):
-        return 'static-logos.notify.tools'
-
-    subdomain = parsed_uri.hostname.split('.')[0]
-    domain = parsed_uri.netloc[len(subdomain + '.'):]
-
-    return "static-logos.{}".format(domain)
 
 
 def parse_filter_args(filter_dict):

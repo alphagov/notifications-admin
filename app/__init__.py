@@ -129,7 +129,6 @@ from app.url_converters import (
     TemplateTypeConverter,
     TicketTypeConverter,
 )
-from app.utils import get_logo_cdn_domain
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -372,7 +371,7 @@ def useful_headers_after_request(response):
         " *.notifications.service.gov.uk {logo_domain} data:;"
         "frame-src 'self' www.youtube-nocookie.com;".format(
             asset_domain=current_app.config['ASSET_DOMAIN'],
-            logo_domain=get_logo_cdn_domain(),
+            logo_domain=current_app.config['LOGO_CDN_DOMAIN'],
         )
     ))
     response.headers.add('Link', (

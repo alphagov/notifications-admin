@@ -25,7 +25,6 @@ from app.s3_client.s3_logo_client import (
     persist_logo,
     upload_letter_temp_logo,
 )
-from app.utils import get_logo_cdn_domain
 from app.utils.user import user_is_platform_admin
 
 
@@ -113,7 +112,7 @@ def update_letter_branding(branding_id, logo=None):
         'views/letter-branding/manage-letter-branding.html',
         file_upload_form=file_upload_form,
         letter_branding_details_form=letter_branding_details_form,
-        cdn_url=get_logo_cdn_domain(),
+        cdn_url=current_app.config['LOGO_CDN_DOMAIN'],
         logo=logo,
         is_update=True
     )
@@ -169,7 +168,7 @@ def create_letter_branding(logo=None):
         'views/letter-branding/manage-letter-branding.html',
         file_upload_form=file_upload_form,
         letter_branding_details_form=letter_branding_details_form,
-        cdn_url=get_logo_cdn_domain(),
+        cdn_url=current_app.config['LOGO_CDN_DOMAIN'],
         logo=logo
     )
 

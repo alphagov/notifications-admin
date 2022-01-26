@@ -6,8 +6,6 @@ def test_owasp_useful_headers_set(
     mock_get_service_and_organisation_counts,
 ):
     client_request.logout()
-    mocker.patch('app.get_logo_cdn_domain', return_value='static-logos.test.com')
-
     response = client_request.get_response('.index')
 
     assert response.headers['X-Frame-Options'] == 'deny'
@@ -36,7 +34,10 @@ def test_headers_non_ascii_characters_are_replaced(
     mock_get_service_and_organisation_counts,
 ):
     client_request.logout()
-    mocker.patch('app.get_logo_cdn_domain', return_value='static-logos€æ.test.com')
+    mocker.patch.dict(
+        'app.current_app.config',
+        values={'LOGO_CDN_DOMAIN': 'static-logos€æ.test.com'},
+    )
 
     response = client_request.get_response('.index')
 

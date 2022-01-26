@@ -11,7 +11,6 @@ from app.s3_client.s3_logo_client import (
     persist_logo,
     upload_email_logo,
 )
-from app.utils import get_logo_cdn_domain
 from app.utils.user import user_is_platform_admin
 
 
@@ -78,7 +77,7 @@ def update_email_branding(branding_id, logo=None):
         'views/email-branding/manage-branding.html',
         form=form,
         email_branding=email_branding,
-        cdn_url=get_logo_cdn_domain(),
+        cdn_url=current_app.config['LOGO_CDN_DOMAIN'],
         logo=logo
     )
 
@@ -123,6 +122,6 @@ def create_email_branding(logo=None):
     return render_template(
         'views/email-branding/manage-branding.html',
         form=form,
-        cdn_url=get_logo_cdn_domain(),
+        cdn_url=current_app.config['LOGO_CDN_DOMAIN'],
         logo=logo
     )
