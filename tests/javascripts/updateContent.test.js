@@ -31,6 +31,9 @@ beforeAll(() => {
 
   $.ajax.mockImplementation(() => jqueryAJAXReturnObj);
 
+  // RollupJS assigns our bundled module code, including DiffDOM, to window.GOVUK.
+  // DiffDOM is assigned to its vendor property so we need to copy that here for the updateContent
+  // code to pick it up.
   window.GOVUK.vendor = {
     DiffDOM: require('diff-dom').DiffDOM
   };
