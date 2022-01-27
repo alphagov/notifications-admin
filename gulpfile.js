@@ -146,7 +146,6 @@ const javascripts = () => {
       paths.npm + 'hogan.js/dist/hogan-3.0.2.js',
       paths.npm + 'jquery/dist/jquery.min.js',
       paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
-      paths.npm + 'domdiff/min.js',
       paths.npm + 'timeago/jquery.timeago.js',
       paths.npm + 'textarea-caret/index.js',
       paths.npm + 'cbor-js/cbor.js'
