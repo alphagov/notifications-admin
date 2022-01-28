@@ -1,5 +1,6 @@
 {% extends "views/platform-admin/_base_template.html" %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block per_page_title %}
   Billing Report
@@ -18,21 +19,28 @@
   {% endcall %}
 
   <h2 class="heading-medium">
-    Guidance for interpreting the report
+    Data included in the report
   </h2>
-  <p class="govuk-body">
-    Billing report shows data for period between start date and end date, inclusive of both dates.
-  </p>
-  <p class="govuk-body">
-    Explanation for more confusing column names in the report:
-  </p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>sms cost - cost accrued by a service through sending text messages after they run out of free allowance</li>
-    <li>sms chargeable units - sms fragments that go over free allowance multiplied by rate multiplier (so higher costs of sending international SMS are taken into consideration)</li>
-    <li>letter cost - cost accrued by a service through sending letters (number of letters * numbers of paper sheets * postage)</li>
-    <li>letter breakdown - amount and cost of letters sent by a service for each postage class</li>
-    <li> purchase order number, contact names, contact email addresses, billing reference - this data is manually filled in by us based on the information we get from services. You can help by filling it in (on Service Settings page)</li>
-
-  </ul>
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Descriptions of billing report data',
+      field_headings=['Name', 'Description'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_length, charge in [
+        ('sms cost', 'The total cost of text messages sent after a service has used its free allowance.'),
+        ('sms chargeable units', 'The number of fragments sent after a service has used its free allowance. This number takes into account the cost multiplier for <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/pricing#international-numbers">sending international text messages</a>.'),
+        ('letter cost', 'The total cost of letters sent by a service.'),
+        ('letter breakdown', 'The number and cost of letters sent by a service, grouped by postage.'),
+        ('purchase order number, contact names, contact email addresses and billing reference', 'We add this data manually based on the information we get from services. You can help by adding it to the service settings page.'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_length) }}
+          {{ text_field(charge | safe) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
 
 {% endblock %}

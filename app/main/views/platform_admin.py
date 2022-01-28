@@ -294,9 +294,9 @@ def get_billing_report():
         rows = [
             [
                 r["organisation_id"], r["organisation_name"], r["service_id"], r["service_name"],
-                r["sms_cost"], r["sms_chargeable_units"], r["total_letters"], r["letter_cost"], r["letter_breakdown"].strip(),
-                r.get("purchase_order_number"), r.get("contact_names"), r.get("contact_email_addresses"),
-                r.get("billing_reference")
+                r["sms_cost"], r["sms_chargeable_units"], r["total_letters"], r["letter_cost"],
+                r["letter_breakdown"].strip(), r.get("purchase_order_number"), r.get("contact_names"),
+                r.get("contact_email_addresses"), r.get("billing_reference")
             ]
             for r in result
         ]
