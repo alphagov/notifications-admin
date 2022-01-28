@@ -1,5 +1,6 @@
 from flask import (
     abort,
+    current_app,
     make_response,
     redirect,
     render_template,
@@ -16,7 +17,7 @@ from app.main.views.sub_navigation_dictionaries import (
     features_nav,
     using_notify_nav,
 )
-from app.utils import get_logo_cdn_domain, hide_from_search_engines
+from app.utils import hide_from_search_engines
 
 
 @main.route('/')
@@ -87,7 +88,7 @@ def email_template():
         colour = email_branding['colour']
         brand_text = email_branding['text']
         brand_colour = colour
-        brand_logo = ('https://{}/{}'.format(get_logo_cdn_domain(), email_branding['logo'])
+        brand_logo = (f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{email_branding['logo']}"
                       if email_branding['logo'] else None)
         govuk_banner = branding_type in ['govuk', 'both']
         brand_banner = branding_type == 'org_banner'

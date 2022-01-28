@@ -1,18 +1,6 @@
 import pytest
 
-from app.utils import get_logo_cdn_domain, merge_jsonlike
-
-
-def test_get_cdn_domain_on_localhost(client_request, mocker):
-    mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'http://localhost:6012'})
-    domain = get_logo_cdn_domain()
-    assert domain == 'static-logos.notify.tools'
-
-
-def test_get_cdn_domain_on_non_localhost(client_request, mocker):
-    mocker.patch.dict('app.current_app.config', values={'ADMIN_BASE_URL': 'https://some.admintest.com'})
-    domain = get_logo_cdn_domain()
-    assert domain == 'static-logos.admintest.com'
+from app.utils import merge_jsonlike
 
 
 @pytest.mark.parametrize("source_object, destination_object, expected_result", [
