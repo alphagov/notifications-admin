@@ -219,7 +219,11 @@ class MainNavigation(Navigation):
         'settings': {
             'add_organisation_from_gp_service',
             'add_organisation_from_nhs_local_service',
+            'email_branding_govuk',
+            'email_branding_nhs',
+            'email_branding_organisation',
             'email_branding_request',
+            'email_branding_something_else',
             'estimate_usage',
             'letter_branding_request',
             'link_service_to_organisation',

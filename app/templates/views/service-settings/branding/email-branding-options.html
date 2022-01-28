@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radio, conditional_radio_panel %}
+{% from "components/radios.html" import radio %}
 {% from "components/select-input.html" import select_wrapper %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
@@ -31,33 +31,27 @@
     </p>
   {% endif %}
 
-  {% call form_wrapper() %}
-    {% if form.something_else_is_only_option %}
-      {{ textbox(
-        form.something_else,
-        hint='Include links to your brand guidelines or examples of how to use your branding',
-        width='1-1',
-      ) }}
-    {% else %}
-      {% call select_wrapper(form.options) %}
-        {% for option in form.options %}
-          {{ radio(option, data_target='panel-something-else' if option.data == form.FALLBACK_OPTION_VALUE else '') }}
-        {% endfor %}
-      {% endcall %}
-      {% call conditional_radio_panel('panel-something-else') %}
+  {% if form.something_else_is_only_option %}
+    {% call form_wrapper() %}
         {{ textbox(
           form.something_else,
           hint='Include links to your brand guidelines or examples of how to use your branding',
           width='1-1',
-          autosize=True,
         ) }}
-      {% endcall %}
-    {% endif %}
-    <p class="form-group">
-      We’ll email you once your branding’s ready to use, or if we need any
-      more information.
-    </p>
-    {{ page_footer('Request new branding') }}
-  {% endcall %}
+      <p class="form-group">
+        We’ll email you when your branding is ready, or if we need any more information.
+      </p>
+      {{ page_footer('Request new branding') }}
+    {% endcall %}
+  {% else %}
+    {% call form_wrapper() %}
+        {% call select_wrapper(form.options) %}
+          {% for option in form.options %}
+            {{ radio(option) }}
+          {% endfor %}
+        {% endcall %}
+      {{ page_footer('Continue') }}
+    {% endcall %}
+  {% endif %}
 
 {% endblock %}

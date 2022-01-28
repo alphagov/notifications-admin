@@ -2130,6 +2130,7 @@ class BrandingOptions(StripWhitespaceForm):
 
     def __init__(self, service, *args, branding_type="email", **kwargs):
         super().__init__(*args, **kwargs)
+        self.branding_type = branding_type
         self.options.choices = tuple(self.get_available_choices(service, branding_type))
         self.options.label.text = 'Choose your new {} branding'.format(branding_type)
         if self.something_else_is_only_option:
@@ -2194,14 +2195,22 @@ class BrandingOptions(StripWhitespaceForm):
         return self.options.choices == (self.FALLBACK_OPTION,)
 
     def validate_something_else(self, field):
-        if (
-            self.something_else_is_only_option
-            or self.options.data == self.FALLBACK_OPTION_VALUE
-        ) and not field.data:
-            raise ValidationError('Cannot be empty')
+        if self.branding_type == 'email':
+            if self.something_else_is_only_option and not field.data:
+                raise ValidationError('Cannot be empty')
+        elif self.branding_type == 'letter':
+            if (
+                self.something_else_is_only_option
+                or self.options.data == self.FALLBACK_OPTION_VALUE
+            ) and not field.data:
+                raise ValidationError('Cannot be empty')
 
         if self.options.data != self.FALLBACK_OPTION_VALUE:
             field.data = ''
+
+
+class SomethingElseBrandingForm(StripWhitespaceForm):
+    something_else = TextAreaField('', validators=[DataRequired('Cannot be empty')])
 
 
 class ServiceDataRetentionForm(StripWhitespaceForm):

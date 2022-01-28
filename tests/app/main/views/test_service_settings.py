@@ -4750,7 +4750,6 @@ def test_update_service_organisation_does_not_update_if_same_value(
     assert mock_update_service_organisation.called is False
 
 
-@pytest.mark.parametrize('branding_type', ['email', 'letter'])
 @pytest.mark.parametrize('organisation_type, expected_options', (
     ('central', None),
     ('local', None),
@@ -4769,21 +4768,77 @@ def test_update_service_organisation_does_not_update_if_same_value(
     ('emergency_service', None),
     ('other', None),
 ))
-def test_show_branding_request_page_when_no_branding_is_set(
-    mocker,
+def test_show_email_branding_request_page_when_no_branding_is_set(
     service_one,
     client_request,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
     organisation_type,
     expected_options,
-    branding_type
 ):
-    service_one['{}_branding'.format(branding_type)] = None
+    service_one['email_branding'] = None
     service_one['organisation_type'] = organisation_type
 
     page = client_request.get(
-        f'.{branding_type}_branding_request', service_id=SERVICE_ONE_ID
+        '.email_branding_request', service_id=SERVICE_ONE_ID
+    )
+
+    assert mock_get_email_branding.called is False
+    assert mock_get_letter_branding_by_id.called is False
+
+    button_text = normalize_spaces(page.select_one('.page-footer button').text)
+
+    if expected_options:
+        assert [
+            (
+                radio['value'],
+                page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+            )
+            for radio in page.select('input[type=radio]')
+        ] == expected_options
+
+        assert button_text == 'Continue'
+    else:
+        assert page.select_one(
+            'textarea'
+        )['name'] == (
+            'something_else'
+        )
+        assert not page.select('.conditional-radios-panel')
+        assert button_text == 'Request new branding'
+
+
+@pytest.mark.parametrize('organisation_type, expected_options', (
+    ('central', None),
+    ('local', None),
+    ('nhs_central', [
+        ('nhs', 'NHS'),
+        ('something_else', 'Something else'),
+    ]),
+    ('nhs_local', [
+        ('nhs', 'NHS'),
+        ('something_else', 'Something else'),
+    ]),
+    ('nhs_gp', [
+        ('nhs', 'NHS'),
+        ('something_else', 'Something else'),
+    ]),
+    ('emergency_service', None),
+    ('other', None),
+))
+def test_letter_show_branding_request_page_when_no_branding_is_set(
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    mock_get_letter_branding_by_id,
+    organisation_type,
+    expected_options,
+):
+    service_one['letter_branding'] = None
+    service_one['organisation_type'] = organisation_type
+
+    page = client_request.get(
+        '.letter_branding_request', service_id=SERVICE_ONE_ID
     )
 
     assert mock_get_email_branding.called is False
@@ -4869,6 +4924,13 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
         )
         for radio in page.select('input[type=radio]')
     ] == expected_options
+
+    button_text = normalize_spaces(page.select_one('.page-footer button').text)
+
+    if branding_type == 'email':
+        assert button_text == 'Continue'
+    else:
+        assert button_text == 'Request new branding'
 
 
 @pytest.mark.parametrize('organisation_type, expected_options, branding_type', (
@@ -5043,58 +5105,103 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
     assert page.select_one('textarea')['name'] == 'something_else'
 
 
-@pytest.mark.parametrize('data, requested_branding', (
+@pytest.mark.parametrize('data, org_type, endpoint, expect_with_org_query_param', (
     (
         {
             'options': 'govuk',
         },
-        'GOV.UK',
+        'central',
+        'main.email_branding_govuk',
+        False
     ),
     (
         {
             'options': 'govuk',
             'something_else': 'ignored',
         },
-        'GOV.UK',
+        'central',
+        'main.email_branding_govuk',
+        False
+    ),
+    (
+        {
+            'options': 'govuk_and_org',
+        },
+        'central',
+        'main.email_branding_govuk',
+        True
+    ),
+    (
+        {
+            'options': 'organisation',
+        },
+        'central',
+        'main.email_branding_organisation',
+        False
     ),
     (
         {
             'options': 'something_else',
-            'something_else': 'Homer Simpson'
         },
-        'Something else\n\nHomer Simpson'
+        'central',
+        'main.email_branding_something_else',
+        False
+    ),
+    (
+        {
+            'options': 'nhs',
+        },
+        'nhs_local',
+        'main.email_branding_nhs',
+        False
     ),
 ))
-@pytest.mark.parametrize('org_name, expected_organisation', (
-    (None, 'Can’t tell (domain is user.gov.uk)'),
-    ('Test Organisation', 'Test Organisation'),
-))
-def test_submit_email_branding_request(
+def test_submit_email_branding_request_when_something_else_is_not_the_only_option(
     client_request,
     service_one,
     mocker,
+    mock_get_email_branding,
+    organisation_one,
     data,
-    requested_branding,
+    org_type,
+    endpoint,
+    expect_with_org_query_param,
+):
+    organisation_one['organisation_type'] = org_type
+    service_one['email_branding'] = sample_uuid()
+    service_one['organisation'] = organisation_one
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+
+    client_request.post(
+        '.email_branding_request',
+        service_id=SERVICE_ONE_ID,
+        _data=data,
+        _expected_status=302,
+        _expected_redirect=url_for(
+            endpoint,
+            service_id=SERVICE_ONE_ID,
+            with_org=(True if expect_with_org_query_param else None),
+            _external=True,
+        )
+    )
+
+
+def test_submit_email_branding_request_when_something_else_is_only_option(
+    client_request,
+    service_one,
+    mocker,
     mock_get_service_settings_page_common,
     mock_get_email_branding,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
-    org_name,
-    expected_organisation,
 ):
     service_one['email_branding'] = sample_uuid()
-    organisation_id = ORGANISATION_ID if org_name else None
-
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=organisation_id,
-    )
-    mocker.patch(
-        'app.organisations_client.get_organisation',
-        return_value=organisation_json(name=org_name),
-    )
+    service_one['organisation_type'] = 'local'
 
     mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
     mock_send_ticket_to_zendesk = mocker.patch(
@@ -5105,27 +5212,27 @@ def test_submit_email_branding_request(
     page = client_request.post(
         '.email_branding_request',
         service_id=SERVICE_ONE_ID,
-        _data=data,
+        _data={'options': 'something_else', 'something_else': 'Homer Simpson'},
         _follow_redirects=True,
     )
 
     mock_create_ticket.assert_called_once_with(
         ANY,
         message='\n'.join([
-            'Organisation: {}',
+            'Organisation: Can’t tell (domain is user.gov.uk)',
             'Service: service one',
             'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
             '',
             '---',
             'Current branding: Organisation name',
-            'Branding requested: {}\n',
-        ]).format(expected_organisation, requested_branding),
+            'Branding requested: Something else\n\nHomer Simpson\n',
+        ]),
         subject='Email branding request - service one',
         ticket_type='question',
         user_name='Test User',
         user_email='test@user.gov.uk',
-        org_id=organisation_id,
-        org_type='central',
+        org_id=None,
+        org_type='local',
         service_id=SERVICE_ONE_ID
     )
     mock_send_ticket_to_zendesk.assert_called_once()
@@ -5135,26 +5242,37 @@ def test_submit_email_branding_request(
     )
 
 
-@pytest.mark.parametrize('data, error_message', (
-    ({'options': 'something_else'}, 'Cannot be empty'),  # no data in 'something_else' textbox
-    ({'options': 'foo'}, 'Select an option'),  # no radio button selected
-))
-def test_submit_email_branding_request_when_form_has_missing_data(
+def test_submit_email_branding_request_when_something_else_is_only_option_and_textbox_is_empty(
     client_request,
     service_one,
-    data,
-    error_message,
+    mock_get_email_branding,
+):
+    service_one['email_branding'] = sample_uuid()
+    service_one['organisation_type'] = 'local'
+
+    page = client_request.post(
+        '.email_branding_request', service_id=SERVICE_ONE_ID,
+        _data={'options': 'something_else', 'something_else': ''},
+        _follow_redirects=True,
+    )
+    assert page.h1.text == 'Change email branding'
+    assert normalize_spaces(page.select_one('.error-message').text) == 'Cannot be empty'
+
+
+def test_submit_email_branding_request_when_no_radio_button_is_selected(
+    client_request,
+    service_one,
     mock_get_email_branding,
 ):
     service_one['email_branding'] = sample_uuid()
 
     page = client_request.post(
         '.email_branding_request', service_id=SERVICE_ONE_ID,
-        _data=data,
+        _data={'options': ''},
         _follow_redirects=True,
     )
     assert page.h1.text == 'Change email branding'
-    assert normalize_spaces(page.select_one('.error-message').text) == error_message
+    assert normalize_spaces(page.select_one('.error-message').text) == 'Select an option'
 
 
 @pytest.mark.parametrize('org_name, expected_organisation', (
@@ -5320,6 +5438,273 @@ def test_submit_branding_when_something_else_is_only_option(
         '\n'
         'Homer Simpson'.format(current_branding)
     ) in mock_create_ticket.call_args_list[0][1]['message']
+
+
+@pytest.mark.parametrize('endpoint, query_param, expected_heading', [
+    ('main.email_branding_govuk', False, 'Before you request new branding'),
+    ('main.email_branding_govuk', True, 'Before you request new branding'),
+    ('main.email_branding_nhs', False, 'Before you request new branding'),
+    ('main.email_branding_organisation', False, 'When you request new branding'),
+])
+def test_get_email_branding_description_pages(client_request, endpoint, query_param, expected_heading):
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        with_org=(True if query_param else None)
+    )
+    assert page.h1.text == expected_heading
+    assert normalize_spaces(page.select_one('.page-footer button').text) == 'Request new branding'
+
+
+def test_get_email_branding_something_else_page(client_request):
+    page = client_request.get(
+        'main.email_branding_something_else',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert normalize_spaces(page.h1.text) == 'Describe the branding you want'
+    assert page.select_one('textarea')['name'] == ('something_else')
+    assert normalize_spaces(page.select_one('.page-footer button').text) == 'Request new branding'
+
+
+@pytest.mark.parametrize('branding_choice, branding_description', [
+    ('govuk', 'GOV.UK'),
+    ('govuk_and_org', 'GOV.UK and organisation one'),
+])
+def test_submit_email_branding_request_from_govuk_description_page(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    mock_get_service_settings_page_common,
+    no_reply_to_email_addresses,
+    mock_get_email_branding,
+    single_sms_sender,
+    branding_choice,
+    branding_description,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+    mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
+    )
+    service_one['email_branding'] = sample_uuid()
+
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_send_ticket_to_zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        autospec=True,
+    )
+
+    page = client_request.post(
+        '.email_branding_govuk',
+        service_id=SERVICE_ONE_ID,
+        _data={'branding_choice': branding_choice},
+        _follow_redirects=True,
+    )
+
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        message='\n'.join([
+            'Organisation: organisation one',
+            'Service: service one',
+            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
+            '',
+            '---',
+            'Current branding: Organisation name',
+            f'Branding requested: {branding_description}\n',
+        ]),
+        subject='Email branding request - service one',
+        ticket_type='question',
+        user_name='Test User',
+        user_email='test@user.gov.uk',
+        org_id=ORGANISATION_ID,
+        org_type='central',
+        service_id=SERVICE_ONE_ID
+    )
+    mock_send_ticket_to_zendesk.assert_called_once()
+    assert normalize_spaces(page.select_one('.banner-default').text) == (
+        'Thanks for your branding request. We’ll get back to you '
+        'within one working day.'
+    )
+
+
+def test_submit_email_branding_request_from_nhs_description_page(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    mock_get_service_settings_page_common,
+    no_reply_to_email_addresses,
+    mock_get_email_branding,
+    single_sms_sender,
+):
+    service_one['email_branding'] = sample_uuid()
+    service_one['organisation_type'] = 'nhs_local'
+
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_send_ticket_to_zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        autospec=True,
+    )
+
+    page = client_request.post(
+        '.email_branding_nhs',
+        service_id=SERVICE_ONE_ID,
+        _follow_redirects=True,
+    )
+
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        message='\n'.join([
+            'Organisation: Can’t tell (domain is user.gov.uk)',
+            'Service: service one',
+            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
+            '',
+            '---',
+            'Current branding: Organisation name',
+            'Branding requested: NHS\n',
+        ]),
+        subject='Email branding request - service one',
+        ticket_type='question',
+        user_name='Test User',
+        user_email='test@user.gov.uk',
+        org_id=None,
+        org_type='nhs_local',
+        service_id=SERVICE_ONE_ID
+    )
+    mock_send_ticket_to_zendesk.assert_called_once()
+    assert normalize_spaces(page.select_one('.banner-default').text) == (
+        'Thanks for your branding request. We’ll get back to you '
+        'within one working day.'
+    )
+
+
+def test_submit_email_branding_request_from_organisation_description_page(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    mock_get_service_settings_page_common,
+    no_reply_to_email_addresses,
+    mock_get_email_branding,
+    single_sms_sender,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+    mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
+    )
+    service_one['email_branding'] = sample_uuid()
+
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_send_ticket_to_zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        autospec=True,
+    )
+
+    page = client_request.post(
+        '.email_branding_organisation',
+        service_id=SERVICE_ONE_ID,
+        _follow_redirects=True,
+    )
+
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        message='\n'.join([
+            'Organisation: organisation one',
+            'Service: service one',
+            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
+            '',
+            '---',
+            'Current branding: Organisation name',
+            'Branding requested: organisation one\n',
+        ]),
+        subject='Email branding request - service one',
+        ticket_type='question',
+        user_name='Test User',
+        user_email='test@user.gov.uk',
+        org_id=ORGANISATION_ID,
+        org_type='central',
+        service_id=SERVICE_ONE_ID
+    )
+    mock_send_ticket_to_zendesk.assert_called_once()
+    assert normalize_spaces(page.select_one('.banner-default').text) == (
+        'Thanks for your branding request. We’ll get back to you '
+        'within one working day.'
+    )
+
+
+def test_submit_email_branding_something_else_page(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_settings_page_common,
+    no_reply_to_email_addresses,
+    mock_get_email_branding,
+    single_sms_sender,
+):
+    service_one['email_branding'] = sample_uuid()
+    service_one['organisation_type'] = 'nhs_local'
+
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_send_ticket_to_zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        autospec=True,
+    )
+
+    page = client_request.post(
+        '.email_branding_something_else',
+        service_id=SERVICE_ONE_ID,
+        _data={'something_else': 'Homer Simpson'},
+        _follow_redirects=True,
+    )
+
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        message='\n'.join([
+            'Organisation: Can’t tell (domain is user.gov.uk)',
+            'Service: service one',
+            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
+            '',
+            '---',
+            'Current branding: Organisation name',
+            'Branding requested: Something else\n',
+            'Homer Simpson\n'
+        ]),
+        subject='Email branding request - service one',
+        ticket_type='question',
+        user_name='Test User',
+        user_email='test@user.gov.uk',
+        org_id=None,
+        org_type='nhs_local',
+        service_id=SERVICE_ONE_ID
+    )
+    mock_send_ticket_to_zendesk.assert_called_once()
+    assert normalize_spaces(page.select_one('.banner-default').text) == (
+        'Thanks for your branding request. We’ll get back to you '
+        'within one working day.'
+    )
+
+
+def test_submit_email_branding_something_else_page_shows_error_if_textbox_is_empty(
+    client_request,
+):
+    page = client_request.post(
+        '.email_branding_something_else',
+        service_id=SERVICE_ONE_ID,
+        _data={'something_else': ''},
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.h1.text) == 'Describe the branding you want'
+    assert normalize_spaces(page.select_one('.error-message').text) == 'Cannot be empty'
 
 
 def test_service_settings_links_to_branding_request_page_for_letters(

@@ -1,0 +1,32 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/textbox.html" import textbox %}
+
+{% block service_page_title %}
+  Describe the branding you want
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('.email_branding_request', service_id=current_service.id)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Describe the branding you want') }}
+
+  {% call form_wrapper() %}
+    {{ textbox(
+      form.something_else,
+        hint='Include links to your brand guidelines or examples of how to use your branding',
+        width='1-1',
+    ) }}
+    <p class="form-group">We’ll email you when your branding is ready, or if we need any more information.</p>
+    {{ page_footer('Request new branding') }}
+  {% endcall %}
+
+{% endblock %}
