@@ -29,7 +29,7 @@
     {% if form.something_else_is_only_option %}
       {{ textbox(
         form.something_else,
-        hint='Include links to your brand guidelines or examples of how to use your branding',
+        hint='Include links to your brand guidelines or examples of how to use your branding.',
         width='1-1',
       ) }}
     {% else %}
@@ -41,7 +41,7 @@
       {% call conditional_radio_panel('panel-something-else') %}
         {{ textbox(
           form.something_else,
-          hint='Include links to your brand guidelines or examples of how to use your branding',
+          hint='Include links to your brand guidelines or examples of how to use your branding.',
           width='1-1',
           autosize=True,
         ) }}
