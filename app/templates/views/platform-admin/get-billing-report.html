@@ -13,8 +13,8 @@
   </h1>
 
   {% call form_wrapper() %}
-    {{ form.start_date(param_extensions={"hint": {"text": "Enter start date in format YYYY-MM-DD"}}) }}
-    {{ form.end_date(param_extensions={"hint": {"text": "Enter end date in format YYYY-MM-DD"}}) }}
+    {{ form.start_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
     {{ page_footer('Download report') }}
   {% endcall %}
 
@@ -32,7 +32,7 @@
         ('sms cost', 'The total cost of text messages sent after a service has used its free allowance.'),
         ('sms chargeable units', 'The number of fragments sent after a service has used its free allowance. This number takes into account the cost multiplier for <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/pricing#international-numbers">sending international text messages</a>.'),
         ('letter cost', 'The total cost of letters sent by a service.'),
-        ('letter breakdown', 'The number and cost of letters sent by a service, grouped by postage.'),
+        ('letter breakdown', 'The number of letters sent by a service, grouped by postage and unit cost.'),
         ('purchase order number, contact names, contact email addresses and billing reference', 'We add this data manually based on the information we get from services. You can help by adding it to the service settings page.'),
       ] %}
         {% call row() %}

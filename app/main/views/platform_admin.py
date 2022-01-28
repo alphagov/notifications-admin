@@ -18,6 +18,7 @@ from app import (
 from app.extensions import redis_client
 from app.main import main
 from app.main.forms import (
+    BillingReportDateFilterForm,
     ClearCacheForm,
     DateFilterForm,
     RequiredDateFilterForm,
@@ -272,7 +273,7 @@ def notifications_sent_by_service():
 @main.route("/platform-admin/reports/usage-for-all-services", methods=['GET', 'POST'])
 @user_is_platform_admin
 def get_billing_report():
-    form = RequiredDateFilterForm()
+    form = BillingReportDateFilterForm()
 
     if form.validate_on_submit():
         start_date = form.start_date.data
