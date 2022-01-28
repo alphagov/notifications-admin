@@ -5704,7 +5704,7 @@ def test_submit_email_branding_something_else_page_shows_error_if_textbox_is_emp
         _follow_redirects=True,
     )
     assert normalize_spaces(page.h1.text) == 'Describe the branding you want'
-    assert normalize_spaces(page.select_one('.error-message').text) == 'Cannot be empty'
+    assert normalize_spaces(page.select_one('.govuk-error-message').text) == 'Error: Cannot be empty'
 
 
 def test_service_settings_links_to_branding_request_page_for_letters(

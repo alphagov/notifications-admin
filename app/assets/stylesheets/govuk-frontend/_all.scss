@@ -35,6 +35,7 @@ $govuk-assets-path: "/static/";
 @import "components/checkboxes/_checkboxes";
 @import "components/input/_input";
 @import "components/inset-text/_inset-text";
+@import "components/textarea/_textarea";
 
 // update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
 @import "./focus/components";
