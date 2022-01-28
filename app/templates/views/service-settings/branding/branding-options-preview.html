@@ -19,20 +19,16 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Preview of {}'.format(option_name)) }}
+  {{ page_header('Check your branding') }}
 
   <p class="govuk-body">
-    This is how your emails will look
+    This is a preview of what emails from {{ current_service.organisation.name }} will look like:
   </p>
 
   <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview"></iframe>
 
-  <p class="govuk-body">
-    What happens next
-  </p>
-
   {% call form_wrapper() %}
-    {{ page_footer('Apply branding') }}
+    {{ page_footer('Use this branding') }}
   {% endcall %}
 
 {% endblock %}

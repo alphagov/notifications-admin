@@ -1227,7 +1227,7 @@ def branding_request_preview(service_id, branding_type, branding_id):
     email_branding = email_branding_client.get_email_branding(branding_id)
 
     if request.method == 'POST':
-        flash('Your new email branding has been applied', 'default_with_tick')
+        flash('You’ve updated your email branding', 'default_with_tick')
         return redirect(url_for(
             '.service_settings',
             service_id=current_service.id,
@@ -1236,7 +1236,6 @@ def branding_request_preview(service_id, branding_type, branding_id):
     return render_template(
         'views/service-settings/branding/branding-options-preview.html',
         branding_type=branding_type,
-        option_name=current_service.organisation.name,
         selected_email_branding_id=email_branding['email_branding']['id'],
     )
 
@@ -1254,6 +1253,7 @@ def branding_request_not_on_file(service_id, branding_type):
     return render_template(
         'views/service-settings/branding/branding-not-on-file.html',
         form=form,
+        branding_type=branding_type,
     )
 
 

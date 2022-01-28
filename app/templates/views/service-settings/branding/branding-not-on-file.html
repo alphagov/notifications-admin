@@ -19,15 +19,15 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change {} branding'.format(branding_type)) }}
+  {{ page_header('Choose a design') }}
 
   <p class="govuk-body">
-    We don’t have the branding for {{ current_service.organisation.name }} set up yet.
+    We do not have have the {{ branding_type }} branding set up for {{ current_service.organisation.name }} yet.
   </p>
 
   {% call form_wrapper() %}
     <fieldset class="form-group {% if form.options.errors %}form-group-error{% endif %} top-gutter">
-      <legend class="bottom-gutter-2-3">
+      <legend class="bottom-gutter-2-3 govuk-visually-hidden">
         Tell us what it looks like
       </legend>
       {% if form.options.errors %}

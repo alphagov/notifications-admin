@@ -22,16 +22,16 @@
   {{ page_header('Change {} branding'.format(branding_type)) }}
 
   <p class="govuk-body">
-    Your {{ branding_type }}s currently have {{ branding_name }} branding:
+    Your {{ branding_type }}s currently have {{ branding_name }} branding.
   </p>
-
-  <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview"></iframe>
 
   {% if current_service.needs_to_change_email_branding and branding_type == "email" %}
     <p class="govuk-body">
-      You should be using your own branding instead. We can help you to set this up.
+      You should be using your own branding instead.
     </p>
   {% endif %}
+
+  <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview"></iframe>
 
   {% call form_wrapper() %}
     {% if form.something_else_is_only_option %}

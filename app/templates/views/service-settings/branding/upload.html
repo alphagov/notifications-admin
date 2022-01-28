@@ -9,7 +9,7 @@
 {% from "components/file-upload.html" import file_upload %}
 
 {% block service_page_title %}
-  Create branding
+  Upload your logo
 {% endblock %}
 
 {% block backLink %}
@@ -20,16 +20,33 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Create branding') }}
+  {{ page_header('Upload your logo') }}
 
   <p class="govuk-body">
-    Upload
+    Your logo should be a:
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>
+      landscape image
+    </li>
+    <li>
+      saved as a PNG file
+    </li>
+    <li>
+      with a transparent background
+    </li>
+  </ul>
+
+  <p class="govuk-body">
+    We do not recommend portrait images because they’ll look very small.
+    This is because the space for email branding has a fixed height.
   </p>
 
   {{ file_upload(
     form.file,
     allowed_file_extensions=['png'],
-    button_text='Choose an image'
+    button_text='Choose a file'
   ) }}
 
 {% endblock %}
