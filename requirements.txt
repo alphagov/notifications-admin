@@ -192,7 +192,7 @@ rsa==4.8
     # via awscli
 rtreelib==0.2.0
     # via -r requirements.in
-s3transfer==0.4.2
+s3transfer==0.5.0
     # via
     #   awscli
     #   boto3
