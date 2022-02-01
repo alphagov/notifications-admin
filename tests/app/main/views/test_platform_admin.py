@@ -935,7 +935,7 @@ def test_get_billing_report_when_calls_api_and_download_data(
             'service_id': '48e82ac0-c8c4-4e46-8712-c83c35a94006',
             'service_name': 'a - with sms and letter',
             'sms_cost': 0,
-            'sms_fragments': 0,
+            'sms_chargeable_units': 0,
             'purchase_order_number': 'PO1234',
             'contact_names': 'Anne, Marie, Josh',
             'contact_email_addresses': 'billing@example.com, accounts@example.com',
@@ -956,10 +956,10 @@ def test_get_billing_report_when_calls_api_and_download_data(
     )
 
     assert response.get_data(as_text=True) == (
-        'organisation_id,organisation_name,service_id,service_name,sms_cost,sms_fragments,total_letters,letter_cost' +
-        ',letter_breakdown,purchase_order_number,contact_names,contact_email_addresses,billing_reference' +
+        'organisation_id,organisation_name,service_id,service_name,sms_cost,sms_chargeable_units' +
+        ',total_letters,letter_cost,letter_breakdown,purchase_order_number,contact_names,contact_email_addresses' +
 
-        '\r\n' +
+        ',billing_reference\r\n' +
 
         '7832a1be-a1f0-4f2a-982f-05adfd3d6354,' +
         'Org for a - with sms and letter,' +
