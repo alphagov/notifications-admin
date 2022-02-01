@@ -94,7 +94,7 @@
 
           {% call settings_row(if_has_permission='email') %}
             {{ text_field('Email branding') }}
-            {{ text_field(current_service.email_branding_name) }}
+            {{ text_field(request.args.get('new_email_branding_name') or current_service.email_branding_name) }}
             {{ edit_field(
               'Change',
               url_for('.branding_request', service_id=current_service.id, branding_type="email"),
