@@ -22,7 +22,13 @@
   {{ page_header('Check your branding') }}
 
   <p class="govuk-body">
-    This is a preview of what emails from {{ current_service.organisation.name }} will look like:
+    This is a preview of what emails from
+    {% if current_service.organisation_type == 'central' %}
+      {{ current_service.name }}
+    {% else %}
+      {{ current_service.organisation.name }}
+    {% endif %}
+    will look like:
   </p>
 
   <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview"></iframe>
