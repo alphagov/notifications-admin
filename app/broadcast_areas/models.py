@@ -14,7 +14,7 @@ from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository, rtree_index
 
 
-class SortableMixin(SortByNameMixin):
+class IdEqualityMixin:
 
     def __repr__(self):
         return f'{self.__class__.__name__}(<{self.id}>)'
@@ -75,7 +75,7 @@ class BaseBroadcastArea(ABC):
         return max(500, min(estimated_bleed, 5000))
 
 
-class BroadcastArea(BaseBroadcastArea, SortableMixin):
+class BroadcastArea(BaseBroadcastArea, IdEqualityMixin, SortByNameMixin):
 
     def __init__(self, row):
         self.id, self.name, self._count_of_phones, self.library_id = row
@@ -220,7 +220,7 @@ class CustomBroadcastAreas(SerialisedModelCollection):
         )
 
 
-class BroadcastAreaLibrary(SerialisedModelCollection, SortableMixin, GetItemByIdMixin):
+class BroadcastAreaLibrary(SerialisedModelCollection, SortByNameMixin, IdEqualityMixin, GetItemByIdMixin):
 
     model = BroadcastArea
 
