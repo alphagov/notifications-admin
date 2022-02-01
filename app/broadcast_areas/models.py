@@ -8,20 +8,16 @@ from rtreelib import Rect
 from werkzeug.utils import cached_property
 
 from app.formatters import square_metres_to_square_miles
+from app.models import SortByNameMixin
 
 from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository, rtree_index
 
 
-class SortableMixin:
+class SortableMixin(SortByNameMixin):
 
     def __repr__(self):
         return f'{self.__class__.__name__}(<{self.id}>)'
-
-    def __lt__(self, other):
-        # Implementing __lt__ means any classes inheriting from this
-        # method are sortable
-        return self.name < other.name
 
     def __eq__(self, other):
         return self.id == other.id
