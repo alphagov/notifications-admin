@@ -306,3 +306,22 @@ def test_complete_webauthn_login_attempt_raises_on_api_error(fake_uuid, mocker):
 
     with pytest.raises(HTTPError):
         user_api_client.complete_webauthn_login_attempt(fake_uuid, is_successful=True)
+
+
+def test_reset_password(
+    mocker,
+    fake_uuid,
+):
+    mock_post = mocker.patch(
+        'app.notify_client.user_api_client.UserApiClient.post'
+    )
+
+    user_api_client.send_reset_password_url('test@example.com')
+
+    mock_post.assert_called_once_with(
+        '/user/reset-password',
+        data={
+            'email': 'test@example.com',
+            'admin_base_url': 'http://localhost:6012',
+        },
+    )
