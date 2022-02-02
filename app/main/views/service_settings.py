@@ -1191,10 +1191,20 @@ def email_branding_request(service_id):
     )
 
 
+def check_branding_allowed_for_service(branding):
+    allowed_branding_for_service = dict(
+        BrandingOptions.get_available_choices(current_service, branding_type='email')
+    )
+    if branding not in allowed_branding_for_service:
+        abort(404)
+
+
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_govuk(service_id):
     with_org = request.args.get('with_org')
+
+    check_branding_allowed_for_service('govuk_and_org' if with_org else 'govuk')
 
     if request.method == 'POST':
         create_email_branding_zendesk_ticket(request.form['branding_choice'])
@@ -1208,6 +1218,8 @@ def email_branding_govuk(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_nhs(service_id):
+    check_branding_allowed_for_service('nhs')
+
     if request.method == 'POST':
         create_email_branding_zendesk_ticket('nhs')
 
@@ -1220,6 +1232,8 @@ def email_branding_nhs(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/organisation", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_organisation(service_id):
+    check_branding_allowed_for_service('organisation')
+
     if request.method == 'POST':
         create_email_branding_zendesk_ticket('organisation')
 
@@ -1232,6 +1246,8 @@ def email_branding_organisation(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_something_else(service_id):
+    check_branding_allowed_for_service('something_else')
+
     form = SomethingElseBrandingForm()
 
     if form.validate_on_submit():

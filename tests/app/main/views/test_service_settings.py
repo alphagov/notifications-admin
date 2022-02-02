@@ -5440,13 +5440,32 @@ def test_submit_branding_when_something_else_is_only_option(
     ) in mock_create_ticket.call_args_list[0][1]['message']
 
 
-@pytest.mark.parametrize('endpoint, query_param, expected_heading', [
-    ('main.email_branding_govuk', False, 'Before you request new branding'),
-    ('main.email_branding_govuk', True, 'Before you request new branding'),
-    ('main.email_branding_nhs', False, 'Before you request new branding'),
-    ('main.email_branding_organisation', False, 'When you request new branding'),
+@pytest.mark.parametrize('endpoint, query_param, service_org_type, expected_heading', [
+    ('main.email_branding_govuk', False, 'central', 'Before you request new branding'),
+    ('main.email_branding_govuk', True, 'central', 'Before you request new branding'),
+    ('main.email_branding_nhs', False, 'nhs_local', 'Before you request new branding'),
+    ('main.email_branding_organisation', 'central', False, 'When you request new branding'),
 ])
-def test_get_email_branding_description_pages(client_request, endpoint, query_param, expected_heading):
+def test_get_email_branding_description_pages(
+    client_request,
+    mocker,
+    service_one,
+    organisation_one,
+    mock_get_email_branding,
+    endpoint,
+    query_param,
+    service_org_type,
+    expected_heading,
+):
+    organisation_one['organisation_type'] = service_org_type
+    service_one['email_branding'] = sample_uuid()
+    service_one['organisation'] = organisation_one
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+
     page = client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,
@@ -5464,6 +5483,27 @@ def test_get_email_branding_something_else_page(client_request):
     assert normalize_spaces(page.h1.text) == 'Describe the branding you want'
     assert page.select_one('textarea')['name'] == ('something_else')
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Request new branding'
+
+
+@pytest.mark.parametrize('endpoint, query_param', [
+    ('main.email_branding_govuk', False),
+    ('main.email_branding_govuk', True),
+    ('main.email_branding_nhs', False),
+    ('main.email_branding_organisation', False),
+])
+def test_get_email_branding_description_pages_give_404_if_selected_branding_not_allowed(
+    client_request,
+    endpoint,
+    query_param,
+):
+    # The only email branding allowed is 'something_else', so trying to visit any of the other
+    # endpoints gives a 404 status code.
+    client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        with_org=(True if query_param else None),
+        _expected_status=404
+    )
 
 
 @pytest.mark.parametrize('branding_choice, branding_description', [
