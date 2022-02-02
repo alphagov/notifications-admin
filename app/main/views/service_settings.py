@@ -1272,6 +1272,7 @@ def branding_request_upload(service_id, branding_style):
     return render_template(
         'views/service-settings/branding/upload.html',
         form=form,
+        branding_type='email',
     )
 
 

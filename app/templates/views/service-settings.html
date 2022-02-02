@@ -94,8 +94,10 @@
 
           {% call settings_row(if_has_permission='email') %}
             {{ text_field('Email branding') }}
-            {{ text_field(request.args.get(
-              current_service.organisation.name if new_email_branding current_service.email_branding_name
+            {{ text_field(
+              current_service.organisation.name
+              if request.args.get('new_email_branding')
+              else current_service.email_branding_name
             ) }}
             {{ edit_field(
               'Change',
