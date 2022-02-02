@@ -675,6 +675,29 @@ def test_should_show_image_of_letter_notification_that_failed_validation(
     assert response.get_data(as_text=True) == 'foo', metadata
 
 
+def test_should_show_image_of_templated_letter_notification_that_failed_validation_because_letter_is_too_long(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    notification = create_notification(
+        notification_status='validation-failed',
+        template_type='letter')
+    mocker.patch('app.notification_api_client.get_notification', return_value=notification)
+    mocker.patch('app.main.views.notifications.get_page_count_for_letter', return_value=11)
+
+    page = client_request.get(
+        'main.view_notification',
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    error_message = page.find('p', class_='notification-status-cancelled').text
+    assert normalize_spaces(error_message) == \
+           "Validation failed because this letter is 11 pages long.Letters must be 10 pages or "\
+           "less (5 double-sided sheets of paper)."
+
+
 def test_should_show_preview_error_image_letter_notification_on_preview_error(
     client_request,
     fake_uuid,

@@ -18,6 +18,7 @@ from flask import (
     url_for,
 )
 from notifications_python_client.errors import APIError, HTTPError
+from notifications_utils import LETTER_MAX_PAGE_COUNT
 from notifications_utils.letter_timings import (
     get_letter_timings,
     letter_can_be_cancelled,
@@ -79,6 +80,19 @@ def view_notification(service_id, notification_id):
             )
     else:
         page_count = get_page_count_for_letter(notification['template'], values=personalisation)
+        if page_count and page_count > LETTER_MAX_PAGE_COUNT:
+            # We check page count here to show the right error message for a letter that is too long.
+            # Another way to do this would be to get the status and error message from letter metadata.
+            # This would be a significant amount of work though, out of scope for this bug fix.
+            # This is because currently we do not pull the letter from S3 when showing preview.
+            # Instead, we generate letter preview based on the letter template and personalisation.
+            # Additionally, when a templated letter is sent via the api and the personalisation pushes the
+            # page count over 10 pages, it takes a while for validation status to come through.
+            # Checking page count here will enable us to show the error message even if the letter is not
+            # fully processed yet.
+            error_message = get_letter_validation_error(
+                "letter-too-long", [1], page_count
+            )
 
     if notification.get('postage'):
         if notification["status"] == "validation-failed":
