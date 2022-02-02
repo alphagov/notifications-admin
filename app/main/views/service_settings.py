@@ -1164,28 +1164,39 @@ def branding_request(service_id, branding_type):
         branding_name = current_service.letter_branding_name
 
     if form.validate_on_submit():
+
+        guessed_branding_id = None
+
         if form.options.data == 'something_else':
             return redirect(url_for(
                 '.branding_request_something_else',
                 service_id=service_id,
                 branding_type=branding_type,
             ))
-        if form.options.data == 'organisation':
-            guessed_branding_id = get_email_branding_id(current_service.organisation.name)
 
-            if guessed_branding_id:
-                return redirect(url_for(
-                    '.branding_request_preview',
-                    service_id=current_service.id,
-                    branding_type=branding_type,
-                    branding_id=guessed_branding_id,
-                ))
-            else:
-                return redirect(url_for(
-                    '.branding_request_not_on_file',
-                    branding_type='email',
-                    service_id=current_service.id,
-                ))
+        if form.options.data == 'organisation':
+            guessed_branding_id = get_email_branding_id(
+                current_service.organisation.name
+            )
+
+        if form.options.data == 'govuk_and_org':
+            guessed_branding_id = get_email_branding_id(
+                f'GOV.UK and {current_service.organisation.name}'
+            )
+
+        if guessed_branding_id:
+            return redirect(url_for(
+                '.branding_request_preview',
+                service_id=current_service.id,
+                branding_type=branding_type,
+                branding_id=guessed_branding_id,
+            ))
+
+        return redirect(url_for(
+            '.branding_request_not_on_file',
+            branding_type='email',
+            service_id=current_service.id,
+        ))
 
     return render_template(
         'views/service-settings/branding/branding-options.html',
