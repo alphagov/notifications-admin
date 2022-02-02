@@ -1231,7 +1231,7 @@ def branding_request_preview(service_id, branding_type, branding_id):
         return redirect(url_for(
             '.service_settings',
             service_id=current_service.id,
-            new_email_branding_name=email_branding['email_branding']['name']
+            new_email_branding=True,
         ))
 
     return render_template(
