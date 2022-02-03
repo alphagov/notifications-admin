@@ -812,6 +812,49 @@ class GovukCheckboxField(BooleanField):
         return govuk_checkbox_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
+class GovukTextareaField(TextAreaField):
+
+    def __init__(self, label='', validators=None, param_extensions=None, **kwargs):
+        super(TextAreaField, self).__init__(label, validators, **kwargs)
+        self.param_extensions = param_extensions
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        # error messages
+        error_message = None
+        if field.errors:
+            error_message = {"text": field.errors[0]}
+
+        params = {
+            "name": field.name,
+            "id": field.id,
+            "rows": 8,
+            "label": {
+                "text": field.label.text,
+                "classes": None,
+                "isPageHeading": False
+            },
+            "hint": {
+              "text": None
+            },
+            "errorMessage": error_message
+        }
+
+        # extend default params with any sent in during instantiation
+        if self.param_extensions:
+            merge_jsonlike(params, self.param_extensions)
+
+        # add any sent in though use in templates
+        if param_extensions:
+            merge_jsonlike(params, param_extensions)
+
+        return Markup(
+            render_template('components/textarea/template.njk', params=params))
+
+
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
 class GovukCheckboxesField(SelectMultipleField):
 
@@ -2130,6 +2173,7 @@ class BrandingOptions(StripWhitespaceForm):
 
     def __init__(self, service, *args, branding_type="email", **kwargs):
         super().__init__(*args, **kwargs)
+        self.branding_type = branding_type
         self.options.choices = tuple(self.get_available_choices(service, branding_type))
         self.options.label.text = 'Choose your new {} branding'.format(branding_type)
         if self.something_else_is_only_option:
@@ -2194,14 +2238,34 @@ class BrandingOptions(StripWhitespaceForm):
         return self.options.choices == (self.FALLBACK_OPTION,)
 
     def validate_something_else(self, field):
-        if (
-            self.something_else_is_only_option
-            or self.options.data == self.FALLBACK_OPTION_VALUE
-        ) and not field.data:
-            raise ValidationError('Cannot be empty')
+        if self.branding_type == 'email':
+            if self.something_else_is_only_option and not field.data:
+                raise ValidationError('Cannot be empty')
+        elif self.branding_type == 'letter':
+            if (
+                self.something_else_is_only_option
+                or self.options.data == self.FALLBACK_OPTION_VALUE
+            ) and not field.data:
+                raise ValidationError('Cannot be empty')
 
         if self.options.data != self.FALLBACK_OPTION_VALUE:
             field.data = ''
+
+
+class SomethingElseBrandingForm(StripWhitespaceForm):
+    something_else = GovukTextareaField(
+        'Describe the branding you want',
+        validators=[DataRequired('Cannot be empty')],
+        param_extensions={
+            "label": {
+                "isPageHeading": True,
+                "classes": "govuk-label--l",
+            },
+            "hint": {
+                "text": "Include links to your brand guidelines or examples of how to use your branding."
+            }
+        }
+    )
 
 
 class ServiceDataRetentionForm(StripWhitespaceForm):

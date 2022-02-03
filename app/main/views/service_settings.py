@@ -65,6 +65,7 @@ from app.main.forms import (
     SetEmailBranding,
     SetLetterBranding,
     SMSPrefixForm,
+    SomethingElseBrandingForm,
 )
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.user import (
@@ -1130,15 +1131,142 @@ def link_service_to_organisation(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/branding-request/<branding_type>", methods=['GET', 'POST'])
+def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
+    form = BrandingOptions(current_service)
+
+    ticket_message = render_template(
+        'support-tickets/branding-request.txt',
+        current_branding=current_service.email_branding_name,
+        branding_requested=dict(form.options.choices)[form_option_selected],
+        detail=detail,
+    )
+    ticket = NotifySupportTicket(
+        subject=f'Email branding request - {current_service.name}',
+        message=ticket_message,
+        ticket_type=NotifySupportTicket.TYPE_QUESTION,
+        user_name=current_user.name,
+        user_email=current_user.email_address,
+        org_id=current_service.organisation_id,
+        org_type=current_service.organisation_type,
+        service_id=current_service.id
+    )
+    zendesk_client.send_ticket_to_zendesk(ticket)
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/service-settings/email-branding", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-def branding_request(service_id, branding_type):
-    form = BrandingOptions(current_service, branding_type=branding_type)
+def email_branding_request(service_id):
+    form = BrandingOptions(current_service, branding_type='email')
+    branding_name = current_service.email_branding_name
+    if form.validate_on_submit():
+        if form.something_else_is_only_option:
+            create_email_branding_zendesk_ticket(
+                form_option_selected=form.options.data,
+                detail=form.something_else.data,
+            )
+
+            flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
+            return redirect(url_for('.service_settings', service_id=current_service.id))
+        else:
+            endpoint = {
+                'govuk': '.email_branding_govuk',
+                'govuk_and_org': '.email_branding_govuk',
+                'nhs': '.email_branding_nhs',
+                'organisation': '.email_branding_organisation',
+                'something_else': '.email_branding_something_else',
+            }[form.options.data]
+
+            return redirect(
+                url_for(
+                    endpoint,
+                    service_id=current_service.id,
+                    with_org=(True if form.options.data == 'govuk_and_org' else None),
+                )
+            )
+
+    return render_template(
+        'views/service-settings/branding/email-branding-options.html',
+        form=form,
+        branding_name=branding_name,
+    )
+
+
+def check_branding_allowed_for_service(branding):
+    allowed_branding_for_service = dict(
+        BrandingOptions.get_available_choices(current_service, branding_type='email')
+    )
+    if branding not in allowed_branding_for_service:
+        abort(404)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def email_branding_govuk(service_id):
+    with_org = request.args.get('with_org')
+
+    check_branding_allowed_for_service('govuk_and_org' if with_org else 'govuk')
+
+    if request.method == 'POST':
+        create_email_branding_zendesk_ticket(request.form['branding_choice'])
+
+        flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
+        return redirect(url_for('.service_settings', service_id=current_service.id))
+
+    return render_template('views/service-settings/branding/email-branding-govuk.html', with_org=with_org)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def email_branding_nhs(service_id):
+    check_branding_allowed_for_service('nhs')
+
+    if request.method == 'POST':
+        create_email_branding_zendesk_ticket('nhs')
+
+        flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
+        return redirect(url_for('.service_settings', service_id=current_service.id))
+
+    return render_template('views/service-settings/branding/email-branding-nhs.html')
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/organisation", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def email_branding_organisation(service_id):
+    check_branding_allowed_for_service('organisation')
+
+    if request.method == 'POST':
+        create_email_branding_zendesk_ticket('organisation')
+
+        flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
+        return redirect(url_for('.service_settings', service_id=current_service.id))
+
+    return render_template('views/service-settings/branding/email-branding-organisation.html')
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def email_branding_something_else(service_id):
+    check_branding_allowed_for_service('something_else')
+
+    form = SomethingElseBrandingForm()
+
+    if form.validate_on_submit():
+        create_email_branding_zendesk_ticket('something_else', detail=form.something_else.data)
+
+        flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
+        return redirect(url_for('.service_settings', service_id=current_service.id))
+
+    return render_template('views/service-settings/branding/email-branding-something-else.html', form=form)
+
+
+@main.route("/services/<uuid:service_id>/branding-request/letter", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def letter_branding_request(service_id):
+    form = BrandingOptions(current_service, branding_type='letter')
     from_template = request.args.get('from_template')
-    if branding_type == "email":
-        branding_name = current_service.email_branding_name
-    elif branding_type == "letter":
-        branding_name = current_service.letter_branding_name
+    branding_name = current_service.letter_branding_name
     if form.validate_on_submit():
         ticket_message = render_template(
             'support-tickets/branding-request.txt',
@@ -1147,7 +1275,7 @@ def branding_request(service_id, branding_type):
             detail=form.something_else.data,
         )
         ticket = NotifySupportTicket(
-            subject=f'{branding_type.capitalize()} branding request - {current_service.name}',
+            subject=f'Letter branding request - {current_service.name}',
             message=ticket_message,
             ticket_type=NotifySupportTicket.TYPE_QUESTION,
             user_name=current_user.name,
@@ -1166,9 +1294,8 @@ def branding_request(service_id, branding_type):
         ) if from_template else url_for('.service_settings', service_id=current_service.id))
 
     return render_template(
-        'views/service-settings/branding/branding-options.html',
+        'views/service-settings/branding/letter-branding-options.html',
         form=form,
-        branding_type=branding_type,
         branding_name=branding_name,
         from_template=from_template
     )

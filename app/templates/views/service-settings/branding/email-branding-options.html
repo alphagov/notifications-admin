@@ -1,0 +1,57 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radio %}
+{% from "components/select-input.html" import select_wrapper %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block service_page_title %}
+  Change email branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('.service_settings', service_id=current_service.id)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Change email branding') }}
+
+  <p class="govuk-body">
+    Your emails currently have {{ branding_name }} branding.
+  </p>
+
+  {% if current_service.needs_to_change_email_branding %}
+    <p class="govuk-body">
+      You should be using your own branding instead. We can help you to set this up.
+    </p>
+  {% endif %}
+
+  {% if form.something_else_is_only_option %}
+    {% call form_wrapper() %}
+        {{ textbox(
+          form.something_else,
+          hint='Include links to your brand guidelines or examples of how to use your branding.',
+          width='1-1',
+        ) }}
+      <p class="form-group">
+        We’ll email you when your branding is ready, or if we need any more information.
+      </p>
+      {{ page_footer('Request new branding') }}
+    {% endcall %}
+  {% else %}
+    {% call form_wrapper() %}
+        {% call select_wrapper(form.options) %}
+          {% for option in form.options %}
+            {{ radio(option) }}
+          {% endfor %}
+        {% endcall %}
+      {{ page_footer('Continue') }}
+    {% endcall %}
+  {% endif %}
+
+{% endblock %}

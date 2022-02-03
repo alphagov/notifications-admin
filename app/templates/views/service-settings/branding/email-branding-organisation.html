@@ -1,0 +1,31 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+
+{% block service_page_title %}
+  When you request new branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('.email_branding_request', service_id=current_service.id)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('When you request new branding') }}
+
+  <p class="govuk-body">We’ll check if we already have the {{organisation}} logo.</p>
+
+  <p class="govuk-body">If we do, we’ll let you know when your new branding is ready to use.</p>
+
+  <p class="govuk-body">If we don’t, we’ll email you to ask for more information.</p>
+
+  {% call form_wrapper() %}
+    {{ page_footer('Request new branding') }}
+  {% endcall %}
+
+{% endblock %}
