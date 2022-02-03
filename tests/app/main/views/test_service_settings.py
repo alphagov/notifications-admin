@@ -5105,14 +5105,13 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
     assert page.select_one('textarea')['name'] == 'something_else'
 
 
-@pytest.mark.parametrize('data, org_type, endpoint, expect_with_org_query_param', (
+@pytest.mark.parametrize('data, org_type, endpoint', (
     (
         {
             'options': 'govuk',
         },
         'central',
         'main.email_branding_govuk',
-        False
     ),
     (
         {
@@ -5121,15 +5120,13 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
         },
         'central',
         'main.email_branding_govuk',
-        False
     ),
     (
         {
             'options': 'govuk_and_org',
         },
         'central',
-        'main.email_branding_govuk',
-        True
+        'main.email_branding_govuk_and_org',
     ),
     (
         {
@@ -5137,7 +5134,6 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
         },
         'central',
         'main.email_branding_organisation',
-        False
     ),
     (
         {
@@ -5145,7 +5141,6 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
         },
         'central',
         'main.email_branding_something_else',
-        False
     ),
     (
         {
@@ -5153,7 +5148,6 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
         },
         'nhs_local',
         'main.email_branding_nhs',
-        False
     ),
 ))
 def test_submit_email_branding_request_when_something_else_is_not_the_only_option(
@@ -5165,7 +5159,6 @@ def test_submit_email_branding_request_when_something_else_is_not_the_only_optio
     data,
     org_type,
     endpoint,
-    expect_with_org_query_param,
 ):
     organisation_one['organisation_type'] = org_type
     service_one['email_branding'] = sample_uuid()
@@ -5184,7 +5177,6 @@ def test_submit_email_branding_request_when_something_else_is_not_the_only_optio
         _expected_redirect=url_for(
             endpoint,
             service_id=SERVICE_ONE_ID,
-            with_org=(True if expect_with_org_query_param else None),
             _external=True,
         )
     )
@@ -5440,11 +5432,12 @@ def test_submit_branding_when_something_else_is_only_option(
     ) in mock_create_ticket.call_args_list[0][1]['message']
 
 
-@pytest.mark.parametrize('endpoint, query_param, service_org_type, expected_heading', [
-    ('main.email_branding_govuk', False, 'central', 'Before you request new branding'),
-    ('main.email_branding_govuk', True, 'central', 'Before you request new branding'),
-    ('main.email_branding_nhs', False, 'nhs_local', 'Before you request new branding'),
-    ('main.email_branding_organisation', 'central', False, 'When you request new branding'),
+@pytest.mark.parametrize('endpoint, service_org_type, expected_heading', [
+    ('main.email_branding_govuk', 'central', 'Before you request new branding'),
+    ('main.email_branding_govuk_and_org', 'central', 'Before you request new branding'),
+    ('main.email_branding_govuk', 'central', 'Before you request new branding'),
+    ('main.email_branding_nhs', 'nhs_local', 'Before you request new branding'),
+    ('main.email_branding_organisation', 'central', 'When you request new branding'),
 ])
 def test_get_email_branding_description_pages(
     client_request,
@@ -5453,7 +5446,6 @@ def test_get_email_branding_description_pages(
     organisation_one,
     mock_get_email_branding,
     endpoint,
-    query_param,
     service_org_type,
     expected_heading,
 ):
@@ -5469,7 +5461,6 @@ def test_get_email_branding_description_pages(
     page = client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,
-        with_org=(True if query_param else None)
     )
     assert page.h1.text == expected_heading
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Request new branding'
@@ -5485,23 +5476,21 @@ def test_get_email_branding_something_else_page(client_request):
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Request new branding'
 
 
-@pytest.mark.parametrize('endpoint, query_param', [
-    ('main.email_branding_govuk', False),
-    ('main.email_branding_govuk', True),
-    ('main.email_branding_nhs', False),
-    ('main.email_branding_organisation', False),
+@pytest.mark.parametrize('endpoint', [
+    ('main.email_branding_govuk'),
+    ('main.email_branding_govuk_and_org'),
+    ('main.email_branding_nhs'),
+    ('main.email_branding_organisation'),
 ])
 def test_get_email_branding_description_pages_give_404_if_selected_branding_not_allowed(
     client_request,
     endpoint,
-    query_param,
 ):
     # The only email branding allowed is 'something_else', so trying to visit any of the other
     # endpoints gives a 404 status code.
     client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,
-        with_org=(True if query_param else None),
         _expected_status=404
     )
 

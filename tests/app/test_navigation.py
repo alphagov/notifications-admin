@@ -112,6 +112,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'edit_user_permissions',
     'email_branding',
     'email_branding_govuk',
+    'email_branding_govuk_and_org',
     'email_branding_nhs',
     'email_branding_organisation',
     'email_branding_request',
