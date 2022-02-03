@@ -1153,7 +1153,6 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
     zendesk_client.send_ticket_to_zendesk(ticket)
 
 
-@main.route("/services/<uuid:service_id>/branding-request/email", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/service-settings/email-branding", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_request(service_id):
@@ -1260,7 +1259,6 @@ def email_branding_something_else(service_id):
     return render_template('views/service-settings/branding/email-branding-something-else.html', form=form)
 
 
-@main.route("/services/<uuid:service_id>/branding-request/letter", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def letter_branding_request(service_id):
