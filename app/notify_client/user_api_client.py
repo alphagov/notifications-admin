@@ -176,7 +176,10 @@ class UserApiClient(NotifyAdminAPIClient):
 
     def send_reset_password_url(self, email_address, next_string=None):
         endpoint = '/user/reset-password'
-        data = {'email': email_address}
+        data = {
+            'email': email_address,
+            'admin_base_url': self.admin_url,
+        }
         if next_string:
             data['next'] = next_string
         self.post(endpoint, data=data)
