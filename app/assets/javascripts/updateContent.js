@@ -34,11 +34,11 @@
     }
   };
 
-  var getRenderer = $component => response => {
+  var getRenderer = ($contents, key) => response => {
     classesToPersist.remove();
     morphdom(
-      $component.get(0),
-      $(response[$component.data('key')]).get(0)
+      $contents.get(0),
+      $(response[key]).get(0)
     );
     classesToPersist.replace();
   };
@@ -84,6 +84,14 @@
 
     this.start = component => {
       var $component = $(component);
+      var $contents = $component.children().eq(0);
+      var key = $component.data('key');
+      var resource = $component.data('resource');
+      var form = $component.data('form');
+
+      // replace component with contents
+      // the renderer does this anyway when diffing against the first response
+      $component.replaceWith($contents);
 
       // store any classes that should persist through updates
       if ($contents.data('classesToPersist') !== undefined) {
@@ -94,10 +102,10 @@
 
       setTimeout(
         () => poll(
-          getRenderer($component),
-          $component.data('resource'),
-          getQueue($component.data('resource')),
-          $component.data('form')
+          getRenderer($contents, key),
+          resource,
+          getQueue(resource),
+          form
         ),
         defaultInterval
       );
