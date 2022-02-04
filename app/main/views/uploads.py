@@ -18,7 +18,7 @@ from flask import (
     send_file,
     url_for,
 )
-from notifications_utils.columns import Columns
+from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
@@ -443,10 +443,10 @@ def check_contact_list(service_id, upload_id):
     first_row = contents.splitlines()[0].strip().rstrip(',') if contents else ''
     original_file_name = ContactList.get_metadata(service_id, upload_id).get('original_file_name', '')
 
-    template_type = {
-        'emailaddress': 'email',
-        'phonenumber': 'sms',
-    }.get(Columns.make_key(first_row))
+    template_type = InsensitiveDict({
+        'email address': 'email',
+        'phone number': 'sms',
+    }).get(first_row)
 
     recipients = RecipientCSV(
         contents,
