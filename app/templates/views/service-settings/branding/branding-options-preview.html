@@ -31,7 +31,7 @@
     will look like:
   </p>
 
-  <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview"></iframe>
+  <iframe src="{{ url_for('main.email_template', branding_style=selected_email_branding_id) }}" class="branding-preview" scrolling="no"></iframe>
 
   {% call form_wrapper() %}
     {{ page_footer('Use this branding') }}
