@@ -223,7 +223,7 @@ werkzeug==2.0.2
     # via
     #   -r requirements.in
     #   flask
-wtforms==3.0.0
+wtforms==3.0.1
     # via
     #   -r requirements.in
     #   flask-wtf
