@@ -11,4 +11,4 @@ flake8-bugbear==22.1.11
 flake8-print==4.0.0
 requests-mock==1.9.3
 # used for creating manifest file locally
-jinja2-cli[yaml]==0.7.0
+jinja2-cli[yaml]==0.8.1
