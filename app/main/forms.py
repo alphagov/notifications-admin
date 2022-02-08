@@ -10,9 +10,9 @@ from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
 from flask_wtf.file import FileField as FileField_wtf
 from flask_wtf.file import FileSize
-from notifications_utils.columns import Columns
 from notifications_utils.countries.data import Postage
 from notifications_utils.formatters import strip_all_whitespace
+from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import (
     InvalidPhoneError,
@@ -360,7 +360,7 @@ class SMSCode(GovukTextInputField):
 
     def process_formdata(self, valuelist):
         if valuelist:
-            self.data = Columns.make_key(valuelist[0])
+            self.data = InsensitiveDict.make_key(valuelist[0])
 
 
 class ForgivingIntegerField(GovukTextInputField):
@@ -2105,12 +2105,12 @@ def get_placeholder_form_instance(
 ):
 
     if (
-        Columns.make_key(placeholder_name) == 'emailaddress' and
+        InsensitiveDict.make_key(placeholder_name) == 'emailaddress' and
         template_type == 'email'
     ):
         field = email_address(label=placeholder_name, gov_user=False)
     elif (
-        Columns.make_key(placeholder_name) == 'phonenumber' and
+        InsensitiveDict.make_key(placeholder_name) == 'phonenumber' and
         template_type == 'sms'
     ):
         if allow_international_phone_numbers:

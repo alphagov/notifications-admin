@@ -15,7 +15,7 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
-from notifications_utils.columns import Columns
+from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.pdf import is_letter_too_long
 from notifications_utils.postal_address import (
     PostalAddress,
@@ -87,7 +87,7 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
     }[template.template_type] + get_example_csv_fields(
         (
             placeholder for placeholder in template.placeholders
-            if placeholder not in Columns.from_keys(
+            if placeholder not in InsensitiveDict.from_keys(
                 first_column_headings[template.template_type]
             )
         ),
@@ -471,7 +471,7 @@ def send_one_off_step(service_id, template_id, step_index):
                 service_id=service_id,
                 template_id=template_id,
             ))
-        if current_placeholder in Columns(PostalAddress('').as_personalisation):
+        if current_placeholder in InsensitiveDict(PostalAddress('').as_personalisation):
             return redirect(url_for(
                 request.endpoint,
                 service_id=service_id,
@@ -839,7 +839,7 @@ def fields_to_fill_in(template, prefill_current_user=False):
 
 
 def get_normalised_placeholders_from_session():
-    return Columns(session.get('placeholders', {}))
+    return InsensitiveDict(session.get('placeholders', {}))
 
 
 def get_recipient_and_placeholders_from_session(template_type):
@@ -888,7 +888,7 @@ def get_back_link(service_id, template, step_index, placeholders=None):
             for index, placeholder in reversed(
                 list(enumerate(placeholders[:step_index]))
             )
-            if placeholder not in Columns(
+            if placeholder not in InsensitiveDict(
                 PostalAddress('').as_personalisation
             )
         ), 1)
@@ -1038,7 +1038,7 @@ def send_notification(service_id, template_id):
         noti = notification_api_client.send_notification(
             service_id,
             template_id=db_template['id'],
-            recipient=session['recipient'] or Columns(session['placeholders'])['address line 1'],
+            recipient=session['recipient'] or InsensitiveDict(session['placeholders'])['address line 1'],
             personalisation=session['placeholders'],
             sender_id=session['sender_id'] if 'sender_id' in session else None
         )
@@ -1092,7 +1092,7 @@ def get_spreadsheet_column_headings_from_template(template):
     for column_heading in (
         recipient_columns + list(template.placeholders)
     ):
-        if column_heading not in Columns.from_keys(column_headings):
+        if column_heading not in InsensitiveDict.from_keys(column_headings):
             column_headings.append(column_heading)
 
     return column_headings
