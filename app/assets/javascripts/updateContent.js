@@ -11,10 +11,37 @@
       1000
   ));
 
-  var getRenderer = $component => response => morphdom(
-    $component.get(0),
-    $(response[$component.data('key')]).get(0)
-  );
+  // Methods to ensure the DOM fragment is clean of classes added by JS before diffing
+  // and that they are replaced afterwards.
+  var classesToPersist = {
+    classNames: [],
+    $els: [],
+    remove: function () {
+      this.classNames.forEach(className => {
+        var $elsWithClassName = $('.' + className).removeClass(className);
+
+        // store elements for that className at the same index
+        this.$els.push($elsWithClassName);
+      });
+    },
+    replace: function () {
+      this.classNames.forEach((className, index) => {
+        this.$els[index].addClass(className);
+      });
+
+      // remove references to elements
+      this.$els = [];
+    }
+  };
+
+  var getRenderer = $component => response => {
+    classesToPersist.remove();
+    morphdom(
+      $component.get(0),
+      $(response[$component.data('key')]).get(0)
+    );
+    classesToPersist.replace();
+  };
 
   var getQueue = resource => (
     queues[resource] = queues[resource] || []
@@ -55,15 +82,26 @@
 
   global.GOVUK.Modules.UpdateContent = function() {
 
-    this.start = component => setTimeout(
-      () => poll(
-        getRenderer($(component)),
-        $(component).data('resource'),
-        getQueue($(component).data('resource')),
-        $(component).data('form')
-      ),
-      defaultInterval
-    );
+    this.start = component => {
+      var $component = $(component);
+
+      // store any classes that should persist through updates
+      if ($contents.data('classesToPersist') !== undefined) {
+        $contents.data('classesToPersist')
+          .split(' ')
+          .forEach(className => classesToPersist.classNames.push(className));
+      }
+
+      setTimeout(
+        () => poll(
+          getRenderer($component),
+          $component.data('resource'),
+          getQueue($component.data('resource')),
+          $component.data('form')
+        ),
+        defaultInterval
+      );
+    };
 
   };
 
