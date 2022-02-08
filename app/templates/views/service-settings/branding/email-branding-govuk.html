@@ -37,7 +37,7 @@
   <p class="govuk-body">We’ll email you once your branding’s ready to use, or if we need any more information.</p>
 
   {% call form_wrapper() %}
-    {{ page_footer('Request new branding', button_name='branding_choice', button_value=('govuk_and_org' if with_org == 'True' else 'govuk')) }}
+    {{ page_footer('Request new branding', button_name='branding_choice', button_value=('govuk_and_org' if with_org else 'govuk')) }}
   {% endcall %}
 
 {% endblock %}

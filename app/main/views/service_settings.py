@@ -1153,7 +1153,6 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
     zendesk_client.send_ticket_to_zendesk(ticket)
 
 
-@main.route("/services/<uuid:service_id>/branding-request/email", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/service-settings/email-branding", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_request(service_id):
@@ -1169,19 +1168,10 @@ def email_branding_request(service_id):
             flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
             return redirect(url_for('.service_settings', service_id=current_service.id))
         else:
-            endpoint = {
-                'govuk': '.email_branding_govuk',
-                'govuk_and_org': '.email_branding_govuk',
-                'nhs': '.email_branding_nhs',
-                'organisation': '.email_branding_organisation',
-                'something_else': '.email_branding_something_else',
-            }[form.options.data]
-
             return redirect(
                 url_for(
-                    endpoint,
+                    f'.email_branding_{form.options.data}',
                     service_id=current_service.id,
-                    with_org=(True if form.options.data == 'govuk_and_org' else None),
                 )
             )
 
@@ -1203,9 +1193,7 @@ def check_branding_allowed_for_service(branding):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_govuk(service_id):
-    with_org = request.args.get('with_org')
-
-    check_branding_allowed_for_service('govuk_and_org' if with_org else 'govuk')
+    check_branding_allowed_for_service('govuk')
 
     if request.method == 'POST':
         create_email_branding_zendesk_ticket(request.form['branding_choice'])
@@ -1213,7 +1201,21 @@ def email_branding_govuk(service_id):
         flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
         return redirect(url_for('.service_settings', service_id=current_service.id))
 
-    return render_template('views/service-settings/branding/email-branding-govuk.html', with_org=with_org)
+    return render_template('views/service-settings/branding/email-branding-govuk.html')
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk-and-org", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def email_branding_govuk_and_org(service_id):
+    check_branding_allowed_for_service('govuk_and_org')
+
+    if request.method == 'POST':
+        create_email_branding_zendesk_ticket(request.form['branding_choice'])
+
+        flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
+        return redirect(url_for('.service_settings', service_id=current_service.id))
+
+    return render_template('views/service-settings/branding/email-branding-govuk.html', with_org=True)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=['GET', 'POST'])
@@ -1260,7 +1262,6 @@ def email_branding_something_else(service_id):
     return render_template('views/service-settings/branding/email-branding-something-else.html', form=form)
 
 
-@main.route("/services/<uuid:service_id>/branding-request/letter", methods=['GET', 'POST'])
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def letter_branding_request(service_id):
