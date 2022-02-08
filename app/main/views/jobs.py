@@ -159,6 +159,11 @@ def view_job_updates(service_id, job_id):
 @main.route('/services/<uuid:service_id>/notifications/<template_type:message_type>', methods=['GET', 'POST'])
 @user_has_permissions()
 def view_notifications(service_id, message_type=None):
+
+    # Don’t let particpants see emails which previous participants have
+    # sent to themselves
+    abort(403)
+
     return render_template(
         'views/notifications.html',
         partials=get_notifications(service_id, message_type),
