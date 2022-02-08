@@ -24,3 +24,12 @@ $(() => $('.banner-dangerous').eq(0).trigger('focus'));
 $(() => $('.govuk-header__container').on('click', function() {
   $(this).css('border-color', '#005ea5');
 }));
+
+$('.js-mark-focus-on-parent').on('focus blur', '*', e => {
+  $target = $(e.target);
+  if (e.type === 'focusin') {
+    $target.parent().addClass('js-child-has-focus');
+  } else {
+    $target.parent().removeClass('js-child-has-focus');
+  }
+});

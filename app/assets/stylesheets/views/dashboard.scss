@@ -44,6 +44,13 @@
 
 .file-list {
 
+  &-hint,
+  &-hint-large,
+  &-status {
+    pointer-events: none; // delegate clicks to the overlapping link
+    position: relative; // make non-static to sit above the overlapping focus style
+  }
+
   &-filename {
     @include bold-19;
     display: block;
@@ -84,7 +91,6 @@
     @include core-16;
     display: block;
     color: $secondary-text-colour;
-    pointer-events: none;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -95,7 +101,6 @@
     @include core-19;
     display: block;
     color: $secondary-text-colour;
-    pointer-events: none;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -110,13 +115,6 @@
 
 /* The focus state for sibling links overlaps the hint so the hint's text colour needs to adapt */
 .govuk-link:focus {
-  &.file-list-filename,
-  &.file-list-filename-large,
-  & + .file-list-hint,
-  & + .file-list-hint-large {
-    /* link needs non-static position to overlap the cell border, hint so it isn't overlapped itself */
-    position: relative;
-  }
 
   &.file-list-filename,
   &.file-list-filename-large {
@@ -126,6 +124,17 @@
 
   & + .file-list-hint,
   & + .file-list-hint-large {
+    color: $govuk-focus-text-colour;
+  }
+
+}
+
+// Note: this selector should use the :has() pseudo-class in the future when it is supported
+//       which will remove the need for JS
+.file-list .js-child-has-focus + .govuk-grid-row {
+
+  & .file-list-hint-large,
+  & .file-list-status > .govuk-hint {
     color: $govuk-focus-text-colour;
   }
 
