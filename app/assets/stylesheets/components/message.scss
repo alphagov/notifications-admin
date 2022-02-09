@@ -108,17 +108,22 @@ a {
           }
         }
 
-        &:active,
-        &:focus {
+        &:focus,
+        &:active {
 
+          &,
           &::before {
             background-color: $govuk-focus-colour;
-            box-shadow: 0px -2px $govuk-focus-colour, 0px 4px $govuk-focus-text-colour;
           }
 
+          &,
           & + .template-list-item-hint,
           .message-type {
-            color: $govuk-text-colour;
+            color: $govuk-focus-text-colour;
+          }
+
+          &::before {
+            box-shadow: 0px -2px $govuk-focus-colour, 0px 4px $govuk-focus-text-colour;
           }
 
         }
@@ -177,7 +182,8 @@ a {
       background-image: file-url('folder-blue-bold-hover.svg');
     }
 
-    &:focus {
+    &:focus,
+    &:active {
       background-image: file-url('folder-black-bold.svg');
     }
 
