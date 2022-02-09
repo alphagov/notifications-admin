@@ -16,11 +16,11 @@
     </div>
     <div id="total-sms" class="govuk-grid-column-one-third">
       {{ big_number_with_status(
-        statistics['sms']['requested'],
-        statistics['sms']['requested']|message_count_label('sms', suffix='sent'),
-        statistics['sms']['failed'],
-        statistics['sms']['failed_percentage'],
-        statistics['sms']['show_warning'],
+        statistics['text']['requested'],
+        statistics['text']['requested']|message_count_label('sms', suffix='sent'),
+        statistics['text']['failed'],
+        statistics['text']['failed_percentage'],
+        statistics['text']['show_warning'],
         failure_link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='failed'),
         link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed'),
         smaller=True,

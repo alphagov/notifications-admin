@@ -1,6 +1,6 @@
 import calendar
 from collections import namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import partial
 from itertools import groupby
 from operator import itemgetter
@@ -24,6 +24,7 @@ from app import (
     service_api_client,
     template_statistics_client,
 )
+from app.extensions import redis_client
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import main
 from app.statistics_utils import get_formatted_percentage
@@ -280,12 +281,48 @@ def aggregate_notifications_stats(template_statistics):
     return notifications
 
 
+def notification_count_cache_key(
+    service_id, created_at_utc, notification_type, simplified_status
+):
+    # this is not actually turning it in to bst, will need to fix this
+    bst_date = created_at_utc.strftime("%Y-%m-%d")
+    x = "service-{}-bst-date-{}-{}-{}".format(
+            str(service_id), bst_date, notification_type, simplified_status
+        )
+    return x
+
+def get_last_7_days_total(service_id, notification_type, simplified_status):
+    total = 0
+    for i in range(7):
+        total += int(
+            redis_client.get(
+                notification_count_cache_key(
+                    service_id, datetime.utcnow() - timedelta(days=i) , notification_type, simplified_status
+                )
+            ) or 0)
+
+    return total
+
+
+def get_dashboard_stats_from_redis(service_id):
+    results = {}
+    for notification_type in ['email', 'text', 'letter']:
+        results[notification_type] = {}
+        for status in ['sending', 'delivered', 'failed']:
+            results[notification_type][status] = get_last_7_days_total(
+                service_id, notification_type, status
+            )
+        results[notification_type]['requested'] = sum(results[notification_type].values())
+
+    return results
+
+
 def get_dashboard_partials(service_id):
     all_statistics = template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
     template_statistics = aggregate_template_usage(all_statistics)
     stats = aggregate_notifications_stats(all_statistics)
 
-    dashboard_totals = get_dashboard_totals(stats),
+    dashboard_totals = get_dashboard_totals(get_dashboard_stats_from_redis(service_id)),
     free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(
         current_service.id,
         get_current_financial_year(),
