@@ -26,7 +26,11 @@
     },
     replace: function () {
       this.classNames.forEach((className, index) => {
-        this.$els[index].addClass(className);
+        var $el = this.$els[index];
+
+        if (global.document.body.contains($el.get(0))) {
+          $el.addClass(className);
+        }
       });
 
       // remove references to elements
