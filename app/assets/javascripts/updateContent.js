@@ -13,7 +13,7 @@
 
   // Methods to ensure the DOM fragment is clean of classes added by JS before diffing
   // and that they are replaced afterwards.
-  var classesToPersist = {
+  var classesPersister = {
     classNames: [],
     $els: [],
     remove: function () {
@@ -39,12 +39,12 @@
   };
 
   var getRenderer = ($contents, key) => response => {
-    classesToPersist.remove();
+    classesPersister.remove();
     morphdom(
       $contents.get(0),
       $(response[key]).get(0)
     );
-    classesToPersist.replace();
+    classesPersister.replace();
   };
 
   var getQueue = resource => (
@@ -101,7 +101,7 @@
       if ($contents.data('classesToPersist') !== undefined) {
         $contents.data('classesToPersist')
           .split(' ')
-          .forEach(className => classesToPersist.classNames.push(className));
+          .forEach(className => classesPersister.classNames.push(className));
       }
 
       setTimeout(
