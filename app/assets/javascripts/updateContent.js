@@ -14,19 +14,22 @@
   // Methods to ensure the DOM fragment is clean of classes added by JS before diffing
   // and that they are replaced afterwards.
   var classesPersister = {
-    classNames: [],
-    $els: [],
+    _classNames: [],
+    _$els: [],
+    addClassName: function (className) {
+      this._classNames.push(className);
+    },
     remove: function () {
-      this.classNames.forEach(className => {
+      this._classNames.forEach(className => {
         var $elsWithClassName = $('.' + className).removeClass(className);
 
         // store elements for that className at the same index
-        this.$els.push($elsWithClassName);
+        this._$els.push($elsWithClassName);
       });
     },
     replace: function () {
-      this.classNames.forEach((className, index) => {
-        var $el = this.$els[index];
+      this._classNames.forEach((className, index) => {
+        var $el = this._$els[index];
 
         if (global.document.body.contains($el.get(0))) {
           $el.addClass(className);
@@ -101,7 +104,7 @@
       if ($contents.data('classesToPersist') !== undefined) {
         $contents.data('classesToPersist')
           .split(' ')
-          .forEach(className => classesPersister.classNames.push(className));
+          .forEach(className => classesPersister.addClassName(className));
       }
 
       setTimeout(
