@@ -317,7 +317,7 @@ describe('Update content', () => {
 
       document.body.innerHTML = initialHTMLString;
 
-      // make the response have an extra item
+      // make a response with no changes
       responseObj[updateKey] = HTMLString;
 
       // start the module
@@ -468,8 +468,29 @@ describe('Update content', () => {
       // Add class to indicate focus state of link on parent heading
       document.querySelectorAll('.file-list h2')[0].classList.add('js-child-has-focus');
 
-      // make the response match the initial HTML to emulate a response with no changes
-      responseObj[updateKey] = HTMLString;
+      var updatedHTMLString = getHTMLString([
+        {
+          title: "Gas leak",
+          hint: "There's a gas leak in the local area. Residents should vacate until further notice.",
+          status: "Waiting for approval",
+          areas: [
+            "Santa Claus Village, Rovaniemi B",
+            "Santa Claus Village, Rovaniemi C"
+          ]
+        },
+        {
+          title: "Reservoir flooding template",
+          hint: "The local reservoir has flooded. All people within 5 miles should move to a safer location.",
+          status: "Waiting for approval",
+          areas: [
+            "Santa Claus Village, Rovaniemi A",
+            "Santa Claus Village, Rovaniemi D"
+          ]
+        }
+      ]);
+
+      // make the response have an extra item
+      responseObj[updateKey] = updatedHTMLString;
 
       // start the module
       window.GOVUK.modules.start();
