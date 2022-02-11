@@ -94,7 +94,7 @@ describe('Update content', () => {
         </div>`;
 
 
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}" aria-live="polite">
+      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
                           ${HTMLString}
                           </div>`;
 
@@ -102,6 +102,15 @@ describe('Update content', () => {
 
       // default the response to match the content inside div[data-module]
       responseObj[updateKey] = HTMLString;
+
+    });
+
+    test("It should replace the original HTML with that of the partial, to match that returned from AJAX responses", () => {
+
+      // start the module
+      window.GOVUK.modules.start();
+
+      expect(document.querySelector('.ajax-block-container').parentNode.hasAttribute('data-resource')).toBe(false);
 
     });
 
@@ -302,7 +311,7 @@ describe('Update content', () => {
         }
       ]);
 
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}" aria-live="polite">
+      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
                           ${HTMLString}
                           </div>`;
 
@@ -336,7 +345,7 @@ describe('Update content', () => {
         }
       ]);
 
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}" aria-live="polite">
+      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
                           ${HTMLString}
                           </div>`;
 
@@ -401,7 +410,7 @@ describe('Update content', () => {
         }
       ]);
 
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}" aria-live="polite">
+      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
                           ${HTMLString}
                           </div>`;
 
@@ -447,7 +456,7 @@ describe('Update content', () => {
         }
       ]);
 
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}" aria-live="polite">
+      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
                           ${HTMLString}
                           </div>`;
 
