@@ -6,7 +6,7 @@
 #
 ago==0.0.93
     # via -r requirements.in
-awscli==1.19.84
+awscli==1.22.54
     # via
     #   awscli-cwlogs
     #   notifications-utils
