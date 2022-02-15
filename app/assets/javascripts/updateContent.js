@@ -45,7 +45,7 @@
       });
 
       // remove references to elements
-      this.$els = [];
+      this._$els = [];
     }
   };
 
