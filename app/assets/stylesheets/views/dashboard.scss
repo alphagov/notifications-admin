@@ -120,6 +120,11 @@
   &.file-list-filename-large {
     /* override box-shadow to push underline down a bit */
     box-shadow: 0 -2px $govuk-focus-colour, 0 5px $govuk-focus-text-colour;
+
+    // File-list items contained by keyline-blocks have more spacing at the top so adapt to cover it
+    .keyline-block > .file-list & {
+      box-shadow: 0 -5px $govuk-focus-colour, 0 5px $govuk-focus-text-colour;
+    }
   }
 
   & + .file-list-hint,
