@@ -17,7 +17,9 @@
     _classNames: [],
     _$els: [],
     addClassName: function (className) {
-      this._classNames.push(className);
+      if (this._classNames.indexOf(className) === -1) {
+        this._classNames.push(className);
+      }
     },
     remove: function () {
       this._classNames.forEach(className => {
@@ -31,6 +33,8 @@
       this._classNames.forEach((className, index) => {
         var $el = this._$els[index];
 
+        // Avoid updating elements that are no longer present.
+        // elements removed will still exist in memory but won't be attached to the DOM any more
         if (global.document.body.contains($el.get(0))) {
           $el.addClass(className);
         }
