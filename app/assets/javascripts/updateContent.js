@@ -13,6 +13,10 @@
 
   // Methods to ensure the DOM fragment is clean of classes added by JS before diffing
   // and that they are replaced afterwards.
+  //
+  // Added to allow the use of JS, in main.js, to apply styles which in future could be
+  // achieved with the :has pseudo-class. If :has is available in our supported browsers,
+  // this can be removed in favour of a CSS-only solution.
   var classesPersister = {
     _classNames: [],
     _$els: [],
@@ -100,11 +104,15 @@
       var resource = $component.data('resource');
       var form = $component.data('form');
 
-      // replace component with contents
-      // the renderer does this anyway when diffing against the first response
+      // Replace component with contents.
+      // The renderer does this anyway when diffing against the first response
       $component.replaceWith($contents);
 
-      // store any classes that should persist through updates
+      // Store any classes that should persist through updates
+      //
+      // Added to allow the use of JS, in main.js, to apply styles which in future could be
+      // achieved with the :has pseudo-class. If :has is available in our supported browsers,
+      // this can be removed in favour of a CSS-only solution.
       if ($contents.data('classesToPersist') !== undefined) {
         $contents.data('classesToPersist')
           .split(' ')
