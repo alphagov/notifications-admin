@@ -47,108 +47,20 @@ afterAll(() => {
 
 describe('Update content', () => {
 
-  let HTMLString;
-  let initialHTMLString;
+  const getInitialHTMLString = partial => `
+    <div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
+      ${partial}
+    </div>`;
 
-  describe('When updating the contents of DOM nodes', () => {
+  describe("All variations", () => {
 
     beforeEach(() => {
 
-      // store HTML in string to allow use in AJAX responses
-      HTMLString = `
-        <div class="bottom-gutter ajax-block-container">
-          <ul role="tablist" class="pill">
-            <li aria-selected="true" role="tab">
-              <div class="pill-selected-item" tabindex="0">
-                <div class="big-number-smaller">
-                  <div class="big-number-number">0</div>
-                </div>
-                <div class="pill-label">total</div>
-              </div>
-            </li>
-            <li aria-selected="false" role="tab">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=sending">
-                <div class="big-number-smaller">
-                  <div class="big-number-number">0</div>
-                </div>
-                <div class="pill-label">sending</div>
-              </a>
-            </li>
-            <li aria-selected="false" role="tab">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=delivered">
-                <div class="big-number-smaller">
-                  <div class="big-number-number">0</div>
-                </div>
-                <div class="pill-label">delivered</div>
-              </a>
-            </li>
-            <li aria-selected="false" role="tab">
-              <a class="govuk-link govuk-link--no-visited-state" href="/services/6658542f-0cad-491f-bec8-ab8457700ead/notifications/email?status=failed">
-                <div class="big-number-smaller">
-                  <div class="big-number-number">0</div>
-                </div>
-                <div class="pill-label">failed</div>
-              </a>
-            </li>
-          </ul>
-        </div>`;
-
-
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
-                          ${HTMLString}
-                          </div>`;
-
-      document.body.innerHTML = initialHTMLString;
+      // Intentionally basic example because we're not testing changes to the partial
+      document.body.innerHTML = getInitialHTMLString(`<p class="notification-status">Sending</p>`);
 
       // default the response to match the content inside div[data-module]
-      responseObj[updateKey] = HTMLString;
-
-    });
-
-    test("It should replace the original HTML with that of the partial, to match that returned from AJAX responses", () => {
-
-      // start the module
-      window.GOVUK.modules.start();
-
-      expect(document.querySelector('.ajax-block-container').parentNode.hasAttribute('data-resource')).toBe(false);
-
-    });
-
-    test("It should make requests to the URL specified in the data-resource attribute", () => {
-
-      // start the module
-      window.GOVUK.modules.start();
-      jest.advanceTimersByTime(2000);
-
-      expect($.ajax.mock.calls[0][0]).toEqual(resourceURL);
-
-    });
-
-    test("If the response contains no changes, the DOM should stay the same", () => {
-
-      // send the done callback a response with updates included
-      responseObj[updateKey] = HTMLString;
-
-      // start the module
-      window.GOVUK.modules.start();
-      jest.advanceTimersByTime(2000);
-
-      // check a sample DOM node is unchanged
-      expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("0");
-
-    });
-
-    test("If the response contains changes, it should update the DOM with them", () => {
-
-      // send the done callback a response with updates included
-      responseObj[updateKey] = HTMLString.replace(/<div class="big-number-number">0<\/div>{1}/, '<div class="big-number-number">1</div>');
-
-      // start the module
-      window.GOVUK.modules.start();
-      jest.advanceTimersByTime(2000);
-
-      // check the right DOM node is updated
-      expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("1");
+      responseObj[updateKey] = `<p class="notification-status">Sending</p>`;
 
     });
 
@@ -216,12 +128,14 @@ describe('Update content', () => {
 
       beforeEach(() => {
 
+        // Add a form to the page
         document.body.innerHTML += `
           <form method="post" id="service">
             <input type="hidden" name="serviceName" value="Buckhurst surgery" />
             <input type="hidden" name="serviceNumber" value="${serviceNumber}" />
           </form>`;
 
+        // Link the component to the form
         document.querySelector('[data-module=update-content]').setAttribute('data-form', 'service');
 
         // start the module
@@ -250,40 +164,156 @@ describe('Update content', () => {
 
   });
 
-  describe("When adding or removing DOM nodes", () => {
-    var getItemHTMLString = content => {
-      var areas = '';
+  describe('When updating the contents of DOM nodes', () => {
 
-      content.areas.forEach(area =>
-        areas += "\n" + `<li class="area-list-item area-list-item--unremoveable area-list-item--smaller">${area}</li>`
-      );
+    let partialData;
+
+    const getPartial = items => {
+      let pillsHTML = '';
+
+      items.forEach(item => {
+        pillsHTML += `
+          <li ${item.selected ? 'aria-selected="true"' : ''} role="tab">
+            <div ${item.selected ? 'class="pill-selected-item" tabindex="0"' : ''}>
+              <div class="big-number-smaller">
+                <div class="big-number-number">${item.count}</div>
+              </div>
+              <div class="pill-label">${item.label}</div>
+            </div>
+          </li>`;
+      });
 
       return `
-        <div class="keyline-block">
-          <div class="file-list govuk-!-margin-bottom-2">
-            <h2>
-              <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="/services/7597847f-ad8e-4600-8faf-c42a647d8dee/current-alerts/b9e53cda-54f9-47bc-9fb2-b78a11eda6a9">${content.title}</a>
-            </h2>
-            <div class="govuk-grid-row">
-              <div class="govuk-grid-column-one-half">
-                <span class="file-list-hint-large govuk-!-margin-bottom-2">
-                  ${content.hint}
-                </span>
-              </div>
-              <div class="govuk-grid-column-one-half file-list-status">
-                <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
-                  ${content.status}
-                </p>
-              </div>
-            </div>
-            <ul class="area-list">
-              ${areas}
-            </ul>
-          </div>
+        <div class="bottom-gutter ajax-block-container">
+          <ul role="tablist" class="pill">
+            ${pillsHTML}
+          </ul>
         </div>`;
     };
 
-    var getHTMLString = items => {
+    beforeEach(() => {
+
+      partialData = [
+        {
+          count: 0,
+          label: 'total',
+          selected: true
+        },
+        {
+          count: 0,
+          label: 'sending',
+          selected: false
+        },
+        {
+          count: 0,
+          label: 'delivered',
+          selected: false
+        },
+        {
+          count: 0,
+          label: 'failed',
+          selected: false
+        }
+      ];
+
+      document.body.innerHTML = getInitialHTMLString(getPartial(partialData));
+
+    });
+
+    test("It should replace the original HTML with that of the partial, to match that returned from AJAX responses", () => {
+
+      // default the response to match the content inside div[data-module]
+      responseObj[updateKey] = getPartial(partialData);
+
+      // start the module
+      window.GOVUK.modules.start();
+
+      expect(document.querySelector('.ajax-block-container').parentNode.hasAttribute('data-resource')).toBe(false);
+
+    });
+
+    test("It should make requests to the URL specified in the data-resource attribute", () => {
+
+      // default the response to match the content inside div[data-module]
+      responseObj[updateKey] = getPartial(partialData);
+
+      // start the module
+      window.GOVUK.modules.start();
+      jest.advanceTimersByTime(2000);
+
+      expect($.ajax.mock.calls[0][0]).toEqual(resourceURL);
+
+    });
+
+    test("If the response contains no changes, the DOM should stay the same", () => {
+
+      // send the done callback a response with updates included
+      responseObj[updateKey] = getPartial(partialData);
+
+      // start the module
+      window.GOVUK.modules.start();
+      jest.advanceTimersByTime(2000);
+
+      // check a sample DOM node is unchanged
+      expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("0");
+
+    });
+
+    test("If the response contains changes, it should update the DOM with them", () => {
+
+      partialData[0].count = 1;
+
+      // send the done callback a response with updates included
+      responseObj[updateKey] = getPartial(partialData);
+
+      // start the module
+      window.GOVUK.modules.start();
+      jest.advanceTimersByTime(2000);
+
+      // check the right DOM node is updated
+      expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("1");
+
+    });
+
+  });
+
+  describe("When adding or removing DOM nodes", () => {
+
+    let partialData;
+
+    const getPartial = items => {
+
+      const getItemHTMLString = content => {
+        var areas = '';
+
+        content.areas.forEach(area =>
+          areas += "\n" + `<li class="area-list-item area-list-item--unremoveable area-list-item--smaller">${area}</li>`
+        );
+
+        return `
+          <div class="keyline-block">
+            <div class="file-list govuk-!-margin-bottom-2">
+              <h2>
+                <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="/services/7597847f-ad8e-4600-8faf-c42a647d8dee/current-alerts/b9e53cda-54f9-47bc-9fb2-b78a11eda6a9">${content.title}</a>
+              </h2>
+              <div class="govuk-grid-row">
+                <div class="govuk-grid-column-one-half">
+                  <span class="file-list-hint-large govuk-!-margin-bottom-2">
+                    ${content.hint}
+                  </span>
+                </div>
+                <div class="govuk-grid-column-one-half file-list-status">
+                  <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
+                    ${content.status}
+                  </p>
+                </div>
+              </div>
+              <ul class="area-list">
+                ${areas}
+              </ul>
+            </div>
+          </div>`;
+      };
 
       var itemsHTMLString = '';
 
@@ -296,10 +326,9 @@ describe('Update content', () => {
 
     };
 
-    test("If the response contains no changes, the DOM should stay the same", () => {
+    beforeEach(() => {
 
-      // store HTML in string to allow use in AJAX responses
-      HTMLString = getHTMLString([
+      partialData = [
         {
           title: "Gas leak",
           hint: "There's a gas leak in the local area. Residents should vacate until further notice.",
@@ -309,16 +338,16 @@ describe('Update content', () => {
             "Santa Claus Village, Rovaniemi C"
           ]
         }
-      ]);
+      ];
 
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
-                          ${HTMLString}
-                          </div>`;
+    });
 
-      document.body.innerHTML = initialHTMLString;
+    test("If the response contains no changes, the DOM should stay the same", () => {
+
+      document.body.innerHTML = getInitialHTMLString(getPartial(partialData));
 
       // make a response with no changes
-      responseObj[updateKey] = HTMLString;
+      responseObj[updateKey] = getPartial(partialData);
 
       // start the module
       window.GOVUK.modules.start();
@@ -332,48 +361,20 @@ describe('Update content', () => {
 
     test("If the response adds a node, the DOM should contain that node", () => {
 
-      // store HTML in string to allow use in AJAX responses
-      HTMLString = getHTMLString([
-        {
-          title: "Gas leak",
-          hint: "There's a gas leak in the local area. Residents should vacate until further notice.",
-          status: "Waiting for approval",
-          areas: [
-            "Santa Claus Village, Rovaniemi B",
-            "Santa Claus Village, Rovaniemi C"
-          ]
-        }
-      ]);
+      document.body.innerHTML = getInitialHTMLString(getPartial(partialData));
 
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
-                          ${HTMLString}
-                          </div>`;
-
-      document.body.innerHTML = initialHTMLString;
-
-      var updatedHTMLString = getHTMLString([
-        {
-          title: "Gas leak",
-          hint: "There's a gas leak in the local area. Residents should vacate until further notice.",
-          status: "Waiting for approval",
-          areas: [
-            "Santa Claus Village, Rovaniemi B",
-            "Santa Claus Village, Rovaniemi C"
-          ]
-        },
-        {
-          title: "Reservoir flooding template",
-          hint: "The local reservoir has flooded. All people within 5 miles should move to a safer location.",
-          status: "Waiting for approval",
-          areas: [
-            "Santa Claus Village, Rovaniemi A",
-            "Santa Claus Village, Rovaniemi D"
-          ]
-        }
-      ]);
+      partialData.push({
+        title: "Reservoir flooding template",
+        hint: "The local reservoir has flooded. All people within 5 miles should move to a safer location.",
+        status: "Waiting for approval",
+        areas: [
+          "Santa Claus Village, Rovaniemi A",
+          "Santa Claus Village, Rovaniemi D"
+        ]
+      });
 
       // make the response have an extra item
-      responseObj[updateKey] = updatedHTMLString;
+      responseObj[updateKey] = getPartial(partialData);
 
       // start the module
       window.GOVUK.modules.start();
@@ -388,48 +389,24 @@ describe('Update content', () => {
 
     test("If the response removes a node, the DOM should not contain that node", () => {
 
-      // store HTML in string to allow use in AJAX responses
-      HTMLString = getHTMLString([
-        {
-          title: "Gas leak",
-          hint: "There's a gas leak in the local area. Residents should vacate until further notice.",
-          status: "Waiting for approval",
-          areas: [
-            "Santa Claus Village, Rovaniemi B",
-            "Santa Claus Village, Rovaniemi C"
-          ]
-        },
-        {
-          title: "Reservoir flooding template",
-          hint: "The local reservoir has flooded. All people within 5 miles should move to a safer location.",
-          status: "Waiting for approval",
-          areas: [
-            "Santa Claus Village, Rovaniemi A",
-            "Santa Claus Village, Rovaniemi D"
-          ]
-        }
-      ]);
+      // add another item so we start with 2
+      partialData.push({
+        title: "Reservoir flooding template",
+        hint: "The local reservoir has flooded. All people within 5 miles should move to a safer location.",
+        status: "Waiting for approval",
+        areas: [
+          "Santa Claus Village, Rovaniemi A",
+          "Santa Claus Village, Rovaniemi D"
+        ]
+      });
 
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
-                          ${HTMLString}
-                          </div>`;
+      document.body.innerHTML = getInitialHTMLString(getPartial(partialData));
 
-      document.body.innerHTML = initialHTMLString;
-
-      var updatedHTMLString = getHTMLString([
-        {
-          title: "Gas leak",
-          hint: "There's a gas leak in the local area. Residents should vacate until further notice.",
-          status: "Waiting for approval",
-          areas: [
-            "Santa Claus Village, Rovaniemi B",
-            "Santa Claus Village, Rovaniemi C"
-          ]
-        }
-      ]);
+      // remove the last item
+      partialData.pop();
 
       // default the response to match the content inside div[data-module]
-      responseObj[updateKey] = updatedHTMLString;
+      responseObj[updateKey] = getPartial(partialData);
 
       // start the module
       window.GOVUK.modules.start();
@@ -443,24 +420,7 @@ describe('Update content', () => {
 
     test("If other scripts have added classes to the DOM, they should persist through updates", () => {
 
-      // store HTML in string to allow use in AJAX responses
-      HTMLString = getHTMLString([
-        {
-          title: "Gas leak",
-          hint: "There's a gas leak in the local area. Residents should vacate until further notice.",
-          status: "Waiting for approval",
-          areas: [
-            "Santa Claus Village, Rovaniemi B",
-            "Santa Claus Village, Rovaniemi C"
-          ]
-        }
-      ]);
-
-      initialHTMLString = `<div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
-                          ${HTMLString}
-                          </div>`;
-
-      document.body.innerHTML = initialHTMLString;
+      document.body.innerHTML = getInitialHTMLString(getPartial(partialData));
 
       // mark classes to persist on the partial
       document.querySelector('.ajax-block-container').setAttribute('data-classes-to-persist', 'js-child-has-focus');
@@ -468,29 +428,19 @@ describe('Update content', () => {
       // Add class to indicate focus state of link on parent heading
       document.querySelectorAll('.file-list h2')[0].classList.add('js-child-has-focus');
 
-      var updatedHTMLString = getHTMLString([
-        {
-          title: "Gas leak",
-          hint: "There's a gas leak in the local area. Residents should vacate until further notice.",
-          status: "Waiting for approval",
-          areas: [
-            "Santa Claus Village, Rovaniemi B",
-            "Santa Claus Village, Rovaniemi C"
-          ]
-        },
-        {
-          title: "Reservoir flooding template",
-          hint: "The local reservoir has flooded. All people within 5 miles should move to a safer location.",
-          status: "Waiting for approval",
-          areas: [
-            "Santa Claus Village, Rovaniemi A",
-            "Santa Claus Village, Rovaniemi D"
-          ]
-        }
-      ]);
+      // Add an item to trigger an update
+      partialData.push({
+        title: "Reservoir flooding template",
+        hint: "The local reservoir has flooded. All people within 5 miles should move to a safer location.",
+        status: "Waiting for approval",
+        areas: [
+          "Santa Claus Village, Rovaniemi A",
+          "Santa Claus Village, Rovaniemi D"
+        ]
+      });
 
       // make the response have an extra item
-      responseObj[updateKey] = updatedHTMLString;
+      responseObj[updateKey] = getPartial(partialData);
 
       // start the module
       window.GOVUK.modules.start();
