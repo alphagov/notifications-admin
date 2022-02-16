@@ -17,45 +17,46 @@
   // Added to allow the use of JS, in main.js, to apply styles which in future could be
   // achieved with the :has pseudo-class. If :has is available in our supported browsers,
   // this can be removed in favour of a CSS-only solution.
-  var classesPersister = {
-    _classNames: [],
-    _classesTo$ElsMap: {},
-    addClassName: function (className) {
-      if (this._classNames.indexOf(className) === -1) {
-        this._classNames.push(className);
-      }
-    },
-    remove: function () {
-      // Store references to any elements with class names to persist
-      this._classNames.forEach(className => {
-        var $elsWithClassName = $('.' + className).removeClass(className);
-
-        if ($elsWithClassName.length > 0) {
-          this._classesTo$ElsMap[className] = $elsWithClassName;
-        }
-      });
-    },
-    replace: function () {
-      var className;
-
-      for (className in this._classesTo$ElsMap) {
-        this._classesTo$ElsMap[className].each((idx, el) => {
-
-          // Avoid updating elements that are no longer present.
-          // elements removed will still exist in memory but won't be attached to the DOM any more
-          if (global.document.body.contains(el)) {
-            $(el).addClass(className);
-          }
-
-        });
-      }
-
-      // remove references to elements
-      this._classesTo$ElsMap = {};
+  var ClassesPersister = function ($contents) {
+    this._$contents = $contents;
+    this._classNames = [];
+    this._classesTo$ElsMap = {};
+  };
+  ClassesPersister.prototype.addClassName = function (className) {
+    if (this._classNames.indexOf(className) === -1) {
+      this._classNames.push(className);
     }
   };
+  ClassesPersister.prototype.remove = function () {
+    // Store references to any elements with class names to persist
+    this._classNames.forEach(className => {
+      var $elsWithClassName = $('.' + className, this._$contents).removeClass(className);
 
-  var getRenderer = ($contents, key) => response => {
+      if ($elsWithClassName.length > 0) {
+        this._classesTo$ElsMap[className] = $elsWithClassName;
+      }
+    });
+  };
+  ClassesPersister.prototype.replace = function () {
+    var className;
+
+    for (className in this._classesTo$ElsMap) {
+      this._classesTo$ElsMap[className].each((idx, el) => {
+
+        // Avoid updating elements that are no longer present.
+        // elements removed will still exist in memory but won't be attached to the DOM any more
+        if (global.document.body.contains(el)) {
+          $(el).addClass(className);
+        }
+
+      });
+    }
+
+    // remove references to elements
+    this._classesTo$ElsMap = {};
+  };
+
+  var getRenderer = ($contents, key, classesPersister) => response => {
     classesPersister.remove();
     morphdom(
       $contents.get(0),
@@ -109,6 +110,7 @@
       var key = $component.data('key');
       var resource = $component.data('resource');
       var form = $component.data('form');
+      var classesPersister = new ClassesPersister($contents);
 
       // Replace component with contents.
       // The renderer does this anyway when diffing against the first response
@@ -127,7 +129,7 @@
 
       setTimeout(
         () => poll(
-          getRenderer($contents, key),
+          getRenderer($contents, key, classesPersister),
           resource,
           getQueue(resource),
           form
