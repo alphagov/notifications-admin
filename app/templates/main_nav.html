@@ -32,6 +32,9 @@
     <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('usage') }}" href="{{ url_for('.usage', service_id=current_service.id) }}">Usage</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('team-members') }}" href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
   {% endif %}
+  {% if current_user.platform_admin %}
+    <li><a class="govuk-link govuk-link--no-visited-state{{ main_navigation.is_selected('history') }}" href="{{ url_for('.history', service_id=current_service.id) }}">Service history</a></li>
+  {% endif %}
   </ul>
 </nav>
 {% endif %}

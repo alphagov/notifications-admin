@@ -282,6 +282,9 @@ class MainNavigation(Navigation):
             'guest_list',
             'old_guest_list',
         },
+        'history': {
+            'history'
+        }
     }
 
 

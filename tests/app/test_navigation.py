@@ -538,6 +538,22 @@ def test_navigation_for_services_with_broadcast_permission(
     ]
 
 
+def test_navigation_for_platform_admins(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_get_api_keys,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
+
+    assert '/services/{}/history'.format(SERVICE_ONE_ID) in [
+        a['href'] for a in page.select('.navigation a')
+    ]
+
+
 def test_caseworkers_get_caseworking_navigation(
     client_request,
     mocker,
