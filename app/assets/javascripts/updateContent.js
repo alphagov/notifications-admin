@@ -19,33 +19,39 @@
   // this can be removed in favour of a CSS-only solution.
   var classesPersister = {
     _classNames: [],
-    _$els: [],
+    _classesTo$ElsMap: {},
     addClassName: function (className) {
       if (this._classNames.indexOf(className) === -1) {
         this._classNames.push(className);
       }
     },
     remove: function () {
+      // Store references to any elements with class names to persist
       this._classNames.forEach(className => {
         var $elsWithClassName = $('.' + className).removeClass(className);
 
-        // store elements for that className at the same index
-        this._$els.push($elsWithClassName);
+        if ($elsWithClassName.length > 0) {
+          this._classesTo$ElsMap[className] = $elsWithClassName;
+        }
       });
     },
     replace: function () {
-      this._classNames.forEach((className, index) => {
-        var $el = this._$els[index];
+      var className;
 
-        // Avoid updating elements that are no longer present.
-        // elements removed will still exist in memory but won't be attached to the DOM any more
-        if (global.document.body.contains($el.get(0))) {
-          $el.addClass(className);
-        }
-      });
+      for (className in this._classesTo$ElsMap) {
+        this._classesTo$ElsMap[className].each((idx, el) => {
+
+          // Avoid updating elements that are no longer present.
+          // elements removed will still exist in memory but won't be attached to the DOM any more
+          if (global.document.body.contains(el)) {
+            $(el).addClass(className);
+          }
+
+        });
+      }
 
       // remove references to elements
-      this._$els = [];
+      this._classesTo$ElsMap = {};
     }
   };
 

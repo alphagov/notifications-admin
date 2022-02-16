@@ -418,7 +418,7 @@ describe('Update content', () => {
 
     });
 
-    test("If other scripts have added classes to the DOM, they should persist through updates", () => {
+    test("If other scripts have added classes to the DOM, they should persist through updates to a single component", () => {
 
       document.body.innerHTML = getInitialHTMLString(getPartial(partialData));
 
@@ -448,6 +448,48 @@ describe('Update content', () => {
 
       // check the class is still there
       expect(document.querySelectorAll('.file-list h2')[0].classList.contains('js-child-has-focus')).toBe(true);
+
+    });
+
+    test("If other scripts have added classes to the DOM, they should persist through updates to multiple components", () => {
+
+      // Create duplicate components in the page
+      document.body.innerHTML = getInitialHTMLString(getPartial(partialData)) + "\n" + getInitialHTMLString(getPartial(partialData));
+
+      var partialsInPage = document.querySelectorAll('.ajax-block-container');
+
+      // Mark classes to persist on the partials (2nd is made up)
+      partialsInPage[0].setAttribute('data-classes-to-persist', 'js-child-has-focus');
+      partialsInPage[1].setAttribute('data-classes-to-persist', 'js-2nd-child-has-focus');
+
+      // Add examples of those classes on each partial (2nd is made up)
+      partialsInPage[0].querySelectorAll('.file-list h2')[0].classList.add('js-child-has-focus');
+      partialsInPage[1].querySelectorAll('.file-list h2')[0].classList.add('js-2nd-child-has-focus');
+
+      // Add an item to trigger an update
+      partialData.push({
+        title: "Reservoir flooding template",
+        hint: "The local reservoir has flooded. All people within 5 miles should move to a safer location.",
+        status: "Waiting for approval",
+        areas: [
+          "Santa Claus Village, Rovaniemi A",
+          "Santa Claus Village, Rovaniemi D"
+        ]
+      });
+
+      // make all responses have an extra item
+      responseObj[updateKey] = getPartial(partialData);
+
+      // start the module
+      window.GOVUK.modules.start();
+      jest.advanceTimersByTime(2000);
+
+      // re-select in case nodes in partialsInPage have changed
+      partialsInPage = document.querySelectorAll('.ajax-block-container');
+
+      // check the classes are still there
+      expect(partialsInPage[0].querySelectorAll('.file-list h2')[0].classList.contains('js-child-has-focus')).toBe(true);
+      expect(partialsInPage[1].querySelectorAll('.file-list h2')[0].classList.contains('js-2nd-child-has-focus')).toBe(true);
 
     });
 
