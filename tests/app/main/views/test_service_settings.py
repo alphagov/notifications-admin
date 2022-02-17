@@ -5495,10 +5495,6 @@ def test_get_email_branding_description_pages_give_404_if_selected_branding_not_
     )
 
 
-@pytest.mark.parametrize('branding_choice, branding_description', [
-    ('govuk', 'GOV.UK'),
-    ('govuk_and_org', 'GOV.UK and organisation one'),
-])
 def test_submit_email_branding_request_from_govuk_description_page(
     mocker,
     client_request,
@@ -5508,8 +5504,6 @@ def test_submit_email_branding_request_from_govuk_description_page(
     no_reply_to_email_addresses,
     mock_get_email_branding,
     single_sms_sender,
-    branding_choice,
-    branding_description,
 ):
     mocker.patch(
         'app.organisations_client.get_organisation',
@@ -5531,7 +5525,6 @@ def test_submit_email_branding_request_from_govuk_description_page(
     page = client_request.post(
         '.email_branding_govuk',
         service_id=SERVICE_ONE_ID,
-        _data={'branding_choice': branding_choice},
         _follow_redirects=True,
     )
 
@@ -5544,7 +5537,66 @@ def test_submit_email_branding_request_from_govuk_description_page(
             '',
             '---',
             'Current branding: Organisation name',
-            f'Branding requested: {branding_description}\n',
+            'Branding requested: GOV.UK\n',
+        ]),
+        subject='Email branding request - service one',
+        ticket_type='question',
+        user_name='Test User',
+        user_email='test@user.gov.uk',
+        org_id=ORGANISATION_ID,
+        org_type='central',
+        service_id=SERVICE_ONE_ID
+    )
+    mock_send_ticket_to_zendesk.assert_called_once()
+    assert normalize_spaces(page.select_one('.banner-default').text) == (
+        'Thanks for your branding request. We’ll get back to you '
+        'within one working day.'
+    )
+
+
+def test_submit_email_branding_request_from_govuk_and_org_description_page(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    mock_get_service_settings_page_common,
+    no_reply_to_email_addresses,
+    mock_get_email_branding,
+    single_sms_sender,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+    mocker.patch(
+        'app.models.service.Service.organisation_id',
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
+    )
+    service_one['email_branding'] = sample_uuid()
+
+    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_send_ticket_to_zendesk = mocker.patch(
+        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        autospec=True,
+    )
+
+    page = client_request.post(
+        '.email_branding_govuk_and_org',
+        service_id=SERVICE_ONE_ID,
+        _follow_redirects=True,
+    )
+
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        message='\n'.join([
+            'Organisation: organisation one',
+            'Service: service one',
+            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
+            '',
+            '---',
+            'Current branding: Organisation name',
+            'Branding requested: GOV.UK and organisation one\n',
         ]),
         subject='Email branding request - service one',
         ticket_type='question',
