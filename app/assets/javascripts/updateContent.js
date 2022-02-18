@@ -38,18 +38,19 @@
     });
   };
   ClassesPersister.prototype.replace = function () {
+    var replaceClasses = (idx, el) => {
+
+      // Avoid updating elements that are no longer present.
+      // elements removed will still exist in memory but won't be attached to the DOM any more
+      if (global.document.body.contains(el)) {
+        $(el).addClass(className);
+      }
+
+    };
     var className;
 
     for (className in this._classesTo$ElsMap) {
-      this._classesTo$ElsMap[className].each((idx, el) => {
-
-        // Avoid updating elements that are no longer present.
-        // elements removed will still exist in memory but won't be attached to the DOM any more
-        if (global.document.body.contains(el)) {
-          $(el).addClass(className);
-        }
-
-      });
+      this._classesTo$ElsMap[className].each(replaceClasses);
     }
 
     // remove references to elements

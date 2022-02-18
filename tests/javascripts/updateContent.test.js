@@ -491,6 +491,10 @@ describe('Update content', () => {
       expect(partialsInPage[0].querySelectorAll('.file-list h2')[0].classList.contains('js-child-has-focus')).toBe(true);
       expect(partialsInPage[1].querySelectorAll('.file-list h2')[0].classList.contains('js-2nd-child-has-focus')).toBe(true);
 
+      // check each heading only has the classes assigned to it before updates occurred
+      expect(partialsInPage[0].querySelectorAll('.file-list h2')[0].classList.contains('js-2nd-child-has-focus')).toBe(false);
+      expect(partialsInPage[1].querySelectorAll('.file-list h2')[0].classList.contains('js-child-has-focus')).toBe(false);
+
     });
 
   });
