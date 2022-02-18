@@ -1025,7 +1025,9 @@ def get_template_error_dict(exception):
 @main.route("/services/<uuid:service_id>/template/<uuid:template_id>/notification/check", methods=['POST'])
 @user_has_permissions('send_messages', restrict_admin_usage=True)
 def send_notification(service_id, template_id):
-    if {'recipient', 'placeholders'} - set(session.keys()):
+    recipient = get_recipient()
+
+    if not recipient:
         return redirect(url_for(
             '.send_one_off',
             service_id=service_id,
@@ -1038,9 +1040,9 @@ def send_notification(service_id, template_id):
         noti = notification_api_client.send_notification(
             service_id,
             template_id=db_template['id'],
-            recipient=session['recipient'] or InsensitiveDict(session['placeholders'])['address line 1'],
+            recipient=recipient,
             personalisation=session['placeholders'],
-            sender_id=session['sender_id'] if 'sender_id' in session else None
+            sender_id=session.get('sender_id', None),
         )
     except HTTPError as exception:
         current_app.logger.info('Service {} could not send notification: "{}"'.format(
@@ -1096,3 +1098,13 @@ def get_spreadsheet_column_headings_from_template(template):
             column_headings.append(column_heading)
 
     return column_headings
+
+
+def get_recipient():
+    if {'recipient', 'placeholders'} - set(session.keys()):
+        return None
+
+    return (
+        session['recipient'] or
+        InsensitiveDict(session['placeholders']).get('address line 1')
+    )

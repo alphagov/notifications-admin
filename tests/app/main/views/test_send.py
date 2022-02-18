@@ -3969,12 +3969,18 @@ def test_send_notification_clears_session(
         assert 'placeholders' not in session
 
 
+@pytest.mark.parametrize('session_data', [
+    {'placeholders': {'a': 'b'}},  # missing recipient
+    {'recipient': '123'},  # missing placeholders
+    {'placeholders': {}, 'recipient': ''},  # missing address
+])
 def test_send_notification_redirects_if_missing_data(
     client_request,
     fake_uuid,
+    session_data,
 ):
     with client_request.session_transaction() as session:
-        session['placeholders'] = {'a': 'b'}
+        session.update(session_data)
 
     client_request.post(
         'main.send_notification',
