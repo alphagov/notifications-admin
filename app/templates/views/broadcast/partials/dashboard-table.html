@@ -1,6 +1,6 @@
 {% from "components/table.html" import list_table, field, right_aligned_field_heading, row_heading %}
 
-<div class='ajax-block-container'>
+<div class="ajax-block-container js-mark-focus-on-parent" data-classes-to-persist="js-child-has-focus">
 {% for item in broadcasts|sort|reverse|list %}
   <div class="keyline-block">
     <div class="file-list govuk-!-margin-bottom-2">
