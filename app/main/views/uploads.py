@@ -7,7 +7,6 @@ from functools import partial
 from io import BytesIO
 from zipfile import BadZipFile
 
-from botocore.exceptions import ClientError
 from flask import (
     abort,
     current_app,
@@ -39,6 +38,7 @@ from app.main import main
 from app.main.forms import CsvUploadForm, LetterUploadPostageForm, PDFUploadForm
 from app.models.contact_list import ContactList
 from app.s3_client.s3_letter_upload_client import (
+    LetterNotFoundError,
     backup_original_letter_to_s3,
     get_letter_metadata,
     get_letter_pdf_and_metadata,
@@ -267,17 +267,16 @@ def uploaded_letter_preview(service_id, file_id):
 
     try:
         metadata = get_letter_metadata(service_id, file_id)
-    except ClientError as e:
+    except LetterNotFoundError as e:
+        current_app.logger.warning(e)
+
         # if the file's not there, it's probably because we've already created the notification and the letter has been
         # moved to the normal letters-pdf bucket. So lets just bounce out to the notification page
-        if e.response['Error']['Code'] == 'NoSuchKey':
-            return redirect(url_for(
-                '.view_notification',
-                service_id=service_id,
-                notification_id=file_id,
-            ))
-        else:
-            raise
+        return redirect(url_for(
+            '.view_notification',
+            service_id=service_id,
+            notification_id=file_id,
+        ))
 
     original_filename = metadata.get('filename')
     page_count = metadata.get('page_count')
@@ -352,7 +351,18 @@ def send_uploaded_letter(service_id, file_id):
     if not current_service.has_permission('letter'):
         abort(403)
 
-    metadata = get_letter_metadata(service_id, file_id)
+    try:
+        metadata = get_letter_metadata(service_id, file_id)
+    except LetterNotFoundError as e:
+        current_app.logger.error(e)
+
+        # if the file's not there, it's probably because we've already created the notification and the letter has been
+        # moved to the normal letters-pdf bucket. So lets just bounce out to the notification page
+        return redirect(url_for(
+            '.view_notification',
+            service_id=service_id,
+            notification_id=file_id,
+        ))
 
     if metadata.get('status') != 'valid':
         abort(403)
