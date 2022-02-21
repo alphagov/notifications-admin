@@ -734,13 +734,18 @@ def test_clear_cache_shows_form(
 
     page = client_request.get('main.clear_cache')
 
-    assert page.select('input[type=radio]')[0]['value'] == 'user'
-    assert page.select('input[type=radio]')[1]['value'] == 'service'
-    assert page.select('input[type=radio]')[2]['value'] == 'template'
-    assert page.select('input[type=radio]')[3]['value'] == 'email_branding'
-    assert page.select('input[type=radio]')[4]['value'] == 'letter_branding'
-    assert page.select('input[type=radio]')[5]['value'] == 'organisation'
     assert not redis.delete_cache_keys_by_pattern.called
+    radios = {el['value'] for el in page.select('input[type=radio]')}
+
+    assert radios == {
+        'user',
+        'service',
+        'template',
+        'email_branding',
+        'letter_branding',
+        'organisation',
+        'broadcast'
+    }
 
 
 @pytest.mark.parametrize('model_type, expected_calls, expected_confirmation', (
