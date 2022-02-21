@@ -2445,9 +2445,13 @@ class TemplateAndFoldersSelectionForm(Form):
 
 
 class ClearCacheForm(StripWhitespaceForm):
-    model_type = GovukRadiosField(
+    model_type = GovukCheckboxesField(
         'What do you want to clear today',
     )
+
+    def validate_model_type(self, field):
+        if not field.data:
+            raise ValidationError('Select at least one option')
 
 
 class GoLiveNotesForm(StripWhitespaceForm):
