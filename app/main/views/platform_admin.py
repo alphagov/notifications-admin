@@ -423,14 +423,16 @@ def clear_cache():
     form.model_type.choices = [(key, key.replace('_', ' ').title()) for key in CACHE_KEYS]
 
     if form.validate_on_submit():
-        to_delete = form.model_type.data
+        group_key = form.model_type.data
+        group = CACHE_KEYS[group_key]
 
-        num_deleted = max(
+        num_deleted = sum(
             redis_client.delete_cache_keys_by_pattern(pattern)
-            for pattern in CACHE_KEYS[to_delete]
+            for pattern in group
         )
-        msg = 'Removed {} {} object{} from redis'
-        flash(msg.format(num_deleted, to_delete, 's' if num_deleted != 1 else ''), category='default')
+
+        msg = f'Removed {num_deleted} {group_key} objects across {len(group)} key formats'
+        flash(msg, category='default')
 
     return render_template(
         'views/platform-admin/clear-cache.html',
