@@ -24,7 +24,7 @@ notifications-python-client==6.3.0
 Shapely==1.8.1.post1
 rtreelib==0.2.0
 fido2==0.9.3
-importlib-metadata==4.2.0
+importlib-metadata==4.11.1
 pyproj==3.2.1
 
 # PaaS
