@@ -9,7 +9,7 @@ from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 class ServiceAPIClient(NotifyAdminAPIClient):
 
     def _delete_template_cache_for_service(self, service_id):
-        redis_client.delete_cache_keys_by_pattern(f"service-{service_id}-template-*")
+        redis_client.delete_by_pattern(f"service-{service_id}-template-*")
 
     @cache.delete('user-{user_id}')
     def create_service(

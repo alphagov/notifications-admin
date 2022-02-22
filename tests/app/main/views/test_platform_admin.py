@@ -698,7 +698,7 @@ def test_platform_admin_submit_returned_letters(
     )
 
     mock_client.assert_called_once_with(['REF1', 'REF2'])
-    assert redis.delete_cache_keys_by_pattern.call_args_list == [
+    assert redis.delete_by_pattern.call_args_list == [
         call('service-????????-????-????-????-????????????-returned-letters-statistics'),
         call('service-????????-????-????-????-????????????-returned-letters-summary'),
     ]
@@ -734,7 +734,7 @@ def test_clear_cache_shows_form(
 
     page = client_request.get('main.clear_cache')
 
-    assert not redis.delete_cache_keys_by_pattern.called
+    assert not redis.delete_by_pattern.called
     radios = {el['value'] for el in page.select('input[type=checkbox]')}
 
     assert radios == {
@@ -780,7 +780,7 @@ def test_clear_cache_submits_and_tells_you_how_many_things_were_deleted(
     expected_confirmation,
 ):
     redis = mocker.patch('app.main.views.platform_admin.redis_client')
-    redis.delete_cache_keys_by_pattern.return_value = 2
+    redis.delete_by_pattern.return_value = 2
     client_request.login(platform_admin_user)
 
     page = client_request.post(
@@ -789,7 +789,7 @@ def test_clear_cache_submits_and_tells_you_how_many_things_were_deleted(
         _expected_status=200
     )
 
-    assert redis.delete_cache_keys_by_pattern.call_args_list == expected_calls
+    assert redis.delete_by_pattern.call_args_list == expected_calls
 
     flash_banner = page.find('div', class_='banner-default')
     assert flash_banner.text.strip() == expected_confirmation
@@ -806,7 +806,7 @@ def test_clear_cache_requires_option(
     page = client_request.post('main.clear_cache', _data={}, _expected_status=200)
 
     assert normalize_spaces(page.find('span', class_='govuk-error-message').text) == 'Error: Select at least one option'
-    assert not redis.delete_cache_keys_by_pattern.called
+    assert not redis.delete_by_pattern.called
 
 
 def test_reports_page(

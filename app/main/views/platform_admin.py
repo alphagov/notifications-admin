@@ -352,10 +352,10 @@ def platform_admin_returned_letters():
 
         try:
             letter_jobs_client.submit_returned_letters(references)
-            redis_client.delete_cache_keys_by_pattern(
+            redis_client.delete_by_pattern(
                 'service-????????-????-????-????-????????????-returned-letters-statistics'
             )
-            redis_client.delete_cache_keys_by_pattern(
+            redis_client.delete_by_pattern(
                 'service-????????-????-????-????-????????????-returned-letters-summary'
             )
         except HTTPError as error:
@@ -431,7 +431,7 @@ def clear_cache():
         patterns = list(itertools.chain(*groups))
 
         num_deleted = sum(
-            redis_client.delete_cache_keys_by_pattern(pattern)
+            redis_client.delete_by_pattern(pattern)
             for pattern in patterns
         )
 
