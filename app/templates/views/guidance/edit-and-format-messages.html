@@ -15,6 +15,7 @@
     <li><a class="govuk-link govuk-link--no-visited-state" href="#links">add links</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="#personalised-content">personalise your content</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="#optional-content">add optional content</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#api-formatting">formatting when using our API</a></li>
   </ul>
 
   <h2 class="heading-medium" id="formatting">Format your content</h2>
@@ -96,4 +97,20 @@
 
   <p class="govuk-body">If you upload a list, the column names need to match the optional content in your template.</p>
 
+  <p class="govuk-body">You cannot use personalisation within optional content.</p>
+
+  <h2 class="heading-medium" id="api-formatting">Formatting when using our API</h2>
+
+  <p class="govuk-body">Placeholders can contain all the usual Notify content formatting, except for:</p>
+
+  <ul class="list list-bullet">
+    <li>line breaks</li>
+    <li>bullet points</li>
+  </ul>
+
+  <p class="govuk-body">To create a line break, use the new line character \n in the placeholder.</p>
+
+  <p class="govuk-body">To create a list of bullet points, set the placeholder value to be a list of strings. Each string will become a new bullet point. For example: placeholder_name = ["my first bullet", "my second bullet", "my third bullet"]</p>
+
+  <p class="govuk-body">If you prefer, you can generate all your content on your side and send it to our API. To do this, add a single placeholder to your Notify template, for example ((content)).</p>
 {% endblock %}
