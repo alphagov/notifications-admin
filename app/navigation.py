@@ -220,6 +220,7 @@ class MainNavigation(Navigation):
             'add_organisation_from_gp_service',
             'add_organisation_from_nhs_local_service',
             'email_branding_govuk',
+            'email_branding_govuk_and_org',
             'email_branding_nhs',
             'email_branding_organisation',
             'email_branding_request',
