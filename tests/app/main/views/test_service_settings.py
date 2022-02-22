@@ -4772,6 +4772,7 @@ def test_update_service_organisation_does_not_update_if_same_value(
 def test_show_email_branding_request_page_when_no_branding_is_set(
     service_one,
     client_request,
+    mocker,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
     organisation_type,
@@ -4780,11 +4781,18 @@ def test_show_email_branding_request_page_when_no_branding_is_set(
     service_one['email_branding'] = None
     service_one['organisation_type'] = organisation_type
 
+    mocker.patch(
+        'app.models.service.Service.email_branding_id',
+        new_callable=PropertyMock,
+        return_value=None,
+    )
+
     page = client_request.get(
         '.email_branding_request', service_id=SERVICE_ONE_ID
     )
 
     assert mock_get_email_branding.called is False
+    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='__NONE__')
     assert mock_get_letter_branding_by_id.called is False
 
     button_text = normalize_spaces(page.select_one('.page-footer button').text)
@@ -4984,17 +4992,22 @@ def test_show_email_branding_request_page_when_email_branding_is_set(
     client_request,
     mock_get_email_branding,
     mock_get_service_organisation,
-    active_user_with_permissions,
 ):
     service_one['email_branding'] = sample_uuid()
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json(),
     )
+    mocker.patch(
+        'app.models.service.Service.email_branding_id',
+        new_callable=PropertyMock,
+        return_value='1234-abcd',
+    )
 
     page = client_request.get(
         '.email_branding_request', service_id=SERVICE_ONE_ID
     )
+    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='1234-abcd')
     assert [
         (
             radio['value'],
