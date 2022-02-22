@@ -216,8 +216,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             })
         data = _attach_current_user(data)
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
+        ret = self.post(endpoint, data)
         self._delete_template_cache_for_service(service_id)
-        return self.post(endpoint, data)
+        return ret
 
     @cache.delete('service-{service_id}-templates')
     def redact_service_template(self, service_id, id_):
@@ -311,8 +312,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             'archived': True
         }
         data = _attach_current_user(data)
+        ret = self.post(endpoint, data=data)
         self._delete_template_cache_for_service(service_id)
-        return self.post(endpoint, data=data)
+        return ret
 
     # Temp access of service history data. Includes service and api key history
     def get_service_history(self, service_id):
