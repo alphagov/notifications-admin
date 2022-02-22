@@ -193,7 +193,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(endpoint, data)
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{id_}-versions')
     def update_service_template(
         self, id_, name, type_, content, service_id, subject=None, process_type=None
     ):
@@ -221,7 +220,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(endpoint, data)
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{id_}-versions')
     def redact_service_template(self, service_id, id_):
         ret = self.post(
             "/service/{}/template/{}".format(service_id, id_),
@@ -233,7 +231,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return ret
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{template_id}-versions')
     def update_service_template_sender(self, service_id, template_id, reply_to):
         data = {
             'reply_to': reply_to,
@@ -247,7 +244,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return ret
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{template_id}-versions')
     def update_service_template_postage(self, service_id, template_id, postage):
         ret = self.post(
             "/service/{0}/template/{1}".format(service_id, template_id),
@@ -306,7 +302,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         ])
 
     @cache.delete('service-{service_id}-templates')
-    @cache.delete('service-{service_id}-template-{template_id}-versions')
     def delete_service_template(self, service_id, template_id):
         """
         Set a service template's archived flag to True

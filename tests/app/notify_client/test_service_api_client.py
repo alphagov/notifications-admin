@@ -433,23 +433,18 @@ def test_deletes_service_cache(
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('update_service_template', [FAKE_TEMPLATE_ID, 'foo', 'sms', 'bar', SERVICE_ONE_ID], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('redact_service_template', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('update_service_template_sender', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, 'foo'], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('update_service_template_postage', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, 'first'], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('delete_service_template', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('archive_service', [SERVICE_ONE_ID, []], [
