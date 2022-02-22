@@ -5,7 +5,7 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
-  Before you request new branding
+  Check your new branding
 {% endblock %}
 
 {% block backLink %}
@@ -16,16 +16,17 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Before you request new branding') }}
+  {{ page_header('Check your new branding') }}
 
-  <p class="govuk-body">Check that your new branding matches the rest of your service.</p>
+  <p class="govuk-body">
+    Emails from {{ current_service.name }} will look like this.
+  </p>
 
-  <p class="govuk-body">You can use the GOV.UK logo on your emails if:</p>
-  <ul class="list list-bullet">
-    <li>your website looks like GOV.UK</li>
-    <li>your email links to a website that looks like GOV.UK</li>
-    <li>people get an email from your service after using GOV.UK</li>
-  </ul>
+  <iframe src="{{ url_for('main.email_template', branding_style='__NONE__') }}" class="branding-preview"></iframe>
+
+  <h2 class="heading-medium">Before you continue</h2>
+
+  <p class="govuk-body">You can only use GOV.UK branding if people go to GOV.UK to access your service.</p>
 
   <p class="govuk-body">
     You cannot use GOV.UK branding if your organisation is
@@ -34,10 +35,8 @@
       from government</a>.
   </p>
 
-  <p class="govuk-body">We’ll email you once your branding’s ready to use, or if we need any more information.</p>
-
   {% call form_wrapper() %}
-    {{ page_footer('Request new branding') }}
+    {{ page_footer('Use this branding') }}
   {% endcall %}
 
 {% endblock %}

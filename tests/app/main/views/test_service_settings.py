@@ -14,6 +14,7 @@ from notifications_utils.clients.zendesk.zendesk_client import (
 )
 
 import app
+from app.main.views.service_settings import NHS_BRANDING_ID
 from tests import (
     find_element_by_tag_and_partial_text,
     invite_json,
@@ -5432,24 +5433,19 @@ def test_submit_branding_when_something_else_is_only_option(
     ) in mock_create_ticket.call_args_list[0][1]['message']
 
 
-@pytest.mark.parametrize('endpoint, service_org_type, expected_heading', [
-    ('main.email_branding_govuk', 'central', 'Before you request new branding'),
-    ('main.email_branding_govuk_and_org', 'central', 'Before you request new branding'),
-    ('main.email_branding_govuk', 'central', 'Before you request new branding'),
-    ('main.email_branding_nhs', 'nhs_local', 'Before you request new branding'),
-    ('main.email_branding_organisation', 'central', 'When you request new branding'),
+@pytest.mark.parametrize('endpoint, expected_heading', [
+    ('main.email_branding_govuk_and_org', 'Before you request new branding'),
+    ('main.email_branding_organisation', 'When you request new branding'),
 ])
-def test_get_email_branding_description_pages(
+def test_get_email_branding_description_pages_for_org_branding(
     client_request,
     mocker,
     service_one,
     organisation_one,
     mock_get_email_branding,
     endpoint,
-    service_org_type,
     expected_heading,
 ):
-    organisation_one['organisation_type'] = service_org_type
     service_one['email_branding'] = sample_uuid()
     service_one['organisation'] = organisation_one
 
@@ -5464,6 +5460,39 @@ def test_get_email_branding_description_pages(
     )
     assert page.h1.text == expected_heading
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Request new branding'
+
+
+@pytest.mark.parametrize('endpoint, service_org_type, branding_preview_id', [
+    ('main.email_branding_govuk', 'central', '__NONE__'),
+    ('main.email_branding_nhs', 'nhs_local', NHS_BRANDING_ID),
+])
+def test_get_email_branding_govuk_and_nhs_pages(
+    client_request,
+    mocker,
+    service_one,
+    organisation_one,
+    mock_get_email_branding,
+    endpoint,
+    service_org_type,
+    branding_preview_id,
+):
+    organisation_one['organisation_type'] = service_org_type
+    service_one['email_branding'] = sample_uuid()
+    service_one['organisation'] = organisation_one
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+    )
+    assert page.h1.text == 'Check your new branding'
+    assert 'Emails from service one will look like this' in normalize_spaces(page.text)
+    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style=branding_preview_id)
+    assert normalize_spaces(page.select_one('.page-footer button').text) == 'Use this branding'
 
 
 def test_get_email_branding_something_else_page(client_request):
@@ -5495,7 +5524,7 @@ def test_get_email_branding_description_pages_give_404_if_selected_branding_not_
     )
 
 
-def test_submit_email_branding_request_from_govuk_description_page(
+def test_update_email_branding_from_govuk_preview_page(
     mocker,
     client_request,
     service_one,
@@ -5504,6 +5533,7 @@ def test_submit_email_branding_request_from_govuk_description_page(
     no_reply_to_email_addresses,
     mock_get_email_branding,
     single_sms_sender,
+    mock_update_service,
 ):
     mocker.patch(
         'app.organisations_client.get_organisation',
@@ -5516,42 +5546,18 @@ def test_submit_email_branding_request_from_govuk_description_page(
     )
     service_one['email_branding'] = sample_uuid()
 
-    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
-    mock_send_ticket_to_zendesk = mocker.patch(
-        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
-        autospec=True,
-    )
-
     page = client_request.post(
         '.email_branding_govuk',
         service_id=SERVICE_ONE_ID,
         _follow_redirects=True,
     )
 
-    mock_create_ticket.assert_called_once_with(
-        ANY,
-        message='\n'.join([
-            'Organisation: organisation one',
-            'Service: service one',
-            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
-            '',
-            '---',
-            'Current branding: Organisation name',
-            'Branding requested: GOV.UK\n',
-        ]),
-        subject='Email branding request - service one',
-        ticket_type='question',
-        user_name='Test User',
-        user_email='test@user.gov.uk',
-        org_id=ORGANISATION_ID,
-        org_type='central',
-        service_id=SERVICE_ONE_ID
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        email_branding=None,
     )
-    mock_send_ticket_to_zendesk.assert_called_once()
-    assert normalize_spaces(page.select_one('.banner-default').text) == (
-        'Thanks for your branding request. We’ll get back to you '
-        'within one working day.'
-    )
+    assert page.h1.text == 'Settings'
+    assert normalize_spaces(page.select_one('.banner-default').text) == 'You’ve updated your email branding'
 
 
 def test_submit_email_branding_request_from_govuk_and_org_description_page(
@@ -5613,7 +5619,7 @@ def test_submit_email_branding_request_from_govuk_and_org_description_page(
     )
 
 
-def test_submit_email_branding_request_from_nhs_description_page(
+def test_update_email_branding_from_nhs_preview_page(
     mocker,
     client_request,
     service_one,
@@ -5622,15 +5628,10 @@ def test_submit_email_branding_request_from_nhs_description_page(
     no_reply_to_email_addresses,
     mock_get_email_branding,
     single_sms_sender,
+    mock_update_service,
 ):
     service_one['email_branding'] = sample_uuid()
     service_one['organisation_type'] = 'nhs_local'
-
-    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
-    mock_send_ticket_to_zendesk = mocker.patch(
-        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
-        autospec=True,
-    )
 
     page = client_request.post(
         '.email_branding_nhs',
@@ -5638,30 +5639,12 @@ def test_submit_email_branding_request_from_nhs_description_page(
         _follow_redirects=True,
     )
 
-    mock_create_ticket.assert_called_once_with(
-        ANY,
-        message='\n'.join([
-            'Organisation: Can’t tell (domain is user.gov.uk)',
-            'Service: service one',
-            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
-            '',
-            '---',
-            'Current branding: Organisation name',
-            'Branding requested: NHS\n',
-        ]),
-        subject='Email branding request - service one',
-        ticket_type='question',
-        user_name='Test User',
-        user_email='test@user.gov.uk',
-        org_id=None,
-        org_type='nhs_local',
-        service_id=SERVICE_ONE_ID
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        email_branding=NHS_BRANDING_ID,
     )
-    mock_send_ticket_to_zendesk.assert_called_once()
-    assert normalize_spaces(page.select_one('.banner-default').text) == (
-        'Thanks for your branding request. We’ll get back to you '
-        'within one working day.'
-    )
+    assert page.h1.text == 'Settings'
+    assert normalize_spaces(page.select_one('.banner-default').text) == 'You’ve updated your email branding'
 
 
 def test_submit_email_branding_request_from_organisation_description_page(
