@@ -13,6 +13,7 @@
       </h1>
       <p class="govuk-body">{{ user.email_address }}</p>
       <p class="{{ '' if user.mobile_number else 'hint' }}">{{ user.mobile_number or 'No mobile number'}}</p>
+
       <h2 class="heading-medium">Live services</h2>
       <nav class="browse-list">
         {% if user.live_services %}
@@ -45,6 +46,15 @@
           </p>
         {% endif %}
       </nav>
+
+      <h2 class="heading-medium">Authentication</h2>
+      <p class="govuk-body">{{ user.auth_type }}</p>
+      {% if user.auth_type != 'webauthn_auth' %}
+        <a class="govuk-link govuk-link" href="{{ url_for('main.change_user_auth', user_id=user.id) }}">
+          Change authentication for this user
+        </a>
+      {% endif %}
+
       <h2 class="heading-medium">Last login</h2>
       {% if not user.logged_in_at %}
       <p class="hint">This person has never logged in</p>

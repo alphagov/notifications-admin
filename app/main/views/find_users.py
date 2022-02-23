@@ -1,11 +1,11 @@
-from flask import flash, redirect, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import user_api_client
 from app.event_handlers import create_archive_user_event
 from app.main import main
-from app.main.forms import SearchUsersByEmailForm
+from app.main.forms import AuthTypeForm, SearchUsersByEmailForm
 from app.models.user import User
 from app.utils.user import user_is_platform_admin
 
@@ -50,3 +50,23 @@ def archive_user(user_id):
     else:
         flash('There\'s no way to reverse this! Are you sure you want to archive this user?', 'delete')
         return user_information(user_id)
+
+
+@main.route("/users/<uuid:user_id>/change_auth", methods=['GET', 'POST'])
+@user_is_platform_admin
+def change_user_auth(user_id):
+    user = User.from_id(user_id)
+    if user.webauthn_auth:
+        abort(403)
+
+    form = AuthTypeForm(auth_type=user.auth_type)
+
+    if form.validate_on_submit():
+        user.update(auth_type=form.auth_type.data)
+        return redirect(url_for('.user_information', user_id=user_id))
+
+    return render_template(
+        'views/find-users/auth_type.html',
+        form=form,
+        user=user,
+    )
