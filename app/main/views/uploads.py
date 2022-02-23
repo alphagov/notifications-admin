@@ -270,8 +270,10 @@ def uploaded_letter_preview(service_id, file_id):
     except LetterNotFoundError as e:
         current_app.logger.warning(e)
 
-        # if the file's not there, it's probably because we've already created the notification and the letter has been
-        # moved to the normal letters-pdf bucket. So lets just bounce out to the notification page
+        # If the file is missing it could be because this is a duplicate
+        # request, the notification already exists and the file has been
+        # moved to a different bucket. Note that the ID of a precompiled
+        # notification is always set to the file_id.
         return redirect(url_for(
             '.view_notification',
             service_id=service_id,
@@ -356,8 +358,10 @@ def send_uploaded_letter(service_id, file_id):
     except LetterNotFoundError as e:
         current_app.logger.error(e)
 
-        # if the file's not there, it's probably because we've already created the notification and the letter has been
-        # moved to the normal letters-pdf bucket. So lets just bounce out to the notification page
+        # If the file is missing it could be because this is a duplicate
+        # request, the notification already exists and the file has been
+        # moved to a different bucket. Note that the ID of a precompiled
+        # notification is always set to the file_id.
         return redirect(url_for(
             '.view_notification',
             service_id=service_id,
