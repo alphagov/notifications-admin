@@ -1,5 +1,6 @@
 import json
 import uuid
+from datetime import datetime
 from unittest.mock import Mock
 
 from flask import session as flask_session
@@ -126,6 +127,59 @@ def test_verify_email_redirects_to_verify_if_token_valid(
 
     with client_request.session_transaction() as session:
         assert session['user_details'] == {'email': api_user_pending['email_address'], 'id': api_user_pending['id']}
+
+
+def test_verify_email_doesnt_verify_sms_if_user_on_email_auth(
+    client_request,
+    mocker,
+    mock_send_verify_code,
+    mock_check_verify_code,
+    mock_activate_user,
+    fake_uuid,
+):
+    pending_user_with_email_auth = {
+        'id': fake_uuid,
+        'name': 'Test User',
+        'password': 'somepassword',
+        'email_address': 'test@user.gov.uk',
+        'mobile_number': '07700 900762',
+        'state': 'pending',
+        'failed_login_count': 0,
+        'permissions': {},
+        'platform_admin': False,
+        'auth_type': 'email_auth',
+        'password_changed_at': str(datetime.utcnow()),
+        'services': [],
+        'organisations': [],
+        'current_session_id': None,
+        'logged_in_at': None,
+        'email_access_validated_at': None,
+        'can_use_webauthn': False,
+    }
+    mocker.patch('app.user_api_client.get_user', return_value=pending_user_with_email_auth)
+    token_data = {"user_id": pending_user_with_email_auth['id'], "secret_code": 'UNUSED'}
+    mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
+
+    with client_request.session_transaction() as session:
+        session['user_details'] = {
+            'email_address': pending_user_with_email_auth['email_address'],
+            'id': pending_user_with_email_auth['id'],
+        }
+
+    client_request.get(
+        'main.verify_email',
+        token='notreal',
+        _expected_redirect=url_for('main.add_service', first='first', _external=True),
+    )
+
+    assert not mock_check_verify_code.called
+    assert not mock_send_verify_code.called
+
+    mock_activate_user.assert_called_once_with(pending_user_with_email_auth['id'])
+
+    # user is logged in
+    with client_request.session_transaction() as session:
+        assert session['user_id'] == pending_user_with_email_auth['id']
 
 
 def test_verify_email_redirects_to_email_sent_if_token_expired(
