@@ -20,9 +20,20 @@
     <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper() %}
         {{ form_field(error_message_with_html=True) }}
-        {{ page_footer('Save') }}
+        {% if current_user.auth_type == 'email_auth' %}
+          {{ page_footer(
+            'Save',
+            delete_link=url_for(
+              'main.user_profile_mobile_number_delete',
+              user_id=current_user.id
+            ),
+            delete_link_text='Delete your number'
+            )
+          }}
+        {% else %}
+          {{ page_footer('Save')}}
+        {% endif %}
       {% endcall %}
     </div>
   </div>
-
 {% endblock %}

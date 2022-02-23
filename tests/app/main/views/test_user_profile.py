@@ -183,6 +183,59 @@ def test_should_show_mobile_number_page(
 ):
     page = client_request.get(('main.user_profile_mobile_number'))
     assert 'Change your mobile number' in page.text
+    assert 'Delete your number' not in page.text
+
+
+def test_change_your_mobile_number_page_shows_delete_link_if_user_on_email_auth(
+    client_request,
+    api_user_active_email_auth,
+    mocker
+):
+    mocker.patch('app.user_api_client.get_user', return_value=api_user_active_email_auth)
+    page = client_request.get(('main.user_profile_mobile_number'))
+    assert 'Change your mobile number' in page.text
+    assert 'Delete your number' in page.text
+
+
+def test_confirm_delete_mobile_number(
+    client_request,
+    api_user_active_email_auth,
+    mocker
+):
+    mocker.patch('app.user_api_client.get_user', return_value=api_user_active_email_auth)
+
+    page = client_request.get(
+        '.user_profile_confirm_delete_mobile_number',
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to delete your mobile number from Notify? '
+        'Yes, delete'
+    )
+    assert 'action' not in page.select_one('.banner-dangerous form')
+    assert page.select_one('.banner-dangerous form')['method'] == 'post'
+
+
+def test_delete_mobile_number(
+    client_request,
+    api_user_active_email_auth,
+    mocker
+):
+    mocker.patch('app.user_api_client.get_user', return_value=api_user_active_email_auth)
+    mock_delete = mocker.patch('app.user_api_client.update_user_attribute')
+
+    client_request.post(
+        '.user_profile_mobile_number_delete',
+        _expected_redirect=url_for(
+            '.user_profile',
+            _external=True,
+        )
+    )
+    mock_delete.assert_called_once_with(
+        api_user_active_email_auth["id"],
+        mobile_number=None
+    )
 
 
 @pytest.mark.parametrize('phone_number_to_register_with', [
