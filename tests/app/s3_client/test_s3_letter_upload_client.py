@@ -1,11 +1,17 @@
 import urllib
 import uuid
 
+import boto3
+import botocore
+import pytest
 from flask import current_app
+from moto import mock_s3
 
 from app.s3_client.s3_letter_upload_client import (
     LetterMetadata,
+    LetterNotFoundError,
     backup_original_letter_to_s3,
+    get_letter_metadata,
     upload_letter_to_s3,
 )
 
@@ -89,3 +95,26 @@ def test_lettermetadata_unquotes_special_keys():
     metadata = LetterMetadata({"filename": "%C2%A3hello", "recipient": "%C2%A3hi"})
     assert metadata.get("filename") == "£hello"
     assert metadata.get("recipient") == "£hi"
+
+
+@mock_s3
+@pytest.mark.parametrize('will_raise_custom_error,expected_exception', [
+    (True, LetterNotFoundError),
+    (False, botocore.exceptions.ClientError)
+])
+def test_get_letter_s3_object_raises_custom_error(
+    will_raise_custom_error,
+    expected_exception
+):
+    bucket_name = current_app.config['TRANSIENT_UPLOADED_LETTERS']
+    s3 = boto3.client('s3', region_name='eu-west-1')
+
+    # bucket not existing will trigger some other error
+    if will_raise_custom_error:
+        s3.create_bucket(
+            Bucket=bucket_name,
+            CreateBucketConfiguration={'LocationConstraint': 'eu-west-1'}
+        )
+
+    with pytest.raises(expected_exception):
+        get_letter_metadata('service', 'file')

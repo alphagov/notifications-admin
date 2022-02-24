@@ -1,12 +1,14 @@
 from unittest.mock import ANY, Mock
 
 import pytest
-from botocore.exceptions import ClientError
 from flask import make_response, url_for
 from requests import RequestException
 
 from app.formatters import normalize_spaces
-from app.s3_client.s3_letter_upload_client import LetterMetadata
+from app.s3_client.s3_letter_upload_client import (
+    LetterMetadata,
+    LetterNotFoundError,
+)
 from tests.conftest import SERVICE_ONE_ID
 
 
@@ -465,11 +467,11 @@ def test_uploaded_letter_preview_redirects_if_file_not_in_s3(
     client_request,
     fake_uuid
 ):
-    boto_error_json = {'Error': {'Code': 'NoSuchKey', 'Message': 'The specified key does not exist.'}}
     mocker.patch(
         'app.main.views.uploads.get_letter_metadata',
-        side_effect=ClientError(boto_error_json, 'operation_name')
+        side_effect=LetterNotFoundError
     )
+
     client_request.get(
         'main.uploaded_letter_preview',
         service_id=SERVICE_ONE_ID,
@@ -643,6 +645,33 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(
         fake_uuid,
         expected_postage,
         address,
+    )
+
+
+def test_send_uploaded_letter_redirects_if_file_not_in_s3(
+    mocker,
+    client_request,
+    fake_uuid,
+    service_one,
+):
+    mocker.patch(
+        'app.main.views.uploads.get_letter_metadata',
+        side_effect=LetterNotFoundError
+    )
+
+    service_one['permissions'] = ['letter', 'upload_letters']
+
+    client_request.post(
+        'main.send_uploaded_letter',
+        service_id=SERVICE_ONE_ID,
+        file_id=fake_uuid,
+        _data={'filename': 'my_file.pdf'},
+        _expected_redirect=url_for(
+            'main.view_notification',
+            service_id=SERVICE_ONE_ID,
+            notification_id=fake_uuid,
+            _external=True
+        )
     )
 
 

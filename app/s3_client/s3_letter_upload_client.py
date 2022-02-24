@@ -1,9 +1,14 @@
 import json
 import urllib
 
+import botocore
 from boto3 import resource
 from flask import current_app
 from notifications_utils.s3 import s3upload as utils_s3upload
+
+
+class LetterNotFoundError(Exception):
+    pass
 
 
 def get_transient_letter_file_location(service_id, upload_id):
@@ -69,19 +74,24 @@ class LetterMetadata:
         return value
 
 
+def get_letter_s3_object(service_id, file_id):
+    try:
+        file_location = get_transient_letter_file_location(service_id, file_id)
+        s3 = resource('s3')
+        return s3.Object(current_app.config['TRANSIENT_UPLOADED_LETTERS'], file_location).get()
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            raise LetterNotFoundError(f'Letter not found for service {service_id} and file {file_id}')
+
+        raise
+
+
 def get_letter_pdf_and_metadata(service_id, file_id):
-    file_location = get_transient_letter_file_location(service_id, file_id)
-    s3 = resource('s3')
-    s3_object = s3.Object(current_app.config['TRANSIENT_UPLOADED_LETTERS'], file_location).get()
-
+    s3_object = get_letter_s3_object(service_id, file_id)
     pdf = s3_object['Body'].read()
-
     return pdf, LetterMetadata(s3_object['Metadata'])
 
 
 def get_letter_metadata(service_id, file_id):
-    file_location = get_transient_letter_file_location(service_id, file_id)
-    s3 = resource('s3')
-    s3_object = s3.Object(current_app.config['TRANSIENT_UPLOADED_LETTERS'], file_location).get()
-
+    s3_object = get_letter_s3_object(service_id, file_id)
     return LetterMetadata(s3_object['Metadata'])
