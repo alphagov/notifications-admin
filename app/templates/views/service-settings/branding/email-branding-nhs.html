@@ -5,7 +5,7 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
-  Before you request new branding
+  Check your new branding
 {% endblock %}
 
 {% block backLink %}
@@ -16,18 +16,24 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Before you request new branding') }}
+  {{ page_header('Check your new branding') }}
 
   <p class="govuk-body">
-    <a class="govuk-link govuk-link--no-visited-state" href="https://www.england.nhs.uk/nhsidentity/identity-guidelines/who-can-use-the-nhs-identity/">Check that your service is allowed to use the NHS identity</a>.
+    Emails from {{ current_service.name }} will look like this.
   </p>
 
-  <p class="govuk-body">Your new branding should match the rest of your service.</p>
+  <iframe src="{{ url_for('main.email_template', branding_style=nhs_branding_id) }}" class="branding-preview"></iframe>
 
-  <p class="govuk-body">We’ll email you once your branding’s ready to use, or if we need any more information.</p>
+  <h2 class="heading-medium">Before you continue</h2>
+
+  <p class="govuk-body">Make sure you’re allowed to use NHS branding.</p>
+
+  <p class="govuk-body">
+    If you’re not sure, <a class="govuk-link govuk-link--no-visited-state" href="https://www.england.nhs.uk/nhsidentity/identity-guidelines/who-can-use-the-nhs-identity/">check the guidance on the NHS website</a>.
+  </p>
 
   {% call form_wrapper() %}
-    {{ page_footer('Request new branding') }}
+    {{ page_footer('Use this branding') }}
   {% endcall %}
 
 {% endblock %}

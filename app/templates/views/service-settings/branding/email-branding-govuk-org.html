@@ -5,7 +5,7 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
-  Check your new branding
+  Before you request new branding
 {% endblock %}
 
 {% block backLink %}
@@ -16,15 +16,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Check your new branding') }}
-
-  <p class="govuk-body">
-    Emails from {{ current_service.name }} will look like this.
-  </p>
-
-  <iframe src="{{ url_for('main.email_template', branding_style='__NONE__') }}" class="branding-preview"></iframe>
-
-  <h2 class="heading-medium">Before you continue</h2>
+  {{ page_header('Before you request new branding') }}
 
   <p class="govuk-body">You can only use GOV.UK branding if people go to GOV.UK to access your service.</p>
 
@@ -35,8 +27,10 @@
       from government</a>.
   </p>
 
+  <p class="govuk-body">We’ll email you once your branding’s ready to use, or if we need any more information.</p>
+
   {% call form_wrapper() %}
-    {{ page_footer('Use this branding') }}
+    {{ page_footer('Request new branding') }}
   {% endcall %}
 
 {% endblock %}
