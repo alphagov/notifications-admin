@@ -3800,6 +3800,7 @@ def test_should_show_page_to_set_sms_allowance(
 
 @freeze_time("2017-04-01 11:09:00.061258")
 @pytest.mark.parametrize('given_allowance, expected_api_argument', [
+    ('0', 0),
     ('1', 1),
     ('250000', 250000),
     pytest.param('foo', 'foo', marks=pytest.mark.xfail),
