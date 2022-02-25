@@ -270,7 +270,7 @@ def uploaded_letter_preview(service_id, file_id):
     except LetterNotFoundError as e:
         current_app.logger.warning(e)
 
-        # If the file is missing it could be because this is a duplicate
+        # If the file is missing it's likely because this is a duplicate
         # request, the notification already exists and the file has been
         # moved to a different bucket. Note that the ID of a precompiled
         # notification is always set to the file_id.
@@ -356,9 +356,9 @@ def send_uploaded_letter(service_id, file_id):
     try:
         metadata = get_letter_metadata(service_id, file_id)
     except LetterNotFoundError as e:
-        current_app.logger.error(e)
+        current_app.logger.warning(e)
 
-        # If the file is missing it could be because this is a duplicate
+        # If the file is missing it's likely because this is a duplicate
         # request, the notification already exists and the file has been
         # moved to a different bucket. Note that the ID of a precompiled
         # notification is always set to the file_id.
