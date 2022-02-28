@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 from flask import abort
 from notifications_utils.serialised_model import (
@@ -62,7 +62,16 @@ class PaginatedModelList(ModelList):
         self.next_page = response.get('links', {}).get('next', None)
 
 
-class SortByNameMixin():
+class SortByStringAttributeMixin(ABC):
+
+    @property
+    @abstractmethod
+    def __sort_attribute__(self):
+        pass
 
     def __lt__(self, other):
-        return self.name.lower() < other.name.lower()
+        return (
+            getattr(self, self.__sort_attribute__).lower()
+        ) < (
+            getattr(other, self.__sort_attribute__).lower()
+        )

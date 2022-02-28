@@ -8,7 +8,7 @@ from rtreelib import Rect
 from werkzeug.utils import cached_property
 
 from app.formatters import square_metres_to_square_miles
-from app.models import SortByNameMixin
+from app.models import SortByStringAttributeMixin
 
 from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository, rtree_index
@@ -75,7 +75,9 @@ class BaseBroadcastArea(ABC):
         return max(500, min(estimated_bleed, 5000))
 
 
-class BroadcastArea(BaseBroadcastArea, IdEqualityMixin, SortByNameMixin):
+class BroadcastArea(BaseBroadcastArea, IdEqualityMixin, SortByStringAttributeMixin):
+
+    __sort_attribute__ = 'name'
 
     def __init__(self, row):
         self.id, self.name, self._count_of_phones, self.library_id = row
@@ -220,9 +222,11 @@ class CustomBroadcastAreas(SerialisedModelCollection):
         )
 
 
-class BroadcastAreaLibrary(SerialisedModelCollection, SortByNameMixin, IdEqualityMixin, GetItemByIdMixin):
+class BroadcastAreaLibrary(SerialisedModelCollection, SortByStringAttributeMixin, IdEqualityMixin, GetItemByIdMixin):
 
     model = BroadcastArea
+
+    __sort_attribute__ = 'name'
 
     def __init__(self, row):
         id, name, name_singular, is_group = row

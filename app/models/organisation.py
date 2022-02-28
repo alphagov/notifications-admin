@@ -7,14 +7,14 @@ from app.models import (
     JSONModel,
     ModelList,
     SerialisedModelCollection,
-    SortByNameMixin,
+    SortByStringAttributeMixin,
 )
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
 
 
-class Organisation(JSONModel, SortByNameMixin):
+class Organisation(JSONModel, SortByStringAttributeMixin):
 
     TYPE_CENTRAL = 'central'
     TYPE_LOCAL = 'local'
@@ -65,6 +65,8 @@ class Organisation(JSONModel, SortByNameMixin):
         'purchase_order_number',
         'notes',
     }
+
+    __sort_attribute__ = 'name'
 
     @classmethod
     def from_id(cls, org_id):
@@ -165,10 +167,7 @@ class Organisation(JSONModel, SortByNameMixin):
 
     @cached_property
     def team_members(self):
-        return sorted(
-            self.invited_users + self.active_users,
-            key=lambda user: user.email_address.lower(),
-        )
+        return self.invited_users + self.active_users
 
     @cached_property
     def email_branding(self):

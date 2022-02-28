@@ -20,7 +20,7 @@
   {% endif %}
 
   <div class="user-list">
-    {% for user in users %}
+    {% for user in users|sort %}
       <div class="user-list-item">
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-three-quarters">
