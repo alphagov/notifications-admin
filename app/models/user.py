@@ -32,7 +32,11 @@ def _get_org_id_from_view_args():
     return str(request.view_args.get('org_id', '')) or None
 
 
-class User(JSONModel, UserMixin, SortByStringAttributeMixin):
+class BaseUser(JSONModel, SortByStringAttributeMixin):
+    __sort_attribute__ = 'email_address'
+
+
+class User(BaseUser, UserMixin):
 
     MAX_FAILED_LOGIN_COUNT = 10
 
@@ -51,8 +55,6 @@ class User(JSONModel, UserMixin, SortByStringAttributeMixin):
         'permissions',
         'state',
     }
-
-    __sort_attribute__ = 'email_address'
 
     def __init__(self, _dict):
         super().__init__(_dict)
@@ -454,7 +456,7 @@ class User(JSONModel, UserMixin, SortByStringAttributeMixin):
         return False
 
 
-class InvitedUser(JSONModel, SortByStringAttributeMixin):
+class InvitedUser(BaseUser):
 
     ALLOWED_PROPERTIES = {
         'id',
@@ -466,8 +468,6 @@ class InvitedUser(JSONModel, SortByStringAttributeMixin):
         'auth_type',
         'folder_permissions',
     }
-
-    __sort_attribute__ = 'email_address'
 
     def __init__(self, _dict):
         super().__init__(_dict)
@@ -594,7 +594,7 @@ class InvitedUser(JSONModel, SortByStringAttributeMixin):
         return False
 
 
-class InvitedOrgUser(JSONModel, SortByStringAttributeMixin):
+class InvitedOrgUser(BaseUser):
 
     ALLOWED_PROPERTIES = {
         'id',
@@ -603,8 +603,6 @@ class InvitedOrgUser(JSONModel, SortByStringAttributeMixin):
         'status',
         'created_at',
     }
-
-    __sort_attribute__ = 'email_address'
 
     def __init__(self, _dict):
         super().__init__(_dict)
