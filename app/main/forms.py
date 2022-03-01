@@ -40,7 +40,14 @@ from wtforms import (
     ValidationError,
     validators,
 )
-from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
+from wtforms.validators import (
+    URL,
+    DataRequired,
+    InputRequired,
+    Length,
+    Optional,
+    Regexp,
+)
 
 from app.formatters import format_thousands, guess_name_from_email_address
 from app.main.validators import (
@@ -1300,7 +1307,7 @@ class FreeSMSAllowance(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
         'Numbers of text message fragments per year',
         validators=[
-            DataRequired(message='Cannot be empty')
+            InputRequired(message='Cannot be empty')
         ]
     )
 

@@ -55,7 +55,6 @@ class Config(object):
     CSV_UPLOAD_BUCKET_NAME = 'local-notifications-csv-upload'
     CONTACT_LIST_UPLOAD_BUCKET_NAME = 'local-contact-list'
     ACTIVITY_STATS_LIMIT_DAYS = 7
-    TEST_MESSAGE_FILENAME = 'Report'
 
     REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT = 45
 
