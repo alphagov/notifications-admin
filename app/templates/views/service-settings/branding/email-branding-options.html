@@ -6,7 +6,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
-{% from "components/branding-preview.html" import branding_preview %}
+{% from "components/branding-preview.html" import email_branding_preview %}
 
 {% block service_page_title %}
   Change email branding
@@ -26,7 +26,7 @@
     Your emails currently have {{ branding_name }} branding.
   </p>
 
-  {{ branding_preview(
+  {{ email_branding_preview(
     current_service.email_branding_id if current_service.email_branding else '__NONE__'
   ) }}
 
