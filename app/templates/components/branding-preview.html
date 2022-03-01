@@ -1,5 +1,5 @@
 {% macro branding_preview(branding_style, endpoint) %}
-  <iframe src="{{ url_for(endpoint, branding_style=branding_style) }}" class="branding-preview"></iframe>
+  <iframe src="{{ url_for(endpoint, branding_style=branding_style) }}" class="branding-preview" scrolling="no"></iframe>
 {% endmacro %}
 
 {% macro email_branding_preview(branding_style) %}

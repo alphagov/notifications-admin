@@ -13,7 +13,7 @@
   const $paneWrapper = $('<div class="govuk-grid-column-full"></div>');
   const $form = $('form');
   const previewType = $form.data('previewType');
-  const $previewPane = $(`<iframe src="/_${previewType}?${buildQueryString(['branding_style', branding_style])}" class="branding-preview"></iframe>`);
+  const $previewPane = $(`<iframe src="/_${previewType}?${buildQueryString(['branding_style', branding_style])}" class="branding-preview" scrolling="no"></iframe>`);
 
   function buildQueryString () {
     return $.map(arguments, (val, idx) => encodeURI(val[0]) + '=' + encodeURI(val[1])).join('&');
