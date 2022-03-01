@@ -1,3 +1,4 @@
+{% from "components/content-metadata.html" import content_metadata %}
 {% from "components/table.html" import mapping_table, row, text_field, field, row_heading %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/details/macro.njk" import govukDetails %}
@@ -11,6 +12,13 @@
 {% block content_column_content %}
 
   <h1 class="heading-large">Pricing</h1>
+
+    {{ content_metadata(
+      data={
+        "Last updated": "1 March 2022"
+      }
+    ) }}
+
   <p class="govuk-body">GOV.UK Notify is free to use unless you:</p>
   <ul class="list list-bullet">
     <li>exceed your <a class="govuk-link govuk-link--no-visited-state" href="#text-messages">free text message allowance</a></li>
@@ -247,10 +255,6 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
-  </div>
-
-  <div class="panel panel-border-wide">  
-    <p class="govuk-body">These prices were updated on 1 March 2022.</p>
   </div>
 
 {% endblock %}
