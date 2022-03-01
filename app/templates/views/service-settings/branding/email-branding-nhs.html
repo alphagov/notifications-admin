@@ -3,6 +3,7 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/branding-preview.html" import branding_preview %}
 
 {% block service_page_title %}
   Check your new branding
@@ -21,8 +22,7 @@
   <p class="govuk-body">
     Emails from {{ current_service.name }} will look like this.
   </p>
-
-  <iframe src="{{ url_for('main.email_template', branding_style=nhs_branding_id) }}" class="branding-preview"></iframe>
+  {{ branding_preview(nhs_branding_id) }}
 
   <h2 class="heading-medium">Before you continue</h2>
 

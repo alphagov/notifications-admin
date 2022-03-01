@@ -1,0 +1,3 @@
+{% macro branding_preview(branding_style) %}
+  <iframe src="{{ url_for('main.email_template', branding_style=branding_style) }}" class="branding-preview"></iframe>
+{% endmacro %}

@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/button/macro.njk" import govukButton %}
+{% from "components/branding-preview.html" import branding_preview %}
 
 {% block service_page_title %}
   Preview email branding
@@ -11,7 +12,7 @@
   <h1 class="heading-large">Preview email branding</h1>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <iframe src="{{ url_for('main.email_template', branding_style=form.branding_style.data) }}" class="branding-preview"></iframe>
+      {{ branding_preview(form.branding_style.data) }}
       {% call form_wrapper(action=action) %}
         <div class="form-group">
           {{ form.hidden_tag() }}
