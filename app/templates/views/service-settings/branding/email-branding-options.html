@@ -26,7 +26,7 @@
   </p>
 
   {% set branding_id = current_service.email_branding_id if current_service.email_branding else '__NONE__' %}
-  <iframe src="{{ url_for('main.email_template', branding_style=branding_id) }}" class="branding-preview"></iframe>
+  <iframe src="{{ url_for('main.email_template', branding_style=branding_id) }}" class="branding-preview" scrolling="no"></iframe>
 
   {% if current_service.needs_to_change_email_branding %}
     <p class="govuk-body">
