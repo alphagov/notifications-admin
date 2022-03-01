@@ -45,6 +45,7 @@ from app.main.forms import (
     FreeSMSAllowance,
     LinkOrganisationsForm,
     MessageLimit,
+    NewBrandingOptionsEmail,
     PreviewBranding,
     RateLimit,
     RenameServiceForm,
@@ -67,6 +68,7 @@ from app.main.forms import (
     SMSPrefixForm,
     SomethingElseBrandingForm,
 )
+from app.models.organisation import Organisation
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.user import (
     user_has_permissions,
@@ -1159,29 +1161,57 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
 @user_has_permissions('manage_service')
 def email_branding_request(service_id):
     form = BrandingOptions(current_service, branding_type='email')
-    branding_name = current_service.email_branding_name
-    if form.validate_on_submit():
-        if form.something_else_is_only_option:
-            create_email_branding_zendesk_ticket(
-                form_option_selected=form.options.data,
-                detail=form.something_else.data,
-            )
 
-            flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
-            return redirect(url_for('.service_settings', service_id=current_service.id))
-        else:
-            return redirect(
-                url_for(
-                    f'.email_branding_{form.options.data}',
-                    service_id=current_service.id,
-                )
-            )
+    if form.something_else_is_only_option or form.validate_on_submit():
+        return redirect(url_for(
+            '.branding_request_not_on_file',
+            service_id=current_service.id,
+            option_chosen=form.options.data,
+        ))
 
     return render_template(
         'views/service-settings/branding/email-branding-options.html',
         form=form,
-        branding_name=branding_name,
+        branding_name=current_service.email_branding_name,
     )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/not-on-file", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_not_on_file(service_id, branding_type='email'):
+    option_chosen = request.args.get('option_chosen')
+    form = NewBrandingOptionsEmail(
+        choice=option_chosen,
+        can_use_coat_of_arms=current_service.organisation_type == Organisation.TYPE_CENTRAL,
+    )
+    if form.validate_on_submit():
+        return redirect(url_for(
+            'main.branding_request_upload',
+            service_id=current_service.id,
+            branding_style=form.options.data,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file.html',
+        form=form,
+        branding_type=branding_type,
+        something_else_chosen=(
+            option_chosen == BrandingOptions.FALLBACK_OPTION_VALUE
+        )
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/upload/<branding_style>", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_upload(service_id, branding_style):
+
+    if branding_style == 'single_identity':
+        return 'Crest with stripe'
+
+    if branding_style == 'org':
+        return 'Your logo'
+
+    if branding_style == 'org_banner':
+        return 'Your logo on a colour'
 
 
 def check_branding_allowed_for_service(branding):

@@ -1,0 +1,59 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radio, conditional_radio_panel %}
+{% from "components/select-input.html" import select_wrapper %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block service_page_title %}
+  Change {{ branding_type }} branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('.email_branding_request', service_id=current_service.id)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Choose a design') }}
+
+  {% if not something_else_chosen %}
+    <p class="govuk-body">
+      We do not have have the {{ branding_type }} branding set up for {{ current_service.organisation.name }} yet.
+    </p>
+  {% endif %}
+
+  {% call form_wrapper() %}
+    <fieldset class="form-group {% if form.options.errors %}form-group-error{% endif %} top-gutter">
+      <legend class="bottom-gutter-2-3 govuk-visually-hidden">
+        {% if something_else_chosen %}
+          Tell us what your branding looks like
+        {% else %}
+          Tell us what it looks like
+        {% endif %}
+      </legend>
+      {% if form.options.errors %}
+        <span class="error-message" data-module="track-error" data-error-type="Can’t be empty" data-error-label="{{ form.options.name }}">
+          You need to choose an option
+        </span>
+      {% endif %}
+      <div class="govuk-grid-row">
+        {% for option in form.options %}
+          <div class="govuk-grid-column-one-third">
+            <label for="{{ option.id }}">
+              <img src="{{ asset_url('images/branding/{}.png'.format(option.data)) }}" alt="" class="bordered-image bottom-gutter-1-3">
+            </label>
+            {{ radio(option) }}
+          </div>
+        {% endfor %}
+      </div>
+    </fieldset>
+    {{ page_footer('Continue') }}
+
+  {% endcall %}
+
+{% endblock %}
