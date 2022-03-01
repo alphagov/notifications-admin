@@ -233,11 +233,11 @@
       caption_visible=False
     ) %}
       {% for sheets, second, first, international in [
-        ('1 sheet', '39p', '69p', '89p'),
-        ('2 sheets', '44p', '74p', '97p'),
-        ('3 sheets', '49p', '79p', '£1.05'),
-        ('4 sheets', '54p', '84p', '£1.13'),
-        ('5 sheets', '59p', '89p', '£1.21'),
+        ('1 sheet', '41p', '63p', '96p'),
+        ('2 sheets', '46p', '68p', '£1.04'),
+        ('3 sheets', '51p', '73p', '£1.12'),
+        ('4 sheets', '56p', '78p', '£1.20'),
+        ('5 sheets', '61p', '83p', '£1.28'),
       ] %}
         {% call row() %}
           {% call row_heading() %} {{ sheets }} {% endcall %}
@@ -250,12 +250,7 @@
   </div>
 
   <div class="panel panel-border-wide">  
-    <p class="govuk-body">On 1 March 2022:</p>
-    <ul class="list list-bullet">
-    <li>second class postage will go up by 2 pence, plus VAT</li>
-    <li>international postage will go up by 7 pence, plus VAT</li>
-    <li>first class postage will go down by 6 pence, plus VAT</li>
-  </ul>
+    <p class="govuk-body">These prices were updated on 1 March 2022.</p>
   </div>
 
 {% endblock %}
