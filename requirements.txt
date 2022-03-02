@@ -73,7 +73,7 @@ gds-metrics==0.2.4
     # via -r requirements.in
 geojson==2.5.0
     # via notifications-utils
-govuk-bank-holidays==0.10
+govuk-bank-holidays==0.11
     # via
     #   -r requirements.in
     #   notifications-utils
@@ -83,7 +83,7 @@ greenlet==1.1.0
     # via eventlet
 gunicorn==20.1.0
     # via -r requirements.in
-humanize==3.12.0
+humanize==4.0.0
     # via -r requirements.in
 idna==2.10
     # via requests
@@ -143,7 +143,7 @@ pyexcel==0.6.7
     # via -r requirements.in
 pyexcel-ezodf==0.3.4
     # via pyexcel-ods3
-pyexcel-io==0.6.5
+pyexcel-io==0.6.6
     # via
     #   -r requirements.in
     #   pyexcel
@@ -223,7 +223,7 @@ werkzeug==2.0.2
     # via
     #   -r requirements.in
     #   flask
-wtforms==3.0.0
+wtforms==3.0.1
     # via
     #   -r requirements.in
     #   flask-wtf
