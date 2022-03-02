@@ -19,11 +19,13 @@ At the moment we run Python 3.9 in production.
 brew install node
 ```
 
-[NPM](npmjs.org) is Node's package management tool. `n` is a tool for managing different versions of Node. The following installs `n` and uses the long term support (LTS) version of Node.
+[NPM](npmjs.org) is Node's package management tool. `n` is a tool for managing different versions of Node.
+
+The following installs `n` and installs the version of Node specified in `package.json` `engines` property. This will also install the NPM version packaged with that version of Node.
 
 ```shell
 npm install -g n
-n lts
+n auto
 ```
 
 ### `environment.sh`
@@ -71,6 +73,19 @@ npm run test-watch
 ```
 
 To run a specific JavaScript test, you'll need to copy the full command from `package.json`.
+
+### Updating the Node version for frontend builds
+
+Edit the respective `node` version specified in the `engines` property in the `package.json` file.
+
+Run `n auto` to install the new Node version.
+
+The version specified in `engines` is also used to select the Node version used in CI builds:
+
+ - Creating a PR with an updated version will build the PR using that version
+ - Merging a version change will build and deploy the frontend assets using the new version
+
+Ensure that an [LTS Node version](https://nodejs.org/en/about/releases/) is specified. This will also ensure the corresponding LTS NPM version is also installed.
 
 ## Further docs
 
