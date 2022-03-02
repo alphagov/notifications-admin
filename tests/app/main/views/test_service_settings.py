@@ -4778,7 +4778,7 @@ def test_update_service_organisation_does_not_update_if_same_value(
         ('something_else', 'Something else'),
     ])
 ))
-def test_show_email_branding_request_page_when_no_branding_is_set(
+def test_email_branding_request_page_when_no_branding_is_set(
     service_one,
     client_request,
     mocker,
@@ -4835,7 +4835,7 @@ def test_show_email_branding_request_page_when_no_branding_is_set(
     ('emergency_service', None),
     ('other', None),
 ))
-def test_letter_show_branding_request_page_when_no_branding_is_set(
+def test_letter_branding_request_page_when_no_branding_is_set(
     service_one,
     client_request,
     mock_get_email_branding,
@@ -4902,7 +4902,7 @@ def test_letter_show_branding_request_page_when_no_branding_is_set(
         ('something_else', 'Something else'),
     ]),
 ))
-def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exists(
+def test_branding_request_page_when_no_branding_is_set_but_organisation_exists(
     mocker,
     service_one,
     client_request,
@@ -4953,7 +4953,7 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
         ('something_else', 'Something else'),
     ], 'letter'),
 ))
-def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exists_central_org(
+def test_branding_request_page_when_no_branding_is_set_but_organisation_exists_central_org(
     mocker,
     service_one,
     client_request,
@@ -4986,7 +4986,7 @@ def test_show_branding_request_page_when_no_branding_is_set_but_organisation_exi
     ] == expected_options
 
 
-def test_show_email_branding_request_page_when_email_branding_is_set(
+def test_email_branding_request_page_when_email_branding_is_set(
     mocker,
     service_one,
     client_request,
@@ -5022,7 +5022,7 @@ def test_show_email_branding_request_page_when_email_branding_is_set(
     ]
 
 
-def test_show_letter_branding_request_page_when_letter_branding_is_set(
+def test_letter_branding_request_page_when_letter_branding_is_set(
     mocker,
     service_one,
     client_request,
@@ -5051,7 +5051,7 @@ def test_show_letter_branding_request_page_when_letter_branding_is_set(
     ]
 
 
-def test_back_link_on_email_branding_request_page(
+def test_email_branding_request_page_back_link(
     client_request,
 ):
     page = client_request.get(
@@ -5066,7 +5066,7 @@ def test_back_link_on_email_branding_request_page(
     (None, '/services/{}/service-settings'.format(SERVICE_ONE_ID),),
     (TEMPLATE_ONE_ID, '/services/{}/templates/{}'.format(SERVICE_ONE_ID, TEMPLATE_ONE_ID),)
 ])
-def test_back_link_on_letter_branding_request_page(
+def test_letter_branding_request_page_back_link(
     client_request,
     from_template,
     back_link_url,
@@ -5084,7 +5084,7 @@ def test_back_link_on_letter_branding_request_page(
     assert back_link[0].attrs['href'] == back_link_url
 
 
-def test_show_letter_branding_request_page_when_branding_is_same_as_org(
+def test_letter_branding_request_page_when_branding_is_same_as_org(
     mocker,
     service_one,
     client_request,
@@ -5155,7 +5155,7 @@ def test_show_letter_branding_request_page_when_branding_is_same_as_org(
         'main.email_branding_nhs',
     ),
 ))
-def test_submit_email_branding_request(
+def test_email_branding_request_submit(
     client_request,
     service_one,
     mocker,
@@ -5187,7 +5187,7 @@ def test_submit_email_branding_request(
     )
 
 
-def test_submit_email_branding_request_when_no_radio_button_is_selected(
+def test_email_branding_request_submit_when_no_radio_button_is_selected(
     client_request,
     service_one,
     mock_get_email_branding,
@@ -5207,7 +5207,7 @@ def test_submit_email_branding_request_when_no_radio_button_is_selected(
     (None, 'Can’t tell (domain is user.gov.uk)'),
     ('Test Organisation', 'Test Organisation'),
 ))
-def test_submit_letter_branding_request(
+def test_letter_branding_request_submit(
     client_request,
     service_one,
     mocker,
@@ -5277,7 +5277,7 @@ def test_submit_letter_branding_request(
     ({'options': 'something_else'}, 'Cannot be empty'),  # no data in 'something_else' textbox
     ({'options': ''}, 'Select an option'),  # no radio button selected
 ))
-def test_submit_letter_branding_request_when_form_has_missing_data(
+def test_letter_branding_request_submit_when_form_has_missing_data(
     client_request,
     mocker,
     service_one,
@@ -5306,7 +5306,7 @@ def test_submit_letter_branding_request_when_form_has_missing_data(
     None,
     TEMPLATE_ONE_ID
 ])
-def test_submit_letter_branding_request_redirects_if_from_template_is_set(
+def test_letter_branding_request_submit_redirects_if_from_template_is_set(
     client_request,
     service_one,
     mocker,
@@ -5333,7 +5333,7 @@ def test_submit_letter_branding_request_redirects_if_from_template_is_set(
         )
 
 
-def test_submit_letter_branding_when_something_else_is_only_option(
+def test_letter_branding_submit_when_something_else_is_only_option(
     client_request,
     service_one,
     mocker,
@@ -5366,7 +5366,7 @@ def test_submit_letter_branding_when_something_else_is_only_option(
     ('main.email_branding_govuk_and_org', 'Before you request new branding'),
     ('main.email_branding_organisation', 'When you request new branding'),
 ])
-def test_get_email_branding_description_pages_for_org_branding(
+def test_email_branding_description_pages_for_org_branding(
     client_request,
     mocker,
     service_one,
@@ -5395,7 +5395,7 @@ def test_get_email_branding_description_pages_for_org_branding(
     ('main.email_branding_govuk', 'central', '__NONE__'),
     ('main.email_branding_nhs', 'nhs_local', NHS_BRANDING_ID),
 ])
-def test_get_email_branding_govuk_and_nhs_pages(
+def test_email_branding_govuk_and_nhs_pages(
     client_request,
     mocker,
     service_one,
@@ -5424,7 +5424,7 @@ def test_get_email_branding_govuk_and_nhs_pages(
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Use this branding'
 
 
-def test_get_email_branding_something_else_page(client_request, service_one):
+def test_email_branding_something_else_page(client_request, service_one):
     # expect to have a "NHS" option as well as the
     # fallback, so back button goes to choices page
     service_one['organisation_type'] = 'nhs_central'
@@ -5461,7 +5461,7 @@ def test_get_email_branding_something_else_page_is_only_option(client_request, s
     ('main.email_branding_nhs'),
     ('main.email_branding_organisation'),
 ])
-def test_get_email_branding_description_pages_give_404_if_selected_branding_not_allowed(
+def test_email_branding_pages_give_404_if_selected_branding_not_allowed(
     client_request,
     endpoint,
 ):
@@ -5474,7 +5474,7 @@ def test_get_email_branding_description_pages_give_404_if_selected_branding_not_
     )
 
 
-def test_update_email_branding_from_govuk_preview_page(
+def test_email_branding_govuk_submit(
     mocker,
     client_request,
     service_one,
@@ -5510,7 +5510,7 @@ def test_update_email_branding_from_govuk_preview_page(
     assert normalize_spaces(page.select_one('.banner-default').text) == 'You’ve updated your email branding'
 
 
-def test_submit_email_branding_request_from_govuk_and_org_description_page(
+def test_email_branding_govuk_and_org_submit(
     mocker,
     client_request,
     service_one,
@@ -5569,7 +5569,7 @@ def test_submit_email_branding_request_from_govuk_and_org_description_page(
     )
 
 
-def test_update_email_branding_from_nhs_preview_page(
+def test_email_branding_nhs_submit(
     mocker,
     client_request,
     service_one,
@@ -5597,7 +5597,7 @@ def test_update_email_branding_from_nhs_preview_page(
     assert normalize_spaces(page.select_one('.banner-default').text) == 'You’ve updated your email branding'
 
 
-def test_submit_email_branding_request_from_organisation_description_page(
+def test_email_branding_organisation_submit(
     mocker,
     client_request,
     service_one,
@@ -5656,7 +5656,7 @@ def test_submit_email_branding_request_from_organisation_description_page(
     )
 
 
-def test_submit_email_branding_something_else_page(
+def test_email_branding_something_else_submit(
     client_request,
     mocker,
     service_one,
@@ -5708,7 +5708,7 @@ def test_submit_email_branding_something_else_page(
     )
 
 
-def test_submit_email_branding_something_else_page_shows_error_if_textbox_is_empty(
+def test_email_branding_something_else_submit_shows_error_if_textbox_is_empty(
     client_request,
 ):
     page = client_request.post(
