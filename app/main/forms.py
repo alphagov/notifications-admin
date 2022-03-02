@@ -2245,10 +2245,7 @@ class BrandingOptions(StripWhitespaceForm):
         return self.options.choices == (self.FALLBACK_OPTION,)
 
     def validate_something_else(self, field):
-        if self.branding_type == 'email':
-            if self.something_else_is_only_option and not field.data:
-                raise ValidationError('Cannot be empty')
-        elif self.branding_type == 'letter':
+        if self.branding_type == 'letter':
             if (
                 self.something_else_is_only_option
                 or self.options.data == self.FALLBACK_OPTION_VALUE

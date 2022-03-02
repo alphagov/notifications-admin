@@ -92,12 +92,18 @@
             }}
           {% endcall %}
 
+          {% if email_branding_options.something_else_is_only_option %}
+            {% set email_request_url = url_for('.email_branding_something_else', service_id=current_service.id) %}
+          {% else %}
+            {% set email_request_url = url_for('.email_branding_request', service_id=current_service.id) %}
+          {% endif %}
+
           {% call settings_row(if_has_permission='email') %}
             {{ text_field('Email branding') }}
             {{ text_field(current_service.email_branding_name) }}
             {{ edit_field(
               'Change',
-              url_for('.email_branding_request', service_id=current_service.id),
+              email_request_url,
               permissions=['manage_service'],
               suffix='email branding',
             )}}

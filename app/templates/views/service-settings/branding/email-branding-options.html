@@ -34,27 +34,13 @@
     </p>
   {% endif %}
 
-  {% if form.something_else_is_only_option %}
-    {% call form_wrapper() %}
-        {{ textbox(
-          form.something_else,
-          hint='Include links to your brand guidelines or examples of how to use your branding.',
-          width='1-1',
-        ) }}
-      <p class="form-group">
-        We’ll email you when your branding is ready, or if we need any more information.
-      </p>
-      {{ page_footer('Request new branding') }}
-    {% endcall %}
-  {% else %}
-    {% call form_wrapper() %}
-        {% call select_wrapper(form.options) %}
-          {% for option in form.options %}
-            {{ radio(option) }}
-          {% endfor %}
-        {% endcall %}
-      {{ page_footer('Continue') }}
-    {% endcall %}
-  {% endif %}
+  {% call form_wrapper() %}
+      {% call select_wrapper(form.options) %}
+        {% for option in form.options %}
+          {{ radio(option) }}
+        {% endfor %}
+      {% endcall %}
+    {{ page_footer('Continue') }}
+  {% endcall %}
 
 {% endblock %}
