@@ -465,7 +465,7 @@ class Service(JSONModel, SortByNameMixin):
 
     @property
     def email_branding_id(self):
-        return self._dict['email_branding']
+        return None
 
     @cached_property
     def email_branding(self):
