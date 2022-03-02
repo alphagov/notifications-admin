@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "description": "Admin front end for GOV.UK Notify",
   "engines": {
-    "node": ">=10.15.3"
+    "node": "^16.14.0",
+    "npm": "^8.3.1"
   },
   "scripts": {
     "test": "gulp lint && jest --config tests/javascripts/jest.config.js tests/javascripts",
