@@ -2618,26 +2618,28 @@ class ChangeSecurityKeyNameForm(StripWhitespaceForm):
         ])
 
 
-class NewBrandingOptionsEmail(StripWhitespaceForm):
-
-    def __init__(self, *args, choice, can_use_coat_of_arms, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.options.choices = tuple(self.get_options(
-            choice, can_use_coat_of_arms
-        ))
-
-    @staticmethod
-    def get_options(choice, can_use_coat_of_arms):
-        if can_use_coat_of_arms:
-            yield ('single_identity', 'Crest with stripe')
-
-        yield ('org', 'Your logo')
-
-        if choice != 'govuk_and_org':
-            yield ('org_banner', 'Your logo on a colour')
+class NewBrandingOptionsSingleIdentityOrCustom(StripWhitespaceForm):
 
     options = RadioField(
         'Branding options',
+        choices=[
+            ('single_identity', 'Crest with stripe'),
+            ('org', 'Your logo'),
+        ],
+        validators=[
+            DataRequired()
+        ],
+    )
+
+
+class NewBrandingOptionsBannerOrLogo(StripWhitespaceForm):
+
+    options = RadioField(
+        'Branding options',
+        choices=[
+            ('org', 'Your logo'),
+            ('org_banner', 'Your logo on a colour'),
+        ],
         validators=[
             DataRequired()
         ],

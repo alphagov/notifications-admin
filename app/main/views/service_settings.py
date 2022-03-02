@@ -45,7 +45,8 @@ from app.main.forms import (
     FreeSMSAllowance,
     LinkOrganisationsForm,
     MessageLimit,
-    NewBrandingOptionsEmail,
+    NewBrandingOptionsBannerOrLogo,
+    NewBrandingOptionsSingleIdentityOrCustom,
     PreviewBranding,
     RateLimit,
     RenameServiceForm,
@@ -1181,13 +1182,42 @@ def email_branding_request(service_id):
 @user_has_permissions('manage_service')
 def branding_request_not_on_file(service_id, branding_type='email'):
     option_chosen = request.args.get('option_chosen')
-    form = NewBrandingOptionsEmail(
-        choice=option_chosen,
-        can_use_coat_of_arms=current_service.organisation_type == Organisation.TYPE_CENTRAL,
+    if current_service.organisation_type != Organisation.TYPE_CENTRAL:
+        return redirect(url_for(
+            '.branding_request_not_on_file_your_logo',
+            service_id=current_service.id,
+        ))
+    form = NewBrandingOptionsSingleIdentityOrCustom()
+    if form.validate_on_submit():
+        if form.options.data == 'single_identity':
+            return redirect(url_for(
+                'main.branding_request_create',
+                service_id=current_service.id,
+                branding_style='single_identity',
+            ))
+        return redirect(url_for(
+            'main.branding_request_not_on_file_your_logo',
+            service_id=current_service.id,
+            option_chosen=option_chosen,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file.html',
+        form=form,
+        branding_type=branding_type,
+        something_else_chosen=(
+            option_chosen == BrandingOptions.FALLBACK_OPTION_VALUE
+        )
     )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/upload/organisation", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_not_on_file_your_logo(service_id, branding_type='email'):
+    option_chosen = request.args.get('option_chosen')
+    form = NewBrandingOptionsBannerOrLogo()
     if form.validate_on_submit():
         return redirect(url_for(
-            'main.branding_request_upload',
+            'main.branding_request_create',
             service_id=current_service.id,
             branding_style=form.options.data,
         ))
@@ -1201,9 +1231,9 @@ def branding_request_not_on_file(service_id, branding_type='email'):
     )
 
 
-@main.route("/services/<uuid:service_id>/branding-request/email/upload/<branding_style>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/branding-request/email/create/<branding_style>", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-def branding_request_upload(service_id, branding_style):
+def branding_request_create(service_id, branding_style):
 
     if branding_style == 'single_identity':
         form = SingleIdentityOptions()
