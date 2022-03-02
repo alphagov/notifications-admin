@@ -65,6 +65,7 @@ from app.main.forms import (
     ServiceSwitchChannelForm,
     SetEmailBranding,
     SetLetterBranding,
+    SingleIdentityOptions,
     SMSPrefixForm,
     SomethingElseBrandingForm,
 )
@@ -1205,7 +1206,21 @@ def branding_request_not_on_file(service_id, branding_type='email'):
 def branding_request_upload(service_id, branding_style):
 
     if branding_style == 'single_identity':
-        return 'Crest with stripe'
+        form = SingleIdentityOptions()
+
+        if form.validate_on_submit():
+            flash(
+                'Thanks for your branding request. We’ll get back to you within one working day.',
+                'default',
+            )
+            return redirect(url_for(
+                'main.service_settings',
+                service_id=current_service.id,
+            ))
+        return render_template(
+            'views/service-settings/branding/branding-not-on-file-single-identity.html',
+            form=form,
+        )
 
     if branding_style == 'org':
         return 'Your logo'

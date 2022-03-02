@@ -2642,3 +2642,153 @@ class NewBrandingOptionsEmail(StripWhitespaceForm):
             DataRequired()
         ],
     )
+
+
+class SingleIdentityOptions(StripWhitespaceForm):
+
+    organisations = {
+        "attorney-generals-office": {
+            "colour": "#9f1888",
+            "name": "Attorney General’s Office",
+        },
+        "cabinet-office": {
+            "colour": "#005abb",
+            "name": "Cabinet Office",
+        },
+        "civil-service": {
+            "colour": "#af292e",
+            "name": "Civil Service",
+        },
+        "department-for-business-innovation-skills": {
+            "colour": "#003479",
+            "name": "Department for Business Innovation and Skills",
+        },
+        "department-for-culture-media-sport": {
+            "colour": "#d40072",
+            "name": "Department for Digital, Culture, Media and Sport",
+        },
+        "department-for-education": {
+            "colour": "#003a69",
+            "name": "Department for Education",
+        },
+        "department-for-environment-food-rural-affairs": {
+            "colour": "#00a33b",
+            "name": "Department for Environment Food and Rural Affairs",
+        },
+        "department-for-international-development": {
+            "colour": "#002878",
+            "name": "Department for International Development",
+        },
+        "department-for-international-trade": {
+            "colour": "#cf102d",
+            "name": "Department for International Trade",
+        },
+        "department-for-levelling-up-housing-and-communities": {
+            "colour": "#012169",
+            "name": "Department for Levelling Up, Housing and Communities",
+        },
+        "department-for-transport": {
+            "colour": "#006c56",
+            "name": "Department for Transport",
+        },
+        "department-for-work-pensions": {
+            "colour": "#00beb7",
+            "name": "Department for Work and Pensions",
+        },
+        "department-of-health": {
+            "colour": "#00ad93",
+            "name": "Department of Health and Social Care",
+        },
+        "foreign-commonwealth-development-office": {
+            "colour": "#012169",
+            "name": "Foreign and Commonwealth Development Office",
+        },
+        "government-equalities-office": {
+            "colour": "#9325b2",
+            "name": "Government Equalities Office",
+        },
+        "hm-government": {
+            "colour": "#0076c0",
+            "name": "HM Government",
+        },
+        "hm-revenue-customs": {
+            "colour": "#009390",
+            "name": "HM Revenue and Customs",
+        },
+        "hm-treasury": {
+            "colour": "#af292e",
+            "name": "HM Treasury",
+        },
+        "home-office": {
+            "colour": "#9325b2",
+            "name": "Home Office",
+        },
+        "ministry-of-defence": {
+            "colour": "#4d2942",
+            "name": "Ministry of Defence",
+        },
+        "ministry-of-justice": {
+            "colour": "#231f20",
+            "name": "Ministry of Justice",
+        },
+        "northern-ireland-office": {
+            "colour": "#002663",
+            "name": "Northern Ireland Office",
+        },
+        "office-of-the-advocate-general-for-scotland": {
+            "colour": "#002663",
+            "name": "Office of the Advocate General for Scotland",
+        },
+        "office-of-the-leader-of-the-house-of-commons": {
+            "colour": "#317023",
+            "name": "Office of the Leader of the House of Commons",
+        },
+        "office-of-the-leader-of-the-house-of-lords": {
+            "colour": "#9c132e",
+            "name": "Office of the Leader of the House of Lords",
+        },
+        "scotland-office": {
+            "colour": "#002663",
+            "name": "Scotland Office",
+        },
+        "uk-export-finance": {
+            "colour": "#005747",
+            "name": "UK Export Finance",
+        },
+        "wales-office": {
+            "colour": "#a33038",
+            "name": "Wales Office",
+        },
+    }
+
+    coat_of_arms_or_insignia = RadioField(
+        'Branding options',
+        choices=[
+            ('royal-coat-of-arms', 'Royal Coat of Arms'),
+            ('royal-coat-of-arms-scotland', 'Royal Coat of Arms Scotland'),
+            ('home-office', 'Home Office'),
+            ('ministry-of-defence', 'Ministry of Defence'),
+            ('wales-office', 'Wales Office'),
+            ('department-for-international-trade', 'Department for International Trade'),
+            ('hm-coastguard', 'HM Coastguard'),
+            ('hm-revenue-and-customs', 'HM Revenue and Customs'),
+        ],
+        validators=[
+            DataRequired()
+        ],
+    )
+
+    colour = RadioField(
+        'Branding options',
+        choices=[
+            (slug, item['name'])
+            for slug, item in organisations.items()
+        ],
+        validators=[
+            DataRequired()
+        ],
+    )
+
+    text = GovukTextInputField(
+        'Text to display'
+    )

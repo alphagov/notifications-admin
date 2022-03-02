@@ -1,0 +1,104 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radio, conditional_radio_panel %}
+{% from "components/select-input.html" import select_wrapper %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block service_page_title %}
+  Change {{ branding_type }} branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('.email_branding_request', service_id=current_service.id)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Crest with stripe') }}
+
+  {% call form_wrapper() %}
+    <fieldset class="form-group {% if form.options.errors %}form-group-error{% endif %} top-gutter">
+      <legend class="bottom-gutter-2-3">
+        Coat of arms or departmental insignia
+      </legend>
+      {% if form.coat_of_arms_or_insignia.errors %}
+        <span class="error-message" data-module="track-error" data-error-type="Can’t be empty" data-error-label="{{ form.coat_of_arms_or_insignia.name }}">
+          You need to choose an option
+        </span>
+      {% endif %}
+      {% for option in form.coat_of_arms_or_insignia %}
+        <div class="multiple-choice">
+          <input
+            id="{{ option.id }}" name="{{ option.name }}" type="radio" value="{{ option.data }}"
+            {% if option.checked %}
+              checked
+            {% endif %}
+          >
+          <label class="block-label" for="{{ option.id }}">
+            <img src="{{ asset_url('images/branding/insignia/{}.png'.format(option.data)) }}" alt="" height="27"
+            style="
+            margin-bottom: -0.4em;
+            margin-right: 5px;
+            ">
+            {{ option.label.text }}
+            {% if option.data == 'royal-coat-of-arms' %}
+              <div class="block-label-hint" style="margin-left: 40px;">
+                Default
+              </div>
+            {% endif %}
+          </label>
+          {% if caller %}
+              {{ caller() }}
+          {% endif %}
+        </div>
+      {% endfor %}
+    </fieldset>
+
+    <fieldset class="form-group {% if form.options.errors %}form-group-error{% endif %} top-gutter">
+      <legend class="bottom-gutter-2-3">
+        Colour of stripe
+      </legend>
+      {% if form.colour.errors %}
+        <span class="error-message" data-module="track-error" data-error-type="Can’t be empty" data-error-label="{{ form.colour.name }}">
+          You need to choose an option
+        </span>
+      {% endif %}
+      {% for option in form.colour %}
+        <div class="multiple-choice">
+          <input
+            id="{{ option.id }}" name="{{ option.name }}" type="radio" value="{{ option.data }}"
+            {% if option.checked %}
+              checked
+            {% endif %}
+          >
+          <label class="block-label" for="{{ option.id }}">
+            <div style="
+              height: 1.4em;
+              width: 1.4em;
+              margin-bottom: -0.4em;
+              margin-right: 0.4em;
+              background: {{ form.organisations[option.data]['colour'] }};
+              display: inline-block;
+              border-radius: 50%;
+            "></div>
+            {{ option.label.text }}
+          </label>
+          {% if caller %}
+              {{ caller() }}
+          {% endif %}
+        </div>
+      {% endfor %}
+    </fieldset>
+
+    {{ form.text }}
+
+    {{ page_footer('Continue') }}
+
+  {% endcall %}
+
+{% endblock %}
