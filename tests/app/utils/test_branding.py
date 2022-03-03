@@ -1,3 +1,5 @@
+from unittest.mock import PropertyMock
+
 import pytest
 
 from app.models.service import Service
@@ -83,3 +85,48 @@ def test_get_available_choices_with_central_org(
 
     options = get_available_choices(service, branding_type=branding_type)
     assert list(options) == expected_options
+
+
+def test_get_available_choices_email_branding_set(
+    mocker,
+    service_one,
+    mock_get_service_organisation,
+    mock_get_email_branding,
+):
+    service = Service(service_one)
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_json()
+    )
+    mocker.patch(
+        'app.models.service.Service.email_branding_id',
+        new_callable=PropertyMock,
+        return_value='1234-abcd',
+    )
+
+    options = get_available_choices(service, branding_type='email')
+    assert list(options) == [
+        ('govuk', 'GOV.UK'),
+        ('govuk_and_org', 'GOV.UK and Test Organisation'),
+        ('organisation', 'Test Organisation'),
+    ]
+
+
+def test_get_available_choices_letter_branding_set(
+    mocker,
+    service_one,
+    mock_get_service_organisation,
+    mock_get_letter_branding_by_id,
+):
+    service = Service(service_one)
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_json()
+    )
+
+    options = get_available_choices(service, branding_type='letter')
+    assert list(options) == [
+        ('organisation', 'Test Organisation'),
+    ]
