@@ -1876,7 +1876,7 @@ class ServiceSwitchChannelForm(ServiceOnOffSettingForm):
         super().__init__(name, *args, **kwargs)
 
 
-class SetEmailBranding(StripWhitespaceForm):
+class AdminSetEmailBrandingForm(StripWhitespaceForm):
 
     branding_style = GovukRadiosFieldWithNoneOption(
         'Branding style',
@@ -1900,17 +1900,17 @@ class SetEmailBranding(StripWhitespaceForm):
         )
 
 
-class SetLetterBranding(SetEmailBranding):
+class AdminSetLetterBrandingForm(AdminSetEmailBrandingForm):
     # form is the same, but instead of GOV.UK we have None as a valid option
     DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'None')
 
 
-class PreviewBranding(StripWhitespaceForm):
+class AdminPreviewBrandingForm(StripWhitespaceForm):
 
     branding_style = HiddenFieldWithNoneOption('branding_style')
 
 
-class ServiceUpdateEmailBranding(StripWhitespaceForm):
+class AdminEditEmailBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField('Name of brand')
     text = GovukTextInputField('Text')
     colour = GovukTextInputField(
@@ -1939,6 +1939,10 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
             raise ValidationError('This field is required')
 
 
+class AdminEditLetterBrandingForm(StripWhitespaceForm):
+    name = GovukTextInputField('Name of brand', validators=[DataRequired()])
+
+
 class SVGFileUpload(StripWhitespaceForm):
     file = FileField_wtf(
         'Upload an SVG logo',
@@ -1949,10 +1953,6 @@ class SVGFileUpload(StripWhitespaceForm):
             NoTextInSVG(),
         ]
     )
-
-
-class ServiceLetterBrandingDetails(StripWhitespaceForm):
-    name = GovukTextInputField('Name of brand', validators=[DataRequired()])
 
 
 class PDFUploadForm(StripWhitespaceForm):

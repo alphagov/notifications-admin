@@ -19,6 +19,9 @@ from app.main import main
 from app.main.forms import (
     AddGPOrganisationForm,
     AddNHSLocalOrganisationForm,
+    AdminPreviewBrandingForm,
+    AdminSetEmailBrandingForm,
+    AdminSetLetterBrandingForm,
     BillingDetailsForm,
     EditNotesForm,
     GoLiveNotesForm,
@@ -28,12 +31,9 @@ from app.main.forms import (
     OrganisationCrownStatusForm,
     OrganisationDomainsForm,
     OrganisationOrganisationTypeForm,
-    PreviewBranding,
     RenameOrganisationForm,
     SearchByNameForm,
     SearchUsersForm,
-    SetEmailBranding,
-    SetLetterBranding,
 )
 from app.main.views.dashboard import (
     get_tuples_of_financial_years,
@@ -405,7 +405,7 @@ def edit_organisation_email_branding(org_id):
 
     email_branding = email_branding_client.get_all_email_branding()
 
-    form = SetEmailBranding(
+    form = AdminSetEmailBrandingForm(
         all_branding_options=get_branding_as_value_and_label(email_branding),
         current_branding=current_organisation.email_branding_id,
     )
@@ -430,7 +430,7 @@ def organisation_preview_email_branding(org_id):
 
     branding_style = request.args.get('branding_style', None)
 
-    form = PreviewBranding(branding_style=branding_style)
+    form = AdminPreviewBrandingForm(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_organisation.update(
@@ -451,7 +451,7 @@ def organisation_preview_email_branding(org_id):
 def edit_organisation_letter_branding(org_id):
     letter_branding = letter_branding_client.get_all_letter_branding()
 
-    form = SetLetterBranding(
+    form = AdminSetLetterBrandingForm(
         all_branding_options=get_branding_as_value_and_label(letter_branding),
         current_branding=current_organisation.letter_branding_id,
     )
@@ -475,7 +475,7 @@ def edit_organisation_letter_branding(org_id):
 def organisation_preview_letter_branding(org_id):
     branding_style = request.args.get('branding_style')
 
-    form = PreviewBranding(branding_style=branding_style)
+    form = AdminPreviewBrandingForm(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_organisation.update(

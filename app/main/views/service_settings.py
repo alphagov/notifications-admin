@@ -38,6 +38,9 @@ from app.extensions import zendesk_client
 from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
+    AdminPreviewBrandingForm,
+    AdminSetEmailBrandingForm,
+    AdminSetLetterBrandingForm,
     BillingDetailsForm,
     BrandingOptions,
     EditNotesForm,
@@ -45,7 +48,6 @@ from app.main.forms import (
     FreeSMSAllowance,
     LinkOrganisationsForm,
     MessageLimit,
-    PreviewBranding,
     RateLimit,
     RenameServiceForm,
     SearchByNameForm,
@@ -62,8 +64,6 @@ from app.main.forms import (
     ServiceReplyToEmailForm,
     ServiceSmsSenderForm,
     ServiceSwitchChannelForm,
-    SetEmailBranding,
-    SetLetterBranding,
     SMSPrefixForm,
     SomethingElseBrandingForm,
 )
@@ -1022,7 +1022,7 @@ def set_rate_limit(service_id):
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
 
-    form = SetEmailBranding(
+    form = AdminSetEmailBrandingForm(
         all_branding_options=get_branding_as_value_and_label(email_branding),
         current_branding=current_service.email_branding_id,
     )
@@ -1046,7 +1046,7 @@ def service_set_email_branding(service_id):
 def service_preview_email_branding(service_id):
     branding_style = request.args.get('branding_style', None)
 
-    form = PreviewBranding(branding_style=branding_style)
+    form = AdminPreviewBrandingForm(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_service.update(
@@ -1067,7 +1067,7 @@ def service_preview_email_branding(service_id):
 def service_set_letter_branding(service_id):
     letter_branding = letter_branding_client.get_all_letter_branding()
 
-    form = SetLetterBranding(
+    form = AdminSetLetterBrandingForm(
         all_branding_options=get_branding_as_value_and_label(letter_branding),
         current_branding=current_service.letter_branding_id,
     )
@@ -1091,7 +1091,7 @@ def service_set_letter_branding(service_id):
 def service_preview_letter_branding(service_id):
     branding_style = request.args.get('branding_style')
 
-    form = PreviewBranding(branding_style=branding_style)
+    form = AdminPreviewBrandingForm(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_service.update(
