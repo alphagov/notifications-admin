@@ -120,6 +120,7 @@ def test_user_information_page_shows_information_about_user(
     ] == [
         'test@gov.uk',
         '+447700900986',
+        'sms_auth',
         'Last logged in just now',
     ]
 
@@ -130,6 +131,7 @@ def test_user_information_page_shows_information_about_user(
     ] == [
         'Live services',
         'Trial mode services',
+        'Authentication',
         'Last login',
     ]
 
@@ -139,6 +141,107 @@ def test_user_information_page_shows_information_about_user(
         'Nature Therapy',
         'Fresh Orchard Juice',
     ]
+
+
+def test_user_information_page_shows_change_auth_type_link(
+    client_request,
+    platform_admin_user,
+    api_user_active,
+    mock_get_organisations_and_services_for_user,
+    mocker
+):
+    client_request.login(platform_admin_user)
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        platform_admin_user,
+        user_json(id_=api_user_active['id'], name="Apple Bloom", auth_type='sms_auth')
+    ], autospec=True)
+
+    page = client_request.get(
+        'main.user_information', user_id=api_user_active['id']
+    )
+    change_auth_url = url_for('main.change_user_auth', user_id=api_user_active['id'])
+
+    link = page.find('a', {'href': change_auth_url})
+    assert normalize_spaces(link.text) == 'Change authentication for this user'
+
+
+def test_user_information_page_doesnt_show_change_auth_type_link_if_user_on_webauthn(
+    client_request,
+    platform_admin_user,
+    api_user_active,
+    mock_get_organisations_and_services_for_user,
+    mocker
+):
+    client_request.login(platform_admin_user)
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        platform_admin_user,
+        user_json(id_=api_user_active['id'], name="Apple Bloom", auth_type='webauthn_auth')
+    ], autospec=True)
+
+    page = client_request.get(
+        'main.user_information', user_id=api_user_active['id']
+    )
+    change_auth_url = url_for('main.change_user_auth', user_id=api_user_active['id'])
+
+    link = page.find_all('a', {'href': change_auth_url})
+    assert len(link) == 0
+
+
+@pytest.mark.parametrize('current_auth_type', ['email_auth', 'sms_auth'])
+def test_change_user_auth_preselects_current_auth_type(
+    client_request,
+    platform_admin_user,
+    api_user_active,
+    mocker,
+    current_auth_type
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        platform_admin_user,
+        user_json(id_=api_user_active['id'], name="Apple Bloom", auth_type=current_auth_type)
+    ], autospec=True)
+
+    checked_radios = client_request.get(
+        'main.change_user_auth',
+        user_id=api_user_active['id'],
+    ).select(
+        '.govuk-radios__item input[checked]'
+    )
+
+    assert len(checked_radios) == 1
+    assert checked_radios[0]['value'] == current_auth_type
+
+
+def test_change_user_auth(
+    client_request,
+    platform_admin_user,
+    api_user_active,
+    mocker
+):
+
+    client_request.login(platform_admin_user)
+
+    mocker.patch('app.user_api_client.get_user', side_effect=[
+        platform_admin_user,
+        user_json(id_=api_user_active['id'], name="Apple Bloom", auth_type='sms_auth')
+    ], autospec=True)
+
+    mock_update = mocker.patch('app.user_api_client.update_user_attribute')
+
+    client_request.post(
+        'main.change_user_auth',
+        user_id=api_user_active['id'],
+        _data={
+            'auth_type': 'email_auth'
+        },
+        _expected_redirect=url_for('main.user_information', user_id=api_user_active['id'], _external=True)
+    )
+
+    mock_update.assert_called_once_with(
+        api_user_active['id'],
+        auth_type='email_auth',
+    )
 
 
 def test_user_information_page_displays_if_there_are_failed_login_attempts(

@@ -1015,6 +1015,16 @@ def filter_by_broadcast_permissions(valuelist):
         return [entry for entry in valuelist if any(entry in option for option in broadcast_permission_options)]
 
 
+class AuthTypeForm(StripWhitespaceForm):
+    auth_type = GovukRadiosField(
+        'Sign in using',
+        choices=[
+            ('sms_auth', 'Text message code'),
+            ('email_auth', 'Email link'),
+        ]
+    )
+
+
 class BasePermissionsForm(StripWhitespaceForm):
     def __init__(self, all_template_folders=None, *args, **kwargs):
         super().__init__(*args, **kwargs)

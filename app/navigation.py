@@ -79,6 +79,7 @@ class HeaderNavigation(Navigation):
         },
         'platform-admin': {
             'archive_user',
+            'change_user_auth',
             'clear_cache',
             'create_email_branding',
             'create_letter_branding',
