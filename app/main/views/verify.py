@@ -63,6 +63,13 @@ def verify_email(token):
         return redirect(url_for('main.sign_in'))
 
     session['user_details'] = {"email": user.email_address, "id": user.id}
+
+    if user.email_auth:
+        try:
+            return activate_user(user.id)
+        finally:
+            session.pop('user_details', None)
+
     user.send_verify_code()
     return redirect(url_for('main.verify'))
 

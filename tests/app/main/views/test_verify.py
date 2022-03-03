@@ -8,6 +8,7 @@ from itsdangerous import SignatureExpired
 from notifications_python_client.errors import HTTPError
 
 from app.main.views.verify import activate_user
+from tests.conftest import create_user
 
 
 def test_should_return_verify_template(
@@ -109,12 +110,6 @@ def test_verify_email_redirects_to_verify_if_token_valid(
     token_data = {"user_id": api_user_pending['id'], "secret_code": 'UNUSED'}
     mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
 
-    with client_request.session_transaction() as session:
-        session['user_details'] = {
-            'email_address': api_user_pending['email_address'],
-            'id': api_user_pending['id'],
-        }
-
     client_request.get(
         'main.verify_email',
         token='notreal',
@@ -126,6 +121,36 @@ def test_verify_email_redirects_to_verify_if_token_valid(
 
     with client_request.session_transaction() as session:
         assert session['user_details'] == {'email': api_user_pending['email_address'], 'id': api_user_pending['id']}
+
+
+def test_verify_email_doesnt_verify_sms_if_user_on_email_auth(
+    client_request,
+    mocker,
+    mock_send_verify_code,
+    mock_check_verify_code,
+    mock_activate_user,
+    fake_uuid,
+):
+    pending_user_with_email_auth = create_user(auth_type='email_auth', state='pending', id=fake_uuid)
+
+    mocker.patch('app.user_api_client.get_user', return_value=pending_user_with_email_auth)
+    token_data = {"user_id": pending_user_with_email_auth['id'], "secret_code": 'UNUSED'}
+    mocker.patch('app.main.views.verify.check_token', return_value=json.dumps(token_data))
+
+    client_request.get(
+        'main.verify_email',
+        token='notreal',
+        _expected_redirect=url_for('main.add_service', first='first', _external=True),
+    )
+
+    assert not mock_check_verify_code.called
+    assert not mock_send_verify_code.called
+
+    mock_activate_user.assert_called_once_with(pending_user_with_email_auth['id'])
+
+    # user is logged in
+    with client_request.session_transaction() as session:
+        assert session['user_id'] == pending_user_with_email_auth['id']
 
 
 def test_verify_email_redirects_to_email_sent_if_token_expired(
