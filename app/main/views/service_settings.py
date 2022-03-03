@@ -42,7 +42,9 @@ from app.main.forms import (
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     BillingDetailsForm,
-    BrandingOptions,
+    ChooseBrandingForm,
+    ChooseEmailBrandingForm,
+    ChooseLetterBrandingForm,
     EditNotesForm,
     EstimateUsageForm,
     FreeSMSAllowance,
@@ -89,7 +91,7 @@ def service_settings(service_id):
     return render_template(
         'views/service-settings.html',
         service_permissions=PLATFORM_ADMIN_SERVICE_PERMISSIONS,
-        email_branding_options=BrandingOptions(current_service, branding_type='email')
+        email_branding_options=ChooseBrandingForm(current_service, branding_type='email')
     )
 
 
@@ -1135,7 +1137,7 @@ def link_service_to_organisation(service_id):
 
 
 def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
-    form = BrandingOptions(current_service)
+    form = ChooseEmailBrandingForm(current_service)
 
     ticket_message = render_template(
         'support-tickets/branding-request.txt',
@@ -1159,7 +1161,7 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_request(service_id):
-    form = BrandingOptions(current_service, branding_type='email')
+    form = ChooseEmailBrandingForm(current_service)
     branding_name = current_service.email_branding_name
     if form.validate_on_submit():
         return redirect(
@@ -1176,9 +1178,9 @@ def email_branding_request(service_id):
     )
 
 
-def check_branding_allowed_for_service(branding):
+def check_email_branding_allowed_for_service(branding):
     allowed_branding_for_service = dict(
-        BrandingOptions.get_available_choices(current_service, branding_type='email')
+        ChooseEmailBrandingForm.get_available_choices(current_service, branding_type='email')
     )
     if branding not in allowed_branding_for_service:
         abort(404)
@@ -1187,7 +1189,7 @@ def check_branding_allowed_for_service(branding):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_govuk(service_id):
-    check_branding_allowed_for_service('govuk')
+    check_email_branding_allowed_for_service('govuk')
 
     if request.method == 'POST':
         current_service.update(email_branding=None)
@@ -1201,7 +1203,7 @@ def email_branding_govuk(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk-and-org", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_govuk_and_org(service_id):
-    check_branding_allowed_for_service('govuk_and_org')
+    check_email_branding_allowed_for_service('govuk_and_org')
 
     if request.method == 'POST':
         create_email_branding_zendesk_ticket('govuk_and_org')
@@ -1215,7 +1217,7 @@ def email_branding_govuk_and_org(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_nhs(service_id):
-    check_branding_allowed_for_service('nhs')
+    check_email_branding_allowed_for_service('nhs')
 
     if request.method == 'POST':
         current_service.update(email_branding=NHS_BRANDING_ID)
@@ -1229,7 +1231,7 @@ def email_branding_nhs(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/organisation", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_organisation(service_id):
-    check_branding_allowed_for_service('organisation')
+    check_email_branding_allowed_for_service('organisation')
 
     if request.method == 'POST':
         create_email_branding_zendesk_ticket('organisation')
@@ -1243,7 +1245,7 @@ def email_branding_organisation(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_something_else(service_id):
-    check_branding_allowed_for_service('something_else')
+    check_email_branding_allowed_for_service('something_else')
 
     form = SomethingElseBrandingForm()
 
@@ -1256,14 +1258,14 @@ def email_branding_something_else(service_id):
     return render_template(
         'views/service-settings/branding/email-branding-something-else.html',
         form=form,
-        branding_options=BrandingOptions(current_service, branding_type='email')
+        branding_options=ChooseBrandingForm(current_service, branding_type='email')
     )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def letter_branding_request(service_id):
-    form = BrandingOptions(current_service, branding_type='letter')
+    form = ChooseLetterBrandingForm(current_service)
     from_template = request.args.get('from_template')
     branding_name = current_service.letter_branding_name
     if form.validate_on_submit():

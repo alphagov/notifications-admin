@@ -2180,7 +2180,7 @@ class LinkOrganisationsForm(StripWhitespaceForm):
     )
 
 
-class BrandingOptions(StripWhitespaceForm):
+class ChooseBrandingForm(StripWhitespaceForm):
 
     FALLBACK_OPTION_VALUE = 'something_else'
     FALLBACK_OPTION = (FALLBACK_OPTION_VALUE, 'Something else')
@@ -2188,8 +2188,8 @@ class BrandingOptions(StripWhitespaceForm):
     options = RadioField('Choose your new branding')
     something_else = TextAreaField('Describe the branding you want')
 
-    def __init__(self, service, *args, branding_type="email", **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, service, branding_type):
+        super().__init__()
         self.branding_type = branding_type
         self.options.choices = tuple(self.get_available_choices(service, branding_type))
         self.options.label.text = 'Choose your new {} branding'.format(branding_type)
@@ -2248,7 +2248,7 @@ class BrandingOptions(StripWhitespaceForm):
         ):
             yield ('organisation', service.organisation.name)
 
-        yield BrandingOptions.FALLBACK_OPTION
+        yield ChooseBrandingForm.FALLBACK_OPTION
 
     @property
     def something_else_is_only_option(self):
@@ -2264,6 +2264,16 @@ class BrandingOptions(StripWhitespaceForm):
 
         if self.options.data != self.FALLBACK_OPTION_VALUE:
             field.data = ''
+
+
+class ChooseEmailBrandingForm(ChooseBrandingForm):
+    def __init__(self, service_id):
+        ChooseBrandingForm.__init__(self, service_id, branding_type='email')
+
+
+class ChooseLetterBrandingForm(ChooseBrandingForm):
+    def __init__(self, service_id):
+        ChooseBrandingForm.__init__(self, service_id, branding_type='letter')
 
 
 class SomethingElseBrandingForm(StripWhitespaceForm):
