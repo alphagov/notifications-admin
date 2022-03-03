@@ -4753,25 +4753,8 @@ def test_update_service_organisation_does_not_update_if_same_value(
 
 
 @pytest.mark.parametrize('organisation_type, expected_options', (
-    ('central', [
-        ('something_else', 'Something else'),
-    ]),
-    ('local', [
-        ('something_else', 'Something else'),
-    ]),
     ('nhs_central', [
         ('nhs', 'NHS'),
-        ('something_else', 'Something else'),
-    ]),
-    ('nhs_local', [
-        ('nhs', 'NHS'),
-        ('something_else', 'Something else'),
-    ]),
-    ('nhs_gp', [
-        ('nhs', 'NHS'),
-        ('something_else', 'Something else'),
-    ]),
-    ('emergency_service', [
         ('something_else', 'Something else'),
     ]),
     ('other', [
@@ -4818,21 +4801,10 @@ def test_email_branding_request_page_when_no_branding_is_set(
 
 
 @pytest.mark.parametrize('organisation_type, expected_options', (
-    ('central', None),
-    ('local', None),
     ('nhs_central', [
         ('nhs', 'NHS'),
         ('something_else', 'Something else'),
     ]),
-    ('nhs_local', [
-        ('nhs', 'NHS'),
-        ('something_else', 'Something else'),
-    ]),
-    ('nhs_gp', [
-        ('nhs', 'NHS'),
-        ('something_else', 'Something else'),
-    ]),
-    ('emergency_service', None),
     ('other', None),
 ))
 def test_letter_branding_request_page_when_no_branding_is_set(
