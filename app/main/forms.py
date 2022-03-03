@@ -2646,151 +2646,200 @@ class NewBrandingOptionsBannerOrLogo(StripWhitespaceForm):
     )
 
 
-class SingleIdentityOptions(StripWhitespaceForm):
+class SingleIdentityOptions:
 
     organisations = {
+        "hm-government": {
+            "colour": "#0076c0",
+            "name": "HM Government",
+            "colour-description": "blue",
+        },
         "attorney-generals-office": {
             "colour": "#9f1888",
             "name": "Attorney General’s Office",
+            "colour-description": "purple",
         },
         "cabinet-office": {
             "colour": "#005abb",
             "name": "Cabinet Office",
+            "colour-description": "blue",
         },
         "civil-service": {
             "colour": "#af292e",
             "name": "Civil Service",
+            "colour-description": "red",
         },
         "department-for-business-innovation-skills": {
             "colour": "#003479",
             "name": "Department for Business Innovation and Skills",
+            "colour-description": "blue",
         },
         "department-for-culture-media-sport": {
             "colour": "#d40072",
             "name": "Department for Digital, Culture, Media and Sport",
+            "colour-description": "pink",
         },
         "department-for-education": {
             "colour": "#003a69",
             "name": "Department for Education",
+            "colour-description": "blue",
         },
         "department-for-environment-food-rural-affairs": {
             "colour": "#00a33b",
             "name": "Department for Environment Food and Rural Affairs",
+            "colour-description": "green",
         },
         "department-for-international-development": {
             "colour": "#002878",
             "name": "Department for International Development",
+            "colour-description": "blue",
         },
         "department-for-international-trade": {
             "colour": "#cf102d",
             "name": "Department for International Trade",
+            "colour-description": "red",
         },
         "department-for-levelling-up-housing-and-communities": {
             "colour": "#012169",
             "name": "Department for Levelling Up, Housing and Communities",
+            "colour-description": "dark blue",
         },
         "department-for-transport": {
             "colour": "#006c56",
             "name": "Department for Transport",
+            "colour-description": "green",
         },
         "department-for-work-pensions": {
             "colour": "#00beb7",
             "name": "Department for Work and Pensions",
+            "colour-description": "aqua",
         },
         "department-of-health": {
             "colour": "#00ad93",
             "name": "Department of Health and Social Care",
+            "colour-description": "turquoise",
         },
         "foreign-commonwealth-development-office": {
             "colour": "#012169",
             "name": "Foreign and Commonwealth Development Office",
+            "colour-description": "dark blue",
         },
         "government-equalities-office": {
             "colour": "#9325b2",
             "name": "Government Equalities Office",
+            "colour-description": "purple",
         },
         "hm-government": {
             "colour": "#0076c0",
             "name": "HM Government",
+            "colour-description": "blue",
         },
         "hm-revenue-customs": {
             "colour": "#009390",
             "name": "HM Revenue and Customs",
+            "colour-description": "green",
         },
         "hm-treasury": {
             "colour": "#af292e",
             "name": "HM Treasury",
+            "colour-description": "red",
         },
         "home-office": {
             "colour": "#9325b2",
             "name": "Home Office",
+            "colour-description": "purple",
+        },
+        "hm-coastguard": {
+            "colour": "#006c56",
+            "name": "Maritime and Coastguard Agency",
+            "colour-description": "green",
         },
         "ministry-of-defence": {
             "colour": "#4d2942",
             "name": "Ministry of Defence",
+            "colour-description": "brown",
         },
         "ministry-of-justice": {
             "colour": "#231f20",
             "name": "Ministry of Justice",
+            "colour-description": "dark brown",
         },
         "northern-ireland-office": {
             "colour": "#002663",
             "name": "Northern Ireland Office",
+            "colour-description": "dark blue",
         },
         "office-of-the-advocate-general-for-scotland": {
             "colour": "#002663",
             "name": "Office of the Advocate General for Scotland",
+            "colour-description": "dark blue",
         },
         "office-of-the-leader-of-the-house-of-commons": {
             "colour": "#317023",
             "name": "Office of the Leader of the House of Commons",
+            "colour-description": "green",
         },
         "office-of-the-leader-of-the-house-of-lords": {
             "colour": "#9c132e",
             "name": "Office of the Leader of the House of Lords",
+            "colour-description": "red",
         },
         "scotland-office": {
             "colour": "#002663",
             "name": "Scotland Office",
+            "colour-description": "dark blue",
         },
         "uk-export-finance": {
             "colour": "#005747",
             "name": "UK Export Finance",
+            "colour-description": "dark green",
         },
         "wales-office": {
             "colour": "#a33038",
             "name": "Wales Office",
+            "colour-description": "red",
         },
     }
+
+
+class SingleIdentityCoatOfArmsOrInsignia(StripWhitespaceForm, SingleIdentityOptions):
 
     coat_of_arms_or_insignia = RadioField(
         'Branding options',
         choices=[
-            ('royal-coat-of-arms', 'Royal Coat of Arms'),
-            ('royal-coat-of-arms-scotland', 'Royal Coat of Arms Scotland'),
+            ('hm-government', 'Royal Coat of Arms'),
+            ('scotland-office', 'Royal Coat of Arms Scotland'),
             ('home-office', 'Home Office'),
             ('ministry-of-defence', 'Ministry of Defence'),
             ('wales-office', 'Wales Office'),
             ('department-for-international-trade', 'Department for International Trade'),
             ('hm-coastguard', 'HM Coastguard'),
-            ('hm-revenue-and-customs', 'HM Revenue and Customs'),
+            ('hm-revenue-customs', 'HM Revenue and Customs'),
         ],
         validators=[
             DataRequired()
         ],
     )
 
+
+class SingleIdentityColour(StripWhitespaceForm, SingleIdentityOptions):
     colour = RadioField(
         'Branding options',
         choices=[
             (slug, item['name'])
-            for slug, item in organisations.items()
+            for slug, item in SingleIdentityOptions.organisations.items()
         ],
         validators=[
             DataRequired()
         ],
     )
 
+
+class SingleIdentityText(StripWhitespaceForm, SingleIdentityOptions):
     text = GovukTextInputField(
         'Text to display'
     )
+
+
+class BrandingLogoUploadForm(StripWhitespaceForm):
+    logo = FileField_wtf('Upload a PNG logo')

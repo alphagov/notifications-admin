@@ -66,9 +66,12 @@ from app.main.forms import (
     ServiceSwitchChannelForm,
     SetEmailBranding,
     SetLetterBranding,
-    SingleIdentityOptions,
+    SingleIdentityCoatOfArmsOrInsignia,
+    SingleIdentityColour,
+    SingleIdentityText,
     SMSPrefixForm,
     SomethingElseBrandingForm,
+    BrandingLogoUploadForm,
 )
 from app.models.organisation import Organisation
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
@@ -1231,26 +1234,111 @@ def branding_request_not_on_file_your_logo(service_id, branding_type='email'):
     )
 
 
-@main.route("/services/<uuid:service_id>/branding-request/email/create/<branding_style>", methods=['GET', 'POST'])
+@main.route("/services/<uuid:service_id>/branding-request/email/create/single_identity", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
-def branding_request_create(service_id, branding_style):
+def branding_request_create_single_identity(service_id):
 
-    if branding_style == 'single_identity':
-        form = SingleIdentityOptions()
+    form = SingleIdentityCoatOfArmsOrInsignia()
 
-        if form.validate_on_submit():
-            flash(
-                'Thanks for your branding request. We’ll get back to you within one working day.',
-                'default',
-            )
-            return redirect(url_for(
-                'main.service_settings',
-                service_id=current_service.id,
-            ))
-        return render_template(
-            'views/service-settings/branding/branding-not-on-file-single-identity.html',
-            form=form,
+    if form.validate_on_submit():
+        if form.coat_of_arms_or_insignia.data == 'hm-government':
+            endpoint = '.branding_request_create_single_identity_colour'
+        else:
+            endpoint = '.branding_request_create_single_identity_text'
+        return redirect(url_for(
+            endpoint,
+            service_id=current_service.id,
+            coat_of_arms_or_insignia=form.coat_of_arms_or_insignia.data,
+            colour=form.coat_of_arms_or_insignia.data,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file-single-identity.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/create/single_identity/colour", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_create_single_identity_colour(service_id):
+
+    form = SingleIdentityColour()
+
+    if form.validate_on_submit():
+        return redirect(url_for(
+            'main.branding_request_create_single_identity_text',
+            service_id=current_service.id,
+            coat_of_arms_or_insignia=request.args.get('coat_of_arms_or_insignia'),
+            colour=form.colour.data,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file-single-identity-colour.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/create/single_identity/text", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_create_single_identity_text(service_id):
+
+    form = SingleIdentityText()
+
+    if form.validate_on_submit():
+        return redirect(url_for(
+            '.branding_request_create_single_identity_check',
+            service_id=current_service.id,
+            coat_of_arms_or_insignia=request.args.get('coat_of_arms_or_insignia'),
+            colour=request.args.get('colour'),
+            text=form.text.data,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file-single-identity-text.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/create/single_identity/check", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_create_single_identity_check(service_id):
+    form = SingleIdentityText()
+
+    if form.validate_on_submit():
+        flash(
+            'Thanks for your branding request. We’ll get back to you within one working day.',
+            'default',
         )
+        return redirect(url_for(
+            'main.service_settings',
+            service_id=current_service.id,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file-single-identity-check.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/create/org", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_create_org(service_id):
+    form = SingleIdentityText()
+
+    if form.validate_on_submit():
+        flash(
+            'Thanks for your branding request. We’ll get back to you within one working day.',
+            'default',
+        )
+        return redirect(url_for(
+            'main.service_settings',
+            service_id=current_service.id,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file-single-identity-check.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/create/org_banner", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_create_org_banner(service_id):
 
     if branding_style == 'org':
         return 'Your logo'

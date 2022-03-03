@@ -13,7 +13,7 @@
 
 {% block backLink %}
   {{ govukBackLink({
-    "href": url_for('.branding_request_not_on_file', service_id=current_service.id, option_chosen='organisation')
+    "href": url_for('.branding_request_create_single_identity', service_id=current_service.id, option_chosen='organisation')
   }) }}
 {% endblock %}
 
@@ -22,7 +22,7 @@
   {{ page_header('Crest with stripe') }}
 
   {% call form_wrapper() %}
-    <fieldset class="form-group {% if form.coat_of_arms_or_insignia.errors %}form-group-error{% endif %} top-gutter">
+    <fieldset class="form-group {% if form.colour.errors %}form-group-error{% endif %} top-gutter">
       <legend class="bottom-gutter-2-3">
         Coat of arms or departmental insignia
       </legend>
@@ -31,8 +31,8 @@
           You need to choose an option
         </span>
       {% endif %}
-      {% for option in form.coat_of_arms_or_insignia %}
-        <div class="multiple-choice">
+      {% for option in form.colour %}
+        <div class="multiple-choice" {% if option.data == 'hm-government' %}data-target="colour-selection"{% endif %}>
           <input
             id="{{ option.id }}" name="{{ option.name }}" type="radio" value="{{ option.data }}"
             {% if option.checked %}
@@ -40,14 +40,24 @@
             {% endif %}
           >
           <label class="block-label" for="{{ option.id }}">
-            <img src="{{ asset_url('images/branding/insignia/{}.png'.format(option.data)) }}" alt="" height="27"
+            <div style="
+              height: 1.4em;
+              width: 4px;
+              margin-bottom: -0.4em;
+              margin-right: 1px;
+              margin-left: 5px;
+              background: {{ form.organisations[option.data]['colour'] if option.data in form.organisations else 'yellow' }};
+              display: inline-block;
+            "></div>
+            <img src="{{ asset_url('images/branding/insignia/hm-government.png') }}" alt="" height="27"
             style="
             margin-bottom: -0.4em;
             margin-right: 5px;
             ">
             {{ option.label.text }}
+            ({{ form.organisations[option.data]['colour-description'] }})
             {% if option.data == 'hm-government' %}
-              <div class="block-label-hint" style="margin-left: 42px;">
+              <div class="block-label-hint" style="margin-left: 55px;">
                 Default
               </div>
             {% endif %}
@@ -55,6 +65,8 @@
         </div>
       {% endfor %}
     </fieldset>
+
+    {{ form.text }}
 
     {{ page_footer('Continue') }}
 
