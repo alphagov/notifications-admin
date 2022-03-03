@@ -4853,6 +4853,9 @@ def test_letter_branding_request_page_when_no_branding_is_set(
     assert mock_get_email_branding.called is False
     assert mock_get_letter_branding_by_id.called is False
 
+    button_text = normalize_spaces(page.select_one('.page-footer button').text)
+    assert button_text == 'Request new branding'
+
     if expected_options:
         assert [
             (
