@@ -64,7 +64,7 @@ def verify_email(token):
 
     session['user_details'] = {"email": user.email_address, "id": user.id}
 
-    if user.auth_type == 'email_auth':
+    if user.email_auth:
         try:
             return activate_user(user.id)
         finally:
