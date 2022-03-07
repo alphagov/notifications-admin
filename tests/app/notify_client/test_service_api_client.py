@@ -12,7 +12,7 @@ FAKE_TEMPLATE_ID = uuid4()
 
 def test_client_posts_archived_true_when_deleting_template(mocker):
     mocker.patch('app.notify_client.current_user', id='1')
-    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_cache_keys_by_pattern')
+    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_by_pattern')
     expected_data = {
         'archived': True,
         'created_by': '1'
@@ -433,23 +433,18 @@ def test_deletes_service_cache(
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('update_service_template', [FAKE_TEMPLATE_ID, 'foo', 'sms', 'bar', SERVICE_ONE_ID], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('redact_service_template', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('update_service_template_sender', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, 'foo'], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('update_service_template_postage', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, 'first'], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('delete_service_template', [SERVICE_ONE_ID, FAKE_TEMPLATE_ID], [
-        'service-{}-template-{}-versions'.format(SERVICE_ONE_ID, FAKE_TEMPLATE_ID),
         'service-{}-templates'.format(SERVICE_ONE_ID),
     ]),
     ('archive_service', [SERVICE_ONE_ID, []], [
@@ -467,7 +462,7 @@ def test_deletes_caches_when_modifying_templates(
 ):
     mocker.patch('app.notify_client.current_user', id='1')
     mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
-    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_cache_keys_by_pattern')
+    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_by_pattern')
     mock_request = mocker.patch('notifications_python_client.base.BaseAPIClient.request')
 
     getattr(service_api_client, method)(*extra_args)
@@ -482,7 +477,7 @@ def test_deletes_caches_when_modifying_templates(
 
 def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_templates):
     mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
-    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_cache_keys_by_pattern')
+    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_by_pattern')
 
     mocker.patch('notifications_python_client.base.BaseAPIClient.request', return_value={'data': ""})
 
@@ -542,7 +537,7 @@ def test_client_doesnt_delete_service_template_cache_when_none_exist(
     mocker.patch('app.notify_client.current_user', id='1')
     mocker.patch('notifications_python_client.base.BaseAPIClient.request')
     mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
-    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_cache_keys_by_pattern')
+    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_by_pattern')
 
     service_api_client.update_reply_to_email_address(SERVICE_ONE_ID, uuid4(), 'foo@bar.com')
 
@@ -560,7 +555,7 @@ def test_client_deletes_service_template_cache_when_service_is_updated(
     mocker.patch('app.notify_client.current_user', id='1')
     mocker.patch('notifications_python_client.base.BaseAPIClient.request')
     mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
-    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_cache_keys_by_pattern')
+    mock_redis_delete_by_pattern = mocker.patch('app.extensions.RedisClient.delete_by_pattern')
 
     service_api_client.update_reply_to_email_address(SERVICE_ONE_ID, uuid4(), 'foo@bar.com')
 
