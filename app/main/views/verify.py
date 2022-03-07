@@ -31,10 +31,8 @@ def verify():
     form = TwoFactorForm(_check_code)
 
     if form.validate_on_submit():
-        try:
-            return activate_user(user_id)
-        finally:
-            session.pop('user_details', None)
+        session.pop('user_details', None)
+        return activate_user(user_id)
 
     return render_template('views/two-factor-sms.html', form=form)
 
@@ -62,15 +60,12 @@ def verify_email(token):
         flash("That verification link has expired.")
         return redirect(url_for('main.sign_in'))
 
-    session['user_details'] = {"email": user.email_address, "id": user.id}
-
     if user.email_auth:
-        try:
-            return activate_user(user.id)
-        finally:
-            session.pop('user_details', None)
+        session.pop('user_details', None)
+        return activate_user(user.id)
 
     user.send_verify_code()
+    session['user_details'] = {"email": user.email_address, "id": user.id}
     return redirect(url_for('main.verify'))
 
 
@@ -95,7 +90,7 @@ def activate_user(user_id):
 
     invited_org_user = InvitedOrgUser.from_session()
     if invited_org_user:
-        user_api_client.add_user_to_organisation(invited_org_user.organisation, session['user_details']['id'])
+        user_api_client.add_user_to_organisation(invited_org_user.organisation, user_id)
 
     if organisation_id:
         return redirect(url_for('main.organisation_dashboard', org_id=organisation_id))
