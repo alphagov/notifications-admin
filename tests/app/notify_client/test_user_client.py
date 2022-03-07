@@ -325,3 +325,22 @@ def test_reset_password(
             'admin_base_url': 'http://localhost:6012',
         },
     )
+
+
+def test_send_registration_email(
+    mocker,
+    fake_uuid,
+):
+    mock_post = mocker.patch(
+        'app.notify_client.user_api_client.UserApiClient.post'
+    )
+
+    user_api_client.send_verify_email(fake_uuid, 'test@example.com')
+
+    mock_post.assert_called_once_with(
+        f'/user/{fake_uuid}/email-verification',
+        data={
+            'to': 'test@example.com',
+            'admin_base_url': 'http://localhost:6012',
+        },
+    )
