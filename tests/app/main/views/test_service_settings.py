@@ -5424,7 +5424,7 @@ def test_get_email_branding_govuk_and_nhs_pages(
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Use this branding'
 
 
-def test_get_email_branding_something_else_page(client_request, service_one, mocker):
+def test_get_email_branding_something_else_page(client_request, service_one):
     # expect to have a "NHS" option as well as the
     # fallback, so back button goes to choices page
     service_one['organisation_type'] = 'nhs_central'
@@ -5441,7 +5441,7 @@ def test_get_email_branding_something_else_page(client_request, service_one, moc
     )
 
 
-def test_get_email_branding_something_else_page_is_only_option(client_request, mocker, service_one):
+def test_get_email_branding_something_else_page_is_only_option(client_request, service_one):
     # should only have a "something else" option
     # so back button goes back to settings page
     service_one['organisation_type'] = 'other'
@@ -5741,17 +5741,13 @@ def test_service_settings_links_to_branding_request_page_for_letters(
     (False, f'/services/{SERVICE_ONE_ID}/service-settings/email-branding'),
 ])
 def test_service_settings_links_to_branding_request_page_for_emails(
-    mocker,
     service_one,
     client_request,
     no_reply_to_email_addresses,
-    no_letter_contact_blocks,
     single_sms_sender,
     single_branding_option,
     expected_href,
 ):
-    service_one['permissions'].append('letter')
-
     if single_branding_option:
         # should only have a "something else" option
         # so we go straight to that form
