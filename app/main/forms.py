@@ -2843,3 +2843,7 @@ class SingleIdentityText(StripWhitespaceForm, SingleIdentityOptions):
 
 class BrandingLogoUploadForm(StripWhitespaceForm):
     logo = FileField_wtf('Upload a PNG logo')
+
+
+class BrandingLogoBannerColourForm(StripWhitespaceForm):
+    colour = GovukTextInputField('Colour')

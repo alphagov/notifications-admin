@@ -39,6 +39,8 @@ from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
     BillingDetailsForm,
+    BrandingLogoUploadForm,
+    BrandingLogoBannerColourForm,
     BrandingOptions,
     EditNotesForm,
     EstimateUsageForm,
@@ -71,7 +73,6 @@ from app.main.forms import (
     SingleIdentityText,
     SMSPrefixForm,
     SomethingElseBrandingForm,
-    BrandingLogoUploadForm,
 )
 from app.models.organisation import Organisation
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
@@ -1219,11 +1220,16 @@ def branding_request_not_on_file_your_logo(service_id, branding_type='email'):
     option_chosen = request.args.get('option_chosen')
     form = NewBrandingOptionsBannerOrLogo()
     if form.validate_on_submit():
-        return redirect(url_for(
-            'main.branding_request_create',
-            service_id=current_service.id,
-            branding_style=form.options.data,
-        ))
+        if form.options.data == 'org_banner':
+            return redirect(url_for(
+                'main.branding_request_create_org_banner',
+                service_id=current_service.id,
+            ))
+        else:
+            return redirect(url_for(
+                'main.branding_request_create_org',
+                service_id=current_service.id,
+            ))
     return render_template(
         'views/service-settings/branding/branding-not-on-file.html',
         form=form,
@@ -1319,19 +1325,16 @@ def branding_request_create_single_identity_check(service_id):
 @main.route("/services/<uuid:service_id>/branding-request/email/create/org", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def branding_request_create_org(service_id):
-    form = SingleIdentityText()
+    form = BrandingLogoUploadForm()
 
-    if form.validate_on_submit():
-        flash(
-            'Thanks for your branding request. We’ll get back to you within one working day.',
-            'default',
-        )
+    if request.method == 'POST':
         return redirect(url_for(
-            'main.service_settings',
+            '.branding_request_create_org_banner_check',
             service_id=current_service.id,
+            filename=form.logo.data.filename,
         ))
     return render_template(
-        'views/service-settings/branding/branding-not-on-file-single-identity-check.html',
+        'views/service-settings/branding/branding-not-on-file-org.html',
         form=form,
     )
 
@@ -1340,11 +1343,56 @@ def branding_request_create_org(service_id):
 @user_has_permissions('manage_service')
 def branding_request_create_org_banner(service_id):
 
-    if branding_style == 'org':
-        return 'Your logo'
+    form = BrandingLogoUploadForm()
 
-    if branding_style == 'org_banner':
-        return 'Your logo on a colour'
+    if form.validate_on_submit():
+        return redirect(url_for(
+            'main.branding_request_create_org_banner_colour',
+            service_id=current_service.id,
+            filename=form.logo.data.filename,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file-org-banner.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/create/org_banner_colour", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_create_org_banner_colour(service_id):
+
+    form = BrandingLogoBannerColourForm()
+
+    if form.validate_on_submit():
+        return redirect(url_for(
+            '.branding_request_create_org_banner_check',
+            service_id=current_service.id,
+            filename=request.args.get('filename'),
+            colour=form.colour.data,
+        ))
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file-org-banner-colour.html',
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/branding-request/email/create/check", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def branding_request_create_org_banner_check(service_id):
+
+    if request.method == 'POST':
+        flash(
+            'Thanks for your branding request. We’ll get back to you within one working day.',
+            'default',
+        )
+        return redirect(url_for(
+            'main.service_settings',
+            service_id=current_service.id,
+        ))
+
+    return render_template(
+        'views/service-settings/branding/branding-not-on-file-check.html'
+    )
 
 
 def check_branding_allowed_for_service(branding):

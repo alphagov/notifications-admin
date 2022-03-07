@@ -1,0 +1,38 @@
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radio, conditional_radio_panel, radios_nested %}
+{% from "components/select-input.html" import select_wrapper %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block service_page_title %}
+  Change {{ branding_type }} branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('.branding_request_not_on_file', service_id=current_service.id, option_chosen='organisation')
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Org banner') }}
+
+  <div class="form-group">
+    {{ file_upload(
+      form.logo,
+      allowed_file_extensions=['png', 'jpg', 'gif'],
+      button_text='Choose a file',
+      show_errors=False
+    ) }}
+  </div>
+
+  <p class="govuk-body">
+    Don’t have an image? <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.branding_request_create_org_banner_colour', service_id=current_service.id) }}">Skip this step</a>
+  </p>
+
+{% endblock %}
