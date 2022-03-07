@@ -41,5 +41,19 @@ class BillingAPIClient(NotifyAdminAPIClient):
                             'end_date': str(end_date),
                         })
 
+    def get_data_for_volumes_by_service_report(self, start_date, end_date):
+        return self.get(url='/platform-stats/volumes-by-service',
+                        params={
+                            'start_date': str(start_date),
+                            'end_date': str(end_date),
+                        })
+
+    def get_data_for_daily_volumes_report(self, start_date, end_date):
+        return self.get(url='/platform-stats/daily-volumes-report',
+                        params={
+                            'start_date': str(start_date),
+                            'end_date': str(end_date),
+                        })
+
 
 billing_api_client = BillingAPIClient()

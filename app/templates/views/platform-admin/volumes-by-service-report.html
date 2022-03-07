@@ -1,0 +1,46 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/table.html" import mapping_table, row, text_field %}
+
+{% block per_page_title %}
+  Volumes by service report
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">
+    Volumes by service Report
+  </h1>
+
+  {% call form_wrapper() %}
+    {{ form.start_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
+    {{ page_footer('Download report') }}
+  {% endcall %}
+
+  <h2 class="heading-medium">
+    Data included in the report
+  </h2>
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Descriptions of volumes by service data',
+      field_headings=['Name', 'Description'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_length, charge in [
+        ('free allowance', 'Free allowance set for the service. This is the latest free allowance for the date range given'),
+        ('sms notifications', 'The number of text messages sent by the service.'),
+        ('sms volume', 'The number of text message fragments times the rate multiplier sent by the service.'),
+        ('email totals', 'The number of emails sent by a service'),
+        ('letter totals', 'The number of letters sent by a service'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_length) }}
+          {{ text_field(charge | safe) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+{% endblock %}

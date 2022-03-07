@@ -313,6 +313,74 @@ def get_billing_report():
     return render_template('views/platform-admin/get-billing-report.html', form=form)
 
 
+@main.route("/platform-admin/reports/volumes-by-service", methods=['GET', 'POST'])
+@user_is_platform_admin
+def get_volumes_by_service():
+    form = BillingReportDateFilterForm()
+
+    if form.validate_on_submit():
+        start_date = form.start_date.data
+        end_date = form.end_date.data
+        headers = [
+            "organisation_id", "organisation_name", "service_id", "service_name",
+            "free_allowance", "sms_notifications", "sms chargeable units", "email_totals",
+            "letter_totals", "letter_cost", "letter_sheet_totals"
+        ]
+        result = billing_api_client.get_data_for_volumes_by_service_report(start_date, end_date)
+
+        rows = [
+            [
+                r["organisation_id"], r["organisation_name"], r["service_id"], r["service_name"],
+                r["free_allowance"], r["sms_notifications"], r["sms_chargeable_units"], r["email_totals"],
+                r["letter_totals"], r["letter_cost"], r["letter_sheet_totals"]
+            ]
+            for r in result
+        ]
+        if rows:
+            return Spreadsheet.from_rows([headers] + rows).as_csv_data, 200, {
+                'Content-Type': 'text/csv; charset=utf-8',
+                'Content-Disposition': 'attachment; filename="Volumes by service report from {} to {}.csv"'.format(
+                    start_date, end_date
+                )
+            }
+        else:
+            flash('No results for dates')
+    return render_template('views/platform-admin/volumes-by-service-report.html', form=form)
+
+
+@main.route("/platform-admin/reports/daily-volumes-report", methods=['GET', 'POST'])
+@user_is_platform_admin
+def get_daily_volumes():
+    form = BillingReportDateFilterForm()
+
+    if form.validate_on_submit():
+        start_date = form.start_date.data
+        end_date = form.end_date.data
+        headers = [
+            "day", "sms totals", "sms fragment totals", "sms chargeable units",
+            "email totals", "letter totals", "letter sheet totals"
+        ]
+        result = billing_api_client.get_data_for_daily_volumes_report(start_date, end_date)
+
+        rows = [
+            [
+                r["day"], r["sms_totals"], r["sms_fragment_totals"], r["sms_chargeable_units"],
+                r["email_totals"], r["letter_totals"], r["letter_sheet_totals"]
+            ]
+            for r in result
+        ]
+        if rows:
+            return Spreadsheet.from_rows([headers] + rows).as_csv_data, 200, {
+                'Content-Type': 'text/csv; charset=utf-8',
+                'Content-Disposition': 'attachment; filename="Daily volumes report from {} to {}.csv"'.format(
+                    start_date, end_date
+                )
+            }
+        else:
+            flash('No results for dates')
+    return render_template('views/platform-admin/daily-volumes-report.html', form=form)
+
+
 @main.route("/platform-admin/complaints")
 @user_is_platform_admin
 def platform_admin_list_complaints():

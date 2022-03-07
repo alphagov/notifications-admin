@@ -131,6 +131,8 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'find_users_by_email',
     'forgot_password',
     'get_billing_report',
+    'get_daily_volumes',
+    'get_volumes_by_service',
     'get_example_csv',
     'get_notifications_as_json',
     'get_started',
