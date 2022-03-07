@@ -221,7 +221,7 @@ def password(label='Password'):
 
 
 def govuk_text_input_field_widget(self, field, type=None, param_extensions=None, **kwargs):
-    value = kwargs["value"] if kwargs.get("value") else field.data
+    value = kwargs["value"] if "value" in kwargs else field.data
     value = str(value) if isinstance(value, Number) else value
 
     # error messages
