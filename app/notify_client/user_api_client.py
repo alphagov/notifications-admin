@@ -101,7 +101,10 @@ class UserApiClient(NotifyAdminAPIClient):
         self.post(endpoint, data=data)
 
     def send_verify_email(self, user_id, to):
-        data = {'to': to}
+        data = {
+            'to': to,
+            'admin_base_url': self.admin_url,
+        }
         endpoint = '/user/{0}/email-verification'.format(user_id)
         self.post(endpoint, data=data)
 
