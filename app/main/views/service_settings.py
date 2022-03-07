@@ -1198,6 +1198,11 @@ def branding_request_not_on_file(service_id, branding_type='email'):
                 'main.branding_request_create_single_identity',
                 service_id=current_service.id,
             ))
+        if option_chosen == 'govuk_and_org':
+            return redirect(url_for(
+                'main.branding_request_create_org',
+                service_id=current_service.id,
+            ))
         return redirect(url_for(
             'main.branding_request_not_on_file_your_logo',
             service_id=current_service.id,
