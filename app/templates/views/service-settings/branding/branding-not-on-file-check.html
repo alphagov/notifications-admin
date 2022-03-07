@@ -38,13 +38,13 @@
         {% endcall %}
         {% call row() %}
           {{ text_field('Background colour') }}
-          {{ text_field(request.args.get('colour') or 'No background colour') }}
+          {{ optional_text_field(request.args.get('colour'), default='Colour not specified') }}
         {% endcall %}
       {% endcall %}
     </div>
 
     <p class="govuk-body">
-      What happens next
+      We’ll email you when your branding is ready, or if we need any more information.
     </p>
 
     {{ page_footer('Request new branding') }}

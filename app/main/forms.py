@@ -2623,8 +2623,8 @@ class NewBrandingOptionsSingleIdentityOrCustom(StripWhitespaceForm):
     options = RadioField(
         'Branding options',
         choices=[
-            ('single_identity', 'Crest with stripe'),
-            ('org', 'Your logo'),
+            ('single_identity', 'Use a government identity logo'),
+            ('org', 'Upload a logo'),
         ],
         validators=[
             DataRequired()
@@ -2637,8 +2637,8 @@ class NewBrandingOptionsBannerOrLogo(StripWhitespaceForm):
     options = RadioField(
         'Branding options',
         choices=[
-            ('org', 'Your logo'),
-            ('org_banner', 'Your logo on a colour'),
+            ('org', 'No banner'),
+            ('org_banner', 'Coloured banner'),
         ],
         validators=[
             DataRequired()
@@ -2846,4 +2846,4 @@ class BrandingLogoUploadForm(StripWhitespaceForm):
 
 
 class BrandingLogoBannerColourForm(StripWhitespaceForm):
-    colour = GovukTextInputField('Colour')
+    colour = GovukTextInputField('Enter a hex colour code')

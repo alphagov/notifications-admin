@@ -8,7 +8,7 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
-  Change {{ branding_type }} branding
+  Upload a logo
 {% endblock %}
 
 {% block backLink %}
@@ -19,7 +19,17 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Org') }}
+  {{ page_header('Upload a logo') }}
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>landscape image</li>
+    <li>saved as a PNG file</li>
+    <li>with a transparent background</li>
+  </ul>
+
+  <p class="govuk-body">
+    We do not recommend portrait images because they’ll look very small. This is because the space for email branding has a fixed height.
+  </p>
 
   <div class="form-group">
     {{ file_upload(
@@ -30,7 +40,7 @@
     ) }}
   </div>
   <p class="govuk-body">
-    Don’t have an image? <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.branding_request_create_org_banner_check', service_id=current_service.id) }}">Skip this step</a>
+    Don’t have an image? <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.branding_request_create_org_banner_check', service_id=current_service.id, colour='No banner') }}">Skip this step</a>
   </p>
 
 {% endblock %}

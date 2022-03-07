@@ -8,7 +8,7 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
-  Change {{ branding_type }} branding
+  Check your new email branding
 {% endblock %}
 
 {% block backLink %}
@@ -19,7 +19,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Crest with stripe') }}
+  {{ page_header('Check your new email branding') }}
 
   {% call form_wrapper() %}
     <div class="govuk-grid-row">
@@ -45,7 +45,7 @@
       </div>
     </div>
     <p class="govuk-body">
-      What happens next
+      We’ll email you when your branding is ready, or if we need any more information.
     </p>
 
     {{ page_footer('Request new branding') }}

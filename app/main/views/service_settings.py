@@ -1195,14 +1195,13 @@ def branding_request_not_on_file(service_id, branding_type='email'):
     if form.validate_on_submit():
         if form.options.data == 'single_identity':
             return redirect(url_for(
-                'main.branding_request_create',
+                'main.branding_request_create_single_identity',
                 service_id=current_service.id,
-                branding_style='single_identity',
             ))
         return redirect(url_for(
             'main.branding_request_not_on_file_your_logo',
             service_id=current_service.id,
-            option_chosen=option_chosen,
+            option_chosen='something_else',
         ))
     return render_template(
         'views/service-settings/branding/branding-not-on-file.html',
@@ -1231,7 +1230,7 @@ def branding_request_not_on_file_your_logo(service_id, branding_type='email'):
                 service_id=current_service.id,
             ))
     return render_template(
-        'views/service-settings/branding/branding-not-on-file.html',
+        'views/service-settings/branding/branding-not-on-file-banner.html',
         form=form,
         branding_type=branding_type,
         something_else_chosen=(
@@ -1332,6 +1331,7 @@ def branding_request_create_org(service_id):
             '.branding_request_create_org_banner_check',
             service_id=current_service.id,
             filename=form.logo.data.filename,
+            colour='No banner',
         ))
     return render_template(
         'views/service-settings/branding/branding-not-on-file-org.html',

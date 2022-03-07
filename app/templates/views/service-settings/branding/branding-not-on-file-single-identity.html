@@ -8,7 +8,7 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block service_page_title %}
-  Change {{ branding_type }} branding
+  Choose a symbol
 {% endblock %}
 
 {% block backLink %}
@@ -19,12 +19,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Crest with stripe') }}
+  {{ page_header('Choose a symbol') }}
 
   {% call form_wrapper() %}
     <fieldset class="form-group {% if form.coat_of_arms_or_insignia.errors %}form-group-error{% endif %} top-gutter">
-      <legend class="bottom-gutter-2-3">
-        Coat of arms or departmental insignia
+      <legend class="bottom-gutter-2-3 govuk-visually-hidden">
+        Choose a symbol
       </legend>
       {% if form.coat_of_arms_or_insignia.errors %}
         <span class="error-message" data-module="track-error" data-error-type="Can’t be empty" data-error-label="{{ form.coat_of_arms_or_insignia.name }}">
