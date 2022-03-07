@@ -4753,8 +4753,12 @@ def test_update_service_organisation_does_not_update_if_same_value(
 
 
 @pytest.mark.parametrize('organisation_type, expected_options', (
-    ('central', None),
-    ('local', None),
+    ('central', [
+        ('something_else', 'Something else'),
+    ]),
+    ('local', [
+        ('something_else', 'Something else'),
+    ]),
     ('nhs_central', [
         ('nhs', 'NHS'),
         ('something_else', 'Something else'),
@@ -4767,8 +4771,12 @@ def test_update_service_organisation_does_not_update_if_same_value(
         ('nhs', 'NHS'),
         ('something_else', 'Something else'),
     ]),
-    ('emergency_service', None),
-    ('other', None),
+    ('emergency_service', [
+        ('something_else', 'Something else'),
+    ]),
+    ('other', [
+        ('something_else', 'Something else'),
+    ])
 ))
 def test_show_email_branding_request_page_when_no_branding_is_set(
     service_one,
@@ -4798,24 +4806,15 @@ def test_show_email_branding_request_page_when_no_branding_is_set(
 
     button_text = normalize_spaces(page.select_one('.page-footer button').text)
 
-    if expected_options:
-        assert [
-            (
-                radio['value'],
-                page.select_one('label[for={}]'.format(radio['id'])).text.strip()
-            )
-            for radio in page.select('input[type=radio]')
-        ] == expected_options
-
-        assert button_text == 'Continue'
-    else:
-        assert page.select_one(
-            'textarea'
-        )['name'] == (
-            'something_else'
+    assert [
+        (
+            radio['value'],
+            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
         )
-        assert not page.select('.conditional-radios-panel')
-        assert button_text == 'Request new branding'
+        for radio in page.select('input[type=radio]')
+    ] == expected_options
+
+    assert button_text == 'Continue'
 
 
 @pytest.mark.parametrize('organisation_type, expected_options', (
@@ -5085,31 +5084,22 @@ def test_back_link_on_letter_branding_request_page(
     assert back_link[0].attrs['href'] == back_link_url
 
 
-@pytest.mark.parametrize('branding_type', ['email', 'letter'])
-def test_show_branding_request_page_when_branding_is_same_as_org(
+def test_show_letter_branding_request_page_when_branding_is_same_as_org(
     mocker,
     service_one,
     client_request,
-    mock_get_email_branding,
     mock_get_letter_branding_by_id,
     mock_get_service_organisation,
     active_user_with_permissions,
-    branding_type
 ):
-    service_one['{}_branding'.format(branding_type)] = sample_uuid()
-    if branding_type == 'email':
-        mocker.patch(
-            'app.organisations_client.get_organisation',
-            return_value=organisation_json(email_branding_id=service_one['email_branding']),
-        )
-    else:
-        mocker.patch(
-            'app.organisations_client.get_organisation',
-            return_value=organisation_json(letter_branding_id=service_one['letter_branding']),
-        )
+    service_one['letter_branding'] = sample_uuid()
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_json(letter_branding_id=service_one['letter_branding']),
+    )
 
     page = client_request.get(
-        f'.{branding_type}_branding_request', service_id=SERVICE_ONE_ID
+        '.letter_branding_request', service_id=SERVICE_ONE_ID
     )
 
     # Central government organisations who have their own default
@@ -5165,7 +5155,7 @@ def test_show_branding_request_page_when_branding_is_same_as_org(
         'main.email_branding_nhs',
     ),
 ))
-def test_submit_email_branding_request_when_something_else_is_not_the_only_option(
+def test_submit_email_branding_request(
     client_request,
     service_one,
     mocker,
@@ -5195,75 +5185,6 @@ def test_submit_email_branding_request_when_something_else_is_not_the_only_optio
             _external=True,
         )
     )
-
-
-def test_submit_email_branding_request_when_something_else_is_only_option(
-    client_request,
-    service_one,
-    mocker,
-    mock_get_service_settings_page_common,
-    mock_get_email_branding,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
-):
-    service_one['email_branding'] = sample_uuid()
-    service_one['organisation_type'] = 'local'
-
-    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
-    mock_send_ticket_to_zendesk = mocker.patch(
-        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
-        autospec=True,
-    )
-
-    page = client_request.post(
-        '.email_branding_request',
-        service_id=SERVICE_ONE_ID,
-        _data={'options': 'something_else', 'something_else': 'Homer Simpson'},
-        _follow_redirects=True,
-    )
-
-    mock_create_ticket.assert_called_once_with(
-        ANY,
-        message='\n'.join([
-            'Organisation: Can’t tell (domain is user.gov.uk)',
-            'Service: service one',
-            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
-            '',
-            '---',
-            'Current branding: Organisation name',
-            'Branding requested: Something else\n\nHomer Simpson\n',
-        ]),
-        subject='Email branding request - service one',
-        ticket_type='question',
-        user_name='Test User',
-        user_email='test@user.gov.uk',
-        org_id=None,
-        org_type='local',
-        service_id=SERVICE_ONE_ID
-    )
-    mock_send_ticket_to_zendesk.assert_called_once()
-    assert normalize_spaces(page.select_one('.banner-default').text) == (
-        'Thanks for your branding request. We’ll get back to you '
-        'within one working day.'
-    )
-
-
-def test_submit_email_branding_request_when_something_else_is_only_option_and_textbox_is_empty(
-    client_request,
-    service_one,
-    mock_get_email_branding,
-):
-    service_one['email_branding'] = sample_uuid()
-    service_one['organisation_type'] = 'local'
-
-    page = client_request.post(
-        '.email_branding_request', service_id=SERVICE_ONE_ID,
-        _data={'options': 'something_else', 'something_else': ''},
-        _follow_redirects=True,
-    )
-    assert page.h1.text == 'Change email branding'
-    assert normalize_spaces(page.select_one('.error-message').text) == 'Cannot be empty'
 
 
 def test_submit_email_branding_request_when_no_radio_button_is_selected(
@@ -5412,18 +5333,12 @@ def test_submit_letter_branding_request_redirects_if_from_template_is_set(
         )
 
 
-@pytest.mark.parametrize('branding_type,current_branding', [
-    ('email', 'GOV.UK'), ('letter', 'no')
-])
-def test_submit_branding_when_something_else_is_only_option(
+def test_submit_letter_branding_when_something_else_is_only_option(
     client_request,
     service_one,
     mocker,
     mock_get_service_settings_page_common,
-    mock_get_email_branding,
     mock_get_letter_branding_by_id,
-    branding_type,
-    current_branding,
 ):
     mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
     mocker.patch(
@@ -5432,7 +5347,7 @@ def test_submit_branding_when_something_else_is_only_option(
     )
 
     client_request.post(
-        f'.{branding_type}_branding_request',
+        '.letter_branding_request',
         service_id=SERVICE_ONE_ID,
         _data={
             'something_else': 'Homer Simpson',
@@ -5440,10 +5355,10 @@ def test_submit_branding_when_something_else_is_only_option(
     )
 
     assert (
-        'Current branding: {}\n'
+        'Current branding: no\n'
         'Branding requested: Something else\n'
         '\n'
-        'Homer Simpson'.format(current_branding)
+        'Homer Simpson'
     ) in mock_create_ticket.call_args_list[0][1]['message']
 
 
@@ -5509,7 +5424,11 @@ def test_get_email_branding_govuk_and_nhs_pages(
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Use this branding'
 
 
-def test_get_email_branding_something_else_page(client_request):
+def test_get_email_branding_something_else_page(client_request, service_one):
+    # expect to have a "NHS" option as well as the
+    # fallback, so back button goes to choices page
+    service_one['organisation_type'] = 'nhs_central'
+
     page = client_request.get(
         'main.email_branding_something_else',
         service_id=SERVICE_ONE_ID,
@@ -5517,6 +5436,23 @@ def test_get_email_branding_something_else_page(client_request):
     assert normalize_spaces(page.h1.text) == 'Describe the branding you want'
     assert page.select_one('textarea')['name'] == ('something_else')
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Request new branding'
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        'main.email_branding_request', service_id=SERVICE_ONE_ID,
+    )
+
+
+def test_get_email_branding_something_else_page_is_only_option(client_request, service_one):
+    # should only have a "something else" option
+    # so back button goes back to settings page
+    service_one['organisation_type'] = 'other'
+
+    page = client_request.get(
+        'main.email_branding_something_else',
+        service_id=SERVICE_ONE_ID,
+    )
+    assert page.select_one('.govuk-back-link')['href'] == url_for(
+        'main.service_settings', service_id=SERVICE_ONE_ID,
+    )
 
 
 @pytest.mark.parametrize('endpoint', [
@@ -5789,17 +5725,42 @@ def test_service_settings_links_to_branding_request_page_for_letters(
     mocker,
     service_one,
     client_request,
-    active_user_with_permissions,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
-    mock_get_service_settings_page_common,
 ):
     service_one['permissions'].append('letter')
     page = client_request.get(
         '.service_settings', service_id=SERVICE_ONE_ID
     )
     assert len(page.find_all('a', attrs={'href': f'/services/{SERVICE_ONE_ID}/service-settings/letter-branding'})) == 1
+
+
+@pytest.mark.parametrize('single_branding_option, expected_href', [
+    (True, f'/services/{SERVICE_ONE_ID}/service-settings/email-branding/something-else'),
+    (False, f'/services/{SERVICE_ONE_ID}/service-settings/email-branding'),
+])
+def test_service_settings_links_to_branding_request_page_for_emails(
+    service_one,
+    client_request,
+    no_reply_to_email_addresses,
+    single_sms_sender,
+    single_branding_option,
+    expected_href,
+):
+    if single_branding_option:
+        # should only have a "something else" option
+        # so we go straight to that form
+        service_one['organisation_type'] = 'other'
+    else:
+        # expect to have a "NHS" option as well as the
+        # fallback one, so ask user to choose
+        service_one['organisation_type'] = 'nhs_central'
+
+    page = client_request.get(
+        '.service_settings', service_id=SERVICE_ONE_ID
+    )
+    assert len(page.find_all('a', attrs={'href': expected_href})) == 1
 
 
 def test_show_service_data_retention(

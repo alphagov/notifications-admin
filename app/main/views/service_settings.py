@@ -88,7 +88,8 @@ NHS_BRANDING_ID = 'a7dc4e56-660b-4db7-8cff-12c37b12b5ea'
 def service_settings(service_id):
     return render_template(
         'views/service-settings.html',
-        service_permissions=PLATFORM_ADMIN_SERVICE_PERMISSIONS
+        service_permissions=PLATFORM_ADMIN_SERVICE_PERMISSIONS,
+        email_branding_options=BrandingOptions(current_service, branding_type='email')
     )
 
 
@@ -1161,21 +1162,12 @@ def email_branding_request(service_id):
     form = BrandingOptions(current_service, branding_type='email')
     branding_name = current_service.email_branding_name
     if form.validate_on_submit():
-        if form.something_else_is_only_option:
-            create_email_branding_zendesk_ticket(
-                form_option_selected=form.options.data,
-                detail=form.something_else.data,
+        return redirect(
+            url_for(
+                f'.email_branding_{form.options.data}',
+                service_id=current_service.id,
             )
-
-            flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
-            return redirect(url_for('.service_settings', service_id=current_service.id))
-        else:
-            return redirect(
-                url_for(
-                    f'.email_branding_{form.options.data}',
-                    service_id=current_service.id,
-                )
-            )
+        )
 
     return render_template(
         'views/service-settings/branding/email-branding-options.html',
@@ -1261,7 +1253,11 @@ def email_branding_something_else(service_id):
         flash('Thanks for your branding request. We’ll get back to you within one working day.', 'default')
         return redirect(url_for('.service_settings', service_id=current_service.id))
 
-    return render_template('views/service-settings/branding/email-branding-something-else.html', form=form)
+    return render_template(
+        'views/service-settings/branding/email-branding-something-else.html',
+        form=form,
+        branding_options=BrandingOptions(current_service, branding_type='email')
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=['GET', 'POST'])
