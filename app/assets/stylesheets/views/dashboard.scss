@@ -69,7 +69,7 @@
 
       // simulate govuk-grid-column-one-half spacing - larger screens
       @include govuk-media-query($from: tablet) {
-        width: calc(50% - #{$govuk-gutter-half});
+        max-width: calc(50% - #{$govuk-gutter-half});
       }
     }
 
