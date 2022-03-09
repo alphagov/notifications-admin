@@ -322,9 +322,9 @@ def get_volumes_by_service():
         start_date = form.start_date.data
         end_date = form.end_date.data
         headers = [
-            "organisation_id", "organisation_name", "service_id", "service_name",
-            "free_allowance", "sms_notifications", "sms chargeable units", "email_totals",
-            "letter_totals", "letter_cost", "letter_sheet_totals"
+            "organisation id", "organisation name", "service id", "service name",
+            "free allowance", "sms notifications", "sms chargeable units", "email totals",
+            "letter totals", "letter cost", "letter sheet totals"
         ]
         result = billing_api_client.get_data_for_volumes_by_service_report(start_date, end_date)
 

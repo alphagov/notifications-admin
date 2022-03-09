@@ -31,9 +31,11 @@
       {% for message_length, charge in [
         ('free allowance', 'Free allowance set for the service. This is the latest free allowance for the date range given'),
         ('sms notifications', 'The number of text messages sent by the service.'),
-        ('sms volume', 'The number of text message fragments times the rate multiplier sent by the service.'),
+        ('sms chargeable units', 'The number of text message fragments times the rate multiplier sent by the service.'),
         ('email totals', 'The number of emails sent by a service'),
         ('letter totals', 'The number of letters sent by a service'),
+        ('letter costs', 'The cost of the letters, rate * letter totals'),
+        ('letter sheet totals', 'The number of sheet sent by a service')
       ] %}
         {% call row() %}
           {{ text_field(message_length) }}

@@ -31,11 +31,11 @@
       {% for message_length, charge in [
         ('day', 'The whole business day in BST.'),
         ('sms totals', 'The number of text messages sent'),
+        ('sms fragments', 'The number of text message fragments sent times the rate multiplier'),
         ('sms chargeable units', 'The number of text message fragments sent'),
-        ('sms_fragments_times_multiplier', 'The number of text message fragments sent times the rate multiplier'),
         ('email totals', 'The number of emails sent'),
         ('letter totals', 'The number of letters sent'),
-        ('letter sheet totals', The number of sheets sent)
+        ('letter sheet totals', 'The number of sheets sent')
       ] %}
         {% call row() %}
           {{ text_field(message_length) }}
