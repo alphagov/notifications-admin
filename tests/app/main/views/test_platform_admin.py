@@ -1014,3 +1014,102 @@ def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
         '2019-01-01,596364a0-858e-42c8-9062-a8fe822260eb,service one,sms,42,0,0,8,0,0\r\n'
         '2019-01-01,147ad62a-2951-4fa1-9ca0-093cd1a52c52,service two,email,3,1,0,2,0,0\r\n'
     )
+
+
+def test_get_volumes_by_service_report_when_calls_api_and_download_data(
+    client_request,
+    platform_admin_user,
+    mocker
+):
+    mocker.patch(
+        "app.main.views.platform_admin.billing_api_client.get_data_for_volumes_by_service_report",
+        return_value=[{
+            "organisation_id": "7832a1be-a1f0-4f2a-982f-05adfd3d6354",
+            "organisation_name": "Org name",
+            "service_id": "48e82ac0-c8c4-4e46-8712-c83c35a94006",
+            "service_name": "service name",
+            "free_allowance": 10000,
+            "sms_notifications": 10,
+            "sms_chargeable_units": 20,
+            "email_totals": 8,
+            "letter_totals": 10,
+            "letter_cost": 4.5,
+            "letter_sheet_totals": 10
+        }]
+    )
+
+    client_request.login(platform_admin_user)
+    response = client_request.post_response(
+        'main.get_volumes_by_service',
+        _data={'start_date': '2019-01-01', 'end_date': '2019-03-31'},
+        _expected_status=200,
+    )
+
+    assert response.content_type == 'text/csv; charset=utf-8'
+    assert response.headers['Content-Disposition'] == (
+        'attachment; filename="Volumes by service report from {} to {}.csv"'.format('2019-01-01', '2019-03-31')
+    )
+
+    assert response.get_data(as_text=True) == (
+        "organisation id,organisation name,service id,service name,free allowance,sms notifications," +
+        "sms chargeable units,email totals,letter totals,letter cost,letter sheet totals\r\n" +
+
+        '7832a1be-a1f0-4f2a-982f-05adfd3d6354,' +
+        'Org name,' +
+        '48e82ac0-c8c4-4e46-8712-c83c35a94006,' +
+        'service name,' +
+        '10000,' +
+        '10,' +
+        '20,' +
+        '8,' +
+        '10,' +
+        '4.5,' +
+        '10'
+
+        '\r\n'
+    )
+
+
+def test_get_daily_volumes_report_when_calls_api_and_download_data(
+    client_request,
+    platform_admin_user,
+    mocker
+):
+    mocker.patch(
+        "app.main.views.platform_admin.billing_api_client.get_data_for_daily_volumes_report",
+        return_value=[{
+            "day": '2019-01-01',
+            "sms_totals": 20,
+            "sms_fragment_totals": 40,
+            "sms_chargeable_units": 60,
+            "email_totals": 100,
+            "letter_totals": 10,
+            "letter_sheet_totals": 20
+        }]
+    )
+
+    client_request.login(platform_admin_user)
+    response = client_request.post_response(
+        'main.get_daily_volumes',
+        _data={'start_date': '2019-01-01', 'end_date': '2019-03-31'},
+        _expected_status=200,
+    )
+
+    assert response.content_type == 'text/csv; charset=utf-8'
+    assert response.headers['Content-Disposition'] == (
+        'attachment; filename="Daily volumes report from {} to {}.csv"'.format('2019-01-01', '2019-03-31')
+    )
+
+    assert response.get_data(as_text=True) == (
+        "day,sms totals,sms fragment totals,sms chargeable units,email totals,letter totals,letter sheet totals\r\n" +
+
+        '2019-01-01,' +
+        '20,' +
+        '40,' +
+        '60,' +
+        '100,' +
+        '10,' +
+        '20'
+
+        '\r\n'
+    )
