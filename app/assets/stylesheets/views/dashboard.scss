@@ -63,11 +63,13 @@
       // and making children inline mimic `justify-content: space-between`
       display: inline-block;
 
-      // simulate govuk-grid-column-one-half spacing - smaller screens
+      // This simulates a 50% column in a govuk grid on smaller screens
+      // govuk grid columns go to 100% width on smaller screens
       width: 100%;
-      flex-grow: 1;
 
-      // simulate govuk-grid-column-one-half spacing - larger screens
+      // This simulates a 50% column in a govuk grid on larger screens
+      // as with govuk grid, this includes a gap between columns to ensure the contents
+      // are separated by a space
       @include govuk-media-query($from: tablet) {
         max-width: calc(50% - #{$govuk-gutter-half});
       }
@@ -76,10 +78,6 @@
     & > .file-list-status {
       overflow: hidden; // old IE hack to make it vertically line up with the hint
       margin-bottom: 0; // cancel margin-bottom from .govuk-hint class
-
-      @include govuk-media-query($from: tablet) {
-        margin-bottom: 10px; // match margin-bottom on hint
-      }
     }
 
     & > .file-list-hint-large {
