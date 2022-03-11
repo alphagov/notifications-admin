@@ -3,36 +3,30 @@
 <div class="ajax-block-container js-mark-focus-on-parent" data-classes-to-persist="js-child-has-focus">
 {% for item in broadcasts|sort|reverse|list %}
   <div class="keyline-block">
-    <div class="file-list govuk-!-margin-bottom-2">
+    <div class="file-list file-list--sectioned govuk-!-margin-bottom-2">
       <h2>
         <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for(view_broadcast_endpoint, service_id=current_service.id, broadcast_message_id=item.id) }}">{{ item.template.name }}</a>
       </h2>
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-half">
-          <span class="file-list-hint-large govuk-!-margin-bottom-2">
-            {{ item.content }}
-          </span>
-        </div>
-        <div class="govuk-grid-column-one-half file-list-status">
-          {% if item.status == 'pending-approval' %}
-            <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
-              Waiting for approval
-            </p>
-          {% elif item.status == 'rejected' %}
-            <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
-              {{ item.updated_at|format_date_human|title }} at {{ item.updated_at|format_time }}
-            </p>
-          {% elif item.status == 'broadcasting' %}
-            <p class="govuk-body govuk-!-margin-bottom-0 live-broadcast">
-              Live since {{ item.starts_at|format_datetime_relative }}
-            </p>
-          {% else %}
-            <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
-              {{ item.starts_at|format_date_human|title }} at {{ item.starts_at|format_time }}
-            </p>
-          {% endif %}
-        </div>
-      </div>
+      <span class="file-list-hint-large govuk-!-margin-bottom-2">
+        {{ item.content }}
+      </span>
+      {% if item.status == 'pending-approval' %}
+        <p class="govuk-body govuk-hint file-list-status">
+          Waiting for approval
+        </p>
+      {% elif item.status == 'rejected' %}
+        <p class="govuk-body govuk-hint file-list-status">
+          {{ item.updated_at|format_date_human|title }} at {{ item.updated_at|format_time }}
+        </p>
+      {% elif item.status == 'broadcasting' %}
+        <p class="govuk-body live-broadcast file-list-status">
+          Live since {{ item.starts_at|format_datetime_relative }}
+        </p>
+      {% else %}
+        <p class="govuk-body govuk-hint file-list-status">
+          {{ item.starts_at|format_date_human|title }} at {{ item.starts_at|format_time }}
+        </p>
+      {% endif %}
       <ul class="area-list">
         {% for area in item.areas %}
           <li class="area-list-item area-list-item--unremoveable area-list-item--smaller">{{ area.name }}</li>

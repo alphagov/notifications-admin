@@ -44,6 +44,47 @@
 
 .file-list {
 
+  // for file-lists with section-like content and a single item
+  &--sectioned {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: justify; // fallback for browsers that don't support flexbox
+    justify-content: space-between;
+
+    // note: first-child of a section should be a heading
+    & > :first-child,
+    & > .area-list {
+      width: 100%;
+    }
+
+    & > .file-list-hint-large,
+    & > .file-list-status {
+      // fallback for browsers that don't support flexbox - let `text-align: justify` on parent
+      // and making children inline mimic `justify-content: space-between`
+      display: inline-block;
+
+      // This simulates a 50% column in a govuk grid on smaller screens
+      // govuk grid columns go to 100% width on smaller screens
+      width: 100%;
+
+      // This simulates a 50% column in a govuk grid on larger screens
+      // as with govuk grid, this includes a gap between columns to ensure the contents
+      // are separated by a space
+      @include govuk-media-query($from: tablet) {
+        max-width: calc(50% - #{$govuk-gutter-half});
+      }
+    }
+
+    & > .file-list-status {
+      overflow: hidden; // old IE hack to make it vertically line up with the hint
+      margin-bottom: 0; // cancel margin-bottom from .govuk-hint class
+    }
+
+    & > .file-list-hint-large {
+      text-align: left; // reset for text-align fallback on parent
+    }
+  }
+
   &-hint,
   &-hint-large,
   &-status {
@@ -136,10 +177,10 @@
 
 // Note: this selector should use the :has() pseudo-class in the future when it is supported
 //       which will remove the need for JS
-.file-list .js-child-has-focus + .govuk-grid-row {
+.file-list .js-child-has-focus {
 
-  & .file-list-hint-large,
-  & .file-list-status > .govuk-hint {
+  & + .file-list-hint-large,
+  & ~ .file-list-status {
     color: $govuk-focus-text-colour;
   }
 
