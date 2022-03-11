@@ -3,71 +3,12 @@ from unittest.mock import Mock
 import pytest
 from wtforms import ValidationError
 
-from app.main.forms import RegisterUserForm, ServiceSmsSenderForm
 from app.main.validators import (
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
     OnlySMSCharacters,
     ValidGovEmail,
 )
-
-
-@pytest.mark.parametrize('password', [
-    'govuknotify', '11111111', 'kittykat', 'blackbox'
-])
-def test_should_raise_validation_error_for_password(
-    client_request,
-    mock_get_user_by_email,
-    password,
-):
-    form = RegisterUserForm()
-    form.name.data = 'test'
-    form.email_address.data = 'teset@example.gov.uk'
-    form.mobile_number.data = '441231231231'
-    form.password.data = password
-
-    form.validate()
-    assert 'Choose a password that’s harder to guess' in form.errors['password']
-
-
-def test_valid_email_not_in_valid_domains(
-    client_request,
-    mock_get_organisations,
-):
-    form = RegisterUserForm(email_address="test@test.com", mobile_number='441231231231')
-    assert not form.validate()
-    assert "Enter a public sector email address" in form.errors['email_address'][0]
-
-
-def test_valid_email_in_valid_domains(
-    client_request,
-):
-    form = RegisterUserForm(
-        name="test",
-        email_address="test@my.gov.uk",
-        mobile_number='4407888999111',
-        password='an uncommon password')
-    form.validate()
-    assert form.errors == {}
-
-
-def test_invalid_email_address_error_message(
-    client_request,
-    mock_get_organisations,
-):
-    form = RegisterUserForm(
-        name="test",
-        email_address="test.com",
-        mobile_number='4407888999111',
-        password='1234567890')
-    assert not form.validate()
-
-    form = RegisterUserForm(
-        name="test",
-        email_address="test.com",
-        mobile_number='4407888999111',
-        password='1234567890')
-    assert not form.validate()
 
 
 def _gen_mock_field(x):
@@ -185,37 +126,3 @@ def test_if_string_does_not_contain_alphanumeric_characters_raises(string):
 @pytest.mark.parametrize("string", [".A8", "AB.", ".42...."])
 def test_if_string_contains_alphanumeric_characters_does_not_raise(string):
     MustContainAlphanumericCharacters()(None, _gen_mock_field(string))
-
-
-@pytest.mark.parametrize(
-    "sms_sender,error_expected,error_message",
-    [
-        ('', True, 'Cannot be empty'),
-        ('22', True, 'Enter 3 characters or more'),
-        ('333', False, None),
-        ('elevenchars', False, None),  # 11 chars
-        ('twelvecharas', True, 'Enter 11 characters or fewer'),  # 12 chars
-        ('###', True, 'Use letters and numbers only'),
-        ('00111222333', True, 'Cannot start with 00'),
-        ('UK_GOV', False, None),  # Underscores are allowed
-        ('UK.GOV', False, None),  # Full stops are allowed
-        ("'UC'", False, None),  # Straight single quotes are allowed
-    ]
-)
-def test_sms_sender_form_validation(
-    client_request,
-    mock_get_user_by_email,
-    sms_sender,
-    error_expected,
-    error_message
-):
-    form = ServiceSmsSenderForm()
-    form.sms_sender.data = sms_sender
-
-    form.validate()
-
-    if error_expected:
-        assert form.errors
-        assert error_message == form.errors['sms_sender'][0]
-    else:
-        assert not form.errors
