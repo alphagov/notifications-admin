@@ -2,6 +2,7 @@ import math
 import weakref
 from datetime import datetime, timedelta
 from itertools import chain
+from numbers import Number
 
 import pytz
 from flask import Markup, render_template, request
@@ -227,7 +228,8 @@ def password(label='Password'):
 
 
 def govuk_text_input_field_widget(self, field, type=None, param_extensions=None, **kwargs):
-    value = kwargs["value"] if kwargs.get("value") else field.data
+    value = kwargs["value"] if "value" in kwargs else field.data
+    value = str(value) if isinstance(value, Number) else value
 
     # error messages
     error_message = None
