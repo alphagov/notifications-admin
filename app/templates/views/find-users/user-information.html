@@ -48,7 +48,7 @@
       </nav>
 
       <h2 class="heading-medium">Authentication</h2>
-      <p class="govuk-body">{{ user.auth_type }}</p>
+      <p class="govuk-body">{{ user.auth_type | format_auth_type }}</p>
       {% if user.auth_type != 'webauthn_auth' %}
         <a class="govuk-link govuk-link" href="{{ url_for('main.change_user_auth', user_id=user.id) }}">
           Change authentication for this user

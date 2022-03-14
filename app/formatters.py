@@ -528,3 +528,16 @@ def format_yes_no(value, yes='Yes', no='No', none='No'):
 
 def square_metres_to_square_miles(area):
     return area * 3.86e-7
+
+
+def format_auth_type(auth_type, with_indefinite_article=False):
+    indefinite_article, auth_type = {
+        'email_auth': ('an', 'Email link'),
+        'sms_auth': ('a', 'Text message code'),
+        'webauthn_auth': ('a', 'Security key'),
+    }.get(auth_type, ('a', auth_type))
+
+    if with_indefinite_article:
+        return f'{indefinite_article} {auth_type.lower()}'
+
+    return auth_type

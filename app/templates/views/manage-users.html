@@ -64,13 +64,8 @@
             {% endif %}
             {% if current_service.has_permission('email_auth') %}
               <p class="govuk-body tick-cross-list-hint">
-                {% if user.auth_type == 'sms_auth' %}
-                  Signs in with a text message code
-                {% elif user.auth_type == 'email_auth' %}
-                  Signs in with an email link
-                {% elif user.auth_type == 'webauthn_auth' %}
-                  Signs in with a security key
-                {% endif %}
+                Signs in with
+                {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}
               </p>
             {% endif %}
             </div>

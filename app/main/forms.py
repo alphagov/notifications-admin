@@ -50,7 +50,11 @@ from wtforms.validators import (
     Regexp,
 )
 
-from app.formatters import format_thousands, guess_name_from_email_address
+from app.formatters import (
+    format_auth_type,
+    format_thousands,
+    guess_name_from_email_address,
+)
 from app.main.validators import (
     BroadcastLength,
     CommonlyUsedPassword,
@@ -1021,8 +1025,8 @@ class AuthTypeForm(StripWhitespaceForm):
     auth_type = GovukRadiosField(
         'Sign in using',
         choices=[
-            ('sms_auth', 'Text message code'),
-            ('email_auth', 'Email link'),
+            ('sms_auth', format_auth_type('sms_auth')),
+            ('email_auth', format_auth_type('email_auth')),
         ]
     )
 
