@@ -58,36 +58,22 @@ def test_get_available_choices_service_assigned_to_org(
     assert list(options) == expected_options
 
 
-@pytest.mark.parametrize('branding_type, expected_options', [
-    ('email', [
+@pytest.mark.parametrize('service_branding, expected_options', [
+    (None, [
         ('govuk_and_org', 'GOV.UK and Test Organisation'),
         ('organisation', 'Test Organisation'),
     ]),
-    ('letter', [
+    ('1234-abcd', [
+        ('govuk', 'GOV.UK'),
+        ('govuk_and_org', 'GOV.UK and Test Organisation'),
         ('organisation', 'Test Organisation'),
     ])
 ])
-def test_get_available_choices_with_central_org(
+def test_get_available_choices_email_branding_central_org(
     mocker,
     service_one,
-    branding_type,
+    service_branding,
     expected_options,
-    mock_get_service_organisation,
-):
-    service = Service(service_one)
-
-    mocker.patch(
-        'app.organisations_client.get_organisation',
-        return_value=organisation_json(organisation_type='central'),
-    )
-
-    options = get_available_choices(service, branding_type=branding_type)
-    assert list(options) == expected_options
-
-
-def test_get_available_choices_email_branding_set(
-    mocker,
-    service_one,
     mock_get_service_organisation,
     mock_get_email_branding,
 ):
@@ -95,20 +81,16 @@ def test_get_available_choices_email_branding_set(
 
     mocker.patch(
         'app.organisations_client.get_organisation',
-        return_value=organisation_json()
+        return_value=organisation_json(organisation_type='central'),
     )
     mocker.patch(
         'app.models.service.Service.email_branding_id',
         new_callable=PropertyMock,
-        return_value='1234-abcd',
+        return_value=service_branding,
     )
 
     options = get_available_choices(service, branding_type='email')
-    assert list(options) == [
-        ('govuk', 'GOV.UK'),
-        ('govuk_and_org', 'GOV.UK and Test Organisation'),
-        ('organisation', 'Test Organisation'),
-    ]
+    assert list(options) == expected_options
 
 
 def test_get_available_choices_letter_branding_set(
