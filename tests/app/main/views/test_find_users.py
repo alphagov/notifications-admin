@@ -120,7 +120,7 @@ def test_user_information_page_shows_information_about_user(
     ] == [
         'test@gov.uk',
         '+447700900986',
-        'sms_auth',
+        'Text message code',
         'Last logged in just now',
     ]
 
