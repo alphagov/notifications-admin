@@ -196,10 +196,8 @@ s3transfer==0.4.2
     # via
     #   awscli
     #   boto3
-shapely==1.7.1
-    # via
-    #   -r requirements.in
-    #   notifications-utils
+shapely==1.8.1.post1
+    # via notifications-utils
 six==1.16.0
     # via
     #   awscli-cwlogs

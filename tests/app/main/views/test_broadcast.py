@@ -934,8 +934,8 @@ def test_preview_broadcast_areas_page(
             [[7, 8], [9, 10], [11, 12]],
         ],
         [
-            'An area of 1,000 square miles Will get the alert',
-            'An extra area of 1,000 square miles is Likely to get the alert',
+            'An area of 800 square miles Will get the alert',
+            'An extra area of 2,000 square miles is Likely to get the alert',
             'Unknown number of phones',
         ]
     ),
