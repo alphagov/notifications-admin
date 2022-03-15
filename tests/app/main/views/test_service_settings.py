@@ -4850,18 +4850,13 @@ def test_letter_branding_request_page_when_no_branding_is_set(
         assert not page.select('.conditional-radios-panel')
 
 
-def test_email_branding_request_page_when_email_branding_is_set(
+def test_email_branding_request_page_shows_branding_if_set(
     mocker,
     service_one,
     client_request,
     mock_get_email_branding,
     mock_get_service_organisation,
 ):
-    service_one['email_branding'] = sample_uuid()
-    mocker.patch(
-        'app.organisations_client.get_organisation',
-        return_value=organisation_json(),
-    )
     mocker.patch(
         'app.models.service.Service.email_branding_id',
         new_callable=PropertyMock,
@@ -4872,47 +4867,6 @@ def test_email_branding_request_page_when_email_branding_is_set(
         '.email_branding_request', service_id=SERVICE_ONE_ID
     )
     assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='1234-abcd')
-    assert [
-        (
-            radio['value'],
-            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
-        )
-        for radio in page.select('input[type=radio]')
-    ] == [
-        ('govuk', 'GOV.UK'),
-        ('govuk_and_org', 'GOV.UK and Test Organisation'),
-        ('organisation', 'Test Organisation'),
-        ('something_else', 'Something else'),
-    ]
-
-
-def test_letter_branding_request_page_when_letter_branding_is_set(
-    mocker,
-    service_one,
-    client_request,
-    mock_get_letter_branding_by_id,
-    mock_get_service_organisation,
-    active_user_with_permissions,
-):
-    service_one['letter_branding'] = sample_uuid()
-    mocker.patch(
-        'app.organisations_client.get_organisation',
-        return_value=organisation_json(),
-    )
-
-    page = client_request.get(
-        '.letter_branding_request', service_id=SERVICE_ONE_ID
-    )
-    assert [
-        (
-            radio['value'],
-            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
-        )
-        for radio in page.select('input[type=radio]')
-    ] == [
-        ('organisation', 'Test Organisation'),
-        ('something_else', 'Something else'),
-    ]
 
 
 def test_email_branding_request_page_back_link(
