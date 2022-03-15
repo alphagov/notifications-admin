@@ -38,29 +38,29 @@ from app.extensions import zendesk_client
 from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
+    AdminBillingDetailsForm,
+    AdminNotesForm,
     AdminPreviewBrandingForm,
+    AdminServiceAddDataRetentionForm,
+    AdminServiceEditDataRetentionForm,
+    AdminServiceInboundNumberForm,
+    AdminServiceMessageLimitForm,
+    AdminServiceRateLimitForm,
+    AdminServiceSMSAllowanceForm,
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
-    BillingDetailsForm,
+    AdminSetOrganisationForm,
     ChooseBrandingForm,
     ChooseEmailBrandingForm,
     ChooseLetterBrandingForm,
-    EditNotesForm,
     EstimateUsageForm,
-    FreeSMSAllowance,
-    LinkOrganisationsForm,
-    MessageLimit,
-    RateLimit,
     RenameServiceForm,
     SearchByNameForm,
     ServiceBroadcastAccountTypeForm,
     ServiceBroadcastChannelForm,
     ServiceBroadcastNetworkForm,
     ServiceContactDetailsForm,
-    ServiceDataRetentionEditForm,
-    ServiceDataRetentionForm,
     ServiceEditInboundNumberForm,
-    ServiceInboundNumberForm,
     ServiceLetterContactBlockForm,
     ServiceOnOffSettingForm,
     ServiceReplyToEmailForm,
@@ -650,7 +650,7 @@ def service_set_inbound_number(service_id):
         (number['id'], number['number']) for number in available_inbound_numbers['data']
     ]
     no_available_numbers = available_inbound_numbers['data'] == []
-    form = ServiceInboundNumberForm(
+    form = AdminServiceInboundNumberForm(
         inbound_number_choices=inbound_numbers_value_and_label
     )
 
@@ -972,7 +972,7 @@ def service_delete_sms_sender(service_id, sms_sender_id):
 @user_is_platform_admin
 def set_free_sms_allowance(service_id):
 
-    form = FreeSMSAllowance(free_sms_allowance=current_service.free_sms_fragment_limit)
+    form = AdminServiceSMSAllowanceForm(free_sms_allowance=current_service.free_sms_fragment_limit)
 
     if form.validate_on_submit():
         billing_api_client.create_or_update_free_sms_fragment_limit(service_id, form.free_sms_allowance.data)
@@ -989,7 +989,7 @@ def set_free_sms_allowance(service_id):
 @user_is_platform_admin
 def set_message_limit(service_id):
 
-    form = MessageLimit(message_limit=current_service.message_limit)
+    form = AdminServiceMessageLimitForm(message_limit=current_service.message_limit)
 
     if form.validate_on_submit():
         current_service.update(message_limit=form.message_limit.data)
@@ -1006,7 +1006,7 @@ def set_message_limit(service_id):
 @user_is_platform_admin
 def set_rate_limit(service_id):
 
-    form = RateLimit(rate_limit=current_service.rate_limit)
+    form = AdminServiceRateLimitForm(rate_limit=current_service.rate_limit)
 
     if form.validate_on_submit():
         current_service.update(rate_limit=form.rate_limit.data)
@@ -1115,7 +1115,7 @@ def link_service_to_organisation(service_id):
 
     all_organisations = organisations_client.get_organisations()
 
-    form = LinkOrganisationsForm(
+    form = AdminSetOrganisationForm(
         choices=convert_dictionary_to_wtforms_choices_format(all_organisations, 'id', 'name'),
         organisations=current_service.organisation_id
     )
@@ -1313,7 +1313,7 @@ def data_retention(service_id):
 @main.route("/services/<uuid:service_id>/data-retention/add", methods=['GET', 'POST'])
 @user_is_platform_admin
 def add_data_retention(service_id):
-    form = ServiceDataRetentionForm()
+    form = AdminServiceAddDataRetentionForm()
     if form.validate_on_submit():
         service_api_client.create_service_data_retention(service_id,
                                                          form.notification_type.data,
@@ -1329,7 +1329,7 @@ def add_data_retention(service_id):
 @user_is_platform_admin
 def edit_data_retention(service_id, data_retention_id):
     data_retention_item = current_service.get_data_retention_item(data_retention_id)
-    form = ServiceDataRetentionEditForm(days_of_retention=data_retention_item['days_of_retention'])
+    form = AdminServiceEditDataRetentionForm(days_of_retention=data_retention_item['days_of_retention'])
     if form.validate_on_submit():
         service_api_client.update_service_data_retention(service_id, data_retention_id, form.days_of_retention.data)
         return redirect(url_for('.data_retention', service_id=service_id))
@@ -1344,7 +1344,7 @@ def edit_data_retention(service_id, data_retention_id):
 @main.route("/services/<uuid:service_id>/notes", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_service_notes(service_id):
-    form = EditNotesForm(notes=current_service.notes)
+    form = AdminNotesForm(notes=current_service.notes)
 
     if form.validate_on_submit():
 
@@ -1365,7 +1365,7 @@ def edit_service_notes(service_id):
 @main.route("/services/<uuid:service_id>/edit-billing-details", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_service_billing_details(service_id):
-    form = BillingDetailsForm(
+    form = AdminBillingDetailsForm(
         billing_contact_email_addresses=current_service.billing_contact_email_addresses,
         billing_contact_names=current_service.billing_contact_names,
         billing_reference=current_service.billing_reference,

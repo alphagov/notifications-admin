@@ -7,7 +7,7 @@ from werkzeug.utils import redirect
 
 from app import format_date_numeric, provider_client
 from app.main import main
-from app.main.forms import ProviderForm, ProviderRatioForm
+from app.main.forms import AdminProviderForm, AdminProviderRatioForm
 from app.utils.user import user_is_platform_admin
 
 PROVIDER_PRIORITY_MEANING_SWITCHOVER = datetime(2019, 11, 29, 11, 0).isoformat()
@@ -48,7 +48,7 @@ def add_monthly_traffic(domestic_sms_providers):
 @user_is_platform_admin
 def edit_provider(provider_id):
     provider = provider_client.get_provider_by_id(provider_id)['provider_details']
-    form = ProviderForm(active=provider['active'], priority=provider['priority'])
+    form = AdminProviderForm(active=provider['active'], priority=provider['priority'])
 
     if form.validate_on_submit():
         provider_client.update_provider(provider_id, form.priority.data)
@@ -67,7 +67,7 @@ def edit_sms_provider_ratio():
         if provider['notification_type'] == 'sms'
     ], key=itemgetter('identifier'), reverse=True)
 
-    form = ProviderRatioForm(ratio=providers[0]['priority'])
+    form = AdminProviderRatioForm(ratio=providers[0]['priority'])
 
     if len(providers) < 2:
         abort(400)

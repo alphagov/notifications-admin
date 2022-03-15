@@ -1264,7 +1264,7 @@ class OrganisationAgreementSignedForm(StripWhitespaceForm):
     )
 
 
-class OrganisationDomainsForm(StripWhitespaceForm):
+class AdminOrganisationDomainsForm(StripWhitespaceForm):
 
     def populate(self, domains_list):
         for index, value in enumerate(domains_list):
@@ -1302,7 +1302,7 @@ class CreateNhsServiceForm(CreateServiceForm):
     )
 
 
-class NewOrganisationForm(
+class AdminNewOrganisationForm(
     RenameOrganisationForm,
     OrganisationOrganisationTypeForm,
     OrganisationCrownStatusForm,
@@ -1313,7 +1313,7 @@ class NewOrganisationForm(
         self.crown_status.choices = self.crown_status.choices[:-1]
 
 
-class FreeSMSAllowance(StripWhitespaceForm):
+class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
         'Numbers of text message fragments per year',
         validators=[
@@ -1322,7 +1322,7 @@ class FreeSMSAllowance(StripWhitespaceForm):
     )
 
 
-class MessageLimit(StripWhitespaceForm):
+class AdminServiceMessageLimitForm(StripWhitespaceForm):
     message_limit = GovukIntegerField(
         'Number of messages the service is allowed to send each day',
         validators=[
@@ -1331,7 +1331,7 @@ class MessageLimit(StripWhitespaceForm):
     )
 
 
-class RateLimit(StripWhitespaceForm):
+class AdminServiceRateLimitForm(StripWhitespaceForm):
     rate_limit = GovukIntegerField(
         'Number of messages the service can send in a rolling 60 second window',
         validators=[
@@ -1734,13 +1734,13 @@ class EstimateUsageForm(StripWhitespaceForm):
         return super().validate(*args, **kwargs)
 
 
-class ProviderForm(StripWhitespaceForm):
+class AdminProviderForm(StripWhitespaceForm):
     priority = GovukIntegerField(
         'Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")]
     )
 
 
-class ProviderRatioForm(StripWhitespaceForm):
+class AdminProviderRatioForm(StripWhitespaceForm):
 
     ratio = GovukRadiosField(choices=[
             (str(value), '{}% / {}%'.format(value, 100 - value))
@@ -1823,11 +1823,11 @@ class ServiceEditInboundNumberForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender the default")
 
 
-class EditNotesForm(StripWhitespaceForm):
+class AdminNotesForm(StripWhitespaceForm):
     notes = TextAreaField(validators=[])
 
 
-class BillingDetailsForm(StripWhitespaceForm):
+class AdminBillingDetailsForm(StripWhitespaceForm):
     billing_contact_email_addresses = GovukTextInputField('Contact email addresses')
     billing_contact_names = GovukTextInputField('Contact names')
     billing_reference = GovukTextInputField('Reference')
@@ -2035,7 +2035,7 @@ class SearchByNameForm(StripWhitespaceForm):
     )
 
 
-class SearchUsersByEmailForm(StripWhitespaceForm):
+class AdminSearchUsersByEmailForm(StripWhitespaceForm):
 
     search = GovukSearchField(
         'Search by name or email address',
@@ -2083,7 +2083,7 @@ class PlaceholderForm(StripWhitespaceForm):
     pass
 
 
-class ServiceInboundNumberForm(StripWhitespaceForm):
+class AdminServiceInboundNumberForm(StripWhitespaceForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.inbound_number.choices = kwargs['inbound_number_choices']
@@ -2166,7 +2166,7 @@ class SetTemplateSenderForm(StripWhitespaceForm):
     sender = GovukRadiosField()
 
 
-class LinkOrganisationsForm(StripWhitespaceForm):
+class AdminSetOrganisationForm(StripWhitespaceForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -2245,7 +2245,7 @@ class SomethingElseBrandingForm(StripWhitespaceForm):
     )
 
 
-class ServiceDataRetentionForm(StripWhitespaceForm):
+class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
 
     notification_type = GovukRadiosField(
         'What notification type?',
@@ -2262,14 +2262,14 @@ class ServiceDataRetentionForm(StripWhitespaceForm):
     )
 
 
-class ServiceDataRetentionEditForm(StripWhitespaceForm):
+class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
     days_of_retention = GovukIntegerField(
         label="Days of retention",
         validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
     )
 
 
-class ReturnedLettersForm(StripWhitespaceForm):
+class AdminReturnedLettersForm(StripWhitespaceForm):
     references = TextAreaField(
         u'Letter references',
         validators=[
@@ -2421,7 +2421,7 @@ class TemplateAndFoldersSelectionForm(Form):
     ], required_message='Select the type of template you want to add')
 
 
-class ClearCacheForm(StripWhitespaceForm):
+class AdminClearCacheForm(StripWhitespaceForm):
     model_type = GovukCheckboxesField(
         'What do you want to clear today',
     )
@@ -2431,7 +2431,7 @@ class ClearCacheForm(StripWhitespaceForm):
             raise ValidationError('Select at least one option')
 
 
-class GoLiveNotesForm(StripWhitespaceForm):
+class AdminOrganisationGoLiveNotesForm(StripWhitespaceForm):
     request_to_go_live_notes = TextAreaField(
         'Go live notes',
         filters=[lambda x: x or None],

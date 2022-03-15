@@ -19,17 +19,17 @@ from app.main import main
 from app.main.forms import (
     AddGPOrganisationForm,
     AddNHSLocalOrganisationForm,
+    AdminBillingDetailsForm,
+    AdminNewOrganisationForm,
+    AdminNotesForm,
+    AdminOrganisationDomainsForm,
+    AdminOrganisationGoLiveNotesForm,
     AdminPreviewBrandingForm,
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
-    BillingDetailsForm,
-    EditNotesForm,
-    GoLiveNotesForm,
     InviteOrgUserForm,
-    NewOrganisationForm,
     OrganisationAgreementSignedForm,
     OrganisationCrownStatusForm,
-    OrganisationDomainsForm,
     OrganisationOrganisationTypeForm,
     RenameOrganisationForm,
     SearchByNameForm,
@@ -60,7 +60,7 @@ def organisations():
 @main.route("/organisations/add", methods=['GET', 'POST'])
 @user_is_platform_admin
 def add_organisation():
-    form = NewOrganisationForm()
+    form = AdminNewOrganisationForm()
 
     if form.validate_on_submit():
         try:
@@ -495,7 +495,7 @@ def organisation_preview_letter_branding(org_id):
 @user_is_platform_admin
 def edit_organisation_domains(org_id):
 
-    form = OrganisationDomainsForm()
+    form = AdminOrganisationDomainsForm()
 
     if form.validate_on_submit():
         try:
@@ -530,7 +530,7 @@ def edit_organisation_domains(org_id):
 @user_is_platform_admin
 def edit_organisation_go_live_notes(org_id):
 
-    form = GoLiveNotesForm()
+    form = AdminOrganisationGoLiveNotesForm()
 
     if form.validate_on_submit():
         organisations_client.update_organisation(
@@ -551,7 +551,7 @@ def edit_organisation_go_live_notes(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/notes", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_notes(org_id):
-    form = EditNotesForm(notes=current_organisation.notes)
+    form = AdminNotesForm(notes=current_organisation.notes)
 
     if form.validate_on_submit():
 
@@ -572,7 +572,7 @@ def edit_organisation_notes(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/edit-billing-details", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_billing_details(org_id):
-    form = BillingDetailsForm(
+    form = AdminBillingDetailsForm(
         billing_contact_email_addresses=current_organisation.billing_contact_email_addresses,
         billing_contact_names=current_organisation.billing_contact_names,
         billing_reference=current_organisation.billing_reference,
