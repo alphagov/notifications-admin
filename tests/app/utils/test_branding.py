@@ -8,20 +8,19 @@ from tests import organisation_json
 
 
 @pytest.mark.parametrize('branding_type', ['email', 'letter'])
-@pytest.mark.parametrize('org_type, existing_branding, expected_options', [
-    ('central', None, []),
-    ('local', None, []),
-    ('nhs_central', None, [('nhs', 'NHS')]),
-    ('nhs_local', None, [('nhs', 'NHS')]),
-    ('nhs_gp', None, [('nhs', 'NHS')]),
-    ('emergency_service', None, []),
-    ('other', None, []),
+@pytest.mark.parametrize('org_type, expected_options', [
+    ('central', []),
+    ('local', []),
+    ('nhs_central', [('nhs', 'NHS')]),
+    ('nhs_local', [('nhs', 'NHS')]),
+    ('nhs_gp', [('nhs', 'NHS')]),
+    ('emergency_service', []),
+    ('other', []),
 ])
-def test_get_available_choices_no_org(
+def test_get_available_choices_service_not_assigned_to_org(
     service_one,
     branding_type,
     org_type,
-    existing_branding,
     expected_options,
 ):
     service_one['organisation_type'] = org_type
@@ -32,20 +31,19 @@ def test_get_available_choices_no_org(
 
 
 @pytest.mark.parametrize('branding_type', ['email', 'letter'])
-@pytest.mark.parametrize('org_type, existing_branding, expected_options', [
-    ('local', None, [('organisation', 'Test Organisation')]),
-    ('nhs_central', None, [('nhs', 'NHS')]),
-    ('nhs_local', None, [('nhs', 'NHS')]),
-    ('nhs_gp', None, [('nhs', 'NHS')]),
-    ('emergency_service', None, [('organisation', 'Test Organisation')]),
-    ('other', None, [('organisation', 'Test Organisation')]),
+@pytest.mark.parametrize('org_type, expected_options', [
+    ('local', [('organisation', 'Test Organisation')]),
+    ('nhs_central', [('nhs', 'NHS')]),
+    ('nhs_local', [('nhs', 'NHS')]),
+    ('nhs_gp', [('nhs', 'NHS')]),
+    ('emergency_service', [('organisation', 'Test Organisation')]),
+    ('other', [('organisation', 'Test Organisation')]),
 ])
-def test_get_available_choices_with_org(
+def test_get_available_choices_service_assigned_to_org(
     mocker,
     service_one,
     branding_type,
     org_type,
-    existing_branding,
     expected_options,
     mock_get_service_organisation,
 ):
@@ -124,6 +122,11 @@ def test_get_available_choices_letter_branding_set(
     mocker.patch(
         'app.organisations_client.get_organisation',
         return_value=organisation_json()
+    )
+    mocker.patch(
+        'app.models.service.Service.letter_branding_id',
+        new_callable=PropertyMock,
+        return_value='1234-abcd',
     )
 
     options = get_available_choices(service, branding_type='letter')

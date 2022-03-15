@@ -2196,11 +2196,11 @@ class ChooseBrandingForm(StripWhitespaceForm):
         if self.something_else_is_only_option:
             self.options.data = self.FALLBACK_OPTION_VALUE
 
-    @staticmethod
-    def get_available_choices(service, branding_type):
+    @classmethod
+    def get_available_choices(cls, service, branding_type):
         return (
             list(branding.get_available_choices(service, branding_type)) +
-            [ChooseBrandingForm.FALLBACK_OPTION]
+            [cls.FALLBACK_OPTION]
         )
 
     @property
@@ -2221,12 +2221,12 @@ class ChooseBrandingForm(StripWhitespaceForm):
 
 class ChooseEmailBrandingForm(ChooseBrandingForm):
     def __init__(self, service_id):
-        ChooseBrandingForm.__init__(self, service_id, branding_type='email')
+        super().__init__(service_id, branding_type='email')
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):
     def __init__(self, service_id):
-        ChooseBrandingForm.__init__(self, service_id, branding_type='letter')
+        super().__init__(service_id, branding_type='letter')
 
 
 class SomethingElseBrandingForm(StripWhitespaceForm):
