@@ -535,7 +535,7 @@ def format_auth_type(auth_type, with_indefinite_article=False):
         'email_auth': ('an', 'Email link'),
         'sms_auth': ('a', 'Text message code'),
         'webauthn_auth': ('a', 'Security key'),
-    }.get(auth_type, ('a', auth_type))
+    }[auth_type]
 
     if with_indefinite_article:
         return f'{indefinite_article} {auth_type.lower()}'
