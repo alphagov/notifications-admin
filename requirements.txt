@@ -198,7 +198,6 @@ s3transfer==0.5.2
     #   boto3
 shapely==1.8.1.post1
     # via
-    #   -r requirements.in
     #   notifications-utils
 
 six==1.16.0
