@@ -39,7 +39,7 @@ chardet==4.0.0
     #   requests
 click==8.0.4
     # via flask
-colorama==0.4.4
+colorama==0.4.3
     # via awscli
 cryptography==36.0.1
     # via fido2
