@@ -1005,7 +1005,6 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
 @pytest.mark.parametrize('area_ids, expected_list', (
     ([], [
         'Countries',
-        'Demo areas',
         'Local authorities',
         'Test areas',
     ]),
@@ -1015,7 +1014,6 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         'ctry19-S92000003',
     ], [
         'Countries',
-        'Demo areas',
         'Local authorities',
         'Test areas',
     ]),
@@ -1026,7 +1024,6 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         'lad20-E06000052',  # Cornwall, a unitary authority
     ], [
         'Countries',
-        'Demo areas',
         'Local authorities',
         'Test areas',
     ]),
@@ -1044,7 +1041,6 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         'Shetland Islands',
         # ---
         'Countries',
-        'Demo areas',
         'Local authorities',
         'Test areas',
     ]),
