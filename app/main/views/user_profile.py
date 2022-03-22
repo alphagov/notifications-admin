@@ -147,7 +147,7 @@ def user_profile_mobile_number():
 @main.route("/user-profile/mobile-number/delete", methods=['POST'])
 @user_is_logged_in
 def user_profile_mobile_number_delete():
-    if current_user.auth_type == 'sms_auth':
+    if current_user.auth_type != 'email_auth':
         abort(403)
 
     current_user.update(mobile_number=None)
