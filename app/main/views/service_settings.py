@@ -50,7 +50,6 @@ from app.main.forms import (
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     AdminSetOrganisationForm,
-    ChooseBrandingForm,
     ChooseEmailBrandingForm,
     ChooseLetterBrandingForm,
     EstimateUsageForm,
@@ -91,7 +90,7 @@ def service_settings(service_id):
     return render_template(
         'views/service-settings.html',
         service_permissions=PLATFORM_ADMIN_SERVICE_PERMISSIONS,
-        email_branding_options=ChooseBrandingForm(current_service, branding_type='email')
+        email_branding_options=ChooseEmailBrandingForm(current_service)
     )
 
 
@@ -1258,7 +1257,7 @@ def email_branding_something_else(service_id):
     return render_template(
         'views/service-settings/branding/email-branding-something-else.html',
         form=form,
-        branding_options=ChooseBrandingForm(current_service, branding_type='email')
+        branding_options=ChooseEmailBrandingForm(current_service)
     )
 
 
