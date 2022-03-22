@@ -4860,13 +4860,13 @@ def test_email_branding_request_page_shows_branding_if_set(
     mocker.patch(
         'app.models.service.Service.email_branding_id',
         new_callable=PropertyMock,
-        return_value='1234-abcd',
+        return_value='some-random-branding',
     )
 
     page = client_request.get(
         '.email_branding_request', service_id=SERVICE_ONE_ID
     )
-    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='1234-abcd')
+    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='some-random-branding')
 
 
 def test_email_branding_request_page_back_link(

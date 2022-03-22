@@ -63,8 +63,8 @@ def test_get_available_choices_service_assigned_to_org(
         ('govuk_and_org', 'GOV.UK and Test Organisation'),
         ('organisation', 'Test Organisation'),
     ]),
-    ('1234-abcd', [
-        ('govuk', 'GOV.UK'),
+    ('some-random-branding', [
+        ('govuk', 'GOV.UK'),  # central orgs can switch back to GOV.UK
         ('govuk_and_org', 'GOV.UK and Test Organisation'),
         ('organisation', 'Test Organisation'),
     ])
@@ -108,7 +108,7 @@ def test_get_available_choices_letter_branding_set(
     mocker.patch(
         'app.models.service.Service.letter_branding_id',
         new_callable=PropertyMock,
-        return_value='1234-abcd',
+        return_value='some-random-branding',
     )
 
     options = get_available_choices(service, branding_type='letter')
