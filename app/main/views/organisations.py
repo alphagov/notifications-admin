@@ -19,21 +19,21 @@ from app.main import main
 from app.main.forms import (
     AddGPOrganisationForm,
     AddNHSLocalOrganisationForm,
-    BillingDetailsForm,
-    EditNotesForm,
-    GoLiveNotesForm,
+    AdminBillingDetailsForm,
+    AdminNewOrganisationForm,
+    AdminNotesForm,
+    AdminOrganisationDomainsForm,
+    AdminOrganisationGoLiveNotesForm,
+    AdminPreviewBrandingForm,
+    AdminSetEmailBrandingForm,
+    AdminSetLetterBrandingForm,
     InviteOrgUserForm,
-    NewOrganisationForm,
     OrganisationAgreementSignedForm,
     OrganisationCrownStatusForm,
-    OrganisationDomainsForm,
     OrganisationOrganisationTypeForm,
-    PreviewBranding,
     RenameOrganisationForm,
     SearchByNameForm,
     SearchUsersForm,
-    SetEmailBranding,
-    SetLetterBranding,
 )
 from app.main.views.dashboard import (
     get_tuples_of_financial_years,
@@ -60,7 +60,7 @@ def organisations():
 @main.route("/organisations/add", methods=['GET', 'POST'])
 @user_is_platform_admin
 def add_organisation():
-    form = NewOrganisationForm()
+    form = AdminNewOrganisationForm()
 
     if form.validate_on_submit():
         try:
@@ -405,7 +405,7 @@ def edit_organisation_email_branding(org_id):
 
     email_branding = email_branding_client.get_all_email_branding()
 
-    form = SetEmailBranding(
+    form = AdminSetEmailBrandingForm(
         all_branding_options=get_branding_as_value_and_label(email_branding),
         current_branding=current_organisation.email_branding_id,
     )
@@ -430,7 +430,7 @@ def organisation_preview_email_branding(org_id):
 
     branding_style = request.args.get('branding_style', None)
 
-    form = PreviewBranding(branding_style=branding_style)
+    form = AdminPreviewBrandingForm(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_organisation.update(
@@ -451,7 +451,7 @@ def organisation_preview_email_branding(org_id):
 def edit_organisation_letter_branding(org_id):
     letter_branding = letter_branding_client.get_all_letter_branding()
 
-    form = SetLetterBranding(
+    form = AdminSetLetterBrandingForm(
         all_branding_options=get_branding_as_value_and_label(letter_branding),
         current_branding=current_organisation.letter_branding_id,
     )
@@ -475,7 +475,7 @@ def edit_organisation_letter_branding(org_id):
 def organisation_preview_letter_branding(org_id):
     branding_style = request.args.get('branding_style')
 
-    form = PreviewBranding(branding_style=branding_style)
+    form = AdminPreviewBrandingForm(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_organisation.update(
@@ -495,7 +495,7 @@ def organisation_preview_letter_branding(org_id):
 @user_is_platform_admin
 def edit_organisation_domains(org_id):
 
-    form = OrganisationDomainsForm()
+    form = AdminOrganisationDomainsForm()
 
     if form.validate_on_submit():
         try:
@@ -530,7 +530,7 @@ def edit_organisation_domains(org_id):
 @user_is_platform_admin
 def edit_organisation_go_live_notes(org_id):
 
-    form = GoLiveNotesForm()
+    form = AdminOrganisationGoLiveNotesForm()
 
     if form.validate_on_submit():
         organisations_client.update_organisation(
@@ -551,7 +551,7 @@ def edit_organisation_go_live_notes(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/notes", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_notes(org_id):
-    form = EditNotesForm(notes=current_organisation.notes)
+    form = AdminNotesForm(notes=current_organisation.notes)
 
     if form.validate_on_submit():
 
@@ -572,7 +572,7 @@ def edit_organisation_notes(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/edit-billing-details", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_organisation_billing_details(org_id):
-    form = BillingDetailsForm(
+    form = AdminBillingDetailsForm(
         billing_contact_email_addresses=current_organisation.billing_contact_email_addresses,
         billing_contact_names=current_organisation.billing_contact_names,
         billing_reference=current_organisation.billing_reference,

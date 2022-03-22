@@ -5,7 +5,7 @@ from notifications_python_client.errors import HTTPError
 from app import user_api_client
 from app.event_handlers import create_archive_user_event
 from app.main import main
-from app.main.forms import AuthTypeForm, SearchUsersByEmailForm
+from app.main.forms import AdminSearchUsersByEmailForm, AuthTypeForm
 from app.models.user import User
 from app.utils.user import user_is_platform_admin
 
@@ -13,7 +13,7 @@ from app.utils.user import user_is_platform_admin
 @main.route("/find-users-by-email", methods=['GET', 'POST'])
 @user_is_platform_admin
 def find_users_by_email():
-    form = SearchUsersByEmailForm()
+    form = AdminSearchUsersByEmailForm()
     users_found = None
     if form.validate_on_submit():
         users_found = user_api_client.find_users_by_full_or_partial_email(form.search.data)['data']

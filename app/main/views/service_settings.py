@@ -38,32 +38,34 @@ from app.extensions import zendesk_client
 from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
-    BillingDetailsForm,
-    BrandingOptions,
-    EditNotesForm,
+    AdminBillingDetailsForm,
+    AdminNotesForm,
+    AdminPreviewBrandingForm,
+    AdminServiceAddDataRetentionForm,
+    AdminServiceEditDataRetentionForm,
+    AdminServiceInboundNumberForm,
+    AdminServiceMessageLimitForm,
+    AdminServiceRateLimitForm,
+    AdminServiceSMSAllowanceForm,
+    AdminSetEmailBrandingForm,
+    AdminSetLetterBrandingForm,
+    AdminSetOrganisationForm,
+    ChooseBrandingForm,
+    ChooseEmailBrandingForm,
+    ChooseLetterBrandingForm,
     EstimateUsageForm,
-    FreeSMSAllowance,
-    LinkOrganisationsForm,
-    MessageLimit,
-    PreviewBranding,
-    RateLimit,
     RenameServiceForm,
     SearchByNameForm,
     ServiceBroadcastAccountTypeForm,
     ServiceBroadcastChannelForm,
     ServiceBroadcastNetworkForm,
     ServiceContactDetailsForm,
-    ServiceDataRetentionEditForm,
-    ServiceDataRetentionForm,
     ServiceEditInboundNumberForm,
-    ServiceInboundNumberForm,
     ServiceLetterContactBlockForm,
     ServiceOnOffSettingForm,
     ServiceReplyToEmailForm,
     ServiceSmsSenderForm,
     ServiceSwitchChannelForm,
-    SetEmailBranding,
-    SetLetterBranding,
     SMSPrefixForm,
     SomethingElseBrandingForm,
 )
@@ -89,7 +91,7 @@ def service_settings(service_id):
     return render_template(
         'views/service-settings.html',
         service_permissions=PLATFORM_ADMIN_SERVICE_PERMISSIONS,
-        email_branding_options=BrandingOptions(current_service, branding_type='email')
+        email_branding_options=ChooseBrandingForm(current_service, branding_type='email')
     )
 
 
@@ -648,7 +650,7 @@ def service_set_inbound_number(service_id):
         (number['id'], number['number']) for number in available_inbound_numbers['data']
     ]
     no_available_numbers = available_inbound_numbers['data'] == []
-    form = ServiceInboundNumberForm(
+    form = AdminServiceInboundNumberForm(
         inbound_number_choices=inbound_numbers_value_and_label
     )
 
@@ -970,7 +972,7 @@ def service_delete_sms_sender(service_id, sms_sender_id):
 @user_is_platform_admin
 def set_free_sms_allowance(service_id):
 
-    form = FreeSMSAllowance(free_sms_allowance=current_service.free_sms_fragment_limit)
+    form = AdminServiceSMSAllowanceForm(free_sms_allowance=current_service.free_sms_fragment_limit)
 
     if form.validate_on_submit():
         billing_api_client.create_or_update_free_sms_fragment_limit(service_id, form.free_sms_allowance.data)
@@ -987,7 +989,7 @@ def set_free_sms_allowance(service_id):
 @user_is_platform_admin
 def set_message_limit(service_id):
 
-    form = MessageLimit(message_limit=current_service.message_limit)
+    form = AdminServiceMessageLimitForm(message_limit=current_service.message_limit)
 
     if form.validate_on_submit():
         current_service.update(message_limit=form.message_limit.data)
@@ -1004,7 +1006,7 @@ def set_message_limit(service_id):
 @user_is_platform_admin
 def set_rate_limit(service_id):
 
-    form = RateLimit(rate_limit=current_service.rate_limit)
+    form = AdminServiceRateLimitForm(rate_limit=current_service.rate_limit)
 
     if form.validate_on_submit():
         current_service.update(rate_limit=form.rate_limit.data)
@@ -1022,7 +1024,7 @@ def set_rate_limit(service_id):
 def service_set_email_branding(service_id):
     email_branding = email_branding_client.get_all_email_branding()
 
-    form = SetEmailBranding(
+    form = AdminSetEmailBrandingForm(
         all_branding_options=get_branding_as_value_and_label(email_branding),
         current_branding=current_service.email_branding_id,
     )
@@ -1046,7 +1048,7 @@ def service_set_email_branding(service_id):
 def service_preview_email_branding(service_id):
     branding_style = request.args.get('branding_style', None)
 
-    form = PreviewBranding(branding_style=branding_style)
+    form = AdminPreviewBrandingForm(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_service.update(
@@ -1067,7 +1069,7 @@ def service_preview_email_branding(service_id):
 def service_set_letter_branding(service_id):
     letter_branding = letter_branding_client.get_all_letter_branding()
 
-    form = SetLetterBranding(
+    form = AdminSetLetterBrandingForm(
         all_branding_options=get_branding_as_value_and_label(letter_branding),
         current_branding=current_service.letter_branding_id,
     )
@@ -1091,7 +1093,7 @@ def service_set_letter_branding(service_id):
 def service_preview_letter_branding(service_id):
     branding_style = request.args.get('branding_style')
 
-    form = PreviewBranding(branding_style=branding_style)
+    form = AdminPreviewBrandingForm(branding_style=branding_style)
 
     if form.validate_on_submit():
         current_service.update(
@@ -1113,7 +1115,7 @@ def link_service_to_organisation(service_id):
 
     all_organisations = organisations_client.get_organisations()
 
-    form = LinkOrganisationsForm(
+    form = AdminSetOrganisationForm(
         choices=convert_dictionary_to_wtforms_choices_format(all_organisations, 'id', 'name'),
         organisations=current_service.organisation_id
     )
@@ -1135,7 +1137,7 @@ def link_service_to_organisation(service_id):
 
 
 def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
-    form = BrandingOptions(current_service)
+    form = ChooseEmailBrandingForm(current_service)
 
     ticket_message = render_template(
         'support-tickets/branding-request.txt',
@@ -1159,7 +1161,7 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_request(service_id):
-    form = BrandingOptions(current_service, branding_type='email')
+    form = ChooseEmailBrandingForm(current_service)
     branding_name = current_service.email_branding_name
     if form.validate_on_submit():
         return redirect(
@@ -1176,9 +1178,9 @@ def email_branding_request(service_id):
     )
 
 
-def check_branding_allowed_for_service(branding):
+def check_email_branding_allowed_for_service(branding):
     allowed_branding_for_service = dict(
-        BrandingOptions.get_available_choices(current_service, branding_type='email')
+        ChooseEmailBrandingForm.get_available_choices(current_service, branding_type='email')
     )
     if branding not in allowed_branding_for_service:
         abort(404)
@@ -1187,7 +1189,7 @@ def check_branding_allowed_for_service(branding):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_govuk(service_id):
-    check_branding_allowed_for_service('govuk')
+    check_email_branding_allowed_for_service('govuk')
 
     if request.method == 'POST':
         current_service.update(email_branding=None)
@@ -1201,7 +1203,7 @@ def email_branding_govuk(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk-and-org", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_govuk_and_org(service_id):
-    check_branding_allowed_for_service('govuk_and_org')
+    check_email_branding_allowed_for_service('govuk_and_org')
 
     if request.method == 'POST':
         create_email_branding_zendesk_ticket('govuk_and_org')
@@ -1215,7 +1217,7 @@ def email_branding_govuk_and_org(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_nhs(service_id):
-    check_branding_allowed_for_service('nhs')
+    check_email_branding_allowed_for_service('nhs')
 
     if request.method == 'POST':
         current_service.update(email_branding=NHS_BRANDING_ID)
@@ -1229,7 +1231,7 @@ def email_branding_nhs(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/organisation", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_organisation(service_id):
-    check_branding_allowed_for_service('organisation')
+    check_email_branding_allowed_for_service('organisation')
 
     if request.method == 'POST':
         create_email_branding_zendesk_ticket('organisation')
@@ -1243,7 +1245,7 @@ def email_branding_organisation(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_something_else(service_id):
-    check_branding_allowed_for_service('something_else')
+    check_email_branding_allowed_for_service('something_else')
 
     form = SomethingElseBrandingForm()
 
@@ -1256,14 +1258,14 @@ def email_branding_something_else(service_id):
     return render_template(
         'views/service-settings/branding/email-branding-something-else.html',
         form=form,
-        branding_options=BrandingOptions(current_service, branding_type='email')
+        branding_options=ChooseBrandingForm(current_service, branding_type='email')
     )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def letter_branding_request(service_id):
-    form = BrandingOptions(current_service, branding_type='letter')
+    form = ChooseLetterBrandingForm(current_service)
     from_template = request.args.get('from_template')
     branding_name = current_service.letter_branding_name
     if form.validate_on_submit():
@@ -1311,7 +1313,7 @@ def data_retention(service_id):
 @main.route("/services/<uuid:service_id>/data-retention/add", methods=['GET', 'POST'])
 @user_is_platform_admin
 def add_data_retention(service_id):
-    form = ServiceDataRetentionForm()
+    form = AdminServiceAddDataRetentionForm()
     if form.validate_on_submit():
         service_api_client.create_service_data_retention(service_id,
                                                          form.notification_type.data,
@@ -1327,7 +1329,7 @@ def add_data_retention(service_id):
 @user_is_platform_admin
 def edit_data_retention(service_id, data_retention_id):
     data_retention_item = current_service.get_data_retention_item(data_retention_id)
-    form = ServiceDataRetentionEditForm(days_of_retention=data_retention_item['days_of_retention'])
+    form = AdminServiceEditDataRetentionForm(days_of_retention=data_retention_item['days_of_retention'])
     if form.validate_on_submit():
         service_api_client.update_service_data_retention(service_id, data_retention_id, form.days_of_retention.data)
         return redirect(url_for('.data_retention', service_id=service_id))
@@ -1342,7 +1344,7 @@ def edit_data_retention(service_id, data_retention_id):
 @main.route("/services/<uuid:service_id>/notes", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_service_notes(service_id):
-    form = EditNotesForm(notes=current_service.notes)
+    form = AdminNotesForm(notes=current_service.notes)
 
     if form.validate_on_submit():
 
@@ -1363,7 +1365,7 @@ def edit_service_notes(service_id):
 @main.route("/services/<uuid:service_id>/edit-billing-details", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_service_billing_details(service_id):
-    form = BillingDetailsForm(
+    form = AdminBillingDetailsForm(
         billing_contact_email_addresses=current_service.billing_contact_email_addresses,
         billing_contact_names=current_service.billing_contact_names,
         billing_reference=current_service.billing_reference,

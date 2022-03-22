@@ -2,7 +2,7 @@ from flask import current_app, redirect, render_template, session, url_for
 
 from app import email_branding_client
 from app.main import main
-from app.main.forms import SearchByNameForm, ServiceUpdateEmailBranding
+from app.main.forms import AdminEditEmailBrandingForm, SearchByNameForm
 from app.s3_client.s3_logo_client import (
     TEMP_TAG,
     delete_email_temp_file,
@@ -32,7 +32,7 @@ def email_branding():
 def update_email_branding(branding_id, logo=None):
     email_branding = email_branding_client.get_email_branding(branding_id)['email_branding']
 
-    form = ServiceUpdateEmailBranding(
+    form = AdminEditEmailBrandingForm(
         name=email_branding['name'],
         text=email_branding['text'],
         colour=email_branding['colour'],
@@ -86,7 +86,7 @@ def update_email_branding(branding_id, logo=None):
 @main.route("/email-branding/create/<logo>", methods=['GET', 'POST'])
 @user_is_platform_admin
 def create_email_branding(logo=None):
-    form = ServiceUpdateEmailBranding(brand_type='org')
+    form = AdminEditEmailBrandingForm(brand_type='org')
 
     if form.validate_on_submit():
         if form.file.data:

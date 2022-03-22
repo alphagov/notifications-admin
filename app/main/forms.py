@@ -72,7 +72,7 @@ from app.main.validators import (
 )
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
-from app.utils import merge_jsonlike
+from app.utils import branding, merge_jsonlike
 from app.utils.user import distinct_email_addresses
 from app.utils.user_permissions import (
     all_ui_permissions,
@@ -1270,7 +1270,7 @@ class OrganisationAgreementSignedForm(StripWhitespaceForm):
     )
 
 
-class OrganisationDomainsForm(StripWhitespaceForm):
+class AdminOrganisationDomainsForm(StripWhitespaceForm):
 
     def populate(self, domains_list):
         for index, value in enumerate(domains_list):
@@ -1308,7 +1308,7 @@ class CreateNhsServiceForm(CreateServiceForm):
     )
 
 
-class NewOrganisationForm(
+class AdminNewOrganisationForm(
     RenameOrganisationForm,
     OrganisationOrganisationTypeForm,
     OrganisationCrownStatusForm,
@@ -1319,7 +1319,7 @@ class NewOrganisationForm(
         self.crown_status.choices = self.crown_status.choices[:-1]
 
 
-class FreeSMSAllowance(StripWhitespaceForm):
+class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
         'Numbers of text message fragments per year',
         validators=[
@@ -1328,7 +1328,7 @@ class FreeSMSAllowance(StripWhitespaceForm):
     )
 
 
-class MessageLimit(StripWhitespaceForm):
+class AdminServiceMessageLimitForm(StripWhitespaceForm):
     message_limit = GovukIntegerField(
         'Number of messages the service is allowed to send each day',
         validators=[
@@ -1337,7 +1337,7 @@ class MessageLimit(StripWhitespaceForm):
     )
 
 
-class RateLimit(StripWhitespaceForm):
+class AdminServiceRateLimitForm(StripWhitespaceForm):
     rate_limit = GovukIntegerField(
         'Number of messages the service can send in a rolling 60 second window',
         validators=[
@@ -1740,13 +1740,13 @@ class EstimateUsageForm(StripWhitespaceForm):
         return super().validate(*args, **kwargs)
 
 
-class ProviderForm(StripWhitespaceForm):
+class AdminProviderForm(StripWhitespaceForm):
     priority = GovukIntegerField(
         'Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")]
     )
 
 
-class ProviderRatioForm(StripWhitespaceForm):
+class AdminProviderRatioForm(StripWhitespaceForm):
 
     ratio = GovukRadiosField(choices=[
             (str(value), '{}% / {}%'.format(value, 100 - value))
@@ -1829,11 +1829,11 @@ class ServiceEditInboundNumberForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender the default")
 
 
-class EditNotesForm(StripWhitespaceForm):
+class AdminNotesForm(StripWhitespaceForm):
     notes = TextAreaField(validators=[])
 
 
-class BillingDetailsForm(StripWhitespaceForm):
+class AdminBillingDetailsForm(StripWhitespaceForm):
     billing_contact_email_addresses = GovukTextInputField('Contact email addresses')
     billing_contact_names = GovukTextInputField('Contact names')
     billing_reference = GovukTextInputField('Reference')
@@ -1882,7 +1882,7 @@ class ServiceSwitchChannelForm(ServiceOnOffSettingForm):
         super().__init__(name, *args, **kwargs)
 
 
-class SetEmailBranding(StripWhitespaceForm):
+class AdminSetEmailBrandingForm(StripWhitespaceForm):
 
     branding_style = GovukRadiosFieldWithNoneOption(
         'Branding style',
@@ -1906,17 +1906,17 @@ class SetEmailBranding(StripWhitespaceForm):
         )
 
 
-class SetLetterBranding(SetEmailBranding):
+class AdminSetLetterBrandingForm(AdminSetEmailBrandingForm):
     # form is the same, but instead of GOV.UK we have None as a valid option
     DEFAULT = (FieldWithNoneOption.NONE_OPTION_VALUE, 'None')
 
 
-class PreviewBranding(StripWhitespaceForm):
+class AdminPreviewBrandingForm(StripWhitespaceForm):
 
     branding_style = HiddenFieldWithNoneOption('branding_style')
 
 
-class ServiceUpdateEmailBranding(StripWhitespaceForm):
+class AdminEditEmailBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField('Name of brand')
     text = GovukTextInputField('Text')
     colour = GovukTextInputField(
@@ -1945,6 +1945,10 @@ class ServiceUpdateEmailBranding(StripWhitespaceForm):
             raise ValidationError('This field is required')
 
 
+class AdminEditLetterBrandingForm(StripWhitespaceForm):
+    name = GovukTextInputField('Name of brand', validators=[DataRequired()])
+
+
 class SVGFileUpload(StripWhitespaceForm):
     file = FileField_wtf(
         'Upload an SVG logo',
@@ -1955,10 +1959,6 @@ class SVGFileUpload(StripWhitespaceForm):
             NoTextInSVG(),
         ]
     )
-
-
-class ServiceLetterBrandingDetails(StripWhitespaceForm):
-    name = GovukTextInputField('Name of brand', validators=[DataRequired()])
 
 
 class PDFUploadForm(StripWhitespaceForm):
@@ -2041,7 +2041,7 @@ class SearchByNameForm(StripWhitespaceForm):
     )
 
 
-class SearchUsersByEmailForm(StripWhitespaceForm):
+class AdminSearchUsersByEmailForm(StripWhitespaceForm):
 
     search = GovukSearchField(
         'Search by name or email address',
@@ -2089,7 +2089,7 @@ class PlaceholderForm(StripWhitespaceForm):
     pass
 
 
-class ServiceInboundNumberForm(StripWhitespaceForm):
+class AdminServiceInboundNumberForm(StripWhitespaceForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.inbound_number.choices = kwargs['inbound_number_choices']
@@ -2172,7 +2172,7 @@ class SetTemplateSenderForm(StripWhitespaceForm):
     sender = GovukRadiosField()
 
 
-class LinkOrganisationsForm(StripWhitespaceForm):
+class AdminSetOrganisationForm(StripWhitespaceForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -2186,7 +2186,7 @@ class LinkOrganisationsForm(StripWhitespaceForm):
     )
 
 
-class BrandingOptions(StripWhitespaceForm):
+class ChooseBrandingForm(StripWhitespaceForm):
 
     FALLBACK_OPTION_VALUE = 'something_else'
     FALLBACK_OPTION = (FALLBACK_OPTION_VALUE, 'Something else')
@@ -2194,67 +2194,20 @@ class BrandingOptions(StripWhitespaceForm):
     options = RadioField('Choose your new branding')
     something_else = TextAreaField('Describe the branding you want')
 
-    def __init__(self, service, *args, branding_type="email", **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, service, branding_type):
+        super().__init__()
         self.branding_type = branding_type
         self.options.choices = tuple(self.get_available_choices(service, branding_type))
         self.options.label.text = 'Choose your new {} branding'.format(branding_type)
         if self.something_else_is_only_option:
             self.options.data = self.FALLBACK_OPTION_VALUE
 
-    @staticmethod
-    def get_available_choices(service, branding_type):
-        if branding_type == "email":
-            organisation_branding_id = service.organisation.email_branding_id if service.organisation else None
-            service_branding_id = service.email_branding_id
-            service_branding_name = service.email_branding_name
-        elif branding_type == "letter":
-            organisation_branding_id = service.organisation.letter_branding_id if service.organisation else None
-            service_branding_id = service.letter_branding_id
-            service_branding_name = service.letter_branding_name
-
-        if (
-            service.organisation_type == Organisation.TYPE_CENTRAL
-            and organisation_branding_id is None
-            and service_branding_id is not None
-            and branding_type == "email"
-        ):
-            yield ('govuk', 'GOV.UK')
-
-        if (
-            service.organisation_type == Organisation.TYPE_CENTRAL
-            and service.organisation
-            and organisation_branding_id is None
-            and service_branding_name.lower() != 'GOV.UK and {}'.format(service.organisation.name).lower()
-            and branding_type == "email"
-        ):
-            yield ('govuk_and_org', 'GOV.UK and {}'.format(service.organisation.name))
-
-        if (
-            service.organisation_type in {
-                Organisation.TYPE_NHS_CENTRAL,
-                Organisation.TYPE_NHS_LOCAL,
-                Organisation.TYPE_NHS_GP,
-            }
-            and service_branding_name != 'NHS'
-        ):
-            yield ('nhs', 'NHS')
-
-        if (
-            service.organisation
-            and service.organisation_type not in {
-                Organisation.TYPE_NHS_LOCAL,
-                Organisation.TYPE_NHS_CENTRAL,
-                Organisation.TYPE_NHS_GP,
-            }
-            and (
-                service_branding_id is None
-                or service_branding_id != organisation_branding_id
-            )
-        ):
-            yield ('organisation', service.organisation.name)
-
-        yield BrandingOptions.FALLBACK_OPTION
+    @classmethod
+    def get_available_choices(cls, service, branding_type):
+        return (
+            list(branding.get_available_choices(service, branding_type)) +
+            [cls.FALLBACK_OPTION]
+        )
 
     @property
     def something_else_is_only_option(self):
@@ -2270,6 +2223,16 @@ class BrandingOptions(StripWhitespaceForm):
 
         if self.options.data != self.FALLBACK_OPTION_VALUE:
             field.data = ''
+
+
+class ChooseEmailBrandingForm(ChooseBrandingForm):
+    def __init__(self, service_id):
+        super().__init__(service_id, branding_type='email')
+
+
+class ChooseLetterBrandingForm(ChooseBrandingForm):
+    def __init__(self, service_id):
+        super().__init__(service_id, branding_type='letter')
 
 
 class SomethingElseBrandingForm(StripWhitespaceForm):
@@ -2288,7 +2251,7 @@ class SomethingElseBrandingForm(StripWhitespaceForm):
     )
 
 
-class ServiceDataRetentionForm(StripWhitespaceForm):
+class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
 
     notification_type = GovukRadiosField(
         'What notification type?',
@@ -2305,14 +2268,14 @@ class ServiceDataRetentionForm(StripWhitespaceForm):
     )
 
 
-class ServiceDataRetentionEditForm(StripWhitespaceForm):
+class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
     days_of_retention = GovukIntegerField(
         label="Days of retention",
         validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
     )
 
 
-class ReturnedLettersForm(StripWhitespaceForm):
+class AdminReturnedLettersForm(StripWhitespaceForm):
     references = TextAreaField(
         u'Letter references',
         validators=[
@@ -2464,7 +2427,7 @@ class TemplateAndFoldersSelectionForm(Form):
     ], required_message='Select the type of template you want to add')
 
 
-class ClearCacheForm(StripWhitespaceForm):
+class AdminClearCacheForm(StripWhitespaceForm):
     model_type = GovukCheckboxesField(
         'What do you want to clear today',
     )
@@ -2474,7 +2437,7 @@ class ClearCacheForm(StripWhitespaceForm):
             raise ValidationError('Select at least one option')
 
 
-class GoLiveNotesForm(StripWhitespaceForm):
+class AdminOrganisationGoLiveNotesForm(StripWhitespaceForm):
     request_to_go_live_notes = TextAreaField(
         'Go live notes',
         filters=[lambda x: x or None],

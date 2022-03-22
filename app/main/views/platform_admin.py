@@ -18,11 +18,11 @@ from app import (
 from app.extensions import redis_client
 from app.main import main
 from app.main.forms import (
+    AdminClearCacheForm,
+    AdminReturnedLettersForm,
     BillingReportDateFilterForm,
-    ClearCacheForm,
     DateFilterForm,
     RequiredDateFilterForm,
-    ReturnedLettersForm,
 )
 from app.statistics_utils import (
     get_formatted_percentage,
@@ -409,7 +409,7 @@ def platform_admin_list_complaints():
 @main.route("/platform-admin/returned-letters", methods=["GET", "POST"])
 @user_is_platform_admin
 def platform_admin_returned_letters():
-    form = ReturnedLettersForm()
+    form = AdminReturnedLettersForm()
 
     if form.validate_on_submit():
         references = [
@@ -487,7 +487,7 @@ def clear_cache():
         ]),
     ])
 
-    form = ClearCacheForm()
+    form = AdminClearCacheForm()
 
     form.model_type.choices = [
         (key, key.replace('_', ' ').title()) for key in CACHE_KEYS
