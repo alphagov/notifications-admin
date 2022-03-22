@@ -3,11 +3,11 @@ from unittest.mock import PropertyMock
 import pytest
 
 from app.models.service import Service
-from app.utils.branding import get_available_choices
+from app.utils.branding import get_email_choices, get_letter_choices
 from tests import organisation_json
 
 
-@pytest.mark.parametrize('branding_type', ['email', 'letter'])
+@pytest.mark.parametrize('function', [get_email_choices, get_letter_choices])
 @pytest.mark.parametrize('org_type, expected_options', [
     ('central', []),
     ('local', []),
@@ -17,20 +17,20 @@ from tests import organisation_json
     ('emergency_service', []),
     ('other', []),
 ])
-def test_get_available_choices_service_not_assigned_to_org(
+def test_get_choices_service_not_assigned_to_org(
     service_one,
-    branding_type,
+    function,
     org_type,
     expected_options,
 ):
     service_one['organisation_type'] = org_type
     service = Service(service_one)
 
-    options = get_available_choices(service, branding_type=branding_type)
+    options = function(service)
     assert list(options) == expected_options
 
 
-@pytest.mark.parametrize('branding_type', ['email', 'letter'])
+@pytest.mark.parametrize('function', [get_email_choices, get_letter_choices])
 @pytest.mark.parametrize('org_type, expected_options', [
     ('local', [('organisation', 'Test Organisation')]),
     ('nhs_central', [('nhs', 'NHS')]),
@@ -39,10 +39,10 @@ def test_get_available_choices_service_not_assigned_to_org(
     ('emergency_service', [('organisation', 'Test Organisation')]),
     ('other', [('organisation', 'Test Organisation')]),
 ])
-def test_get_available_choices_service_assigned_to_org(
+def test_get_choices_service_assigned_to_org(
     mocker,
     service_one,
-    branding_type,
+    function,
     org_type,
     expected_options,
     mock_get_service_organisation,
@@ -54,7 +54,7 @@ def test_get_available_choices_service_assigned_to_org(
         return_value=organisation_json(organisation_type=org_type)
     )
 
-    options = get_available_choices(service, branding_type=branding_type)
+    options = function(service)
     assert list(options) == expected_options
 
 
@@ -69,7 +69,7 @@ def test_get_available_choices_service_assigned_to_org(
         ('organisation', 'Test Organisation'),
     ])
 ])
-def test_get_available_choices_email_branding_central_org(
+def test_get_email_choices_central_org(
     mocker,
     service_one,
     service_branding,
@@ -89,11 +89,11 @@ def test_get_available_choices_email_branding_central_org(
         return_value=service_branding,
     )
 
-    options = get_available_choices(service, branding_type='email')
+    options = get_email_choices(service)
     assert list(options) == expected_options
 
 
-def test_get_available_choices_letter_branding_set(
+def test_get_letter_choices_branding_set(
     mocker,
     service_one,
     mock_get_service_organisation,
@@ -111,7 +111,7 @@ def test_get_available_choices_letter_branding_set(
         return_value='some-random-branding',
     )
 
-    options = get_available_choices(service, branding_type='letter')
+    options = get_letter_choices(service)
     assert list(options) == [
         ('organisation', 'Test Organisation'),
     ]

@@ -2190,13 +2190,6 @@ class ChooseBrandingForm(StripWhitespaceForm):
     FALLBACK_OPTION_VALUE = 'something_else'
     FALLBACK_OPTION = (FALLBACK_OPTION_VALUE, 'Something else')
 
-    @classmethod
-    def get_available_choices(cls, service, branding_type):
-        return (
-            list(branding.get_available_choices(service, branding_type)) +
-            [cls.FALLBACK_OPTION]
-        )
-
     @property
     def something_else_is_only_option(self):
         return self.options.choices == (self.FALLBACK_OPTION,)
@@ -2207,7 +2200,14 @@ class ChooseEmailBrandingForm(ChooseBrandingForm):
 
     def __init__(self, service):
         super().__init__()
-        self.options.choices = tuple(self.get_available_choices(service, 'email'))
+        self.options.choices = tuple(self.get_available_choices(service))
+
+    @classmethod
+    def get_available_choices(cls, service):
+        return (
+            list(branding.get_email_choices(service)) +
+            [cls.FALLBACK_OPTION]
+        )
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):
@@ -2216,7 +2216,12 @@ class ChooseLetterBrandingForm(ChooseBrandingForm):
 
     def __init__(self, service):
         super().__init__()
-        self.options.choices = tuple(self.get_available_choices(service, 'letter'))
+
+        self.options.choices = tuple(
+            list(branding.get_letter_choices(service)) +
+            [self.FALLBACK_OPTION]
+        )
+
         if self.something_else_is_only_option:
             self.options.data = self.FALLBACK_OPTION_VALUE
 

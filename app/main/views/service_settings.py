@@ -1179,7 +1179,7 @@ def email_branding_request(service_id):
 
 def check_email_branding_allowed_for_service(branding):
     allowed_branding_for_service = dict(
-        ChooseEmailBrandingForm.get_available_choices(current_service, branding_type='email')
+        ChooseEmailBrandingForm.get_available_choices(current_service)
     )
     if branding not in allowed_branding_for_service:
         abort(404)
