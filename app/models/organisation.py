@@ -23,12 +23,16 @@ class Organisation(JSONModel, SortByNameMixin):
     TYPE_SCHOOL_OR_COLLEGE = 'school_or_college'
     TYPE_OTHER = 'other'
 
-    TYPES = (
-        (TYPE_CENTRAL, 'Central government'),
-        (TYPE_LOCAL, 'Local government'),
+    NHS_TYPES = (
         (TYPE_NHS_CENTRAL, 'NHS – central government agency or public body'),
         (TYPE_NHS_LOCAL, 'NHS Trust or Clinical Commissioning Group'),
         (TYPE_NHS_GP, 'GP practice'),
+    )
+
+    TYPES = (
+        (TYPE_CENTRAL, 'Central government'),
+        (TYPE_LOCAL, 'Local government'),
+    ) + NHS_TYPES + (
         (TYPE_EMERGENCY_SERVICE, 'Emergency service'),
         (TYPE_SCHOOL_OR_COLLEGE, 'School or college'),
         (TYPE_OTHER, 'Other'),

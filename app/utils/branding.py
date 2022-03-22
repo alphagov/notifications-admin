@@ -1,5 +1,7 @@
 from app.models.organisation import Organisation
 
+NHS_TYPES = dict(Organisation.NHS_TYPES).keys()
+
 
 def get_email_choices(service):
     organisation_branding_id = service.organisation.email_branding_id if service.organisation else None
@@ -22,22 +24,14 @@ def get_email_choices(service):
         yield ('govuk_and_org', 'GOV.UK and {}'.format(service.organisation.name))
 
     if (
-        service.organisation_type in {
-            Organisation.TYPE_NHS_CENTRAL,
-            Organisation.TYPE_NHS_LOCAL,
-            Organisation.TYPE_NHS_GP,
-        }
+        service.organisation_type in NHS_TYPES
         and service_branding_name != 'NHS'
     ):
         yield ('nhs', 'NHS')
 
     if (
         service.organisation
-        and service.organisation_type not in {
-            Organisation.TYPE_NHS_LOCAL,
-            Organisation.TYPE_NHS_CENTRAL,
-            Organisation.TYPE_NHS_GP,
-        }
+        and service.organisation_type not in NHS_TYPES
         and (
             service_branding_id is None
             or service_branding_id != organisation_branding_id
@@ -52,22 +46,14 @@ def get_letter_choices(service):
     service_branding_name = service.letter_branding_name
 
     if (
-        service.organisation_type in {
-            Organisation.TYPE_NHS_CENTRAL,
-            Organisation.TYPE_NHS_LOCAL,
-            Organisation.TYPE_NHS_GP,
-        }
+        service.organisation_type in NHS_TYPES
         and service_branding_name != 'NHS'
     ):
         yield ('nhs', 'NHS')
 
     if (
         service.organisation
-        and service.organisation_type not in {
-            Organisation.TYPE_NHS_LOCAL,
-            Organisation.TYPE_NHS_CENTRAL,
-            Organisation.TYPE_NHS_GP,
-        }
+        and service.organisation_type not in NHS_TYPES
         and (
             service_branding_id is None
             or service_branding_id != organisation_branding_id
