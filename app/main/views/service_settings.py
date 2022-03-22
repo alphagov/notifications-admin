@@ -69,6 +69,7 @@ from app.main.forms import (
     SomethingElseBrandingForm,
 )
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
+from app.utils.branding import NHS_EMAIL_BRANDING_ID
 from app.utils.user import (
     user_has_permissions,
     user_is_gov_user,
@@ -80,8 +81,6 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
     ('email_auth', {'title': 'Email authentication'}),
     ('international_letters', {'title': 'Send international letters', 'requires': 'letter'}),
 ])
-
-NHS_BRANDING_ID = 'a7dc4e56-660b-4db7-8cff-12c37b12b5ea'
 
 
 @main.route("/services/<uuid:service_id>/service-settings")
@@ -1219,12 +1218,15 @@ def email_branding_nhs(service_id):
     check_email_branding_allowed_for_service('nhs')
 
     if request.method == 'POST':
-        current_service.update(email_branding=NHS_BRANDING_ID)
+        current_service.update(email_branding=NHS_EMAIL_BRANDING_ID)
 
         flash('You’ve updated your email branding', 'default')
         return redirect(url_for('.service_settings', service_id=current_service.id))
 
-    return render_template('views/service-settings/branding/email-branding-nhs.html', nhs_branding_id=NHS_BRANDING_ID)
+    return render_template(
+        'views/service-settings/branding/email-branding-nhs.html',
+        nhs_branding_id=NHS_EMAIL_BRANDING_ID
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/organisation", methods=['GET', 'POST'])

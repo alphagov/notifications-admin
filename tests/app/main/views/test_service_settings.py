@@ -14,7 +14,7 @@ from notifications_utils.clients.zendesk.zendesk_client import (
 )
 
 import app
-from app.main.views.service_settings import NHS_BRANDING_ID
+from app.utils.branding import NHS_EMAIL_BRANDING_ID
 from tests import (
     find_element_by_tag_and_partial_text,
     invite_json,
@@ -5211,7 +5211,7 @@ def test_email_branding_description_pages_for_org_branding(
 
 @pytest.mark.parametrize('endpoint, service_org_type, branding_preview_id', [
     ('main.email_branding_govuk', 'central', '__NONE__'),
-    ('main.email_branding_nhs', 'nhs_local', NHS_BRANDING_ID),
+    ('main.email_branding_nhs', 'nhs_local', NHS_EMAIL_BRANDING_ID),
 ])
 def test_email_branding_govuk_and_nhs_pages(
     client_request,
@@ -5409,7 +5409,7 @@ def test_email_branding_nhs_submit(
 
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        email_branding=NHS_BRANDING_ID,
+        email_branding=NHS_EMAIL_BRANDING_ID,
     )
     assert page.h1.text == 'Settings'
     assert normalize_spaces(page.select_one('.banner-default').text) == 'You’ve updated your email branding'
