@@ -119,6 +119,45 @@ def test_get_email_choices_org_has_default_branding(
     assert list(options) == expected_options
 
 
+@pytest.mark.parametrize('branding_name, expected_options', [
+    ('GOV.UK and something else', [
+        ('govuk', 'GOV.UK'),
+        ('govuk_and_org', 'GOV.UK and Test Organisation'),
+        ('organisation', 'Test Organisation'),
+    ]),
+    ('GOv.Uk and test OrganisatioN', [
+        ('govuk', 'GOV.UK'),
+        ('organisation', 'Test Organisation'),
+    ])
+])
+def test_get_email_choices_branding_name_in_use(
+    mocker,
+    service_one,
+    branding_name,
+    expected_options,
+    mock_get_service_organisation,
+):
+    service = Service(service_one)
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_json(organisation_type='central')
+    )
+    mocker.patch(
+        'app.models.service.Service.email_branding_id',
+        new_callable=PropertyMock,
+        return_value='some-branding-id',
+    )
+    mocker.patch(
+        'app.email_branding_client.get_email_branding',
+        return_value=create_email_branding('_id', {'name': branding_name})
+    )
+
+    options = get_email_choices(service)
+    # don't show option if its name is similar to current branding
+    assert list(options) == expected_options
+
+
 @pytest.mark.parametrize('org_type, branding_id, expected_options', [
     ('central', None, [
         ('organisation', 'Test Organisation')
@@ -190,4 +229,39 @@ def test_get_letter_choices_org_has_default_branding(
 
     options = get_letter_choices(service)
     # don't show org option if it's the current branding
+    assert list(options) == expected_options
+
+
+@pytest.mark.parametrize('branding_name, expected_options', [
+    ('NHS something else', [
+        ('nhs', 'NHS'),
+    ]),
+    ('NHS', [
+        # don't show NHS option if it's the current branding
+    ])
+])
+def test_get_letter_choices_branding_name_in_use(
+    mocker,
+    service_one,
+    branding_name,
+    expected_options,
+    mock_get_service_organisation,
+):
+    service = Service(service_one)
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_json(organisation_type='nhs_central')
+    )
+    mocker.patch(
+        'app.models.service.Service.letter_branding_id',
+        new_callable=PropertyMock,
+        return_value='org-branding-id',
+    )
+    mocker.patch(
+        'app.letter_branding_client.get_letter_branding',
+        return_value={'name': branding_name}
+    )
+
+    options = get_letter_choices(service)
     assert list(options) == expected_options
