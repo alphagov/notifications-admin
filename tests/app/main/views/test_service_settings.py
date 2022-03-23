@@ -4902,32 +4902,6 @@ def test_letter_branding_request_page_back_link(
     assert back_link[0].attrs['href'] == back_link_url
 
 
-def test_letter_branding_request_page_when_branding_is_same_as_org(
-    mocker,
-    service_one,
-    client_request,
-    mock_get_letter_branding_by_id,
-    mock_get_service_organisation,
-    active_user_with_permissions,
-):
-    service_one['letter_branding'] = sample_uuid()
-    mocker.patch(
-        'app.organisations_client.get_organisation',
-        return_value=organisation_json(letter_branding_id=service_one['letter_branding']),
-    )
-
-    page = client_request.get(
-        '.letter_branding_request', service_id=SERVICE_ONE_ID
-    )
-
-    # Central government organisations who have their own default
-    # branding will do so because they’re exempt from GOV.UK.
-    # We also don’t show their organisation’s branding because they
-    # have it already. So ‘Something else’ is the only option.
-    assert not page.select('input[type=radio]')
-    assert page.select_one('textarea')['name'] == 'something_else'
-
-
 @pytest.mark.parametrize('data, org_type, endpoint', (
     (
         {
