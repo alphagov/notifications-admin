@@ -4912,14 +4912,6 @@ def test_letter_branding_request_page_back_link(
     ),
     (
         {
-            'options': 'govuk',
-            'something_else': 'ignored',
-        },
-        'central',
-        'main.email_branding_govuk',
-    ),
-    (
-        {
             'options': 'govuk_and_org',
         },
         'central',
