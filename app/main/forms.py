@@ -2200,13 +2200,10 @@ class ChooseEmailBrandingForm(ChooseBrandingForm):
 
     def __init__(self, service):
         super().__init__()
-        self.options.choices = tuple(self.get_available_choices(service))
 
-    @classmethod
-    def get_available_choices(cls, service):
-        return (
+        self.options.choices = tuple(
             list(branding.get_email_choices(service)) +
-            [cls.FALLBACK_OPTION]
+            [self.FALLBACK_OPTION]
         )
 
 

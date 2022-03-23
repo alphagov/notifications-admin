@@ -70,6 +70,7 @@ from app.main.forms import (
 )
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.branding import NHS_EMAIL_BRANDING_ID
+from app.utils.branding import get_email_choices as get_email_branding_choices
 from app.utils.user import (
     user_has_permissions,
     user_is_gov_user,
@@ -1178,8 +1179,9 @@ def email_branding_request(service_id):
 
 def check_email_branding_allowed_for_service(branding):
     allowed_branding_for_service = dict(
-        ChooseEmailBrandingForm.get_available_choices(current_service)
+        get_email_branding_choices(current_service)
     )
+
     if branding not in allowed_branding_for_service:
         abort(404)
 
