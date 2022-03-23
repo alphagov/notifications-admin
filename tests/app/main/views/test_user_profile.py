@@ -12,6 +12,8 @@ from app.models.webauthn_credential import (
 )
 from tests.conftest import (
     create_api_user_active,
+    create_user,
+    fake_uuid,
     normalize_spaces,
     url_for_endpoint_with_token,
 )
@@ -91,6 +93,8 @@ def test_should_show_email_page(
         'main.user_profile_email'
     )
     assert page.select_one('h1').text.strip() == 'Change your email address'
+    # template is shared with "Change your mobile number" but we don't want to show Delete mobile number link
+    assert 'Delete your number' not in page.text
 
 
 def test_should_redirect_after_email_change(
@@ -195,6 +199,22 @@ def test_change_your_mobile_number_page_shows_delete_link_if_user_on_email_auth(
     page = client_request.get(('main.user_profile_mobile_number'))
     assert 'Change your mobile number' in page.text
     assert 'Delete your number' in page.text
+
+
+def test_change_your_mobile_number_page_doesnt_show_delete_link_if_user_has_no_mobile_number(
+    client_request,
+    api_user_active_email_auth,
+    mocker
+):
+    user = create_user(
+        id=fake_uuid,
+        auth_type='email_auth',
+        mobile_number=None
+    )
+    mocker.patch('app.user_api_client.get_user', return_value=user)
+    page = client_request.get(('main.user_profile_mobile_number'))
+    assert 'Change your mobile number' in page.text
+    assert 'Delete your number' not in page.text
 
 
 def test_confirm_delete_mobile_number(

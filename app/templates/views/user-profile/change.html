@@ -20,7 +20,7 @@
     <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper() %}
         {{ form_field(error_message_with_html=True) }}
-        {% if current_user.auth_type == 'email_auth' %}
+        {% if current_user.auth_type == 'email_auth' and (current_user.mobile_number and thing == "mobile number") %}
           {{ page_footer(
             'Save',
             delete_link=url_for(
