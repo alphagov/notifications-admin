@@ -30,8 +30,11 @@ def test_get_choices_service_not_assigned_to_org(
     assert list(options) == expected_options
 
 
-@pytest.mark.parametrize('function', [get_email_choices, get_letter_choices])
 @pytest.mark.parametrize('org_type, expected_options', [
+    ('central', [
+        ('govuk_and_org', 'GOV.UK and Test Organisation'),
+        ('organisation', 'Test Organisation'),
+    ]),
     ('local', [('organisation', 'Test Organisation')]),
     ('nhs_central', [('nhs', 'NHS')]),
     ('nhs_local', [('nhs', 'NHS')]),
@@ -39,10 +42,9 @@ def test_get_choices_service_not_assigned_to_org(
     ('emergency_service', [('organisation', 'Test Organisation')]),
     ('other', [('organisation', 'Test Organisation')]),
 ])
-def test_get_choices_service_assigned_to_org(
+def test_get_email_choices_service_assigned_to_org(
     mocker,
     service_one,
-    function,
     org_type,
     expected_options,
     mock_get_service_organisation,
@@ -54,26 +56,13 @@ def test_get_choices_service_assigned_to_org(
         return_value=organisation_json(organisation_type=org_type)
     )
 
-    options = function(service)
+    options = get_email_choices(service)
     assert list(options) == expected_options
 
 
-@pytest.mark.parametrize('service_branding, expected_options', [
-    (None, [
-        ('govuk_and_org', 'GOV.UK and Test Organisation'),
-        ('organisation', 'Test Organisation'),
-    ]),
-    ('some-random-branding', [
-        ('govuk', 'GOV.UK'),  # central orgs can switch back to GOV.UK
-        ('govuk_and_org', 'GOV.UK and Test Organisation'),
-        ('organisation', 'Test Organisation'),
-    ])
-])
-def test_get_email_choices_central_org(
+def test_get_email_choices_central_org_includes_govuk(
     mocker,
     service_one,
-    service_branding,
-    expected_options,
     mock_get_service_organisation,
     mock_get_email_branding,
 ):
@@ -86,10 +75,40 @@ def test_get_email_choices_central_org(
     mocker.patch(
         'app.models.service.Service.email_branding_id',
         new_callable=PropertyMock,
-        return_value=service_branding,
+        return_value='some-random-branding',
     )
 
-    options = get_email_choices(service)
+    assert list(get_email_choices(service)) == [
+        ('govuk', 'GOV.UK'),  # central orgs can switch back to GOV.UK
+        ('govuk_and_org', 'GOV.UK and Test Organisation'),
+        ('organisation', 'Test Organisation'),
+    ]
+
+
+@pytest.mark.parametrize('org_type, expected_options', [
+    ('central', [('organisation', 'Test Organisation')]),
+    ('local', [('organisation', 'Test Organisation')]),
+    ('nhs_central', [('nhs', 'NHS')]),
+    ('nhs_local', [('nhs', 'NHS')]),
+    ('nhs_gp', [('nhs', 'NHS')]),
+    ('emergency_service', [('organisation', 'Test Organisation')]),
+    ('other', [('organisation', 'Test Organisation')]),
+])
+def test_get_letter_choices_service_assigned_to_org(
+    mocker,
+    service_one,
+    org_type,
+    expected_options,
+    mock_get_service_organisation,
+):
+    service = Service(service_one)
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_json(organisation_type=org_type)
+    )
+
+    options = get_letter_choices(service)
     assert list(options) == expected_options
 
 
