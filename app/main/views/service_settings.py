@@ -1246,8 +1246,6 @@ def email_branding_organisation(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_something_else(service_id):
-    check_email_branding_allowed_for_service('something_else')
-
     form = SomethingElseBrandingForm()
 
     if form.validate_on_submit():
