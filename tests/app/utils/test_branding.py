@@ -12,10 +12,6 @@ from tests import organisation_json
     ('central', []),
     ('local', []),
     ('nhs_central', [('nhs', 'NHS')]),
-    ('nhs_local', [('nhs', 'NHS')]),
-    ('nhs_gp', [('nhs', 'NHS')]),
-    ('emergency_service', []),
-    ('other', []),
 ])
 def test_get_choices_service_not_assigned_to_org(
     service_one,
@@ -37,10 +33,6 @@ def test_get_choices_service_not_assigned_to_org(
     ]),
     ('local', [('organisation', 'Test Organisation')]),
     ('nhs_central', [('nhs', 'NHS')]),
-    ('nhs_local', [('nhs', 'NHS')]),
-    ('nhs_gp', [('nhs', 'NHS')]),
-    ('emergency_service', [('organisation', 'Test Organisation')]),
-    ('other', [('organisation', 'Test Organisation')]),
 ])
 def test_get_email_choices_service_assigned_to_org(
     mocker,
@@ -89,10 +81,6 @@ def test_get_email_choices_central_org_includes_govuk(
     ('central', [('organisation', 'Test Organisation')]),
     ('local', [('organisation', 'Test Organisation')]),
     ('nhs_central', [('nhs', 'NHS')]),
-    ('nhs_local', [('nhs', 'NHS')]),
-    ('nhs_gp', [('nhs', 'NHS')]),
-    ('emergency_service', [('organisation', 'Test Organisation')]),
-    ('other', [('organisation', 'Test Organisation')]),
 ])
 def test_get_letter_choices_service_assigned_to_org(
     mocker,
