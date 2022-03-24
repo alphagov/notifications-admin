@@ -151,9 +151,11 @@ def test_service_setting_toggles_show(
 @pytest.mark.parametrize('service_fields, endpoint, index, text', [
     ({'active': True}, '.archive_service', 0, 'Delete this service'),
     ({'active': True}, '.suspend_service', 1, 'Suspend service'),
+    ({'active': True}, '.history', 2, 'Service history'),
     ({'active': False}, '.resume_service', 0, 'Resume service'),
+    ({'active': False}, '.history', 1, 'Service history'),
     pytest.param(
-        {'active': False}, '.archive_service', 1, 'Resume service',
+        {'active': False}, '.archive_service', 2, 'Resume service',
         marks=pytest.mark.xfail(raises=IndexError)
     )
 ])

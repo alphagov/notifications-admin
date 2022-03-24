@@ -471,6 +471,12 @@
                 Suspend service
               </a>
           </span>
+
+          <span class="page-footer-link">
+            <a href="{{ url_for('.history', service_id=current_service.id) }}" class="govuk-link govuk-link--no-visited-state page-footer-link">
+              Service history
+            </a>
+          </span>
         {% endif %}
       </p>
     {% endif %}
@@ -483,6 +489,12 @@
         <span class="page-footer-link page-footer-delete-link-without-button">
           <a class="govuk-link govuk-link--destructive" href="{{ url_for('.resume_service', service_id=current_service.id) }}">
             Resume service
+          </a>
+        </span>
+
+        <span class="page-footer-link">
+          <a href="{{ url_for('.history', service_id=current_service.id) }}" class="govuk-link govuk-link--no-visited-state page-footer-link">
+            Service history
           </a>
         </span>
       </p>
