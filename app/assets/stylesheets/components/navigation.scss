@@ -68,6 +68,10 @@
       text-decoration: underline;
     }
 
+    &:focus {
+      text-decoration: none; // override the :hover style (the focus style has its own underline)
+    }
+
   }
 
   &-service {
@@ -165,6 +169,10 @@
 
     &:hover {
       text-decoration: underline;
+    }
+
+    &:focus { // override the :hover style (the focus style has its own underline)
+      text-decoration: none;
     }
 
     &.selected {
