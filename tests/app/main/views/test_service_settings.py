@@ -4181,7 +4181,7 @@ def test_archive_service_prompts_user(
         'main.archive_service',
         service_id=SERVICE_ONE_ID
     )
-    delete_link = settings_page.select('.page-footer-delete-link a')[0]
+    delete_link = settings_page.select('.page-footer-link a')[0]
     assert normalize_spaces(delete_link.text) == 'Delete this service'
     assert delete_link['href'] == url_for(
         'main.archive_service',

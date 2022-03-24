@@ -130,7 +130,7 @@
   <div class="js-stick-at-bottom-when-scrolling">
     <div class="page-footer">
       {% if not confirm_delete_banner %}
-        <span class="page-footer-delete-link page-footer-delete-link-without-button">
+        <span class="page-footer-link page-footer-delete-link-without-button">
           <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.delete_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Delete this contact list</a>
         </span>
       {% endif %}

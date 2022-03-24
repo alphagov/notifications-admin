@@ -168,7 +168,7 @@ def test_service_setting_link_toggles(
     link_url = url_for(endpoint, service_id=service_one['id'])
     service_one.update(service_fields)
     page = get_service_settings_page()
-    link = page.select('.page-footer-delete-link a')[index]
+    link = page.select('.page-footer-link a')[index]
     assert normalize_spaces(link.text) == text
     assert link['href'] == link_url
 
