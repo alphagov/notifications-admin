@@ -521,13 +521,20 @@ def test_navigation_urls(
 
 
 def test_navigation_for_services_with_broadcast_permission(
+    mocker,
     client_request,
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_get_api_keys,
+    active_user_create_broadcasts_permission,
 ):
     service_one['permissions'] += ['broadcast']
+    mocker.patch(
+        'app.user_api_client.get_user',
+        return_value=active_user_create_broadcasts_permission
+    )
+
     page = client_request.get('main.choose_template', service_id=SERVICE_ONE_ID)
     assert [
         a['href'] for a in page.select('.navigation a')
@@ -537,7 +544,6 @@ def test_navigation_for_services_with_broadcast_permission(
         '/services/{}/rejected-alerts'.format(SERVICE_ONE_ID),
         '/services/{}/templates'.format(SERVICE_ONE_ID),
         '/services/{}/users'.format(SERVICE_ONE_ID),
-        '/services/{}/service-settings'.format(SERVICE_ONE_ID),
     ]
 
 
