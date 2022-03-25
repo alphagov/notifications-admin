@@ -12,8 +12,8 @@ from tests.conftest import normalize_spaces
 sms_provider_1 = {
     'id': '6005e192-4738-4962-beec-ebd982d0b03f',
     'active': True,
-    'priority': 1,
-    'display_name': 'Domestic SMS Provider',
+    'priority': 20,
+    'display_name': 'First Domestic SMS Provider',
     'identifier': 'first_sms_domestic',
     'notification_type': 'sms',
     'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
@@ -26,7 +26,7 @@ sms_provider_1 = {
 sms_provider_2 = {
     'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
     'active': True,
-    'priority': 2,
+    'priority': 10,
     'display_name': 'Second Domestic SMS Provider',
     'identifier': 'second_sms_domestic',
     'notification_type': 'sms',
@@ -182,8 +182,8 @@ def test_should_show_all_providers(
     table_data = domestic_sms_first_row.find_all('td')
 
     assert table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
-    assert table_data[0].text.strip() == "Domestic SMS Provider"
-    assert table_data[1].text.strip() == "1"
+    assert table_data[0].text.strip() == "First Domestic SMS Provider"
+    assert table_data[1].text.strip() == "20"
     assert table_data[2].text.strip() == "42"
     assert table_data[3].text.strip() == "True"
     assert table_data[4].text.strip() == "16 January at 3:20pm"
@@ -194,7 +194,7 @@ def test_should_show_all_providers(
 
     assert table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
     assert table_data[0].text.strip() == "Second Domestic SMS Provider"
-    assert table_data[1].text.strip() == "2"
+    assert table_data[1].text.strip() == "10"
     assert table_data[2].text.strip() == "58"
     assert table_data[3].text.strip() == "True"
     assert table_data[4].text.strip() == "None"
@@ -278,12 +278,12 @@ def test_should_show_edit_provider_form(
 
     h1 = [header.text.strip() for header in page.find_all('h1')]
 
-    assert 'Domestic SMS Provider' in h1
+    assert 'First Domestic SMS Provider' in h1
 
     form = [form for form in page.find_all('form')]
 
     form_elements = [element for element in form[0].find_all('input')]
-    assert form_elements[0]['value'] == '1'
+    assert form_elements[0]['value'] == '20'
     assert form_elements[0]['name'] == 'priority'
 
 
