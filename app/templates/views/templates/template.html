@@ -67,14 +67,14 @@
     {% endif %}
     {% if current_user.has_permissions('manage_templates') and user_has_template_permission %}
       {% if not template._template.archived %}
-        <span class="page-footer-delete-link page-footer-delete-link-without-button bottom-gutter-2-3">
+        <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter-2-3">
           <a class="govuk-link govuk-link--destructive" href="{{ url_for('.delete_service_template', service_id=current_service.id, template_id=template.id) }}">Delete this template</a>
         </span>
         &emsp;
       {% endif %}
       {% if template.template_type not in ('letter', 'broadcast') %}
         {% if not template._template.redact_personalisation %}
-          <span class="page-footer-delete-link page-footer-delete-link-without-button">
+          <span class="page-footer-link page-footer-delete-link-without-button">
             <a class="govuk-link govuk-link--destructive" href="{{ url_for('.confirm_redact_template', service_id=current_service.id, template_id=template.id) }}">Hide personalisation after sending</a>
           </span>
         {% else %}

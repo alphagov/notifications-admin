@@ -31,7 +31,7 @@
 
     {% endif %}
     {% if delete_link %}
-      <span class="page-footer-delete-link {% if not button_text %}page-footer-delete-link-without-button{% endif %}">
+      <span class="page-footer-link {% if not button_text %}page-footer-delete-link-without-button{% endif %}">
         <a class="govuk-link govuk-link--destructive" href="{{ delete_link }}">{{ delete_link_text }}</a>
       </span>
     {% endif %}

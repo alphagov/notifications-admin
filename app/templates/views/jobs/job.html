@@ -30,7 +30,7 @@
     {% if job.letter_job_can_be_cancelled %}
       <div class="js-stick-at-bottom-when-scrolling">
         <div class="page-footer">
-          <span class="page-footer-delete-link page-footer-delete-link-without-button">
+          <span class="page-footer-link page-footer-delete-link-without-button">
             <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Cancel sending these letters</a>
           </span>
     {% else %}
