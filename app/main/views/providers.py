@@ -65,6 +65,7 @@ def edit_sms_provider_ratio():
         provider
         for provider in provider_client.get_all_providers()['provider_details']
         if provider['notification_type'] == 'sms'
+        and provider['active']
     ], key=itemgetter('identifier'), reverse=True)
 
     form = AdminProviderRatioForm(ratio=providers[0]['priority'])
