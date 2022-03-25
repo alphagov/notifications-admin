@@ -172,7 +172,7 @@ def test_should_show_all_providers(
     domestic_sms_first_row = domestic_sms_table.tbody.find_all('tr')[0]
     table_data = domestic_sms_first_row.find_all('td')
 
-    assert not table_data[0].find_all("a")
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
     assert table_data[0].text.strip() == "Domestic SMS Provider"
     assert table_data[1].text.strip() == "1"
     assert table_data[2].text.strip() == "42"
@@ -183,7 +183,7 @@ def test_should_show_all_providers(
     domestic_sms_second_row = domestic_sms_table.tbody.find_all('tr')[1]
     table_data = domestic_sms_second_row.find_all('td')
 
-    assert not table_data[0].find_all("a")
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
     assert table_data[0].text.strip() == "Second Domestic SMS Provider"
     assert table_data[1].text.strip() == "2"
     assert table_data[2].text.strip() == "58"
