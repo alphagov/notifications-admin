@@ -118,20 +118,41 @@ def user_profile_email_confirm(token):
 
 
 @main.route("/user-profile/mobile-number", methods=['GET', 'POST'])
+@main.route(
+    "/user-profile/mobile-number/delete",
+    methods=['GET'],
+    endpoint="user_profile_confirm_delete_mobile_number"
+)
 @user_is_logged_in
 def user_profile_mobile_number():
 
+    user = User.from_id(current_user.id)
     form = ChangeMobileNumberForm(mobile_number=current_user.mobile_number)
 
     if form.validate_on_submit():
         session[NEW_MOBILE] = form.mobile_number.data
         return redirect(url_for('.user_profile_mobile_number_authenticate'))
 
+    if (request.endpoint == "main.user_profile_confirm_delete_mobile_number"):
+        flash("Are you sure you want to delete your mobile number from Notify?", 'delete')
+
     return render_template(
         'views/user-profile/change.html',
         thing='mobile number',
-        form_field=form.mobile_number
+        form_field=form.mobile_number,
+        user_auth=user.auth_type
     )
+
+
+@main.route("/user-profile/mobile-number/delete", methods=['POST'])
+@user_is_logged_in
+def user_profile_mobile_number_delete():
+    if current_user.auth_type != 'email_auth':
+        abort(403)
+
+    current_user.update(mobile_number=None)
+
+    return redirect(url_for('.user_profile'))
 
 
 @main.route("/user-profile/mobile-number/authenticate", methods=['GET', 'POST'])
