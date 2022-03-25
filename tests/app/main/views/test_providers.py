@@ -10,103 +10,103 @@ import app
 from app.main.views.providers import add_monthly_traffic
 from tests.conftest import normalize_spaces
 
+sms_provider_1 = {
+    'id': '6005e192-4738-4962-beec-ebd982d0b03f',
+    'active': True,
+    'priority': 1,
+    'display_name': 'Domestic SMS Provider',
+    'identifier': 'first_sms_domestic',
+    'notification_type': 'sms',
+    'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
+    'version': 1,
+    'created_by_name': 'Test User',
+    'supports_international': False,
+    'current_month_billable_sms': 5020,
+}
+
+sms_provider_2 = {
+    'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
+    'active': True,
+    'priority': 2,
+    'display_name': 'Second Domestic SMS Provider',
+    'identifier': 'second_sms_domestic',
+    'notification_type': 'sms',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': False,
+    'current_month_billable_sms': 6891,
+}
+
+email_provider_1 = {
+    'id': '6005e192-4738-4962-beec-ebd982d0b03a',
+    'active': True,
+    'priority': 1,
+    'display_name': 'first_email_provider',
+    'identifier': 'first_email',
+    'notification_type': 'email',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': False,
+    'current_month_billable_sms': 0,
+}
+
+email_provider_2 = {
+    'active': True,
+    'priority': 2,
+    'display_name': 'second_email_provider',
+    'identifier': 'second_email',
+    'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b',
+    'notification_type': 'email',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': False,
+    'current_month_billable_sms': 0,
+}
+
+sms_provider_int_1 = {
+    'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
+    'active': False,
+    'priority': 10,
+    'display_name': 'First International SMS Provider',
+    'identifier': 'first_sms_international',
+    'notification_type': 'sms',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': True,
+    'current_month_billable_sms': 0,
+}
+
+sms_provider_int_2 = {
+    'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
+    'active': False,
+    'priority': 10,
+    'display_name': 'Second International SMS Provider',
+    'identifier': 'second_sms_international',
+    'notification_type': 'sms',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': True,
+    'current_month_billable_sms': 0,
+}
+
 stub_providers = {
     'provider_details': [
-        {
-            'id': '6005e192-4738-4962-beec-ebd982d0b03f',
-            'active': True,
-            'priority': 1,
-            'display_name': 'Domestic SMS Provider',
-            'identifier': 'first_sms_domestic',
-            'notification_type': 'sms',
-            'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
-            'version': 1,
-            'created_by_name': 'Test User',
-            'supports_international': False,
-            'current_month_billable_sms': 5020,
-        },
-        {
-            'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
-            'active': True,
-            'priority': 2,
-            'display_name': 'Second Domestic SMS Provider',
-            'identifier': 'second_sms_domestic',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False,
-            'current_month_billable_sms': 6891,
-        },
-        {
-            'id': '6005e192-4738-4962-beec-ebd982d0b03a',
-            'active': True,
-            'priority': 1,
-            'display_name': 'first_email_provider',
-            'identifier': 'first_email',
-            'notification_type': 'email',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False,
-            'current_month_billable_sms': 0,
-        },
-        {
-            'active': True,
-            'priority': 2,
-            'display_name': 'second_email_provider',
-            'identifier': 'second_email',
-            'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b',
-            'notification_type': 'email',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False,
-            'current_month_billable_sms': 0,
-        },
-        {
-            'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
-            'active': False,
-            'priority': 10,
-            'display_name': 'First International SMS Provider',
-            'identifier': 'first_sms_international',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': True,
-            'current_month_billable_sms': 0,
-        },
-        {
-            'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
-            'active': False,
-            'priority': 10,
-            'display_name': 'Second International SMS Provider',
-            'identifier': 'second_sms_international',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': True,
-            'current_month_billable_sms': 0,
-        }
+        sms_provider_1,
+        sms_provider_2,
+        email_provider_1,
+        email_provider_2,
+        sms_provider_int_1,
+        sms_provider_int_2,
     ]
 }
 
 stub_provider = {
-    'provider_details':
-        {
-            'id': '6005e192-4738-4962-beec-ebd982d0b03f',
-            'active': True,
-            'priority': 1,
-            'display_name': 'Domestic SMS Provider',
-            'identifier': 'first_sms_domestic',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False
-        }
+    'provider_details': sms_provider_1
 }
 
 stub_provider_history = {
@@ -428,15 +428,14 @@ def test_should_show_version_history_for_first_two_sms_providers(
     )
     # second_sms_international will be the primary provider because it’s
     # the first in the list when reverse sorting the SMS providers
-    second_sms_international = stub_providers['provider_details'][5]
     mocker.patch(
         'app.provider_client.get_provider_versions',
         return_value={'data': [
             {
                 'id': id,
                 'priority': priority,
-                'display_name': second_sms_international['display_name'],
-                'identifier': second_sms_international['identifier'],
+                'display_name': sms_provider_int_2['display_name'],
+                'identifier': sms_provider_int_2['identifier'],
                 'updated_at': updated_at,
                 'created_by': {
                     'email_address': 'test@foo.bar',
@@ -473,7 +472,7 @@ def test_should_show_version_history_for_first_two_sms_providers(
         radio['value']
         for radio in page.select('input[checked]')
     ] == [
-        str(second_sms_international['priority'])
+        str(sms_provider_int_2['priority'])
     ]
 
     assert [
@@ -511,15 +510,15 @@ def test_should_show_version_history_for_first_two_sms_providers(
     (
         '10',
         [
-            call(stub_providers['provider_details'][5]['id'], 10),
-            call(stub_providers['provider_details'][1]['id'], 90),
+            call(sms_provider_int_2['id'], 10),
+            call(sms_provider_2['id'], 90),
         ],
     ),
     (
         '80',
         [
-            call(stub_providers['provider_details'][5]['id'], 80),
-            call(stub_providers['provider_details'][1]['id'], 20),
+            call(sms_provider_int_2['id'], 80),
+            call(sms_provider_2['id'], 20),
         ],
     ),
 ])
