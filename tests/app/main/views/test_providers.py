@@ -445,15 +445,15 @@ def test_should_show_version_history_for_first_two_sms_providers(
     )
 
     # we get only get version info for the "primary" (first) provider
-    # in reverse alphabetical order i.e. sms_provider_2
+    # in alphabetical order i.e. sms_provider_1
     mocker.patch(
         'app.provider_client.get_provider_versions',
         return_value={'data': [
             {
                 'id': id,
                 'priority': priority,
-                'display_name': sms_provider_2['display_name'],
-                'identifier': sms_provider_2['identifier'],
+                'display_name': sms_provider_1['display_name'],
+                'identifier': sms_provider_1['identifier'],
                 'updated_at': updated_at,
                 'created_by': {
                     'email_address': 'test@foo.bar',
@@ -490,7 +490,7 @@ def test_should_show_version_history_for_first_two_sms_providers(
         radio['value']
         for radio in page.select('input[checked]')
     ] == [
-        str(sms_provider_2['priority'])
+        str(sms_provider_1['priority'])
     ]
 
     assert [
@@ -508,18 +508,18 @@ def test_should_show_version_history_for_first_two_sms_providers(
     ] == [
         (
             'Test User 2:00pm '
-            'Second Domestic SMS Provider 100% '
-            'First Domestic SMS Provider 0%'
+            'First Domestic SMS Provider 100% '
+            'Second Domestic SMS Provider 0%'
         ),
         (
             'Test User 5:00am '
-            'Second Domestic SMS Provider 80% '
-            'First Domestic SMS Provider 20%'
+            'First Domestic SMS Provider 80% '
+            'Second Domestic SMS Provider 20%'
         ),
         (
             'Test User 3:00am '
-            'Second Domestic SMS Provider 10% '
-            'First Domestic SMS Provider 90%'
+            'First Domestic SMS Provider 10% '
+            'Second Domestic SMS Provider 90%'
         ),
     ]
 
@@ -528,15 +528,15 @@ def test_should_show_version_history_for_first_two_sms_providers(
     (
         '10',
         [
-            call(sms_provider_2['id'], 10),
-            call(sms_provider_1['id'], 90),
+            call(sms_provider_1['id'], 10),
+            call(sms_provider_2['id'], 90),
         ],
     ),
     (
         '80',
         [
-            call(sms_provider_2['id'], 80),
-            call(sms_provider_1['id'], 20),
+            call(sms_provider_1['id'], 80),
+            call(sms_provider_2['id'], 20),
         ],
     ),
 ])
