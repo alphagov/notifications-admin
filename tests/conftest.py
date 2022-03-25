@@ -3604,6 +3604,7 @@ def create_active_user_create_broadcasts_permissions(with_unique_id=False):
             'create_broadcasts',
             'reject_broadcasts',
             'cancel_broadcasts',
+            'view_activity',  # added automatically by API
         ]},
         auth_type='webauthn_auth',
     )
@@ -3617,6 +3618,7 @@ def create_active_user_approve_broadcasts_permissions(with_unique_id=False):
             'approve_broadcasts',
             'reject_broadcasts',
             'cancel_broadcasts',
+            'view_activity',  # added automatically by API
         ]},
         auth_type='webauthn_auth',
     )
