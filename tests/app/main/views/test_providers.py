@@ -1,4 +1,3 @@
-import copy
 from datetime import datetime
 from unittest.mock import call
 
@@ -94,61 +93,71 @@ sms_provider_int_2 = {
     'current_month_billable_sms': 0,
 }
 
-stub_providers = {
-    'provider_details': [
-        sms_provider_1,
-        sms_provider_2,
-        email_provider_1,
-        email_provider_2,
-        sms_provider_int_1,
-        sms_provider_int_2,
-    ]
-}
 
-stub_provider = {
-    'provider_details': sms_provider_1
-}
+@pytest.fixture
+def stub_providers():
+    return {
+        'provider_details': [
+            sms_provider_1,
+            sms_provider_2,
+            email_provider_1,
+            email_provider_2,
+            sms_provider_int_1,
+            sms_provider_int_2,
+        ]
+    }
 
-stub_provider_history = {
-    'data': [
-        {
-            'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
-            'active': True,
-            'priority': 20,
-            'display_name': 'Foo',
-            'identifier': 'foo',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 2,
-            'created_by': {
-                'email_address': 'test@foo.bar',
-                'name': 'Test User',
-                'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
+
+@pytest.fixture
+def stub_provider():
+    return {
+        'provider_details': sms_provider_1
+    }
+
+
+@pytest.fixture
+def stub_provider_history():
+    return {
+        'data': [
+            {
+                'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
+                'active': True,
+                'priority': 20,
+                'display_name': 'Foo',
+                'identifier': 'foo',
+                'notification_type': 'sms',
+                'updated_at': None,
+                'version': 2,
+                'created_by': {
+                    'email_address': 'test@foo.bar',
+                    'name': 'Test User',
+                    'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
+                },
+                'supports_international': False
             },
-            'supports_international': False
-        },
-        {
-            'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
-            'active': True,
-            'priority': 10,
-            'display_name': 'Bar',
-            'identifier': 'bar',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False
-        }
-    ]
-}
+            {
+                'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
+                'active': True,
+                'priority': 10,
+                'display_name': 'Bar',
+                'identifier': 'bar',
+                'notification_type': 'sms',
+                'updated_at': None,
+                'version': 1,
+                'created_by': None,
+                'supports_international': False
+            }
+        ]
+    }
 
 
 def test_should_show_all_providers(
     client_request,
     platform_admin_user,
     mocker,
+    stub_providers,
 ):
-    mocker.patch('app.provider_client.get_all_providers', return_value=copy.deepcopy(stub_providers))
+    mocker.patch('app.provider_client.get_all_providers', return_value=stub_providers)
 
     client_request.login(platform_admin_user)
     page = client_request.get('main.view_providers')
@@ -260,8 +269,9 @@ def test_should_show_edit_provider_form(
     platform_admin_user,
     mocker,
     fake_uuid,
+    stub_provider
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.get('main.edit_provider', provider_id=fake_uuid)
@@ -281,8 +291,9 @@ def test_should_show_error_on_bad_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -301,8 +312,9 @@ def test_should_show_error_on_negative_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -321,8 +333,9 @@ def test_should_show_error_on_too_big_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -341,8 +354,9 @@ def test_should_show_error_on_too_little_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -361,9 +375,10 @@ def test_should_update_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
-    mocker.patch('app.provider_client.update_provider', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
+    mocker.patch('app.provider_client.update_provider', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     client_request.post(
@@ -379,9 +394,10 @@ def test_should_update_provider_priority(
 def test_should_show_provider_version_history(
     client_request,
     platform_admin_user,
-    mocker
+    mocker,
+    stub_provider_history
 ):
-    mocker.patch('app.provider_client.get_provider_versions', return_value=copy.deepcopy(stub_provider_history))
+    mocker.patch('app.provider_client.get_provider_versions', return_value=stub_provider_history)
 
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -420,11 +436,12 @@ def test_should_show_provider_version_history(
 def test_should_show_version_history_for_first_two_sms_providers(
     client_request,
     platform_admin_user,
-    mocker
+    mocker,
+    stub_providers,
 ):
     mocker.patch(
         'app.provider_client.get_all_providers',
-        return_value=copy.deepcopy(stub_providers)
+        return_value=stub_providers
     )
     # second_sms_international will be the primary provider because it’s
     # the first in the list when reverse sorting the SMS providers
@@ -528,10 +545,11 @@ def test_should_update_priority_of_first_two_sms_providers(
     mocker,
     posted_number,
     expected_calls,
+    stub_providers,
 ):
     mocker.patch(
         'app.provider_client.get_all_providers',
-        return_value=copy.deepcopy(stub_providers)
+        return_value=stub_providers
     )
     mocker.patch(
         'app.provider_client.get_provider_versions',
