@@ -43,7 +43,7 @@ colorama==0.4.4
     # via awscli
 cryptography==36.0.2
     # via fido2
-dnspython==1.16.0
+dnspython==2.2.1
     # via eventlet
 docopt==0.6.2
     # via notifications-python-client
