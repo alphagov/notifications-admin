@@ -113,7 +113,7 @@ lxml==4.8.0
     # via
     #   pyexcel-ezodf
     #   pyexcel-ods3
-markupsafe==2.0.1
+markupsafe==2.1.1
     # via
     #   jinja2
     #   wtforms
