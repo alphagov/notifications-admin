@@ -31,7 +31,7 @@ certifi==2021.10.8
     # via
     #   pyproj
     #   requests
-cffi==1.14.5
+cffi==1.15.0
     # via cryptography
 chardet==4.0.0
     # via
