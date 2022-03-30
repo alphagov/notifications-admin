@@ -992,7 +992,7 @@ class OrganisationTypeField(GovukRadiosField):
         super().__init__(
             *args,
             choices=[
-                (value, label) for value, label in Organisation.TYPES
+                (value, label) for value, label in Organisation.TYPE_LABELS.items()
                 if not include_only or value in include_only
             ],
             thing='the type of organisation',
