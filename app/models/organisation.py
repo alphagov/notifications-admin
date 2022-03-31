@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from flask import abort
 from werkzeug.utils import cached_property
 
@@ -23,7 +25,13 @@ class Organisation(JSONModel, SortByNameMixin):
     TYPE_SCHOOL_OR_COLLEGE = 'school_or_college'
     TYPE_OTHER = 'other'
 
-    TYPES = (
+    NHS_TYPES = (
+        TYPE_NHS_CENTRAL,
+        TYPE_NHS_LOCAL,
+        TYPE_NHS_GP,
+    )
+
+    TYPE_LABELS = OrderedDict([
         (TYPE_CENTRAL, 'Central government'),
         (TYPE_LOCAL, 'Local government'),
         (TYPE_NHS_CENTRAL, 'NHS – central government agency or public body'),
@@ -32,7 +40,7 @@ class Organisation(JSONModel, SortByNameMixin):
         (TYPE_EMERGENCY_SERVICE, 'Emergency service'),
         (TYPE_SCHOOL_OR_COLLEGE, 'School or college'),
         (TYPE_OTHER, 'Other'),
-    )
+    ])
 
     ALLOWED_PROPERTIES = {
         'id',
@@ -108,7 +116,7 @@ class Organisation(JSONModel, SortByNameMixin):
 
     @property
     def organisation_type_label(self):
-        return dict(self.TYPES).get(self.organisation_type)
+        return self.TYPE_LABELS.get(self.organisation_type)
 
     @property
     def crown_status_or_404(self):

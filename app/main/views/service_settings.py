@@ -50,7 +50,6 @@ from app.main.forms import (
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     AdminSetOrganisationForm,
-    ChooseBrandingForm,
     ChooseEmailBrandingForm,
     ChooseLetterBrandingForm,
     EstimateUsageForm,
@@ -70,6 +69,8 @@ from app.main.forms import (
     SomethingElseBrandingForm,
 )
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
+from app.utils.branding import NHS_EMAIL_BRANDING_ID
+from app.utils.branding import get_email_choices as get_email_branding_choices
 from app.utils.user import (
     user_has_permissions,
     user_is_gov_user,
@@ -82,8 +83,6 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict([
     ('international_letters', {'title': 'Send international letters', 'requires': 'letter'}),
 ])
 
-NHS_BRANDING_ID = 'a7dc4e56-660b-4db7-8cff-12c37b12b5ea'
-
 
 @main.route("/services/<uuid:service_id>/service-settings")
 @user_has_permissions('manage_service', 'manage_api_keys')
@@ -91,7 +90,7 @@ def service_settings(service_id):
     return render_template(
         'views/service-settings.html',
         service_permissions=PLATFORM_ADMIN_SERVICE_PERMISSIONS,
-        email_branding_options=ChooseBrandingForm(current_service, branding_type='email')
+        email_branding_options=ChooseEmailBrandingForm(current_service)
     )
 
 
@@ -1180,8 +1179,9 @@ def email_branding_request(service_id):
 
 def check_email_branding_allowed_for_service(branding):
     allowed_branding_for_service = dict(
-        ChooseEmailBrandingForm.get_available_choices(current_service, branding_type='email')
+        get_email_branding_choices(current_service)
     )
+
     if branding not in allowed_branding_for_service:
         abort(404)
 
@@ -1220,12 +1220,15 @@ def email_branding_nhs(service_id):
     check_email_branding_allowed_for_service('nhs')
 
     if request.method == 'POST':
-        current_service.update(email_branding=NHS_BRANDING_ID)
+        current_service.update(email_branding=NHS_EMAIL_BRANDING_ID)
 
         flash('You’ve updated your email branding', 'default')
         return redirect(url_for('.service_settings', service_id=current_service.id))
 
-    return render_template('views/service-settings/branding/email-branding-nhs.html', nhs_branding_id=NHS_BRANDING_ID)
+    return render_template(
+        'views/service-settings/branding/email-branding-nhs.html',
+        nhs_branding_id=NHS_EMAIL_BRANDING_ID
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/organisation", methods=['GET', 'POST'])
@@ -1245,8 +1248,6 @@ def email_branding_organisation(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_something_else(service_id):
-    check_email_branding_allowed_for_service('something_else')
-
     form = SomethingElseBrandingForm()
 
     if form.validate_on_submit():
@@ -1258,7 +1259,7 @@ def email_branding_something_else(service_id):
     return render_template(
         'views/service-settings/branding/email-branding-something-else.html',
         form=form,
-        branding_options=ChooseBrandingForm(current_service, branding_type='email')
+        branding_options=ChooseEmailBrandingForm(current_service)
     )
 
 

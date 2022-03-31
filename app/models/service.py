@@ -519,7 +519,7 @@ class Service(JSONModel, SortByNameMixin):
 
     @property
     def organisation_type_label(self):
-        return dict(Organisation.TYPES).get(self.organisation_type)
+        return Organisation.TYPE_LABELS.get(self.organisation_type)
 
     @cached_property
     def inbound_number(self):

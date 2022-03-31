@@ -992,7 +992,7 @@ class OrganisationTypeField(GovukRadiosField):
         super().__init__(
             *args,
             choices=[
-                (value, label) for value, label in Organisation.TYPES
+                (value, label) for value, label in Organisation.TYPE_LABELS.items()
                 if not include_only or value in include_only
             ],
             thing='the type of organisation',
@@ -2187,52 +2187,50 @@ class AdminSetOrganisationForm(StripWhitespaceForm):
 
 
 class ChooseBrandingForm(StripWhitespaceForm):
-
     FALLBACK_OPTION_VALUE = 'something_else'
     FALLBACK_OPTION = (FALLBACK_OPTION_VALUE, 'Something else')
-
-    options = RadioField('Choose your new branding')
-    something_else = TextAreaField('Describe the branding you want')
-
-    def __init__(self, service, branding_type):
-        super().__init__()
-        self.branding_type = branding_type
-        self.options.choices = tuple(self.get_available_choices(service, branding_type))
-        self.options.label.text = 'Choose your new {} branding'.format(branding_type)
-        if self.something_else_is_only_option:
-            self.options.data = self.FALLBACK_OPTION_VALUE
-
-    @classmethod
-    def get_available_choices(cls, service, branding_type):
-        return (
-            list(branding.get_available_choices(service, branding_type)) +
-            [cls.FALLBACK_OPTION]
-        )
 
     @property
     def something_else_is_only_option(self):
         return self.options.choices == (self.FALLBACK_OPTION,)
 
-    def validate_something_else(self, field):
-        if self.branding_type == 'letter':
-            if (
-                self.something_else_is_only_option
-                or self.options.data == self.FALLBACK_OPTION_VALUE
-            ) and not field.data:
-                raise ValidationError('Cannot be empty')
-
-        if self.options.data != self.FALLBACK_OPTION_VALUE:
-            field.data = ''
-
 
 class ChooseEmailBrandingForm(ChooseBrandingForm):
-    def __init__(self, service_id):
-        super().__init__(service_id, branding_type='email')
+    options = RadioField('Choose your new email branding')
+
+    def __init__(self, service):
+        super().__init__()
+
+        self.options.choices = tuple(
+            list(branding.get_email_choices(service)) +
+            [self.FALLBACK_OPTION]
+        )
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):
-    def __init__(self, service_id):
-        super().__init__(service_id, branding_type='letter')
+    options = RadioField('Choose your new letter branding')
+    something_else = TextAreaField('Describe the branding you want')
+
+    def __init__(self, service):
+        super().__init__()
+
+        self.options.choices = tuple(
+            list(branding.get_letter_choices(service)) +
+            [self.FALLBACK_OPTION]
+        )
+
+        if self.something_else_is_only_option:
+            self.options.data = self.FALLBACK_OPTION_VALUE
+
+    def validate_something_else(self, field):
+        if (
+            self.something_else_is_only_option
+            or self.options.data == self.FALLBACK_OPTION_VALUE
+        ) and not field.data:
+            raise ValidationError('Cannot be empty')
+
+        if self.options.data != self.FALLBACK_OPTION_VALUE:
+            field.data = ''
 
 
 class SomethingElseBrandingForm(StripWhitespaceForm):
