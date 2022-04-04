@@ -67,7 +67,7 @@ flask-login==0.5.0
     # via -r requirements.in
 flask-redis==0.4.0
     # via notifications-utils
-flask-wtf==1.0.0
+flask-wtf==1.0.1
     # via -r requirements.in
 gds-metrics==0.2.4
     # via -r requirements.in
