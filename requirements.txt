@@ -55,7 +55,7 @@ eventlet==0.33.0
     # via gunicorn
 fido2==0.9.3
     # via -r requirements.in
-flask==1.1.2
+flask==2.1.1
     # via
     #   -r requirements.in
     #   flask-login
