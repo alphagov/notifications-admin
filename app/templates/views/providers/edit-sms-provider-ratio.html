@@ -22,10 +22,10 @@
         <div class="govuk-grid-column-two-thirds">
           <div class="history-list-percentage-without-border">
             <div class="history-list-percentage-left-label">
-              {{ primary_provider }}
+              {{ first_provider }}
             </div>
             <div class="history-list-percentage-right-label">
-              {{ secondary_provider }}
+              {{ second_provider }}
             </div>
             {% call form_wrapper() %}
               <div class="radio-slider" data-module="radio-slider">
@@ -71,11 +71,11 @@
             <div class="govuk-grid-column-two-thirds">
               <div class="history-list-percentage">
                 <div class="history-list-percentage-left-label">
-                  {{ primary_provider }}<br><br>
+                  {{ first_provider }}<br><br>
                   {{ version.priority|format_thousands }}%
                 </div>
                 <div class="history-list-percentage-right-label">
-                  {{ secondary_provider }}<br><br>
+                  {{ second_provider }}<br><br>
                   {{ (100 - version.priority)|format_thousands }}%
                 </div>
                 <div class="history-list-percentage-marker" style="left: {{ (100 -version.priority)|format_thousands }}%"></div>

@@ -65,26 +65,27 @@ def edit_sms_provider_ratio():
         provider
         for provider in provider_client.get_all_providers()['provider_details']
         if provider['notification_type'] == 'sms'
-    ], key=itemgetter('identifier'), reverse=True)
+        and provider['active']
+    ], key=itemgetter('identifier'))
 
     form = AdminProviderRatioForm(ratio=providers[0]['priority'])
 
     if len(providers) < 2:
         abort(400)
 
-    primary_provider, secondary_provider = providers[0:2]
+    first_provider, second_provider = providers[0:2]
 
     if form.validate_on_submit():
-        provider_client.update_provider(primary_provider['id'], form.percentage_left)
-        provider_client.update_provider(secondary_provider['id'], form.percentage_right)
+        provider_client.update_provider(first_provider['id'], form.percentage_left)
+        provider_client.update_provider(second_provider['id'], form.percentage_right)
         return redirect(url_for('.edit_sms_provider_ratio'))
 
     return render_template(
         'views/providers/edit-sms-provider-ratio.html',
-        versions=_chunk_versions_by_day(_get_versions_since_switchover(primary_provider['id'])),
+        versions=_chunk_versions_by_day(_get_versions_since_switchover(first_provider['id'])),
         form=form,
-        primary_provider=providers[0]['display_name'],
-        secondary_provider=providers[1]['display_name'],
+        first_provider=providers[0]['display_name'],
+        second_provider=providers[1]['display_name'],
     )
 
 

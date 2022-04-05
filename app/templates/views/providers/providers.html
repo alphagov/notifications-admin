@@ -23,7 +23,7 @@ Providers
       field_headings_visible=True
   ) %}
 
-      {{ text_field(item.display_name) }}
+      {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
 
       {{ text_field(item.priority) }}
 

@@ -1,4 +1,3 @@
-import copy
 from datetime import datetime
 from unittest.mock import call
 
@@ -10,145 +9,155 @@ import app
 from app.main.views.providers import add_monthly_traffic
 from tests.conftest import normalize_spaces
 
-stub_providers = {
-    'provider_details': [
-        {
-            'id': '6005e192-4738-4962-beec-ebd982d0b03f',
-            'active': True,
-            'priority': 1,
-            'display_name': 'Domestic SMS Provider',
-            'identifier': 'first_sms_domestic',
-            'notification_type': 'sms',
-            'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
-            'version': 1,
-            'created_by_name': 'Test User',
-            'supports_international': False,
-            'current_month_billable_sms': 5020,
-        },
-        {
-            'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
-            'active': True,
-            'priority': 2,
-            'display_name': 'Second Domestic SMS Provider',
-            'identifier': 'second_sms_domestic',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False,
-            'current_month_billable_sms': 6891,
-        },
-        {
-            'id': '6005e192-4738-4962-beec-ebd982d0b03a',
-            'active': True,
-            'priority': 1,
-            'display_name': 'first_email_provider',
-            'identifier': 'first_email',
-            'notification_type': 'email',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False,
-            'current_month_billable_sms': 0,
-        },
-        {
-            'active': True,
-            'priority': 2,
-            'display_name': 'second_email_provider',
-            'identifier': 'second_email',
-            'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b',
-            'notification_type': 'email',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False,
-            'current_month_billable_sms': 0,
-        },
-        {
-            'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
-            'active': False,
-            'priority': 10,
-            'display_name': 'First International SMS Provider',
-            'identifier': 'first_sms_international',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': True,
-            'current_month_billable_sms': 0,
-        },
-        {
-            'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
-            'active': False,
-            'priority': 10,
-            'display_name': 'Second International SMS Provider',
-            'identifier': 'second_sms_international',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': True,
-            'current_month_billable_sms': 0,
-        }
-    ]
+sms_provider_1 = {
+    'id': '6005e192-4738-4962-beec-ebd982d0b03f',
+    'active': True,
+    'priority': 20,
+    'display_name': 'First Domestic SMS Provider',
+    'identifier': 'first_sms_domestic',
+    'notification_type': 'sms',
+    'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
+    'version': 1,
+    'created_by_name': 'Test User',
+    'supports_international': False,
+    'current_month_billable_sms': 5020,
 }
 
-stub_provider = {
-    'provider_details':
-        {
-            'id': '6005e192-4738-4962-beec-ebd982d0b03f',
-            'active': True,
-            'priority': 1,
-            'display_name': 'Domestic SMS Provider',
-            'identifier': 'first_sms_domestic',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False
-        }
+sms_provider_2 = {
+    'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
+    'active': True,
+    'priority': 10,
+    'display_name': 'Second Domestic SMS Provider',
+    'identifier': 'second_sms_domestic',
+    'notification_type': 'sms',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': False,
+    'current_month_billable_sms': 6891,
 }
 
-stub_provider_history = {
-    'data': [
-        {
-            'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
-            'active': True,
-            'priority': 20,
-            'display_name': 'Foo',
-            'identifier': 'foo',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 2,
-            'created_by': {
-                'email_address': 'test@foo.bar',
-                'name': 'Test User',
-                'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
+email_provider_1 = {
+    'id': '6005e192-4738-4962-beec-ebd982d0b03a',
+    'active': True,
+    'priority': 1,
+    'display_name': 'first_email_provider',
+    'identifier': 'first_email',
+    'notification_type': 'email',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': False,
+    'current_month_billable_sms': 0,
+}
+
+email_provider_2 = {
+    'active': True,
+    'priority': 2,
+    'display_name': 'second_email_provider',
+    'identifier': 'second_email',
+    'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b',
+    'notification_type': 'email',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': False,
+    'current_month_billable_sms': 0,
+}
+
+sms_provider_intl_1 = {
+    'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
+    'active': False,
+    'priority': 10,
+    'display_name': 'First International SMS Provider',
+    'identifier': 'first_sms_international',
+    'notification_type': 'sms',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': True,
+    'current_month_billable_sms': 0,
+}
+
+sms_provider_intl_2 = {
+    'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
+    'active': False,
+    'priority': 10,
+    'display_name': 'Second International SMS Provider',
+    'identifier': 'second_sms_international',
+    'notification_type': 'sms',
+    'updated_at': None,
+    'version': 1,
+    'created_by': None,
+    'supports_international': True,
+    'current_month_billable_sms': 0,
+}
+
+
+@pytest.fixture
+def stub_providers():
+    return {
+        'provider_details': [
+            sms_provider_1,
+            sms_provider_2,
+            email_provider_1,
+            email_provider_2,
+            sms_provider_intl_1,
+            sms_provider_intl_2,
+        ]
+    }
+
+
+@pytest.fixture
+def stub_provider():
+    return {
+        'provider_details': sms_provider_1
+    }
+
+
+@pytest.fixture
+def stub_provider_history():
+    return {
+        'data': [
+            {
+                'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
+                'active': True,
+                'priority': 20,
+                'display_name': 'Foo',
+                'identifier': 'foo',
+                'notification_type': 'sms',
+                'updated_at': None,
+                'version': 2,
+                'created_by': {
+                    'email_address': 'test@foo.bar',
+                    'name': 'Test User',
+                    'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
+                },
+                'supports_international': False
             },
-            'supports_international': False
-        },
-        {
-            'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
-            'active': True,
-            'priority': 10,
-            'display_name': 'Bar',
-            'identifier': 'bar',
-            'notification_type': 'sms',
-            'updated_at': None,
-            'version': 1,
-            'created_by': None,
-            'supports_international': False
-        }
-    ]
-}
+            {
+                'id': 'f9af1ec7-58ef-4f7d-a6f4-5fe7e48644cb',
+                'active': True,
+                'priority': 10,
+                'display_name': 'Bar',
+                'identifier': 'bar',
+                'notification_type': 'sms',
+                'updated_at': None,
+                'version': 1,
+                'created_by': None,
+                'supports_international': False
+            }
+        ]
+    }
 
 
 def test_should_show_all_providers(
     client_request,
     platform_admin_user,
     mocker,
+    stub_providers,
 ):
-    mocker.patch('app.provider_client.get_all_providers', return_value=copy.deepcopy(stub_providers))
+    mocker.patch('app.provider_client.get_all_providers', return_value=stub_providers)
 
     client_request.login(platform_admin_user)
     page = client_request.get('main.view_providers')
@@ -172,9 +181,9 @@ def test_should_show_all_providers(
     domestic_sms_first_row = domestic_sms_table.tbody.find_all('tr')[0]
     table_data = domestic_sms_first_row.find_all('td')
 
-    assert not table_data[0].find_all("a")
-    assert table_data[0].text.strip() == "Domestic SMS Provider"
-    assert table_data[1].text.strip() == "1"
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
+    assert table_data[0].text.strip() == "First Domestic SMS Provider"
+    assert table_data[1].text.strip() == "20"
     assert table_data[2].text.strip() == "42"
     assert table_data[3].text.strip() == "True"
     assert table_data[4].text.strip() == "16 January at 3:20pm"
@@ -183,9 +192,9 @@ def test_should_show_all_providers(
     domestic_sms_second_row = domestic_sms_table.tbody.find_all('tr')[1]
     table_data = domestic_sms_second_row.find_all('td')
 
-    assert not table_data[0].find_all("a")
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
     assert table_data[0].text.strip() == "Second Domestic SMS Provider"
-    assert table_data[1].text.strip() == "2"
+    assert table_data[1].text.strip() == "10"
     assert table_data[2].text.strip() == "58"
     assert table_data[3].text.strip() == "True"
     assert table_data[4].text.strip() == "None"
@@ -260,20 +269,21 @@ def test_should_show_edit_provider_form(
     platform_admin_user,
     mocker,
     fake_uuid,
+    stub_provider
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.get('main.edit_provider', provider_id=fake_uuid)
 
     h1 = [header.text.strip() for header in page.find_all('h1')]
 
-    assert 'Domestic SMS Provider' in h1
+    assert 'First Domestic SMS Provider' in h1
 
     form = [form for form in page.find_all('form')]
 
     form_elements = [element for element in form[0].find_all('input')]
-    assert form_elements[0]['value'] == '1'
+    assert form_elements[0]['value'] == '20'
     assert form_elements[0]['name'] == 'priority'
 
 
@@ -281,8 +291,9 @@ def test_should_show_error_on_bad_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -301,8 +312,9 @@ def test_should_show_error_on_negative_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -321,8 +333,9 @@ def test_should_show_error_on_too_big_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -341,8 +354,9 @@ def test_should_show_error_on_too_little_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -361,9 +375,10 @@ def test_should_update_provider_priority(
     client_request,
     platform_admin_user,
     mocker,
+    stub_provider,
 ):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=copy.deepcopy(stub_provider))
-    mocker.patch('app.provider_client.update_provider', return_value=copy.deepcopy(stub_provider))
+    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
+    mocker.patch('app.provider_client.update_provider', return_value=stub_provider)
 
     client_request.login(platform_admin_user)
     client_request.post(
@@ -379,9 +394,10 @@ def test_should_update_provider_priority(
 def test_should_show_provider_version_history(
     client_request,
     platform_admin_user,
-    mocker
+    mocker,
+    stub_provider_history
 ):
-    mocker.patch('app.provider_client.get_provider_versions', return_value=copy.deepcopy(stub_provider_history))
+    mocker.patch('app.provider_client.get_provider_versions', return_value=stub_provider_history)
 
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -420,23 +436,26 @@ def test_should_show_provider_version_history(
 def test_should_show_version_history_for_first_two_sms_providers(
     client_request,
     platform_admin_user,
-    mocker
+    mocker,
+    stub_providers,
 ):
     mocker.patch(
         'app.provider_client.get_all_providers',
-        return_value=copy.deepcopy(stub_providers)
+        return_value=stub_providers
     )
-    # second_sms_international will be the primary provider because it’s
-    # the first in the list when reverse sorting the SMS providers
-    second_sms_international = stub_providers['provider_details'][5]
+
+    # Getting the history for one provider implicitly gives us the
+    # history of the other one (in a world with only two providers).
+    # The code picks the first provider in alphabetical order of its
+    # id i.e. sms_provider_1.
     mocker.patch(
         'app.provider_client.get_provider_versions',
         return_value={'data': [
             {
                 'id': id,
                 'priority': priority,
-                'display_name': second_sms_international['display_name'],
-                'identifier': second_sms_international['identifier'],
+                'display_name': sms_provider_1['display_name'],
+                'identifier': sms_provider_1['identifier'],
                 'updated_at': updated_at,
                 'created_by': {
                     'email_address': 'test@foo.bar',
@@ -473,7 +492,7 @@ def test_should_show_version_history_for_first_two_sms_providers(
         radio['value']
         for radio in page.select('input[checked]')
     ] == [
-        str(second_sms_international['priority'])
+        str(sms_provider_1['priority'])
     ]
 
     assert [
@@ -491,17 +510,17 @@ def test_should_show_version_history_for_first_two_sms_providers(
     ] == [
         (
             'Test User 2:00pm '
-            'Second International SMS Provider 100% '
+            'First Domestic SMS Provider 100% '
             'Second Domestic SMS Provider 0%'
         ),
         (
             'Test User 5:00am '
-            'Second International SMS Provider 80% '
+            'First Domestic SMS Provider 80% '
             'Second Domestic SMS Provider 20%'
         ),
         (
             'Test User 3:00am '
-            'Second International SMS Provider 10% '
+            'First Domestic SMS Provider 10% '
             'Second Domestic SMS Provider 90%'
         ),
     ]
@@ -511,15 +530,15 @@ def test_should_show_version_history_for_first_two_sms_providers(
     (
         '10',
         [
-            call(stub_providers['provider_details'][5]['id'], 10),
-            call(stub_providers['provider_details'][1]['id'], 90),
+            call(sms_provider_1['id'], 10),
+            call(sms_provider_2['id'], 90),
         ],
     ),
     (
         '80',
         [
-            call(stub_providers['provider_details'][5]['id'], 80),
-            call(stub_providers['provider_details'][1]['id'], 20),
+            call(sms_provider_1['id'], 80),
+            call(sms_provider_2['id'], 20),
         ],
     ),
 ])
@@ -529,10 +548,11 @@ def test_should_update_priority_of_first_two_sms_providers(
     mocker,
     posted_number,
     expected_calls,
+    stub_providers,
 ):
     mocker.patch(
         'app.provider_client.get_all_providers',
-        return_value=copy.deepcopy(stub_providers)
+        return_value=stub_providers
     )
     mocker.patch(
         'app.provider_client.get_provider_versions',
