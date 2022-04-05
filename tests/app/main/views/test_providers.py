@@ -65,7 +65,7 @@ email_provider_2 = {
     'current_month_billable_sms': 0,
 }
 
-sms_provider_int_1 = {
+sms_provider_intl_1 = {
     'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
     'active': False,
     'priority': 10,
@@ -79,7 +79,7 @@ sms_provider_int_1 = {
     'current_month_billable_sms': 0,
 }
 
-sms_provider_int_2 = {
+sms_provider_intl_2 = {
     'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
     'active': False,
     'priority': 10,
@@ -102,8 +102,8 @@ def stub_providers():
             sms_provider_2,
             email_provider_1,
             email_provider_2,
-            sms_provider_int_1,
-            sms_provider_int_2,
+            sms_provider_intl_1,
+            sms_provider_intl_2,
         ]
     }
 
@@ -444,8 +444,10 @@ def test_should_show_version_history_for_first_two_sms_providers(
         return_value=stub_providers
     )
 
-    # we get only get version info for the "primary" (first) provider
-    # in alphabetical order i.e. sms_provider_1
+    # Getting the history for one provider implicitly gives us the
+    # history of the other one (in a world with only two providers).
+    # The code picks the first provider in alphabetical order of its
+    # id i.e. sms_provider_1.
     mocker.patch(
         'app.provider_client.get_provider_versions',
         return_value={'data': [
