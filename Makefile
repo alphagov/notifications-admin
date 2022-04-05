@@ -25,8 +25,8 @@ VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$V
 .PHONY: bootstrap
 bootstrap: generate-version-file ## Set up everything to run the app
 	pip3 install -r requirements_for_test.txt
-	npm install
-	. environment.sh; npm run build
+	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci
+	. environment.sh; source $(HOME)/.nvm/nvm.sh && npm run build
 
 .PHONY: watch-frontend
 watch-frontend:  ## Build frontend and watch for changes
@@ -56,7 +56,7 @@ generate-version-file: ## Generates the app version file
 test: ## Run tests
 	flake8 .
 	isort --check-only ./app ./tests
-	npm test
+	source $(HOME)/.nvm/nvm.sh && npm test
 	py.test -n auto --maxfail=10 tests/
 
 .PHONY: fix-imports

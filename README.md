@@ -13,17 +13,21 @@ GOV.UK Notify admin application - https://www.notifications.service.gov.uk/
 
 At the moment we run Python 3.9 in production.
 
-### NPM packages
+### NodeJS & NPM
+
+If you don't have NodeJS on your system, install it with homebrew.
 
 ```shell
 brew install node
 ```
 
-[NPM](npmjs.org) is Node's package management tool. `n` is a tool for managing different versions of Node. The following installs `n` and uses the long term support (LTS) version of Node.
+`nvm` is a tool for managing different versions of NodeJS. Follow [the guidance on nvm's github repository](https://github.com/nvm-sh/nvm#installing-and-updating) to install it.
+
+Once installed, run the following to switch to the version of NodeJS for this project. If you don't
+have that version, it should tell you how to install it.
 
 ```shell
-npm install -g n
-n lts
+nvm use
 ```
 
 ### `environment.sh`
@@ -75,4 +79,5 @@ To run a specific JavaScript test, you'll need to copy the full command from `pa
 ## Further docs
 
 - [Working with static assets](docs/static-assets.md)
+- [JavaScript documentation](https://github.com/alphagov/notifications-manuals/wiki/JavaScript-Documentation)
 - [Updating dependencies](https://github.com/alphagov/notifications-manuals/wiki/Dependencies)
