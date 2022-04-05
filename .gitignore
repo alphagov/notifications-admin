@@ -107,7 +107,6 @@ environment.sh
 
 # CloudFoundry
 .cf
-package-lock.json
 
 # Files/folders created by build so not present in .cfignore
 app/version.py
