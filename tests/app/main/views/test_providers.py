@@ -1,3 +1,4 @@
+import copy
 from datetime import datetime
 from unittest.mock import call
 
@@ -309,6 +310,31 @@ def test_edit_sms_provider_provider_ratio(
 
     first_input = page.select_one('.govuk-input[name="first_sms_domestic"]')
     assert first_input.attrs['value'] == str(sms_provider_1['priority'])
+
+
+def test_edit_sms_provider_provider_ratio_only_shows_active_providers(
+    client_request,
+    platform_admin_user,
+    mocker,
+    stub_providers,
+):
+    sms_provider_1_inactive = copy.deepcopy(sms_provider_1)
+    sms_provider_1_inactive['active'] = False
+
+    mocker.patch(
+        'app.provider_client.get_all_providers',
+        return_value={
+            'provider_details': [sms_provider_1_inactive, sms_provider_2]
+        }
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.edit_sms_provider_ratio',
+    )
+
+    inputs = page.select('.govuk-input[type="text"]')
+    assert len(inputs) == 1
 
 
 @pytest.mark.parametrize('post_data, expected_calls', [
