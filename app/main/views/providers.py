@@ -54,23 +54,21 @@ def edit_sms_provider_ratio():
         and provider['active']
     ], key=itemgetter('identifier'))
 
-    form = AdminProviderRatioForm(ratio=providers[0]['priority'])
+    form = AdminProviderRatioForm(providers)
 
     if len(providers) < 2:
         abort(400)
 
-    first_provider, second_provider = providers[0:2]
-
     if form.validate_on_submit():
-        provider_client.update_provider(first_provider['id'], form.percentage_left)
-        provider_client.update_provider(second_provider['id'], form.percentage_right)
+        for provider in providers:
+            field = getattr(form, provider['identifier'])
+            provider_client.update_provider(provider['id'], field.data)
         return redirect(url_for('.view_providers'))
 
     return render_template(
         'views/providers/edit-sms-provider-ratio.html',
         form=form,
-        first_provider=providers[0]['display_name'],
-        second_provider=providers[1]['display_name'],
+        providers=providers
     )
 
 

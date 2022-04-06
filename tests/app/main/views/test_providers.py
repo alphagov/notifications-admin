@@ -288,27 +288,33 @@ def test_view_provider_shows_version_history(
     assert second_row[4].text.strip() == "True"
 
 
-@pytest.mark.parametrize('posted_number, expected_calls', [
+@pytest.mark.parametrize('post_data, expected_calls', [
     (
-        '10',
+        {
+            sms_provider_1['identifier']: 10,
+            sms_provider_2['identifier']: 90
+        },
         [
             call(sms_provider_1['id'], 10),
             call(sms_provider_2['id'], 90),
         ],
     ),
     (
-        '80',
+        {
+            sms_provider_1['identifier']: 80,
+            sms_provider_2['identifier']: 20
+        },
         [
             call(sms_provider_1['id'], 80),
             call(sms_provider_2['id'], 20),
         ],
     ),
 ])
-def test_edit_sms_provider_ratio_should_update_priority_of_first_two_sms_providers(
+def test_edit_sms_provider_ratio_submit(
     client_request,
     platform_admin_user,
     mocker,
-    posted_number,
+    post_data,
     expected_calls,
     stub_providers,
 ):
@@ -323,9 +329,7 @@ def test_edit_sms_provider_ratio_should_update_priority_of_first_two_sms_provide
     client_request.login(platform_admin_user)
     client_request.post(
         '.edit_sms_provider_ratio',
-        _data={
-            'ratio': posted_number,
-        },
+        _data=post_data,
         _expected_redirect=url_for(
             '.view_providers',
             _external=True,
