@@ -288,6 +288,29 @@ def test_view_provider_shows_version_history(
     assert second_row[4].text.strip() == "True"
 
 
+def test_edit_sms_provider_provider_ratio(
+    client_request,
+    platform_admin_user,
+    mocker,
+    stub_providers,
+):
+    mocker.patch(
+        'app.provider_client.get_all_providers',
+        return_value=stub_providers
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.edit_sms_provider_ratio',
+    )
+
+    inputs = page.select('.govuk-input[type="text"]')
+    assert len(inputs) == 2
+
+    first_input = page.select_one('.govuk-input[name="first_sms_domestic"]')
+    assert first_input.attrs['value'] == str(sms_provider_1['priority'])
+
+
 @pytest.mark.parametrize('post_data, expected_calls', [
     (
         {
