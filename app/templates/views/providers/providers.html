@@ -25,7 +25,7 @@ Providers
 
       {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
 
-      {{ text_field(item.priority) }}
+      {{ optional_text_field(item.priority if item.active, default='None') }}
 
       {{ text_field(item.monthly_traffic) }}
 
