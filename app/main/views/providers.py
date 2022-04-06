@@ -1,11 +1,10 @@
-from collections import defaultdict
 from datetime import datetime
 from operator import itemgetter
 
 from flask import abort, render_template, url_for
 from werkzeug.utils import redirect
 
-from app import format_date_numeric, provider_client
+from app import provider_client
 from app.main import main
 from app.main.forms import AdminProviderForm, AdminProviderRatioForm
 from app.utils.user import user_is_platform_admin
@@ -82,39 +81,10 @@ def edit_sms_provider_ratio():
 
     return render_template(
         'views/providers/edit-sms-provider-ratio.html',
-        versions=_chunk_versions_by_day(_get_versions_since_switchover(first_provider['id'])),
         form=form,
         first_provider=providers[0]['display_name'],
         second_provider=providers[1]['display_name'],
     )
-
-
-def _get_versions_since_switchover(provider_id):
-
-    for version in sorted(  # noqa: B020
-        provider_client.get_provider_versions(provider_id)['data'],
-        key=lambda version: version['updated_at'] or ''
-    ):
-
-        if not version['updated_at']:
-            continue
-
-        if version['updated_at'] < PROVIDER_PRIORITY_MEANING_SWITCHOVER:
-            continue
-
-        yield version
-
-
-def _chunk_versions_by_day(versions):
-
-    days = defaultdict(list)
-
-    for version in sorted(versions, key=lambda version: version['updated_at'] or '', reverse=True):  # noqa: B020
-        days[
-            format_date_numeric(version['updated_at'])
-        ].append(version)
-
-    return sorted(days.items(), reverse=True)
 
 
 @main.route("/provider/<uuid:provider_id>")

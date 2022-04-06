@@ -3,7 +3,6 @@ from unittest.mock import call
 
 import pytest
 from flask import url_for
-from freezegun import freeze_time
 
 import app
 from app.main.views.providers import add_monthly_traffic
@@ -432,100 +431,6 @@ def test_should_show_provider_version_history(
     assert second_row[4].text.strip() == "True"
 
 
-@freeze_time('2022-2-22 15:00')
-def test_should_show_version_history_for_first_two_sms_providers(
-    client_request,
-    platform_admin_user,
-    mocker,
-    stub_providers,
-):
-    mocker.patch(
-        'app.provider_client.get_all_providers',
-        return_value=stub_providers
-    )
-
-    # Getting the history for one provider implicitly gives us the
-    # history of the other one (in a world with only two providers).
-    # The code picks the first provider in alphabetical order of its
-    # id i.e. sms_provider_1.
-    mocker.patch(
-        'app.provider_client.get_provider_versions',
-        return_value={'data': [
-            {
-                'id': id,
-                'priority': priority,
-                'display_name': sms_provider_1['display_name'],
-                'identifier': sms_provider_1['identifier'],
-                'updated_at': updated_at,
-                'created_by': {
-                    'email_address': 'test@foo.bar',
-                    'name': 'Test User',
-                    'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
-                },
-                'supports_international': False,
-            }
-            for updated_at, priority in [
-                (datetime(2022, 2, 22, 14).isoformat(), 100),
-                (datetime(2020, 1, 1, 5).isoformat(), 80),
-                (datetime(2020, 1, 1, 3).isoformat(), 10),
-                # Anything older than 11am on 29 November 2019
-                # should be ignored because the priority numbers
-                # didn’t mean the same thing before then
-                (datetime(2019, 11, 29, 10, 59).isoformat(), 123),
-                (datetime(2000, 1, 1, 0).isoformat(), 1999),
-                (None, 30),
-            ]
-        ]}
-    )
-
-    client_request.login(platform_admin_user)
-    page = client_request.get('main.edit_sms_provider_ratio')
-
-    assert [
-        radio['value']
-        for radio in page.select('input[name=ratio]')
-    ] == [
-        '100', '90', '80', '70', '60', '50', '40', '30', '20', '10', '0',
-    ]
-
-    assert [
-        radio['value']
-        for radio in page.select('input[checked]')
-    ] == [
-        str(sms_provider_1['priority'])
-    ]
-
-    assert [
-        normalize_spaces(heading.text)
-        for heading in page.select('main h2')
-    ] == [
-        'Now',
-        'Today',
-        '1 January 2020',
-    ]
-
-    assert [
-        normalize_spaces(version.text)
-        for version in page.select('li.history-list-item')
-    ] == [
-        (
-            'Test User 2:00pm '
-            'First Domestic SMS Provider 100% '
-            'Second Domestic SMS Provider 0%'
-        ),
-        (
-            'Test User 5:00am '
-            'First Domestic SMS Provider 80% '
-            'Second Domestic SMS Provider 20%'
-        ),
-        (
-            'Test User 3:00am '
-            'First Domestic SMS Provider 10% '
-            'Second Domestic SMS Provider 90%'
-        ),
-    ]
-
-
 @pytest.mark.parametrize('posted_number, expected_calls', [
     (
         '10',
@@ -553,10 +458,6 @@ def test_should_update_priority_of_first_two_sms_providers(
     mocker.patch(
         'app.provider_client.get_all_providers',
         return_value=stub_providers
-    )
-    mocker.patch(
-        'app.provider_client.get_provider_versions',
-        return_value={'data': []}
     )
     mock_update_provider = mocker.patch(
         'app.provider_client.update_provider'
