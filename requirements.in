@@ -16,7 +16,7 @@ pyexcel==0.7.0
 pyexcel-io==0.6.6
 pyexcel-xls==0.7.0
 pyexcel-xlsx==0.6.0
-pyexcel-ods3==0.6.0
+pyexcel-ods3==0.6.1
 pytz==2022.1
 # Should be pinned until a new gunicorn release greater than 20.1.0 comes out. (Due to eventlet v0.33 compatibility issues)
 git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b864c64#egg=gunicorn[eventlet]==20.1.0
@@ -32,6 +32,5 @@ notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@55
 govuk-frontend-jinja @ git+https://github.com/alphagov/govuk-frontend-jinja.git@v0.5.8-alpha
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
-# version 0.10.0 introduced exceptions when workers crashed due to deprecating lower case `prometheus_multiproc_dir`.
-prometheus-client>=0.9.0,!=0.10.0
+prometheus-client==0.14.0
 gds-metrics==0.2.4
