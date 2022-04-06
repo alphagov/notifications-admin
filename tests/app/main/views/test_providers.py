@@ -141,7 +141,7 @@ def stub_provider_history():
     }
 
 
-def test_should_show_all_providers(
+def test_view_providers_shows_all_providers(
     client_request,
     platform_admin_user,
     mocker,
@@ -247,7 +247,7 @@ def test_add_monthly_traffic():
     }]
 
 
-def test_should_show_provider_version_history(
+def test_view_provider_shows_version_history(
     client_request,
     platform_admin_user,
     mocker,
@@ -304,7 +304,7 @@ def test_should_show_provider_version_history(
         ],
     ),
 ])
-def test_should_update_priority_of_first_two_sms_providers(
+def test_edit_sms_provider_ratio_should_update_priority_of_first_two_sms_providers(
     client_request,
     platform_admin_user,
     mocker,
