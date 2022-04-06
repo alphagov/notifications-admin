@@ -63,7 +63,7 @@ flask==1.1.2
     #   flask-wtf
     #   gds-metrics
     #   notifications-utils
-flask-login==0.5.0
+flask-login==0.6.0
     # via -r requirements.in
 flask-redis==0.4.0
     # via notifications-utils
@@ -219,6 +219,7 @@ werkzeug==2.0.2
     # via
     #   -r requirements.in
     #   flask
+    #   flask-login
 wtforms==3.0.1
     # via
     #   -r requirements.in
