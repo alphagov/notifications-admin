@@ -1,5 +1,4 @@
 from datetime import datetime
-from operator import itemgetter
 
 from flask import render_template, url_for
 from werkzeug.utils import redirect
@@ -46,13 +45,11 @@ def add_monthly_traffic(domestic_sms_providers):
 @main.route("/provider/edit-sms-provider-ratio", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_sms_provider_ratio():
-
-    providers = sorted([
+    providers = [
         provider
         for provider in provider_client.get_all_providers()['provider_details']
-        if provider['notification_type'] == 'sms'
-        and provider['active']
-    ], key=itemgetter('identifier'))
+        if provider['notification_type'] == 'sms' and provider['active']
+    ]
 
     form = AdminProviderRatioForm(providers)
 
