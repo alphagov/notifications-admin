@@ -1,4 +1,3 @@
-import copy
 from datetime import datetime
 from unittest.mock import call
 
@@ -7,93 +6,118 @@ from flask import url_for
 
 from app.main.views.providers import add_monthly_traffic
 
-sms_provider_1 = {
-    'id': 'sms_provider_1-id',
-    'active': True,
-    'priority': 20,
-    'display_name': 'SMS Provider 1',
-    'identifier': 'sms_provider_1',
-    'notification_type': 'sms',
-    'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
-    'version': 1,
-    'created_by_name': 'Test User',
-    'supports_international': False,
-    'current_month_billable_sms': 5020,
-}
 
-sms_provider_2 = {
-    'id': 'sms_provider_2-id',
-    'active': True,
-    'priority': 10,
-    'display_name': 'SMS Provider 2',
-    'identifier': 'sms_provider_2',
-    'notification_type': 'sms',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': False,
-    'current_month_billable_sms': 6891,
-}
-
-email_provider_1 = {
-    'id': 'email_provider_1-id',
-    'active': True,
-    'priority': 1,
-    'display_name': 'Email Provider 1',
-    'identifier': 'email_provider_1',
-    'notification_type': 'email',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': False,
-    'current_month_billable_sms': 0,
-}
-
-email_provider_2 = {
-    'id': 'email_provider_2-id',
-    'active': True,
-    'priority': 2,
-    'display_name': 'Email Provider 2',
-    'identifier': 'email_provider_2',
-    'notification_type': 'email',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': False,
-    'current_month_billable_sms': 0,
-}
-
-sms_provider_intl_1 = {
-    'id': 'sms_provider_intl_1-id',
-    'active': False,
-    'priority': 10,
-    'display_name': 'SMS Provider Intl 1',
-    'identifier': 'sms_provider_intl_1',
-    'notification_type': 'sms',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': True,
-    'current_month_billable_sms': 0,
-}
-
-sms_provider_intl_2 = {
-    'id': 'sms_provider_intl_2-id',
-    'active': False,
-    'priority': 10,
-    'display_name': 'SMS Provider Intl 2',
-    'identifier': 'sms_provider_intl_2',
-    'notification_type': 'sms',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': True,
-    'current_month_billable_sms': 0,
-}
+@pytest.fixture
+def sms_provider_1():
+    return {
+        'id': 'sms_provider_1-id',
+        'active': True,
+        'priority': 20,
+        'display_name': 'SMS Provider 1',
+        'identifier': 'sms_provider_1',
+        'notification_type': 'sms',
+        'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
+        'version': 1,
+        'created_by_name': 'Test User',
+        'supports_international': False,
+        'current_month_billable_sms': 5020,
+    }
 
 
 @pytest.fixture
-def stub_providers():
+def sms_provider_2():
+    return {
+        'id': 'sms_provider_2-id',
+        'active': True,
+        'priority': 10,
+        'display_name': 'SMS Provider 2',
+        'identifier': 'sms_provider_2',
+        'notification_type': 'sms',
+        'updated_at': None,
+        'version': 1,
+        'created_by': None,
+        'supports_international': False,
+        'current_month_billable_sms': 6891,
+    }
+
+
+@pytest.fixture
+def email_provider_1():
+    return {
+        'id': 'email_provider_1-id',
+        'active': True,
+        'priority': 1,
+        'display_name': 'Email Provider 1',
+        'identifier': 'email_provider_1',
+        'notification_type': 'email',
+        'updated_at': None,
+        'version': 1,
+        'created_by': None,
+        'supports_international': False,
+        'current_month_billable_sms': 0,
+    }
+
+
+@pytest.fixture
+def email_provider_2():
+    return {
+        'id': 'email_provider_2-id',
+        'active': True,
+        'priority': 2,
+        'display_name': 'Email Provider 2',
+        'identifier': 'email_provider_2',
+        'notification_type': 'email',
+        'updated_at': None,
+        'version': 1,
+        'created_by': None,
+        'supports_international': False,
+        'current_month_billable_sms': 0,
+    }
+
+
+@pytest.fixture
+def sms_provider_intl_1():
+    return {
+        'id': 'sms_provider_intl_1-id',
+        'active': False,
+        'priority': 10,
+        'display_name': 'SMS Provider Intl 1',
+        'identifier': 'sms_provider_intl_1',
+        'notification_type': 'sms',
+        'updated_at': None,
+        'version': 1,
+        'created_by': None,
+        'supports_international': True,
+        'current_month_billable_sms': 0,
+    }
+
+
+@pytest.fixture
+def sms_provider_intl_2():
+    return {
+        'id': 'sms_provider_intl_2-id',
+        'active': False,
+        'priority': 10,
+        'display_name': 'SMS Provider Intl 2',
+        'identifier': 'sms_provider_intl_2',
+        'notification_type': 'sms',
+        'updated_at': None,
+        'version': 1,
+        'created_by': None,
+        'supports_international': True,
+        'current_month_billable_sms': 0,
+    }
+
+
+@pytest.fixture
+def stub_providers(
+    sms_provider_1,
+    sms_provider_2,
+    email_provider_1,
+    email_provider_2,
+    sms_provider_intl_1,
+    sms_provider_intl_2,
+):
     return {
         'provider_details': [
             sms_provider_1,
@@ -294,6 +318,7 @@ def test_edit_sms_provider_provider_ratio(
     platform_admin_user,
     mocker,
     stub_providers,
+    sms_provider_1
 ):
     mocker.patch(
         'app.provider_client.get_all_providers',
@@ -317,15 +342,13 @@ def test_edit_sms_provider_provider_ratio_only_shows_active_providers(
     platform_admin_user,
     mocker,
     stub_providers,
+    sms_provider_1,
 ):
-    sms_provider_1_inactive = copy.deepcopy(sms_provider_1)
-    sms_provider_1_inactive['active'] = False
+    sms_provider_1['active'] = False
 
     mocker.patch(
         'app.provider_client.get_all_providers',
-        return_value={
-            'provider_details': [sms_provider_1_inactive, sms_provider_2]
-        }
+        return_value=stub_providers,
     )
 
     client_request.login(platform_admin_user)
