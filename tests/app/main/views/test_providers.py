@@ -7,106 +7,93 @@ from flask import url_for
 from app.main.views.providers import add_monthly_traffic
 
 
+def provider_json(overrides):
+    provider = {
+        'id': 'override-me',
+        'active': True,
+        'priority': 20,
+        'display_name': 'Provider',
+        'identifier': 'override-me',
+        'notification_type': 'sms',
+        'updated_at': None,
+        'version': 1,
+        'created_by_name': None,
+        'supports_international': False,
+        'current_month_billable_sms': 0,
+    }
+
+    provider.update(**overrides)
+    return provider
+
+
 @pytest.fixture
 def sms_provider_1():
-    return {
+    return provider_json({
         'id': 'sms_provider_1-id',
-        'active': True,
         'priority': 20,
         'display_name': 'SMS Provider 1',
         'identifier': 'sms_provider_1',
         'notification_type': 'sms',
         'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
-        'version': 1,
         'created_by_name': 'Test User',
-        'supports_international': False,
         'current_month_billable_sms': 5020,
-    }
+    })
 
 
 @pytest.fixture
 def sms_provider_2():
-    return {
+    return provider_json({
         'id': 'sms_provider_2-id',
-        'active': True,
         'priority': 10,
         'display_name': 'SMS Provider 2',
         'identifier': 'sms_provider_2',
         'notification_type': 'sms',
-        'updated_at': None,
-        'version': 1,
-        'created_by': None,
-        'supports_international': False,
         'current_month_billable_sms': 6891,
-    }
+    })
 
 
 @pytest.fixture
 def email_provider_1():
-    return {
+    return provider_json({
         'id': 'email_provider_1-id',
-        'active': True,
-        'priority': 1,
         'display_name': 'Email Provider 1',
         'identifier': 'email_provider_1',
         'notification_type': 'email',
-        'updated_at': None,
-        'version': 1,
-        'created_by': None,
-        'supports_international': False,
-        'current_month_billable_sms': 0,
-    }
+    })
 
 
 @pytest.fixture
 def email_provider_2():
-    return {
+    return provider_json({
         'id': 'email_provider_2-id',
-        'active': True,
-        'priority': 2,
         'display_name': 'Email Provider 2',
         'identifier': 'email_provider_2',
         'notification_type': 'email',
-        'updated_at': None,
-        'version': 1,
-        'created_by': None,
-        'supports_international': False,
-        'current_month_billable_sms': 0,
-    }
+    })
 
 
 @pytest.fixture
 def sms_provider_intl_1():
-    return {
+    return provider_json({
         'id': 'sms_provider_intl_1-id',
         'active': False,
-        'priority': 10,
         'display_name': 'SMS Provider Intl 1',
         'identifier': 'sms_provider_intl_1',
         'notification_type': 'sms',
-        'updated_at': None,
-        'version': 1,
-        'created_by': None,
         'supports_international': True,
-        'current_month_billable_sms': 0,
-    }
+    })
 
 
 @pytest.fixture
 def sms_provider_intl_2():
-    return {
+    return provider_json({
         'id': 'sms_provider_intl_2-id',
         'active': False,
-        'priority': 10,
         'display_name': 'SMS Provider Intl 2',
         'identifier': 'sms_provider_intl_2',
         'notification_type': 'sms',
-        'updated_at': None,
-        'version': 1,
-        'created_by': None,
         'supports_international': True,
-        'current_month_billable_sms': 0,
-    }
+    })
 
 
 @pytest.fixture
