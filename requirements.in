@@ -23,7 +23,6 @@ git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b86
 notifications-python-client==6.3.0
 rtreelib==0.2.0
 fido2==0.9.3
-importlib-metadata==4.2.0
 pyproj==3.2.1
 
 # PaaS
