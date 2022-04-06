@@ -48,13 +48,11 @@ Providers
       caption="Email providers",
       caption_visible=False,
       empty_message='No email providers',
-      field_headings=['Provider', 'Priority', 'Active', 'Last Updated', 'Updated By'],
+      field_headings=['Provider', 'Active', 'Last Updated', 'Updated By'],
       field_headings_visible=True
   ) %}
 
       {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
-
-      {{ text_field(item.priority) }}
 
       {{ text_field(item.active) }}
 
@@ -65,9 +63,6 @@ Providers
       {% endif %}
 
       {{ optional_text_field(item.created_by_name, default='None') }}
-
-      {{ link_field('change', url_for('main.edit_provider', provider_id=item.id)) }}
-
   {% endcall %}
 
   <h2 class="heading-medium">International SMS Providers</h2>
@@ -77,13 +72,11 @@ Providers
       caption="International SMS providers",
       caption_visible=False,
       empty_message='No international sms providers',
-      field_headings=['Provider', 'Priority', 'Active', 'Last Updated', 'Updated By'],
+      field_headings=['Provider', 'Active', 'Last Updated', 'Updated By'],
       field_headings_visible=True
   ) %}
 
       {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
-
-      {{ text_field(item.priority) }}
 
       {{ text_field(item.active) }}
 

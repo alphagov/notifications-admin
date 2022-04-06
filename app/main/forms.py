@@ -1740,12 +1740,6 @@ class EstimateUsageForm(StripWhitespaceForm):
         return super().validate(*args, **kwargs)
 
 
-class AdminProviderForm(StripWhitespaceForm):
-    priority = GovukIntegerField(
-        'Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")]
-    )
-
-
 class AdminProviderRatioForm(StripWhitespaceForm):
 
     ratio = GovukRadiosField(choices=[

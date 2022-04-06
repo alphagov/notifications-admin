@@ -6,7 +6,7 @@ from werkzeug.utils import redirect
 
 from app import provider_client
 from app.main import main
-from app.main.forms import AdminProviderForm, AdminProviderRatioForm
+from app.main.forms import AdminProviderRatioForm
 from app.utils.user import user_is_platform_admin
 
 PROVIDER_PRIORITY_MEANING_SWITCHOVER = datetime(2019, 11, 29, 11, 0).isoformat()
@@ -41,19 +41,6 @@ def add_monthly_traffic(domestic_sms_providers):
     for provider in domestic_sms_providers:
         percentage = (provider['current_month_billable_sms'] / total_sms_sent * 100) if total_sms_sent else 0
         provider['monthly_traffic'] = round(percentage)
-
-
-@main.route("/provider/<uuid:provider_id>/edit", methods=['GET', 'POST'])
-@user_is_platform_admin
-def edit_provider(provider_id):
-    provider = provider_client.get_provider_by_id(provider_id)['provider_details']
-    form = AdminProviderForm(active=provider['active'], priority=provider['priority'])
-
-    if form.validate_on_submit():
-        provider_client.update_provider(provider_id, form.priority.data)
-        return redirect(url_for('.view_providers'))
-
-    return render_template('views/providers/edit-provider.html', form=form, provider=provider)
 
 
 @main.route("/provider/edit-sms-provider-ratio", methods=['GET', 'POST'])
