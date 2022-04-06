@@ -91,7 +91,7 @@ def edit_sms_provider_ratio():
 
 def _get_versions_since_switchover(provider_id):
 
-    for version in sorted(
+    for version in sorted(  # noqa: B020
         provider_client.get_provider_versions(provider_id)['data'],
         key=lambda version: version['updated_at'] or ''
     ):
@@ -109,7 +109,7 @@ def _chunk_versions_by_day(versions):
 
     days = defaultdict(list)
 
-    for version in sorted(versions, key=lambda version: version['updated_at'] or '', reverse=True):
+    for version in sorted(versions, key=lambda version: version['updated_at'] or '', reverse=True):  # noqa: B020
         days[
             format_date_numeric(version['updated_at'])
         ].append(version)

@@ -100,7 +100,7 @@ def get_user_number(service_id, notification_id):
 
 def get_sms_thread(service_id, user_number):
 
-    for notification in sorted((
+    for notification in sorted((  # noqa: B020
         notification_api_client.get_notifications_for_service(service_id,
                                                               to=user_number,
                                                               template_type='sms')['notifications'] +
