@@ -31,11 +31,10 @@ Providers
 
       {{ text_field(item.active) }}
 
-      {% if item.updated_at %}
-          {{ text_field(item.updated_at|format_datetime_short) }}
-      {% else %}
-          {{ text_field('None') }}
-      {% endif %}
+      {{ optional_text_field(
+          item.updated_at|format_datetime_short if item.updated_at,
+          default='None'
+      ) }}
 
       {{ optional_text_field(item.created_by_name, default='None') }}
 
@@ -56,11 +55,10 @@ Providers
 
       {{ text_field(item.active) }}
 
-      {% if item.updated_at %}
-          {{ text_field(item.updated_at|format_datetime_short) }}
-      {% else %}
-          {{ text_field('None') }}
-      {% endif %}
+      {{ optional_text_field(
+        item.updated_at|format_datetime_short if item.updated_at,
+        default='None'
+      ) }}
 
       {{ optional_text_field(item.created_by_name, default='None') }}
   {% endcall %}
@@ -80,11 +78,10 @@ Providers
 
       {{ text_field(item.active) }}
 
-      {% if item.updated_at %}
-          {{ text_field(item.updated_at|format_datetime_short) }}
-      {% else %}
-          {{ text_field('None') }}
-      {% endif %}
+      {{ optional_text_field(
+        item.updated_at|format_datetime_short if item.updated_at,
+        default='None'
+      ) }}
 
       {{ optional_text_field(item.created_by_name, default='None') }}
 
