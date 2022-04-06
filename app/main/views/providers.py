@@ -1,7 +1,7 @@
 from datetime import datetime
 from operator import itemgetter
 
-from flask import abort, render_template, url_for
+from flask import render_template, url_for
 from werkzeug.utils import redirect
 
 from app import provider_client
@@ -55,9 +55,6 @@ def edit_sms_provider_ratio():
     ], key=itemgetter('identifier'))
 
     form = AdminProviderRatioForm(providers)
-
-    if len(providers) < 2:
-        abort(400)
 
     if form.validate_on_submit():
         for provider in providers:
