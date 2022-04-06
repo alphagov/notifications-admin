@@ -137,7 +137,7 @@ pyasn1==0.4.8
     # via rsa
 pycparser==2.20
     # via cffi
-pyexcel==0.6.7
+pyexcel==0.7.0
     # via -r requirements.in
 pyexcel-ezodf==0.3.4
     # via pyexcel-ods3

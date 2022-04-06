@@ -12,7 +12,7 @@ werkzeug==2.0.2
 jinja2==3.0.2
 
 blinker==1.4
-pyexcel==0.6.7
+pyexcel==0.7.0
 pyexcel-io==0.6.6
 pyexcel-xls==0.7.0
 pyexcel-xlsx==0.6.0
