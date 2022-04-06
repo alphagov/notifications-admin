@@ -77,7 +77,7 @@ def edit_sms_provider_ratio():
     if form.validate_on_submit():
         provider_client.update_provider(first_provider['id'], form.percentage_left)
         provider_client.update_provider(second_provider['id'], form.percentage_right)
-        return redirect(url_for('.edit_sms_provider_ratio'))
+        return redirect(url_for('.view_providers'))
 
     return render_template(
         'views/providers/edit-sms-provider-ratio.html',

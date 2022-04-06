@@ -470,7 +470,7 @@ def test_should_update_priority_of_first_two_sms_providers(
             'ratio': posted_number,
         },
         _expected_redirect=url_for(
-            '.edit_sms_provider_ratio',
+            '.view_providers',
             _external=True,
         ),
     )
