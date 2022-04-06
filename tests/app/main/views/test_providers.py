@@ -337,3 +337,46 @@ def test_edit_sms_provider_ratio_submit(
     )
 
     assert mock_update_provider.call_args_list == expected_calls
+
+
+@pytest.mark.parametrize('post_data, expected_error', [
+    (
+        {
+            sms_provider_1['identifier']: 90,
+            sms_provider_2['identifier']: 20
+        },
+        "Must add up to 100%"
+    ),
+    (
+        {
+            sms_provider_1['identifier']: 101,
+            sms_provider_2['identifier']: 20
+        },
+        "Must be between 0 and 100"
+    ),
+])
+def test_edit_sms_provider_submit_invalid_percentages(
+    client_request,
+    platform_admin_user,
+    mocker,
+    post_data,
+    expected_error,
+    stub_providers,
+):
+    mocker.patch(
+        'app.provider_client.get_all_providers',
+        return_value=stub_providers
+    )
+    mock_update_provider = mocker.patch(
+        'app.provider_client.update_provider'
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.edit_sms_provider_ratio',
+        _data=post_data,
+        _follow_redirects=True
+    )
+
+    assert expected_error in page.select_one('.govuk-error-message').text
+    mock_update_provider.assert_not_called()

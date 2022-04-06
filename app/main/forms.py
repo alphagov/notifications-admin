@@ -1742,6 +1742,8 @@ class EstimateUsageForm(StripWhitespaceForm):
 
 class AdminProviderRatioForm(Form):
     def __init__(self, providers):
+        self._providers = providers
+
         # hack: https://github.com/wtforms/wtforms/issues/736
         self._unbound_fields = [
             (
@@ -1759,6 +1761,25 @@ class AdminProviderRatioForm(Form):
             provider['identifier']: provider['priority']
             for provider in providers
         })
+
+    def validate(self):
+        if not super().validate():
+            return False
+
+        total = sum(
+            getattr(self, provider['identifier']).data
+            for provider in self._providers
+        )
+
+        if total == 100:
+            return True
+
+        for provider in self._providers:
+            getattr(self, provider['identifier']).errors += [
+                'Must add up to 100%'
+            ]
+
+        return False
 
 
 class ServiceContactDetailsForm(StripWhitespaceForm):
