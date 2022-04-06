@@ -18,6 +18,11 @@
   <div class="govuk-grid-column-two-thirds">
 
     {{ page_header(provider_versions[0].display_name) }}
+
+    <p class="govuk-body">
+      Only showing the latest 100 versions.
+    </p>
+
     {% call(item, row_number) list_table(
         provider_versions,
         caption='',
