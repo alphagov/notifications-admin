@@ -1,0 +1,47 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/table.html" import mapping_table, row, text_field %}
+
+{% block per_page_title %}
+  Daily SMS provider volumes Report
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">
+    Daily SMS provider volumes Report
+  </h1>
+
+  {% call form_wrapper() %}
+    {{ form.start_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
+    {{ page_footer('Download report') }}
+  {% endcall %}
+
+  <h2 class="heading-medium">
+    Data included in the report
+  </h2>
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Descriptions of daily SMS provider volumes data',
+      field_headings=['Name', 'Description'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_length, description in [
+        ('day', 'The whole business day in BST'),
+        ('provider', 'The SMS provider'),
+        ('sms totals', 'The number of text messages sent'),
+        ('sms fragments', 'The number of text message fragments sent'),
+        ('sms chargeable units', 'The number of text message fragments sent times the rate multiplier'),
+        ('sms cost', 'The cost of text messages sent'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_length) }}
+          {{ text_field(description | safe) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+{% endblock %}

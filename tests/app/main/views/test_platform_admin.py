@@ -1113,3 +1113,46 @@ def test_get_daily_volumes_report_when_calls_api_and_download_data(
 
         '\r\n'
     )
+
+
+def test_get_daily_sms_provider_volumes_report_when_calls_api_and_download_data(
+    client_request,
+    platform_admin_user,
+    mocker
+):
+    mocker.patch(
+        "app.main.views.platform_admin.billing_api_client.get_data_for_daily_sms_provider_volumes_report",
+        return_value=[{
+            "day": '2019-01-01',
+            "provider": 'foo',
+            "sms_totals": 20,
+            "sms_fragment_totals": 40,
+            "sms_chargeable_units": 60,
+            "sms_cost": 80,
+        }]
+    )
+
+    client_request.login(platform_admin_user)
+    response = client_request.post_response(
+        'main.get_daily_sms_provider_volumes',
+        _data={'start_date': '2019-01-01', 'end_date': '2019-03-31'},
+        _expected_status=200,
+    )
+
+    assert response.content_type == 'text/csv; charset=utf-8'
+    assert response.headers['Content-Disposition'] == (
+        'attachment; filename="Daily SMS provider volumes report from {} to {}.csv"'.format('2019-01-01', '2019-03-31')
+    )
+
+    assert response.get_data(as_text=True) == (
+        "day,provider,sms totals,sms fragment totals,sms chargeable units,sms cost\r\n" +
+
+        '2019-01-01,' +
+        'foo,' +
+        '20,' +
+        '40,' +
+        '60,' +
+        '80'
+
+        '\r\n'
+    )
