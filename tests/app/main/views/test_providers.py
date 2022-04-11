@@ -3,99 +3,108 @@ from unittest.mock import call
 
 import pytest
 from flask import url_for
-from freezegun import freeze_time
 
-import app
 from app.main.views.providers import add_monthly_traffic
-from tests.conftest import normalize_spaces
 
-sms_provider_1 = {
-    'id': '6005e192-4738-4962-beec-ebd982d0b03f',
-    'active': True,
-    'priority': 20,
-    'display_name': 'First Domestic SMS Provider',
-    'identifier': 'first_sms_domestic',
-    'notification_type': 'sms',
-    'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
-    'version': 1,
-    'created_by_name': 'Test User',
-    'supports_international': False,
-    'current_month_billable_sms': 5020,
-}
 
-sms_provider_2 = {
-    'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f',
-    'active': True,
-    'priority': 10,
-    'display_name': 'Second Domestic SMS Provider',
-    'identifier': 'second_sms_domestic',
-    'notification_type': 'sms',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': False,
-    'current_month_billable_sms': 6891,
-}
+def provider_json(overrides):
+    provider = {
+        'id': 'override-me',
+        'active': True,
+        'priority': 20,
+        'display_name': 'Provider',
+        'identifier': 'override-me',
+        'notification_type': 'sms',
+        'updated_at': None,
+        'version': 1,
+        'created_by_name': None,
+        'supports_international': False,
+        'current_month_billable_sms': 0,
+    }
 
-email_provider_1 = {
-    'id': '6005e192-4738-4962-beec-ebd982d0b03a',
-    'active': True,
-    'priority': 1,
-    'display_name': 'first_email_provider',
-    'identifier': 'first_email',
-    'notification_type': 'email',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': False,
-    'current_month_billable_sms': 0,
-}
-
-email_provider_2 = {
-    'active': True,
-    'priority': 2,
-    'display_name': 'second_email_provider',
-    'identifier': 'second_email',
-    'id': '0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b',
-    'notification_type': 'email',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': False,
-    'current_month_billable_sms': 0,
-}
-
-sms_provider_intl_1 = {
-    'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
-    'active': False,
-    'priority': 10,
-    'display_name': 'First International SMS Provider',
-    'identifier': 'first_sms_international',
-    'notification_type': 'sms',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': True,
-    'current_month_billable_sms': 0,
-}
-
-sms_provider_intl_2 = {
-    'id': '67c770f5-918e-4afa-a5ff-880b9beb161d',
-    'active': False,
-    'priority': 10,
-    'display_name': 'Second International SMS Provider',
-    'identifier': 'second_sms_international',
-    'notification_type': 'sms',
-    'updated_at': None,
-    'version': 1,
-    'created_by': None,
-    'supports_international': True,
-    'current_month_billable_sms': 0,
-}
+    provider.update(**overrides)
+    return provider
 
 
 @pytest.fixture
-def stub_providers():
+def sms_provider_1():
+    return provider_json({
+        'id': 'sms_provider_1-id',
+        'priority': 20,
+        'display_name': 'SMS Provider 1',
+        'identifier': 'sms_provider_1',
+        'notification_type': 'sms',
+        'updated_at': datetime(2017, 1, 16, 15, 20, 40).isoformat(),
+        'created_by_name': 'Test User',
+        'current_month_billable_sms': 5020,
+    })
+
+
+@pytest.fixture
+def sms_provider_2():
+    return provider_json({
+        'id': 'sms_provider_2-id',
+        'priority': 10,
+        'display_name': 'SMS Provider 2',
+        'identifier': 'sms_provider_2',
+        'notification_type': 'sms',
+        'current_month_billable_sms': 6891,
+    })
+
+
+@pytest.fixture
+def email_provider_1():
+    return provider_json({
+        'id': 'email_provider_1-id',
+        'display_name': 'Email Provider 1',
+        'identifier': 'email_provider_1',
+        'notification_type': 'email',
+    })
+
+
+@pytest.fixture
+def email_provider_2():
+    return provider_json({
+        'id': 'email_provider_2-id',
+        'display_name': 'Email Provider 2',
+        'identifier': 'email_provider_2',
+        'notification_type': 'email',
+    })
+
+
+@pytest.fixture
+def sms_provider_intl_1():
+    return provider_json({
+        'id': 'sms_provider_intl_1-id',
+        'active': False,
+        'display_name': 'SMS Provider Intl 1',
+        'identifier': 'sms_provider_intl_1',
+        'notification_type': 'sms',
+        'supports_international': True,
+    })
+
+
+@pytest.fixture
+def sms_provider_intl_2():
+    return provider_json({
+        'id': 'sms_provider_intl_2-id',
+        'active': False,
+        'display_name': 'SMS Provider Intl 2',
+        'identifier': 'sms_provider_intl_2',
+        'notification_type': 'sms',
+        'supports_international': True,
+    })
+
+
+@pytest.fixture
+def stub_providers(
+    sms_provider_1,
+    sms_provider_2,
+    email_provider_1,
+    email_provider_2,
+    sms_provider_intl_1,
+    sms_provider_intl_2,
+):
     return {
         'provider_details': [
             sms_provider_1,
@@ -105,13 +114,6 @@ def stub_providers():
             sms_provider_intl_1,
             sms_provider_intl_2,
         ]
-    }
-
-
-@pytest.fixture
-def stub_provider():
-    return {
-        'provider_details': sms_provider_1
     }
 
 
@@ -151,7 +153,7 @@ def stub_provider_history():
     }
 
 
-def test_should_show_all_providers(
+def test_view_providers_shows_all_providers(
     client_request,
     platform_admin_user,
     mocker,
@@ -181,8 +183,8 @@ def test_should_show_all_providers(
     domestic_sms_first_row = domestic_sms_table.tbody.find_all('tr')[0]
     table_data = domestic_sms_first_row.find_all('td')
 
-    assert table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03f'
-    assert table_data[0].text.strip() == "First Domestic SMS Provider"
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/sms_provider_1-id'
+    assert table_data[0].text.strip() == "SMS Provider 1"
     assert table_data[1].text.strip() == "20"
     assert table_data[2].text.strip() == "42"
     assert table_data[3].text.strip() == "True"
@@ -192,8 +194,8 @@ def test_should_show_all_providers(
     domestic_sms_second_row = domestic_sms_table.tbody.find_all('tr')[1]
     table_data = domestic_sms_second_row.find_all('td')
 
-    assert table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51f'
-    assert table_data[0].text.strip() == "Second Domestic SMS Provider"
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/sms_provider_2-id'
+    assert table_data[0].text.strip() == "SMS Provider 2"
     assert table_data[1].text.strip() == "10"
     assert table_data[2].text.strip() == "58"
     assert table_data[3].text.strip() == "True"
@@ -203,36 +205,29 @@ def test_should_show_all_providers(
     domestic_email_first_row = domestic_email_table.tbody.find_all('tr')[0]
     domestic_email_table_data = domestic_email_first_row.find_all('td')
 
-    assert domestic_email_table_data[0].find_all("a")[0]['href'] == '/provider/6005e192-4738-4962-beec-ebd982d0b03a'
-    assert domestic_email_table_data[0].text.strip() == "first_email_provider"
-    assert domestic_email_table_data[1].text.strip() == "1"
-    assert domestic_email_table_data[2].text.strip() == "True"
+    assert domestic_email_table_data[0].find_all("a")[0]['href'] == '/provider/email_provider_1-id'
+    assert domestic_email_table_data[0].text.strip() == "Email Provider 1"
+    assert domestic_email_table_data[1].text.strip() == "True"
+    assert domestic_email_table_data[2].text.strip() == "None"
     assert domestic_email_table_data[3].text.strip() == "None"
-    assert domestic_email_table_data[4].text.strip() == "None"
-    assert domestic_email_table_data[5].find_all("a")[0]['href'] \
-        == '/provider/6005e192-4738-4962-beec-ebd982d0b03a/edit'
 
     domestic_email_second_row = domestic_email_table.tbody.find_all('tr')[1]
     domestic_email_table_data = domestic_email_second_row.find_all('td')
 
-    assert domestic_email_table_data[0].find_all("a")[0]['href'] == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b'
-    assert domestic_email_table_data[0].text.strip() == "second_email_provider"
-    assert domestic_email_table_data[1].text.strip() == "2"
-    assert domestic_email_table_data[2].text.strip() == "True"
+    assert domestic_email_table_data[0].find_all("a")[0]['href'] == '/provider/email_provider_2-id'
+    assert domestic_email_table_data[0].text.strip() == "Email Provider 2"
+    assert domestic_email_table_data[1].text.strip() == "True"
+    assert domestic_email_table_data[2].text.strip() == "None"
     assert domestic_email_table_data[3].text.strip() == "None"
-    assert domestic_email_table_data[4].text.strip() == "None"
-    assert domestic_email_table_data[5].find_all("a")[0]['href'] \
-        == '/provider/0bd529cd-a0fd-43e5-80ee-b95ef6b0d51b/edit'
 
     international_sms_first_row = international_sms_table.tbody.find_all('tr')[0]
     table_data = international_sms_first_row.find_all('td')
 
-    assert table_data[0].find_all("a")[0]['href'] == '/provider/67c770f5-918e-4afa-a5ff-880b9beb161d'
-    assert table_data[0].text.strip() == "First International SMS Provider"
-    assert table_data[1].text.strip() == "10"
-    assert table_data[2].text.strip() == "False"
+    assert table_data[0].find_all("a")[0]['href'] == '/provider/sms_provider_intl_1-id'
+    assert table_data[0].text.strip() == "SMS Provider Intl 1"
+    assert table_data[1].text.strip() == "False"
+    assert table_data[2].text.strip() == "None"
     assert table_data[3].text.strip() == "None"
-    assert table_data[4].text.strip() == "None"
 
 
 def test_add_monthly_traffic():
@@ -264,134 +259,7 @@ def test_add_monthly_traffic():
     }]
 
 
-def test_should_show_edit_provider_form(
-    client_request,
-    platform_admin_user,
-    mocker,
-    fake_uuid,
-    stub_provider
-):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
-
-    client_request.login(platform_admin_user)
-    page = client_request.get('main.edit_provider', provider_id=fake_uuid)
-
-    h1 = [header.text.strip() for header in page.find_all('h1')]
-
-    assert 'First Domestic SMS Provider' in h1
-
-    form = [form for form in page.find_all('form')]
-
-    form_elements = [element for element in form[0].find_all('input')]
-    assert form_elements[0]['value'] == '20'
-    assert form_elements[0]['name'] == 'priority'
-
-
-def test_should_show_error_on_bad_provider_priority(
-    client_request,
-    platform_admin_user,
-    mocker,
-    stub_provider,
-):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
-
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        'main.edit_provider',
-        provider_id=stub_provider['provider_details']['id'],
-        _data={'priority': "not valid"},
-        _expected_status=200,
-    )
-
-    assert normalize_spaces(
-        page.select_one('.govuk-error-message').text
-    ) == "Error: Not a valid integer value."
-
-
-def test_should_show_error_on_negative_provider_priority(
-    client_request,
-    platform_admin_user,
-    mocker,
-    stub_provider,
-):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
-
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        'main.edit_provider',
-        provider_id=stub_provider['provider_details']['id'],
-        _data={'priority': -1},
-        _expected_status=200,
-    )
-
-    assert normalize_spaces(
-        page.select_one('.govuk-error-message').text
-    ) == "Error: Must be between 1 and 100"
-
-
-def test_should_show_error_on_too_big_provider_priority(
-    client_request,
-    platform_admin_user,
-    mocker,
-    stub_provider,
-):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
-
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        'main.edit_provider',
-        provider_id=stub_provider['provider_details']['id'],
-        _data={'priority': 101},
-        _expected_status=200,
-    )
-
-    assert normalize_spaces(
-        page.select_one('.govuk-error-message').text
-    ) == "Error: Must be between 1 and 100"
-
-
-def test_should_show_error_on_too_little_provider_priority(
-    client_request,
-    platform_admin_user,
-    mocker,
-    stub_provider,
-):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
-
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        'main.edit_provider',
-        provider_id=stub_provider['provider_details']['id'],
-        _data={'priority': 0},
-        _expected_status=200,
-    )
-
-    assert normalize_spaces(
-        page.select_one('.govuk-error-message').text
-    ) == "Error: Must be between 1 and 100"
-
-
-def test_should_update_provider_priority(
-    client_request,
-    platform_admin_user,
-    mocker,
-    stub_provider,
-):
-    mocker.patch('app.provider_client.get_provider_by_id', return_value=stub_provider)
-    mocker.patch('app.provider_client.update_provider', return_value=stub_provider)
-
-    client_request.login(platform_admin_user)
-    client_request.post(
-        'main.edit_provider',
-        provider_id=stub_provider['provider_details']['id'],
-        _data={'priority': 2},
-        _expected_redirect='http://localhost/providers',
-    )
-
-    app.provider_client.update_provider.assert_called_with(stub_provider['provider_details']['id'], 2)
-
-
-def test_should_show_provider_version_history(
+def test_view_provider_shows_version_history(
     client_request,
     platform_admin_user,
     mocker,
@@ -432,131 +300,86 @@ def test_should_show_provider_version_history(
     assert second_row[4].text.strip() == "True"
 
 
-@freeze_time('2022-2-22 15:00')
-def test_should_show_version_history_for_first_two_sms_providers(
+def test_edit_sms_provider_provider_ratio(
     client_request,
     platform_admin_user,
     mocker,
     stub_providers,
+    sms_provider_1
 ):
     mocker.patch(
         'app.provider_client.get_all_providers',
         return_value=stub_providers
     )
 
-    # Getting the history for one provider implicitly gives us the
-    # history of the other one (in a world with only two providers).
-    # The code picks the first provider in alphabetical order of its
-    # id i.e. sms_provider_1.
-    mocker.patch(
-        'app.provider_client.get_provider_versions',
-        return_value={'data': [
-            {
-                'id': id,
-                'priority': priority,
-                'display_name': sms_provider_1['display_name'],
-                'identifier': sms_provider_1['identifier'],
-                'updated_at': updated_at,
-                'created_by': {
-                    'email_address': 'test@foo.bar',
-                    'name': 'Test User',
-                    'id': '7cc1dddb-bcbc-4739-8fc1-61bedde3332a'
-                },
-                'supports_international': False,
-            }
-            for updated_at, priority in [
-                (datetime(2022, 2, 22, 14).isoformat(), 100),
-                (datetime(2020, 1, 1, 5).isoformat(), 80),
-                (datetime(2020, 1, 1, 3).isoformat(), 10),
-                # Anything older than 11am on 29 November 2019
-                # should be ignored because the priority numbers
-                # didn’t mean the same thing before then
-                (datetime(2019, 11, 29, 10, 59).isoformat(), 123),
-                (datetime(2000, 1, 1, 0).isoformat(), 1999),
-                (None, 30),
-            ]
-        ]}
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.edit_sms_provider_ratio',
     )
 
-    client_request.login(platform_admin_user)
-    page = client_request.get('main.edit_sms_provider_ratio')
+    inputs = page.select('.govuk-input[type="text"]')
+    assert len(inputs) == 2
 
-    assert [
-        radio['value']
-        for radio in page.select('input[name=ratio]')
-    ] == [
-        '100', '90', '80', '70', '60', '50', '40', '30', '20', '10', '0',
-    ]
-
-    assert [
-        radio['value']
-        for radio in page.select('input[checked]')
-    ] == [
-        str(sms_provider_1['priority'])
-    ]
-
-    assert [
-        normalize_spaces(heading.text)
-        for heading in page.select('main h2')
-    ] == [
-        'Now',
-        'Today',
-        '1 January 2020',
-    ]
-
-    assert [
-        normalize_spaces(version.text)
-        for version in page.select('li.history-list-item')
-    ] == [
-        (
-            'Test User 2:00pm '
-            'First Domestic SMS Provider 100% '
-            'Second Domestic SMS Provider 0%'
-        ),
-        (
-            'Test User 5:00am '
-            'First Domestic SMS Provider 80% '
-            'Second Domestic SMS Provider 20%'
-        ),
-        (
-            'Test User 3:00am '
-            'First Domestic SMS Provider 10% '
-            'Second Domestic SMS Provider 90%'
-        ),
-    ]
+    first_input = page.select_one('.govuk-input[name="sms_provider_1"]')
+    assert first_input.attrs['value'] == str(sms_provider_1['priority'])
 
 
-@pytest.mark.parametrize('posted_number, expected_calls', [
-    (
-        '10',
-        [
-            call(sms_provider_1['id'], 10),
-            call(sms_provider_2['id'], 90),
-        ],
-    ),
-    (
-        '80',
-        [
-            call(sms_provider_1['id'], 80),
-            call(sms_provider_2['id'], 20),
-        ],
-    ),
-])
-def test_should_update_priority_of_first_two_sms_providers(
+def test_edit_sms_provider_provider_ratio_only_shows_active_providers(
     client_request,
     platform_admin_user,
     mocker,
-    posted_number,
+    stub_providers,
+    sms_provider_1,
+):
+    sms_provider_1['active'] = False
+
+    mocker.patch(
+        'app.provider_client.get_all_providers',
+        return_value=stub_providers,
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        '.edit_sms_provider_ratio',
+    )
+
+    inputs = page.select('.govuk-input[type="text"]')
+    assert len(inputs) == 1
+
+
+@pytest.mark.parametrize('post_data, expected_calls', [
+    (
+        {
+            'sms_provider_1': 10,
+            'sms_provider_2': 90
+        },
+        [
+            call('sms_provider_1-id', 10),
+            call('sms_provider_2-id', 90),
+        ],
+    ),
+    (
+        {
+            'sms_provider_1': 80,
+            'sms_provider_2': 20
+        },
+        [
+            call('sms_provider_1-id', 80),
+            call('sms_provider_2-id', 20),
+        ],
+    ),
+])
+def test_edit_sms_provider_ratio_submit(
+    client_request,
+    platform_admin_user,
+    mocker,
+    post_data,
     expected_calls,
     stub_providers,
 ):
     mocker.patch(
         'app.provider_client.get_all_providers',
         return_value=stub_providers
-    )
-    mocker.patch(
-        'app.provider_client.get_provider_versions',
-        return_value={'data': []}
     )
     mock_update_provider = mocker.patch(
         'app.provider_client.update_provider'
@@ -565,13 +388,54 @@ def test_should_update_priority_of_first_two_sms_providers(
     client_request.login(platform_admin_user)
     client_request.post(
         '.edit_sms_provider_ratio',
-        _data={
-            'ratio': posted_number,
-        },
+        _data=post_data,
         _expected_redirect=url_for(
-            '.edit_sms_provider_ratio',
+            '.view_providers',
             _external=True,
         ),
     )
 
     assert mock_update_provider.call_args_list == expected_calls
+
+
+@pytest.mark.parametrize('post_data, expected_error', [
+    (
+        {
+            'sms_provider_1': 90,
+            'sms_provider_2': 20
+        },
+        "Must add up to 100%"
+    ),
+    (
+        {
+            'sms_provider_1': 101,
+            'sms_provider_2': 20
+        },
+        "Must be between 0 and 100"
+    ),
+])
+def test_edit_sms_provider_submit_invalid_percentages(
+    client_request,
+    platform_admin_user,
+    mocker,
+    post_data,
+    expected_error,
+    stub_providers,
+):
+    mocker.patch(
+        'app.provider_client.get_all_providers',
+        return_value=stub_providers
+    )
+    mock_update_provider = mocker.patch(
+        'app.provider_client.update_provider'
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.edit_sms_provider_ratio',
+        _data=post_data,
+        _follow_redirects=True
+    )
+
+    assert expected_error in page.select_one('.govuk-error-message').text
+    mock_update_provider.assert_not_called()

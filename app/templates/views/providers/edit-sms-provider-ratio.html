@@ -4,87 +4,22 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Text message providers
+  Edit SMS provider priorities
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  {{ page_header('Text message providers') }}
+  {{ page_header('Edit SMS provider priorities') }}
 
+  <p class="govuk-body">
+    If you change one priority you will need to change the others so they add up to 100%.
+  </p>
 
-  <h2 class="heading-small top-gutter">
-    Now
-  </h2>
-  <div class="bottom-gutter">
-    <div class="history-list-item">
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-third">&nbsp;</div>
-        <div class="govuk-grid-column-two-thirds">
-          <div class="history-list-percentage-without-border">
-            <div class="history-list-percentage-left-label">
-              {{ first_provider }}
-            </div>
-            <div class="history-list-percentage-right-label">
-              {{ second_provider }}
-            </div>
-            {% call form_wrapper() %}
-              <div class="radio-slider" data-module="radio-slider">
-                {{ form.ratio }}
-                <div class="radio-slider-left-value">
-                  —
-                </div>
-                <div class="radio-slider-right-value">
-                  —
-                </div>
-              </div>
-              {{ page_footer('Update', centered_button=True) }}
-            {% endcall %}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% call form_wrapper() %}
+    {% for field in form %}
+      {{ field }}
+    {% endfor %}
 
-
-  {% for day, versions in versions %}
-    <h2 class="heading-small top-gutter">
-      {% if day %}
-        {{ versions[0]['updated_at']|format_date_human|title }}
-      {% else %}
-        Start
-      {% endif %}
-    </h2>
-    <ul class="bottom-gutter">
-      {% for version in versions %}
-        <li class="history-list-item">
-          <div class="govuk-grid-row">
-            <div class="govuk-grid-column-one-third">
-              <div class="history-list-user">
-                {{ version.created_by.name or ('&nbsp;'|safe) }}
-              </div>
-              {% if version.updated_at %}
-                <div class="history-list-time">
-                  {{ version.updated_at|format_time }}
-                </div>
-              {% endif %}
-            </div>
-            <div class="govuk-grid-column-two-thirds">
-              <div class="history-list-percentage">
-                <div class="history-list-percentage-left-label">
-                  {{ first_provider }}<br><br>
-                  {{ version.priority|format_thousands }}%
-                </div>
-                <div class="history-list-percentage-right-label">
-                  {{ second_provider }}<br><br>
-                  {{ (100 - version.priority)|format_thousands }}%
-                </div>
-                <div class="history-list-percentage-marker" style="left: {{ (100 -version.priority)|format_thousands }}%"></div>
-              </div>
-            </div>
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endfor %}
-
+    {{ page_footer('Save') }}
+  {% endcall %}
 {% endblock %}

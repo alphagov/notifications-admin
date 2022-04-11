@@ -1,13 +1,11 @@
-from collections import defaultdict
 from datetime import datetime
-from operator import itemgetter
 
-from flask import abort, render_template, url_for
+from flask import render_template, url_for
 from werkzeug.utils import redirect
 
-from app import format_date_numeric, provider_client
+from app import provider_client
 from app.main import main
-from app.main.forms import AdminProviderForm, AdminProviderRatioForm
+from app.main.forms import AdminProviderRatioForm
 from app.utils.user import user_is_platform_admin
 
 PROVIDER_PRIORITY_MEANING_SWITCHOVER = datetime(2019, 11, 29, 11, 0).isoformat()
@@ -44,77 +42,28 @@ def add_monthly_traffic(domestic_sms_providers):
         provider['monthly_traffic'] = round(percentage)
 
 
-@main.route("/provider/<uuid:provider_id>/edit", methods=['GET', 'POST'])
-@user_is_platform_admin
-def edit_provider(provider_id):
-    provider = provider_client.get_provider_by_id(provider_id)['provider_details']
-    form = AdminProviderForm(active=provider['active'], priority=provider['priority'])
-
-    if form.validate_on_submit():
-        provider_client.update_provider(provider_id, form.priority.data)
-        return redirect(url_for('.view_providers'))
-
-    return render_template('views/providers/edit-provider.html', form=form, provider=provider)
-
-
 @main.route("/provider/edit-sms-provider-ratio", methods=['GET', 'POST'])
 @user_is_platform_admin
 def edit_sms_provider_ratio():
-
-    providers = sorted([
+    providers = [
         provider
         for provider in provider_client.get_all_providers()['provider_details']
-        if provider['notification_type'] == 'sms'
-        and provider['active']
-    ], key=itemgetter('identifier'))
+        if provider['notification_type'] == 'sms' and provider['active']
+    ]
 
-    form = AdminProviderRatioForm(ratio=providers[0]['priority'])
-
-    if len(providers) < 2:
-        abort(400)
-
-    first_provider, second_provider = providers[0:2]
+    form = AdminProviderRatioForm(providers)
 
     if form.validate_on_submit():
-        provider_client.update_provider(first_provider['id'], form.percentage_left)
-        provider_client.update_provider(second_provider['id'], form.percentage_right)
-        return redirect(url_for('.edit_sms_provider_ratio'))
+        for provider in providers:
+            field = getattr(form, provider['identifier'])
+            provider_client.update_provider(provider['id'], field.data)
+        return redirect(url_for('.view_providers'))
 
     return render_template(
         'views/providers/edit-sms-provider-ratio.html',
-        versions=_chunk_versions_by_day(_get_versions_since_switchover(first_provider['id'])),
         form=form,
-        first_provider=providers[0]['display_name'],
-        second_provider=providers[1]['display_name'],
+        providers=providers
     )
-
-
-def _get_versions_since_switchover(provider_id):
-
-    for version in sorted(  # noqa: B020
-        provider_client.get_provider_versions(provider_id)['data'],
-        key=lambda version: version['updated_at'] or ''
-    ):
-
-        if not version['updated_at']:
-            continue
-
-        if version['updated_at'] < PROVIDER_PRIORITY_MEANING_SWITCHOVER:
-            continue
-
-        yield version
-
-
-def _chunk_versions_by_day(versions):
-
-    days = defaultdict(list)
-
-    for version in sorted(versions, key=lambda version: version['updated_at'] or '', reverse=True):  # noqa: B020
-        days[
-            format_date_numeric(version['updated_at'])
-        ].append(version)
-
-    return sorted(days.items(), reverse=True)
 
 
 @main.route("/provider/<uuid:provider_id>")

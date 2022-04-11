@@ -1740,34 +1740,49 @@ class EstimateUsageForm(StripWhitespaceForm):
         return super().validate(*args, **kwargs)
 
 
-class AdminProviderForm(StripWhitespaceForm):
-    priority = GovukIntegerField(
-        'Priority', [validators.NumberRange(min=1, max=100, message="Must be between 1 and 100")]
-    )
+class AdminProviderRatioForm(Form):
+    def __init__(self, providers):
+        self._providers = providers
 
+        # hack: https://github.com/wtforms/wtforms/issues/736
+        self._unbound_fields = [
+            (
+                provider['identifier'],
+                GovukIntegerField(
+                    f"{provider['display_name']} (%)",
+                    validators=[validators.NumberRange(
+                        min=0, max=100, message="Must be between 0 and 100"
+                    )],
+                    param_extensions={
+                        'classes': "govuk-input--width-3",
+                    }
+                )
+            ) for provider in providers
+        ]
 
-class AdminProviderRatioForm(StripWhitespaceForm):
-
-    ratio = GovukRadiosField(choices=[
-            (str(value), '{}% / {}%'.format(value, 100 - value))
-            for value in range(100, -10, -10)
-        ],
-        param_extensions={
-            "classes": "govuk-radios--inline",
-            "fieldset": {
-                "legend": {
-                    "classes": "govuk-visually-hidden"
-                }
-            }
+        super().__init__(data={
+            provider['identifier']: provider['priority']
+            for provider in providers
         })
 
-    @property
-    def percentage_left(self):
-        return int(self.ratio.data)
+    def validate(self):
+        if not super().validate():
+            return False
 
-    @property
-    def percentage_right(self):
-        return 100 - self.percentage_left
+        total = sum(
+            getattr(self, provider['identifier']).data
+            for provider in self._providers
+        )
+
+        if total == 100:
+            return True
+
+        for provider in self._providers:
+            getattr(self, provider['identifier']).errors += [
+                'Must add up to 100%'
+            ]
+
+        return False
 
 
 class ServiceContactDetailsForm(StripWhitespaceForm):
