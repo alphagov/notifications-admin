@@ -207,7 +207,7 @@ smartypants==2.0.1
     # via notifications-utils
 statsd==3.3.0
     # via notifications-utils
-texttable==1.6.3
+texttable==1.6.4
     # via pyexcel
 urllib3==1.26.5
     # via
