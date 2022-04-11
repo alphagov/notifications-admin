@@ -28,7 +28,7 @@
       field_headings_visible=True,
       caption_visible=False
     ) %}
-      {% for message_length, charge in [
+      {% for column_heading, description in [
         ('free allowance', 'Free allowance set for the service. This is the latest free allowance for the date range given'),
         ('sms notifications', 'The number of text messages sent by the service.'),
         ('sms chargeable units', 'The number of text message fragments times the rate multiplier sent by the service.'),
@@ -38,8 +38,8 @@
         ('letter sheet totals', 'The number of sheet sent by a service')
       ] %}
         {% call row() %}
-          {{ text_field(message_length) }}
-          {{ text_field(charge | safe) }}
+          {{ text_field(column_heading) }}
+          {{ text_field(description) }}
         {% endcall %}
       {% endfor %}
     {% endcall %}

@@ -28,16 +28,16 @@
       field_headings_visible=True,
       caption_visible=False
     ) %}
-      {% for message_length, charge in [
+      {% for column_heading, description in [
         ('sms cost', 'The total cost of text messages sent after a service has used its free allowance.'),
-        ('sms chargeable units', 'The number of fragments sent after a service has used its free allowance. This number takes into account the cost multiplier for <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/pricing#international-numbers">sending international text messages</a>.'),
+        ('sms chargeable units', 'The number of fragments sent after a service has used its free allowance. This number takes into account the cost multiplier for <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/pricing#international-numbers">sending international text messages</a>.' | safe),
         ('letter cost', 'The total cost of letters sent by a service.'),
         ('letter breakdown', 'The number of letters sent by a service, grouped by postage and unit cost.'),
         ('purchase order number, contact names, contact email addresses and billing reference', 'We add this data manually based on the information we get from services. You can help by adding it to the service settings page.'),
       ] %}
         {% call row() %}
-          {{ text_field(message_length) }}
-          {{ text_field(charge | safe) }}
+          {{ text_field(column_heading) }}
+          {{ text_field(description) }}
         {% endcall %}
       {% endfor %}
     {% endcall %}

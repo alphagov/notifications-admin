@@ -28,7 +28,7 @@
       field_headings_visible=True,
       caption_visible=False
     ) %}
-      {% for message_length, charge in [
+      {% for column_heading, description in [
         ('day', 'The whole business day in BST.'),
         ('sms totals', 'The number of text messages sent'),
         ('sms fragments', 'The number of text message fragments sent times the rate multiplier'),
@@ -38,8 +38,8 @@
         ('letter sheet totals', 'The number of sheets sent')
       ] %}
         {% call row() %}
-          {{ text_field(message_length) }}
-          {{ text_field(charge | safe) }}
+          {{ text_field(column_heading) }}
+          {{ text_field(description) }}
         {% endcall %}
       {% endfor %}
     {% endcall %}
