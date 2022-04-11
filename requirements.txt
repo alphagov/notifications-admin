@@ -209,7 +209,7 @@ statsd==3.3.0
     # via notifications-utils
 texttable==1.6.4
     # via pyexcel
-urllib3==1.26.5
+urllib3==1.26.9
     # via
     #   botocore
     #   requests
