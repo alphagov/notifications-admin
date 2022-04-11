@@ -1749,10 +1749,13 @@ class AdminProviderRatioForm(Form):
             (
                 provider['identifier'],
                 GovukIntegerField(
-                    provider['display_name'],
+                    f"{provider['display_name']} (%)",
                     validators=[validators.NumberRange(
                         min=0, max=100, message="Must be between 0 and 100"
-                    )]
+                    )],
+                    param_extensions={
+                        'classes': "govuk-input--width-3",
+                    }
                 )
             ) for provider in providers
         ]
