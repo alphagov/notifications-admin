@@ -854,14 +854,14 @@ def test_get_live_services_report(
     )
     report = response.get_data(as_text=True)
     assert report.strip() == (
-        'Service ID,Organisation,Organisation type,Service name,Consent to research,Main contact,Contact email,'
-        + 'Contact mobile,Live date,SMS volume intent,Email volume intent,Letter volume intent,SMS sent this year,'
-        + 'Emails sent this year,Letters sent this year,Free sms allowance\r\n'
+        'Service ID,Organisation,Organisation type,Service name,Consent to research,Main contact,Contact email,' +
+        'Contact mobile,Live date,SMS volume intent,Email volume intent,Letter volume intent,SMS sent this year,' +
+        'Emails sent this year,Letters sent this year,Free sms allowance\r\n' +
 
-        + '1,Forest,Ecosystem,jessie the oak tree,True,Forest fairy,forest.fairy@digital.cabinet-office.gov.uk,'
-        + '+447700900986,29-03-2014,100,50,20,300,1200,0,100\r\n'
+        '1,Forest,Ecosystem,jessie the oak tree,True,Forest fairy,forest.fairy@digital.cabinet-office.gov.uk,' +
+        '+447700900986,29-03-2014,100,50,20,300,1200,0,100\r\n' +
 
-        + '2,Forest,Ecosystem,james the pine tree,,,,,,,60,0,0,0,0,200'
+        '2,Forest,Ecosystem,james the pine tree,,,,,,,60,0,0,0,0,200'
     )
 
 
@@ -920,7 +920,7 @@ def test_get_billing_report_when_no_results_for_date(client_request, platform_ad
     assert normalize_spaces(error.text) == 'No results for dates'
 
 
-def test_get_billing_report_when_calls_api_and_download_data(
+def test_get_billing_report_calls_api_and_download_data(
     client_request,
     platform_admin_user,
     mocker
@@ -957,10 +957,9 @@ def test_get_billing_report_when_calls_api_and_download_data(
     )
 
     assert response.get_data(as_text=True) == (
-        'organisation_id,organisation_name,service_id,service_name,sms_cost,sms_chargeable_units' +
-        ',total_letters,letter_cost,letter_breakdown,purchase_order_number,contact_names,contact_email_addresses' +
-
-        ',billing_reference\r\n' +
+        'organisation_id,organisation_name,service_id,service_name,sms_cost,sms_chargeable_units,' +
+        'total_letters,letter_cost,letter_breakdown,purchase_order_number,contact_names,contact_email_addresses,' +
+        'billing_reference\r\n' +
 
         '7832a1be-a1f0-4f2a-982f-05adfd3d6354,' +
         'Org for a - with sms and letter,' +
@@ -973,7 +972,7 @@ def test_get_billing_report_when_calls_api_and_download_data(
         '"6 second class letters at 45p' +
         '\n' +
         '2 first class letters at 35p",' +
-        'PO1234,"Anne, Marie, Josh","billing@example.com, accounts@example.com",Notify2020'
+        'PO1234,"Anne, Marie, Josh","billing@example.com, accounts@example.com",Notify2020' +
 
         '\r\n'
     )
@@ -1008,15 +1007,16 @@ def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
         'attachment; filename="{} to {} notification status per service report.csv"'.format(start_date, end_date)
     )
     assert response.get_data(as_text=True) == (
-        'date_created,service_id,service_name,notification_type,count_sending,count_delivered,count_technical_failure,'
-        'count_temporary_failure,count_permanent_failure,count_sent\r\n'
-        '2019-01-01,596364a0-858e-42c8-9062-a8fe822260eb,service one,email,191,0,0,14,0,0\r\n'
-        '2019-01-01,596364a0-858e-42c8-9062-a8fe822260eb,service one,sms,42,0,0,8,0,0\r\n'
+        'date_created,service_id,service_name,notification_type,count_sending,count_delivered,' +
+        'count_technical_failure,count_temporary_failure,count_permanent_failure,count_sent\r\n' +
+
+        '2019-01-01,596364a0-858e-42c8-9062-a8fe822260eb,service one,email,191,0,0,14,0,0\r\n' +
+        '2019-01-01,596364a0-858e-42c8-9062-a8fe822260eb,service one,sms,42,0,0,8,0,0\r\n' +
         '2019-01-01,147ad62a-2951-4fa1-9ca0-093cd1a52c52,service two,email,3,1,0,2,0,0\r\n'
     )
 
 
-def test_get_volumes_by_service_report_when_calls_api_and_download_data(
+def test_get_volumes_by_service_report_calls_api_and_download_data(
     client_request,
     platform_admin_user,
     mocker
@@ -1064,13 +1064,13 @@ def test_get_volumes_by_service_report_when_calls_api_and_download_data(
         '8,' +
         '10,' +
         '4.5,' +
-        '10'
+        '10' +
 
         '\r\n'
     )
 
 
-def test_get_daily_volumes_report_when_calls_api_and_download_data(
+def test_get_daily_volumes_report_calls_api_and_download_data(
     client_request,
     platform_admin_user,
     mocker
@@ -1109,13 +1109,13 @@ def test_get_daily_volumes_report_when_calls_api_and_download_data(
         '60,' +
         '100,' +
         '10,' +
-        '20'
+        '20' +
 
         '\r\n'
     )
 
 
-def test_get_daily_sms_provider_volumes_report_when_calls_api_and_download_data(
+def test_get_daily_sms_provider_volumes_report_calls_api_and_download_data(
     client_request,
     platform_admin_user,
     mocker
@@ -1152,7 +1152,7 @@ def test_get_daily_sms_provider_volumes_report_when_calls_api_and_download_data(
         '20,' +
         '40,' +
         '60,' +
-        '80'
+        '80' +
 
         '\r\n'
     )
