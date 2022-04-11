@@ -1,5 +1,7 @@
 import uuid
 
+import pytest
+
 from app.notify_client.billing_api_client import BillingAPIClient
 
 
@@ -43,19 +45,18 @@ def test_post_free_sms_fragment_limit_for_year_endpoint(mocker, api_user_active)
     )
 
 
-def test_get_data_for_volumes_by_service_report(mocker, api_user_active):
+@pytest.mark.parametrize('func, expected_url', [
+    (BillingAPIClient.get_data_for_volumes_by_service_report, '/platform-stats/volumes-by-service'),
+    (BillingAPIClient.get_data_for_daily_volumes_report, '/platform-stats/daily-volumes-report'),
+    (
+        BillingAPIClient.get_data_for_daily_sms_provider_volumes_report,
+        '/platform-stats/daily-sms-provider-volumes-report'
+    ),
+])
+def test_get_data_for_volume_reports(mocker, api_user_active, func, expected_url):
     mock_get = mocker.patch('app.notify_client.billing_api_client.BillingAPIClient.get')
     client = BillingAPIClient()
 
-    client.get_data_for_volumes_by_service_report('2022-03-01', '2022-03-31')
-    mock_get.assert_called_once_with(url='/platform-stats/volumes-by-service',
-                                     params={'start_date': '2022-03-01', 'end_date': '2022-03-31'})
+    func(client, '2022-03-01', '2022-03-31')
 
-
-def test_get_data_for_daily_volumes_report(mocker, api_user_active):
-    mock_get = mocker.patch('app.notify_client.billing_api_client.BillingAPIClient.get')
-    client = BillingAPIClient()
-
-    client.get_data_for_daily_volumes_report('2022-03-01', '2022-03-31')
-    mock_get.assert_called_once_with(url='/platform-stats/daily-volumes-report',
-                                     params={'start_date': '2022-03-01', 'end_date': '2022-03-31'})
+    mock_get.assert_called_once_with(url=expected_url, params={'start_date': '2022-03-01', 'end_date': '2022-03-31'})
