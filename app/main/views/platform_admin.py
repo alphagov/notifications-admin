@@ -381,6 +381,46 @@ def get_daily_volumes():
     return render_template('views/platform-admin/daily-volumes-report.html', form=form)
 
 
+@main.route("/platform-admin/reports/daily-sms-provider-volumes-report", methods=['GET', 'POST'])
+@user_is_platform_admin
+def get_daily_sms_provider_volumes():
+    form = BillingReportDateFilterForm()
+
+    if form.validate_on_submit():
+        start_date = form.start_date.data
+        end_date = form.end_date.data
+        headers = [
+            "day",
+            "provider",
+            "sms totals",
+            "sms fragment totals",
+            "sms chargeable units",
+            "sms cost",
+        ]
+        result = billing_api_client.get_data_for_daily_sms_provider_volumes_report(start_date, end_date)
+
+        rows = [
+            [
+                r["day"],
+                r["provider"],
+                r["sms_totals"],
+                r["sms_fragment_totals"],
+                r["sms_chargeable_units"],
+                r["sms_cost"]
+            ]
+            for r in result
+        ]
+        if rows:
+            return Spreadsheet.from_rows([headers] + rows).as_csv_data, 200, {
+                'Content-Type': 'text/csv; charset=utf-8',
+                'Content-Disposition':
+                    f'attachment; filename="Daily SMS provider volumes report from {start_date} to {end_date}.csv"'
+            }
+        else:
+            flash('No results for dates')
+    return render_template('views/platform-admin/daily-sms-provider-volumes-report.html', form=form)
+
+
 @main.route("/platform-admin/complaints")
 @user_is_platform_admin
 def platform_admin_list_complaints():

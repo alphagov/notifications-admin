@@ -3,13 +3,13 @@
 {% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block per_page_title %}
-  Volumes by service report
+  Daily SMS provider volumes Report
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-large">
-    Volumes by service Report
+    Daily SMS provider volumes Report
   </h1>
 
   {% call form_wrapper() %}
@@ -23,19 +23,18 @@
   </h2>
 <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Descriptions of volumes by service data',
+      caption='Descriptions of daily SMS provider volumes data',
       field_headings=['Name', 'Description'],
       field_headings_visible=True,
       caption_visible=False
     ) %}
       {% for column_heading, description in [
-        ('free allowance', 'Free allowance set for the service. This is the latest free allowance for the date range given'),
-        ('sms notifications', 'The number of text messages sent by the service.'),
-        ('sms chargeable units', 'The number of text message fragments times the rate multiplier sent by the service.'),
-        ('email totals', 'The number of emails sent by a service'),
-        ('letter totals', 'The number of letters sent by a service'),
-        ('letter costs', 'The cost of the letters, rate * letter totals'),
-        ('letter sheet totals', 'The number of sheet sent by a service')
+        ('day', 'The whole business day in BST'),
+        ('provider', 'The SMS provider'),
+        ('sms totals', 'The number of text messages sent'),
+        ('sms fragments', 'The number of text message fragments sent'),
+        ('sms chargeable units', 'The number of text message fragments sent times the rate multiplier'),
+        ('sms cost', 'The cost of text messages sent'),
       ] %}
         {% call row() %}
           {{ text_field(column_heading) }}
