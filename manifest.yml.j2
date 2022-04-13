@@ -1,9 +1,9 @@
 {%- set apps = {
   'notify-admin': {
     'routes': {
-      'preview': ['www.notify.works'],
-      'staging': ['www.staging-notify.works'],
-      'production': ['www.notifications.service.gov.uk'],
+      'preview': ['www.notify.works', 'notify-admin-preview.apps.internal'],
+      'staging': ['www.staging-notify.works', 'notify-admin-staging.apps.internal'],
+      'production': ['www.notifications.service.gov.uk', 'notify-admin-production.apps.internal'],
     }
   },
   'notify-admin-prototype': {},
