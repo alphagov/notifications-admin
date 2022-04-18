@@ -35,7 +35,7 @@ chardet==4.0.0
     # via
     #   pyexcel
     #   requests
-click==8.0.1
+click==8.1.2
     # via flask
 colorama==0.4.3
     # via awscli
