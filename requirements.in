@@ -32,5 +32,5 @@ notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@55
 govuk-frontend-jinja==2.0.0
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
-prometheus-client==0.14.0
+prometheus-client==0.14.1
 gds-metrics==0.2.4
