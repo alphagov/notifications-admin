@@ -39,7 +39,7 @@ click==8.1.2
     # via flask
 colorama==0.4.4
     # via awscli
-cryptography==36.0.1
+cryptography==36.0.2
     # via fido2
 dnspython==1.16.0
     # via eventlet
