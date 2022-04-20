@@ -30,7 +30,9 @@
           <div class="keyline-block">
             {{ big_number(sms_sent, 'sent', smaller=True) }}
             {{ big_number(sms_free_allowance, 'free allowance', smaller=True) }}
-            {{ big_number(sms_allowance_remaining, 'free allowance remaining', smaller=True) }}
+            {% if sms_free_allowance > 0 %}
+              {{ big_number(sms_allowance_remaining, 'free allowance remaining', smaller=True) }}
+            {% endif %}
             {% if sms_chargeable %}
               {{ big_number(
                 sms_chargeable,
