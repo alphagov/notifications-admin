@@ -33,6 +33,7 @@ applications:
       - logit-ssl-syslog-drain
       - notify-prometheus
       - notify-splunk
+      - notify-redis
 
     env:
       NOTIFY_APP_NAME: admin
@@ -61,6 +62,5 @@ applications:
       TEMPLATE_PREVIEW_API_KEY: '{{ TEMPLATE_PREVIEW_API_KEY }}'
 
       REDIS_ENABLED: '{{ REDIS_ENABLED }}'
-      REDIS_URL: '{{ REDIS_URL }}'
 
       NOTIFY_BILLING_DETAILS: '{{ NOTIFY_BILLING_DETAILS | tojson }}'
