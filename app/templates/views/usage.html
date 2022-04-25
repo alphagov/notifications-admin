@@ -97,7 +97,7 @@
             {% endcall %}
             {% call field(align='left') %}
               {{ big_number(
-                (sms_rate * month.sms_paid_count) + month.letter_total,
+                (month.sms_rate * month.sms_paid_count) + month.letter_total,
                 currency="£",
                 smallest=True
               ) }}
@@ -107,7 +107,7 @@
               {% endif %}
               {% if month.sms_paid_count %}
                 <li class="tabular-numbers">{{ month.sms_paid_count|message_count('sms') }} at
-                {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
+                {{- ' {:.2f}p'.format(month.sms_rate * 100) }}</li>
               {% endif %}
               {% for letter in month.letters%}
                 {% if letter.billing_units %}

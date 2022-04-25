@@ -429,6 +429,7 @@ def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, bi
             'letters': letter_billing,
             'sms_paid_count': breakdown['paid'],
             'sms_free_count': breakdown['free'],
+            'sms_rate': breakdown['sms_rate'],
         }
 
 
@@ -476,23 +477,31 @@ def get_free_paid_breakdown_for_month(
 ):
     allowance = free_sms_fragment_limit
 
+    # makes the assumption that there is either no item in `monthly_usage` because they have not sent any SMS
+    # or that they have sent SMS and that there is only a single item in `monthly_usage` because they have only
+    # been sent at a single rate during the month
+    sms_rate = monthly_usage[0]['rate'] if len(monthly_usage) else 0
+
     total_monthly_billing_units = get_sum_billing_units(monthly_usage)
 
     if cumulative < allowance:
         return {
             'paid': 0,
             'free': total_monthly_billing_units,
+            'sms_rate': sms_rate,
         }
     elif previous_cumulative < allowance:
         remaining_allowance = allowance - previous_cumulative
         return {
             'paid': total_monthly_billing_units - remaining_allowance,
             'free': remaining_allowance,
+            'sms_rate': sms_rate,
         }
     else:
         return {
             'paid': total_monthly_billing_units,
             'free': 0,
+            'sms_rate': sms_rate,
         }
 
 
