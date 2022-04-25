@@ -1595,18 +1595,18 @@ def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_mont
             ]
         )
         assert list(billing_units) == [
-            {'free': 100000, 'name': 'April', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 100000, 'name': 'May', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 50000, 'name': 'June', 'paid': 50000, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'July', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'August', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'September', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'October', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'November', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'December', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'January', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'February', 'paid': 2000, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'March', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0}
+            {'free': 100000, 'name': 'April', 'paid': 0, 'letter_total': 0, 'letters': []},
+            {'free': 100000, 'name': 'May', 'paid': 0, 'letter_total': 0, 'letters': []},
+            {'free': 50000, 'name': 'June', 'paid': 50000, 'letter_total': 0, 'letters': []},
+            {'free': 0, 'name': 'July', 'paid': 0, 'letter_total': 0, 'letters': []},
+            {'free': 0, 'name': 'August', 'paid': 0, 'letter_total': 0, 'letters': []},
+            {'free': 0, 'name': 'September', 'paid': 0, 'letter_total': 0, 'letters': []},
+            {'free': 0, 'name': 'October', 'paid': 0, 'letter_total': 0, 'letters': []},
+            {'free': 0, 'name': 'November', 'paid': 0, 'letter_total': 0, 'letters': []},
+            {'free': 0, 'name': 'December', 'paid': 0, 'letter_total': 0, 'letters': []},
+            {'free': 0, 'name': 'January', 'paid': 0, 'letter_total': 0, 'letters': []},
+            {'free': 0, 'name': 'February', 'paid': 2000, 'letter_total': 0, 'letters': []},
+            {'free': 0, 'name': 'March', 'paid': 0, 'letter_total': 0, 'letters': []}
         ][:expected_number_of_months]
 
 

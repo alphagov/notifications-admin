@@ -406,7 +406,6 @@ def get_sum_billing_units(billing_units, month=None):
 
 def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, billing_units):
     cumulative = 0
-    letter_cumulative = 0
     sms_units = [x for x in billing_units if x['notification_type'] == 'sms']
     letter_units = [x for x in billing_units if x['notification_type'] == 'letter']
     for month in get_months_for_financial_year(year):
@@ -424,11 +423,9 @@ def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, bi
         letter_total = 0
         for x in letter_billing:
             letter_total += x.cost
-            letter_cumulative += letter_total
         yield {
             'name': month,
             'letter_total': letter_total,
-            'letter_cumulative': letter_cumulative,
             'paid': breakdown['paid'],
             'free': breakdown['free'],
             'letters': letter_billing
