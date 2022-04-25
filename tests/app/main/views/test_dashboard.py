@@ -1595,18 +1595,18 @@ def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_mont
             ]
         )
         assert list(billing_units) == [
-            {'free': 100000, 'name': 'April', 'paid': 0, 'letter_total': 0, 'letters': []},
-            {'free': 100000, 'name': 'May', 'paid': 0, 'letter_total': 0, 'letters': []},
-            {'free': 50000, 'name': 'June', 'paid': 50000, 'letter_total': 0, 'letters': []},
-            {'free': 0, 'name': 'July', 'paid': 0, 'letter_total': 0, 'letters': []},
-            {'free': 0, 'name': 'August', 'paid': 0, 'letter_total': 0, 'letters': []},
-            {'free': 0, 'name': 'September', 'paid': 0, 'letter_total': 0, 'letters': []},
-            {'free': 0, 'name': 'October', 'paid': 0, 'letter_total': 0, 'letters': []},
-            {'free': 0, 'name': 'November', 'paid': 0, 'letter_total': 0, 'letters': []},
-            {'free': 0, 'name': 'December', 'paid': 0, 'letter_total': 0, 'letters': []},
-            {'free': 0, 'name': 'January', 'paid': 0, 'letter_total': 0, 'letters': []},
-            {'free': 0, 'name': 'February', 'paid': 2000, 'letter_total': 0, 'letters': []},
-            {'free': 0, 'name': 'March', 'paid': 0, 'letter_total': 0, 'letters': []}
+            {'sms_free_count': 100000, 'name': 'April', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 100000, 'name': 'May', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 50000, 'name': 'June', 'sms_paid_count': 50000, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 0, 'name': 'July', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 0, 'name': 'August', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 0, 'name': 'September', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 0, 'name': 'October', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 0, 'name': 'November', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 0, 'name': 'December', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 0, 'name': 'January', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 0, 'name': 'February', 'sms_paid_count': 2000, 'letter_total': 0, 'letters': []},
+            {'sms_free_count': 0, 'name': 'March', 'sms_paid_count': 0, 'letter_total': 0, 'letters': []}
         ][:expected_number_of_months]
 
 

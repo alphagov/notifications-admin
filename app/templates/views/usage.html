@@ -97,16 +97,16 @@
             {% endcall %}
             {% call field(align='left') %}
               {{ big_number(
-                (sms_rate * month.paid) + month.letter_total,
+                (sms_rate * month.sms_paid_count) + month.letter_total,
                 currency="£",
                 smallest=True
               ) }}
               <ul>
-              {% if month.free %}
-                <li class="tabular-numbers">{{ month.free|format_thousands }} free {{ month.free|message_count_label('sms', suffix='') }}</li>
+              {% if month.sms_free_count %}
+                <li class="tabular-numbers">{{ month.sms_free_count|format_thousands }} free {{ month.sms_free_count|message_count_label('sms', suffix='') }}</li>
               {% endif %}
-              {% if month.paid %}
-                <li class="tabular-numbers">{{ month.paid|message_count('sms') }} at
+              {% if month.sms_paid_count %}
+                <li class="tabular-numbers">{{ month.sms_paid_count|message_count('sms') }} at
                 {{- ' {:.2f}p'.format(sms_rate * 100) }}</li>
               {% endif %}
               {% for letter in month.letters%}
@@ -115,7 +115,7 @@
                   {{ letter.rate | format_number_in_pounds_as_currency }}</li>
                 {% endif %}
               {% endfor %}
-              {% if not (month.free or month.paid or month.letters) %}
+              {% if not (month.sms_free_count or month.sms_paid_count or month.letters) %}
                 <li aria-hidden="true">–</li>
               {% endif %}
               </ul>

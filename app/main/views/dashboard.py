@@ -426,9 +426,9 @@ def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, bi
         yield {
             'name': month,
             'letter_total': letter_total,
-            'paid': breakdown['paid'],
-            'free': breakdown['free'],
-            'letters': letter_billing
+            'letters': letter_billing,
+            'sms_paid_count': breakdown['paid'],
+            'sms_free_count': breakdown['free'],
         }
 
 
