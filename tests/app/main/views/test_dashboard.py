@@ -1126,32 +1126,15 @@ def test_usage_page_displays_letters_split_by_month_and_postage(
     assert '7 international letters at £1.00' in may_row
 
 
-@pytest.mark.parametrize('free_allowance, expected_sms_usage_breakdown', (
-    (0, (
-        'Text messages '
-        '252,190 sent '
-        '0 free allowance '
-        '252,190 at 1.65 pence per message'
-    )),
-    (100_000, (
-        'Text messages '
-        '252,190 sent '
-        '100,000 free allowance '
-        '0 free allowance remaining '
-        '152,190 at 1.65 pence per message'
-    )),
-))
 def test_usage_page_with_0_free_allowance(
     mocker,
     client_request,
     mock_get_usage,
     mock_get_billable_units,
-    free_allowance,
-    expected_sms_usage_breakdown,
 ):
     mocker.patch(
         'app.billing_api_client.get_free_sms_fragment_limit_for_year',
-        return_value=free_allowance,
+        return_value=0,
     )
     page = client_request.get(
         'main.usage',
@@ -1161,7 +1144,10 @@ def test_usage_page_with_0_free_allowance(
     assert normalize_spaces(
         page.select('main .govuk-grid-column-one-third')[1].text
     ) == (
-        expected_sms_usage_breakdown
+        'Text messages '
+        '251,800 sent '
+        '0 free allowance '
+        '251,800 at 1.65 pence per message'
     )
 
 
