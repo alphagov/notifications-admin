@@ -2316,11 +2316,41 @@ def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
 def mock_get_usage(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
-            {"notification_type": "email", "billing_units": 1000, "rate": 0.00, "letter_total": 0},
-            {"notification_type": "sms", "billing_units": 251500, "rate": 0.0165, "letter_total": 0},
-            {"notification_type": "sms", "billing_units": 300, "rate": 0.0165, "letter_total": 0},
-            {"notification_type": "sms", "billing_units": 300, "rate": 0.0165, "letter_total": 0},
-            {"notification_type": "sms", "billing_units": 90, "rate": 0.0165, "letter_total": 0}
+            {
+                "notification_type": "email",
+                "chargeable_units": 1000,
+                "notifications_sent": 1000,
+                "rate": 0.00,
+                "letter_total": 0
+            },
+            {
+                "notification_type": "sms",
+                "chargeable_units": 251500,
+                "notifications_sent": 105000,
+                "rate": 0.0165,
+                "letter_total": 0
+            },
+            {
+                "notification_type": "sms",
+                "chargeable_units": 300,
+                "notifications_sent": 300,
+                "rate": 0.0165,
+                "letter_total": 0
+            },
+            {
+                "notification_type": "sms",
+                "chargeable_units": 300,
+                "notifications_sent": 150,
+                "rate": 0.0165,
+                "letter_total": 0
+            },
+            {
+                "notification_type": "sms",
+                "chargeable_units": 90,
+                "notifications_sent": 90,
+                "rate": 0.0165,
+                "letter_total": 0
+            }
         ]
 
     return mocker.patch(
@@ -2440,12 +2470,18 @@ def mock_get_future_usage(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
             {
-                'notification_type': 'sms', 'billing_units': 0,
-                'rate': 0.0158, 'letter_total': 0
+                'notification_type': 'sms',
+                'chargeable_units': 0,
+                'notifications_sent': 0,
+                'rate': 0.0158,
+                'letter_total': 0
             },
             {
-                'notification_type': 'email', 'billing_units': 0,
-                'rate': 0.0, 'letter_total': 0
+                'notification_type': 'email',
+                'chargeable_units': 0,
+                'notifications_sent': 0,
+                'rate': 0.0,
+                'letter_total': 0
             }
         ]
 
