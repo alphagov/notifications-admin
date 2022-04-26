@@ -1021,12 +1021,44 @@ def test_usage_page(
     assert '250,000 free allowance' in sms_column
     assert '0 free allowance remaining' in sms_column
     assert '£29.85 spent' in sms_column
-    assert '1,800 at 1.65 pence' in sms_column
+    assert '1,500 at 1.65 pence' in sms_column
+    assert '300 at 1.70 pence' in sms_column
 
     letter_column = normalize_spaces(annual_usage[2].text + annual_usage[5].text)
     assert 'Letters' in letter_column
     assert '100 sent' in letter_column
     assert '£30.00 spent' in letter_column
+
+
+@freeze_time("2012-03-31 12:12:12")
+def test_usage_page_no_sms_spend(
+    mocker,
+    client_request,
+    mock_get_billable_units,
+    mock_get_free_sms_fragment_limit
+):
+    mocker.patch('app.billing_api_client.get_service_usage', return_value=[
+        {
+            "notification_type": "sms",
+            "chargeable_units": 1000,
+            "charged_units": 0,
+            "rate": 0.0165,
+            "cost": 0
+        }
+    ])
+
+    page = client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    annual_usage = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
+    sms_column = normalize_spaces(annual_usage[1].text + annual_usage[4].text)
+    assert 'Text messages' in sms_column
+    assert '250,000 free allowance' in sms_column
+    assert '249,000 free allowance remaining' in sms_column
+    assert '£0.00 spent' in sms_column
+    assert 'pence per message' not in sms_column
 
 
 @freeze_time("2012-03-31 12:12:12")
@@ -1141,14 +1173,12 @@ def test_usage_page_with_0_free_allowance(
         service_id=SERVICE_ONE_ID,
         year=2020,
     )
-    assert normalize_spaces(
-        page.select('main .govuk-grid-column-one-third')[1].text
-    ) == (
-        'Text messages '
-        '251,800 sent '
-        '0 free allowance '
-        '251,800 at 1.65 pence per message'
-    )
+
+    annual_usage = page.select('main .govuk-grid-column-one-third')
+    sms_column = normalize_spaces(annual_usage[1].text)
+
+    assert '0 free allowance' in sms_column
+    assert 'free allowance remaining' not in sms_column
 
 
 def test_usage_page_with_year_argument(

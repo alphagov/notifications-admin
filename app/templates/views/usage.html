@@ -33,13 +33,15 @@
             {% if sms_free_allowance > 0 %}
               {{ big_number(sms_allowance_remaining, 'free allowance remaining', smaller=True) }}
             {% endif %}
-            {% if sms_charged %}
-              {{ big_number(
-                sms_charged,
-                'at {:.2f} pence per message'.format(sms_rate * 100),
-                smaller=True
-              ) }}
-            {% endif %}
+            {% for row in sms_breakdown %}
+              {% if row.charged_units > 0 %}
+                {{ big_number(
+                  row.charged_units,
+                  'at {:.2f} pence per message'.format(row.rate * 100),
+                  smaller=True
+                ) }}
+              {% endif %}
+            {% endfor %}
           </div>
         </div>
         <div class='govuk-grid-column-one-third'>

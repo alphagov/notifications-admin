@@ -328,8 +328,6 @@ def get_dashboard_totals(statistics):
 
 def get_annual_usage_breakdown(usage, free_sms_fragment_limit):
     sms = get_usage_breakdown_by_type(usage, 'sms')
-    # this relies on the assumption: only one SMS rate per financial year.
-    sms_rate = 0 if len(sms) == 0 else sms[0].get("rate", 0)
     sms_chargeable_units = sum(row['chargeable_units'] for row in sms)
     sms_free_allowance = free_sms_fragment_limit
     sms_cost = sum(row['cost'] for row in sms)
@@ -346,9 +344,8 @@ def get_annual_usage_breakdown(usage, free_sms_fragment_limit):
         'sms_free_allowance': sms_free_allowance,
         'sms_sent': sms_chargeable_units,
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_chargeable_units)),
-        'sms_charged': max(0, sms_chargeable_units - sms_free_allowance),
         'sms_cost': sms_cost,
-        'sms_rate': sms_rate,
+        'sms_breakdown': sms,
         'letter_sent': letters_sent,
         'letter_cost': letters_cost
     }
