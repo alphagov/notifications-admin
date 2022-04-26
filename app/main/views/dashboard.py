@@ -346,7 +346,7 @@ def get_annual_usage_breakdown(usage, free_sms_fragment_limit):
         'sms_free_allowance': sms_free_allowance,
         'sms_sent': sms_chargeable_units,
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_chargeable_units)),
-        'sms_chargeable': max(0, sms_chargeable_units - sms_free_allowance),
+        'sms_charged': max(0, sms_chargeable_units - sms_free_allowance),
         'sms_cost': sms_cost,
         'sms_rate': sms_rate,
         'letter_sent': letters_sent,
