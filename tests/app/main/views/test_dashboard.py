@@ -1022,8 +1022,8 @@ def test_usage_page(
     assert 'March' in table
     assert '£28.99' in table
     assert '140 free text messages' in table
-    assert '£20.30' in table
-    assert '1,230 text messages at 1.65p' in table
+    assert '£20.91' in table
+    assert '1,230 text messages at 1.70p' in table
 
 
 @freeze_time("2012-03-31 12:12:12")
@@ -1064,8 +1064,8 @@ def test_usage_page_with_letters(
     assert 'March' in table
     assert '£28.99' in table
     assert '140 free text messages' in table
-    assert '£20.30' in table
-    assert '1,230 text messages at 1.65p' in table
+    assert '£20.91' in table
+    assert '1,230 text messages at 1.70p' in table
     assert '10 second class letters at 31p' in normalize_spaces(table)
     assert '5 first class letters at 33p' in normalize_spaces(table)
     assert '10 international letters at 84p' in normalize_spaces(table)
