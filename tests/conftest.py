@@ -2321,28 +2321,28 @@ def mock_get_usage(mocker, service_one, fake_uuid):
                 "chargeable_units": 1000,
                 "notifications_sent": 1000,
                 "rate": 0.00,
-                "letter_total": 0
+                "cost": 0
             },
             {
                 "notification_type": "sms",
                 "chargeable_units": 251500,
                 "notifications_sent": 105000,
                 "rate": 0.0165,
-                "letter_total": 0
+                "cost": 24.75  # 250K free allowance
             },
             {
                 "notification_type": "sms",
                 "chargeable_units": 300,
                 "notifications_sent": 300,
                 "rate": 0.0165,
-                "letter_total": 0
+                "cost": 5.1
             },
             {
                 "notification_type": "letter",
                 "chargeable_units": 300,
                 "notifications_sent": 100,
                 "rate": 0.1,
-                "letter_total": 30
+                "cost": 30
             },
         ]
 
@@ -2467,14 +2467,14 @@ def mock_get_future_usage(mocker, service_one, fake_uuid):
                 'chargeable_units': 0,
                 'notifications_sent': 0,
                 'rate': 0.0158,
-                'letter_total': 0
+                'cost': 0
             },
             {
                 'notification_type': 'email',
                 'chargeable_units': 0,
                 'notifications_sent': 0,
                 'rate': 0.0,
-                'letter_total': 0
+                'cost': 0
             }
         ]
 

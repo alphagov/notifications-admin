@@ -1020,7 +1020,7 @@ def test_usage_page(
     assert '251,800 sent' in sms_column
     assert '250,000 free allowance' in sms_column
     assert '0 free allowance remaining' in sms_column
-    assert '£36.14 spent' in sms_column
+    assert '£29.85 spent' in sms_column
     assert '1,800 at 1.65 pence' in sms_column
 
     letter_column = normalize_spaces(annual_usage[2].text + annual_usage[5].text)
@@ -1855,7 +1855,7 @@ def test_service_dashboard_shows_usage(
     ) == (
         'Unlimited '
         'free email allowance '
-        '£36.14 '
+        '£29.85 '
         'spent on text messages '
         '£30.00 '
         'spent on letters'

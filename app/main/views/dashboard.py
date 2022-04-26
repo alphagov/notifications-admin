@@ -332,13 +332,14 @@ def get_annual_usage_breakdown(usage, free_sms_fragment_limit):
     sms_rate = 0 if len(sms) == 0 else sms[0].get("rate", 0)
     sms_chargeable_units = sum(row['chargeable_units'] for row in sms)
     sms_free_allowance = free_sms_fragment_limit
+    sms_cost = sum(row['cost'] for row in sms)
 
     emails = get_usage_breakdown_by_type(usage, 'email')
     emails_sent = sum(row['notifications_sent'] for row in emails)
 
     letters = get_usage_breakdown_by_type(usage, 'letter')
     letters_sent = sum(row['notifications_sent'] for row in letters)
-    letters_cost = sum(row['letter_total'] for row in letters)
+    letters_cost = sum(row['cost'] for row in letters)
 
     return {
         'emails_sent': emails_sent,
@@ -346,6 +347,7 @@ def get_annual_usage_breakdown(usage, free_sms_fragment_limit):
         'sms_sent': sms_chargeable_units,
         'sms_allowance_remaining': max(0, (sms_free_allowance - sms_chargeable_units)),
         'sms_chargeable': max(0, sms_chargeable_units - sms_free_allowance),
+        'sms_cost': sms_cost,
         'sms_rate': sms_rate,
         'letter_sent': letters_sent,
         'letter_cost': letters_cost

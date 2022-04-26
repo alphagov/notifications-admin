@@ -59,7 +59,7 @@
         <div class='govuk-grid-column-one-third'>
           <div class="keyline-block">
             {{ big_number(
-              (sms_chargeable * sms_rate),
+              sms_cost,
               'spent',
               currency="£",
               smaller=True

@@ -8,9 +8,9 @@
   </div>
   <div class='govuk-grid-column-one-third'>
     <div class="keyline-block">
-      {% if sms_chargeable %}
+      {% if sms_cost %}
         {{ big_number(
-          sms_chargeable * sms_rate,
+          sms_cost,
           'spent on text messages',
           currency="£",
           smaller=True
