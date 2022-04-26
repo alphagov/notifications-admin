@@ -2350,7 +2350,14 @@ def mock_get_usage(mocker, service_one, fake_uuid):
                 "notifications_sent": 90,
                 "rate": 0.0165,
                 "letter_total": 0
-            }
+            },
+            {
+                "notification_type": "letter",
+                "chargeable_units": 300,
+                "notifications_sent": 100,
+                "rate": 0.1,
+                "letter_total": 30
+            },
         ]
 
     return mocker.patch(

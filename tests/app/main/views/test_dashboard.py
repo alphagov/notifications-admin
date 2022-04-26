@@ -1002,15 +1002,31 @@ def test_usage_page(
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
-    cols = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
     nav = page.find('ul', {'class': 'pill'})
     unselected_nav_links = nav.select('a:not(.pill-item--selected)')
-
     assert normalize_spaces(nav.find('a', {'aria-current': 'page'}).text) == '2011 to 2012 financial year'
     assert normalize_spaces(unselected_nav_links[0].text) == '2010 to 2011 financial year'
     assert normalize_spaces(unselected_nav_links[1].text) == '2009 to 2010 financial year'
-    assert '252,190' in cols[1].text
-    assert 'Text messages' in cols[1].text
+
+    annual_usage = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
+
+    # annual stats are shown in two rows, each with three column; email is col 1
+    email_column = normalize_spaces(annual_usage[0].text + annual_usage[3].text)
+    assert 'Emails' in email_column
+    assert '1,000 sent' in email_column
+
+    sms_column = normalize_spaces(annual_usage[1].text + annual_usage[4].text)
+    assert 'Text messages' in sms_column
+    assert '252,190 sent' in sms_column
+    assert '250,000 free allowance' in sms_column
+    assert '0 free allowance remaining' in sms_column
+    assert '£36.14 spent' in sms_column
+    assert '2,190 at 1.65 pence' in sms_column
+
+    letter_column = normalize_spaces(annual_usage[2].text + annual_usage[5].text)
+    assert 'Letters' in letter_column
+    assert '100 sent' in letter_column
+    assert '£30.00 spent' in letter_column
 
 
 @freeze_time("2012-03-31 12:12:12")
@@ -1834,7 +1850,7 @@ def test_breadcrumb_shows_if_service_is_suspended(
     ['email', 'sms'],
     ['email', 'sms', 'letter'],
 ))
-def test_should_show_usage_on_dashboard(
+def test_service_dashboard_shows_usage(
     client_request,
     service_one,
     mock_get_service_templates,
@@ -1855,6 +1871,6 @@ def test_should_show_usage_on_dashboard(
         'free email allowance '
         '£36.14 '
         'spent on text messages '
-        '£0.00 '
+        '£30.00 '
         'spent on letters'
     )
