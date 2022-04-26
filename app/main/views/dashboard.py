@@ -150,8 +150,7 @@ def usage(service_id):
             start=current_financial_year - 2,
             end=current_financial_year,
         ),
-        **calculate_usage(yearly_usage,
-                          free_sms_allowance)
+        **get_annual_usage_breakdown(yearly_usage, free_sms_allowance)
     )
 
 
@@ -315,7 +314,7 @@ def get_dashboard_partials(service_id):
         ),
         'usage': render_template(
             'views/dashboard/_usage.html',
-            **calculate_usage(yearly_usage, free_sms_allowance),
+            **get_annual_usage_breakdown(yearly_usage, free_sms_allowance),
         ),
     }
 
@@ -327,31 +326,29 @@ def get_dashboard_totals(statistics):
     return statistics
 
 
-def calculate_usage(usage, free_sms_fragment_limit):
-    sms_breakdowns = [breakdown for breakdown in usage if breakdown['notification_type'] == 'sms']
-
+def get_annual_usage_breakdown(usage, free_sms_fragment_limit):
+    sms = get_usage_breakdown_by_type(usage, 'sms')
     # this relies on the assumption: only one SMS rate per financial year.
-    sms_rate = 0 if len(sms_breakdowns) == 0 else sms_breakdowns[0].get("rate", 0)
-    sms_sent = get_sum_billing_units(sms_breakdowns)
+    sms_rate = 0 if len(sms) == 0 else sms[0].get("rate", 0)
+    sms_chargeable_units = sum(row['billing_units'] for row in sms)
     sms_free_allowance = free_sms_fragment_limit
 
-    emails = [breakdown["billing_units"] for breakdown in usage if breakdown['notification_type'] == 'email']
-    emails_sent = 0 if len(emails) == 0 else emails[0]
+    emails = get_usage_breakdown_by_type(usage, 'email')
+    emails_sent = sum(row['billing_units'] for row in emails)
 
-    letters = [(breakdown["billing_units"], breakdown['letter_total']) for breakdown in usage if
-               breakdown['notification_type'] == 'letter']
-    letter_sent = sum(row[0] for row in letters)
-    letter_cost = sum(row[1] for row in letters)
+    letters = get_usage_breakdown_by_type(usage, 'letter')
+    letters_sent = sum(row['billing_units'] for row in letters)
+    letters_cost = sum(row['letter_total'] for row in letters)
 
     return {
         'emails_sent': emails_sent,
         'sms_free_allowance': sms_free_allowance,
-        'sms_sent': sms_sent,
-        'sms_allowance_remaining': max(0, (sms_free_allowance - sms_sent)),
-        'sms_chargeable': max(0, sms_sent - sms_free_allowance),
+        'sms_sent': sms_chargeable_units,
+        'sms_allowance_remaining': max(0, (sms_free_allowance - sms_chargeable_units)),
+        'sms_chargeable': max(0, sms_chargeable_units - sms_free_allowance),
         'sms_rate': sms_rate,
-        'letter_sent': letter_sent,
-        'letter_cost': letter_cost
+        'letter_sent': letters_sent,
+        'letter_cost': letters_cost
     }
 
 
@@ -402,6 +399,10 @@ def get_sum_billing_units(billing_units, month=None):
     if month:
         return sum(b['billing_units'] for b in billing_units if b['month'] == month)
     return sum(b['billing_units'] for b in billing_units)
+
+
+def get_usage_breakdown_by_type(usage, notification_type):
+    return [row for row in usage if row['notification_type'] == notification_type]
 
 
 def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, billing_units):
