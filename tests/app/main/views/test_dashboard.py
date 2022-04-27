@@ -1890,3 +1890,30 @@ def test_service_dashboard_shows_usage(
         '£30.00 '
         'spent on letters'
     )
+
+
+def test_service_dashboard_shows_free_allowance(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_has_no_jobs,
+    mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+):
+    mocker.patch('app.billing_api_client.get_service_usage', return_value=[
+        {
+            "notification_type": "sms",
+            "chargeable_units": 1000,
+            "charged_units": 0,
+            "rate": 0.0165,
+            "cost": 0
+        }
+    ])
+
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
+
+    usage_text = normalize_spaces(page.select_one('[data-key=usage]').text)
+    assert 'spent on text messages' not in usage_text
+    assert '249,000 free text messages left' in usage_text
