@@ -1022,8 +1022,8 @@ def test_usage_page(
     assert 'March' in table
     assert '£28.99' in table
     assert '140 free text messages' in table
-    assert '£20.30' in table
-    assert '1,230 text messages at 1.65p' in table
+    assert '£20.91' in table
+    assert '1,230 text messages at 1.70p' in table
 
 
 @freeze_time("2012-03-31 12:12:12")
@@ -1064,8 +1064,8 @@ def test_usage_page_with_letters(
     assert 'March' in table
     assert '£28.99' in table
     assert '140 free text messages' in table
-    assert '£20.30' in table
-    assert '1,230 text messages at 1.65p' in table
+    assert '£20.91' in table
+    assert '1,230 text messages at 1.70p' in table
     assert '10 second class letters at 31p' in normalize_spaces(table)
     assert '5 first class letters at 33p' in normalize_spaces(table)
     assert '10 international letters at 84p' in normalize_spaces(table)
@@ -1586,27 +1586,111 @@ def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_mont
                 },
                 {
                     'month': 'June', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
+                    'notification_type': 'sms', 'rate': 1.71, 'billing_units': 100000
                 },
                 {
                     'month': 'February', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 2000
+                    'notification_type': 'sms', 'rate': 1.71, 'billing_units': 2000
                 },
             ]
         )
         assert list(billing_units) == [
-            {'free': 100000, 'name': 'April', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 100000, 'name': 'May', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 50000, 'name': 'June', 'paid': 50000, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'July', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'August', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'September', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'October', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'November', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'December', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'January', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'February', 'paid': 2000, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0},
-            {'free': 0, 'name': 'March', 'paid': 0, 'letter_total': 0, 'letters': [], 'letter_cumulative': 0}
+            {
+                'sms_free_count': 100000,
+                'name': 'April',
+                'sms_paid_count': 0,
+                'sms_rate': 1.65,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 100000,
+                'name': 'May',
+                'sms_paid_count': 0,
+                'sms_rate': 1.65,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 50000,
+                'name': 'June',
+                'sms_paid_count': 50000,
+                'sms_rate': 1.71,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 0,
+                'name': 'July',
+                'sms_paid_count': 0,
+                'sms_rate': 0,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 0,
+                'name': 'August',
+                'sms_paid_count': 0,
+                'sms_rate': 0,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 0,
+                'name': 'September',
+                'sms_paid_count': 0,
+                'sms_rate': 0,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 0,
+                'name': 'October',
+                'sms_paid_count': 0,
+                'sms_rate': 0,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 0,
+                'name': 'November',
+                'sms_paid_count': 0,
+                'sms_rate': 0,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 0,
+                'name': 'December',
+                'sms_paid_count': 0,
+                'sms_rate': 0,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 0,
+                'name': 'January',
+                'sms_paid_count': 0,
+                'sms_rate': 0,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 0,
+                'name': 'February',
+                'sms_paid_count': 2000,
+                'sms_rate': 1.71,
+                'letter_total': 0,
+                'letters': []
+            },
+            {
+                'sms_free_count': 0,
+                'name': 'March',
+                'sms_paid_count': 0,
+                'sms_rate': 0,
+                'letter_total': 0,
+                'letters': []
+            },
         ][:expected_number_of_months]
 
 
