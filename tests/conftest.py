@@ -2338,20 +2338,6 @@ def mock_get_usage(mocker, service_one, fake_uuid):
                 "letter_total": 0
             },
             {
-                "notification_type": "sms",
-                "chargeable_units": 300,
-                "notifications_sent": 150,
-                "rate": 0.0165,
-                "letter_total": 0
-            },
-            {
-                "notification_type": "sms",
-                "chargeable_units": 90,
-                "notifications_sent": 90,
-                "rate": 0.0165,
-                "letter_total": 0
-            },
-            {
                 "notification_type": "letter",
                 "chargeable_units": 300,
                 "notifications_sent": 100,

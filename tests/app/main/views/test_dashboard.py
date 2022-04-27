@@ -1017,11 +1017,11 @@ def test_usage_page(
 
     sms_column = normalize_spaces(annual_usage[1].text + annual_usage[4].text)
     assert 'Text messages' in sms_column
-    assert '252,190 sent' in sms_column
+    assert '251,800 sent' in sms_column
     assert '250,000 free allowance' in sms_column
     assert '0 free allowance remaining' in sms_column
     assert '£36.14 spent' in sms_column
-    assert '2,190 at 1.65 pence' in sms_column
+    assert '1,800 at 1.65 pence' in sms_column
 
     letter_column = normalize_spaces(annual_usage[2].text + annual_usage[5].text)
     assert 'Letters' in letter_column
