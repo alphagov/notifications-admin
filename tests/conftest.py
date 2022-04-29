@@ -2359,73 +2359,17 @@ def mock_get_monthly_usage_for_service(mocker):
     def _get_usage(service_id, year):
         return [
             {
-                'month': 'April',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 249500,
-                'postage': 'none',
-            },
-            {
-                'month': 'April',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 100,
-                'postage': 'none',
-            },
-            {
-                'month': 'April',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 200,
-                'postage': 'none',
-            },
-            {
-                'month': 'April',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 60,
-                'postage': 'none',
-            },
-            {
                 'month': 'March',
                 'notification_type': 'sms',
                 'rate': 0.017,
-                'billing_units': 1000,
-                'postage': 'none',
-            },
-            {
-                'month': 'March',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 100,
-                'postage': 'none',
-            },
-            {
-                'month': 'March',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 100,
-                'postage': 'none',
-            },
-            {
-                'month': 'March',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 30,
+                'billing_units': 1230,
                 'postage': 'none',
             },
             {
                 'month': 'February',
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 1000,
-                'postage': 'none',
-            },
-            {
-                'month': 'February',
-                'notification_type': 'sms',
-                'rate': 0.0165,
-                'billing_units': 100,
+                'billing_units': 1100,
                 'postage': 'none',
             },
             {
@@ -2455,6 +2399,13 @@ def mock_get_monthly_usage_for_service(mocker):
                 'rate': 0.84,
                 'billing_units': 7,
                 'postage': 'rest-of-world',
+            },
+            {
+                'month': 'April',
+                'notification_type': 'sms',
+                'rate': 0.017,
+                'billing_units': 249860,
+                'postage': 'none',
             },
         ]
 
