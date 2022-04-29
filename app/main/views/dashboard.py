@@ -406,18 +406,19 @@ def get_usage_breakdown_by_type(usage, notification_type):
 
 def get_monthly_usage_breakdown(year, free_sms_fragment_limit, monthly_usage):
     cumulative = 0
-    sms_units = [x for x in monthly_usage if x['notification_type'] == 'sms']
-    letter_units = [x for x in monthly_usage if x['notification_type'] == 'letter']
+    sms = get_usage_breakdown_by_type(monthly_usage, 'sms')
+    letters = get_usage_breakdown_by_type(monthly_usage, 'letter')
+
     for month in get_months_for_financial_year(year):
         previous_cumulative = cumulative
-        monthly_usage = get_sum_billing_units(sms_units, month)
+        monthly_usage = get_sum_billing_units(sms, month)
         cumulative += monthly_usage
         breakdown = get_free_paid_breakdown_for_month(
             free_sms_fragment_limit, cumulative, previous_cumulative,
-            [billing_month for billing_month in sms_units if billing_month['month'] == month]
+            [billing_month for billing_month in sms if billing_month['month'] == month]
         )
 
-        letter_units_for_month = [x for x in letter_units if x['month'] == month]
+        letter_units_for_month = [x for x in letters if x['month'] == month]
         letter_billing = format_letter_details_for_month(letter_units_for_month)
 
         letter_total = 0
