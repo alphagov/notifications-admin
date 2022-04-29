@@ -99,7 +99,7 @@
             {% endcall %}
             {% call field(align='left') %}
               {{ big_number(
-                (item.sms_rate * item.sms_charged) + item.letter_cost,
+                item.sms_cost + item.letter_cost,
                 currency="£",
                 smallest=True
               ) }}

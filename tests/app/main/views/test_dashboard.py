@@ -1578,28 +1578,53 @@ def test_aggregate_status_types(dict_in, expected_failed, expected_requested):
     ]
 )
 def test_get_monthly_usage_breakdown(now, expected_number_of_months):
-    sms_allowance = 250000
     with now:
-        breakdown = get_monthly_usage_breakdown(
-            2016, sms_allowance, [
-                {
-                    'month': 'April', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
-                },
-                {
-                    'month': 'May', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
-                },
-                {
-                    'month': 'June', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.71, 'billing_units': 100000
-                },
-                {
-                    'month': 'February', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.71, 'billing_units': 2000
-                },
-            ]
-        )
+        breakdown = get_monthly_usage_breakdown(2016, [
+            {
+                'month': 'April',
+                'international': False,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 100000,
+                'sms_charged': 0,
+                'sms_free_allowance_used': 100000,
+                'sms_cost': 0,
+            },
+            {
+                'month': 'May',
+                'international': False,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.65,
+                'billing_units': 100000,
+                'sms_charged': 0,
+                'sms_free_allowance_used': 100000,
+                'sms_cost': 0,
+            },
+            {
+                'month': 'June',
+                'international': False,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.71,
+                'billing_units': 100000,
+                'sms_charged': 50000,
+                'sms_free_allowance_used': 50000,
+                'sms_cost': 85500,
+            },
+            {
+                'month': 'February',
+                'international': False,
+                'rate_multiplier': 1,
+                'notification_type': 'sms',
+                'rate': 1.71,
+                'billing_units': 2000,
+                'sms_charged': 2000,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 3420,
+            },
+        ])
 
         assert list(breakdown) == [
             {
@@ -1608,7 +1633,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 1.65,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
             {
                 'sms_free_allowance_used': 100000,
@@ -1616,7 +1642,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 1.65,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
             {
                 'sms_free_allowance_used': 50000,
@@ -1624,7 +1651,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 50000,
                 'sms_rate': 1.71,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 85500,
             },
             {
                 'sms_free_allowance_used': 0,
@@ -1632,7 +1660,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 0,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
             {
                 'sms_free_allowance_used': 0,
@@ -1640,7 +1669,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 0,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
             {
                 'sms_free_allowance_used': 0,
@@ -1648,7 +1678,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 0,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
             {
                 'sms_free_allowance_used': 0,
@@ -1656,7 +1687,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 0,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
             {
                 'sms_free_allowance_used': 0,
@@ -1664,7 +1696,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 0,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
             {
                 'sms_free_allowance_used': 0,
@@ -1672,7 +1705,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 0,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
             {
                 'sms_free_allowance_used': 0,
@@ -1680,7 +1714,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 0,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
             {
                 'sms_free_allowance_used': 0,
@@ -1688,7 +1723,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 2000,
                 'sms_rate': 1.71,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 3420,
             },
             {
                 'sms_free_allowance_used': 0,
@@ -1696,7 +1732,8 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
                 'sms_charged': 0,
                 'sms_rate': 0,
                 'letter_cost': 0,
-                'letter_breakdown': []
+                'letter_breakdown': [],
+                'sms_cost': 0,
             },
         ][:expected_number_of_months]
 

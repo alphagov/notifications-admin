@@ -2364,6 +2364,9 @@ def mock_get_monthly_usage_for_service(mocker):
                 'rate': 0.017,
                 'billing_units': 1230,
                 'postage': 'none',
+                'sms_charged': 1230,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 20.91,
             },
             {
                 'month': 'February',
@@ -2371,6 +2374,9 @@ def mock_get_monthly_usage_for_service(mocker):
                 'rate': 0.0165,
                 'billing_units': 1100,
                 'postage': 'none',
+                'sms_charged': 960,
+                'sms_free_allowance_used': 140,
+                'sms_cost': 15.84,
             },
             {
                 'month': 'February',
@@ -2378,6 +2384,9 @@ def mock_get_monthly_usage_for_service(mocker):
                 'rate': 0.31,
                 'billing_units': 10,
                 'postage': 'second',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 0,
             },
             {
                 'month': 'February',
@@ -2385,6 +2394,9 @@ def mock_get_monthly_usage_for_service(mocker):
                 'rate': 0.33,
                 'billing_units': 5,
                 'postage': 'first',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 0,
             },
             {
                 'month': 'February',
@@ -2392,6 +2404,9 @@ def mock_get_monthly_usage_for_service(mocker):
                 'rate': 0.84,
                 'billing_units': 3,
                 'postage': 'europe',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 0,
             },
             {
                 'month': 'February',
@@ -2399,6 +2414,9 @@ def mock_get_monthly_usage_for_service(mocker):
                 'rate': 0.84,
                 'billing_units': 7,
                 'postage': 'rest-of-world',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 0,
             },
             {
                 'month': 'April',
@@ -2406,6 +2424,9 @@ def mock_get_monthly_usage_for_service(mocker):
                 'rate': 0.017,
                 'billing_units': 249860,
                 'postage': 'none',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 249860,
+                'sms_cost': 0,
             },
         ]
 

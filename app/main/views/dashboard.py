@@ -139,11 +139,7 @@ def usage(service_id):
 
     return render_template(
         'views/usage.html',
-        months=list(get_monthly_usage_breakdown(
-            year,
-            free_sms_allowance,
-            units
-        )),
+        months=list(get_monthly_usage_breakdown(year, units)),
         selected_year=year,
         years=get_tuples_of_financial_years(
             partial(url_for, '.usage', service_id=service_id),
@@ -398,19 +394,19 @@ def get_usage_breakdown_by_type(usage, notification_type):
     return [row for row in usage if row['notification_type'] == notification_type]
 
 
-def get_monthly_usage_breakdown(year, free_sms_fragment_limit, monthly_usage):
-    cumulative = 0
+def get_monthly_usage_breakdown(year, monthly_usage):
     sms = get_usage_breakdown_by_type(monthly_usage, 'sms')
     letters = get_usage_breakdown_by_type(monthly_usage, 'letter')
 
     for month in get_months_for_financial_year(year):
         monthly_sms = [row for row in sms if row['month'] == month]
-        previous_cumulative = cumulative
-        monthly_chargeable_units = sum(row['billing_units'] for row in monthly_sms)
-        cumulative += monthly_chargeable_units
-        sms_breakdown = get_free_paid_breakdown_for_month(
-            free_sms_fragment_limit, cumulative, previous_cumulative, monthly_sms
-        )
+        sms_charged = sum(row['sms_charged'] for row in monthly_sms)
+        sms_free_allowance_used = sum(row['sms_free_allowance_used'] for row in monthly_sms)
+        sms_cost = sum(row['sms_cost'] for row in monthly_sms)
+        # makes the assumption that there is either no item in `monthly_sms` because they
+        # have not sent any SMS or that they have sent SMS and that there is only a single
+        # item in `monthly_sms` because they have only been sent at a single rate
+        sms_rate = monthly_sms[0]['rate'] if len(monthly_sms) else 0
 
         monthly_letters = [row for row in letters if row['month'] == month]
         letter_breakdown = format_letter_details_for_month(monthly_letters)
@@ -422,9 +418,10 @@ def get_monthly_usage_breakdown(year, free_sms_fragment_limit, monthly_usage):
             'month': month,
             'letter_cost': letter_cost,
             'letter_breakdown': letter_breakdown,
-            'sms_charged': sms_breakdown['paid'],
-            'sms_free_allowance_used': sms_breakdown['free'],
-            'sms_rate': sms_breakdown['sms_rate'],
+            'sms_charged': sms_charged,
+            'sms_free_allowance_used': sms_free_allowance_used,
+            'sms_rate': sms_rate,
+            'sms_cost': sms_cost,
         }
 
 
@@ -462,42 +459,6 @@ def get_postage_description(postage):
     if postage in ('first', 'second'):
         return f'{postage} class'
     return 'international'
-
-
-def get_free_paid_breakdown_for_month(
-    free_sms_fragment_limit,
-    cumulative,
-    previous_cumulative,
-    monthly_usage
-):
-    allowance = free_sms_fragment_limit
-
-    # makes the assumption that there is either no item in `monthly_usage` because they have not sent any SMS
-    # or that they have sent SMS and that there is only a single item in `monthly_usage` because they have only
-    # been sent at a single rate during the month
-    sms_rate = monthly_usage[0]['rate'] if len(monthly_usage) else 0
-
-    total_monthly_billing_units = sum(row['billing_units'] for row in monthly_usage)
-
-    if cumulative < allowance:
-        return {
-            'paid': 0,
-            'free': total_monthly_billing_units,
-            'sms_rate': sms_rate,
-        }
-    elif previous_cumulative < allowance:
-        remaining_allowance = allowance - previous_cumulative
-        return {
-            'paid': total_monthly_billing_units - remaining_allowance,
-            'free': remaining_allowance,
-            'sms_rate': sms_rate,
-        }
-    else:
-        return {
-            'paid': total_monthly_billing_units,
-            'free': 0,
-            'sms_rate': sms_rate,
-        }
 
 
 def requested_and_current_financial_year(request):
