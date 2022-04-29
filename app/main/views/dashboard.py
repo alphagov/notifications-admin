@@ -134,8 +134,8 @@ def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
     free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year)
-    units = billing_api_client.get_billable_units(service_id, year)
-    yearly_usage = billing_api_client.get_service_usage(service_id, year)
+    units = billing_api_client.get_monthly_usage_for_service(service_id, year)
+    yearly_usage = billing_api_client.get_annual_usage_for_service(service_id, year)
 
     return render_template(
         'views/usage.html',
@@ -289,7 +289,7 @@ def get_dashboard_partials(service_id):
         current_service.id,
         get_current_financial_year(),
     )
-    yearly_usage = billing_api_client.get_service_usage(
+    yearly_usage = billing_api_client.get_annual_usage_for_service(
         service_id,
         get_current_financial_year(),
     )

@@ -2313,7 +2313,7 @@ def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def mock_get_usage(mocker, service_one, fake_uuid):
+def mock_get_annual_usage_for_service(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
             {
@@ -2351,11 +2351,11 @@ def mock_get_usage(mocker, service_one, fake_uuid):
         ]
 
     return mocker.patch(
-        'app.billing_api_client.get_service_usage', side_effect=_get_usage)
+        'app.billing_api_client.get_annual_usage_for_service', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
-def mock_get_billable_units(mocker):
+def mock_get_monthly_usage_for_service(mocker):
     def _get_usage(service_id, year):
         return [
             {
@@ -2459,11 +2459,11 @@ def mock_get_billable_units(mocker):
         ]
 
     return mocker.patch(
-        'app.billing_api_client.get_billable_units', side_effect=_get_usage)
+        'app.billing_api_client.get_monthly_usage_for_service', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
-def mock_get_future_usage(mocker, service_one, fake_uuid):
+def mock_get_annual_usage_for_service_in_future(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
             {
@@ -2485,16 +2485,16 @@ def mock_get_future_usage(mocker, service_one, fake_uuid):
         ]
 
     return mocker.patch(
-        'app.billing_api_client.get_service_usage', side_effect=_get_usage)
+        'app.billing_api_client.get_annual_usage_for_service', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
-def mock_get_future_billable_units(mocker):
+def mock_get_monthly_usage_for_service_in_future(mocker):
     def _get_usage(service_id, year):
         return []
 
     return mocker.patch(
-        'app.billing_api_client.get_billable_units', side_effect=_get_usage)
+        'app.billing_api_client.get_monthly_usage_for_service', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')

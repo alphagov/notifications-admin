@@ -3,13 +3,13 @@ from app.notify_client import NotifyAdminAPIClient
 
 class BillingAPIClient(NotifyAdminAPIClient):
 
-    def get_billable_units(self, service_id, year):
+    def get_monthly_usage_for_service(self, service_id, year):
         return self.get(
             '/service/{0}/billing/monthly-usage'.format(service_id),
             params=dict(year=year)
         )
 
-    def get_service_usage(self, service_id, year=None):
+    def get_annual_usage_for_service(self, service_id, year=None):
         return self.get(
             '/service/{0}/billing/yearly-usage-summary'.format(service_id),
             params=dict(year=year)
