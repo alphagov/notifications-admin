@@ -1077,19 +1077,20 @@ def test_usage_page_monthly_breakdown(
 
     monthly_breakdown = normalize_spaces(page.find('table').text)
 
-    assert '249,860 free text messages' in monthly_breakdown
-    assert '40 free text messages' in monthly_breakdown
-    assert '960 text messages at 1.65p' in monthly_breakdown
     assert 'April' in monthly_breakdown
+    assert '249,860 free text messages' in monthly_breakdown
+
     assert 'February' in monthly_breakdown
-    assert 'March' in monthly_breakdown
     assert '£28.99' in monthly_breakdown
     assert '140 free text messages' in monthly_breakdown
-    assert '£20.91' in monthly_breakdown
-    assert '1,230 text messages at 1.70p' in monthly_breakdown
+    assert '960 text messages at 1.65p' in monthly_breakdown
     assert '10 second class letters at 31p' in monthly_breakdown
     assert '5 first class letters at 33p' in monthly_breakdown
     assert '10 international letters at 84p' in monthly_breakdown
+
+    assert 'March' in monthly_breakdown
+    assert '£20.91' in monthly_breakdown
+    assert '1,230 text messages at 1.70p' in monthly_breakdown
 
 
 @freeze_time("2012-04-30 12:12:12")
