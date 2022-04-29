@@ -139,7 +139,7 @@ def usage(service_id):
 
     return render_template(
         'views/usage.html',
-        months=list(get_free_paid_breakdown_for_billable_units(
+        months=list(get_monthly_usage_breakdown(
             year,
             free_sms_allowance,
             units
@@ -404,10 +404,10 @@ def get_usage_breakdown_by_type(usage, notification_type):
     return [row for row in usage if row['notification_type'] == notification_type]
 
 
-def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, billing_units):
+def get_monthly_usage_breakdown(year, free_sms_fragment_limit, monthly_usage):
     cumulative = 0
-    sms_units = [x for x in billing_units if x['notification_type'] == 'sms']
-    letter_units = [x for x in billing_units if x['notification_type'] == 'letter']
+    sms_units = [x for x in monthly_usage if x['notification_type'] == 'sms']
+    letter_units = [x for x in monthly_usage if x['notification_type'] == 'letter']
     for month in get_months_for_financial_year(year):
         previous_cumulative = cumulative
         monthly_usage = get_sum_billing_units(sms_units, month)

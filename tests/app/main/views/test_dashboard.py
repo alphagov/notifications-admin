@@ -12,7 +12,7 @@ from app.main.views.dashboard import (
     aggregate_template_usage,
     format_monthly_stats_to_list,
     get_dashboard_totals,
-    get_free_paid_breakdown_for_billable_units,
+    get_monthly_usage_breakdown,
     get_tuples_of_financial_years,
 )
 from tests import (
@@ -1576,10 +1576,10 @@ def test_aggregate_status_types(dict_in, expected_failed, expected_requested):
         (freeze_time("2017-01-01 11:09:00.061258"), 10)
     ]
 )
-def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_months):
+def test_get_monthly_usage_breakdown(now, expected_number_of_months):
     sms_allowance = 250000
     with now:
-        billing_units = get_free_paid_breakdown_for_billable_units(
+        breakdown = get_monthly_usage_breakdown(
             2016, sms_allowance, [
                 {
                     'month': 'April', 'international': False, 'rate_multiplier': 1,
@@ -1599,7 +1599,8 @@ def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_mont
                 },
             ]
         )
-        assert list(billing_units) == [
+
+        assert list(breakdown) == [
             {
                 'sms_free_count': 100000,
                 'name': 'April',
