@@ -394,12 +394,6 @@ def get_months_for_year(start, end, year):
     return [datetime(year, month, 1) for month in range(start, end)]
 
 
-def get_sum_billing_units(billing_units, month=None):
-    if month:
-        return sum(b['billing_units'] for b in billing_units if b['month'] == month)
-    return sum(b['billing_units'] for b in billing_units)
-
-
 def get_usage_breakdown_by_type(usage, notification_type):
     return [row for row in usage if row['notification_type'] == notification_type]
 
@@ -410,16 +404,16 @@ def get_monthly_usage_breakdown(year, free_sms_fragment_limit, monthly_usage):
     letters = get_usage_breakdown_by_type(monthly_usage, 'letter')
 
     for month in get_months_for_financial_year(year):
+        monthly_sms = [row for row in sms if row['month'] == month]
         previous_cumulative = cumulative
-        monthly_usage = get_sum_billing_units(sms, month)
-        cumulative += monthly_usage
+        monthly_chargeable_units = sum(row['billing_units'] for row in monthly_sms)
+        cumulative += monthly_chargeable_units
         sms_breakdown = get_free_paid_breakdown_for_month(
-            free_sms_fragment_limit, cumulative, previous_cumulative,
-            [billing_month for billing_month in sms if billing_month['month'] == month]
+            free_sms_fragment_limit, cumulative, previous_cumulative, monthly_sms
         )
 
-        letter_units_for_month = [x for x in letters if x['month'] == month]
-        letter_breakdown = format_letter_details_for_month(letter_units_for_month)
+        monthly_letters = [row for row in letters if row['month'] == month]
+        letter_breakdown = format_letter_details_for_month(monthly_letters)
 
         letter_cost = 0
         for x in letter_breakdown:
@@ -483,7 +477,7 @@ def get_free_paid_breakdown_for_month(
     # been sent at a single rate during the month
     sms_rate = monthly_usage[0]['rate'] if len(monthly_usage) else 0
 
-    total_monthly_billing_units = get_sum_billing_units(monthly_usage)
+    total_monthly_billing_units = sum(row['billing_units'] for row in monthly_usage)
 
     if cumulative < allowance:
         return {
