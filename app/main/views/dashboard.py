@@ -413,24 +413,24 @@ def get_monthly_usage_breakdown(year, free_sms_fragment_limit, monthly_usage):
         previous_cumulative = cumulative
         monthly_usage = get_sum_billing_units(sms, month)
         cumulative += monthly_usage
-        breakdown = get_free_paid_breakdown_for_month(
+        sms_breakdown = get_free_paid_breakdown_for_month(
             free_sms_fragment_limit, cumulative, previous_cumulative,
             [billing_month for billing_month in sms if billing_month['month'] == month]
         )
 
         letter_units_for_month = [x for x in letters if x['month'] == month]
-        letter_billing = format_letter_details_for_month(letter_units_for_month)
+        letter_breakdown = format_letter_details_for_month(letter_units_for_month)
 
-        letter_total = 0
-        for x in letter_billing:
-            letter_total += x.cost
+        letter_cost = 0
+        for x in letter_breakdown:
+            letter_cost += x.cost
         yield {
-            'name': month,
-            'letter_total': letter_total,
-            'letters': letter_billing,
-            'sms_paid_count': breakdown['paid'],
-            'sms_free_count': breakdown['free'],
-            'sms_rate': breakdown['sms_rate'],
+            'month': month,
+            'letter_cost': letter_cost,
+            'letter_breakdown': letter_breakdown,
+            'sms_charged': sms_breakdown['paid'],
+            'sms_free_allowance_used': sms_breakdown['free'],
+            'sms_rate': sms_breakdown['sms_rate'],
         }
 
 
@@ -445,7 +445,7 @@ def format_letter_details_for_month(letter_units_for_month):
     postage_order = {'first class': 0, 'second class': 1, 'international': 2}
     letter_units_for_month.sort(key=lambda x: (postage_order[x['postage']], x['rate']))
 
-    LetterDetails = namedtuple('LetterDetails', ['billing_units', 'rate', 'cost', 'postage_description'])
+    LetterDetails = namedtuple('LetterDetails', ['sent', 'rate', 'cost', 'postage_description'])
 
     # Aggregate the rows for international letters which have the same rate
     result = []
@@ -453,7 +453,7 @@ def format_letter_details_for_month(letter_units_for_month):
         rate_group = list(rate_group)
 
         letter_details = LetterDetails(
-            billing_units=sum(x['billing_units'] for x in rate_group),
+            sent=sum(x['billing_units'] for x in rate_group),
             rate=rate_group[0]['rate'],
             cost=(sum(x['billing_units'] for x in rate_group) * rate_group[0]['rate']),
             postage_description=rate_group[0]['postage']

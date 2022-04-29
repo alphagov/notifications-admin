@@ -83,7 +83,7 @@
 
       {% if months %}
         <div class="dashboard-table usage-table body-copy-table">
-          {% call(month, row_index) list_table(
+          {% call(item, row_index) list_table(
             months,
             caption="Total spend",
             caption_visible=False,
@@ -95,29 +95,29 @@
             field_headings_visible=True
           ) %}
             {% call row_heading() %}
-              {{ month.name }}
+              {{ item.month }}
             {% endcall %}
             {% call field(align='left') %}
               {{ big_number(
-                (month.sms_rate * month.sms_paid_count) + month.letter_total,
+                (item.sms_rate * item.sms_charged) + item.letter_cost,
                 currency="£",
                 smallest=True
               ) }}
               <ul>
-              {% if month.sms_free_count %}
-                <li class="tabular-numbers">{{ month.sms_free_count|format_thousands }} free {{ month.sms_free_count|message_count_label('sms', suffix='') }}</li>
+              {% if item.sms_free_allowance_used %}
+                <li class="tabular-numbers">{{ item.sms_free_allowance_used|format_thousands }} free {{ item.sms_free_count|message_count_label('sms', suffix='') }}</li>
               {% endif %}
-              {% if month.sms_paid_count %}
-                <li class="tabular-numbers">{{ month.sms_paid_count|message_count('sms') }} at
-                {{- ' {:.2f}p'.format(month.sms_rate * 100) }}</li>
+              {% if item.sms_charged %}
+                <li class="tabular-numbers">{{ item.sms_charged|message_count('sms') }} at
+                {{- ' {:.2f}p'.format(item.sms_rate * 100) }}</li>
               {% endif %}
-              {% for letter in month.letters%}
-                {% if letter.billing_units %}
-                  <li class="tabular-numbers">{{ "{:,} {}".format(letter.billing_units, letter.postage_description) }} {{ letter.billing_units|message_count_label('letter', suffix='') }} at
+              {% for letter in item.letter_breakdown %}
+                {% if letter.sent %}
+                  <li class="tabular-numbers">{{ "{:,} {}".format(letter.sent, letter.postage_description) }} {{ letter.sent|message_count_label('letter', suffix='') }} at
                   {{ letter.rate | format_number_in_pounds_as_currency }}</li>
                 {% endif %}
               {% endfor %}
-              {% if not (month.sms_free_count or month.sms_paid_count or month.letters) %}
+              {% if not (item.sms_free_allowance_used or item.sms_charged or item.letter_breakdown) %}
                 <li aria-hidden="true">–</li>
               {% endif %}
               </ul>

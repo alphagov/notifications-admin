@@ -1602,100 +1602,100 @@ def test_get_monthly_usage_breakdown(now, expected_number_of_months):
 
         assert list(breakdown) == [
             {
-                'sms_free_count': 100000,
-                'name': 'April',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 100000,
+                'month': 'April',
+                'sms_charged': 0,
                 'sms_rate': 1.65,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 100000,
-                'name': 'May',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 100000,
+                'month': 'May',
+                'sms_charged': 0,
                 'sms_rate': 1.65,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 50000,
-                'name': 'June',
-                'sms_paid_count': 50000,
+                'sms_free_allowance_used': 50000,
+                'month': 'June',
+                'sms_charged': 50000,
                 'sms_rate': 1.71,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 0,
-                'name': 'July',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 0,
+                'month': 'July',
+                'sms_charged': 0,
                 'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 0,
-                'name': 'August',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 0,
+                'month': 'August',
+                'sms_charged': 0,
                 'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 0,
-                'name': 'September',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 0,
+                'month': 'September',
+                'sms_charged': 0,
                 'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 0,
-                'name': 'October',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 0,
+                'month': 'October',
+                'sms_charged': 0,
                 'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 0,
-                'name': 'November',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 0,
+                'month': 'November',
+                'sms_charged': 0,
                 'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 0,
-                'name': 'December',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 0,
+                'month': 'December',
+                'sms_charged': 0,
                 'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 0,
-                'name': 'January',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 0,
+                'month': 'January',
+                'sms_charged': 0,
                 'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 0,
-                'name': 'February',
-                'sms_paid_count': 2000,
+                'sms_free_allowance_used': 0,
+                'month': 'February',
+                'sms_charged': 2000,
                 'sms_rate': 1.71,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
             {
-                'sms_free_count': 0,
-                'name': 'March',
-                'sms_paid_count': 0,
+                'sms_free_allowance_used': 0,
+                'month': 'March',
+                'sms_charged': 0,
                 'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
+                'letter_cost': 0,
+                'letter_breakdown': []
             },
         ][:expected_number_of_months]
 
