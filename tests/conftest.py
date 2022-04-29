@@ -2316,11 +2316,38 @@ def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
 def mock_get_usage(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
-            {"notification_type": "email", "billing_units": 1000, "rate": 0.00, "letter_total": 0},
-            {"notification_type": "sms", "billing_units": 251500, "rate": 0.0165, "letter_total": 0},
-            {"notification_type": "sms", "billing_units": 300, "rate": 0.0165, "letter_total": 0},
-            {"notification_type": "sms", "billing_units": 300, "rate": 0.0165, "letter_total": 0},
-            {"notification_type": "sms", "billing_units": 90, "rate": 0.0165, "letter_total": 0}
+            {
+                "notification_type": "email",
+                "chargeable_units": 1000,
+                "notifications_sent": 1000,
+                "charged_units": 1000,
+                "rate": 0.00,
+                "cost": 0
+            },
+            {
+                "notification_type": "sms",
+                "chargeable_units": 251500,
+                "notifications_sent": 105000,
+                "charged_units": 1500,
+                "rate": 0.0165,
+                "cost": 24.75  # 250K free allowance
+            },
+            {
+                "notification_type": "sms",
+                "chargeable_units": 300,
+                "notifications_sent": 300,
+                "charged_units": 300,
+                "rate": 0.017,
+                "cost": 5.1
+            },
+            {
+                "notification_type": "letter",
+                "chargeable_units": 300,
+                "notifications_sent": 100,
+                "charged_units": 300,
+                "rate": 0.1,
+                "cost": 30
+            },
         ]
 
     return mocker.patch(
@@ -2440,12 +2467,20 @@ def mock_get_future_usage(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
             {
-                'notification_type': 'sms', 'billing_units': 0,
-                'rate': 0.0158, 'letter_total': 0
+                'notification_type': 'sms',
+                'chargeable_units': 0,
+                'notifications_sent': 0,
+                'charged_units': 0,
+                'rate': 0.0158,
+                'cost': 0
             },
             {
-                'notification_type': 'email', 'billing_units': 0,
-                'rate': 0.0, 'letter_total': 0
+                'notification_type': 'email',
+                'chargeable_units': 0,
+                'notifications_sent': 0,
+                'charged_units': 0,
+                'rate': 0.0,
+                'cost': 0
             }
         ]
 

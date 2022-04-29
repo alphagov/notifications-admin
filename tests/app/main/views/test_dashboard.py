@@ -1002,32 +1002,67 @@ def test_usage_page(
     mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
-    cols = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
     nav = page.find('ul', {'class': 'pill'})
     unselected_nav_links = nav.select('a:not(.pill-item--selected)')
-
     assert normalize_spaces(nav.find('a', {'aria-current': 'page'}).text) == '2011 to 2012 financial year'
     assert normalize_spaces(unselected_nav_links[0].text) == '2010 to 2011 financial year'
     assert normalize_spaces(unselected_nav_links[1].text) == '2009 to 2010 financial year'
-    assert '252,190' in cols[1].text
-    assert 'Text messages' in cols[1].text
 
-    table = page.find('table').text.strip()
+    annual_usage = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
 
-    assert '249,860 free text messages' in table
-    assert '40 free text messages' in table
-    assert '960 text messages at 1.65p' in table
-    assert 'April' in table
-    assert 'February' in table
-    assert 'March' in table
-    assert '£28.99' in table
-    assert '140 free text messages' in table
-    assert '£20.91' in table
-    assert '1,230 text messages at 1.70p' in table
+    # annual stats are shown in two rows, each with three column; email is col 1
+    email_column = normalize_spaces(annual_usage[0].text + annual_usage[3].text)
+    assert 'Emails' in email_column
+    assert '1,000 sent' in email_column
+
+    sms_column = normalize_spaces(annual_usage[1].text + annual_usage[4].text)
+    assert 'Text messages' in sms_column
+    assert '251,800 sent' in sms_column
+    assert '250,000 free allowance' in sms_column
+    assert '0 free allowance remaining' in sms_column
+    assert '£29.85 spent' in sms_column
+    assert '1,500 at 1.65 pence' in sms_column
+    assert '300 at 1.70 pence' in sms_column
+
+    letter_column = normalize_spaces(annual_usage[2].text + annual_usage[5].text)
+    assert 'Letters' in letter_column
+    assert '100 sent' in letter_column
+    assert '£30.00 spent' in letter_column
 
 
 @freeze_time("2012-03-31 12:12:12")
-def test_usage_page_with_letters(
+def test_usage_page_no_sms_spend(
+    mocker,
+    client_request,
+    mock_get_billable_units,
+    mock_get_free_sms_fragment_limit
+):
+    mocker.patch('app.billing_api_client.get_service_usage', return_value=[
+        {
+            "notification_type": "sms",
+            "chargeable_units": 1000,
+            "charged_units": 0,
+            "rate": 0.0165,
+            "cost": 0
+        }
+    ])
+
+    page = client_request.get(
+        'main.usage',
+        service_id=SERVICE_ONE_ID,
+    )
+
+    annual_usage = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
+    sms_column = normalize_spaces(annual_usage[1].text + annual_usage[4].text)
+    assert 'Text messages' in sms_column
+    assert '250,000 free allowance' in sms_column
+    assert '249,000 free allowance remaining' in sms_column
+    assert '£0.00 spent' in sms_column
+    assert 'pence per message' not in sms_column
+
+
+@freeze_time("2012-03-31 12:12:12")
+def test_usage_page_monthly_breakdown(
     client_request,
     service_one,
     mock_get_usage,
@@ -1040,35 +1075,21 @@ def test_usage_page_with_letters(
         service_id=SERVICE_ONE_ID,
     )
 
-    mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
-    mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
-    mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
+    monthly_breakdown = normalize_spaces(page.find('table').text)
 
-    cols = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
-    nav = page.find('ul', {'class': 'pill'})
-    unselected_nav_links = nav.select('a:not(.pill-item--selected)')
-
-    assert normalize_spaces(nav.find('a', {'aria-current': 'page'}).text) == '2011 to 2012 financial year'
-    assert normalize_spaces(unselected_nav_links[0].text) == '2010 to 2011 financial year'
-    assert normalize_spaces(unselected_nav_links[1].text) == '2009 to 2010 financial year'
-    assert '252,190' in cols[1].text
-    assert 'Text messages' in cols[1].text
-
-    table = page.find('table').text.strip()
-
-    assert '249,860 free text messages' in table
-    assert '40 free text messages' in table
-    assert '960 text messages at 1.65p' in table
-    assert 'April' in table
-    assert 'February' in table
-    assert 'March' in table
-    assert '£28.99' in table
-    assert '140 free text messages' in table
-    assert '£20.91' in table
-    assert '1,230 text messages at 1.70p' in table
-    assert '10 second class letters at 31p' in normalize_spaces(table)
-    assert '5 first class letters at 33p' in normalize_spaces(table)
-    assert '10 international letters at 84p' in normalize_spaces(table)
+    assert '249,860 free text messages' in monthly_breakdown
+    assert '40 free text messages' in monthly_breakdown
+    assert '960 text messages at 1.65p' in monthly_breakdown
+    assert 'April' in monthly_breakdown
+    assert 'February' in monthly_breakdown
+    assert 'March' in monthly_breakdown
+    assert '£28.99' in monthly_breakdown
+    assert '140 free text messages' in monthly_breakdown
+    assert '£20.91' in monthly_breakdown
+    assert '1,230 text messages at 1.70p' in monthly_breakdown
+    assert '10 second class letters at 31p' in monthly_breakdown
+    assert '5 first class letters at 33p' in monthly_breakdown
+    assert '10 international letters at 84p' in monthly_breakdown
 
 
 @freeze_time("2012-04-30 12:12:12")
@@ -1137,43 +1158,27 @@ def test_usage_page_displays_letters_split_by_month_and_postage(
     assert '7 international letters at £1.00' in may_row
 
 
-@pytest.mark.parametrize('free_allowance, expected_sms_usage_breakdown', (
-    (0, (
-        'Text messages '
-        '252,190 sent '
-        '0 free allowance '
-        '252,190 at 1.65 pence per message'
-    )),
-    (100_000, (
-        'Text messages '
-        '252,190 sent '
-        '100,000 free allowance '
-        '0 free allowance remaining '
-        '152,190 at 1.65 pence per message'
-    )),
-))
 def test_usage_page_with_0_free_allowance(
     mocker,
     client_request,
     mock_get_usage,
     mock_get_billable_units,
-    free_allowance,
-    expected_sms_usage_breakdown,
 ):
     mocker.patch(
         'app.billing_api_client.get_free_sms_fragment_limit_for_year',
-        return_value=free_allowance,
+        return_value=0,
     )
     page = client_request.get(
         'main.usage',
         service_id=SERVICE_ONE_ID,
         year=2020,
     )
-    assert normalize_spaces(
-        page.select('main .govuk-grid-column-one-third')[1].text
-    ) == (
-        expected_sms_usage_breakdown
-    )
+
+    annual_usage = page.select('main .govuk-grid-column-one-third')
+    sms_column = normalize_spaces(annual_usage[1].text)
+
+    assert '0 free allowance' in sms_column
+    assert 'free allowance remaining' not in sms_column
 
 
 def test_usage_page_with_year_argument(
@@ -1861,7 +1866,7 @@ def test_breadcrumb_shows_if_service_is_suspended(
     ['email', 'sms'],
     ['email', 'sms', 'letter'],
 ))
-def test_should_show_usage_on_dashboard(
+def test_service_dashboard_shows_usage(
     client_request,
     service_one,
     mock_get_service_templates,
@@ -1880,8 +1885,35 @@ def test_should_show_usage_on_dashboard(
     ) == (
         'Unlimited '
         'free email allowance '
-        '£36.14 '
+        '£29.85 '
         'spent on text messages '
-        '£0.00 '
+        '£30.00 '
         'spent on letters'
     )
+
+
+def test_service_dashboard_shows_free_allowance(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_has_no_jobs,
+    mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+):
+    mocker.patch('app.billing_api_client.get_service_usage', return_value=[
+        {
+            "notification_type": "sms",
+            "chargeable_units": 1000,
+            "charged_units": 0,
+            "rate": 0.0165,
+            "cost": 0
+        }
+    ])
+
+    page = client_request.get('main.service_dashboard', service_id=SERVICE_ONE_ID)
+
+    usage_text = normalize_spaces(page.select_one('[data-key=usage]').text)
+    assert 'spent on text messages' not in usage_text
+    assert '249,000 free text messages left' in usage_text
