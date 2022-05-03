@@ -1,9 +1,7 @@
 import calendar
-from collections import namedtuple
 from datetime import datetime
 from functools import partial
 from itertools import groupby
-from operator import itemgetter
 
 from flask import (
     Response,
@@ -410,12 +408,12 @@ def get_monthly_usage_breakdown(year, monthly_usage):
 
         monthly_letters = [row for row in letters if row['month'] == month]
         letter_cost = sum(row['letter_cost'] for row in monthly_letters)
-        letter_breakdown = format_letter_details_for_month(monthly_letters)
+        letter_breakdown = get_monthly_usage_breakdown_for_letters(monthly_letters)
 
         yield {
             'month': month,
             'letter_cost': letter_cost,
-            'letter_breakdown': letter_breakdown,
+            'letter_breakdown': list(letter_breakdown),
             'sms_charged': sms_charged,
             'sms_free_allowance_used': sms_free_allowance_used,
             'sms_rate': sms_rate,
@@ -423,39 +421,30 @@ def get_monthly_usage_breakdown(year, monthly_usage):
         }
 
 
-def format_letter_details_for_month(letter_units_for_month):
-    # Format postage descriptions in letter units e.g. to 'international' not 'europe'
-    for month in letter_units_for_month:
-        for k, v in month.items():
-            if k == 'postage':
-                month[k] = get_postage_description(v)
-
-    # letter_units_for_month must be sorted before international postage values can be aggregated
+def get_monthly_usage_breakdown_for_letters(monthly_letters):
     postage_order = {'first class': 0, 'second class': 1, 'international': 2}
-    letter_units_for_month.sort(key=lambda x: (postage_order[x['postage']], x['rate']))
 
-    LetterDetails = namedtuple('LetterDetails', ['sent', 'rate', 'cost', 'postage_description'])
+    group_key = lambda row: (  # noqa: E731
+        postage_order[get_monthly_usage_postage_description(row)], row['rate']
+    )
 
-    # Aggregate the rows for international letters which have the same rate
-    result = []
-    for _key, rate_group in groupby(letter_units_for_month, key=itemgetter('postage', 'rate')):
+    rate_groups = groupby(sorted(monthly_letters, key=group_key), key=group_key)
+
+    for _key, rate_group in rate_groups:
+        # rate_group is a one-time generator so must be converted to a list for reuse
         rate_group = list(rate_group)
 
-        letter_details = LetterDetails(
-            sent=sum(x['notifications_sent'] for x in rate_group),
-            rate=rate_group[0]['rate'],
-            cost=sum(x['letter_cost'] for x in rate_group),
-            postage_description=rate_group[0]['postage']
-        )
-
-        result.append(letter_details)
-
-    return result
+        yield {
+            "sent": sum(x['notifications_sent'] for x in rate_group),
+            "rate": rate_group[0]['rate'],
+            "cost": sum(x['letter_cost'] for x in rate_group),
+            "postage_description": get_monthly_usage_postage_description(rate_group[0])
+        }
 
 
-def get_postage_description(postage):
-    if postage in ('first', 'second'):
-        return f'{postage} class'
+def get_monthly_usage_postage_description(row):
+    if row['postage'] in ('first', 'second'):
+        return f'{row["postage"]} class'
     return 'international'
 
 
