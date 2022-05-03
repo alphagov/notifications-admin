@@ -13,8 +13,6 @@ from app.main.views.sub_navigation_dictionaries import pricing_nav
 
 
 def get_current_sms_rate():
-    if convert_utc_to_bst(datetime.utcnow()) < convert_utc_to_bst(datetime(2022, 5, 1)):
-        return '1.61'
     return '1.72'
 
 
