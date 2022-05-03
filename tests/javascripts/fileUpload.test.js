@@ -67,7 +67,9 @@ describe('File upload', () => {
     // start module
     window.GOVUK.modules.start();
 
-    expect(form.querySelector('button[type=button]')).not.toBeNull();
+    var uploadButton = form.querySelector('button[type=button]');
+
+    expect(uploadButton).not.toBeNull();
 
     // Note: the existing form controls are also hidden but this is through CSS so out of scope
 
@@ -132,9 +134,14 @@ describe('File upload', () => {
 
     });
 
-    test("It should add a link to cancel the upload by reloading the page", () => {
+    test("It should replace the upload button with one for cancelling the upload", () => {
 
-      expect(form.querySelector("a[href='']")).not.toBeNull();
+      var cancelLink = form.querySelector("a.file-upload-button");
+
+      expect(cancelLink).not.toBeNull();
+
+      // the cancel button should be focused
+      expect(document.activeElement).toBe(cancelLink);
 
     });
 
