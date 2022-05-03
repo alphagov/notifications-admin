@@ -1093,87 +1093,21 @@ def test_usage_page_monthly_breakdown(
     assert '1,230 text messages at 1.70p' in monthly_breakdown
 
 
-@freeze_time("2012-04-30 12:12:12")
-def test_usage_page_displays_letters_ordered_by_postage(
-    mocker,
+@freeze_time("2012-03-31 12:12:12")
+def test_usage_page_letter_breakdown_ordering(
     client_request,
     service_one,
+    mock_get_monthly_usage_for_service,
     mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit
 ):
-    monthly_usage = [
-        {
-            'month': 'April',
-            'notification_type': 'letter',
-            'rate': 0.5,
-            'chargeable_units': 1,
-            'notifications_sent': 1,
-            'postage': 'second',
-            'letter_cost': 0.5,
-        },
-        {
-            'month': 'April',
-            'notification_type': 'letter',
-            'rate': 1,
-            'chargeable_units': 1,
-            'notifications_sent': 1,
-            'postage': 'europe',
-            'letter_cost': 1,
-        },
-        {
-            'month': 'April',
-            'notification_type': 'letter',
-            'rate': 1,
-            'chargeable_units': 2,
-            'notifications_sent': 2,
-            'postage': 'rest-of-word',
-            'letter_cost': 2,
-        },
-        {
-            'month': 'April',
-            'notification_type': 'letter',
-            'rate': 1.5,
-            'chargeable_units': 7,
-            'notifications_sent': 7,
-            'postage': 'europe',
-            'letter_cost': 11.5,
-        },
-        {
-            'month': 'April',
-            'notification_type': 'letter',
-            'rate': 0.3,
-            'chargeable_units': 3,
-            'notifications_sent': 3,
-            'postage': 'second',
-            'letter_cost': 0.9,
-        },
-        {
-            'month': 'April',
-            'notification_type': 'letter',
-            'rate': 0.5,
-            'chargeable_units': 1,
-            'notifications_sent': 1,
-            'postage': 'first',
-            'letter_cost': 0.5,
-        },
-    ]
+    page = client_request.get('main.usage', service_id=SERVICE_ONE_ID)
+    row_for_feb = page.find('table').find_all('tr', class_='table-row')[10]
+    postage_details = row_for_feb.find_all('li', class_='tabular-numbers')
 
-    mocker.patch('app.billing_api_client.get_monthly_usage_for_service', return_value=monthly_usage)
-    service_one['permissions'].append('letter')
-    page = client_request.get(
-        'main.usage',
-        service_id=SERVICE_ONE_ID,
-    )
-
-    row_for_april = page.find('table').find('tr', class_='table-row')
-    postage_details = row_for_april.find_all('li', class_='tabular-numbers')
-
-    assert len(postage_details) == 5
-    assert normalize_spaces(postage_details[0].text) == '1 first class letter at 50p'
-    assert normalize_spaces(postage_details[1].text) == '3 second class letters at 30p'
-    assert normalize_spaces(postage_details[2].text) == '1 second class letter at 50p'
-    assert normalize_spaces(postage_details[3].text) == '3 international letters at £1.00'
-    assert normalize_spaces(postage_details[4].text) == '7 international letters at £1.50'
+    assert normalize_spaces(postage_details[2].text) == '5 first class letters at 33p'
+    assert normalize_spaces(postage_details[3].text) == '10 second class letters at 31p'
+    assert normalize_spaces(postage_details[4].text) == '10 international letters at 84p'
 
 
 def test_usage_page_with_0_free_allowance(
