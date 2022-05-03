@@ -398,13 +398,9 @@ def get_monthly_usage_breakdown(year, monthly_usage):
 
     for month in get_months_for_financial_year(year):
         monthly_sms = [row for row in sms if row['month'] == month]
-        sms_charged = sum(row['sms_charged'] for row in monthly_sms)
         sms_free_allowance_used = sum(row['sms_free_allowance_used'] for row in monthly_sms)
         sms_cost = sum(row['sms_cost'] for row in monthly_sms)
-        # makes the assumption that there is either no item in `monthly_sms` because they
-        # have not sent any SMS or that they have sent SMS and that there is only a single
-        # item in `monthly_sms` because they have only been sent at a single rate
-        sms_rate = monthly_sms[0]['rate'] if len(monthly_sms) else 0
+        sms_breakdown = [row for row in monthly_sms if row['sms_charged']]
 
         monthly_letters = [row for row in letters if row['month'] == month]
         letter_cost = sum(row['letter_cost'] for row in monthly_letters)
@@ -414,9 +410,8 @@ def get_monthly_usage_breakdown(year, monthly_usage):
             'month': month,
             'letter_cost': letter_cost,
             'letter_breakdown': list(letter_breakdown),
-            'sms_charged': sms_charged,
             'sms_free_allowance_used': sms_free_allowance_used,
-            'sms_rate': sms_rate,
+            'sms_breakdown': sms_breakdown,
             'sms_cost': sms_cost,
         }
 

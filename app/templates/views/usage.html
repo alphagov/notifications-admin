@@ -107,17 +107,17 @@
               {% if item.sms_free_allowance_used %}
                 <li class="tabular-numbers">{{ item.sms_free_allowance_used|format_thousands }} free {{ item.sms_free_count|message_count_label('sms', suffix='') }}</li>
               {% endif %}
-              {% if item.sms_charged %}
-                <li class="tabular-numbers">{{ item.sms_charged|message_count('sms') }} at
-                {{- ' {:.2f}p'.format(item.sms_rate * 100) }}</li>
-              {% endif %}
+              {% for sms in item.sms_breakdown %}
+                  <li class="tabular-numbers">{{ sms.sms_charged|message_count('sms') }} at
+                  {{- ' {:.2f}p'.format(sms.rate * 100) }}</li>
+              {% endfor %}
               {% for letter in item.letter_breakdown %}
                 {% if letter.sent %}
                   <li class="tabular-numbers">{{ "{:,} {}".format(letter.sent, letter.postage_description) }} {{ letter.sent|message_count_label('letter', suffix='') }} at
                   {{ letter.rate | format_number_in_pounds_as_currency }}</li>
                 {% endif %}
               {% endfor %}
-              {% if not (item.sms_free_allowance_used or item.sms_charged or item.letter_breakdown) %}
+              {% if not (item.sms_free_allowance_used or item.sms_cost or item.letter_breakdown) %}
                 <li aria-hidden="true">–</li>
               {% endif %}
               </ul>

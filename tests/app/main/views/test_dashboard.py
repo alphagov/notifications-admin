@@ -1068,21 +1068,17 @@ def test_usage_page_monthly_breakdown(
     mock_get_monthly_usage_for_service,
     mock_get_free_sms_fragment_limit
 ):
-    service_one['permissions'].append('letter')
-    page = client_request.get(
-        'main.usage',
-        service_id=SERVICE_ONE_ID,
-    )
-
+    page = client_request.get('main.usage', service_id=SERVICE_ONE_ID)
     monthly_breakdown = normalize_spaces(page.find('table').text)
 
     assert 'April' in monthly_breakdown
     assert '249,860 free text messages' in monthly_breakdown
 
     assert 'February' in monthly_breakdown
-    assert '£28.99' in monthly_breakdown
+    assert '£29.55' in monthly_breakdown
     assert '140 free text messages' in monthly_breakdown
     assert '960 text messages at 1.65p' in monthly_breakdown
+    assert '33 text messages at 1.70p' in monthly_breakdown
     assert '10 second class letters at 31p' in monthly_breakdown
     assert '5 first class letters at 33p' in monthly_breakdown
     assert '10 international letters at 84p' in monthly_breakdown
@@ -1125,9 +1121,9 @@ def test_usage_page_letter_breakdown_ordering(
     row_for_feb = page.find('table').find_all('tr', class_='table-row')[10]
     postage_details = row_for_feb.find_all('li', class_='tabular-numbers')
 
-    assert normalize_spaces(postage_details[2].text) == '5 first class letters at 33p'
-    assert normalize_spaces(postage_details[3].text) == '10 second class letters at 31p'
-    assert normalize_spaces(postage_details[4].text) == '10 international letters at 84p'
+    assert normalize_spaces(postage_details[3].text) == '5 first class letters at 33p'
+    assert normalize_spaces(postage_details[4].text) == '10 second class letters at 31p'
+    assert normalize_spaces(postage_details[5].text) == '10 international letters at 84p'
 
 
 def test_usage_page_with_0_free_allowance(
