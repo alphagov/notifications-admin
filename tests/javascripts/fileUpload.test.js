@@ -1,7 +1,18 @@
 const helpers = require('./support/helpers.js');
 
 beforeAll(() => {
+
+  // Stub out JS from window.GOVUK namespace used by this component
+  window.GOVUK.Frontend = {
+    Button: function () {
+      return {
+        init: function () {}
+      }
+    }
+  };
+
   require('../../app/assets/javascripts/fileUpload.js');
+
 });
 
 afterAll(() => {
@@ -19,18 +30,16 @@ describe('File upload', () => {
     document.body.innerHTML = `
       <form method="post" enctype="multipart/form-data" class="" data-module="file-upload">
         <label class="file-upload-label" for="file">
-          <span class="visually-hidden">Upload a PNG logo</span>
+          Upload a PNG logo
         </label>
-        <input class="file-upload-field" id="file" name="file" type="file">
-        <label class="file-upload-button" for="file">
-          Upload logo
-        </label>
-        <label class="file-upload-filename" for="file"></label>
+        <input class="file-upload-field" data-button-text="Upload logo" id="file" name="file" type="file">
         <button type="submit" class="govuk-button file-upload-submit">Submit</button>
       </form>`;
 
     form = document.querySelector('form');
-    uploadControl = form.querySelector('input[type=file]');
+    uploadLabel = form.querySelector('label.file-upload-label');
+    uploadControl = form.querySelector('input.file-upload-field');
+    uploadSubmit = form.querySelector('button.file-upload-submit')
 
   });
 
@@ -53,7 +62,40 @@ describe('File upload', () => {
 
   });
 
-  describe("If the state of the upload form control changes", () => {
+  test("An 'upload' button should be added and the existing form contents hidden", () => {
+
+    // start module
+    window.GOVUK.modules.start();
+
+    expect(form.querySelector('button[type=button]')).not.toBeNull();
+    expect(uploadLabel.hasAttribute('hidden')).toBe(true);
+    expect(uploadControl.hasAttribute('hidden')).toBe(true);
+    expect(uploadSubmit.hasAttribute('hidden')).toBe(true);
+
+  });
+
+  /*
+    The file is selected by a click event on the input[type=file] control and the user choosing
+    a file from the OS dialog this opens. This creates an onchange event we use to submit the form.
+
+    We can't simulate the user choosing a file so we test the behaviours resulting from the click
+    and onchange events.
+  */
+  test("If the 'upload' button is clicked, it should click the file upload control", () => {
+
+    // start module
+    window.GOVUK.modules.start();
+
+    var fileUploadClickCallback = jest.fn(() => {});
+    uploadControl.addEventListener('click', fileUploadClickCallback);
+
+    helpers.triggerEvent(form.querySelector('button[type=button]'), 'click');
+
+    expect(fileUploadClickCallback).toHaveBeenCalled();
+
+  });
+
+  describe("If the state of the upload form control changes (from clicking the 'upload' button)", () => {
 
     beforeEach(() => {
 

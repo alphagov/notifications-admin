@@ -19,7 +19,7 @@ def test_get_upload_letter(client_request):
     assert page.find('input', class_='file-upload-field')
     assert page.find('input', class_='file-upload-field')['accept'] == '.pdf'
     assert page.select('main button[type=submit]')
-    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Choose file'
+    assert normalize_spaces(page.find('input', type='file')['data-button-text']) == 'Choose file'
 
 
 @pytest.mark.parametrize('extra_permissions, expected_allow_international', (
@@ -226,7 +226,7 @@ def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request):
         )
     assert page.find('h1').text == 'Wrong file type'
     assert page.find('div', class_='banner-dangerous').find('p').text == 'Save your letter as a PDF and try again.'
-    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
+    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
     assert page.find('input', type='file')['accept'] == '.pdf'
 
 
@@ -238,7 +238,7 @@ def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
         _expected_status=200
     )
     assert page.find('div', class_='banner-dangerous').find('h1').text == 'You need to choose a file to upload'
-    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
+    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
 
 
 def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_request):
@@ -253,7 +253,7 @@ def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_
             _expected_status=400
         )
     assert page.find('div', class_='banner-dangerous').find('h1').text == 'Your file contains a virus'
-    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
+    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
     mock_s3_backup.assert_not_called()
 
 
@@ -269,7 +269,7 @@ def test_post_choose_upload_file_when_file_is_too_big(mocker, client_request):
         )
     assert page.find('div', class_='banner-dangerous').find('h1').text == 'Your file is too big'
     assert page.find('div', class_='banner-dangerous').find('p').text == 'Files must be smaller than 2MB.'
-    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
+    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
 
 
 def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
@@ -286,7 +286,7 @@ def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
     assert page.find(
         'div', class_='banner-dangerous'
     ).find('p').text == 'Notify cannot read this PDF.Save a new copy of your file and try again.'
-    assert normalize_spaces(page.find('label', class_='file-upload-button').text) == 'Upload your file again'
+    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
 
 
 def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid):
@@ -364,7 +364,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
     assert len(page.select('.letter-postage')) == 0
 
     assert page.find("a", {"class": "govuk-back-link"})["href"] == "/services/{}/upload-letter".format(SERVICE_ONE_ID)
-    assert page.find("label", {"class": "file-upload-button"})
+    assert page.find("input", {"type": "file"}).has_attr("data-button-text")
     assert page.find("input", {"type": "file"})["accept"] == '.pdf'
 
     letter_images = page.select('main img')

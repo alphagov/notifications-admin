@@ -9,13 +9,29 @@
       <a href="" class='govuk-button govuk-button--warning govuk-!-margin-right-1'>Cancel upload</a>
     `);
 
+    // Add a button that passes a click to the input[type=file]
+    this.addFakeButton = function () {
+      $(
+        '<button type="button" class="govuk-button govuk-!-margin-right-1">' +
+          this.$field.data('buttonText') +
+        '</button>'
+      )
+      .on('click', e => this.$field.click())
+      .insertAfter(this.$field);
+    };
+
     this.start = function(component) {
 
       this.$form = $(component);
+      this.$field = this.$form.find('.file-upload-field');
 
-      // The label gets styled like a button and is used to hide the native file upload control. This is so that
-      // users see a button that looks like the others on the site.
-      this.$form.find('label.file-upload-button').addClass('govuk-button govuk-!-margin-right-1');
+      // Hide all controls except the button, semantically and visually
+      // These elements are also hidden in their CSS to override any use of the display style
+      this.$form.find('.file-upload-label, .file-upload-submit')
+                .add(this.$field)
+                .attr('hidden', "");
+
+      this.addFakeButton();
 
       // Clear the form if the user navigates back to the page
       $(window).on("pageshow", () => this.$form[0].reset());
