@@ -12,7 +12,6 @@ from app.main.views.dashboard import (
     aggregate_template_usage,
     format_monthly_stats_to_list,
     get_dashboard_totals,
-    get_monthly_usage_breakdown,
     get_tuples_of_financial_years,
 )
 from tests import (
@@ -1093,6 +1092,27 @@ def test_usage_page_monthly_breakdown(
     assert '1,230 text messages at 1.70p' in monthly_breakdown
 
 
+@pytest.mark.parametrize(
+    'now, expected_number_of_months', [
+        (freeze_time("2017-03-31 11:09:00.061258"), 12),
+        (freeze_time("2017-01-01 11:09:00.061258"), 10)
+    ]
+)
+def test_usage_page_monthly_breakdown_shows_months_so_far(
+    client_request,
+    service_one,
+    mock_get_annual_usage_for_service,
+    mock_get_monthly_usage_for_service,
+    mock_get_free_sms_fragment_limit,
+    now,
+    expected_number_of_months
+):
+    with now:
+        page = client_request.get('main.usage', service_id=SERVICE_ONE_ID)
+        rows = page.find('table').find_all('tr', class_='table-row')
+        assert len(rows) == expected_number_of_months
+
+
 @freeze_time("2012-03-31 12:12:12")
 def test_usage_page_letter_breakdown_ordering(
     client_request,
@@ -1520,177 +1540,6 @@ def test_aggregate_status_types(dict_in, expected_failed, expected_requested):
     sms_counts = aggregate_status_types({'sms': dict_in})['sms_counts']
     assert sms_counts['failed'] == expected_failed
     assert sms_counts['requested'] == expected_requested
-
-
-@pytest.mark.parametrize(
-    'now, expected_number_of_months', [
-        (freeze_time("2017-12-31 11:09:00.061258"), 12),
-        (freeze_time("2017-01-01 11:09:00.061258"), 10)
-    ]
-)
-def test_get_monthly_usage_breakdown(now, expected_number_of_months):
-    with now:
-        breakdown = get_monthly_usage_breakdown(2016, [
-            {
-                'month': 'April',
-                'international': False,
-                'rate_multiplier': 1,
-                'notification_type': 'sms',
-                'rate': 1.65,
-                'chargeable_units': 100000,
-                'notifications_sent': 1234,
-                'sms_charged': 0,
-                'sms_free_allowance_used': 100000,
-                'sms_cost': 0,
-            },
-            {
-                'month': 'May',
-                'international': False,
-                'rate_multiplier': 1,
-                'notification_type': 'sms',
-                'rate': 1.65,
-                'chargeable_units': 100000,
-                'notifications_sent': 1234,
-                'sms_charged': 0,
-                'sms_free_allowance_used': 100000,
-                'sms_cost': 0,
-            },
-            {
-                'month': 'June',
-                'international': False,
-                'rate_multiplier': 1,
-                'notification_type': 'sms',
-                'rate': 1.71,
-                'chargeable_units': 100000,
-                'notifications_sent': 1234,
-                'sms_charged': 50000,
-                'sms_free_allowance_used': 50000,
-                'sms_cost': 85500,
-            },
-            {
-                'month': 'February',
-                'international': False,
-                'rate_multiplier': 1,
-                'notification_type': 'sms',
-                'rate': 1.71,
-                'chargeable_units': 2000,
-                'notifications_sent': 1234,
-                'sms_charged': 2000,
-                'sms_free_allowance_used': 0,
-                'sms_cost': 3420,
-            },
-        ])
-
-        assert list(breakdown) == [
-            {
-                'sms_free_allowance_used': 100000,
-                'month': 'April',
-                'sms_charged': 0,
-                'sms_rate': 1.65,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-            {
-                'sms_free_allowance_used': 100000,
-                'month': 'May',
-                'sms_charged': 0,
-                'sms_rate': 1.65,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-            {
-                'sms_free_allowance_used': 50000,
-                'month': 'June',
-                'sms_charged': 50000,
-                'sms_rate': 1.71,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 85500,
-            },
-            {
-                'sms_free_allowance_used': 0,
-                'month': 'July',
-                'sms_charged': 0,
-                'sms_rate': 0,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-            {
-                'sms_free_allowance_used': 0,
-                'month': 'August',
-                'sms_charged': 0,
-                'sms_rate': 0,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-            {
-                'sms_free_allowance_used': 0,
-                'month': 'September',
-                'sms_charged': 0,
-                'sms_rate': 0,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-            {
-                'sms_free_allowance_used': 0,
-                'month': 'October',
-                'sms_charged': 0,
-                'sms_rate': 0,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-            {
-                'sms_free_allowance_used': 0,
-                'month': 'November',
-                'sms_charged': 0,
-                'sms_rate': 0,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-            {
-                'sms_free_allowance_used': 0,
-                'month': 'December',
-                'sms_charged': 0,
-                'sms_rate': 0,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-            {
-                'sms_free_allowance_used': 0,
-                'month': 'January',
-                'sms_charged': 0,
-                'sms_rate': 0,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-            {
-                'sms_free_allowance_used': 0,
-                'month': 'February',
-                'sms_charged': 2000,
-                'sms_rate': 1.71,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 3420,
-            },
-            {
-                'sms_free_allowance_used': 0,
-                'month': 'March',
-                'sms_charged': 0,
-                'sms_rate': 0,
-                'letter_cost': 0,
-                'letter_breakdown': [],
-                'sms_cost': 0,
-            },
-        ][:expected_number_of_months]
 
 
 def test_get_tuples_of_financial_years():
