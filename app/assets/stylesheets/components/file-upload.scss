@@ -23,6 +23,25 @@
     display: none;
   }
 
+  &-loading-content {
+    display: inline-block;
+
+    &:focus-visible {
+
+      outline: solid 3px $govuk-focus-colour;
+      outline-offset: 5px;
+
+    }
+
+  }
+
+  &-loading-message {
+
+    display: inline-block; // use to constrain width to contents
+    padding: 7px 0px 6px;
+
+  }
+
   &-alternate-link {
     display: inline-block;
     line-height: 35px;

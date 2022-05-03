@@ -114,9 +114,20 @@ describe('File upload', () => {
 
     });
 
-    test("It should add a link to cancel the upload by reloading the page", () => {
+    test("It should replace the upload button with a notice that uploading has started and a cancel upload button", () => {
 
-      expect(form.querySelector("a[href='']")).not.toBeNull();
+      var uploadingContent = form.querySelector('p.file-upload-loading-content');
+
+      expect(uploadingContent).not.toBeNull();
+
+      var cancelLink = uploadingContent.querySelector("a[href='']");
+
+      expect(cancelLink).not.toBeNull();
+
+      // the new content replaces the 'upload' button so needs focusing so:
+      // - focus is not lost
+      // - the text in the paragraph is announced to screen readers
+      expect(document.activeElement).toBe(uploadingContent);
 
     });
 
