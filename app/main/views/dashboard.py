@@ -442,7 +442,7 @@ def format_letter_details_for_month(letter_units_for_month):
         rate_group = list(rate_group)
 
         letter_details = LetterDetails(
-            sent=sum(x['billing_units'] for x in rate_group),
+            sent=sum(x['notifications_sent'] for x in rate_group),
             rate=rate_group[0]['rate'],
             cost=sum(x['letter_cost'] for x in rate_group),
             postage_description=rate_group[0]['postage']
