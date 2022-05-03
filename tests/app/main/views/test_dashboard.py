@@ -1102,13 +1102,56 @@ def test_usage_page_displays_letters_ordered_by_postage(
     mock_get_free_sms_fragment_limit
 ):
     monthly_usage = [
-        {'month': 'April', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 1, 'postage': 'second'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 1, 'billing_units': 1, 'postage': 'europe'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 1, 'billing_units': 2, 'postage': 'rest-of-word'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 1.5, 'billing_units': 7, 'postage': 'europe'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 0.3, 'billing_units': 3, 'postage': 'second'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 1, 'postage': 'first'},
+        {
+            'month': 'April',
+            'notification_type': 'letter',
+            'rate': 0.5,
+            'billing_units': 1,
+            'postage': 'second',
+            'letter_cost': 0.5,
+        },
+        {
+            'month': 'April',
+            'notification_type': 'letter',
+            'rate': 1,
+            'billing_units': 1,
+            'postage': 'europe',
+            'letter_cost': 1,
+        },
+        {
+            'month': 'April',
+            'notification_type': 'letter',
+            'rate': 1,
+            'billing_units': 2,
+            'postage': 'rest-of-word',
+            'letter_cost': 2,
+        },
+        {
+            'month': 'April',
+            'notification_type': 'letter',
+            'rate': 1.5,
+            'billing_units': 7,
+            'postage': 'europe',
+            'letter_cost': 11.5,
+        },
+        {
+            'month': 'April',
+            'notification_type': 'letter',
+            'rate': 0.3,
+            'billing_units': 3,
+            'postage': 'second',
+            'letter_cost': 0.9,
+        },
+        {
+            'month': 'April',
+            'notification_type': 'letter',
+            'rate': 0.5,
+            'billing_units': 1,
+            'postage': 'first',
+            'letter_cost': 0.5,
+        },
     ]
+
     mocker.patch('app.billing_api_client.get_monthly_usage_for_service', return_value=monthly_usage)
     service_one['permissions'].append('letter')
     page = client_request.get(
@@ -1136,12 +1179,48 @@ def test_usage_page_displays_letters_split_by_month_and_postage(
     mock_get_free_sms_fragment_limit
 ):
     billable_units_resp = [
-        {'month': 'April', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 1, 'postage': 'second'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 1, 'billing_units': 1, 'postage': 'europe'},
-        {'month': 'May', 'notification_type': 'letter', 'rate': 1, 'billing_units': 7, 'postage': 'europe'},
-        {'month': 'May', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 3, 'postage': 'second'},
-        {'month': 'May', 'notification_type': 'letter', 'rate': 0.7, 'billing_units': 1, 'postage': 'first'},
+        {
+            'month': 'April',
+            'notification_type': 'letter',
+            'rate': 0.5,
+            'billing_units': 1,
+            'postage': 'second',
+            'letter_cost': 0.5,
+        },
+        {
+            'month': 'April',
+            'notification_type': 'letter',
+            'rate': 1,
+            'billing_units': 1,
+            'postage': 'europe',
+            'letter_cost': 1,
+        },
+        {
+            'month': 'May',
+            'notification_type': 'letter',
+            'rate': 1,
+            'billing_units': 7,
+            'postage': 'europe',
+            'letter_cost': 7,
+        },
+        {
+            'month': 'May',
+            'notification_type': 'letter',
+            'rate': 0.5,
+            'billing_units': 3,
+            'postage': 'second',
+            'letter_cost': 1.5,
+        },
+        {
+            'month': 'May',
+            'notification_type': 'letter',
+            'rate': 0.7,
+            'billing_units': 1,
+            'postage': 'first',
+            'letter_cost': 0.7,
+        },
     ]
+
     mocker.patch('app.billing_api_client.get_monthly_usage_for_service', return_value=billable_units_resp)
     service_one['permissions'].append('letter')
     page = client_request.get(

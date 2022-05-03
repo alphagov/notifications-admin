@@ -409,11 +409,9 @@ def get_monthly_usage_breakdown(year, monthly_usage):
         sms_rate = monthly_sms[0]['rate'] if len(monthly_sms) else 0
 
         monthly_letters = [row for row in letters if row['month'] == month]
+        letter_cost = sum(row['letter_cost'] for row in monthly_letters)
         letter_breakdown = format_letter_details_for_month(monthly_letters)
 
-        letter_cost = 0
-        for x in letter_breakdown:
-            letter_cost += x.cost
         yield {
             'month': month,
             'letter_cost': letter_cost,
@@ -446,7 +444,7 @@ def format_letter_details_for_month(letter_units_for_month):
         letter_details = LetterDetails(
             sent=sum(x['billing_units'] for x in rate_group),
             rate=rate_group[0]['rate'],
-            cost=(sum(x['billing_units'] for x in rate_group) * rate_group[0]['rate']),
+            cost=sum(x['letter_cost'] for x in rate_group),
             postage_description=rate_group[0]['postage']
         )
 

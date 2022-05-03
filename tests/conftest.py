@@ -2367,6 +2367,7 @@ def mock_get_monthly_usage_for_service(mocker):
                 'sms_charged': 1230,
                 'sms_free_allowance_used': 0,
                 'sms_cost': 20.91,
+                'letter_cost': 0,
             },
             {
                 'month': 'February',
@@ -2377,6 +2378,7 @@ def mock_get_monthly_usage_for_service(mocker):
                 'sms_charged': 960,
                 'sms_free_allowance_used': 140,
                 'sms_cost': 15.84,
+                'letter_cost': 0,
             },
             {
                 'month': 'February',
@@ -2387,6 +2389,7 @@ def mock_get_monthly_usage_for_service(mocker):
                 'sms_charged': 0,
                 'sms_free_allowance_used': 0,
                 'sms_cost': 0,
+                'letter_cost': 3.1,
             },
             {
                 'month': 'February',
@@ -2397,6 +2400,7 @@ def mock_get_monthly_usage_for_service(mocker):
                 'sms_charged': 0,
                 'sms_free_allowance_used': 0,
                 'sms_cost': 0,
+                'letter_cost': 1.65,
             },
             {
                 'month': 'February',
@@ -2407,6 +2411,7 @@ def mock_get_monthly_usage_for_service(mocker):
                 'sms_charged': 0,
                 'sms_free_allowance_used': 0,
                 'sms_cost': 0,
+                'letter_cost': 2.52,
             },
             {
                 'month': 'February',
@@ -2417,6 +2422,7 @@ def mock_get_monthly_usage_for_service(mocker):
                 'sms_charged': 0,
                 'sms_free_allowance_used': 0,
                 'sms_cost': 0,
+                'letter_cost': 5.88,
             },
             {
                 'month': 'April',
@@ -2427,6 +2433,7 @@ def mock_get_monthly_usage_for_service(mocker):
                 'sms_charged': 0,
                 'sms_free_allowance_used': 249860,
                 'sms_cost': 0,
+                'letter_cost': 0,
             },
         ]
 
