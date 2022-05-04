@@ -151,6 +151,45 @@ def test_should_show_overview_page(
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize('state', (
+    'active', 'pending',
+))
+def test_should_show_change_details_link(
+    client_request,
+    mocker,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    service_one,
+    active_user_with_permissions,
+    active_caseworking_user,
+    state,
+):
+    current_user = active_user_with_permissions
+
+    other_user = active_caseworking_user
+    other_user['id'] = uuid.uuid4()
+    other_user['email_address'] = 'zzzzzzz@example.gov.uk'
+    other_user['state'] = state
+
+    mocker.patch('app.user_api_client.get_user', return_value=current_user)
+    mocker.patch('app.models.user.Users.client_method', return_value=[
+        current_user,
+        other_user,
+    ])
+
+    page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
+    link = page.select('.user-list-item')[-1].select_one('a')
+
+    assert normalize_spaces(link.text) == (
+        'Change details for Test User zzzzzzz@example.gov.uk'
+    )
+    assert link['href'] == url_for(
+        '.edit_user_permissions',
+        service_id=SERVICE_ONE_ID,
+        user_id=other_user['id'],
+    )
+
+
 @pytest.mark.parametrize('number_of_users', (
     pytest.param(7, marks=pytest.mark.xfail),
     pytest.param(8),

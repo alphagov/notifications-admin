@@ -447,7 +447,7 @@ class User(JSONModel, UserMixin):
     def is_editable_by(self, other_user):
         if other_user == self:
             return False
-        if self.is_active:
+        if self.is_active or self.is_pending:
             return True
         return False
 
