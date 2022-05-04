@@ -359,7 +359,6 @@ def test_font_preload(
 
 
 @pytest.mark.parametrize('current_date, expected_rate', (
-    ('2022-04-30', '1.61'),
     ('2022-05-01', '1.72'),
 ))
 def test_sms_price(

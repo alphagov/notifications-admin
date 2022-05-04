@@ -1,28 +1,21 @@
-from datetime import datetime
-
 from flask import current_app, render_template
 from flask_login import current_user
 from notifications_utils.international_billing_rates import (
     INTERNATIONAL_BILLING_RATES,
 )
-from notifications_utils.timezones import convert_utc_to_bst
 
 from app.main import main
 from app.main.forms import SearchByNameForm
 from app.main.views.sub_navigation_dictionaries import pricing_nav
 
-
-def get_current_sms_rate():
-    if convert_utc_to_bst(datetime.utcnow()) < convert_utc_to_bst(datetime(2022, 5, 1)):
-        return '1.61'
-    return '1.72'
+CURRENT_SMS_RATE = '1.72'
 
 
 @main.route('/pricing')
 def pricing():
     return render_template(
         'views/pricing/index.html',
-        sms_rate=get_current_sms_rate(),
+        sms_rate=CURRENT_SMS_RATE,
         international_sms_rates=sorted([
             (cc, country['names'], country['billable_units'])
             for cc, country in INTERNATIONAL_BILLING_RATES.items()
