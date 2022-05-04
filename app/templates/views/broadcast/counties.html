@@ -25,15 +25,17 @@
     </div>
     {{ live_search(target_selector='.file-list-item', show=show_search_form, form=search_form, label='Or by district') }}
 
+    <div class="govuk-!-margin-bottom-6">
     {% for area in county.sub_areas|sort %}
       <div class="file-list-item">
       {# these are districts within a county#}
         <a
-          class="file-list-filename-large govuk-link govuk-link--no-visited-state"
+          class="file-list-filename-large file-list-filename-large-no-hint govuk-link govuk-link--no-visited-state"
           href="{{ url_for('.choose_broadcast_sub_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=library_slug, area_slug=area.id, prev_area_slug=county.id) }}"
         >{{ area.name }}</a>
       </div>
     {% endfor %}
+    </div>
 
     {{ sticky_page_footer('Continue') }}
 
