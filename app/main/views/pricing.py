@@ -8,15 +8,14 @@ from app.main import main
 from app.main.forms import SearchByNameForm
 from app.main.views.sub_navigation_dictionaries import pricing_nav
 
-
-SMS_RATE = '1.72'
+CURRENT_SMS_RATE = '1.72'
 
 
 @main.route('/pricing')
 def pricing():
     return render_template(
         'views/pricing/index.html',
-        sms_rate=SMS_RATE,
+        sms_rate=CURRENT_SMS_RATE,
         international_sms_rates=sorted([
             (cc, country['names'], country['billable_units'])
             for cc, country in INTERNATIONAL_BILLING_RATES.items()

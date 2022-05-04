@@ -13,7 +13,7 @@ from notifications_utils.template import HTMLEmailTemplate, LetterImageTemplate
 from app import email_branding_client, letter_branding_client, status_api_client
 from app.main import main
 from app.main.forms import FieldWithNoneOption
-from app.main.views.pricing import SMS_RATE
+from app.main.views.pricing import CURRENT_SMS_RATE
 from app.main.views.sub_navigation_dictionaries import (
     features_nav,
     using_notify_nav,
@@ -29,7 +29,7 @@ def index():
 
     return render_template(
         'views/signedout.html',
-        sms_rate=SMS_RATE,
+        sms_rate=CURRENT_SMS_RATE,
         counts=status_api_client.get_count_of_live_services_and_organisations(),
     )
 
