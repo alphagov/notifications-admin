@@ -151,7 +151,7 @@ class User(JSONModel, UserMixin):
         return session.get('current_session_id') != self.current_session_id
 
     def activate(self):
-        if self.state == 'pending':
+        if self.is_pending:
             user_data = user_api_client.activate_user(self.id)
             return self.__class__(user_data['data'])
         else:
@@ -191,6 +191,10 @@ class User(JSONModel, UserMixin):
     @property
     def is_active(self):
         return self.state == 'active'
+
+    @property
+    def is_pending(self):
+        return self.state == 'pending'
 
     @property
     def is_gov_user(self):
@@ -443,7 +447,7 @@ class User(JSONModel, UserMixin):
     def is_editable_by(self, other_user):
         if other_user == self:
             return False
-        if self.state == 'active':
+        if self.is_active:
             return True
         return False
 
