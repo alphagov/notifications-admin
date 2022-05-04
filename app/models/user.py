@@ -440,6 +440,13 @@ class User(JSONModel, UserMixin):
     def complete_webauthn_login_attempt(self, is_successful=True):
         return user_api_client.complete_webauthn_login_attempt(self.id, is_successful)
 
+    def is_editable_by(self, other_user):
+        if other_user == self:
+            return False
+        if self.state == 'active':
+            return True
+        return False
+
 
 class InvitedUser(JSONModel):
 
@@ -574,6 +581,9 @@ class InvitedUser(JSONModel):
     def template_folders_for_service(self, service=None):
         # only used on the manage users page to display the count, so okay to not be fully fledged for now
         return [{'id': x} for x in self.folder_permissions]
+
+    def is_editable_by(self, other):
+        return False
 
 
 class InvitedOrgUser(JSONModel):

@@ -73,7 +73,7 @@
               {% if current_user.has_permissions('manage_service') %}
                 {% if user.status == 'pending' %}
                   <a class="user-list-edit-link govuk-link govuk-link--no-visited-state" href="{{ url_for('.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation<span class="govuk-visually-hidden"> for {{ user.email_address }}</span></a>
-                {% elif user.state == 'active' and current_user.id != user.id %}
+                {% elif user.is_editable_by(current_user) %}
                   <a class="user-list-edit-link govuk-link govuk-link--no-visited-state" href="{{ url_for('.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Change details<span class="govuk-visually-hidden"> for {{ user.name }} {{ user.email_address }}</span></a>
                 {% endif %}
               {% endif %}
