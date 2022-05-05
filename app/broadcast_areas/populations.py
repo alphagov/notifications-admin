@@ -55,7 +55,7 @@ def estimate_number_of_smartphones_for_population(population):
     total_population = sum(dict(population).values())
     total_phones = sum(smartphone_ownership_for_area_by_age_range.values())
 
-    print(  # noqa: T001
+    print(  # noqa: T201
         f'    Population:{total_population: 11,.0f}'
         f'    Phones:{total_phones: 11,.0f}'
     )
