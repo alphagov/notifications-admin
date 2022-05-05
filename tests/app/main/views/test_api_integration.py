@@ -281,8 +281,9 @@ def test_should_create_api_key_with_type_normal(
         _expected_status=200,
     )
 
-    assert page.select_one('span.copy-to-clipboard__value').text.strip() == (
-        'some_default_key_name_12-{}-{}'.format(SERVICE_ONE_ID, fake_uuid)
+    assert page.select_one('span.copy-to-clipboard__value').text == (
+        # The text should be exactly this, with no leading or trailing whitespace
+        f'some_default_key_name_12-{SERVICE_ONE_ID}-{fake_uuid}'
     )
 
     post.assert_called_once_with(url='/service/{}/api-key'.format(SERVICE_ONE_ID), data={
