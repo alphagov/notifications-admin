@@ -19,12 +19,21 @@
   "license": "MIT",
   "homepage": "https://github.com/alphagov/notifications-admin#readme",
   "dependencies": {
-    "@babel/core": "7.4.0",
-    "@babel/preset-env": "7.4.2",
     "cbor-js": "0.1.0",
     "govuk_frontend_toolkit": "8.1.0",
     "govuk-elements-sass": "3.1.2",
     "govuk-frontend": "2.13.0",
+    "hogan": "1.0.2",
+    "jquery": "3.5.0",
+    "leaflet": "1.6.0",
+    "morphdom": "2.6.1",
+    "query-command-supported": "1.0.0",
+    "textarea-caret": "3.1.0",
+    "timeago": "1.6.5"
+  },
+  "devDependencies": {
+    "@babel/core": "7.4.0",
+    "@babel/preset-env": "7.4.2",
     "gulp": "4.0.2",
     "gulp-add-src": "1.0.0",
     "gulp-babel": "8.0.0",
@@ -34,18 +43,6 @@
     "gulp-include": "2.4.1",
     "gulp-sass": "5.0.0",
     "gulp-uglify": "3.0.2",
-    "hogan": "1.0.2",
-    "jquery": "3.5.0",
-    "leaflet": "1.6.0",
-    "morphdom": "2.6.1",
-    "query-command-supported": "1.0.0",
-    "rollup": "1.23.1",
-    "sass": "1.32.7",
-    "streamqueue": "1.1.2",
-    "textarea-caret": "3.1.0",
-    "timeago": "1.6.5"
-  },
-  "devDependencies": {
     "gulp-css-url-adjuster": "0.2.3",
     "gulp-jshint": "2.1.0",
     "gulp-prettyerror": "2.0.0",
@@ -55,7 +52,10 @@
     "jest-each": "^25.3.0",
     "jshint": "2.10.2",
     "jshint-stylish": "2.2.1",
+    "rollup": "1.23.1",
     "rollup-plugin-commonjs": "10.1.0",
-    "rollup-plugin-node-resolve": "5.2.0"
+    "rollup-plugin-node-resolve": "5.2.0",
+    "sass": "1.32.7",
+    "streamqueue": "1.1.2"
   }
 }
