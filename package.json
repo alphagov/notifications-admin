@@ -22,7 +22,6 @@
     "@babel/core": "7.4.0",
     "@babel/preset-env": "7.4.2",
     "cbor-js": "0.1.0",
-    "del": "5.1.0",
     "govuk_frontend_toolkit": "8.1.0",
     "govuk-elements-sass": "3.1.2",
     "govuk-frontend": "2.13.0",
