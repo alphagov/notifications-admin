@@ -64,7 +64,7 @@ def clean_up_invalid_polygons(polygons, indent="    "):
         )).simplify(0)
 
         if simplified_polygon.is_valid:
-            print(  # noqa: T001
+            print(  # noqa: T201
                 f"{indent}Polygon {index + 1}/{len(polygons)} is valid"
             )
             yield simplified_polygon
@@ -76,12 +76,12 @@ def clean_up_invalid_polygons(polygons, indent="    "):
             # don’t have an area. They wouldn’t contribute to a broadcast
             # so we can ignore them.
             if simplified_polygon.area == 0:
-                print(  # noqa: T001
+                print(  # noqa: T201
                     f"{indent}Polygon {index + 1}/{len(polygons)} has 0 area, skipping"
                 )
                 continue
 
-            print(  # noqa: T001
+            print(  # noqa: T201
                 f"{indent}Polygon {index + 1}/{len(polygons)} needs fixing..."
             )
 
@@ -107,7 +107,7 @@ def clean_up_invalid_polygons(polygons, indent="    "):
             assert fixed_polygon.is_valid
             assert isclose(fixed_polygon.area, shapely_polygon.area, rel_tol=0.001)
 
-            print(  # noqa: T001
+            print(  # noqa: T201
                 f"{indent}Polygon {index + 1}/{len(polygons)} fixed!"
             )
 
@@ -135,7 +135,7 @@ def polygons_and_simplified_polygons(feature):
             'Polygon of 0 size found'
         )
 
-    print(  # noqa: T001
+    print(  # noqa: T201
         f'    Original:{full_resolution.point_count: >5} points'
         f'    Smoothed:{smoothed.point_count: >5} points'
         f'    Simplified:{simplified.point_count: >4} points'
@@ -169,7 +169,7 @@ def estimate_number_of_smartphones_in_area(country_or_ward_code):
         # We don’t have population figures for wards of the City of
         # London. We’ll leave it empty here and estimate on the fly
         # later based on physical area.
-        print('    Population:   N/A')  # noqa: T001
+        print('    Population:   N/A')  # noqa: T201
         return None
 
     # For some reason Bryher is the only ward missing population data, so we
@@ -264,8 +264,8 @@ def add_test_areas():
         f_id = feature["properties"]['id']
         f_name = feature["properties"]['name']
 
-        print()  # noqa: T001
-        print(f_name)  # noqa: T001
+        print()  # noqa: T201
+        print(f_name)  # noqa: T201
 
         feature, _, utm_crs = polygons_and_simplified_polygons(
             feature["geometry"]
@@ -296,8 +296,8 @@ def add_countries():
         f_id = feature["properties"]['ctry19cd']
         f_name = feature["properties"]['ctry19nm']
 
-        print()  # noqa: T001
-        print(f_name)  # noqa: T001
+        print()  # noqa: T201
+        print(f_name)  # noqa: T201
 
         feature, simple_feature, utm_crs = (
             polygons_and_simplified_polygons(feature["geometry"])
@@ -336,8 +336,8 @@ def _add_electoral_wards(dataset_id):
         ward_name = feature["properties"]["wd20nm"]
         ward_id = "wd20-" + ward_code
 
-        print()  # noqa: T001
-        print(ward_name)  # noqa: T001
+        print()  # noqa: T201
+        print(ward_name)  # noqa: T201
 
         try:
             la_id = "lad20-" + ward_code_to_la_id_mapping[ward_code]
@@ -358,7 +358,7 @@ def _add_electoral_wards(dataset_id):
             ])
 
         except KeyError:
-            print("Skipping", ward_code, ward_name)  # noqa: T001
+            print("Skipping", ward_code, ward_name)  # noqa: T201
 
     rtree_index_path.open('wb').write(pickle.dumps(rtree_index))
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
@@ -371,8 +371,8 @@ def _add_local_authorities(dataset_id):
         la_id = feature["properties"]["LAD20CD"]
         group_name = feature["properties"]["LAD20NM"]
 
-        print()  # noqa: T001
-        print(group_name)  # noqa: T001
+        print()  # noqa: T201
+        print(group_name)  # noqa: T201
 
         group_id = "lad20-" + la_id
 
@@ -424,7 +424,7 @@ def _add_counties_and_unitary_authorities(dataset_id):
 
 # cheeky global variable
 keep_old_polygons = sys.argv[1:] == ['--keep-old-polygons']
-print('keep_old_polygons: ', keep_old_polygons)  # noqa: T001
+print('keep_old_polygons: ', keep_old_polygons)  # noqa: T201
 
 repo = BroadcastAreasRepository()
 
@@ -443,7 +443,7 @@ most_detailed_polygons = formatted_list(
     after_each='',
 )
 
-print(  # noqa: T001
+print(  # noqa: T201
     '\n'
     'DONE\n'
     f'    Processed {len(point_counts):,} polygons.\n'
