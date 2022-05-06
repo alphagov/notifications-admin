@@ -25,7 +25,7 @@ VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$V
 .PHONY: bootstrap
 bootstrap: generate-version-file ## Set up everything to run the app
 	pip3 install -r requirements_for_test.txt
-	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci
+	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci --no-audit
 	. environment.sh; source $(HOME)/.nvm/nvm.sh && npm run build
 
 .PHONY: watch-frontend
