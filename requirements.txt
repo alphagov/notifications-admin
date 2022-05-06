@@ -61,7 +61,7 @@ flask==1.1.2
     #   flask-wtf
     #   gds-metrics
     #   notifications-utils
-flask-login==0.6.0
+flask-login==0.6.1
     # via -r requirements.in
 flask-redis==0.4.0
     # via notifications-utils
@@ -91,7 +91,7 @@ itsdangerous==1.1.0
     #   flask
     #   flask-wtf
     #   notifications-utils
-jinja2==3.0.2
+jinja2==3.0.3
     # via
     #   -r requirements.in
     #   flask
@@ -158,7 +158,7 @@ pyparsing==2.4.7
     # via packaging
 pypdf2==1.27.9
     # via notifications-utils
-pyproj==3.3.0
+pyproj==3.3.1
     # via
     #   -r requirements.in
     #   notifications-utils
@@ -213,7 +213,7 @@ urllib3==1.26.5
     #   requests
 webencodings==0.5.1
     # via bleach
-werkzeug==2.0.2
+werkzeug==2.0.3
     # via
     #   -r requirements.in
     #   flask
