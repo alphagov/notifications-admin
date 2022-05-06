@@ -151,7 +151,7 @@ class User(JSONModel, UserMixin):
         return session.get('current_session_id') != self.current_session_id
 
     def activate(self):
-        if self.state == 'pending':
+        if self.is_pending:
             user_data = user_api_client.activate_user(self.id)
             return self.__class__(user_data['data'])
         else:
@@ -191,6 +191,10 @@ class User(JSONModel, UserMixin):
     @property
     def is_active(self):
         return self.state == 'active'
+
+    @property
+    def is_pending(self):
+        return self.state == 'pending'
 
     @property
     def is_gov_user(self):
@@ -440,6 +444,13 @@ class User(JSONModel, UserMixin):
     def complete_webauthn_login_attempt(self, is_successful=True):
         return user_api_client.complete_webauthn_login_attempt(self.id, is_successful)
 
+    def is_editable_by(self, other_user):
+        if other_user == self:
+            return False
+        if self.is_active or self.is_pending:
+            return True
+        return False
+
 
 class InvitedUser(JSONModel):
 
@@ -574,6 +585,9 @@ class InvitedUser(JSONModel):
     def template_folders_for_service(self, service=None):
         # only used on the manage users page to display the count, so okay to not be fully fledged for now
         return [{'id': x} for x in self.folder_permissions]
+
+    def is_editable_by(self, other):
+        return False
 
 
 class InvitedOrgUser(JSONModel):
