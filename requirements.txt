@@ -6,7 +6,7 @@
 #
 ago==0.0.93
     # via -r requirements.in
-awscli==1.22.93
+awscli==1.23.9
     # via awscli-cwlogs
 awscli-cwlogs==1.4.6
     # via -r requirements.in
