@@ -7,9 +7,7 @@
 
     const states = {
       'valueVisible': (options) => `
-        <span class="copy-to-clipboard__value">
-          ${options.valueLabel ? '<span class="govuk-visually-hidden">' + options.thing + ': </span>' : ''}${options.value}
-        </span>
+        <span class="copy-to-clipboard__value">${options.valueLabel ? '<span class="govuk-visually-hidden">' + options.thing + ': </span>' : ''}${options.value}</span>
         <span class="copy-to-clipboard__notice govuk-visually-hidden" aria-live="assertive">
           ${options.onload ? '' : options.thing + ' returned to page, press button to copy to clipboard'}
         </span>

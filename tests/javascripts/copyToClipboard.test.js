@@ -25,9 +25,7 @@ describe('copy to clipboard', () => {
         ${options.thing}
       </h2>
       <div data-module="copy-to-clipboard" data-value="${apiKey}" data-thing="${options.thing}" data-name="${options.name}">
-        <span class="copy-to-clipboard__value" aria-live="assertive">
-          ${(options.name === options.thing) ? '<span class="govuk-visually-hidden">' + options.thing + ': </span>' : ''}${apiKey}
-        </span>
+        <span class="copy-to-clipboard__value" aria-live="assertive">${(options.name === options.thing) ? '<span class="govuk-visually-hidden">' + options.thing + ': </span>' : ''}${apiKey}</span>
         <span class="copy-to-clipboard__notice" aria-live="assertive"></span>
       </div>`;
 
@@ -151,6 +149,12 @@ describe('copy to clipboard', () => {
           expect(window.getComputedStyle(component)['min-height']).toEqual(`${componentHeightOnLoad}px`);
 
         });
+
+        test("It should render the 'thing' without extra whitespace", () => {
+
+          expect(component.querySelector('.copy-to-clipboard__value').textContent).toBe('00000000-0000-0000-0000-000000000000');
+
+        });        
 
       });
 
@@ -346,11 +350,11 @@ describe('copy to clipboard', () => {
 
         test("the copied selection (range) should start after the prefix of the id", () => {
 
-          // that selection (a range) should have a startOffset past the first two nodes:
-          // index 0: text node containing the whitespace before the prefix
-          // index 1: the prefix node
+          // that selection (a range) should have a startOffset of 1:
+          // index 0: the prefix node
+          // index 1: the value node
           expect(rangeMock.setStart).toHaveBeenCalled();
-          expect(rangeMock.setStart.mock.calls[0][1]).toEqual(2);
+          expect(rangeMock.setStart.mock.calls[0][1]).toEqual(1);
 
           // reset any methods in the global space
           window.queryCommandSupported = undefined;
