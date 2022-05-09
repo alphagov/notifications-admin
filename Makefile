@@ -36,6 +36,10 @@ watch-frontend:  ## Build frontend and watch for changes
 run-flask:  ## Run flask
 	. environment.sh && flask run -p 6012
 
+.PHONY: npm-audit
+npm-audit:  ## Check for vulnerabilities in NPM packages
+	source $(HOME)/.nvm/nvm.sh && npm run audit
+
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
