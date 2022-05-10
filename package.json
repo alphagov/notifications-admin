@@ -9,7 +9,8 @@
     "test": "gulp lint && jest --config tests/javascripts/jest.config.js tests/javascripts",
     "test-watch": "jest --watch --config tests/javascripts/jest.config.js tests/javascripts",
     "build": "gulp",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "audit": "better-npm-audit audit --production --level high"
   },
   "repository": {
     "type": "git",
