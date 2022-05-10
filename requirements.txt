@@ -81,7 +81,7 @@ greenlet==1.1.0
     # via eventlet
 gunicorn @ git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b864c64
     # via -r requirements.in
-humanize==4.0.0
+humanize==4.1.0
     # via -r requirements.in
 idna==2.10
     # via requests
