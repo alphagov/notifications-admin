@@ -423,6 +423,10 @@ def get_monthly_usage_breakdown_for_letters(monthly_letters):
         postage_order[get_monthly_usage_postage_description(row)], row['rate']
     )
 
+    # First sort letter rows by postage and then by rate, clumping "europe" and
+    # "rest-of-world" postage together as "international". Group the sorted rows
+    # together using the same fields - "group_key" is used for both operations.
+    # Note that "groupby" preserves the sort order in the groups it returns.
     rate_groups = groupby(sorted(monthly_letters, key=group_key), key=group_key)
 
     for _key, rate_group in rate_groups:

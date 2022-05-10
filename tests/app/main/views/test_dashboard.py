@@ -1079,9 +1079,10 @@ def test_usage_page_monthly_breakdown(
     assert '140 free text messages' in monthly_breakdown
     assert '960 text messages at 1.65p' in monthly_breakdown
     assert '33 text messages at 1.70p' in monthly_breakdown
-    assert '10 second class letters at 31p' in monthly_breakdown
     assert '5 first class letters at 33p' in monthly_breakdown
-    assert '10 international letters at 84p' in monthly_breakdown
+    assert '10 second class letters at 31p' in monthly_breakdown
+    assert '3 international letters at 55p' in monthly_breakdown
+    assert '7 international letters at 84p' in monthly_breakdown
 
     assert 'March' in monthly_breakdown
     assert '£20.91' in monthly_breakdown
@@ -1110,7 +1111,7 @@ def test_usage_page_monthly_breakdown_shows_months_so_far(
 
 
 @freeze_time("2012-03-31 12:12:12")
-def test_usage_page_letter_breakdown_ordering(
+def test_usage_page_letter_breakdown_ordered_by_postage_and_rate(
     client_request,
     service_one,
     mock_get_monthly_usage_for_service,
@@ -1123,7 +1124,8 @@ def test_usage_page_letter_breakdown_ordering(
 
     assert normalize_spaces(postage_details[3].text) == '5 first class letters at 33p'
     assert normalize_spaces(postage_details[4].text) == '10 second class letters at 31p'
-    assert normalize_spaces(postage_details[5].text) == '10 international letters at 84p'
+    assert normalize_spaces(postage_details[5].text) == '3 international letters at 55p'
+    assert normalize_spaces(postage_details[6].text) == '7 international letters at 84p'
 
 
 def test_usage_page_with_0_free_allowance(
