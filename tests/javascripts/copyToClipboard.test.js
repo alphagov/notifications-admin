@@ -348,10 +348,10 @@ describe('copy to clipboard', () => {
 
         });
 
-        test("the copied selection (range) should start after the prefix of the id", () => {
+        test("the copied selection (range) should start after visually hidden prefix", () => {
 
           // that selection (a range) should have a startOffset of 1:
-          // index 0: the prefix node
+          // index 0: the visually hidden prefix node, for example "Template ID: " or "API key: "
           // index 1: the value node
           expect(rangeMock.setStart).toHaveBeenCalled();
           expect(rangeMock.setStart.mock.calls[0][1]).toEqual(1);
