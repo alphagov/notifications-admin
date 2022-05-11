@@ -398,12 +398,12 @@ def get_monthly_usage_breakdown(year, monthly_usage):
 
     for month in get_months_for_financial_year(year):
         monthly_sms = [row for row in sms if row['month'] == month]
-        sms_free_allowance_used = sum(row['sms_free_allowance_used'] for row in monthly_sms)
-        sms_cost = sum(row['sms_cost'] for row in monthly_sms)
-        sms_breakdown = [row for row in monthly_sms if row['sms_charged']]
+        sms_free_allowance_used = sum(row['free_allowance_used'] for row in monthly_sms)
+        sms_cost = sum(row['cost'] for row in monthly_sms)
+        sms_breakdown = [row for row in monthly_sms if row['charged_units']]
 
         monthly_letters = [row for row in letters if row['month'] == month]
-        letter_cost = sum(row['letter_cost'] for row in monthly_letters)
+        letter_cost = sum(row['cost'] for row in monthly_letters)
         letter_breakdown = get_monthly_usage_breakdown_for_letters(monthly_letters)
 
         yield {
@@ -436,7 +436,7 @@ def get_monthly_usage_breakdown_for_letters(monthly_letters):
         yield {
             "sent": sum(x['notifications_sent'] for x in rate_group),
             "rate": rate_group[0]['rate'],
-            "cost": sum(x['letter_cost'] for x in rate_group),
+            "cost": sum(x['cost'] for x in rate_group),
             "postage_description": get_monthly_usage_postage_description(rate_group[0])
         }
 

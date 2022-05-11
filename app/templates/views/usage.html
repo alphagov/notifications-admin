@@ -108,7 +108,7 @@
                 <li class="tabular-numbers">{{ item.sms_free_allowance_used|format_thousands }} free {{ item.sms_free_count|message_count_label('sms', suffix='') }}</li>
               {% endif %}
               {% for sms in item.sms_breakdown %}
-                  <li class="tabular-numbers">{{ sms.sms_charged|message_count('sms') }} at
+                  <li class="tabular-numbers">{{ sms.charged_units|message_count('sms') }} at
                   {{- ' {:.2f}p'.format(sms.rate * 100) }}</li>
               {% endfor %}
               {% for letter in item.letter_breakdown %}
