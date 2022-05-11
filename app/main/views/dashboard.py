@@ -1,9 +1,7 @@
 import calendar
-from collections import namedtuple
 from datetime import datetime
 from functools import partial
 from itertools import groupby
-from operator import itemgetter
 
 from flask import (
     Response,
@@ -134,16 +132,12 @@ def usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
 
     free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(service_id, year)
-    units = billing_api_client.get_billable_units(service_id, year)
-    yearly_usage = billing_api_client.get_service_usage(service_id, year)
+    units = billing_api_client.get_monthly_usage_for_service(service_id, year)
+    yearly_usage = billing_api_client.get_annual_usage_for_service(service_id, year)
 
     return render_template(
         'views/usage.html',
-        months=list(get_free_paid_breakdown_for_billable_units(
-            year,
-            free_sms_allowance,
-            units
-        )),
+        months=list(get_monthly_usage_breakdown(year, units)),
         selected_year=year,
         years=get_tuples_of_financial_years(
             partial(url_for, '.usage', service_id=service_id),
@@ -289,7 +283,7 @@ def get_dashboard_partials(service_id):
         current_service.id,
         get_current_financial_year(),
     )
-    yearly_usage = billing_api_client.get_service_usage(
+    yearly_usage = billing_api_client.get_annual_usage_for_service(
         service_id,
         get_current_financial_year(),
     )
@@ -394,115 +388,63 @@ def get_months_for_year(start, end, year):
     return [datetime(year, month, 1) for month in range(start, end)]
 
 
-def get_sum_billing_units(billing_units, month=None):
-    if month:
-        return sum(b['billing_units'] for b in billing_units if b['month'] == month)
-    return sum(b['billing_units'] for b in billing_units)
-
-
 def get_usage_breakdown_by_type(usage, notification_type):
     return [row for row in usage if row['notification_type'] == notification_type]
 
 
-def get_free_paid_breakdown_for_billable_units(year, free_sms_fragment_limit, billing_units):
-    cumulative = 0
-    sms_units = [x for x in billing_units if x['notification_type'] == 'sms']
-    letter_units = [x for x in billing_units if x['notification_type'] == 'letter']
+def get_monthly_usage_breakdown(year, monthly_usage):
+    sms = get_usage_breakdown_by_type(monthly_usage, 'sms')
+    letters = get_usage_breakdown_by_type(monthly_usage, 'letter')
+
     for month in get_months_for_financial_year(year):
-        previous_cumulative = cumulative
-        monthly_usage = get_sum_billing_units(sms_units, month)
-        cumulative += monthly_usage
-        breakdown = get_free_paid_breakdown_for_month(
-            free_sms_fragment_limit, cumulative, previous_cumulative,
-            [billing_month for billing_month in sms_units if billing_month['month'] == month]
-        )
+        monthly_sms = [row for row in sms if row['month'] == month]
+        sms_free_allowance_used = sum(row['sms_free_allowance_used'] for row in monthly_sms)
+        sms_cost = sum(row['sms_cost'] for row in monthly_sms)
+        sms_breakdown = [row for row in monthly_sms if row['sms_charged']]
 
-        letter_units_for_month = [x for x in letter_units if x['month'] == month]
-        letter_billing = format_letter_details_for_month(letter_units_for_month)
+        monthly_letters = [row for row in letters if row['month'] == month]
+        letter_cost = sum(row['letter_cost'] for row in monthly_letters)
+        letter_breakdown = get_monthly_usage_breakdown_for_letters(monthly_letters)
 
-        letter_total = 0
-        for x in letter_billing:
-            letter_total += x.cost
         yield {
-            'name': month,
-            'letter_total': letter_total,
-            'letters': letter_billing,
-            'sms_paid_count': breakdown['paid'],
-            'sms_free_count': breakdown['free'],
-            'sms_rate': breakdown['sms_rate'],
+            'month': month,
+            'letter_cost': letter_cost,
+            'letter_breakdown': list(letter_breakdown),
+            'sms_free_allowance_used': sms_free_allowance_used,
+            'sms_breakdown': sms_breakdown,
+            'sms_cost': sms_cost,
         }
 
 
-def format_letter_details_for_month(letter_units_for_month):
-    # Format postage descriptions in letter units e.g. to 'international' not 'europe'
-    for month in letter_units_for_month:
-        for k, v in month.items():
-            if k == 'postage':
-                month[k] = get_postage_description(v)
-
-    # letter_units_for_month must be sorted before international postage values can be aggregated
+def get_monthly_usage_breakdown_for_letters(monthly_letters):
     postage_order = {'first class': 0, 'second class': 1, 'international': 2}
-    letter_units_for_month.sort(key=lambda x: (postage_order[x['postage']], x['rate']))
 
-    LetterDetails = namedtuple('LetterDetails', ['billing_units', 'rate', 'cost', 'postage_description'])
+    group_key = lambda row: (  # noqa: E731
+        postage_order[get_monthly_usage_postage_description(row)], row['rate']
+    )
 
-    # Aggregate the rows for international letters which have the same rate
-    result = []
-    for _key, rate_group in groupby(letter_units_for_month, key=itemgetter('postage', 'rate')):
+    # First sort letter rows by postage and then by rate, clumping "europe" and
+    # "rest-of-world" postage together as "international". Group the sorted rows
+    # together using the same fields - "group_key" is used for both operations.
+    # Note that "groupby" preserves the sort order in the groups it returns.
+    rate_groups = groupby(sorted(monthly_letters, key=group_key), key=group_key)
+
+    for _key, rate_group in rate_groups:
+        # rate_group is a one-time generator so must be converted to a list for reuse
         rate_group = list(rate_group)
 
-        letter_details = LetterDetails(
-            billing_units=sum(x['billing_units'] for x in rate_group),
-            rate=rate_group[0]['rate'],
-            cost=(sum(x['billing_units'] for x in rate_group) * rate_group[0]['rate']),
-            postage_description=rate_group[0]['postage']
-        )
-
-        result.append(letter_details)
-
-    return result
+        yield {
+            "sent": sum(x['notifications_sent'] for x in rate_group),
+            "rate": rate_group[0]['rate'],
+            "cost": sum(x['letter_cost'] for x in rate_group),
+            "postage_description": get_monthly_usage_postage_description(rate_group[0])
+        }
 
 
-def get_postage_description(postage):
-    if postage in ('first', 'second'):
-        return f'{postage} class'
+def get_monthly_usage_postage_description(row):
+    if row['postage'] in ('first', 'second'):
+        return f'{row["postage"]} class'
     return 'international'
-
-
-def get_free_paid_breakdown_for_month(
-    free_sms_fragment_limit,
-    cumulative,
-    previous_cumulative,
-    monthly_usage
-):
-    allowance = free_sms_fragment_limit
-
-    # makes the assumption that there is either no item in `monthly_usage` because they have not sent any SMS
-    # or that they have sent SMS and that there is only a single item in `monthly_usage` because they have only
-    # been sent at a single rate during the month
-    sms_rate = monthly_usage[0]['rate'] if len(monthly_usage) else 0
-
-    total_monthly_billing_units = get_sum_billing_units(monthly_usage)
-
-    if cumulative < allowance:
-        return {
-            'paid': 0,
-            'free': total_monthly_billing_units,
-            'sms_rate': sms_rate,
-        }
-    elif previous_cumulative < allowance:
-        remaining_allowance = allowance - previous_cumulative
-        return {
-            'paid': total_monthly_billing_units - remaining_allowance,
-            'free': remaining_allowance,
-            'sms_rate': sms_rate,
-        }
-    else:
-        return {
-            'paid': total_monthly_billing_units,
-            'free': 0,
-            'sms_rate': sms_rate,
-        }
 
 
 def requested_and_current_financial_year(request):

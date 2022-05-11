@@ -2313,7 +2313,7 @@ def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope='function')
-def mock_get_usage(mocker, service_one, fake_uuid):
+def mock_get_annual_usage_for_service(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
             {
@@ -2351,119 +2351,117 @@ def mock_get_usage(mocker, service_one, fake_uuid):
         ]
 
     return mocker.patch(
-        'app.billing_api_client.get_service_usage', side_effect=_get_usage)
+        'app.billing_api_client.get_annual_usage_for_service', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
-def mock_get_billable_units(mocker):
+def mock_get_monthly_usage_for_service(mocker):
     def _get_usage(service_id, year):
         return [
             {
-                'month': 'April',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 249500,
-                'postage': 'none',
-            },
-            {
-                'month': 'April',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 100,
-                'postage': 'none',
-            },
-            {
-                'month': 'April',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 200,
-                'postage': 'none',
-            },
-            {
-                'month': 'April',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 60,
-                'postage': 'none',
-            },
-            {
                 'month': 'March',
                 'notification_type': 'sms',
                 'rate': 0.017,
-                'billing_units': 1000,
+                'chargeable_units': 1230,
+                'notifications_sent': 1234,
                 'postage': 'none',
+                'sms_charged': 1230,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 20.91,
+                'letter_cost': 0,
             },
             {
-                'month': 'March',
+                'month': 'February',
                 'notification_type': 'sms',
                 'rate': 0.017,
-                'billing_units': 100,
+                'chargeable_units': 33,
+                'notifications_sent': 1234,
                 'postage': 'none',
-            },
-            {
-                'month': 'March',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 100,
-                'postage': 'none',
-            },
-            {
-                'month': 'March',
-                'notification_type': 'sms',
-                'rate': 0.017,
-                'billing_units': 30,
-                'postage': 'none',
+                'sms_charged': 33,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 0.561,
+                'letter_cost': 0,
             },
             {
                 'month': 'February',
                 'notification_type': 'sms',
                 'rate': 0.0165,
-                'billing_units': 1000,
+                'chargeable_units': 1100,
+                'notifications_sent': 1234,
                 'postage': 'none',
-            },
-            {
-                'month': 'February',
-                'notification_type': 'sms',
-                'rate': 0.0165,
-                'billing_units': 100,
-                'postage': 'none',
+                'sms_charged': 960,
+                'sms_free_allowance_used': 140,
+                'sms_cost': 15.84,
+                'letter_cost': 0,
             },
             {
                 'month': 'February',
                 'notification_type': 'letter',
                 'rate': 0.31,
-                'billing_units': 10,
+                'chargeable_units': 10,
+                'notifications_sent': 10,
                 'postage': 'second',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 0,
+                'letter_cost': 3.1,
             },
             {
                 'month': 'February',
                 'notification_type': 'letter',
                 'rate': 0.33,
-                'billing_units': 5,
+                'chargeable_units': 5,
+                'notifications_sent': 5,
                 'postage': 'first',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 0,
+                'letter_cost': 1.65,
             },
             {
                 'month': 'February',
                 'notification_type': 'letter',
-                'rate': 0.84,
-                'billing_units': 3,
+                'rate': 0.55,
+                'chargeable_units': 3,
+                'notifications_sent': 3,
                 'postage': 'europe',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 0,
+                'letter_cost': 2.52,
             },
             {
                 'month': 'February',
                 'notification_type': 'letter',
                 'rate': 0.84,
-                'billing_units': 7,
+                'chargeable_units': 7,
+                'notifications_sent': 7,
                 'postage': 'rest-of-world',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 0,
+                'sms_cost': 0,
+                'letter_cost': 5.88,
+            },
+            {
+                'month': 'April',
+                'notification_type': 'sms',
+                'rate': 0.017,
+                'chargeable_units': 249860,
+                'notifications_sent': 1234,
+                'postage': 'none',
+                'sms_charged': 0,
+                'sms_free_allowance_used': 249860,
+                'sms_cost': 0,
+                'letter_cost': 0,
             },
         ]
 
     return mocker.patch(
-        'app.billing_api_client.get_billable_units', side_effect=_get_usage)
+        'app.billing_api_client.get_monthly_usage_for_service', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
-def mock_get_future_usage(mocker, service_one, fake_uuid):
+def mock_get_annual_usage_for_service_in_future(mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
             {
@@ -2485,16 +2483,16 @@ def mock_get_future_usage(mocker, service_one, fake_uuid):
         ]
 
     return mocker.patch(
-        'app.billing_api_client.get_service_usage', side_effect=_get_usage)
+        'app.billing_api_client.get_annual_usage_for_service', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')
-def mock_get_future_billable_units(mocker):
+def mock_get_monthly_usage_for_service_in_future(mocker):
     def _get_usage(service_id, year):
         return []
 
     return mocker.patch(
-        'app.billing_api_client.get_billable_units', side_effect=_get_usage)
+        'app.billing_api_client.get_monthly_usage_for_service', side_effect=_get_usage)
 
 
 @pytest.fixture(scope='function')

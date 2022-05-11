@@ -12,7 +12,6 @@ from app.main.views.dashboard import (
     aggregate_template_usage,
     format_monthly_stats_to_list,
     get_dashboard_totals,
-    get_free_paid_breakdown_for_billable_units,
     get_tuples_of_financial_years,
 )
 from tests import (
@@ -141,7 +140,7 @@ def test_get_started(
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -166,7 +165,7 @@ def test_get_started_is_hidden_once_templates_exist(
     mock_get_service_templates,
     mock_has_no_jobs,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -192,7 +191,7 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
     mock_has_no_jobs,
     mock_get_service_statistics,
     mock_get_template_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -218,7 +217,7 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_messages(
     mock_get_scheduled_job_stats,
     mock_get_service_statistics,
     mock_get_template_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -246,7 +245,7 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
     mock_get_scheduled_job_stats,
     mock_get_service_statistics,
     mock_get_template_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary_with_no_messages,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -280,7 +279,7 @@ def test_inbox_showing_inbound_messages(
     mock_get_jobs,
     mock_get_service_statistics,
     mock_get_template_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_most_recent_inbound_sms,
     index,
     expected_row,
@@ -309,7 +308,7 @@ def test_get_inbound_sms_shows_page_links(
     mock_get_jobs,
     mock_get_service_statistics,
     mock_get_template_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_most_recent_inbound_sms,
     mock_get_inbound_number_for_service,
 ):
@@ -332,7 +331,7 @@ def test_empty_inbox(
     mock_get_jobs,
     mock_get_service_statistics,
     mock_get_template_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_most_recent_inbound_sms_with_no_messages,
     mock_get_inbound_number_for_service,
 ):
@@ -489,7 +488,7 @@ def test_returned_letters_not_visible_if_service_has_no_returned_letters(
     mock_has_no_jobs,
     mock_get_service_statistics,
     mock_get_template_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -525,7 +524,7 @@ def test_returned_letters_shows_count_of_recently_returned_letters(
     mock_get_scheduled_job_stats,
     mock_get_service_statistics,
     mock_get_template_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     reporting_date,
@@ -585,7 +584,7 @@ def test_returned_letters_only_counts_recently_returned_letters(
     mock_get_scheduled_job_stats,
     mock_get_service_statistics,
     mock_get_template_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary_with_no_messages,
     reporting_date,
@@ -616,7 +615,7 @@ def test_should_show_recent_templates_on_dashboard(
     mock_get_service_templates,
     mock_has_no_jobs,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -670,7 +669,7 @@ def test_should_not_show_recent_templates_on_dashboard_if_only_one_template_used
     mock_get_service_templates,
     mock_has_no_jobs,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -826,7 +825,7 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_service_statistics,
     mock_get_jobs,
     mock_get_scheduled_job_stats,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -863,7 +862,7 @@ def test_should_not_show_upcoming_jobs_on_dashboard_if_count_is_0(
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_has_jobs,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -889,7 +888,7 @@ def test_should_not_show_upcoming_jobs_on_dashboard_if_service_has_no_jobs(
     mock_get_service_statistics,
     mock_has_no_jobs,
     mock_get_scheduled_job_stats,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -931,7 +930,7 @@ def test_correct_font_size_for_big_numbers(
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_has_no_jobs,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     service_one,
@@ -968,7 +967,7 @@ def test_should_not_show_jobs_on_dashboard_for_users_with_uploads_page(
     mock_get_service_statistics,
     mock_get_jobs,
     mock_get_scheduled_job_stats,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -989,8 +988,8 @@ def test_should_not_show_jobs_on_dashboard_for_users_with_uploads_page(
 @freeze_time("2012-03-31 12:12:12")
 def test_usage_page(
     client_request,
-    mock_get_usage,
-    mock_get_billable_units,
+    mock_get_annual_usage_for_service,
+    mock_get_monthly_usage_for_service,
     mock_get_free_sms_fragment_limit
 ):
     page = client_request.get(
@@ -998,8 +997,8 @@ def test_usage_page(
         service_id=SERVICE_ONE_ID,
     )
 
-    mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2011)
-    mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2011)
+    mock_get_monthly_usage_for_service.assert_called_once_with(SERVICE_ONE_ID, 2011)
+    mock_get_annual_usage_for_service.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
     nav = page.find('ul', {'class': 'pill'})
@@ -1034,10 +1033,10 @@ def test_usage_page(
 def test_usage_page_no_sms_spend(
     mocker,
     client_request,
-    mock_get_billable_units,
+    mock_get_monthly_usage_for_service,
     mock_get_free_sms_fragment_limit
 ):
-    mocker.patch('app.billing_api_client.get_service_usage', return_value=[
+    mocker.patch('app.billing_api_client.get_annual_usage_for_service', return_value=[
         {
             "notification_type": "sms",
             "chargeable_units": 1000,
@@ -1065,104 +1064,75 @@ def test_usage_page_no_sms_spend(
 def test_usage_page_monthly_breakdown(
     client_request,
     service_one,
-    mock_get_usage,
-    mock_get_billable_units,
+    mock_get_annual_usage_for_service,
+    mock_get_monthly_usage_for_service,
     mock_get_free_sms_fragment_limit
 ):
-    service_one['permissions'].append('letter')
-    page = client_request.get(
-        'main.usage',
-        service_id=SERVICE_ONE_ID,
-    )
-
+    page = client_request.get('main.usage', service_id=SERVICE_ONE_ID)
     monthly_breakdown = normalize_spaces(page.find('table').text)
 
-    assert '249,860 free text messages' in monthly_breakdown
-    assert '40 free text messages' in monthly_breakdown
-    assert '960 text messages at 1.65p' in monthly_breakdown
     assert 'April' in monthly_breakdown
+    assert '249,860 free text messages' in monthly_breakdown
+
     assert 'February' in monthly_breakdown
-    assert 'March' in monthly_breakdown
-    assert '£28.99' in monthly_breakdown
+    assert '£29.55' in monthly_breakdown
     assert '140 free text messages' in monthly_breakdown
+    assert '960 text messages at 1.65p' in monthly_breakdown
+    assert '33 text messages at 1.70p' in monthly_breakdown
+    assert '5 first class letters at 33p' in monthly_breakdown
+    assert '10 second class letters at 31p' in monthly_breakdown
+    assert '3 international letters at 55p' in monthly_breakdown
+    assert '7 international letters at 84p' in monthly_breakdown
+
+    assert 'March' in monthly_breakdown
     assert '£20.91' in monthly_breakdown
     assert '1,230 text messages at 1.70p' in monthly_breakdown
-    assert '10 second class letters at 31p' in monthly_breakdown
-    assert '5 first class letters at 33p' in monthly_breakdown
-    assert '10 international letters at 84p' in monthly_breakdown
 
 
-@freeze_time("2012-04-30 12:12:12")
-def test_usage_page_displays_letters_ordered_by_postage(
-    mocker,
+@pytest.mark.parametrize(
+    'now, expected_number_of_months', [
+        (freeze_time("2017-03-31 11:09:00.061258"), 12),
+        (freeze_time("2017-01-01 11:09:00.061258"), 10)
+    ]
+)
+def test_usage_page_monthly_breakdown_shows_months_so_far(
     client_request,
     service_one,
-    mock_get_usage,
-    mock_get_free_sms_fragment_limit
+    mock_get_annual_usage_for_service,
+    mock_get_monthly_usage_for_service,
+    mock_get_free_sms_fragment_limit,
+    now,
+    expected_number_of_months
 ):
-    billable_units_resp = [
-        {'month': 'April', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 1, 'postage': 'second'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 1, 'billing_units': 1, 'postage': 'europe'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 1, 'billing_units': 2, 'postage': 'rest-of-word'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 1.5, 'billing_units': 7, 'postage': 'europe'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 0.3, 'billing_units': 3, 'postage': 'second'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 1, 'postage': 'first'},
-    ]
-    mocker.patch('app.billing_api_client.get_billable_units', return_value=billable_units_resp)
-    service_one['permissions'].append('letter')
-    page = client_request.get(
-        'main.usage',
-        service_id=SERVICE_ONE_ID,
-    )
-
-    row_for_april = page.find('table').find('tr', class_='table-row')
-    postage_details = row_for_april.find_all('li', class_='tabular-numbers')
-
-    assert len(postage_details) == 5
-    assert normalize_spaces(postage_details[0].text) == '1 first class letter at 50p'
-    assert normalize_spaces(postage_details[1].text) == '3 second class letters at 30p'
-    assert normalize_spaces(postage_details[2].text) == '1 second class letter at 50p'
-    assert normalize_spaces(postage_details[3].text) == '3 international letters at £1.00'
-    assert normalize_spaces(postage_details[4].text) == '7 international letters at £1.50'
+    with now:
+        page = client_request.get('main.usage', service_id=SERVICE_ONE_ID)
+        rows = page.find('table').find_all('tr', class_='table-row')
+        assert len(rows) == expected_number_of_months
 
 
-@freeze_time("2012-07-30 12:12:12")
-def test_usage_page_displays_letters_split_by_month_and_postage(
-    mocker,
+@freeze_time("2012-03-31 12:12:12")
+def test_usage_page_letter_breakdown_ordered_by_postage_and_rate(
     client_request,
     service_one,
-    mock_get_usage,
+    mock_get_monthly_usage_for_service,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit
 ):
-    billable_units_resp = [
-        {'month': 'April', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 1, 'postage': 'second'},
-        {'month': 'April', 'notification_type': 'letter', 'rate': 1, 'billing_units': 1, 'postage': 'europe'},
-        {'month': 'May', 'notification_type': 'letter', 'rate': 1, 'billing_units': 7, 'postage': 'europe'},
-        {'month': 'May', 'notification_type': 'letter', 'rate': 0.5, 'billing_units': 3, 'postage': 'second'},
-        {'month': 'May', 'notification_type': 'letter', 'rate': 0.7, 'billing_units': 1, 'postage': 'first'},
-    ]
-    mocker.patch('app.billing_api_client.get_billable_units', return_value=billable_units_resp)
-    service_one['permissions'].append('letter')
-    page = client_request.get(
-        'main.usage',
-        service_id=SERVICE_ONE_ID,
-    )
+    page = client_request.get('main.usage', service_id=SERVICE_ONE_ID)
+    row_for_feb = page.find('table').find_all('tr', class_='table-row')[10]
+    postage_details = row_for_feb.find_all('li', class_='tabular-numbers')
 
-    april_row = normalize_spaces(page.find('table').find_all('tr')[1].text)
-    may_row = normalize_spaces(page.find('table').find_all('tr')[2].text)
-
-    assert '1 second class letter at 50p' in april_row
-    assert '1 international letter at £1.00' in april_row
-    assert '1 first class letter at 70p' in may_row
-    assert '3 second class letters at 50p' in may_row
-    assert '7 international letters at £1.00' in may_row
+    assert normalize_spaces(postage_details[3].text) == '5 first class letters at 33p'
+    assert normalize_spaces(postage_details[4].text) == '10 second class letters at 31p'
+    assert normalize_spaces(postage_details[5].text) == '3 international letters at 55p'
+    assert normalize_spaces(postage_details[6].text) == '7 international letters at 84p'
 
 
 def test_usage_page_with_0_free_allowance(
     mocker,
     client_request,
-    mock_get_usage,
-    mock_get_billable_units,
+    mock_get_annual_usage_for_service,
+    mock_get_monthly_usage_for_service,
 ):
     mocker.patch(
         'app.billing_api_client.get_free_sms_fragment_limit_for_year',
@@ -1183,8 +1153,8 @@ def test_usage_page_with_0_free_allowance(
 
 def test_usage_page_with_year_argument(
     client_request,
-    mock_get_usage,
-    mock_get_billable_units,
+    mock_get_annual_usage_for_service,
+    mock_get_monthly_usage_for_service,
     mock_get_free_sms_fragment_limit,
 ):
     client_request.get(
@@ -1192,8 +1162,8 @@ def test_usage_page_with_year_argument(
         service_id=SERVICE_ONE_ID,
         year=2000,
     )
-    mock_get_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2000)
-    mock_get_usage.assert_called_once_with(SERVICE_ONE_ID, 2000)
+    mock_get_monthly_usage_for_service.assert_called_once_with(SERVICE_ONE_ID, 2000)
+    mock_get_annual_usage_for_service.assert_called_once_with(SERVICE_ONE_ID, 2000)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2000)
 
 
@@ -1211,8 +1181,8 @@ def test_usage_page_for_invalid_year(
 @freeze_time("2012-03-31 12:12:12")
 def test_future_usage_page(
     client_request,
-    mock_get_future_usage,
-    mock_get_future_billable_units,
+    mock_get_annual_usage_for_service_in_future,
+    mock_get_monthly_usage_for_service_in_future,
     mock_get_free_sms_fragment_limit
 ):
     client_request.get(
@@ -1221,8 +1191,8 @@ def test_future_usage_page(
         year=2014,
     )
 
-    mock_get_future_billable_units.assert_called_once_with(SERVICE_ONE_ID, 2014)
-    mock_get_future_usage.assert_called_once_with(SERVICE_ONE_ID, 2014)
+    mock_get_monthly_usage_for_service_in_future.assert_called_once_with(SERVICE_ONE_ID, 2014)
+    mock_get_annual_usage_for_service_in_future.assert_called_once_with(SERVICE_ONE_ID, 2014)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2014)
 
 
@@ -1248,7 +1218,7 @@ def test_menu_send_messages(
     mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_inbound_sms_summary,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -1284,7 +1254,7 @@ def test_menu_send_messages_when_service_does_not_have_upload_letters_permission
     mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_inbound_sms_summary,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -1309,7 +1279,7 @@ def test_menu_manage_service(
     mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
@@ -1340,7 +1310,7 @@ def test_menu_manage_api_keys(
     mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
@@ -1369,7 +1339,7 @@ def test_menu_all_services_for_platform_admin_user(
     mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_free_sms_fragment_limit,
@@ -1400,7 +1370,7 @@ def test_route_for_service_permissions(
     mock_has_no_jobs,
     mock_get_template_statistics,
     mock_get_service_statistics,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -1454,7 +1424,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     mock_get_template_statistics,
     mock_get_service_statistics,
     mock_has_no_jobs,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
@@ -1570,135 +1540,6 @@ def test_aggregate_status_types(dict_in, expected_failed, expected_requested):
     assert sms_counts['requested'] == expected_requested
 
 
-@pytest.mark.parametrize(
-    'now, expected_number_of_months', [
-        (freeze_time("2017-12-31 11:09:00.061258"), 12),
-        (freeze_time("2017-01-01 11:09:00.061258"), 10)
-    ]
-)
-def test_get_free_paid_breakdown_for_billable_units(now, expected_number_of_months):
-    sms_allowance = 250000
-    with now:
-        billing_units = get_free_paid_breakdown_for_billable_units(
-            2016, sms_allowance, [
-                {
-                    'month': 'April', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
-                },
-                {
-                    'month': 'May', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.65, 'billing_units': 100000
-                },
-                {
-                    'month': 'June', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.71, 'billing_units': 100000
-                },
-                {
-                    'month': 'February', 'international': False, 'rate_multiplier': 1,
-                    'notification_type': 'sms', 'rate': 1.71, 'billing_units': 2000
-                },
-            ]
-        )
-        assert list(billing_units) == [
-            {
-                'sms_free_count': 100000,
-                'name': 'April',
-                'sms_paid_count': 0,
-                'sms_rate': 1.65,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 100000,
-                'name': 'May',
-                'sms_paid_count': 0,
-                'sms_rate': 1.65,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 50000,
-                'name': 'June',
-                'sms_paid_count': 50000,
-                'sms_rate': 1.71,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 0,
-                'name': 'July',
-                'sms_paid_count': 0,
-                'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 0,
-                'name': 'August',
-                'sms_paid_count': 0,
-                'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 0,
-                'name': 'September',
-                'sms_paid_count': 0,
-                'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 0,
-                'name': 'October',
-                'sms_paid_count': 0,
-                'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 0,
-                'name': 'November',
-                'sms_paid_count': 0,
-                'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 0,
-                'name': 'December',
-                'sms_paid_count': 0,
-                'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 0,
-                'name': 'January',
-                'sms_paid_count': 0,
-                'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 0,
-                'name': 'February',
-                'sms_paid_count': 2000,
-                'sms_rate': 1.71,
-                'letter_total': 0,
-                'letters': []
-            },
-            {
-                'sms_free_count': 0,
-                'name': 'March',
-                'sms_paid_count': 0,
-                'sms_rate': 0,
-                'letter_total': 0,
-                'letters': []
-            },
-        ][:expected_number_of_months]
-
-
 def test_get_tuples_of_financial_years():
     assert list(get_tuples_of_financial_years(
         lambda year: 'http://example.com?year={}'.format(year),
@@ -1722,7 +1563,7 @@ def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
 ):
@@ -1760,7 +1601,7 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     active_user_with_permissions,
@@ -1790,7 +1631,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     active_user_with_permissions,
@@ -1815,7 +1656,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     platform_admin_user,
@@ -1844,7 +1685,7 @@ def test_breadcrumb_shows_if_service_is_suspended(
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     active_user_with_permissions,
@@ -1872,7 +1713,7 @@ def test_service_dashboard_shows_usage(
     mock_get_service_templates,
     mock_get_template_statistics,
     mock_has_no_jobs,
-    mock_get_usage,
+    mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     permissions,
@@ -1902,7 +1743,7 @@ def test_service_dashboard_shows_free_allowance(
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
 ):
-    mocker.patch('app.billing_api_client.get_service_usage', return_value=[
+    mocker.patch('app.billing_api_client.get_annual_usage_for_service', return_value=[
         {
             "notification_type": "sms",
             "chargeable_units": 1000,
