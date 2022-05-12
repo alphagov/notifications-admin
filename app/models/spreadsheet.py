@@ -3,6 +3,7 @@ from io import StringIO
 from os import path
 
 import pyexcel
+import pyexcel_xlsx
 
 
 class Spreadsheet():
@@ -71,6 +72,15 @@ class Spreadsheet():
         if extension == 'tsv':
             file_content = StringIO(
                 Spreadsheet.normalise_newlines(file_content))
+
+        if extension == 'xlsm':
+            file_data = pyexcel_xlsx.get_data(file_content)
+            instance = cls.from_rows(
+                # Get the first sheet from the workbook
+                list(file_data.values())[0],
+                filename,
+            )
+            return instance
 
         instance = cls.from_rows(
             pyexcel.iget_array(

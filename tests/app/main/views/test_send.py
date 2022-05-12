@@ -300,8 +300,8 @@ def test_set_sender_redirects_if_one_sms_sender(
 
 
 def test_that_test_files_exist():
-    assert len(test_spreadsheet_files) == 7
-    assert len(test_non_spreadsheet_files) == 7
+    assert len(test_spreadsheet_files) == 8
+    assert len(test_non_spreadsheet_files) == 6
 
 
 def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
