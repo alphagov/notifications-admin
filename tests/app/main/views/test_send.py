@@ -2780,38 +2780,38 @@ def test_can_start_letters_job(
     (
         'png',
         {},
-        {'postcode': 'abc123', 'addressline1': '123 street'},
+        {'postcode': 'abc123', 'addressline1': '123 street', 'result': 'pass'},
         1
     ),
     (
         'pdf',
         {},
-        {'postcode': 'abc123', 'addressline1': '123 street'},
+        {'postcode': 'abc123', 'addressline1': '123 street', 'result': 'pass'},
         None
     ),
     (
         'png',
         {'row_index': 2},
-        {'postcode': 'abc123', 'addressline1': '123 street'},
+        {'postcode': 'abc123', 'addressline1': '123 street', 'result': 'pass'},
         1
     ),
     (
         'png',
         {'row_index': 3},
-        {'postcode': 'cba321', 'addressline1': '321 avenue'},
+        {'postcode': 'cba321', 'addressline1': '321 avenue', 'result': 'fail'},
         1
     ),
     (
         'png',
         {'row_index': 3, 'page': 2},
-        {'postcode': 'cba321', 'addressline1': '321 avenue'},
+        {'postcode': 'cba321', 'addressline1': '321 avenue', 'result': 'fail'},
         '2'
     ),
     (
         # pdf expected page is always None
         'pdf',
         {'row_index': 3, 'page': 2},
-        {'postcode': 'cba321', 'addressline1': '321 avenue'},
+        {'postcode': 'cba321', 'addressline1': '321 avenue', 'result': 'fail'},
         None
     ),
 ])
@@ -2833,14 +2833,14 @@ def test_should_show_preview_letter_message(
 ):
     service_one['permissions'] = ['letter']
     mocker.patch('app.service_api_client.get_service', return_value={"data": service_one})
-    mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
+    mock_page_count = mocker.patch('app.main.views.send.get_page_count_for_letter', return_value=1)
 
     mocker.patch(
         'app.main.views.send.s3download',
         return_value='\n'.join(
-            ['address line 1, postcode'] +
-            ['123 street, abc123'] +
-            ['321 avenue, cba321']
+            ['address line 1, postcode, result'] +
+            ['123 street, abc123, pass'] +
+            ['321 avenue, cba321, fail']
         )
     )
     mocker.patch(
@@ -2876,11 +2876,14 @@ def test_should_show_preview_letter_message(
     mock_get_service_letter_template.assert_called_with(service_id, template_id, None)
 
     assert response.get_data(as_text=True) == 'foo'
+    mocked_preview.assert_called_once()
     assert mocked_preview.call_args[0][0].id == template_id
     assert type(mocked_preview.call_args[0][0]) == LetterPreviewTemplate
     assert mocked_preview.call_args[0][1] == filetype
     assert mocked_preview.call_args[0][0].values == expected_values
     assert mocked_preview.call_args[1] == {'page': expected_page}
+
+    mock_page_count.assert_called_with(ANY, expected_values)
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(
