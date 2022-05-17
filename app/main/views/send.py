@@ -357,6 +357,8 @@ def send_one_off_letter_address(service_id, template_id):
 
     db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
+    session_placeholders = get_normalised_placeholders_from_session()
+
     template = get_template(
         db_template,
         current_service,
@@ -367,14 +369,12 @@ def send_one_off_letter_address(service_id, template_id):
             template_id=template_id,
             filetype='png',
         ),
-        page_count=get_page_count_for_letter(db_template),
+        page_count=get_page_count_for_letter(db_template, session_placeholders),
         email_reply_to=None,
         sms_sender=None
     )
 
-    current_session_address = PostalAddress.from_personalisation(
-        get_normalised_placeholders_from_session()
-    )
+    current_session_address = PostalAddress.from_personalisation(session_placeholders)
 
     form = LetterAddressForm(
         address=current_session_address.normalised,
@@ -645,6 +645,9 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         ) if not letters_as_pdf else None,
         email_reply_to=email_reply_to,
         sms_sender=sms_sender,
+        # In this case, we don't provide template values when calculating the page count
+        # because we don't know them at this point. It means that later on we will need to
+        # recalculate the page count once we have the values
         page_count=get_page_count_for_letter(db_template),
     )
     recipients = RecipientCSV(
@@ -677,6 +680,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         abort(404)
 
     page_count = get_page_count_for_letter(db_template, template.values)
+    template.page_count = page_count
     original_file_name = get_csv_metadata(service_id, upload_id).get('original_file_name', '')
 
     return dict(
