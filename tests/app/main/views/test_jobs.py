@@ -106,7 +106,7 @@ def test_should_show_page_for_one_job(
         job_id=fake_uuid,
         status=status_argument
     )
-    assert csv_link.text == 'Download this report'
+    assert csv_link.text == 'Download this report (CSV)'
     assert page.find('span', {'id': 'time-left'}).text == 'Data available for 7 days'
 
     assert normalize_spaces(page.select_one('tbody tr').text) == normalize_spaces(

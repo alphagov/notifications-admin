@@ -17,7 +17,7 @@
 {{ page_header('Returned letters for {}'.format(reported_at|format_date_normal)) }}
 
 <p class="bottom-gutter">
-  <a download href="{{ url_for('.returned_letters_report', service_id=current_service.id, reported_at=reported_at) }}" class="govuk-link heading-small">Download this report</a>
+  <a download href="{{ url_for('.returned_letters_report', service_id=current_service.id, reported_at=reported_at) }}" class="govuk-link heading-small">Download this report (<abbr title="Comma separated values">CSV</abbr>)</a>
 </p>
 
 <div class="dashboard-table">
