@@ -83,7 +83,7 @@ govuk-frontend-jinja==2.2.0
     # via -r requirements.in
 greenlet==1.1.2
     # via eventlet
-gunicorn @ git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b864c64
+gunicorn==20.1.0
     # via -r requirements.in
 humanize==4.1.0
     # via -r requirements.in
