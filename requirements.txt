@@ -27,7 +27,7 @@ botocore==1.26.5
     #   s3transfer
 cachetools==5.1.0
     # via notifications-utils
-certifi==2021.10.8
+certifi==2022.5.18.1
     # via
     #   pyproj
     #   requests
