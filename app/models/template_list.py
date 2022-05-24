@@ -1,4 +1,5 @@
 from app import format_notification_type
+from werkzeug.utils import cached_property
 
 
 class TemplateList():
@@ -16,10 +17,13 @@ class TemplateList():
         self.user = user
 
     def __iter__(self):
-        for item in self.get_templates_and_folders(
+        yield from self.items
+
+    @cached_property
+    def items(self):
+        return list(self.get_templates_and_folders(
             self.template_type, self.template_folder_id, self.user, ancestors=[]
-        ):
-            yield item
+        ))
 
     def get_templates_and_folders(self, template_type, template_folder_id, user, ancestors):
 
