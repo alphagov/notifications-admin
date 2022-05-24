@@ -547,6 +547,12 @@ class Service(JSONModel, SortByNameMixin):
         return {folder['id'] for folder in self.all_template_folders}
 
     def get_user_template_folders(self, user):
+        if not hasattr(self, '_cache'):
+            self._cache = {}
+
+        if user in self._cache:
+            return self._cache[user]
+
         """Returns a modified list of folders a user has permission to view
 
         For each folder, we do the following:
@@ -585,6 +591,7 @@ class Service(JSONModel, SortByNameMixin):
                         if user.has_template_folder_permission(parent, service=self):
                             break
                 user_folders.append(folder_attrs)
+        self._cache[user] = user_folders
         return user_folders
 
     def get_template_folders(self, template_type='all', parent_folder_id=None, user=None):
