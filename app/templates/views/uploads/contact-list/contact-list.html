@@ -134,7 +134,7 @@
           <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.delete_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Delete this contact list</a>
         </span>
       {% endif %}
-      <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link-without-button" download href="{{ url_for('main.download_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Download this contact list</a>
+      <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link-without-button" download href="{{ url_for('main.download_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Download this contact list (<abbr title="Comma separated values">CSV</abbr>)</a>
     </div>
   </div>
 

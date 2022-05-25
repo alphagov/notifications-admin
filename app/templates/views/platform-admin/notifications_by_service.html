@@ -14,7 +14,7 @@
   {% call form_wrapper() %}
     {{ form.start_date(param_extensions={"hint": {"text": "Enter start date in format YYYY-MM-DD"}}) }}
     {{ form.end_date(param_extensions={"hint": {"text": "Enter end date in format YYYY-MM-DD"}}) }}
-    {{ page_footer('Download report') }}
+    {{ page_footer('Download report (CSV)') }}
   {% endcall %}
 
 {% endblock %}

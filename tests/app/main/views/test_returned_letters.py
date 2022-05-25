@@ -146,7 +146,7 @@ def test_returned_letters_page_with_many_letters(
         expected_message
     )
     assert page.select_one('a[download]').text == (
-        'Download this report'
+        'Download this report (CSV)'
     )
     assert page.select_one('a[download]')['href'] == url_for(
         '.returned_letters_report',

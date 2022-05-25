@@ -24,7 +24,7 @@
         </p>
         <p class="govuk-body">
           <a class="govuk-link govuk-link--no-visited-state"
-             href="{{ url_for('.organisation_download_agreement', org_id=current_org.id) }}">Download the current version of the agreement
+             href="{{ url_for('.organisation_download_agreement', org_id=current_org.id) }}">Download the current version of the agreement (PDF)
           </a>
         </p>
       {% elif current_org.agreement_signed %}
@@ -33,7 +33,7 @@
         </p>
         <p class="govuk-body">
           <a class="govuk-link govuk-link--no-visited-state"
-             href="{{ url_for('.organisation_download_agreement', org_id=current_org.id) }}">Download the current version of the agreement
+             href="{{ url_for('.organisation_download_agreement', org_id=current_org.id) }}">Download the current version of the agreement (PDF)
           </a>
         </p>
       {% elif current_org.agreement_signed is false %}

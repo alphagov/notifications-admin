@@ -34,7 +34,7 @@
           </p>
         {% elif notifications %}
           <p class="{% if job.template_type != 'letter' %}bottom-gutter{% endif %}">
-            <a href="{{ download_link }}" download class="govuk-link govuk-link--no-visited-state heading-small">Download this report</a>
+            <a href="{{ download_link }}" download class="govuk-link govuk-link--no-visited-state heading-small">Download this report (<abbr title="Comma separated values">CSV</abbr>)</a>
             &emsp;
             <span id="time-left">{{ time_left }}</span>
           </p>
