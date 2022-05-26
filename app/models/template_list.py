@@ -66,6 +66,28 @@ class TemplateList():
         ))
 
 
+class ServiceTemplateList(TemplateList):
+    def __iter__(self):
+        template_list_service = TemplateListService(
+            self.service,
+            templates=self.service.get_templates(
+                template_folder_id=None,
+            ),
+            folders=self.service.get_template_folders(
+                parent_folder_id=None,
+            ),
+        )
+
+        yield template_list_service
+
+        yield from self.get_templates_and_folders(
+            self.template_type,
+            self.template_folder_id,
+            self.user,
+            ancestors=[template_list_service]
+        )
+
+
 class TemplateLists():
 
     def __init__(self, user):
@@ -84,20 +106,10 @@ class TemplateLists():
             return
 
         for service in self.services:
-
-            template_list_service = TemplateListService(service)
-
-            yield template_list_service
-
-            for service_templates_and_folders in TemplateList(
-                service, user=self.user
-            ).get_templates_and_folders(
-                template_type='all',
-                template_folder_id=None,
+            yield from ServiceTemplateList(
+                service=service,
                 user=self.user,
-                ancestors=[template_list_service],
-            ):
-                yield service_templates_and_folders
+            )
 
     @property
     def templates_to_show(self):
@@ -183,21 +195,18 @@ class TemplateListFolder(TemplateListItem):
 
 
 class TemplateListService(TemplateListFolder):
-
     is_service = True
 
     def __init__(
         self,
         service,
+        templates,
+        folders,
     ):
         super().__init__(
             folder=service._dict,
-            templates=service.get_templates(
-                template_folder_id=None,
-            ),
-            folders=service.get_template_folders(
-                parent_folder_id=None,
-            ),
+            templates=templates,
+            folders=folders,
             ancestors=[],
             service_id=service.id,
         )
