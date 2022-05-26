@@ -76,12 +76,11 @@ class TemplateLists():
         self.user = user
 
     def __iter__(self):
-
         if len(self.services) == 1:
-
-            for template_or_folder in TemplateList(self.services[0], user=self.user):
-                yield template_or_folder
-
+            yield from TemplateList(
+                service=self.services[0],
+                user=self.user,
+            )
             return
 
         for service in self.services:
