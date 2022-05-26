@@ -650,12 +650,6 @@ class Service(JSONModel, SortByNameMixin):
             template,
         ]
 
-    def get_template_folders_and_templates(self, template_type, template_folder_id):
-        return (
-            self.get_templates(template_type, template_folder_id)
-            + self.get_template_folders(template_type, template_folder_id)
-        )
-
     @property
     def count_of_templates_and_folders(self):
         return len(self.all_templates + self.all_template_folders)

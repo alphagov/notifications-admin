@@ -470,10 +470,9 @@ def manage_template_folder(service_id, template_folder_id):
 @user_has_permissions('manage_templates')
 def delete_template_folder(service_id, template_folder_id):
     template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
+    template_list = TemplateList(service=current_service, template_folder_id=template_folder_id)
 
-    if len(current_service.get_template_folders_and_templates(
-        template_type="all", template_folder_id=template_folder_id
-    )) > 0:
+    if not template_list.folder_is_empty:
         flash("You must empty this folder before you can delete it", 'info')
         return redirect(
             url_for(

@@ -5,7 +5,7 @@ from flask import abort, url_for
 from notifications_python_client.errors import HTTPError
 
 from app.models.user import User
-from tests import sample_uuid
+from tests import sample_uuid, template_json
 from tests.conftest import (
     SERVICE_ONE_ID,
     TEMPLATE_ONE_ID,
@@ -968,7 +968,7 @@ def test_delete_template_folder_should_detect_non_empty_folder_on_get(
     ]
     mocker.patch(
         'app.models.service.Service.get_templates',
-        return_value=[{'id': template_id, 'name': 'template'}],
+        return_value=[template_json(service_one['id'], template_id)],
     )
     client_request.get(
         'main.delete_template_folder', service_id=service_one['id'],
