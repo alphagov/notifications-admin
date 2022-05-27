@@ -89,7 +89,7 @@ humanize==4.1.0
     # via -r requirements.in
 idna==3.3
     # via requests
-itsdangerous==1.1.0
+itsdangerous==2.0.1
     # via
     #   -r requirements.in
     #   flask
