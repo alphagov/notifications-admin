@@ -121,7 +121,6 @@ def test_unknown_gps_and_trusts_are_redirected(
         _expected_redirect=url_for(
             expected_endpoint,
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
     )
 
@@ -406,7 +405,6 @@ def test_accept_agreement_page_persists(
         _expected_redirect=url_for(
             'main.service_confirm_agreement',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
     )
     assert mock_update_organisation.call_args_list == [expected_persisted]
@@ -476,7 +474,6 @@ def test_confirm_agreement_page_persists(
         _expected_redirect=url_for(
             'main.request_to_go_live',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
     )
     mock_update_organisation.assert_called_once_with(

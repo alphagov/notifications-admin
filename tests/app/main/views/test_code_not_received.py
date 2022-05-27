@@ -106,7 +106,7 @@ def test_should_resend_verify_code_and_update_mobile_for_pending_user(
         'main.check_and_resend_text_code',
         next=redirect_url,
         _data={'mobile_number': phone_number_to_register_with},
-        _expected_redirect=url_for('main.verify', _external=True, next=redirect_url),
+        _expected_redirect=url_for('main.verify', next=redirect_url),
     )
 
     mock_update_user_attribute.assert_called_once_with(
@@ -139,7 +139,7 @@ def test_check_and_redirect_to_two_factor_if_user_active(
     client_request.get(
         'main.check_and_resend_verification_code',
         next=redirect_url,
-        _expected_redirect=url_for('main.two_factor_sms', _external=True, next=redirect_url)
+        _expected_redirect=url_for('main.two_factor_sms', next=redirect_url)
     )
 
 
@@ -166,7 +166,7 @@ def test_check_and_redirect_to_verify_if_user_pending(
     client_request.get(
         'main.check_and_resend_verification_code',
         next=redirect_url,
-        _expected_redirect=url_for('main.verify', _external=True, next=redirect_url),
+        _expected_redirect=url_for('main.verify', next=redirect_url),
     )
 
 
@@ -182,7 +182,7 @@ def test_redirect_to_sign_in_if_not_logged_in(
     client_request.logout()
     client_request.get(
         endpoint,
-        _expected_redirect=url_for('main.sign_in', _external=True),
+        _expected_redirect=url_for('main.sign_in'),
     )
 
 

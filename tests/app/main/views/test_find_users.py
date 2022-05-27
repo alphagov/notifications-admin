@@ -235,7 +235,7 @@ def test_change_user_auth(
         _data={
             'auth_type': 'email_auth'
         },
-        _expected_redirect=url_for('main.user_information', user_id=api_user_active['id'], _external=True)
+        _expected_redirect=url_for('main.user_information', user_id=api_user_active['id'])
     )
 
     mock_update.assert_called_once_with(
@@ -332,7 +332,6 @@ def test_archive_user_posts_to_user_client(
         _expected_redirect=url_for(
             'main.user_information',
             user_id=api_user_active['id'],
-            _external=True,
         ),
     )
 

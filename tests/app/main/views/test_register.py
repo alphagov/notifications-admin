@@ -26,7 +26,7 @@ def test_logged_in_user_redirects_to_account(
     client_request.get(
         'main.register',
         _expected_status=302,
-        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+        _expected_redirect=url_for('main.show_accounts_or_dashboard'),
     )
 
 
@@ -80,7 +80,7 @@ def test_register_continue_handles_missing_session_sensibly(
     # session is not set
     client_request.get(
         'main.registration_continue',
-        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+        _expected_redirect=url_for('main.show_accounts_or_dashboard'),
     )
 
 
@@ -196,7 +196,7 @@ def test_register_with_existing_email_sends_emails(
     client_request.post(
         'main.register',
         _data=user_data,
-        _expected_redirect=url_for('main.registration_continue', _external=True),
+        _expected_redirect=url_for('main.registration_continue'),
     )
 
 
@@ -295,7 +295,7 @@ def test_register_from_invite(
             auth_type='sms_auth',
             **extra_data
         ),
-        _expected_redirect=url_for('main.verify', _external=True),
+        _expected_redirect=url_for('main.verify'),
     )
     mock_register_user.assert_called_once_with(
         'Registered in another Browser',
@@ -329,7 +329,7 @@ def test_register_from_invite_when_user_registers_in_another_browser(
             'password': 'somreallyhardthingtoguess',
             'auth_type': 'sms_auth'
         },
-        _expected_redirect=url_for('main.verify', _external=True),
+        _expected_redirect=url_for('main.verify'),
     )
 
 
@@ -376,7 +376,6 @@ def test_register_from_email_auth_invite(
         _expected_redirect=url_for(
             'main.service_dashboard',
             service_id=sample_invite['service'],
-            _external=True,
         ),
     )
 
@@ -448,7 +447,6 @@ def test_can_register_email_auth_without_phone_number(
         _expected_redirect=url_for(
             'main.service_dashboard',
             service_id=sample_invite['service'],
-            _external=True,
         ),
     )
 

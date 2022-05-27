@@ -391,7 +391,6 @@ def test_edit_sms_provider_ratio_submit(
         _data=post_data,
         _expected_redirect=url_for(
             '.view_providers',
-            _external=True,
         ),
     )
 

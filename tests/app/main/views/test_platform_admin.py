@@ -31,7 +31,7 @@ def test_should_redirect_if_not_logged_in(
     client_request.logout()
     client_request.get(
         endpoint,
-        _expected_redirect=url_for('main.sign_in', next=url_for(endpoint), _external=True),
+        _expected_redirect=url_for('main.sign_in', next=url_for(endpoint)),
     )
 
 
@@ -693,7 +693,6 @@ def test_platform_admin_submit_returned_letters(
         _data={'references': ' NOTIFY000REF1 \n NOTIFY002REF2 '},
         _expected_redirect=url_for(
             'main.platform_admin_returned_letters',
-            _external=True,
         )
     )
 

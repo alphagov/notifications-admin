@@ -481,7 +481,6 @@ def test_uploaded_letter_preview_redirects_if_file_not_in_s3(
             'main.view_notification',
             service_id=SERVICE_ONE_ID,
             notification_id=fake_uuid,
-            _external=True
         )
     )
 
@@ -636,7 +635,6 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(
             'main.view_notification',
             service_id=SERVICE_ONE_ID,
             notification_id=fake_uuid,
-            _external=True
         )
     )
     mock_send.assert_called_once_with(
@@ -670,7 +668,6 @@ def test_send_uploaded_letter_redirects_if_file_not_in_s3(
             'main.view_notification',
             service_id=SERVICE_ONE_ID,
             notification_id=fake_uuid,
-            _external=True
         )
     )
 

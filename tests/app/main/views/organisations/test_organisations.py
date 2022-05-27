@@ -139,7 +139,6 @@ def test_create_new_organisation(
         _expected_redirect=url_for(
             'main.organisation_settings',
             org_id=ORGANISATION_ID,
-            _external=True,
         ),
     )
 
@@ -366,7 +365,6 @@ def test_gps_can_name_their_organisation(
         _expected_redirect=url_for(
             'main.service_agreement',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
 
@@ -436,7 +434,6 @@ def test_nhs_local_assigns_to_selected_organisation(
         _expected_redirect=url_for(
             'main.service_agreement',
             service_id=SERVICE_ONE_ID,
-            _external=True
         )
     )
     mock_update_service_organisation.assert_called_once_with(SERVICE_ONE_ID, ORGANISATION_ID)
@@ -904,7 +901,6 @@ def test_remove_user_from_organisation_makes_api_request_to_remove_user(
         user_id=fake_uuid,
         _expected_redirect=url_for(
             'main.show_accounts_or_dashboard',
-            _external=True,
         ),
     )
 
@@ -1123,7 +1119,6 @@ def test_update_organisation_settings(
         _expected_redirect=url_for(
             'main.organisation_settings',
             org_id=organisation_one['id'],
-            _external=True,
         ),
     )
 
@@ -1151,7 +1146,6 @@ def test_update_organisation_sector_sends_service_id_data_to_api_client(
         _expected_redirect=url_for(
             'main.organisation_settings',
             org_id=organisation_one['id'],
-            _external=True,
         ),
     )
 
@@ -1272,7 +1266,6 @@ def test_update_organisation_domains(
         _expected_redirect=url_for(
             'main.organisation_settings',
             org_id=organisation_one['id'],
-            _external=True,
         ),
     )
 
@@ -1329,7 +1322,6 @@ def test_update_organisation_name(
         _expected_redirect=url_for(
             '.organisation_settings',
             org_id=fake_uuid,
-            _external=True,
         )
     )
     mock_update_organisation.assert_called_once_with(
@@ -1425,7 +1417,6 @@ def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
         _expected_redirect=url_for(
             '.organisation_settings',
             org_id=organisation_one['id'],
-            _external=True,
         ),
     )
     mock_update_organisation.assert_called_once_with(
@@ -1481,7 +1472,6 @@ def test_update_organisation_notes(
         _expected_redirect=url_for(
             'main.organisation_settings',
             org_id=organisation_one['id'],
-            _external=True,
         ),
     )
     mock_update_organisation.assert_called_with(
@@ -1525,7 +1515,6 @@ def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
         _expected_redirect=url_for(
             'main.organisation_settings',
             org_id=organisation_one['id'],
-            _external=True,
         ),
     )
     assert not mock_update_organisation.called
@@ -1604,7 +1593,6 @@ def test_update_organisation_billing_details(
         _expected_redirect=url_for(
             'main.organisation_settings',
             org_id=organisation_one['id'],
-            _external=True,
         )
     )
     mock_update_organisation.assert_called_with(

@@ -148,7 +148,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
             'main.begin_tour',
             service_id=101,
             template_id="Example%20text%20message%20template",
-            _external=True,
         ),
     )
     assert mock_get_services_with_no_services.called
@@ -270,7 +269,6 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
         _expected_redirect=url_for(
             'main.service_dashboard',
             service_id=101,
-            _external=True,
         )
     )
     assert mock_get_services.called

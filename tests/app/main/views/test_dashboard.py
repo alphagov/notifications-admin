@@ -106,14 +106,14 @@ def test_redirect_from_old_dashboard(
     mocker,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=user)
-    expected_location = 'http://localhost/services/{}'.format(SERVICE_ONE_ID)
+    expected_location = '/services/{}'.format(SERVICE_ONE_ID)
 
     client_request.get_url(
         '/services/{}/dashboard'.format(SERVICE_ONE_ID),
         _expected_redirect=expected_location,
     )
 
-    assert expected_location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID, _external=True)
+    assert expected_location == url_for('main.service_dashboard', service_id=SERVICE_ONE_ID)
 
 
 def test_redirect_caseworkers_to_templates(
@@ -129,7 +129,6 @@ def test_redirect_caseworkers_to_templates(
         _expected_redirect=url_for(
             'main.choose_template',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
 

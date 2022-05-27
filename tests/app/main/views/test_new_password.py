@@ -72,7 +72,7 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(
     client_request.post_url(
         url_for_endpoint_with_token('.new_password', token=token, next=redirect_url),
         _data={'new_password': 'a-new_password'},
-        _expected_redirect=url_for('.two_factor_sms', _external=True, next=redirect_url),
+        _expected_redirect=url_for('.two_factor_sms', next=redirect_url),
     )
     mock_get_user_by_email_request_password_reset.assert_called_once_with(user['email_address'])
 
@@ -97,7 +97,7 @@ def test_should_redirect_to_two_factor_webauthn_when_password_reset_is_successfu
     client_request.post_url(
         url_for_endpoint_with_token('.new_password', token=token, next=redirect_url),
         _data={'new_password': 'a-new_password'},
-        _expected_redirect=url_for('.two_factor_webauthn', _external=True, next=redirect_url),
+        _expected_redirect=url_for('.two_factor_webauthn', next=redirect_url),
     )
     mock_get_user_by_email_request_password_reset.assert_called_once_with(user['email_address'])
 
@@ -120,7 +120,7 @@ def test_should_redirect_index_if_user_has_already_changed_password(
     client_request.post_url(
         url_for_endpoint_with_token('.new_password', token=token),
         _data={'new_password': 'a-new_password'},
-        _expected_redirect=url_for('.index', _external=True),
+        _expected_redirect=url_for('.index'),
     )
     mock_get_user_by_email_user_changed_password.assert_called_once_with(user['email_address'])
 
@@ -137,7 +137,7 @@ def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_exp
 
     client_request.get_url(
         url_for_endpoint_with_token('.new_password', token=token),
-        _expected_redirect=url_for('.forgot_password', _external=True),
+        _expected_redirect=url_for('.forgot_password'),
     )
 
 
@@ -162,7 +162,7 @@ def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
     client_request.post_url(
         url_for_endpoint_with_token('.new_password', token=token),
         _data={'new_password': 'a-new_password'},
-        _expected_redirect=url_for('.show_accounts_or_dashboard', _external=True),
+        _expected_redirect=url_for('.show_accounts_or_dashboard'),
     )
 
     assert mock_get_user_by_email_request_password_reset.called

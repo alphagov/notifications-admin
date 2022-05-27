@@ -18,7 +18,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
 def no_redirect():
-    return lambda _external=True: None
+    return lambda: None
 
 
 def test_get_support_index_page(
@@ -165,7 +165,6 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker, 
             'main.thanks',
             out_of_hours_emergency=False,
             email_address_provided=True,
-            _external=True,
         ),
     )
 
@@ -217,7 +216,6 @@ def test_passes_user_details_through_flow(
             'main.thanks',
             email_address_provided=True,
             out_of_hours_emergency=False,
-            _external=True,
         ),
     )
     mock_create_ticket.assert_called_once_with(
@@ -239,7 +237,6 @@ def test_passes_user_details_through_flow(
         url_for(
             'main.service_dashboard',
             service_id=SERVICE_ONE_ID,
-            _external=True
         ),
         ''
     ])
@@ -343,7 +340,6 @@ def test_urgency(
             'main.thanks',
             out_of_hours_emergency=is_out_of_hours_emergency,
             email_address_provided=True,
-            _external=True,
         ),
     )
     assert mock_ticket.call_args[1]['p1'] == is_out_of_hours_emergency
@@ -405,7 +401,7 @@ def test_redirects_to_triage(
         'main.feedback',
         ticket_type=ticket_type,
         _expected_status=expected_status,
-        _expected_redirect=expected_redirect(_external=True),
+        _expected_redirect=expected_redirect(),
     )
 
 
@@ -437,7 +433,7 @@ def test_doesnt_lose_message_if_post_across_closing(
         ticket_type=PROBLEM_TICKET_TYPE,
         _data={'feedback': 'foo'},
         _expected_status=302,
-        _expected_redirect=url_for('.triage', ticket_type=PROBLEM_TICKET_TYPE, _external=True),
+        _expected_redirect=url_for('.triage', ticket_type=PROBLEM_TICKET_TYPE),
     )
     with client_request.session_transaction() as session:
         assert session['feedback_message'] == 'foo'
@@ -498,7 +494,6 @@ def test_triage_redirects_to_correct_url(
             'main.feedback',
             ticket_type=ticket_type,
             severe=expected_redirect_param,
-            _external=True,
         ),
     )
 
@@ -604,7 +599,7 @@ def test_should_be_shown_the_bat_email(
     client_request.get_url(
         feedback_page,
         _expected_status=expected_status_code,
-        _expected_redirect=expected_redirect(_external=True),
+        _expected_redirect=expected_redirect(),
     )
 
     # logged in users should never be redirected to the bat email page
@@ -612,7 +607,7 @@ def test_should_be_shown_the_bat_email(
     client_request.get_url(
         feedback_page,
         _expected_status=expected_status_code_when_logged_in,
-        _expected_redirect=expected_redirect_when_logged_in(_external=True),
+        _expected_redirect=expected_redirect_when_logged_in(),
     )
 
 
@@ -659,7 +654,7 @@ def test_should_be_shown_the_bat_email_for_general_questions(
     client_request.get_url(
         feedback_page,
         _expected_status=expected_status_code,
-        _expected_redirect=expected_redirect(_external=True),
+        _expected_redirect=expected_redirect(),
     )
 
     # logged in users should never be redirected to the bat email page
@@ -667,7 +662,7 @@ def test_should_be_shown_the_bat_email_for_general_questions(
     client_request.get_url(
         feedback_page,
         _expected_status=expected_status_code_when_logged_in,
-        _expected_redirect=expected_redirect_when_logged_in(_external=True),
+        _expected_redirect=expected_redirect_when_logged_in(),
     )
 
 
@@ -692,7 +687,7 @@ def test_bat_email_page(
     client_request.login(active_user_with_permissions)
     client_request.get(
         bat_phone_page,
-        _expected_redirect=url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE, _external=True)
+        _expected_redirect=url_for('main.feedback', ticket_type=PROBLEM_TICKET_TYPE)
     )
 
 

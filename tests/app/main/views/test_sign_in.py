@@ -92,7 +92,7 @@ def test_redirect_to_sign_in_if_logged_in_from_other_browser(
     client_request.get(
         'main.choose_account',
         _expected_status=302,
-        _expected_redirect=url_for('main.sign_in', next='/accounts', _external=True),
+        _expected_redirect=url_for('main.sign_in', next='/accounts'),
     )
 
 
@@ -102,7 +102,7 @@ def test_logged_in_user_redirects_to_account(
     client_request.get(
         'main.sign_in',
         _expected_status=302,
-        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+        _expected_redirect=url_for('main.show_accounts_or_dashboard'),
     )
 
 
@@ -113,7 +113,7 @@ def test_logged_in_user_redirects_to_next_url(
         'main.sign_in',
         next='/user-profile',
         _expected_status=302,
-        _expected_redirect=url_for('main.user_profile', _external=True),
+        _expected_redirect=url_for('main.user_profile'),
     )
 
 
@@ -124,7 +124,7 @@ def test_logged_in_user_doesnt_do_evil_redirect(
         'main.sign_in',
         next='http://www.evil.com',
         _expected_status=302,
-        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+        _expected_redirect=url_for('main.show_accounts_or_dashboard'),
     )
 
 
@@ -155,7 +155,7 @@ def test_process_sms_auth_sign_in_return_2fa_template(
             'email_address': email_address,
             'password': password,
         },
-        _expected_redirect=url_for('.two_factor_sms', next=redirect_url, _external=True),
+        _expected_redirect=url_for('.two_factor_sms', next=redirect_url),
     )
     mock_verify_password.assert_called_with(api_user_active['id'], password)
     mock_get_user_by_email.assert_called_with('valid@example.gov.uk')
@@ -184,7 +184,7 @@ def test_process_email_auth_sign_in_return_2fa_template(
             'email_address': 'valid@example.gov.uk',
             'password': 'val1dPassw0rd!',
         },
-        _expected_redirect=url_for('.two_factor_email_sent', _external=True, next=redirect_url),
+        _expected_redirect=url_for('.two_factor_email_sent', next=redirect_url),
     )
 
     mock_send_verify_code.assert_called_with(api_user_active_email_auth['id'], 'email', None, redirect_url)
@@ -213,7 +213,7 @@ def test_process_webauthn_auth_sign_in_redirects_to_webauthn_with_next_redirect(
             'email_address': 'valid@example.gov.uk',
             'password': 'val1dPassw0rd!',
         },
-        _expected_redirect=url_for('.two_factor_webauthn', _external=True, next=redirect_url)
+        _expected_redirect=url_for('.two_factor_webauthn', next=redirect_url)
     )
 
     mock_get_user_by_email.assert_called_once_with('valid@example.gov.uk')
@@ -265,7 +265,7 @@ def test_should_return_redirect_when_user_is_pending(
             'email_address': 'pending_user@example.gov.uk',
             'password': 'val1dPassw0rd!'
         },
-        _expected_redirect=url_for('main.resend_email_verification', _external=True),
+        _expected_redirect=url_for('main.resend_email_verification'),
     )
     with client_request.session_transaction() as s:
         assert s['user_details'] == {
@@ -292,7 +292,7 @@ def test_should_attempt_redirect_when_user_is_pending(
             'email_address': 'pending_user@example.gov.uk',
             'password': 'val1dPassw0rd!'
         },
-        _expected_redirect=url_for('main.resend_email_verification', _external=True, next=redirect_url)
+        _expected_redirect=url_for('main.resend_email_verification', next=redirect_url)
     )
 
 

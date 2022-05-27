@@ -88,6 +88,5 @@ def test_find_services_by_name_redirects_for_uuid(
         _expected_redirect=url_for(
             'main.service_dashboard',
             service_id=fake_uuid,
-            _external=True,
         ),
     )

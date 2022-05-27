@@ -432,7 +432,6 @@ def test_save_contact_list(
         _expected_redirect=url_for(
             'main.uploads',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_get_metadata.assert_called_once_with(
@@ -721,7 +720,6 @@ def test_delete_contact_list(
         _expected_redirect=url_for(
             'main.uploads',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_delete.assert_called_once_with(

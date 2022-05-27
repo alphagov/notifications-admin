@@ -580,7 +580,6 @@ def test_caseworker_redirected_to_set_sender_for_one_off(
             'main.set_sender',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
 
@@ -633,7 +632,6 @@ def test_user_with_only_send_and_view_redirected_to_set_sender_for_one_off(
             'main.set_sender',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
 
@@ -1207,7 +1205,6 @@ def test_choosing_to_copy_redirects(
         _expected_redirect=url_for(
             'main.choose_template_to_copy',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
     )
 
@@ -1722,7 +1719,6 @@ def test_should_redirect_when_saving_a_template(
             '.view_template',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
     mock_update_service_template.assert_called_with(
@@ -1753,7 +1749,6 @@ def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
             '.view_template',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         )
     )
     mock_update_service_template.assert_called_with(
@@ -1956,7 +1951,6 @@ def test_removing_placeholders_is_not_a_breaking_change(
             'main.view_template',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
     assert mock_update_service_template.called is True
@@ -2066,7 +2060,6 @@ def test_should_redirect_when_saving_a_template_email(
             '.view_template',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
     mock_update_service_template.assert_called_with(
@@ -2183,7 +2176,6 @@ def test_should_redirect_when_deleting_a_template(
             '.choose_template',
             service_id=SERVICE_ONE_ID,
             template_folder_id=parent,
-            _external=True,
         )
     )
 

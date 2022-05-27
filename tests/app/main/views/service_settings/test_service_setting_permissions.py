@@ -113,7 +113,6 @@ def test_service_set_permission(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=service_one['id'],
-            _external=True,
         )
     )
 
