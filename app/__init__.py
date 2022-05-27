@@ -162,6 +162,9 @@ def create_app(application):
 
     init_app(application)
 
+    if 'extensions' not in application.jinja_options:
+        application.jinja_options['extensions'] = []
+
     init_govuk_frontend(application)
     init_jinja(application)
 
