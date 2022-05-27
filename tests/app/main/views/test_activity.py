@@ -1,7 +1,7 @@
 import json
 import uuid
 from functools import partial
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import url_for
@@ -600,7 +600,7 @@ def test_get_status_filters_constructs_links(client_request):
     ret = get_status_filters(Service({'id': 'foo'}), 'sms', STATISTICS)
 
     link = ret[0][2]
-    assert link == '/services/foo/notifications/sms?status={}'.format(quote('sending,delivered,failed'))
+    assert link == '/services/foo/notifications/sms?status={}'.format('sending,delivered,failed')
 
 
 def test_html_contains_notification_id(
