@@ -13,7 +13,7 @@ def get_mou(organisation_is_crown):
     try:
         key = get_s3_object(bucket, filename)
         return {
-            'filename_or_fp': key.get()['Body'],
+            'path_or_file': key.get()['Body'],
             'attachment_filename': attachment_filename,
             'as_attachment': True,
         }
