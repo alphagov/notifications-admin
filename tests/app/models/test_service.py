@@ -267,29 +267,7 @@ def test_service_billing_details(purchase_order_number, expected_result):
     assert service.billing_details == expected_result
 
 
-@pytest.mark.xfail
-def test_has_email_templates_includes_folders(
-    mocker,
-    service_one,
-    mock_get_template_folders,
-):
-    mocker.patch(
-        'app.service_api_client.get_service_templates',
-        return_value={'data': [create_template(
-            folder='something', template_type='email'
-        )]}
-    )
-
-    mocker.patch(
-        'app.template_folder_api_client.get_template_folders',
-        return_value=[create_folder(id='something')]
-    )
-
-    assert Service(service_one).has_email_templates
-
-
-@pytest.mark.xfail
-def test_has_sms_templates_includes_folders(
+def test_has_templates_of_type_includes_folders(
     mocker,
     service_one,
     mock_get_template_folders,
@@ -306,4 +284,4 @@ def test_has_sms_templates_includes_folders(
         return_value=[create_folder(id='something')]
     )
 
-    assert Service(service_one).has_sms_templates
+    assert Service(service_one).has_templates_of_type('sms')
