@@ -8,7 +8,7 @@ ago==0.0.93
     # via -r requirements.in
 async-timeout==4.0.2
     # via redis
-awscli==1.23.13
+awscli==1.24.8
     # via awscli-cwlogs
 awscli-cwlogs==1.4.6
     # via -r requirements.in
@@ -18,16 +18,16 @@ blinker==1.4
     # via
     #   -r requirements.in
     #   gds-metrics
-boto3==1.22.13
+boto3==1.23.8
     # via notifications-utils
-botocore==1.25.13
+botocore==1.26.8
     # via
     #   awscli
     #   boto3
     #   s3transfer
-cachetools==5.0.0
+cachetools==5.1.0
     # via notifications-utils
-certifi==2021.10.8
+certifi==2022.5.18.1
     # via
     #   pyproj
     #   requests
@@ -49,7 +49,7 @@ dnspython==2.2.1
     # via eventlet
 docopt==0.6.2
     # via notifications-python-client
-docutils==0.15.2
+docutils==0.16
     # via awscli
 et-xmlfile==1.1.0
     # via openpyxl
@@ -123,7 +123,7 @@ notifications-python-client==6.3.0
     # via -r requirements.in
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@55.1.6
     # via -r requirements.in
-openpyxl==3.0.9
+openpyxl==3.0.10
     # via pyexcel-xlsx
 orderedset==2.0.3
     # via notifications-utils
@@ -131,7 +131,7 @@ packaging==21.3
     # via redis
 phonenumbers==8.12.48
     # via notifications-utils
-prometheus-client==0.14.0
+prometheus-client==0.14.1
     # via
     #   -r requirements.in
     #   gds-metrics
@@ -160,7 +160,7 @@ pyjwt==2.4.0
     # via notifications-python-client
 pyparsing==3.0.9
     # via packaging
-pypdf2==1.27.12
+pypdf2==1.28.2
     # via notifications-utils
 pyproj==3.3.1
     # via
