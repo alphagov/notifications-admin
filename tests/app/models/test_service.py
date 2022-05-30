@@ -82,39 +82,20 @@ def test_get_user_template_folders_only_returns_folders_visible_to_user(
 ):
     mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
     service = Service(service_one)
-    result = service.get_user_template_folders(User(active_user_with_permissions))
-    assert result == [
-        {
-            'name': ["Parent 1 - invisible", "1's Visible child"],
-            'id': mocker.ANY,
-            'parent_id': None,
-            'users_with_permission': [active_user_with_permissions['id']],
-        },
-        {
-            'name': ["Parent 1 - invisible", ["1's Invisible child", "1's Visible grandchild"]],
-            'id': mocker.ANY,
-            'parent_id': None,
-            'users_with_permission': [active_user_with_permissions['id']],
-        },
-        {
-            'name': "2's Visible child",
-            'id': mocker.ANY,
-            'parent_id': VIS_PARENT_FOLDER_ID,
-            'users_with_permission': [active_user_with_permissions['id']],
-        },
-        {
-            'name': ["2's Invisible child", "2's Visible grandchild"],
-            'id': mocker.ANY,
-            'parent_id': VIS_PARENT_FOLDER_ID,
-            'users_with_permission': [active_user_with_permissions['id']],
-        },
-        {
-            'name': "Parent 2 - visible",
-            'id': VIS_PARENT_FOLDER_ID,
-            'parent_id': None,
-            'users_with_permission': [active_user_with_permissions['id']],
-        },
-    ]
+    user = User(active_user_with_permissions)
+
+    result_folder_names = tuple(
+        result['name'] for result in
+        service.get_user_template_folders(user)
+    )
+
+    assert result_folder_names == (
+        ["Parent 1 - invisible", "1's Visible child"],
+        ["Parent 1 - invisible", ["1's Invisible child", "1's Visible grandchild"]],
+        "2's Visible child",
+        ["2's Invisible child", "2's Visible grandchild"],
+        "Parent 2 - visible",
+    )
 
 
 def test_get_template_folders_shows_user_folders_when_user_id_passed_in(
@@ -126,27 +107,17 @@ def test_get_template_folders_shows_user_folders_when_user_id_passed_in(
 ):
     mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
     service = Service(service_one)
-    result = service.get_template_folders(user=User(active_user_with_permissions))
-    assert result == [
-        {
-            'name': ["Parent 1 - invisible", "1's Visible child"],
-            'id': mocker.ANY,
-            'parent_id': None,
-            'users_with_permission': [active_user_with_permissions['id']]
-        },
-        {
-            'name': ["Parent 1 - invisible", ["1's Invisible child", "1's Visible grandchild"]],
-            'id': mocker.ANY,
-            'parent_id': None,
-            'users_with_permission': [active_user_with_permissions['id']]
-        },
-        {
-            'name': "Parent 2 - visible",
-            'id': VIS_PARENT_FOLDER_ID,
-            'parent_id': None,
-            'users_with_permission': [active_user_with_permissions['id']]
-        },
-    ]
+    user = User(active_user_with_permissions)
+
+    result_folder_names = tuple(
+        result['name'] for result in
+        service.get_template_folders(parent_folder_id=VIS_PARENT_FOLDER_ID, user=user)
+    )
+
+    assert result_folder_names == (
+        "2's Visible child",
+        ["2's Invisible child", "2's Visible grandchild"],
+    )
 
 
 def test_get_template_folders_shows_all_folders_when_user_id_not_passed_in(
@@ -157,27 +128,16 @@ def test_get_template_folders_shows_all_folders_when_user_id_not_passed_in(
 ):
     mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
     service = Service(service_one)
-    result = service.get_template_folders()
-    assert result == [
-        {
-            'name': "Invisible folder",
-            'id': mocker.ANY,
-            'parent_id': None,
-            'users_with_permission': []
-        },
-        {
-            'name': "Parent 1 - invisible",
-            'id': INV_PARENT_FOLDER_ID,
-            'parent_id': None,
-            'users_with_permission': []
-        },
-        {
-            'name': "Parent 2 - visible",
-            'id': VIS_PARENT_FOLDER_ID,
-            'parent_id': None,
-            'users_with_permission': [active_user_with_permissions['id']],
-        }
-    ]
+
+    result_folder_names = tuple(
+        result['name'] for result in
+        service.get_template_folders(parent_folder_id=VIS_PARENT_FOLDER_ID)
+    )
+
+    assert result_folder_names == (
+        "2's Invisible child",
+        "2's Visible child",
+    )
 
 
 def test_organisation_type_when_services_organisation_has_no_org_type(mocker, service_one):
