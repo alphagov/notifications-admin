@@ -170,6 +170,7 @@ class TemplateListFolder(TemplateListItem):
         super().__init__(folder, ancestors)
         self.folder = folder
         self.service_id = service_id
+        self.folders = folders
         self.number_of_templates = len(templates)
         self.number_of_folders = len(folders)
 
