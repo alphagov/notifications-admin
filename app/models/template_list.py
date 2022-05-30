@@ -1,3 +1,5 @@
+from werkzeug.utils import cached_property
+
 from app import format_notification_type
 
 
@@ -16,10 +18,13 @@ class TemplateList():
         self.user = user
 
     def __iter__(self):
-        for item in self.get_templates_and_folders(
+        yield from self.items
+
+    @cached_property
+    def items(self):
+        return list(self.get_templates_and_folders(
             self.template_type, self.template_folder_id, ancestors=[]
-        ):
-            yield item
+        ))
 
     def get_templates_and_folders(self, template_type, template_folder_id, ancestors):
 
@@ -67,7 +72,8 @@ class TemplateList():
             and template.get('folder') == template_folder_id
         ]
 
-    def get_user_template_folders(self):
+    @cached_property
+    def user_template_folders(self):
         """Returns a modified list of folders a user has permission to view
 
         For each folder, we do the following:
@@ -110,7 +116,7 @@ class TemplateList():
 
     def get_template_folders(self, template_type='all', parent_folder_id=None):
         if self.user:
-            folders = self.get_user_template_folders()
+            folders = self.user_template_folders
         else:
             folders = self.service.all_template_folders
         if parent_folder_id:
