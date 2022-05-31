@@ -112,9 +112,10 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
         user=current_user
     )
 
-    all_template_folders = [
-        item.folder for item in UserTemplateList(service=current_service, user=current_user) if item.is_folder
-    ]
+    all_template_folders = UserTemplateList(
+        service=current_service,
+        user=current_user
+    ).all_template_folders
 
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
         all_template_folders=all_template_folders,
