@@ -64,15 +64,12 @@ class TemplateList():
             )
 
     def get_templates(self, template_type, template_folder_id):
-        if isinstance(template_type, str):
-            template_type = [template_type]
-
         if template_folder_id:
             template_folder_id = str(template_folder_id)
 
         return [
             template for template in self.all_templates
-            if (set(template_type) & {'all', template['template_type']})
+            if (set([template_type]) & {'all', template['template_type']})
             and template.get('folder') == template_folder_id
         ]
 
