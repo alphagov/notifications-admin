@@ -102,7 +102,12 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
 
     user_has_template_folder_permission = current_user.has_template_folder_permission(template_folder)
 
-    template_list = TemplateList(current_service, template_type, template_folder_id, current_user)
+    template_list = TemplateList(
+        service=current_service,
+        template_type=template_type,
+        template_folder_id=template_folder_id,
+        user=current_user
+    )
 
     all_template_folders = [
         item.folder for item in TemplateList(service=current_service, user=current_user) if item.is_folder
@@ -345,7 +350,7 @@ def choose_template_to_copy(
         return render_template(
             'views/templates/copy.html',
             services_templates_and_folders=TemplateList(
-                service,
+                service=service,
                 template_folder_id=from_folder,
                 user=current_user
             ),

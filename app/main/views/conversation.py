@@ -47,7 +47,7 @@ def conversation_reply(
     return render_template(
         'views/templates/choose-reply.html',
         templates_and_folders=TemplateList(
-            current_service,
+            service=current_service,
             template_folder_id=from_folder,
             user=current_user,
             template_type='sms'

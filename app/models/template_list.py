@@ -7,6 +7,7 @@ class TemplateList():
 
     def __init__(
         self,
+        *,
         service,
         template_type='all',
         template_folder_id=None,
