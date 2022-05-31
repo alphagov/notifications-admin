@@ -7,7 +7,7 @@ from notifications_utils.template import SMSPreviewTemplate
 from app import current_service, notification_api_client, service_api_client
 from app.main import main
 from app.main.forms import SearchByNameForm
-from app.models.template_list import TemplateList
+from app.models.template_list import UserTemplateList
 from app.utils.user import user_has_permissions
 
 
@@ -46,7 +46,7 @@ def conversation_reply(
 ):
     return render_template(
         'views/templates/choose-reply.html',
-        templates_and_folders=TemplateList(
+        templates_and_folders=UserTemplateList(
             service=current_service,
             template_folder_id=from_folder,
             user=current_user,
