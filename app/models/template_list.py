@@ -29,6 +29,10 @@ class TemplateList():
     def all_template_folders(self):
         return self.service.all_template_folders
 
+    @property
+    def all_templates(self):
+        return self.service.all_templates
+
     def get_templates_and_folders(self, template_type, template_folder_id, ancestors):
 
         for item in self.get_template_folders(
@@ -67,7 +71,7 @@ class TemplateList():
             template_folder_id = str(template_folder_id)
 
         return [
-            template for template in self.service.all_templates
+            template for template in self.all_templates
             if (set(template_type) & {'all', template['template_type']})
             and template.get('folder') == template_folder_id
         ]
@@ -120,16 +124,16 @@ class UserTemplateList(TemplateList):
         self.user = user
         super().__init__(**kwargs)
 
-    def get_templates(self, template_type='all', template_folder_id=None):
-        if template_folder_id:
-            folder = self.service.get_template_folder(template_folder_id)
-            if not self.user.has_template_folder_permission(folder):
-                return []
+    @cached_property
+    def all_templates(self):
+        all_folder_ids = [
+            folder['id'] for folder in self.all_template_folders
+        ]
 
-        return super().get_templates(
-            template_type=template_type,
-            template_folder_id=template_folder_id
-        )
+        return [
+            template for template in self.service.all_templates
+            if template['folder'] in (all_folder_ids + [None])
+        ]
 
     @cached_property
     def all_template_folders(self):
