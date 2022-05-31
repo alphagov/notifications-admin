@@ -63,7 +63,7 @@ class TemplateList():
                 service_id=self.service.id,
             )
 
-    def get_templates(self, template_type='all', template_folder_id=None):
+    def get_templates(self, template_type, template_folder_id):
         if isinstance(template_type, str):
             template_type = [template_type]
 
@@ -76,7 +76,7 @@ class TemplateList():
             and template.get('folder') == template_folder_id
         ]
 
-    def get_template_folders(self, template_type='all', parent_folder_id=None):
+    def get_template_folders(self, template_type, parent_folder_id):
         if parent_folder_id:
             parent_folder_id = str(parent_folder_id)
 
@@ -88,7 +88,7 @@ class TemplateList():
             )
         ]
 
-    def is_folder_visible(self, template_folder_id, template_type='all'):
+    def is_folder_visible(self, template_folder_id, template_type):
 
         if template_type == 'all':
             return True
@@ -183,9 +183,11 @@ class ServiceTemplateList(UserTemplateList):
         template_list_service = TemplateListService(
             self.service,
             templates=self.get_templates(
+                template_type='all',
                 template_folder_id=None,
             ),
             folders=self.get_template_folders(
+                template_type='all',
                 parent_folder_id=None,
             ),
         )
