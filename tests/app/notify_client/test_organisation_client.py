@@ -245,3 +245,19 @@ def test_remove_user_from_organisation_deletes_user_cache(mocker):
 
     assert mock_redis_delete.call_args_list == [call(f'user-{user_id}')]
     mock_delete.assert_called_with(f'/organisations/{org_id}/users/{user_id}')
+
+
+def test_archive_organisation(mocker):
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+    mock_post = mocker.patch('app.notify_client.organisations_api_client.OrganisationsClient.post')
+
+    org_id = 'abcd-1234'
+
+    organisations_client.archive_organisation(org_id=org_id)
+
+    assert mock_redis_delete.call_args_list == [
+        call(f'organisation-{org_id}-name'),
+        call('domains'),
+        call('organisations'),
+    ]
+    mock_post.assert_called_with(url=f'/organisations/{org_id}/archive', data=None)

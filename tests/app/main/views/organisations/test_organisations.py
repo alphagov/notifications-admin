@@ -953,6 +953,146 @@ def test_organisation_settings_for_platform_admin(
     mock_get_organisation.assert_called_with(organisation_one['id'])
 
 
+def test_organisation_settings_shows_delete_link(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
+
+    delete_link = page.select('.page-footer-link a')[0]
+    assert normalize_spaces(delete_link.text) == 'Delete this organisation'
+    assert delete_link['href'] == url_for(
+        'main.archive_organisation',
+        org_id=organisation_one['id'],
+    )
+
+
+def test_organisation_settings_does_not_show_delete_link_for_archived_organisations(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mocker,
+):
+    organisation_one['active'] = False
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+
+    client_request.login(platform_admin_user)
+    page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
+
+    assert not page.select('.page-footer-link a')
+
+
+def test_archive_organisation_is_platform_admin_only(
+    client_request,
+    organisation_one,
+    mock_get_organisation,
+    mocker,
+):
+    client_request.get(
+        'main.archive_organisation',
+        org_id=organisation_one['id'],
+        _expected_status=403
+    )
+
+
+def test_archive_organisation_prompts_user(client_request, platform_admin_user, organisation_one, mocker):
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+
+    client_request.login(platform_admin_user)
+    delete_page = client_request.get(
+        'main.archive_organisation',
+        org_id=organisation_one['id'],
+    )
+    assert normalize_spaces(delete_page.select_one('.banner-dangerous').text) == (
+        'Are you sure you want to delete ‘organisation one’? There’s no way to undo this. Yes, delete'
+    )
+
+
+@pytest.mark.parametrize('method', ['get', 'post'])
+def test_archive_organisation_gives_403_for_inactive_orgs(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mocker,
+    method,
+):
+    organisation_one['active'] = False
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+
+    client_request.login(platform_admin_user)
+
+    getattr(client_request, method)(
+        'main.archive_organisation',
+        org_id=organisation_one['id'],
+        _expected_status=403
+    )
+
+
+def test_archive_organisation_after_confirmation(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mocker,
+    mock_get_organisation,
+    mock_get_organisations,
+    mock_get_organisations_and_services_for_user,
+    mock_get_service_and_organisation_counts,
+):
+    mock_api = mocker.patch('app.organisations_client.post')
+    redis_delete_mock = mocker.patch('app.notify_client.organisations_api_client.redis_client.delete')
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.archive_organisation',
+        org_id=organisation_one['id'],
+        _follow_redirects=True
+    )
+    mock_api.assert_called_once_with(url=f"/organisations/{organisation_one['id']}/archive", data=None)
+    assert normalize_spaces(page.select_one('h1').text) == 'Choose service'
+    assert normalize_spaces(page.select_one('.banner-default-with-tick').text) == (
+        '‘Test organisation’ was deleted'
+    )
+    assert redis_delete_mock.call_args_list == [
+        mocker.call(f'organisation-{organisation_one["id"]}-name'),
+        mocker.call('domains'),
+        mocker.call('organisations'),
+    ]
+
+
+@pytest.mark.parametrize('error_message', [
+    'Cannot archive an organisation with services',
+    'Cannot archive an organisation with team members or invited team members',
+])
+def test_archive_organisation_does_not_allow_orgs_with_team_members_or_services_to_be_archived(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+    mock_get_users_for_organisation,
+    mock_get_invited_users_for_organisation,
+    mocker,
+    error_message,
+):
+    mocker.patch('app.organisations_client.archive_organisation', side_effect=HTTPError(
+        response=mocker.Mock(
+            status_code=400,
+            json={'result': 'error', 'message': error_message}
+        ),
+        message=error_message)
+    )
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.archive_organisation',
+        org_id=organisation_one['id'],
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.find("div", class_="banner-dangerous").text) == error_message
+
+
 @pytest.mark.parametrize('endpoint, expected_options, expected_selected', (
     (
         '.edit_organisation_type',
