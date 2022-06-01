@@ -6,7 +6,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import APIError, HTTPError
-from PyPDF2.utils import PdfReadError
+from PyPDF2.errors import PdfReadError
 
 from tests.conftest import (
     SERVICE_ONE_ID,
