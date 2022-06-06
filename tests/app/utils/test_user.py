@@ -4,55 +4,44 @@ from werkzeug.exceptions import Forbidden
 
 from app.main.views.index import index
 from app.utils.user import user_has_permissions
-from tests.conftest import create_platform_admin_user
+from tests.conftest import create_platform_admin_user, create_user, sample_uuid
 
-
-def _user_with_permissions():
-    user_data = {'id': 999,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '+4412341234',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {'foo': ['manage_users', 'manage_templates', 'manage_settings']},
-                 'platform_admin': False,
-                 'organisations': ['org_1', 'org_2'],
-                 'services': ['foo', 'bar'],
-                 'current_session_id': None,
-                 }
-    return user_data
+_user_with_permissions = create_user(
+    id=sample_uuid(),
+    permissions={'foo': ['manage_users', 'manage_templates', 'manage_settings']},
+    services=['foo', 'bar'],
+)
 
 
 @pytest.mark.parametrize('user, permissions, kwargs', (
     pytest.param(
-        _user_with_permissions(),
+        _user_with_permissions,
         ['send_messages'],
         {},
         marks=pytest.mark.xfail(raises=Forbidden),
     ),
     (
-        _user_with_permissions(),
+        _user_with_permissions,
         ['manage_service'],
         {},
     ),
     (
-        _user_with_permissions(),
+        _user_with_permissions,
         ['send_messages', 'manage_service'],
         {},
     ),
     (
-        _user_with_permissions(),
+        _user_with_permissions,
         ['manage_templates', 'manage_service'],
         {},
     ),
     (
-        _user_with_permissions(),
+        _user_with_permissions,
         ['manage_service', 'manage_templates'],
         {},
     ),
     (
-        create_platform_admin_user(),
+        _user_with_permissions,
         [],
         {},
     ),
@@ -91,8 +80,10 @@ def test_no_user_returns_redirect_to_sign_in(
 def test_user_has_permissions_for_organisation(
     client_request,
 ):
-    user = _user_with_permissions()
-    user['organisations'] = ['org_1', 'org_2']
+    user = create_user(
+        id=sample_uuid(),
+        organisations=['org_1', 'org_2'],
+    )
     client_request.login(user)
 
     request.view_args = {'org_id': 'org_2'}
@@ -139,8 +130,10 @@ def test_cant_use_decorator_without_view_args(
 def test_user_doesnt_have_permissions_for_organisation(
     client_request,
 ):
-    user = _user_with_permissions()
-    user['organisations'] = ['org_1', 'org_2']
+    user = create_user(
+        id=sample_uuid(),
+        organisations=['org_1', 'org_2'],
+    )
     client_request.login(user)
 
     request.view_args = {'org_id': 'org_3'}
@@ -156,8 +149,7 @@ def test_user_doesnt_have_permissions_for_organisation(
 def test_user_with_no_permissions_to_service_goes_to_templates(
     client_request,
 ):
-    user = _user_with_permissions()
-    client_request.login(user)
+    client_request.login(_user_with_permissions)
     request.view_args = {'service_id': 'bar'}
 
     @user_has_permissions()
