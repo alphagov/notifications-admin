@@ -10,7 +10,7 @@ def _test_permissions(
     client_request,
     usr,
     permissions,
-    will_succeed,
+    will_succeed=True,
     kwargs=None,
 ):
     request.view_args.update({'service_id': 'foo'})
@@ -19,19 +19,7 @@ def _test_permissions(
 
     decorator = user_has_permissions(*permissions, **(kwargs or {}))
     decorated_index = decorator(index)
-
-    if will_succeed:
-        decorated_index()
-    else:
-        try:
-            response = decorated_index()
-            if not (
-                response.location.startswith('/sign-in?next=') and
-                response.status_code == 302
-            ):
-                pytest.fail("Failed to throw a forbidden or unauthorised exception")
-        except Forbidden:
-            pass
+    return decorated_index()
 
 
 def test_user_has_permissions_on_endpoint_fail(
@@ -41,11 +29,12 @@ def test_user_has_permissions_on_endpoint_fail(
 ):
     user = _user_with_permissions()
     mocker.patch('app.user_api_client.get_user', return_value=user)
-    _test_permissions(
-        client_request,
-        user,
-        ['send_messages'],
-        will_succeed=False)
+    with pytest.raises(Forbidden):
+        _test_permissions(
+            client_request,
+            user,
+            ['send_messages'],
+        )
 
 
 def test_user_has_permissions_success(
@@ -58,7 +47,7 @@ def test_user_has_permissions_success(
         client_request,
         user,
         ['manage_service'],
-        will_succeed=True)
+    )
 
 
 def test_user_has_permissions_or(
@@ -71,7 +60,7 @@ def test_user_has_permissions_or(
         client_request,
         user,
         ['send_messages', 'manage_service'],
-        will_succeed=True)
+    )
 
 
 def test_user_has_permissions_multiple(
@@ -84,7 +73,7 @@ def test_user_has_permissions_multiple(
         client_request,
         user,
         ['manage_templates', 'manage_service'],
-        will_succeed=True)
+    )
 
 
 def test_exact_permissions(
@@ -97,7 +86,7 @@ def test_exact_permissions(
         client_request,
         user,
         ['manage_service', 'manage_templates'],
-        will_succeed=True)
+    )
 
 
 def test_platform_admin_user_can_access_page_that_has_no_permissions(
@@ -110,7 +99,7 @@ def test_platform_admin_user_can_access_page_that_has_no_permissions(
         client_request,
         platform_admin_user,
         [],
-        will_succeed=True)
+    )
 
 
 def test_platform_admin_user_can_not_access_page(
@@ -120,23 +109,26 @@ def test_platform_admin_user_can_not_access_page(
     mock_get_service,
 ):
     mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
-    _test_permissions(
-        client_request,
-        platform_admin_user,
-        [],
-        will_succeed=False,
-        kwargs={'restrict_admin_usage': True})
+    with pytest.raises(Forbidden):
+        _test_permissions(
+            client_request,
+            platform_admin_user,
+            [],
+            kwargs={'restrict_admin_usage': True},
+        )
 
 
-def test_no_user_returns_401_unauth(
+def test_no_user_returns_redirect_to_sign_in(
     client_request
 ):
     client_request.logout()
-    _test_permissions(
+    response = _test_permissions(
         client_request,
         None,
         [],
-        will_succeed=False)
+    )
+    assert response.status_code == 302
+    assert response.location.startswith('/sign-in?next=')
 
 
 def test_user_has_permissions_for_organisation(
