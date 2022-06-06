@@ -204,14 +204,14 @@ def test_letter_branding_request_submit_redirects_if_from_template_is_set(
             '.letter_branding_request', service_id=SERVICE_ONE_ID, from_template=from_template,
             _data=data,
             _expected_redirect=url_for(
-                'main.view_template', service_id=SERVICE_ONE_ID, template_id=from_template, _external=True
+                'main.view_template', service_id=SERVICE_ONE_ID, template_id=from_template,
             )
         )
     else:
         client_request.post(
             '.letter_branding_request', service_id=SERVICE_ONE_ID,
             _data=data,
-            _expected_redirect=url_for('main.service_settings', service_id=SERVICE_ONE_ID, _external=True)
+            _expected_redirect=url_for('main.service_settings', service_id=SERVICE_ONE_ID)
         )
 
 

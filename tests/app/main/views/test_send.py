@@ -228,7 +228,6 @@ def test_set_sender_redirects_if_no_reply_to_email_addresses(
             '.send_one_off',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -248,7 +247,6 @@ def test_set_sender_redirects_if_no_sms_senders(
             '.send_one_off',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -268,7 +266,6 @@ def test_set_sender_redirects_if_one_email_sender(
             '.send_one_off',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -291,7 +288,6 @@ def test_set_sender_redirects_if_one_sms_sender(
             '.send_one_off',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -1008,7 +1004,6 @@ def test_upload_valid_csv_redirects_to_check_page(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             upload_id=fake_uuid,
-            _external=True,
         ),
     )
 
@@ -1294,7 +1289,6 @@ def test_send_one_off_step_redirects_to_start_if_session_not_setup(
             'main.send_one_off',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -1715,7 +1709,6 @@ def test_send_one_off_redirects_to_end_if_step_out_of_bounds(
             'main.check_notification',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -1752,7 +1745,6 @@ def test_send_one_off_redirects_to_start_if_you_skip_steps(
             'main.send_one_off',
             service_id=service_one['id'],
             template_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -1787,7 +1779,6 @@ def test_send_one_off_redirects_to_start_if_index_out_of_bounds_and_some_placeho
             'main.send_one_off',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
 
@@ -1817,7 +1808,6 @@ def test_send_one_off_sms_message_redirects(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             step_index=0,
-            _external=True,
         )
     )
 
@@ -1962,7 +1952,6 @@ def test_send_one_off_letter_redirects_to_right_url(
             'main.check_notification',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
 
@@ -2158,7 +2147,6 @@ def test_send_one_off_sms_message_puts_submitted_data_in_session(
             'main.check_notification',
             service_id=service_one['id'],
             template_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -2245,7 +2233,6 @@ def test_send_one_off_redirects_to_letter_address(client_request, fake_uuid, moc
             'main.send_one_off_letter_address',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         )
     )
     # make sure it cleared session first
@@ -2355,7 +2342,6 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
             'main.check_notification',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
     with client_request.session_transaction() as session:
@@ -2447,7 +2433,6 @@ def test_send_one_off_letter_address_goes_to_next_placeholder(client_request, mo
             service_id=SERVICE_ONE_ID,
             template_id=template_data['id'],
             step_index=7,
-            _external=True,
         )
     )
 
@@ -3783,7 +3768,6 @@ def test_check_notification_redirects_if_session_not_populated(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             step_index=1,
-            _external=True,
         )
     )
 
@@ -3994,7 +3978,6 @@ def test_send_notification_redirects_if_missing_data(
             '.send_one_off',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
 
@@ -4024,7 +4007,6 @@ def test_send_notification_redirects_to_view_page(
             '.view_notification',
             service_id=SERVICE_ONE_ID,
             notification_id=fake_uuid,
-            _external=True,
             **extra_redirect_args
         ),
         **extra_args
@@ -4256,7 +4238,6 @@ def test_redirects_to_template_if_job_exists_already(
             'main.send_messages',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -4405,7 +4386,6 @@ def test_send_from_contact_list(
             template_id=fake_uuid,
             upload_id=new_uuid,
             contact_list_id=fake_uuid,
-            _external=True,
         )
     )
     mock_download.assert_called_once_with(
@@ -4439,7 +4419,6 @@ def test_send_to_myself_sets_placeholder_and_redirects_for_email(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             step_index=1,
-            _external=True,
         )
     )
 
@@ -4465,7 +4444,6 @@ def test_send_to_myself_sets_placeholder_and_redirects_for_sms(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             step_index=1,
-            _external=True,
         )
     )
 

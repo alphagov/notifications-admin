@@ -38,7 +38,7 @@ def test_show_accounts_or_dashboard_redirects_to_choose_account_or_service_dashb
 
     client_request.get(
         'main.show_accounts_or_dashboard',
-        _expected_redirect=url_for(endpoint, _external=True, **endpoint_kwargs)
+        _expected_redirect=url_for(endpoint, **endpoint_kwargs)
     )
 
 
@@ -53,7 +53,6 @@ def test_show_accounts_or_dashboard_redirects_if_service_in_session(client_reque
         _expected_redirect=url_for(
             'main.service_dashboard',
             service_id='service1',
-            _external=True
         ),
     )
 
@@ -69,7 +68,6 @@ def test_show_accounts_or_dashboard_redirects_if_org_in_session(client_request):
         _expected_redirect=url_for(
             'main.organisation_dashboard',
             org_id='org1',
-            _external=True
         ),
     )
 
@@ -86,7 +84,7 @@ def test_show_accounts_or_dashboard_doesnt_redirect_to_service_dashboard_if_user
 
     client_request.get(
         '.show_accounts_or_dashboard',
-        _expected_redirect=url_for('main.organisation_dashboard', org_id='org1', _external=True)
+        _expected_redirect=url_for('main.organisation_dashboard', org_id='org1')
     )
 
 
@@ -101,7 +99,7 @@ def test_show_accounts_or_dashboard_doesnt_redirect_to_org_dashboard_if_user_not
 
     client_request.get(
         '.show_accounts_or_dashboard',
-        _expected_redirect=url_for('main.organisation_dashboard', org_id='org1', _external=True)
+        _expected_redirect=url_for('main.organisation_dashboard', org_id='org1')
     )
 
 
@@ -112,7 +110,7 @@ def test_show_accounts_or_dashboard_redirects_if_not_logged_in(
     client_request.logout()
     client_request.get(
         'main.show_accounts_or_dashboard',
-        _expected_redirect=url_for('main.index', _external=True),
+        _expected_redirect=url_for('main.index'),
     )
 
 
@@ -131,7 +129,6 @@ def test_show_accounts_or_dashboard_redirects_to_service_dashboard_if_platform_a
         _expected_redirect=url_for(
             'main.service_dashboard',
             service_id='service2',
-            _external=True
         ),
     )
 
@@ -149,6 +146,5 @@ def test_show_accounts_or_dashboard_redirects_to_org_dashboard_if_platform_admin
         _expected_redirect=url_for(
             'main.organisation_dashboard',
             org_id='org2',
-            _external=True
         ),
     )

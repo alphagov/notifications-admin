@@ -230,7 +230,7 @@ def view_letter_notification_as_preview(
     mimetype = 'image/png' if filetype == 'png' else 'application/pdf'
 
     return send_file(
-        filename_or_fp=file,
+        path_or_file=file,
         mimetype=mimetype,
     )
 

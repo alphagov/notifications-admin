@@ -445,7 +445,6 @@ def test_dashboard_redirects_to_broadcast_dashboard(
         _expected_redirect=url_for(
             '.broadcast_dashboard',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
     ),
 
@@ -687,7 +686,6 @@ def test_new_broadcast_page_redirects(
         _expected_redirect=url_for(
             expected_redirect_endpoint,
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
 
@@ -761,7 +759,6 @@ def test_write_new_broadcast_posts(
             '.choose_broadcast_library',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
-            _external=True,
         ),
     )
     mock_create_broadcast_message.assert_called_once_with(
@@ -822,7 +819,6 @@ def test_broadcast_page(
             '.choose_broadcast_library',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
-            _external=True,
         ),
     ),
 
@@ -1554,7 +1550,6 @@ def test_remove_broadcast_area_page(
             '.preview_broadcast_areas',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
-            _external=True,
         ),
     )
     mock_get_polygons_from_areas.assert_called_once_with(area_attribute='simple_polygons')
@@ -1631,7 +1626,6 @@ def test_start_broadcasting(
             'main.view_current_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
-            _external=True,
         ),
     ),
     mock_update_broadcast_message_status.assert_called_once_with(
@@ -2513,7 +2507,6 @@ def test_confirm_approve_broadcast(
         broadcast_message_id=fake_uuid,
         _expected_redirect=expected_redirect(
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
         _data=post_data,
     )
@@ -2572,7 +2565,6 @@ def test_reject_broadcast(
         _expected_redirect=url_for(
             '.broadcast_dashboard',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
 
@@ -2629,7 +2621,6 @@ def test_cant_reject_broadcast_in_wrong_state(
             '.view_current_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
-            _external=True,
         )
     )
 
@@ -2727,7 +2718,6 @@ def test_confirm_cancel_broadcast(
             '.view_previous_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
-            _external=True,
         ),
     )
     mock_update_broadcast_message_status.assert_called_once_with(
@@ -2757,7 +2747,6 @@ def test_cant_cancel_broadcast_in_a_different_state(
             '.view_current_broadcast',
             service_id=SERVICE_ONE_ID,
             broadcast_message_id=fake_uuid,
-            _external=True,
         ),
     )
     assert mock_update_broadcast_message_status.called is False

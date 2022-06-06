@@ -100,7 +100,6 @@ def test_should_login_user_and_should_redirect_to_next_url(
         _expected_redirect=url_for(
             'main.service_dashboard',
             service_id=SERVICE_ONE_ID,
-            _external=True
         ),
     )
 
@@ -128,7 +127,6 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
         _data={'sms_code': '12345'},
         _expected_redirect=url_for(
             'main.revalidate_email_sent',
-            _external=True,
             next=f'/services/{SERVICE_ONE_ID}'
         ),
     )
@@ -157,7 +155,7 @@ def test_should_login_user_and_not_redirect_to_external_url(
         'main.two_factor_sms',
         next='http://www.google.com',
         _data={'sms_code': '12345'},
-        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True)
+        _expected_redirect=url_for('main.show_accounts_or_dashboard')
     )
 
 
@@ -185,7 +183,7 @@ def test_should_login_user_and_redirect_to_show_accounts(
     client_request.post(
         'main.two_factor_sms',
         _data={'sms_code': '12345'},
-        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True)
+        _expected_redirect=url_for('main.show_accounts_or_dashboard')
     )
 
 
@@ -257,7 +255,7 @@ def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
     client_request.post(
         'main.two_factor_sms',
         _data={'sms_code': '12345'},
-        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+        _expected_redirect=url_for('main.show_accounts_or_dashboard'),
     )
 
     mock_update_user_password.assert_called_once_with(
@@ -293,7 +291,7 @@ def test_two_factor_sms_post_should_redirect_to_sign_in_if_user_not_in_session(
     client_request.post(
         'main.two_factor_sms',
         _data={'sms_code': '12345'},
-        _expected_redirect=url_for('main.sign_in', _external=True)
+        _expected_redirect=url_for('main.sign_in')
     )
 
 
@@ -304,7 +302,7 @@ def test_two_factor_endpoints_get_should_redirect_to_sign_in_if_user_not_in_sess
 ):
     client_request.get(
         endpoint,
-        _expected_redirect=url_for('main.sign_in', _external=True)
+        _expected_redirect=url_for('main.sign_in')
     )
 
 
@@ -421,7 +419,7 @@ def test_valid_two_factor_email_link_logs_in_user(
 
     client_request.post_url(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
-        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True)
+        _expected_redirect=url_for('main.show_accounts_or_dashboard')
     )
 
 
@@ -518,5 +516,5 @@ def test_two_factor_email_link_used_when_user_already_logged_in(
 ):
     client_request.post_url(
         url_for_endpoint_with_token('main.two_factor_email', token=valid_token),
-        _expected_redirect=url_for('main.show_accounts_or_dashboard', _external=True),
+        _expected_redirect=url_for('main.show_accounts_or_dashboard'),
     )

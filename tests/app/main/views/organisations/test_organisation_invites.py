@@ -145,7 +145,6 @@ def test_user_invite_already_accepted(
         _expected_redirect=url_for(
             'main.organisation_dashboard',
             org_id=ORGANISATION_ID,
-            _external=True,
         ),
     )
 
@@ -170,7 +169,6 @@ def test_existing_user_invite_already_is_member_of_organisation(
         _expected_redirect=url_for(
             'main.organisation_dashboard',
             org_id=ORGANISATION_ID,
-            _external=True
         ),
     )
 
@@ -203,7 +201,6 @@ def test_existing_user_invite_not_a_member_of_organisation(
         _expected_redirect=url_for(
             'main.organisation_dashboard',
             org_id=ORGANISATION_ID,
-            _external=True,
         ),
     )
 
@@ -231,7 +228,7 @@ def test_user_accepts_invite(
     client_request.get(
         'main.accept_org_invite',
         token='thisisnotarealtoken',
-        _expected_redirect=url_for('main.register_from_org_invite', _external=True)
+        _expected_redirect=url_for('main.register_from_org_invite')
     )
 
     mock_check_org_invite_token.assert_called_once_with('thisisnotarealtoken')
@@ -337,7 +334,7 @@ def test_org_user_registers_with_email_already_in_use(
             'email_address': sample_org_invite['email_address'],
             'organisation': sample_org_invite['organisation'],
         },
-        _expected_redirect=url_for('main.verify', _external=True),
+        _expected_redirect=url_for('main.verify'),
     )
 
     mock_get_user_by_email.assert_called_once_with(
@@ -372,7 +369,7 @@ def test_org_user_registration(
             'password': 'validPassword!',
             'organisation': sample_org_invite['organisation'],
         },
-        _expected_redirect=url_for('main.verify', _external=True)
+        _expected_redirect=url_for('main.verify')
     )
 
     assert mock_get_user_by_email.called is False
@@ -412,6 +409,5 @@ def test_verified_org_user_redirects_to_dashboard(
         _expected_redirect=url_for(
             'main.organisation_dashboard',
             org_id=invited_org_user['organisation'],
-            _external=True
         ),
     )

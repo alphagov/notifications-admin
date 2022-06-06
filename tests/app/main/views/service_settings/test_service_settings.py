@@ -636,7 +636,6 @@ def test_switch_service_to_live(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_update_service.assert_called_with(
@@ -679,7 +678,6 @@ def test_switch_service_to_restricted(
         _expected_response=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_update_service.assert_called_with(
@@ -740,7 +738,6 @@ def test_switch_service_to_count_as_live(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_update_service.assert_called_with(
@@ -778,7 +775,6 @@ def test_should_redirect_after_service_name_change(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
     )
 
@@ -1455,7 +1451,6 @@ def test_should_show_persist_estimated_volumes(
         _expected_redirect=url_for(
             'main.request_to_go_live',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_update_service.assert_called_once_with(
@@ -2201,7 +2196,6 @@ def test_remove_default_from_default_letter_contact_block(
     letter_contact_details_page = url_for(
         'main.service_letter_contact_details',
         service_id=SERVICE_ONE_ID,
-        _external=True,
     )
 
     link = client_request.get_url(letter_contact_details_page).select_one('.user-list-item a')
@@ -2379,7 +2373,6 @@ def test_add_reply_to_email_address_sends_test_notification(
             'main.service_verify_reply_to_address',
             service_id=SERVICE_ONE_ID,
             notification_id="123",
-            _external=True,
         ) + "?is_default={}".format(api_default_args)
     )
     mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.com")
@@ -2409,7 +2402,6 @@ def test_service_add_reply_to_email_address_without_verification_for_platform_ad
         _expected_redirect=url_for(
             'main.service_email_reply_to',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_update.assert_called_once_with(
@@ -2571,7 +2563,6 @@ def test_add_letter_contact_when_coming_from_template(
             'main.view_template',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
 
@@ -2709,7 +2700,6 @@ def test_service_edit_email_reply_to_updates_email_address_without_verification_
         _expected_redirect=url_for(
             'main.service_email_reply_to',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_update.assert_called_once_with(
@@ -2936,7 +2926,6 @@ def test_delete_reply_to_email_address(
         _expected_redirect=url_for(
             'main.service_email_reply_to',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_delete.assert_called_once_with(service_id=SERVICE_ONE_ID, reply_to_email_id=fake_uuid)
@@ -3010,7 +2999,6 @@ def test_delete_letter_contact_block(
         _expected_redirect=url_for(
             'main.service_letter_contact_details',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_delete.assert_called_once_with(
@@ -3257,7 +3245,6 @@ def test_delete_sms_sender(
         _expected_redirect=url_for(
             'main.service_sms_senders',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_delete.assert_called_once_with(service_id=SERVICE_ONE_ID, sms_sender_id=fake_uuid)
@@ -3444,7 +3431,6 @@ def test_service_set_letter_branding_redirects_to_preview_page_when_form_submitt
         _expected_redirect=url_for(
             expected_redirect,
             branding_style=expected_post_data,
-            _external=True,
             **extra_args
         ),
         **extra_args
@@ -3517,7 +3503,6 @@ def test_service_preview_letter_branding_saves(
         _expected_status=302,
         _expected_redirect=url_for(
             expected_redirect,
-            _external=True,
             **extra_args
         ),
         **extra_args
@@ -3652,7 +3637,6 @@ def test_should_send_branding_and_organisations_to_preview(
         _expected_location=url_for(
             expected_redirect,
             branding_style='1',
-            _external=True,
             **extra_args
         ),
         **extra_args
@@ -3735,7 +3719,6 @@ def test_should_set_branding_and_organisations(
         _expected_status=302,
         _expected_redirect=url_for(
             expected_redirect,
-            _external=True,
             **extra_args
         ),
         **extra_args
@@ -3822,7 +3805,6 @@ def test_should_set_sms_allowance(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
     )
 
@@ -3909,7 +3891,6 @@ def test_old_set_letters_page_redirects(
             'main.service_set_channel',
             service_id=SERVICE_ONE_ID,
             channel='letter',
-            _external=True,
         )
     )
 
@@ -4016,7 +3997,6 @@ def test_switch_service_channels_on_and_off(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=service_one['id'],
-            _external=True
         )
     )
     assert set(mocked_fn.call_args[1]['permissions']) == set(expected_updated_permissions)
@@ -4099,7 +4079,7 @@ def test_switch_service_enable_international_sms_and_letters(
         _data={
             'enabled': post_value
         },
-        _expected_redirect=url_for('main.service_settings', service_id=service_one['id'], _external=True)
+        _expected_redirect=url_for('main.service_settings', service_id=service_one['id'])
     )
 
     if permission_expected_in_api_call:
@@ -4237,7 +4217,6 @@ def test_suspend_service_after_confirm(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True
         ),
     )
 
@@ -4310,7 +4289,6 @@ def test_resume_service_after_confirm(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True
         )
     )
 
@@ -4663,7 +4641,6 @@ def test_updates_sms_prefixing(
         _data={'enabled': post_value},
         _expected_redirect=url_for(
             'main.service_settings', service_id=SERVICE_ONE_ID,
-            _external=True
         )
     )
     mock_update_service.assert_called_once_with(
@@ -4842,7 +4819,6 @@ def test_add_service_data_retention(
         _expected_redirect=url_for(
             'main.data_retention',
             service_id=service_one['id'],
-            _external=True,
         ),
     )
     assert mock_create_service_data_retention.called
@@ -4865,7 +4841,6 @@ def test_update_service_data_retention(
         _expected_redirect=url_for(
             'main.data_retention',
             service_id=service_one['id'],
-            _external=True,
         ),
     )
     assert mock_update_service_data_retention.called
@@ -4958,7 +4933,6 @@ def test_update_service_notes(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
     mock_update_service.assert_called_with(SERVICE_ONE_ID, notes="Very fluffy")
@@ -5039,7 +5013,6 @@ def test_update_service_billing_details(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
     )
     mock_update_service.assert_called_with(
@@ -5194,7 +5167,6 @@ def test_service_set_broadcast_channel_redirects(
         _expected_redirect=url_for(
             expected_redirect_endpoint,
             service_id=SERVICE_ONE_ID,
-            _external=True,
             **extra_args,
         )
     )
@@ -5289,7 +5261,6 @@ def test_service_set_broadcast_network(
             'main.service_confirm_broadcast_account_type',
             service_id=SERVICE_ONE_ID,
             account_type=expected_result,
-            _external=True,
         )
     )
 
@@ -5436,7 +5407,6 @@ def test_service_confirm_broadcast_account_type_posts_data_to_api_and_redirects(
         _expected_redirect=url_for(
             'main.service_settings',
             service_id=SERVICE_ONE_ID,
-            _external=True,
         ),
     )
     set_service_broadcast_settings_mock.assert_called_once_with(

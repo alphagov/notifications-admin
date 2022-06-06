@@ -12,7 +12,6 @@ def test_render_sign_out_redirects_to_sign_in(
         'main.sign_out',
         _expected_redirect=url_for(
             'main.index',
-            _external=True,
         )
     )
     with client_request.session_transaction() as session:
@@ -48,7 +47,6 @@ def test_sign_out_user(
         _expected_status=302,
         _expected_redirect=url_for(
             'main.index',
-            _external=True,
         )
     )
     with client_request.session_transaction() as session:

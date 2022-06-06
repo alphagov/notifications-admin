@@ -301,7 +301,6 @@ def test_tour_step_redirects_to_tour_start_if_placeholders_doesnt_exist_in_sessi
             'main.begin_tour',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
 
@@ -374,7 +373,6 @@ def test_post_tour_step_saves_data_and_redirects_to_next_step(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             step_index=2,
-            _external=True,
         ),
     )
 
@@ -403,7 +401,6 @@ def test_post_tour_step_adds_data_to_saved_data_and_redirects_to_next_step(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             step_index=3,
-            _external=True,
         ),
     )
 
@@ -473,7 +470,6 @@ def test_post_final_tour_step_saves_data_and_redirects_to_check_notification(
             'main.check_tour_notification',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True
         ),
     )
 
@@ -503,7 +499,6 @@ def test_get_test_step_out_of_index_redirects_to_first_step(
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             step_index=1,
-            _external=True
         ),
     )
 
@@ -527,7 +522,6 @@ def test_get_test_step_out_of_index_redirects_to_check_notification_if_all_place
             'main.check_tour_notification',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True
         ),
     )
 
@@ -619,7 +613,6 @@ def test_check_tour_notification_redirects_to_tour_start_if_placeholders_doesnt_
             'main.begin_tour',
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
-            _external=True,
         ),
     )
 
@@ -643,7 +636,6 @@ def test_check_tour_notification_redirects_to_first_step_if_not_all_placeholders
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             step_index=1,
-            _external=True
         ),
     )
 
@@ -685,7 +677,6 @@ def test_go_to_dashboard_after_tour_link(
         _expected_redirect=url_for(
             "main.service_dashboard",
             service_id=fake_uuid,
-            _external=True,
         )
     )
 

@@ -153,7 +153,6 @@ def test_email_branding_request_submit(
         _expected_redirect=url_for(
             endpoint,
             service_id=SERVICE_ONE_ID,
-            _external=True,
         )
     )
 

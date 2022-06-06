@@ -584,7 +584,7 @@ def delete_contact_list(service_id, contact_list_id):
 def download_contact_list(service_id, contact_list_id):
     contact_list = ContactList.from_id(contact_list_id, service_id=service_id)
     return send_file(
-        filename_or_fp=BytesIO(contact_list.contents.encode('utf-8')),
+        path_or_file=BytesIO(contact_list.contents.encode('utf-8')),
         attachment_filename=contact_list.saved_file_name,
         as_attachment=True,
     )

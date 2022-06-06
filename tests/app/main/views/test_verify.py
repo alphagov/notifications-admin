@@ -48,7 +48,7 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(
     client_request.post(
         'main.verify',
         _data={'sms_code': '12345'},
-        _expected_redirect=url_for('main.add_service', first='first', _external=True),
+        _expected_redirect=url_for('main.add_service', first='first'),
     )
 
     # make sure the current_session_id has changed to what the API returned
@@ -113,7 +113,7 @@ def test_verify_email_redirects_to_verify_if_token_valid(
     client_request.get(
         'main.verify_email',
         token='notreal',
-        _expected_redirect=url_for('main.verify', _external=True),
+        _expected_redirect=url_for('main.verify'),
     )
 
     assert not mock_check_verify_code.called
@@ -140,7 +140,7 @@ def test_verify_email_doesnt_verify_sms_if_user_on_email_auth(
     client_request.get(
         'main.verify_email',
         token='notreal',
-        _expected_redirect=url_for('main.add_service', first='first', _external=True),
+        _expected_redirect=url_for('main.add_service', first='first'),
     )
 
     assert not mock_check_verify_code.called
@@ -164,7 +164,7 @@ def test_verify_email_redirects_to_email_sent_if_token_expired(
     client_request.get(
         'main.verify_email',
         token='notreal',
-        _expected_redirect=url_for('main.resend_email_verification', _external=True),
+        _expected_redirect=url_for('main.resend_email_verification'),
     )
 
 
@@ -193,7 +193,7 @@ def test_verify_redirects_to_sign_in_if_not_logged_in(
     client_request.logout()
     client_request.get(
         'main.verify',
-        _expected_redirect=url_for('main.sign_in', _external=True),
+        _expected_redirect=url_for('main.sign_in'),
     )
 
 

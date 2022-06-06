@@ -26,7 +26,7 @@ def accept_invite(token):
             and click the link again to accept this invite.
             """.format(
             current_user.email_address,
-            url_for("main.sign_out", _external=True)))
+            url_for("main.sign_out")))
 
         flash(message=message)
 
@@ -96,7 +96,7 @@ def accept_org_invite(token):
             and click the link again to accept this invite.
             """.format(
             current_user.email_address,
-            url_for("main.sign_out", _external=True)))
+            url_for("main.sign_out")))
 
         flash(message=message)
 

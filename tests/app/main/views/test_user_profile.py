@@ -81,7 +81,7 @@ def test_should_redirect_after_name_change(
         'main.user_profile_name',
         _data={'new_name': 'New Name'},
         _expected_status=302,
-        _expected_redirect=url_for('main.user_profile', _external=True),
+        _expected_redirect=url_for('main.user_profile'),
     )
     assert mock_update_user_attribute.called is True
 
@@ -108,7 +108,6 @@ def test_should_redirect_after_email_change(
         _expected_status=302,
         _expected_redirect=url_for(
             'main.user_profile_email_authenticate',
-            _external=True,
         )
     )
 
@@ -178,7 +177,7 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
             'main.user_profile_email_confirm',
             token=token,
         ),
-        _expected_redirect=url_for('main.user_profile', _external=True),
+        _expected_redirect=url_for('main.user_profile'),
     )
 
 
@@ -249,7 +248,6 @@ def test_delete_mobile_number(
         '.user_profile_mobile_number_delete',
         _expected_redirect=url_for(
             '.user_profile',
-            _external=True,
         )
     )
     mock_delete.assert_called_once_with(
@@ -272,7 +270,6 @@ def test_should_redirect_after_mobile_number_change(
         _expected_status=302,
         _expected_redirect=url_for(
             'main.user_profile_mobile_number_authenticate',
-            _external=True,
         )
     )
     with client_request.session_transaction() as session:
@@ -307,7 +304,6 @@ def test_should_redirect_after_mobile_number_authenticate(
         _expected_status=302,
         _expected_redirect=url_for(
             'main.user_profile_mobile_number_confirm',
-            _external=True,
         )
     )
 
@@ -355,7 +351,6 @@ def test_should_redirect_after_mobile_number_confirm(
         _expected_status=302,
         _expected_redirect=url_for(
             'main.user_profile',
-            _external=True,
         )
     )
 
@@ -386,7 +381,6 @@ def test_should_redirect_after_password_change(
         _expected_status=302,
         _expected_redirect=url_for(
             'main.user_profile',
-            _external=True,
         ),
     )
 
@@ -433,7 +427,7 @@ def test_can_disable_platform_admin(client_request, platform_admin_user):
         'main.user_profile_disable_platform_admin_view',
         _data={'enabled': False},
         _expected_status=302,
-        _expected_redirect=url_for('main.user_profile', _external=True),
+        _expected_redirect=url_for('main.user_profile'),
     )
 
     with client_request.session_transaction() as session:
@@ -450,7 +444,7 @@ def test_can_reenable_platform_admin(client_request, platform_admin_user):
         'main.user_profile_disable_platform_admin_view',
         _data={'enabled': True},
         _expected_status=302,
-        _expected_redirect=url_for('main.user_profile', _external=True),
+        _expected_redirect=url_for('main.user_profile'),
     )
 
     with client_request.session_transaction() as session:
@@ -607,7 +601,6 @@ def test_should_redirect_after_change_of_security_key_name(
         _expected_status=302,
         _expected_redirect=url_for(
             'main.user_profile_security_keys',
-            _external=True,
         )
     )
 
@@ -640,7 +633,6 @@ def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_
         _expected_status=302,
         _expected_redirect=url_for(
             'main.user_profile_security_keys',
-            _external=True,
         )
     )
 
@@ -709,7 +701,6 @@ def test_delete_security_key(
         key_id=webauthn_credential['id'],
         _expected_redirect=url_for(
             '.user_profile_security_keys',
-            _external=True,
         )
     )
     mock_delete.assert_called_once_with(

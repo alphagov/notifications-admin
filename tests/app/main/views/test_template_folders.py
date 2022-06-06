@@ -563,8 +563,7 @@ def test_can_create_email_template_with_parent_folder(
                         _data=data,
                         _expected_redirect=url_for("main.view_template",
                                                    service_id=SERVICE_ONE_ID,
-                                                   template_id="new%20name",
-                                                   _external=True)
+                                                   template_id="new%20name",)
                         )
     mock_create_service_template.assert_called_once_with(
         data['name'],
@@ -831,8 +830,7 @@ def test_rename_folder(client_request, active_user_with_permissions, service_one
         _data={"name": "new beautiful name", "users_with_permission": []},
         _expected_redirect=url_for("main.choose_template",
                                    service_id=service_one['id'],
-                                   template_folder_id=folder_id,
-                                   _external=True)
+                                   template_folder_id=folder_id,)
     )
 
     mock_update.assert_called_once_with(
@@ -864,8 +862,7 @@ def test_manage_folder_users(
         _data={"name": "new beautiful name", "users_with_permission": []},
         _expected_redirect=url_for("main.choose_template",
                                    service_id=service_one['id'],
-                                   template_folder_id=folder_id,
-                                   _external=True)
+                                   template_folder_id=folder_id,)
     )
 
     mock_update.assert_called_once_with(
@@ -907,8 +904,7 @@ def test_manage_folder_users_doesnt_change_permissions_current_user_cannot_manag
         _data={"name": "new beautiful name", "users_with_permission": []},
         _expected_redirect=url_for("main.choose_template",
                                    service_id=service_one['id'],
-                                   template_folder_id=folder_id,
-                                   _external=True)
+                                   template_folder_id=folder_id,)
     )
 
     mock_update.assert_called_once_with(
@@ -978,7 +974,6 @@ def test_delete_template_folder_should_detect_non_empty_folder_on_get(
             template_type="all",
             service_id=service_one['id'],
             template_folder_id=folder_id,
-            _external=True
         ),
         _expected_status=302
     )
@@ -1007,7 +1002,6 @@ def test_delete_folder(client_request, service_one, mock_get_template_folders, m
             "main.choose_template",
             service_id=service_one['id'],
             template_folder_id=parent_folder_id,
-            _external=True,
         )
     )
 
