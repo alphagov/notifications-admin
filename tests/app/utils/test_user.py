@@ -10,12 +10,10 @@ def _test_permissions(
     client_request,
     usr,
     permissions,
-    will_succeed=True,
     kwargs=None,
 ):
     request.view_args.update({'service_id': 'foo'})
-    if usr:
-        client_request.login(usr)
+    client_request.login(usr)
 
     decorator = user_has_permissions(*permissions, **(kwargs or {}))
     decorated_index = decorator(index)
@@ -24,15 +22,12 @@ def _test_permissions(
 
 def test_user_has_permissions_on_endpoint_fail(
     client_request,
-    mocker,
     mock_get_service,
 ):
-    user = _user_with_permissions()
-    mocker.patch('app.user_api_client.get_user', return_value=user)
     with pytest.raises(Forbidden):
         _test_permissions(
             client_request,
-            user,
+            _user_with_permissions(),
             ['send_messages'],
         )
 
@@ -41,50 +36,39 @@ def test_user_has_permissions_success(
     client_request,
     mocker,
 ):
-    user = _user_with_permissions()
-    mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
         client_request,
-        user,
+        _user_with_permissions(),
         ['manage_service'],
     )
 
 
 def test_user_has_permissions_or(
     client_request,
-    mocker,
 ):
-    user = _user_with_permissions()
-    mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
         client_request,
-        user,
+        _user_with_permissions(),
         ['send_messages', 'manage_service'],
     )
 
 
 def test_user_has_permissions_multiple(
     client_request,
-    mocker,
 ):
-    user = _user_with_permissions()
-    mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
         client_request,
-        user,
+        _user_with_permissions(),
         ['manage_templates', 'manage_service'],
     )
 
 
 def test_exact_permissions(
     client_request,
-    mocker,
 ):
-    user = _user_with_permissions()
-    mocker.patch('app.user_api_client.get_user', return_value=user)
     _test_permissions(
         client_request,
-        user,
+        _user_with_permissions(),
         ['manage_service', 'manage_templates'],
     )
 
@@ -92,9 +76,7 @@ def test_exact_permissions(
 def test_platform_admin_user_can_access_page_that_has_no_permissions(
     client_request,
     platform_admin_user,
-    mocker,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     _test_permissions(
         client_request,
         platform_admin_user,
@@ -105,10 +87,8 @@ def test_platform_admin_user_can_access_page_that_has_no_permissions(
 def test_platform_admin_user_can_not_access_page(
     client_request,
     platform_admin_user,
-    mocker,
     mock_get_service,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     with pytest.raises(Forbidden):
         _test_permissions(
             client_request,
@@ -122,22 +102,18 @@ def test_no_user_returns_redirect_to_sign_in(
     client_request
 ):
     client_request.logout()
-    response = _test_permissions(
-        client_request,
-        None,
-        [],
-    )
+    decorator = user_has_permissions()
+    decorated_index = decorator(index)
+    response = decorated_index()
     assert response.status_code == 302
     assert response.location.startswith('/sign-in?next=')
 
 
 def test_user_has_permissions_for_organisation(
     client_request,
-    mocker,
 ):
     user = _user_with_permissions()
     user['organisations'] = ['org_1', 'org_2']
-    mocker.patch('app.user_api_client.get_user', return_value=user)
     client_request.login(user)
 
     request.view_args = {'org_id': 'org_2'}
@@ -152,10 +128,8 @@ def test_user_has_permissions_for_organisation(
 def test_platform_admin_can_see_orgs_they_dont_have(
     client_request,
     platform_admin_user,
-    mocker,
 ):
     platform_admin_user['organisations'] = []
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     client_request.login(platform_admin_user)
 
     request.view_args = {'org_id': 'org_2'}
@@ -170,9 +144,7 @@ def test_platform_admin_can_see_orgs_they_dont_have(
 def test_cant_use_decorator_without_view_args(
     client_request,
     platform_admin_user,
-    mocker,
 ):
-    mocker.patch('app.user_api_client.get_user', return_value=platform_admin_user)
     client_request.login(platform_admin_user)
 
     request.view_args = {}
@@ -187,11 +159,9 @@ def test_cant_use_decorator_without_view_args(
 
 def test_user_doesnt_have_permissions_for_organisation(
     client_request,
-    mocker,
 ):
     user = _user_with_permissions()
     user['organisations'] = ['org_1', 'org_2']
-    mocker.patch('app.user_api_client.get_user', return_value=user)
     client_request.login(user)
 
     request.view_args = {'org_id': 'org_3'}
@@ -205,11 +175,9 @@ def test_user_doesnt_have_permissions_for_organisation(
 
 
 def test_user_with_no_permissions_to_service_goes_to_templates(
-        client_request,
-        mocker
+    client_request,
 ):
     user = _user_with_permissions()
-    mocker.patch('app.user_api_client.get_user', return_value=user)
     client_request.login(user)
     request.view_args = {'service_id': 'bar'}
 
