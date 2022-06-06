@@ -3,7 +3,6 @@ from flask import request
 from werkzeug.exceptions import Forbidden
 
 from app.utils.user import user_has_permissions
-from tests.conftest import create_user, sample_uuid
 
 
 @pytest.mark.parametrize('permissions', (
@@ -20,14 +19,14 @@ from tests.conftest import create_user, sample_uuid
 def test_permissions(
     client_request,
     permissions,
+    api_user_active,
 ):
     request.view_args.update({'service_id': 'foo'})
-    user = create_user(
-        id=sample_uuid(),
-        permissions={'foo': ['manage_users', 'manage_templates', 'manage_settings']},
-        services=['foo', 'bar'],
-    )
-    client_request.login(user)
+
+    api_user_active['permissions'] = {'foo': ['manage_users', 'manage_templates', 'manage_settings']}
+    api_user_active['services'] = ['foo', 'bar']
+
+    client_request.login(api_user_active)
 
     @user_has_permissions(*permissions)
     def index():
@@ -67,12 +66,10 @@ def test_no_user_returns_redirect_to_sign_in(
 
 def test_user_has_permissions_for_organisation(
     client_request,
+    api_user_active,
 ):
-    user = create_user(
-        id=sample_uuid(),
-        organisations=['org_1', 'org_2'],
-    )
-    client_request.login(user)
+    api_user_active['organisations'] = ['org_1', 'org_2']
+    client_request.login(api_user_active)
 
     request.view_args = {'org_id': 'org_2'}
 
@@ -117,12 +114,10 @@ def test_cant_use_decorator_without_view_args(
 
 def test_user_doesnt_have_permissions_for_organisation(
     client_request,
+    api_user_active,
 ):
-    user = create_user(
-        id=sample_uuid(),
-        organisations=['org_1', 'org_2'],
-    )
-    client_request.login(user)
+    api_user_active['organisations'] = ['org_1', 'org_2']
+    client_request.login(api_user_active)
 
     request.view_args = {'org_id': 'org_3'}
 
@@ -136,13 +131,11 @@ def test_user_doesnt_have_permissions_for_organisation(
 
 def test_user_with_no_permissions_to_service_goes_to_templates(
     client_request,
+    api_user_active,
 ):
-    user = create_user(
-        id=sample_uuid(),
-        permissions={'foo': ['manage_users', 'manage_templates', 'manage_settings']},
-        services=['foo', 'bar'],
-    )
-    client_request.login(user)
+    api_user_active['permissions'] = {'foo': ['manage_users', 'manage_templates', 'manage_settings']}
+    api_user_active['services'] = ['foo', 'bar']
+    client_request.login(api_user_active)
     request.view_args = {'service_id': 'bar'}
 
     @user_has_permissions()
