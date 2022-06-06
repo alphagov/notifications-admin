@@ -4,98 +4,77 @@ from werkzeug.exceptions import Forbidden
 
 from app.main.views.index import index
 from app.utils.user import user_has_permissions
+from tests.conftest import create_platform_admin_user
 
 
-def _test_permissions(
+def _user_with_permissions():
+    user_data = {'id': 999,
+                 'name': 'Test User',
+                 'password': 'somepassword',
+                 'email_address': 'test@user.gov.uk',
+                 'mobile_number': '+4412341234',
+                 'state': 'active',
+                 'failed_login_count': 0,
+                 'permissions': {'foo': ['manage_users', 'manage_templates', 'manage_settings']},
+                 'platform_admin': False,
+                 'organisations': ['org_1', 'org_2'],
+                 'services': ['foo', 'bar'],
+                 'current_session_id': None,
+                 }
+    return user_data
+
+
+@pytest.mark.parametrize('user, permissions, kwargs', (
+    pytest.param(
+        _user_with_permissions(),
+        ['send_messages'],
+        {},
+        marks=pytest.mark.xfail(raises=Forbidden),
+    ),
+    (
+        _user_with_permissions(),
+        ['manage_service'],
+        {},
+    ),
+    (
+        _user_with_permissions(),
+        ['send_messages', 'manage_service'],
+        {},
+    ),
+    (
+        _user_with_permissions(),
+        ['manage_templates', 'manage_service'],
+        {},
+    ),
+    (
+        _user_with_permissions(),
+        ['manage_service', 'manage_templates'],
+        {},
+    ),
+    (
+        create_platform_admin_user(),
+        [],
+        {},
+    ),
+    pytest.param(
+        create_platform_admin_user(),
+        [],
+        {'restrict_admin_usage': True},
+        marks=pytest.mark.xfail(raises=Forbidden),
+    ),
+))
+def test_permissions(
     client_request,
-    usr,
+    user,
     permissions,
-    kwargs=None,
+    kwargs,
 ):
     request.view_args.update({'service_id': 'foo'})
-    client_request.login(usr)
+    client_request.login(user)
 
     decorator = user_has_permissions(*permissions, **(kwargs or {}))
     decorated_index = decorator(index)
-    return decorated_index()
-
-
-def test_user_has_permissions_on_endpoint_fail(
-    client_request,
-    mock_get_service,
-):
-    with pytest.raises(Forbidden):
-        _test_permissions(
-            client_request,
-            _user_with_permissions(),
-            ['send_messages'],
-        )
-
-
-def test_user_has_permissions_success(
-    client_request,
-    mocker,
-):
-    _test_permissions(
-        client_request,
-        _user_with_permissions(),
-        ['manage_service'],
-    )
-
-
-def test_user_has_permissions_or(
-    client_request,
-):
-    _test_permissions(
-        client_request,
-        _user_with_permissions(),
-        ['send_messages', 'manage_service'],
-    )
-
-
-def test_user_has_permissions_multiple(
-    client_request,
-):
-    _test_permissions(
-        client_request,
-        _user_with_permissions(),
-        ['manage_templates', 'manage_service'],
-    )
-
-
-def test_exact_permissions(
-    client_request,
-):
-    _test_permissions(
-        client_request,
-        _user_with_permissions(),
-        ['manage_service', 'manage_templates'],
-    )
-
-
-def test_platform_admin_user_can_access_page_that_has_no_permissions(
-    client_request,
-    platform_admin_user,
-):
-    _test_permissions(
-        client_request,
-        platform_admin_user,
-        [],
-    )
-
-
-def test_platform_admin_user_can_not_access_page(
-    client_request,
-    platform_admin_user,
-    mock_get_service,
-):
-    with pytest.raises(Forbidden):
-        _test_permissions(
-            client_request,
-            platform_admin_user,
-            [],
-            kwargs={'restrict_admin_usage': True},
-        )
+    decorated_index()
 
 
 def test_no_user_returns_redirect_to_sign_in(
@@ -186,20 +165,3 @@ def test_user_with_no_permissions_to_service_goes_to_templates(
         pass
 
     index()
-
-
-def _user_with_permissions():
-    user_data = {'id': 999,
-                 'name': 'Test User',
-                 'password': 'somepassword',
-                 'email_address': 'test@user.gov.uk',
-                 'mobile_number': '+4412341234',
-                 'state': 'active',
-                 'failed_login_count': 0,
-                 'permissions': {'foo': ['manage_users', 'manage_templates', 'manage_settings']},
-                 'platform_admin': False,
-                 'organisations': ['org_1', 'org_2'],
-                 'services': ['foo', 'bar'],
-                 'current_session_id': None,
-                 }
-    return user_data
