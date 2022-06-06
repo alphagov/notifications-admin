@@ -2,7 +2,6 @@ import pytest
 from flask import request
 from werkzeug.exceptions import Forbidden
 
-from app.main.views.index import index
 from app.utils.user import user_has_permissions
 from tests.conftest import create_user, sample_uuid
 
@@ -30,9 +29,11 @@ def test_permissions(
     )
     client_request.login(user)
 
-    decorator = user_has_permissions(*permissions)
-    decorated_index = decorator(index)
-    decorated_index()
+    @user_has_permissions(*permissions)
+    def index():
+        pass
+
+    index()
 
 
 def test_restrict_admin_usage(
@@ -42,20 +43,24 @@ def test_restrict_admin_usage(
     request.view_args.update({'service_id': 'foo'})
     client_request.login(platform_admin_user)
 
-    decorator = user_has_permissions(restrict_admin_usage=True)
-    decorated_index = decorator(index)
+    @user_has_permissions(restrict_admin_usage=True)
+    def index():
+        pass
 
     with pytest.raises(Forbidden):
-        decorated_index()
+        index()
 
 
 def test_no_user_returns_redirect_to_sign_in(
     client_request
 ):
     client_request.logout()
-    decorator = user_has_permissions()
-    decorated_index = decorator(index)
-    response = decorated_index()
+
+    @user_has_permissions()
+    def index():
+        pass
+
+    response = index()
     assert response.status_code == 302
     assert response.location.startswith('/sign-in?next=')
 
