@@ -1,6 +1,6 @@
 import pytest
 from flask import request
-from werkzeug.exceptions import Forbidden, Unauthorized
+from werkzeug.exceptions import Forbidden
 
 from app.main.views.index import index
 from app.utils.user import user_has_permissions
@@ -30,7 +30,7 @@ def _test_permissions(
                 response.status_code == 302
             ):
                 pytest.fail("Failed to throw a forbidden or unauthorised exception")
-        except (Forbidden, Unauthorized):
+        except Forbidden:
             pass
 
 
