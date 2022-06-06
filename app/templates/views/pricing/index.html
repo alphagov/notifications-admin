@@ -197,7 +197,7 @@
 
     <div id="international-pricing" class="bottom-gutter-3-2">
       {% call mapping_table(
-        caption='Letter pricing',
+        caption='International text message rates',
         field_headings=['Country code', 'Country', 'Cost multiplier'],
         field_headings_visible=True,
         caption_visible=False
@@ -213,10 +213,16 @@
             {{ text_field('{}&hairsp;&times;'.format(billable_units)|safe) }}
           {% endcall %}
         {% endfor %}
+
+        {% call row() %}
+          {{ text_field('+882') }}
+          {% call field() %}Worldwide{% endcall %}
+          {{ text_field('Not supported') }}
+        {% endcall %}
       {% endcall %}
     </div>
-
   {% endset %}
+
   {{ govukDetails({
     "summaryText": "International text message rates",
     "html": smsIntRates
