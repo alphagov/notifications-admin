@@ -4,7 +4,7 @@ from werkzeug.exceptions import Forbidden
 
 from app.main.views.index import index
 from app.utils.user import user_has_permissions
-from tests.conftest import create_platform_admin_user, create_user, sample_uuid
+from tests.conftest import create_user, sample_uuid
 
 _user_with_permissions = create_user(
     id=sample_uuid(),
@@ -13,57 +13,41 @@ _user_with_permissions = create_user(
 )
 
 
-@pytest.mark.parametrize('user, permissions, kwargs', (
+@pytest.mark.parametrize('permissions', (
     pytest.param(
-        _user_with_permissions,
         ['send_messages'],
-        {},
         marks=pytest.mark.xfail(raises=Forbidden),
     ),
-    (
-        _user_with_permissions,
-        ['manage_service'],
-        {},
-    ),
-    (
-        _user_with_permissions,
-        ['send_messages', 'manage_service'],
-        {},
-    ),
-    (
-        _user_with_permissions,
-        ['manage_templates', 'manage_service'],
-        {},
-    ),
-    (
-        _user_with_permissions,
-        ['manage_service', 'manage_templates'],
-        {},
-    ),
-    (
-        _user_with_permissions,
-        [],
-        {},
-    ),
-    pytest.param(
-        create_platform_admin_user(),
-        [],
-        {'restrict_admin_usage': True},
-        marks=pytest.mark.xfail(raises=Forbidden),
-    ),
+    ['manage_service'],
+    ['send_messages', 'manage_service'],
+    ['manage_templates', 'manage_service'],
+    ['manage_service', 'manage_templates'],
+    [],
 ))
 def test_permissions(
     client_request,
-    user,
     permissions,
-    kwargs,
 ):
     request.view_args.update({'service_id': 'foo'})
-    client_request.login(user)
+    client_request.login(_user_with_permissions)
 
-    decorator = user_has_permissions(*permissions, **(kwargs or {}))
+    decorator = user_has_permissions(*permissions)
     decorated_index = decorator(index)
     decorated_index()
+
+
+def test_restrict_admin_usage(
+    client_request,
+    platform_admin_user,
+):
+    request.view_args.update({'service_id': 'foo'})
+    client_request.login(platform_admin_user)
+
+    decorator = user_has_permissions(restrict_admin_usage=True)
+    decorated_index = decorator(index)
+
+    with pytest.raises(Forbidden):
+        decorated_index()
 
 
 def test_no_user_returns_redirect_to_sign_in(
