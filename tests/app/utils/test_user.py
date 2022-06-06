@@ -6,12 +6,6 @@ from app.main.views.index import index
 from app.utils.user import user_has_permissions
 from tests.conftest import create_user, sample_uuid
 
-_user_with_permissions = create_user(
-    id=sample_uuid(),
-    permissions={'foo': ['manage_users', 'manage_templates', 'manage_settings']},
-    services=['foo', 'bar'],
-)
-
 
 @pytest.mark.parametrize('permissions', (
     pytest.param(
@@ -29,7 +23,12 @@ def test_permissions(
     permissions,
 ):
     request.view_args.update({'service_id': 'foo'})
-    client_request.login(_user_with_permissions)
+    user = create_user(
+        id=sample_uuid(),
+        permissions={'foo': ['manage_users', 'manage_templates', 'manage_settings']},
+        services=['foo', 'bar'],
+    )
+    client_request.login(user)
 
     decorator = user_has_permissions(*permissions)
     decorated_index = decorator(index)
@@ -133,7 +132,12 @@ def test_user_doesnt_have_permissions_for_organisation(
 def test_user_with_no_permissions_to_service_goes_to_templates(
     client_request,
 ):
-    client_request.login(_user_with_permissions)
+    user = create_user(
+        id=sample_uuid(),
+        permissions={'foo': ['manage_users', 'manage_templates', 'manage_settings']},
+        services=['foo', 'bar'],
+    )
+    client_request.login(user)
     request.view_args = {'service_id': 'bar'}
 
     @user_has_permissions()
