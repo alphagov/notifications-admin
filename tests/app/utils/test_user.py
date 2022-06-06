@@ -6,15 +6,25 @@ from app.utils.user import user_has_permissions
 
 
 @pytest.mark.parametrize('permissions', (
-    pytest.param(
-        ['send_messages'],
-        marks=pytest.mark.xfail(raises=Forbidden),
-    ),
-    ['manage_service'],
-    ['send_messages', 'manage_service'],
-    ['manage_templates', 'manage_service'],
-    ['manage_service', 'manage_templates'],
-    [],
+    pytest.param([
+        # Route has a permission which the user doesn’t have
+        'send_messages'
+    ], marks=pytest.mark.xfail(raises=Forbidden)),
+    [
+        # Route has one of the permissions which the user has
+        'manage_service'
+    ],
+    [
+        # Route has more than one of the permissions which the user has
+        'manage_templates', 'manage_service'
+    ],
+    [
+        # Route has one of the permissions which the user has, and one they do not
+        'manage_service', 'send_messages',
+    ],
+    [
+        # Route has no specific permissions required
+    ],
 ))
 def test_permissions(
     client_request,
