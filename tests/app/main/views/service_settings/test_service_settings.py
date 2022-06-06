@@ -36,6 +36,7 @@ from tests.conftest import (
     create_platform_admin_user,
     create_reply_to_email_address,
     create_sms_sender,
+    create_template,
     normalize_spaces,
 )
 
@@ -837,20 +838,6 @@ def test_should_check_if_estimated_volumes_provided(
 
 
 @pytest.mark.parametrize((
-    'count_of_users_with_manage_service,'
-    'count_of_invites_with_manage_service,'
-    'expected_user_checklist_item'
-), [
-    (1, 0, 'Add a team member who can manage settings, team and usage Not completed'),
-    (2, 0, 'Add a team member who can manage settings, team and usage Completed'),
-    (1, 1, 'Add a team member who can manage settings, team and usage Completed'),
-])
-@pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
-    (0, 'Add templates with examples of the content you plan to send Not completed'),
-    (1, 'Add templates with examples of the content you plan to send Completed'),
-    (2, 'Add templates with examples of the content you plan to send Completed'),
-])
-@pytest.mark.parametrize((
     'volume_email,'
     'count_of_email_templates,'
     'reply_to_email_addresses,'
@@ -865,6 +852,66 @@ def test_should_check_if_estimated_volumes_provided(
     (1, 0, [], 'Add a reply-to email address Not completed'),
     (1, 0, [{}], 'Add a reply-to email address Completed'),
 ])
+def test_should_check_for_reply_to_on_go_live(
+    client_request,
+    mocker,
+    service_one,
+    fake_uuid,
+    single_sms_sender,
+    volume_email,
+    count_of_email_templates,
+    reply_to_email_addresses,
+    expected_reply_to_checklist_item,
+    mock_get_invites_for_service,
+    mock_get_users_by_service,
+):
+    mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [
+            create_template(template_type='email')
+            for _ in range(0, count_of_email_templates)
+        ]}
+    )
+
+    mock_get_reply_to_email_addresses = mocker.patch(
+        'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
+        return_value=reply_to_email_addresses
+    )
+
+    for channel, volume in (('email', volume_email), ('sms', 0), ('letter', 1)):
+        mocker.patch(
+            'app.models.service.Service.volume_{}'.format(channel),
+            create=True,
+            new_callable=PropertyMock,
+            return_value=volume,
+        )
+
+    page = client_request.get(
+        'main.request_to_go_live', service_id=SERVICE_ONE_ID
+    )
+    assert page.h1.text == 'Before you request to go live'
+
+    checklist_items = page.select('.task-list .task-list-item')
+    assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
+
+    if count_of_email_templates:
+        mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize((
+    'count_of_users_with_manage_service,'
+    'count_of_invites_with_manage_service,'
+    'expected_user_checklist_item'
+), [
+    (1, 0, 'Add a team member who can manage settings, team and usage Not completed'),
+    (2, 0, 'Add a team member who can manage settings, team and usage Completed'),
+    (1, 1, 'Add a team member who can manage settings, team and usage Completed'),
+])
+@pytest.mark.parametrize('count_of_templates, expected_templates_checklist_item', [
+    (0, 'Add templates with examples of the content you plan to send Not completed'),
+    (1, 'Add templates with examples of the content you plan to send Completed'),
+    (2, 'Add templates with examples of the content you plan to send Completed'),
+])
 def test_should_check_for_sending_things_right(
     client_request,
     mocker,
@@ -876,19 +923,18 @@ def test_should_check_for_sending_things_right(
     expected_user_checklist_item,
     count_of_templates,
     expected_templates_checklist_item,
-    volume_email,
-    count_of_email_templates,
-    reply_to_email_addresses,
-    expected_reply_to_checklist_item,
     active_user_with_permissions,
     active_user_no_settings_permission,
+    single_reply_to_email_address,
 ):
-    def _templates_by_type(template_type):
-        return {
-            'email': list(range(0, count_of_email_templates)),
-            'sms': [],
-        }.get(template_type)
-    active_user_with_permissions,
+    mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [
+            create_template(template_type='sms')
+            for _ in range(0, count_of_templates)
+        ]}
+    )
+
     mock_get_users = mocker.patch(
         'app.models.user.Users.client_method',
         return_value=(
@@ -917,35 +963,6 @@ def test_should_check_for_sending_things_right(
         )
     )
 
-    mock_templates = mocker.patch(
-        'app.models.service.Service.all_templates',
-        new_callable=PropertyMock,
-        return_value=list(range(0, count_of_templates)),
-    )
-
-    mocker.patch(
-        'app.models.service.Service.get_templates',
-        side_effect=_templates_by_type,
-    )
-    mocker.patch(
-        'app.models.service.Service.organisation_id',
-        new_callable=PropertyMock,
-        return_value=None,
-    )
-
-    mock_get_reply_to_email_addresses = mocker.patch(
-        'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
-        return_value=reply_to_email_addresses
-    )
-
-    for channel, volume in (('email', volume_email), ('sms', 0), ('letter', 1)):
-        mocker.patch(
-            'app.models.service.Service.volume_{}'.format(channel),
-            create=True,
-            new_callable=PropertyMock,
-            return_value=volume,
-        )
-
     page = client_request.get(
         'main.request_to_go_live', service_id=SERVICE_ONE_ID
     )
@@ -954,14 +971,9 @@ def test_should_check_for_sending_things_right(
     checklist_items = page.select('.task-list .task-list-item')
     assert normalize_spaces(checklist_items[1].text) == expected_user_checklist_item
     assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
-    assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
 
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
     mock_get_invites.assert_called_once_with(SERVICE_ONE_ID)
-    assert mock_templates.called is True
-
-    if count_of_email_templates:
-        mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
 
 
 @pytest.mark.parametrize('checklist_completed, agreement_signed, expected_button', (
@@ -1149,33 +1161,22 @@ def test_should_check_for_sms_sender_on_go_live(
 ):
     service_one['organisation_type'] = organisation_type
 
-    def _templates_by_type(template_type):
-        return list(range(0, {
-            'email': 0,
-            'sms': count_of_sms_templates,
-        }.get(template_type, count_of_sms_templates)))
+    mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [
+            create_template(template_type='sms')
+            for _ in range(0, count_of_sms_templates)
+        ]}
+    )
 
     mocker.patch(
         'app.models.service.Service.has_team_members',
         return_value=True,
     )
-    mock_templates = mocker.patch(
-        'app.models.service.Service.all_templates',
-        new_callable=PropertyMock,
-        side_effect=partial(_templates_by_type, 'all'),
-    )
-    mocker.patch(
-        'app.models.service.Service.get_templates',
-        side_effect=_templates_by_type,
-    )
 
     mock_get_sms_senders = mocker.patch(
         'app.main.views.service_settings.service_api_client.get_sms_senders',
         return_value=sms_senders,
-    )
-    mocker.patch(
-        'app.main.views.service_settings.service_api_client.get_reply_to_email_addresses',
-        return_value=[],
     )
 
     for channel, volume in (('email', 0), ('sms', estimated_sms_volume)):
@@ -1193,8 +1194,6 @@ def test_should_check_for_sms_sender_on_go_live(
 
     checklist_items = page.select('.task-list .task-list-item')
     assert normalize_spaces(checklist_items[3].text) == expected_sms_sender_checklist_item
-
-    assert mock_templates.called is True
 
     mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
 

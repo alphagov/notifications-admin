@@ -6,7 +6,7 @@ from app.models.organisation import Organisation
 from app.models.service import Service
 from app.models.user import User
 from tests import organisation_json, service_json
-from tests.conftest import ORGANISATION_ID
+from tests.conftest import ORGANISATION_ID, create_folder, create_template
 
 INV_PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
 INV_CHILD_1_FOLDER_ID = '92ee1ee0-e4ee-4dcc-b1a7-a5da9ebcfa2b'
@@ -265,3 +265,23 @@ def test_service_billing_details(purchase_order_number, expected_result):
     service = Service(service_json(purchase_order_number=purchase_order_number))
     service._dict['purchase_order_number'] = purchase_order_number
     assert service.billing_details == expected_result
+
+
+def test_has_templates_of_type_includes_folders(
+    mocker,
+    service_one,
+    mock_get_template_folders,
+):
+    mocker.patch(
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [create_template(
+            folder='something', template_type='sms'
+        )]}
+    )
+
+    mocker.patch(
+        'app.template_folder_api_client.get_template_folders',
+        return_value=[create_folder(id='something')]
+    )
+
+    assert Service(service_one).has_templates_of_type('sms')

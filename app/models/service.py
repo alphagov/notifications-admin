@@ -284,13 +284,19 @@ class Service(JSONModel, SortByNameMixin):
             ))
         )
 
+    def has_templates_of_type(self, template_type):
+        return any(
+            template for template in self.all_templates
+            if template['template_type'] == template_type
+        )
+
     @property
     def has_email_templates(self):
-        return len(self.get_templates('email')) > 0
+        return self.has_templates_of_type('email')
 
     @property
     def has_sms_templates(self):
-        return len(self.get_templates('sms')) > 0
+        return self.has_templates_of_type('sms')
 
     @property
     def intending_to_send_email(self):

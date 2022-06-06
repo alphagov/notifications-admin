@@ -3982,6 +3982,14 @@ def create_notifications(
     )
 
 
+def create_folder(id):
+    return {
+        'id': id,
+        'parent_id': None,
+        'name': 'My folder'
+    }
+
+
 def create_template(
     service_id=SERVICE_ONE_ID,
     template_id=None,
@@ -3990,7 +3998,8 @@ def create_template(
     content='Template content',
     subject='Template subject',
     redact_personalisation=False,
-    postage=None
+    postage=None,
+    folder=None
 ):
     return template_json(
         service_id=service_id,
@@ -4001,6 +4010,7 @@ def create_template(
         subject=subject,
         redact_personalisation=redact_personalisation,
         postage=postage,
+        folder=folder,
     )
 
 
