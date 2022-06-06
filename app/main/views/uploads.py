@@ -22,7 +22,7 @@ from notifications_utils.pdf import pdf_page_count
 from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.sanitise_text import SanitiseASCII
-from PyPDF2.utils import PdfReadError
+from PyPDF2.errors import PdfReadError
 from requests import RequestException
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError

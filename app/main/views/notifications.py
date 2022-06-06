@@ -24,7 +24,7 @@ from notifications_utils.letter_timings import (
     letter_can_be_cancelled,
 )
 from notifications_utils.pdf import pdf_page_count
-from PyPDF2.utils import PdfReadError
+from PyPDF2.errors import PdfReadError
 
 from app import (
     current_service,
