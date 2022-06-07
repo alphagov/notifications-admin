@@ -96,34 +96,7 @@ def test_template_list_yields_folders_visible_to_user(
     )
 
 
-def test_template_list_folder_yields_user_folders_when_user_id_passed_in(
-    notify_admin,
-    mock_get_template_folders,
-    mock_get_service_templates,
-    service_one,
-    active_user_with_permissions,
-    mocker
-):
-    mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
-    service = Service(service_one)
-    user = User(active_user_with_permissions)
-
-    second_parent = next(
-        result for result in TemplateList(service=service, user=user)
-        if result.id == VIS_PARENT_FOLDER_ID
-    )
-
-    result_folder_names = tuple(
-        result['name'] for result in second_parent.folders
-    )
-
-    assert result_folder_names == (
-        "2's Visible child",
-        ["2's Invisible child", "2's Visible grandchild"],
-    )
-
-
-def test_template_list_folder_yields_all_folders_when_user_id_not_passed_in(
+def test_template_list_yields_all_folders_without_user(
     mock_get_template_folders,
     mock_get_service_templates,
     service_one,
@@ -133,16 +106,20 @@ def test_template_list_folder_yields_all_folders_when_user_id_not_passed_in(
     mock_get_template_folders.return_value = _get_all_folders(active_user_with_permissions)
     service = Service(service_one)
 
-    second_parent = next(
-        result for result in TemplateList(service=service)
-        if result.id == VIS_PARENT_FOLDER_ID
-    )
-
     result_folder_names = tuple(
-        result['name'] for result in second_parent.folders
+        result.name for result in
+        TemplateList(service=service)
+        if result.is_folder
     )
 
     assert result_folder_names == (
+        "Invisible folder",
+        "Parent 1 - invisible",
+        "1's Invisible child",
+        "1's Visible grandchild",
+        "1's Visible child",
+        "Parent 2 - visible",
         "2's Invisible child",
+        "2's Visible grandchild",
         "2's Visible child",
     )
