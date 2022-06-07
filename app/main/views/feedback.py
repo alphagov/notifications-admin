@@ -114,17 +114,10 @@ def feedback(ticket_type):
     if form.validate_on_submit():
         user_email = form.email_address.data
         user_name = form.name.data or None
-        if current_service:
-            service_string = 'Service: "{name}"\n{url}\n'.format(
-                name=current_service.name,
-                url=url_for('main.service_dashboard', service_id=current_service.id)
-            )
-        else:
-            service_string = ''
 
-        feedback_msg = '{}\n{}'.format(
-            form.feedback.data,
-            service_string,
+        feedback_msg = render_template(
+            'support-tickets/support-ticket.txt',
+            content=form.feedback.data,
         )
 
         ticket = NotifySupportTicket(
