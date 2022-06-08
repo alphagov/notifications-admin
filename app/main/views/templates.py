@@ -104,8 +104,12 @@ def choose_template(service_id, template_type='all', template_folder_id=None):
 
     template_list = TemplateList(current_service, template_type, template_folder_id, current_user)
 
+    all_template_folders = [
+        item.folder for item in TemplateList(service=current_service, user=current_user) if item.is_folder
+    ]
+
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
-        all_template_folders=current_service.get_user_template_folders(current_user),
+        all_template_folders=all_template_folders,
         template_list=template_list,
         template_type=template_type,
         available_template_types=current_service.available_template_types,
@@ -470,10 +474,9 @@ def manage_template_folder(service_id, template_folder_id):
 @user_has_permissions('manage_templates')
 def delete_template_folder(service_id, template_folder_id):
     template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
+    template_list = TemplateList(service=current_service, template_folder_id=template_folder_id)
 
-    if len(current_service.get_template_folders_and_templates(
-        template_type="all", template_folder_id=template_folder_id
-    )) > 0:
+    if not template_list.folder_is_empty:
         flash("You must empty this folder before you can delete it", 'info')
         return redirect(
             url_for(

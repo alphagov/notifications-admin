@@ -13,6 +13,7 @@ from tests.conftest import (
     create_active_caseworking_user,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
+    create_template,
     normalize_spaces,
 )
 
@@ -916,17 +917,17 @@ def test_manage_folder_users_doesnt_change_permissions_current_user_cannot_manag
 
 
 def test_delete_template_folder_should_request_confirmation(
-    client_request, service_one, mock_get_template_folders, mocker,
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    mocker,
+    mock_get_service_templates_when_no_templates_exist,
 ):
     mocker.patch('app.models.service.Service.active_users', [])
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.side_effect = [[
         _folder('sacrifice', folder_id, None),
     ], []]
-    mocker.patch(
-        'app.models.service.Service.get_templates',
-        return_value=[],
-    )
     page = client_request.get(
         'main.delete_template_folder', service_id=service_one['id'],
         template_folder_id=folder_id,
@@ -954,17 +955,19 @@ def test_delete_template_folder_should_request_confirmation(
 
 
 def test_delete_template_folder_should_detect_non_empty_folder_on_get(
-    client_request, service_one, mock_get_template_folders, mocker
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    mocker
 ):
     folder_id = str(uuid.uuid4())
-    template_id = str(uuid.uuid4())
     mock_get_template_folders.side_effect = [
         [_folder("can't touch me", folder_id, None)],
         []
     ]
     mocker.patch(
-        'app.models.service.Service.get_templates',
-        return_value=[{'id': template_id, 'name': 'template'}],
+        'app.service_api_client.get_service_templates',
+        return_value={'data': [create_template(folder=folder_id)]}
     )
     client_request.get(
         'main.delete_template_folder', service_id=service_one['id'],
@@ -983,16 +986,19 @@ def test_delete_template_folder_should_detect_non_empty_folder_on_get(
     None,
     PARENT_FOLDER_ID,
 ))
-def test_delete_folder(client_request, service_one, mock_get_template_folders, mocker, parent_folder_id):
+def test_delete_folder(
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    mocker,
+    parent_folder_id,
+    mock_get_service_templates_when_no_templates_exist,
+):
     mock_delete = mocker.patch('app.template_folder_api_client.delete_template_folder')
     folder_id = str(uuid.uuid4())
     mock_get_template_folders.side_effect = [[
         _folder('sacrifice', folder_id, parent_folder_id),
     ], []]
-    mocker.patch(
-        'app.models.service.Service.get_templates',
-        return_value=[],
-    )
 
     client_request.post(
         'main.delete_template_folder',
