@@ -4,6 +4,23 @@ from app import format_notification_type
 
 
 class TemplateList():
+    """
+    Represents a list of all templates and folders for a service,
+    with optional filtering by "template_type", and by an ancestor
+    template_folder_id i.e. only return templates and folders that
+    are somewhere inside the specified folder.
+
+    This is used in several places:
+
+    - On the "Templates" page to show whether a folder is totally
+    empty or has other types of template in it.
+
+    - On the "Delete template" page to check whether a folder is
+    totally empty before deleting it.
+
+    Subclasses of this class are also used in several places - see
+    comments on those classes for more details.
+    """
 
     def __init__(
         self,
@@ -117,6 +134,23 @@ class TemplateList():
 
 
 class UserTemplateList(TemplateList):
+    """
+    Represents a filtered list of templates and folders for a
+    service based on which folders the specified user has access
+    to. See the comment on "all_template_folders".
+
+    This is used in several places:
+
+    - On the "Templates" page. We render all the templates and
+    folders to support JS search, hiding nested items with CSS.
+
+    - On the "Templates" page, we also use "all_template_folders"
+    to render the list of folders to move a template to.
+
+    - On the SMS reply-to page. We render all the templates and
+    folders to support JS search, hiding nested items with CSS.
+    """
+
     def __init__(self, user, **kwargs):
         self.user = user
         super().__init__(**kwargs)
@@ -176,6 +210,14 @@ class UserTemplateList(TemplateList):
 
 
 class ServiceTemplateList(UserTemplateList):
+    """
+    Represents a list of templates and folders for a service,
+    with the service itself returned first in the iterable as
+    a "fake" folder - a TemplateListService.
+
+    This is used exclusively by the UserTemplateLists class.
+    """
+
     def __iter__(self):
         template_list_service = TemplateListService(
             self.service,
@@ -199,6 +241,13 @@ class ServiceTemplateList(UserTemplateList):
 
 
 class UserTemplateLists():
+    """
+    Represents one or more lists of templates and folders
+    for each service a user has access to.
+
+    This is used exclusively on the "Copy template" page.
+    """
+
     def __init__(self, user):
         self.services = sorted(
             user.services,
