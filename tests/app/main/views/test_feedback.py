@@ -237,6 +237,7 @@ def test_passes_user_details_through_flow(
         url_for(
             'main.service_dashboard',
             service_id=SERVICE_ONE_ID,
+            _external=True,
         ),
         ''
     ])

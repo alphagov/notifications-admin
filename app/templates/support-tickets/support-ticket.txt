@@ -1,0 +1,5 @@
+{{ content }}
+{% if current_service -%}
+Service: "{{ current_service.name }}"
+{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+{% endif %}
