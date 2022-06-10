@@ -59,5 +59,9 @@
     "rollup-plugin-node-resolve": "5.2.0",
     "sass": "1.32.7",
     "streamqueue": "1.1.2"
+  },
+  "overrides": {
+    "minimist": "1.2.6",
+    "lodash.template": "4.5.0"
   }
 }
