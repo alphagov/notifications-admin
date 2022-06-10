@@ -10,7 +10,7 @@
       'trackingId': config.trackingId,
       'cookieDomain': config.cookieDomain,
       'cookieExpires': config.expires * 24 * 60 * 60,
-      'cookieFlags': 'Secure',
+      'cookieFlags': 'Secure; SameSite=Lax',
     });
 
     window.ga('set', 'anonymizeIp', config.anonymizeIp);
