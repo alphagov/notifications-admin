@@ -163,6 +163,9 @@ class UserTemplateList(TemplateList):
 
         return [
             template for template in self.service.all_templates
+            # Check if each template is in a folder the user has
+            # access to. If it's not in a folder ("None"), then
+            # it's at the top level and all users have access.
             if template['folder'] in (all_folder_ids + [None])
         ]
 
@@ -213,7 +216,10 @@ class ServiceTemplateList(UserTemplateList):
     """
     Represents a list of templates and folders for a service,
     with the service itself returned first in the iterable as
-    a "fake" folder - a TemplateListService.
+    a "fake" folder - a TemplateListService. As this inherits
+    from UserTemplateList, the list of templates and folders
+    is filtered based on which folders the specified user has
+    access to.
 
     This is used exclusively by the UserTemplateLists class.
     """
