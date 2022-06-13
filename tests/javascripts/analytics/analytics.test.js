@@ -48,7 +48,9 @@ describe("Analytics", () => {
 
       setUpArguments = window.ga.mock.calls;
 
-      expect(setUpArguments[0]).toEqual(['create', { 'trackingId': 'UA-75215134-1', 'cookieDomain': 'auto', 'cookieExpires': 31536000 }]);
+      expect(setUpArguments[0]).toEqual(['create', {
+       'trackingId': 'UA-75215134-1', 'cookieDomain': 'auto', 'cookieExpires': 31536000, "cookieFlags": "Secure; SameSite=Lax",
+      }]);
       expect(setUpArguments[1]).toEqual(['set', 'anonymizeIp', true]);
       expect(setUpArguments[2]).toEqual(['set', 'allowAdFeatures', false]);
       expect(setUpArguments[3]).toEqual(['set', 'transport', 'beacon']);
