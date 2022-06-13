@@ -119,7 +119,7 @@ markupsafe==2.1.1
     # via
     #   jinja2
     #   wtforms
-mistune==0.8.4
+mistune==2.0.2
     # via notifications-utils
 notifications-python-client==6.3.0
     # via -r requirements.in
