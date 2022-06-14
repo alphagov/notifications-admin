@@ -1192,8 +1192,19 @@ def email_branding_request(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/pool", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def email_branding_pool_option(service_id):
+    chosen_branding_id = request.args.get('branding_option')
+    chosen_branding_name = [
+        branding['name'] for branding in current_service.email_branding_pool if branding["id"] == chosen_branding_id
+    ][0]
+    if request.method == 'POST':
+        current_service.update(email_branding=chosen_branding_id)
+
+        flash('You’ve updated your email branding', 'default')
+        return redirect(url_for('.service_settings', service_id=current_service.id))
     return render_template(
         'views/service-settings/branding/email-branding-pool-option.html',
+        chosen_branding_id=chosen_branding_id,
+        chosen_branding_name=chosen_branding_name
     )
 
 

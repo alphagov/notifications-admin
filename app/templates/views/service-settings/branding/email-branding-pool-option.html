@@ -1,10 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "withnav_template.html" %}
+{% from "components/radios.html" import radio %}
+{% from "components/select-input.html" import select_wrapper %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/branding-preview.html" import email_branding_preview %}
 
-</body>
-</html>
+{% block service_page_title %}
+  Change email branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('.email_branding_request', service_id=current_service.id)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Change email branding') }}
+
+  <p class="govuk-body">
+    If you confirm, your emails will come with {{ chosen_branding_name }} branding.
+  </p>
+
+  {{ email_branding_preview(chosen_branding_id) }}
+
+
+  {% call form_wrapper() %}
+    {{ page_footer('Change email branding') }}
+  {% endcall %}
+
+{% endblock %}
