@@ -1166,7 +1166,7 @@ def email_branding_request(service_id):
 
         branding_choice = form.options.data
 
-        if branding_choice in [branding['name'] for branding in current_service.email_branding_pool]:
+        if branding_choice in [branding['id'] for branding in current_service.email_branding_pool]:
             return redirect(
                 url_for(
                     '.email_branding_pool_option',
@@ -1176,11 +1176,11 @@ def email_branding_request(service_id):
             )
         else:
             return redirect(
-            url_for(
-                f'.email_branding_{branding_choice}',
-                service_id=current_service.id,
+                url_for(
+                    f'.email_branding_{branding_choice}',
+                    service_id=current_service.id,
+                )
             )
-        )
 
     return render_template(
         'views/service-settings/branding/email-branding-options.html',

@@ -62,19 +62,19 @@ def test_email_branding_request_page_when_no_branding_is_set(
 @pytest.mark.parametrize('organisation_type, expected_options', (
     ('nhs_central', [
         ('nhs', 'NHS'),
-        ('email_branding_name_1', 'Email branding text 1'),
-        ('email_branding_name_2', 'Email branding text 2'),
+        ('email-branding-1-id', 'Email branding name 1'),
+        ('email-branding-2-id', 'Email branding name 2'),
         ('something_else', 'Something else'),
     ]),
     ('central', [
         ('govuk', 'GOV.UK'),
-        ('email_branding_name_1', 'Email branding text 1'),
-        ('email_branding_name_2', 'Email branding text 2'),
+        ('email-branding-1-id', 'Email branding name 1'),
+        ('email-branding-2-id', 'Email branding name 2'),
         ('something_else', 'Something else'),
     ]),
     ('other', [
-        ('email_branding_name_1', 'Email branding text 1'),
-        ('email_branding_name_2', 'Email branding text 2'),
+        ('email-branding-1-id', 'Email branding name 1'),
+        ('email-branding-2-id', 'Email branding name 2'),
         ('something_else', 'Something else'),
     ])
 ))
@@ -124,16 +124,28 @@ def test_email_branding_request_redirects_to_branding_preview_for_a_branding_poo
     client_request.post(
         '.email_branding_request',
         service_id=SERVICE_ONE_ID,
-        _data={'options': 'email_branding_name_1'},
+        _data={'options': 'email-branding-1-id'},
         _expected_status=302,
         _expected_redirect=url_for(
             'main.email_branding_pool_option',
             service_id=SERVICE_ONE_ID,
-            branding_option="email_branding_name_1",
-            _external=True
+            branding_option='email-branding-1-id',
         )
     )
 
+
+def test_email_branding_pool_option_page_displays_preview_of_chosen_branding(
+    service_one,
+    client_request,
+    mock_get_email_branding_pool
+):
+
+    page = client_request.get(
+        '.email_branding_pool_option', service_id=SERVICE_ONE_ID,
+        branding_option='email-branding-1-id'
+        )
+
+    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='email-branding-1-id')
 
 
 def test_email_branding_request_page_shows_branding_if_set(

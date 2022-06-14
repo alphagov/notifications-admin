@@ -2607,17 +2607,17 @@ def create_email_branding_pool(non_standard_values=None):
     branding_pool = [
         {
             'logo': 'example_1.png',
-            'name': 'email_branding_name_1',
+            'name': 'Email branding name 1',
             'text': 'Email branding text 1',
-            'id': uuid4(),
+            'id': 'email-branding-1-id',
             'colour': '#f00',
             'brand_type': 'org',
         },
         {
             'logo': 'example_2.png',
-            'name': 'email_branding_name_2',
+            'name': 'Email branding name 2',
             'text': 'Email branding text 2',
-            'id': uuid4(),
+            'id': 'email-branding-2-id',
             'colour': '#f00',
             'brand_type': 'org',
         }
