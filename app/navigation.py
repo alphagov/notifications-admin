@@ -229,6 +229,7 @@ class MainNavigation(Navigation):
             'email_branding_govuk_and_org',
             'email_branding_nhs',
             'email_branding_organisation',
+            'email_branding_pool_option',
             'email_branding_request',
             'email_branding_something_else',
             'estimate_usage',

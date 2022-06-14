@@ -1163,9 +1163,21 @@ def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
     branding_name = current_service.email_branding_name
     if form.validate_on_submit():
-        return redirect(
+
+        branding_choice = form.options.data
+
+        if branding_choice in [branding['name'] for branding in current_service.email_branding_pool]:
+            return redirect(
+                url_for(
+                    '.email_branding_pool_option',
+                    service_id=current_service.id,
+                    branding_option=branding_choice
+                )
+            )
+        else:
+            return redirect(
             url_for(
-                f'.email_branding_{form.options.data}',
+                f'.email_branding_{branding_choice}',
                 service_id=current_service.id,
             )
         )
@@ -1174,6 +1186,14 @@ def email_branding_request(service_id):
         'views/service-settings/branding/email-branding-options.html',
         form=form,
         branding_name=branding_name,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/pool", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def email_branding_pool_option(service_id):
+    return render_template(
+        'views/service-settings/branding/email-branding-pool-option.html',
     )
 
 

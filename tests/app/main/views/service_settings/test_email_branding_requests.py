@@ -108,6 +108,34 @@ def test_email_branding_request_page_shows_branding_pool_options_if_branding_poo
     ] == expected_options
 
 
+def test_email_branding_request_redirects_to_branding_preview_for_a_branding_pool_option(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    mock_get_email_branding_pool
+):
+    mocker.patch(
+        'app.models.service.Service.email_branding_id',
+        new_callable=PropertyMock,
+        return_value='some-random-branding',
+    )
+
+    client_request.post(
+        '.email_branding_request',
+        service_id=SERVICE_ONE_ID,
+        _data={'options': 'email_branding_name_1'},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.email_branding_pool_option',
+            service_id=SERVICE_ONE_ID,
+            branding_option="email_branding_name_1",
+            _external=True
+        )
+    )
+
+
+
 def test_email_branding_request_page_shows_branding_if_set(
     mocker,
     service_one,
