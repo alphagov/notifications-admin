@@ -4,50 +4,74 @@ from app import format_notification_type
 
 
 class TemplateList():
+    """
+    Represents a list of all templates and folders for a service,
+    with optional filtering by "template_type", and by an ancestor
+    template_folder_id i.e. only return templates and folders that
+    are somewhere inside the specified folder.
+
+    This is used in several places:
+
+    - On the "Templates" page to show whether a folder is totally
+    empty or has other types of template in it.
+
+    - On the "Delete template" page to check whether a folder is
+    totally empty before deleting it.
+
+    Subclasses of this class are also used in several places - see
+    comments on those classes for more details.
+    """
 
     def __init__(
         self,
+        *,
         service,
         template_type='all',
         template_folder_id=None,
-        user=None,
     ):
         self.service = service
         self.template_type = template_type
         self.template_folder_id = template_folder_id
-        self.user = user
 
     def __iter__(self):
         yield from self.items
 
     @cached_property
     def items(self):
-        return list(self.get_templates_and_folders(
+        return list(self._get_templates_and_folders(
             self.template_type, self.template_folder_id, ancestors=[]
         ))
 
-    def get_templates_and_folders(self, template_type, template_folder_id, ancestors):
+    @property
+    def all_template_folders(self):
+        return self.service.all_template_folders
 
-        for item in self.get_template_folders(
+    @property
+    def all_templates(self):
+        return self.service.all_templates
+
+    def _get_templates_and_folders(self, template_type, template_folder_id, ancestors):
+
+        for item in self._get_template_folders(
             template_type, template_folder_id,
         ):
             yield TemplateListFolder(
                 item,
-                folders=self.get_template_folders(
+                folders=self._get_template_folders(
                     template_type, item['id'],
                 ),
-                templates=self.get_templates(
+                templates=self._get_templates(
                     template_type, item['id']
                 ),
                 ancestors=ancestors,
                 service_id=self.service.id,
             )
-            for sub_item in self.get_templates_and_folders(
+            for sub_item in self._get_templates_and_folders(
                 template_type, item['id'], ancestors + [item]
             ):
                 yield sub_item
 
-        for item in self.get_templates(
+        for item in self._get_templates(
             template_type, template_folder_id,
         ):
             yield TemplateListTemplate(
@@ -56,24 +80,97 @@ class TemplateList():
                 service_id=self.service.id,
             )
 
-    def get_templates(self, template_type='all', template_folder_id=None):
-        if self.user and template_folder_id:
-            folder = self.service.get_template_folder(template_folder_id)
-            if not self.user.has_template_folder_permission(folder):
-                return []
-
-        if isinstance(template_type, str):
-            template_type = [template_type]
+    def _get_templates(self, template_type, template_folder_id):
         if template_folder_id:
             template_folder_id = str(template_folder_id)
+
         return [
-            template for template in self.service.all_templates
-            if (set(template_type) & {'all', template['template_type']})
+            template for template in self.all_templates
+            if (set([template_type]) & {'all', template['template_type']})
             and template.get('folder') == template_folder_id
         ]
 
+    def _get_template_folders(self, template_type, parent_folder_id):
+        if parent_folder_id:
+            parent_folder_id = str(parent_folder_id)
+
+        return [
+            folder for folder in self.all_template_folders
+            if (
+                folder['parent_id'] == parent_folder_id
+                and self._is_folder_visible(folder['id'], template_type)
+            )
+        ]
+
+    def _is_folder_visible(self, template_folder_id, template_type):
+
+        if template_type == 'all':
+            return True
+
+        if self._get_templates(template_type, template_folder_id):
+            return True
+
+        if any(
+            self._is_folder_visible(child_folder['id'], template_type)
+            for child_folder in self._get_template_folders(template_type, template_folder_id)
+        ):
+            return True
+
+        return False
+
+    @property
+    def as_id_and_name(self):
+        return [(item.id, item.name) for item in self]
+
+    @property
+    def templates_to_show(self):
+        return any(self)
+
+    @property
+    def folder_is_empty(self):
+        return not any(self._get_templates_and_folders(
+            'all', self.template_folder_id, []
+        ))
+
+
+class UserTemplateList(TemplateList):
+    """
+    Represents a filtered list of templates and folders for a
+    service based on which folders the specified user has access
+    to. See the comment on "all_template_folders".
+
+    This is used in several places:
+
+    - On the "Templates" page. We render all the templates and
+    folders to support JS search, hiding nested items with CSS.
+
+    - On the "Templates" page, we also use "all_template_folders"
+    to render the list of folders to move a template to.
+
+    - On the SMS reply-to page. We render all the templates and
+    folders to support JS search, hiding nested items with CSS.
+    """
+
+    def __init__(self, user, **kwargs):
+        self.user = user
+        super().__init__(**kwargs)
+
     @cached_property
-    def user_template_folders(self):
+    def all_templates(self):
+        all_folder_ids = [
+            folder['id'] for folder in self.all_template_folders
+        ]
+
+        return [
+            template for template in self.service.all_templates
+            # Check if each template is in a folder the user has
+            # access to. If it's not in a folder ("None"), then
+            # it's at the top level and all users have access.
+            if template['folder'] in (all_folder_ids + [None])
+        ]
+
+    @cached_property
+    def all_template_folders(self):
         """Returns a modified list of folders a user has permission to view
 
         For each folder, we do the following:
@@ -114,75 +211,48 @@ class TemplateList():
                 user_folders.append(folder_attrs)
         return user_folders
 
-    def get_template_folders(self, template_type='all', parent_folder_id=None):
-        if self.user:
-            folders = self.user_template_folders
-        else:
-            folders = self.service.all_template_folders
-        if parent_folder_id:
-            parent_folder_id = str(parent_folder_id)
 
-        return [
-            folder for folder in folders
-            if (
-                folder['parent_id'] == parent_folder_id
-                and self.is_folder_visible(folder['id'], template_type)
-            )
-        ]
+class ServiceTemplateList(UserTemplateList):
+    """
+    Represents a list of templates and folders for a service,
+    with the service itself returned first in the iterable as
+    a "fake" folder - a TemplateListService. As this inherits
+    from UserTemplateList, the list of templates and folders
+    is filtered based on which folders the specified user has
+    access to.
 
-    def is_folder_visible(self, template_folder_id, template_type='all'):
+    This is used exclusively by the UserTemplateLists class.
+    """
 
-        if template_type == 'all':
-            return True
-
-        if self.get_templates(template_type, template_folder_id):
-            return True
-
-        if any(
-            self.is_folder_visible(child_folder['id'], template_type)
-            for child_folder in self.get_template_folders(template_type, template_folder_id)
-        ):
-            return True
-
-        return False
-
-    @property
-    def as_id_and_name(self):
-        return [(item.id, item.name) for item in self]
-
-    @property
-    def templates_to_show(self):
-        return any(self)
-
-    @property
-    def folder_is_empty(self):
-        return not any(self.get_templates_and_folders(
-            'all', self.template_folder_id, []
-        ))
-
-
-class ServiceTemplateList(TemplateList):
     def __iter__(self):
         template_list_service = TemplateListService(
             self.service,
-            templates=self.get_templates(
+            templates=self._get_templates(
+                template_type='all',
                 template_folder_id=None,
             ),
-            folders=self.get_template_folders(
+            folders=self._get_template_folders(
+                template_type='all',
                 parent_folder_id=None,
             ),
         )
 
         yield template_list_service
 
-        yield from self.get_templates_and_folders(
+        yield from self._get_templates_and_folders(
             self.template_type,
             self.template_folder_id,
             ancestors=[template_list_service]
         )
 
 
-class TemplateLists():
+class UserTemplateLists():
+    """
+    Represents one or more lists of templates and folders
+    for each service a user has access to.
+
+    This is used exclusively on the "Copy template" page.
+    """
 
     def __init__(self, user):
         self.services = sorted(
@@ -193,7 +263,7 @@ class TemplateLists():
 
     def __iter__(self):
         if len(self.services) == 1:
-            yield from TemplateList(
+            yield from UserTemplateList(
                 service=self.services[0],
                 user=self.user,
             )
@@ -262,7 +332,6 @@ class TemplateListFolder(TemplateListItem):
         service_id,
     ):
         super().__init__(folder, ancestors)
-        self.folder = folder
         self.service_id = service_id
         self.number_of_templates = len(templates)
         self.number_of_folders = len(folders)

@@ -3,7 +3,7 @@ import uuid
 import pytest
 
 from app.models.service import Service
-from app.models.template_list import TemplateList
+from app.models.template_list import TemplateList, UserTemplateList
 from app.models.user import User
 
 INV_PARENT_FOLDER_ID = '7e979e79-d970-43a5-ac69-b625a8d147b0'
@@ -86,7 +86,7 @@ def test_template_list_yields_folders_visible_to_user(
 
     result_folder_names = tuple(
         result.name for result in
-        TemplateList(service=service, user=user)
+        UserTemplateList(service=service, user=user)
         if result.is_folder
     )
 

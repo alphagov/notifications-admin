@@ -37,7 +37,11 @@ from app.main.forms import (
 )
 from app.main.views.send import get_sender_details
 from app.models.service import Service
-from app.models.template_list import TemplateList, TemplateLists
+from app.models.template_list import (
+    TemplateList,
+    UserTemplateList,
+    UserTemplateLists,
+)
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import NOTIFICATION_TYPES, should_skip_template_page
 from app.utils.templates import get_template
@@ -99,14 +103,19 @@ def view_template(service_id, template_id):
 @user_has_permissions()
 def choose_template(service_id, template_type='all', template_folder_id=None):
     template_folder = current_service.get_template_folder(template_folder_id)
-
     user_has_template_folder_permission = current_user.has_template_folder_permission(template_folder)
 
-    template_list = TemplateList(current_service, template_type, template_folder_id, current_user)
+    template_list = UserTemplateList(
+        service=current_service,
+        template_type=template_type,
+        template_folder_id=template_folder_id,
+        user=current_user
+    )
 
-    all_template_folders = [
-        item.folder for item in TemplateList(service=current_service, user=current_user) if item.is_folder
-    ]
+    all_template_folders = UserTemplateList(
+        service=current_service,
+        user=current_user
+    ).all_template_folders
 
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
         all_template_folders=all_template_folders,
@@ -344,8 +353,8 @@ def choose_template_to_copy(
 
         return render_template(
             'views/templates/copy.html',
-            services_templates_and_folders=TemplateList(
-                service,
+            services_templates_and_folders=UserTemplateList(
+                service=service,
                 template_folder_id=from_folder,
                 user=current_user
             ),
@@ -357,7 +366,7 @@ def choose_template_to_copy(
     else:
         return render_template(
             'views/templates/copy.html',
-            services_templates_and_folders=TemplateLists(current_user),
+            services_templates_and_folders=UserTemplateLists(current_user),
             search_form=SearchTemplatesForm(current_service.api_keys),
         )
 
