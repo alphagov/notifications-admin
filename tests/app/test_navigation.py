@@ -27,6 +27,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'api_integration',
     'api_keys',
     'approve_broadcast_message',
+    'archive_organisation',
     'archive_service',
     'archive_user',
     'bat_phone',

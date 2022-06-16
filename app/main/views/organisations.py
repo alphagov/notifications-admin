@@ -596,6 +596,32 @@ def edit_organisation_billing_details(org_id):
     )
 
 
+@main.route("/organisations/<uuid:org_id>/settings/archive", methods=['GET', 'POST'])
+@user_is_platform_admin
+def archive_organisation(org_id):
+    if not current_organisation.active:
+        abort(403)
+
+    if request.method == 'POST':
+        try:
+            organisations_client.archive_organisation(org_id)
+        except HTTPError as e:
+            if e.status_code == 400 and ('team members' in e.message or 'services' in e.message):
+                flash(e.message)
+                return organisation_settings(org_id)
+            else:
+                raise e
+
+        flash(f'‘{current_organisation.name}’ was deleted', 'default_with_tick')
+        return redirect(url_for('.choose_account'))
+
+    flash(
+        f'Are you sure you want to delete ‘{current_organisation.name}’? There’s no way to undo this.',
+        'delete',
+    )
+    return organisation_settings(org_id)
+
+
 @main.route("/organisations/<uuid:org_id>/billing")
 @user_is_platform_admin
 def organisation_billing(org_id):

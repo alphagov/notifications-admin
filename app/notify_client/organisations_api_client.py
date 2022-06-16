@@ -86,5 +86,15 @@ class OrganisationsClient(NotifyAdminAPIClient):
             params={"year": str(year)}
         )
 
+    @cache.delete('organisations')
+    @cache.delete('domains')
+    def archive_organisation(self, org_id):
+        redis_client.delete(f'organisation-{org_id}-name')
+
+        return self.post(
+            url=f"/organisations/{org_id}/archive",
+            data=None,
+        )
+
 
 organisations_client = OrganisationsClient()

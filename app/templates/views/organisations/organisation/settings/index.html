@@ -133,5 +133,14 @@
         }}
       {% endcall %}
     {% endcall %}
+    {% if current_org.active %}
+      <p class="top-gutter-1-2">
+        <span class="page-footer-link page-footer-delete-link-without-button">
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('.archive_organisation', org_id=current_org.id) }}">
+            Delete this organisation
+          </a>
+        </span>
+      </p>
+    {% endif %}
   </div>
 {% endblock %}
