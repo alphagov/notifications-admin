@@ -340,32 +340,24 @@ def choose_template_to_copy(
     from_service=None,
     from_folder=None,
 ):
+    service = None
 
     if from_service:
-
         current_user.belongs_to_service_or_403(from_service)
+
         service = Service(
             service_api_client.get_service(from_service)['data']
         )
 
-        return render_template(
-            'views/templates/copy.html',
-            copy_template_presenter=UserTemplateList(
-                service=service,
-                template_folder_id=from_folder,
-                user=current_user
-            ),
-            template_folder_path=service.get_template_folder_path(from_folder),
-            from_service=service,
-            search_form=SearchTemplatesForm(current_service.api_keys),
-        )
-
-    else:
-        return render_template(
-            'views/templates/copy.html',
-            copy_template_presenter=presenters.CopyTemplate(current_user),
-            search_form=SearchTemplatesForm(current_service.api_keys),
-        )
+    return render_template(
+        'views/templates/copy.html',
+        copy_template_presenter=presenters.CopyTemplate(
+            user=current_user,
+            template_folder_id=from_folder,
+            service=service
+        ),
+        search_form=SearchTemplatesForm(current_service.api_keys),
+    )
 
 
 @main.route("/services/<uuid:service_id>/templates/copy/<uuid:template_id>", methods=['GET', 'POST'])

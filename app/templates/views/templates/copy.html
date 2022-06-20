@@ -12,7 +12,12 @@
 
     <div class="bottom-gutter-1-2">
       <h1 class="heading-large">{{ page_title }}</h1>
-      {{ copy_folder_path(template_folder_path, current_service.id, from_service, current_user) }}
+      {{ copy_folder_path(
+          copy_template_presenter.template_folder_path,
+          current_service.id,
+          copy_template_presenter.service,
+          current_user
+      ) }}
     </div>
     {% if not copy_template_presenter.templates_to_show %}
       <p class="template-list-empty">

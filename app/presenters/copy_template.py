@@ -6,23 +6,43 @@ class CopyTemplate:
     Represents one or more lists of templates and folders
     for each service a user has access to.
     """
-    def __init__(self, user):
-        self.services = sorted(
-            user.services,
-            key=lambda service: service.name.lower(),
-        )
+    def __init__(
+        self,
+        user,
+        template_folder_id=None,
+        service=None,
+    ):
+        self.service = service
         self.user = user
+        self.template_folder_id = template_folder_id
+
+    @property
+    def template_folder_path(self):
+        return self.service.get_template_folder_path(self.template_folder_id)
 
     @property
     def items(self):
-        if len(self.services) == 1:
+        if self.service:
             yield from UserTemplateList(
-                service=self.services[0],
+                service=self.service,
+                user=self.user,
+                template_folder_id=self.template_folder_id
+            )
+            return
+
+        services = sorted(
+            self.user.services,
+            key=lambda service: service.name.lower(),
+        )
+
+        if len(services) == 1:
+            yield from UserTemplateList(
+                service=services[0],
                 user=self.user,
             )
             return
 
-        for service in self.services:
+        for service in services:
             yield from _ServiceTemplateList(
                 service=service,
                 user=self.user,
@@ -30,7 +50,7 @@ class CopyTemplate:
 
     @property
     def templates_to_show(self):
-        return bool(self.services)
+        return bool(self.user.services)
 
 
 class _ServiceTemplateList(UserTemplateList):
