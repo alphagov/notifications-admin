@@ -14,7 +14,7 @@
       <h1 class="heading-large">{{ page_title }}</h1>
       {{ copy_folder_path(template_folder_path, current_service.id, from_service, current_user) }}
     </div>
-    {% if not services_templates_and_folders.templates_to_show %}
+    {% if not copy_template_presenter.templates_to_show %}
       <p class="template-list-empty">
         This folder is empty
       </p>
@@ -27,7 +27,7 @@
       ) }}
       <nav id="template-list">
         <ul>
-        {% for item in services_templates_and_folders %}
+        {% for item in copy_template_presenter.items %}
           <li class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
             {% for ancestor in item.ancestors %}
               {% if ancestor.is_service %}

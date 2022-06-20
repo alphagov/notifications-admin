@@ -18,6 +18,7 @@ from app import (
     current_service,
     format_delta,
     nl2br,
+    presenters,
     service_api_client,
     template_folder_api_client,
     template_statistics_client,
@@ -37,11 +38,7 @@ from app.main.forms import (
 )
 from app.main.views.send import get_sender_details
 from app.models.service import Service
-from app.models.template_list import (
-    TemplateList,
-    UserTemplateList,
-    UserTemplateLists,
-)
+from app.models.template_list import TemplateList, UserTemplateList
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import NOTIFICATION_TYPES, should_skip_template_page
 from app.utils.templates import get_template
@@ -353,7 +350,7 @@ def choose_template_to_copy(
 
         return render_template(
             'views/templates/copy.html',
-            services_templates_and_folders=UserTemplateList(
+            copy_template_presenter=UserTemplateList(
                 service=service,
                 template_folder_id=from_folder,
                 user=current_user
@@ -366,7 +363,7 @@ def choose_template_to_copy(
     else:
         return render_template(
             'views/templates/copy.html',
-            services_templates_and_folders=UserTemplateLists(current_user),
+            copy_template_presenter=presenters.CopyTemplate(current_user),
             search_form=SearchTemplatesForm(current_service.api_keys),
         )
 
