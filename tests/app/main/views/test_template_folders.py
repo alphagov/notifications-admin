@@ -357,7 +357,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             [],
             [],
             [],
-            'This folder is empty',
+            'There are no text message templates in this folder',
         ),
         (
             'folder_two – Templates – service one – GOV.UK Notify',
@@ -1671,7 +1671,7 @@ def test_show_custom_error_message(
             {'template_folder_id': CHILD_FOLDER_ID, 'template_type': 'sms'},
             [],
             [],
-            'This folder is empty',
+            'There are no text message templates in this folder',
         ),
     ]
 )

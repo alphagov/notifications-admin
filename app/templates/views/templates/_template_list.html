@@ -14,10 +14,10 @@
 
 {% if template_list.template_folder_id and not template_list.templates_to_show %}
   <p class="template-list-empty">
-    {% if template_list.folder_is_empty %}
-      This folder is empty
-    {% else %}
+    {% if template_list.template_type != 'all' %}
       There are no {{ 1|message_count_label(template_type, suffix='') }} templates in this folder
+    {% else %}
+      This folder is empty
     {% endif %}
   </p>
 {% else %}
