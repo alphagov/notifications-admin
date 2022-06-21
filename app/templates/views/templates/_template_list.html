@@ -21,7 +21,7 @@
     {% endif %}
   </p>
 {% else %}
-  <nav id="template-list" class="{{ 'govuk-!-margin-top-1' if (not show_template_nav and not show_search_box) else 'govuk-!-margin-top-6' }}">
+  <div id="template-list" class="{{ 'govuk-!-margin-top-1' if (not show_template_nav and not show_search_box) else 'govuk-!-margin-top-6' }}">
     {% set checkboxes_data = [] %}
 
     {% if not current_user.has_permissions('manage_templates') %}
@@ -99,5 +99,5 @@
         "formGroup": False
       }) }}
     {% endif %}
-  </nav>
+  </div>
 {% endif %}
