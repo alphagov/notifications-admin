@@ -148,6 +148,31 @@ def test_email_branding_pool_option_page_displays_preview_of_chosen_branding(
     assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='email-branding-1-id')
 
 
+def test_email_branding_pool_option_changes_email_branding_when_user_confirms(
+    mocker,
+    service_one,
+    client_request,
+    no_reply_to_email_addresses,
+    single_sms_sender,
+    mock_get_email_branding_pool,
+    mock_update_service
+):
+
+    page = client_request.post(
+        '.email_branding_pool_option',
+        service_id=SERVICE_ONE_ID,
+        branding_option='email-branding-1-id',
+        _follow_redirects=True,
+    )
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        email_branding='email-branding-1-id',
+    )
+    assert page.h1.text == 'Settings'
+    assert normalize_spaces(page.select_one('.banner-default').text) == 'You’ve updated your email branding'
+
+
 def test_email_branding_request_page_shows_branding_if_set(
     mocker,
     service_one,
