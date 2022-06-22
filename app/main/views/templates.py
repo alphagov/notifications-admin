@@ -397,6 +397,7 @@ def copy_template(service_id, template_id):
         template=template,
         heading_action='Add',
         services=current_user.service_ids,
+        back_link='#',  # TODO: broken
     )
 
 
@@ -574,6 +575,11 @@ def add_service_template(service_id, template_type, template_folder_id=None):
         template_type=template_type,
         template_folder_id=template_folder_id,
         heading_action='New',
+        back_link=url_for(
+            'main.choose_template',
+            service_id=current_service.id,
+            template_folder_id=template_folder_id
+        )
     )
 
 
@@ -657,6 +663,11 @@ def edit_service_template(service_id, template_id):
             form=form,
             template=template,
             heading_action='Edit',
+            back_link=url_for(
+                'main.view_template',
+                service_id=current_service.id,
+                template_id=template['id']
+            )
         )
 
 

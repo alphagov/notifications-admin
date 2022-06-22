@@ -489,6 +489,13 @@ def test_should_show_page_for_one_template(
         template_id=template_id,
     )
 
+    back_link = page.select_one('.govuk-back-link')
+    assert back_link['href'] == url_for(
+        'main.view_template',
+        service_id=SERVICE_ONE_ID,
+        template_id=template_id,
+    )
+
     assert page.select_one('input[type=text]')['value'] == "Two week reminder"
     assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in str(
         page.select_one('textarea')
@@ -2308,7 +2315,7 @@ def test_route_invalid_permissions(
     ('sms', 'New text message template'),
     ('broadcast', 'New template'),
 ))
-def test_add_template_page_title(
+def test_add_template_page_furniture(
     client_request,
     service_one,
     template_type,
@@ -2321,6 +2328,13 @@ def test_add_template_page_title(
         template_type=template_type,
     )
     assert normalize_spaces(page.select_one('h1').text) == expected
+
+    back_link = page.select_one('.govuk-back-link')
+    assert back_link['href'] == url_for(
+        'main.choose_template',
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=None
+    )
 
 
 def test_can_create_email_template_with_emoji(
