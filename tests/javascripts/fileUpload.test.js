@@ -62,15 +62,14 @@ describe('File upload', () => {
 
   });
 
-  test("An 'upload' button should be added and the existing form contents hidden", () => {
+  test("An 'upload' button should be added", () => {
 
     // start module
     window.GOVUK.modules.start();
 
     expect(form.querySelector('button[type=button]')).not.toBeNull();
-    expect(uploadLabel.hasAttribute('hidden')).toBe(true);
-    expect(uploadControl.hasAttribute('hidden')).toBe(true);
-    expect(uploadSubmit.hasAttribute('hidden')).toBe(true);
+
+    // Note: the existing form controls are also hidden but this is through CSS so out of scope
 
   });
 

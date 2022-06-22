@@ -42,11 +42,8 @@
       this.$form = $(component);
       this.$field = this.$form.find('.file-upload-field');
 
-      // Hide all controls except the button, semantically and visually
-      // These elements are also hidden in their CSS to override any use of the display style
-      this.$form.find('.file-upload-label, .file-upload-submit')
-                .add(this.$field)
-                .attr('hidden', "");
+      // Note: label.file-upload-label, input.file-upload-field and button.file-upload-submit
+      // are all hidden by CSS that uses the .js-enabled class on the body tag
 
       this.addFakeButton();
 
