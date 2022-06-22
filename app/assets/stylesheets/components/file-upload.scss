@@ -16,7 +16,7 @@
     margin-bottom: 10px;
   }
 
-  // Only show a button added by JS if JS is available
+  // Hide normal upload form if we're adding a custom version with JS
   .js-enabled &-label,
   .js-enabled &-field,
   .js-enabled &-submit {
