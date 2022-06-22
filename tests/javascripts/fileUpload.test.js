@@ -80,30 +80,28 @@ describe('File upload', () => {
     We can't simulate the user choosing a file so we test the behaviours resulting from the click
     and onchange events.
   */
-  test("If the 'upload' button is clicked, it should click the file upload control", () => {
+  describe("If the 'upload' button is clicked", () => {
 
-    // start module
-    window.GOVUK.modules.start();
-
-    var fileUploadClickCallback = jest.fn(() => {});
-    uploadControl.addEventListener('click', fileUploadClickCallback);
-
-    helpers.triggerEvent(form.querySelector('button[type=button]'), 'click');
-
-    expect(fileUploadClickCallback).toHaveBeenCalled();
-
-  });
-
-  describe("If the state of the upload form control changes (from clicking the 'upload' button)", () => {
+    var fileUploadClickCallback;
 
     beforeEach(() => {
 
+      fileUploadClickCallback = jest.fn(() => {});
       form.submit = jest.fn(() => {});
 
       // start module
       window.GOVUK.modules.start();
 
+      uploadControl.addEventListener('click', fileUploadClickCallback);
+
+      helpers.triggerEvent(form.querySelector('button[type=button]'), 'click');
       helpers.triggerEvent(uploadControl, 'change', { eventInit: { bubbles: true } });
+
+    });
+
+    test("It should click the file upload control", () => {
+
+      expect(fileUploadClickCallback).toHaveBeenCalled();
 
     });
 
