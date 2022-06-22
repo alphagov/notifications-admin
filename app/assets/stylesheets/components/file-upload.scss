@@ -1,15 +1,17 @@
 .file-upload {
 
-  &-label {
+  &-label,
+  &-button-label {
 
     @include bold-19;
     display: block;
     margin: 0 0 10px 0;
 
-    .error-message {
-      padding: 0;
-    }
+  }
 
+  &-label .error-message,
+  &-button-label.error-message {
+    padding: 0;
   }
 
   &-field {

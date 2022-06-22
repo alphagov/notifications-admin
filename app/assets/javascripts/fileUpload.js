@@ -28,19 +28,33 @@
 
     // Add a button that passes a click to the input[type=file]
     this.addFakeButton = function () {
-      $(
-        '<button type="button" class="govuk-button govuk-!-margin-right-1">' +
-          this.$field.data('buttonText') +
-        '</button>'
-      )
+      var buttonHTMLStr = `
+        <button type="button" class="govuk-button govuk-!-margin-right-1" id="file-upload-button">
+          ${this.$field.data('buttonText')}
+        </button>`;
+
+      // If errors with the upload, copy into a label above the button
+      // Buttons don't need labels by default as the accessible name comes from their text but
+      // errors need to be added to that. A label will do that, and keeps the current visual style
+      if (this.$fieldErrors.length > 0) {
+        buttonHTMLStr = `
+          <label class="file-upload-button-label error-message" for="file-upload-button">
+            ${this.$fieldErrors.eq(0).text()}
+          </label>
+          ${buttonHTMLStr}`;
+      }
+
+      $(buttonHTMLStr)
       .on('click', e => this.$field.click())
       .insertAfter(this.$field);
+
     };
 
     this.start = function(component) {
 
       this.$form = $(component);
       this.$field = this.$form.find('.file-upload-field');
+      this.$fieldErrors = this.$form.find('.file-upload-label .error-message');
 
       // Note: label.file-upload-label, input.file-upload-field and button.file-upload-submit
       // are all hidden by CSS that uses the .js-enabled class on the body tag
