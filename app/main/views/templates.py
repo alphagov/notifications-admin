@@ -391,13 +391,27 @@ def copy_template(service_id, template_id):
     template['name'] = _get_template_copy_name(template, current_service.all_templates)
     form = form_objects[template['template_type']](**template)
 
+    if template['folder']:
+        back_link = url_for(
+            '.choose_template_to_copy',
+            service_id=current_service.id,
+            from_service=from_service,
+            from_folder=template['folder'],
+        )
+    else:
+        back_link = url_for(
+            '.choose_template_to_copy',
+            service_id=current_service.id,
+            from_service=from_service,
+        )
+
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
         form=form,
         template=template,
         heading_action='Add',
         services=current_user.service_ids,
-        back_link='#',  # TODO: broken
+        back_link=back_link,
     )
 
 

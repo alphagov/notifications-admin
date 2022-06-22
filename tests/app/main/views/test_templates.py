@@ -1517,6 +1517,13 @@ def test_load_edit_template_with_copy_of_template(
         from_service=SERVICE_TWO_ID,
     )
 
+    back_link = page.select_one('.govuk-back-link')
+    assert back_link['href'] == url_for(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+    )
+
     assert page.select_one('form')['method'] == 'post'
 
     assert page.select_one('input')['value'] == (
@@ -1560,6 +1567,14 @@ def test_copy_template_loads_template_from_within_subfolder(
         service_id=SERVICE_ONE_ID,
         template_id=TEMPLATE_ONE_ID,
         from_service=SERVICE_TWO_ID,
+    )
+
+    back_link = page.select_one('.govuk-back-link')
+    assert back_link['href'] == url_for(
+        'main.choose_template_to_copy',
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+        from_folder=PARENT_FOLDER_ID,
     )
 
     assert page.select_one('input')['value'] == 'foo (copy)'
