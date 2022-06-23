@@ -73,6 +73,24 @@ describe('File upload', () => {
 
   });
 
+  test("If the page loads with validation errors, they should be added to the 'upload' button", () => {
+
+    var buttonLabel;
+
+    uploadLabel.innerHTML += '<span class="error-message">PNG images only!</span>';
+
+    // start module
+    window.GOVUK.modules.start();
+
+    buttonLabel = form.querySelector('label.file-upload-button-label');
+
+    expect(buttonLabel).not.toBeNull();
+
+    // The button's label should include its existing text and the validation errors added together
+    expect(buttonLabel.textContent.trim().replace(/\s{2,}/g, ' ')).toEqual("Upload logo PNG images only!");
+
+  });
+
   /*
     The file is selected by a click event on the input[type=file] control and the user choosing
     a file from the OS dialog this opens. This creates an onchange event we use to submit the form.
