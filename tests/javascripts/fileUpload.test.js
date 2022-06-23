@@ -94,7 +94,10 @@ describe('File upload', () => {
 
       uploadControl.addEventListener('click', fileUploadClickCallback);
 
+      // click the 'upload' button
       helpers.triggerEvent(form.querySelector('button[type=button]'), 'click');
+
+      // fake the 'onchange' event triggered in browsers by selection of a file
       helpers.triggerEvent(uploadControl, 'change', { eventInit: { bubbles: true } });
 
     });
