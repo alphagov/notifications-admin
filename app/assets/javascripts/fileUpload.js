@@ -35,7 +35,7 @@
 
       // If errors with the upload, copy into a label above the button
       // Buttons don't need labels by default as the accessible name comes from their text but
-      // errors need to be added to that. A label will do that, and keeps the current visual style
+      // errors need to be added to that.
       if (this.$fieldErrors.length > 0) {
         buttonHTMLStr = `
           <label class="file-upload-button-label error-message" for="file-upload-button">
