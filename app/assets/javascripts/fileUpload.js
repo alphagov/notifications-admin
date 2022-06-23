@@ -28,9 +28,10 @@
 
     // Add a button that passes a click to the input[type=file]
     this.addFakeButton = function () {
+      var buttonText = this.$field.data('buttonText');
       var buttonHTMLStr = `
         <button type="button" class="govuk-button govuk-!-margin-right-1" id="file-upload-button">
-          ${this.$field.data('buttonText')}
+          ${buttonText}
         </button>`;
 
       // If errors with the upload, copy into a label above the button
@@ -39,6 +40,7 @@
       if (this.$fieldErrors.length > 0) {
         buttonHTMLStr = `
           <label class="file-upload-button-label error-message" for="file-upload-button">
+            <span class="govuk-visually-hidden">${buttonText} </span>
             ${this.$fieldErrors.eq(0).text()}
           </label>
           ${buttonHTMLStr}`;
