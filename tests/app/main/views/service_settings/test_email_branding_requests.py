@@ -59,6 +59,55 @@ def test_email_branding_request_page_when_no_branding_is_set(
     assert button_text == 'Continue'
 
 
+@pytest.mark.parametrize('organisation_type, expected_options', (
+    ('nhs_central', [
+        ('nhs', 'NHS'),
+        ('email_branding_name_1', 'Email branding text 1'),
+        ('email_branding_name_2', 'Email branding text 2'),
+        ('something_else', 'Something else'),
+    ]),
+    ('central', [
+        ('govuk', 'GOV.UK'),
+        ('email_branding_name_1', 'Email branding text 1'),
+        ('email_branding_name_2', 'Email branding text 2'),
+        ('something_else', 'Something else'),
+    ]),
+    ('other', [
+        ('email_branding_name_1', 'Email branding text 1'),
+        ('email_branding_name_2', 'Email branding text 2'),
+        ('something_else', 'Something else'),
+    ])
+))
+def test_email_branding_request_page_shows_branding_pool_options_if_branding_pool_set_for_org(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    mock_get_email_branding_pool,
+    organisation_type,
+    expected_options
+):
+
+    service_one['organisation_type'] = organisation_type
+    mocker.patch(
+        'app.models.service.Service.email_branding_id',
+        new_callable=PropertyMock,
+        return_value='some-random-branding',
+    )
+
+    page = client_request.get(
+        '.email_branding_request', service_id=SERVICE_ONE_ID
+    )
+
+    assert [
+        (
+            radio['value'],
+            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
+        )
+        for radio in page.select('input[type=radio]')
+    ] == expected_options
+
+
 def test_email_branding_request_page_shows_branding_if_set(
     mocker,
     service_one,

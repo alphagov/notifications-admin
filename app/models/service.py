@@ -620,6 +620,10 @@ class Service(JSONModel, SortByNameMixin):
     def contact_lists(self):
         return ContactLists(self.id)
 
+    @property
+    def email_branding_pool(self):
+        return organisations_client.get_email_branding_pool(self.organisation_id)
+
 
 class Services(SerialisedModelCollection):
     model = Service
