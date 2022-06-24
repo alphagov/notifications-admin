@@ -90,7 +90,6 @@ def service_settings(service_id):
     return render_template(
         'views/service-settings.html',
         service_permissions=PLATFORM_ADMIN_SERVICE_PERMISSIONS,
-        email_branding_options=ChooseEmailBrandingForm(current_service)
     )
 
 
@@ -1161,6 +1160,8 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
 @user_has_permissions('manage_service')
 def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
+    if form.something_else_is_only_option:
+        return redirect(url_for('.email_branding_something_else', service_id=current_service.id))
     branding_name = current_service.email_branding_name
     if form.validate_on_submit():
 
