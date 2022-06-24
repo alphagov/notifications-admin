@@ -21,6 +21,7 @@ from tests.conftest import create_email_branding
 def test_get_choices_service_not_assigned_to_org(
     service_one,
     function,
+    mock_get_empty_email_branding_pool,
     org_type,
     expected_options,
 ):
@@ -60,6 +61,7 @@ def test_get_email_choices_service_assigned_to_org(
     org_type,
     branding_id,
     expected_options,
+    mock_get_empty_email_branding_pool,
     mock_get_service_organisation,
     mock_get_email_branding
 ):
@@ -97,6 +99,7 @@ def test_get_email_choices_org_has_default_branding(
     org_type,
     branding_id,
     expected_options,
+    mock_get_empty_email_branding_pool,
     mock_get_service_organisation,
     mock_get_email_branding
 ):
@@ -135,6 +138,7 @@ def test_get_email_choices_branding_name_in_use(
     service_one,
     branding_name,
     expected_options,
+    mock_get_empty_email_branding_pool,
     mock_get_service_organisation,
 ):
     service = Service(service_one)
