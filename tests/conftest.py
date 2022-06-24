@@ -2640,6 +2640,16 @@ def mock_get_email_branding_pool(mocker):
 
 
 @pytest.fixture(scope='function')
+def mock_get_empty_email_branding_pool(mocker):
+    def _get_email_branding_pool(org_id):
+        return []
+
+    return mocker.patch(
+        'app.organisations_client.get_email_branding_pool', side_effect=_get_email_branding_pool
+    )
+
+
+@pytest.fixture(scope='function')
 def mock_get_email_branding(mocker, fake_uuid):
     def _get_email_branding(id):
         return create_email_branding(fake_uuid)

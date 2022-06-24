@@ -11,26 +11,16 @@ from tests import sample_uuid
 from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, normalize_spaces
 
 
-@pytest.mark.parametrize('organisation_type, expected_options', (
-    ('nhs_central', [
-        ('nhs', 'NHS'),
-        ('something_else', 'Something else'),
-    ]),
-    ('other', [
-        ('something_else', 'Something else'),
-    ])
-))
 def test_email_branding_request_page_when_no_branding_is_set(
     service_one,
     client_request,
     mocker,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
-    organisation_type,
-    expected_options,
 ):
     service_one['email_branding'] = None
-    service_one['organisation_type'] = organisation_type
+    service_one['organisation_type'] = 'nhs_central'
 
     mocker.patch(
         'app.models.service.Service.email_branding_id',
@@ -39,7 +29,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
     )
 
     page = client_request.get(
-        '.email_branding_request', service_id=SERVICE_ONE_ID
+        '.email_branding_request', service_id=SERVICE_ONE_ID,
     )
 
     assert mock_get_email_branding.called is False
@@ -54,7 +44,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
             page.select_one('label[for={}]'.format(radio['id'])).text.strip()
         )
         for radio in page.select('input[type=radio]')
-    ] == expected_options
+    ] == [('nhs', 'NHS'), ('something_else', 'Something else')]
 
     assert button_text == 'Continue'
 
@@ -202,6 +192,7 @@ def test_email_branding_request_page_shows_branding_if_set(
     mocker,
     service_one,
     client_request,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     mock_get_service_organisation,
 ):
@@ -219,7 +210,9 @@ def test_email_branding_request_page_shows_branding_if_set(
 
 def test_email_branding_request_page_back_link(
     client_request,
+    mock_get_email_branding_pool
 ):
+
     page = client_request.get(
         '.email_branding_request', service_id=SERVICE_ONE_ID
     )
@@ -269,6 +262,7 @@ def test_email_branding_request_submit(
     client_request,
     service_one,
     mocker,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     organisation_one,
     data,
@@ -299,6 +293,7 @@ def test_email_branding_request_submit(
 def test_email_branding_request_submit_when_no_radio_button_is_selected(
     client_request,
     service_one,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
 ):
     service_one['email_branding'] = sample_uuid()
@@ -321,6 +316,7 @@ def test_email_branding_description_pages_for_org_branding(
     mocker,
     service_one,
     organisation_one,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     endpoint,
     expected_heading,
@@ -350,6 +346,7 @@ def test_email_branding_govuk_and_nhs_pages(
     mocker,
     service_one,
     organisation_one,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     endpoint,
     service_org_type,
@@ -374,7 +371,9 @@ def test_email_branding_govuk_and_nhs_pages(
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Use this branding'
 
 
-def test_email_branding_something_else_page(client_request, service_one):
+def test_email_branding_something_else_page(
+    client_request, service_one, mock_get_empty_email_branding_pool
+):
     # expect to have a "NHS" option as well as the
     # fallback, so back button goes to choices page
     service_one['organisation_type'] = 'nhs_central'
@@ -391,7 +390,11 @@ def test_email_branding_something_else_page(client_request, service_one):
     )
 
 
-def test_get_email_branding_something_else_page_is_only_option(client_request, service_one):
+def test_get_email_branding_something_else_page_is_only_option(
+    client_request,
+    service_one,
+    mock_get_empty_email_branding_pool
+):
     # should only have a "something else" option
     # so back button goes back to settings page
     service_one['organisation_type'] = 'other'
@@ -413,6 +416,7 @@ def test_get_email_branding_something_else_page_is_only_option(client_request, s
 ])
 def test_email_branding_pages_give_404_if_selected_branding_not_allowed(
     client_request,
+    mock_get_empty_email_branding_pool,
     endpoint,
 ):
     # The only email branding allowed is 'something_else', so trying to visit any of the other
@@ -430,6 +434,7 @@ def test_email_branding_govuk_submit(
     service_one,
     organisation_one,
     no_reply_to_email_addresses,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     single_sms_sender,
     mock_update_service,
@@ -465,6 +470,7 @@ def test_email_branding_govuk_and_org_submit(
     service_one,
     organisation_one,
     no_reply_to_email_addresses,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     single_sms_sender,
 ):
@@ -523,6 +529,7 @@ def test_email_branding_nhs_submit(
     service_one,
     organisation_one,
     no_reply_to_email_addresses,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     single_sms_sender,
     mock_update_service,
@@ -550,6 +557,7 @@ def test_email_branding_organisation_submit(
     service_one,
     organisation_one,
     no_reply_to_email_addresses,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     single_sms_sender,
 ):
@@ -607,6 +615,7 @@ def test_email_branding_something_else_submit(
     mocker,
     service_one,
     no_reply_to_email_addresses,
+    mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     single_sms_sender,
 ):
@@ -654,7 +663,7 @@ def test_email_branding_something_else_submit(
 
 
 def test_email_branding_something_else_submit_shows_error_if_textbox_is_empty(
-    client_request,
+    client_request, mock_get_empty_email_branding_pool
 ):
     page = client_request.post(
         '.email_branding_something_else',
