@@ -2360,7 +2360,9 @@ class TemplateAndFoldersSelectionForm(Form):
 
         self.available_template_types = available_template_types
 
-        self.templates_and_folders.choices = template_list.as_id_and_name
+        self.templates_and_folders.choices = [
+            (item.id, item.name) for item in template_list
+        ]
 
         self.op = None
         self.is_move_op = self.is_add_folder_op = self.is_add_template_op = False
