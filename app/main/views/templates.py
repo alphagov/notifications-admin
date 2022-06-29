@@ -391,12 +391,27 @@ def copy_template(service_id, template_id):
     template['name'] = _get_template_copy_name(template, current_service.all_templates)
     form = form_objects[template['template_type']](**template)
 
+    if template['folder']:
+        back_link = url_for(
+            '.choose_template_to_copy',
+            service_id=current_service.id,
+            from_service=from_service,
+            from_folder=template['folder'],
+        )
+    else:
+        back_link = url_for(
+            '.choose_template_to_copy',
+            service_id=current_service.id,
+            from_service=from_service,
+        )
+
     return render_template(
         'views/edit-{}-template.html'.format(template['template_type']),
         form=form,
         template=template,
         heading_action='Add',
         services=current_user.service_ids,
+        back_link=back_link,
     )
 
 
@@ -574,6 +589,11 @@ def add_service_template(service_id, template_type, template_folder_id=None):
         template_type=template_type,
         template_folder_id=template_folder_id,
         heading_action='New',
+        back_link=url_for(
+            'main.choose_template',
+            service_id=current_service.id,
+            template_folder_id=template_folder_id
+        )
     )
 
 
@@ -657,6 +677,11 @@ def edit_service_template(service_id, template_id):
             form=form,
             template=template,
             heading_action='Edit',
+            back_link=url_for(
+                'main.view_template',
+                service_id=current_service.id,
+                template_id=template['id']
+            )
         )
 
 
