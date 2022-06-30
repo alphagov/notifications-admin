@@ -389,31 +389,6 @@ def archive_service(service_id):
         return service_settings(service_id)
 
 
-@main.route("/services/<uuid:service_id>/service-settings/suspend", methods=["GET", "POST"])
-@user_is_platform_admin
-def suspend_service(service_id):
-    if request.method == 'POST':
-        service_api_client.suspend_service(service_id)
-        create_suspend_service_event(service_id=service_id, suspended_by_id=current_user.id)
-        return redirect(url_for('.service_settings', service_id=service_id))
-    else:
-        flash("This will suspend the service and revoke all api keys. Are you sure you want to suspend this service?",
-              'suspend')
-        return service_settings(service_id)
-
-
-@main.route("/services/<uuid:service_id>/service-settings/resume", methods=["GET", "POST"])
-@user_is_platform_admin
-def resume_service(service_id):
-    if request.method == 'POST':
-        service_api_client.resume_service(service_id)
-        create_resume_service_event(service_id=service_id, resumed_by_id=current_user.id)
-        return redirect(url_for('.service_settings', service_id=service_id))
-    else:
-        flash("This will resume the service. New api key are required for this service to use the API.", 'resume')
-        return service_settings(service_id)
-
-
 @main.route("/services/<uuid:service_id>/service-settings/send-files-by-email", methods=['GET', 'POST'])
 @user_has_permissions('manage_service')
 def send_files_by_email_contact_details(service_id):

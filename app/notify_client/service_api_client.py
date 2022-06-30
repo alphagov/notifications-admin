@@ -143,14 +143,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post('/service/{}/archive'.format(service_id), data=None)
 
     @cache.delete('service-{service_id}')
-    def suspend_service(self, service_id):
-        return self.post('/service/{}/suspend'.format(service_id), data=None)
-
-    @cache.delete('service-{service_id}')
-    def resume_service(self, service_id):
-        return self.post('/service/{}/resume'.format(service_id), data=None)
-
-    @cache.delete('service-{service_id}')
     @cache.delete('user-{user_id}')
     def remove_user_from_service(self, service_id, user_id):
         """
