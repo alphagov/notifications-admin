@@ -49,7 +49,7 @@ dnspython==2.2.1
     # via eventlet
 docopt==0.6.2
     # via notifications-python-client
-docutils==0.16
+docutils==0.18.1
     # via awscli
 et-xmlfile==1.1.0
     # via openpyxl
