@@ -22,7 +22,7 @@ pytz==2022.1
 git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b864c64#egg=gunicorn[eventlet]==20.1.0
 notifications-python-client==6.3.0
 rtreelib==0.2.0
-fido2==0.9.3
+fido2==1.0.0
 pyproj==3.3.1
 
 # PaaS
