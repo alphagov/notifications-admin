@@ -1194,9 +1194,15 @@ def email_branding_request(service_id):
 @user_has_permissions('manage_service')
 def email_branding_pool_option(service_id):
     chosen_branding_id = request.args.get('branding_option')
-    chosen_branding_name = [
+    chosen_brandings = [
         branding['name'] for branding in current_service.email_branding_pool if branding["id"] == chosen_branding_id
-    ][0]
+    ]
+    if not chosen_brandings:
+        flash('No branding found for this id.')
+        return redirect(url_for('.email_branding_request', service_id=current_service.id))
+
+    chosen_branding_name = chosen_brandings[0]
+
     if request.method == 'POST':
         current_service.update(email_branding=chosen_branding_id)
 

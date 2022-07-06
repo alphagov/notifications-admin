@@ -185,9 +185,35 @@ def test_email_branding_pool_option_page_displays_preview_of_chosen_branding(
     page = client_request.get(
         '.email_branding_pool_option', service_id=SERVICE_ONE_ID,
         branding_option='email-branding-1-id'
-        )
+    )
 
     assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='email-branding-1-id')
+
+
+def test_email_branding_pool_option_page_redirects_to_branding_request_page_if_branding_option_not_found(
+    service_one,
+    organisation_one,
+    client_request,
+    mocker,
+    mock_get_email_branding_pool
+):
+    organisation_one['organisation_type'] = 'central'
+    service_one['organisation'] = organisation_one
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+
+    client_request.get(
+        '.email_branding_pool_option', service_id=SERVICE_ONE_ID,
+        branding_option='some-unknown-branding-id',
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.email_branding_request',
+            service_id=SERVICE_ONE_ID
+        )
+    )
 
 
 def test_email_branding_pool_option_changes_email_branding_when_user_confirms(
