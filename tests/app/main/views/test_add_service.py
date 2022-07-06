@@ -5,7 +5,7 @@ from notifications_python_client.errors import HTTPError
 
 from app.utils.user import is_gov_user
 from tests import organisation_json
-from tests.conftest import normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
 def test_non_gov_user_cannot_see_add_service_button(
@@ -357,3 +357,32 @@ def test_non_government_user_cannot_create_service(
         _data={'name': 'SERVICE TWO'},
         _expected_status=403,
     )
+
+
+def test_email_auth_user_creates_service_with_email_auth_permission(
+    api_user_active_email_auth,
+    client_request,
+    mock_get_no_organisation_by_domain,
+    mock_create_service,
+    mock_get_services,
+    mock_create_service_template,
+    mock_update_service,
+):
+    client_request.login(api_user_active_email_auth, service=None)
+    client_request.post(
+        'main.add_service',
+        _data={
+            'name': 'service name',
+            'organisation_type': 'central',
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            'main.service_dashboard',
+            service_id=101,
+        )
+    )
+    assert mock_create_service.called
+    # confusingly not the same as the id of `101` returned by mock_create_service that we see
+    # in the redirect, because Service.from_id is mocked to return `service_one`
+    assert mock_update_service.call_args[0][0] == SERVICE_ONE_ID
+    assert 'email_auth' in mock_update_service.call_args[1]['permissions']
