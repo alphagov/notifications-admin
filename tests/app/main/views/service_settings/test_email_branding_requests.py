@@ -71,6 +71,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
 def test_email_branding_request_page_shows_branding_pool_options_if_branding_pool_set_for_org(
     mocker,
     service_one,
+    organisation_one,
     client_request,
     mock_get_email_branding,
     mock_get_email_branding_pool,
@@ -79,6 +80,14 @@ def test_email_branding_request_page_shows_branding_pool_options_if_branding_poo
 ):
 
     service_one['organisation_type'] = organisation_type
+    organisation_one['organisation_type'] = organisation_type
+    service_one['organisation'] = organisation_one
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+
     mocker.patch(
         'app.models.service.Service.email_branding_id',
         new_callable=PropertyMock,
@@ -126,10 +135,19 @@ def test_email_branding_request_page_redirects_to_something_else_page_if_that_is
 def test_email_branding_request_redirects_to_branding_preview_for_a_branding_pool_option(
     mocker,
     service_one,
+    organisation_one,
     client_request,
     mock_get_email_branding,
     mock_get_email_branding_pool
 ):
+    organisation_one['organisation_type'] = 'central'
+    service_one['organisation'] = organisation_one
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
+
     mocker.patch(
         'app.models.service.Service.email_branding_id',
         new_callable=PropertyMock,
@@ -151,9 +169,18 @@ def test_email_branding_request_redirects_to_branding_preview_for_a_branding_poo
 
 def test_email_branding_pool_option_page_displays_preview_of_chosen_branding(
     service_one,
+    organisation_one,
     client_request,
+    mocker,
     mock_get_email_branding_pool
 ):
+    organisation_one['organisation_type'] = 'central'
+    service_one['organisation'] = organisation_one
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
 
     page = client_request.get(
         '.email_branding_pool_option', service_id=SERVICE_ONE_ID,
@@ -166,12 +193,20 @@ def test_email_branding_pool_option_page_displays_preview_of_chosen_branding(
 def test_email_branding_pool_option_changes_email_branding_when_user_confirms(
     mocker,
     service_one,
+    organisation_one,
     client_request,
     no_reply_to_email_addresses,
     single_sms_sender,
     mock_get_email_branding_pool,
     mock_update_service
 ):
+    organisation_one['organisation_type'] = 'central'
+    service_one['organisation'] = organisation_one
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
 
     page = client_request.post(
         '.email_branding_pool_option',
@@ -210,8 +245,18 @@ def test_email_branding_request_page_shows_branding_if_set(
 
 def test_email_branding_request_page_back_link(
     client_request,
-    mock_get_email_branding_pool
+    mock_get_email_branding_pool,
+    service_one,
+    organisation_one,
+    mocker
 ):
+    organisation_one['organisation_type'] = 'central'
+    service_one['organisation'] = organisation_one
+
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        return_value=organisation_one,
+    )
 
     page = client_request.get(
         '.email_branding_request', service_id=SERVICE_ONE_ID

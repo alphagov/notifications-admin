@@ -622,7 +622,10 @@ class Service(JSONModel, SortByNameMixin):
 
     @property
     def email_branding_pool(self):
-        return organisations_client.get_email_branding_pool(self.organisation_id)
+        if self.organisation_id:
+            return organisations_client.get_email_branding_pool(self.organisation_id)
+        else:
+            return []
 
 
 class Services(SerialisedModelCollection):
