@@ -4727,31 +4727,20 @@ def test_update_service_organisation_does_not_update_if_same_value(
     assert mock_update_service_organisation.called is False
 
 
-@pytest.mark.parametrize('single_branding_option, expected_href', [
-    (True, f'/services/{SERVICE_ONE_ID}/service-settings/email-branding/something-else'),
-    (False, f'/services/{SERVICE_ONE_ID}/service-settings/email-branding'),
-])
 def test_service_settings_links_to_branding_request_page_for_emails(
     service_one,
     client_request,
     no_reply_to_email_addresses,
     single_sms_sender,
-    single_branding_option,
-    expected_href,
 ):
-    if single_branding_option:
-        # should only have a "something else" option
-        # so we go straight to that form
-        service_one['organisation_type'] = 'other'
-    else:
-        # expect to have a "NHS" option as well as the
-        # fallback one, so ask user to choose
-        service_one['organisation_type'] = 'nhs_central'
+    # expect to have a "NHS" option as well as the
+    # fallback one, so ask user to choose
+    service_one['organisation_type'] = 'nhs_central'
 
     page = client_request.get(
         '.service_settings', service_id=SERVICE_ONE_ID
     )
-    assert len(page.find_all('a', attrs={'href': expected_href})) == 1
+    assert len(page.find_all('a', attrs={'href': f'/services/{SERVICE_ONE_ID}/service-settings/email-branding'})) == 1
 
 
 def test_service_settings_links_to_branding_request_page_for_letters(

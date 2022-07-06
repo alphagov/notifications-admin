@@ -90,7 +90,6 @@ def service_settings(service_id):
     return render_template(
         'views/service-settings.html',
         service_permissions=PLATFORM_ADMIN_SERVICE_PERMISSIONS,
-        email_branding_options=ChooseEmailBrandingForm(current_service)
     )
 
 
@@ -1161,19 +1160,58 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
 @user_has_permissions('manage_service')
 def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
+    if form.something_else_is_only_option:
+        return redirect(url_for('.email_branding_something_else', service_id=current_service.id))
     branding_name = current_service.email_branding_name
     if form.validate_on_submit():
-        return redirect(
-            url_for(
-                f'.email_branding_{form.options.data}',
-                service_id=current_service.id,
+
+        branding_choice = form.options.data
+
+        if branding_choice in [branding['id'] for branding in current_service.email_branding_pool]:
+            return redirect(
+                url_for(
+                    '.email_branding_pool_option',
+                    service_id=current_service.id,
+                    branding_option=branding_choice
+                )
             )
-        )
+        else:
+            return redirect(
+                url_for(
+                    f'.email_branding_{branding_choice}',
+                    service_id=current_service.id,
+                )
+            )
 
     return render_template(
         'views/service-settings/branding/email-branding-options.html',
         form=form,
         branding_name=branding_name,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/pool", methods=['GET', 'POST'])
+@user_has_permissions('manage_service')
+def email_branding_pool_option(service_id):
+    chosen_branding_id = request.args.get('branding_option')
+    chosen_brandings = [
+        branding['name'] for branding in current_service.email_branding_pool if branding["id"] == chosen_branding_id
+    ]
+    if not chosen_brandings:
+        flash('No branding found for this id.')
+        return redirect(url_for('.email_branding_request', service_id=current_service.id))
+
+    chosen_branding_name = chosen_brandings[0]
+
+    if request.method == 'POST':
+        current_service.update(email_branding=chosen_branding_id)
+
+        flash('You’ve updated your email branding', 'default')
+        return redirect(url_for('.service_settings', service_id=current_service.id))
+    return render_template(
+        'views/service-settings/branding/email-branding-pool-option.html',
+        chosen_branding_id=chosen_branding_id,
+        chosen_branding_name=chosen_branding_name
     )
 
 

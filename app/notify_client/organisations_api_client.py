@@ -96,5 +96,13 @@ class OrganisationsClient(NotifyAdminAPIClient):
             data=None,
         )
 
+    @cache.set('organisation-{org_id}-email-branding-pool')
+    def get_email_branding_pool(self, org_id):
+        branding = self.get(
+            url=f"/organisations/{org_id}/email-branding-pool",
+
+        )
+        return branding["data"]
+
 
 organisations_client = OrganisationsClient()

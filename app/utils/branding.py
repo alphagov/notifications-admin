@@ -14,28 +14,34 @@ def get_email_choices(service):
         yield ('govuk', 'GOV.UK')
 
     if (
-        service.organisation_type == Organisation.TYPE_CENTRAL
-        and service.organisation
-        and organisation_branding_id is None  # don't offer both if org has default
-        and service.email_branding_name.lower() != f'GOV.UK and {service.organisation.name}'.lower()
-    ):
-        yield ('govuk_and_org', f'GOV.UK and {service.organisation.name}')
-
-    if (
         service.organisation_type in Organisation.NHS_TYPES
         and service.email_branding_id != NHS_EMAIL_BRANDING_ID
     ):
         yield ('nhs', 'NHS')
 
-    if (
-        service.organisation
-        and service.organisation_type not in Organisation.NHS_TYPES
-        and (
-            service.email_branding_id is None  # GOV.UK is current branding
-            or service.email_branding_id != organisation_branding_id
-        )
-    ):
-        yield ('organisation', service.organisation.name)
+    if service.email_branding_pool:
+        for branding in service.email_branding_pool:
+            if not branding['id'] == service.email_branding_id:
+                yield (branding["id"], branding["name"])
+    else:
+        # fake branding options
+        if (
+            service.organisation_type == Organisation.TYPE_CENTRAL
+            and service.organisation
+            and organisation_branding_id is None  # don't offer both if org has default
+            and service.email_branding_name.lower() != f'GOV.UK and {service.organisation.name}'.lower()
+        ):
+            yield ('govuk_and_org', f'GOV.UK and {service.organisation.name}')
+
+        if (
+            service.organisation
+            and service.organisation_type not in Organisation.NHS_TYPES
+            and (
+                service.email_branding_id is None  # GOV.UK is current branding
+                or service.email_branding_id != organisation_branding_id
+            )
+        ):
+            yield ('organisation', service.organisation.name)
 
 
 def get_letter_choices(service):

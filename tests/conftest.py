@@ -2603,6 +2603,52 @@ def create_email_branding(id, non_standard_values=None):
     return {'email_branding': branding}
 
 
+def create_email_branding_pool(non_standard_values=None):
+    branding_pool = [
+        {
+            'logo': 'example_1.png',
+            'name': 'Email branding name 1',
+            'text': 'Email branding text 1',
+            'id': 'email-branding-1-id',
+            'colour': '#f00',
+            'brand_type': 'org',
+        },
+        {
+            'logo': 'example_2.png',
+            'name': 'Email branding name 2',
+            'text': 'Email branding text 2',
+            'id': 'email-branding-2-id',
+            'colour': '#f00',
+            'brand_type': 'org',
+        }
+    ]
+
+    if non_standard_values:
+        branding_pool.update(non_standard_values)
+
+    return branding_pool
+
+
+@pytest.fixture(scope='function')
+def mock_get_email_branding_pool(mocker):
+    def _get_email_branding_pool(org_id):
+        return create_email_branding_pool()
+
+    return mocker.patch(
+        'app.organisations_client.get_email_branding_pool', side_effect=_get_email_branding_pool
+    )
+
+
+@pytest.fixture(scope='function')
+def mock_get_empty_email_branding_pool(mocker):
+    def _get_email_branding_pool(org_id):
+        return []
+
+    return mocker.patch(
+        'app.organisations_client.get_email_branding_pool', side_effect=_get_email_branding_pool
+    )
+
+
 @pytest.fixture(scope='function')
 def mock_get_email_branding(mocker, fake_uuid):
     def _get_email_branding(id):
