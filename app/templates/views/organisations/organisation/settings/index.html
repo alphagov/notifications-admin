@@ -110,6 +110,11 @@
         }}
       {% endcall %}
       {% call row() %}
+        {{ text_field('Email branding options') }}
+        {{ optional_text_field(current_org.email_branding_pool_names, default="None") }}
+        {{ text_field('') }}
+      {% endcall %}
+      {% call row() %}
         {{ text_field('Default letter branding') }}
         {{ optional_text_field(
           current_org.letter_branding.name,

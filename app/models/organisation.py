@@ -183,6 +183,14 @@ class Organisation(JSONModel, SortByNameMixin):
             return self.email_branding['name']
         return 'GOV.UK'
 
+    @property
+    def email_branding_pool(self):
+        return organisations_client.get_email_branding_pool(self.id)
+
+    @property
+    def email_branding_pool_names(self):
+        return [branding['name'] for branding in self.email_branding_pool]
+
     @cached_property
     def letter_branding(self):
         if self.letter_branding_id:
