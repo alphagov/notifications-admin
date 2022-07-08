@@ -923,6 +923,7 @@ def test_organisation_settings_for_platform_admin(
     client_request,
     platform_admin_user,
     mock_get_organisation,
+    mock_get_empty_email_branding_pool,
     organisation_one
 ):
     expected_rows = [
@@ -938,6 +939,7 @@ def test_organisation_settings_for_platform_admin(
         'Billing details None Change billing details for the organisation',
         'Notes None Change the notes for the organisation',
         'Default email branding GOV.UK Change default email branding for the organisation',
+        'Email branding options None',
         'Default letter branding No branding Change default letter branding for the organisation',
         'Known email domains None Change known email domains for the organisation',
     ]
@@ -953,11 +955,31 @@ def test_organisation_settings_for_platform_admin(
     mock_get_organisation.assert_called_with(organisation_one['id'])
 
 
+def test_organisation_settings_table_shows_email_branding_pool(
+    client_request,
+    platform_admin_user,
+    mock_get_organisation,
+    mock_get_email_branding_pool,
+    organisation_one,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
+
+    email_branding_options_row = page.select('tr')[9]
+
+    assert normalize_spaces(email_branding_options_row.text) == (
+        'Email branding options '
+        'Email branding name 1 '
+        'Email branding name 2'
+    )
+
+
 def test_organisation_settings_shows_delete_link(
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_organisation,
+    mock_get_email_branding_pool,
 ):
     client_request.login(platform_admin_user)
     page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
@@ -974,6 +996,7 @@ def test_organisation_settings_does_not_show_delete_link_for_archived_organisati
     client_request,
     platform_admin_user,
     organisation_one,
+    mock_get_email_branding_pool,
     mocker,
 ):
     organisation_one['active'] = False
@@ -998,7 +1021,13 @@ def test_archive_organisation_is_platform_admin_only(
     )
 
 
-def test_archive_organisation_prompts_user(client_request, platform_admin_user, organisation_one, mocker):
+def test_archive_organisation_prompts_user(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+    mocker,
+):
     mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
 
     client_request.login(platform_admin_user)
@@ -1071,6 +1100,7 @@ def test_archive_organisation_does_not_allow_orgs_with_team_members_or_services_
     platform_admin_user,
     organisation_one,
     mock_get_organisation,
+    mock_get_email_branding_pool,
     mock_get_users_for_organisation,
     mock_get_invited_users_for_organisation,
     mocker,
@@ -1568,6 +1598,7 @@ def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
 def test_organisation_settings_links_to_edit_organisation_notes_page(
     mocker,
     mock_get_organisation,
+    mock_get_email_branding_pool,
     organisation_one,
     client_request,
     platform_admin_user,
@@ -1663,6 +1694,7 @@ def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
 def test_organisation_settings_links_to_edit_organisation_billing_details_page(
     mocker,
     mock_get_organisation,
+    mock_get_email_branding_pool,
     organisation_one,
     client_request,
     platform_admin_user,
