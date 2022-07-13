@@ -12,8 +12,8 @@
 
   {{ content_metadata(
     data={
-      "Last updated": "27 April 2022",
-      "Next review due": "12 July 2022"
+      "Last updated": "12 July 2022",
+      "Next review due": "20 September 2022"
     }
   ) }}
 
@@ -29,25 +29,28 @@
   <ul class="list list-bullet">
    
     <li>Make it easier for services to pick their own <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.branding_and_customisation')}}">email branding</a></li>
-    <li>Help services to get better value for money</li>
-    <li>Improve the time it takes some of our webpages to load</li>
+    <li>Let services preview their branding before sending an email</li>
+    <li>Make <a class="govuk-link govuk-link--no-visited-state" href="/features/email#send-files">sending files by email</a> more secure</li>
   </ul>
 
   <h3 class="heading-small" id="next">Next</h3>
 
   <ul class="list list-bullet">
-    <li>Explore ways to share common content patterns</li>
-    <li>Make it easier for organisations to find the usage data they need</li>
+    <li>Let services upload their own logo for emails and letters</li>
+    <li>Design reusable content patterns for text messages</li>
+    <li>Start looking for a cloud hosting platform to <a class="govuk-link govuk-link--no-visited-state" href="https://gds.blog.gov.uk/2022/07/12/why-weve-decided-to-decommission-gov-uk-paas-platform-as-a-service/">replace GOV.UK Paas</a></li>
   </ul>
 
   <h3 class="heading-small" id="later">Later</h3>
 
   <ul class="list list-bullet">
 
-    <li>Let services preview their email branding</li>
-    <li>Let services upload their own logo for emails and letters</li>
+    <li>Make it easier for organisations to find the usage data they need</li>
+    <li>Explore ways to share common content patterns</li>
     <li>Meet our targets for <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.accessibility_statement')}}">accessibility</a></li>
-
+    <li>Add multilingual letter templates so services can provide information in several languages</li>
+    <li>Make it easier to start using Notify</li>
+    
   </ul>
 
   <h2 class="heading-medium" id="things-we-have-done">Things we’ve done</h2>
@@ -56,17 +59,12 @@
 
   <ul class="list list-bullet">
 
-    <li>upgraded some of our software dependencies</li>
-    <li>completed our annual IT health check</li>
-    <li>tested new ways for services to upload their own brand logo</li>
-    <li>improved our performance by <a class="govuk-link govuk-link--no-visited-state" href="https://technology.blog.gov.uk/2022/02/01/upgrading-celery-on-gov-uk-notify/">upgrading the software we use</a></li>
-    <li>made our website work better in Windows high contrast mode</li>
-    <li>increased our capacity at short notice during a busy period</li>
-    <li>added quarterly billing reports that organisations can download</li>
+    <li>worked with services to reduce the cost of their text messages</li>
+    <li>rewritten our billing code to handle more complex logic</li>
+    <li>user tested changes to the way we send files by email</li>
+    <li>continued upgrading our software dependencies</li>
+    <li>reduced the time it takes some of our webpages to load</li>
     
   </ul>
-
-  <p class="govuk-body">Between April 2021 and March 2022 we sent a total of 2.7 billion notifications. Half of those were for services set up in response to the coronavirus (COVID-19) pandemic.</p>
-
 
 {% endblock %}
