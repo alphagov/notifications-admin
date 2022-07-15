@@ -5,8 +5,8 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
-{% block service_page_title %}
-  {{ '{} email branding'.format('Update' if email_branding else 'Create')}}
+{% block per_page_title %}
+  {{ '{} email branding'.format('Update' if email_branding else 'Add')}}
 {% endblock %}
 
 
