@@ -1960,6 +1960,19 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
             raise ValidationError('This field is required')
 
 
+class AdminChangeEmailBrandingPoolForm(StripWhitespaceForm):
+    branding_field = GovukCheckboxesField(
+        'Branding options',
+        param_extensions={
+            "fieldset": {
+                "legend": {
+                    "classes": "govuk-visually-hidden"
+                }
+            }
+        }
+    )
+
+
 class AdminEditLetterBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField('Name of brand', validators=[DataRequired()])
 

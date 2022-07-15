@@ -20,6 +20,7 @@ from app.main.forms import (
     AddGPOrganisationForm,
     AddNHSLocalOrganisationForm,
     AdminBillingDetailsForm,
+    AdminChangeEmailBrandingPoolForm,
     AdminNewOrganisationForm,
     AdminNotesForm,
     AdminOrganisationDomainsForm,
@@ -443,6 +444,27 @@ def organisation_preview_email_branding(org_id):
         'views/organisations/organisation/settings/preview-email-branding.html',
         form=form,
         action=url_for('main.organisation_preview_email_branding', org_id=org_id),
+    )
+
+
+@main.route("/organisations/<uuid:org_id>/settings/email-branding-options", methods=['GET'])
+@user_is_platform_admin
+def organisation_email_branding_options(org_id):
+    form = AdminChangeEmailBrandingPoolForm()
+
+    form.branding_field.choices = [
+        (branding['id'], branding['name'])
+        for branding in email_branding_client.get_all_email_branding(sort_key='name')
+    ]
+    form.branding_field.data = [
+        branding['id']
+        for branding in current_organisation.email_branding_pool
+    ]
+
+    return render_template(
+        'views/organisations/organisation/settings/change-email-branding-options.html',
+        form=form,
+        search_form=SearchByNameForm()
     )
 
 
