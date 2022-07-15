@@ -3946,7 +3946,7 @@ def create_multiple_letter_contact_blocks(service_id='abcd'):
 
 
 def create_notification(
-    notifification_id=None,
+    notification_id=None,
     service_id='abcd',
     notification_status='delivered',
     redact_personalisation=False,
@@ -3967,7 +3967,7 @@ def create_notification(
         reply_to_text=reply_to_text,
     )['notifications'][0]
 
-    noti['id'] = notifification_id or sample_uuid()
+    noti['id'] = notification_id or sample_uuid()
     if sent_one_off:
         noti['created_by'] = {
             'id': sample_uuid(),
