@@ -2216,10 +2216,14 @@ class ChooseEmailBrandingForm(ChooseBrandingForm):
     def __init__(self, service):
         super().__init__()
 
-        self.options.choices = tuple(
-            list(branding.get_email_choices(service)) +
-            [self.FALLBACK_OPTION]
-        )
+        branding_choices = list(branding.get_email_choices(service)) + [self.FALLBACK_OPTION]
+
+        # If NHS branding is an option for the service and NHS branding is also in the branding pool we remove the
+        # version in the pool to stop it appearing twice on the form
+        if (('nhs', 'NHS') in branding_choices) and ((branding.NHS_EMAIL_BRANDING_ID, 'NHS') in branding_choices):
+            branding_choices.remove((branding.NHS_EMAIL_BRANDING_ID, 'NHS'))
+
+        self.options.choices = tuple(branding_choices)
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):

@@ -8,7 +8,13 @@ from notifications_utils.clients.zendesk.zendesk_client import (
 
 from app.utils.branding import NHS_EMAIL_BRANDING_ID
 from tests import sample_uuid
-from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, normalize_spaces
+from tests.conftest import (
+    ORGANISATION_ID,
+    SERVICE_ONE_ID,
+    create_email_branding,
+    create_email_branding_pool,
+    normalize_spaces,
+)
 
 
 def test_email_branding_request_page_when_no_branding_is_set(
@@ -105,6 +111,41 @@ def test_email_branding_request_page_shows_branding_pool_options_if_branding_poo
         )
         for radio in page.select('input[type=radio]')
     ] == expected_options
+
+
+def test_email_branding_request_does_not_show_nhs_branding_twice(
+    mocker,
+    service_one,
+    organisation_one,
+    client_request,
+    mock_get_email_branding,
+):
+    organisation_one['organisation_type'] = 'nhs_central'
+    service_one['organisation'] = organisation_one
+
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+
+    nhs_branding = create_email_branding(
+        NHS_EMAIL_BRANDING_ID,
+        {'colour': None, 'name': 'NHS', 'text': None}
+    )['email_branding']
+    updated_branding_pool = create_email_branding_pool(additional_values=nhs_branding)
+    mocker.patch('app.organisations_client.get_email_branding_pool', return_value=updated_branding_pool)
+
+    page = client_request.get('.email_branding_request', service_id=SERVICE_ONE_ID)
+
+    assert [
+        (
+            radio['value'],
+            page.select_one(f'label[for={radio["id"]}]').text.strip()
+        )
+        for radio in page.select('input[type=radio]')
+    ] == [
+        ('nhs', 'NHS'),
+        ('email-branding-1-id', 'Email branding name 1'),
+        ('email-branding-2-id', 'Email branding name 2'),
+        ('something_else', 'Something else')
+    ]
 
 
 def test_email_branding_request_page_redirects_to_something_else_page_if_that_is_only_option(

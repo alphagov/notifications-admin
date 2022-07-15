@@ -2603,7 +2603,7 @@ def create_email_branding(id, non_standard_values=None):
     return {'email_branding': branding}
 
 
-def create_email_branding_pool(non_standard_values=None):
+def create_email_branding_pool(additional_values=None):
     branding_pool = [
         {
             'logo': 'example_1.png',
@@ -2623,8 +2623,8 @@ def create_email_branding_pool(non_standard_values=None):
         }
     ]
 
-    if non_standard_values:
-        branding_pool.update(non_standard_values)
+    if additional_values:
+        branding_pool.append(additional_values)
 
     return branding_pool
 
