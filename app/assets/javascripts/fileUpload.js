@@ -5,32 +5,30 @@
 
     this.submit = () => this.$form.trigger('submit');
 
-    this.showLoadingContent = () => {
-      var $loadingContent = $(`
-        <p tabindex="0" class="file-upload-loading-content">
-          <span class="file-upload-loading-message govuk-!-margin-right-3">
-            Uploading your file.<span class="govuk-visually-hidden"> Use cancel button to stop.</span>
-          </span>
-          <a href="" role="button" class='govuk-button govuk-button--warning'>
-            Cancel upload
-          </a>
-        </p>
+    this.addCancelButton = () => {
+
+      var $cancelButton = $(`
+        <a href="" role="button" class="file-upload-button govuk-button govuk-button--warning">
+          Cancel upload
+        </a>
       `);
 
-      $('button[type=button]', this.$form).replaceWith($loadingContent);
+      $('button[type=button]', this.$form).replaceWith($cancelButton);
 
       // add GOVUK Frontend behaviours
       new window.GOVUK.Frontend.Button(this.$form[0]).init();
 
-      // move focus to the content, it is lost when the upload button is removed
-      $loadingContent.focus();
+      // move focus to the cancel button, it is lost when the upload button is removed
+      $cancelButton.focus();
+
     };
 
     // Add a button that passes a click to the input[type=file]
     this.addFakeButton = function () {
+
       var buttonText = this.$field.data('buttonText');
       var buttonHTMLStr = `
-        <button type="button" class="govuk-button govuk-!-margin-right-1" id="file-upload-button">
+        <button type="button" class="file-upload-button govuk-button govuk-!-margin-right-1" id="file-upload-button">
           ${buttonText}
         </button>`;
 
@@ -69,7 +67,7 @@
       // Need to put the event on the container, not the input for it to work properly
       this.$form.on(
         'change', '.file-upload-field',
-        () => this.submit() && this.showLoadingContent()
+        () => this.submit() && this.addCancelButton()
       );
 
     };

@@ -67,7 +67,9 @@ describe('File upload', () => {
     // start module
     window.GOVUK.modules.start();
 
-    expect(form.querySelector('button[type=button]')).not.toBeNull();
+    var uploadButton = form.querySelector('button[type=button]');
+
+    expect(uploadButton).not.toBeNull();
 
     // Note: the existing form controls are also hidden but this is through CSS so out of scope
 
@@ -132,20 +134,14 @@ describe('File upload', () => {
 
     });
 
-    test("It should replace the upload button with a notice that uploading has started and a cancel upload button", () => {
+    test("It should replace the upload button with one for cancelling the upload", () => {
 
-      var uploadingContent = form.querySelector('p.file-upload-loading-content');
-
-      expect(uploadingContent).not.toBeNull();
-
-      var cancelLink = uploadingContent.querySelector("a[href='']");
+      var cancelLink = form.querySelector("a.file-upload-button");
 
       expect(cancelLink).not.toBeNull();
 
-      // the new content replaces the 'upload' button so needs focusing so:
-      // - focus is not lost
-      // - the text in the paragraph is announced to screen readers
-      expect(document.activeElement).toBe(uploadingContent);
+      // the cancel button should be focused
+      expect(document.activeElement).toBe(cancelLink);
 
     });
 
