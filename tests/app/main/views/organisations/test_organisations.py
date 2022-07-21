@@ -939,7 +939,7 @@ def test_organisation_settings_for_platform_admin(
         'Billing details None Change billing details for the organisation',
         'Notes None Change the notes for the organisation',
         'Default email branding GOV.UK Change default email branding for the organisation',
-        'Email branding options None',
+        'Email branding options None Change email branding options for the organisation',
         'Default letter branding No branding Change default letter branding for the organisation',
         'Known email domains None Change known email domains for the organisation',
     ]
@@ -970,7 +970,8 @@ def test_organisation_settings_table_shows_email_branding_pool(
     assert normalize_spaces(email_branding_options_row.text) == (
         'Email branding options '
         'Email branding name 1 '
-        'Email branding name 2'
+        'Email branding name 2 '
+        'Change email branding options for the organisation'
     )
 
 
@@ -1689,6 +1690,65 @@ def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
         ),
     )
     assert not mock_update_organisation.called
+
+
+def test_organisation_email_branding_options_is_platform_admin_only(
+    client_request,
+    organisation_one,
+    mock_get_organisation,
+    mocker,
+):
+    client_request.get(
+        'main.organisation_email_branding_options',
+        org_id=organisation_one['id'],
+        _expected_status=403
+    )
+
+
+def test_organisation_email_branding_options_shows_branding_pool(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+    mock_get_all_email_branding,
+):
+    branding_pool = [
+        {
+            'logo': 'logo1.png',
+            'name': 'org 1',
+            'text': 'org 1',
+            'id': '1',
+            'colour': None,
+            'brand_type': 'org',
+        },
+        {
+            'logo': 'logo4.png',
+            'name': 'org 4',
+            'text': 'org 4',
+            'id': '4',
+            'colour': None,
+            'brand_type': 'org',
+        }
+    ]
+    mocker.patch('app.organisations_client.get_email_branding_pool', return_value=branding_pool)
+
+    client_request.login(platform_admin_user)
+    page = client_request.get('.organisation_email_branding_options', org_id=organisation_one['id'])
+
+    assert page.h1.text == 'Change email branding options'
+    assert page.select_one('[data-module=live-search]')['data-targets'] == ('.govuk-checkboxes__item')
+
+    assert [
+        (checkbox.text.strip(), checkbox.input['value'], checkbox.input.has_attr('checked'))
+        for checkbox in page.select('.govuk-checkboxes__item')
+        ] == [
+            ('org 1', '1', True),
+            ('org 2', '2', False),
+            ('org 3', '3', False),
+            ('org 4', '4', True),
+            ('org 5', '5', False),
+        ]
 
 
 def test_organisation_settings_links_to_edit_organisation_billing_details_page(

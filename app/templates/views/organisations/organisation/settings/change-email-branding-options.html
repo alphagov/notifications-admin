@@ -1,0 +1,28 @@
+{% extends "org_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/live-search.html" import live_search %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block org_page_title %}
+  Change email branding options
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.organisation_settings', org_id=current_org.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header("Change email branding options") }}
+  {{ live_search(target_selector='.govuk-checkboxes__item', show=True, form=search_form, autofocus=True) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {% call form_wrapper() %}
+        <div class="brand-pool">
+            {{ form.branding_field }}
+        </div>
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}
