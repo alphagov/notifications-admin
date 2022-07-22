@@ -2,6 +2,7 @@ from datetime import date
 from unittest.mock import patch
 
 import pytest
+import werkzeug
 
 from app.models.service import Service
 from app.notify_client import NotifyAdminAPIClient
@@ -39,6 +40,25 @@ def test_active_service_can_be_modified(notify_admin, method, user, service):
 
     assert request.called
     assert ret == request.return_value
+
+
+@pytest.mark.parametrize('method', [
+    'put',
+    'post',
+    'delete'
+])
+def test_inactive_service_cannot_be_modified_by_normal_user(notify_admin, api_user_active, method):
+    api_client = NotifyAdminAPIClient()
+
+    with notify_admin.test_request_context() as request_context, notify_admin.test_client() as client:
+        client.login(api_user_active)
+        request_context.service = Service(service_json(active=False))
+
+        with patch.object(api_client, 'request') as request:
+            with pytest.raises(werkzeug.exceptions.Forbidden):
+                getattr(api_client, method)('url', 'data')
+
+    assert not request.called
 
 
 @pytest.mark.parametrize('method', [

@@ -103,7 +103,6 @@ class HeaderNavigation(Navigation):
             'platform_admin_reports',
             'platform_admin_returned_letters',
             'platform_admin_splash_page',
-            'suspend_service',
             'trial_services',
             'update_email_branding',
             'update_letter_branding',

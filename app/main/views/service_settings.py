@@ -31,8 +31,6 @@ from app import (
 from app.event_handlers import (
     create_archive_service_event,
     create_broadcast_account_type_change_event,
-    create_resume_service_event,
-    create_suspend_service_event,
 )
 from app.extensions import zendesk_client
 from app.formatters import email_safe
