@@ -2513,6 +2513,7 @@ def create_email_brandings(number_of_brandings, non_standard_values=None, shuffl
 
     for idx, row in enumerate(non_standard_values or {}):
         brandings[row['idx']].update(non_standard_values[idx])
+        brandings[row['idx']].pop('idx')
 
     if shuffle:
         brandings.insert(3, brandings.pop(4))
