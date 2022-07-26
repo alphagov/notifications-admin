@@ -1705,7 +1705,7 @@ def test_organisation_email_branding_options_is_platform_admin_only(
     )
 
 
-def test_organisation_email_branding_options_shows_branding_pool(
+def test_organisation_email_branding_options_shows_branding_not_in_branding_pool(
     mocker,
     client_request,
     platform_admin_user,
@@ -1725,7 +1725,7 @@ def test_organisation_email_branding_options_shows_branding_pool(
         {
             'logo': 'logo4.png',
             'name': 'org 4',
-            'text': 'org 4',
+            'text': None,
             'id': '4',
             'colour': None,
             'brand_type': 'org',
@@ -1736,17 +1736,15 @@ def test_organisation_email_branding_options_shows_branding_pool(
     client_request.login(platform_admin_user)
     page = client_request.get('.organisation_email_branding_options', org_id=organisation_one['id'])
 
-    assert page.h1.text == 'Change email branding options'
+    assert page.h1.text == 'Add email branding options'
     assert page.select_one('[data-module=live-search]')['data-targets'] == ('.govuk-checkboxes__item')
 
     assert [
         (checkbox.text.strip(), checkbox.input['value'], checkbox.input.has_attr('checked'))
         for checkbox in page.select('.govuk-checkboxes__item')
         ] == [
-            ('org 1', '1', True),
             ('org 2', '2', False),
             ('org 3', '3', False),
-            ('org 4', '4', True),
             ('org 5', '5', False),
         ]
 

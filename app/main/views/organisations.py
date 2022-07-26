@@ -455,14 +455,11 @@ def organisation_email_branding_options(org_id):
     form.branding_field.choices = [
         (branding['id'], branding['name'])
         for branding in email_branding_client.get_all_email_branding(sort_key='name')
-    ]
-    form.branding_field.data = [
-        branding['id']
-        for branding in current_organisation.email_branding_pool
+        if branding not in current_organisation.email_branding_pool
     ]
 
     return render_template(
-        'views/organisations/organisation/settings/change-email-branding-options.html',
+        'views/organisations/organisation/settings/add-email-branding-options.html',
         form=form,
         search_form=SearchByNameForm()
     )
