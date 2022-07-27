@@ -29,7 +29,7 @@ $path: '/static/images/';
 @import 'elements/forms/form-validation';
 @import 'elements/lists';
 @import 'elements/panels';
-@import 'elements/tables';
+@import 'govuk_elements/tables';
 
 // Dependencies from GOV.UK Frontend, packaged to be specific to this application
 @import './govuk-frontend/all';
