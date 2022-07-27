@@ -30,16 +30,13 @@
       </p>
       {% call form_wrapper() %}
 
-        {% call select_wrapper(form.contact_details_type, hide_legend=true) %}
-          {% for option in form.contact_details_type %}
-            {% set data_target = option.data.replace('_', '-') ~ "-type" %}
-
-            {{ radio(option, data_target=data_target) }}
-            <div class="panel panel-border-narrow js-hidden" id={{data_target}}>
-              {{ form|attr(option.data)(param_extensions={"classes": "govuk-!-width-full", "label": {"text": " "}}) }}
-            </div>
-          {% endfor %}
-        {% endcall %}
+        {{ form.contact_details_type(param_extensions={
+          "items": [
+            { "conditional": { "html": form.url(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } },
+            { "conditional": { "html": form.email_address(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } },
+            { "conditional": { "html": form.phone_number(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } }
+          ]
+        }) }}
 
         {{ page_footer('Save') }}
       {% endcall %}
