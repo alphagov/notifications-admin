@@ -130,7 +130,7 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
     client_request,
 ):
     request = partial(client_request.get, 'main.edit_and_format_messages')
-    selector = '.list-number li a'
+    selector = '.govuk-list--number li a'
 
     # Check the page loads when user is signed in
     page = request()
