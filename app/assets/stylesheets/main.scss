@@ -24,9 +24,9 @@ $path: '/static/images/';
 @import 'elements/reset';
 @import 'elements/details';
 @import 'elements/elements-typography';
-@import 'elements/forms';
-@import 'elements/forms/form-multiple-choice';
-@import 'elements/forms/form-validation';
+@import 'govuk_elements/forms';
+@import 'govuk_elements/forms/form-multiple-choice';
+@import 'govuk_elements/forms/form-validation';
 @import 'govuk_elements/tables';
 
 // Dependencies from GOV.UK Frontend, packaged to be specific to this application
