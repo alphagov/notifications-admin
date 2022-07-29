@@ -41,19 +41,9 @@ textarea {
 // 2. Form wrappers
 // ==========================================================================
 
-.form-section,
 .form-group {
   @extend %contain-floats;
   @include box-sizing(border-box);
-}
-
-// Form section is used to wrap .form-group and has twice its margin
-.form-section {
-  margin-bottom: $gutter;
-
-  @include media(tablet) {
-    margin-bottom: $gutter * 2;
-  }
 }
 
 // Form group is used to wrap label and input pairs
@@ -65,53 +55,17 @@ textarea {
   }
 }
 
-// Form group related is used to reduce the space between label and input pairs
-.form-group-related {
-  margin-bottom: 10px;
-
-  @include media(tablet) {
-    margin-bottom: 20px;
-  }
-}
-
-// Form group compound is used to reduce the space between label and input pairs
-.form-group-compound {
-  margin-bottom: 10px;
-}
-
-
 // 3. Form labels
 // ==========================================================================
 
 // Form labels, or for legends styled to look like labels
 // TODO: Amend so there is only one label style
-.form-label,
-.form-label-bold {
+.form-label {
   display: block;
   color: $text-colour;
   padding-bottom: 2px;
-}
 
-.form-label {
   @include core-19;
-}
-
-.form-label-bold {
-  @include bold-19;
-}
-
-// Used for the 'or' in between block label options
-.form-block {
-  float: left;
-  clear: left;
-
-  margin-top: -5px;
-  margin-bottom: 5px;
-
-  @include media(tablet) {
-    margin-top: 0;
-    margin-bottom: 10px;
-  }
 }
 
 // 4. Form hints
@@ -128,8 +82,7 @@ textarea {
   padding-bottom: 2px;
 }
 
-.form-label .form-hint,
-.form-label-bold .form-hint {
+.form-label .form-hint {
   margin-top: 0;
   padding-bottom: 0;
 }
