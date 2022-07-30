@@ -180,13 +180,3 @@ textarea.form-control {
     width: 12.5%;
   }
 }
-
-// 7. Browser accessibility fixes
-// ==========================================================================
-
-option:active,
-option:checked,
-select:focus::-ms-value {
-  color: $white;
-  background-color: $govuk-blue;
-}
