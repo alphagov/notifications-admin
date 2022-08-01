@@ -106,13 +106,13 @@ def service_name_change(service_id):
                 email_from=email_safe(form.name.data),
             )
         except HTTPError as http_error:
-            if http_error.status_code == 400 and any(
-                name_error_message.startswith('Duplicate service name')
-                for name_error_message in http_error.message['name']
-            ):
-                form.name.errors.append('This service name is already in use')
-            else:
-                raise http_error
+            if http_error.status_code == 400:
+                error_message = service_api_client.parse_edit_service_http_error(http_error)
+                if not error_message:
+                    raise http_error
+
+                form.name.errors.append(error_message)
+
         else:
             return redirect(url_for('.service_settings', service_id=service_id))
 

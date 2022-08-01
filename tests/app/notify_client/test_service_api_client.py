@@ -1,4 +1,4 @@
-from unittest.mock import call
+from unittest.mock import Mock, call
 from uuid import uuid4
 
 import pytest
@@ -611,3 +611,24 @@ def test_client_updates_service_with_allowed_attributes(
         f'/service/{SERVICE_ONE_ID}',
         {**{'created_by': '123'}, **attrs_dict}
     )
+
+
+@pytest.mark.parametrize(
+    'err_data, expected_message',
+    (
+        ({'name': 'Service name error'}, "This service name is already in use"),
+        (
+            {'email_from': 'email_from disallowed characters'},
+            "Service name must not include characters from a non-Latin alphabet"
+        ),
+        ({'other': 'blah'}, None),
+    )
+)
+def test_client_parsing_service_name_errors(err_data, expected_message):
+    client = ServiceAPIClient()
+    error = Mock()
+    error.message = err_data
+
+    error_message = client.parse_edit_service_http_error(error)
+
+    assert error_message == expected_message

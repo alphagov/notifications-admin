@@ -25,11 +25,14 @@ def _create_service(service_name, organisation_type, email_from, form):
 
         return service_id, None
     except HTTPError as e:
-        if e.status_code == 400 and e.message['name']:
-            form.name.errors.append("This service name is already in use")
+        if e.status_code == 400:
+            error_message = service_api_client.parse_edit_service_http_error(e)
+            if not error_message:
+                raise e
+
+            form.name.errors.append(error_message)
+
             return None, e
-        else:
-            raise e
 
 
 def _create_example_template(service_id):
