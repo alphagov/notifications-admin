@@ -211,6 +211,21 @@ def test_update_organisation_when_updating_org_type_but_org_has_no_services(mock
     ]
 
 
+def test_add_brandings_to_email_branding_pool(mocker, fake_uuid):
+    mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
+    mock_post = mocker.patch('app.notify_client.organisations_api_client.OrganisationsClient.post')
+
+    organisations_client.add_brandings_to_email_branding_pool(
+        fake_uuid,
+        branding_ids=['abcd', 'efgh'],
+    )
+    mock_post.assert_called_with(
+        url=f'/organisations/{fake_uuid}/email-branding-pool',
+        data={'branding_ids': ['abcd', 'efgh']}
+    )
+    mock_redis_delete.assert_called_once_with(f'organisation-{fake_uuid}-email-branding-pool')
+
+
 def test_update_service_organisation_deletes_cache(mocker, fake_uuid):
     mock_redis_delete = mocker.patch('app.extensions.RedisClient.delete')
     mock_post = mocker.patch('app.notify_client.organisations_api_client.OrganisationsClient.post')

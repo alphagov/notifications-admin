@@ -447,7 +447,7 @@ def organisation_preview_email_branding(org_id):
     )
 
 
-@main.route("/organisations/<uuid:org_id>/settings/email-branding-options", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>/settings/email-branding-options", methods=['GET', 'POST'])
 @user_is_platform_admin
 def organisation_email_branding_options(org_id):
     form = AdminChangeEmailBrandingPoolForm()
@@ -457,6 +457,20 @@ def organisation_email_branding_options(org_id):
         for branding in email_branding_client.get_all_email_branding(sort_key='name')
         if branding not in current_organisation.email_branding_pool
     ]
+
+    if form.validate_on_submit():
+        selected_email_branding_ids = form.branding_field.data
+
+        organisations_client.add_brandings_to_email_branding_pool(org_id, selected_email_branding_ids)
+
+        if len(selected_email_branding_ids) == 1:
+            msg = '1 email branding option added'
+        else:
+            msg = f'{len(selected_email_branding_ids)} email branding options added'
+
+        flash(msg, 'default_with_tick')
+        # TODO: redirect to page showing a preview of all branding in pool once it exists
+        return redirect(url_for('.organisation_settings', org_id=org_id))
 
     return render_template(
         'views/organisations/organisation/settings/add-email-branding-options.html',

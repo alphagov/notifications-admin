@@ -1,5 +1,6 @@
 {% extends "org_template.html" %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
@@ -22,6 +23,7 @@
         <div class="brand-pool">
             {{ form.branding_field }}
         </div>
+      {{ page_footer('Add') }}
       {% endcall %}
     </div>
   </div>

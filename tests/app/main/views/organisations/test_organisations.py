@@ -1747,6 +1747,59 @@ def test_organisation_email_branding_options_shows_branding_not_in_branding_pool
             ('org 3', '3', False),
             ('org 5', '5', False),
         ]
+    assert normalize_spaces(page.select_one('.page-footer__button').text) == 'Add'
+
+
+def test_organisation_email_branding_options_shows_error_if_no_branding_selected(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+    mock_get_all_email_branding,
+    mock_get_email_branding_pool,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.organisation_email_branding_options',
+        org_id=organisation_one['id'],
+        _data=[],
+        _expected_status=200,
+    )
+    assert normalize_spaces(
+        page.select_one('.govuk-error-message').text
+    ) == 'Error: Select at least 1 email branding option'
+
+
+@pytest.mark.parametrize('branding_ids_added, flash_message', [
+    (['1', '2'], '2 email branding options added'),
+    (['1'], '1 email branding option added'),
+])
+def test_organisation_email_branding_options_calls_api_client_with_chosen_branding(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mocker,
+    mock_get_organisation,
+    mock_get_all_email_branding,
+    mock_get_email_branding_pool,
+    branding_ids_added,
+    flash_message,
+):
+    mock_update_pool = mocker.patch('app.organisations_client.add_brandings_to_email_branding_pool')
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        '.organisation_email_branding_options',
+        org_id=organisation_one['id'],
+        _data={'branding_field': branding_ids_added},
+        _follow_redirects=True,
+    )
+
+    assert page.h1.text == 'Settings'
+    assert normalize_spaces(
+        page.find('div', class_='banner-default-with-tick').text
+    ) == flash_message
+    mock_update_pool.assert_called_once_with(organisation_one['id'], branding_ids_added)
 
 
 def test_organisation_settings_links_to_edit_organisation_billing_details_page(
