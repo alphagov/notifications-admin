@@ -1,0 +1,30 @@
+{% extends "org_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/live-search.html" import live_search %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block org_page_title %}
+    Email Branding
+{% endblock %}
+
+{% block backLink %}
+    {{ govukBackLink({ "href": url_for('.organisation_settings', org_id=current_org.id) }) }}
+{%  endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header("Email branding") }}
+    {{ default_email_branding }}
+
+  {% call form_wrapper(data_kwargs={'preview-type': 'email'}) %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full preview-pane">
+      </div>
+    </div>
+    <div class="js-stick-at-bottom-when-scrolling">
+      {{ page_footer('Preview') }}
+    </div>
+  {% endcall %}
+{% endblock %}
+

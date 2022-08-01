@@ -11,7 +11,7 @@
 
 {% block backLink %}
   {{ govukBackLink({
-    "href": url_for('.email_branding_request', service_id=current_service.id)
+    "href": url_for('.organisation_settings', service_id=current_service.id)
   }) }}
 {% endblock %}
 

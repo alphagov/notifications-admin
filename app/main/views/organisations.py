@@ -450,6 +450,19 @@ def organisation_preview_email_branding(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/email-branding-options", methods=['GET', 'POST'])
 @user_is_platform_admin
 def organisation_email_branding_options(org_id):
+    email_branding_options = email_branding_client.get_all_email_branding(sort_key='name')
+    default_email_branding = current_organisation.email_branding_id
+    form = AdminChangeEmailBrandingPoolForm
+    return render_template(
+        'views/organisations/organisation/settings/email-branding-options.html',
+        form=form,
+        action=url_for('main.organisation_email_branding_options', org_id=org_id),
+    )
+
+
+@main.route("/organisations/<uuid:org_id>/settings/email-branding-options/add", methods=['GET'])
+@user_is_platform_admin
+def add_organisation_email_branding_options(org_id):
     form = AdminChangeEmailBrandingPoolForm()
 
     form.branding_field.choices = [

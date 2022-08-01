@@ -338,6 +338,7 @@ class OrgNavigation(Navigation):
         },
         'settings': {
             'archive_organisation',
+            'add_organisation_email_branding_options'
             'edit_organisation_agreement',
             'edit_organisation_billing_details',
             'edit_organisation_crown_status',
@@ -349,7 +350,7 @@ class OrgNavigation(Navigation):
             'edit_organisation_name',
             'edit_organisation_notes',
             'edit_organisation_type',
-            'organisation_email_branding_options',
+            'organisation_email_branding_options'
             'organisation_preview_email_branding',
             'organisation_preview_letter_branding',
             'organisation_settings',

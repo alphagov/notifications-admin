@@ -1692,20 +1692,54 @@ def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
     assert not mock_update_organisation.called
 
 
-def test_organisation_email_branding_options_is_platform_admin_only(
+def test_organisation_email_branding_options_page_is_not_accessible_by_non_platform_admin(
+    client_request,
+    organisation_one,
+    mock_get_organisation,
+
+):
+    #client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.organisation_email_branding_options',
+        org_id=organisation_one['id'],
+        _expected_status=403
+    )
+    assert page
+
+
+def test_organisation_email_branding_options_page_is_accessible_to_platform_admin(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+
+):
+    import pdb
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        'main.organisation_email_branding_options',
+        org_id=organisation_one['id'],
+        _expected_status=200
+    )
+    pdb.set_trace()
+    assert page
+
+
+# TODO
+def test_add_organisation_email_branding_options_is_platform_admin_only(
     client_request,
     organisation_one,
     mock_get_organisation,
     mocker,
 ):
     client_request.get(
-        'main.organisation_email_branding_options',
+        'main.add_organisation_email_branding_options',
         org_id=organisation_one['id'],
         _expected_status=403
     )
 
 
-def test_organisation_email_branding_options_shows_branding_not_in_branding_pool(
+def test_add_organisation_email_branding_options_shows_branding_not_in_branding_pool(
     mocker,
     client_request,
     platform_admin_user,
@@ -1734,8 +1768,7 @@ def test_organisation_email_branding_options_shows_branding_not_in_branding_pool
     mocker.patch('app.organisations_client.get_email_branding_pool', return_value=branding_pool)
 
     client_request.login(platform_admin_user)
-    page = client_request.get('.organisation_email_branding_options', org_id=organisation_one['id'])
-
+    page = client_request.get('.add_organisation_email_branding_options', org_id=organisation_one['id'])
     assert page.h1.text == 'Add email branding options'
     assert page.select_one('[data-module=live-search]')['data-targets'] == ('.govuk-checkboxes__item')
 
