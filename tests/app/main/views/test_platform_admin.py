@@ -1,5 +1,4 @@
 import datetime
-import re
 import uuid
 from functools import partial
 from unittest.mock import ANY, call
@@ -319,8 +318,8 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
                                                         'include_from_test_key': True,
                                                         'only_active': ANY})
 
-    table_body = page.find_all('table')[0].find_all('tbody')[0]
-    service_row_group = table_body.find_all('tbody')[0].find_all('tr')
+    table_body = page.select('table tbody')[0]
+    service_row_group = table_body.select_one('tbody').select('tr')
     email_stats = service_row_group[1].select('.big-number-number')[0]
     sms_stats = service_row_group[1].select('.big-number-number')[1]
 
@@ -356,8 +355,8 @@ def test_should_show_archived_services_last(
                                                         'include_from_test_key': True,
                                                         'only_active': ANY})
 
-    table_body = page.find_all('table')[0].find_all('tbody')[0]
-    services = [service.tr for service in table_body.find_all('tbody')]
+    table_body = page.select_one('table tbody')
+    services = [service.tr for service in table_body.select('tbody')]
     assert len(services) == 3
     assert normalize_spaces(services[0].td.text) == 'A'
     assert normalize_spaces(services[1].td.text) == 'B'
@@ -417,8 +416,7 @@ def test_should_order_services_by_usage_with_inactive_last(
                                                         'include_from_test_key': True,
                                                         'only_active': ANY})
 
-    table_body = page.find_all('table')[0].find_all('tbody')[0]
-    services = [service.tr for service in table_body.find_all('tbody')]
+    services = page.select('table tbody tbody tr:first-child')
     assert len(services) == 3
     assert normalize_spaces(services[0].td.text) == 'My Service 2'
     assert normalize_spaces(services[1].td.text) == 'My Service 1'
@@ -506,8 +504,8 @@ def test_should_show_complaints_with_next_previous(
         page=2,
     )
 
-    next_page_link = page.find('a', {'rel': 'next'})
-    prev_page_link = page.find('a', {'rel': 'previous'})
+    next_page_link = page.select_one('a[rel=next]')
+    prev_page_link = page.select_one('a[rel=previous]')
     assert (url_for('main.platform_admin_list_complaints', page=3) in next_page_link['href'])
     assert 'Next page' in next_page_link.text.strip()
     assert 'page 3' in next_page_link.text.strip()
@@ -661,21 +659,21 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
     page = client_request.get('main.platform_admin')
 
     # Email permanent failure status box - number is correct
-    assert '3 permanent failures' in page.find_all(
-        'div', class_='govuk-grid-column-one-third'
-    )[0].find(string=re.compile('permanent'))
+    assert '3 permanent failures' in page.select(
+        '.big-number-status'
+    )[1].text
     # Email complaints status box - link exists and number is correct
-    assert page.find('a', string='15 complaints')
+    assert page.select_one('a', string='15 complaints')
     # SMS total box - number is correct
-    assert page.find_all('span', class_='big-number-number')[1].text.strip() == '168'
+    assert page.select('span.big-number-number')[1].text.strip() == '168'
     # Test SMS box - number is correct
-    assert '5' in page.find_all('div', class_='govuk-grid-column-one-third')[4].text
+    assert '5' in page.select('div.govuk-grid-column-one-third')[4].text
     # SMS technical failure status box - number is correct and failure class is used
-    assert '1 technical failures' in page.find_all('div', class_='govuk-grid-column-one-third')[1].find(
-        'div', class_='big-number-status-failing').text
+    assert '1 technical failures' in page.select('div.govuk-grid-column-one-third')[1].select_one(
+        'div.big-number-status-failing').text
     # Letter virus scan failure status box - number is correct and failure class is used
-    assert '1 virus scan failures' in page.find_all('div', class_='govuk-grid-column-one-third')[2].find(
-        'div', class_='big-number-status-failing').text
+    assert '1 virus scan failures' in page.select('div.govuk-grid-column-one-third')[2].select_one(
+        'div.big-number-status-failing').text
 
 
 def test_platform_admin_submit_returned_letters(
@@ -791,7 +789,7 @@ def test_clear_cache_submits_and_tells_you_how_many_things_were_deleted(
 
     assert redis.delete_by_pattern.call_args_list == expected_calls
 
-    flash_banner = page.find('div', class_='banner-default')
+    flash_banner = page.select_one('div.banner-default')
     assert flash_banner.text.strip() == expected_confirmation
 
 
@@ -805,7 +803,7 @@ def test_clear_cache_requires_option(
 
     page = client_request.post('main.clear_cache', _data={}, _expected_status=200)
 
-    assert normalize_spaces(page.find('span', class_='govuk-error-message').text) == 'Error: Select at least one option'
+    assert normalize_spaces(page.select_one('.govuk-error-message').text) == 'Error: Select at least one option'
     assert not redis.delete_by_pattern.called
 
 
@@ -816,13 +814,13 @@ def test_reports_page(
     client_request.login(platform_admin_user)
     page = client_request.get('main.platform_admin_reports')
 
-    assert page.find(
-        'a', text="Download live services csv report"
-    ).attrs['href'] == '/platform-admin/reports/live-services.csv'
+    live_services_link = page.select('main a')[0]
+    assert live_services_link.text == "Download live services csv report"
+    assert live_services_link['href'] == '/platform-admin/reports/live-services.csv'
 
-    assert page.find(
-        'a', text="Monthly notification statuses for live services"
-    ).attrs['href'] == url_for('main.notifications_sent_by_service')
+    monthly_statuses_link = page.select('main a')[1]
+    assert monthly_statuses_link.text == "Monthly notification statuses for live services"
+    assert monthly_statuses_link['href'] == url_for('main.notifications_sent_by_service')
 
 
 def test_get_live_services_report(

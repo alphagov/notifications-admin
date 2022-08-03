@@ -353,7 +353,7 @@ def test_service_with_no_email_auth_hides_auth_type_options(
     if service_has_email_auth:
         service_one['permissions'].append('email_auth')
     page = client_request.get(endpoint, service_id=service_one['id'], **extra_args)
-    assert (page.find('input', attrs={"name": "login_authentication"}) is None) == auth_options_hidden
+    assert (page.select_one('input[name=login_authentication]') is None) == auth_options_hidden
 
 
 @pytest.mark.parametrize('service_has_caseworking', (True, False))
@@ -977,8 +977,8 @@ def test_should_show_page_for_inviting_user(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert 'Invite a team member' in page.find('h1').text.strip()
-    assert not page.find('div', class_='checkboxes-nested')
+    assert 'Invite a team member' in page.select_one('h1').text.strip()
+    assert not page.select_one('div.checkboxes-nested')
 
 
 def test_should_show_page_for_inviting_user_with_email_prefilled(
@@ -1157,9 +1157,9 @@ def test_should_show_folder_permission_form_if_service_has_folder_permissions_en
         service_id=SERVICE_ONE_ID,
     )
 
-    assert 'Invite a team member' in page.find('h1').text.strip()
+    assert 'Invite a team member' in page.select_one('h1').text.strip()
 
-    folder_checkboxes = page.find('div', class_='selection-wrapper').find_all('li')
+    folder_checkboxes = page.select_one('div.selection-wrapper').select('li')
     assert len(folder_checkboxes) == 3
 
 
@@ -1199,7 +1199,7 @@ def test_invite_user(
         _follow_redirects=True,
     )
     assert page.h1.string.strip() == 'Team members'
-    flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
+    flash_banner = page.select_one('div.banner-default-with-tick').string.strip()
     assert flash_banner == f"Invite sent to {email_address}"
 
     expected_permissions = {'manage_api_keys', 'manage_service', 'manage_templates', 'send_messages', 'view_activity'}
@@ -1301,7 +1301,7 @@ def test_invite_user_with_email_auth_service(
     )
 
     assert page.h1.string.strip() == 'Team members'
-    flash_banner = page.find('div', class_='banner-default-with-tick').string.strip()
+    flash_banner = page.select_one('div.banner-default-with-tick').string.strip()
     assert flash_banner == 'Invite sent to test@example.gov.uk'
 
     expected_permissions = {'manage_api_keys', 'manage_service', 'manage_templates', 'send_messages', 'view_activity'}
@@ -1398,7 +1398,7 @@ def test_invite_non_govt_user_to_broadcast_service_fails_validation(
         _expected_status=200
     )
     assert app.invite_api_client.create_invite.called is False
-    assert "Enter a public sector email address" in page.find_all('span', class_='govuk-error-message')[0].text
+    assert "Enter a public sector email address" in page.select_one('.govuk-error-message').text
 
 
 def test_cancel_invited_user_cancels_user_invitations(
@@ -1422,7 +1422,7 @@ def test_cancel_invited_user_cancels_user_invitations(
 
     assert normalize_spaces(page.h1.text) == 'Team members'
     flash_banner = normalize_spaces(
-        page.find('div', class_='banner-default-with-tick').text
+        page.select_one('div.banner-default-with-tick').text
     )
     assert flash_banner == f"Invitation cancelled for {sample_invite['email_address']}"
     mock_cancel.assert_called_once_with(
@@ -1500,9 +1500,9 @@ def test_manage_users_does_not_show_accepted_invite(
     page = client_request.get('main.manage_users', service_id=SERVICE_ONE_ID)
 
     assert page.h1.string.strip() == 'Team members'
-    user_lists = page.find_all('div', {'class': 'user-list'})
+    user_lists = page.select('div.user-list')
     assert len(user_lists) == 1
-    assert not page.find(text='invited_user@test.gov.uk')
+    assert 'invited_user@test.gov.uk' not in page.text
 
 
 def test_user_cant_invite_themselves(
@@ -1527,7 +1527,7 @@ def test_user_cant_invite_themselves(
         _expected_status=200,
     )
     assert page.h1.string.strip() == 'Invite a team member'
-    form_error = page.find('span', class_='govuk-error-message').text.strip()
+    form_error = page.select_one('.govuk-error-message').text.strip()
     assert form_error == "Error: You cannot send an invitation to yourself"
     assert not mock_create_invite.called
 
@@ -1740,7 +1740,7 @@ def test_edit_user_email_page(
         user_id=sample_uuid()
     )
 
-    assert page.find('h1').text == "Change team member’s email address"
+    assert page.select_one('h1').text == "Change team member’s email address"
     assert page.select('p[id=user_name]')[0].text == "This will change the email address for {}.".format(user['name'])
     assert page.select('input[type=email]')[0].attrs["value"] == user['email_address']
     assert normalize_spaces(page.select('main button[type=submit]')[0].text) == "Save"
@@ -2009,7 +2009,7 @@ def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_l
         user_id=active_user_with_permissions['id'],
     )
 
-    assert active_user_with_permissions['name'] in page.find('h1').text
+    assert active_user_with_permissions['name'] in page.select_one('h1').text
     mobile_number_paragraph = page.select('p[id=user_mobile_number]')[0]
     assert '0770 •  •  •  • 762' in mobile_number_paragraph.text
     change_link = mobile_number_paragraph.findChild()
@@ -2032,7 +2032,7 @@ def test_edit_user_permissions_with_delete_query_shows_banner(
         delete=1
     )
 
-    banner = page.find('div', class_='banner-dangerous')
+    banner = page.select_one('div.banner-dangerous')
     assert banner.contents[0].strip() == "Are you sure you want to remove Test User?"
     assert banner.form.attrs['action'] == url_for(
         'main.remove_user_from_service',
@@ -2054,7 +2054,7 @@ def test_edit_user_mobile_number_page(
         user_id=active_user_with_permissions['id'],
     )
 
-    assert page.find('h1').text == "Change team member’s mobile number"
+    assert page.select_one('h1').text == "Change team member’s mobile number"
     assert page.select('p[id=user_name]')[0].text == (
         "This will change the mobile number for {}."
     ).format(active_user_with_permissions['name'])

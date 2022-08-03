@@ -39,7 +39,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
     )
 
     assert mock_get_email_branding.called is False
-    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='__NONE__')
+    assert page.select_one('iframe')['src'] == url_for('main.email_template', branding_style='__NONE__')
     assert mock_get_letter_branding_by_id.called is False
 
     button_text = normalize_spaces(page.select_one('.page-footer button').text)
@@ -228,7 +228,7 @@ def test_email_branding_pool_option_page_displays_preview_of_chosen_branding(
         branding_option='email-branding-1-id'
     )
 
-    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='email-branding-1-id')
+    assert page.select_one('iframe')['src'] == url_for('main.email_template', branding_style='email-branding-1-id')
 
 
 def test_email_branding_pool_option_page_redirects_to_branding_request_page_if_branding_option_not_found(
@@ -307,7 +307,7 @@ def test_email_branding_request_page_shows_branding_if_set(
     page = client_request.get(
         '.email_branding_request', service_id=SERVICE_ONE_ID
     )
-    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style='some-random-branding')
+    assert page.select_one('iframe')['src'] == url_for('main.email_template', branding_style='some-random-branding')
 
 
 def test_email_branding_request_page_back_link(
@@ -479,7 +479,7 @@ def test_email_branding_govuk_and_nhs_pages(
     )
     assert page.h1.text == 'Check your new branding'
     assert 'Emails from service one will look like this' in normalize_spaces(page.text)
-    assert page.find('iframe')['src'] == url_for('main.email_template', branding_style=branding_preview_id)
+    assert page.select_one('iframe')['src'] == url_for('main.email_template', branding_style=branding_preview_id)
     assert normalize_spaces(page.select_one('.page-footer button').text) == 'Use this branding'
 
 

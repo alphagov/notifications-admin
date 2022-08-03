@@ -2897,7 +2897,7 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
                 if count_of_h1s != 1:
                     raise AssertionError('Page should have one H1 ({} found)'.format(count_of_h1s))
                 page_title, h1 = (
-                    normalize_spaces(page.find(selector).text) for selector in ('title', 'h1')
+                    normalize_spaces(page.select_one(selector).text) for selector in ('title', 'h1')
                 )
                 if not normalize_spaces(page_title).startswith(h1):
                     raise AssertionError('Page title ‘{}’ does not start with H1 ‘{}’'.format(page_title, h1))

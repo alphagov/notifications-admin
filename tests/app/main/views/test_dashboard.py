@@ -179,7 +179,9 @@ def test_get_started_is_hidden_once_templates_exist(
     )
 
     mock_get_service_templates.assert_called_once_with(SERVICE_ONE_ID)
-    assert not page.find('h2', string='Get started')
+    assert not any(
+        'Get started' in h2.text for h2 in page.select('h2')
+    )
 
 
 def test_inbound_messages_not_visible_to_service_without_permissions(
@@ -319,8 +321,8 @@ def test_get_inbound_sms_shows_page_links(
         page=2,
     )
 
-    assert 'Next page' in page.find('li', {'class': 'next-page'}).text
-    assert 'Previous page' in page.find('li', {'class': 'previous-page'}).text
+    assert 'Next page' in page.select_one('li.next-page').text
+    assert 'Previous page' in page.select_one('li.previous-page').text
 
 
 def test_empty_inbox(
@@ -629,28 +631,28 @@ def test_should_show_recent_templates_on_dashboard(
 
     mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
 
-    headers = [header.text.strip() for header in page.find_all('h2') + page.find_all('h1')]
+    headers = [header.text.strip() for header in page.select('h2') + page.select('h1')]
     assert 'In the last 7 days' in headers
 
-    table_rows = page.find_all('tbody')[0].find_all('tr')
+    table_rows = page.select_one('tbody').select('tr')
 
     assert len(table_rows) == 4
 
-    assert 'Provided as PDF' in table_rows[0].find_all('th')[0].text
-    assert 'Letter' in table_rows[0].find_all('th')[0].text
-    assert '400' in table_rows[0].find_all('td')[0].text
+    assert 'Provided as PDF' in table_rows[0].select('th')[0].text
+    assert 'Letter' in table_rows[0].select('th')[0].text
+    assert '400' in table_rows[0].select('td')[0].text
 
-    assert 'three' in table_rows[1].find_all('th')[0].text
-    assert 'Letter template' in table_rows[1].find_all('th')[0].text
-    assert '300' in table_rows[1].find_all('td')[0].text
+    assert 'three' in table_rows[1].select('th')[0].text
+    assert 'Letter template' in table_rows[1].select('th')[0].text
+    assert '300' in table_rows[1].select('td')[0].text
 
-    assert 'two' in table_rows[2].find_all('th')[0].text
-    assert 'Email template' in table_rows[2].find_all('th')[0].text
-    assert '200' in table_rows[2].find_all('td')[0].text
+    assert 'two' in table_rows[2].select('th')[0].text
+    assert 'Email template' in table_rows[2].select('th')[0].text
+    assert '200' in table_rows[2].select('td')[0].text
 
-    assert 'one' in table_rows[3].find_all('th')[0].text
-    assert 'Text message template' in table_rows[3].find_all('th')[0].text
-    assert '100' in table_rows[3].find_all('td')[0].text
+    assert 'one' in table_rows[3].select('th')[0].text
+    assert 'Text message template' in table_rows[3].select('th')[0].text
+    assert '100' in table_rows[3].select('td')[0].text
 
 
 @pytest.mark.parametrize('stats', (
@@ -1000,13 +1002,13 @@ def test_usage_page(
     mock_get_annual_usage_for_service.assert_called_once_with(SERVICE_ONE_ID, 2011)
     mock_get_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, 2011)
 
-    nav = page.find('ul', {'class': 'pill'})
+    nav = page.select_one('ul.pill')
     unselected_nav_links = nav.select('a:not(.pill-item--selected)')
     assert normalize_spaces(nav.find('a', {'aria-current': 'page'}).text) == '2011 to 2012 financial year'
     assert normalize_spaces(unselected_nav_links[0].text) == '2010 to 2011 financial year'
     assert normalize_spaces(unselected_nav_links[1].text) == '2009 to 2010 financial year'
 
-    annual_usage = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
+    annual_usage = page.select('div.govuk-grid-column-one-third')
 
     # annual stats are shown in two rows, each with three column; email is col 1
     email_column = normalize_spaces(annual_usage[0].text + annual_usage[3].text)
@@ -1050,7 +1052,7 @@ def test_usage_page_no_sms_spend(
         service_id=SERVICE_ONE_ID,
     )
 
-    annual_usage = page.find_all('div', {'class': 'govuk-grid-column-one-third'})
+    annual_usage = page.select('div.govuk-grid-column-one-third')
     sms_column = normalize_spaces(annual_usage[1].text + annual_usage[4].text)
     assert 'Text messages' in sms_column
     assert '250,000 free allowance' in sms_column
@@ -1068,7 +1070,7 @@ def test_usage_page_monthly_breakdown(
     mock_get_free_sms_fragment_limit
 ):
     page = client_request.get('main.usage', service_id=SERVICE_ONE_ID)
-    monthly_breakdown = normalize_spaces(page.find('table').text)
+    monthly_breakdown = normalize_spaces(page.select_one('table').text)
 
     assert 'April' in monthly_breakdown
     assert '249,860 free text messages' in monthly_breakdown
@@ -1105,7 +1107,7 @@ def test_usage_page_monthly_breakdown_shows_months_so_far(
 ):
     with now:
         page = client_request.get('main.usage', service_id=SERVICE_ONE_ID)
-        rows = page.find('table').find_all('tr', class_='table-row')
+        rows = page.select_one('table').select('tr.table-row')
         assert len(rows) == expected_number_of_months
 
 
@@ -1118,8 +1120,8 @@ def test_usage_page_letter_breakdown_ordered_by_postage_and_rate(
     mock_get_free_sms_fragment_limit
 ):
     page = client_request.get('main.usage', service_id=SERVICE_ONE_ID)
-    row_for_feb = page.find('table').find_all('tr', class_='table-row')[10]
-    postage_details = row_for_feb.find_all('li', class_='tabular-numbers')
+    row_for_feb = page.select_one('table').select('tr.table-row')[10]
+    postage_details = row_for_feb.select('li.tabular-numbers')
 
     assert normalize_spaces(postage_details[3].text) == '5 first class letters at 33p'
     assert normalize_spaces(postage_details[4].text) == '10 second class letters at 31p'
@@ -1438,7 +1440,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
         service_id=SERVICE_ONE_ID,
     )
 
-    numbers = [number.text.strip() for number in page.find_all('span', class_='big-number-number')]
+    numbers = [number.text.strip() for number in page.select('span.big-number-number')]
     assert '123' in numbers
     assert '456' in numbers
 

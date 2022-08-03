@@ -46,8 +46,8 @@ def test_should_render_correct_resend_template_for_active_user(
 
     assert page.h1.string == 'Resend security code'
     # there shouldn't be a form for updating mobile number
-    assert page.find('form') is None
-    assert page.find('a', class_="govuk-button")['href'] == url_for(
+    assert page.select_one('form') is None
+    assert page.select_one('a.govuk-button')['href'] == url_for(
         'main.check_and_resend_verification_code',
         next=redirect_url
     )
@@ -73,7 +73,7 @@ def test_should_render_correct_resend_template_for_pending_user(
     expected = 'Check your mobile phone number is correct and then resend the security code.'
     message = page.select('main p')[0].text
     assert message == expected
-    assert page.find('form').input['value'] == api_user_pending['mobile_number']
+    assert page.select_one('form').input['value'] == api_user_pending['mobile_number']
 
 
 @pytest.mark.parametrize('redirect_url', [
@@ -206,5 +206,5 @@ def test_should_render_correct_email_not_received_template_for_active_user(
 
     assert page.h1.string == 'Resend email link'
     # there shouldn't be a form for updating mobile number
-    assert page.find('form') is None
-    assert page.find('a', class_="govuk-button")['href'] == url_for('main.resend_email_link', next=redirect_url)
+    assert page.select_one('form') is None
+    assert page.select_one('a.govuk-button')['href'] == url_for('main.resend_email_link', next=redirect_url)

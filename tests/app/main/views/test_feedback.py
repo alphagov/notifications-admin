@@ -84,7 +84,7 @@ def test_choose_support_type(
     assert page.h1.string.strip() == expected_h1
     assert not page.select_one('input[name=name]')
     assert not page.select_one('input[name=email_address]')
-    assert page.find('form').find('p').text.strip() == (
+    assert page.select_one('form').find('p').text.strip() == (
         'We’ll reply to test@user.gov.uk'
     )
 
@@ -446,7 +446,7 @@ def test_doesnt_lose_message_if_post_across_closing(
     )
 
     with client_request.session_transaction() as session:
-        assert page.find('textarea', {'name': 'feedback'}).text == '\r\nfoo'
+        assert page.select_one('textarea', {'name': 'feedback'}).text == '\r\nfoo'
         assert 'feedback_message' not in session
 
 
@@ -742,4 +742,4 @@ def test_thanks(
         out_of_hours_emergency=out_of_hours_emergency,
         email_address_provided=email_address_provided,
     )
-    assert normalize_spaces(page.find('main').find('p').text) == message
+    assert normalize_spaces(page.select_one('main').find('p').text) == message

@@ -186,16 +186,16 @@ def test_message_status_page_contains_message_status_ids(client_request):
     # so this test ensures we don't accidentally remove them
     page = client_request.get('main.message_status')
 
-    assert page.find(id='email-statuses')
-    assert page.find(id='text-message-statuses')
+    assert page.select_one('#email-statuses')
+    assert page.select_one('#text-message-statuses')
 
 
 def test_message_status_page_contains_link_to_support(client_request):
     page = client_request.get('main.message_status')
-    sms_status_table = page.find(id='text-message-statuses').findNext('tbody')
+    sms_status_table = page.select_one('#text-message-statuses').findNext('tbody')
 
     temp_fail_details_cell = sms_status_table.select_one('tr:nth-child(4) > td:nth-child(2)')
-    assert temp_fail_details_cell.find('a').attrs['href'] == url_for('main.support')
+    assert temp_fail_details_cell.select_one('a')['href'] == url_for('main.support')
 
 
 def test_old_using_notify_page(client_request):
@@ -298,7 +298,7 @@ def test_letter_template_preview_links_to_the_correct_image(
         branding_style=branding_style
     )
 
-    image_link = page.find('img')['src']
+    image_link = page.select_one('img')['src']
 
     assert image_link == url_for(
         'no_cookie.letter_branding_preview_image',

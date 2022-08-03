@@ -57,7 +57,7 @@ def test_update_letter_branding_shows_the_current_letter_brand(
         branding_id=fake_uuid,
     )
 
-    assert page.find('h1').text == 'Update letter branding'
+    assert page.select_one('h1').text == 'Update letter branding'
     assert page.select_one('#logo-img > img')['src'].endswith('/hm-government.svg')
     assert page.select_one('#name').attrs.get('value') == 'HM Government'
     assert page.select_one('#file').attrs.get('accept') == '.svg'
@@ -109,7 +109,7 @@ def test_update_letter_branding_when_uploading_invalid_file(
         _follow_redirects=True
     )
 
-    assert page.find('h1').text == 'Update letter branding'
+    assert page.select_one('h1').text == 'Update letter branding'
     assert page.select_one('.error-message').text.strip() == 'SVG Images only!'
 
 
@@ -139,7 +139,7 @@ def test_update_letter_branding_deletes_any_temp_files_when_uploading_a_file(
 
     assert mock_s3_upload.called
     assert mock_delete_temp_files.called
-    assert page.find('h1').text == 'Update letter branding'
+    assert page.select_one('h1').text == 'Update letter branding'
 
 
 def test_update_letter_branding_with_original_file_and_new_details(
@@ -164,7 +164,7 @@ def test_update_letter_branding_with_original_file_and_new_details(
         _follow_redirects=True,
     )
 
-    assert page.find('h1').text == 'Letter branding'
+    assert page.select_one('h1').text == 'Letter branding'
     assert mock_upload_logos.called is False
 
     mock_client_update.assert_called_once_with(
@@ -197,9 +197,9 @@ def test_update_letter_branding_shows_form_errors_on_name_fields(
         _follow_redirects=True
     )
 
-    error_messages = page.find_all('span', class_='govuk-error-message')
+    error_messages = page.select('.govuk-error-message')
 
-    assert page.find('h1').text == 'Update letter branding'
+    assert page.select_one('h1').text == 'Update letter branding'
     assert len(error_messages) == 1
     assert 'This field is required.' in error_messages[0].text.strip()
 
@@ -237,9 +237,9 @@ def test_update_letter_branding_shows_database_errors_on_name_field(
         _expected_status=200,
     )
 
-    error_message = page.find('span', class_='govuk-error-message').text.strip()
+    error_message = page.select_one('.govuk-error-message').text.strip()
 
-    assert page.find('h1').text == 'Update letter branding'
+    assert page.select_one('h1').text == 'Update letter branding'
     assert 'name already in use' in error_message
 
 
@@ -268,7 +268,7 @@ def test_update_letter_branding_with_new_file_and_new_details(
         },
         _follow_redirects=True
     )
-    assert page.find('h1').text == 'Letter branding'
+    assert page.select_one('h1').text == 'Letter branding'
 
     mock_client_update.assert_called_once_with(
         branding_id=fake_uuid,
@@ -304,7 +304,7 @@ def test_update_letter_branding_rolls_back_db_changes_and_shows_error_if_saving_
         },
         _follow_redirects=True,
     )
-    assert page.find('h1').text == 'Update letter branding'
+    assert page.select_one('h1').text == 'Update letter branding'
     assert page.select_one('.error-message').text.strip() == 'Error saving uploaded file - try uploading again'
 
     assert mock_client_update.call_count == 2
@@ -393,10 +393,10 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_ele
         _follow_redirects=True,
     )
 
-    assert normalize_spaces(page.find('h1').text) == "Add letter branding"
+    assert normalize_spaces(page.select_one('h1').text) == "Add letter branding"
     assert normalize_spaces(page.select_one(".error-message").text) == expected_error
 
-    assert page.findAll('div', {'id': 'logo-img'}) == []
+    assert page.select('div#logo-img') == []
 
     assert mock_s3_upload.called is False
 
@@ -411,7 +411,7 @@ def test_create_letter_branding_when_uploading_invalid_file(
         _data={'file': (BytesIO(''.encode('utf-8')), 'test.png')},
         _follow_redirects=True,
     )
-    assert page.find('h1').text == 'Add letter branding'
+    assert page.select_one('h1').text == 'Add letter branding'
     assert page.select_one('.error-message').text.strip() == 'SVG Images only!'
 
 
@@ -438,7 +438,7 @@ def test_create_letter_branding_deletes_temp_files_when_uploading_a_new_file(
     )
     assert mock_s3_upload.called
     assert mock_delete_temp_files.called
-    assert page.find('h1').text == 'Add letter branding'
+    assert page.select_one('h1').text == 'Add letter branding'
 
 
 def test_create_new_letter_branding_shows_preview_of_logo(
@@ -458,7 +458,7 @@ def test_create_new_letter_branding_shows_preview_of_logo(
         logo=temp_logo,
     )
 
-    assert page.find('h1').text == 'Add letter branding'
+    assert page.select_one('h1').text == 'Add letter branding'
     assert page.select_one('#logo-img > img').attrs['src'].endswith(temp_logo)
 
 
@@ -477,7 +477,7 @@ def test_create_letter_branding_shows_an_error_when_submitting_details_with_no_l
         _expected_status=200,
     )
 
-    assert page.find('h1').text == 'Add letter branding'
+    assert page.select_one('h1').text == 'Add letter branding'
     assert page.select_one('.error-message').text.strip() == 'You need to upload a file to submit'
 
 
@@ -507,7 +507,7 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
         _follow_redirects=True
     )
 
-    assert page.find('h1').text == 'Letter branding'
+    assert page.select_one('h1').text == 'Letter branding'
 
     mock_letter_client.create_letter_branding.assert_called_once_with(
         filename='{}-test'.format(fake_uuid), name='Test brand'
@@ -540,9 +540,9 @@ def test_create_letter_branding_shows_form_errors_on_name_field(
         _expected_status=200,
     )
 
-    error_messages = page.find_all('span', class_='govuk-error-message')
+    error_messages = page.select('.govuk-error-message')
 
-    assert page.find('h1').text == 'Add letter branding'
+    assert page.select_one('h1').text == 'Add letter branding'
     assert len(error_messages) == 1
     assert 'This field is required.' in error_messages[0].text.strip()
 
@@ -584,7 +584,7 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
         _expected_status=200,
     )
 
-    error_message = page.find('span', class_='govuk-error-message').text.strip()
+    error_message = page.select_one('.govuk-error-message').text.strip()
 
-    assert page.find('h1').text == 'Add letter branding'
+    assert page.select_one('h1').text == 'Add letter branding'
     assert 'name already in use' in error_message

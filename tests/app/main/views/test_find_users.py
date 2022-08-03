@@ -13,7 +13,7 @@ def test_find_users_by_email_page_loads_correctly(client_request, platform_admin
     document = client_request.get('main.find_users_by_email')
 
     assert document.h1.text.strip() == 'Find users by email'
-    assert len(document.find_all('input', {'type': 'search'})) > 0
+    assert len(document.select('input[type=search]')) > 0
 
 
 def test_find_users_by_email_displays_users_found(
@@ -22,9 +22,10 @@ def test_find_users_by_email_displays_users_found(
     mocker
 ):
     client_request.login(platform_admin_user)
+    user = user_json()
     mocker.patch(
         'app.user_api_client.find_users_by_full_or_partial_email',
-        return_value={"data": [user_json()]},
+        return_value={"data": [user]},
         autospec=True,
     )
     document = client_request.post(
@@ -33,13 +34,17 @@ def test_find_users_by_email_displays_users_found(
         _expected_status=200
     )
 
-    assert any(element.text.strip() == 'test@gov.uk' for element in document.find_all(
-        'a', {'class': 'browse-list-link'}, href=True)
-    )
-    assert any(element.text.strip() == 'Test User' for element in document.find_all('p', {'class': 'browse-list-hint'}))
+    links = document.select('a.browse-list-link')
+    assert len(links) == 1
+    link = links[0]
 
-    assert document.find('a', {'class': 'browse-list-link'}).text.strip() == 'test@gov.uk'
-    assert document.find('p', {'class': 'browse-list-hint'}).text.strip() == 'Test User'
+    assert normalize_spaces(link.text) == 'test@gov.uk'
+    assert normalize_spaces(document.select_one('p.browse-list-hint').text) == 'Test User'
+
+    assert link['href'] == url_for(
+        'main.user_information',
+        user_id=user['id']
+    )
 
 
 def test_find_users_by_email_displays_multiple_users(
@@ -55,12 +60,12 @@ def test_find_users_by_email_displays_multiple_users(
     )
     document = client_request.post('main.find_users_by_email', _data={"search": "apple"}, _expected_status=200)
 
-    assert any(
-        element.text.strip() == 'Apple Jack' for element in document.find_all('p', {'class': 'browse-list-hint'})
-    )
-    assert any(
-        element.text.strip() == 'Apple Bloom' for element in document.find_all('p', {'class': 'browse-list-hint'})
-    )
+    assert [
+        element.text.strip() for element in document.select('p.browse-list-hint')
+    ] == [
+        'Apple Jack',
+        'Apple Bloom',
+    ]
 
 
 def test_find_users_by_email_displays_message_if_no_users_found(
@@ -74,7 +79,7 @@ def test_find_users_by_email_displays_message_if_no_users_found(
         'main.find_users_by_email', _data={"search": "twilight.sparkle"}, _expected_status=200
     )
 
-    assert document.find('p', {'class': 'browse-list-hint'}).text.strip() == 'No users found.'
+    assert document.select_one('p.browse-list-hint').text.strip() == 'No users found.'
 
 
 def test_find_users_by_email_validates_against_empty_search_submission(
@@ -86,7 +91,7 @@ def test_find_users_by_email_validates_against_empty_search_submission(
     document = client_request.post('main.find_users_by_email', _data={"search": ""}, _expected_status=200)
 
     expected_message = "Error: You need to enter full or partial email address to search by."
-    assert document.find('span', {'class': 'govuk-error-message'}).text.strip() == expected_message
+    assert document.select_one('.govuk-error-message').text.strip() == expected_message
 
 
 def test_user_information_page_shows_information_about_user(
@@ -161,7 +166,7 @@ def test_user_information_page_shows_change_auth_type_link(
     )
     change_auth_url = url_for('main.change_user_auth', user_id=api_user_active['id'])
 
-    link = page.find('a', {'href': change_auth_url})
+    link = page.select_one(f'a[href="{change_auth_url}"]')
     assert normalize_spaces(link.text) == 'Change authentication for this user'
 
 
@@ -183,8 +188,10 @@ def test_user_information_page_doesnt_show_change_auth_type_link_if_user_on_weba
     )
     change_auth_url = url_for('main.change_user_auth', user_id=api_user_active['id'])
 
-    link = page.find_all('a', {'href': change_auth_url})
-    assert len(link) == 0
+    assert not any(
+        link['href'] == change_auth_url
+        for link in page.select('a')
+    )
 
 
 @pytest.mark.parametrize('current_auth_type', ['email_auth', 'sms_auth'])
@@ -280,7 +287,7 @@ def test_user_information_page_shows_archive_link_for_active_users(
     )
     archive_url = url_for('main.archive_user', user_id=api_user_active['id'])
 
-    link = page.find('a', {'href': archive_url})
+    link = page.select_one(f'a[href="{archive_url}"]')
     assert normalize_spaces(link.text) == 'Archive user'
 
 
@@ -299,8 +306,10 @@ def test_user_information_page_does_not_show_archive_link_for_inactive_users(
         'main.user_information', user_id=inactive_user_id
     )
 
-    archive_url = url_for('main.archive_user', user_id=inactive_user_id)
-    assert not page.find('a', {'href': archive_url})
+    assert not any(
+        a['href'] == url_for('main.archive_user', user_id=inactive_user_id)
+        for a in page.select('a')
+    )
 
 
 def test_archive_user_prompts_for_confirmation(
@@ -314,7 +323,7 @@ def test_archive_user_prompts_for_confirmation(
         'main.archive_user', user_id=api_user_active['id']
     )
 
-    assert 'Are you sure you want to archive this user?' in page.find('div', class_='banner-dangerous').text
+    assert 'Are you sure you want to archive this user?' in page.select_one('div.banner-dangerous').text
 
 
 def test_archive_user_posts_to_user_client(
@@ -368,7 +377,7 @@ def test_archive_user_shows_error_message_if_user_cannot_be_archived(
         _follow_redirects=True,
     )
 
-    assert normalize_spaces(page.find('h1').text) == 'Platform admin user'
+    assert normalize_spaces(page.select_one('h1').text) == 'Platform admin user'
     assert normalize_spaces(
         page.select_one('.banner-dangerous').text
     ) == 'User can’t be removed from a service - check all services have another team member with manage_settings'

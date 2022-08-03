@@ -79,7 +79,7 @@ def test_cancel_invited_org_user_cancels_user_invitations(
     )
     assert normalize_spaces(page.h1.text) == 'Team members'
     flash_banner = normalize_spaces(
-        page.find('div', class_='banner-default-with-tick').text
+        page.select_one('div.banner-default-with-tick').text
     )
     assert flash_banner == f"Invitation cancelled for {sample_org_invite['email_address']}"
     mock_cancel.assert_called_once_with(

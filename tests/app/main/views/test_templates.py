@@ -286,7 +286,7 @@ def test_choose_template_can_pass_through_an_initial_state_to_templates_and_fold
         initial_state='add-new-template'
     )
 
-    templates_and_folders_form = page.find('form')
+    templates_and_folders_form = page.select_one('form')
     assert templates_and_folders_form['data-prev-state'] == 'add-new-template'
 
 
@@ -470,11 +470,11 @@ def test_should_add_data_attributes_for_services_that_only_allow_one_type_of_not
         raise ElementNotFound()
 
     if are_data_attrs_added:
-        assert page.find(id='add_new_template_form').attrs['data-channel'] == permissions[0]
-        assert page.find(id='add_new_template_form').attrs['data-service'] == SERVICE_ONE_ID
+        assert page.select_one('#add_new_template_form').attrs['data-channel'] == permissions[0]
+        assert page.select_one('#add_new_template_form').attrs['data-service'] == SERVICE_ONE_ID
     else:
-        assert page.find(id='add_new_template_form').attrs.get('data-channel') is None
-        assert page.find(id='add_new_template_form').attrs.get('data-service') is None
+        assert page.select_one('#add_new_template_form').attrs.get('data-channel') is None
+        assert page.select_one('#add_new_template_form').attrs.get('data-service') is None
 
 
 def test_should_show_page_for_one_template(
@@ -796,7 +796,7 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
     )
 
     assert "Send" not in page.text
-    assert page.find('h1', {"data-error-type": "letter-too-long"})
+    assert page.select_one('h1', {"data-error-type": "letter-too-long"})
 
 
 def test_edit_letter_template_postage_page_displays_correctly(
@@ -1928,7 +1928,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     )
 
     assert page.h1.string.strip() == "Confirm changes"
-    assert page.find('a', {'class': 'govuk-back-link'})['href'] == url_for(
+    assert page.select_one('a.govuk-back-link')['href'] == url_for(
         ".edit_service_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
@@ -1943,11 +1943,11 @@ def test_should_show_interstitial_when_making_breaking_change(
         'template_content': new_content,
         'confirm': 'true'
     }.items():
-        assert page.find('input', {'name': key})['value'] == value
+        assert page.select_one(f'input[name={key}]')['value'] == value
 
     # BeautifulSoup returns the value attribute as unencoded, let’s make
     # sure that it is properly encoded in the HTML
-    assert str(page.find('input', {'name': 'subject'})) == (
+    assert str(page.select_one('input[name=subject]')) == (
         """<input name="subject" type="hidden" value="reminder '&quot; &lt;span&gt; &amp; ((thing))"/>"""
     )
 

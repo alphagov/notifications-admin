@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 from functools import partial
 from unittest.mock import ANY, Mock, PropertyMock, call
@@ -142,7 +141,7 @@ def test_should_show_overview(
         'main.service_settings', service_id=SERVICE_ONE_ID
     )
 
-    assert page.find('h1').text == 'Settings'
+    assert page.select_one('h1').text == 'Settings'
     rows = page.select('tr')
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):
@@ -174,7 +173,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         'main.service_settings', service_id=SERVICE_ONE_ID
     )
 
-    assert page.find('h1').text == 'Settings'
+    assert page.select_one('h1').text == 'Settings'
     rows = page.select('tr')
 
     expected_rows = [
@@ -239,7 +238,8 @@ def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
         'main.service_settings', service_id=SERVICE_ONE_ID
     )
 
-    broadcast_setting_row = page.find(string=re.compile("Emergency alerts")).find_parent('tr')
+    broadcast_setting_row = page.select('tr')[-1]
+    assert normalize_spaces(broadcast_setting_row.select('td')[0].text) == 'Emergency alerts'
     broadcast_setting_description = broadcast_setting_row.select('td')[1].text
     assert normalize_spaces(broadcast_setting_description) == expected_text
 
@@ -257,7 +257,7 @@ def test_no_go_live_link_for_service_without_organisation(
     client_request.login(platform_admin_user)
     page = client_request.get('main.service_settings', service_id=SERVICE_ONE_ID)
 
-    assert page.find('h1').text == 'Settings'
+    assert page.select_one('h1').text == 'Settings'
 
     is_live = find_element_by_tag_and_partial_text(page, tag='td', string='Live')
     assert normalize_spaces(is_live.find_next_sibling().text) == 'No (organisation must be set first)'
@@ -414,7 +414,7 @@ def test_should_show_overview_for_service_with_more_things_set(
         'main.service_settings', service_id=service_one['id']
     )
     for index, row in enumerate(expected_rows):
-        assert row == " ".join(page.find_all('tr')[index + 1].text.split())
+        assert row == " ".join(page.select('tr')[index + 1].text.split())
 
 
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
@@ -443,7 +443,7 @@ def test_letter_contact_block_shows_none_if_not_set(
         service_id=SERVICE_ONE_ID,
     )
 
-    div = page.find_all('tr')[10].find_all('td')[1].div
+    div = page.select('tr')[10].select('td')[1].div
     assert div.text.strip() == 'Not set'
     assert 'default' in div.attrs['class'][0]
 
@@ -463,7 +463,7 @@ def test_escapes_letter_contact_block(
         service_id=SERVICE_ONE_ID,
     )
 
-    div = str(page.find_all('tr')[10].find_all('td')[1].div)
+    div = str(page.select('tr')[10].select('td')[1].div)
     assert 'foo<br/>bar' in div
     assert '<script>' not in div
 
@@ -472,8 +472,8 @@ def test_should_show_service_name(
     client_request,
 ):
     page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
-    assert page.find('h1').text == 'Change your service name'
-    assert page.find('input', attrs={"type": "text"})['value'] == 'service one'
+    assert page.select_one('h1').text == 'Change your service name'
+    assert page.select_one('input', attrs={"type": "text"})['value'] == 'service one'
     assert page.select_one(
         'main p'
     ).text == 'Your service name should tell users what the message is about as well as who it’s from.'
@@ -495,13 +495,13 @@ def test_should_show_different_change_service_name_page_for_local_services(
     )
     service_one['organisation_type'] = 'local'
     page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
-    assert page.find('h1').text == 'Change your service name'
-    assert page.find('input', attrs={"type": "text"})['value'] == 'service one'
+    assert page.select_one('h1').text == 'Change your service name'
+    assert page.select_one('input', attrs={"type": "text"})['value'] == 'service one'
     assert page.select_one('main .govuk-body').text.strip() == (
         'Your service name should tell users what the message is about as well as who it’s from. For example:'
     )
     # when no organisation on the service object, default org for the user is used for hint
-    assert "School admissions - Test Org" in page.find_all("ul", class_="govuk-list govuk-list--bullet")[0].text
+    assert "School admissions - Test Org" in page.select_one("ul.govuk-list.govuk-list--bullet").text
 
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
@@ -522,7 +522,7 @@ def test_should_show_service_org_in_hint_on_change_service_name_page_for_local_s
     service_one['organisation'] = '1234'
     page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
     # when there is organisation on the service object, it is used for hint text instead of user default org
-    assert "School admissions - Local Authority" in page.find_all("ul", class_="govuk-list govuk-list--bullet")[0].text
+    assert "School admissions - Local Authority" in page.select_one("ul.govuk-list.govuk-list--bullet").text
 
 
 def test_should_show_service_name_with_no_prefixing(
@@ -531,7 +531,7 @@ def test_should_show_service_name_with_no_prefixing(
 ):
     service_one['prefix_sms'] = False
     page = client_request.get('main.service_name_change', service_id=SERVICE_ONE_ID)
-    assert page.find('h1').text == 'Change your service name'
+    assert page.select_one('h1').text == 'Change your service name'
     assert page.select_one(
         'main p'
     ).text == 'Your service name should tell users what the message is about as well as who it’s from.'
@@ -555,7 +555,7 @@ def test_service_name_change_fails_if_new_name_fails_validation(
         _expected_status=200,
     )
     assert not mock_update_service.called
-    assert error_message in page.find("span", {"class": "govuk-error-message"}).text
+    assert error_message in page.select_one("span.govuk-error-message").text
 
 
 @pytest.mark.parametrize('user, expected_text, expected_link', [
@@ -587,7 +587,7 @@ def test_show_restricted_service(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert page.find('h1').text == 'Settings'
+    assert page.select_one('h1').text == 'Settings'
     assert page.select('main h2')[0].text == 'Your service is in trial mode'
 
     request_to_live = page.select('main p')[1]
@@ -658,7 +658,7 @@ def test_show_live_service(
         'main.service_settings',
         service_id=SERVICE_ONE_ID,
     )
-    assert page.find('h1').text.strip() == 'Settings'
+    assert page.select_one('h1').text.strip() == 'Settings'
     assert 'Your service is in trial mode' not in page.text
 
 
@@ -2450,14 +2450,16 @@ def test_service_verify_reply_to_address(
         notification_id=notification["id"],
         _optional_args="?is_default={}{}".format(is_default, replace)
     )
-    assert page.find('h1').text == '{} email reply-to address'.format(expected_header)
+    assert page.select_one('h1').text == '{} email reply-to address'.format(expected_header)
+    back_link = page.select_one('.govuk-back-link')
+    assert back_link.text == 'Back'
     if replace:
-        assert "/email-reply-to/123/edit" in page.find('a', text="Back").attrs["href"]
+        assert "/email-reply-to/123/edit" in back_link["href"]
     else:
-        assert "/email-reply-to/add" in page.find('a', text="Back").attrs["href"]
+        assert "/email-reply-to/add" in back_link["href"]
 
-    assert len(page.find_all('div', class_='banner-dangerous')) == expected_failure
-    assert len(page.find_all('div', class_='banner-default-with-tick')) == expected_success
+    assert len(page.select('div.banner-dangerous')) == expected_failure
+    assert len(page.select('div.banner-default-with-tick')) == expected_success
 
     if status == "delivered":
         if replace:
@@ -2473,7 +2475,7 @@ def test_service_verify_reply_to_address(
     else:
         assert mock_add_reply_to_email_address.called is False
     if status == "permanent-failure":
-        assert page.find('input', type='email').attrs["value"] == notification["to"]
+        assert page.select_one('input', type='email').attrs["value"] == notification["to"]
 
 
 @freeze_time("2018-06-01 11:11:00.061258")
@@ -2498,7 +2500,7 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_se
         notification_id=notification["id"],
         _optional_args="?is_default={}".format(False)
     )
-    expected_banner = page.find_all('div', class_='banner-dangerous')[0]
+    expected_banner = page.select_one('div.banner-dangerous')
     assert 'There’s a problem with your reply-to address' in expected_banner.text.strip()
     assert mock_add_reply_to_email_address.called is False
 
@@ -2779,8 +2781,8 @@ def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_
         _follow_redirects=True
     )
 
-    assert page.find('h1').text == "Reply-to email addresses"
-    assert error_message in page.find('div', class_='banner-dangerous').text
+    assert page.select_one('h1').text == "Reply-to email addresses"
+    assert error_message in page.select_one('div.banner-dangerous').text
 
     assert mock_update_reply_to_email_address.called is False
 
@@ -3270,7 +3272,7 @@ def test_inbound_sms_sender_is_not_editable(
         sms_sender_id=fake_uuid,
     )
 
-    assert bool(page.find('input', attrs={'name': "sms_sender"})) != hide_textbox
+    assert bool(page.select_one('input[name=sms_sender]')) != hide_textbox
     if hide_textbox:
         assert normalize_spaces(
             page.select_one('form[method="post"] p').text
@@ -3294,7 +3296,7 @@ def test_shows_research_mode_indicator(
         service_id=SERVICE_ONE_ID,
     )
 
-    element = page.find('span', {"id": "research-mode"})
+    element = page.select_one('span#research-mode')
     assert element.text == 'research mode'
 
 
@@ -3310,7 +3312,7 @@ def test_does_not_show_research_mode_indicator(
         service_id=SERVICE_ONE_ID,
     )
 
-    element = page.find('span', {"id": "research-mode"})
+    element = page.select_one('span#research-mode')
     assert not element
 
 
@@ -3463,7 +3465,7 @@ def test_service_preview_letter_branding_shows_preview_letter(
         **extra_args
     )
 
-    assert page.find('iframe')['src'] == url_for('main.letter_template', branding_style='hm-government')
+    assert page.select_one('iframe')['src'] == url_for('main.letter_template', branding_style='hm-government')
 
 
 @pytest.mark.parametrize('selected_letter_branding, expected_post_data', [
@@ -3578,10 +3580,10 @@ def test_should_show_branding_styles(
     client_request.login(platform_admin_user)
     page = client_request.get(endpoint, **extra_args)
 
-    branding_style_choices = page.find_all('input', attrs={"name": "branding_style"})
+    branding_style_choices = page.select('input[name=branding_style]')
 
     radio_labels = [
-        page.find('label', attrs={"for": branding_style_choices[idx]['id']}).get_text().strip()
+        page.select_one(f'label[for="{branding_style_choices[idx]["id"]}"]').get_text().strip()
         for idx, element in enumerate(branding_style_choices)]
 
     assert len(branding_style_choices) == 6
@@ -3670,11 +3672,11 @@ def test_should_preview_email_branding(
         **extra_args
     )
 
-    iframe = page.find('iframe', attrs={"class": "branding-preview"})
+    iframe = page.select_one('iframe.branding-preview')
     iframeURLComponents = urlparse(iframe['src'])
     iframeQString = parse_qs(iframeURLComponents.query)
 
-    assert page.find('input', attrs={"id": "branding_style"})['value'] == '1'
+    assert page.select_one('input', attrs={"id": "branding_style"})['value'] == '1'
     assert iframeURLComponents.path == '/_email'
     assert iframeQString['branding_style'] == ['1']
 
@@ -4195,7 +4197,7 @@ def test_cant_archive_inactive_service(
         service_id=service_one['id'],
     )
 
-    assert 'Delete service' not in {a.text for a in page.find_all('a', class_='button')}
+    assert 'Delete service' not in {a.text for a in page.select('a.button')}
 
 
 @pytest.mark.parametrize('contact_details_type, contact_details_value', [
@@ -4214,8 +4216,8 @@ def test_send_files_by_email_contact_details_prefills_the_form_with_the_existing
     page = client_request.get(
         'main.send_files_by_email_contact_details', service_id=SERVICE_ONE_ID
     )
-    assert page.find('input', attrs={'name': 'contact_details_type', 'value': contact_details_type}).has_attr('checked')
-    assert page.find('input', {'id': contact_details_type}).get('value') == contact_details_value
+    assert page.select_one(f'input[name=contact_details_type][value={contact_details_type}]').has_attr('checked')
+    assert page.select_one(f'input#{contact_details_type}')['value'] == contact_details_value
 
 
 @pytest.mark.parametrize('contact_details_type, old_value, new_value', [
@@ -4290,11 +4292,11 @@ def test_send_files_by_email_contact_details_page(
     page = client_request.get(
         'main.send_files_by_email_contact_details', service_id=SERVICE_ONE_ID
     )
-    assert normalize_spaces(page.find_all('h2')[1].text) == subheader
+    assert normalize_spaces(page.select('h2')[1].text) == subheader
     if button_selected:
-        assert 'checked' in page.find('input', {'name': 'contact_details_type', 'value': 'email_address'}).attrs
+        assert 'checked' in page.select_one('input[name=contact_details_type][value=email_address]').attrs
     else:
-        assert 'checked' not in page.find('input', {'name': 'contact_details_type', 'value': 'email_address'}).attrs
+        assert 'checked' not in page.select_one('input[name=contact_details_type][value=email_address]').attrs
 
 
 def test_send_files_by_email_contact_details_displays_error_message_when_no_radio_button_selected(
@@ -4311,7 +4313,7 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
         },
         _follow_redirects=True
     )
-    assert normalize_spaces(page.find('span', class_='govuk-error-message').text) == 'Error: Select an option'
+    assert normalize_spaces(page.select_one('.govuk-error-message').text) == 'Error: Select an option'
     assert normalize_spaces(page.h1.text) == "Send files by email"
 
 
@@ -4340,7 +4342,7 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
         _follow_redirects=True
     )
 
-    assert error in page.find('span', class_='govuk-error-message').text
+    assert error in page.select_one('.govuk-error-message').text
     assert normalize_spaces(page.h1.text) == "Send files by email"
 
 
@@ -4600,7 +4602,7 @@ def test_service_settings_links_to_branding_request_page_for_emails(
     page = client_request.get(
         '.service_settings', service_id=SERVICE_ONE_ID
     )
-    assert len(page.find_all('a', attrs={'href': f'/services/{SERVICE_ONE_ID}/service-settings/email-branding'})) == 1
+    assert len(page.select(f'a[href="/services/{SERVICE_ONE_ID}/service-settings/email-branding"]')) == 1
 
 
 def test_service_settings_links_to_branding_request_page_for_letters(
@@ -4615,7 +4617,7 @@ def test_service_settings_links_to_branding_request_page_for_letters(
     page = client_request.get(
         '.service_settings', service_id=SERVICE_ONE_ID
     )
-    assert len(page.find_all('a', attrs={'href': f'/services/{SERVICE_ONE_ID}/service-settings/letter-branding'})) == 1
+    assert len(page.select(f'a[href="/services/{SERVICE_ONE_ID}/service-settings/letter-branding"]')) == 1
 
 
 def test_show_service_data_retention(
@@ -4651,7 +4653,7 @@ def test_view_add_service_data_retention(
         service_id=service_one['id'],
     )
     assert normalize_spaces(page.select_one('input')['value']) == "email"
-    assert page.find('input', attrs={'name': 'days_of_retention'})
+    assert page.select_one('input', attrs={'name': 'days_of_retention'})
 
 
 def test_add_service_data_retention(
@@ -4711,7 +4713,7 @@ def test_update_service_data_retention_return_validation_error_for_negative_days
         _data={'days_of_retention': -5},
         _expected_status=200,
     )
-    assert 'Must be between 3 and 90' in page.find('span', class_='govuk-error-message').text
+    assert 'Must be between 3 and 90' in page.select_one('.govuk-error-message').text
     assert mock_get_service_data_retention.called
     assert not mock_update_service_data_retention.called
 
@@ -4731,7 +4733,7 @@ def test_update_service_data_retention_populates_form(
         service_id=service_one['id'],
         data_retention_id=fake_uuid,
     )
-    assert page.find('input', attrs={'name': 'days_of_retention'})['value'] == '5'
+    assert page.select_one('input', attrs={'name': 'days_of_retention'})['value'] == '5'
 
 
 def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
@@ -4749,7 +4751,7 @@ def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
         '.service_settings',
         service_id=SERVICE_ONE_ID,
     )
-    assert len(page.find_all('a', attrs={'href': '/services/{}/notes'.format(SERVICE_ONE_ID)})) == 1
+    assert len(page.select(f'a[href="/services/{SERVICE_ONE_ID}/notes"]')) == 1
 
 
 def test_view_edit_service_notes(
@@ -4764,8 +4766,8 @@ def test_view_edit_service_notes(
         service_id=SERVICE_ONE_ID,
     )
     assert page.select_one('h1').text == "Edit service notes"
-    assert page.find('label', class_="form-label").text.strip() == "Notes"
-    assert page.find('textarea').attrs["name"] == "notes"
+    assert page.select_one('label.form-label').text.strip() == "Notes"
+    assert page.select_one('textarea').attrs["name"] == "notes"
 
 
 def test_update_service_notes(
@@ -4802,7 +4804,7 @@ def test_service_settings_links_to_edit_service_billing_details_page_for_platfor
         '.service_settings',
         service_id=SERVICE_ONE_ID,
     )
-    assert len(page.find_all('a', attrs={'href': '/services/{}/edit-billing-details'.format(SERVICE_ONE_ID)})) == 1
+    assert len(page.select(f'a[href="/services/{SERVICE_ONE_ID}/edit-billing-details"]')) == 1
 
 
 def test_view_edit_service_billing_details(
@@ -4818,28 +4820,26 @@ def test_view_edit_service_billing_details(
     )
 
     assert page.select_one('h1').text == "Change billing details"
-    labels = page.find_all('label', class_="form-label")
-    labels_list = [
-        'Contact email addresses',
+    assert [
+        label.text.strip()
+        for label in page.select('label.govuk-label') + page.select('label.form-label')
+    ] == [
         'Contact names',
+        'Contact email addresses',
         'Reference',
         'Purchase order number',
         'Notes'
     ]
-    for label in labels:
-        assert label.text.strip() in labels_list
-    textbox_names = page.find_all('input', class_='govuk-input govuk-!-width-full')
-    names_list = [
-        'billing_contact_email_addresses',
+    assert [
+        form_element['name']
+        for form_element in page.select('input.govuk-input.govuk-\\!-width-full') + page.select('textarea')
+    ] == [
         'billing_contact_names',
+        'billing_contact_email_addresses',
         'billing_reference',
         'purchase_order_number',
+        'notes',
     ]
-
-    for name in textbox_names:
-        assert name.attrs["name"] in names_list
-
-    assert page.find('textarea').attrs["name"] == "notes"
 
 
 def test_update_service_billing_details(
@@ -4886,17 +4886,16 @@ def test_service_set_broadcast_channel(
 
     assert page.select_one('h1').text.strip() == 'Emergency alerts settings'
 
-    expected_labels = [
+    assert [
+        normalize_spaces(label)
+        for label in page.select('label.govuk-radios__label')
+    ] == [
         "Training mode",
         "Operator channel",
         "Test channel",
         "Live channel",
         "Government channel",
     ]
-    labels = page.find_all('label', class_="govuk-radios__label")
-    assert len(labels) == len(expected_labels)
-    for label in labels:
-        assert label.text.strip() in expected_labels
 
     assert page.select_one('.govuk-back-link')['href'] == url_for(
         'main.service_settings', service_id=SERVICE_ONE_ID,
@@ -5309,4 +5308,4 @@ def test_service_set_broadcast_channel_makes_you_choose(
         service_id=SERVICE_ONE_ID,
         _expected_status=200,
     )
-    assert 'Error: Select mode or channel' in page.find("span", {"class": "govuk-error-message"}).text
+    assert 'Error: Select mode or channel' in page.select_one("span.govuk-error-message").text

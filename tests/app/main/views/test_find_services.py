@@ -8,7 +8,7 @@ def test_find_services_by_name_page_loads_correctly(client_request, platform_adm
     document = client_request.get('main.find_services_by_name')
 
     assert document.h1.text.strip() == 'Find services by name'
-    assert len(document.find_all('input', {'type': 'search'})) > 0
+    assert len(document.select('input[type=search]')) > 0
 
 
 def test_find_services_by_name_displays_services_found(
@@ -44,7 +44,7 @@ def test_find_services_by_name_displays_multiple_services(
     )
     document = client_request.post('main.find_services_by_name', _data={"search": "Tadfield"}, _expected_status=200)
 
-    results = document.find_all('li', {'class': 'browse-list-item'})
+    results = document.select('li.browse-list-item')
     assert len(results) == 2
     assert sorted([result.text.strip() for result in results]) == ["Tadfield Air Base", "Tadfield Police"]
 
@@ -60,7 +60,7 @@ def test_find_services_by_name_displays_message_if_no_services_found(
         'main.find_services_by_name', _data={"search": "Nabuchodonosorian Empire"}, _expected_status=200
     )
 
-    assert document.find('p', {'class': 'browse-list-hint'}).text.strip() == 'No services found.'
+    assert document.select_one('p.browse-list-hint').text.strip() == 'No services found.'
 
 
 def test_find_services_by_name_validates_against_empty_search_submission(
@@ -72,7 +72,7 @@ def test_find_services_by_name_validates_against_empty_search_submission(
     document = client_request.post('main.find_services_by_name', _data={"search": ""}, _expected_status=200)
 
     expected_message = "Error: You need to enter full or partial name to search by."
-    assert document.find('span', {'class': 'govuk-error-message'}).text.strip() == expected_message
+    assert document.select_one('span.govuk-error-message').text.strip() == expected_message
 
 
 def test_find_services_by_name_redirects_for_uuid(

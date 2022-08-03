@@ -427,7 +427,7 @@ def test_notification_page_shows_validation_failed_precompiled_letter(
         notification_id=fake_uuid,
     )
 
-    error_message = page.find('p', class_='notification-status-cancelled').text
+    error_message = page.select_one('p.notification-status-cancelled').text
     assert normalize_spaces(error_message) == (
         'Validation failed because content is outside the printable area on page 1.'
         'Files must meet our letter specification.'
@@ -692,7 +692,7 @@ def test_should_show_image_of_templated_letter_notification_that_failed_validati
         notification_id=fake_uuid,
     )
 
-    error_message = page.find('p', class_='notification-status-cancelled').text
+    error_message = page.select_one('p.notification-status-cancelled').text
     assert normalize_spaces(error_message) == \
            "Validation failed because this letter is 11 pages long.Letters must be 10 pages or "\
            "less (5 double-sided sheets of paper)."
@@ -747,7 +747,7 @@ def test_notification_page_shows_error_message_if_precompiled_letter_cannot_be_o
         notification_id=fake_uuid,
     )
 
-    error_message = page.find('p', class_='notification-status-cancelled').text
+    error_message = page.select_one('p.notification-status-cancelled').text
     assert normalize_spaces(error_message) == \
         "Validation failed – There’s a problem with your letter. Notify cannot read this PDF."
 
@@ -945,7 +945,7 @@ def test_show_cancel_letter_confirmation(
         notification_id=fake_uuid,
     )
 
-    flash_message = normalize_spaces(page.find('div', class_='banner-dangerous').text)
+    flash_message = normalize_spaces(page.select_one('div.banner-dangerous').text)
 
     assert 'Are you sure you want to cancel sending this letter?' in flash_message
 
@@ -1012,7 +1012,7 @@ def test_cancel_letter_catches_errors_from_API(
         _follow_redirects=True,
     )
 
-    assert page.find('h1').text.strip() == "Letter"
+    assert page.select_one('h1').text.strip() == "Letter"
     assert page.select_one('div.banner-dangerous').text.strip() == error_message
 
 

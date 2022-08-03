@@ -36,8 +36,8 @@ def test_two_factor_email_sent_page(
 
     assert page.h1.string == page_title
     # there shouldn't be a form for updating mobile number
-    assert page.find('form') is None
-    resend_email_link = page.find('a', class_="govuk-link govuk-link--no-visited-state page-footer-secondary-link")
+    assert page.select_one('form') is None
+    resend_email_link = page.select_one('a.govuk-link.govuk-link--no-visited-state.page-footer-secondary-link')
     assert resend_email_link.text == 'Not received an email?'
     assert resend_email_link['href'] == url_for('main.email_not_received', next=redirect_url)
 

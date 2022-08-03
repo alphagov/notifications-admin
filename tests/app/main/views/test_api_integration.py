@@ -26,7 +26,7 @@ def test_should_show_api_page(
         service_id=SERVICE_ONE_ID,
     )
     assert page.h1.string.strip() == 'API integration'
-    rows = page.find_all('details')
+    rows = page.select('details')
     assert len(rows) == 5
     for row in rows:
         assert row.select('h3 .api-notifications-item__recipient')[0].string.strip() == '07123456789'
@@ -44,7 +44,7 @@ def test_should_show_api_page_with_lots_of_notifications(
         'main.api_integration',
         service_id=SERVICE_ONE_ID,
     )
-    rows = page.find_all('div', {'class': 'api-notifications-item'})
+    rows = page.select('div.api-notifications-item')
     assert ' '.join(rows[len(rows) - 1].text.split()) == (
         'Only showing the first 50 messages. Notify deletes messages after 7 days.'
     )
@@ -62,7 +62,7 @@ def test_should_show_api_page_with_no_notifications(
         'main.api_integration',
         service_id=SERVICE_ONE_ID,
     )
-    rows = page.find_all('div', {'class': 'api-notifications-item'})
+    rows = page.select('div.api-notifications-item')
     assert 'When you send messages via the API they’ll appear here.' in rows[len(rows) - 1].text.strip()
 
 
@@ -149,7 +149,7 @@ def test_should_show_api_page_for_live_service(
         'main.api_integration',
         service_id=uuid.uuid4()
     )
-    assert 'Your service is in trial mode' not in page.find('main').text
+    assert 'Your service is in trial mode' not in page.select_one('main').text
 
 
 def test_api_documentation_page_should_redirect(
@@ -435,7 +435,7 @@ def test_should_show_guestlist_page(
         'main.guest_list',
         service_id=SERVICE_ONE_ID,
     )
-    textboxes = page.find_all('input', {'class': 'govuk-input'})
+    textboxes = page.select('input.govuk-input')
     for index, value in enumerate(
         ['test@example.com'] + [None] * 4 + ['07900900000'] + [None] * 4
     ):

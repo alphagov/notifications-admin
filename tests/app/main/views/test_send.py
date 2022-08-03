@@ -1541,8 +1541,10 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
         template_id=fake_uuid,
         step_index=0,
     )
-    skip_link = page.findAll('a', text='Use my phone number')
-    assert not skip_link
+    assert not any(
+        normalize_spaces(link.text) == 'Use my phone number'
+        for link in page.select_one('a')
+    )
 
 
 @pytest.mark.parametrize('user', (
@@ -2280,7 +2282,7 @@ def test_send_one_off_letter_address_shows_form(
     )
 
     assert (
-        page.find_all('a', {'class': 'govuk-back-link'})[0]['href']
+        page.select_one('a.govuk-back-link')['href']
     ) == url_for('main.view_template', service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
 
@@ -3071,7 +3073,7 @@ def test_check_messages_back_link(
     )
 
     assert (
-        page.find_all('a', {'class': 'govuk-back-link'})[0]['href']
+        page.select_one('a.govuk-back-link')['href']
     ) == expected_url(service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
 
@@ -3116,13 +3118,12 @@ def test_check_messages_shows_too_many_messages_errors(
         _test_page_title=False,
     )
 
-    assert page.find('h1').text.strip() == 'Too many recipients'
-    assert page.find('div', class_='banner-dangerous').find('a').text.strip() == 'trial mode'
+    assert page.select_one('h1').text.strip() == 'Too many recipients'
+    assert page.select_one('div.banner-dangerous').find('a').text.strip() == 'trial mode'
 
-    # remove excess whitespace from element
-    details = page.find('div', class_='banner-dangerous').find_all('p')[1]
-    details = ' '.join([line.strip() for line in details.text.split('\n') if line.strip() != ''])
-    assert details == expected_msg
+    assert normalize_spaces(
+        page.select('div.banner-dangerous p')[1]
+    ) == expected_msg
 
 
 def test_check_messages_shows_trial_mode_error(
@@ -3157,7 +3158,7 @@ def test_check_messages_shows_trial_mode_error(
     )
 
     assert ' '.join(
-        page.find('div', class_='banner-dangerous').text.split()
+        page.select_one('div.banner-dangerous').text.split()
     ) == (
         'You cannot send to this phone number '
         'In trial mode you can only send to yourself and members of your team'
@@ -3278,7 +3279,7 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
         upload_id=fake_uuid,
         _test_page_title=False,
     )
-    assert page.find('h1', {"data-error-type": "letter-too-long"})
+    assert page.select_one('h1', {"data-error-type": "letter-too-long"})
 
     assert len(page.select('.letter img')) == 10  # if letter longer than 10 pages, only 10 first pages are displayed
     assert not page.select('main [type=submit]')
@@ -3695,7 +3696,7 @@ def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
         _test_page_title=False,
     )
 
-    assert page.find('h1', {"data-error-type": "letter-too-long"})
+    assert page.select_one('h1', {"data-error-type": "letter-too-long"})
     assert len(page.select('.letter img')) == 10
 
     assert not page.select('main [type=submit]')
@@ -3735,7 +3736,7 @@ def test_check_messages_shows_over_max_row_error(
     )
 
     assert ' '.join(
-        page.find('div', class_='banner-dangerous').text.split()
+        page.select_one('div.banner-dangerous').text.split()
     ) == (
         'Your file has too many rows '
         'Notify can process up to 11,111 rows at once. '
@@ -3790,7 +3791,7 @@ def test_check_notification_shows_preview(
 
     assert page.h1.text.strip() == 'Preview of ‘Two week reminder’'
     assert (
-        page.find_all('a', {'class': 'govuk-back-link'})[0]['href']
+        page.select_one('a.govuk-back-link')['href']
     ) == url_for(
         'main.send_one_off_step',
         service_id=service_one['id'],
@@ -3850,7 +3851,7 @@ def test_check_notification_shows_back_link(
     )
 
     assert page.h1.text.strip() == 'Preview of ‘Awkward letter’'
-    back_link = page.find_all('a', {'class': 'govuk-back-link'})[0]['href']
+    back_link = page.select_one('a.govuk-back-link')['href']
     assert back_link == url_for(
         'main.send_one_off_step',
         service_id=service_one['id'],
@@ -4069,7 +4070,7 @@ def test_send_notification_shows_error_if_400(
 
     assert normalize_spaces(page.select('.banner-dangerous h1')[0].text) == expected_h1
     assert normalize_spaces(page.select('.banner-dangerous p')[0].text) == expected_err_details
-    assert not page.find('input[type=submit]')
+    assert not page.select_one('input[type=submit]')
 
 
 def test_send_notification_shows_email_error_in_trial_mode(

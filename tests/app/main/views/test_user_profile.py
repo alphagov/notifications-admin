@@ -131,7 +131,7 @@ def test_should_show_errors_if_new_email_address_does_not_validate(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.find('span', class_='govuk-error-message').text) == f'Error: {error_message}'
+    assert normalize_spaces(page.select_one('.govuk-error-message').text) == f'Error: {error_message}'
     # We only call API to check if the email address is already in use if there are no other errors
     assert not mock_email_is_not_already_in_use.called
 
@@ -392,7 +392,8 @@ def test_non_gov_user_cannot_see_change_email_link(
 ):
     client_request.login(api_nongov_user_active)
     page = client_request.get('main.user_profile')
-    assert not page.find('a', {'href': url_for('main.user_profile_email')})
+    change_email_link = url_for('main.user_profile_email')
+    assert not page.select_one(f'a[href="{change_email_link}"]')
     assert page.select_one('h1').text.strip() == 'Your profile'
 
 
@@ -734,6 +735,6 @@ def test_delete_security_key_handles_last_credential_error(
         key_id=webauthn_credential['id'],
         _follow_redirects=True
     )
-    assert 'Manage ‘Test credential’' in page.find('h1').text
+    assert 'Manage ‘Test credential’' in page.select_one('h1').text
     expected_message = "You cannot delete your last security key."
-    assert expected_message in page.find('div', class_="banner-dangerous").text
+    assert expected_message in page.select_one('div.banner-dangerous').text

@@ -403,18 +403,18 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
         'invited_user@test.gov.uk'
     )
 
-    form = page.find('form')
-    name = form.find('input', id='name')
-    password = form.find('input', id='password')
-    service = form.find('input', type='hidden', id='service')
-    email = form.find('input', type='hidden', id='email_address')
+    form = page.select_one('form')
+    name = form.select_one('input#name')
+    password = form.select_one('input#password')
+    service = form.select_one('input#service[type=hidden]')
+    email = form.select_one('input#email_address[type=hidden]')
 
     assert email
-    assert email.attrs['value'] == 'invited_user@test.gov.uk'
+    assert email['value'] == 'invited_user@test.gov.uk'
     assert name
     assert password
     assert service
-    assert service.attrs['value'] == service_one['id']
+    assert service['value'] == service_one['id']
 
 
 def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation(
@@ -547,7 +547,7 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
         _expected_status=403,
     )
     assert page.h1.string.strip() == 'You’re not allowed to see this page'
-    flash_banners = page.find_all('div', class_='banner-dangerous')
+    flash_banners = page.select('div.banner-dangerous')
     assert len(flash_banners) == 1
     banner_contents = normalize_spaces(flash_banners[0].text)
     assert "You’re signed in as test@user.gov.uk." in banner_contents
@@ -653,7 +653,7 @@ def test_new_invited_user_verifies_and_added_to_service(
         mock_check_verify_code.assert_called_once_with(new_user_id, '12345', 'sms')
         assert service_one['id'] == session['service_id']
 
-    assert page.find('h1').text == 'Dashboard'
+    assert page.select_one('h1').text == 'Dashboard'
 
 
 @pytest.mark.parametrize('service_permissions, trial_mode, expected_endpoint, extra_args', (
