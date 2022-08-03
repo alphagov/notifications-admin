@@ -1,6 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/table.html" import list_table, field, hidden_field_heading %}
 {% from "components/banner.html" import banner_wrapper %}
+{% from "components/details/macro.njk" import govukDetails %}
 
 {% block service_page_title %}
   API integration
@@ -46,40 +47,45 @@
       </div>
     {% endif %}
     {% for notification in api_notifications.notifications %}
-      <details class="api-notifications-item govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
-        <summary class="govuk-details__summary govuk-clearfix api-notifications-item__heading">
-          <h3>
-            <span class="govuk-details__summary-text">
-            {{ notification.to }}
-            </span>
-            <span class="govuk-grid-row api-notifications-item__meta">
-              <span class="govuk-grid-column-one-half api-notifications-item__meta-key">
-                {{notification.key_name}}
-              </span>
-              <span class="govuk-grid-column-one-half api-notifications-item__meta-time">
-                <time class="timeago" datetime="{{ notification.created_at }}">
-                  {{ notification.created_at|format_delta }}
-                </time>
-              </span>
-            </span>
-          </h3>
-        </summary>
-        <div class="govuk-details__text api-notifications-item__data govuk-!-padding-top-0">
-          <dl id="notification-{{ notification.id }}">
-            {% for key in [
-              'id', 'client_reference', 'notification_type', 'created_at', 'updated_at', 'sent_at', 'status'
+      {% set summary_html %}
+      <h3>
+        <span class="api-notifications-item__recipient">
+        {{ notification.to }}
+        </span>
+        <span class="govuk-grid-row api-notifications-item__meta">
+          <span class="govuk-grid-column-one-half api-notifications-item__meta-key">
+            {{notification.key_name}}
+          </span>
+          <span class="govuk-grid-column-one-half api-notifications-item__meta-time">
+            <time class="timeago" datetime="{{ notification.created_at }}">
+              {{ notification.created_at|format_delta }}
+            </time>
+          </span>
+        </span>
+      </h3>
+      {% endset %}
+
+      {% set htmlcontent %}
+        <dl id="notification-{{ notification.id }}">
+          {% for key in [
+            'id', 'client_reference', 'notification_type', 'created_at', 'updated_at', 'sent_at', 'status'
             ] %}
-              {% if notification[key] %}
-                <dt class="api-notifications-item__data-name">{{ key }}:</dt>
-                <dd class="api-notifications-item__data-value">{{ notification[key] }}</dd>
-              {% endif %}
+            {% if notification[key] %}
+            <dt class="api-notifications-item__data-name">{{ key }}:</dt>
+            <dd class="api-notifications-item__data-value">{{ notification[key] }}</dd>
+            {% endif %}
             {% endfor %}
             {% if notification.status not in ('pending-virus-check', 'virus-scan-failed') %}
-              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ 1|message_count_label(notification.template.template_type, suffix='') }}</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ 1|message_count_label(notification.template.template_type, suffix='') }}</a>
             {% endif %}
           </dl>
-        </div>
-      </details>
+      {% endset %}
+
+      {{ govukDetails({
+        "summaryHtml": summary_html,
+        "html": htmlcontent,
+        "classes": "api-notifications-item govuk-details govuk-!-margin-bottom-0"
+      }) }}
     {% endfor %}
     {% if api_notifications.notifications %}
       <div class="api-notifications-item">
