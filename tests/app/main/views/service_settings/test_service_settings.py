@@ -4257,8 +4257,10 @@ def test_send_files_by_email_contact_details_page(
     client_request, service_one, active_user_with_permissions, contact_link, subheader, button_selected
 ):
     service_one["contact_link"] = contact_link
+
     page = client_request.get("main.send_files_by_email_contact_details", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select("h2")[1].text) == subheader
+    assert normalize_spaces(page.select_one("main h2").text) == subheader
+
     if button_selected:
         assert "checked" in page.select_one("input[name=contact_details_type][value=email_address]").attrs
     else:
