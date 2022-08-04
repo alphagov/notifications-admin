@@ -2,11 +2,14 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/live-search.html" import live_search %}
-{% from "components/form.html" import form_wrapper %}
+{% from "components/form.html" import form_wrapper%}
 {% from "components/back-link/macro.njk" import govukBackLink %}
+{%  from "components/branding-preview.html" import email_branding_preview %}
 
-{% block org_page_title %}
-    Email Branding
+{% set page_title = "Email branding" %}
+
+{% block per_page_title %}
+  {{ page_title }}
 {% endblock %}
 
 {% block backLink %}
@@ -14,17 +17,32 @@
 {%  endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Email branding") }}
-    {{ default_email_branding }}
+    {{ page_header(page_title) }}
 
-  {% call form_wrapper(data_kwargs={'preview-type': 'email'}) %}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full preview-pane">
-      </div>
-    </div>
+    <!-- display default branding and it's preview -->
+    <p class="govuk-body">
+      <h2 class="heading-small">{{ default_email_branding_name }} Default</h2>
+    </p>
+
+    {{ email_branding_preview(default_email_branding_id) }}
+
+    <!--display the email-branding-pool options and the preview for each one -->
+
+    {% for option in email_branding_pool_options %}
+        <p class="govuk-body">
+            <h2 class="heading-small">{{ option[1] }} </h2>
+        </p>
+        {{ email_branding_preview(option[0]) }}
+        {% call form_wrapper() %}
+
+        {% endcall %}
+    {% endfor %}
     <div class="js-stick-at-bottom-when-scrolling">
-      {{ page_footer('Preview') }}
+        {{ page_footer(button_text='Add other options',
+                       secondary_button=True,
+                       secondary_button_url=url_for('.add_organisation_email_branding_options',
+                                                    org_id=current_org_id))
+        }}
     </div>
-  {% endcall %}
 {% endblock %}
 

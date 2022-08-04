@@ -1698,7 +1698,6 @@ def test_organisation_email_branding_options_page_is_not_accessible_by_non_platf
     mock_get_organisation,
 
 ):
-    #client_request.login(platform_admin_user)
     page = client_request.get(
         'main.organisation_email_branding_options',
         org_id=organisation_one['id'],
@@ -1725,7 +1724,6 @@ def test_organisation_email_branding_options_page_is_accessible_to_platform_admi
     assert page
 
 
-# TODO
 def test_add_organisation_email_branding_options_is_platform_admin_only(
     client_request,
     organisation_one,
