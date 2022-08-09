@@ -1963,6 +1963,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
 class AdminChangeEmailBrandingPoolForm(StripWhitespaceForm):
     branding_field = GovukCheckboxesField(
         'Branding options',
+        validators=[DataRequired(message="Select at least 1 email branding option")],
         param_extensions={
             "fieldset": {
                 "legend": {
