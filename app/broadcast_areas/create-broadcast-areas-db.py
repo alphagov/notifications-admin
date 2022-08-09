@@ -401,26 +401,22 @@ def _add_electoral_wards(dataset_id):
         print()  # noqa: T201
         print(ward_name)  # noqa: T201
 
-        try:
-            la_id = "lad20-" + ward_code_to_la_id_mapping[ward_code]
+        la_id = "lad20-" + ward_code_to_la_id_mapping[ward_code]
 
-            feature, simple_feature, utm_crs = (
-                polygons_and_simplified_polygons(feature["geometry"])
-            )
+        feature, simple_feature, utm_crs = (
+            polygons_and_simplified_polygons(feature["geometry"])
+        )
 
-            if feature:
-                rtree_index.insert(ward_id, Rect(*Polygons(feature).bounds))
+        if feature:
+            rtree_index.insert(ward_id, Rect(*Polygons(feature).bounds))
 
-            areas_to_add.append([
-                ward_id, ward_name,
-                dataset_id, la_id,
-                feature, simple_feature,
-                utm_crs,
-                estimate_number_of_smartphones_in_area(ward_code),
-            ])
-
-        except KeyError:
-            print("Skipping", ward_code, ward_name)  # noqa: T201
+        areas_to_add.append([
+            ward_id, ward_name,
+            dataset_id, la_id,
+            feature, simple_feature,
+            utm_crs,
+            estimate_number_of_smartphones_in_area(ward_code),
+        ])
 
     rtree_index_path.open('wb').write(pickle.dumps(rtree_index))
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
