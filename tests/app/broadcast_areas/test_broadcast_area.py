@@ -33,6 +33,11 @@ def test_loads_libraries():
             True,
         ),
         (
+            'pfa20',
+            'Police forces in England and Wales',
+            False,
+        ),
+        (
             'test',
             'Test areas',
             False,
@@ -144,9 +149,10 @@ def test_repository_has_all_libraries():
     repo = BroadcastAreasRepository()
     libraries = repo.get_libraries()
 
-    assert len(libraries) == 3
+    assert len(libraries) == 4
     assert [
         ('Countries', 'country'),
+        ('Police forces in England and Wales', 'police force'),
         ('Test areas', 'test area'),
         ('Local authorities', 'local authority'),
     ] == [(name, name_singular) for _, name, name_singular, _is_group in libraries]

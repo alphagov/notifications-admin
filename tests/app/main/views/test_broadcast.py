@@ -1002,6 +1002,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ([], [
         'Countries',
         'Local authorities',
+        'Police forces in England and Wales',
         'Test areas',
     ]),
     ([
@@ -1011,6 +1012,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ], [
         'Countries',
         'Local authorities',
+        'Police forces in England and Wales',
         'Test areas',
     ]),
     ([
@@ -1021,6 +1023,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ], [
         'Countries',
         'Local authorities',
+        'Police forces in England and Wales',
         'Test areas',
     ]),
     ([
@@ -1038,6 +1041,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         # ---
         'Countries',
         'Local authorities',
+        'Police forces in England and Wales',
         'Test areas',
     ]),
 ))
