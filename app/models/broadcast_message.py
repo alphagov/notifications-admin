@@ -21,7 +21,7 @@ from app.notify_client.broadcast_message_api_client import (
 )
 
 ESTIMATED_AREA_OF_LARGEST_UK_COUNTY = broadcast_area_libraries.get_areas([
-    'ctyua19-E10000023'  # North Yorkshire
+    'ctyua21-E10000023'  # North Yorkshire
 ])[0].polygons.estimated_area
 
 

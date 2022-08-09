@@ -37,7 +37,7 @@ class CITY_OF_LONDON:
 
 
 class BRYHER:
-    WD20_CODE = 'E05011090'
+    WD21_CODE = 'E05011090'
     POPULATION = 84
 
 
