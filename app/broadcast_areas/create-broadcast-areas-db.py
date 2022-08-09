@@ -14,6 +14,7 @@ from populations import (
     CITY_OF_LONDON,
     MEDIAN_AGE_RANGE_UK,
     MEDIAN_AGE_UK,
+    POLICE_FORCE_AREAS,
     SMARTPHONE_OWNERSHIP_BY_AGE_RANGE,
     estimate_number_of_smartphones_for_population,
 )
@@ -336,12 +337,13 @@ def add_police_force_areas():
         feature, simple_feature, utm_crs = (
             polygons_and_simplified_polygons(feature["geometry"])
         )
+        id = f'{dataset_id}-{f_id}'
         areas_to_add.append([
-            f'{dataset_id}-{f_id}', f_name,
+            id, f_name,
             dataset_id, None,
             feature, simple_feature,
             utm_crs,
-            0,
+            POLICE_FORCE_AREAS[id],
         ])
 
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)

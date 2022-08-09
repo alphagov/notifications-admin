@@ -880,6 +880,15 @@ def test_broadcast_page(
         'An extra area of 1,000 square miles is Likely to get the alert',
         '1,000,000 phones estimated',
     ]),
+    ([
+        'pfa20-E23000035',
+    ], [
+        'Devon & Cornwall Remove Devon & Cornwall',
+    ], [
+        'An area of 4,000 square miles Will get the alert',
+        'An extra area of 800 square miles is Likely to get the alert',
+        '1,000,000 phones estimated',
+    ]),
 ))
 def test_preview_broadcast_areas_page(
     mocker,
