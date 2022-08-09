@@ -889,6 +889,15 @@ def test_broadcast_page(
         'An extra area of 800 square miles is Likely to get the alert',
         '1,000,000 phones estimated',
     ]),
+    ([
+        'pfa20-LONDON',
+    ], [
+        'London (Metropolitan & City of London) Remove London (Metropolitan & City of London)',
+    ], [
+        'An area of 600 square miles Will get the alert',
+        'An extra area of 70 square miles is Likely to get the alert',
+        '6,000,000 phones estimated',
+    ]),
 ))
 def test_preview_broadcast_areas_page(
     mocker,

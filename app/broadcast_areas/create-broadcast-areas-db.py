@@ -327,9 +327,21 @@ def add_police_force_areas():
     )
 
     areas_to_add = []
+
+    london_geometry = {
+        'type': 'MultiPolygon',
+        'coordinates': [],
+    }
+
     for feature in dataset_geojson["features"]:
         f_id = feature["properties"]['PFA20CD']
         f_name = feature["properties"]['PFA20NM']
+
+        if f_id in ('E23000001', 'E23000034'):
+            # Skip the Metropolitan Police and City of London for now
+            # because we are going to combine them into one later
+            london_geometry['coordinates'] += feature["geometry"]['coordinates']
+            continue
 
         print()  # noqa: T201
         print(f_name)  # noqa: T201
@@ -345,6 +357,20 @@ def add_police_force_areas():
             utm_crs,
             POLICE_FORCE_AREAS[id],
         ])
+
+    # Manually add the Metropolitan Police and City of London as one combined area
+    feature, simple_feature, utm_crs = (
+        polygons_and_simplified_polygons(london_geometry)
+    )
+
+    areas_to_add.append([
+        'pfa20-LONDON',
+        'London (Metropolitan & City of London)',
+        dataset_id, None,
+        feature, simple_feature,
+        utm_crs,
+        POLICE_FORCE_AREAS['pfa20-E23000001'] + POLICE_FORCE_AREAS['pfa20-E23000034'],
+    ])
 
     repo.insert_broadcast_areas(areas_to_add, keep_old_polygons)
 
