@@ -252,7 +252,7 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
         form=form,
         search_form=SearchByNameForm(),
         show_search_form=(len(form.areas.choices) > 7),
-        page_title=f'Choose {library.name.lower()}',
+        page_title=f'Choose {library.name[0].lower()}{library.name[1:]}',
         broadcast_message=broadcast_message,
     )
 

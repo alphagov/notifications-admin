@@ -880,6 +880,24 @@ def test_broadcast_page(
         'An extra area of 1,000 square miles is Likely to get the alert',
         '1,000,000 phones estimated',
     ]),
+    ([
+        'pfa20-E23000035',
+    ], [
+        'Devon & Cornwall Remove Devon & Cornwall',
+    ], [
+        'An area of 4,000 square miles Will get the alert',
+        'An extra area of 800 square miles is Likely to get the alert',
+        '1,000,000 phones estimated',
+    ]),
+    ([
+        'pfa20-LONDON',
+    ], [
+        'London (Metropolitan & City of London) Remove London (Metropolitan & City of London)',
+    ], [
+        'An area of 600 square miles Will get the alert',
+        'An extra area of 70 square miles is Likely to get the alert',
+        '6,000,000 phones estimated',
+    ]),
 ))
 def test_preview_broadcast_areas_page(
     mocker,
@@ -1002,6 +1020,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ([], [
         'Countries',
         'Local authorities',
+        'Police forces in England and Wales',
         'Test areas',
     ]),
     ([
@@ -1011,6 +1030,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ], [
         'Countries',
         'Local authorities',
+        'Police forces in England and Wales',
         'Test areas',
     ]),
     ([
@@ -1021,6 +1041,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ], [
         'Countries',
         'Local authorities',
+        'Police forces in England and Wales',
         'Test areas',
     ]),
     ([
@@ -1038,6 +1059,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         # ---
         'Countries',
         'Local authorities',
+        'Police forces in England and Wales',
         'Test areas',
     ]),
 ))
@@ -1125,6 +1147,44 @@ def test_suggested_area_has_correct_link(
     )
 
 
+@pytest.mark.parametrize('library_slug, expected_page_title', (
+    (
+        'ctry19',
+        'Choose countries',
+    ),
+    (
+        'wd20-lad20-ctyua19',
+        'Choose a local authority'
+    ),
+    (
+        'pfa20',
+        'Choose police forces in England and Wales'
+    ),
+    (
+        'test',
+        'Choose test areas',
+    ),
+))
+def test_choose_broadcast_area_page_titles(
+    client_request,
+    service_one,
+    mock_get_draft_broadcast_message,
+    fake_uuid,
+    active_user_create_broadcasts_permission,
+    library_slug,
+    expected_page_title,
+):
+    service_one['permissions'] += ['broadcast']
+    client_request.login(active_user_create_broadcasts_permission)
+    page = client_request.get(
+        '.choose_broadcast_area',
+        service_id=SERVICE_ONE_ID,
+        broadcast_message_id=fake_uuid,
+        library_slug=library_slug,
+    )
+    assert normalize_spaces(page.select_one('h1').text) == expected_page_title
+
+
 def test_choose_broadcast_area_page(
     client_request,
     service_one,
@@ -1139,9 +1199,6 @@ def test_choose_broadcast_area_page(
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
         library_slug='ctry19',
-    )
-    assert normalize_spaces(page.select_one('h1').text) == (
-        'Choose countries'
     )
     assert [
         (
