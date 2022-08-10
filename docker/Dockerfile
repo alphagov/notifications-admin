@@ -1,5 +1,8 @@
 FROM node:16-alpine as frontend-build
 
+ARG NOTIFY_ENVIRONMENT=development
+ENV NOTIFY_ENVIRONMENT $NOTIFY_ENVIRONMENT
+
 WORKDIR /usr/frontend
 COPY app app
 COPY package-lock.json package.json gulpfile.js ./
