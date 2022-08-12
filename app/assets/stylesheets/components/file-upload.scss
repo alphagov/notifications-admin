@@ -1,52 +1,36 @@
-.js-enabled {
+.file-upload {
 
-  .file-upload {
+  &-label,
+  &-button-label {
 
-    &-label {
+    @include bold-19;
+    display: block;
+    margin: 0 0 10px 0;
 
-      @include bold-19;
-      display: block;
-      margin: 0 0 10px 0;
+  }
 
-      .error-message {
-        padding: 0;
-      }
+  &-label .error-message,
+  &-button-label.error-message {
+    padding: 0;
+  }
 
-    }
+  &-field {
+    margin-bottom: 10px;
+  }
 
-    &-field {
-      width: 0.1px;
-      height: 0.1px;
-      opacity: 0;
-      overflow: hidden;
-      position: absolute;
-      z-index: -1;
+  // Hide normal upload form if we're adding a custom version with JS
+  .js-enabled &-label,
+  .js-enabled &-field,
+  .js-enabled &-submit {
+    display: none;
+  }
 
-      &:focus + .file-upload-button {
-        background: $govuk-focus-colour;
-        color: $govuk-focus-text-colour;
-      }
+  &-alternate-link {
+    display: inline-block;
+    line-height: 35px;
 
-    }
-
-    &-filename {
-      @include bold-19;
-      display: inline-block;
-      padding-left: govuk-spacing(3);
-    }
-
-    &-submit {
-      display: none;
-    }
-
-    &-alternate-link {
-      display: inline-block;
-      line-height: 35px;
-
-      a {
-        font-weight: bold;
-      }
-
+    a {
+      font-weight: bold;
     }
 
   }
