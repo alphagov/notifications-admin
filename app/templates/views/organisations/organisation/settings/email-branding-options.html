@@ -30,9 +30,9 @@
 
     {% for option in email_branding_pool_options %}
         <p class="govuk-body">
-            <h2 class="heading-small">{{ option[1] }} </h2>
+            <h2 class="heading-small">{{ option[0] }} </h2>
         </p>
-        {{ email_branding_preview(option[0]) }}
+        {{ email_branding_preview(option[1]) }}
         {% call form_wrapper() %}
 
         {% endcall %}

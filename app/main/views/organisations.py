@@ -447,19 +447,16 @@ def organisation_preview_email_branding(org_id):
     )
 
 
-@main.route("/organisations/<uuid:org_id>/settings/email-branding-options", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/email-branding-options", methods=['GET'])
 @user_is_platform_admin
 def organisation_email_branding_options(org_id):
     default_email_branding_name = current_organisation.email_branding_name
     current_org_id = org_id
     # We want to display email branding options apart from an option
     # that has already been set as the default
-    email_branding_pool_options = [
-        (branding['id'], branding['name'])
-        for branding in email_branding_client.get_all_email_branding(sort_key='name')
-        if branding in current_organisation.email_branding_pool
-        and branding['name'] != default_email_branding_name
-    ]
+    email_branding_pool_options = [(option["name"], option["id"]) for option in
+                                   current_organisation.email_branding_pool
+                                   if option["name"] != default_email_branding_name]
     default_email_branding_name = current_organisation.email_branding_name
     default_email_branding_id = current_organisation.email_branding_id
 

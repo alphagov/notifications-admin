@@ -1696,7 +1696,6 @@ def test_organisation_email_branding_options_page_is_not_accessible_by_non_platf
     client_request,
     organisation_one,
     mock_get_organisation,
-
 ):
     page = client_request.get(
         'main.organisation_email_branding_options',
@@ -1706,22 +1705,39 @@ def test_organisation_email_branding_options_page_is_not_accessible_by_non_platf
     assert page
 
 
-def test_organisation_email_branding_options_page_is_accessible_to_platform_admin(
+def test_organisation_email_branding_options_page_shows_all_branding_pool_options(
+    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_organisation,
-
+    mock_get_all_email_branding
 ):
-    import pdb
+    branding_pool = [
+        {
+            'logo': 'logo1.png',
+            'name': 'org 1',
+            'text': 'org 1',
+            'id': '1',
+            'colour': None,
+            'brand_type': 'org',
+        },
+        {
+            'logo': 'logo2.png',
+            'name': 'org 2',
+            'text': 'org 2',
+            'id': '2',
+            'colour': None,
+            'brand_type': 'org',
+        }
+    ]
+    mocker.patch('app.organisations_client.get_email_branding_pool', return_value=branding_pool)
     client_request.login(platform_admin_user)
-    page = client_request.get(
-        'main.organisation_email_branding_options',
-        org_id=organisation_one['id'],
-        _expected_status=200
-    )
-    pdb.set_trace()
-    assert page
+    page = client_request.get('.organisation_email_branding_options', org_id=organisation_one['id'])
+    assert page.h1.text == 'Email branding'
+    assert all(item in [heading.text.strip() for heading in page.select('.heading-small')]
+               for item in ["org 1", "org 2"])
+    assert normalize_spaces(page.select_one('.govuk-button--secondary').text) == 'Add other options'
 
 
 def test_add_organisation_email_branding_options_is_platform_admin_only(
@@ -1781,7 +1797,7 @@ def test_add_organisation_email_branding_options_shows_branding_not_in_branding_
     assert normalize_spaces(page.select_one('.page-footer__button').text) == 'Add'
 
 
-def test_organisation_email_branding_options_shows_error_if_no_branding_selected(
+def test_add_organisation_email_branding_options_shows_error_if_no_branding_selected(
     client_request,
     platform_admin_user,
     organisation_one,
@@ -1791,7 +1807,7 @@ def test_organisation_email_branding_options_shows_error_if_no_branding_selected
 ):
     client_request.login(platform_admin_user)
     page = client_request.post(
-        '.organisation_email_branding_options',
+        '.add_organisation_email_branding_options',
         org_id=organisation_one['id'],
         _data=[],
         _expected_status=200,
@@ -1820,13 +1836,13 @@ def test_organisation_email_branding_options_calls_api_client_with_chosen_brandi
 
     client_request.login(platform_admin_user)
     page = client_request.post(
-        '.organisation_email_branding_options',
+        '.add_organisation_email_branding_options',
         org_id=organisation_one['id'],
         _data={'branding_field': branding_ids_added},
         _follow_redirects=True,
     )
 
-    assert page.h1.text == 'Settings'
+    assert page.h1.text == 'Email branding'
     assert normalize_spaces(
         page.find('div', class_='banner-default-with-tick').text
     ) == flash_message
