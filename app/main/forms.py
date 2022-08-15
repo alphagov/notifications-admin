@@ -1786,7 +1786,7 @@ class AdminProviderRatioForm(Form):
 
 
 class ServiceContactDetailsForm(StripWhitespaceForm):
-    contact_details_type = RadioField(
+    contact_details_type = GovukRadiosField(
         'Type of contact details',
         choices=[
             ('url', 'Link'),

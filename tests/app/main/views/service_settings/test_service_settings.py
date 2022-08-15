@@ -4451,7 +4451,7 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
         },
         _follow_redirects=True
     )
-    assert normalize_spaces(page.find('span', class_='error-message').text) == 'Select an option'
+    assert normalize_spaces(page.find('span', class_='govuk-error-message').text) == 'Error: Select an option'
     assert normalize_spaces(page.h1.text) == "Send files by email"
 
 
