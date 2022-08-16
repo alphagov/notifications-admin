@@ -103,7 +103,7 @@
                 currency="£",
                 smallest=True
               ) }}
-              <ul>
+              <ul class="govuk-list">
               {% if item.sms_free_allowance_used %}
                 <li class="tabular-numbers">{{ item.sms_free_allowance_used|format_thousands }} free {{ item.sms_free_count|message_count_label('sms', suffix='') }}</li>
               {% endif %}
