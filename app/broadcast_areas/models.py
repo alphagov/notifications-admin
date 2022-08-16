@@ -82,11 +82,11 @@ class BroadcastArea(BaseBroadcastArea, IdEqualityMixin, SortByNameMixin):
 
     @cached_property
     def is_lower_tier_local_authority(self):
-        return self.id.startswith('lad20-') and self.parent
+        return self.id.startswith('lad21-') and self.parent
 
     @cached_property
     def is_electoral_ward(self):
-        return self.id.startswith('wd20-')
+        return self.id.startswith('wd21-')
 
     @classmethod
     def from_row_with_simple_polygons(cls, row):
