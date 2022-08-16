@@ -1,0 +1,182 @@
+// Forms
+// ==========================================================================
+
+// Contents:
+//
+// 1. Helpers
+// 2. Form wrappers
+// 3. Form labels
+// 4. Form hints
+// 5. Form controls
+// 6. Form control widths
+// 7. Browser accessibility fixes
+
+// 1. Helpers
+// ==========================================================================
+
+// Fieldset is used to group more than one .form-group
+fieldset {
+  @extend %contain-floats;
+  width: 100%;
+}
+
+// Hack to let legends or elements within legends have margins in webkit browsers
+legend {
+  overflow: hidden;
+}
+
+// Fix left hand gap in IE7 and below
+@include ie-lte(7) {
+  legend {
+    margin-left: -7px;
+  }
+}
+
+// Remove margin under textarea in Chrome and FF
+textarea {
+  display: block;
+}
+
+
+// 2. Form wrappers
+// ==========================================================================
+
+.form-group {
+  @extend %contain-floats;
+  @include box-sizing(border-box);
+}
+
+// Form group is used to wrap label and input pairs
+.form-group {
+  margin-bottom: $gutter-half;
+
+  @include media(tablet) {
+    margin-bottom: $gutter;
+  }
+}
+
+// 3. Form labels
+// ==========================================================================
+
+// Form labels, or for legends styled to look like labels
+// TODO: Amend so there is only one label style
+.form-label {
+  display: block;
+  color: $text-colour;
+  padding-bottom: 2px;
+
+  @include core-19;
+}
+
+// 4. Form hints
+// ==========================================================================
+
+// Form hints and example text are light grey and sit above a form control
+.form-hint {
+  @include core-19;
+  display: block;
+  color: $secondary-text-colour;
+  font-weight: normal;
+
+  margin-top: -2px;
+  padding-bottom: 2px;
+}
+
+.form-label .form-hint {
+  margin-top: 0;
+  padding-bottom: 0;
+}
+
+// 5. Form controls
+// ==========================================================================
+
+// By default, form controls are 50% width for desktop,
+// and 100% width for mobile
+.form-control {
+  @include box-sizing(border-box);
+  @include core-19;
+  width: 100%;
+
+  padding: 5px 4px 4px;
+  // setting any background-color makes text invisible when changing colours to dark backgrounds in Firefox (https://bugzilla.mozilla.org/show_bug.cgi?id=1335476)
+  // as background-color and color need to always be set together, color should not be set either
+  border: 2px solid $text-colour;
+
+  // TODO: Remove 50% width set for tablet and up
+  // !! BREAKING CHANGE !!
+  @include media(tablet) {
+    width: 50%;
+  }
+
+}
+
+// Allow a qualifying element, remove rounded corners from inputs and textareas
+// scss-lint:disable QualifyingElement
+input.form-control,
+textarea.form-control {
+  // Disable inner shadow and remove rounded corners
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+textarea.form-control {
+  // Disable opacity and background image for Firefox
+  opacity: 1;
+  background-image: none;
+}
+// scss-lint:enable QualifyingElement
+
+
+// 6. Form control widths
+// ==========================================================================
+
+// TODO: Update these
+// Form control widths
+
+.form-control-3-4 {
+  width: 100%;
+
+  @include media(tablet) {
+    width: 75%;
+  }
+}
+
+.form-control-2-3 {
+  width: 100%;
+
+  @include media(tablet) {
+    width: 66.66%;
+  }
+}
+
+.form-control-1-2 {
+  width: 100%;
+
+  @include media(tablet) {
+    width: 50%;
+  }
+}
+
+.form-control-1-3 {
+  width: 100%;
+
+  @include media(tablet) {
+    width: 33.33%;
+  }
+}
+
+.form-control-1-4 {
+  width: 100%;
+
+  @include media(tablet) {
+    width: 25%;
+  }
+}
+
+.form-control-1-8 {
+  width: 100%;
+
+  @include media(tablet) {
+    width: 12.5%;
+  }
+}
