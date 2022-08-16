@@ -66,6 +66,7 @@ from app.main.forms import (
     SMSPrefixForm,
     SomethingElseBrandingForm,
 )
+from app.main.views.pricing import CURRENT_SMS_RATE
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.branding import NHS_EMAIL_BRANDING_ID
 from app.utils.branding import get_email_choices as get_email_branding_choices
@@ -752,6 +753,7 @@ def service_set_channel(service_id, channel):
     return render_template(
         'views/service-settings/set-{}.html'.format(channel),
         form=form,
+        sms_rate=CURRENT_SMS_RATE,
     )
 
 
