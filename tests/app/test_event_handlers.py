@@ -9,9 +9,7 @@ from app.event_handlers import (
     create_email_change_event,
     create_mobile_number_change_event,
     create_remove_user_from_service_event,
-    create_resume_service_event,
     create_set_user_permissions_event,
-    create_suspend_service_event,
     on_user_logged_in,
 )
 from app.models.user import User
@@ -103,16 +101,6 @@ def test_create_broadcast_account_type_change_event(client_request, mock_events)
     mock_events.assert_called_with('change_broadcast_account_type', event_dict(**kwargs))
 
 
-def test_suspend_service(client_request, mock_events):
-    kwargs = {
-        "service_id": str(uuid.uuid4()),
-        "suspended_by_id": str(uuid.uuid4())
-    }
-
-    create_suspend_service_event(**kwargs)
-    mock_events.assert_called_with('suspend_service', event_dict(**kwargs))
-
-
 def test_archive_service(client_request, mock_events):
     kwargs = {
         "service_id": str(uuid.uuid4()),
@@ -121,16 +109,6 @@ def test_archive_service(client_request, mock_events):
 
     create_archive_service_event(**kwargs)
     mock_events.assert_called_with('archive_service', event_dict(**kwargs))
-
-
-def test_resume_service(client_request, mock_events):
-    kwargs = {
-        "service_id": str(uuid.uuid4()),
-        "resumed_by_id": str(uuid.uuid4())
-    }
-
-    create_resume_service_event(**kwargs)
-    mock_events.assert_called_with('resume_service', event_dict(**kwargs))
 
 
 def test_set_user_permissions(client_request, mock_events):

@@ -147,31 +147,36 @@ def test_service_setting_toggles_show(
     assert normalize_spaces(page.find('a', {'href': link_url}).find_parent('tr').text.strip()) == text
 
 
-@pytest.mark.parametrize('service_fields, endpoint, index, text', [
-    ({'active': True}, '.archive_service', 0, 'Delete this service'),
-    ({'active': True}, '.suspend_service', 1, 'Suspend service'),
-    ({'active': True}, '.history', 2, 'Service history'),
-    ({'active': False}, '.resume_service', 0, 'Resume service'),
-    ({'active': False}, '.history', 1, 'Service history'),
-    pytest.param(
-        {'active': False}, '.archive_service', 2, 'Resume service',
-        marks=pytest.mark.xfail(raises=IndexError)
-    )
+@pytest.mark.parametrize('endpoint, index, text', [
+    ('.archive_service', 0, 'Delete this service'),
+    ('.history', 1, 'Service history')
 ])
-def test_service_setting_link_toggles(
+def test_service_setting_links_displayed_for_active_services(
     get_service_settings_page,
     service_one,
-    service_fields,
     endpoint,
     index,
     text,
 ):
     link_url = url_for(endpoint, service_id=service_one['id'])
-    service_one.update(service_fields)
     page = get_service_settings_page()
     link = page.select('.page-footer-link a')[index]
     assert normalize_spaces(link.text) == text
     assert link['href'] == link_url
+
+
+def test_service_setting_links_not_displayed_for_archived_services(
+    get_service_settings_page,
+    service_one,
+):
+    link_texts = [
+        'Delete this service',
+        'Service history'
+    ]
+    service_one.update({'active': False})
+    page = get_service_settings_page()
+    toggles = page.find_all('a', {'class': 'govuk-link'})
+    assert not any(link for link in toggles if link.text.strip() in link_texts)
 
 
 @pytest.mark.parametrize('permissions,permissions_text,visible', [
@@ -191,19 +196,6 @@ def test_service_settings_doesnt_show_option_if_parent_permission_disabled(
     page = get_service_settings_page()
     cells = page.find_all('td')
     assert any(cell for cell in cells if permissions_text in cell.text) is visible
-
-
-@pytest.mark.parametrize('service_fields, link_text', [
-    # can't archive or suspend inactive service. Can't resume active service.
-    ({'active': False}, 'Archive service'),
-    ({'active': False}, 'Suspend service'),
-    ({'active': True}, 'Resume service'),
-])
-def test_service_setting_toggles_dont_show(get_service_settings_page, service_one, service_fields, link_text):
-    service_one.update(service_fields)
-    page = get_service_settings_page()
-    toggles = page.find_all('a', {'class': 'govuk-link'})
-    assert not any(link for link in toggles if link_text in link.text)
 
 
 def test_normal_user_doesnt_see_any_platform_admin_settings(
