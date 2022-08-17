@@ -24,6 +24,13 @@
     margin-bottom: govuk-spacing(1);
   }
 
+  // Remove inset-text styling from contents of details in banners
+  // The style clashes with that of the banner (double border)
+  .govuk-details__text {
+    border-left: none;
+    padding: 0;
+  }
+
 }
 
 %banner-with-tick,
