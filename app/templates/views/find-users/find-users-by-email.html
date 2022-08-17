@@ -44,7 +44,7 @@
         <a href="{{url_for('.user_information', user_id=user.id)}}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ user.email_address }}</a>
         <p class="browse-list-hint">{{ user.name }}</p>
       </li>
-      <hr>
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
     {% endfor %}
     </ul>
   </nav>
