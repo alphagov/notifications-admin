@@ -57,7 +57,7 @@ eventlet==0.33.1
     # via gunicorn
 fido2==1.0.0
     # via -r requirements.in
-flask==2.2.2
+flask==2.1.2
     # via
     #   -r requirements.in
     #   flask-login
@@ -118,7 +118,6 @@ lxml==4.9.1
 markupsafe==2.1.1
     # via
     #   jinja2
-    #   werkzeug
     #   wtforms
 mistune==0.8.4
     # via notifications-utils
@@ -221,7 +220,7 @@ urllib3==1.26.11
     #   requests
 webencodings==0.5.1
     # via bleach
-werkzeug==2.2.2
+werkzeug==2.1.2
     # via
     #   -r requirements.in
     #   flask
