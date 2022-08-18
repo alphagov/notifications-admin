@@ -1,9 +1,12 @@
 import base64
 
 from fido2 import cbor
-from fido2.client import ClientData
 from fido2.cose import UnsupportedKey
-from fido2.ctap2 import AttestationObject, AttestedCredentialData
+from fido2.webauthn import (
+    AttestationObject,
+    AttestedCredentialData,
+    CollectedClientData,
+)
 from flask import current_app
 
 from app.models import JSONModel, ModelList
@@ -31,7 +34,7 @@ class WebAuthnCredential(JSONModel):
         try:
             auth_data = server.register_complete(
                 state,
-                ClientData(response["clientDataJSON"]),
+                CollectedClientData(response["clientDataJSON"]),
                 AttestationObject(response["attestationObject"]),
             )
         except ValueError as e:
