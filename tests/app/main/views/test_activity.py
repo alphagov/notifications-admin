@@ -437,7 +437,7 @@ def test_search_recipient_form(
     assert page.select_one('label[for=to]').text.strip() == expected_search_box_label
 
     recipient_inputs = page.select("input[name=to]")
-    assert(len(recipient_inputs) == 2)
+    assert (len(recipient_inputs) == 2)
 
     for field in recipient_inputs:
         assert field.get("value") == expected_search_box_contents
