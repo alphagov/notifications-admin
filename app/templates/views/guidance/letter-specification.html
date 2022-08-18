@@ -1,5 +1,6 @@
 {% extends "content_template.html" %}
 {% from "components/service-link.html" import service_link %}
+{% from "components/details/macro.njk" import govukDetails %}
 
 {% block per_page_title %}
   Letter specification
@@ -16,42 +17,40 @@
 
   <p class="govuk-body">To help you set up your letter, you can download our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.letter_spec') }}">letter specification as a PDF</a>.</p>
 
-  <details class="govuk-details" data-module="govuk-details">
-  <summary class="govuk-details__summary">
-    <span class="govuk-details__summary-text">
-      See a text version of the letter specification
-    </span>
-  </summary>
-  <div class="govuk-details__text">
-  <h2 class="heading-medium">Page 1 of 10</h2>
+  {% set letter_spec %}
+    <h2 class="heading-medium">Page 1 of 10</h2>
 
-  <p class="govuk-body">Left margin 15mm</p>
-  <p class="govuk-body">Right margin 15mm</p>
-  <p class="govuk-body">Top margin 5mm</p>
-  <p class="govuk-body">Bottom margin 5mm</p>
+    <p class="govuk-body">Left margin 15mm</p>
+    <p class="govuk-body">Right margin 15mm</p>
+    <p class="govuk-body">Top margin 5mm</p>
+    <p class="govuk-body">Bottom margin 5mm</p>
 
-  <h3 class="heading-small">Logo block</h3>
+    <h3 class="heading-small">Logo block</h3>
 
-  <p class="govuk-body">Position: 15mm from left edge, 5mm from top edge</p>
-  <p class="govuk-body">Size: 200mm wide by 25mm high</p>
+    <p class="govuk-body">Position: 15mm from left edge, 5mm from top edge</p>
+    <p class="govuk-body">Size: 200mm wide by 25mm high</p>
 
-  <h3 class="heading-small">Address block</h3>
+    <h3 class="heading-small">Address block</h3>
 
-  <p class="govuk-body">Position: 24.6mm from left edge, 39.5mm from top edge</p>
-  <p class="govuk-body">Size: 95.4mm wide by 26.8mm high</p>
+    <p class="govuk-body">Position: 24.6mm from left edge, 39.5mm from top edge</p>
+    <p class="govuk-body">Size: 95.4mm wide by 26.8mm high</p>
 
-  <h3 class="heading-small">Letter contact block</h3>
+    <h3 class="heading-small">Letter contact block</h3>
 
-  <p class="govuk-body">Position: 125mm from left edge, 30mm from top edge</p>
-  <p class="govuk-body">Size: 65mm wide by 65mm high</p>
+    <p class="govuk-body">Position: 125mm from left edge, 30mm from top edge</p>
+    <p class="govuk-body">Size: 65mm wide by 65mm high</p>
 
-  <h2 class="heading-medium">Pages 2 to 10</h2>
+    <h2 class="heading-medium">Pages 2 to 10</h2>
 
-  <p class="govuk-body">Left margin 15mm</p>
-  <p class="govuk-body">Right margin 15mm</p>
-  <p class="govuk-body">Top margin 5mm</p>
-  <p class="govuk-body">Bottom margin 5mm</p>
-  </div>
-</details>
+    <p class="govuk-body">Left margin 15mm</p>
+    <p class="govuk-body">Right margin 15mm</p>
+    <p class="govuk-body">Top margin 5mm</p>
+    <p class="govuk-body">Bottom margin 5mm</p>
+  {% endset %}
+
+  {{ govukDetails({
+    "summaryText": "See a text version of the letter specification",
+    "html": letter_spec
+  }) }}
 
 {% endblock %}

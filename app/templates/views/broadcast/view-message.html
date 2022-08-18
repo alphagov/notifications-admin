@@ -5,6 +5,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "views/broadcast/macros/area-map.html" import map %}
+{% from "components/details/macro.njk" import govukDetails %}
 
 {% extends "withnav_template.html" %}
 
@@ -63,25 +64,28 @@
             When you use a live account you’ll need another member of
             your team to approve your alert.
           </p>
-          <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
-            <summary class="govuk-details__summary govuk-clearfix">
-              Approve your own alert
-            </summary>
+          {% set approve_details %}
             {% call form_wrapper() %}
-              <p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-3">
-                Because you’re in training mode you can approve
-                your own alerts, to see how it works.
-              </p>
-              <p class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-3">
-                No real alerts will be broadcast to anyone’s phone.
-              </p>
-              {{ page_footer(
-                "Start broadcasting now",
-                delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
-                delete_link_text='Reject this alert'
-              ) }}
+            <p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-3">
+              Because you’re in training mode you can approve
+              your own alerts, to see how it works.
+            </p>
+            <p class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-3">
+              No real alerts will be broadcast to anyone’s phone.
+            </p>
+            {{ page_footer(
+              "Start broadcasting now",
+              delete_link=url_for('main.reject_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+              delete_link_text='Reject this alert'
+            ) }}
             {% endcall %}
-          </details>
+          {% endset %}
+
+          {{ govukDetails({
+            "classes": "govuk-!-margin-bottom-0",
+            "summaryText": "Approve your own alert",
+            "html": approve_details
+          }) }}
         {% elif current_user.has_permissions('create_broadcasts', restrict_admin_usage=True) %}
           <p class="govuk-body">
             You need another member of your team to approve this alert.

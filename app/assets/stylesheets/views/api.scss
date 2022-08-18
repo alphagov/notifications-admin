@@ -10,13 +10,15 @@
     border-top: 1px solid $border-colour;
     padding: 10px 0 0 0;
 
-    &__heading,
-    &__data,
-    &__view {
+    // We can't assign classes to the summary.govuk-details__summary or div.govuk-details__text
+    // elements so we have to target them as children of details.api-notifications-item
+    // This will result in selectors like .api-notifications-item > .govuk-details__summary
+    > .govuk-details__summary,
+    > .govuk-details__text {
       font-family: monospace;
     }
 
-    &__heading {
+    > .govuk-details__summary {
       display: block;
       margin-bottom: govuk-spacing(3);
 
@@ -51,20 +53,24 @@
 
     }
 
-    &__data {
+    // We can't assign classes to the div.govuk-details__text element so we have to target it as a
+    // child of details.api-notifications-item instead
+    // This will result in .api-notifications-item > .govuk-details__text
+    > .govuk-details__text {
 
       border-left: none;
       padding-left: 25px;
+      padding-top: 0;
 
-      &-name {
-        color: $secondary-text-colour;
-      }
+    }
 
-      &-value {
-        color: $text-colour;
-        padding-bottom: 15px;
-      }
+    &__data-name {
+      color: $secondary-text-colour;
+    }
 
+    &__data-value {
+      color: $text-colour;
+      padding-bottom: 15px;
     }
 
   }
