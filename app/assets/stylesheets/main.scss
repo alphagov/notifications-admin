@@ -16,17 +16,17 @@ $path: '/static/images/';
 @import 'url-helpers';
 
 // Specific to this application, needs to go at the top of the cascade
+@import 'reset';
 @import 'globals';
 
 // Dependencies from GOV.UK Elements
 // https://github.com/alphagov/govuk_elements
 @import 'elements/helpers';
-@import 'elements/reset';
-@import 'govuk_elements/elements-typography';
-@import 'govuk_elements/forms';
-@import 'govuk_elements/forms/form-multiple-choice';
-@import 'govuk_elements/forms/form-validation';
-@import 'govuk_elements/tables';
+@import './govuk-elements/elements-typography';
+@import './govuk-elements/forms';
+@import './govuk-elements/forms/form-multiple-choice';
+@import './govuk-elements/forms/form-validation';
+@import './govuk-elements/tables';
 
 // Dependencies from GOV.UK Frontend, packaged to be specific to this application
 @import './govuk-frontend/all';
