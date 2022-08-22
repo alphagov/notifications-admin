@@ -21,7 +21,7 @@ $path: '/static/images/';
 
 // Dependencies from GOV.UK Elements
 // https://github.com/alphagov/govuk_elements
-@import 'elements/helpers';
+@import './govuk-elements/helpers';
 @import './govuk-elements/elements-typography';
 @import './govuk-elements/forms';
 @import './govuk-elements/forms/form-multiple-choice';
