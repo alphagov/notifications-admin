@@ -188,7 +188,7 @@ requests==2.28.1
     #   govuk-bank-holidays
     #   notifications-python-client
     #   notifications-utils
-rsa==4.7.2
+rsa==4.9
     # via awscli
 rtreelib==0.2.0
     # via -r requirements.in
