@@ -71,7 +71,7 @@ flask-redis==0.4.0
     # via notifications-utils
 flask-wtf==1.0.1
     # via -r requirements.in
-gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
+gds-metrics==0.2.4
     # via -r requirements.in
 geojson==2.5.0
     # via notifications-utils
