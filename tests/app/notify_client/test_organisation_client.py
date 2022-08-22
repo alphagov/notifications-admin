@@ -198,14 +198,15 @@ def test_update_organisation_when_updating_org_type_but_org_has_no_services(mock
     organisations_client.update_organisation(
         fake_uuid,
         cached_service_ids=[],
-        organisation_type='central',
+        email_branding_id=fake_uuid,
     )
 
     mock_post.assert_called_with(
         url='/organisations/{}'.format(fake_uuid),
-        data={'organisation_type': 'central'}
+        data={'email_branding_id': fake_uuid}
     )
     assert mock_redis_delete.call_args_list == [
+        call(f'organisation-{fake_uuid}-email-branding-pool'),
         call('organisations'),
         call('domains'),
     ]

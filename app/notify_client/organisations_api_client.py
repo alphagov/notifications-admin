@@ -59,6 +59,9 @@ class OrganisationsClient(NotifyAdminAPIClient):
         if 'name' in kwargs:
             redis_client.delete(f'organisation-{org_id}-name')
 
+        if 'email_branding_id' in kwargs and kwargs['email_branding_id']:
+            redis_client.delete(f'organisation-{org_id}-email-branding-pool')
+
         return api_response
 
     @cache.delete('organisation-{org_id}-email-branding-pool')
