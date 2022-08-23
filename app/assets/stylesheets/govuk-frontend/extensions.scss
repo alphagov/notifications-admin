@@ -70,8 +70,8 @@ $govuk-grid-widths: (
 .govuk-input--numbered {
   padding-left: 1.84em;
 
-  @include media(desktop) {
-    @include inline-block;
+  @include govuk-media-query(desktop) {
+    display: inline-block;
   }
 }
 
