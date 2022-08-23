@@ -1,4 +1,5 @@
 module.exports = {
   setupFiles: ['./support/setup.js'],
-  testURL: 'https://www.notifications.service.gov.uk',
+  testEnvironmentOptions: { url: 'https://www.notifications.service.gov.uk' },
+  testEnvironment: 'jsdom'
 }
