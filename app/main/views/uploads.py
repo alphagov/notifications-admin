@@ -141,11 +141,11 @@ def uploaded_letters(service_id, letter_print_day):
 def add_preview_of_content_uploaded_letters(notifications):
 
     for notification in notifications:
-        yield(dict(
+        yield dict(
             preview_of_content=', '.join(notification.pop('to').splitlines()),
             to=notification['client_reference'],
             **notification
-        ))
+        )
 
 
 @main.route("/services/<uuid:service_id>/upload-letter", methods=['GET', 'POST'])
