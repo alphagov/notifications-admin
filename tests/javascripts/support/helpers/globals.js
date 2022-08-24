@@ -79,6 +79,12 @@ class LocationMock {
 
   }
 
+  // empty method for mocking
+  reload () {
+
+  }
+
+  // custom method to reset window.location to the original. Not part of the window.location API
   reset () {
 
     window.location = this._location;
