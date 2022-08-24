@@ -434,10 +434,10 @@ def get_job_partials(job):
 def add_preview_of_content_to_notifications(notifications):
 
     for notification in notifications:
-        yield(dict(
+        yield dict(
             preview_of_content=get_preview_of_content(notification),
             **notification
-        ))
+        )
 
 
 def get_preview_of_content(notification):
