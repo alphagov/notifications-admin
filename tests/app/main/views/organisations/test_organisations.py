@@ -1735,7 +1735,7 @@ def test_organisation_email_branding_options_page_shows_all_branding_pool_option
     client_request.login(platform_admin_user)
     page = client_request.get('.organisation_email_branding_options', org_id=organisation_one['id'])
     assert page.h1.text == 'Email branding'
-    assert all(item in [heading.text.strip() for heading in page.select('.heading-small')]
+    assert set(heading.text.strip() for heading in page.select('.heading-small')) == {"org 1", "org 2"}
                for item in ["org 1", "org 2"])
     assert normalize_spaces(page.select_one('.govuk-button--secondary').text) == 'Add other options'
 
