@@ -2,12 +2,20 @@
 
 class LocationMock {
 
-  constructor (URL) {
+  constructor () {
 
+    const _url = new window.URL(window.location.href);
     this._location = window.location;
 
-    // setting href sets all sub-properties
-    this.href = URL;
+    // proxy use of properties to equivalent from window.URL instance
+    ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'href'].forEach(partName => {
+
+      Object.defineProperty(this, partName, {
+        get: function () { return _url[partName]; },
+        set: function (value) { _url[partName] = value; }
+      });
+
+    });
 
     // JSDOM sets window.location as non-configurable
     // the only way to mock it, currently, is to replace it completely
@@ -16,71 +24,13 @@ class LocationMock {
 
   }
 
-  get href () {
-
-    return `${this.protocol}://${this.host}${this.pathname}${this.search}${this.hash}`
-
-  }
-
-  set href (value) {
-
-    const partNames = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash'];
-
-    const protocol = '(https:|http:)';
-    const hostname = '[^\\/]+';
-    const port = '(:\\d)';
-    const pathname = '([^?]+)';
-    const search = '([^#])';
-    const hash = '(#[\\x00-\\x7F])'; // match any ASCII character
-
-    const re = new RegExp(`^${protocol}{0,1}(?:\\/\\/){0,1}(${hostname}${port}{0,1}){0,1}${pathname}{0,1}${search}{0,1}${hash}{0,1}$`);
-    const match = value.match(re)
-
-    if (match === null) { throw Error(`${value} is not a valid URL`); }
-
-    match.forEach((part, idx) => {
-
-      let partName;
-
-      // 0 index is whole match, we want the groups
-      if (idx > 0) {
-        partName = partNames[idx - 1];
-
-        if (part !== undefined) {
-          this[partName] = part;
-        } else if (!(partName in this)) { // only get value from window.location if property not set
-          this[partName] = this._location[partName];
-        }
-      }
-
-    });
-
-  }
-
-  get host () {
-
-    return `${this.hostname}:${this.port}`;
-
-  }
-
-  set host (value) {
-
-    const parts = value.split(':');
-
-    this.hostname = parts[0];
-    this.protocol = parts[1];
-
-  }
-
-  // origin is read-only
-  get origin () {
-
-    return `${this.protol}://${this.hostname}`;
+  // empty method for mocking
+  reload () {
 
   }
 
   // empty method for mocking
-  reload () {
+  assign () {
 
   }
 
