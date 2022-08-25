@@ -1,3 +1,5 @@
+const helpers = require('./support/helpers.js')
+
 beforeAll(() => {
   window.CBOR = require('../../node_modules/cbor-js/cbor.js')
   require('../../app/assets/javascripts/authenticateSecurityKey.js')
@@ -21,6 +23,15 @@ afterAll(() => {
 
 describe('Authenticate with security key', () => {
   let button
+  let locationMock
+
+  beforeAll(() => {
+    locationMock = new helpers.LocationMock('http://localhost:6012/webauth/authenticate')
+  })
+
+  afterAll(() => {
+    locationMock.reset()
+  })
 
   beforeEach(() => {
     // disable console.error() so we don't see it in test output
@@ -99,8 +110,7 @@ describe('Authenticate with security key', () => {
   })
 
   test('authenticates and passes a redirect url through to the authenticate admin endpoint', (done) => {
-    // https://github.com/facebook/jest/issues/890#issuecomment-415202799
-    window.history.pushState({}, 'Test Title', '/?next=%2Ffoo%3Fbar%3Dbaz')
+    window.location.search = '?next=%2Ffoo%3Fbar%3Dbaz';
 
     jest.spyOn(window, 'fetch')
       .mockImplementationOnce((_url) => {
