@@ -1706,8 +1706,8 @@ def test_organisation_email_branding_options_page_is_not_accessible_by_non_platf
 
 
 @pytest.mark.parametrize("default_email_branding, expected_branding_options", (
-    [None, {"GOV.UK Default", "org 1 branding name", "org 2 branding name"}],
-    ['1', {"org 2 branding name Default", "org 1 branding name"}]
+    [None, {"GOV.UK (default)", "org 1 branding name", "org 2 branding name"}],
+    ['2', {"org 2 branding name (default)", "org 1 branding name"}]
 ))
 def test_organisation_email_branding_options_page_shows_all_branding_pool_options(
     mocker,
@@ -1762,7 +1762,7 @@ def test_organisation_email_branding_options_page_shows_all_branding_pool_option
     page = client_request.get('.organisation_email_branding_options', org_id=organisation_one['id'])
     assert page.h1.text == 'Email branding'
     assert set(
-        heading.text.strip() for heading in page.select('.heading-small')
+        normalize_spaces(heading.text) for heading in page.select('.user-list-item-heading')
             ) == expected_branding_options
     assert normalize_spaces(page.select_one('.govuk-button--secondary').text) == 'Add other options'
 
