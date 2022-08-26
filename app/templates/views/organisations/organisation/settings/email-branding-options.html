@@ -1,7 +1,6 @@
 {% extends "org_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/live-search.html" import live_search %}
 {% from "components/form.html" import form_wrapper%}
 {% from "components/back-link/macro.njk" import govukBackLink %}
 {%  from "components/branding-preview.html" import email_branding_preview %}
@@ -38,9 +37,6 @@
               <span class="heading-small">{{ option.name }} </span></h2>
         </p>
         {{ email_branding_preview(option.id) }}
-        {% call form_wrapper() %}
-
-        {% endcall %}
     {% endfor %}
     <div class="js-stick-at-bottom-when-scrolling">
         {{ page_footer(
