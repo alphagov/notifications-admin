@@ -1705,27 +1705,53 @@ def test_organisation_email_branding_options_page_is_not_accessible_by_non_platf
     assert page
 
 
+@pytest.mark.parametrize("default_email_branding, expected_branding_options", (
+    [None, {"GOV.UK Default", "org 1 branding name", "org 2 branding name"}],
+    ['1', {"org 2 branding name Default", "org 1 branding name"}]
+))
 def test_organisation_email_branding_options_page_shows_all_branding_pool_options(
     mocker,
     client_request,
     platform_admin_user,
     organisation_one,
-    mock_get_organisation,
-    mock_get_all_email_branding
+    mock_get_all_email_branding,
+    default_email_branding,
+    expected_branding_options
 ):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=default_email_branding,
+        )
+    )
+
+    mocker.patch(
+        'app.email_branding_client.get_email_branding',
+        return_value={"email_branding": {
+            'logo': 'logo2.png',
+            'name': 'org 2 branding name',
+            'text': 'org 2 branding text',
+            'id': '2',
+            'colour': None,
+            'brand_type': 'org',
+        }}
+    )
+
     branding_pool = [
         {
             'logo': 'logo1.png',
-            'name': 'org 1',
-            'text': 'org 1',
+            'name': 'org 1 branding name',
+            'text': 'org 1 branding text',
             'id': '1',
             'colour': None,
             'brand_type': 'org',
         },
         {
             'logo': 'logo2.png',
-            'name': 'org 2',
-            'text': 'org 2',
+            'name': 'org 2 branding name',
+            'text': 'org 2 branding text',
             'id': '2',
             'colour': None,
             'brand_type': 'org',
@@ -1735,8 +1761,9 @@ def test_organisation_email_branding_options_page_shows_all_branding_pool_option
     client_request.login(platform_admin_user)
     page = client_request.get('.organisation_email_branding_options', org_id=organisation_one['id'])
     assert page.h1.text == 'Email branding'
-    assert set(heading.text.strip() for heading in page.select('.heading-small')) == {"org 1", "org 2"}
-               for item in ["org 1", "org 2"])
+    assert set(
+        heading.text.strip() for heading in page.select('.heading-small')
+            ) == expected_branding_options
     assert normalize_spaces(page.select_one('.govuk-button--secondary').text) == 'Add other options'
 
 
