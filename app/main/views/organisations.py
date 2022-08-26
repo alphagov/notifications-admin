@@ -447,9 +447,9 @@ def organisation_preview_email_branding(org_id):
     )
 
 
-@main.route("/organisations/<uuid:org_id>/settings/email-branding-options", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>/settings/email-branding", methods=['GET'])
 @user_is_platform_admin
-def organisation_email_branding_options(org_id):
+def organisation_email_branding(org_id):
     # We want to display email branding options apart from an option that has already been set as the default
     email_branding_pool_options = [
         {"name": option["name"], "id": option["id"]} for option in current_organisation.email_branding_pool
@@ -462,7 +462,7 @@ def organisation_email_branding_options(org_id):
     )
 
 
-@main.route("/organisations/<uuid:org_id>/settings/email-branding-options/add", methods=['GET', 'POST'])
+@main.route("/organisations/<uuid:org_id>/settings/email-branding/add", methods=['GET', 'POST'])
 @user_is_platform_admin
 def add_organisation_email_branding_options(org_id):
     form = AdminChangeEmailBrandingPoolForm()
@@ -484,8 +484,7 @@ def add_organisation_email_branding_options(org_id):
             msg = f'{len(selected_email_branding_ids)} email branding options added'
 
         flash(msg, 'default_with_tick')
-        # TODO: redirect to page showing a preview of all branding in pool once it exists
-        return redirect(url_for('.organisation_email_branding_options', org_id=org_id))
+        return redirect(url_for('.organisation_email_branding', org_id=org_id))
 
     return render_template(
         'views/organisations/organisation/settings/add-email-branding-options.html',

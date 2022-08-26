@@ -1692,13 +1692,13 @@ def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
     assert not mock_update_organisation.called
 
 
-def test_organisation_email_branding_options_page_is_not_accessible_by_non_platform_admin(
+def test_organisation_email_branding_page_is_not_accessible_by_non_platform_admin(
     client_request,
     organisation_one,
     mock_get_organisation,
 ):
     page = client_request.get(
-        'main.organisation_email_branding_options',
+        'main.organisation_email_branding',
         org_id=organisation_one['id'],
         _expected_status=403
     )
@@ -1709,7 +1709,7 @@ def test_organisation_email_branding_options_page_is_not_accessible_by_non_platf
     [None, {"GOV.UK (default)", "org 1 branding name", "org 2 branding name"}],
     ['2', {"org 2 branding name (default)", "org 1 branding name"}]
 ))
-def test_organisation_email_branding_options_page_shows_all_branding_pool_options(
+def test_organisation_email_branding_page_shows_all_branding_pool_options(
     mocker,
     client_request,
     platform_admin_user,
@@ -1759,7 +1759,7 @@ def test_organisation_email_branding_options_page_shows_all_branding_pool_option
     ]
     mocker.patch('app.organisations_client.get_email_branding_pool', return_value=branding_pool)
     client_request.login(platform_admin_user)
-    page = client_request.get('.organisation_email_branding_options', org_id=organisation_one['id'])
+    page = client_request.get('.organisation_email_branding', org_id=organisation_one['id'])
     assert page.h1.text == 'Email branding'
     assert set(
         normalize_spaces(heading.text) for heading in page.select('.user-list-item-heading')
@@ -1848,7 +1848,7 @@ def test_add_organisation_email_branding_options_shows_error_if_no_branding_sele
     (['1', '2'], '2 email branding options added'),
     (['1'], '1 email branding option added'),
 ])
-def test_organisation_email_branding_options_calls_api_client_with_chosen_branding(
+def test_add_organisation_email_branding_options_calls_api_client_with_chosen_branding(
     client_request,
     platform_admin_user,
     organisation_one,
