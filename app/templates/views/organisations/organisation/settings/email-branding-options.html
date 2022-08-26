@@ -22,13 +22,13 @@
     <!-- display default branding and it's preview -->
     <p class="govuk-body">
       <h2 class="user-list-item-heading">
-        <span class="heading-small">{{ default_email_branding_name }}</span>&ensp;<span class="hint">
+        <span class="heading-small">{{ current_org.email_branding_name }}</span>&ensp;<span class="hint">
             (default)
         </span>
       </h2>
     </p>
 
-    {{ email_branding_preview(default_email_branding_id) }}
+    {{ email_branding_preview(current_org.email_branding_id) }}
 
     <!--display the email-branding-pool options and the preview for each one -->
 
@@ -46,7 +46,7 @@
         {{ page_footer(
             button_text='Add other options',
             secondary_button=True,
-            secondary_button_url=url_for('.add_organisation_email_branding_options', org_id=current_org_id)
+            secondary_button_url=url_for('.add_organisation_email_branding_options', org_id=current_org.id)
           )
         }}
     </div>
