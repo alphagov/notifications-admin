@@ -454,9 +454,10 @@ def organisation_email_branding_options(org_id):
     current_org_id = org_id
     # We want to display email branding options apart from an option
     # that has already been set as the default
-    email_branding_pool_options = [(option["name"], option["id"]) for option in
-                                   current_organisation.email_branding_pool
-                                   if option["name"] != default_email_branding_name]
+    email_branding_pool_options = [
+        (option["name"], option["id"]) for option in current_organisation.email_branding_pool
+        if option["name"] != default_email_branding_name
+    ]
     default_email_branding_name = current_organisation.email_branding_name
     default_email_branding_id = current_organisation.email_branding_id
 
