@@ -1692,20 +1692,82 @@ def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
     assert not mock_update_organisation.called
 
 
-def test_organisation_email_branding_options_is_platform_admin_only(
+def test_organisation_email_branding_page_is_not_accessible_by_non_platform_admin(
+    client_request,
+    organisation_one,
+    mock_get_organisation,
+):
+    page = client_request.get(
+        'main.organisation_email_branding',
+        org_id=organisation_one['id'],
+        _expected_status=403
+    )
+    assert page
+
+
+@pytest.mark.parametrize("default_email_branding, expected_branding_options", (
+    [None, {"GOV.UK (default)", "Email branding name 1", "Email branding name 2"}],
+    ['2', {"Email branding name 2 (default)", "Email branding name 1"}]
+))
+def test_organisation_email_branding_page_shows_all_branding_pool_options(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+    default_email_branding,
+    expected_branding_options
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=default_email_branding,
+        )
+    )
+
+    mocker.patch(
+        'app.email_branding_client.get_email_branding',
+        return_value={"email_branding": {
+            'logo': 'logo2.png',
+            'name': 'Email branding name 2',
+            'text': 'org 2 branding text',
+            'id': 'email-branding-2-id',
+            'colour': None,
+            'brand_type': 'org',
+        }}
+    )
+    client_request.login(platform_admin_user)
+
+    page = client_request.get('.organisation_email_branding', org_id=organisation_one['id'])
+
+    assert page.h1.text == 'Email branding'
+    assert set(
+        normalize_spaces(heading.text) for heading in page.select('.user-list-item-heading')
+            ) == expected_branding_options
+
+    add_options_button = page.select_one('.govuk-button--secondary')
+    assert normalize_spaces(add_options_button.text) == 'Add branding options'
+    assert add_options_button.attrs["href"] == url_for(
+        '.add_organisation_email_branding_options', org_id=organisation_one['id']
+    )
+
+
+def test_add_organisation_email_branding_options_is_platform_admin_only(
     client_request,
     organisation_one,
     mock_get_organisation,
     mocker,
 ):
     client_request.get(
-        'main.organisation_email_branding_options',
+        'main.add_organisation_email_branding_options',
         org_id=organisation_one['id'],
         _expected_status=403
     )
 
 
-def test_organisation_email_branding_options_shows_branding_not_in_branding_pool(
+def test_add_organisation_email_branding_options_shows_branding_not_in_branding_pool(
     mocker,
     client_request,
     platform_admin_user,
@@ -1734,8 +1796,7 @@ def test_organisation_email_branding_options_shows_branding_not_in_branding_pool
     mocker.patch('app.organisations_client.get_email_branding_pool', return_value=branding_pool)
 
     client_request.login(platform_admin_user)
-    page = client_request.get('.organisation_email_branding_options', org_id=organisation_one['id'])
-
+    page = client_request.get('.add_organisation_email_branding_options', org_id=organisation_one['id'])
     assert page.h1.text == 'Add email branding options'
     assert page.select_one('[data-module=live-search]')['data-targets'] == ('.govuk-checkboxes__item')
 
@@ -1750,7 +1811,7 @@ def test_organisation_email_branding_options_shows_branding_not_in_branding_pool
     assert normalize_spaces(page.select_one('.page-footer__button').text) == 'Add'
 
 
-def test_organisation_email_branding_options_shows_error_if_no_branding_selected(
+def test_add_organisation_email_branding_options_shows_error_if_no_branding_selected(
     client_request,
     platform_admin_user,
     organisation_one,
@@ -1760,7 +1821,7 @@ def test_organisation_email_branding_options_shows_error_if_no_branding_selected
 ):
     client_request.login(platform_admin_user)
     page = client_request.post(
-        '.organisation_email_branding_options',
+        '.add_organisation_email_branding_options',
         org_id=organisation_one['id'],
         _data=[],
         _expected_status=200,
@@ -1774,7 +1835,7 @@ def test_organisation_email_branding_options_shows_error_if_no_branding_selected
     (['1', '2'], '2 email branding options added'),
     (['1'], '1 email branding option added'),
 ])
-def test_organisation_email_branding_options_calls_api_client_with_chosen_branding(
+def test_add_organisation_email_branding_options_calls_api_client_with_chosen_branding(
     client_request,
     platform_admin_user,
     organisation_one,
@@ -1789,13 +1850,13 @@ def test_organisation_email_branding_options_calls_api_client_with_chosen_brandi
 
     client_request.login(platform_admin_user)
     page = client_request.post(
-        '.organisation_email_branding_options',
+        '.add_organisation_email_branding_options',
         org_id=organisation_one['id'],
         _data={'branding_field': branding_ids_added},
         _follow_redirects=True,
     )
 
-    assert page.h1.text == 'Settings'
+    assert page.h1.text == 'Email branding'
     assert normalize_spaces(
         page.find('div', class_='banner-default-with-tick').text
     ) == flash_message
