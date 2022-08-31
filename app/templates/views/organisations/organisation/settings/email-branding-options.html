@@ -17,33 +17,33 @@
 
 {% block maincolumn_content %}
     {{ page_header(page_title) }}
-
     <!-- display default branding and it's preview -->
-    <p class="govuk-body">
-      <h2 class="user-list-item-heading">
-        <span class="heading-small">{{ current_org.email_branding_name }}</span>&ensp;<span class="hint">
-            (default)
-        </span>
-      </h2>
-    </p>
-
-    {{ email_branding_preview(current_org.email_branding_id) }}
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-0">
+      {{ current_org.email_branding_name }}<span class="hint govuk-!-font-weight-normal">&ensp;(default)</span>
+    </h2>
+    {{ email_branding_preview(current_org.email_branding_id, classes='govuk-!-margin-bottom-8') }}
 
     <!--display the email-branding-pool options and the preview for each one -->
 
     {% for option in email_branding_pool_options %}
-        <p class="govuk-body">
-            <h2 class="user-list-item-heading">
-              <span class="heading-small">{{ option.name }} </span></h2>
-        </p>
-        {{ email_branding_preview(option.id) }}
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-0">
+        {{ option.name }}
+      </h2>
+      {{ email_branding_preview(option.id, classes='govuk-!-margin-bottom-0') }}
+      <p class="govuk-body govuk-!-margin-top-1 govuk-!-text-align-right">
+        <a href="{{ url_for('main.organisation_email_branding', org_id=current_org.id) }}?remove_branding_id={{ option.id }}"
+         class="govuk-link govuk-link govuk-link--destructive govuk-link--no-visited-state">
+          Remove <span class="govuk-visually-hidden">this branding option</span>
+        </a>
+      </p>
     {% endfor %}
+
     <div class="js-stick-at-bottom-when-scrolling">
-        {{ page_footer(
-            button_text='Add branding options',
-            secondary_button=True,
-            secondary_button_url=url_for('.add_organisation_email_branding_options', org_id=current_org.id)
-          )
-        }}
+      {{ page_footer(
+          button_text='Add branding options',
+          secondary_button=True,
+          secondary_button_url=url_for('.add_organisation_email_branding_options', org_id=current_org.id)
+        )
+      }}
     </div>
 {% endblock %}
