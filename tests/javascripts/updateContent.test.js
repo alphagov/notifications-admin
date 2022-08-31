@@ -1,5 +1,4 @@
 const each = require('jest-each').default;
-const jestDateMock = require('jest-date-mock');
 
 const helpers = require('./support/helpers.js');
 
@@ -22,7 +21,7 @@ beforeAll(() => {
   jqueryAJAXReturnObj = {
     done: callback => {
       // The server takes 1 second to respond
-      jestDateMock.advanceBy(1000);
+      jest.setSystemTime(Date.now() + 1000);
       callback(responseObj);
       return jqueryAJAXReturnObj;
     },
