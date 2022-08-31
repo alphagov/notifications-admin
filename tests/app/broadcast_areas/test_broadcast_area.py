@@ -28,7 +28,7 @@ def test_loads_libraries():
             False,
         ),
         (
-            'wd21-lad21-ctyua21',
+            'wd20-lad20-ctyua19',
             'Local authorities',
             True,
         ),
@@ -62,8 +62,8 @@ def test_examples():
     countries = broadcast_area_libraries.get('ctry19').get_examples()
     assert countries == 'England, Northern Ireland, Scotland and Wales'
 
-    wards = broadcast_area_libraries.get('wd21-lad21-ctyua21').get_examples()
-    assert wards == 'Aberdeen City, Aberdeenshire, Adur and 384 more…'
+    wards = broadcast_area_libraries.get('wd20-lad20-ctyua19').get_examples()
+    assert wards == 'Aberdeen City, Aberdeenshire, Adur and 391 more…'
 
 
 @pytest.mark.parametrize('id', (
@@ -84,7 +84,7 @@ def test_loads_areas_from_libraries(id):
 def test_get_names_of_areas():
     areas = broadcast_area_libraries.get_areas([
         'ctry19-W92000004',
-        'lad21-W06000014',
+        'lad20-W06000014',
         'ctry19-E92000001',
     ])
     assert [area.name for area in sorted(areas)] == [
@@ -127,19 +127,19 @@ def test_lat_long_order():
 
 def test_includes_electoral_wards():
 
-    areas = broadcast_area_libraries.get_areas(['wd21-E05009289'])
+    areas = broadcast_area_libraries.get_areas(['wd20-E05009289'])
     assert len(areas) == 1
 
 
 def test_electoral_wards_are_groupable_cardiff():
-    areas = broadcast_area_libraries.get_areas(['lad21-W06000015'])
+    areas = broadcast_area_libraries.get_areas(['lad20-W06000015'])
     assert len(areas) == 1
     cardiff = areas[0]
     assert len(cardiff.sub_areas) == 29
 
 
 def test_electoral_wards_are_groupable_ealing():
-    areas = broadcast_area_libraries.get_areas(['lad21-E09000009'])
+    areas = broadcast_area_libraries.get_areas(['lad20-E09000009'])
     assert len(areas) == 1
     ealing = areas[0]
     assert len(ealing.sub_areas) == 23
@@ -172,28 +172,28 @@ def test_every_area_has_count_of_phones(library):
 @pytest.mark.parametrize('area_id, area_name, expected_count', (
 
     # Unitary authority
-    ('ctyua21-E10000014', 'Hampshire', 978_280.52),
+    ('ctyua19-E10000014', 'Hampshire', 853_594.48),
 
     # District
-    ('lad21-E07000087', 'Fareham', 81_462.75),
+    ('lad20-E07000087', 'Fareham', 81_970.06),
 
     # Ward
-    ('wd21-E05004516', 'Fareham East', 5_652.1),
+    ('wd20-E05004516', 'Fareham East', 5_684.9),
 
     # Unitary authority
-    ('lad21-E09000012', 'Hackney', 219_848.91),
+    ('lad20-E09000012', 'Hackney', 222_578.0),
 
     # Ward
-    ('wd21-E05009373', 'Hackney Downs', 11_165.240000000002),
+    ('wd20-E05009373', 'Hackney Downs', 11_321.169999999998),
 
     # Special case: ward with hard-coded population
-    ('wd21-E05011090', 'Bryher', 76.44),
+    ('wd20-E05011090', 'Bryher', 76.44),
 
     # Areas with missing data
-    ('lad21-E07000008', 'Cambridge', 96_863.51000000001),
-    ('lad21-E07000084', 'Basingstoke and Deane', 12_7996.77000000002),
-    ('lad21-E07000118', 'Chorley', 84_910.93000000002),
-    ('lad21-E07000178', 'Oxford', 11_8197.16),
+    ('lad20-E07000008', 'Cambridge', 0),
+    ('lad20-E07000084', 'Basingstoke and Deane', 0),
+    ('lad20-E07000118', 'Chorley', 0),
+    ('lad20-E07000178', 'Oxford', 0),
 
 ))
 def test_count_of_phones_for_all_levels(area_id, area_name, expected_count):
@@ -203,7 +203,7 @@ def test_count_of_phones_for_all_levels(area_id, area_name, expected_count):
 
 
 def test_city_of_london_counts_are_not_derived_from_population():
-    city_of_london = broadcast_area_libraries.get_areas(['lad21-E09000001'])[0]
+    city_of_london = broadcast_area_libraries.get_areas(['lad20-E09000001'])[0]
 
     assert city_of_london.name == 'City of London'
     assert len(city_of_london.sub_areas) == len(CITY_OF_LONDON.WARDS) == 25
@@ -276,24 +276,24 @@ def test_estimate_number_of_smartphones_for_population(
 @pytest.mark.parametrize('area, expected_phones_per_square_mile', (
     (
         # Islington (most dense in UK)
-        'lad21-E09000019', 33_204
+        'lad20-E09000019', 32_662
     ),
     (
         # Cordwainer Ward (City of London)
         # This is higher than Islington because we inflate the
         # popualtion to account for daytime workers
-        'wd21-E05009300', 392_870
+        'wd20-E05009300', 392_870
     ),
     (
         # Crewe East
-        'wd21-E05008621', 3_272),
+        'wd20-E05008621', 3_289),
     (
         # Eden (Cumbria, least dense in England)
-        'lad21-E07000030', 43.48
+        'lad20-E07000030', 43.41
     ),
     (
         # Highland (least dense in UK)
-        'lad21-S12000017', 6.97
+        'lad20-S12000017', 6.97
     ),
 ))
 def test_phone_density(
@@ -308,24 +308,24 @@ def test_phone_density(
 @pytest.mark.parametrize('area, expected_bleed_in_m', (
     (
         # Islington (most dense in UK)
-        'lad21-E09000019', 500
+        'lad20-E09000019', 500
     ),
     (
         # Cordwainer Ward (City of London)
         # Special case because of inflated daytime population
-        'wd21-E05009300', 500
+        'wd20-E05009300', 500
     ),
     (
         # Crewe East
-        'wd21-E05008621', 1_506
+        'wd20-E05008621', 1_504
     ),
     (
         # Eden (Cumbria, least dense in England)
-        'lad21-E07000030', 3_852
+        'lad20-E07000030', 3_852
     ),
     (
         # Highland (least dense in UK)
-        'lad21-S12000017', 4_846
+        'lad20-S12000017', 4_846
     ),
     (
         # No population data available
@@ -358,7 +358,7 @@ def test_estimated_bleed(
             'Stoke Bishop',
             'Windmill Hill',
         ],
-        74_224,
+        72_817,
     ),
     (
         SKYE,
