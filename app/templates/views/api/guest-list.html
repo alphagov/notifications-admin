@@ -23,7 +23,7 @@
         There was a problem with your guest list
       </h1>
       <p class="govuk-body">Fix these errors:</p>
-      <ul>
+      <ul class="govuk-list govuk-!-margin-bottom-0">
         {% if form.email_addresses.errors %}
           <li>
             <a class="govuk-link govuk-link--destructive" href="#{{ form.email_addresses.name }}">Enter valid email addresses</a>
