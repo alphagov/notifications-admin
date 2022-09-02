@@ -22,7 +22,6 @@
   "dependencies": {
     "cbor-js": "0.1.0",
     "govuk_frontend_toolkit": "8.1.0",
-    "govuk-elements-sass": "3.1.2",
     "govuk-frontend": "2.13.0",
     "hogan": "1.0.2",
     "jquery": "3.5.0",
