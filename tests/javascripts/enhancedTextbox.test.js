@@ -13,11 +13,12 @@ describe('Enhanced textbox', () => {
   let input;
   let textarea;
   let backgroundEl;
+  let stylesheet;
 
   beforeAll(() => {
 
     // set some default styling
-    const stylesheet = document.createElement('style');
+    stylesheet = document.createElement('style');
 
     stylesheet.innerHTML = ".textbox-highlight-textbox { padding: 2px; width: 576px; border-width: 1px; }";
     stylesheet.innerHTML += "textarea.textbox-highlight-textbox { height: 224px; }";

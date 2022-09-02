@@ -10,8 +10,10 @@ let locationMock;
 beforeAll(() => {
 
   // mock calls to window.location
+  locationMock = new helpers.LocationMock();
+
   // default to the email page, the pathname can be changed inside specific tests
-  locationMock = new helpers.LocationMock(emailPageURL);
+  window.location.pathname = emailPageURL;
 
 });
 

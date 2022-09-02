@@ -12,7 +12,14 @@ describe('Prevent duplicate form submissions', () => {
 
   let form;
   let button;
-  let formSubmitSpy;
+  let consoleErrorSpy;
+
+  beforeAll(() => {
+
+    // spy on console.error to track JSDOM errors
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+  });
 
   beforeEach(() => {
 
@@ -25,8 +32,8 @@ describe('Prevent duplicate form submissions', () => {
     form = document.querySelector('form');
     button = document.querySelector('button');
 
-    // requires a helper due to JSDOM not implementing the submit method
-    formSubmitSpy = helpers.spyOnFormSubmit(jest, form);
+    // reset all tracking of calls to console.error
+    consoleErrorSpy.mockClear();
 
     require('../../app/assets/javascripts/preventDuplicateFormSubmissions.js');
 
@@ -36,11 +43,15 @@ describe('Prevent duplicate form submissions', () => {
 
     document.body.innerHTML = '';
 
-    // we run the previewPane.js script every test
+    // we run the preventDuplicateFormSubmissions.js script every test
     // the module cache needs resetting each time for the script to execute
     jest.resetModules();
 
-    formSubmitSpy.mockClear();
+  });
+
+  afterAll(() => {
+
+    consoleErrorSpy.mockRestore();
 
   });
 
@@ -49,7 +60,16 @@ describe('Prevent duplicate form submissions', () => {
     helpers.triggerEvent(button, 'click');
     helpers.triggerEvent(button, 'click');
 
-    expect(formSubmitSpy.mock.calls.length).toEqual(1);
+    // JSDOM doesn't implement form submissions
+    // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
+    //
+    // If a form submission is caused by a input/button[type=submit], this instead outputs a
+    // 'not implemented' error from the requestSubmit method.
+    //
+    // That means we can assume any errors of that type would be the same as a form submission in
+    // browsers.
+    expect(consoleErrorSpy.mock.calls.length).toEqual(1);
+    expect(consoleErrorSpy.mock.calls[0][0].message).toEqual('Not implemented: HTMLFormElement.prototype.requestSubmit')
 
   });
 
@@ -61,7 +81,17 @@ describe('Prevent duplicate form submissions', () => {
 
     helpers.triggerEvent(button, 'click');
 
-    expect(formSubmitSpy.mock.calls.length).toEqual(2);
+    // JSDOM doesn't implement form submissions
+    // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
+    //
+    // If a form submission is caused by a input/button[type=submit], this instead outputs a
+    // 'not implemented' error from the requestSubmit method.
+    //
+    // That means we can assume any errors of that type would be the same as a form submission in
+    // browsers.
+    expect(consoleErrorSpy.mock.calls.length).toEqual(2);
+    expect(consoleErrorSpy.mock.calls[0][0].message).toEqual('Not implemented: HTMLFormElement.prototype.requestSubmit')
+    expect(consoleErrorSpy.mock.calls[1][0].message).toEqual('Not implemented: HTMLFormElement.prototype.requestSubmit')
 
   });
 

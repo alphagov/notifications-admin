@@ -1,5 +1,4 @@
 const each = require('jest-each').default;
-const jestDateMock = require('jest-date-mock');
 
 const helpers = require('./support/helpers.js');
 
