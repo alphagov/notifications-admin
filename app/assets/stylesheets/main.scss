@@ -19,7 +19,8 @@ $path: '/static/images/';
 @import 'reset';
 @import 'globals';
 
-// Dependencies from GOV.UK Elements
+// Dependencies from GOV.UK Elements, moved here until all components are migrated
+// to GOVUK Frontend, and so no longer need these styles
 // https://github.com/alphagov/govuk_elements
 @import './govuk-elements/helpers';
 @import './govuk-elements/elements-typography';
