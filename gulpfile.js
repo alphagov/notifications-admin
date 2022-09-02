@@ -118,8 +118,8 @@ const copy = {
 const javascripts = () => {
   // JS from third-party sources
   // We assume none of it will need to pass through Babel
-  const vendored = src(paths.src + 'javascripts/modules/all.mjs')
-    // Use Rollup to combine all JS in JS module format into a Immediately Invoked Function
+  const vendored = src(paths.src + 'javascripts/esm/all.mjs')
+    // Use Rollup to combine all JS in ECMAScript module format into a Immediately Invoked Function
     // Expression (IIFE) to:
     // - deliver it in one bundle
     // - allow it to run in browsers without support for JS Modules
@@ -142,7 +142,7 @@ const javascripts = () => {
         name: 'GOVUK'
       }
     ))
-    // return a stream which pipes these files before the JS modules bundle
+    // return a stream which pipes these files before the ECMAScript modules bundle
     .pipe(plugins.addSrc.prepend([
       paths.npm + 'hogan.js/dist/hogan-3.0.2.js',
       paths.npm + 'jquery/dist/jquery.min.js',
@@ -154,8 +154,8 @@ const javascripts = () => {
 
   // JS local to this application
   const local = src([
-    paths.toolkit + 'javascripts/govuk/modules.js',
-    paths.toolkit + 'javascripts/govuk/show-hide-content.js',
+    paths.src + 'javascripts/modules.js',
+    paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
     paths.src + 'javascripts/govuk/cookie-functions.js',
     paths.src + 'javascripts/consent.js',
     paths.src + 'javascripts/analytics/analytics.js',
