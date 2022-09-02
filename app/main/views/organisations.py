@@ -20,7 +20,7 @@ from app.main.forms import (
     AddGPOrganisationForm,
     AddNHSLocalOrganisationForm,
     AdminBillingDetailsForm,
-    AdminChangeEmailBrandingPoolForm,
+    AddEmailBrandingOptionsForm,
     AdminNewOrganisationForm,
     AdminNotesForm,
     AdminOrganisationDomainsForm,
@@ -488,7 +488,7 @@ def organisation_email_branding(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/email-branding/add", methods=['GET', 'POST'])
 @user_is_platform_admin
 def add_organisation_email_branding_options(org_id):
-    form = AdminChangeEmailBrandingPoolForm()
+    form = AddEmailBrandingOptionsForm()
 
     form.branding_field.choices = [
         (branding['id'], branding['name'])
