@@ -94,3 +94,16 @@ $govuk-grid-widths: (
     bottom: 7px;
   }
 }
+
+// We can delete this code when we upgrade to a version >=3.14
+.govuk-\!-text-align-left {
+  text-align: left !important;
+}
+
+.govuk-\!-text-align-centre {
+  text-align: center !important;
+}
+
+.govuk-\!-text-align-right {
+  text-align: right !important;
+}

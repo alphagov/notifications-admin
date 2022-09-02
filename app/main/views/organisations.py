@@ -447,7 +447,7 @@ def organisation_preview_email_branding(org_id):
     )
 
 
-@main.route("/organisations/<uuid:org_id>/settings/email-branding", methods=['GET'])
+@main.route("/organisations/<uuid:org_id>/settings/email-branding", methods=['GET', 'POST'])
 @user_is_platform_admin
 def organisation_email_branding(org_id):
     # We want to display email branding options apart from an option that has already been set as the default
@@ -455,6 +455,29 @@ def organisation_email_branding(org_id):
         {"name": option["name"], "id": option["id"]} for option in current_organisation.email_branding_pool
         if option["name"] != current_organisation.email_branding_name
     ]
+
+    remove_branding_id = request.args.get('remove_branding_id')
+    if remove_branding_id:
+        try:
+            remove_branding = next(
+                filter(lambda x: x['id'] == remove_branding_id, current_organisation.email_branding_pool)
+            )
+        except StopIteration:
+            abort(400, f'Invalid email branding ID {remove_branding_id} for {current_organisation}')
+
+        if request.method == 'POST':
+            organisations_client.remove_email_branding_from_pool(
+                current_organisation.id,
+                remove_branding_id
+            )
+            flash(f'Email branding ‘{remove_branding["name"]}’ removed.', 'default_with_tick')
+            return redirect(url_for('main.organisation_email_branding', org_id=current_organisation.id))
+
+        else:
+            flash(
+                f'Are you sure you want to remove the email brand ‘{remove_branding["name"]}’?',
+                'delete',
+            )
 
     return render_template(
         'views/organisations/organisation/settings/email-branding-options.html',

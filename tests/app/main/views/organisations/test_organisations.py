@@ -1744,7 +1744,7 @@ def test_organisation_email_branding_page_shows_all_branding_pool_options(
 
     assert page.h1.text == 'Email branding'
     assert set(
-        normalize_spaces(heading.text) for heading in page.select('.user-list-item-heading')
+        normalize_spaces(heading.text) for heading in page.select('.govuk-heading-s')
             ) == expected_branding_options
 
     add_options_button = page.select_one('.govuk-button--secondary')
@@ -1752,6 +1752,128 @@ def test_organisation_email_branding_page_shows_all_branding_pool_options(
     assert add_options_button.attrs["href"] == url_for(
         '.add_organisation_email_branding_options', org_id=organisation_one['id']
     )
+
+
+def test_organisation_email_branding_page_shows_remove_brand_links(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=None,
+        )
+    )
+
+    mocker.patch(
+        'app.email_branding_client.get_email_branding',
+        return_value={"email_branding": {
+            'logo': 'logo2.png',
+            'name': 'Email branding name 2',
+            'text': 'org 2 branding text',
+            'id': 'email-branding-2-id',
+            'colour': None,
+            'brand_type': 'org',
+        }}
+    )
+    client_request.login(platform_admin_user)
+
+    page = client_request.get('.organisation_email_branding', org_id=organisation_one['id'])
+
+    headers_and_remove_links = page.select(
+        'h2.govuk-heading-s, .govuk-\\!-text-align-right a'
+    )
+    assert (
+        [(element.name, normalize_spaces(element.text)) for element in headers_and_remove_links]
+        ==
+        [
+            ('h2', 'GOV.UK (default)'),
+            ('h2', 'Email branding name 1'),
+            ('a', 'Remove this branding option'),
+            ('h2', 'Email branding name 2'),
+            ('a', 'Remove this branding option'),
+        ]
+    )
+
+    assert (
+        headers_and_remove_links[2].get('href')
+        ==
+        '/organisations/c011fa40-4cbe-4524-b415-dde2f421bd9c'
+        '/settings/email-branding?remove_branding_id=email-branding-1-id'
+    )
+
+    assert (
+        headers_and_remove_links[4].get('href')
+        ==
+        '/organisations/c011fa40-4cbe-4524-b415-dde2f421bd9c'
+        '/settings/email-branding?remove_branding_id=email-branding-2-id'
+    )
+
+
+def test_get_organisation_email_branding_page_with_remove_param(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=None,
+        )
+    )
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(
+        '.organisation_email_branding',
+        org_id=organisation_one['id'],
+        remove_branding_id='email-branding-1-id',
+    )
+
+    assert "Are you sure you want to remove the email brand ‘Email branding name 1’?" in page.text
+    assert normalize_spaces(page.select_one('.banner-dangerous form button').text) == 'Yes, delete'
+
+
+def test_post_organisation_email_branding_page_with_remove_param(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=None,
+        )
+    )
+    remove_mock = mocker.patch(
+        'app.organisations_client.remove_email_branding_from_pool',
+        return_value=None
+    )
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        '.organisation_email_branding',
+        org_id=organisation_one['id'],
+        remove_branding_id='email-branding-1-id',
+    )
+
+    assert remove_mock.call_args_list == [
+        mocker.call('c011fa40-4cbe-4524-b415-dde2f421bd9c', 'email-branding-1-id')
+    ]
 
 
 def test_add_organisation_email_branding_options_is_platform_admin_only(
