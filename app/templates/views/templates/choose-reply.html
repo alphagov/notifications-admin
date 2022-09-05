@@ -38,7 +38,7 @@
     {{ live_search(target_selector='#template-list .template-list-item', show=True, form=search_form) }}
 
     <nav id="template-list">
-      <ul>
+      <ul class="govuk-list">
       {% for item in templates_and_folders %}
         <li class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
           {% for ancestor in item.ancestors %}
