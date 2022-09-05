@@ -74,7 +74,7 @@ $button-shadow-size: $govuk-border-width-form-element;
     margin-bottom: govuk-spacing(3);
 
     h2 {
-      @include bold-27;
+      @include govuk-font(27, $weight: bold);
       margin: 0 0 govuk-spacing(6);
     }
 
