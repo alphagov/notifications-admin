@@ -2,10 +2,10 @@
 // ==========================================================================
 
 // Increase the base font size to 19px for the main content area
-// Using the core-19 mixin from the govuk_toolkit _typography.scss file
+// Using the govuk-font(19) mixin from the design system
 
 main {
-    @include core-19;
+    @include govuk-font(19);
     -webkit-font-smoothing: antialiased;
 }
 

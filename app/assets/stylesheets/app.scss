@@ -130,7 +130,7 @@ details summary {
 
     th,
     td {
-      @include core-19;
+      @include govuk-font(19);
       word-wrap: break-word;
     }
 
@@ -145,7 +145,7 @@ details summary {
 }
 
 .tabular-numbers {
-  @include core-19($tabular-numbers: true);
+  @include govuk-font(19, $tabular: true);
 }
 
 summary::-moz-details-marker {
@@ -253,5 +253,5 @@ details .arrow {
 }
 
 input:-webkit-autofill::first-line {
-  @include core-19;
+  @include govuk-font(19);
 }

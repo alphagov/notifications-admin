@@ -62,7 +62,7 @@
   }
 
   .table-heading {
-    @include core-19;
+    @include govuk-font(19);
     margin: 0 0 10px 0;
   }
 
@@ -108,7 +108,7 @@
   }
 
   &-hint {
-    @include core-19;
+    @include govuk-font(19);
     color: $secondary-text-colour;
     pointer-events: none;
   }
@@ -398,7 +398,7 @@
 
 .table-empty-message,
 td.table-empty-message {
-  @include core-19;
+  @include govuk-font(19);
   color: $secondary-text-colour;
   border-bottom: 1px solid $border-colour;
   padding: 20px 0 20px 0;
