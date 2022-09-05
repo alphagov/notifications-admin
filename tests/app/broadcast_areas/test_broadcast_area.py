@@ -63,7 +63,7 @@ def test_examples():
     assert countries == 'England, Northern Ireland, Scotland and Wales'
 
     wards = broadcast_area_libraries.get('wd21-lad21-ctyua21').get_examples()
-    assert wards == 'Aberdeen City, Aberdeenshire, Adur and 384 more…'
+    assert wards == 'Aberdeen City, Aberdeenshire, Adur and 395 more…'
 
 
 @pytest.mark.parametrize('id', (
