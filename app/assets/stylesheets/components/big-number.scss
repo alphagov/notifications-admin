@@ -9,7 +9,7 @@
   }
 
   &-number {
-    @include bold-48($tabular-numbers: true);
+    @include govuk-font(48, $weight: bold, $tabular: true);
   }
 
   &-label {
