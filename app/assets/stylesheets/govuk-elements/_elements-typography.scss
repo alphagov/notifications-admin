@@ -25,13 +25,6 @@ main {
     margin-bottom: em(20, 36);
   }
 
-  .heading-secondary {
-    @include heading-24();
-
-    display: block;
-    color: $secondary-text-colour;
-  }
-
 }
 
 .heading-medium {
