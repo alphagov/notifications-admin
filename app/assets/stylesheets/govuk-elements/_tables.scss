@@ -43,7 +43,7 @@ table {
   .table-font-xsmall {
 
     th {
-      @include bold-16;
+      @include govuk-font(16, $weight: bold);
     }
 
     td {

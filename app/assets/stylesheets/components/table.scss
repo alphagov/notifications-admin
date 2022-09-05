@@ -268,7 +268,7 @@
 
   &-index {
 
-    @include bold-16;
+    @include govuk-font(16, $weight: bold);
     width: 15px;
 
     a {
@@ -304,7 +304,7 @@
 }
 
 .table-font-xsmall td.table-field-index {  // overrides GOV.UK Elements
-  @include bold-16;
+  @include govuk-font(16, $weight: bold);
 }
 
 
