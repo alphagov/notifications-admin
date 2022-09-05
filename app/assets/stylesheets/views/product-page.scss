@@ -38,7 +38,7 @@ $button-shadow-size: $govuk-border-width-form-element;
     }
 
     h1 {
-      @include bold-48;
+      @include govuk-font(48, $weight: bold);
       margin: 20px 0 govuk-spacing(6) 0;
     }
 
@@ -91,7 +91,7 @@ $button-shadow-size: $govuk-border-width-form-element;
   }
 
   &-big-number {
-    @include bold-48($tabular-numbers: true);
+    @include govuk-font(48, $weight: bold, $tabular: true);
     margin: 0 0 0 0;
   }
 
