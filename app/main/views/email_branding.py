@@ -1,4 +1,5 @@
 from flask import current_app, redirect, render_template, session, url_for
+from notifications_python_client.errors import HTTPError
 
 from app import email_branding_client
 from app.main import main
@@ -57,21 +58,28 @@ def update_email_branding(branding_id, logo=None):
 
         updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
-        email_branding_client.update_email_branding(
-            branding_id=branding_id,
-            logo=updated_logo_name,
-            name=form.name.data,
-            text=form.text.data,
-            colour=form.colour.data,
-            brand_type=form.brand_type.data,
-        )
+        try:
+            email_branding_client.update_email_branding(
+                branding_id=branding_id,
+                logo=updated_logo_name,
+                name=form.name.data,
+                text=form.text.data,
+                colour=form.colour.data,
+                brand_type=form.brand_type.data,
+            )
+        except HTTPError as e:
+            if e.status_code == 400 and 'name' in e.response.json().get('message', {}):
+                form.name.errors.append(e.response.json()['message']['name'][0])
+            else:
+                raise e
 
         if logo:
             persist_logo(logo, updated_logo_name)
 
         delete_email_temp_files_created_by(session["user_id"])
 
-        return redirect(url_for('.email_branding', branding_id=branding_id))
+        if not form.errors:
+            return redirect(url_for('.email_branding', branding_id=branding_id))
 
     return render_template(
         'views/email-branding/manage-branding.html',
@@ -79,7 +87,7 @@ def update_email_branding(branding_id, logo=None):
         email_branding=email_branding,
         cdn_url=current_app.config['LOGO_CDN_DOMAIN'],
         logo=logo
-    )
+    ), 400 if form.errors else 200
 
 
 @main.route("/email-branding/create", methods=['GET', 'POST'])
@@ -104,24 +112,31 @@ def create_email_branding(logo=None):
 
         updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
-        email_branding_client.create_email_branding(
-            logo=updated_logo_name,
-            name=form.name.data,
-            text=form.text.data,
-            colour=form.colour.data,
-            brand_type=form.brand_type.data,
-        )
+        try:
+            email_branding_client.create_email_branding(
+                logo=updated_logo_name,
+                name=form.name.data,
+                text=form.text.data,
+                colour=form.colour.data,
+                brand_type=form.brand_type.data,
+            )
+        except HTTPError as e:
+            if e.status_code == 400 and 'name' in e.response.json().get('message', {}):
+                form.name.errors.append(e.response.json()['message']['name'][0])
+            else:
+                raise e
 
         if logo:
             persist_logo(logo, updated_logo_name)
 
         delete_email_temp_files_created_by(session["user_id"])
 
-        return redirect(url_for('.email_branding'))
+        if not form.errors:
+            return redirect(url_for('.email_branding'))
 
     return render_template(
         'views/email-branding/manage-branding.html',
         form=form,
         cdn_url=current_app.config['LOGO_CDN_DOMAIN'],
-        logo=logo
-    )
+        logo=logo,
+    ), 400 if form.errors else 200

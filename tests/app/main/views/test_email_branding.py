@@ -1,4 +1,5 @@
 from io import BytesIO
+from unittest import mock
 from unittest.mock import call
 
 import pytest
@@ -118,6 +119,40 @@ def test_create_new_email_branding_without_logo(
     assert mock_persist.call_args_list == []
 
 
+def test_create_new_email_branding_with_unique_name_conflict(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
+    data = {
+        'logo': None,
+        'colour': '#ff0000',
+        'text': 'new text',
+        'name': 'new name',
+        'brand_type': 'org'
+    }
+
+    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
+
+    client_request.login(platform_admin_user)
+
+    mock_create_email_branding = mocker.patch('app.email_branding_client.create_email_branding')
+    response_mock = mock.Mock()
+    response_mock.status_code = 400
+    response_mock.json.return_value = {'message': {'name': ['An email branding with that name already exists.']}}
+    mock_create_email_branding.side_effect = HTTPError(
+        response=response_mock
+    )
+    resp = client_request.post(
+        '.create_email_branding',
+        _content_type='multipart/form-data',
+        _data=data,
+        _expected_status=400,
+    )
+
+    assert 'An email branding with that name already exists.' in resp.text
+
+
 def test_create_email_branding_requires_a_name_when_submitting_logo_details(
     client_request,
     mocker,
@@ -139,7 +174,7 @@ def test_create_email_branding_requires_a_name_when_submitting_logo_details(
         '.create_email_branding',
         _content_type='multipart/form-data',
         _data=data,
-        _expected_status=200,
+        _expected_status=400,
     )
 
     assert page.select_one('.govuk-error-message').text.strip() == 'Error: This field is required'
@@ -330,6 +365,43 @@ def test_update_existing_branding(
     )
 
 
+def test_updatee_email_branding_with_unique_name_conflict(
+    client_request,
+    platform_admin_user,
+    mocker,
+    fake_uuid,
+    mock_get_email_branding,
+):
+    data = {
+        'logo': None,
+        'colour': '#ff0000',
+        'text': 'new text',
+        'name': 'new name',
+        'brand_type': 'org'
+    }
+
+    mocker.patch('app.main.views.email_branding.delete_email_temp_files_created_by')
+
+    client_request.login(platform_admin_user)
+
+    mock_update_email_branding = mocker.patch('app.email_branding_client.update_email_branding')
+    response_mock = mock.Mock()
+    response_mock.status_code = 400
+    response_mock.json.return_value = {'message': {'name': ['An email branding with that name already exists.']}}
+    mock_update_email_branding.side_effect = HTTPError(
+        response=response_mock
+    )
+    resp = client_request.post(
+        '.update_email_branding',
+        branding_id=fake_uuid,
+        _content_type='multipart/form-data',
+        _data=data,
+        _expected_status=400,
+    )
+
+    assert 'An email branding with that name already exists.' in resp.text
+
+
 def test_temp_logo_is_shown_after_uploading_logo(
     client_request,
     platform_admin_user,
@@ -421,7 +493,7 @@ def test_logo_does_not_get_persisted_if_updating_email_branding_client_throws_an
 
 @pytest.mark.parametrize('colour_hex, expected_status_code', [
     ('#FF00FF', 302),
-    ('hello', 200),
+    ('hello', 400),
     ('', 302),
 ])
 def test_colour_regex_validation(
