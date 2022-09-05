@@ -1250,10 +1250,23 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         for choice in page.select('.file-list-item')
     ]
     assert len(choices) == 398
+
+    # First item, somewhere in Scotland
     assert choices[0] == (partial_url_for(area_slug='lad21-S12000033'), 'Aberdeen City',)
-    # note: we don't populate prev_area_slug query param, so the back link will come here rather than to a county page,
+
+    # Somewhere in England
+    # ---
+    # Note: we don't populate prev_area_slug query param, so the back link will come here rather than to a county page,
     # even though ashford belongs to kent
     assert choices[12] == (partial_url_for(area_slug='lad21-E07000105'), 'Ashford',)
+
+    # Somewhere in Wales
+    assert choices[219] == (partial_url_for(area_slug='lad21-W06000021'), 'Monmouthshire',)
+
+    # Somewhere in Northern Ireland
+    assert choices[95] == (partial_url_for(area_slug='lad21-N09000005'), 'Derry City and Strabane',)
+
+    # Last item on the page
     assert choices[-1] == (partial_url_for(area_slug='lad21-E06000014'), 'York',)
 
 

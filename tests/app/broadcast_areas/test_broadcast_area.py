@@ -195,6 +195,18 @@ def test_every_area_has_count_of_phones(library):
     ('lad21-E07000118', 'Chorley', 84_910.93000000002),
     ('lad21-E07000178', 'Oxford', 11_8197.16),
 
+    # In Scotland
+    ('lad21-S12000013', 'Na h-Eileanan Siar', 9_212.5),
+    ('wd21-S13002600', 'Barraigh, Bhatarsaigh, Eirisgeigh agus Uibhist a Deas', 1_010.32),
+
+    # In Wales
+    ('lad21-W06000021', 'Monmouthshire', 65_870.19000000003),
+    ('wd21-W05000815', 'Mitchel Troy', 811.26),
+
+    # In Northern Ireland
+    ('lad21-N09000005', 'Derry City and Strabane', 132917.33000000005),
+    ('wd21-N08000508', 'City Walls', 3_129.4900000000002),
+
 ))
 def test_count_of_phones_for_all_levels(area_id, area_name, expected_count):
     area = broadcast_area_libraries.get_areas([area_id])[0]
