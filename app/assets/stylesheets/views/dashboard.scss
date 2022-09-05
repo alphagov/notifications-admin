@@ -106,7 +106,7 @@
   }
 
   &-filename-large {
-    @include bold-24;
+    @include govuk-font(24, $weight: bold);
     display: block;
     white-space: nowrap;
     overflow: hidden;

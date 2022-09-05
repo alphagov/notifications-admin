@@ -35,7 +35,7 @@ main {
 }
 
 .heading-medium {
-  @include bold-24();
+  @include govuk-font(24, $weight: bold);
 
   margin-top: em(25, 20);
   margin-bottom: em(10, 20);
