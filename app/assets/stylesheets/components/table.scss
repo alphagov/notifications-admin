@@ -406,7 +406,7 @@ td.table-empty-message {
 
 .table-show-more-link {
 
-  @include core-16;
+  @include govuk-font(16);
   color: $secondary-text-colour;
   margin-bottom: govuk-spacing(7);
   border-bottom: 1px solid $border-colour;
@@ -424,7 +424,7 @@ a.table-show-more-link {
 }
 
 .table-no-data {
-  @include core-16;
+  @include govuk-font(16);
   color: $secondary-text-colour;
   margin-top: 10px;
   margin-bottom: govuk-spacing(7);

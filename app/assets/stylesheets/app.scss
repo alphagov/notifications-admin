@@ -171,7 +171,7 @@ details .arrow {
 }
 
 .block-label-hint {
-  @include core-16;
+  @include govuk-font(16);
   margin-top: 5px;
 }
 
