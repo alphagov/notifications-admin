@@ -5,7 +5,7 @@ $govuk-checkboxes-size: 40px;
 .selection-summary {
 
   .selection-summary__text {
-    @include core-19($tabular-numbers: true);
+    @include govuk-font(19, $tabular: true);
     padding: 5px 0 0 0;
     margin-bottom: govuk-spacing(3);
 

@@ -13,7 +13,7 @@
   }
 
   &-label {
-    @include core-19;
+    @include govuk-font(19);
     padding-bottom: 10px;
   }
 
@@ -139,7 +139,7 @@
   %big-number-status,
   .big-number-status {
 
-    @include core-19;
+    @include govuk-font(19);
     display: block;
     background: $green;
     color: $white;

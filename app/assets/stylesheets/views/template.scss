@@ -5,7 +5,7 @@
 %edit-template-link,
 .edit-template-link {
 
-  @include core-19;
+  @include govuk-font(19);
   position: absolute;
   background: $link-colour;
   color: $white;
@@ -57,7 +57,7 @@
 }
 
 .template-content-count {
-  @include core-19($tabular-numbers: true);
+  @include govuk-font(19, $tabular: true);
   color: $secondary-text-colour;
   padding: 0 0 govuk-spacing(6) 0;
 

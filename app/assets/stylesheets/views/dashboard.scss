@@ -126,7 +126,7 @@
   }
 
   &-filename-unlinked {
-    @include core-19;
+    @include govuk-font(19);
   }
 
   &-hint {
@@ -140,7 +140,7 @@
   }
 
   &-hint-large {
-    @include core-19;
+    @include govuk-font(19);
     display: block;
     color: $secondary-text-colour;
     overflow: hidden;
