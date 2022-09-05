@@ -15,7 +15,7 @@ main {
 
 // Headings
 .heading-large {
-  @include bold-36();
+  @include govuk-font(36, $weight: bold);
 
   margin-top: em(25, 24);
   margin-bottom: em(10, 24);

@@ -38,7 +38,7 @@
   color: $white;
 
   .big-number-number {
-    @include bold-36($tabular-numbers: true);
+    @include govuk-font(36, $weight: bold, $tabular: true);
   }
 }
 
@@ -47,7 +47,7 @@
   @extend %big-number;
 
   .big-number-number {
-    @include bold-36($tabular-numbers: true);
+    @include govuk-font(36, $weight: bold, $tabular: true);
   }
 
 }
