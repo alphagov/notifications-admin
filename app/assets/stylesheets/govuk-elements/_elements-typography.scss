@@ -48,7 +48,7 @@ main {
 }
 
 .heading-small {
-  @include bold-19();
+  @include govuk-font(19, $weight: bold);
 
   margin-top: em(10, 16);
   margin-bottom: em(5, 16);

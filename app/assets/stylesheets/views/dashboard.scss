@@ -94,7 +94,7 @@
   }
 
   &-filename {
-    @include bold-19;
+    @include govuk-font(19, $weight: bold);
     display: block;
     white-space: nowrap;
     overflow: hidden;
@@ -188,7 +188,7 @@
 }
 
 .failure-highlight {
-  @include bold-19;
+  @include govuk-font(19, $weight: bold);
   color: $error-colour;
 }
 

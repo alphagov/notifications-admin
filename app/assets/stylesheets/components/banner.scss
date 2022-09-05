@@ -2,7 +2,7 @@
 .banner,
 .banner-default {
 
-  @include bold-19;
+  @include govuk-font(19, $weight: bold);
   color: $button-colour;
   display: block;
   padding: govuk-spacing(3);
@@ -51,7 +51,7 @@
 .banner-dangerous {
 
   @extend %banner;
-  @include bold-19;
+  @include govuk-font(19, $weight: bold);
   background: $white;
   color: $text-colour;
   border: 5px solid $error-colour;
