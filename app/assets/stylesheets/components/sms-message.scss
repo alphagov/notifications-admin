@@ -61,7 +61,7 @@ $tail-angle: 20deg;
 }
 
 .sms-message-status {
-  @include core-16;
+  @include govuk-font(16);
   color: $secondary-text-colour;
   margin: -20px govuk-spacing(3) 20px govuk-spacing(3);
 }

@@ -208,7 +208,7 @@
   }
 
   &__item {
-    @include core-16;
+    @include govuk-font(16);
 
     border-bottom: 1px $grey-3 solid;
     display: block;

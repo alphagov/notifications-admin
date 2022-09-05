@@ -17,7 +17,7 @@
 
 .spark-bar {
 
-  @include core-16;
+  @include govuk-font(16);
   box-sizing: border-box;
   display: block;
   width: 100%;
@@ -130,7 +130,7 @@
   }
 
   &-hint {
-    @include core-16;
+    @include govuk-font(16);
     display: block;
     color: $secondary-text-colour;
     overflow: hidden;

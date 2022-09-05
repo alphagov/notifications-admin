@@ -30,7 +30,7 @@
 
 .breadcrumbs {
   @include govuk-width-container;
-  @include core-16($line-height: (25 / 16), $line-height-640: 1.75);
+  @include govuk-font(16, $line-height: (25 / 16));
 
   padding: govuk-spacing(2) 0;
   list-style: none;
