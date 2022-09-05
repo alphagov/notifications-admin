@@ -94,7 +94,7 @@
   }
 
   .heading-medium {
-    @include core-24;
+    @include govuk-font(24);
   }
 
   p {
@@ -114,7 +114,7 @@
   }
 
   ul {
-    @include core-24;
+    @include govuk-font(24);
     color: $white;
     margin-bottom: govuk-spacing(5);
   }

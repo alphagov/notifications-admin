@@ -43,7 +43,7 @@ $button-shadow-size: $govuk-border-width-form-element;
     }
 
     p {
-      @include core-24;
+      @include govuk-font(24);
       color: $white;
       margin: govuk-spacing(3) 0 govuk-spacing(6);
     }
