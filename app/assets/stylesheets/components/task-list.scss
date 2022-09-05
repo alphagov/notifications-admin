@@ -1,7 +1,7 @@
 $indicator-colour: $black;
 
 %task-list-indicator {
-  @include bold-16;
+  @include govuk-font(16, $weight: bold);
   display: inline-block;
   padding: 3px 8px 1px 8px;
   position: absolute;
