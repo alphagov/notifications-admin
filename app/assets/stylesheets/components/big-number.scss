@@ -57,7 +57,7 @@
   @extend %big-number;
 
   .big-number-number {
-    @include bold-24($tabular-numbers: true);
+    @include govuk-font(24, $weight: bold, $tabular: true);
   }
 
 }
