@@ -190,11 +190,11 @@ def estimate_number_of_smartphones_in_area(country_or_ward_code):
 test_filepath = source_files_path / "Test.geojson"
 ctry19_filepath = source_files_path / "Countries.geojson"
 
-# https://geoportal.statistics.gov.uk/datasets/ons::wards-december-2021-gb-bgc
-wd21_filepath = source_files_path / "Wards_(December_2021)_GB_BGC.geojson"
+# https://geoportal.statistics.gov.uk/datasets/ons::wards-december-2021-uk-bgc
+wd21_filepath = source_files_path / "Wards_(December_2021)_UK_BGC.geojson"
 
-# https://geoportal.statistics.gov.uk/datasets/ons::local-authority-districts-december-2021-gb-bgc
-lad21_filepath = source_files_path / "Local_Authority_Districts_(December_2021)_GB_BGC.geojson"
+# https://geoportal.statistics.gov.uk/datasets/ons::local-authority-districts-december-2021-uk-bgc
+lad21_filepath = source_files_path / "Local_Authority_Districts_(December_2021)_UK_BGC.geojson"
 
 # https://geoportal.statistics.gov.uk/datasets/ons::counties-and-unitary-authorities-december-2021-uk-bgc
 ctyua21_filepath = source_files_path / "Counties_and_Unitary_Authorities_(December_2021)_UK_BGC.geojson"
