@@ -1,5 +1,9 @@
 {% extends "content_template.html" %}
+
 {% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
 
 {% block per_page_title %}
   Send messages
