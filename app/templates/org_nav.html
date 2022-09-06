@@ -1,4 +1,4 @@
-<nav class="navigation">
+<nav class="navigation" aria-label="Organisation">
   <ul>
     <li><a class="govuk-link govuk-link--no-visited-state{{ org_navigation.is_selected('dashboard') }}" href="{{ url_for('.organisation_dashboard', org_id=current_org.id) }}">Usage</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state{{ org_navigation.is_selected('team-members') }}" href="{{ url_for('.manage_org_users', org_id=current_org.id) }}">Team members</a></li>
