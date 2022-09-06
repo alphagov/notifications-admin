@@ -33,6 +33,8 @@ class Job(JSONModel):
         'recipient',
     }
 
+    __sort_attribute__ = 'original_file_name'
+
     @classmethod
     def from_id(cls, job_id, service_id):
         return cls(job_api_client.get_job(service_id, job_id)['data'])

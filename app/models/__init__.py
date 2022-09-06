@@ -7,10 +7,22 @@ from notifications_utils.serialised_model import (
 )
 
 
-class IdEqualityMixin:
+class SortingAndEqualityMixin(ABC):
+
+    @property
+    @abstractmethod
+    def __sort_attribute__(self):
+        pass
 
     def __repr__(self):
         return f'{self.__class__.__name__}(<{self.id}>)'
+
+    def __lt__(self, other):
+        return (
+            getattr(self, self.__sort_attribute__).lower()
+        ) < (
+            getattr(other, self.__sort_attribute__).lower()
+        )
 
     def __eq__(self, other):
         return self.id == other.id
@@ -19,7 +31,7 @@ class IdEqualityMixin:
         return hash(self.id)
 
 
-class JSONModel(SerialisedModel, IdEqualityMixin):
+class JSONModel(SerialisedModel, SortingAndEqualityMixin):
 
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
@@ -66,18 +78,3 @@ class PaginatedModelList(ModelList):
         self.items = response[self.response_key]
         self.prev_page = response.get('links', {}).get('prev', None)
         self.next_page = response.get('links', {}).get('next', None)
-
-
-class SortByStringAttributeMixin(ABC):
-
-    @property
-    @abstractmethod
-    def __sort_attribute__(self):
-        pass
-
-    def __lt__(self, other):
-        return (
-            getattr(self, self.__sort_attribute__).lower()
-        ) < (
-            getattr(other, self.__sort_attribute__).lower()
-        )

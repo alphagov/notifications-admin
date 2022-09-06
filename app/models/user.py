@@ -10,7 +10,7 @@ from app.event_handlers import (
     create_add_user_to_service_event,
     create_set_user_permissions_event,
 )
-from app.models import JSONModel, ModelList, SortByStringAttributeMixin
+from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation, Organisations
 from app.models.webauthn_credential import WebAuthnCredentials
 from app.notify_client import InviteTokenError
@@ -32,7 +32,7 @@ def _get_org_id_from_view_args():
     return str(request.view_args.get('org_id', '')) or None
 
 
-class BaseUser(JSONModel, SortByStringAttributeMixin):
+class BaseUser(JSONModel):
     __sort_attribute__ = 'email_address'
 
 

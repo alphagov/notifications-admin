@@ -8,7 +8,7 @@ from rtreelib import Rect
 from werkzeug.utils import cached_property
 
 from app.formatters import square_metres_to_square_miles
-from app.models import IdEqualityMixin, SortByStringAttributeMixin
+from app.models import SortingAndEqualityMixin
 
 from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository, rtree_index
@@ -63,7 +63,7 @@ class BaseBroadcastArea(ABC):
         return max(500, min(estimated_bleed, 5000))
 
 
-class BroadcastArea(BaseBroadcastArea, IdEqualityMixin, SortByStringAttributeMixin):
+class BroadcastArea(BaseBroadcastArea, SortingAndEqualityMixin):
 
     __sort_attribute__ = 'name'
 
@@ -210,7 +210,7 @@ class CustomBroadcastAreas(SerialisedModelCollection):
         )
 
 
-class BroadcastAreaLibrary(SerialisedModelCollection, SortByStringAttributeMixin, IdEqualityMixin, GetItemByIdMixin):
+class BroadcastAreaLibrary(SerialisedModelCollection, SortingAndEqualityMixin, GetItemByIdMixin):
 
     model = BroadcastArea
 

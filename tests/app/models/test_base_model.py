@@ -7,6 +7,7 @@ def test_looks_up_from_dict():
 
     class Custom(JSONModel):
         ALLOWED_PROPERTIES = {'foo'}
+        __sort_attribute__ = 'foo'
 
     assert Custom({'foo': 'bar'}).foo == 'bar'
 
@@ -16,6 +17,7 @@ def test_raises_when_overriding_custom_properties():
     class Custom(JSONModel):
 
         ALLOWED_PROPERTIES = {'foo'}
+        __sort_attribute__ = 'foo'
 
         @property
         def foo(self):
@@ -35,6 +37,7 @@ def test_model_raises_for_unknown_attributes(json_response):
 
     class Custom(JSONModel):
         ALLOWED_PROPERTIES = set()
+        __sort_attribute__ = None
 
     model = Custom(json_response)
     assert model.ALLOWED_PROPERTIES == set()
@@ -49,6 +52,7 @@ def test_model_raises_keyerror_if_item_missing_from_dict():
 
     class Custom(JSONModel):
         ALLOWED_PROPERTIES = {'foo'}
+        __sort_attribute__ = 'foo'
 
     with pytest.raises(AttributeError) as e:
         Custom({}).foo
@@ -64,6 +68,7 @@ def test_model_doesnt_swallow_attribute_errors(json_response):
 
     class Custom(JSONModel):
         ALLOWED_PROPERTIES = set()
+        __sort_attribute__ = None
 
         @property
         def foo(self):
@@ -79,6 +84,7 @@ def test_dynamic_properties_are_introspectable():
 
     class Custom(JSONModel):
         ALLOWED_PROPERTIES = {'foo', 'bar', 'baz'}
+        __sort_attribute__ = 'foo'
 
     model = Custom({'foo': None, 'bar': None, 'baz': None})
 

@@ -24,6 +24,8 @@ class WebAuthnCredential(JSONModel):
         'updated_at'
     }
 
+    __sort_attribute__ = 'name'
+
     @classmethod
     def from_registration(cls, state, response):
         server = current_app.webauthn_server
