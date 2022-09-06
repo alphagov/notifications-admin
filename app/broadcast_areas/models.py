@@ -8,22 +8,10 @@ from rtreelib import Rect
 from werkzeug.utils import cached_property
 
 from app.formatters import square_metres_to_square_miles
-from app.models import SortByStringAttributeMixin
+from app.models import IdEqualityMixin, SortByStringAttributeMixin
 
 from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository, rtree_index
-
-
-class IdEqualityMixin:
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}(<{self.id}>)'
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __hash__(self):
-        return hash(self.id)
 
 
 class GetItemByIdMixin:
