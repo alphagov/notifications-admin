@@ -19,7 +19,7 @@ class IdEqualityMixin:
         return hash(self.id)
 
 
-class JSONModel(SerialisedModel):
+class JSONModel(SerialisedModel, IdEqualityMixin):
 
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
@@ -30,12 +30,6 @@ class JSONModel(SerialisedModel):
 
     def __bool__(self):
         return self._dict != {}
-
-    def __hash__(self):
-        return hash(self.id)
-
-    def __eq__(self, other):
-        return self.id == other.id
 
     def _get_by_id(self, things, id):
         try:
