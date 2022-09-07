@@ -1448,6 +1448,36 @@ def test_update_organisation_domains_when_domain_already_exists(
     assert response.select_one("div.banner-dangerous").text.strip() == "This domain is already in use"
 
 
+def test_update_organisation_domains_with_more_than_just_domain(
+    mocker,
+    client_request,
+    fake_uuid,
+    organisation_one,
+    mock_get_organisation,
+):
+    user = create_platform_admin_user()
+    client_request.login(user)
+
+    page = client_request.post(
+        'main.edit_organisation_domains',
+        org_id=ORGANISATION_ID,
+        _data={
+            'domains-0': 'test@example.gov.uk',
+            'domains-1': 'example.gov.uk',
+            'domains-2': '@example.gov.uk',
+        },
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(
+        page.select_one(".banner-dangerous").text
+     ) == (
+        "There is a problem "
+        "Item 1: Enter a domain name without a leading ‘@’ "
+        "Item 3: Enter a domain name without a leading ‘@’"
+    )
+
+
 def test_update_organisation_name(
     client_request,
     platform_admin_user,

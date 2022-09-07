@@ -63,6 +63,7 @@ from app.main.validators import (
     DoesNotStartWithDoubleZero,
     LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly,
     MustContainAlphanumericCharacters,
+    NoAtSymbols,
     NoCommasInPlaceHolders,
     NoEmbeddedImagesInSVG,
     NoPlaceholders,
@@ -1165,6 +1166,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
         StripWhitespaceStringField(
             "",
             validators=[
+                NoAtSymbols(),
                 Optional(),
             ],
             default="",

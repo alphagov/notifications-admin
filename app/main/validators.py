@@ -183,3 +183,13 @@ class MustContainAlphanumericCharacters:
     def __call__(self, form, field):
         if field.data and not re.match(self.regex, field.data):
             raise ValidationError(self.message)
+
+
+class NoAtSymbols:
+
+    def __init__(self, message='Enter a domain name without a leading ‘@’'):
+        self.message = message
+
+    def __call__(self, form, field):
+        if '@' in field.data:
+            raise ValidationError(self.message)
