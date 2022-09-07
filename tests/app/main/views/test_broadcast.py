@@ -836,11 +836,11 @@ def test_broadcast_page(
         '40,000,000 phones estimated',
     ]),
     ([
-        'wd20-E05003224',
-        'wd20-E05003225',
-        'wd20-E05003227',
-        'wd20-E05003228',
-        'wd20-E05003229',
+        'wd21-E05003224',
+        'wd21-E05003225',
+        'wd21-E05003227',
+        'wd21-E05003228',
+        'wd21-E05003229',
     ], [
         'Penrith Carleton Remove Penrith Carleton',
         'Penrith East Remove Penrith East',
@@ -853,7 +853,7 @@ def test_broadcast_page(
         '9,000 to 10,000 phones',
     ]),
     ([
-        'lad20-E09000019',
+        'lad21-E09000019',
     ], [
         'Islington Remove Islington',
     ], [
@@ -862,7 +862,7 @@ def test_broadcast_page(
         '200,000 to 600,000 phones',
     ]),
     ([
-        'ctyua19-E10000019',
+        'ctyua21-E10000019',
     ], [
         'Lincolnshire Remove Lincolnshire',
     ], [
@@ -871,8 +871,8 @@ def test_broadcast_page(
         '500,000 to 600,000 phones',
     ]),
     ([
-        'ctyua19-E10000019',
-        'ctyua19-E10000023'
+        'ctyua21-E10000019',
+        'ctyua21-E10000023'
     ], [
         'Lincolnshire Remove Lincolnshire', 'North Yorkshire Remove North Yorkshire',
     ], [
@@ -1036,8 +1036,8 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
     ([
         # If you’ve chosen the whole of a county or unitary authority
         # there’s no reason to  also pick districts of it
-        'ctyua19-E10000013',  # Gloucestershire, a county
-        'lad20-E06000052',  # Cornwall, a unitary authority
+        'ctyua21-E10000013',  # Gloucestershire, a county
+        'lad21-E06000052',  # Cornwall, a unitary authority
     ], [
         'Countries',
         'Local authorities',
@@ -1045,11 +1045,11 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         'Test areas',
     ]),
     ([
-        'wd20-E05004299',  # Pitville, in Cheltenham, in Gloucestershire
-        'wd20-E05004290',  # Benhall and the Reddings, in Cheltenham, in Gloucestershire
-        'wd20-E05010951',  # Abbeymead, in Gloucester, in Gloucestershire
-        'wd20-S13002775',  # Shetland Central, in Shetland Isles
-        'lad20-E07000037',  # High Peak, a district in Derbyshire
+        'wd21-E05004299',  # Pitville, in Cheltenham, in Gloucestershire
+        'wd21-E05004290',  # Benhall and the Reddings, in Cheltenham, in Gloucestershire
+        'wd21-E05010951',  # Abbeymead, in Gloucester, in Gloucestershire
+        'wd21-S13002775',  # Shetland Central, in Shetland Isles
+        'lad21-E07000037',  # High Peak, a district in Derbyshire
     ], [
         'Cheltenham',
         'Derbyshire',
@@ -1125,7 +1125,7 @@ def test_suggested_area_has_correct_link(
             service_id=SERVICE_ONE_ID,
             status='draft',
             area_ids=[
-                'wd20-E05004299',  # Pitville, a ward of Cheltenham
+                'wd21-E05004299',  # Pitville, a ward of Cheltenham
             ],
         ),
     )
@@ -1142,8 +1142,8 @@ def test_suggested_area_has_correct_link(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20-ctyua19',
-        area_slug='lad20-E07000078',
+        library_slug='wd21-lad21-ctyua21',
+        area_slug='lad21-E07000078',
     )
 
 
@@ -1153,7 +1153,7 @@ def test_suggested_area_has_correct_link(
         'Choose countries',
     ),
     (
-        'wd20-lad20-ctyua19',
+        'wd21-lad21-ctyua21',
         'Choose a local authority'
     ),
     (
@@ -1227,7 +1227,7 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         '.choose_broadcast_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20-ctyua19',
+        library_slug='wd21-lad21-ctyua21',
     )
     assert normalize_spaces(page.select_one('h1').text) == (
         'Choose a local authority'
@@ -1240,7 +1240,7 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20-ctyua19',
+        library_slug='wd21-lad21-ctyua21',
     )
     choices = [
         (
@@ -1249,13 +1249,25 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         )
         for choice in page.select('.file-list-item')
     ]
-    assert len(choices) == 394
+    assert len(choices) == 398
 
-    assert choices[0] == (partial_url_for(area_slug='lad20-S12000033'), 'Aberdeen City',)
-    # note: we don't populate prev_area_slug query param, so the back link will come here rather than to a county page,
+    # First item, somewhere in Scotland
+    assert choices[0] == (partial_url_for(area_slug='lad21-S12000033'), 'Aberdeen City',)
+
+    # Somewhere in England
+    # ---
+    # Note: we don't populate prev_area_slug query param, so the back link will come here rather than to a county page,
     # even though ashford belongs to kent
-    assert choices[12] == (partial_url_for(area_slug='lad20-E07000105'), 'Ashford',)
-    assert choices[-1] == (partial_url_for(area_slug='lad20-E06000014'), 'York',)
+    assert choices[12] == (partial_url_for(area_slug='lad21-E07000105'), 'Ashford',)
+
+    # Somewhere in Wales
+    assert choices[219] == (partial_url_for(area_slug='lad21-W06000021'), 'Monmouthshire',)
+
+    # Somewhere in Northern Ireland
+    assert choices[95] == (partial_url_for(area_slug='lad21-N09000005'), 'Derry City and Strabane',)
+
+    # Last item on the page
+    assert choices[-1] == (partial_url_for(area_slug='lad21-E06000014'), 'York',)
 
 
 def test_choose_broadcast_sub_area_page_for_district_shows_checkboxes_for_wards(
@@ -1271,8 +1283,8 @@ def test_choose_broadcast_sub_area_page_for_district_shows_checkboxes_for_wards(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20-ctyua19',
-        area_slug='lad20-S12000033',
+        library_slug='wd21-lad21-ctyua21',
+        area_slug='lad21-S12000033',
     )
     assert normalize_spaces(page.select_one('h1').text) == (
         'Choose an area of Aberdeen City'
@@ -1296,25 +1308,25 @@ def test_choose_broadcast_sub_area_page_for_district_shows_checkboxes_for_wards(
     ]
     assert all_choices[:3] == [
         ('y', 'All of Aberdeen City'),
-        ('wd20-S13002845', 'Airyhall/Broomhill/Garthdee'),
-        ('wd20-S13002836', 'Bridge of Don'),
+        ('wd21-S13002845', 'Airyhall/Broomhill/Garthdee'),
+        ('wd21-S13002836', 'Bridge of Don'),
     ]
     assert sub_choices[:3] == [
-        ('wd20-S13002845', 'Airyhall/Broomhill/Garthdee'),
-        ('wd20-S13002836', 'Bridge of Don'),
-        ('wd20-S13002835', 'Dyce/Bucksburn/Danestone'),
+        ('wd21-S13002845', 'Airyhall/Broomhill/Garthdee'),
+        ('wd21-S13002836', 'Bridge of Don'),
+        ('wd21-S13002835', 'Dyce/Bucksburn/Danestone'),
     ]
     assert all_choices[-1:] == sub_choices[-1:] == [
-        ('wd20-S13002846', 'Torry/Ferryhill'),
+        ('wd21-S13002846', 'Torry/Ferryhill'),
     ]
 
 
 @pytest.mark.parametrize('prev_area_slug, expected_back_link_url, expected_back_link_extra_kwargs', [
     (
-        'ctyua19-E10000016',
+        'ctyua21-E10000016',
         'main.choose_broadcast_sub_area',
         {
-            'area_slug': 'ctyua19-E10000016'  # Kent
+            'area_slug': 'ctyua21-E10000016'  # Kent
         }
     ),
     (
@@ -1339,8 +1351,8 @@ def test_choose_broadcast_sub_area_page_for_district_has_back_link(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=str(uuid.UUID(int=0)),
-        library_slug='wd20-lad20-ctyua19',
-        area_slug='lad20-E07000105',  # Ashford
+        library_slug='wd21-lad21-ctyua21',
+        area_slug='lad21-E07000105',  # Ashford
         prev_area_slug=prev_area_slug,
     )
     assert normalize_spaces(page.select_one('h1').text) == (
@@ -1351,7 +1363,7 @@ def test_choose_broadcast_sub_area_page_for_district_has_back_link(
         expected_back_link_url,
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=str(uuid.UUID(int=0)),
-        library_slug='wd20-lad20-ctyua19',
+        library_slug='wd21-lad21-ctyua21',
         **expected_back_link_extra_kwargs
     )
 
@@ -1370,8 +1382,8 @@ def test_choose_broadcast_sub_area_page_for_county_shows_links_for_districts(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20-ctyua19',
-        area_slug='ctyua19-E10000016',  # Kent
+        library_slug='wd21-lad21-ctyua21',
+        area_slug='ctyua21-E10000016',  # Kent
     )
     assert normalize_spaces(page.select_one('h1').text) == (
         'Choose an area of Kent'
@@ -1401,18 +1413,18 @@ def test_choose_broadcast_sub_area_page_for_county_shows_links_for_districts(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20-ctyua19',
-        area_slug='lad20-E07000105',
-        prev_area_slug='ctyua19-E10000016',  # Kent
+        library_slug='wd21-lad21-ctyua21',
+        area_slug='lad21-E07000105',
+        prev_area_slug='ctyua21-E10000016',  # Kent
     )
     assert districts[0][1] == 'Ashford'
     assert districts[-1][0] == url_for(
         'main.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20-ctyua19',
-        area_slug='lad20-E07000116',
-        prev_area_slug='ctyua19-E10000016',  # Kent
+        library_slug='wd21-lad21-ctyua21',
+        area_slug='lad21-E07000116',
+        prev_area_slug='ctyua21-E10000016',  # Kent
     )
     assert districts[-1][1] == 'Tunbridge Wells'
 
@@ -1463,21 +1475,21 @@ def test_add_broadcast_area(
 @pytest.mark.parametrize('post_data, expected_data', (
     (
         {
-            'select_all': 'y', 'areas': ['wd20-S13002845']
+            'select_all': 'y', 'areas': ['wd21-S13002845']
         },
         {
-            # wd20-S13002845 is ignored because the user chose ‘Select all…’
-            'ids': ['lad20-S12000033'],
+            # wd21-S13002845 is ignored because the user chose ‘Select all…’
+            'ids': ['lad21-S12000033'],
             'names': ['Aberdeen City'],
             'aggregate_names': ['Aberdeen City']
         }
     ),
     (
         {
-            'areas': ['wd20-S13002845', 'wd20-S13002836']
+            'areas': ['wd21-S13002845', 'wd21-S13002836']
         },
         {
-            'ids': ['wd20-S13002845', 'wd20-S13002836'],
+            'ids': ['wd21-S13002845', 'wd21-S13002836'],
             'names': ['Bridge of Don', 'Airyhall/Broomhill/Garthdee'],
             'aggregate_names': ['Aberdeen City'],
         }
@@ -1508,8 +1520,8 @@ def test_add_broadcast_sub_area_district_view(
         '.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20-ctyua19',
-        area_slug='lad20-S12000033',
+        library_slug='wd21-lad21-ctyua21',
+        area_slug='lad21-S12000033',
         _data=post_data,
     )
 
@@ -1554,8 +1566,8 @@ def test_add_broadcast_sub_area_county_view(
         '.choose_broadcast_sub_area',
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
-        library_slug='wd20-lad20-ctyua19',
-        area_slug='ctyua19-E10000016',  # Kent
+        library_slug='wd21-lad21-ctyua21',
+        area_slug='ctyua21-E10000016',  # Kent
         _data={'select_all': 'y'},
     )
     mock_get_polygons_from_areas.assert_called_once_with(area_attribute='simple_polygons')
@@ -1570,7 +1582,7 @@ def test_add_broadcast_sub_area_county_view(
                     'ctry19-E92000001',
                     'ctry19-S92000003',
                 ] + [
-                    'ctyua19-E10000016'
+                    'ctyua21-E10000016'
                 ],
                 'names': ['England', 'Scotland', 'Kent'],
                 'aggregate_names': ['England', 'Kent', 'Scotland']
