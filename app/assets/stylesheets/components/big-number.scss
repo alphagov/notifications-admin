@@ -82,7 +82,7 @@
 
     &:link,
     &:visited {
-      color: $link-colour;
+      color: $govuk-link-colour;
     }
 
   }
@@ -90,10 +90,10 @@
   .big-number-link {
 
     text-decoration: none;
-    background: $link-colour;
+    background: $govuk-link-colour;
     color: govuk-colour("white");
     display: block;
-    border: 2px solid $link-colour;
+    border: 2px solid $govuk-link-colour;
     margin-bottom: 5px;
 
     &:hover {

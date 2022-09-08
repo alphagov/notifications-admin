@@ -35,7 +35,7 @@
   }
 
   &-item {
-    $background: $link-colour;
+    $background: $govuk-link-colour;
     background: $background;
     color: govuk-colour("white");
     border: 2px solid $background;
@@ -128,7 +128,7 @@
 
     &:link,
     &:visited {
-      background: $link-colour;
+      background: $govuk-link-colour;
       color: govuk-colour("white");
       text-decoration: underline;
     }
