@@ -29,15 +29,15 @@
     letter-spacing: 0.05em;
 
     &--training {
-      background: $grey-3;
-      color: mix($grey-1, $text-colour);
-      box-shadow: 0 -3px 0 0 $grey-3;
+      background: govuk-colour("grey-3");
+      color: mix(govuk-colour("grey-1"), $text-colour);
+      box-shadow: 0 -3px 0 0 govuk-colour("grey-3");
     }
 
     &--suspended {
-      background: $grey-3;
-      color: mix($grey-1, $text-colour);
-      box-shadow: 0 -3px 0 0 $grey-3;
+      background: govuk-colour("grey-3");
+      color: mix(govuk-colour("grey-1"), $text-colour);
+      box-shadow: 0 -3px 0 0 govuk-colour("grey-3");
     }
 
     &--live, &--test, &--operator {
@@ -203,14 +203,14 @@
     ol,
     ul {
       margin-top: govuk-spacing(2);
-      border-top: 1px $grey-3 solid;
+      border-top: 1px govuk-colour("grey-3") solid;
     }
   }
 
   &__item {
     @include govuk-font(16);
 
-    border-bottom: 1px $grey-3 solid;
+    border-bottom: 1px govuk-colour("grey-3") solid;
     display: block;
     padding: govuk-spacing(2) 0;
 

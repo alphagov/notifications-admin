@@ -26,7 +26,7 @@
     width: calc(100% + 2px); // grow to overlap wrapper's border (when combined with top and left)
     box-sizing: border-box;
     font-weight: bold;
-    background: $grey-1;
+    background: govuk-colour("grey-1");
     color: $white;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
