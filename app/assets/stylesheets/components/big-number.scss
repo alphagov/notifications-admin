@@ -35,7 +35,7 @@
   padding: govuk-spacing(3);
   position: relative;
   background: govuk-colour("black");
-  color: $white;
+  color: govuk-colour("white");
 
   .big-number-number {
     @include govuk-font(36, $weight: bold, $tabular: true);
@@ -73,7 +73,7 @@
     padding: govuk-spacing(3);
     position: relative;
     background: govuk-colour("black");
-    color: $white;
+    color: govuk-colour("white");
   }
 
   .big-number-label {
@@ -91,7 +91,7 @@
 
     text-decoration: none;
     background: $link-colour;
-    color: $white;
+    color: govuk-colour("white");
     display: block;
     border: 2px solid $link-colour;
     margin-bottom: 5px;
@@ -142,7 +142,7 @@
     @include govuk-font(19);
     display: block;
     background: govuk-colour("green");
-    color: $white;
+    color: govuk-colour("white");
     padding: 15px;
 
     a {
@@ -151,7 +151,7 @@
       &:visited,
       &:active,
       &:hover {
-        color: $white;
+        color: govuk-colour("white");
         text-decoration: underline;
       }
 
@@ -180,7 +180,7 @@
   .big-number-meta {
 
     padding: govuk-spacing(2) govuk-spacing(3);
-    color: $white;
+    color: govuk-colour("white");
     pointer-events: none;
 
     @include media(desktop) {

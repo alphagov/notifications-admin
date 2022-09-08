@@ -54,7 +54,7 @@ $govuk-checkboxes-size: 40px;
 
     [type=checkbox]+label::before {
       // To overlap the grey inset line
-      background: $white;
+      background: govuk-colour("white");
     }
 
     ul {

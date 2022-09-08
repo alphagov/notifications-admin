@@ -37,7 +37,7 @@
   &-item {
     $background: $link-colour;
     background: $background;
-    color: $white;
+    color: govuk-colour("white");
     border: 2px solid $background;
     position: relative;
     text-decoration: none;
@@ -45,7 +45,7 @@
 
     &:link,
     &:visited {
-      color: $white;
+      color: govuk-colour("white");
     }
 
     &:hover {
@@ -66,7 +66,7 @@
   &-item--selected {
     background: inherit;
     border: 2px solid $govuk-input-border-colour;
-    outline: 1px solid rgba($white, 0.1);
+    outline: 1px solid rgba(govuk-colour("white"), 0.1);
     position: relative;
     z-index: 10;
 
@@ -129,7 +129,7 @@
     &:link,
     &:visited {
       background: $link-colour;
-      color: $white;
+      color: govuk-colour("white");
       text-decoration: underline;
     }
 

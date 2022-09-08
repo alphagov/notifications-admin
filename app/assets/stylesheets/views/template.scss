@@ -8,12 +8,12 @@
   @include govuk-font(19);
   position: absolute;
   background: $link-colour;
-  color: $white;
+  color: govuk-colour("white");
   padding: 10px govuk-spacing(3);
   z-index: 10000;
 
   &:link, &:visited {
-    color: $white;
+    color: govuk-colour("white");
   }
 
   &:hover {

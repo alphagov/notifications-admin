@@ -66,7 +66,7 @@ $sticky-padding: govuk-spacing(4);
 .content-fixed-onload {
 
   position: fixed;
-  background: $white;
+  background: govuk-colour("white");
   z-index: 100;
   padding-right: govuk-spacing(3);
   margin-top: 0;

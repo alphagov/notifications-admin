@@ -198,19 +198,19 @@ details .arrow {
 @keyframes live-pulse {
   0%   {
     background: govuk-colour("red");
-    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px $white;
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px govuk-colour("white");
   }
   40%   {
     background: govuk-colour("red");
-    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px $white;
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px govuk-colour("white");
   }
   50% {
-    background: $white;
-    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 2px $white;
+    background: govuk-colour("white");
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 2px govuk-colour("white");
   }
   100% {
-    background: $white;
-    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px $white;
+    background: govuk-colour("white");
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px govuk-colour("white");
   }
 }
 
@@ -233,7 +233,6 @@ details .arrow {
     height: 19px;
     border-radius: 50%;
     animation: live-pulse 1.5s infinite;
-    //box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 5px $white;
   }
 
   &--left {

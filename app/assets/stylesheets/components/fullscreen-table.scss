@@ -2,7 +2,7 @@
 
   &-content {
 
-    background: $white;
+    background: govuk-colour("white");
     z-index: 10;
     overflow-y: hidden;
     box-sizing: border-box;
@@ -17,7 +17,7 @@
 
       tr:last-child {
         td {
-          border-bottom: 1px solid $white;
+          border-bottom: 1px solid govuk-colour("white");
         }
       }
 
@@ -65,7 +65,7 @@
     .table-field-left-aligned {
       position: relative;
       z-index: 150;
-      background: $white;
+      background: govuk-colour("white");
     }
 
     &::-webkit-scrollbar {
@@ -74,17 +74,17 @@
 
     &::-webkit-scrollbar:horizontal {
       height: 11px;
-      background-color: $white;
+      background-color: govuk-colour("white");
     }
 
     &::-webkit-scrollbar-thumb {
       border-radius: 8px;
-      border: 2px solid $white;
+      border: 2px solid govuk-colour("white");
       background-color: rgba(0, 0, 0, .5);
     }
 
     &::-webkit-scrollbar-track {
-      background-color: $white;
+      background-color: govuk-colour("white");
       border-radius: 8px;
     }
 
@@ -112,7 +112,7 @@
       transition: none;
       position: relative;
       z-index: 200;
-      background: $white;
+      background: govuk-colour("white");
     }
 
   }

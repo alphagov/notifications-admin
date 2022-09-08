@@ -19,7 +19,7 @@ $iso-paper-ratio: 141.42135624%;
     left: 50%;
     margin-left: -0.5em;
     font-size: 96px;
-    color: $white;
+    color: govuk-colour("white");
     overflow: hidden;
     display: block;
     vertical-align: bottom;
@@ -86,7 +86,7 @@ $iso-paper-ratio: 141.42135624%;
   img {
     display: block;
     width: 100%;
-    background: $white;
+    background: govuk-colour("white");
     position: absolute;
     top: 0;
     left: 0;

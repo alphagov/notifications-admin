@@ -7,7 +7,7 @@ $top-spacing: govuk-spacing(5);
 
   .block-label {
     &:before {
-      box-shadow: 0 5px 0 0 $white;
+      box-shadow: 0 5px 0 0 govuk-colour("white");
     }
   }
 

@@ -81,7 +81,7 @@
 
     [type=radio]+label::before {
       // To overlap the grey inset line
-      background: $white;
+      background: govuk-colour("white");
     }
 
     ul {
@@ -146,7 +146,7 @@
       padding: 0;
 
       &:before {
-        background: $white;
+        background: govuk-colour("white");
       }
 
     }

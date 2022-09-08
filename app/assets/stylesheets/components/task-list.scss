@@ -55,7 +55,7 @@ $indicator-colour: govuk-colour("black");
 
   &-indicator-not-completed {
     @extend %task-list-indicator;
-    background-color: $white;
+    background-color: govuk-colour("white");
     color: $indicator-colour;
   }
 

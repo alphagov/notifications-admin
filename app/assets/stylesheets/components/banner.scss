@@ -52,7 +52,7 @@
 
   @extend %banner;
   @include govuk-font(19, $weight: bold);
-  background: $white;
+  background: govuk-colour("white");
   color: $text-colour;
   border: 5px solid $error-colour;
   margin: 15px 0;
@@ -72,7 +72,7 @@
 
   @extend %banner;
   background: $govuk-brand-colour;
-  color: $white;
+  color: govuk-colour("white");
   margin-top: 10px;
   margin-bottom: 0;
   padding: govuk-spacing(6);
@@ -101,7 +101,7 @@
 
     margin-top: 0;
     margin-bottom: govuk-spacing(6);
-    color: $white;
+    color: govuk-colour("white");
 
     &:last-child {
       margin-bottom: 0;
@@ -115,7 +115,7 @@
 
   ul {
     @include govuk-font(24);
-    color: $white;
+    color: govuk-colour("white");
     margin-bottom: govuk-spacing(5);
   }
 
@@ -134,11 +134,11 @@
 
     &:link,
     &:visited {
-      color: $white;
+      color: govuk-colour("white");
     }
 
     &:hover {
-      color: $white;
+      color: govuk-colour("white");
       background-color: $link-hover-colour;
       box-shadow: 0 0 0 10px $link-hover-colour;
     }
