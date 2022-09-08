@@ -97,10 +97,10 @@
 
     &:focus {
 
-      color: $text-colour;
+      color: $govuk-text-colour;
 
       & + .template-statistics-table-hint {
-        color: $text-colour;
+        color: $govuk-text-colour;
       }
 
     }

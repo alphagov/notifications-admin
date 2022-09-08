@@ -53,7 +53,7 @@
   @extend %banner;
   @include govuk-font(19, $weight: bold);
   background: govuk-colour("white");
-  color: $text-colour;
+  color: $govuk-text-colour;
   border: 5px solid $error-colour;
   margin: 15px 0;
   text-align: left;

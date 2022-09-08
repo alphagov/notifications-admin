@@ -30,13 +30,13 @@
 
     &--training {
       background: govuk-colour("grey-3");
-      color: mix(govuk-colour("grey-1"), $text-colour);
+      color: mix(govuk-colour("grey-1"), $govuk-text-colour);
       box-shadow: 0 -3px 0 0 govuk-colour("grey-3");
     }
 
     &--suspended {
       background: govuk-colour("grey-3");
-      color: mix(govuk-colour("grey-1"), $text-colour);
+      color: mix(govuk-colour("grey-1"), $govuk-text-colour);
       box-shadow: 0 -3px 0 0 govuk-colour("grey-3");
     }
 
@@ -237,7 +237,7 @@
     @include govuk-font(16, $weight: bold);
 
     a:link, a:visited {
-      color: $text-colour;
+      color: $govuk-text-colour;
     }
   }
 }
