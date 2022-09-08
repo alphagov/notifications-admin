@@ -30,12 +30,12 @@
     &__meta {
 
       display: block;
-      color: $secondary-text-colour;
+      color: $govuk-secondary-text-colour;
       text-decoration: none;
 
       &-key,
       &-time {
-        color: $secondary-text-colour;
+        color: $govuk-secondary-text-colour;
         display: inline-block;
         width: auto;
       }
@@ -65,7 +65,7 @@
     }
 
     &__data-name {
-      color: $secondary-text-colour;
+      color: $govuk-secondary-text-colour;
     }
 
     &__data-value {

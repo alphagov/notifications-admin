@@ -109,7 +109,7 @@
 
   &-hint {
     @include govuk-font(19);
-    color: $secondary-text-colour;
+    color: $govuk-secondary-text-colour;
     pointer-events: none;
   }
 
@@ -220,7 +220,7 @@
   &-status {
 
     &-default {
-      color: $secondary-text-colour;
+      color: $govuk-secondary-text-colour;
     }
 
     &-error {
@@ -399,7 +399,7 @@
 .table-empty-message,
 td.table-empty-message {
   @include govuk-font(19);
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   border-bottom: 1px solid $border-colour;
   padding: 20px 0 20px 0;
 }
@@ -407,7 +407,7 @@ td.table-empty-message {
 .table-show-more-link {
 
   @include govuk-font(16);
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   margin-bottom: govuk-spacing(7);
   border-bottom: 1px solid $border-colour;
   padding: 35px 0 10px 0;
@@ -425,7 +425,7 @@ a.table-show-more-link {
 
 .table-no-data {
   @include govuk-font(16);
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   margin-top: 10px;
   margin-bottom: govuk-spacing(7);
   border-top: 1px solid $border-colour;

@@ -1,7 +1,7 @@
 .notification-status {
 
   @include govuk-font(16);
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   margin-top: -1 * govuk-spacing(3);
 
   &.error {

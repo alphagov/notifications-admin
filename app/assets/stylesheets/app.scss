@@ -59,7 +59,7 @@ td {
 }
 
 .hint {
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
 
   .form-label + & {
     display: block;
@@ -173,7 +173,7 @@ details .arrow {
 
 .multiple-choice input:disabled+label {
   opacity: 1;
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   cursor: default;
 }
 

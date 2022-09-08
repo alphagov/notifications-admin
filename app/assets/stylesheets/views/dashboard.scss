@@ -132,7 +132,7 @@
   &-hint {
     @include govuk-font(16);
     display: block;
-    color: $secondary-text-colour;
+    color: $govuk-secondary-text-colour;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -142,7 +142,7 @@
   &-hint-large {
     @include govuk-font(19);
     display: block;
-    color: $secondary-text-colour;
+    color: $govuk-secondary-text-colour;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

@@ -75,7 +75,7 @@ textarea {
 .form-hint {
   @include govuk-font(19);
   display: block;
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   font-weight: normal;
 
   margin-top: -2px;
