@@ -33,7 +33,7 @@ $govuk-checkboxes-size: 40px;
     $circle-diameter: 39px;
     $border-thickness: 4px;
     $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
-    $border-colour: $border-colour;
+    $govuk-border-colour: $govuk-border-colour;
 
     float: none;
     position: relative;
@@ -45,7 +45,7 @@ $govuk-checkboxes-size: 40px;
       left: $border-indent;
       width: $border-thickness;
       height: 100%;
-      background: $border-colour;
+      background: $govuk-border-colour;
     }
 
     label {

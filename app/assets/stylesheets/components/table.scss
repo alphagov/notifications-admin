@@ -392,15 +392,15 @@
 
 
 .table-row-group {
-  border-top: 1px solid $border-colour;
-  border-bottom: 1px solid $border-colour;
+  border-top: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
 }
 
 .table-empty-message,
 td.table-empty-message {
   @include govuk-font(19);
   color: $govuk-secondary-text-colour;
-  border-bottom: 1px solid $border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
   padding: 20px 0 20px 0;
 }
 
@@ -409,7 +409,7 @@ td.table-empty-message {
   @include govuk-font(16);
   color: $govuk-secondary-text-colour;
   margin-bottom: govuk-spacing(7);
-  border-bottom: 1px solid $border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
   padding: 35px 0 10px 0;
   text-align: center;
 
@@ -428,8 +428,8 @@ a.table-show-more-link {
   color: $govuk-secondary-text-colour;
   margin-top: 10px;
   margin-bottom: govuk-spacing(7);
-  border-top: 1px solid $border-colour;
-  border-bottom: 1px solid $border-colour;
+  border-top: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
   padding: 0.75em 0 0.5625em 0;
 }
 

@@ -17,7 +17,7 @@ $indicator-colour: govuk-colour("black");
 
 .task-list {
 
-  border-top: 1px solid $border-colour;
+  border-top: 1px solid $govuk-border-colour;
   margin: govuk-spacing(6) 0;
 
   &-item {
@@ -25,7 +25,7 @@ $indicator-colour: govuk-colour("black");
     position: relative;
 
     a {
-      border-bottom: 1px solid $border-colour;
+      border-bottom: 1px solid $govuk-border-colour;
       display: block;
       padding: govuk-spacing(3) 0;
       padding-right: 20%;

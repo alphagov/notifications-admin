@@ -77,7 +77,7 @@
   &-service {
 
     @include govuk-font($size: 19);
-    border-bottom: 1px solid $border-colour;
+    border-bottom: 1px solid $govuk-border-colour;
     margin: 0 0 10px;
     position: relative;
 

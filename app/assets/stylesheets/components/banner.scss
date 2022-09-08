@@ -173,8 +173,8 @@
   align-items: baseline;
   flex-wrap: wrap;
   padding: (govuk-spacing(3) - 1px) 0 (govuk-spacing(3) + 1px) 0;
-  border-top: 1px solid $border-colour;
-  border-bottom: 1px solid $border-colour;
+  border-top: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
   margin-bottom: govuk-spacing(6);
   text-decoration: none;
 

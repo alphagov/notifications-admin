@@ -3,11 +3,11 @@
   font-family: monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  border-bottom: 1px solid $border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
 
   &-item {
 
-    border-top: 1px solid $border-colour;
+    border-top: 1px solid $govuk-border-colour;
     padding: 10px 0 0 0;
 
     // We can't assign classes to the summary.govuk-details__summary or div.govuk-details__text

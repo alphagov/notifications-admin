@@ -9,7 +9,7 @@
     margin: 0 0 govuk-spacing(6) 0;
     padding: 0 0 0 0;
     overflow: hidden;
-    border-bottom: 1px solid $border-colour;
+    border-bottom: 1px solid $govuk-border-colour;
 
     .table {
 
@@ -46,7 +46,7 @@
         transition: box-shadow 0.6s ease-out;
       }
 
-      box-shadow: inset -1px 0 0 0 $border-colour, inset -3px 0 0 0 rgba($border-colour, 0.2);
+      box-shadow: inset -1px 0 0 0 $govuk-border-colour, inset -3px 0 0 0 rgba($govuk-border-colour, 0.2);
 
     }
 
@@ -124,7 +124,7 @@
     .table-field-heading-first,
     .table-field-index {
       transition: box-shadow 0.3s ease-in-out;
-      box-shadow: 1px 0 0 0 $border-colour, 3px 0 0 0 rgba($border-colour, 0.2);
+      box-shadow: 1px 0 0 0 $govuk-border-colour, 3px 0 0 0 rgba($govuk-border-colour, 0.2);
     }
 
   }
