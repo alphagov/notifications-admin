@@ -3688,7 +3688,7 @@ def test_should_preview_email_branding(
     (
         'main.service_preview_email_branding',
         {'service_id': SERVICE_ONE_ID},
-        'main.service_settings',
+        'main.service_set_email_branding_add_to_branding_pool_step',
     ),
     (
         'main.organisation_preview_email_branding',

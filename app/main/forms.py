@@ -1974,6 +1974,12 @@ class AdminChangeEmailBrandingPoolForm(StripWhitespaceForm):
     )
 
 
+class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
+    choice_option = GovukRadiosField(
+        validators=[DataRequired(message="Please select an option")]
+    )
+
+
 class AdminEditLetterBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField('Name of brand', validators=[DataRequired()])
 
@@ -2157,8 +2163,8 @@ def get_placeholder_form_instance(
 ):
 
     if (
-        InsensitiveDict.make_key(placeholder_name) == 'emailaddress' and
-        template_type == 'email'
+         InsensitiveDict.make_key(placeholder_name) == 'emailaddress' and
+         template_type == 'email'
     ):
         field = email_address(label=placeholder_name, gov_user=False)
     elif (
