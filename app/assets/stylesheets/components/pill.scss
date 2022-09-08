@@ -65,7 +65,7 @@
 
   &-item--selected {
     background: inherit;
-    border: 2px solid $black;
+    border: 2px solid $govuk-input-border-colour;
     outline: 1px solid rgba($white, 0.1);
     position: relative;
     z-index: 10;
@@ -83,7 +83,7 @@
     &:focus {
       z-index: 1000;
       color: $govuk-focus-text-colour;
-      border: solid 2px $black;
+      border: solid 2px $govuk-focus-text-colour;
       padding: 10px 0px; /* reset padding to default */
       box-shadow: inset 0 -2px $govuk-focus-text-colour; /* remove bottom border from underline */
     }

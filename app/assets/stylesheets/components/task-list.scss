@@ -1,4 +1,4 @@
-$indicator-colour: $black;
+$indicator-colour: govuk-colour("black");
 
 %task-list-indicator {
   @include govuk-font(16, $weight: bold);

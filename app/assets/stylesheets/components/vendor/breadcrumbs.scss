@@ -67,7 +67,7 @@
     a:hover,
     a:active,
     a:visited {
-      color: $black;
+      color: $govuk-text-colour;
     }
 
     &--active {
@@ -99,7 +99,7 @@
       }
 
       a:focus {
-        color: $black;
+        color: $govuk-focus-text-colour;
       }
     }
   }

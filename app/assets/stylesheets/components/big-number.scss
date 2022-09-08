@@ -34,7 +34,7 @@
   @extend %big-number;
   padding: govuk-spacing(3);
   position: relative;
-  background: $black;
+  background: govuk-colour("black");
   color: $white;
 
   .big-number-number {
@@ -72,7 +72,7 @@
   .big-number-smaller {
     padding: govuk-spacing(3);
     position: relative;
-    background: $black;
+    background: govuk-colour("black");
     color: $white;
   }
 
@@ -157,7 +157,7 @@
 
       &:active,
       &:focus {
-        color: $black;
+        color: $govuk-focus-text-colour;
       }
 
     }
