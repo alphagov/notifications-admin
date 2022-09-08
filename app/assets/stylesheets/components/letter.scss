@@ -11,7 +11,7 @@ $iso-paper-ratio: 141.42135624%;
   padding: $iso-paper-ratio 0 0 0;
   margin: 0 0 govuk-spacing(6) 0;
   position: relative;
-  background: $panel-colour;
+  background: govuk-colour("grey-3");
 
   &:before {
     position: absolute;
