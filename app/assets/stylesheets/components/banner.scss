@@ -139,8 +139,8 @@
 
     &:hover {
       color: govuk-colour("white");
-      background-color: $link-hover-colour;
-      box-shadow: 0 0 0 10px $link-hover-colour;
+      background-color: $govuk-link-hover-colour;
+      box-shadow: 0 0 0 10px $govuk-link-hover-colour;
     }
 
     &:focus,
