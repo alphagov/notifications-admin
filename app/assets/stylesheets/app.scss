@@ -197,26 +197,26 @@ details .arrow {
 
 @keyframes live-pulse {
   0%   {
-    background: $red;
-    box-shadow: inset 0 0 0 2px $red, inset 0 0 0 4px $white;
+    background: govuk-colour("red");
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px $white;
   }
   40%   {
-    background: $red;
-    box-shadow: inset 0 0 0 2px $red, inset 0 0 0 4px $white;
+    background: govuk-colour("red");
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px $white;
   }
   50% {
     background: $white;
-    box-shadow: inset 0 0 0 2px $red, inset 0 0 0 2px $white;
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 2px $white;
   }
   100% {
     background: $white;
-    box-shadow: inset 0 0 0 2px $red, inset 0 0 0 4px $white;
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px $white;
   }
 }
 
 .live-broadcast {
 
-  color: $red;
+  color: govuk-colour("red");
   font-weight: bold;
   position: relative;
   display: inline-block;
@@ -228,12 +228,12 @@ details .arrow {
     margin-top: 1px;
     margin-left: 5px;
     border: none;
-    background: $red;
+    background: govuk-colour("red");
     width: 19px;
     height: 19px;
     border-radius: 50%;
     animation: live-pulse 1.5s infinite;
-    //box-shadow: inset 0 0 0 2px $red, inset 0 0 0 5px $white;
+    //box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 5px $white;
   }
 
   &--left {
