@@ -141,7 +141,7 @@
 
     @include govuk-font(19);
     display: block;
-    background: $green;
+    background: govuk-colour("green");
     color: $white;
     padding: 15px;
 
