@@ -166,7 +166,7 @@
 
   .big-number-status-failing {
     @extend %big-number-status;
-    background: $error-colour;
+    background: $govuk-error-colour;
   }
 
 }

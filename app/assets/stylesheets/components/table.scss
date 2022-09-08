@@ -199,13 +199,13 @@
 
   &-error {
 
-    border-left: 5px solid $error-colour;
+    border-left: 5px solid $govuk-error-colour;
     padding-left: 7px;
     display: block;
 
     &-label {
       display: block;
-      color: $error-colour;
+      color: $govuk-error-colour;
       font-weight: bold;
     }
 
@@ -225,7 +225,7 @@
 
     &-error {
 
-      color: $error-colour;
+      color: $govuk-error-colour;
       font-weight: bold;
 
       .status-hint {

@@ -54,7 +54,7 @@
   @include govuk-font(19, $weight: bold);
   background: govuk-colour("white");
   color: $govuk-text-colour;
-  border: 5px solid $error-colour;
+  border: 5px solid $govuk-error-colour;
   margin: 15px 0;
   text-align: left;
 

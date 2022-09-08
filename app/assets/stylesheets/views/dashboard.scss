@@ -189,7 +189,7 @@
 
 .failure-highlight {
   @include govuk-font(19, $weight: bold);
-  color: $error-colour;
+  color: $govuk-error-colour;
 }
 
 .align-with-message-body {
