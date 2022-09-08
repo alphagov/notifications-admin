@@ -71,7 +71,7 @@
 .banner-tour {
 
   @extend %banner;
-  background: $govuk-blue;
+  background: $govuk-brand-colour;
   color: $white;
   margin-top: 10px;
   margin-bottom: 0;
@@ -90,7 +90,7 @@
   &-with-service-name {
     margin-top: -10px;
     padding-top: 0;
-    box-shadow: 0 -1px 0 0 darken($govuk-blue, 10%);
+    box-shadow: 0 -1px 0 0 darken($govuk-brand-colour, 10%);
   }
 
   .heading-medium {
