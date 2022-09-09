@@ -56,10 +56,6 @@ td {
 
 .form-label {
   margin-bottom: 5px;
-
-  &.heading-small {
-    @include govuk-font(19, $weight: bold);
-  }
 }
 
 .hint {
@@ -250,8 +246,4 @@ details .arrow {
 
   }
 
-}
-
-input:-webkit-autofill::first-line {
-  @include govuk-font(19);
 }
