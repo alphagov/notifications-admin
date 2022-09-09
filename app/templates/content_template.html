@@ -1,4 +1,5 @@
 {% extends "withoutnav_template.html" %}
+
 {% from "components/sub-navigation.html" import sub_navigation %}
 {% from "components/page-header.html" import page_header %}
 
@@ -10,9 +11,9 @@
 
   <div class="govuk-grid-row">
 
-    {% if navigation_links %}
+    {% if navigation_links and navigation_label_prefix %}
       <div class="govuk-grid-column-one-quarter">
-        {{ sub_navigation(navigation_links) }}
+        {{ sub_navigation(navigation_links, navigation_label_prefix) }}
       </div>
       <div class="govuk-grid-column-five-eighths">
     {% else %}

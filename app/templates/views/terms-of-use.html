@@ -1,5 +1,9 @@
 {% extends "content_template.html" %}
+
 {% from "components/banner.html" import banner_wrapper %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'About Notify' %}
 
 {% block per_page_title %}
   Terms of use

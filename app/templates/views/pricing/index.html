@@ -1,9 +1,12 @@
+{% extends "content_template.html" %}
+
 {% from "components/content-metadata.html" import content_metadata %}
 {% from "components/table.html" import mapping_table, row, text_field, field, row_heading %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/details/macro.njk" import govukDetails %}
 
-{% extends "content_template.html" %}
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Pricing information' %}
 
 {% block per_page_title %}
   Pricing

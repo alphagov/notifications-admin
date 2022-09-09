@@ -1,7 +1,10 @@
 {% extends "content_template.html" %}
-{% from "components/page-header.html" import page_header %}
 
+{% from "components/page-header.html" import page_header %}
 {% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Pricing information' %}
 
 {% block per_page_title %}
   Billing details

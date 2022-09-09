@@ -22,9 +22,10 @@
 {% endmacro %}
 
 {% macro sub_navigation(
-  item_set
+  item_set,
+  nav_label_prefix
 ) %}
-  <nav class="sub-navigation">
+  <nav class="sub-navigation" aria-label="{{ nav_label_prefix }}">
     <ol itemscope itemtype="http://schema.org/ItemList">
       {% for item in item_set %}
         {% if item.sub_navigation_items %}

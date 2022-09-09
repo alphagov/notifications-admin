@@ -11,7 +11,7 @@
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-quarter">
-        <nav class="navigation">
+        <nav class="navigation" aria-label="Platform admin">
             {% for link_text, url in [
             ('Summary', url_for('main.platform_admin')),
             ('Live services', url_for('main.live_services')),
