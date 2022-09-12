@@ -118,6 +118,7 @@ def feedback(ticket_type):
         feedback_msg = render_template(
             'support-tickets/support-ticket.txt',
             content=form.feedback.data,
+            out_of_hours_emergency=out_of_hours_emergency
         )
 
         ticket = NotifySupportTicket(
