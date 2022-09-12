@@ -3681,13 +3681,12 @@ def test_should_preview_email_branding(
 
 @pytest.mark.parametrize('posted_value, submitted_value', (
     ('1', '1'),
-    ('__NONE__', None),
     pytest.param('None', None, marks=pytest.mark.xfail(raises=AssertionError)),
 ))
 @pytest.mark.parametrize('endpoint, extra_args, expected_redirect', (
     (
         'main.service_preview_email_branding',
-        {'service_id': SERVICE_ONE_ID},
+        {'service_id': SERVICE_ONE_ID, 'email_branding_id': 1},
         'main.service_set_email_branding_add_to_branding_pool_step',
     ),
     (
@@ -3714,7 +3713,8 @@ def test_should_set_branding_and_organisations(
     client_request.post(
         endpoint,
         _data={
-            'branding_style': posted_value
+            'branding_style': posted_value,
+            'email_branding_id': posted_value
         },
         _expected_status=302,
         _expected_redirect=url_for(
@@ -3743,6 +3743,57 @@ def test_should_set_branding_and_organisations(
         assert mock_update_service.called is False
     else:
         raise Exception
+
+
+@pytest.mark.parametrize('choice_option, flash_message', (
+    (
+        'yes',
+        'message 1',
+    ),
+    (
+        'no',
+        'message 2',
+    ),
+))
+def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
+    mocker,
+    client_request,
+    platform_admin_user,
+    service_one,
+    organisation_one,
+    choice_option,
+    flash_message
+):
+    # Once email branding is set on a service by a platform admin, we now have the option
+    # of it being added to the email branding pool of the wider organisation the service
+    # belongs to.
+    client_request.login(platform_admin_user)
+    service_one['organisation'] = organisation_one
+    email_branding_id = '234'
+    mocker.patch('app.email_branding_client.get_email_branding',
+                 return_value={'email_branding': {'name': 'branding1'}}
+                 )
+    mocker.patch('app.organisations_client.get_organisation',
+                 return_value=organisation_one
+                 )
+    mock_add_to_branding_pool = mocker.patch('app.organisations_client.add_brandings_to_email_branding_pool',
+                                             return_value=None)
+    client_request.post('main.service_set_email_branding_add_to_branding_pool_step',
+                        _data={'choice_option': choice_option},
+                        service_id=SERVICE_ONE_ID,
+                        email_branding_id=email_branding_id,
+                        _expected_status=302,
+                        _expected_redirect=url_for(
+                            'main.service_settings',
+                            service_id=SERVICE_ONE_ID
+                            ),
+                        )
+
+    if choice_option == 'yes':
+        mock_add_to_branding_pool.assert_called_with(organisation_one['id'], [email_branding_id])
+
+    elif choice_option == 'no':
+        mock_add_to_branding_pool.assert_not_called()
 
 
 @pytest.mark.parametrize('method', ['get', 'post'])

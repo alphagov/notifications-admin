@@ -266,6 +266,7 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'service_set_broadcast_network',
     'service_set_channel',
     'service_set_email_branding',
+    'service_set_email_branding_add_to_branding_pool_step',
     'service_set_inbound_number',
     'service_set_inbound_sms',
     'service_set_international_letters',

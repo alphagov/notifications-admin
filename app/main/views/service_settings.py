@@ -2,11 +2,11 @@ from collections import OrderedDict
 from datetime import datetime
 
 from flask import (
+    Markup,
     abort,
     current_app,
     flash,
     jsonify,
-    Markup,
     redirect,
     render_template,
     request,
@@ -38,7 +38,6 @@ from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
     AdminBillingDetailsForm,
-    AdminSetEmailBrandingAddToBrandingPoolStepForm,
     AdminNotesForm,
     AdminPreviewBrandingForm,
     AdminServiceAddDataRetentionForm,
@@ -47,6 +46,7 @@ from app.main.forms import (
     AdminServiceMessageLimitForm,
     AdminServiceRateLimitForm,
     AdminServiceSMSAllowanceForm,
+    AdminSetEmailBrandingAddToBrandingPoolStepForm,
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     AdminSetOrganisationForm,
