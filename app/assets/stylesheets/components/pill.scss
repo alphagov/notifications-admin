@@ -49,7 +49,7 @@
     }
 
     &:hover {
-      color: $light-blue-25;
+      color: govuk-tint(govuk-colour("light-blue"), 75);
     }
 
     &:active,
@@ -134,7 +134,7 @@
     }
 
     &:hover {
-      color: $light-blue-25;
+      color: govuk-tint(govuk-colour("light-blue"), 75);
     }
 
     &:focus,

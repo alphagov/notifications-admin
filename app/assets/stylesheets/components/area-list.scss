@@ -37,7 +37,7 @@
       }
 
       &:hover {
-        color: $light-blue-25;
+        color: govuk-tint(govuk-colour("light-blue"), 75);
       }
 
       // set styles so they don't get overriden by govuk-button styles
@@ -103,9 +103,9 @@
 
     &--unremoveable {
       padding-right: govuk-spacing(2);
-      background: $light-blue-25;
+      background: govuk-tint(govuk-colour("light-blue"), 75);
       color: mix(govuk-colour("black"), $govuk-brand-colour, 66%);
-      border-color: $light-blue-25;
+      border-color: govuk-tint(govuk-colour("light-blue"), 75);
       margin: 0 govuk-spacing(1) govuk-spacing(2) 0;
       font-weight: bold;
     }
@@ -146,7 +146,7 @@
   &--certain {
     &:before {
       border: 2px solid $govuk-input-border-colour;
-      background: $light-blue-50;
+      background: govuk-tint(govuk-colour("light-blue"), 50);
     }
   }
 
@@ -155,7 +155,7 @@
       padding: 1px;
       border: 2px dashed $govuk-brand-colour;
       border-image: file-url('dashed-border-govuk-blue.svg') 4 round;
-      background: $light-blue-25;
+      background: govuk-tint(govuk-colour("light-blue"), 75);
     }
   }
 

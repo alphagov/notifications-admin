@@ -56,7 +56,7 @@ $button-shadow-size: $govuk-border-width-form-element;
       }
 
       &:hover {
-        color: $light-blue-25;
+        color: govuk-tint(govuk-colour("light-blue"), 75);
       }
 
       &:active,
@@ -125,7 +125,7 @@ $button-shadow-size: $govuk-border-width-form-element;
   }
 
   &:hover {
-    background: $light-blue-25;
+    background: govuk-tint(govuk-colour("light-blue"), 75);
     outline: none;
   }
 
