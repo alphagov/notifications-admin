@@ -81,7 +81,7 @@ govuk-bank-holidays==0.11
     #   notifications-utils
 govuk-frontend-jinja==2.3.0
     # via -r requirements.in
-greenlet==1.1.2
+greenlet==1.1.3
     # via eventlet
 gunicorn @ git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b864c64
     # via -r requirements.in
