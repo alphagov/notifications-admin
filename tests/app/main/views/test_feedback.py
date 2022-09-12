@@ -345,6 +345,11 @@ def test_urgency(
     )
     assert mock_ticket.call_args[1]['p1'] == is_out_of_hours_emergency
 
+    if is_out_of_hours_emergency:
+        assert 'See runbook for help resolving' in mock_ticket.call_args[1]['message']
+    else:
+        assert 'See runbook for help resolving' not in mock_ticket.call_args[1]['message']
+
 
 ids, params = zip(*[
     ('non-logged in users always have to triage', (

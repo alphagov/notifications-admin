@@ -2,4 +2,8 @@
 {% if current_service -%}
 Service: "{{ current_service.name }}"
 {{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+{% endif -%}
+{% if out_of_hours_emergency -%}
+This ticket has been flagged by the user as an emergency.
+See runbook for help resolving: https://github.com/alphagov/notifications-manuals/wiki/Incidents-raised-through-Zendesk-tickets
 {% endif %}
