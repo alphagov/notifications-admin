@@ -8,7 +8,7 @@ ago==0.0.95
     # via -r requirements.in
 async-timeout==4.0.2
     # via redis
-awscli==1.25.57
+awscli==1.25.62
     # via awscli-cwlogs
 awscli-cwlogs==1.4.6
     # via -r requirements.in
@@ -18,9 +18,9 @@ blinker==1.5
     # via
     #   -r requirements.in
     #   gds-metrics
-boto3==1.24.56
+boto3==1.24.61
     # via notifications-utils
-botocore==1.27.56
+botocore==1.27.61
     # via
     #   awscli
     #   boto3
@@ -39,7 +39,7 @@ charset-normalizer==2.1.1
     # via requests
 click==8.1.3
     # via flask
-colorama==0.4.4
+colorama==0.4.5
     # via awscli
 cryptography==37.0.4
     # via fido2
@@ -49,15 +49,15 @@ dnspython==2.2.1
     # via eventlet
 docopt==0.6.2
     # via notifications-python-client
-docutils==0.16
+docutils==0.19
     # via awscli
 et-xmlfile==1.1.0
     # via openpyxl
 eventlet==0.33.1
     # via gunicorn
-fido2==0.9.3
+fido2==1.0.0
     # via -r requirements.in
-flask==2.1.2
+flask==2.2.2
     # via
     #   -r requirements.in
     #   flask-login
@@ -65,13 +65,13 @@ flask==2.1.2
     #   flask-wtf
     #   gds-metrics
     #   notifications-utils
-flask-login==0.6.1
+flask-login==0.6.2
     # via -r requirements.in
 flask-redis==0.4.0
     # via notifications-utils
 flask-wtf==1.0.1
     # via -r requirements.in
-gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
+gds-metrics==0.2.4
     # via -r requirements.in
 geojson==2.5.0
     # via notifications-utils
@@ -79,11 +79,11 @@ govuk-bank-holidays==0.11
     # via
     #   -r requirements.in
     #   notifications-utils
-govuk-frontend-jinja @ git+https://github.com/Crown-Commercial-Service/govuk-frontend-jinja.git@v0.5.8-alpha
+govuk-frontend-jinja==2.3.0
     # via -r requirements.in
-greenlet==1.1.2
+greenlet==1.1.3
     # via eventlet
-gunicorn @ git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b864c64
+gunicorn==20.1.0
     # via -r requirements.in
 humanize==4.3.0
     # via -r requirements.in
@@ -119,7 +119,7 @@ markupsafe==2.1.1
     # via
     #   jinja2
     #   wtforms
-mistune==0.8.4
+mistune==2.0.4
     # via notifications-utils
 notifications-python-client==6.3.0
     # via -r requirements.in
@@ -162,7 +162,7 @@ pyjwt==2.4.0
     # via notifications-python-client
 pyparsing==3.0.9
     # via packaging
-pypdf2==2.10.3
+pypdf2==2.10.4
     # via notifications-utils
 pyproj==3.3.1
     # via
@@ -178,7 +178,7 @@ pytz==2022.2.1
     # via
     #   -r requirements.in
     #   notifications-utils
-pyyaml==5.4.1
+pyyaml==6.0
     # via
     #   awscli
     #   notifications-utils
@@ -190,7 +190,7 @@ requests==2.28.1
     #   govuk-bank-holidays
     #   notifications-python-client
     #   notifications-utils
-rsa==4.7.2
+rsa==4.9
     # via awscli
 rtreelib==0.2.0
     # via -r requirements.in
@@ -215,13 +215,13 @@ texttable==1.6.4
     # via pyexcel
 typing-extensions==4.3.0
     # via pypdf2
-urllib3==1.26.9
+urllib3==1.26.12
     # via
     #   botocore
     #   requests
 webencodings==0.5.1
     # via bleach
-werkzeug==2.1.2
+werkzeug==2.2.2
     # via
     #   -r requirements.in
     #   flask
