@@ -3,14 +3,16 @@
 .banner-default {
 
   @include govuk-font(19, $weight: bold);
-  color: $button-colour;
+  // TODO: replace with `$govuk-success-colour` when GOV.UK Frontend version >= 3.10.0
+  color: govuk-colour("green");
   display: block;
   padding: govuk-spacing(3);
   margin: govuk-spacing(3) 0 govuk-spacing(6) 0;
   text-align: left;
   position: relative;
   clear: both;
-  border: 5px solid $button-colour;
+  // TODO: replace with `$govuk-success-colour` when GOV.UK Frontend version >= 3.10.0
+  border: 5px solid govuk-colour("green");
 
   &-title {
     @include govuk-font(24, $weight: bold);
