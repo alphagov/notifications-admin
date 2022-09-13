@@ -31,7 +31,7 @@
       // first off show the new template / new folder buttons
       this._lastState = this.$form.data('prev-state');
       if (this._lastState === undefined) {
-        this.selectActionButtons();
+        this.showInitialState();
       } else {
         this.currentState = this._lastState;
         this.render();
@@ -48,8 +48,9 @@
           // uncheck all templates and folders
           this.$form.find('input:checkbox').prop('checked', false);
 
-          // go back to action buttons
-          this.selectActionButtons(selector);
+          // move focus to the first checkbox
+          this.$form.find('input:checkbox').eq(0).focus();
+          this.showInitialState();
         },
         'nonvisualText': "selection"
       });
@@ -77,15 +78,10 @@
         return $btn;
     };
 
-    this.selectActionButtons = function (targetSelector) {
-      // If we want to show one of the grey choose actions state, we can pretend we're in the choose actions state,
-      // and then pretend a checkbox was clicked to work out whether to show zero or non-zero options.
-      // This calls a render at the end
+    this.showInitialState = function () {
+      // Reset the form to initial state, where nothing is selected
       this.currentState = 'nothing-selected-hint';
       this.BrandingOptionCheckboxChanged();
-      if (targetSelector) {
-        $(targetSelector).focus();
-      }
     };
 
     // method that checks the state against the last one, used prior to render() to see if needed

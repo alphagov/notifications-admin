@@ -1,26 +1,4 @@
-// Before the module starts
-//   ✓ the HTML for the module should contain placeholder classes on each part that needs to be sticky (15 ms)
-// When the module starts
-//   ✓ the default controls and the counter should be showing (38 ms)
-//   ✓ should make the current controls sticky (29 ms)
-//   Selection counter
-//     ✓ the visible counter should be hidden from assistive tech (13 ms)
-//     ✓ the content of both visible and hidden counters should match (13 ms)
-//
-//
-// When some templates/folders are selected
-//       ✓ the buttons for moving to a new or existing folder are showing (11 ms)
-//       ✓ should make the current controls sticky (11 ms)
-//       'Clear selection' link
-//         ✓ the link has been added with the right text (9 ms)
-//         ✓ clicking the link clears the selection (10 ms)
-//         ✓ clicking the link puts Focus on  (10 ms)
-//       Selection counter
-//         ✓ the content of both visible and hidden counters should match (9 ms)
-//         ✓ the content of the counter should reflect the selection (8 ms)
-//
-
-
+  const helpers = require('./support/helpers');
 
 beforeAll(() => {
   require('../../app/assets/javascripts/addEmailBrandingOptionsForm.js');
@@ -155,48 +133,89 @@ describe('TemplateFolderForm', () => {
       });
     });
 
-//     describe("When some branding options are selected", () => {
-//
-//       let EmailBrandingOptionsCheckboxes;
-//
-//       beforeEach(() => {
-//
-//         // start module
-//         window.GOVUK.modules.start();
-//
-//         EmailBrandingOptionsCheckboxes = getEmailBrandingOptionsCheckboxes();
-//
-//         formControls = templateFolderForm.querySelector('.brand-pool');
-//
-//         helpers.triggerEvent(EmailBrandingOptionsCheckboxes[0], 'click');
-//         helpers.triggerEvent(EmailBrandingOptionsCheckboxes[2], 'click');
-//
-//       });
-//
-//
-//       test("the buttons for moving to a new or existing folder are showing", () => {
-//
-//         expect(formControls.querySelector('button[value=move-to-new-folder]')).not.toBeNull();
-//         expect(formControls.querySelector('button[value=move-to-existing-folder]')).not.toBeNull();
-//         expect(formControls.querySelector('button[value=move-to-new-folder]').getAttribute('aria-expanded')).toEqual('false');
-//         expect(formControls.querySelector('button[value=move-to-existing-folder]').getAttribute('aria-expanded')).toEqual('false');
-//
-//       });
-//
-//       test("should make the current controls sticky", () => {
-//
-//         // the class the sticky JS hooks into should be present
-//         expect(formControls.querySelector('#items_selected .js-stick-at-bottom-when-scrolling')).not.toBeNull();
-//
-//         // .recalculate should have been called so the sticky JS picks up the controls
-//         expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
-//
-//         // mode should have been set to 'default' as the controls only have one part
-//         expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
-//         expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
-//
-//       });
-//    });
+    describe("When some branding options are selected", () => {
+
+      let EmailBrandingOptionsCheckboxes;
+
+      beforeEach(() => {
+
+        // start module
+        window.GOVUK.modules.start();
+
+        EmailBrandingOptionsCheckboxes = getEmailBrandingOptionsCheckboxes();
+
+        formControls = addEmailBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
+
+        helpers.triggerEvent(EmailBrandingOptionsCheckboxes[0], 'click');
+        helpers.triggerEvent(EmailBrandingOptionsCheckboxes[2], 'click');
+
+      });
+
+      describe("'Clear selection' link", () => {
+
+        let clearLink;
+
+        beforeEach(() => {
+
+          clearLink = formControls.querySelector('.js-cancel');
+
+        });
+
+        test("the link has been added with the right text", () => {
+
+          expect(clearLink).not.toBeNull();
+          expect(clearLink.textContent.trim()).toEqual('Clear selection');
+
+        });
+
+        test("clicking the link clears the selection", () => {
+
+          helpers.triggerEvent(clearLink, 'click');
+
+          const checkedCheckboxes = Array.from(EmailBrandingOptionsCheckboxes).filter(checkbox => checkbox.checked);
+
+          expect(checkedCheckboxes.length === 0).toBe(true);
+
+        });
+
+        test("clicking the link moves focus to first checkbox", () => {
+
+          helpers.triggerEvent(clearLink, 'click');
+
+          const firstCheckbox = EmailBrandingOptionsCheckboxes[0];
+
+          expect(document.activeElement).toBe(firstCheckbox);
+
+        });
+
+      });
+
+      // describe("Selection counter", () => {
+      //
+      //   let visibleCounterText;
+      //   let hiddenCounterText;
+      //
+      //   beforeEach(() => {
+      //
+      //     visibleCounterText = getVisibleCounter().textContent.trim();
+      //     hiddenCounterText = getHiddenCounter().textContent.trim();
+      //
+      //   });
+      //
+      //   test("the content of both visible and hidden counters should match", () => {
+      //
+      //     expect(visibleCounterText).toEqual(hiddenCounterText);
+      //
+      //   });
+      //
+      //   test("the content of the counter should reflect the selection", () => {
+      //
+      //     expect(visibleCounterText).toEqual('1 template, 1 folder selected');
+      //
+      //   });
+      //
+      // });
+
+   });
   });
-//
 })
