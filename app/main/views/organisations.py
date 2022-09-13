@@ -17,10 +17,10 @@ from app import (
 )
 from app.main import main
 from app.main.forms import (
+    AddEmailBrandingOptionsForm,
     AddGPOrganisationForm,
     AddNHSLocalOrganisationForm,
     AdminBillingDetailsForm,
-    AddEmailBrandingOptionsForm,
     AdminNewOrganisationForm,
     AdminNotesForm,
     AdminOrganisationDomainsForm,

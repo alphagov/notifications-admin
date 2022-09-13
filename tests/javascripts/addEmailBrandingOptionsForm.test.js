@@ -2,19 +2,13 @@
 
 beforeAll(() => {
   require('../../app/assets/javascripts/addEmailBrandingOptionsForm.js');
-
-  // plug JSDOM's lack of support for window.scrollTo
-  window.scrollTo = () => {};
 });
 
 afterAll(() => {
   require('./support/teardown.js');
-
-  // tidy up
-  delete window.scrollTo;
 });
 
-describe('TemplateFolderForm', () => {
+describe('AddEmailBrandingOptionsForm', () => {
 
   let addEmailBrandingOptionsForm;
   let formControls;
@@ -131,6 +125,13 @@ describe('TemplateFolderForm', () => {
 
         expect(visibleCounter.textContent.trim()).toEqual(hiddenCounter.textContent.trim());
       });
+
+      test("the content of the counter should reflect the selection", () => {
+
+        expect(visibleCounter.textContent.trim()).toEqual('Nothing selected');
+
+      });
+
     });
 
     describe("When some branding options are selected", () => {
