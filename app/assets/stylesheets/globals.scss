@@ -60,10 +60,14 @@ input[type="search"]::-webkit-search-decoration {
 
 // Global styles for form controls
 
+// TODO: remove these styles once the text areas and radio buttons are using GOV.UK Frontend
+//
+// This is the focus colour from GOV.UK Frontend ($govuk-focus-colour).
+// We can't use the colour variable from GOV.UK Frontend, since this file is
+// above GOV.UK Frontend in the cascade.
 input:focus,
 textarea:focus,
-select:focus
 {
-  outline: 3px solid $focus-colour;
+  outline: 3px solid #FFDD00;
   outline-offset: 0;
 }
