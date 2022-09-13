@@ -190,31 +190,31 @@ describe('TemplateFolderForm', () => {
 
       });
 
-      // describe("Selection counter", () => {
-      //
-      //   let visibleCounterText;
-      //   let hiddenCounterText;
-      //
-      //   beforeEach(() => {
-      //
-      //     visibleCounterText = getVisibleCounter().textContent.trim();
-      //     hiddenCounterText = getHiddenCounter().textContent.trim();
-      //
-      //   });
-      //
-      //   test("the content of both visible and hidden counters should match", () => {
-      //
-      //     expect(visibleCounterText).toEqual(hiddenCounterText);
-      //
-      //   });
-      //
-      //   test("the content of the counter should reflect the selection", () => {
-      //
-      //     expect(visibleCounterText).toEqual('1 template, 1 folder selected');
-      //
-      //   });
-      //
-      // });
+      describe("Selection counter", () => {
+
+        let visibleCounterText;
+        let hiddenCounterText;
+
+        beforeEach(() => {
+
+          visibleCounterText = getVisibleCounter().textContent.trim();
+          hiddenCounterText = getHiddenCounter().textContent.trim();
+
+        });
+
+        test("the content of both visible and hidden counters should match", () => {
+
+          expect(visibleCounterText).toEqual(hiddenCounterText);
+
+        });
+
+        test("the content of the counter should reflect the selection", () => {
+
+          expect(visibleCounterText).toEqual('2 options selected');
+
+        });
+
+      });
 
    });
   });
