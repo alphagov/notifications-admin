@@ -32,7 +32,7 @@ table {
     // Allow a qualifying element, only table data cells should use tabular numbers
     // scss-lint:disable QualifyingElement
     td.numeric {
-      font-family: $toolkit-font-stack-tabular;
+      @include govuk-font(19, $tabular: true);
     }
 
     caption {
