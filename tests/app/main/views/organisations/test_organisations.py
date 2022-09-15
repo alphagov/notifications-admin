@@ -1876,6 +1876,40 @@ def test_post_organisation_email_branding_page_with_remove_param(
     ]
 
 
+def test_should_set_branding_for_organisation(
+        client_request,
+        platform_admin_user,
+        organisation_one,
+        mock_get_organisation,
+        mock_get_organisation_services,
+        mock_update_service,
+        mock_update_organisation,
+        mock_get_all_email_branding,
+        mock_get_email_branding_pool
+):
+    org_id = ORGANISATION_ID
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.organisation_preview_email_branding',
+        _data={
+            'branding_style': "132",
+        },
+        org_id=org_id,
+        _follow_redirects=True
+    )
+
+    assert 'Settings' in normalize_spaces(page.find('title').text)
+    mock_update_organisation.assert_called_once_with(
+        org_id,
+        email_branding_id="132",
+        cached_service_ids=[
+            '12345',
+            '67890',
+            '596364a0-858e-42c8-9062-a8fe822260eb',
+        ],
+    )
+
+
 def test_add_organisation_email_branding_options_is_platform_admin_only(
     client_request,
     organisation_one,

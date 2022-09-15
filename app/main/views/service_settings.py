@@ -1004,17 +1004,11 @@ def service_set_email_branding(service_id):
     )
 
     if form.validate_on_submit():
-        email_branding_name = form.data
-        if current_service.organisation:
-            return redirect(url_for(
-                '.service_preview_email_branding',
-                service_id=service_id,
-                branding_style=form.branding_style.data,
-            ))
-        else:
-            message = f"The email branding has been set to {email_branding_name}"
-            flash(message, 'default-with-tick')
-            return redirect(url_for('.service_settings', service_id=service_id))
+        return redirect(url_for(
+            '.service_preview_email_branding',
+            service_id=service_id,
+            branding_style=form.branding_style.data,
+        ))
 
     return render_template(
         'views/service-settings/set-email-branding.html',
@@ -1042,10 +1036,10 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
     form = AdminSetEmailBrandingAddToBrandingPoolStepForm(**data)
 
     if form.validate_on_submit():
-        choice = form.choice_option.data
+        add_to_pool = form.add_to_pool.data
         # If the platform admin chose "yes" the branding is added to the organisation's
         # branding pool
-        if choice == "yes":
+        if add_to_pool == "yes":
             email_branding_ids = [email_branding_id]
             organisations_client.add_brandings_to_email_branding_pool(org_id,
                                                                       email_branding_ids)
@@ -1078,9 +1072,12 @@ def service_preview_email_branding(service_id):
         )
         # in addition to updating the email branding we want the option of adding it to the
         # email branding pool if desirable
-        return redirect(url_for('main.service_set_email_branding_add_to_branding_pool_step',
-                                service_id=service_id,
-                                email_branding_id=email_branding_id))
+        if current_service.organisation:
+            return redirect(url_for('main.service_set_email_branding_add_to_branding_pool_step',
+                                    service_id=service_id,
+                                    email_branding_id=email_branding_id))
+        else:
+            return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
         'views/service-settings/preview-email-branding.html',
