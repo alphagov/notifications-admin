@@ -2,7 +2,6 @@ from collections import OrderedDict
 from datetime import datetime
 
 from flask import (
-    Markup,
     abort,
     current_app,
     flash,
@@ -1005,11 +1004,17 @@ def service_set_email_branding(service_id):
     )
 
     if form.validate_on_submit():
-        return redirect(url_for(
-            '.service_preview_email_branding',
-            service_id=service_id,
-            branding_style=form.branding_style.data,
-        ))
+        email_branding_name = form.data
+        if current_service.organisation:
+            return redirect(url_for(
+                '.service_preview_email_branding',
+                service_id=service_id,
+                branding_style=form.branding_style.data,
+            ))
+        else:
+            message = f"The email branding has been set to {email_branding_name}"
+            flash(message, 'default-with-tick')
+            return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
         'views/service-settings/set-email-branding.html',
@@ -1028,30 +1033,13 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
     org_name = current_service.organisation.name
     org_id = current_service.organisation.id
     service_name = current_service.name
-
-    form = AdminSetEmailBrandingAddToBrandingPoolStepForm()
-    form.choice_option.choices = [
-        ('yes', 'Yes'),
-        ('no', 'No')
-    ]
-
-    # For clarity we are going to add some hints to the choices "Yes or No"
-    form.choice_option.param_extensions = {'items': [{}, {}]}
-    form.choice_option.param_extensions['items'][0] = {
-        'hint': {
-                'html': Markup(
-                    f"<p>Apply this branding to {service_name}<p>"
-                    f"<p>Let other {org_name} teams apply this branding themselves<p>")
-
-            }
+    data = {
+        'org_name': org_name,
+        'service_name': service_name,
+        'branding_name': email_branding_name
     }
-    form.choice_option.param_extensions['items'][1] = {
-        'hint': {
-            'html': Markup(
-                f"Only apply this branding to {service_name}")
 
-        }
-    }
+    form = AdminSetEmailBrandingAddToBrandingPoolStepForm(**data)
 
     if form.validate_on_submit():
         choice = form.choice_option.data

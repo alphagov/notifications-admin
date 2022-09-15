@@ -5,10 +5,11 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% set page_title = "Apply {} branding".format(email_branding_name) %}
-{% set  page_blurb = "Should other teams in {} have the option of this branding?".format(org_name) %}
+{% set  page_blurb = "Should other teams in {} have the option using the {} branding?".format(org_name,
+email_branding_name) %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.service_settings', service_id=current_service.id) }) }}
+  {{ govukBackLink({ "href": url_for('.service_set_email_branding', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block service_page_title %}
