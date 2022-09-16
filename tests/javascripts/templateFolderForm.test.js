@@ -224,7 +224,7 @@ describe('TemplateFolderForm', () => {
   };
 
   function getVisibleCounter () {
-    return formControls.querySelector('.template-list-selected-counter__count');
+    return formControls.querySelector('.checkbox-list-selected-counter__count');
   };
 
   function getHiddenCounter () {

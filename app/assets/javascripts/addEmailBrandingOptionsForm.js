@@ -55,7 +55,7 @@
         'nonvisualText': "selection"
       });
 
-      state.$el.find('.template-list-selected-counter').append($clear);
+      state.$el.find('.checkbox-list-selected-counter').append($clear);
     };
 
     this.makeButton = (text, opts) => {
@@ -115,7 +115,7 @@
       'update': numSelected => {
         let message = (numSelected.options > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
 
-        $('.template-list-selected-counter__count').html(message);
+        $('.checkbox-list-selected-counter__count').html(message);
         this.$liveRegionCounter.html(message);
       }
     };
@@ -158,8 +158,8 @@
 
     this.nothingSelectedHint = $(`
       <div id="nothing_selected">
-        <div class="template-list-selected-counter">
-          <span class="template-list-selected-counter__count" aria-hidden="true">
+        <div class="checkbox-list-selected-counter">
+          <span class="checkbox-list-selected-counter__count" aria-hidden="true">
             ${this.selectionStatus.default}
           </span>
         </div>
@@ -168,8 +168,8 @@
 
     this.itemsSelectedHint = $(`
       <div id="items_selected">
-        <div class="template-list-selected-counter">
-          <span class="template-list-selected-counter__count" aria-hidden="true">
+        <div class="checkbox-list-selected-counter">
+          <span class="checkbox-list-selected-counter__count" aria-hidden="true">
             ${this.selectionStatus.selected(1)}
           </span>
         </div>
