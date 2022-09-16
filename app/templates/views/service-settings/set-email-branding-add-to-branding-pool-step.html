@@ -5,7 +5,7 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% set page_title = "Apply {} branding".format(email_branding_name) %}
-{% set  page_blurb = "Should other teams in {} have the option using the {} branding?".format(org_name,
+{% set  page_blurb = "Should other teams in {} have the option of using the {} branding?".format(org_name,
 email_branding_name) %}
 
 {% block backLink %}
@@ -24,7 +24,7 @@ email_branding_name) %}
     <div class="govuk-grid-column-five-sixths">
     {{ page_blurb }}
       {% call form_wrapper() %}
-        {{ form.choice_option }}
+        {{ form.add_to_pool }}
         {{ page_footer('Continue') }}
       {% endcall %}
     </div>
