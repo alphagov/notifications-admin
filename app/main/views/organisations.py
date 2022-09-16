@@ -1,10 +1,12 @@
 from collections import OrderedDict
 from datetime import datetime
 from functools import partial
+from typing import Optional
 
 from flask import flash, redirect, render_template, request, send_file, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
+from werkzeug import Response
 from werkzeug.exceptions import abort
 
 from app import (
@@ -447,6 +449,29 @@ def organisation_preview_email_branding(org_id):
     )
 
 
+def __handle_remove_branding(remove_branding_id) -> Optional[Response]:
+    try:
+        remove_branding = next(
+            filter(lambda x: x['id'] == remove_branding_id, current_organisation.email_branding_pool)
+        )
+    except StopIteration:
+        abort(400, f'Invalid email branding ID {remove_branding_id} for {current_organisation}')
+
+    if request.method == 'POST':
+        organisations_client.remove_email_branding_from_pool(
+            current_organisation.id,
+            remove_branding_id
+        )
+        flash(f'Email branding ‘{remove_branding["name"]}’ removed.', 'default_with_tick')
+        return redirect(url_for('main.organisation_email_branding', org_id=current_organisation.id))
+
+    else:
+        flash(
+            f'Are you sure you want to remove the email brand ‘{remove_branding["name"]}’?',
+            'delete',
+        )
+
+
 @main.route("/organisations/<uuid:org_id>/settings/email-branding", methods=['GET', 'POST'])
 @user_is_platform_admin
 def organisation_email_branding(org_id):
@@ -458,26 +483,8 @@ def organisation_email_branding(org_id):
 
     remove_branding_id = request.args.get('remove_branding_id')
     if remove_branding_id:
-        try:
-            remove_branding = next(
-                filter(lambda x: x['id'] == remove_branding_id, current_organisation.email_branding_pool)
-            )
-        except StopIteration:
-            abort(400, f'Invalid email branding ID {remove_branding_id} for {current_organisation}')
-
-        if request.method == 'POST':
-            organisations_client.remove_email_branding_from_pool(
-                current_organisation.id,
-                remove_branding_id
-            )
-            flash(f'Email branding ‘{remove_branding["name"]}’ removed.', 'default_with_tick')
-            return redirect(url_for('main.organisation_email_branding', org_id=current_organisation.id))
-
-        else:
-            flash(
-                f'Are you sure you want to remove the email brand ‘{remove_branding["name"]}’?',
-                'delete',
-            )
+        if response := __handle_remove_branding(remove_branding_id):
+            return response
 
     return render_template(
         'views/organisations/organisation/settings/email-branding-options.html',
