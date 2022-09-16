@@ -45,6 +45,7 @@ from app.main.forms import (
     AdminServiceMessageLimitForm,
     AdminServiceRateLimitForm,
     AdminServiceSMSAllowanceForm,
+    AdminSetEmailBrandingAddToBrandingPoolStepForm,
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     AdminSetOrganisationForm,
@@ -1016,18 +1017,67 @@ def service_set_email_branding(service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/service-settings/set-email-branding/add_to_branding_pool_step", methods=[
+    'GET', 'POST'])
+@user_is_platform_admin
+def service_set_email_branding_add_to_branding_pool_step(service_id):
+    email_branding_id = request.args.get('email_branding_id')
+    email_branding = email_branding_client.get_email_branding(email_branding_id)['email_branding']
+    email_branding_name = email_branding['name']
+    org_name = current_service.organisation.name
+    org_id = current_service.organisation.id
+    service_name = current_service.name
+    data = {
+        'org_name': org_name,
+        'service_name': service_name,
+        'branding_name': email_branding_name
+    }
+
+    form = AdminSetEmailBrandingAddToBrandingPoolStepForm(**data)
+
+    if form.validate_on_submit():
+        add_to_pool = form.add_to_pool.data
+        # If the platform admin chose "yes" the branding is added to the organisation's
+        # branding pool
+        if add_to_pool == "yes":
+            email_branding_ids = [email_branding_id]
+            organisations_client.add_brandings_to_email_branding_pool(org_id,
+                                                                      email_branding_ids)
+            message = f"The email branding has been set to {email_branding_name} and it has been " \
+                      f"added to {org_name}'s email branding pool"
+
+        else:
+            message = f"The email branding has been set to {email_branding_name}"
+        flash(message, 'default_with_tick')
+        return redirect(url_for('.service_settings', service_id=service_id))
+
+    return render_template(
+        'views/service-settings/set-email-branding-add-to-branding-pool-step.html',
+        form=form,
+        email_branding_name=email_branding_name,
+        org_name=org_name
+    )
+
+
 @main.route("/services/<uuid:service_id>/service-settings/preview-email-branding", methods=['GET', 'POST'])
 @user_is_platform_admin
 def service_preview_email_branding(service_id):
     branding_style = request.args.get('branding_style', None)
 
     form = AdminPreviewBrandingForm(branding_style=branding_style)
-
+    email_branding_id = form.branding_style.data
     if form.validate_on_submit():
         current_service.update(
-            email_branding=form.branding_style.data
+            email_branding=email_branding_id
         )
-        return redirect(url_for('.service_settings', service_id=service_id))
+        # in addition to updating the email branding we want the option of adding it to the
+        # email branding pool if desirable
+        if current_service.organisation:
+            return redirect(url_for('main.service_set_email_branding_add_to_branding_pool_step',
+                                    service_id=service_id,
+                                    email_branding_id=email_branding_id))
+        else:
+            return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
         'views/service-settings/preview-email-branding.html',

@@ -3679,70 +3679,170 @@ def test_should_preview_email_branding(
     assert iframeQString['branding_style'] == ['1']
 
 
-@pytest.mark.parametrize('posted_value, submitted_value', (
-    ('1', '1'),
-    ('__NONE__', None),
-    pytest.param('None', None, marks=pytest.mark.xfail(raises=AssertionError)),
-))
-@pytest.mark.parametrize('endpoint, extra_args, expected_redirect', (
-    (
-        'main.service_preview_email_branding',
-        {'service_id': SERVICE_ONE_ID},
-        'main.service_settings',
-    ),
-    (
-        'main.organisation_preview_email_branding',
-        {'org_id': ORGANISATION_ID},
-        'main.organisation_settings',
-    ),
-))
-def test_should_set_branding_and_organisations(
+def test_should_set_branding_for_service_with_organisation(
+    mocker,
     client_request,
     platform_admin_user,
     service_one,
+    organisation_one,
     mock_get_organisation,
     mock_get_organisation_services,
     mock_update_service,
     mock_update_organisation,
-    posted_value,
-    submitted_value,
-    endpoint,
-    extra_args,
-    expected_redirect,
+    single_reply_to_email_address,
+    single_sms_sender,
+    mock_get_free_sms_fragment_limit,
+    mock_get_service_data_retention
 ):
+    service_one['organisation'] = organisation_one
+    service_id = SERVICE_ONE_ID
+    email_branding_id = '174'
+    email_branding_name = 'branding1'
+
+    mocker.patch('app.email_branding_client.get_email_branding',
+                 return_value={'email_branding': {'name': email_branding_name}}
+                 )
+
+    mocker.patch('app.organisations_client.get_organisation',
+                 return_value=organisation_one)
+
     client_request.login(platform_admin_user)
-    client_request.post(
-        endpoint,
+    page = client_request.post(
+        'main.service_preview_email_branding',
         _data={
-            'branding_style': posted_value
+            'branding_style': email_branding_id
         },
-        _expected_status=302,
-        _expected_redirect=url_for(
-            expected_redirect,
-            **extra_args
-        ),
-        **extra_args
+        service_id=service_id,
+        _follow_redirects=True,
     )
 
-    if endpoint == 'main.service_preview_email_branding':
-        mock_update_service.assert_called_once_with(
-            SERVICE_ONE_ID,
-            email_branding=submitted_value,
-        )
-        assert mock_update_organisation.called is False
-    elif endpoint == 'main.organisation_preview_email_branding':
-        mock_update_organisation.assert_called_once_with(
-            ORGANISATION_ID,
-            email_branding_id=submitted_value,
-            cached_service_ids=[
-                '12345',
-                '67890',
-                '596364a0-858e-42c8-9062-a8fe822260eb',
-            ],
-        )
-        assert mock_update_service.called is False
-    else:
-        raise Exception
+    assert normalize_spaces(page.find('h1').text) == f"Apply {email_branding_name} branding"
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        email_branding=email_branding_id,
+    )
+
+
+def test_should_set_branding_for_service_with_no_organisation(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_update_service,
+    mock_update_organisation,
+    single_reply_to_email_address,
+    single_sms_sender,
+    mock_get_free_sms_fragment_limit,
+    mock_get_service_data_retention
+):
+    service_id = SERVICE_ONE_ID
+    email_branding_id = '174'
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        'main.service_preview_email_branding',
+        _data={
+            'branding_style': email_branding_id
+        },
+        service_id=service_id,
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.find('h1').text) == 'Settings'
+
+
+def test_get_service_set_email_branding_add_to_branding_pool_step(
+    mocker,
+    client_request,
+    platform_admin_user,
+    service_one,
+    organisation_one
+):
+    service_one['organisation'] = organisation_one
+    client_request.login(platform_admin_user)
+    email_branding_id = '234'
+    email_branding_name = 'branding1'
+    mocker.patch('app.email_branding_client.get_email_branding',
+                 return_value={'email_branding': {'name': email_branding_name}}
+                 )
+    mocker.patch('app.organisations_client.get_organisation',
+                 return_value=organisation_one
+                 )
+
+    page = client_request.get('main.service_set_email_branding_add_to_branding_pool_step',
+                              _expected_status=200,
+                              service_id=SERVICE_ONE_ID,
+                              email_branding_id=email_branding_id)
+    assert f"Apply {email_branding_name} branding" in normalize_spaces(page.find('title').text)
+
+
+def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_only(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one
+
+):
+    service_one['organisation'] = organisation_one
+    email_branding_id = '234'
+    email_branding_name = 'branding1'
+    mocker.patch('app.email_branding_client.get_email_branding',
+                 return_value={'email_branding': {'name': email_branding_name}})
+    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+    mocker.patch('app.main.forms.AdminSetEmailBrandingAddToBrandingPoolStepForm',
+                 return_value=None)
+    client_request.get('main.service_set_email_branding_add_to_branding_pool_step',
+                       _expected_status=403,
+                       service_id=SERVICE_ONE_ID,
+                       email_branding_id=email_branding_id)
+
+
+@pytest.mark.parametrize('add_to_pool', ['yes', 'no'])
+def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
+    mocker,
+    client_request,
+    platform_admin_user,
+    service_one,
+    organisation_one,
+    add_to_pool,
+    single_reply_to_email_address,
+    single_sms_sender,
+    mock_get_free_sms_fragment_limit,
+    mock_get_service_data_retention
+):
+
+    client_request.login(platform_admin_user)
+    service_one['organisation'] = organisation_one
+    email_branding_id = '234'
+    email_branding_name = 'branding_1'
+
+    mocker.patch('app.email_branding_client.get_email_branding',
+                 return_value={'email_branding': {'name': email_branding_name}}
+                 )
+    mocker.patch('app.organisations_client.get_organisation',
+                 return_value=organisation_one
+                 )
+    mock_add_to_branding_pool = \
+        mocker.patch('app.organisations_client.add_brandings_to_email_branding_pool',
+                     return_value=None)
+
+    page = client_request.post('main.service_set_email_branding_add_to_branding_pool_step',
+                               _data={'add_to_pool': add_to_pool},
+                               service_id=SERVICE_ONE_ID,
+                               email_branding_id=email_branding_id,
+                               _follow_redirects=True)
+
+    if add_to_pool == 'yes':
+        mock_add_to_branding_pool.assert_called_with(organisation_one['id'], [email_branding_id])
+        assert normalize_spaces(
+            page.find('div', class_='banner-default-with-tick').text
+        ) == f"The email branding has been set to {email_branding_name} " \
+             f"and it has been added to {organisation_one['name']}'s email branding pool"
+
+    elif add_to_pool == 'no':
+        mock_add_to_branding_pool.assert_not_called()
+        assert normalize_spaces(
+            page.find('div', class_='banner-default-with-tick').text
+        ) == f"The email branding has been set to {email_branding_name}"
 
 
 @pytest.mark.parametrize('method', ['get', 'post'])
