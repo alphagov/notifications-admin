@@ -1964,11 +1964,15 @@ class AddEmailBrandingOptionsForm(StripWhitespaceForm):
 
 
 class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self,
+        *args,
+        org_name,
+        service_name,
+        branding_name,
+        **kwargs
+    ):
         super().__init__(*args, **kwargs)
-        org_name = kwargs['org_name']
-        service_name = kwargs['service_name']
-        branding_name = kwargs['branding_name']
         self.add_to_pool.label.text = (
             f'Should other teams in {org_name} have the option of using '
             f'the {branding_name} branding?'
