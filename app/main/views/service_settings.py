@@ -1017,7 +1017,7 @@ def service_set_email_branding(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-email-branding/add_to_branding_pool_step", methods=[
+@main.route("/services/<uuid:service_id>/service-settings/set-email-branding/add-to-branding-pool-step", methods=[
     'GET', 'POST'])
 @user_is_platform_admin
 def service_set_email_branding_add_to_branding_pool_step(service_id):
