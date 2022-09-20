@@ -143,7 +143,7 @@
         'nonvisualText': "selection"
       });
 
-      state.$el.find('.template-list-selected-counter').append($clear);
+      state.$el.find('.checkbox-list-selected-counter').append($clear);
     };
 
     this.makeButton = (text, opts) => {
@@ -229,7 +229,7 @@
       'update': numSelected => {
         let message = (numSelected.total > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
 
-        $('.template-list-selected-counter__count').html(message);
+        $('.checkbox-list-selected-counter__count').html(message);
         this.$liveRegionCounter.html(message);
       }
     };
@@ -251,7 +251,7 @@
 
       this.selectionStatus.update(numSelected);
 
-      $('.template-list-selected-counter').toggle(this.hasCheckboxes());
+      $('.checkbox-list-selected-counter').toggle(this.hasCheckboxes());
 
     };
 
@@ -303,8 +303,8 @@
             New template
           </button>
           <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="add-new-folder" aria-expanded="false">New folder</button>
-          <div class="template-list-selected-counter">
-            <span class="template-list-selected-counter__count" aria-hidden="true">
+          <div class="checkbox-list-selected-counter">
+            <span class="checkbox-list-selected-counter__count" aria-hidden="true">
               ${this.selectionStatus.default}
             </span>
           </div>
@@ -319,8 +319,8 @@
             Move<span class="govuk-visually-hidden"> selection to folder</span>
           </button>
           <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="move-to-new-folder" aria-expanded="false">Add to new folder</button>
-          <div class="template-list-selected-counter" aria-hidden="true">
-            <span class="template-list-selected-counter__count" aria-hidden="true">
+          <div class="checkbox-list-selected-counter" aria-hidden="true">
+            <span class="checkbox-list-selected-counter__count" aria-hidden="true">
               ${this.selectionStatus.selected(1)}
             </span>
           </div>

@@ -199,7 +199,9 @@ a {
     color: $secondary-text-colour;
     padding: govuk-spacing(3) 0 govuk-spacing(2) 0;
   }
+}
 
+.checkbox-list {
   &-selected-counter {
     color: $secondary-text-colour;
     margin: govuk-spacing(3) 0;
@@ -214,9 +216,7 @@ a {
     .content-fixed__bottom & {
       right: govuk-spacing(3);
     }
-
   }
-
 }
 
 .sticky-template-form {

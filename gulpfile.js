@@ -177,6 +177,7 @@ const javascripts = () => {
     paths.src + 'javascripts/previewPane.js',
     paths.src + 'javascripts/colourPreview.js',
     paths.src + 'javascripts/templateFolderForm.js',
+    paths.src + 'javascripts/addEmailBrandingOptionsForm.js',
     paths.src + 'javascripts/collapsibleCheckboxes.js',
     paths.src + 'javascripts/radioSlider.js',
     paths.src + 'javascripts/registerSecurityKey.js',
