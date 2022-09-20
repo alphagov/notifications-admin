@@ -1981,13 +1981,17 @@ class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
         self.add_to_pool.param_extensions = {'items': [{'hint': {'html': ''}},
                                                        {'hint': {'html': ''}}]
                                              }
-        self.add_to_pool.param_extensions['items'][0]['hint']['html'] = Markup(
-            f'''
-                   Apply branding to {service_name}. <br>
-                   Let other {org_name} teams apply this branding themselves
-                ''')
-        self.add_to_pool.param_extensions['items'][1]['hint']['html'] = Markup(
-            f"Only apply branding to {service_name}")
+        self.add_to_pool.param_extensions['items'][0]['hint']['html'] = Markup(f'''
+            <ul class="govuk-list govuk-hint">
+                <li>Apply branding to {service_name}</li>
+                <li>Let other {org_name} teams apply this branding themselves</li>
+            </ul>
+        ''')
+        self.add_to_pool.param_extensions['items'][1]['hint']['html'] = Markup(f'''
+            <ul class="govuk-list govuk-hint">
+                <li>Only apply branding to {service_name}</li>
+            </ul>
+        ''')
 
     add_to_pool = GovukRadiosField(
         choices=[
