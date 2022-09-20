@@ -1978,10 +1978,17 @@ class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
         )
 
         self.add_to_pool.param_extensions = {
+            'fieldset': {
+                'legend': {
+                    # This removes the `govuk-fieldset__legend--s` class, thereby
+                    # making the form label font regular weight, not bold
+                    'classes': '',
+                },
+            },
             'items': [
                 {'hint': {}},
                 {'hint': {}},
-            ]
+            ],
         }
         self.add_to_pool.param_extensions['items'][0]['hint']['html'] = Markup(f'''
             <ul class="govuk-list govuk-hint">
