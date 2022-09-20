@@ -1055,7 +1055,6 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
         'views/service-settings/set-email-branding-add-to-branding-pool-step.html',
         form=form,
         email_branding_name=email_branding_name,
-        org_name=org_name
     )
 
 

@@ -5,8 +5,6 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% set page_title = "Apply {} branding".format(email_branding_name) %}
-{% set  page_blurb = "Should other teams in {} have the option of using the {} branding?".format(org_name,
-email_branding_name) %}
 
 {% block backLink %}
   {{ govukBackLink({ "href": url_for('.service_set_email_branding', service_id=current_service.id) }) }}
@@ -19,8 +17,6 @@ email_branding_name) %}
 
 {% block maincolumn_content %}
     {{page_header(page_title)}}
-
-    {{ page_blurb }}
 
     {% call form_wrapper() %}
       {{ form.add_to_pool }}

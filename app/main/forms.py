@@ -1968,6 +1968,12 @@ class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         org_name = kwargs['org_name']
         service_name = kwargs['service_name']
+        branding_name = kwargs['branding_name']
+        self.add_to_pool.label.text = (
+            f'Should other teams in {org_name} have the option of using '
+            f'the {branding_name} branding?'
+        )
+
         self.add_to_pool.param_extensions = {'items': [{'hint': {'html': ''}},
                                                        {'hint': {'html': ''}}]
                                              }
