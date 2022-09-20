@@ -58,7 +58,7 @@
 
     white-space: nowrap;
 
-    @include device-pixel-ratio(2) {
+    @include govuk-device-pixel-ratio(2) {
       background-image: file-url('separator-2x.png');
     }
 
