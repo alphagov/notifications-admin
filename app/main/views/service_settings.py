@@ -1029,7 +1029,6 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
     form = AdminSetEmailBrandingAddToBrandingPoolStepForm(
         org_name=current_service.organisation.name,
         service_name=current_service.name,
-        branding_name=email_branding_name,
     )
 
     if form.validate_on_submit():

@@ -1969,13 +1969,12 @@ class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
         *args,
         org_name,
         service_name,
-        branding_name,
         **kwargs
     ):
         super().__init__(*args, **kwargs)
         self.add_to_pool.label.text = (
-            f'Should other teams in {org_name} have the option of using '
-            f'the {branding_name} branding?'
+            f'Should other teams in {org_name} have the option to use '
+            f'this branding?'
         )
 
         self.add_to_pool.param_extensions = {'items': [{'hint': {'html': ''}},
@@ -1983,13 +1982,13 @@ class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
                                              }
         self.add_to_pool.param_extensions['items'][0]['hint']['html'] = Markup(f'''
             <ul class="govuk-list govuk-hint">
-                <li>Apply branding to {service_name}</li>
+                <li>Apply this branding to ‘{service_name}’</li>
                 <li>Let other {org_name} teams apply this branding themselves</li>
             </ul>
         ''')
         self.add_to_pool.param_extensions['items'][1]['hint']['html'] = Markup(f'''
             <ul class="govuk-list govuk-hint">
-                <li>Only apply branding to {service_name}</li>
+                <li>Only apply this branding to ‘{service_name}’</li>
             </ul>
         ''')
 

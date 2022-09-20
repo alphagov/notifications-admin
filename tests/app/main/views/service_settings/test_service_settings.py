@@ -3716,7 +3716,7 @@ def test_should_set_branding_for_service_with_organisation(
         _follow_redirects=True,
     )
 
-    assert normalize_spaces(page.find('h1').text) == f"Apply {email_branding_name} branding"
+    assert normalize_spaces(page.find('h1').text) == f"Apply ‘{email_branding_name}’ branding"
 
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
@@ -3772,7 +3772,7 @@ def test_get_service_set_email_branding_add_to_branding_pool_step(
                               _expected_status=200,
                               service_id=SERVICE_ONE_ID,
                               email_branding_id=email_branding_id)
-    assert f"Apply {email_branding_name} branding" in normalize_spaces(page.find('title').text)
+    assert f"Apply ‘{email_branding_name}’ branding" in normalize_spaces(page.find('title').text)
 
 
 def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_only(
