@@ -1977,8 +1977,8 @@ class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
             f'this branding?'
         )
 
-        self.add_to_pool.param_extensions = {'items': [{'hint': {'html': ''}},
-                                                       {'hint': {'html': ''}}]
+        self.add_to_pool.param_extensions = {'items': [{'hint': {}},
+                                                       {'hint': {}}]
                                              }
         self.add_to_pool.param_extensions['items'][0]['hint']['html'] = Markup(f'''
             <ul class="govuk-list govuk-hint">
