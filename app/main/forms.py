@@ -1991,14 +1991,14 @@ class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
             ],
         }
         self.add_to_pool.param_extensions['items'][0]['hint']['html'] = Markup(f'''
-            <ul class="govuk-list govuk-hint">
+            <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
                 <li>Apply this branding to ‘{service_name}’</li>
-                <li>Let other {org_name} teams apply this branding themselves</li>
+                <li class="govuk-!-margin-bottom-0">Let other {org_name} teams apply this branding themselves</li>
             </ul>
         ''')
         self.add_to_pool.param_extensions['items'][1]['hint']['html'] = Markup(f'''
-            <ul class="govuk-list govuk-hint">
-                <li>Only apply this branding to ‘{service_name}’</li>
+            <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
+                <li class="govuk-!-margin-bottom-0">Only apply this branding to ‘{service_name}’</li>
             </ul>
         ''')
 
