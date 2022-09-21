@@ -30,7 +30,7 @@
 
 .breadcrumbs {
   @include govuk-width-container;
-  @include core-16($line-height: (25 / 16), $line-height-640: 1.75);
+  @include govuk-font(16, $line-height: (25 / 16));
 
   padding: govuk-spacing(2) 0;
   list-style: none;
@@ -58,7 +58,7 @@
 
     white-space: nowrap;
 
-    @include device-pixel-ratio(2) {
+    @include govuk-device-pixel-ratio(2) {
       background-image: file-url('separator-2x.png');
     }
 
@@ -71,7 +71,7 @@
     }
 
     &--active {
-      @include bold-16;
+      @include govuk-font(16, $weight: bold);
 
       a:link,
       a:visited {

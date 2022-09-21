@@ -17,7 +17,7 @@
 
 .spark-bar {
 
-  @include core-16;
+  @include govuk-font(16);
   box-sizing: border-box;
   display: block;
   width: 100%;
@@ -27,7 +27,7 @@
   text-align: left;
 
   &-bar {
-    @include bold-27($tabular-numbers: true);
+    @include govuk-font(27, $weight: bold, $tabular: true);
     box-sizing: border-box;
     display: inline-block;
     overflow: visible;
@@ -94,7 +94,7 @@
   }
 
   &-filename {
-    @include bold-19;
+    @include govuk-font(19, $weight: bold);
     display: block;
     white-space: nowrap;
     overflow: hidden;
@@ -106,7 +106,7 @@
   }
 
   &-filename-large {
-    @include bold-24;
+    @include govuk-font(24, $weight: bold);
     display: block;
     white-space: nowrap;
     overflow: hidden;
@@ -126,11 +126,11 @@
   }
 
   &-filename-unlinked {
-    @include core-19;
+    @include govuk-font(19);
   }
 
   &-hint {
-    @include core-16;
+    @include govuk-font(16);
     display: block;
     color: $secondary-text-colour;
     overflow: hidden;
@@ -140,7 +140,7 @@
   }
 
   &-hint-large {
-    @include core-19;
+    @include govuk-font(19);
     display: block;
     color: $secondary-text-colour;
     overflow: hidden;
@@ -188,7 +188,7 @@
 }
 
 .failure-highlight {
-  @include bold-19;
+  @include govuk-font(19, $weight: bold);
   color: $error-colour;
 }
 

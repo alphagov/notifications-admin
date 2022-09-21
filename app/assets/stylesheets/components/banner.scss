@@ -2,7 +2,7 @@
 .banner,
 .banner-default {
 
-  @include bold-19;
+  @include govuk-font(19, $weight: bold);
   color: $button-colour;
   display: block;
   padding: govuk-spacing(3);
@@ -13,7 +13,7 @@
   border: 5px solid $button-colour;
 
   &-title {
-    @include bold-24;
+    @include govuk-font(24, $weight: bold);
   }
 
   p {
@@ -51,7 +51,7 @@
 .banner-dangerous {
 
   @extend %banner;
-  @include bold-19;
+  @include govuk-font(19, $weight: bold);
   background: $white;
   color: $text-colour;
   border: 5px solid $error-colour;
@@ -94,7 +94,7 @@
   }
 
   .heading-medium {
-    @include core-24;
+    @include govuk-font(24);
   }
 
   p {
@@ -114,7 +114,7 @@
   }
 
   ul {
-    @include core-24;
+    @include govuk-font(24);
     color: $white;
     margin-bottom: govuk-spacing(5);
   }

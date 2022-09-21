@@ -65,7 +65,7 @@ textarea {
   color: $text-colour;
   padding-bottom: 2px;
 
-  @include core-19;
+  @include govuk-font(19);
 }
 
 // 4. Form hints
@@ -73,7 +73,7 @@ textarea {
 
 // Form hints and example text are light grey and sit above a form control
 .form-hint {
-  @include core-19;
+  @include govuk-font(19);
   display: block;
   color: $secondary-text-colour;
   font-weight: normal;
@@ -94,7 +94,7 @@ textarea {
 // and 100% width for mobile
 .form-control {
   @include box-sizing(border-box);
-  @include core-19;
+  @include govuk-font(19);
   width: 100%;
 
   padding: 5px 4px 4px;

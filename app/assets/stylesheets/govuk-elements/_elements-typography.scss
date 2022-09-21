@@ -2,10 +2,10 @@
 // ==========================================================================
 
 // Increase the base font size to 19px for the main content area
-// Using the core-19 mixin from the govuk_toolkit _typography.scss file
+// Using the govuk-font(19) mixin from the design system
 
 main {
-    @include core-19;
+    @include govuk-font(19);
     -webkit-font-smoothing: antialiased;
 }
 
@@ -15,7 +15,7 @@ main {
 
 // Headings
 .heading-large {
-  @include bold-36();
+  @include govuk-font(36, $weight: bold);
 
   margin-top: em(25, 24);
   margin-bottom: em(10, 24);
@@ -25,17 +25,10 @@ main {
     margin-bottom: em(20, 36);
   }
 
-  .heading-secondary {
-    @include heading-24();
-
-    display: block;
-    color: $secondary-text-colour;
-  }
-
 }
 
 .heading-medium {
-  @include bold-24();
+  @include govuk-font(24, $weight: bold);
 
   margin-top: em(25, 20);
   margin-bottom: em(10, 20);
@@ -48,7 +41,7 @@ main {
 }
 
 .heading-small {
-  @include bold-19();
+  @include govuk-font(19, $weight: bold);
 
   margin-top: em(10, 16);
   margin-bottom: em(5, 16);

@@ -8,7 +8,7 @@ table {
 
     th,
     td {
-      @include core-19;
+      @include govuk-font(19);
       padding: em(12, 19) em(20, 19) em(9, 19) 0;
 
       text-align: left;
@@ -32,7 +32,7 @@ table {
     // Allow a qualifying element, only table data cells should use tabular numbers
     // scss-lint:disable QualifyingElement
     td.numeric {
-      font-family: $toolkit-font-stack-tabular;
+      @include govuk-font(19, $tabular: true);
     }
 
     caption {
@@ -43,11 +43,11 @@ table {
   .table-font-xsmall {
 
     th {
-      @include bold-16;
+      @include govuk-font(16, $weight: bold);
     }
 
     td {
-      @include core-16;
+      @include govuk-font(16);
     }
 
     th,

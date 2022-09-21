@@ -10,7 +10,7 @@
     position: relative;
 
     &:before {
-      @include bold-24;
+      @include govuk-font(24, $weight: bold);
       content: counter(get-started-counter) ".";
       position: absolute;
       top: 5px;
@@ -24,7 +24,7 @@
   }
 
   &__heading {
-    @include bold-24;
+    @include govuk-font(24, $weight: bold);
     display: inline-block;
     margin: 5px 0 govuk-spacing(3) 0;
   }
