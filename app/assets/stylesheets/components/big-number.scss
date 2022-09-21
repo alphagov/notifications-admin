@@ -9,11 +9,11 @@
   }
 
   &-number {
-    @include govuk-font(48, $weight: bold, $tabular: true);
+    @include bold-48($tabular-numbers: true);
   }
 
   &-label {
-    @include govuk-font(19);
+    @include core-19;
     padding-bottom: 10px;
   }
 
@@ -38,7 +38,7 @@
   color: $white;
 
   .big-number-number {
-    @include govuk-font(36, $weight: bold, $tabular: true);
+    @include bold-36($tabular-numbers: true);
   }
 }
 
@@ -47,7 +47,7 @@
   @extend %big-number;
 
   .big-number-number {
-    @include govuk-font(36, $weight: bold, $tabular: true);
+    @include bold-36($tabular-numbers: true);
   }
 
 }
@@ -57,7 +57,7 @@
   @extend %big-number;
 
   .big-number-number {
-    @include govuk-font(24, $weight: bold, $tabular: true);
+    @include bold-24($tabular-numbers: true);
   }
 
 }
@@ -139,7 +139,7 @@
   %big-number-status,
   .big-number-status {
 
-    @include govuk-font(19);
+    @include core-19;
     display: block;
     background: $green;
     color: $white;

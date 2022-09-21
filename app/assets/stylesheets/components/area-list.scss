@@ -111,7 +111,7 @@
     }
 
     &--smaller {
-      @include govuk-font(16, $weight: bold);
+      @include bold-16;
     }
 
   }

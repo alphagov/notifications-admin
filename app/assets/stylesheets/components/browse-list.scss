@@ -11,7 +11,7 @@
 
   &-item,
   &-sub-item {
-    @include govuk-font(24, $weight: bold);
+    @include bold-24;
     list-style: none;
     margin-bottom: govuk-spacing(3);
   }
@@ -21,7 +21,7 @@
   }
 
   &-hint {
-    @include govuk-font(19);
+    @include core-19;
     margin: 5px 0 10px 0;
     color: $secondary-text-colour;
   }

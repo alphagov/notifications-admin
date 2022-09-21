@@ -56,6 +56,10 @@ td {
 
 .form-label {
   margin-bottom: 5px;
+
+  &.heading-small {
+    @include bold-19();
+  }
 }
 
 .hint {
@@ -126,13 +130,13 @@ details summary {
 
     th,
     td {
-      @include govuk-font(19);
+      @include core-19;
       word-wrap: break-word;
     }
 
     thead {
       th {
-        @include govuk-font(19, $weight: bold);
+        @include bold-19;
       }
     }
 
@@ -141,7 +145,7 @@ details summary {
 }
 
 .tabular-numbers {
-  @include govuk-font(19, $tabular: true);
+  @include core-19($tabular-numbers: true);
 }
 
 summary::-moz-details-marker {
@@ -167,7 +171,7 @@ details .arrow {
 }
 
 .block-label-hint {
-  @include govuk-font(16);
+  @include core-16;
   margin-top: 5px;
 }
 
@@ -246,4 +250,8 @@ details .arrow {
 
   }
 
+}
+
+input:-webkit-autofill::first-line {
+  @include core-19;
 }

@@ -2,7 +2,7 @@ $item-top-padding: govuk-spacing(3);
 
 .history-list {
 
-  @include govuk-font(19);
+  @include core-19;
   margin-bottom: govuk-spacing(6);
 
   &-item {

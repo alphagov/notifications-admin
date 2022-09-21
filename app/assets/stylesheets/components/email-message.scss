@@ -11,12 +11,12 @@ $email-message-gutter: govuk-spacing(9);
 
   &-meta {
 
-    @include govuk-font(19);
+    @include core-19;
     margin: 0;
 
     td,
     th {
-      @include govuk-font(19);
+      @include core-19;
       border-top: 0;
       border-bottom: 1px solid $border-colour;
       vertical-align: top;

@@ -21,7 +21,7 @@
 
 // Error messages should be red and bold
 .error-message {
-  @include govuk-font(19, $weight: bold);
+  @include bold-19;
   color: $error-colour;
 
 
