@@ -1,6 +1,6 @@
 .notification-status {
 
-  @include govuk-font(16);
+  @include core-16;
   color: $secondary-text-colour;
   margin-top: -1 * govuk-spacing(3);
 
@@ -12,7 +12,7 @@
   }
 
   &-cancelled {
-    @include govuk-font(19, $weight: bold);
+    @include bold-19;
     color: $govuk-error-colour;
   }
 

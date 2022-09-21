@@ -5,7 +5,7 @@
   display: flex;
 
   &__name {
-    @include govuk-font(19, $weight: bold);
+    @include bold-19;
     margin-bottom: 5px;
   }
 

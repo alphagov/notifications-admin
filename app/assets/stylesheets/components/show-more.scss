@@ -1,7 +1,7 @@
 %show-more,
 .show-more {
 
-  @include govuk-font(16);
+  @include core-16;
   display: block;
   padding: 0 0;
   margin: govuk-spacing(3) 0 govuk-spacing(3) 0;

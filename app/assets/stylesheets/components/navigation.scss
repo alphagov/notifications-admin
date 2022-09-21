@@ -20,7 +20,7 @@
 
   &-service-type {
 
-    @include govuk-font(16, $weight: bold);
+    @include bold-16;
     position: relative;
     display: inline-block;
     margin-left: govuk-spacing(2);
@@ -176,7 +176,7 @@
     }
 
     &.selected {
-      @include govuk-font(19, $weight: bold);
+      @include bold-19;
       position: relative;
       // These two lines stop the width of the item jumping so much
       // between selected and unselected states
@@ -208,7 +208,7 @@
   }
 
   &__item {
-    @include govuk-font(16);
+    @include core-16;
 
     border-bottom: 1px $grey-3 solid;
     display: block;
@@ -234,7 +234,7 @@
   }
 
   &__item--active {
-    @include govuk-font(16, $weight: bold);
+    @include bold-16;
 
     a:link, a:visited {
       color: $text-colour;

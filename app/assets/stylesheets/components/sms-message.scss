@@ -49,19 +49,19 @@ $tail-angle: 20deg;
 }
 
 .sms-message-sender {
-  @extend %govuk-body-m;
+  @include copy-19;
   color: $secondary-text-colour;
   margin: 0 0 -10px 0;
 }
 
 .sms-message-recipient {
-  @extend %govuk-body-m;
+  @include copy-19;
   color: $secondary-text-colour;
   margin: 10px 0 0 0;
 }
 
 .sms-message-status {
-  @include govuk-font(16);
+  @include core-16;
   color: $secondary-text-colour;
   margin: -20px govuk-spacing(3) 20px govuk-spacing(3);
 }

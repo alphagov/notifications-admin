@@ -62,7 +62,7 @@
 }
 
 .extra-tracking .govuk-input {
-  @include govuk-font(19, $tabular: true);
+  @include core-19($tabular-numbers: true);
   padding-left: 5px;
   letter-spacing: 0.04em;
 }

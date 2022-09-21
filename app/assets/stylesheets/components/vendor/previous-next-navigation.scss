@@ -42,7 +42,7 @@ $is-ie: false !default;
   }
 
   li {
-    @include govuk-font(16, $line-height: (25 / 16));
+    @include core-16($line-height: (20 / 16));
     float: left;
     list-style: none;
     text-align: right;
@@ -64,7 +64,7 @@ $is-ie: false !default;
       }
 
       .pagination-part-title {
-        @include govuk-font(27, $line-height: (33.75 / 27));
+        @include core-27($line-height: (33.75 / 27));
         display: block;
       }
     }
