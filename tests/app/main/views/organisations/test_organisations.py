@@ -3,6 +3,7 @@ from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
+from app import Organisation
 from tests import organisation_json, service_json
 from tests.app.main.views.test_agreement import MockS3Object
 from tests.conftest import (
@@ -1747,7 +1748,7 @@ def test_organisation_email_branding_page_shows_all_branding_pool_options(
         normalize_spaces(heading.text) for heading in page.select('.govuk-heading-s')
             ) == expected_branding_options
 
-    add_options_button = page.select_one('.govuk-button--secondary')
+    add_options_button = page.select('.govuk-button--secondary')[-1]
     assert normalize_spaces(add_options_button.text) == 'Add branding options'
     assert add_options_button.attrs["href"] == url_for(
         '.add_organisation_email_branding_options', org_id=organisation_one['id']
@@ -1865,7 +1866,7 @@ def test_post_organisation_email_branding_page_with_remove_param(
 
     client_request.login(platform_admin_user)
 
-    client_request.post(
+    response = client_request.post_response(
         '.organisation_email_branding',
         org_id=organisation_one['id'],
         remove_branding_id='email-branding-1-id',
@@ -1873,6 +1874,267 @@ def test_post_organisation_email_branding_page_with_remove_param(
 
     assert remove_mock.call_args_list == [
         mocker.call('c011fa40-4cbe-4524-b415-dde2f421bd9c', 'email-branding-1-id')
+    ]
+
+    page = client_request.get_url(response.location)
+    assert "Email branding ‘Email branding name 1’ removed." in page.text
+
+
+def test_remove_org_email_branding_from_pool_invalid_brand_id(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=None,
+        )
+    )
+    remove_mock = mocker.patch(
+        'app.organisations_client.remove_email_branding_from_pool',
+        return_value=None
+    )
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        '.organisation_email_branding',
+        org_id=organisation_one['id'],
+        remove_branding_id='bad-email-branding-id',
+        _expected_status=400
+    )
+
+    assert remove_mock.call_args_list == []
+
+
+@pytest.mark.parametrize(
+    'organisation_type, should_be_available',
+    (
+        (Organisation.TYPE_CENTRAL, True),
+        (Organisation.TYPE_LOCAL, False),
+        (Organisation.TYPE_NHS_CENTRAL, False),
+        (Organisation.TYPE_NHS_LOCAL, False),
+        (Organisation.TYPE_NHS_GP, False),
+        (Organisation.TYPE_EMERGENCY_SERVICE, False),
+        (Organisation.TYPE_SCHOOL_OR_COLLEGE, False),
+        (Organisation.TYPE_OTHER, False),
+    )
+)
+def test_reset_org_email_branding_to_govuk_only_for_central_government(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+    organisation_type,
+    should_be_available,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id='email-branding-1-id',
+            organisation_type=organisation_type,
+        )
+    )
+    mocker.patch(
+        'app.email_branding_client.get_email_branding',
+        return_value={"email_branding": {
+            'logo': 'logo2.png',
+            'name': 'Email branding name 2',
+            'text': 'org 2 branding text',
+            'id': 'email-branding-2-id',
+            'colour': None,
+            'brand_type': 'org',
+        }}
+    )
+
+    client_request.login(platform_admin_user)
+
+    url = url_for('.organisation_email_branding', org_id=organisation_one['id']) + '?change_default_branding_to_govuk'
+    page = client_request.get_url(url)
+
+    assert ("Use GOV.UK as default instead" in page.text) is should_be_available
+    assert ("Are you sure you want to make GOV.UK the default email branding?" in page.text) is should_be_available
+
+
+@pytest.mark.parametrize(
+    'organisation_type, should_succeed',
+    (
+        (Organisation.TYPE_CENTRAL, True),
+        (Organisation.TYPE_LOCAL, False),
+        (Organisation.TYPE_NHS_CENTRAL, False),
+        (Organisation.TYPE_NHS_LOCAL, False),
+        (Organisation.TYPE_NHS_GP, False),
+        (Organisation.TYPE_EMERGENCY_SERVICE, False),
+        (Organisation.TYPE_SCHOOL_OR_COLLEGE, False),
+        (Organisation.TYPE_OTHER, False),
+    )
+)
+def test_reset_org_email_branding_to_govuk_successfully(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+    mock_update_organisation,
+    organisation_type,
+    should_succeed,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=None,
+            organisation_type=organisation_type,
+        )
+    )
+    expected_status = 302 if should_succeed else 200
+
+    client_request.login(platform_admin_user)
+
+    url = url_for('.organisation_email_branding', org_id=organisation_one['id']) + '?change_default_branding_to_govuk'
+    client_request.post_url(url, _expected_status=expected_status)
+
+    expected_calls = []
+    if should_succeed:
+        expected_calls.append(mocker.call(organisation_one['id'], email_branding_id=None))
+
+    assert mock_update_organisation.call_args_list == expected_calls
+
+
+def test_change_default_org_email_branding_invalid_brand_id(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=None,
+        )
+    )
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        '.organisation_email_branding',
+        org_id=organisation_one['id'],
+        new_default_branding_id='bad-email-branding-id',
+        _expected_status=400
+    )
+
+
+def test_change_default_org_email_branding_shows_confirmation_question_from_govuk(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+    mock_update_organisation,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=None,
+        )
+    )
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        '.organisation_email_branding',
+        org_id=organisation_one['id'],
+        _data={'email_branding_id': 'email-branding-1-id'},
+        _follow_redirects=True
+    )
+
+    assert "Are you sure you want to make ‘Email branding name 1’ the default email branding?" in page.text
+    assert mock_update_organisation.call_args_list == []
+
+
+def test_change_default_org_email_branding_successfully_from_govuk(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+    mock_update_organisation
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id=None,
+        )
+    )
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        '.organisation_email_branding',
+        org_id=organisation_one['id'],
+        new_default_branding_id='email-branding-1-id',
+    )
+
+    assert mock_update_organisation.call_args_list == [
+        mocker.call(organisation_one['id'], email_branding_id='email-branding-1-id')
+    ]
+
+
+def test_change_default_org_email_branding_successfully_from_explicit_brand(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_email_branding_pool,
+    mock_update_organisation,
+):
+    mocker.patch(
+        'app.organisations_client.get_organisation',
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            'Org 1',
+            email_branding_id='email-branding-2-id',
+        )
+    )
+
+    mocker.patch(
+        'app.email_branding_client.get_email_branding',
+        return_value={"email_branding": {
+            'logo': 'logo2.png',
+            'name': 'Email branding name 2',
+            'text': 'org 2 branding text',
+            'id': 'email-branding-2-id',
+            'colour': None,
+            'brand_type': 'org',
+        }}
+    )
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        '.organisation_email_branding',
+        org_id=organisation_one['id'],
+        _data={'email_branding_id': 'email-branding-1-id'},
+    )
+
+    assert mock_update_organisation.call_args_list == [
+        mocker.call(organisation_one['id'], email_branding_id='email-branding-1-id')
     ]
 
 

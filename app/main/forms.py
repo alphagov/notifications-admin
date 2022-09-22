@@ -1949,6 +1949,13 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
             raise ValidationError('This field is required')
 
 
+class AdminChangeOrganisationDefaultEmailBrandingForm(StripWhitespaceForm):
+    email_branding_id = HiddenField(
+        'Email branding id',
+        validators=[DataRequired()],
+    )
+
+
 class AddEmailBrandingOptionsForm(StripWhitespaceForm):
     branding_field = GovukCheckboxesField(
         'Branding options',
