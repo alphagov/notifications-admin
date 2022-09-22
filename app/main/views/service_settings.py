@@ -1032,6 +1032,8 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
     )
 
     if form.validate_on_submit():
+        # The service’s branding gets updated either way
+        current_service.update(email_branding=email_branding_id)
         # If the platform admin chose "yes" the branding is added to the organisation's
         # branding pool
         if form.add_to_pool.data == "yes":
@@ -1061,9 +1063,6 @@ def service_preview_email_branding(service_id):
     form = AdminPreviewBrandingForm(branding_style=branding_style)
     email_branding_id = form.branding_style.data
     if form.validate_on_submit():
-        current_service.update(
-            email_branding=email_branding_id
-        )
         # in addition to updating the email branding we want the option of adding it to the
         # email branding pool if desirable
         if (
@@ -1074,6 +1073,7 @@ def service_preview_email_branding(service_id):
                                     service_id=service_id,
                                     email_branding_id=email_branding_id))
         else:
+            current_service.update(email_branding=email_branding_id)
             return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
