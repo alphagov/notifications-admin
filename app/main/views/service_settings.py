@@ -1034,6 +1034,8 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
     if form.validate_on_submit():
         # The service’s branding gets updated either way
         current_service.update(email_branding=email_branding_id)
+        message = f"The email branding has been set to {email_branding_name}"
+
         # If the platform admin chose "yes" the branding is added to the organisation's
         # branding pool
         if form.add_to_pool.data == "yes":
@@ -1043,8 +1045,6 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
             message = f"The email branding has been set to {email_branding_name} and it has been " \
                       f"added to {current_service.organisation.name}'s email branding pool"
 
-        else:
-            message = f"The email branding has been set to {email_branding_name}"
         flash(message, 'default_with_tick')
         return redirect(url_for('.service_settings', service_id=service_id))
 
