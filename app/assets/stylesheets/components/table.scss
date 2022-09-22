@@ -62,7 +62,7 @@
   }
 
   .table-heading {
-    @include core-19;
+    @include govuk-font(19);
     margin: 0 0 10px 0;
   }
 
@@ -87,7 +87,7 @@
 
   &-template-name {
 
-    @include bold-24;
+    @include govuk-font(24, $weight: bold);
     display: block;
     white-space: nowrap;
     overflow: hidden;
@@ -108,7 +108,7 @@
   }
 
   &-hint {
-    @include core-19;
+    @include govuk-font(19);
     color: $secondary-text-colour;
     pointer-events: none;
   }
@@ -268,7 +268,7 @@
 
   &-index {
 
-    @include bold-16;
+    @include govuk-font(16, $weight: bold);
     width: 15px;
 
     a {
@@ -304,7 +304,7 @@
 }
 
 .table-font-xsmall td.table-field-index {  // overrides GOV.UK Elements
-  @include bold-16;
+  @include govuk-font(16, $weight: bold);
 }
 
 
@@ -330,7 +330,7 @@
 .table-field-headings-visible {
 
   th {
-    @include bold-19;
+    @include govuk-font(19, $weight: bold);
   }
 
   .dashboard-table &-first {
@@ -398,7 +398,7 @@
 
 .table-empty-message,
 td.table-empty-message {
-  @include core-19;
+  @include govuk-font(19);
   color: $secondary-text-colour;
   border-bottom: 1px solid $border-colour;
   padding: 20px 0 20px 0;
@@ -406,7 +406,7 @@ td.table-empty-message {
 
 .table-show-more-link {
 
-  @include core-16;
+  @include govuk-font(16);
   color: $secondary-text-colour;
   margin-bottom: govuk-spacing(7);
   border-bottom: 1px solid $border-colour;
@@ -424,7 +424,7 @@ a.table-show-more-link {
 }
 
 .table-no-data {
-  @include core-16;
+  @include govuk-font(16);
   color: $secondary-text-colour;
   margin-top: 10px;
   margin-bottom: govuk-spacing(7);

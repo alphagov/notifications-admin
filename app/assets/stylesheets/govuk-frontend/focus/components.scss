@@ -107,71 +107,10 @@
   }
 }
 
-// Updates to form textareas (hacked to work with GOVUK Elements version)
-.form-control {
-  @include govuk-focusable;
-
-  &:focus {
-    // Double the border by adding its width again. Use `box-shadow` to do
-    // this instead of changing `border-width` (which changes element size) and
-    // since `outline` is already used for the yellow focus state.
-    box-shadow: inset 0 0 0 $govuk-border-width-form-element;
-  }
-}
-.form-control-error {
-  &:focus {
-    border-color: $govuk-input-border-colour;
-    // Remove `box-shadow` inherited from `:focus` as `input--error`
-    // already has the thicker border.
-    box-shadow: none;
-  }
-}
-
-// Updates to form radios (hacked to work with GOVUK Elements version)
-
-$govuk-radios-size: 40px;
 // When the default focus width is used on a curved edge it looks visually smaller.
 // So for the circular radios we bump the default to make it look visually consistent.
 $govuk-radios-focus-width: $govuk-focus-width + 1px;
 
-// ( ) Radio ring
-.multiple-choice [type=radio] + label::before {
-  content: "";
-  box-sizing: border-box;
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: $govuk-radios-size;
-  height: $govuk-radios-size;
-
-  border: $govuk-border-width-form-element solid currentColor;
-  border-radius: 50%;
-  background: transparent;
-}
-
-//  •  Radio button
-//
-// We create the 'button' entirely out of 'border' so that they remain
-// 'filled' even when colours are overridden in the browser.
-.multiple-choice [type=radio] + label::after {
-  content: "";
-
-  position: absolute;
-  top: govuk-spacing(2);
-  left: govuk-spacing(2);
-
-  width: 0;
-  height: 0;
-
-  border: govuk-spacing(2) solid currentColor;
-  border-radius: 50%;
-  opacity: 0;
-  background: currentColor;
-}
-
-// Focused state (includes targeting for GOVUK radios, to apply version 3.x.x styles)
-.multiple-choice [type=radio]:focus + label::before,
 .govuk-radios__input:focus + .govuk-radios__label::before {
   border-width: 4px;
   // Since box-shadows are removed when users customise their colours we set a
@@ -180,11 +119,6 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
   outline: $govuk-focus-width solid transparent;
   outline-offset: $govuk-focus-width;
   box-shadow: 0 0 0 $govuk-radios-focus-width $govuk-focus-colour;
-}
-
-// Selected state
-.multiple-choice [type=radio]:checked + label::after {
-  opacity: 1;
 }
 
 // Updates to form checkboxes

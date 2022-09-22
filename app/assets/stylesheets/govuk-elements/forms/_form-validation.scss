@@ -16,12 +16,20 @@
 // Use .form-control-error to add a red border to .form-control
 .form-control-error {
   border: 4px solid $error-colour;
+
+  // Hack to give GOVUK Frontend styling
+  &:focus {
+    border-color: $govuk-input-border-colour;
+    // Remove `box-shadow` inherited from `:focus` as `input--error`
+    // already has the thicker border.
+    box-shadow: none;
+  }
 }
 
 
 // Error messages should be red and bold
 .error-message {
-  @include bold-19;
+  @include govuk-font(19, $weight: bold);
   color: $error-colour;
 
 
