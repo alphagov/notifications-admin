@@ -1017,23 +1017,19 @@ def service_set_email_branding(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-email-branding/add_to_branding_pool_step", methods=[
+@main.route("/services/<uuid:service_id>/service-settings/set-email-branding/add-to-branding-pool-step", methods=[
     'GET', 'POST'])
 @user_is_platform_admin
 def service_set_email_branding_add_to_branding_pool_step(service_id):
     email_branding_id = request.args.get('email_branding_id')
     email_branding = email_branding_client.get_email_branding(email_branding_id)['email_branding']
     email_branding_name = email_branding['name']
-    org_name = current_service.organisation.name
     org_id = current_service.organisation.id
-    service_name = current_service.name
-    data = {
-        'org_name': org_name,
-        'service_name': service_name,
-        'branding_name': email_branding_name
-    }
 
-    form = AdminSetEmailBrandingAddToBrandingPoolStepForm(**data)
+    form = AdminSetEmailBrandingAddToBrandingPoolStepForm(
+        org_name=current_service.organisation.name,
+        service_name=current_service.name,
+    )
 
     if form.validate_on_submit():
         add_to_pool = form.add_to_pool.data
@@ -1044,7 +1040,7 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
             organisations_client.add_brandings_to_email_branding_pool(org_id,
                                                                       email_branding_ids)
             message = f"The email branding has been set to {email_branding_name} and it has been " \
-                      f"added to {org_name}'s email branding pool"
+                      f"added to {current_service.organisation.name}'s email branding pool"
 
         else:
             message = f"The email branding has been set to {email_branding_name}"
@@ -1055,7 +1051,6 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
         'views/service-settings/set-email-branding-add-to-branding-pool-step.html',
         form=form,
         email_branding_name=email_branding_name,
-        org_name=org_name
     )
 
 
