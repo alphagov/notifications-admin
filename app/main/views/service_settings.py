@@ -1032,10 +1032,9 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
     )
 
     if form.validate_on_submit():
-        add_to_pool = form.add_to_pool.data
         # If the platform admin chose "yes" the branding is added to the organisation's
         # branding pool
-        if add_to_pool == "yes":
+        if form.add_to_pool.data == "yes":
             email_branding_ids = [email_branding_id]
             organisations_client.add_brandings_to_email_branding_pool(org_id,
                                                                       email_branding_ids)
