@@ -342,7 +342,6 @@ class OrgNavigation(Navigation):
             'edit_organisation_billing_details',
             'edit_organisation_crown_status',
             'edit_organisation_domains',
-            'edit_organisation_email_branding',
             'edit_organisation_letter_branding',
             'edit_organisation_domains',
             'edit_organisation_go_live_notes',

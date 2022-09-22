@@ -939,7 +939,6 @@ def test_organisation_settings_for_platform_admin(
         'Request to go live notes None Change go live notes for the organisation',
         'Billing details None Change billing details for the organisation',
         'Notes None Change the notes for the organisation',
-        'Default email branding GOV.UK Change default email branding for the organisation',
         'Email branding options None Change email branding options for the organisation',
         'Default letter branding No branding Change default letter branding for the organisation',
         'Known email domains None Change known email domains for the organisation',
@@ -966,7 +965,7 @@ def test_organisation_settings_table_shows_email_branding_pool(
     client_request.login(platform_admin_user)
     page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
 
-    email_branding_options_row = page.select('tr')[9]
+    email_branding_options_row = page.select('tr')[8]
 
     assert normalize_spaces(email_branding_options_row.text) == (
         'Email branding options '

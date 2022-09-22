@@ -3548,10 +3548,6 @@ def test_service_preview_letter_branding_saves(
         'main.service_set_email_branding',
         {'service_id': SERVICE_ONE_ID},
     ),
-    (
-        'main.edit_organisation_email_branding',
-        {'org_id': ORGANISATION_ID},
-    ),
 ))
 def test_should_show_branding_styles(
     mocker,
@@ -3608,11 +3604,6 @@ def test_should_show_branding_styles(
         'main.service_set_email_branding',
         {'service_id': SERVICE_ONE_ID},
         'main.service_preview_email_branding',
-    ),
-    (
-        'main.edit_organisation_email_branding',
-        {'org_id': ORGANISATION_ID},
-        'main.organisation_preview_email_branding',
     ),
 ))
 def test_should_send_branding_and_organisations_to_preview(

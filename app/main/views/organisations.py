@@ -38,7 +38,6 @@ from app.main.forms import (
     AdminOrganisationDomainsForm,
     AdminOrganisationGoLiveNotesForm,
     AdminPreviewBrandingForm,
-    AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     InviteOrgUserForm,
     OrganisationAgreementSignedForm,
@@ -409,31 +408,6 @@ def edit_organisation_agreement(org_id):
     return render_template(
         'views/organisations/organisation/settings/edit-agreement.html',
         form=form,
-    )
-
-
-@main.route("/organisations/<uuid:org_id>/settings/set-email-branding", methods=['GET', 'POST'])
-@user_is_platform_admin
-def edit_organisation_email_branding(org_id):
-
-    email_branding = email_branding_client.get_all_email_branding()
-
-    form = AdminSetEmailBrandingForm(
-        all_branding_options=get_branding_as_value_and_label(email_branding),
-        current_branding=current_organisation.email_branding_id,
-    )
-
-    if form.validate_on_submit():
-        return redirect(url_for(
-            '.organisation_preview_email_branding',
-            org_id=org_id,
-            branding_style=form.branding_style.data,
-        ))
-
-    return render_template(
-        'views/organisations/organisation/settings/set-email-branding.html',
-        form=form,
-        search_form=SearchByNameForm()
     )
 
 
