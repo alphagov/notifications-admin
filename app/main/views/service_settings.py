@@ -1067,7 +1067,10 @@ def service_preview_email_branding(service_id):
         )
         # in addition to updating the email branding we want the option of adding it to the
         # email branding pool if desirable
-        if current_service.organisation:
+        if (
+            current_service.organisation
+            and email_branding_id not in current_service.organisation.email_branding_pool_ids
+        ):
             return redirect(url_for('main.service_set_email_branding_add_to_branding_pool_step',
                                     service_id=service_id,
                                     email_branding_id=email_branding_id))

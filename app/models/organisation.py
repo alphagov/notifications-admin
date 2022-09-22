@@ -191,6 +191,10 @@ class Organisation(JSONModel, SortByNameMixin):
     def email_branding_pool_names(self):
         return [branding['name'] for branding in self.email_branding_pool]
 
+    @property
+    def email_branding_pool_ids(self):
+        return [branding['id'] for branding in self.email_branding_pool]
+
     @cached_property
     def letter_branding(self):
         if self.letter_branding_id:
