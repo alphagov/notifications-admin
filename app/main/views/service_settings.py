@@ -1072,9 +1072,9 @@ def service_preview_email_branding(service_id):
             return redirect(url_for('main.service_set_email_branding_add_to_branding_pool_step',
                                     service_id=service_id,
                                     email_branding_id=email_branding_id))
-        else:
-            current_service.update(email_branding=email_branding_id)
-            return redirect(url_for('.service_settings', service_id=service_id))
+
+        current_service.update(email_branding=email_branding_id)
+        return redirect(url_for('.service_settings', service_id=service_id))
 
     return render_template(
         'views/service-settings/preview-email-branding.html',
