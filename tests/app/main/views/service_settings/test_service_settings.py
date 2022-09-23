@@ -3679,6 +3679,27 @@ def test_should_preview_email_branding(
     assert iframeQString['branding_style'] == ['1']
 
 
+@pytest.mark.parametrize('email_branding_id, service_should_be_updated, expected_redirect', (
+    (
+        '174',  # Not already in the pool
+        False,
+        partial(
+            url_for,
+            'main.service_set_email_branding_add_to_branding_pool_step',
+            service_id=SERVICE_ONE_ID,
+            email_branding_id='174',
+        )
+    ),
+    (
+        'email-branding-1-id',  # Already in the pool
+        True,
+        partial(
+            url_for,
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+        )
+    ),
+))
 def test_should_set_branding_for_service_with_organisation(
     mocker,
     client_request,
@@ -3692,11 +3713,14 @@ def test_should_set_branding_for_service_with_organisation(
     single_reply_to_email_address,
     single_sms_sender,
     mock_get_free_sms_fragment_limit,
-    mock_get_service_data_retention
+    mock_get_service_data_retention,
+    mock_get_email_branding_pool,
+    email_branding_id,
+    service_should_be_updated,
+    expected_redirect,
 ):
     service_one['organisation'] = organisation_one
     service_id = SERVICE_ONE_ID
-    email_branding_id = '174'
     email_branding_name = 'branding1'
 
     mocker.patch('app.email_branding_client.get_email_branding',
@@ -3707,21 +3731,22 @@ def test_should_set_branding_for_service_with_organisation(
                  return_value=organisation_one)
 
     client_request.login(platform_admin_user)
-    page = client_request.post(
+    client_request.post(
         'main.service_preview_email_branding',
         _data={
             'branding_style': email_branding_id
         },
         service_id=service_id,
-        _follow_redirects=True,
+        _expected_redirect=expected_redirect(),
     )
 
-    assert normalize_spaces(page.find('h1').text) == f"Apply ‘{email_branding_name}’ branding"
-
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        email_branding=email_branding_id,
-    )
+    if service_should_be_updated:
+        mock_update_service.assert_called_once_with(
+            SERVICE_ONE_ID,
+            email_branding=email_branding_id,
+        )
+    else:
+        assert mock_update_service.called is False
 
 
 def test_should_set_branding_for_service_with_no_organisation(
@@ -3738,16 +3763,22 @@ def test_should_set_branding_for_service_with_no_organisation(
     service_id = SERVICE_ONE_ID
     email_branding_id = '174'
     client_request.login(platform_admin_user)
-    page = client_request.post(
+    client_request.post(
         'main.service_preview_email_branding',
         _data={
             'branding_style': email_branding_id
         },
         service_id=service_id,
-        _follow_redirects=True,
+        _expected_redirect=url_for(
+            'main.service_settings',
+            service_id=SERVICE_ONE_ID,
+        ),
     )
 
-    assert normalize_spaces(page.find('h1').text) == 'Settings'
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        email_branding=email_branding_id,
+    )
 
 
 def test_get_service_set_email_branding_add_to_branding_pool_step(
@@ -3807,7 +3838,8 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
     single_reply_to_email_address,
     single_sms_sender,
     mock_get_free_sms_fragment_limit,
-    mock_get_service_data_retention
+    mock_get_service_data_retention,
+    mock_update_service,
 ):
 
     client_request.login(platform_admin_user)
@@ -3830,6 +3862,8 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
                                service_id=SERVICE_ONE_ID,
                                email_branding_id=email_branding_id,
                                _follow_redirects=True)
+
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, email_branding=email_branding_id)
 
     if add_to_pool == 'yes':
         mock_add_to_branding_pool.assert_called_with(organisation_one['id'], [email_branding_id])
