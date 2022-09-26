@@ -156,8 +156,6 @@ const javascripts = () => {
   const local = src([
     paths.src + 'javascripts/modules.js',
     paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
-    paths.src + 'javascripts/govuk/cookie-functions.js',
-    paths.src + 'javascripts/consent.js',
     paths.src + 'javascripts/stick-to-window-when-scrolling.js',
     paths.src + 'javascripts/copyToClipboard.js',
     paths.src + 'javascripts/autofocus.js',
@@ -167,7 +165,6 @@ const javascripts = () => {
     paths.src + 'javascripts/updateContent.js',
     paths.src + 'javascripts/listEntry.js',
     paths.src + 'javascripts/liveSearch.js',
-    paths.src + 'javascripts/errorTracking.js',
     paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
     paths.src + 'javascripts/fullscreenTable.js',
     paths.src + 'javascripts/previewPane.js',
