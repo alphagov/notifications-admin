@@ -98,17 +98,6 @@
           )
         }}
       {% endcall %}
-
-      {% call row() %}
-        {{ text_field('Default email branding') }}
-        {{ text_field(current_org.email_branding_name) }}
-        {{ edit_field(
-            'Change',
-            url_for('.edit_organisation_email_branding', org_id=current_org.id),
-            suffix='default email branding for the organisation'
-          )
-        }}
-      {% endcall %}
       {% call row() %}
         {{ text_field('Email branding options') }}
         {{ optional_text_field(current_org.email_branding_pool_names, default="None") }}

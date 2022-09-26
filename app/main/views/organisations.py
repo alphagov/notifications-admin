@@ -38,7 +38,6 @@ from app.main.forms import (
     AdminOrganisationDomainsForm,
     AdminOrganisationGoLiveNotesForm,
     AdminPreviewBrandingForm,
-    AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     InviteOrgUserForm,
     OrganisationAgreementSignedForm,
@@ -409,53 +408,6 @@ def edit_organisation_agreement(org_id):
     return render_template(
         'views/organisations/organisation/settings/edit-agreement.html',
         form=form,
-    )
-
-
-@main.route("/organisations/<uuid:org_id>/settings/set-email-branding", methods=['GET', 'POST'])
-@user_is_platform_admin
-def edit_organisation_email_branding(org_id):
-
-    email_branding = email_branding_client.get_all_email_branding()
-
-    form = AdminSetEmailBrandingForm(
-        all_branding_options=get_branding_as_value_and_label(email_branding),
-        current_branding=current_organisation.email_branding_id,
-    )
-
-    if form.validate_on_submit():
-        return redirect(url_for(
-            '.organisation_preview_email_branding',
-            org_id=org_id,
-            branding_style=form.branding_style.data,
-        ))
-
-    return render_template(
-        'views/organisations/organisation/settings/set-email-branding.html',
-        form=form,
-        search_form=SearchByNameForm()
-    )
-
-
-@main.route("/organisations/<uuid:org_id>/settings/preview-email-branding", methods=['GET', 'POST'])
-@user_is_platform_admin
-def organisation_preview_email_branding(org_id):
-
-    branding_style = request.args.get('branding_style', None)
-
-    form = AdminPreviewBrandingForm(branding_style=branding_style)
-
-    if form.validate_on_submit():
-        current_organisation.update(
-            email_branding_id=form.branding_style.data,
-            delete_services_cache=True,
-        )
-        return redirect(url_for('.organisation_settings', org_id=org_id))
-
-    return render_template(
-        'views/organisations/organisation/settings/preview-email-branding.html',
-        form=form,
-        action=url_for('main.organisation_preview_email_branding', org_id=org_id),
     )
 
 

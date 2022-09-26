@@ -939,7 +939,6 @@ def test_organisation_settings_for_platform_admin(
         'Request to go live notes None Change go live notes for the organisation',
         'Billing details None Change billing details for the organisation',
         'Notes None Change the notes for the organisation',
-        'Default email branding GOV.UK Change default email branding for the organisation',
         'Email branding options None Change email branding options for the organisation',
         'Default letter branding No branding Change default letter branding for the organisation',
         'Known email domains None Change known email domains for the organisation',
@@ -966,7 +965,7 @@ def test_organisation_settings_table_shows_email_branding_pool(
     client_request.login(platform_admin_user)
     page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
 
-    email_branding_options_row = page.select('tr')[9]
+    email_branding_options_row = page.select('tr')[8]
 
     assert normalize_spaces(email_branding_options_row.text) == (
         'Email branding options '
@@ -2136,40 +2135,6 @@ def test_change_default_org_email_branding_successfully_from_explicit_brand(
     assert mock_update_organisation.call_args_list == [
         mocker.call(organisation_one['id'], email_branding_id='email-branding-1-id')
     ]
-
-
-def test_should_set_branding_for_organisation(
-        client_request,
-        platform_admin_user,
-        organisation_one,
-        mock_get_organisation,
-        mock_get_organisation_services,
-        mock_update_service,
-        mock_update_organisation,
-        mock_get_all_email_branding,
-        mock_get_email_branding_pool
-):
-    org_id = ORGANISATION_ID
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        'main.organisation_preview_email_branding',
-        _data={
-            'branding_style': "132",
-        },
-        org_id=org_id,
-        _follow_redirects=True
-    )
-
-    assert 'Settings' in normalize_spaces(page.find('title').text)
-    mock_update_organisation.assert_called_once_with(
-        org_id,
-        email_branding_id="132",
-        cached_service_ids=[
-            '12345',
-            '67890',
-            '596364a0-858e-42c8-9062-a8fe822260eb',
-        ],
-    )
 
 
 def test_add_organisation_email_branding_options_is_platform_admin_only(
