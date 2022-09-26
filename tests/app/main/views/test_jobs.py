@@ -89,10 +89,10 @@ def test_should_show_page_for_one_job(
     assert page.select_one('.govuk-back-link')['href'] == url_for(
         'main.uploads', service_id=SERVICE_ONE_ID,
     )
-    assert ' '.join(page.find('tbody').find('tr').text.split()) == (
+    assert ' '.join(page.select_one('tbody').find('tr').text.split()) == (
         '07123456789 template content Delivered 1 January at 11:10am'
     )
-    assert page.find('div', {'data-key': 'notifications'})['data-resource'] == url_for(
+    assert page.select_one('div[data-key=notifications]')['data-resource'] == url_for(
         'main.view_job_updates',
         service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
@@ -106,7 +106,7 @@ def test_should_show_page_for_one_job(
         status=status_argument
     )
     assert csv_link.text == 'Download this report (CSV)'
-    assert page.find('span', {'id': 'time-left'}).text == 'Data available for 7 days'
+    assert page.select_one('span#time-left').text == 'Data available for 7 days'
 
     assert normalize_spaces(page.select_one('tbody tr').text) == normalize_spaces(
         '07123456789 '
@@ -147,7 +147,7 @@ def test_should_show_page_for_one_job_with_flexible_data_retention(
         status='delivered'
     )
 
-    assert page.find('span', {'id': 'time-left'}).text == 'Data available for 10 days'
+    assert page.select_one('span#time-left').text == 'Data available for 10 days'
     assert "Cancel sending these letters" not in page
 
 
@@ -166,7 +166,7 @@ def test_get_jobs_should_tell_user_if_more_than_one_page(
         job_id=fake_uuid,
         status='',
     )
-    assert page.find('p', {'class': 'table-show-more-link'}).text.strip() == 'Only showing the first 50 rows'
+    assert page.select_one('p.table-show-more-link').text.strip() == 'Only showing the first 50 rows'
 
 
 def test_should_show_job_in_progress(
@@ -593,7 +593,7 @@ def test_should_not_show_cancel_link_for_letter_job_if_too_late(
     )
 
     assert "Cancel sending these letters" not in page
-    assert page.find('p', {'id': 'printing-info'}).text.strip() == "Printed {} at 5:30pm".format(expected_fragment)
+    assert page.select_one('p#printing-info').text.strip() == f"Printed {expected_fragment} at 5:30pm"
 
 
 @freeze_time("2019-06-20 15:32:00.000001")
@@ -629,10 +629,12 @@ def test_should_show_cancel_link_for_letter_job(
         job_id=str(job_id)
     )
 
-    assert page.find('a', text='Cancel sending these letters').attrs["href"] == url_for(
+    cancel_link = page.select_one('.page-footer-delete-link-without-button a.govuk-link.govuk-link--destructive')
+    assert normalize_spaces(cancel_link.text) == 'Cancel sending these letters'
+    assert cancel_link["href"] == url_for(
         "main.cancel_letter_job", service_id=SERVICE_ONE_ID, job_id=job_id
     )
-    assert page.find('p', {'id': 'printing-info'}).text.strip() == "Printing starts today at 5:30pm"
+    assert page.select_one('p#printing-info').text.strip() == "Printing starts today at 5:30pm"
 
 
 @freeze_time("2019-06-20 15:31:00.000001")
@@ -673,7 +675,7 @@ def test_dont_cancel_letter_job_when_to_early_to_cancel(
         _expected_status=200,
     )
     assert mock_cancel.called is False
-    flash_message = normalize_spaces(page.find('div', class_='banner-dangerous').text)
+    flash_message = normalize_spaces(page.select_one('div.banner-dangerous').text)
 
     assert 'We are still processing these letters, please try again in a minute.' in flash_message
 

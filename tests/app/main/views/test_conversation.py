@@ -1,5 +1,4 @@
 import json
-import re
 from datetime import datetime
 from unittest.mock import Mock
 
@@ -274,11 +273,13 @@ def test_conversation_reply_shows_link_to_add_templates_if_service_has_no_templa
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
     )
-    page_text = page.find('p', class_='bottom-gutter').text
-    link = page.find('a', text=re.compile('Add a new template'))['href']
 
+    page_text = page.select_one('p.bottom-gutter').text
     assert normalize_spaces(page_text) == 'You need a template before you can send text messages.'
-    assert link == url_for(
+
+    link = page.select_one('a.govuk-button[role=button]')
+    assert normalize_spaces(link.text) == 'Add a new template'
+    assert link['href'] == url_for(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
         initial_state='add-new-template'

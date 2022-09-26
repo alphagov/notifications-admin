@@ -1,5 +1,3 @@
-import re
-
 import pytest
 
 
@@ -22,14 +20,14 @@ def test_displays_govuk_branding_by_default(client_request):
 
     page = client_request.get('main.email_template', _test_page_title=False)
 
-    assert page.find("a", attrs={"href": "https://www.gov.uk"})
+    assert page.select_one("a")["href"] == "https://www.gov.uk"
 
 
 def test_displays_govuk_branding(client_request, mock_get_email_branding_with_govuk_brand_type):
 
     page = client_request.get('main.email_template', branding_style="1", _test_page_title=False)
 
-    assert page.find("a", attrs={"href": "https://www.gov.uk"})
+    assert page.select_one("a")["href"] == "https://www.gov.uk"
 
 
 def test_displays_both_branding(client_request, mock_get_email_branding_with_both_brand_type):
@@ -38,8 +36,13 @@ def test_displays_both_branding(client_request, mock_get_email_branding_with_bot
 
     mock_get_email_branding_with_both_brand_type.assert_called_once_with('1')
 
-    assert page.find("a", attrs={"href": "https://www.gov.uk"})
-    assert page.find("img", attrs={"src": re.compile("example.png$")})
+    assert page.select_one("a")["href"] == "https://www.gov.uk"
+    assert page.select("img")[0]["src"] == (
+        "https://static.notifications.service.gov.uk/images/gov.uk_logotype_crown.png"
+    )
+    assert page.select("img")[1]["src"] == (
+        "https://static-logos.test.com/example.png"
+    )
     assert page.select("body > table:nth-of-type(3) table > tr:nth-of-type(1) > td:nth-of-type(2)")[0]\
         .get_text().strip() == 'Organisation text'  # brand text is set
 
@@ -50,8 +53,10 @@ def test_displays_org_branding(client_request, mock_get_email_branding):
 
     mock_get_email_branding.assert_called_once_with('1')
 
-    assert not page.find("a", attrs={"href": "https://www.gov.uk"})
-    assert page.find("img", attrs={"src": re.compile("example.png")})
+    assert not any(
+        a['href'] == 'https://www.gov.uk' for a in page.select('a')
+    )
+    assert page.select_one("img")["src"] == "https://static-logos.test.com/example.png"
     assert not page.select("body > table > tr > td[bgcolor='#f00']")  # banner colour is not set
     assert page.select("body > table:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2)")[0]\
         .get_text().strip() == 'Organisation text'  # brand text is set
@@ -64,8 +69,10 @@ def test_displays_org_branding_with_banner(
 
     mock_get_email_branding_with_org_banner_brand_type.assert_called_once_with('1')
 
-    assert not page.find("a", attrs={"href": "https://www.gov.uk"})
-    assert page.find("img", attrs={"src": re.compile("example.png")})
+    assert not any(
+        a['href'] == 'https://www.gov.uk' for a in page.select('a')
+    )
+    assert page.select_one("img")["src"] == "https://static-logos.test.com/example.png"
     assert page.select("body > table > tr > td[bgcolor='#f00']")  # banner colour is set
     assert page.select("body > table table > tr > td > span")[0]\
         .get_text().strip() == 'Organisation text'  # brand text is set
@@ -80,7 +87,9 @@ def test_displays_org_branding_with_banner_without_brand_text(
 
     mock_get_email_branding_without_brand_text.assert_called_once_with('1')
 
-    assert not page.find("a", attrs={"href": "https://www.gov.uk"})
-    assert page.find("img", attrs={"src": re.compile("example.png")})
+    assert not any(
+        a['href'] == 'https://www.gov.uk' for a in page.select('a')
+    )
+    assert page.select_one("img")["src"] == "https://static-logos.test.com/example.png"
     assert page.select("body > table > tr > td[bgcolor='#f00']")  # banner colour is set
     assert not page.select("body > table table > tr > td > span") == 0  # brand text is not set

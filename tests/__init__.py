@@ -694,7 +694,7 @@ def assert_url_expected(actual, expected):
 
 
 def find_element_by_tag_and_partial_text(page, tag, string):
-    return [e for e in page.find_all(tag) if string in e.text][0]
+    return [e for e in page.select(tag) if string in e.text][0]
 
 
 def broadcast_message_json(

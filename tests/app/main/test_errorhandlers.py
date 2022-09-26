@@ -35,7 +35,7 @@ def test_malformed_token_returns_page_not_found(client_request, url):
     page = client_request.get_url(url, _expected_status=404)
 
     assert page.h1.string.strip() == 'Page not found'
-    flash_banner = page.find('div', class_='banner-dangerous').string.strip()
+    flash_banner = page.select_one('div.banner-dangerous').string.strip()
     assert flash_banner == "There’s something wrong with the link you’ve used."
     assert page.title.string.strip() == 'Page not found – GOV.UK Notify'
 

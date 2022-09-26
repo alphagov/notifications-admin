@@ -164,26 +164,26 @@ def test_view_providers_shows_all_providers(
     client_request.login(platform_admin_user)
     page = client_request.get('main.view_providers')
 
-    h1 = [header.text.strip() for header in page.find_all('h1')]
+    h1 = [header.text.strip() for header in page.select('h1')]
 
     assert 'Providers' in h1
 
-    h2 = [header.text.strip() for header in page.find_all('h2')]
+    h2 = [header.text.strip() for header in page.select('h2')]
 
     assert 'Email' in h2
     assert 'SMS' in h2
 
-    tables = page.find_all('table')
+    tables = page.select('table')
     assert len(tables) == 3
 
     domestic_sms_table = tables[0]
     domestic_email_table = tables[1]
     international_sms_table = tables[2]
 
-    domestic_sms_first_row = domestic_sms_table.tbody.find_all('tr')[0]
-    table_data = domestic_sms_first_row.find_all('td')
+    domestic_sms_first_row = domestic_sms_table.select_one('tbody tr')
+    table_data = domestic_sms_first_row.select('td')
 
-    assert table_data[0].find_all("a")[0]['href'] == '/provider/sms_provider_1-id'
+    assert table_data[0].select_one("a")['href'] == '/provider/sms_provider_1-id'
     assert table_data[0].text.strip() == "SMS Provider 1"
     assert table_data[1].text.strip() == "20"
     assert table_data[2].text.strip() == "42"
@@ -191,10 +191,10 @@ def test_view_providers_shows_all_providers(
     assert table_data[4].text.strip() == "16 January at 3:20pm"
     assert table_data[5].text.strip() == "Test User"
 
-    domestic_sms_second_row = domestic_sms_table.tbody.find_all('tr')[1]
-    table_data = domestic_sms_second_row.find_all('td')
+    domestic_sms_second_row = domestic_sms_table.select_one('tbody').select('tr')[1]
+    table_data = domestic_sms_second_row.select('td')
 
-    assert table_data[0].find_all("a")[0]['href'] == '/provider/sms_provider_2-id'
+    assert table_data[0].select_one("a")['href'] == '/provider/sms_provider_2-id'
     assert table_data[0].text.strip() == "SMS Provider 2"
     assert table_data[1].text.strip() == "10"
     assert table_data[2].text.strip() == "58"
@@ -202,28 +202,28 @@ def test_view_providers_shows_all_providers(
     assert table_data[4].text.strip() == "None"
     assert table_data[5].text.strip() == "None"
 
-    domestic_email_first_row = domestic_email_table.tbody.find_all('tr')[0]
-    domestic_email_table_data = domestic_email_first_row.find_all('td')
+    domestic_email_first_row = domestic_email_table.select_one('tbody tr')
+    domestic_email_table_data = domestic_email_first_row.select('td')
 
-    assert domestic_email_table_data[0].find_all("a")[0]['href'] == '/provider/email_provider_1-id'
+    assert domestic_email_table_data[0].select_one("a")['href'] == '/provider/email_provider_1-id'
     assert domestic_email_table_data[0].text.strip() == "Email Provider 1"
     assert domestic_email_table_data[1].text.strip() == "True"
     assert domestic_email_table_data[2].text.strip() == "None"
     assert domestic_email_table_data[3].text.strip() == "None"
 
-    domestic_email_second_row = domestic_email_table.tbody.find_all('tr')[1]
-    domestic_email_table_data = domestic_email_second_row.find_all('td')
+    domestic_email_second_row = domestic_email_table.select_one('tbody').select('tr')[1]
+    domestic_email_table_data = domestic_email_second_row.select('td')
 
-    assert domestic_email_table_data[0].find_all("a")[0]['href'] == '/provider/email_provider_2-id'
+    assert domestic_email_table_data[0].select_one("a")['href'] == '/provider/email_provider_2-id'
     assert domestic_email_table_data[0].text.strip() == "Email Provider 2"
     assert domestic_email_table_data[1].text.strip() == "True"
     assert domestic_email_table_data[2].text.strip() == "None"
     assert domestic_email_table_data[3].text.strip() == "None"
 
-    international_sms_first_row = international_sms_table.tbody.find_all('tr')[0]
-    table_data = international_sms_first_row.find_all('td')
+    international_sms_first_row = international_sms_table.tbody.select_one('tbody tr')
+    table_data = international_sms_first_row.select('td')
 
-    assert table_data[0].find_all("a")[0]['href'] == '/provider/sms_provider_intl_1-id'
+    assert table_data[0].select_one("a")['href'] == '/provider/sms_provider_intl_1-id'
     assert table_data[0].text.strip() == "SMS Provider Intl 1"
     assert table_data[1].text.strip() == "False"
     assert table_data[2].text.strip() == "None"
@@ -272,13 +272,12 @@ def test_view_provider_shows_version_history(
         'main.view_provider', provider_id=stub_provider_history['data'][0]['id']
     )
 
-    table = page.find('table')
-    table_rows = table.find_all('tr')
-    table_headings = table_rows[0].find_all('th')
-    first_row = table_rows[1].find_all('td')
-    second_row = table_rows[2].find_all('td')
+    table_rows = page.select('table tr')
+    table_headings = table_rows[0].select('th')
+    first_row = table_rows[1].select('td')
+    second_row = table_rows[2].select('td')
 
-    assert page.find_all('h1')[0].text.strip() == stub_provider_history['data'][0]["display_name"]
+    assert page.select_one('h1').text.strip() == stub_provider_history['data'][0]["display_name"]
     assert len(table_rows) == 3
 
     assert table_headings[0].text.strip() == "Version"

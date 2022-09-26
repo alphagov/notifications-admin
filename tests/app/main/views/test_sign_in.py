@@ -35,7 +35,7 @@ def test_render_sign_in_template_with_next_link_for_password_reset(
         _optional_args=f"?next=/services/{SERVICE_ONE_ID}/templates",
         _test_page_title=False
     )
-    forgot_password_link = page.find('a', class_="govuk-link govuk-link--no-visited-state page-footer-secondary-link")
+    forgot_password_link = page.select_one('a.govuk-link.govuk-link--no-visited-state.page-footer-secondary-link')
     assert forgot_password_link.text == 'Forgotten your password?'
     assert forgot_password_link['href'] == url_for('main.forgot_password', next=f'/services/{SERVICE_ONE_ID}/templates')
 

@@ -452,11 +452,9 @@ def test_should_show_templates_folder_page(
     for index, expected_item in enumerate(expected_items):
         assert normalize_spaces(all_page_items[index].text) == expected_item
 
-    displayed_page_items = page.find_all(lambda tag: (
-        tag.has_attr('class')
-        and 'template-list-item' in tag['class']
-        and 'template-list-item-hidden-by-default' not in tag['class']
-    ))
+    displayed_page_items = page.select(
+        '.template-list-item:not(.template-list-item-hidden-by-default)'
+    )
     assert len(displayed_page_items) == len(expected_displayed_items)
 
     for index, expected_item in enumerate(expected_displayed_items):
@@ -601,7 +599,8 @@ def test_get_manage_folder_page(
         'folder_two – Templates – service one – GOV.UK Notify'
     )
     assert page.select_one('input[name=name]')['value'] == 'folder_two'
-    delete_link = page.find('a', string="Delete this folder")
+    delete_link = page.select_one('a.govuk-link--destructive')
+    assert normalize_spaces(delete_link.text) == 'Delete this folder'
     expected_delete_url = "/services/{}/templates/folders/{}/delete".format(service_one['id'], folder_id)
     assert expected_delete_url in delete_link["href"]
 
@@ -646,7 +645,7 @@ def test_get_manage_folder_viewing_permissions_for_users(
     assert checkboxes[1]['value'] == team_member_2['id']
     assert "checked" in checkboxes[1].attrs
 
-    assert "Test User" in page.find_all('label', {'for': 'users_with_permission-1'})[0].text
+    assert "Test User" in page.select_one('label[for=users_with_permission-1]').text
 
 
 def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_manage_settings_permission(
@@ -1080,12 +1079,12 @@ def test_should_not_show_radios_and_buttons_for_move_destination_if_incorrect_pe
         service_id=SERVICE_ONE_ID,
     )
     radios = page.select('input[type=radio]')
-    radio_div = page.find('div', {'id': 'move_to_folder_radios'})
+    radio_div = page.select('div#move_to_folder_radios')
     assert radios == page.select('input[name=move_to]')
 
     assert not radios
     assert not radio_div
-    assert page.find_all('button', {'name': 'operation'}) == []
+    assert not page.select('button[name=operation]')
 
 
 def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissions(
@@ -1114,7 +1113,7 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
         service_id=SERVICE_ONE_ID,
     )
     radios = page.select('#move_to_folder_radios input[type=radio]')
-    radio_div = page.find('div', {'id': 'move_to_folder_radios'})
+    radio_div = page.select_one('div#move_to_folder_radios')
     assert radios == page.select('input[name=move_to]')
 
     assert [x['value'] for x in radios] == [
@@ -1123,7 +1122,7 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
     assert [x.text.strip() for x in radio_div.select('label')] == [
         'Templates', 'folder_one', 'folder_one_one', 'folder_one_two', 'folder_two',
     ]
-    assert set(x['value'] for x in page.find_all('button', {'name': 'operation'})) == {
+    assert set(x['value'] for x in page.select('button[name=operation]')) == {
         'unknown',
         'move-to-existing-folder',
         'move-to-new-folder',
@@ -1154,8 +1153,8 @@ def test_move_to_shouldnt_select_a_folder_by_default(
         'main.choose_template',
         service_id=SERVICE_ONE_ID,
     )
-    checked_radio = page.find('input', attrs={'name': 'move_to', 'checked': 'checked'})
-    assert checked_radio is None
+    checked_radio = page.select('input[name=move_to][checked=checked]')
+    assert checked_radio == []
 
 
 def test_should_be_able_to_move_to_existing_folder(
@@ -1251,9 +1250,9 @@ def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
         _test_page_title=False
     )
 
-    page.find("input", attrs={"name": "move_to", "value": PARENT_FOLDER_ID})
+    assert page.select(f'input[name=move_to][value="{PARENT_FOLDER_ID}"]')
 
-    move_form_labels = page.find('div', id='move_to_folder_radios').find_all('label')
+    move_form_labels = page.select('div#move_to_folder_radios label')
 
     assert len(move_form_labels) == 3
     assert normalize_spaces(move_form_labels[0].text) == 'Templates'
@@ -1278,9 +1277,9 @@ def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
         _test_page_title=False
     )
 
-    page.find("input", attrs={"name": "move_to", "value": PARENT_FOLDER_ID})
+    assert page.select(f'input[name=move_to][value="{PARENT_FOLDER_ID}"]')
 
-    move_form_labels = page.find('div', id='move_to_folder_radios').find_all('label')
+    move_form_labels = page.select('div#move_to_folder_radios label')
 
     assert len(move_form_labels) == 3
     assert normalize_spaces(move_form_labels[0].text) == 'Templates'
@@ -1717,11 +1716,9 @@ def test_should_filter_templates_folder_page_based_on_user_permissions(
         **extra_args
     )
 
-    displayed_page_items = page.find_all(lambda tag: (
-        tag.has_attr('class')
-        and 'template-list-item' in tag['class']
-        and 'template-list-item-hidden-by-default' not in tag['class']
-    ))
+    displayed_page_items = page.select(
+        '.template-list-item:not(.template-list-item-hidden-by-default)'
+    )
     assert [
         [i.strip() for i in e.text.split("\n") if i.strip()]
         for e in displayed_page_items

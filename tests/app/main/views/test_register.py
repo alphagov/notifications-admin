@@ -13,7 +13,7 @@ def test_render_register_returns_template_with_form(
     client_request.logout()
     page = client_request.get_url('/register')
 
-    assert page.find('input', attrs={'name': 'auth_type'}).attrs['value'] == 'sms_auth'
+    assert page.select_one('input[name=auth_type]')['value'] == 'sms_auth'
     assert page.select_one('#email_address')['spellcheck'] == 'false'
     assert page.select_one('#email_address')['autocomplete'] == 'email'
     assert page.select_one('#password')['autocomplete'] == 'new-password'
@@ -493,5 +493,5 @@ def test_register_from_invite_form_doesnt_show_mobile_number_field_if_email_auth
 
     page = client_request.get('main.register_from_invite')
 
-    assert page.find('input', attrs={'name': 'auth_type'}).attrs['value'] == 'email_auth'
-    assert page.find('input', attrs={'name': 'mobile_number'}) is None
+    assert page.select_one('input[name=auth_type]')['value'] == 'email_auth'
+    assert page.select_one('input[name=mobile_number]') is None

@@ -1,5 +1,3 @@
-import re
-
 import pytest
 from flask import url_for
 from freezegun import freeze_time
@@ -35,7 +33,8 @@ def test_upload_letters_button_only_with_letters_permission(
 ):
     service_one['permissions'] += extra_permissions
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    assert page.find('a', text=re.compile('Upload a letter'))
+    button = page.select_one('a.govuk-button--secondary[role=button]')
+    assert normalize_spaces(button.text) == 'Upload a letter'
 
 
 @pytest.mark.parametrize('user', (
@@ -51,8 +50,8 @@ def test_all_users_have_upload_contact_list(
 ):
     client_request.login(user)
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    button = page.find('a', text=re.compile('Upload an emergency contact list'))
-    assert button
+    button = page.select_one('a.govuk-button--secondary[role=button]')
+    assert normalize_spaces(button.text) == 'Upload an emergency contact list'
     assert button['href'] == url_for(
         'main.upload_contact_list', service_id=SERVICE_ONE_ID,
     )
@@ -96,8 +95,11 @@ def test_get_upload_hub_page(
     mocker.patch('app.job_api_client.get_jobs', return_value={'data': []})
     service_one['permissions'] += ['letter', 'upload_letters']
     page = client_request.get('main.uploads', service_id=SERVICE_ONE_ID)
-    assert page.find('h1').text == 'Uploads'
-    assert page.find('a', text=re.compile('Upload a letter')).attrs['href'] == url_for(
+    assert page.select_one('h1').text == 'Uploads'
+
+    upload_button = page.select_one('a.govuk-button--secondary[role=button]')
+    assert normalize_spaces(upload_button.text) == 'Upload a letter'
+    assert upload_button['href'] == url_for(
         'main.upload_letter', service_id=SERVICE_ONE_ID
     )
 

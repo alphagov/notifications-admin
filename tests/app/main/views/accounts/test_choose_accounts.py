@@ -147,13 +147,12 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
         'organisations': [],
         'services': []
     }
-    resp = client_request.get('main.choose_account')
-    page = resp.find('main', {'id': 'main-content'})
+    page = client_request.get('main.choose_account')
 
-    links = page.find_all('a')
+    links = page.select('main#main-content a')
     assert len(links) == 1
     add_service_link = links[0]
-    assert normalize_spaces(page.h1.text) == 'Choose service'
+    assert normalize_spaces(page.select_one('h1').text) == 'Choose service'
     assert normalize_spaces(add_service_link.text) == 'Add a new service'
     assert not page.select('main h2')
     assert add_service_link['href'] == url_for('main.add_service')
@@ -231,8 +230,7 @@ def test_choose_account_should_show_back_to_service_link(
 ):
     resp = client_request.get('main.choose_account')
 
-    service_navigation = resp.find('div', {'class': 'navigation-service'})
-    back_to_service_link = service_navigation.a
+    back_to_service_link = resp.select_one('div.navigation-service a')
 
     assert back_to_service_link['href'] == url_for('main.show_accounts_or_dashboard')
     assert back_to_service_link.text == 'Back to service one'

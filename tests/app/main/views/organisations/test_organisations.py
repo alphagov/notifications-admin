@@ -780,7 +780,7 @@ def test_manage_org_users_shows_correct_link_next_to_each_user(
     # No banner confirming a user to be deleted shown
     assert not page.select_one('.banner-dangerous')
 
-    users = page.find_all(class_='user-list-item')
+    users = page.select('.user-list-item')
 
     # The first user is an invited user, so has the link to cancel the invitation.
     # The second two users are active users, so have the link to be removed from the org
@@ -813,7 +813,7 @@ def test_manage_org_users_shows_no_link_for_cancelled_users(
         '.manage_org_users',
         org_id=ORGANISATION_ID,
     )
-    users = page.find_all(class_='user-list-item')
+    users = page.select('.user-list-item')
 
     assert normalize_spaces(users[0].text) == 'invited_user@test.gov.uk (cancelled invite)'
     assert not users[0].a
@@ -948,7 +948,7 @@ def test_organisation_settings_for_platform_admin(
     client_request.login(platform_admin_user)
     page = client_request.get('.organisation_settings', org_id=organisation_one['id'])
 
-    assert page.find('h1').text == 'Settings'
+    assert page.select_one('h1').text == 'Settings'
     rows = page.select('tr')
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):
@@ -1122,7 +1122,7 @@ def test_archive_organisation_does_not_allow_orgs_with_team_members_or_services_
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.find("div", class_="banner-dangerous").text) == error_message
+    assert normalize_spaces(page.select_one("div.banner-dangerous").text) == error_message
 
 
 @pytest.mark.parametrize('endpoint, expected_options, expected_selected', (
@@ -1476,7 +1476,7 @@ def test_update_organisation_domains_when_domain_already_exists(
         _expected_status=200,
     )
 
-    assert response.find("div", class_="banner-dangerous").text.strip() == "This domain is already in use"
+    assert response.select_one("div.banner-dangerous").text.strip() == "This domain is already in use"
 
 
 def test_update_organisation_name(
@@ -1565,7 +1565,7 @@ def test_get_edit_organisation_go_live_notes_page(
         '.edit_organisation_go_live_notes',
         org_id=organisation_one['id'],
     )
-    assert page.find('textarea', id='request_to_go_live_notes')
+    assert page.select_one('textarea', id='request_to_go_live_notes')
 
 
 @pytest.mark.parametrize('input_note,saved_note', [
@@ -1609,8 +1609,8 @@ def test_organisation_settings_links_to_edit_organisation_notes_page(
     page = client_request.get(
         '.organisation_settings', org_id=organisation_one['id']
     )
-    assert len(page.find_all(
-        'a', attrs={'href': '/organisations/{}/settings/notes'.format(organisation_one['id'])}
+    assert len(page.select(
+        f'''a[href="/organisations/{organisation_one['id']}/settings/notes"]'''
     )) == 1
 
 
@@ -1626,8 +1626,8 @@ def test_view_edit_organisation_notes(
         org_id=organisation_one['id'],
     )
     assert page.select_one('h1').text == "Edit organisation notes"
-    assert page.find('label', class_="form-label").text.strip() == "Notes"
-    assert page.find('textarea').attrs["name"] == "notes"
+    assert page.select_one('label.form-label').text.strip() == "Notes"
+    assert page.select_one('textarea').attrs["name"] == "notes"
 
 
 def test_update_organisation_notes(
@@ -2293,8 +2293,8 @@ def test_organisation_settings_links_to_edit_organisation_billing_details_page(
     page = client_request.get(
         '.organisation_settings', org_id=organisation_one['id']
     )
-    assert len(page.find_all(
-        'a', attrs={'href': '/organisations/{}/settings/edit-billing-details'.format(organisation_one['id'])}
+    assert len(page.select(
+        f'''a[href="/organisations/{organisation_one['id']}/settings/edit-billing-details"]'''
     )) == 1
 
 
@@ -2310,28 +2310,28 @@ def test_view_edit_organisation_billing_details(
         org_id=organisation_one['id'],
     )
     assert page.select_one('h1').text == "Edit organisation billing details"
-    labels = page.find_all('label', class_="form-label")
-    labels_list = [
-        'Contact email addresses',
+
+    assert [
+        label.text.strip()
+        for label in page.select('label.govuk-label') + page.select('label.form-label')
+    ] == [
         'Contact names',
+        'Contact email addresses',
         'Reference',
         'Purchase order number',
         'Notes'
     ]
-    for label in labels:
-        assert label.text.strip() in labels_list
-    textbox_names = page.find_all('input', class_='govuk-input govuk-!-width-full')
-    names_list = [
-        'billing_contact_email_addresses',
+
+    assert [
+        form_element['name']
+        for form_element in page.select('input.govuk-input.govuk-\\!-width-full') + page.select('textarea')
+    ] == [
         'billing_contact_names',
+        'billing_contact_email_addresses',
         'billing_reference',
         'purchase_order_number',
+        'notes',
     ]
-
-    for name in textbox_names:
-        assert name.attrs["name"] in names_list
-
-    assert page.find('textarea').attrs["name"] == "notes"
 
 
 def test_update_organisation_billing_details(

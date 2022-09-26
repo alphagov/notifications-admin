@@ -15,11 +15,11 @@ from tests.conftest import SERVICE_ONE_ID
 def test_get_upload_letter(client_request):
     page = client_request.get('main.upload_letter', service_id=SERVICE_ONE_ID)
 
-    assert page.find('h1').text == 'Upload a letter'
-    assert page.find('input', class_='file-upload-field')
-    assert page.find('input', class_='file-upload-field')['accept'] == '.pdf'
+    assert page.select_one('h1').text == 'Upload a letter'
+    assert page.select_one('input.file-upload-field')
+    assert page.select_one('input.file-upload-field')['accept'] == '.pdf'
     assert page.select('main button[type=submit]')
-    assert normalize_spaces(page.find('input', type='file')['data-button-text']) == 'Choose file'
+    assert normalize_spaces(page.select_one('input[type=file]')['data-button-text']) == 'Choose file'
 
 
 @pytest.mark.parametrize('extra_permissions, expected_allow_international', (
@@ -88,11 +88,11 @@ def test_post_upload_letter_redirects_for_valid_file(
         upload_id=ANY,
     )
 
-    assert 'The Queen' in page.find('div', class_='js-stick-at-bottom-when-scrolling').text
-    assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
-    assert not page.find(id='validation-error-message')
+    assert 'The Queen' in page.select_one('div.js-stick-at-bottom-when-scrolling').text
+    assert page.select_one('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
+    assert not page.select_one('#validation-error-message')
 
-    assert not page.find('input', {'name': 'file_id'})
+    assert not page.select_one('input[name=file_id]')
     assert normalize_spaces(page.select('main button[type=submit]')[0].text) == 'Send 1 letter'
 
 
@@ -140,11 +140,11 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
             _follow_redirects=True,
         )
 
-    assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
+    assert page.select_one('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert len(page.select('.letter-postage')) == 0
     # Check postage radios exists and second class is checked by default
-    assert page.find('input', id="postage-0", value="first")
-    assert page.find('input', id="postage-1", value="second").has_attr('checked')
+    assert page.select_one('input#postage-0')['value'] == 'first'
+    assert page.select_one('input#postage-1[checked]')['value'] == 'second'
 
     letter_images = page.select('main img')
     assert len(letter_images) == 3
@@ -204,7 +204,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
             _follow_redirects=True,
         )
 
-    assert page.find('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
+    assert page.select_one('h1').text == 'tests/test_pdf_files/one_page_pdf.pdf'
     assert not page.select('.letter-postage')
     assert not page.select('input[type=radio]')
     assert normalize_spaces(
@@ -224,10 +224,9 @@ def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request):
             _data={'file': file},
             _expected_status=200
         )
-    assert page.find('h1').text == 'Wrong file type'
-    assert page.find('div', class_='banner-dangerous').find('p').text == 'Save your letter as a PDF and try again.'
-    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
-    assert page.find('input', type='file')['accept'] == '.pdf'
+    assert page.select_one('.banner-dangerous h1').text == 'Wrong file type'
+    assert normalize_spaces(page.select_one('input[type=file]')['data-button-text']) == 'Upload your file again'
+    assert page.select_one('input[type=file]')['accept'] == '.pdf'
 
 
 def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
@@ -237,8 +236,8 @@ def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
         _data={'file': ''},
         _expected_status=200
     )
-    assert page.find('div', class_='banner-dangerous').find('h1').text == 'You need to choose a file to upload'
-    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
+    assert page.select_one('.banner-dangerous h1').text == 'You need to choose a file to upload'
+    assert normalize_spaces(page.select_one('input[type=file]')['data-button-text']) == 'Upload your file again'
 
 
 def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_request):
@@ -252,8 +251,8 @@ def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_
             _data={'file': file},
             _expected_status=400
         )
-    assert page.find('div', class_='banner-dangerous').find('h1').text == 'Your file contains a virus'
-    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
+    assert page.select_one('.banner-dangerous h1').text == 'Your file contains a virus'
+    assert normalize_spaces(page.select_one('input[type=file]')['data-button-text']) == 'Upload your file again'
     mock_s3_backup.assert_not_called()
 
 
@@ -267,9 +266,9 @@ def test_post_choose_upload_file_when_file_is_too_big(mocker, client_request):
             _data={'file': file},
             _expected_status=400
         )
-    assert page.find('div', class_='banner-dangerous').find('h1').text == 'Your file is too big'
-    assert page.find('div', class_='banner-dangerous').find('p').text == 'Files must be smaller than 2MB.'
-    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
+    assert page.select_one('.banner-dangerous h1').text == 'Your file is too big'
+    assert page.select_one('.banner-dangerous p').text == 'Files must be smaller than 2MB.'
+    assert normalize_spaces(page.select_one('input[type=file]')['data-button-text']) == 'Upload your file again'
 
 
 def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
@@ -282,11 +281,11 @@ def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
             _data={'file': file},
             _expected_status=400
         )
-    assert page.find('div', class_='banner-dangerous').find('h1').text == "There’s a problem with your file"
-    assert page.find(
-        'div', class_='banner-dangerous'
+    assert page.select_one('div.banner-dangerous').find('h1').text == "There’s a problem with your file"
+    assert page.select_one(
+        'div.banner-dangerous'
     ).find('p').text == 'Notify cannot read this PDF.Save a new copy of your file and try again.'
-    assert normalize_spaces(page.find('input', type="file")['data-button-text']) == 'Upload your file again'
+    assert normalize_spaces(page.select_one('input[type=file]')['data-button-text']) == 'Upload your file again'
 
 
 def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid):
@@ -329,8 +328,8 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
         )
 
     mock_s3_backup.assert_not_called()
-    assert page.find('div', class_='banner-dangerous').find('h1', {"data-error-type": 'content-outside-printable-area'})
-    assert not page.find('button', {'class': 'page-footer__button', 'type': 'submit'})
+    assert page.select_one('div.banner-dangerous h1')['data-error-type'] == 'content-outside-printable-area'
+    assert not page.select_one('button.page-footer__button[type=submit]')
 
 
 def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request, fake_uuid):
@@ -362,10 +361,9 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
 
     assert 'The Queen' not in page.text
     assert len(page.select('.letter-postage')) == 0
-
-    assert page.find("a", {"class": "govuk-back-link"})["href"] == "/services/{}/upload-letter".format(SERVICE_ONE_ID)
-    assert page.find("input", {"type": "file"}).has_attr("data-button-text")
-    assert page.find("input", {"type": "file"})["accept"] == '.pdf'
+    assert page.select_one("a.govuk-back-link")["href"] == f"/services/{SERVICE_ONE_ID}/upload-letter"
+    assert page.select_one("input[type=file]")["data-button-text"]
+    assert page.select_one("input[type=file]")["accept"] == '.pdf'
 
     letter_images = page.select('main img')
     assert len(letter_images) == 1
@@ -424,10 +422,10 @@ def test_uploaded_letter_preview(
         file_id=fake_uuid,
     )
 
-    assert page.find('h1').text == 'my_encoded_filename£.pdf'
-    assert page.find('div', class_='letter-sent')
-    assert not page.find("label", {"class": "file-upload-button"})
-    assert page.find('button', {'class': 'page-footer__button', 'type': 'submit'})
+    assert page.select_one('h1').text == 'my_encoded_filename£.pdf'
+    assert page.select_one('div.letter-sent')
+    assert not page.select_one("label.file-upload-button")
+    assert page.select_one('button.page-footer__button[type=submit]')
 
 
 def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_mode(
@@ -451,14 +449,14 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.find('h1').text) == 'You cannot send this letter'
-    assert page.find('div', class_='letter-sent')
+    assert normalize_spaces(page.select_one('h1').text) == 'You cannot send this letter'
+    assert page.select_one('div.letter-sent')
     assert normalize_spaces(
         page.select_one('.js-stick-at-bottom-when-scrolling p').text
     ) == (
         'Recipient: The Queen'
     )
-    assert not page.find('form')
+    assert not page.select_one('form')
     assert len(page.select('main button[type=submit]')) == 0
 
 

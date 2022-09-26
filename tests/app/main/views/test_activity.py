@@ -159,7 +159,7 @@ def test_can_show_notifications(
 
     assert page_title in page.h1.text.strip()
 
-    path_to_json = page.find("div", {'data-key': 'notifications'})['data-resource']
+    path_to_json = page.select_one("div[data-key=notifications]")['data-resource']
 
     url = urlparse(path_to_json)
     assert url.path == '/services/{}/notifications{}'.format(
@@ -303,7 +303,7 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
         status='',
     )
 
-    error_description = page.find('div', attrs={'class': 'table-field-status-error'}).text.strip()
+    error_description = page.select_one('div.table-field-status-error').text.strip()
     assert 'Virus detected\n' in error_description
 
 
@@ -330,7 +330,7 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
         status='',
     )
 
-    assert not page.find('a', attrs={'class': 'file-list-filename'})
+    assert not page.select_one('a.file-list-filename')
 
 
 def test_shows_message_when_no_notifications(
@@ -424,8 +424,8 @@ def test_search_recipient_form(
         **initial_query_arguments
     )
 
-    assert page.find("form")['method'] == 'post'
-    action_url = page.find("form")['action']
+    assert page.select_one("form")['method'] == 'post'
+    action_url = page.select_one("form")['action']
     url = urlparse(action_url)
     assert url.path == '/services/{}/notifications/{}'.format(
         SERVICE_ONE_ID,
@@ -510,8 +510,8 @@ def test_should_show_notifications_for_a_service_with_next_previous(
         page=2
     )
 
-    next_page_link = page.find('a', {'rel': 'next'})
-    prev_page_link = page.find('a', {'rel': 'previous'})
+    next_page_link = page.select_one('a[rel=next]')
+    prev_page_link = page.select_one('a[rel=previous]')
     assert (
         url_for('main.view_notifications', service_id=service_one['id'], message_type='sms', page=3) in
         next_page_link['href']
@@ -546,8 +546,8 @@ def test_doesnt_show_pagination_with_search_term(
         _expected_status=200,
     )
     assert len(page.select('tbody tr')) == 50
-    assert not page.find('a', {'rel': 'next'})
-    assert not page.find('a', {'rel': 'previous'})
+    assert not page.select_one('a[rel=next]')
+    assert not page.select_one('a[rel=previous]')
     assert normalize_spaces(
         page.select_one('.table-show-more-link').text
     ) == (
@@ -620,7 +620,7 @@ def test_html_contains_notification_id(
         status='',
     )
 
-    notifications = page.tbody.find_all('tr')
+    notifications = page.select('tbody tr')
     for tr in notifications:
         assert uuid.UUID(tr.attrs['id'])
 
@@ -641,9 +641,9 @@ def test_html_contains_links_for_failed_notifications(
         message_type='sms',
         status='sending%2Cdelivered%2Cfailed'
     )
-    notifications = response.tbody.find_all('tr')
+    notifications = response.select('tbody tr')
     for tr in notifications:
-        link_text = tr.find('div', class_='table-field-status-error').find('a').text
+        link_text = tr.select_one('div.table-field-status-error a').text
         assert normalize_spaces(link_text) == 'Technical failure'
 
 
@@ -803,4 +803,4 @@ def test_should_show_address_and_hint_for_letters(
     )
 
     assert page.select_one('a.file-list-filename').text == 'Full Name, First address line, postcode'
-    assert page.find('p', {'class': 'file-list-hint'}).text.strip() == expected_hint
+    assert page.select_one('p.file-list-hint').text.strip() == expected_hint
