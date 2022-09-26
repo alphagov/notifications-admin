@@ -164,7 +164,7 @@ pyparsing==3.0.9
     # via packaging
 pypdf2==2.10.3
     # via notifications-utils
-pyproj==3.3.1
+pyproj==3.4.0
     # via
     #   -r requirements.in
     #   notifications-utils
