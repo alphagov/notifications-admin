@@ -186,7 +186,6 @@ EXCLUDED_ENDPOINTS = tuple(map(Navigation.get_endpoint_with_blueprint, {
     'organisation_dashboard',
     'organisation_download_agreement',
     'organisation_email_branding',
-    'organisation_preview_email_branding',
     'organisation_preview_letter_branding',
     'organisation_settings',
     'organisation_trial_mode_services',

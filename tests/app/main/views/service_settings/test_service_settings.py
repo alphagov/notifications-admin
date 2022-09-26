@@ -3641,10 +3641,6 @@ def test_should_send_branding_and_organisations_to_preview(
         'main.service_preview_email_branding',
         {'service_id': SERVICE_ONE_ID},
     ),
-    (
-        'main.organisation_preview_email_branding',
-        {'org_id': ORGANISATION_ID},
-    ),
 ))
 def test_should_preview_email_branding(
     client_request,

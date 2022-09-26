@@ -349,7 +349,6 @@ class OrgNavigation(Navigation):
             'edit_organisation_notes',
             'edit_organisation_type',
             'organisation_email_branding',
-            'organisation_preview_email_branding',
             'organisation_preview_letter_branding',
             'organisation_settings',
 

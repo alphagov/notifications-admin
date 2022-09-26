@@ -411,28 +411,6 @@ def edit_organisation_agreement(org_id):
     )
 
 
-@main.route("/organisations/<uuid:org_id>/settings/preview-email-branding", methods=['GET', 'POST'])
-@user_is_platform_admin
-def organisation_preview_email_branding(org_id):
-
-    branding_style = request.args.get('branding_style', None)
-
-    form = AdminPreviewBrandingForm(branding_style=branding_style)
-
-    if form.validate_on_submit():
-        current_organisation.update(
-            email_branding_id=form.branding_style.data,
-            delete_services_cache=True,
-        )
-        return redirect(url_for('.organisation_settings', org_id=org_id))
-
-    return render_template(
-        'views/organisations/organisation/settings/preview-email-branding.html',
-        form=form,
-        action=url_for('main.organisation_preview_email_branding', org_id=org_id),
-    )
-
-
 def _handle_remove_branding(remove_branding_id) -> Optional[Response]:
     """
     The user has clicked 'remove' on a brand and is either going to see a confirmation flash message
