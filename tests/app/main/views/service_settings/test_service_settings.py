@@ -3543,12 +3543,6 @@ def test_service_preview_letter_branding_saves(
         'org 5', 'GOV.UK', 'org 1', 'org 2', 'org 3', 'org 4',
     ]),
 ])
-@pytest.mark.parametrize('endpoint, extra_args', (
-    (
-        'main.service_set_email_branding',
-        {'service_id': SERVICE_ONE_ID},
-    ),
-))
 def test_should_show_branding_styles(
     mocker,
     client_request,
@@ -3558,8 +3552,6 @@ def test_should_show_branding_styles(
     current_branding,
     expected_values,
     expected_labels,
-    endpoint,
-    extra_args,
 ):
     service_one['email_branding'] = current_branding
     mocker.patch(
@@ -3572,7 +3564,7 @@ def test_should_show_branding_styles(
     )
 
     client_request.login(platform_admin_user)
-    page = client_request.get(endpoint, **extra_args)
+    page = client_request.get('main.service_set_email_branding', **{'service_id': SERVICE_ONE_ID})
 
     branding_style_choices = page.find_all('input', attrs={"name": "branding_style"})
 
@@ -3599,13 +3591,6 @@ def test_should_show_branding_styles(
     app.service_api_client.get_service.assert_called_once_with(service_one['id'])
 
 
-@pytest.mark.parametrize('endpoint, extra_args, expected_redirect', (
-    (
-        'main.service_set_email_branding',
-        {'service_id': SERVICE_ONE_ID},
-        'main.service_preview_email_branding',
-    ),
-))
 def test_should_send_branding_and_organisations_to_preview(
     client_request,
     platform_admin_user,
@@ -3613,20 +3598,18 @@ def test_should_send_branding_and_organisations_to_preview(
     mock_get_organisation,
     mock_get_all_email_branding,
     mock_update_service,
-    endpoint,
-    extra_args,
-    expected_redirect,
 ):
+    extra_args = {'service_id': SERVICE_ONE_ID}
     client_request.login(platform_admin_user)
     client_request.post(
-        endpoint,
+        'main.service_set_email_branding',
         _data={
             'branding_type': 'org',
             'branding_style': '1'
         },
         _expected_status=302,
         _expected_location=url_for(
-            expected_redirect,
+            'main.service_preview_email_branding',
             branding_style='1',
             **extra_args
         ),
