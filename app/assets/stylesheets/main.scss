@@ -32,7 +32,6 @@ $path: '/static/images/';
 // Specific to this application
 @import 'local/typography';
 @import 'grids';
-@import 'components/cookie-message';
 @import 'components/placeholder';
 @import 'components/sms-message';
 @import 'components/page-footer';
@@ -77,7 +76,6 @@ $path: '/static/images/';
 @import 'views/send';
 @import 'views/get_started';
 @import 'views/history';
-@import 'views/cookies';
 @import 'views/webauthn';
 
 // TODO: break this up
