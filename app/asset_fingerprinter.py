@@ -3,23 +3,23 @@ import hashlib
 
 class AssetFingerprinter(object):
     """
-        Get a unique hash for an asset file, so that it doesn't stay cached
-        when it changes
+    Get a unique hash for an asset file, so that it doesn't stay cached
+    when it changes
 
-        Usage:
+    Usage:
 
-            in the application
-            template_data.asset_fingerprinter = AssetFingerprinter()
+        in the application
+        template_data.asset_fingerprinter = AssetFingerprinter()
 
-            where template data is how you pass variables to every template.
+        where template data is how you pass variables to every template.
 
-            in template.html:
-            {{ asset_fingerprinter.get_url('stylesheets/application.css') }}
+        in template.html:
+        {{ asset_fingerprinter.get_url('stylesheets/application.css') }}
 
-        * 'app/static' is assumed to be the root for all asset files
+    * 'app/static' is assumed to be the root for all asset files
     """
 
-    def __init__(self, asset_root='/static/', filesystem_path='app/static/'):
+    def __init__(self, asset_root="/static/", filesystem_path="app/static/"):
         self._cache = {}
         self._asset_root = asset_root
         self._filesystem_path = filesystem_path
@@ -29,20 +29,15 @@ class AssetFingerprinter(object):
             return self._asset_root + asset_path
         if asset_path not in self._cache:
             self._cache[asset_path] = (
-                self._asset_root +
-                asset_path +
-                '?' +
-                self.get_asset_fingerprint(self._filesystem_path + asset_path)
+                self._asset_root + asset_path + "?" + self.get_asset_fingerprint(self._filesystem_path + asset_path)
             )
         return self._cache[asset_path]
 
     def get_asset_fingerprint(self, asset_file_path):
-        return hashlib.md5(
-            self.get_asset_file_contents(asset_file_path)
-        ).hexdigest()
+        return hashlib.md5(self.get_asset_file_contents(asset_file_path)).hexdigest()
 
     def get_asset_file_contents(self, asset_file_path):
-        with open(asset_file_path, 'rb') as asset_file:
+        with open(asset_file_path, "rb") as asset_file:
             contents = asset_file.read()
         return contents
 

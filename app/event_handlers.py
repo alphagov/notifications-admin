@@ -10,7 +10,13 @@ EVENT_SCHEMAS = {
     "add_user_to_service": {"user_id", "invited_by_id", "service_id", "ui_permissions"},
     "set_user_permissions": {"user_id", "service_id", "original_ui_permissions", "new_ui_permissions", "set_by_id"},
     "archive_user": {"user_id", "archived_by_id"},
-    "change_broadcast_account_type": {"service_id", "changed_by_id", "service_mode", "broadcast_channel", "provider_restriction"},  # noqa: E501 (length)
+    "change_broadcast_account_type": {
+        "service_id",
+        "changed_by_id",
+        "service_mode",
+        "broadcast_channel",
+        "provider_restriction",
+    },  # noqa: E501 (length)
     "archive_service": {"service_id", "archived_by_id"},
     "suspend_service": {"service_id", "suspended_by_id"},
     "resume_service": {"service_id", "resumed_by_id"},
@@ -18,39 +24,39 @@ EVENT_SCHEMAS = {
 
 
 def on_user_logged_in(_sender, user):
-    _send_event('sucessful_login', user_id=user.id)
+    _send_event("sucessful_login", user_id=user.id)
 
 
 def create_email_change_event(**kwargs):
-    _send_event('update_user_email', **kwargs)
+    _send_event("update_user_email", **kwargs)
 
 
 def create_mobile_number_change_event(**kwargs):
-    _send_event('update_user_mobile_number', **kwargs)
+    _send_event("update_user_mobile_number", **kwargs)
 
 
 def create_remove_user_from_service_event(**kwargs):
-    _send_event('remove_user_from_service', **kwargs)
+    _send_event("remove_user_from_service", **kwargs)
 
 
 def create_add_user_to_service_event(**kwargs):
-    _send_event('add_user_to_service', **kwargs)
+    _send_event("add_user_to_service", **kwargs)
 
 
 def create_set_user_permissions_event(**kwargs):
-    _send_event('set_user_permissions', **kwargs)
+    _send_event("set_user_permissions", **kwargs)
 
 
 def create_archive_user_event(**kwargs):
-    _send_event('archive_user', **kwargs)
+    _send_event("archive_user", **kwargs)
 
 
 def create_broadcast_account_type_change_event(**kwargs):
-    _send_event('change_broadcast_account_type', **kwargs)
+    _send_event("change_broadcast_account_type", **kwargs)
 
 
 def create_archive_service_event(**kwargs):
-    _send_event('archive_service', **kwargs)
+    _send_event("archive_service", **kwargs)
 
 
 def _send_event(event_type, **kwargs):
@@ -58,7 +64,7 @@ def _send_event(event_type, **kwargs):
     actual_keys = set(kwargs.keys())
 
     if expected_keys != actual_keys:
-        raise ValueError(f'Expected {expected_keys}, but got {actual_keys}')
+        raise ValueError(f"Expected {expected_keys}, but got {actual_keys}")
 
     event_data = _construct_event_data(request)
     event_data.update(kwargs)
@@ -67,8 +73,7 @@ def _send_event(event_type, **kwargs):
 
 
 def _construct_event_data(request):
-    return {'ip_address': _get_remote_addr(request),
-            'browser_fingerprint': _get_browser_fingerprint(request)}
+    return {"ip_address": _get_remote_addr(request), "browser_fingerprint": _get_browser_fingerprint(request)}
 
 
 # This might not be totally correct depending on proxy setup
@@ -85,9 +90,11 @@ def _get_browser_fingerprint(request):
     platform = request.user_agent.platform
     user_agent_string = request.user_agent.string
     # at some point this may be hashed?
-    finger_print = {'browser': browser,
-                    'platform': platform,
-                    'version': version,
-                    'user_agent_string': user_agent_string}
+    finger_print = {
+        "browser": browser,
+        "platform": platform,
+        "version": version,
+        "user_agent_string": user_agent_string,
+    }
 
     return finger_print

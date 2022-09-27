@@ -3,16 +3,14 @@ from flask import url_for
 from tests.conftest import SERVICE_ONE_ID
 
 
-def test_render_sign_out_redirects_to_sign_in(
-    client_request
-):
+def test_render_sign_out_redirects_to_sign_in(client_request):
     with client_request.session_transaction() as session:
         assert session
     client_request.get(
-        'main.sign_out',
+        "main.sign_out",
         _expected_redirect=url_for(
-            'main.index',
-        )
+            "main.index",
+        ),
     )
     with client_request.session_transaction() as session:
         assert not session
@@ -33,36 +31,34 @@ def test_sign_out_user(
     mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
-    mock_get_returned_letter_statistics_with_no_returned_letters
+    mock_get_returned_letter_statistics_with_no_returned_letters,
 ):
     with client_request.session_transaction() as session:
-        assert session.get('user_id') is not None
+        assert session.get("user_id") is not None
     # Check we are logged in
     client_request.get(
-        'main.service_dashboard',
+        "main.service_dashboard",
         service_id=SERVICE_ONE_ID,
     )
     client_request.get(
-        'main.sign_out',
+        "main.sign_out",
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.index',
-        )
+            "main.index",
+        ),
     )
     with client_request.session_transaction() as session:
-        assert session.get('user_id') is None
+        assert session.get("user_id") is None
 
 
-def test_sign_out_of_two_sessions(
-    client_request
-):
+def test_sign_out_of_two_sessions(client_request):
     client_request.get(
-        'main.sign_out',
+        "main.sign_out",
         _expected_status=302,
     )
     with client_request.session_transaction() as session:
         assert not session
     client_request.get(
-        'main.sign_out',
+        "main.sign_out",
         _expected_status=302,
     )

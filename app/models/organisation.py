@@ -11,14 +11,14 @@ from app.notify_client.organisations_api_client import organisations_client
 
 class Organisation(JSONModel):
 
-    TYPE_CENTRAL = 'central'
-    TYPE_LOCAL = 'local'
-    TYPE_NHS_CENTRAL = 'nhs_central'
-    TYPE_NHS_LOCAL = 'nhs_local'
-    TYPE_NHS_GP = 'nhs_gp'
-    TYPE_EMERGENCY_SERVICE = 'emergency_service'
-    TYPE_SCHOOL_OR_COLLEGE = 'school_or_college'
-    TYPE_OTHER = 'other'
+    TYPE_CENTRAL = "central"
+    TYPE_LOCAL = "local"
+    TYPE_NHS_CENTRAL = "nhs_central"
+    TYPE_NHS_LOCAL = "nhs_local"
+    TYPE_NHS_GP = "nhs_gp"
+    TYPE_EMERGENCY_SERVICE = "emergency_service"
+    TYPE_SCHOOL_OR_COLLEGE = "school_or_college"
+    TYPE_OTHER = "other"
 
     NHS_TYPES = (
         TYPE_NHS_CENTRAL,
@@ -26,42 +26,44 @@ class Organisation(JSONModel):
         TYPE_NHS_GP,
     )
 
-    TYPE_LABELS = OrderedDict([
-        (TYPE_CENTRAL, 'Central government'),
-        (TYPE_LOCAL, 'Local government'),
-        (TYPE_NHS_CENTRAL, 'NHS – central government agency or public body'),
-        (TYPE_NHS_LOCAL, 'NHS Trust or Clinical Commissioning Group'),
-        (TYPE_NHS_GP, 'GP practice'),
-        (TYPE_EMERGENCY_SERVICE, 'Emergency service'),
-        (TYPE_SCHOOL_OR_COLLEGE, 'School or college'),
-        (TYPE_OTHER, 'Other'),
-    ])
+    TYPE_LABELS = OrderedDict(
+        [
+            (TYPE_CENTRAL, "Central government"),
+            (TYPE_LOCAL, "Local government"),
+            (TYPE_NHS_CENTRAL, "NHS – central government agency or public body"),
+            (TYPE_NHS_LOCAL, "NHS Trust or Clinical Commissioning Group"),
+            (TYPE_NHS_GP, "GP practice"),
+            (TYPE_EMERGENCY_SERVICE, "Emergency service"),
+            (TYPE_SCHOOL_OR_COLLEGE, "School or college"),
+            (TYPE_OTHER, "Other"),
+        ]
+    )
 
     ALLOWED_PROPERTIES = {
-        'id',
-        'name',
-        'active',
-        'crown',
-        'organisation_type',
-        'letter_branding_id',
-        'email_branding_id',
-        'agreement_signed',
-        'agreement_signed_at',
-        'agreement_signed_by_id',
-        'agreement_signed_version',
-        'agreement_signed_on_behalf_of_name',
-        'agreement_signed_on_behalf_of_email_address',
-        'domains',
-        'request_to_go_live_notes',
-        'count_of_live_services',
-        'billing_contact_email_addresses',
-        'billing_contact_names',
-        'billing_reference',
-        'purchase_order_number',
-        'notes',
+        "id",
+        "name",
+        "active",
+        "crown",
+        "organisation_type",
+        "letter_branding_id",
+        "email_branding_id",
+        "agreement_signed",
+        "agreement_signed_at",
+        "agreement_signed_by_id",
+        "agreement_signed_version",
+        "agreement_signed_on_behalf_of_name",
+        "agreement_signed_on_behalf_of_email_address",
+        "domains",
+        "request_to_go_live_notes",
+        "count_of_live_services",
+        "billing_contact_email_addresses",
+        "billing_contact_names",
+        "billing_reference",
+        "purchase_order_number",
+        "notes",
     }
 
-    __sort_attribute__ = 'name'
+    __sort_attribute__ = "name"
 
     @classmethod
     def from_id(cls, org_id):
@@ -82,21 +84,23 @@ class Organisation(JSONModel):
         return cls.create(
             name=form.name.data,
             crown={
-                'crown': True,
-                'non-crown': False,
-                'unknown': None,
+                "crown": True,
+                "non-crown": False,
+                "unknown": None,
             }.get(form.crown_status.data),
             organisation_type=form.organisation_type.data,
         )
 
     @classmethod
     def create(cls, name, crown, organisation_type, agreement_signed=False):
-        return cls(organisations_client.create_organisation(
-            name=name,
-            crown=crown,
-            organisation_type=organisation_type,
-            agreement_signed=agreement_signed,
-        ))
+        return cls(
+            organisations_client.create_organisation(
+                name=name,
+                crown=crown,
+                organisation_type=organisation_type,
+                agreement_signed=agreement_signed,
+            )
+        )
 
     def __init__(self, _dict):
 
@@ -127,7 +131,7 @@ class Organisation(JSONModel):
             self.billing_contact_email_addresses,
             self.billing_contact_names,
             self.billing_reference,
-            self.purchase_order_number
+            self.purchase_order_number,
         ]
         if any(billing_details):
             return billing_details
@@ -140,24 +144,26 @@ class Organisation(JSONModel):
 
     @cached_property
     def service_ids(self):
-        return [s['id'] for s in self.services]
+        return [s["id"] for s in self.services]
 
     @property
     def live_services(self):
-        return [s for s in self.services if s['active'] and not s['restricted']]
+        return [s for s in self.services if s["active"] and not s["restricted"]]
 
     @property
     def trial_services(self):
-        return [s for s in self.services if not s['active'] or s['restricted']]
+        return [s for s in self.services if not s["active"] or s["restricted"]]
 
     @cached_property
     def invited_users(self):
         from app.models.user import OrganisationInvitedUsers
+
         return OrganisationInvitedUsers(self.id)
 
     @cached_property
     def active_users(self):
         from app.models.user import OrganisationUsers
+
         return OrganisationUsers(self.id)
 
     @cached_property
@@ -167,15 +173,13 @@ class Organisation(JSONModel):
     @cached_property
     def email_branding(self):
         if self.email_branding_id:
-            return email_branding_client.get_email_branding(
-                self.email_branding_id
-            )['email_branding']
+            return email_branding_client.get_email_branding(self.email_branding_id)["email_branding"]
 
     @property
     def email_branding_name(self):
         if self.email_branding_id:
-            return self.email_branding['name']
-        return 'GOV.UK'
+            return self.email_branding["name"]
+        return "GOV.UK"
 
     @property
     def email_branding_pool(self):
@@ -183,38 +187,32 @@ class Organisation(JSONModel):
 
     @property
     def email_branding_pool_names(self):
-        return [branding['name'] for branding in self.email_branding_pool]
+        return [branding["name"] for branding in self.email_branding_pool]
 
     @property
     def email_branding_pool_ids(self):
-        return [branding['id'] for branding in self.email_branding_pool]
+        return [branding["id"] for branding in self.email_branding_pool]
 
     @cached_property
     def letter_branding(self):
         if self.letter_branding_id:
-            return letter_branding_client.get_letter_branding(
-                self.letter_branding_id
-            )
+            return letter_branding_client.get_letter_branding(self.letter_branding_id)
 
     @cached_property
     def agreement_signed_by(self):
         if self.agreement_signed_by_id:
             from app.models.user import User
+
             return User.from_id(self.agreement_signed_by_id)
 
     def update(self, delete_services_cache=False, **kwargs):
         response = organisations_client.update_organisation(
-            self.id,
-            cached_service_ids=self.service_ids if delete_services_cache else None,
-            **kwargs
+            self.id, cached_service_ids=self.service_ids if delete_services_cache else None, **kwargs
         )
         self.__init__(response)
 
     def associate_service(self, service_id):
-        organisations_client.update_service_organisation(
-            service_id,
-            self.id
-        )
+        organisations_client.update_service_organisation(service_id, self.id)
 
     def services_and_usage(self, financial_year):
         return organisations_client.get_services_and_usage(self.id, financial_year)

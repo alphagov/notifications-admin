@@ -21,48 +21,52 @@ from app.utils.templates import get_sample_template
 class ContactList(JSONModel):
 
     ALLOWED_PROPERTIES = {
-        'id',
-        'created_at',
-        'created_by',
-        'has_jobs',
-        'recent_job_count',
-        'service_id',
-        'original_file_name',
-        'row_count',
-        'template_type',
+        "id",
+        "created_at",
+        "created_by",
+        "has_jobs",
+        "recent_job_count",
+        "service_id",
+        "original_file_name",
+        "row_count",
+        "template_type",
     }
 
-    __sort_attribute__ = 'original_file_name'
+    __sort_attribute__ = "original_file_name"
 
-    upload_type = 'contact_list'
+    upload_type = "contact_list"
 
     @classmethod
     def from_id(cls, contact_list_id, *, service_id):
-        return cls(contact_list_api_client.get_contact_list(
-            service_id=service_id,
-            contact_list_id=contact_list_id,
-        ))
+        return cls(
+            contact_list_api_client.get_contact_list(
+                service_id=service_id,
+                contact_list_id=contact_list_id,
+            )
+        )
 
     @staticmethod
     def get_bucket_name():
-        return current_app.config['CONTACT_LIST_UPLOAD_BUCKET_NAME']
+        return current_app.config["CONTACT_LIST_UPLOAD_BUCKET_NAME"]
 
     @staticmethod
     def upload(service_id, file_dict):
         return s3upload(
             service_id,
             file_dict,
-            current_app.config['AWS_REGION'],
+            current_app.config["AWS_REGION"],
             bucket=ContactList.get_bucket_name(),
         )
 
     @staticmethod
     def download(service_id, upload_id):
-        return strip_all_whitespace(s3download(
-            service_id,
-            upload_id,
-            bucket=ContactList.get_bucket_name(),
-        ))
+        return strip_all_whitespace(
+            s3download(
+                service_id,
+                upload_id,
+                bucket=ContactList.get_bucket_name(),
+            )
+        )
 
     @staticmethod
     def set_metadata(service_id, upload_id, **kwargs):
@@ -85,8 +89,8 @@ class ContactList(JSONModel):
         metadata = self.get_metadata(self.service_id, self.id)
         new_upload_id = s3upload(
             self.service_id,
-            {'data': self.contents},
-            current_app.config['AWS_REGION'],
+            {"data": self.contents},
+            current_app.config["AWS_REGION"],
         )
         set_metadata_on_csv_upload(
             self.service_id,
@@ -100,16 +104,18 @@ class ContactList(JSONModel):
 
         metadata = cls.get_metadata(service_id, upload_id)
 
-        if not metadata.get('valid'):
+        if not metadata.get("valid"):
             abort(403)
 
-        return cls(contact_list_api_client.create_contact_list(
-            service_id=service_id,
-            upload_id=upload_id,
-            original_file_name=metadata['original_file_name'],
-            row_count=int(metadata['row_count']),
-            template_type=metadata['template_type'],
-        ))
+        return cls(
+            contact_list_api_client.create_contact_list(
+                service_id=service_id,
+                upload_id=upload_id,
+                original_file_name=metadata["original_file_name"],
+                row_count=int(metadata["row_count"]),
+                template_type=metadata["template_type"],
+            )
+        )
 
     def delete(self):
         contact_list_api_client.delete_contact_list(
@@ -133,7 +139,7 @@ class ContactList(JSONModel):
     @property
     def saved_file_name(self):
         file_name, extention = path.splitext(self.original_file_name)
-        return f'{file_name}.csv'
+        return f"{file_name}.csv"
 
     def get_jobs(self, *, page, limit_days=None):
         return PaginatedJobsAndScheduledJobs(
@@ -150,21 +156,18 @@ class ContactLists(ModelList):
     model = ContactList
     sort_function = partial(
         sorted,
-        key=lambda item: item['created_at'],
+        key=lambda item: item["created_at"],
         reverse=True,
     )
 
     def __init__(self, service_id, template_type=None):
         super().__init__(service_id)
-        self.items = self.sort_function([
-            item for item in self.items
-            if template_type in {item['template_type'], None}
-        ])
+        self.items = self.sort_function([item for item in self.items if template_type in {item["template_type"], None}])
 
 
 class ContactListsAlphabetical(ContactLists):
 
     sort_function = partial(
         sorted,
-        key=lambda item: item['original_file_name'].lower(),
+        key=lambda item: item["original_file_name"].lower(),
     )

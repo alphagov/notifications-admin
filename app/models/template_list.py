@@ -3,7 +3,7 @@ from werkzeug.utils import cached_property
 from app import format_notification_type
 
 
-class TemplateList():
+class TemplateList:
     """
     Represents a list of all templates and folders for a service,
     with optional filtering by "template_type", and by an ancestor
@@ -26,7 +26,7 @@ class TemplateList():
         self,
         *,
         service,
-        template_type='all',
+        template_type="all",
         template_folder_id=None,
     ):
         self.service = service
@@ -38,9 +38,7 @@ class TemplateList():
 
     @cached_property
     def items(self):
-        return list(self._get_templates_and_folders(
-            self.template_type, self.template_folder_id, ancestors=[]
-        ))
+        return list(self._get_templates_and_folders(self.template_type, self.template_folder_id, ancestors=[]))
 
     @property
     def all_template_folders(self):
@@ -53,26 +51,25 @@ class TemplateList():
     def _get_templates_and_folders(self, template_type, template_folder_id, ancestors):
 
         for item in self._get_template_folders(
-            template_type, template_folder_id,
+            template_type,
+            template_folder_id,
         ):
             yield TemplateListFolder(
                 item,
                 folders=self._get_template_folders(
-                    template_type, item['id'],
+                    template_type,
+                    item["id"],
                 ),
-                templates=self._get_templates(
-                    template_type, item['id']
-                ),
+                templates=self._get_templates(template_type, item["id"]),
                 ancestors=ancestors,
                 service_id=self.service.id,
             )
-            for sub_item in self._get_templates_and_folders(
-                template_type, item['id'], ancestors + [item]
-            ):
+            for sub_item in self._get_templates_and_folders(template_type, item["id"], ancestors + [item]):
                 yield sub_item
 
         for item in self._get_templates(
-            template_type, template_folder_id,
+            template_type,
+            template_folder_id,
         ):
             yield TemplateListTemplate(
                 item,
@@ -85,9 +82,10 @@ class TemplateList():
             template_folder_id = str(template_folder_id)
 
         return [
-            template for template in self.all_templates
-            if (set([template_type]) & {'all', template['template_type']})
-            and template.get('folder') == template_folder_id
+            template
+            for template in self.all_templates
+            if (set([template_type]) & {"all", template["template_type"]})
+            and template.get("folder") == template_folder_id
         ]
 
     def _get_template_folders(self, template_type, parent_folder_id):
@@ -95,23 +93,21 @@ class TemplateList():
             parent_folder_id = str(parent_folder_id)
 
         return [
-            folder for folder in self.all_template_folders
-            if (
-                folder['parent_id'] == parent_folder_id
-                and self._is_folder_visible(folder['id'], template_type)
-            )
+            folder
+            for folder in self.all_template_folders
+            if (folder["parent_id"] == parent_folder_id and self._is_folder_visible(folder["id"], template_type))
         ]
 
     def _is_folder_visible(self, template_folder_id, template_type):
 
-        if template_type == 'all':
+        if template_type == "all":
             return True
 
         if self._get_templates(template_type, template_folder_id):
             return True
 
         if any(
-            self._is_folder_visible(child_folder['id'], template_type)
+            self._is_folder_visible(child_folder["id"], template_type)
             for child_folder in self._get_template_folders(template_type, template_folder_id)
         ):
             return True
@@ -124,9 +120,7 @@ class TemplateList():
 
     @property
     def folder_is_empty(self):
-        return not any(self._get_templates_and_folders(
-            'all', self.template_folder_id, []
-        ))
+        return not any(self._get_templates_and_folders("all", self.template_folder_id, []))
 
 
 class UserTemplateList(TemplateList):
@@ -153,16 +147,15 @@ class UserTemplateList(TemplateList):
 
     @cached_property
     def all_templates(self):
-        all_folder_ids = [
-            folder['id'] for folder in self.all_template_folders
-        ]
+        all_folder_ids = [folder["id"] for folder in self.all_template_folders]
 
         return [
-            template for template in self.service.all_templates
+            template
+            for template in self.service.all_templates
             # Check if each template is in a folder the user has
             # access to. If it's not in a folder ("None"), then
             # it's at the top level and all users have access.
-            if template['folder'] in (all_folder_ids + [None])
+            if template["folder"] in (all_folder_ids + [None])
         ]
 
     @cached_property
@@ -189,8 +182,10 @@ class UserTemplateList(TemplateList):
                 user_folders.append(folder)
             else:
                 folder_attrs = {
-                    "id": folder["id"], "name": folder["name"], "parent_id": folder["parent_id"],
-                    "users_with_permission": folder["users_with_permission"]
+                    "id": folder["id"],
+                    "name": folder["name"],
+                    "parent_id": folder["parent_id"],
+                    "users_with_permission": folder["users_with_permission"],
                 }
                 while folder_attrs["parent_id"] is not None:
                     folder_attrs["name"] = [
@@ -224,11 +219,11 @@ class ServiceTemplateList(UserTemplateList):
         template_list_service = TemplateListService(
             self.service,
             templates=self._get_templates(
-                template_type='all',
+                template_type="all",
                 template_folder_id=None,
             ),
             folders=self._get_template_folders(
-                template_type='all',
+                template_type="all",
                 parent_folder_id=None,
             ),
         )
@@ -236,13 +231,11 @@ class ServiceTemplateList(UserTemplateList):
         yield template_list_service
 
         yield from self._get_templates_and_folders(
-            self.template_type,
-            self.template_folder_id,
-            ancestors=[template_list_service]
+            self.template_type, self.template_folder_id, ancestors=[template_list_service]
         )
 
 
-class UserTemplateLists():
+class UserTemplateLists:
     """
     Represents one or more lists of templates and folders
     for each service a user has access to.
@@ -276,7 +269,7 @@ class UserTemplateLists():
         return bool(self.services)
 
 
-class TemplateListItem():
+class TemplateListItem:
 
     is_service = False
 
@@ -285,8 +278,8 @@ class TemplateListItem():
         template_or_folder,
         ancestors,
     ):
-        self.id = template_or_folder['id']
-        self.name = template_or_folder['name']
+        self.id = template_or_folder["id"]
+        self.name = template_or_folder["name"]
         self.ancestors = ancestors
 
 
@@ -302,17 +295,17 @@ class TemplateListTemplate(TemplateListItem):
     ):
         super().__init__(template, ancestors)
         self.service_id = service_id
-        self.template_type = template['template_type']
-        self.content = template.get('content')
+        self.template_type = template["template_type"]
+        self.content = template.get("content")
 
     @property
     def hint(self):
-        if self.template_type == 'broadcast':
+        if self.template_type == "broadcast":
             max_length_in_chars = 40
             if len(self.content) > (max_length_in_chars + 2):
-                return self.content[:max_length_in_chars].strip() + '…'
+                return self.content[:max_length_in_chars].strip() + "…"
             return self.content
-        return format_notification_type(self.template_type) + ' template'
+        return format_notification_type(self.template_type) + " template"
 
 
 class TemplateListFolder(TemplateListItem):
@@ -336,21 +329,21 @@ class TemplateListFolder(TemplateListItem):
     def _hint_parts(self):
 
         if self.number_of_folders == self.number_of_templates == 0:
-            yield 'Empty'
+            yield "Empty"
 
         if self.number_of_templates == 1:
-            yield '1 template'
+            yield "1 template"
         elif self.number_of_templates > 1:
-            yield '{} templates'.format(self.number_of_templates)
+            yield "{} templates".format(self.number_of_templates)
 
         if self.number_of_folders == 1:
-            yield '1 folder'
+            yield "1 folder"
         elif self.number_of_folders > 1:
-            yield '{} folders'.format(self.number_of_folders)
+            yield "{} folders".format(self.number_of_folders)
 
     @property
     def hint(self):
-        return ', '.join(self._hint_parts)
+        return ", ".join(self._hint_parts)
 
 
 class TemplateListService(TemplateListFolder):

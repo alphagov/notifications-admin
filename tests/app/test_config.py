@@ -8,7 +8,7 @@ from app import config
 
 
 def cf_conf():
-    os.environ['API_HOST_NAME'] = 'cf'
+    os.environ["API_HOST_NAME"] = "cf"
 
 
 @pytest.fixture
@@ -28,29 +28,29 @@ def reload_config(os_environ):
 
 
 def test_load_cloudfoundry_config_if_available(reload_config):
-    os.environ['API_HOST_NAME'] = 'env'
-    os.environ['VCAP_APPLICATION'] = 'some json blob'
+    os.environ["API_HOST_NAME"] = "env"
+    os.environ["VCAP_APPLICATION"] = "some json blob"
 
-    with mock.patch('app.cloudfoundry_config.extract_cloudfoundry_config', side_effect=cf_conf) as cf_config:
+    with mock.patch("app.cloudfoundry_config.extract_cloudfoundry_config", side_effect=cf_conf) as cf_config:
         # reload config so that its module level code (ie: all of it) is re-instantiated
         importlib.reload(config)
 
     assert cf_config.called
 
-    assert os.environ['API_HOST_NAME'] == 'cf'
-    assert config.Config.API_HOST_NAME == 'cf'
+    assert os.environ["API_HOST_NAME"] == "cf"
+    assert config.Config.API_HOST_NAME == "cf"
 
 
 def test_load_config_if_cloudfoundry_not_available(reload_config):
-    os.environ['API_HOST_NAME'] = 'env'
+    os.environ["API_HOST_NAME"] = "env"
 
-    os.environ.pop('VCAP_APPLICATION', None)
+    os.environ.pop("VCAP_APPLICATION", None)
 
-    with mock.patch('app.cloudfoundry_config.extract_cloudfoundry_config') as cf_config:
+    with mock.patch("app.cloudfoundry_config.extract_cloudfoundry_config") as cf_config:
         # reload config so that its module level code (ie: all of it) is re-instantiated
         importlib.reload(config)
 
     assert not cf_config.called
 
-    assert os.environ['API_HOST_NAME'] == 'env'
-    assert config.Config.API_HOST_NAME == 'env'
+    assert os.environ["API_HOST_NAME"] == "env"
+    assert config.Config.API_HOST_NAME == "env"

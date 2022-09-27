@@ -23,7 +23,6 @@ class GetItemByIdMixin:
 
 
 class BaseBroadcastArea(ABC):
-
     @property
     @abstractmethod
     def simple_polygons(self):
@@ -51,12 +50,12 @@ class BaseBroadcastArea(ABC):
 
     @property
     def estimated_bleed_in_m(self):
-        '''
+        """
         Estimates the amount of bleed based on the population of an
         area. Higher density areas tend to have short range masts, so
         the bleed is low (down to 500m). Lower density areas have longer
         range masts, so the typical bleed will be high (up to 5,000m).
-        '''
+        """
         if self.phone_density < 1:
             return Polygons.approx_bleed_in_m
         estimated_bleed = 5_900 - (math.log(self.phone_density, 10) * 1_250)
@@ -65,18 +64,18 @@ class BaseBroadcastArea(ABC):
 
 class BroadcastArea(BaseBroadcastArea, SortingAndEqualityMixin):
 
-    __sort_attribute__ = 'name'
+    __sort_attribute__ = "name"
 
     def __init__(self, row):
         self.id, self.name, self._count_of_phones, self.library_id = row
 
     @cached_property
     def is_lower_tier_local_authority(self):
-        return self.id.startswith('lad21-') and self.parent
+        return self.id.startswith("lad21-") and self.parent
 
     @cached_property
     def is_electoral_ward(self):
-        return self.id.startswith('wd21-')
+        return self.id.startswith("wd21-")
 
     @classmethod
     def from_row_with_simple_polygons(cls, row):
@@ -90,25 +89,16 @@ class BroadcastArea(BaseBroadcastArea, SortingAndEqualityMixin):
     @cached_property
     def polygons(self):
         polygons, utm_crs = BroadcastAreasRepository().get_polygons_for_area(self.id)
-        return Polygons(
-            polygons, utm_crs=utm_crs
-        )
+        return Polygons(polygons, utm_crs=utm_crs)
 
     @cached_property
     def simple_polygons(self):
-        simple_polygons, utm_crs = (
-            BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
-        )
-        return Polygons(
-            simple_polygons, utm_crs=utm_crs
-        ).utm_polygons
+        simple_polygons, utm_crs = BroadcastAreasRepository().get_simple_polygons_for_area(self.id)
+        return Polygons(simple_polygons, utm_crs=utm_crs).utm_polygons
 
     @cached_property
     def sub_areas(self):
-        return [
-            BroadcastArea(row)
-            for row in BroadcastAreasRepository().get_all_areas_for_group(self.id)
-        ]
+        return [BroadcastArea(row) for row in BroadcastAreasRepository().get_all_areas_for_group(self.id)]
 
     @property
     def count_of_phones(self):
@@ -146,7 +136,6 @@ class BroadcastArea(BaseBroadcastArea, SortingAndEqualityMixin):
 
 
 class CustomBroadcastArea(BaseBroadcastArea):
-
     def __init__(self, *, name, polygons=None):
         self.name = name
         self._polygons = polygons or []
@@ -162,31 +151,26 @@ class CustomBroadcastArea(BaseBroadcastArea):
         return Polygons(
             # Polygons in the DB are stored with the coordinate pair
             # order flipped – this flips them back again
-            [
-                [[lat, long] for long, lat in polygon]
-                for polygon in self._polygons
-            ]
+            [[[lat, long] for long, lat in polygon] for polygon in self._polygons]
         )
 
     simple_polygons = polygons
 
     @cached_property
     def overlapping_electoral_wards(self):
-        return [
-            area for area in self.nearby_electoral_wards
-            if area.simple_polygons.intersects(self.polygons)
-        ]
+        return [area for area in self.nearby_electoral_wards if area.simple_polygons.intersects(self.polygons)]
 
     @cached_property
     def nearby_electoral_wards(self):
         if not self.polygons:
             return []
-        return broadcast_area_libraries.get_areas_with_simple_polygons([
-            # We only index electoral wards in the RTree
-            overlap.data for overlap in rtree_index.query(
-                Rect(*self.simple_polygons.bounds)
-            )
-        ])
+        return broadcast_area_libraries.get_areas_with_simple_polygons(
+            [
+                # We only index electoral wards in the RTree
+                overlap.data
+                for overlap in rtree_index.query(Rect(*self.simple_polygons.bounds))
+            ]
+        )
 
     @cached_property
     def count_of_phones(self):
@@ -214,7 +198,7 @@ class BroadcastAreaLibrary(SerialisedModelCollection, SortingAndEqualityMixin, G
 
     model = BroadcastArea
 
-    __sort_attribute__ = 'name'
+    __sort_attribute__ = "name"
 
     def __init__(self, row):
         id, name, name_singular, is_group = row
@@ -231,9 +215,9 @@ class BroadcastAreaLibrary(SerialisedModelCollection, SortingAndEqualityMixin, G
         count_of_areas_not_named = len(self.items) - 3
         # if there's exactly one area not named, there are exactly four - we should just show all four.
         if count_of_areas_not_named > 1:
-            areas_to_show = areas_to_show[:3] + [f'{count_of_areas_not_named} more…']
+            areas_to_show = areas_to_show[:3] + [f"{count_of_areas_not_named} more…"]
 
-        return formatted_list(areas_to_show, before_each='', after_each='')
+        return formatted_list(areas_to_show, before_each="", after_each="")
 
 
 class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):

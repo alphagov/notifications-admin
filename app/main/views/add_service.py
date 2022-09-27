@@ -16,12 +16,12 @@ def _create_service(service_name, organisation_type, email_from, form):
         service_id = service_api_client.create_service(
             service_name=service_name,
             organisation_type=organisation_type,
-            message_limit=current_app.config['DEFAULT_SERVICE_LIMIT'],
+            message_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
             restricted=True,
-            user_id=session['user_id'],
+            user_id=session["user_id"],
             email_from=email_from,
         )
-        session['service_id'] = service_id
+        session["service_id"] = service_id
 
         return service_id, None
     except HTTPError as e:
@@ -37,26 +37,24 @@ def _create_service(service_name, organisation_type, email_from, form):
 
 def _create_example_template(service_id):
     example_sms_template = service_api_client.create_service_template(
-        'Example text message template',
-        'sms',
-        'Hey ((name)), I’m trying out Notify. Today is ((day of week)) and my favourite colour is ((colour)).',
+        "Example text message template",
+        "sms",
+        "Hey ((name)), I’m trying out Notify. Today is ((day of week)) and my favourite colour is ((colour)).",
         service_id,
     )
     return example_sms_template
 
 
-@main.route("/add-service", methods=['GET', 'POST'])
+@main.route("/add-service", methods=["GET", "POST"])
 @user_is_logged_in
 @user_is_gov_user
 def add_service():
     default_organisation_type = current_user.default_organisation_type
-    if default_organisation_type == 'nhs':
+    if default_organisation_type == "nhs":
         form = CreateNhsServiceForm()
         default_organisation_type = None
     else:
-        form = CreateServiceForm(
-            organisation_type=default_organisation_type
-        )
+        form = CreateServiceForm(organisation_type=default_organisation_type)
 
     if form.validate_on_submit():
         email_from = email_safe(form.name.data)
@@ -70,39 +68,37 @@ def add_service():
         )
         if error:
             return _render_add_service_page(form, default_organisation_type)
-        if len(service_api_client.get_active_services({'user_id': session['user_id']}).get('data', [])) > 1:
+        if len(service_api_client.get_active_services({"user_id": session["user_id"]}).get("data", [])) > 1:
 
             # if user has email auth, it makes sense that people they invite to their new service can have it too
             if current_user.email_auth:
                 new_service = Service.from_id(service_id)
                 new_service.force_permission("email_auth", on=True)
 
-            return redirect(url_for('main.service_dashboard', service_id=service_id))
+            return redirect(url_for("main.service_dashboard", service_id=service_id))
 
         example_sms_template = _create_example_template(service_id)
 
-        return redirect(url_for(
-            'main.begin_tour',
-            service_id=service_id,
-            template_id=example_sms_template['data']['id']
-        ))
+        return redirect(
+            url_for("main.begin_tour", service_id=service_id, template_id=example_sms_template["data"]["id"])
+        )
     else:
         return _render_add_service_page(form, default_organisation_type)
 
 
 def _render_add_service_page(form, default_organisation_type):
-    heading = 'About your service'
+    heading = "About your service"
 
-    if default_organisation_type == 'local':
+    if default_organisation_type == "local":
         return render_template(
-            'views/add-service-local.html',
+            "views/add-service-local.html",
             form=form,
             heading=heading,
             default_organisation_type=default_organisation_type,
         )
 
     return render_template(
-        'views/add-service.html',
+        "views/add-service.html",
         form=form,
         heading=heading,
         default_organisation_type=default_organisation_type,

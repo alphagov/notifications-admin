@@ -16,7 +16,7 @@ def features_nav():
                     "name": "Letters",
                     "link": "main.features_letters",
                 },
-            ]
+            ],
         },
         {
             "name": "Roadmap",
@@ -92,7 +92,7 @@ def using_notify_nav():
                     "name": "Letter specification",
                     "link": "main.letter_specification",
                 },
-            ]
+            ],
         },
         {
             "name": "API documentation",
