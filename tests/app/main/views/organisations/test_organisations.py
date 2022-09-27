@@ -1473,8 +1473,8 @@ def test_update_organisation_domains_with_more_than_just_domain(
         page.select_one(".banner-dangerous").text
      ) == (
         "There is a problem "
-        "Item 1: Enter a domain name without a leading ‘@’ "
-        "Item 3: Enter a domain name without a leading ‘@’"
+        "Item 1: Cannot contain @ "
+        "Item 3: Cannot contain @"
     )
 
 

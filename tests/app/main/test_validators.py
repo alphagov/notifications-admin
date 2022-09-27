@@ -4,6 +4,7 @@ import pytest
 from wtforms import ValidationError
 
 from app.main.validators import (
+    CharactersNotAllowed,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
     OnlySMSCharacters,
@@ -126,3 +127,20 @@ def test_if_string_does_not_contain_alphanumeric_characters_raises(string):
 @pytest.mark.parametrize("string", [".A8", "AB.", ".42...."])
 def test_if_string_contains_alphanumeric_characters_does_not_raise(string):
     MustContainAlphanumericCharacters()(None, _gen_mock_field(string))
+
+
+def test_string_cannot_contain_characters():
+    with pytest.raises(ValidationError) as error:
+        CharactersNotAllowed('abcdef')(None, _gen_mock_field('abc'))
+
+    assert str(error.value) == "Cannot contain a, b or c"
+
+
+def test_string_cannot_contain_characters_with_custom_error_message():
+    with pytest.raises(ValidationError) as error:
+        CharactersNotAllowed(
+            'abcdef',
+            message='Cannot use first 3 letters of the alphabet'
+        )(None, _gen_mock_field('abc'))
+
+    assert str(error.value) == "Cannot use first 3 letters of the alphabet"

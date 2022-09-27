@@ -6,6 +6,7 @@ from notifications_utils.formatters import formatted_list
 from notifications_utils.recipients import InvalidEmailError, validate_email_address
 from notifications_utils.sanitise_text import SanitiseSMS
 from notifications_utils.template import BroadcastMessageTemplate
+from orderedset import OrderedSet
 from wtforms import ValidationError
 
 from app.main._commonly_used_passwords import commonly_used_passwords
@@ -185,11 +186,19 @@ class MustContainAlphanumericCharacters:
             raise ValidationError(self.message)
 
 
-class NoAtSymbols:
+class CharactersNotAllowed:
 
-    def __init__(self, message='Enter a domain name without a leading ‘@’'):
+    def __init__(self, characters_not_allowed, *, message=None):
+        self.characters_not_allowed = OrderedSet(characters_not_allowed)
         self.message = message
 
     def __call__(self, form, field):
-        if '@' in field.data:
-            raise ValidationError(self.message)
+        illegal_characters = self.characters_not_allowed.intersection(field.data)
+
+        if illegal_characters:
+            if self.message:
+                raise ValidationError(self.message)
+            raise ValidationError(
+                f'Cannot contain '
+                f'{formatted_list(illegal_characters, conjunction="or", before_each="", after_each="")}'
+            )

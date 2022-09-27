@@ -58,12 +58,12 @@ from app.formatters import (
 )
 from app.main.validators import (
     BroadcastLength,
+    CharactersNotAllowed,
     CommonlyUsedPassword,
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
     LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly,
     MustContainAlphanumericCharacters,
-    NoAtSymbols,
     NoCommasInPlaceHolders,
     NoEmbeddedImagesInSVG,
     NoPlaceholders,
@@ -1166,7 +1166,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
         StripWhitespaceStringField(
             "",
             validators=[
-                NoAtSymbols(),
+                CharactersNotAllowed('@'),
                 Optional(),
             ],
             default="",
