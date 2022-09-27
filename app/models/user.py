@@ -32,7 +32,11 @@ def _get_org_id_from_view_args():
     return str(request.view_args.get('org_id', '')) or None
 
 
-class User(JSONModel, UserMixin):
+class BaseUser(JSONModel):
+    __sort_attribute__ = 'email_address'
+
+
+class User(BaseUser, UserMixin):
 
     MAX_FAILED_LOGIN_COUNT = 10
 
@@ -452,7 +456,7 @@ class User(JSONModel, UserMixin):
         return False
 
 
-class InvitedUser(JSONModel):
+class InvitedUser(BaseUser):
 
     ALLOWED_PROPERTIES = {
         'id',
@@ -590,7 +594,7 @@ class InvitedUser(JSONModel):
         return False
 
 
-class InvitedOrgUser(JSONModel):
+class InvitedOrgUser(BaseUser):
 
     ALLOWED_PROPERTIES = {
         'id',

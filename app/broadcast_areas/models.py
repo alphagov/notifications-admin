@@ -8,22 +8,10 @@ from rtreelib import Rect
 from werkzeug.utils import cached_property
 
 from app.formatters import square_metres_to_square_miles
-from app.models import SortByNameMixin
+from app.models import SortingAndEqualityMixin
 
 from .populations import CITY_OF_LONDON
 from .repo import BroadcastAreasRepository, rtree_index
-
-
-class IdEqualityMixin:
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}(<{self.id}>)'
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __hash__(self):
-        return hash(self.id)
 
 
 class GetItemByIdMixin:
@@ -75,7 +63,9 @@ class BaseBroadcastArea(ABC):
         return max(500, min(estimated_bleed, 5000))
 
 
-class BroadcastArea(BaseBroadcastArea, IdEqualityMixin, SortByNameMixin):
+class BroadcastArea(BaseBroadcastArea, SortingAndEqualityMixin):
+
+    __sort_attribute__ = 'name'
 
     def __init__(self, row):
         self.id, self.name, self._count_of_phones, self.library_id = row
@@ -220,9 +210,11 @@ class CustomBroadcastAreas(SerialisedModelCollection):
         )
 
 
-class BroadcastAreaLibrary(SerialisedModelCollection, SortByNameMixin, IdEqualityMixin, GetItemByIdMixin):
+class BroadcastAreaLibrary(SerialisedModelCollection, SortingAndEqualityMixin, GetItemByIdMixin):
 
     model = BroadcastArea
+
+    __sort_attribute__ = 'name'
 
     def __init__(self, row):
         id, name, name_singular, is_group = row

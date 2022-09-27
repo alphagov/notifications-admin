@@ -1,4 +1,5 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
+from functools import total_ordering
 
 from flask import abort
 from notifications_utils.serialised_model import (
@@ -7,7 +8,38 @@ from notifications_utils.serialised_model import (
 )
 
 
-class JSONModel(SerialisedModel):
+@total_ordering
+class SortingAndEqualityMixin(ABC):
+
+    @property
+    @abstractmethod
+    def __sort_attribute__(self):
+        """
+        Subclasses that want sorting to work must set this property to the
+        string name of the attribute on which the instances should be
+        sorted. For example 'email_address' or 'created_at' to sort on
+        instance.email_address or instance.created_at respectively.
+        """
+        pass
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(<{self.id}>)'
+
+    def __lt__(self, other):
+        return (
+            getattr(self, self.__sort_attribute__).lower()
+        ) < (
+            getattr(other, self.__sort_attribute__).lower()
+        )
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __hash__(self):
+        return hash(self.id)
+
+
+class JSONModel(SerialisedModel, SortingAndEqualityMixin):
 
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
@@ -18,12 +50,6 @@ class JSONModel(SerialisedModel):
 
     def __bool__(self):
         return self._dict != {}
-
-    def __hash__(self):
-        return hash(self.id)
-
-    def __eq__(self, other):
-        return self.id == other.id
 
     def _get_by_id(self, things, id):
         try:
@@ -60,9 +86,3 @@ class PaginatedModelList(ModelList):
         self.items = response[self.response_key]
         self.prev_page = response.get('links', {}).get('prev', None)
         self.next_page = response.get('links', {}).get('next', None)
-
-
-class SortByNameMixin():
-
-    def __lt__(self, other):
-        return self.name.lower() < other.name.lower()

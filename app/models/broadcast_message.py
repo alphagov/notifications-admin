@@ -48,6 +48,8 @@ class BroadcastMessage(JSONModel):
 
     libraries = broadcast_area_libraries
 
+    __sort_attribute__ = None  # Class defines its own sorting behaviour
+
     def __lt__(self, other):
         if self.starts_at and other.starts_at:
             return self.starts_at < other.starts_at

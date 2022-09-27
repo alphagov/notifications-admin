@@ -2,7 +2,7 @@ from flask import abort, current_app
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel, SortByNameMixin
+from app.models import JSONModel
 from app.models.contact_list import ContactLists
 from app.models.job import (
     ImmediateJobs,
@@ -27,7 +27,7 @@ from app.notify_client.template_folder_api_client import (
 from app.utils import get_default_sms_sender
 
 
-class Service(JSONModel, SortByNameMixin):
+class Service(JSONModel):
 
     ALLOWED_PROPERTIES = {
         'active',
@@ -56,6 +56,8 @@ class Service(JSONModel, SortByNameMixin):
         'volume_sms',
         'volume_letter',
     }
+
+    __sort_attribute__ = 'name'
 
     TEMPLATE_TYPES = (
         'email',
@@ -181,10 +183,7 @@ class Service(JSONModel, SortByNameMixin):
 
     @cached_property
     def team_members(self):
-        return sorted(
-            self.invited_users + self.active_users,
-            key=lambda user: user.email_address.lower(),
-        )
+        return self.invited_users + self.active_users
 
     @cached_property
     def has_team_members(self):

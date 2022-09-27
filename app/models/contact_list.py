@@ -32,6 +32,8 @@ class ContactList(JSONModel):
         'template_type',
     }
 
+    __sort_attribute__ = 'original_file_name'
+
     upload_type = 'contact_list'
 
     @classmethod
