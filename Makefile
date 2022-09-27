@@ -60,6 +60,7 @@ generate-version-file: ## Generates the app version file
 test: ## Run tests
 	flake8 .
 	isort --check-only ./app ./tests
+	black --check .
 	source $(HOME)/.nvm/nvm.sh && npm test
 	py.test -n auto --maxfail=10 tests/
 
