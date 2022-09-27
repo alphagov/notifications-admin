@@ -13,6 +13,7 @@
     {% set email_address_row =
       {
         "key": {
+          "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
           "text": "Email address"
         },
         "value": {
@@ -33,6 +34,7 @@
       {
         "classes": "govuk-summary-list__row--no-actions",
         "key": {
+          "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
           "text": "Email address"
         },
         "value": {
@@ -45,6 +47,7 @@
   {% set rows = [
     {
       "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
         "text": "Name"
       },
       "value": {
@@ -64,6 +67,7 @@
     email_address_row,
     {
       "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
         "text": "Mobile number"
       },
       "value": {
@@ -84,6 +88,7 @@
     },
     {
       "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
         "text": "Password"
       },
       "value": {
@@ -106,6 +111,7 @@
   {% set _ = rows.append(
     {
       "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
         "text": "Security keys"
       },
       "value": {
@@ -130,6 +136,7 @@
   {% set _ = rows.append(
     {
       "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
         "text": "Use platform admin view"
       },
       "value": {
@@ -150,7 +157,7 @@
 {% endif %}
 
 {{ govukSummaryList({
-  "classes": "settings-summary-list settings-summary-list--full-width",
+  "classes": "notify-summary-list",
   "rows": rows
 }) }}
 
