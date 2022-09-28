@@ -8,10 +8,16 @@ from orderedset._orderedset import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
 
-SENDING_STATUSES = ['created', 'pending', 'sending', 'pending-virus-check']
-DELIVERED_STATUSES = ['delivered', 'sent', 'returned-letter']
-FAILURE_STATUSES = ['failed', 'temporary-failure', 'permanent-failure',
-                    'technical-failure', 'virus-scan-failed', 'validation-failed']
+SENDING_STATUSES = ["created", "pending", "sending", "pending-virus-check"]
+DELIVERED_STATUSES = ["delivered", "sent", "returned-letter"]
+FAILURE_STATUSES = [
+    "failed",
+    "temporary-failure",
+    "permanent-failure",
+    "technical-failure",
+    "virus-scan-failed",
+    "validation-failed",
+]
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
 NOTIFICATION_TYPES = ["sms", "email", "letter", "broadcast"]
@@ -27,12 +33,14 @@ def service_has_permission(permission):
             if not current_service or not current_service.has_permission(permission):
                 abort(403)
             return func(*args, **kwargs)
+
         return wrap_func
+
     return wrap
 
 
 def get_help_argument():
-    return request.args.get('help') if request.args.get('help') in ('1', '2', '3') else None
+    return request.args.get("help") if request.args.get("help") in ("1", "2", "3") else None
 
 
 def parse_filter_args(filter_dict):
@@ -40,44 +48,42 @@ def parse_filter_args(filter_dict):
         filter_dict = MultiDict(filter_dict)
 
     return MultiDict(
-        (
-            key,
-            (','.join(filter_dict.getlist(key))).split(',')
-        )
+        (key, (",".join(filter_dict.getlist(key))).split(","))
         for key in filter_dict.keys()
-        if ''.join(filter_dict.getlist(key))
+        if "".join(filter_dict.getlist(key))
     )
 
 
 def set_status_filters(filter_args):
-    status_filters = filter_args.get('status', [])
-    return list(OrderedSet(chain(
-        (status_filters or REQUESTED_STATUSES),
-        DELIVERED_STATUSES if 'delivered' in status_filters else [],
-        SENDING_STATUSES if 'sending' in status_filters else [],
-        FAILURE_STATUSES if 'failed' in status_filters else []
-    )))
+    status_filters = filter_args.get("status", [])
+    return list(
+        OrderedSet(
+            chain(
+                (status_filters or REQUESTED_STATUSES),
+                DELIVERED_STATUSES if "delivered" in status_filters else [],
+                SENDING_STATUSES if "sending" in status_filters else [],
+                FAILURE_STATUSES if "failed" in status_filters else [],
+            )
+        )
+    )
 
 
 def unicode_truncate(s, length):
-    encoded = s.encode('utf-8')[:length]
-    return encoded.decode('utf-8', 'ignore')
+    encoded = s.encode("utf-8")[:length]
+    return encoded.decode("utf-8", "ignore")
 
 
 def should_skip_template_page(db_template):
     return (
-        current_user.has_permissions('send_messages')
-        and not current_user.has_permissions('manage_templates', 'manage_api_keys')
-        and db_template['template_type'] != 'letter'
-        and not db_template['archived']
+        current_user.has_permissions("send_messages")
+        and not current_user.has_permissions("manage_templates", "manage_api_keys")
+        and db_template["template_type"] != "letter"
+        and not db_template["archived"]
     )
 
 
 def get_default_sms_sender(sms_senders):
-    return str(next((
-        Field(x['sms_sender'], html='escape')
-        for x in sms_senders if x['is_default']
-    ), "None"))
+    return str(next((Field(x["sms_sender"], html="escape") for x in sms_senders if x["is_default"]), "None"))
 
 
 class PermanentRedirect(RequestRedirect):
@@ -86,6 +92,7 @@ class PermanentRedirect(RequestRedirect):
     308 status codes are not supported when Internet Explorer is used with Windows 7
     and Windows 8.1, so this class keeps the original status code of 301.
     """
+
     code = 301
 
 
@@ -94,8 +101,9 @@ def hide_from_search_engines(f):
     def decorated_function(*args, **kwargs):
         g.hide_from_search_engines = True
         response = make_response(f(*args, **kwargs))
-        response.headers['X-Robots-Tag'] = 'noindex'
+        response.headers["X-Robots-Tag"] = "noindex"
         return response
+
     return decorated_function
 
 

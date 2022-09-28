@@ -4,12 +4,7 @@ from werkzeug.utils import cached_property
 
 from app.models import JSONModel
 from app.models.contact_list import ContactLists
-from app.models.job import (
-    ImmediateJobs,
-    PaginatedJobs,
-    PaginatedUploads,
-    ScheduledJobs,
-)
+from app.models.job import ImmediateJobs, PaginatedJobs, PaginatedUploads, ScheduledJobs
 from app.models.organisation import Organisation
 from app.models.user import InvitedUsers, User, Users
 from app.notify_client.api_key_api_client import api_key_api_client
@@ -21,68 +16,66 @@ from app.notify_client.job_api_client import job_api_client
 from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
-from app.notify_client.template_folder_api_client import (
-    template_folder_api_client,
-)
+from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.utils import get_default_sms_sender
 
 
 class Service(JSONModel):
 
     ALLOWED_PROPERTIES = {
-        'active',
-        'allowed_broadcast_provider',
-        'billing_contact_email_addresses',
-        'billing_contact_names',
-        'billing_reference',
-        'broadcast_channel',
-        'consent_to_research',
-        'contact_link',
-        'count_as_live',
-        'email_from',
-        'go_live_at',
-        'go_live_user',
-        'id',
-        'inbound_api',
-        'message_limit',
-        'rate_limit',
-        'name',
-        'notes',
-        'prefix_sms',
-        'purchase_order_number',
-        'research_mode',
-        'service_callback_api',
-        'volume_email',
-        'volume_sms',
-        'volume_letter',
+        "active",
+        "allowed_broadcast_provider",
+        "billing_contact_email_addresses",
+        "billing_contact_names",
+        "billing_reference",
+        "broadcast_channel",
+        "consent_to_research",
+        "contact_link",
+        "count_as_live",
+        "email_from",
+        "go_live_at",
+        "go_live_user",
+        "id",
+        "inbound_api",
+        "message_limit",
+        "rate_limit",
+        "name",
+        "notes",
+        "prefix_sms",
+        "purchase_order_number",
+        "research_mode",
+        "service_callback_api",
+        "volume_email",
+        "volume_sms",
+        "volume_letter",
     }
 
-    __sort_attribute__ = 'name'
+    __sort_attribute__ = "name"
 
     TEMPLATE_TYPES = (
-        'email',
-        'sms',
-        'letter',
-        'broadcast',
+        "email",
+        "sms",
+        "letter",
+        "broadcast",
     )
 
     ALL_PERMISSIONS = TEMPLATE_TYPES + (
-        'edit_folder_permissions',
-        'email_auth',
-        'inbound_sms',
-        'international_letters',
-        'international_sms',
-        'upload_document',
-        'broadcast',
+        "edit_folder_permissions",
+        "email_auth",
+        "inbound_sms",
+        "international_letters",
+        "international_sms",
+        "upload_document",
+        "broadcast",
     )
 
     @classmethod
     def from_id(cls, service_id):
-        return cls(service_api_client.get_service(service_id)['data'])
+        return cls(service_api_client.get_service(service_id)["data"])
 
     @property
     def permissions(self):
-        return self._dict.get('permissions', self.TEMPLATE_TYPES)
+        return self._dict.get("permissions", self.TEMPLATE_TYPES)
 
     @property
     def billing_details(self):
@@ -90,7 +83,7 @@ class Service(JSONModel):
             self.billing_contact_email_addresses,
             self.billing_contact_names,
             self.billing_reference,
-            self.purchase_order_number
+            self.purchase_order_number,
         ]
         if any(billing_details):
             return billing_details
@@ -128,7 +121,7 @@ class Service(JSONModel):
 
     @property
     def trial_mode(self):
-        return self._dict['restricted']
+        return self._dict["restricted"]
 
     @property
     def live(self):
@@ -136,7 +129,7 @@ class Service(JSONModel):
 
     def has_permission(self, permission):
         if permission not in self.ALL_PERMISSIONS:
-            raise KeyError(f'{permission} is not a service permission')
+            raise KeyError(f"{permission} is not a service permission")
         return permission in self.permissions
 
     def get_page_of_jobs(self, page):
@@ -164,7 +157,7 @@ class Service(JSONModel):
     @cached_property
     def scheduled_job_stats(self):
         if not self.has_jobs:
-            return {'count': 0}
+            return {"count": 0}
         return job_api_client.get_scheduled_job_stats(self.id)
 
     @cached_property
@@ -172,10 +165,7 @@ class Service(JSONModel):
         return InvitedUsers(self.id)
 
     def invite_pending_for(self, email_address):
-        return email_address.lower() in (
-            invited_user.email_address.lower()
-            for invited_user in self.invited_users
-        )
+        return email_address.lower() in (invited_user.email_address.lower() for invited_user in self.invited_users)
 
     @cached_property
     def active_users(self):
@@ -187,10 +177,9 @@ class Service(JSONModel):
 
     @cached_property
     def has_team_members(self):
-        return len([
-            user for user in self.team_members
-            if user.has_permission_for_service(self.id, 'manage_service')
-        ]) > 1
+        return (
+            len([user for user in self.team_members if user.has_permission_for_service(self.id, "manage_service")]) > 1
+        )
 
     def cancel_invite(self, invited_user_id):
         if str(invited_user_id) not in {user.id for user in self.invited_users}:
@@ -211,19 +200,16 @@ class Service(JSONModel):
     @cached_property
     def all_templates(self):
 
-        templates = service_api_client.get_service_templates(self.id)['data']
+        templates = service_api_client.get_service_templates(self.id)["data"]
 
-        return [
-            template for template in templates
-            if template['template_type'] in self.available_template_types
-        ]
+        return [template for template in templates if template["template_type"] in self.available_template_types]
 
     @cached_property
     def all_template_ids(self):
-        return {template['id'] for template in self.all_templates}
+        return {template["id"] for template in self.all_templates}
 
     def get_template(self, template_id, version=None):
-        return service_api_client.get_service_template(self.id, template_id, version)['data']
+        return service_api_client.get_service_template(self.id, template_id, version)["data"]
 
     def get_template_folder_with_user_permission_or_403(self, folder_id, user):
         template_folder = self.get_template_folder(folder_id)
@@ -236,7 +222,7 @@ class Service(JSONModel):
     def get_template_with_user_permission_or_403(self, template_id, user):
         template = self.get_template(template_id)
 
-        self.get_template_folder_with_user_permission_or_403(template['folder'], user)
+        self.get_template_folder_with_user_permission_or_403(template["folder"], user)
 
         return template
 
@@ -253,33 +239,28 @@ class Service(JSONModel):
 
     @property
     def has_multiple_template_types(self):
-        return len({
-            template['template_type'] for template in self.all_templates
-        }) > 1
+        return len({template["template_type"] for template in self.all_templates}) > 1
 
     @property
     def has_estimated_usage(self):
-        return (
-            self.consent_to_research is not None and any((
+        return self.consent_to_research is not None and any(
+            (
                 self.volume_email,
                 self.volume_sms,
                 self.volume_letter,
-            ))
+            )
         )
 
     def has_templates_of_type(self, template_type):
-        return any(
-            template for template in self.all_templates
-            if template['template_type'] == template_type
-        )
+        return any(template for template in self.all_templates if template["template_type"] == template_type)
 
     @property
     def has_email_templates(self):
-        return self.has_templates_of_type('email')
+        return self.has_templates_of_type("email")
 
     @property
     def has_sms_templates(self):
-        return self.has_templates_of_type('sms')
+        return self.has_templates_of_type("sms")
 
     @property
     def intending_to_send_email(self):
@@ -307,12 +288,7 @@ class Service(JSONModel):
 
     @property
     def default_email_reply_to_address(self):
-        return next(
-            (
-                x['email_address']
-                for x in self.email_reply_to_addresses if x['is_default']
-            ), None
-        )
+        return next((x["email_address"] for x in self.email_reply_to_addresses if x["is_default"]), None)
 
     def get_email_reply_to_address(self, id):
         return service_api_client.get_reply_to_email_address(self.id, id)
@@ -331,15 +307,14 @@ class Service(JSONModel):
 
     @property
     def sms_senders_with_hints(self):
-
         def attach_hint(sender):
             hints = []
-            if sender['is_default']:
+            if sender["is_default"]:
                 hints += ["default"]
-            if sender['inbound_number_id']:
+            if sender["inbound_number_id"]:
                 hints += ["receives replies"]
             if hints:
-                sender['hint'] = "(" + " and ".join(hints) + ")"
+                sender["hint"] = "(" + " and ".join(hints) + ")"
             return sender
 
         return [attach_hint(sender) for sender in self.sms_senders]
@@ -354,18 +329,20 @@ class Service(JSONModel):
 
     @property
     def sms_sender_is_govuk(self):
-        return self.default_sms_sender in {'GOVUK', 'None'}
+        return self.default_sms_sender in {"GOVUK", "None"}
 
     def get_sms_sender(self, id):
         return service_api_client.get_sms_sender(self.id, id)
 
     @property
     def needs_to_change_sms_sender(self):
-        return all((
-            self.intending_to_send_sms,
-            self.shouldnt_use_govuk_as_sms_sender,
-            self.sms_sender_is_govuk,
-        ))
+        return all(
+            (
+                self.intending_to_send_sms,
+                self.shouldnt_use_govuk_as_sms_sender,
+                self.sms_sender_is_govuk,
+            )
+        )
 
     @cached_property
     def letter_contact_details(self):
@@ -381,8 +358,9 @@ class Service(JSONModel):
             (
                 letter_contact_block
                 for letter_contact_block in self.letter_contact_details
-                if letter_contact_block['is_default']
-            ), None
+                if letter_contact_block["is_default"]
+            ),
+            None,
         )
 
     @property
@@ -391,19 +369,22 @@ class Service(JSONModel):
         from app import nl2br
 
         if self.default_letter_contact_block:
-            return nl2br(self.default_letter_contact_block['contact_block'])
-        return ''
+            return nl2br(self.default_letter_contact_block["contact_block"])
+        return ""
 
     def edit_letter_contact_block(self, id, contact_block, is_default):
         service_api_client.update_letter_contact(
-            self.id, letter_contact_id=id, contact_block=contact_block, is_default=is_default,
+            self.id,
+            letter_contact_id=id,
+            contact_block=contact_block,
+            is_default=is_default,
         )
 
     def remove_default_letter_contact_block(self):
         if self.default_letter_contact_block:
             self.edit_letter_contact_block(
-                self.default_letter_contact_block['id'],
-                self.default_letter_contact_block['contact_block'],
+                self.default_letter_contact_block["id"],
+                self.default_letter_contact_block["contact_block"],
                 is_default=False,
             )
 
@@ -412,25 +393,32 @@ class Service(JSONModel):
 
     @property
     def volumes(self):
-        return sum(filter(None, (
-            self.volume_email,
-            self.volume_sms,
-            self.volume_letter,
-        )))
+        return sum(
+            filter(
+                None,
+                (
+                    self.volume_email,
+                    self.volume_sms,
+                    self.volume_letter,
+                ),
+            )
+        )
 
     @property
     def go_live_checklist_completed(self):
-        return all((
-            bool(self.volumes),
-            self.has_team_members,
-            self.has_templates,
-            not self.needs_to_add_email_reply_to_address,
-            not self.needs_to_change_sms_sender,
-        ))
+        return all(
+            (
+                bool(self.volumes),
+                self.has_team_members,
+                self.has_templates,
+                not self.needs_to_add_email_reply_to_address,
+                not self.needs_to_change_sms_sender,
+            )
+        )
 
     @property
     def go_live_checklist_completed_as_yes_no(self):
-        return 'Yes' if self.go_live_checklist_completed else 'No'
+        return "Yes" if self.go_live_checklist_completed else "No"
 
     @cached_property
     def free_sms_fragment_limit(self):
@@ -441,38 +429,34 @@ class Service(JSONModel):
         return service_api_client.get_service_data_retention(self.id)
 
     def get_data_retention_item(self, id):
-        return next(
-            (dr for dr in self.data_retention if dr['id'] == id),
-            None
-        )
+        return next((dr for dr in self.data_retention if dr["id"] == id), None)
 
     def get_days_of_retention(self, notification_type):
-        return next(
-            (dr for dr in self.data_retention if dr['notification_type'] == notification_type),
-            {}
-        ).get('days_of_retention', current_app.config['ACTIVITY_STATS_LIMIT_DAYS'])
+        return next((dr for dr in self.data_retention if dr["notification_type"] == notification_type), {}).get(
+            "days_of_retention", current_app.config["ACTIVITY_STATS_LIMIT_DAYS"]
+        )
 
     @property
     def email_branding_id(self):
-        return self._dict['email_branding']
+        return self._dict["email_branding"]
 
     @cached_property
     def email_branding(self):
         if self.email_branding_id:
-            return email_branding_client.get_email_branding(self.email_branding_id)['email_branding']
+            return email_branding_client.get_email_branding(self.email_branding_id)["email_branding"]
         return None
 
     @cached_property
     def email_branding_name(self):
         if self.email_branding is None:
-            return 'GOV.UK'
-        return self.email_branding['name']
+            return "GOV.UK"
+        return self.email_branding["name"]
 
     @cached_property
     def letter_branding_name(self):
         if self.letter_branding is None:
-            return 'no'
-        return self.letter_branding['name']
+            return "no"
+        return self.letter_branding["name"]
 
     @property
     def needs_to_change_email_branding(self):
@@ -480,7 +464,7 @@ class Service(JSONModel):
 
     @property
     def letter_branding_id(self):
-        return self._dict['letter_branding']
+        return self._dict["letter_branding"]
 
     @cached_property
     def letter_branding(self):
@@ -494,11 +478,11 @@ class Service(JSONModel):
 
     @property
     def organisation_id(self):
-        return self._dict['organisation']
+        return self._dict["organisation"]
 
     @property
     def organisation_type(self):
-        return self.organisation.organisation_type or self._dict['organisation_type']
+        return self.organisation.organisation_type or self._dict["organisation_type"]
 
     @property
     def organisation_name(self):
@@ -512,7 +496,7 @@ class Service(JSONModel):
 
     @cached_property
     def inbound_number(self):
-        return inbound_number_client.get_inbound_sms_number_for_service(self.id)['data'].get('number', '')
+        return inbound_number_client.get_inbound_sms_number_for_service(self.id)["data"].get("number", "")
 
     @property
     def has_inbound_number(self):
@@ -520,7 +504,7 @@ class Service(JSONModel):
 
     @cached_property
     def inbound_sms_summary(self):
-        if not self.has_permission('inbound_sms'):
+        if not self.has_permission("inbound_sms"):
             return None
         return service_api_client.get_inbound_sms_summary(self.id)
 
@@ -528,19 +512,19 @@ class Service(JSONModel):
     def all_template_folders(self):
         return sorted(
             template_folder_api_client.get_template_folders(self.id),
-            key=lambda folder: folder['name'].lower(),
+            key=lambda folder: folder["name"].lower(),
         )
 
     @cached_property
     def all_template_folder_ids(self):
-        return {folder['id'] for folder in self.all_template_folders}
+        return {folder["id"] for folder in self.all_template_folders}
 
     def get_template_folder(self, folder_id):
         if folder_id is None:
             return {
-                'id': None,
-                'name': 'Templates',
-                'parent_id': None,
+                "id": None,
+                "name": "Templates",
+                "parent_id": None,
             }
         return self._get_by_id(self.all_template_folders, folder_id)
 
@@ -548,15 +532,13 @@ class Service(JSONModel):
 
         folder = self.get_template_folder(template_folder_id)
 
-        if folder['id'] is None:
+        if folder["id"] is None:
             return [folder]
 
-        return self.get_template_folder_path(folder['parent_id']) + [
-            self.get_template_folder(folder['id'])
-        ]
+        return self.get_template_folder_path(folder["parent_id"]) + [self.get_template_folder(folder["id"])]
 
     def get_template_path(self, template):
-        return self.get_template_folder_path(template['folder']) + [
+        return self.get_template_folder_path(template["folder"]) + [
             template,
         ]
 
@@ -578,8 +560,8 @@ class Service(JSONModel):
     @cached_property
     def api_keys(self):
         return sorted(
-            api_key_api_client.get_api_keys(self.id)['apiKeys'],
-            key=lambda key: key['name'].lower(),
+            api_key_api_client.get_api_keys(self.id)["apiKeys"],
+            key=lambda key: key["name"].lower(),
         )
 
     def get_api_key(self, id):
@@ -587,13 +569,10 @@ class Service(JSONModel):
 
     @property
     def able_to_accept_agreement(self):
-        return (
-            self.organisation.agreement_signed is not None
-            or self.organisation_type in {
-                Organisation.TYPE_NHS_GP,
-                Organisation.TYPE_NHS_LOCAL,
-            }
-        )
+        return self.organisation.agreement_signed is not None or self.organisation_type in {
+            Organisation.TYPE_NHS_GP,
+            Organisation.TYPE_NHS_LOCAL,
+        }
 
     @cached_property
     def returned_letter_statistics(self):
@@ -605,11 +584,11 @@ class Service(JSONModel):
 
     @property
     def count_of_returned_letters_in_last_7_days(self):
-        return self.returned_letter_statistics['returned_letter_count']
+        return self.returned_letter_statistics["returned_letter_count"]
 
     @property
     def date_of_most_recent_returned_letter_report(self):
-        return self.returned_letter_statistics['most_recent_report']
+        return self.returned_letter_statistics["most_recent_report"]
 
     @property
     def has_returned_letters(self):

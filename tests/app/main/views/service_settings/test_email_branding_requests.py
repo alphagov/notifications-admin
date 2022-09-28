@@ -2,9 +2,7 @@ from unittest.mock import ANY, PropertyMock
 
 import pytest
 from flask import url_for
-from notifications_utils.clients.zendesk.zendesk_client import (
-    NotifySupportTicket,
-)
+from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
 from app.utils.branding import NHS_EMAIL_BRANDING_ID
 from tests import sample_uuid
@@ -25,55 +23,65 @@ def test_email_branding_request_page_when_no_branding_is_set(
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
 ):
-    service_one['email_branding'] = None
-    service_one['organisation_type'] = 'nhs_central'
+    service_one["email_branding"] = None
+    service_one["organisation_type"] = "nhs_central"
 
     mocker.patch(
-        'app.models.service.Service.email_branding_id',
+        "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
         return_value=None,
     )
 
     page = client_request.get(
-        '.email_branding_request', service_id=SERVICE_ONE_ID,
+        ".email_branding_request",
+        service_id=SERVICE_ONE_ID,
     )
 
     assert mock_get_email_branding.called is False
-    assert page.select_one('iframe')['src'] == url_for('main.email_template', branding_style='__NONE__')
+    assert page.select_one("iframe")["src"] == url_for("main.email_template", branding_style="__NONE__")
     assert mock_get_letter_branding_by_id.called is False
 
-    button_text = normalize_spaces(page.select_one('.page-footer button').text)
+    button_text = normalize_spaces(page.select_one(".page-footer button").text)
 
     assert [
+        (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
+        for radio in page.select("input[type=radio]")
+    ] == [("nhs", "NHS"), ("something_else", "Something else")]
+
+    assert button_text == "Continue"
+
+
+@pytest.mark.parametrize(
+    "organisation_type, expected_options",
+    (
         (
-            radio['value'],
-            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
-        )
-        for radio in page.select('input[type=radio]')
-    ] == [('nhs', 'NHS'), ('something_else', 'Something else')]
-
-    assert button_text == 'Continue'
-
-
-@pytest.mark.parametrize('organisation_type, expected_options', (
-    ('nhs_central', [
-        ('nhs', 'NHS'),
-        ('email-branding-1-id', 'Email branding name 1'),
-        ('email-branding-2-id', 'Email branding name 2'),
-        ('something_else', 'Something else'),
-    ]),
-    ('central', [
-        ('govuk', 'GOV.UK'),
-        ('email-branding-1-id', 'Email branding name 1'),
-        ('email-branding-2-id', 'Email branding name 2'),
-        ('something_else', 'Something else'),
-    ]),
-    ('other', [
-        ('email-branding-1-id', 'Email branding name 1'),
-        ('email-branding-2-id', 'Email branding name 2'),
-        ('something_else', 'Something else'),
-    ])
-))
+            "nhs_central",
+            [
+                ("nhs", "NHS"),
+                ("email-branding-1-id", "Email branding name 1"),
+                ("email-branding-2-id", "Email branding name 2"),
+                ("something_else", "Something else"),
+            ],
+        ),
+        (
+            "central",
+            [
+                ("govuk", "GOV.UK"),
+                ("email-branding-1-id", "Email branding name 1"),
+                ("email-branding-2-id", "Email branding name 2"),
+                ("something_else", "Something else"),
+            ],
+        ),
+        (
+            "other",
+            [
+                ("email-branding-1-id", "Email branding name 1"),
+                ("email-branding-2-id", "Email branding name 2"),
+                ("something_else", "Something else"),
+            ],
+        ),
+    ),
+)
 def test_email_branding_request_page_shows_branding_pool_options_if_branding_pool_set_for_org(
     mocker,
     service_one,
@@ -82,34 +90,29 @@ def test_email_branding_request_page_shows_branding_pool_options_if_branding_poo
     mock_get_email_branding,
     mock_get_email_branding_pool,
     organisation_type,
-    expected_options
+    expected_options,
 ):
 
-    service_one['organisation_type'] = organisation_type
-    organisation_one['organisation_type'] = organisation_type
-    service_one['organisation'] = organisation_one
+    service_one["organisation_type"] = organisation_type
+    organisation_one["organisation_type"] = organisation_type
+    service_one["organisation"] = organisation_one
 
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
     mocker.patch(
-        'app.models.service.Service.email_branding_id',
+        "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value='some-random-branding',
+        return_value="some-random-branding",
     )
 
-    page = client_request.get(
-        '.email_branding_request', service_id=SERVICE_ONE_ID
-    )
+    page = client_request.get(".email_branding_request", service_id=SERVICE_ONE_ID)
 
     assert [
-        (
-            radio['value'],
-            page.select_one('label[for={}]'.format(radio['id'])).text.strip()
-        )
-        for radio in page.select('input[type=radio]')
+        (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
+        for radio in page.select("input[type=radio]")
     ] == expected_options
 
 
@@ -120,31 +123,27 @@ def test_email_branding_request_does_not_show_nhs_branding_twice(
     client_request,
     mock_get_email_branding,
 ):
-    organisation_one['organisation_type'] = 'nhs_central'
-    service_one['organisation'] = organisation_one
+    organisation_one["organisation_type"] = "nhs_central"
+    service_one["organisation"] = organisation_one
 
-    mocker.patch('app.organisations_client.get_organisation', return_value=organisation_one)
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
-    nhs_branding = create_email_branding(
-        NHS_EMAIL_BRANDING_ID,
-        {'colour': None, 'name': 'NHS', 'text': None}
-    )['email_branding']
+    nhs_branding = create_email_branding(NHS_EMAIL_BRANDING_ID, {"colour": None, "name": "NHS", "text": None})[
+        "email_branding"
+    ]
     updated_branding_pool = create_email_branding_pool(additional_values=nhs_branding)
-    mocker.patch('app.organisations_client.get_email_branding_pool', return_value=updated_branding_pool)
+    mocker.patch("app.organisations_client.get_email_branding_pool", return_value=updated_branding_pool)
 
-    page = client_request.get('.email_branding_request', service_id=SERVICE_ONE_ID)
+    page = client_request.get(".email_branding_request", service_id=SERVICE_ONE_ID)
 
     assert [
-        (
-            radio['value'],
-            page.select_one(f'label[for={radio["id"]}]').text.strip()
-        )
-        for radio in page.select('input[type=radio]')
+        (radio["value"], page.select_one(f'label[for={radio["id"]}]').text.strip())
+        for radio in page.select("input[type=radio]")
     ] == [
-        ('nhs', 'NHS'),
-        ('email-branding-1-id', 'Email branding name 1'),
-        ('email-branding-2-id', 'Email branding name 2'),
-        ('something_else', 'Something else')
+        ("nhs", "NHS"),
+        ("email-branding-1-id", "Email branding name 1"),
+        ("email-branding-2-id", "Email branding name 2"),
+        ("something_else", "Something else"),
     ]
 
 
@@ -156,104 +155,89 @@ def test_email_branding_request_page_redirects_to_something_else_page_if_that_is
     mock_get_empty_email_branding_pool,
 ):
 
-    service_one['organisation_type'] = "other"
+    service_one["organisation_type"] = "other"
     mocker.patch(
-        'app.models.service.Service.email_branding_id',
+        "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value='some-random-branding',
+        return_value="some-random-branding",
     )
 
     client_request.get(
-        '.email_branding_request', service_id=SERVICE_ONE_ID,
+        ".email_branding_request",
+        service_id=SERVICE_ONE_ID,
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.email_branding_something_else',
+            "main.email_branding_something_else",
             service_id=SERVICE_ONE_ID,
-        )
+        ),
     )
 
 
 def test_email_branding_request_redirects_to_branding_preview_for_a_branding_pool_option(
-    mocker,
-    service_one,
-    organisation_one,
-    client_request,
-    mock_get_email_branding,
-    mock_get_email_branding_pool
+    mocker, service_one, organisation_one, client_request, mock_get_email_branding, mock_get_email_branding_pool
 ):
-    organisation_one['organisation_type'] = 'central'
-    service_one['organisation'] = organisation_one
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
 
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
     mocker.patch(
-        'app.models.service.Service.email_branding_id',
+        "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value='some-random-branding',
+        return_value="some-random-branding",
     )
 
     client_request.post(
-        '.email_branding_request',
+        ".email_branding_request",
         service_id=SERVICE_ONE_ID,
-        _data={'options': 'email-branding-1-id'},
+        _data={"options": "email-branding-1-id"},
         _expected_status=302,
         _expected_redirect=url_for(
-            'main.email_branding_pool_option',
+            "main.email_branding_pool_option",
             service_id=SERVICE_ONE_ID,
-            branding_option='email-branding-1-id',
-        )
+            branding_option="email-branding-1-id",
+        ),
     )
 
 
 def test_email_branding_pool_option_page_displays_preview_of_chosen_branding(
-    service_one,
-    organisation_one,
-    client_request,
-    mocker,
-    mock_get_email_branding_pool
+    service_one, organisation_one, client_request, mocker, mock_get_email_branding_pool
 ):
-    organisation_one['organisation_type'] = 'central'
-    service_one['organisation'] = organisation_one
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
 
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
     page = client_request.get(
-        '.email_branding_pool_option', service_id=SERVICE_ONE_ID,
-        branding_option='email-branding-1-id'
+        ".email_branding_pool_option", service_id=SERVICE_ONE_ID, branding_option="email-branding-1-id"
     )
 
-    assert page.select_one('iframe')['src'] == url_for('main.email_template', branding_style='email-branding-1-id')
+    assert page.select_one("iframe")["src"] == url_for("main.email_template", branding_style="email-branding-1-id")
 
 
 def test_email_branding_pool_option_page_redirects_to_branding_request_page_if_branding_option_not_found(
-    service_one,
-    organisation_one,
-    client_request,
-    mocker,
-    mock_get_email_branding_pool
+    service_one, organisation_one, client_request, mocker, mock_get_email_branding_pool
 ):
-    organisation_one['organisation_type'] = 'central'
-    service_one['organisation'] = organisation_one
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
 
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
     client_request.get(
-        '.email_branding_pool_option', service_id=SERVICE_ONE_ID,
-        branding_option='some-unknown-branding-id',
+        ".email_branding_pool_option",
+        service_id=SERVICE_ONE_ID,
+        branding_option="some-unknown-branding-id",
         _expected_status=302,
-        _expected_redirect=url_for(
-            'main.email_branding_request',
-            service_id=SERVICE_ONE_ID
-        )
+        _expected_redirect=url_for("main.email_branding_request", service_id=SERVICE_ONE_ID),
     )
 
 
@@ -265,29 +249,29 @@ def test_email_branding_pool_option_changes_email_branding_when_user_confirms(
     no_reply_to_email_addresses,
     single_sms_sender,
     mock_get_email_branding_pool,
-    mock_update_service
+    mock_update_service,
 ):
-    organisation_one['organisation_type'] = 'central'
-    service_one['organisation'] = organisation_one
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
 
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
     page = client_request.post(
-        '.email_branding_pool_option',
+        ".email_branding_pool_option",
         service_id=SERVICE_ONE_ID,
-        branding_option='email-branding-1-id',
+        branding_option="email-branding-1-id",
         _follow_redirects=True,
     )
 
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        email_branding='email-branding-1-id',
+        email_branding="email-branding-1-id",
     )
-    assert page.h1.text == 'Settings'
-    assert normalize_spaces(page.select_one('.banner-default').text) == 'You’ve updated your email branding'
+    assert page.h1.text == "Settings"
+    assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your email branding"
 
 
 def test_email_branding_request_page_shows_branding_if_set(
@@ -299,77 +283,72 @@ def test_email_branding_request_page_shows_branding_if_set(
     mock_get_service_organisation,
 ):
     mocker.patch(
-        'app.models.service.Service.email_branding_id',
+        "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value='some-random-branding',
+        return_value="some-random-branding",
     )
 
-    page = client_request.get(
-        '.email_branding_request', service_id=SERVICE_ONE_ID
-    )
-    assert page.select_one('iframe')['src'] == url_for('main.email_template', branding_style='some-random-branding')
+    page = client_request.get(".email_branding_request", service_id=SERVICE_ONE_ID)
+    assert page.select_one("iframe")["src"] == url_for("main.email_template", branding_style="some-random-branding")
 
 
 def test_email_branding_request_page_back_link(
-    client_request,
-    mock_get_email_branding_pool,
-    service_one,
-    organisation_one,
-    mocker
+    client_request, mock_get_email_branding_pool, service_one, organisation_one, mocker
 ):
-    organisation_one['organisation_type'] = 'central'
-    service_one['organisation'] = organisation_one
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
 
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
-    page = client_request.get(
-        '.email_branding_request', service_id=SERVICE_ONE_ID
-    )
+    page = client_request.get(".email_branding_request", service_id=SERVICE_ONE_ID)
 
-    back_link = page.select('a[class=govuk-back-link]')
-    assert back_link[0].attrs['href'] == url_for('.service_settings', service_id=SERVICE_ONE_ID)
+    back_link = page.select("a[class=govuk-back-link]")
+    assert back_link[0].attrs["href"] == url_for(".service_settings", service_id=SERVICE_ONE_ID)
 
 
-@pytest.mark.parametrize('data, org_type, endpoint', (
+@pytest.mark.parametrize(
+    "data, org_type, endpoint",
     (
-        {
-            'options': 'govuk',
-        },
-        'central',
-        'main.email_branding_govuk',
+        (
+            {
+                "options": "govuk",
+            },
+            "central",
+            "main.email_branding_govuk",
+        ),
+        (
+            {
+                "options": "govuk_and_org",
+            },
+            "central",
+            "main.email_branding_govuk_and_org",
+        ),
+        (
+            {
+                "options": "organisation",
+            },
+            "central",
+            "main.email_branding_organisation",
+        ),
+        (
+            {
+                "options": "something_else",
+            },
+            "central",
+            "main.email_branding_something_else",
+        ),
+        (
+            {
+                "options": "nhs",
+            },
+            "nhs_local",
+            "main.email_branding_nhs",
+        ),
     ),
-    (
-        {
-            'options': 'govuk_and_org',
-        },
-        'central',
-        'main.email_branding_govuk_and_org',
-    ),
-    (
-        {
-            'options': 'organisation',
-        },
-        'central',
-        'main.email_branding_organisation',
-    ),
-    (
-        {
-            'options': 'something_else',
-        },
-        'central',
-        'main.email_branding_something_else',
-    ),
-    (
-        {
-            'options': 'nhs',
-        },
-        'nhs_local',
-        'main.email_branding_nhs',
-    ),
-))
+)
 def test_email_branding_request_submit(
     client_request,
     service_one,
@@ -381,24 +360,24 @@ def test_email_branding_request_submit(
     org_type,
     endpoint,
 ):
-    organisation_one['organisation_type'] = org_type
-    service_one['email_branding'] = sample_uuid()
-    service_one['organisation'] = organisation_one
+    organisation_one["organisation_type"] = org_type
+    service_one["email_branding"] = sample_uuid()
+    service_one["organisation"] = organisation_one
 
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
     client_request.post(
-        '.email_branding_request',
+        ".email_branding_request",
         service_id=SERVICE_ONE_ID,
         _data=data,
         _expected_status=302,
         _expected_redirect=url_for(
             endpoint,
             service_id=SERVICE_ONE_ID,
-        )
+        ),
     )
 
 
@@ -408,21 +387,25 @@ def test_email_branding_request_submit_when_no_radio_button_is_selected(
     mock_get_empty_email_branding_pool,
     mock_get_email_branding,
 ):
-    service_one['email_branding'] = sample_uuid()
+    service_one["email_branding"] = sample_uuid()
 
     page = client_request.post(
-        '.email_branding_request', service_id=SERVICE_ONE_ID,
-        _data={'options': ''},
+        ".email_branding_request",
+        service_id=SERVICE_ONE_ID,
+        _data={"options": ""},
         _follow_redirects=True,
     )
-    assert page.h1.text == 'Change email branding'
-    assert normalize_spaces(page.select_one('.error-message').text) == 'Select an option'
+    assert page.h1.text == "Change email branding"
+    assert normalize_spaces(page.select_one(".error-message").text) == "Select an option"
 
 
-@pytest.mark.parametrize('endpoint, expected_heading', [
-    ('main.email_branding_govuk_and_org', 'Before you request new branding'),
-    ('main.email_branding_organisation', 'When you request new branding'),
-])
+@pytest.mark.parametrize(
+    "endpoint, expected_heading",
+    [
+        ("main.email_branding_govuk_and_org", "Before you request new branding"),
+        ("main.email_branding_organisation", "When you request new branding"),
+    ],
+)
 def test_email_branding_description_pages_for_org_branding(
     client_request,
     mocker,
@@ -433,11 +416,11 @@ def test_email_branding_description_pages_for_org_branding(
     endpoint,
     expected_heading,
 ):
-    service_one['email_branding'] = sample_uuid()
-    service_one['organisation'] = organisation_one
+    service_one["email_branding"] = sample_uuid()
+    service_one["organisation"] = organisation_one
 
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
@@ -446,13 +429,16 @@ def test_email_branding_description_pages_for_org_branding(
         service_id=SERVICE_ONE_ID,
     )
     assert page.h1.text == expected_heading
-    assert normalize_spaces(page.select_one('.page-footer button').text) == 'Request new branding'
+    assert normalize_spaces(page.select_one(".page-footer button").text) == "Request new branding"
 
 
-@pytest.mark.parametrize('endpoint, service_org_type, branding_preview_id', [
-    ('main.email_branding_govuk', 'central', '__NONE__'),
-    ('main.email_branding_nhs', 'nhs_local', NHS_EMAIL_BRANDING_ID),
-])
+@pytest.mark.parametrize(
+    "endpoint, service_org_type, branding_preview_id",
+    [
+        ("main.email_branding_govuk", "central", "__NONE__"),
+        ("main.email_branding_nhs", "nhs_local", NHS_EMAIL_BRANDING_ID),
+    ],
+)
 def test_email_branding_govuk_and_nhs_pages(
     client_request,
     mocker,
@@ -464,12 +450,12 @@ def test_email_branding_govuk_and_nhs_pages(
     service_org_type,
     branding_preview_id,
 ):
-    organisation_one['organisation_type'] = service_org_type
-    service_one['email_branding'] = sample_uuid()
-    service_one['organisation'] = organisation_one
+    organisation_one["organisation_type"] = service_org_type
+    service_one["email_branding"] = sample_uuid()
+    service_one["organisation"] = organisation_one
 
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
@@ -477,55 +463,56 @@ def test_email_branding_govuk_and_nhs_pages(
         endpoint,
         service_id=SERVICE_ONE_ID,
     )
-    assert page.h1.text == 'Check your new branding'
-    assert 'Emails from service one will look like this' in normalize_spaces(page.text)
-    assert page.select_one('iframe')['src'] == url_for('main.email_template', branding_style=branding_preview_id)
-    assert normalize_spaces(page.select_one('.page-footer button').text) == 'Use this branding'
+    assert page.h1.text == "Check your new branding"
+    assert "Emails from service one will look like this" in normalize_spaces(page.text)
+    assert page.select_one("iframe")["src"] == url_for("main.email_template", branding_style=branding_preview_id)
+    assert normalize_spaces(page.select_one(".page-footer button").text) == "Use this branding"
 
 
-def test_email_branding_something_else_page(
-    client_request, service_one, mock_get_empty_email_branding_pool
-):
+def test_email_branding_something_else_page(client_request, service_one, mock_get_empty_email_branding_pool):
     # expect to have a "NHS" option as well as the
     # fallback, so back button goes to choices page
-    service_one['organisation_type'] = 'nhs_central'
+    service_one["organisation_type"] = "nhs_central"
 
     page = client_request.get(
-        'main.email_branding_something_else',
+        "main.email_branding_something_else",
         service_id=SERVICE_ONE_ID,
     )
-    assert normalize_spaces(page.h1.text) == 'Describe the branding you want'
-    assert page.select_one('textarea')['name'] == ('something_else')
-    assert normalize_spaces(page.select_one('.page-footer button').text) == 'Request new branding'
-    assert page.select_one('.govuk-back-link')['href'] == url_for(
-        'main.email_branding_request', service_id=SERVICE_ONE_ID,
+    assert normalize_spaces(page.h1.text) == "Describe the branding you want"
+    assert page.select_one("textarea")["name"] == ("something_else")
+    assert normalize_spaces(page.select_one(".page-footer button").text) == "Request new branding"
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.email_branding_request",
+        service_id=SERVICE_ONE_ID,
     )
 
 
 def test_get_email_branding_something_else_page_is_only_option(
-    client_request,
-    service_one,
-    mock_get_empty_email_branding_pool
+    client_request, service_one, mock_get_empty_email_branding_pool
 ):
     # should only have a "something else" option
     # so back button goes back to settings page
-    service_one['organisation_type'] = 'other'
+    service_one["organisation_type"] = "other"
 
     page = client_request.get(
-        'main.email_branding_something_else',
+        "main.email_branding_something_else",
         service_id=SERVICE_ONE_ID,
     )
-    assert page.select_one('.govuk-back-link')['href'] == url_for(
-        'main.service_settings', service_id=SERVICE_ONE_ID,
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.service_settings",
+        service_id=SERVICE_ONE_ID,
     )
 
 
-@pytest.mark.parametrize('endpoint', [
-    ('main.email_branding_govuk'),
-    ('main.email_branding_govuk_and_org'),
-    ('main.email_branding_nhs'),
-    ('main.email_branding_organisation'),
-])
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        ("main.email_branding_govuk"),
+        ("main.email_branding_govuk_and_org"),
+        ("main.email_branding_nhs"),
+        ("main.email_branding_organisation"),
+    ],
+)
 def test_email_branding_pages_give_404_if_selected_branding_not_allowed(
     client_request,
     mock_get_empty_email_branding_pool,
@@ -533,11 +520,7 @@ def test_email_branding_pages_give_404_if_selected_branding_not_allowed(
 ):
     # The only email branding allowed is 'something_else', so trying to visit any of the other
     # endpoints gives a 404 status code.
-    client_request.get(
-        endpoint,
-        service_id=SERVICE_ONE_ID,
-        _expected_status=404
-    )
+    client_request.get(endpoint, service_id=SERVICE_ONE_ID, _expected_status=404)
 
 
 def test_email_branding_govuk_submit(
@@ -552,18 +535,18 @@ def test_email_branding_govuk_submit(
     mock_update_service,
 ):
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
     mocker.patch(
-        'app.models.service.Service.organisation_id',
+        "app.models.service.Service.organisation_id",
         new_callable=PropertyMock,
         return_value=ORGANISATION_ID,
     )
-    service_one['email_branding'] = sample_uuid()
+    service_one["email_branding"] = sample_uuid()
 
     page = client_request.post(
-        '.email_branding_govuk',
+        ".email_branding_govuk",
         service_id=SERVICE_ONE_ID,
         _follow_redirects=True,
     )
@@ -572,8 +555,8 @@ def test_email_branding_govuk_submit(
         SERVICE_ONE_ID,
         email_branding=None,
     )
-    assert page.h1.text == 'Settings'
-    assert normalize_spaces(page.select_one('.banner-default').text) == 'You’ve updated your email branding'
+    assert page.h1.text == "Settings"
+    assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your email branding"
 
 
 def test_email_branding_govuk_and_org_submit(
@@ -587,51 +570,52 @@ def test_email_branding_govuk_and_org_submit(
     single_sms_sender,
 ):
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
     mocker.patch(
-        'app.models.service.Service.organisation_id',
+        "app.models.service.Service.organisation_id",
         new_callable=PropertyMock,
         return_value=ORGANISATION_ID,
     )
-    service_one['email_branding'] = sample_uuid()
+    service_one["email_branding"] = sample_uuid()
 
-    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
-        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
 
     page = client_request.post(
-        '.email_branding_govuk_and_org',
+        ".email_branding_govuk_and_org",
         service_id=SERVICE_ONE_ID,
         _follow_redirects=True,
     )
 
     mock_create_ticket.assert_called_once_with(
         ANY,
-        message='\n'.join([
-            'Organisation: organisation one',
-            'Service: service one',
-            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
-            '',
-            '---',
-            'Current branding: Organisation name',
-            'Branding requested: GOV.UK and organisation one\n',
-        ]),
-        subject='Email branding request - service one',
-        ticket_type='question',
-        user_name='Test User',
-        user_email='test@user.gov.uk',
+        message="\n".join(
+            [
+                "Organisation: organisation one",
+                "Service: service one",
+                "http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb",
+                "",
+                "---",
+                "Current branding: Organisation name",
+                "Branding requested: GOV.UK and organisation one\n",
+            ]
+        ),
+        subject="Email branding request - service one",
+        ticket_type="question",
+        user_name="Test User",
+        user_email="test@user.gov.uk",
         org_id=ORGANISATION_ID,
-        org_type='central',
-        service_id=SERVICE_ONE_ID
+        org_type="central",
+        service_id=SERVICE_ONE_ID,
     )
     mock_send_ticket_to_zendesk.assert_called_once()
-    assert normalize_spaces(page.select_one('.banner-default').text) == (
-        'Thanks for your branding request. We’ll get back to you '
-        'within one working day.'
+    assert normalize_spaces(page.select_one(".banner-default").text) == (
+        "Thanks for your branding request. We’ll get back to you " "within one working day."
     )
 
 
@@ -646,11 +630,11 @@ def test_email_branding_nhs_submit(
     single_sms_sender,
     mock_update_service,
 ):
-    service_one['email_branding'] = sample_uuid()
-    service_one['organisation_type'] = 'nhs_local'
+    service_one["email_branding"] = sample_uuid()
+    service_one["organisation_type"] = "nhs_local"
 
     page = client_request.post(
-        '.email_branding_nhs',
+        ".email_branding_nhs",
         service_id=SERVICE_ONE_ID,
         _follow_redirects=True,
     )
@@ -659,8 +643,8 @@ def test_email_branding_nhs_submit(
         SERVICE_ONE_ID,
         email_branding=NHS_EMAIL_BRANDING_ID,
     )
-    assert page.h1.text == 'Settings'
-    assert normalize_spaces(page.select_one('.banner-default').text) == 'You’ve updated your email branding'
+    assert page.h1.text == "Settings"
+    assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your email branding"
 
 
 def test_email_branding_organisation_submit(
@@ -674,51 +658,52 @@ def test_email_branding_organisation_submit(
     single_sms_sender,
 ):
     mocker.patch(
-        'app.organisations_client.get_organisation',
+        "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
     mocker.patch(
-        'app.models.service.Service.organisation_id',
+        "app.models.service.Service.organisation_id",
         new_callable=PropertyMock,
         return_value=ORGANISATION_ID,
     )
-    service_one['email_branding'] = sample_uuid()
+    service_one["email_branding"] = sample_uuid()
 
-    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
-        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
 
     page = client_request.post(
-        '.email_branding_organisation',
+        ".email_branding_organisation",
         service_id=SERVICE_ONE_ID,
         _follow_redirects=True,
     )
 
     mock_create_ticket.assert_called_once_with(
         ANY,
-        message='\n'.join([
-            'Organisation: organisation one',
-            'Service: service one',
-            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
-            '',
-            '---',
-            'Current branding: Organisation name',
-            'Branding requested: organisation one\n',
-        ]),
-        subject='Email branding request - service one',
-        ticket_type='question',
-        user_name='Test User',
-        user_email='test@user.gov.uk',
+        message="\n".join(
+            [
+                "Organisation: organisation one",
+                "Service: service one",
+                "http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb",
+                "",
+                "---",
+                "Current branding: Organisation name",
+                "Branding requested: organisation one\n",
+            ]
+        ),
+        subject="Email branding request - service one",
+        ticket_type="question",
+        user_name="Test User",
+        user_email="test@user.gov.uk",
         org_id=ORGANISATION_ID,
-        org_type='central',
-        service_id=SERVICE_ONE_ID
+        org_type="central",
+        service_id=SERVICE_ONE_ID,
     )
     mock_send_ticket_to_zendesk.assert_called_once()
-    assert normalize_spaces(page.select_one('.banner-default').text) == (
-        'Thanks for your branding request. We’ll get back to you '
-        'within one working day.'
+    assert normalize_spaces(page.select_one(".banner-default").text) == (
+        "Thanks for your branding request. We’ll get back to you " "within one working day."
     )
 
 
@@ -731,46 +716,47 @@ def test_email_branding_something_else_submit(
     mock_get_email_branding,
     single_sms_sender,
 ):
-    service_one['email_branding'] = sample_uuid()
-    service_one['organisation_type'] = 'nhs_local'
+    service_one["email_branding"] = sample_uuid()
+    service_one["organisation_type"] = "nhs_local"
 
-    mock_create_ticket = mocker.spy(NotifySupportTicket, '__init__')
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
-        'app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk',
+        "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
 
     page = client_request.post(
-        '.email_branding_something_else',
+        ".email_branding_something_else",
         service_id=SERVICE_ONE_ID,
-        _data={'something_else': 'Homer Simpson'},
+        _data={"something_else": "Homer Simpson"},
         _follow_redirects=True,
     )
 
     mock_create_ticket.assert_called_once_with(
         ANY,
-        message='\n'.join([
-            'Organisation: Can’t tell (domain is user.gov.uk)',
-            'Service: service one',
-            'http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb',
-            '',
-            '---',
-            'Current branding: Organisation name',
-            'Branding requested: Something else\n',
-            'Homer Simpson\n'
-        ]),
-        subject='Email branding request - service one',
-        ticket_type='question',
-        user_name='Test User',
-        user_email='test@user.gov.uk',
+        message="\n".join(
+            [
+                "Organisation: Can’t tell (domain is user.gov.uk)",
+                "Service: service one",
+                "http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb",
+                "",
+                "---",
+                "Current branding: Organisation name",
+                "Branding requested: Something else\n",
+                "Homer Simpson\n",
+            ]
+        ),
+        subject="Email branding request - service one",
+        ticket_type="question",
+        user_name="Test User",
+        user_email="test@user.gov.uk",
         org_id=None,
-        org_type='nhs_local',
-        service_id=SERVICE_ONE_ID
+        org_type="nhs_local",
+        service_id=SERVICE_ONE_ID,
     )
     mock_send_ticket_to_zendesk.assert_called_once()
-    assert normalize_spaces(page.select_one('.banner-default').text) == (
-        'Thanks for your branding request. We’ll get back to you '
-        'within one working day.'
+    assert normalize_spaces(page.select_one(".banner-default").text) == (
+        "Thanks for your branding request. We’ll get back to you " "within one working day."
     )
 
 
@@ -778,10 +764,10 @@ def test_email_branding_something_else_submit_shows_error_if_textbox_is_empty(
     client_request, mock_get_empty_email_branding_pool
 ):
     page = client_request.post(
-        '.email_branding_something_else',
+        ".email_branding_something_else",
         service_id=SERVICE_ONE_ID,
-        _data={'something_else': ''},
+        _data={"something_else": ""},
         _follow_redirects=True,
     )
-    assert normalize_spaces(page.h1.text) == 'Describe the branding you want'
-    assert normalize_spaces(page.select_one('.govuk-error-message').text) == 'Error: Cannot be empty'
+    assert normalize_spaces(page.h1.text) == "Describe the branding you want"
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Cannot be empty"

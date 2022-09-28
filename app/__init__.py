@@ -92,9 +92,7 @@ from app.navigation import (
 from app.notify_client import InviteTokenError
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
-from app.notify_client.broadcast_message_api_client import (
-    broadcast_message_api_client,
-)
+from app.notify_client.broadcast_message_api_client import broadcast_message_api_client
 from app.notify_client.complaint_api_client import complaint_api_client
 from app.notify_client.contact_list_api_client import contact_list_api_client
 from app.notify_client.email_branding_client import email_branding_client
@@ -110,18 +108,12 @@ from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.performance_dashboard_api_client import (
     performance_dashboard_api_client,
 )
-from app.notify_client.platform_stats_api_client import (
-    platform_stats_api_client,
-)
+from app.notify_client.platform_stats_api_client import platform_stats_api_client
 from app.notify_client.provider_client import provider_client
 from app.notify_client.service_api_client import service_api_client
 from app.notify_client.status_api_client import status_api_client
-from app.notify_client.template_folder_api_client import (
-    template_folder_api_client,
-)
-from app.notify_client.template_statistics_api_client import (
-    template_statistics_client,
-)
+from app.notify_client.template_folder_api_client import template_folder_api_client
+from app.notify_client.template_statistics_api_client import template_statistics_client
 from app.notify_client.upload_api_client import upload_api_client
 from app.notify_client.user_api_client import user_api_client
 from app.url_converters import (
@@ -138,32 +130,32 @@ metrics = GDSMetrics()
 
 # The current service attached to the request stack.
 def _get_current_service():
-    return _lookup_req_object('service')
+    return _lookup_req_object("service")
 
 
 current_service = LocalProxy(_get_current_service)
 
 # The current organisation attached to the request stack.
-current_organisation = LocalProxy(partial(_lookup_req_object, 'organisation'))
+current_organisation = LocalProxy(partial(_lookup_req_object, "organisation"))
 
 navigation = {
-    'casework_navigation': CaseworkNavigation(),
-    'main_navigation': MainNavigation(),
-    'header_navigation': HeaderNavigation(),
-    'org_navigation': OrgNavigation(),
+    "casework_navigation": CaseworkNavigation(),
+    "main_navigation": MainNavigation(),
+    "header_navigation": HeaderNavigation(),
+    "org_navigation": OrgNavigation(),
 }
 
 
 def create_app(application):
-    notify_environment = os.environ['NOTIFY_ENVIRONMENT']
+    notify_environment = os.environ["NOTIFY_ENVIRONMENT"]
 
     application.config.from_object(configs[notify_environment])
-    asset_fingerprinter._asset_root = application.config['ASSET_PATH']
+    asset_fingerprinter._asset_root = application.config["ASSET_PATH"]
 
     init_app(application)
 
-    if 'extensions' not in application.jinja_options:
-        application.jinja_options['extensions'] = []
+    if "extensions" not in application.jinja_options:
+        application.jinja_options["extensions"] = []
 
     init_govuk_frontend(application)
     init_jinja(application)
@@ -178,7 +170,6 @@ def create_app(application):
         login_manager,
         proxy_fix,
         request_helper,
-
         # API clients
         api_key_api_client,
         billing_api_client,
@@ -204,20 +195,18 @@ def create_app(application):
         template_statistics_client,
         upload_api_client,
         user_api_client,
-
         # External API clients
         antivirus_client,
         redis_client,
         zendesk_client,
-
     ):
         client.init_app(application)
 
     logging.init_app(application)
     webauthn_server.init_app(application)
 
-    login_manager.login_view = 'main.sign_in'
-    login_manager.login_message_category = 'default'
+    login_manager.login_view = "main.sign_in"
+    login_manager.login_message_category = "default"
     login_manager.session_protection = None
     login_manager.anonymous_user = AnonymousUser
 
@@ -241,21 +230,21 @@ def init_app(application):
     application.before_request(request_helper.check_proxy_header_before_request)
 
     font_paths = [
-        str(item)[len(asset_fingerprinter._filesystem_path):]
-        for item in pathlib.Path(asset_fingerprinter._filesystem_path).glob('fonts/*.woff2')
+        str(item)[len(asset_fingerprinter._filesystem_path) :]
+        for item in pathlib.Path(asset_fingerprinter._filesystem_path).glob("fonts/*.woff2")
     ]
 
     @application.context_processor
     def _attach_current_service():
-        return {'current_service': current_service}
+        return {"current_service": current_service}
 
     @application.context_processor
     def _attach_current_organisation():
-        return {'current_org': current_organisation}
+        return {"current_org": current_organisation}
 
     @application.context_processor
     def _attach_current_user():
-        return {'current_user': current_user}
+        return {"current_user": current_user}
 
     @application.context_processor
     def _nav_selected():
@@ -269,17 +258,17 @@ def init_app(application):
     @application.context_processor
     def inject_global_template_variables():
         return {
-            'asset_path': application.config['ASSET_PATH'],
-            'header_colour': application.config['HEADER_COLOUR'],
-            'asset_url': asset_fingerprinter.get_url,
-            'font_paths': font_paths,
+            "asset_path": application.config["ASSET_PATH"],
+            "header_colour": application.config["HEADER_COLOUR"],
+            "asset_url": asset_fingerprinter.get_url,
+            "font_paths": font_paths,
         }
 
-    application.url_map.converters['uuid'].to_python = lambda self, value: value
-    application.url_map.converters['template_type'] = TemplateTypeConverter
-    application.url_map.converters['ticket_type'] = TicketTypeConverter
-    application.url_map.converters['letter_file_extension'] = LetterFileExtensionConverter
-    application.url_map.converters['simple_date'] = SimpleDateTypeConverter
+    application.url_map.converters["uuid"].to_python = lambda self, value: value
+    application.url_map.converters["template_type"] = TemplateTypeConverter
+    application.url_map.converters["ticket_type"] = TicketTypeConverter
+    application.url_map.converters["letter_file_extension"] = LetterFileExtensionConverter
+    application.url_map.converters["simple_date"] = SimpleDateTypeConverter
 
 
 @login_manager.user_loader
@@ -301,22 +290,20 @@ def make_session_permanent():
 
 
 def load_service_before_request():
-    if '/static/' in request.url:
+    if "/static/" in request.url:
         _request_ctx_stack.top.service = None
         return
     if _request_ctx_stack.top is not None:
         _request_ctx_stack.top.service = None
 
         if request.view_args:
-            service_id = request.view_args.get('service_id', session.get('service_id'))
+            service_id = request.view_args.get("service_id", session.get("service_id"))
         else:
-            service_id = session.get('service_id')
+            service_id = session.get("service_id")
 
         if service_id:
             try:
-                _request_ctx_stack.top.service = Service(
-                    service_api_client.get_service(service_id)['data']
-                )
+                _request_ctx_stack.top.service = Service(service_api_client.get_service(service_id)["data"])
             except HTTPError as exc:
                 # if service id isn't real, then 404 rather than 500ing later because we expect service to be set
                 if exc.status_code == 404:
@@ -326,14 +313,14 @@ def load_service_before_request():
 
 
 def load_organisation_before_request():
-    if '/static/' in request.url:
+    if "/static/" in request.url:
         _request_ctx_stack.top.organisation = None
         return
     if _request_ctx_stack.top is not None:
         _request_ctx_stack.top.organisation = None
 
         if request.view_args:
-            org_id = request.view_args.get('org_id')
+            org_id = request.view_args.get("org_id")
 
             if org_id:
                 try:
@@ -348,45 +335,50 @@ def load_organisation_before_request():
 
 def save_service_or_org_after_request(response):
     # Only save the current session if the request is 200
-    service_id = request.view_args.get('service_id', None) if request.view_args else None
-    organisation_id = request.view_args.get('org_id', None) if request.view_args else None
+    service_id = request.view_args.get("service_id", None) if request.view_args else None
+    organisation_id = request.view_args.get("org_id", None) if request.view_args else None
     if response.status_code == 200:
         if service_id:
-            session['service_id'] = service_id
-            session['organisation_id'] = None
+            session["service_id"] = service_id
+            session["organisation_id"] = None
         elif organisation_id:
-            session['service_id'] = None
-            session['organisation_id'] = organisation_id
+            session["service_id"] = None
+            session["organisation_id"] = organisation_id
     return response
 
 
 #  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
-    response.headers.add('X-Frame-Options', 'deny')
-    response.headers.add('X-Content-Type-Options', 'nosniff')
-    response.headers.add('X-XSS-Protection', '1; mode=block')
-    response.headers.add('Content-Security-Policy', (
-        "default-src 'self' {asset_domain} 'unsafe-inline';"
-        "script-src 'self' {asset_domain} *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
-        "connect-src 'self' *.google-analytics.com;"
-        "object-src 'self';"
-        "font-src 'self' {asset_domain} data:;"
-        "img-src 'self' {asset_domain} *.tile.openstreetmap.org *.google-analytics.com"
-        " *.notifications.service.gov.uk {logo_domain} data:;"
-        "frame-src 'self' www.youtube-nocookie.com;".format(
-            asset_domain=current_app.config['ASSET_DOMAIN'],
-            logo_domain=current_app.config['LOGO_CDN_DOMAIN'],
-        )
-    ))
-    response.headers.add('Link', (
-        '<{asset_url}>; rel=dns-prefetch, <{asset_url}>; rel=preconnect'.format(
-            asset_url=f'https://{current_app.config["ASSET_DOMAIN"]}'
-        )
-    ))
-    if 'Cache-Control' in response.headers:
-        del response.headers['Cache-Control']
+    response.headers.add("X-Frame-Options", "deny")
+    response.headers.add("X-Content-Type-Options", "nosniff")
+    response.headers.add("X-XSS-Protection", "1; mode=block")
     response.headers.add(
-        'Cache-Control', 'no-store, no-cache, private, must-revalidate')
+        "Content-Security-Policy",
+        (
+            "default-src 'self' {asset_domain} 'unsafe-inline';"
+            "script-src 'self' {asset_domain} *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
+            "connect-src 'self' *.google-analytics.com;"
+            "object-src 'self';"
+            "font-src 'self' {asset_domain} data:;"
+            "img-src 'self' {asset_domain} *.tile.openstreetmap.org *.google-analytics.com"
+            " *.notifications.service.gov.uk {logo_domain} data:;"
+            "frame-src 'self' www.youtube-nocookie.com;".format(
+                asset_domain=current_app.config["ASSET_DOMAIN"],
+                logo_domain=current_app.config["LOGO_CDN_DOMAIN"],
+            )
+        ),
+    )
+    response.headers.add(
+        "Link",
+        (
+            "<{asset_url}>; rel=dns-prefetch, <{asset_url}>; rel=preconnect".format(
+                asset_url=f'https://{current_app.config["ASSET_DOMAIN"]}'
+            )
+        ),
+    )
+    if "Cache-Control" in response.headers:
+        del response.headers["Cache-Control"]
+    response.headers.add("Cache-Control", "no-store, no-cache, private, must-revalidate")
     for key, value in response.headers:
         response.headers[key] = SanitiseASCII.encode(value)
     return response
@@ -401,28 +393,28 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
 
     @application.errorhandler(HTTPError)
     def render_http_error(error):
-        application.logger.warning("API {} failed with status {} message {}".format(
-            error.response.url if error.response else 'unknown',
-            error.status_code,
-            error.message
-        ))
+        application.logger.warning(
+            "API {} failed with status {} message {}".format(
+                error.response.url if error.response else "unknown", error.status_code, error.message
+            )
+        )
         error_code = error.status_code
         if error_code not in [401, 404, 403, 410]:
             # probably a 500 or 503.
             # it might be a 400, which we should handle as if it's an internal server error. If the API might
             # legitimately return a 400, we should handle that within the view or the client that calls it.
-            application.logger.exception("API {} failed with status {} message {}".format(
-                error.response.url if error.response else 'unknown',
-                error.status_code,
-                error.message
-            ))
+            application.logger.exception(
+                "API {} failed with status {} message {}".format(
+                    error.response.url if error.response else "unknown", error.status_code, error.message
+                )
+            )
             error_code = 500
         return _error_response(error_code)
 
     @application.errorhandler(400)
     def handle_client_error(error):
         # This is tripped if we call `abort(400)`.
-        application.logger.exception('Unhandled 400 client error')
+        application.logger.exception("Unhandled 400 client error")
         return _error_response(400, error_page_template=500)
 
     @application.errorhandler(410)
@@ -444,23 +436,21 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     @application.errorhandler(BadSignature)
     def handle_bad_token(error):
         # if someone has a malformed token
-        flash('There’s something wrong with the link you’ve used.')
+        flash("There’s something wrong with the link you’ve used.")
         return _error_response(404)
 
     @application.errorhandler(CSRFError)
     def handle_csrf(reason):
-        application.logger.warning('csrf.error_message: {}'.format(reason))
+        application.logger.warning("csrf.error_message: {}".format(reason))
 
-        if 'user_id' not in session:
-            application.logger.warning(
-                u'csrf.session_expired: Redirecting user to log in page'
-            )
+        if "user_id" not in session:
+            application.logger.warning("csrf.session_expired: Redirecting user to log in page")
 
             return application.login_manager.unauthorized()
 
         application.logger.warning(
-            u'csrf.invalid_token: Aborting request, user_id: {user_id}',
-            extra={'user_id': session['user_id']})
+            "csrf.invalid_token: Aborting request, user_id: {user_id}", extra={"user_id": session["user_id"]}
+        )
 
         return _error_response(400, error_page_template=500)
 
@@ -479,14 +469,14 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     @application.errorhandler(InviteTokenError)
     def handle_bad_invite_token(error):
         flash(str(error))
-        return redirect(url_for('main.sign_in'))
+        return redirect(url_for("main.sign_in"))
 
     @application.errorhandler(500)
     @application.errorhandler(Exception)
     def handle_bad_request(error):
         current_app.logger.exception(error)
         # We want the Flask in browser stacktrace
-        if current_app.config.get('DEBUG', None):
+        if current_app.config.get("DEBUG", None):
             raise error
         return _error_response(500)
 
@@ -579,10 +569,10 @@ def add_template_filters(application):
 
 
 def init_jinja(application):
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     template_folders = [
-        os.path.join(repo_root, 'app/templates'),
-        os.path.join(repo_root, 'app/templates/vendor/govuk-frontend'),
+        os.path.join(repo_root, "app/templates"),
+        os.path.join(repo_root, "app/templates/vendor/govuk-frontend"),
     ]
     jinja_loader = jinja2.FileSystemLoader(template_folders)
     application.jinja_loader = jinja_loader

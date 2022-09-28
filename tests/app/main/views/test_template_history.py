@@ -15,27 +15,19 @@ def test_view_template_version(
     service_id = fake_uuid
     template_id = fake_uuid
     version = 1
-    all_versions_link = url_for(
-        'main.view_template_versions',
-        service_id=service_id,
-        template_id=template_id
-    )
+    all_versions_link = url_for("main.view_template_versions", service_id=service_id, template_id=template_id)
     page = client_request.get(
-        '.view_template_version',
+        ".view_template_version",
         service_id=service_id,
         template_id=template_id,
         version=version,
     )
 
     template = mock_get_template_version(service_id, template_id, version)
-    assert api_user_active['name'] in page.text
-    assert template['data']['content'] in page.text
+    assert api_user_active["name"] in page.text
+    assert template["data"]["content"] in page.text
     assert all_versions_link in str(page)
-    mock_get_template_version.assert_called_with(
-        service_id,
-        template_id,
-        version
-    )
+    mock_get_template_version.assert_called_with(service_id, template_id, version)
 
 
 def test_view_template_versions(
@@ -53,15 +45,12 @@ def test_view_template_versions(
     service_id = fake_uuid
     template_id = fake_uuid
     page = client_request.get(
-        '.view_template_versions',
+        ".view_template_versions",
         service_id=service_id,
         template_id=template_id,
     )
 
     versions = mock_get_template_versions(service_id, template_id)
-    assert api_user_active['name'] in page.text
-    assert versions['data'][0]['content'] in page.text
-    mock_get_template_versions.assert_called_with(
-        service_id,
-        template_id
-    )
+    assert api_user_active["name"] in page.text
+    assert versions["data"][0]["content"] in page.text
+    mock_get_template_versions.assert_called_with(service_id, template_id)

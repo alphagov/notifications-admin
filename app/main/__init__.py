@@ -1,7 +1,7 @@
 from flask import Blueprint
 
-main = Blueprint('main', __name__)
-no_cookie = Blueprint('no_cookie', __name__)
+main = Blueprint("main", __name__)
+no_cookie = Blueprint("no_cookie", __name__)
 
 from app.main.views import (  # noqa isort:skip
     add_service,

@@ -8,15 +8,11 @@ from app.main import main
 from app.models.user import User
 from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 from app.notify_client.user_api_client import user_api_client
-from app.utils.login import (
-    email_needs_revalidating,
-    log_in_user,
-    redirect_to_sign_in,
-)
+from app.utils.login import email_needs_revalidating, log_in_user, redirect_to_sign_in
 from app.utils.user import user_is_logged_in
 
 
-@main.route('/webauthn/register')
+@main.route("/webauthn/register")
 @user_is_logged_in
 def webauthn_begin_register():
     if not current_user.can_use_webauthn:
@@ -26,7 +22,7 @@ def webauthn_begin_register():
 
     registration_data, state = server.register_begin(
         {
-            "id": bytes(current_user.id, 'utf-8'),
+            "id": bytes(current_user.id, "utf-8"),
             "name": current_user.email_address,
             "displayName": current_user.name,
         },
@@ -39,10 +35,10 @@ def webauthn_begin_register():
     return cbor.encode(registration_data)
 
 
-@main.route('/webauthn/register', methods=['POST'])
+@main.route("/webauthn/register", methods=["POST"])
 @user_is_logged_in
 def webauthn_complete_register():
-    if 'webauthn_registration_state' not in session:
+    if "webauthn_registration_state" not in session:
         return cbor.encode("No registration in progress"), 400
 
     try:
@@ -51,21 +47,21 @@ def webauthn_complete_register():
             cbor.decode(request.get_data()),
         )
     except RegistrationError as e:
-        current_app.logger.info(f'User {current_user.id} could not register a new webauthn token - {e}')
+        current_app.logger.info(f"User {current_user.id} could not register a new webauthn token - {e}")
         abort(400)
 
     current_user.create_webauthn_credential(credential)
-    current_user.update(auth_type='webauthn_auth')
+    current_user.update(auth_type="webauthn_auth")
 
-    flash((
-        'Registration complete. Next time you sign in to Notify '
-        'you’ll be asked to use your security key.'
-    ), 'default_with_tick')
+    flash(
+        ("Registration complete. Next time you sign in to Notify " "you’ll be asked to use your security key."),
+        "default_with_tick",
+    )
 
-    return cbor.encode('')
+    return cbor.encode("")
 
 
-@main.route('/webauthn/authenticate', methods=['GET'])
+@main.route("/webauthn/authenticate", methods=["GET"])
 @redirect_to_sign_in
 def webauthn_begin_authentication():
     """
@@ -78,7 +74,7 @@ def webauthn_begin_authentication():
     the challenge is correct in webauthn_complete_authentication
     """
     # get user from session
-    user_to_login = User.from_id(session['user_details']['id'])
+    user_to_login = User.from_id(session["user_details"]["id"])
 
     if not user_to_login.webauthn_auth:
         abort(403)
@@ -91,7 +87,7 @@ def webauthn_begin_authentication():
     return cbor.encode(authentication_data)
 
 
-@main.route('/webauthn/authenticate', methods=['POST'])
+@main.route("/webauthn/authenticate", methods=["POST"])
 @redirect_to_sign_in
 def webauthn_complete_authentication():
     """
@@ -101,13 +97,13 @@ def webauthn_complete_authentication():
     that user.
     2. If succesful, log the user in, setting up the session etc. Then return the URL they should be redirected to.
     """
-    user_id = session['user_details']['id']
+    user_id = session["user_details"]["id"]
     user_to_login = User.from_id(user_id)
 
     _verify_webauthn_authentication(user_to_login)
     redirect = _complete_webauthn_login_attempt(user_to_login)
 
-    return cbor.encode({'redirect_url': redirect.location}), 200
+    return cbor.encode({"redirect_url": redirect.location}), 200
 
 
 def _verify_webauthn_authentication(user):
@@ -122,10 +118,10 @@ def _verify_webauthn_authentication(user):
         current_app.webauthn_server.authenticate_complete(
             state=state,
             credentials=user.webauthn_credentials.as_cbor,
-            credential_id=request_data['credentialId'],
-            client_data=ClientData(request_data['clientDataJSON']),
-            auth_data=AuthenticatorData(request_data['authenticatorData']),
-            signature=request_data['signature']
+            credential_id=request_data["credentialId"],
+            client_data=ClientData(request_data["clientDataJSON"]),
+            auth_data=AuthenticatorData(request_data["authenticatorData"]),
+            signature=request_data["signature"],
         )
     except ValueError as exc:
         # We don't expect to reach this case in normal situations - normally errors (such as using the wrong
@@ -134,7 +130,7 @@ def _verify_webauthn_authentication(user):
         # couldn't be authenticated, something went wrong along the way, probably:
         # * The browser didn't implement the webauthn standard correctly, and let something through it shouldn't have
         # * The key itself is in some way corrupted, or of lower security standard
-        current_app.logger.info(f'User {user.id} could not sign in using their webauthn token - {exc}')
+        current_app.logger.info(f"User {user.id} could not sign in using their webauthn token - {exc}")
         user.complete_webauthn_login_attempt(is_successful=False)
         abort(403)
 
@@ -145,7 +141,7 @@ def _complete_webauthn_login_attempt(user):
     * check that the user's email is validated
     * if succesful, update current_session_id, log in date, and then redirect
     """
-    redirect_url = request.args.get('next')
+    redirect_url = request.args.get("next")
 
     # normally API handles this when verifying an sms or email code but since the webauthn logic happens in the
     # admin we need a separate call that just finalises the login in the database
@@ -155,7 +151,7 @@ def _complete_webauthn_login_attempt(user):
         abort(403)
 
     if email_needs_revalidating(user):
-        user_api_client.send_verify_code(user.id, 'email', None, redirect_url)
-        return redirect(url_for('.revalidate_email_sent', next=redirect_url))
+        user_api_client.send_verify_code(user.id, "email", None, redirect_url)
+        return redirect(url_for(".revalidate_email_sent", next=redirect_url))
 
     return log_in_user(user.id)

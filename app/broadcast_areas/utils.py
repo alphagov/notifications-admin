@@ -23,10 +23,7 @@ def _convert_custom_areas_to_wards(areas):
 
 
 def _aggregate_wards_by_local_authority(areas):
-    return {
-        area.parent if area.is_electoral_ward
-        else area for area in areas
-    }
+    return {area.parent if area.is_electoral_ward else area for area in areas}
 
 
 def _aggregate_lower_tier_authorities(areas):

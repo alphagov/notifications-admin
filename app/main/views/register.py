@@ -14,21 +14,21 @@ from app.models.user import InvitedOrgUser, InvitedUser, User
 from app.utils import hide_from_search_engines
 
 
-@main.route('/register', methods=['GET', 'POST'])
+@main.route("/register", methods=["GET", "POST"])
 @hide_from_search_engines
 def register():
     if current_user and current_user.is_authenticated:
-        return redirect(url_for('main.show_accounts_or_dashboard'))
+        return redirect(url_for("main.show_accounts_or_dashboard"))
 
     form = RegisterUserForm()
     if form.validate_on_submit():
         _do_registration(form, send_sms=False)
-        return redirect(url_for('main.registration_continue'))
+        return redirect(url_for("main.registration_continue"))
 
-    return render_template('views/register.html', form=form)
+    return render_template("views/register.html", form=form)
 
 
-@main.route('/register-from-invite', methods=['GET', 'POST'])
+@main.route("/register-from-invite", methods=["GET", "POST"])
 def register_from_invite():
     invited_user = InvitedUser.from_session()
     if not invited_user:
@@ -42,16 +42,16 @@ def register_from_invite():
         _do_registration(form, send_email=False, send_sms=invited_user.sms_auth)
         invited_user.accept_invite()
         if invited_user.sms_auth:
-            return redirect(url_for('main.verify'))
+            return redirect(url_for("main.verify"))
         else:
             # we've already proven this user has email because they clicked the invite link,
             # so just activate them straight away
-            return activate_user(session['user_details']['id'])
+            return activate_user(session["user_details"]["id"])
 
-    return render_template('views/register-from-invite.html', invited_user=invited_user, form=form)
+    return render_template("views/register-from-invite.html", invited_user=invited_user, form=form)
 
 
-@main.route('/register-from-org-invite', methods=['GET', 'POST'])
+@main.route("/register-from-org-invite", methods=["GET", "POST"])
 def register_from_org_invite():
     invited_org_user = InvitedOrgUser.from_session()
     if not invited_org_user:
@@ -60,17 +60,19 @@ def register_from_org_invite():
     form = RegisterUserFromOrgInviteForm(
         invited_org_user,
     )
-    form.auth_type.data = 'sms_auth'
+    form.auth_type.data = "sms_auth"
 
     if form.validate_on_submit():
-        if (form.organisation.data != invited_org_user.organisation or
-                form.email_address.data != invited_org_user.email_address):
+        if (
+            form.organisation.data != invited_org_user.organisation
+            or form.email_address.data != invited_org_user.email_address
+        ):
             abort(400)
         _do_registration(form, send_email=False, send_sms=True, organisation_id=invited_org_user.organisation)
         invited_org_user.accept_invite()
 
-        return redirect(url_for('main.verify'))
-    return render_template('views/register-from-org-invite.html', invited_org_user=invited_org_user, form=form)
+        return redirect(url_for("main.verify"))
+    return render_template("views/register-from-org-invite.html", invited_org_user=invited_org_user, form=form)
 
 
 def _do_registration(form, send_sms=True, send_email=True, organisation_id=None):
@@ -78,8 +80,8 @@ def _do_registration(form, send_sms=True, send_email=True, organisation_id=None)
     if user:
         if send_email:
             user.send_already_registered_email()
-        session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
-        session['user_details'] = {"email": user.email_address, "id": user.id}
+        session["expiry_date"] = str(datetime.utcnow() + timedelta(hours=1))
+        session["user_details"] = {"email": user.email_address, "id": user.id}
     else:
         user = User.register(
             name=form.name.data,
@@ -94,14 +96,14 @@ def _do_registration(form, send_sms=True, send_email=True, organisation_id=None)
 
         if send_sms:
             user.send_verify_code()
-        session['expiry_date'] = str(datetime.utcnow() + timedelta(hours=1))
-        session['user_details'] = {"email": user.email_address, "id": user.id}
+        session["expiry_date"] = str(datetime.utcnow() + timedelta(hours=1))
+        session["user_details"] = {"email": user.email_address, "id": user.id}
     if organisation_id:
-        session['organisation_id'] = organisation_id
+        session["organisation_id"] = organisation_id
 
 
-@main.route('/registration-continue')
+@main.route("/registration-continue")
 def registration_continue():
-    if not session.get('user_details'):
-        return redirect(url_for('.show_accounts_or_dashboard'))
-    return render_template('views/registration-continue.html')
+    if not session.get("user_details"):
+        return redirect(url_for(".show_accounts_or_dashboard"))
+    return render_template("views/registration-continue.html")

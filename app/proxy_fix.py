@@ -7,11 +7,9 @@ class CustomProxyFix(object):
         self.forwarded_proto = forwarded_proto
 
     def __call__(self, environ, start_response):
-        environ.update({
-            "HTTP_X_FORWARDED_PROTO": self.forwarded_proto
-        })
+        environ.update({"HTTP_X_FORWARDED_PROTO": self.forwarded_proto})
         return self.app(environ, start_response)
 
 
 def init_app(app):
-    app.wsgi_app = CustomProxyFix(app.wsgi_app, app.config.get('HTTP_PROTOCOL', 'http'))
+    app.wsgi_app = CustomProxyFix(app.wsgi_app, app.config.get("HTTP_PROTOCOL", "http"))

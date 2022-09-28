@@ -8,8 +8,10 @@ max-line-length = 120
 # B306 BaseException.message has been deprecated
 # W503: line break before binary operator
 # W504 line break after binary operator
+# E203: space before/after :
 extend_ignore=
     B003,
     B306,
     W503,
-    W504
+    W504,
+    E203

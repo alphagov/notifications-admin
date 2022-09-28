@@ -17,30 +17,28 @@ from app.models.user import User
 
 def event_dict(**extra):
     return {
-       'browser_fingerprint': {'browser': ANY, 'version': ANY, 'platform': ANY, 'user_agent_string': ''},
-       'ip_address': ANY,
-       **extra
+        "browser_fingerprint": {"browser": ANY, "version": ANY, "platform": ANY, "user_agent_string": ""},
+        "ip_address": ANY,
+        **extra,
     }
 
 
 def test_on_user_logged_in_calls_events_api(client_request, api_user_active, mock_events):
-    on_user_logged_in('_notify_admin', User(api_user_active))
+    on_user_logged_in("_notify_admin", User(api_user_active))
 
-    mock_events.assert_called_with('sucessful_login', event_dict(
-        user_id=str(api_user_active['id'])
-    ))
+    mock_events.assert_called_with("sucessful_login", event_dict(user_id=str(api_user_active["id"])))
 
 
 def test_create_email_change_event_calls_events_api(client_request, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "updated_by_id": str(uuid.uuid4()),
-        "original_email_address": 'original@example.com',
-        "new_email_address": 'new@example.com'
+        "original_email_address": "original@example.com",
+        "new_email_address": "new@example.com",
     }
 
     create_email_change_event(**kwargs)
-    mock_events.assert_called_with('update_user_email', event_dict(**kwargs))
+    mock_events.assert_called_with("update_user_email", event_dict(**kwargs))
 
 
 def test_create_add_user_to_service_event_calls_events_api(client_request, mock_events):
@@ -48,67 +46,57 @@ def test_create_add_user_to_service_event_calls_events_api(client_request, mock_
         "user_id": str(uuid.uuid4()),
         "invited_by_id": str(uuid.uuid4()),
         "service_id": str(uuid.uuid4()),
-        "ui_permissions": {'manage_templates'},
+        "ui_permissions": {"manage_templates"},
     }
 
     create_add_user_to_service_event(**kwargs)
-    mock_events.assert_called_with('add_user_to_service', event_dict(**kwargs))
+    mock_events.assert_called_with("add_user_to_service", event_dict(**kwargs))
 
 
 def test_create_remove_user_from_service_event_calls_events_api(client_request, mock_events):
-    kwargs = {
-        "user_id": str(uuid.uuid4()),
-        "removed_by_id": str(uuid.uuid4()),
-        "service_id": str(uuid.uuid4())
-    }
+    kwargs = {"user_id": str(uuid.uuid4()), "removed_by_id": str(uuid.uuid4()), "service_id": str(uuid.uuid4())}
 
     create_remove_user_from_service_event(**kwargs)
-    mock_events.assert_called_with('remove_user_from_service', event_dict(**kwargs))
+    mock_events.assert_called_with("remove_user_from_service", event_dict(**kwargs))
 
 
 def test_create_mobile_number_change_event_calls_events_api(client_request, mock_events):
     kwargs = {
         "user_id": str(uuid.uuid4()),
         "updated_by_id": str(uuid.uuid4()),
-        "original_mobile_number": '07700900000',
-        "new_mobile_number": '07700900999'
+        "original_mobile_number": "07700900000",
+        "new_mobile_number": "07700900999",
     }
 
     create_mobile_number_change_event(**kwargs)
-    mock_events.assert_called_with('update_user_mobile_number', event_dict(**kwargs))
+    mock_events.assert_called_with("update_user_mobile_number", event_dict(**kwargs))
 
 
 def test_create_archive_user_event_calls_events_api(client_request, mock_events):
-    kwargs = {
-        "user_id": str(uuid.uuid4()),
-        "archived_by_id": str(uuid.uuid4())
-    }
+    kwargs = {"user_id": str(uuid.uuid4()), "archived_by_id": str(uuid.uuid4())}
 
     create_archive_user_event(**kwargs)
-    mock_events.assert_called_with('archive_user', event_dict(**kwargs))
+    mock_events.assert_called_with("archive_user", event_dict(**kwargs))
 
 
 def test_create_broadcast_account_type_change_event(client_request, mock_events):
     kwargs = {
         "service_id": str(uuid.uuid4()),
         "changed_by_id": str(uuid.uuid4()),
-        "service_mode": 'training',
-        "broadcast_channel": 'severe',
-        "provider_restriction": None
+        "service_mode": "training",
+        "broadcast_channel": "severe",
+        "provider_restriction": None,
     }
 
     create_broadcast_account_type_change_event(**kwargs)
-    mock_events.assert_called_with('change_broadcast_account_type', event_dict(**kwargs))
+    mock_events.assert_called_with("change_broadcast_account_type", event_dict(**kwargs))
 
 
 def test_archive_service(client_request, mock_events):
-    kwargs = {
-        "service_id": str(uuid.uuid4()),
-        "archived_by_id": str(uuid.uuid4())
-    }
+    kwargs = {"service_id": str(uuid.uuid4()), "archived_by_id": str(uuid.uuid4())}
 
     create_archive_service_event(**kwargs)
-    mock_events.assert_called_with('archive_service', event_dict(**kwargs))
+    mock_events.assert_called_with("archive_service", event_dict(**kwargs))
 
 
 def test_set_user_permissions(client_request, mock_events):
@@ -121,4 +109,4 @@ def test_set_user_permissions(client_request, mock_events):
     }
 
     create_set_user_permissions_event(**kwargs)
-    mock_events.assert_called_with('set_user_permissions', event_dict(**kwargs))
+    mock_events.assert_called_with("set_user_permissions", event_dict(**kwargs))

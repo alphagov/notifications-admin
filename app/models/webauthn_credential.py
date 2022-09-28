@@ -16,15 +16,15 @@ class RegistrationError(Exception):
 
 class WebAuthnCredential(JSONModel):
     ALLOWED_PROPERTIES = {
-        'id',
-        'name',
-        'credential_data',  # contains public key and credential ID for auth
-        'registration_response',  # sent to API for later auditing (not used)
-        'created_at',
-        'updated_at'
+        "id",
+        "name",
+        "credential_data",  # contains public key and credential ID for auth
+        "registration_response",  # sent to API for later auditing (not used)
+        "created_at",
+        "updated_at",
     }
 
-    __sort_attribute__ = 'name'
+    __sort_attribute__ = "name"
 
     @classmethod
     def from_registration(cls, state, response):
@@ -42,26 +42,26 @@ class WebAuthnCredential(JSONModel):
         if isinstance(auth_data.credential_data.public_key, UnsupportedKey):
             raise RegistrationError("Encryption algorithm not supported")
 
-        return cls({
-            'name': 'Unnamed key',
-            'credential_data': base64.b64encode(
-                cbor.encode(auth_data.credential_data),
-            ).decode('utf-8'),
-            'registration_response': base64.b64encode(
-                cbor.encode(response),
-            ).decode('utf-8')
-        })
+        return cls(
+            {
+                "name": "Unnamed key",
+                "credential_data": base64.b64encode(
+                    cbor.encode(auth_data.credential_data),
+                ).decode("utf-8"),
+                "registration_response": base64.b64encode(
+                    cbor.encode(response),
+                ).decode("utf-8"),
+            }
+        )
 
     def to_credential_data(self):
-        return AttestedCredentialData(
-            cbor.decode(base64.b64decode(self.credential_data.encode()))
-        )
+        return AttestedCredentialData(cbor.decode(base64.b64decode(self.credential_data.encode())))
 
     def serialize(self):
         return {
-            'name': self.name,
-            'credential_data': self.credential_data,
-            'registration_response': self.registration_response,
+            "name": self.name,
+            "credential_data": self.credential_data,
+            "registration_response": self.registration_response,
         }
 
 
