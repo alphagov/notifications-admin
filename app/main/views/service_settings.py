@@ -1155,7 +1155,7 @@ def email_branding_request(service_id):
                     service_id=current_service.id,
                 )
             )
-        if branding_choice in [branding["id"] for branding in current_service.email_branding_pool]:
+        if branding_choice in current_service.email_branding_pool_ids:
             return redirect(
                 url_for(".email_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
             )

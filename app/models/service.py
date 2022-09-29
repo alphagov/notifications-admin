@@ -605,6 +605,10 @@ class Service(JSONModel):
         else:
             return []
 
+    @property
+    def email_branding_pool_ids(self):
+        return [branding["id"] for branding in self.email_branding_pool]
+
 
 class Services(SerialisedModelCollection):
     model = Service
