@@ -554,13 +554,13 @@ def organisation_email_branding(org_id):
         return response
 
     # We only show this link to central government organisations.
-    show_govuk_default_option = is_central_government and current_organisation.email_branding_id is not None
+    show_use_govuk_as_default_link = is_central_government and current_organisation.email_branding_id is not None
 
     return render_template(
         "views/organisations/organisation/settings/email-branding-options.html",
         email_branding_pool_options=email_branding_pool_options,
         form=form,
-        show_govuk_default_option=show_govuk_default_option,
+        show_use_govuk_as_default_link=show_use_govuk_as_default_link,
     )
 
 
