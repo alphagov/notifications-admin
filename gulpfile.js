@@ -73,7 +73,8 @@ const copy = {
         'radios',
         'input',
         'inset-text',
-        'textarea'
+        'textarea',
+        'summary-list'
       ];
       let done = 0;
 

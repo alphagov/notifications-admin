@@ -30,7 +30,7 @@ def test_overview_page_shows_disable_for_platform_admin(client_request, platform
     client_request.login(platform_admin_user)
     page = client_request.get("main.user_profile")
     assert page.select_one("h1").text.strip() == "Your profile"
-    disable_platform_admin_row = page.select_one("#disable-platform-admin")
+    disable_platform_admin_row = page.select(".govuk-summary-list__row")[-1]
     assert (
         " ".join(disable_platform_admin_row.text.split())
         == "Use platform admin view Yes Change whether to use platform admin view"
@@ -60,7 +60,7 @@ def test_overview_page_shows_security_keys_if_user_they_can_use_webauthn(
         return_value=credentials,
     )
     page = client_request.get("main.user_profile")
-    security_keys_row = page.select_one("#security-keys")
+    security_keys_row = page.select(".govuk-summary-list__row")[-2]
     assert " ".join(security_keys_row.text.split()) == expected_row_text
 
 

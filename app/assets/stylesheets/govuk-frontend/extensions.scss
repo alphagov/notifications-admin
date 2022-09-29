@@ -107,3 +107,30 @@ $govuk-grid-widths: (
 .govuk-\!-text-align-right {
   text-align: right !important;
 }
+
+// Extensions to the GOVUK Frontend summary-list component, to apply to all
+// summary-lists on Notify
+.notify-summary-list {
+
+  border-top: 1px solid $govuk-border-colour;
+
+}
+
+.notify-summary-list__key {
+
+  @include govuk-media-query($from: tablet) {
+    font-weight: normal;
+    padding-top: govuk-spacing(3);
+    padding-bottom: govuk-spacing(2) + 1px;
+    width: 33%;
+  }
+
+}
+
+.notify-summary-list__key--one-quarter {
+
+  @include govuk-media-query($from: tablet) {
+    width: 25%;
+  }
+
+}
