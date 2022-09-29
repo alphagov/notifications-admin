@@ -1148,6 +1148,13 @@ def email_branding_request(service_id):
 
         branding_choice = form.options.data
 
+        if branding_choice == NHS_EMAIL_BRANDING_ID:
+            return redirect(
+                url_for(
+                    ".email_branding_nhs",
+                    service_id=current_service.id,
+                )
+            )
         if branding_choice in [branding["id"] for branding in current_service.email_branding_pool]:
             return redirect(
                 url_for(".email_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)

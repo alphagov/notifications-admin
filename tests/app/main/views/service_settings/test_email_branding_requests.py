@@ -173,6 +173,40 @@ def test_email_branding_request_page_redirects_to_something_else_page_if_that_is
     )
 
 
+def test_email_branding_request_page_redirects_nhs_specific_page(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    organisation_one,
+):
+    service_one["organisation"] = organisation_one["id"]
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    mocker.patch(
+        "app.organisations_client.get_email_branding_pool",
+        return_value=[
+            {
+                "name": "NHS",
+                "id": "a7dc4e56-660b-4db7-8cff-12c37b12b5ea",
+            },
+        ],
+    )
+
+    client_request.post(
+        ".email_branding_request",
+        service_id=SERVICE_ONE_ID,
+        _data={"options": "a7dc4e56-660b-4db7-8cff-12c37b12b5ea"},
+        _expected_redirect=url_for(
+            "main.email_branding_nhs",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
+
 def test_email_branding_request_redirects_to_branding_preview_for_a_branding_pool_option(
     mocker, service_one, organisation_one, client_request, mock_get_email_branding, mock_get_email_branding_pool
 ):
