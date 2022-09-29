@@ -10,11 +10,11 @@ if os.environ.get("VCAP_APPLICATION"):
 
 
 class Config(object):
-    ADMIN_CLIENT_SECRET = os.environ.get('ADMIN_CLIENT_SECRET')
-    API_HOST_NAME = os.environ.get('API_HOST_NAME', 'http://localhost:6011')
-    SECRET_KEY = os.environ.get('SECRET_KEY')
-    DANGEROUS_SALT = os.environ.get('DANGEROUS_SALT')
-    ZENDESK_API_KEY = os.environ.get('ZENDESK_API_KEY')
+    ADMIN_CLIENT_SECRET = os.environ.get("ADMIN_CLIENT_SECRET")
+    API_HOST_NAME = os.environ.get("API_HOST_NAME", "http://localhost:6011")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    DANGEROUS_SALT = os.environ.get("DANGEROUS_SALT")
+    ZENDESK_API_KEY = os.environ.get("ZENDESK_API_KEY")
 
     # if we're not on cloudfoundry, we can get to this app from localhost. but on cloudfoundry its different
     ADMIN_BASE_URL = os.environ.get("ADMIN_BASE_URL", "http://localhost:6012")
@@ -105,12 +105,12 @@ class Development(Config):
     TRANSIENT_UPLOADED_LETTERS = "development-transient-uploaded-letters"
     PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "development-letters-precompiled-originals-backup"
 
-    ADMIN_CLIENT_SECRET = 'dev-notify-secret-key'
-    DANGEROUS_SALT = 'dev-notify-salt'
-    SECRET_KEY = 'dev-notify-secret-key'
-    ANTIVIRUS_API_HOST = 'http://localhost:6016'
-    ANTIVIRUS_API_KEY = 'test-key'
-    ANTIVIRUS_ENABLED = os.getenv('ANTIVIRUS_ENABLED') == '1'
+    ADMIN_CLIENT_SECRET = "dev-notify-secret-key"
+    DANGEROUS_SALT = "dev-notify-salt"
+    SECRET_KEY = "dev-notify-secret-key"
+    ANTIVIRUS_API_HOST = "http://localhost:6016"
+    ANTIVIRUS_API_KEY = "test-key"
+    ANTIVIRUS_ENABLED = os.getenv("ANTIVIRUS_ENABLED") == "1"
 
     ASSET_PATH = "/static/"
 

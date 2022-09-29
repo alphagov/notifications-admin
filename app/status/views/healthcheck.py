@@ -15,6 +15,4 @@ def show_status():
         except HTTPError as e:
             current_app.logger.exception("API failed to respond")
             return jsonify(status="error", message=str(e.message)), 500
-        return jsonify(
-            status="ok",
-            api=api_status), 200
+        return jsonify(status="ok", api=api_status), 200
