@@ -1024,11 +1024,15 @@ def service_preview_email_branding(service_id):
 
     form = AdminPreviewBrandingForm(branding_style=branding_style)
     email_branding_id = form.branding_style.data
+    if email_branding_id == "__NONE__":
+        email_branding_id = None
+
     if form.validate_on_submit():
         # in addition to updating the email branding we want the option of adding it to the
         # email branding pool if desirable
         if (
             current_service.organisation
+            and email_branding_id
             and email_branding_id not in current_service.organisation.email_branding_pool_ids
         ):
             return redirect(

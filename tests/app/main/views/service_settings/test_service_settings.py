@@ -3512,7 +3512,7 @@ def test_should_preview_email_branding(
 
 
 @pytest.mark.parametrize(
-    "email_branding_id, service_should_be_updated, expected_redirect",
+    "email_branding_id, service_should_be_updated, expected_redirect,expected_branding_id_in_call",
     (
         (
             "174",  # Not already in the pool
@@ -3523,6 +3523,7 @@ def test_should_preview_email_branding(
                 service_id=SERVICE_ONE_ID,
                 email_branding_id="174",
             ),
+            "174",
         ),
         (
             "email-branding-1-id",  # Already in the pool
@@ -3532,6 +3533,17 @@ def test_should_preview_email_branding(
                 "main.service_settings",
                 service_id=SERVICE_ONE_ID,
             ),
+            "email-branding-1-id",
+        ),
+        (
+            "__NONE__",  # update to no branding, showing as GOV.UK branding
+            True,
+            partial(
+                url_for,
+                "main.service_settings",
+                service_id=SERVICE_ONE_ID,
+            ),
+            None,
         ),
     ),
 )
@@ -3553,6 +3565,7 @@ def test_should_set_branding_for_service_with_organisation(
     email_branding_id,
     service_should_be_updated,
     expected_redirect,
+    expected_branding_id_in_call,
 ):
     service_one["organisation"] = organisation_one
     service_id = SERVICE_ONE_ID
@@ -3575,7 +3588,7 @@ def test_should_set_branding_for_service_with_organisation(
     if service_should_be_updated:
         mock_update_service.assert_called_once_with(
             SERVICE_ONE_ID,
-            email_branding=email_branding_id,
+            email_branding=expected_branding_id_in_call,
         )
     else:
         assert mock_update_service.called is False
