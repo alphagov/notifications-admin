@@ -20,6 +20,7 @@ from notifications_utils.recipients import (
     normalise_phone_number,
     validate_phone_number,
 )
+from orderedset import OrderedSet
 from werkzeug.utils import cached_property
 from wtforms import (
     BooleanField,
@@ -2035,15 +2036,7 @@ class ChooseEmailBrandingForm(ChooseBrandingForm):
 
     def __init__(self, service):
         super().__init__()
-
-        branding_choices = list(branding.get_email_choices(service)) + [self.FALLBACK_OPTION]
-
-        # If NHS branding is an option for the service and NHS branding is also in the branding pool we remove the
-        # version in the pool to stop it appearing twice on the form
-        if (("nhs", "NHS") in branding_choices) and ((branding.NHS_EMAIL_BRANDING_ID, "NHS") in branding_choices):
-            branding_choices.remove((branding.NHS_EMAIL_BRANDING_ID, "NHS"))
-
-        self.options.choices = tuple(branding_choices)
+        self.options.choices = tuple(OrderedSet(branding.get_email_choices(service)) | {self.FALLBACK_OPTION})
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):

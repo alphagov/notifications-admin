@@ -46,7 +46,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
     assert [
         (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
         for radio in page.select("input[type=radio]")
-    ] == [("nhs", "NHS"), ("something_else", "Something else")]
+    ] == [("a7dc4e56-660b-4db7-8cff-12c37b12b5ea", "NHS"), ("something_else", "Something else")]
 
     assert button_text == "Continue"
 
@@ -57,7 +57,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
         (
             "nhs_central",
             [
-                ("nhs", "NHS"),
+                ("a7dc4e56-660b-4db7-8cff-12c37b12b5ea", "NHS"),
                 ("email-branding-1-id", "Email branding name 1"),
                 ("email-branding-2-id", "Email branding name 2"),
                 ("something_else", "Something else"),
@@ -140,7 +140,7 @@ def test_email_branding_request_does_not_show_nhs_branding_twice(
         (radio["value"], page.select_one(f'label[for={radio["id"]}]').text.strip())
         for radio in page.select("input[type=radio]")
     ] == [
-        ("nhs", "NHS"),
+        (NHS_EMAIL_BRANDING_ID, "NHS"),
         ("email-branding-1-id", "Email branding name 1"),
         ("email-branding-2-id", "Email branding name 2"),
         ("something_else", "Something else"),
@@ -376,7 +376,7 @@ def test_email_branding_request_page_back_link(
         ),
         (
             {
-                "options": "nhs",
+                "options": "a7dc4e56-660b-4db7-8cff-12c37b12b5ea",
             },
             "nhs_local",
             "main.email_branding_nhs",

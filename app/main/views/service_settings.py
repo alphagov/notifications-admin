@@ -1237,7 +1237,7 @@ def email_branding_govuk_and_org(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_nhs(service_id):
-    check_email_branding_allowed_for_service("nhs")
+    check_email_branding_allowed_for_service(NHS_EMAIL_BRANDING_ID)
 
     if request.method == "POST":
         current_service.update(email_branding=NHS_EMAIL_BRANDING_ID)
