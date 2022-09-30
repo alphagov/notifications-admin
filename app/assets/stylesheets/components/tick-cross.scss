@@ -16,7 +16,7 @@
 
   &-cross {
     @extend %tick-cross;
-    color: $secondary-text-colour;
+    color: $govuk-secondary-text-colour;
     background-image: file-url('cross-grey.svg');
   }
 

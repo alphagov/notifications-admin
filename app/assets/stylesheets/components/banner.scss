@@ -3,14 +3,16 @@
 .banner-default {
 
   @include govuk-font(19, $weight: bold);
-  color: $button-colour;
+  // TODO: replace with `$govuk-success-colour` when GOV.UK Frontend version >= 3.10.0
+  color: govuk-colour("green");
   display: block;
   padding: govuk-spacing(3);
   margin: govuk-spacing(3) 0 govuk-spacing(6) 0;
   text-align: left;
   position: relative;
   clear: both;
-  border: 5px solid $button-colour;
+  // TODO: replace with `$govuk-success-colour` when GOV.UK Frontend version >= 3.10.0
+  border: 5px solid govuk-colour("green");
 
   &-title {
     @include govuk-font(24, $weight: bold);
@@ -52,9 +54,9 @@
 
   @extend %banner;
   @include govuk-font(19, $weight: bold);
-  background: $white;
-  color: $text-colour;
-  border: 5px solid $error-colour;
+  background: govuk-colour("white");
+  color: $govuk-text-colour;
+  border: 5px solid $govuk-error-colour;
   margin: 15px 0;
   text-align: left;
 
@@ -71,8 +73,8 @@
 .banner-tour {
 
   @extend %banner;
-  background: $govuk-blue;
-  color: $white;
+  background: $govuk-brand-colour;
+  color: govuk-colour("white");
   margin-top: 10px;
   margin-bottom: 0;
   padding: govuk-spacing(6);
@@ -90,7 +92,7 @@
   &-with-service-name {
     margin-top: -10px;
     padding-top: 0;
-    box-shadow: 0 -1px 0 0 darken($govuk-blue, 10%);
+    box-shadow: 0 -1px 0 0 darken($govuk-brand-colour, 10%);
   }
 
   .heading-medium {
@@ -101,7 +103,7 @@
 
     margin-top: 0;
     margin-bottom: govuk-spacing(6);
-    color: $white;
+    color: govuk-colour("white");
 
     &:last-child {
       margin-bottom: 0;
@@ -115,7 +117,7 @@
 
   ul {
     @include govuk-font(24);
-    color: $white;
+    color: govuk-colour("white");
     margin-bottom: govuk-spacing(5);
   }
 
@@ -134,13 +136,13 @@
 
     &:link,
     &:visited {
-      color: $white;
+      color: govuk-colour("white");
     }
 
     &:hover {
-      color: $white;
-      background-color: $link-hover-colour;
-      box-shadow: 0 0 0 10px $link-hover-colour;
+      color: govuk-colour("white");
+      background-color: $govuk-link-hover-colour;
+      box-shadow: 0 0 0 10px $govuk-link-hover-colour;
     }
 
     &:focus,
@@ -173,8 +175,8 @@
   align-items: baseline;
   flex-wrap: wrap;
   padding: (govuk-spacing(3) - 1px) 0 (govuk-spacing(3) + 1px) 0;
-  border-top: 1px solid $border-colour;
-  border-bottom: 1px solid $border-colour;
+  border-top: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
   margin-bottom: govuk-spacing(6);
   text-decoration: none;
 

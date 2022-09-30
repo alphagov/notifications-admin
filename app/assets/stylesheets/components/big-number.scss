@@ -34,8 +34,8 @@
   @extend %big-number;
   padding: govuk-spacing(3);
   position: relative;
-  background: $black;
-  color: $white;
+  background: govuk-colour("black");
+  color: govuk-colour("white");
 
   .big-number-number {
     @include govuk-font(36, $weight: bold, $tabular: true);
@@ -72,8 +72,8 @@
   .big-number-smaller {
     padding: govuk-spacing(3);
     position: relative;
-    background: $black;
-    color: $white;
+    background: govuk-colour("black");
+    color: govuk-colour("white");
   }
 
   .big-number-label {
@@ -82,7 +82,7 @@
 
     &:link,
     &:visited {
-      color: $link-colour;
+      color: $govuk-link-colour;
     }
 
   }
@@ -90,21 +90,21 @@
   .big-number-link {
 
     text-decoration: none;
-    background: $link-colour;
-    color: $white;
+    background: $govuk-link-colour;
+    color: govuk-colour("white");
     display: block;
-    border: 2px solid $link-colour;
+    border: 2px solid $govuk-link-colour;
     margin-bottom: 5px;
 
     &:hover {
 
-      color: $light-blue-25;
+      color: govuk-tint(govuk-colour("light-blue"), 75);
 
       .big-number,
       .big-number-number,
       .big-number-smaller,
       .big-number-label {
-        color: $light-blue-25;
+        color: govuk-tint(govuk-colour("light-blue"), 75);
       }
 
     }
@@ -141,8 +141,8 @@
 
     @include govuk-font(19);
     display: block;
-    background: $green;
-    color: $white;
+    background: govuk-colour("green");
+    color: govuk-colour("white");
     padding: 15px;
 
     a {
@@ -151,13 +151,13 @@
       &:visited,
       &:active,
       &:hover {
-        color: $white;
+        color: govuk-colour("white");
         text-decoration: underline;
       }
 
       &:active,
       &:focus {
-        color: $black;
+        color: $govuk-focus-text-colour;
       }
 
     }
@@ -166,7 +166,7 @@
 
   .big-number-status-failing {
     @extend %big-number-status;
-    background: $error-colour;
+    background: $govuk-error-colour;
   }
 
 }
@@ -175,12 +175,12 @@
 
   position: relative;
   margin: govuk-spacing(3) 0 govuk-spacing(6) 0;
-  background: $govuk-blue;
+  background: $govuk-brand-colour;
 
   .big-number-meta {
 
     padding: govuk-spacing(2) govuk-spacing(3);
-    color: $white;
+    color: govuk-colour("white");
     pointer-events: none;
 
     @include media(desktop) {

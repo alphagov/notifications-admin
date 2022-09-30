@@ -13,7 +13,7 @@ $button-shadow-size: $govuk-border-width-form-element;
     position: relative;
     margin: -10px 0 govuk-spacing(6) * 1.5 0;
     background: $product-page-blue;
-    color: $white;
+    color: govuk-colour("white");
 
     &-wrapper {
 
@@ -44,7 +44,7 @@ $button-shadow-size: $govuk-border-width-form-element;
 
     p {
       @include govuk-font(24);
-      color: $white;
+      color: govuk-colour("white");
       margin: govuk-spacing(3) 0 govuk-spacing(6);
     }
 
@@ -52,11 +52,11 @@ $button-shadow-size: $govuk-border-width-form-element;
 
       &:link,
       &:visited {
-        color: $white;
+        color: govuk-colour("white");
       }
 
       &:hover {
-        color: $light-blue-25;
+        color: govuk-tint(govuk-colour("light-blue"), 75);
       }
 
       &:active,
@@ -79,7 +79,7 @@ $button-shadow-size: $govuk-border-width-form-element;
     }
 
     .with-keyline {
-      border-top: 1px solid $border-colour;
+      border-top: 1px solid $govuk-border-colour;
       padding: govuk-spacing(6) * 1.5 0 0 0;
     }
 
@@ -112,7 +112,7 @@ $button-shadow-size: $govuk-border-width-form-element;
   @include govuk-font($size: 24, $weight: bold);
   color: $product-page-blue;
   box-shadow: 0 $button-shadow-size 0 govuk-shade($colour: $product-page-blue, $percentage: 15%);
-  background: $white;
+  background: govuk-colour("white");
 
   &:link,
   &:visited,
@@ -121,11 +121,11 @@ $button-shadow-size: $govuk-border-width-form-element;
   }
 
   &:focus {
-    background: $white;
+    background: govuk-colour("white");
   }
 
   &:hover {
-    background: $light-blue-25;
+    background: govuk-tint(govuk-colour("light-blue"), 75);
     outline: none;
   }
 

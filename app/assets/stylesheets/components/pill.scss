@@ -35,9 +35,9 @@
   }
 
   &-item {
-    $background: $link-colour;
+    $background: $govuk-link-colour;
     background: $background;
-    color: $white;
+    color: govuk-colour("white");
     border: 2px solid $background;
     position: relative;
     text-decoration: none;
@@ -45,11 +45,11 @@
 
     &:link,
     &:visited {
-      color: $white;
+      color: govuk-colour("white");
     }
 
     &:hover {
-      color: $light-blue-25;
+      color: govuk-tint(govuk-colour("light-blue"), 75);
     }
 
     &:active,
@@ -65,8 +65,8 @@
 
   &-item--selected {
     background: inherit;
-    border: 2px solid $black;
-    outline: 1px solid rgba($white, 0.1);
+    border: 2px solid $govuk-input-border-colour;
+    outline: 1px solid rgba(govuk-colour("white"), 0.1);
     position: relative;
     z-index: 10;
 
@@ -83,7 +83,7 @@
     &:focus {
       z-index: 1000;
       color: $govuk-focus-text-colour;
-      border: solid 2px $black;
+      border: solid 2px $govuk-focus-text-colour;
       padding: 10px 0px; /* reset padding to default */
       box-shadow: inset 0 -2px $govuk-focus-text-colour; /* remove bottom border from underline */
     }
@@ -128,13 +128,13 @@
 
     &:link,
     &:visited {
-      background: $link-colour;
-      color: $white;
+      background: $govuk-link-colour;
+      color: govuk-colour("white");
       text-decoration: underline;
     }
 
     &:hover {
-      color: $light-blue-25;
+      color: govuk-tint(govuk-colour("light-blue"), 75);
     }
 
     &:focus,

@@ -5,7 +5,7 @@
   &-item {
 
     display: inline-block;
-    border: 2px solid $black;
+    border: 2px solid $govuk-input-border-colour;
     // Create space for the remove link on the right of the list item (including borders)
     padding: (govuk-spacing(1) + 1px) (govuk-spacing(2) + 37px) govuk-spacing(1) govuk-spacing(2);
     margin: 0 govuk-spacing(1) govuk-spacing(2) 0;
@@ -24,7 +24,7 @@
       bottom: -2px; // cover list-item border-bottom
       width: 37px;
       padding: 0;
-      border: 2px solid $govuk-blue;
+      border: 2px solid $govuk-brand-colour;
       border-left: none;
       text-align: center;
       font-size: inherit; // counter govuk-button styles
@@ -33,11 +33,11 @@
       // set styles so they don't get overriden by govuk-button styles
       &,
       &:hover {
-        background: $govuk-blue;
+        background: $govuk-brand-colour;
       }
 
       &:hover {
-        color: $light-blue-25;
+        color: govuk-tint(govuk-colour("light-blue"), 75);
       }
 
       // set styles so they don't get overriden by govuk-button styles
@@ -54,7 +54,7 @@
         &:active,
         &:hover,
         &:focus:not(:active):not(:hover) {
-          border-left: 2px solid $govuk-blue;
+          border-left: 2px solid $govuk-brand-colour;
           color: LinkText;
         }
 
@@ -64,18 +64,18 @@
       &,
       &:focus,
       &:focus:not(:active):not(:hover) {
-        box-shadow: -2px 0 0 0 $black, inset 1px 0 0 0 rgba($white, 0.1);
+        box-shadow: -2px 0 0 0 $govuk-focus-text-colour, inset 1px 0 0 0 rgba(govuk-colour("white"), 0.1);
       }
 
       // set styles so they don't get overriden by govuk-button styles
       &:focus,
       &:focus:not(:active):not(:hover) {
-        border-color: $black;
+        border-color: $govuk-input-border-colour;
       }
 
       &:focus:hover {
         background-color: $govuk-focus-colour;
-        color: $black;
+        color: $govuk-focus-text-colour;
       }
 
       // show outline to make focus visible when background colours are overridden
@@ -103,9 +103,9 @@
 
     &--unremoveable {
       padding-right: govuk-spacing(2);
-      background: $light-blue-25;
-      color: mix($black, $govuk-blue, 66%);
-      border-color: $light-blue-25;
+      background: govuk-tint(govuk-colour("light-blue"), 75);
+      color: govuk-tint($govuk-brand-colour, 33%);
+      border-color: govuk-tint(govuk-colour("light-blue"), 75);
       margin: 0 govuk-spacing(1) govuk-spacing(2) 0;
       font-weight: bold;
     }
@@ -145,17 +145,17 @@
 
   &--certain {
     &:before {
-      border: 2px solid $black;
-      background: $light-blue-50;
+      border: 2px solid $govuk-input-border-colour;
+      background: govuk-tint(govuk-colour("light-blue"), 50);
     }
   }
 
   &--likely {
     &:before {
       padding: 1px;
-      border: 2px dashed $govuk-blue;
+      border: 2px dashed $govuk-brand-colour;
       border-image: file-url('dashed-border-govuk-blue.svg') 4 round;
-      background: $light-blue-25;
+      background: govuk-tint(govuk-colour("light-blue"), 75);
     }
   }
 
@@ -182,7 +182,7 @@
   .govuk-details__text {
     padding: 0;
     border: none;
-    border-bottom: 1px solid $border-colour;
+    border-bottom: 1px solid $govuk-border-colour;
     margin-top: -1px;
   }
 

@@ -56,7 +56,7 @@ $is-ie: false !default;
       text-decoration: none;
 
       &:hover {
-        background-color: $canvas-colour;
+        background-color: govuk-colour("grey-4");
       }
 
       &:focus {

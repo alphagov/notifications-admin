@@ -4,18 +4,18 @@
 // Use .form-group-error to add a red border to the left of a .form-group
 .form-group-error {
   margin-right: 15px;
-  border-left: 4px solid $error-colour;
+  border-left: 4px solid $govuk-error-colour;
   padding-left: 10px;
 
   @include media(tablet) {
-    border-left: 5px solid $error-colour;
+    border-left: 5px solid $govuk-error-colour;
     padding-left: $gutter-half;
   }
 }
 
 // Use .form-control-error to add a red border to .form-control
 .form-control-error {
-  border: 4px solid $error-colour;
+  border: 4px solid $govuk-error-colour;
 
   // Hack to give GOVUK Frontend styling
   &:focus {
@@ -30,8 +30,7 @@
 // Error messages should be red and bold
 .error-message {
   @include govuk-font(19, $weight: bold);
-  color: $error-colour;
-
+  color: $govuk-error-colour;
 
   display: block;
   clear: both;

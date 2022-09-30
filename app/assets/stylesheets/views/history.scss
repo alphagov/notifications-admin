@@ -8,11 +8,11 @@ $item-top-padding: govuk-spacing(3);
   &-item {
 
     padding: $item-top-padding 0 govuk-spacing(3) 0;
-    border-top: 1px solid $border-colour;
+    border-top: 1px solid $govuk-border-colour;
     position: relative;
 
     &:last-child {
-      border-bottom: 1px solid $border-colour;
+      border-bottom: 1px solid $govuk-border-colour;
     }
 
     .page-footer {
@@ -27,6 +27,6 @@ $item-top-padding: govuk-spacing(3);
 
   &-time {
     display: block;
-    color: $secondary-text-colour;
+    color: $govuk-secondary-text-colour;
   }
 }

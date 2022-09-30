@@ -59,7 +59,7 @@ td {
 }
 
 .hint {
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
 
   .form-label + & {
     display: block;
@@ -83,7 +83,7 @@ details summary {
 
   th,
   .table-field-index {
-    background: $grey-4;
+    background: govuk-colour("grey-4");
     font-weight: bold;
     text-align: center;
   }
@@ -91,7 +91,7 @@ details summary {
   th, td {
     padding-left: 10px;
     padding-right: 10px;
-    border: 1px solid $border-colour;
+    border: 1px solid $govuk-border-colour;
   }
 
   td {
@@ -113,7 +113,7 @@ details summary {
     z-index: 1000;
 
     .table-field-heading-first {
-      background: $grey-4;
+      background: govuk-colour("grey-4");
     }
 
   }
@@ -173,7 +173,7 @@ details .arrow {
 
 .multiple-choice input:disabled+label {
   opacity: 1;
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   cursor: default;
 }
 
@@ -183,7 +183,7 @@ details .arrow {
 
 .bordered-text-box {
   padding: 5px;
-  outline: 2px solid $black;
+  outline: 2px solid $govuk-input-border-colour;
   max-width: 100%;
 }
 
@@ -197,26 +197,26 @@ details .arrow {
 
 @keyframes live-pulse {
   0%   {
-    background: $red;
-    box-shadow: inset 0 0 0 2px $red, inset 0 0 0 4px $white;
+    background: govuk-colour("red");
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px govuk-colour("white");
   }
   40%   {
-    background: $red;
-    box-shadow: inset 0 0 0 2px $red, inset 0 0 0 4px $white;
+    background: govuk-colour("red");
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px govuk-colour("white");
   }
   50% {
-    background: $white;
-    box-shadow: inset 0 0 0 2px $red, inset 0 0 0 2px $white;
+    background: govuk-colour("white");
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 2px govuk-colour("white");
   }
   100% {
-    background: $white;
-    box-shadow: inset 0 0 0 2px $red, inset 0 0 0 4px $white;
+    background: govuk-colour("white");
+    box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px govuk-colour("white");
   }
 }
 
 .live-broadcast {
 
-  color: $red;
+  color: govuk-colour("red");
   font-weight: bold;
   position: relative;
   display: inline-block;
@@ -228,12 +228,11 @@ details .arrow {
     margin-top: 1px;
     margin-left: 5px;
     border: none;
-    background: $red;
+    background: govuk-colour("red");
     width: 19px;
     height: 19px;
     border-radius: 50%;
     animation: live-pulse 1.5s infinite;
-    //box-shadow: inset 0 0 0 2px $red, inset 0 0 0 5px $white;
   }
 
   &--left {

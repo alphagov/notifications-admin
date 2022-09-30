@@ -6,7 +6,7 @@
   padding: 0 0;
   margin: govuk-spacing(3) 0 govuk-spacing(3) 0;
   text-align: center;
-  border-top: 1px solid $border-colour;
+  border-top: 1px solid $govuk-border-colour;
 
   &:focus {
 
@@ -26,9 +26,9 @@
     position: relative;
     top: -11px;
     outline: 10px solid white;
-    background: $white;
+    background: govuk-colour("white");
     display: inline-block;
-    border-bottom: 1px solid $light-blue;
+    border-bottom: 1px solid govuk-colour("light-blue");
   }
 
 }

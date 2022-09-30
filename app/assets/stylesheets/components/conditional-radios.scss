@@ -7,7 +7,7 @@ $top-spacing: govuk-spacing(5);
 
   .block-label {
     &:before {
-      box-shadow: 0 5px 0 0 $white;
+      box-shadow: 0 5px 0 0 govuk-colour("white");
     }
   }
 
@@ -16,7 +16,7 @@ $top-spacing: govuk-spacing(5);
 .conditional-radios {
 
   &-panel {
-    border-left: $border-thickness solid $border-colour;
+    border-left: $border-thickness solid $govuk-border-colour;
     margin: 0 0 (-1 * govuk-spacing(3)) (govuk-spacing(3) + ($border-thickness / 2));
     padding: govuk-spacing(3) 0 0 (govuk-spacing(6) - ($border-thickness / 2));
     position: relative;

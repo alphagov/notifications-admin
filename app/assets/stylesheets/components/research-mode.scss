@@ -2,7 +2,7 @@
   font-weight: bold;
   display: inline-block;
   padding: 5px 10px;
-  background: $govuk-blue;
-  color: $white;
+  background: $govuk-brand-colour;
+  color: govuk-colour("white");
   border-radius: 2px;
 }

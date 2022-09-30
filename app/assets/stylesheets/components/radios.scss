@@ -60,7 +60,7 @@
     $circle-diameter: 39px;
     $border-thickness: 4px;
     $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
-    $border-colour: $border-colour;
+    $govuk-border-colour: $govuk-border-colour;
 
     float: none;
     position: relative;
@@ -72,7 +72,7 @@
       left: $border-indent;
       width: $border-thickness;
       height: 100%;
-      background: $border-colour;
+      background: $govuk-border-colour;
     }
 
     label {
@@ -81,7 +81,7 @@
 
     [type=radio]+label::before {
       // To overlap the grey inset line
-      background: $white;
+      background: govuk-colour("white");
     }
 
     ul {
@@ -102,7 +102,7 @@
         left: $border-indent;
         width: $border-thickness;
         height: 25px;
-        background: $border-colour;
+        background: $govuk-border-colour;
       }
     }
 
@@ -118,7 +118,7 @@
 
 .radio-slider {
 
-  border-bottom: 2px solid $black;
+  border-bottom: 2px solid $govuk-input-border-colour;
   height: 18px;
   margin-bottom: 18px + 30px;
   margin-right: -18px;
@@ -146,7 +146,7 @@
       padding: 0;
 
       &:before {
-        background: $white;
+        background: govuk-colour("white");
       }
 
     }

@@ -23,7 +23,7 @@ $app-body-text-line-height-tablet: get-govuk-typography-style($size: 19, $breakp
     transform: rotate(45deg);
     border: solid;
     border-width: 2px 2px 0 0;
-    border-color: $secondary-text-colour;
+    border-color: $govuk-secondary-text-colour;
   }
 }
 
@@ -34,7 +34,7 @@ $message-type-bottom-spacing: govuk-spacing(4);
 a {
 
   &:hover .message-name-separator:before {
-    border-color: $link-hover-colour;
+    border-color: $govuk-link-hover-colour;
   }
 
   .message-name-separator {
@@ -43,7 +43,7 @@ a {
     margin-left: -2px;
 
     &:before {
-      border-color: $link-colour;
+      border-color: $govuk-link-colour;
     }
   }
 
@@ -196,14 +196,14 @@ a {
   }
 
   &-empty {
-    color: $secondary-text-colour;
+    color: $govuk-secondary-text-colour;
     padding: govuk-spacing(3) 0 govuk-spacing(2) 0;
   }
 }
 
 .checkbox-list {
   &-selected-counter {
-    color: $secondary-text-colour;
+    color: $govuk-secondary-text-colour;
     margin: govuk-spacing(3) 0;
 
     @include media(tablet) {
@@ -294,7 +294,7 @@ a {
     }
 
     &:hover {
-      color: $link-hover-colour;
+      color: $govuk-link-hover-colour;
     }
 
   }

@@ -7,17 +7,17 @@
 
   @include govuk-font(19);
   position: absolute;
-  background: $link-colour;
-  color: $white;
+  background: $govuk-link-colour;
+  color: govuk-colour("white");
   padding: 10px govuk-spacing(3);
   z-index: 10000;
 
   &:link, &:visited {
-    color: $white;
+    color: govuk-colour("white");
   }
 
   &:hover {
-    color: $light-blue-25;
+    color: govuk-tint(govuk-colour("light-blue"), 75);
   }
 
   &:focus {
@@ -58,7 +58,7 @@
 
 .template-content-count {
   @include govuk-font(19, $tabular: true);
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   padding: 0 0 govuk-spacing(6) 0;
 
   & .govuk-error-message {

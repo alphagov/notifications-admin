@@ -29,15 +29,15 @@
     letter-spacing: 0.05em;
 
     &--training {
-      background: $grey-3;
-      color: mix($grey-1, $text-colour);
-      box-shadow: 0 -3px 0 0 $grey-3;
+      background: govuk-colour("grey-3");
+      color: mix(govuk-colour("grey-1"), $govuk-text-colour);
+      box-shadow: 0 -3px 0 0 govuk-colour("grey-3");
     }
 
     &--suspended {
-      background: $grey-3;
-      color: mix($grey-1, $text-colour);
-      box-shadow: 0 -3px 0 0 $grey-3;
+      background: govuk-colour("grey-3");
+      color: mix(govuk-colour("grey-1"), $govuk-text-colour);
+      box-shadow: 0 -3px 0 0 govuk-colour("grey-3");
     }
 
     &--live, &--test, &--operator {
@@ -77,7 +77,7 @@
   &-service {
 
     @include govuk-font($size: 19);
-    border-bottom: 1px solid $border-colour;
+    border-bottom: 1px solid $govuk-border-colour;
     margin: 0 0 10px;
     position: relative;
 
@@ -136,7 +136,7 @@
       transform: rotate(45deg);
       border: solid;
       border-width: 1px 1px 0 0;
-      border-color: $secondary-text-colour;
+      border-color: $govuk-secondary-text-colour;
     }
 
     &:focus:before {
@@ -203,14 +203,14 @@
     ol,
     ul {
       margin-top: govuk-spacing(2);
-      border-top: 1px $grey-3 solid;
+      border-top: 1px govuk-colour("grey-3") solid;
     }
   }
 
   &__item {
     @include govuk-font(16);
 
-    border-bottom: 1px $grey-3 solid;
+    border-bottom: 1px govuk-colour("grey-3") solid;
     display: block;
     padding: govuk-spacing(2) 0;
 
@@ -237,7 +237,7 @@
     @include govuk-font(16, $weight: bold);
 
     a:link, a:visited {
-      color: $text-colour;
+      color: $govuk-text-colour;
     }
   }
 }

@@ -62,7 +62,7 @@ textarea {
 // TODO: Amend so there is only one label style
 .form-label {
   display: block;
-  color: $text-colour;
+  color: $govuk-text-colour;
   padding-bottom: 2px;
 
   @include govuk-font(19);
@@ -75,7 +75,7 @@ textarea {
 .form-hint {
   @include govuk-font(19);
   display: block;
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   font-weight: normal;
 
   margin-top: -2px;
@@ -101,7 +101,7 @@ textarea {
   padding: 5px 4px 4px;
   // setting any background-color makes text invisible when changing colours to dark backgrounds in Firefox (https://bugzilla.mozilla.org/show_bug.cgi?id=1335476)
   // as background-color and color need to always be set together, color should not be set either
-  border: 2px solid $text-colour;
+  border: 2px solid $govuk-text-colour;
 
   // TODO: Remove 50% width set for tablet and up
   // !! BREAKING CHANGE !!

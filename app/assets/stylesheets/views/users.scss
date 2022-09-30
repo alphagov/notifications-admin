@@ -8,7 +8,7 @@ $item-top-padding: govuk-spacing(3);
   &-item {
 
     padding: govuk-spacing(3) 0px;
-    border-top: 1px solid $border-colour;
+    border-top: 1px solid $govuk-border-colour;
 
     &-heading {
 
@@ -17,13 +17,13 @@ $item-top-padding: govuk-spacing(3);
       overflow-wrap: break-word;
 
       .heading-small {
-        color: $black;
+        color: $govuk-text-colour;
       }
 
     }
 
     &:last-child {
-      border-bottom: 1px solid $border-colour;
+      border-bottom: 1px solid $govuk-border-colour;
     }
 
     & :last-child {

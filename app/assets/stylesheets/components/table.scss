@@ -97,10 +97,10 @@
 
     &:focus {
 
-      color: $text-colour;
+      color: $govuk-text-colour;
 
       & + .template-statistics-table-hint {
-        color: $text-colour;
+        color: $govuk-text-colour;
       }
 
     }
@@ -109,7 +109,7 @@
 
   &-hint {
     @include govuk-font(19);
-    color: $secondary-text-colour;
+    color: $govuk-secondary-text-colour;
     pointer-events: none;
   }
 
@@ -199,13 +199,13 @@
 
   &-error {
 
-    border-left: 5px solid $error-colour;
+    border-left: 5px solid $govuk-error-colour;
     padding-left: 7px;
     display: block;
 
     &-label {
       display: block;
-      color: $error-colour;
+      color: $govuk-error-colour;
       font-weight: bold;
     }
 
@@ -220,18 +220,18 @@
   &-status {
 
     &-default {
-      color: $secondary-text-colour;
+      color: $govuk-secondary-text-colour;
     }
 
     &-error {
 
-      color: $error-colour;
+      color: $govuk-error-colour;
       font-weight: bold;
 
       .status-hint {
         display: block;
         font-weight: normal;
-        color: $red;
+        color: $govuk-error-colour;
         margin-top: 5px;
       }
 
@@ -392,24 +392,24 @@
 
 
 .table-row-group {
-  border-top: 1px solid $border-colour;
-  border-bottom: 1px solid $border-colour;
+  border-top: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
 }
 
 .table-empty-message,
 td.table-empty-message {
   @include govuk-font(19);
-  color: $secondary-text-colour;
-  border-bottom: 1px solid $border-colour;
+  color: $govuk-secondary-text-colour;
+  border-bottom: 1px solid $govuk-border-colour;
   padding: 20px 0 20px 0;
 }
 
 .table-show-more-link {
 
   @include govuk-font(16);
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   margin-bottom: govuk-spacing(7);
-  border-bottom: 1px solid $border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
   padding: 35px 0 10px 0;
   text-align: center;
 
@@ -420,16 +420,16 @@ td.table-empty-message {
 }
 
 a.table-show-more-link {
-  color: $link-colour;
+  color: $govuk-link-colour;
 }
 
 .table-no-data {
   @include govuk-font(16);
-  color: $secondary-text-colour;
+  color: $govuk-secondary-text-colour;
   margin-top: 10px;
   margin-bottom: govuk-spacing(7);
-  border-top: 1px solid $border-colour;
-  border-bottom: 1px solid $border-colour;
+  border-top: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
   padding: 0.75em 0 0.5625em 0;
 }
 

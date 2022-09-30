@@ -67,7 +67,7 @@
     a:hover,
     a:active,
     a:visited {
-      color: $black;
+      color: $govuk-text-colour;
     }
 
     &--active {
@@ -86,8 +86,8 @@
   }
 
   &--inverse {
-    border-bottom: 1px $white solid;
-    border-bottom-color: rgba($white, 0.25);
+    border-bottom: 1px govuk-colour("white") solid;
+    border-bottom-color: rgba(govuk-colour("white"), 0.25);
 
     .breadcrumbs__item {
       &--active,
@@ -95,11 +95,11 @@
       a:hover,
       a:active,
       a:visited {
-        color: $white;
+        color: govuk-colour("white");
       }
 
       a:focus {
-        color: $black;
+        color: $govuk-focus-text-colour;
       }
     }
   }
