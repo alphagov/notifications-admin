@@ -46,7 +46,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
     assert [
         (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
         for radio in page.select("input[type=radio]")
-    ] == [("a7dc4e56-660b-4db7-8cff-12c37b12b5ea", "NHS"), ("something_else", "Something else")]
+    ] == [(NHS_EMAIL_BRANDING_ID, "NHS"), ("something_else", "Something else")]
 
     assert button_text == "Continue"
 
@@ -57,7 +57,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
         (
             "nhs_central",
             [
-                ("a7dc4e56-660b-4db7-8cff-12c37b12b5ea", "NHS"),
+                (NHS_EMAIL_BRANDING_ID, "NHS"),
                 ("email-branding-1-id", "Email branding name 1"),
                 ("email-branding-2-id", "Email branding name 2"),
                 ("something_else", "Something else"),
@@ -191,7 +191,7 @@ def test_email_branding_request_page_redirects_nhs_specific_page(
         return_value=[
             {
                 "name": "NHS",
-                "id": "a7dc4e56-660b-4db7-8cff-12c37b12b5ea",
+                "id": NHS_EMAIL_BRANDING_ID,
             },
         ],
     )
@@ -199,7 +199,7 @@ def test_email_branding_request_page_redirects_nhs_specific_page(
     client_request.post(
         ".email_branding_request",
         service_id=SERVICE_ONE_ID,
-        _data={"options": "a7dc4e56-660b-4db7-8cff-12c37b12b5ea"},
+        _data={"options": NHS_EMAIL_BRANDING_ID},
         _expected_redirect=url_for(
             "main.email_branding_nhs",
             service_id=SERVICE_ONE_ID,
@@ -376,7 +376,7 @@ def test_email_branding_request_page_back_link(
         ),
         (
             {
-                "options": "a7dc4e56-660b-4db7-8cff-12c37b12b5ea",
+                "options": NHS_EMAIL_BRANDING_ID,
             },
             "nhs_local",
             "main.email_branding_nhs",
