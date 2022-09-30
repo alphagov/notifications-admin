@@ -170,26 +170,3 @@
   }
 
 }
-
-.big-number-meta-wrapper {
-
-  position: relative;
-  margin: govuk-spacing(3) 0 govuk-spacing(6) 0;
-  background: $govuk-brand-colour;
-
-  .big-number-meta {
-
-    padding: govuk-spacing(2) govuk-spacing(3);
-    color: govuk-colour("white");
-    pointer-events: none;
-
-    @include media(desktop) {
-      position: absolute;
-      bottom: 7px;
-      right: 5px;
-      text-align: right;
-    }
-
-  }
-
-}
