@@ -65,13 +65,13 @@ describe('Live search', () => {
       // set up DOM
       document.body.innerHTML = `
         <div class="live-search js-header" data-module="live-search" data-targets=".govuk-radios__item">
-          <div class="form-group">
-            <label class="form-label" for="search">
-                ${searchLabelText}
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="search">
+              ${searchLabelText}
             </label>
-            <input autocomplete="off" class="form-control form-control-1-1 " id="search" name="search" rows="8" type="search" value="">
-            <div role="region" aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
+            <input class="govuk-input govuk-!-width-full" id="search" name="search" type="search" autocomplete="off">
           </div>
+          <div aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
         </div>
         <form method="post" autocomplete="off" novalidate>
         </form>`;

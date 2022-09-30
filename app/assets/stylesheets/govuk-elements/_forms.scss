@@ -43,7 +43,7 @@ textarea {
 
 .form-group {
   @extend %contain-floats;
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 }
 
 // Form group is used to wrap label and input pairs
@@ -93,7 +93,7 @@ textarea {
 // By default, form controls are 50% width for desktop,
 // and 100% width for mobile
 .form-control {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   @include govuk-font(19);
   @include govuk-focusable; // hack to give GOVUK Frontend v3 focus styling.
   width: 100%;

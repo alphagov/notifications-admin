@@ -33,7 +33,7 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
     // IE8 doesn’t support pseudoelements, so we don’t want to hide native elements there.
     @if ($is-ie == false) or ($ie-version == 9) {
       margin: 0;
-      @include opacity(0);
+      opacity: 0;
     }
   }
 
@@ -113,7 +113,7 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
   }
 
   input:disabled + label {
-    @include opacity(0.5);
+    opacity: 0.5;
     cursor: default;
   }
 
