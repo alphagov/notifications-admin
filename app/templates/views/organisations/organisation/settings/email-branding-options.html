@@ -23,12 +23,10 @@
     <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
       {{ current_org.email_branding_name }}<span class="hint govuk-!-font-weight-regular">&ensp;(default)</span>
     </h2>
-    {{ email_branding_preview(current_org.email_branding_id, classes='govuk-!-margin-bottom-8') }}
 
-    <!--display the email-branding-pool options and the preview for each one -->
-
-    {% if show_govuk_default_option %}
-      <p class="govuk-body govuk-!-margin-bottom-7">
+    {% if show_use_govuk_as_default_link %}
+      {{ email_branding_preview(current_org.email_branding_id, classes='govuk-!-margin-bottom-2') }}
+      <p class="govuk-body govuk-!-margin-bottom-6">
         <a
           class="govuk-link govuk-link--no-visited-state"
           href="{{ url_for('main.organisation_email_branding', org_id=current_org.id) }}?change_default_branding_to_govuk"
@@ -36,10 +34,14 @@
           Use GOV.UK as default instead
         </a>
       </p>
+    {% else %}
+      {{ email_branding_preview(current_org.email_branding_id, classes='govuk-!-margin-bottom-8') }}
     {% endif %}
 
+    <!--display the email-branding-pool options and the preview for each one -->
+
     {% for option in email_branding_pool_options %}
-      <h2 class="govuk-heading-s govuk-!-margin-bottom-0">
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
         {{ option.name }}
       </h2>
       {{ email_branding_preview(option.id, classes='govuk-!-margin-bottom-0') }}
