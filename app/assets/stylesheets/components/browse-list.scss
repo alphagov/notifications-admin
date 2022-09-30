@@ -1,14 +1,6 @@
 .browse-list {
   margin-bottom: govuk-spacing(3);
 
-  .browse-sub-list {
-    margin-top: govuk-spacing(3);
-    margin-left: govuk-spacing(6);
-    @include media('desktop') {
-      margin-left: govuk-spacing(9);
-    }
-  }
-
   &-item,
   &-sub-item {
     @include govuk-font(24, $weight: bold);
