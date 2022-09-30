@@ -129,6 +129,6 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
 
   @include media (tablet) {
     margin-bottom: 0;
-    margin-right: $gutter;
+    margin-right: $govuk-gutter;
   }
 }
