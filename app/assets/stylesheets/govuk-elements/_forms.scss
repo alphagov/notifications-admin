@@ -48,10 +48,10 @@ textarea {
 
 // Form group is used to wrap label and input pairs
 .form-group {
-  margin-bottom: $gutter-half;
+  margin-bottom: $govuk-gutter-half;
 
   @include media(tablet) {
-    margin-bottom: $gutter;
+    margin-bottom: $govuk-gutter;
   }
 }
 

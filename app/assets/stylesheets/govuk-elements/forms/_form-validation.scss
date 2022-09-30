@@ -9,7 +9,7 @@
 
   @include media(tablet) {
     border-left: 5px solid $govuk-error-colour;
-    padding-left: $gutter-half;
+    padding-left: $govuk-gutter-half;
   }
 }
 
