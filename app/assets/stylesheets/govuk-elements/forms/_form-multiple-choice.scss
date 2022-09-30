@@ -14,7 +14,7 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
   position: relative;
 
   padding: 0 0 0 38px;
-  margin-bottom: $gutter-one-third;
+  margin-bottom: $govuk-gutter / 3;
 
   @include media(tablet) {
     float: left;
@@ -39,7 +39,7 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
 
   label {
     cursor: pointer;
-    padding: 8px $gutter-one-third 9px 12px;
+    padding: 8px ($govuk-gutter / 3) 9px 12px;
     display: block;
 
     // remove 300ms pause on mobile
