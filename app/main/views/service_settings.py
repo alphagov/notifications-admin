@@ -1152,7 +1152,14 @@ def email_branding_request(service_id):
 
         branding_choice = form.options.data
 
-        if branding_choice in [branding["id"] for branding in current_service.email_branding_pool]:
+        if branding_choice == NHS_EMAIL_BRANDING_ID:
+            return redirect(
+                url_for(
+                    ".email_branding_nhs",
+                    service_id=current_service.id,
+                )
+            )
+        if branding_choice in current_service.email_branding_pool_ids:
             return redirect(
                 url_for(".email_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
             )
@@ -1234,7 +1241,7 @@ def email_branding_govuk_and_org(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_nhs(service_id):
-    check_email_branding_allowed_for_service("nhs")
+    check_email_branding_allowed_for_service(NHS_EMAIL_BRANDING_ID)
 
     if request.method == "POST":
         current_service.update(email_branding=NHS_EMAIL_BRANDING_ID)

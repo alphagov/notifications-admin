@@ -12,13 +12,15 @@ from tests import organisation_json
 from tests.conftest import create_email_branding
 
 
-@pytest.mark.parametrize("function", [get_email_choices, get_letter_choices])
 @pytest.mark.parametrize(
-    "org_type, expected_options",
+    "function, org_type, expected_options",
     [
-        ("central", []),
-        ("local", []),
-        ("nhs_central", [("nhs", "NHS")]),
+        (get_email_choices, "central", []),
+        (get_letter_choices, "central", []),
+        (get_email_choices, "local", []),
+        (get_letter_choices, "local", []),
+        (get_email_choices, "nhs_central", [(NHS_EMAIL_BRANDING_ID, "NHS")]),
+        (get_letter_choices, "nhs_central", [("nhs", "NHS")]),
     ],
 )
 def test_get_choices_service_not_assigned_to_org(
@@ -57,7 +59,7 @@ def test_get_choices_service_not_assigned_to_org(
         ),
         ("local", None, [("organisation", "Test Organisation")]),
         ("local", "some-branding-id", [("organisation", "Test Organisation")]),
-        ("nhs_central", None, [("nhs", "NHS")]),
+        ("nhs_central", None, [(NHS_EMAIL_BRANDING_ID, "NHS")]),
         (
             "nhs_central",
             NHS_EMAIL_BRANDING_ID,

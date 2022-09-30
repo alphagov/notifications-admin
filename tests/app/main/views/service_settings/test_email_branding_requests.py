@@ -46,7 +46,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
     assert [
         (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
         for radio in page.select("input[type=radio]")
-    ] == [("nhs", "NHS"), ("something_else", "Something else")]
+    ] == [(NHS_EMAIL_BRANDING_ID, "NHS"), ("something_else", "Something else")]
 
     assert button_text == "Continue"
 
@@ -57,7 +57,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
         (
             "nhs_central",
             [
-                ("nhs", "NHS"),
+                (NHS_EMAIL_BRANDING_ID, "NHS"),
                 ("email-branding-1-id", "Email branding name 1"),
                 ("email-branding-2-id", "Email branding name 2"),
                 ("something_else", "Something else"),
@@ -140,7 +140,7 @@ def test_email_branding_request_does_not_show_nhs_branding_twice(
         (radio["value"], page.select_one(f'label[for={radio["id"]}]').text.strip())
         for radio in page.select("input[type=radio]")
     ] == [
-        ("nhs", "NHS"),
+        (NHS_EMAIL_BRANDING_ID, "NHS"),
         ("email-branding-1-id", "Email branding name 1"),
         ("email-branding-2-id", "Email branding name 2"),
         ("something_else", "Something else"),
@@ -168,6 +168,40 @@ def test_email_branding_request_page_redirects_to_something_else_page_if_that_is
         _expected_status=302,
         _expected_redirect=url_for(
             "main.email_branding_something_else",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
+
+def test_email_branding_request_page_redirects_nhs_specific_page(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    organisation_one,
+):
+    service_one["organisation"] = organisation_one["id"]
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    mocker.patch(
+        "app.organisations_client.get_email_branding_pool",
+        return_value=[
+            {
+                "name": "NHS",
+                "id": NHS_EMAIL_BRANDING_ID,
+            },
+        ],
+    )
+
+    client_request.post(
+        ".email_branding_request",
+        service_id=SERVICE_ONE_ID,
+        _data={"options": NHS_EMAIL_BRANDING_ID},
+        _expected_redirect=url_for(
+            "main.email_branding_nhs",
             service_id=SERVICE_ONE_ID,
         ),
     )
@@ -342,7 +376,7 @@ def test_email_branding_request_page_back_link(
         ),
         (
             {
-                "options": "nhs",
+                "options": NHS_EMAIL_BRANDING_ID,
             },
             "nhs_local",
             "main.email_branding_nhs",

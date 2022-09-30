@@ -14,7 +14,7 @@ def get_email_choices(service):
         yield ("govuk", "GOV.UK")
 
     if service.organisation_type in Organisation.NHS_TYPES and service.email_branding_id != NHS_EMAIL_BRANDING_ID:
-        yield ("nhs", "NHS")
+        yield (NHS_EMAIL_BRANDING_ID, "NHS")
 
     if service.email_branding_pool:
         for branding in service.email_branding_pool:
