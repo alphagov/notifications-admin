@@ -4,7 +4,7 @@
 ago==0.0.95
 govuk-bank-holidays==0.11
 humanize==4.4.0
-Flask==2.1.2
+Flask==2.2.2
 Flask-WTF==1.0.1
 wtforms==3.0.1
 Flask-Login==0.6.1
