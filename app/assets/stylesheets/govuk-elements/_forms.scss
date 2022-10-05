@@ -16,7 +16,7 @@
 
 // Fieldset is used to group more than one .form-group
 fieldset {
-  @extend %contain-floats;
+  @include govuk-clearfix;
   width: 100%;
 }
 
@@ -35,7 +35,7 @@ textarea {
 // ==========================================================================
 
 .form-group {
-  @extend %contain-floats;
+  @include govuk-clearfix;
   box-sizing: border-box;
 }
 
