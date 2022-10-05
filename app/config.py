@@ -70,7 +70,7 @@ class Config(object):
     ANTIVIRUS_ENABLED = True
 
     REDIS_URL = os.environ.get("REDIS_URL")
-    REDIS_ENABLED = True
+    REDIS_ENABLED = os.environ.get("REDIS_ENABLED") == "1"
 
     ASSET_DOMAIN = ""
     ASSET_PATH = "/static/"
@@ -90,6 +90,8 @@ class Config(object):
             "first.last@digital.cabinet-office.gov.uk",
         ],
     }
+
+    NOTIFY_RUNTIME_PLATFORM = os.environ.get("NOTIFY_RUNTIME_PLATFORM", "paas")
 
 
 class Development(Config):
@@ -116,6 +118,7 @@ class Development(Config):
 
     REDIS_URL = "redis://localhost:6379/0"
     REDIS_ENABLED = os.environ.get("REDIS_ENABLED") == "1"
+    NOTIFY_RUNTIME_PLATFORM = "local"
 
 
 class Test(Development):
