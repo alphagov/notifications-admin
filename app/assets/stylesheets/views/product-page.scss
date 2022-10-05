@@ -21,7 +21,7 @@ $button-shadow-size: $govuk-border-width-form-element;
       user-select: none;
       padding: 0 0 govuk-spacing(9) 0;
 
-      @include media(desktop) {
+      @include govuk-media-query($from: desktop) {
         background-image: file-url('product/proposition-illustration.png');
         background-size: 320px;
         background-repeat: no-repeat;
@@ -29,7 +29,7 @@ $button-shadow-size: $govuk-border-width-form-element;
       }
 
       &--alternative {
-        @include media(desktop) {
+        @include govuk-media-query($from: desktop) {
           background-image: file-url('product/proposition-alternative.svg');
           background-position: right 10px bottom 0;
         }

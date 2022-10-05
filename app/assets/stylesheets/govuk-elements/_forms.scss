@@ -50,7 +50,7 @@ textarea {
 .form-group {
   margin-bottom: $govuk-gutter-half;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     margin-bottom: $govuk-gutter;
   }
 }
@@ -105,7 +105,7 @@ textarea {
 
   // TODO: Remove 50% width set for tablet and up
   // !! BREAKING CHANGE !!
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     width: 50%;
   }
 
@@ -146,7 +146,7 @@ textarea.form-control {
 .form-control-3-4 {
   width: 100%;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     width: 75%;
   }
 }
@@ -154,7 +154,7 @@ textarea.form-control {
 .form-control-2-3 {
   width: 100%;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     width: 66.66%;
   }
 }
@@ -162,7 +162,7 @@ textarea.form-control {
 .form-control-1-2 {
   width: 100%;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     width: 50%;
   }
 }
@@ -170,7 +170,7 @@ textarea.form-control {
 .form-control-1-3 {
   width: 100%;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     width: 33.33%;
   }
 }
@@ -178,7 +178,7 @@ textarea.form-control {
 .form-control-1-4 {
   width: 100%;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     width: 25%;
   }
 }
@@ -186,7 +186,7 @@ textarea.form-control {
 .form-control-1-8 {
   width: 100%;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     width: 12.5%;
   }
 }

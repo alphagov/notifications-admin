@@ -17,14 +17,12 @@
   }
 
   &__button--remove {
-    display: block;
     margin-bottom: 15px;
     margin-top: 5px;
     position: static;
     overflow: hidden;
 
-    @include media(tablet) {
-      @include inline-block;
+    @include govuk-media-query($from: tablet) {
       margin: 0 0 0 10px;
       position: absolute;
       top: 0;

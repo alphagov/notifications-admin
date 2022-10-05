@@ -206,7 +206,7 @@ a {
     color: $govuk-secondary-text-colour;
     margin: govuk-spacing(3) 0;
 
-    @include media(tablet) {
+    @include govuk-media-query($from: tablet) {
       position: absolute;
       right: 0;
       top: govuk-spacing(6) - 1px;
