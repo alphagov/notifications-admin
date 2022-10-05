@@ -131,16 +131,15 @@ def test_if_string_contains_alphanumeric_characters_does_not_raise(string):
 
 def test_string_cannot_contain_characters():
     with pytest.raises(ValidationError) as error:
-        CharactersNotAllowed('abcdef')(None, _gen_mock_field('abc'))
+        CharactersNotAllowed("abcdef")(None, _gen_mock_field("abc"))
 
     assert str(error.value) == "Cannot contain a, b or c"
 
 
 def test_string_cannot_contain_characters_with_custom_error_message():
     with pytest.raises(ValidationError) as error:
-        CharactersNotAllowed(
-            'abcdef',
-            message='Cannot use first 3 letters of the alphabet'
-        )(None, _gen_mock_field('abc'))
+        CharactersNotAllowed("abcdef", message="Cannot use first 3 letters of the alphabet")(
+            None, _gen_mock_field("abc")
+        )
 
     assert str(error.value) == "Cannot use first 3 letters of the alphabet"

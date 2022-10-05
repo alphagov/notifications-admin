@@ -187,7 +187,6 @@ class MustContainAlphanumericCharacters:
 
 
 class CharactersNotAllowed:
-
     def __init__(self, characters_not_allowed, *, message=None):
         self.characters_not_allowed = OrderedSet(characters_not_allowed)
         self.message = message
@@ -199,6 +198,6 @@ class CharactersNotAllowed:
             if self.message:
                 raise ValidationError(self.message)
             raise ValidationError(
-                f'Cannot contain '
+                f"Cannot contain "
                 f'{formatted_list(illegal_characters, conjunction="or", before_each="", after_each="")}'
             )

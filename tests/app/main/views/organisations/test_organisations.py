@@ -1466,30 +1466,24 @@ def test_update_organisation_domains_with_more_than_just_domain(
     )
 
     page = client_request.post(
-        'main.edit_organisation_domains',
+        "main.edit_organisation_domains",
         org_id=ORGANISATION_ID,
         _data={
-            'domains-0': 'test@example.gov.uk',
-            'domains-1': 'example.gov.uk',
-            'domains-2': '@example.gov.uk',
+            "domains-0": "test@example.gov.uk",
+            "domains-1": "example.gov.uk",
+            "domains-2": "@example.gov.uk",
         },
         _expected_status=200,
     )
 
-    assert normalize_spaces(
-        page.select_one(".banner-dangerous").text
-     ) == (
-        "There is a problem "
-        "Item 1: Cannot contain @ "
-        "Item 3: Cannot contain @"
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        "There is a problem " "Item 1: Cannot contain @ " "Item 3: Cannot contain @"
     )
 
-    assert [
-        field['value'] for field in page.select("input[type=text][value]")
-    ] == [
-        'test@example.gov.uk',
-        'example.gov.uk',
-        '@example.gov.uk',
+    assert [field["value"] for field in page.select("input[type=text][value]")] == [
+        "test@example.gov.uk",
+        "example.gov.uk",
+        "@example.gov.uk",
     ]
 
 

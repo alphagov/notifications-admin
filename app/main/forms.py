@@ -1166,7 +1166,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
         StripWhitespaceStringField(
             "",
             validators=[
-                CharactersNotAllowed('@'),
+                CharactersNotAllowed("@"),
                 Optional(),
             ],
             default="",
