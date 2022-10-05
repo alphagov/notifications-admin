@@ -58,6 +58,7 @@ from app.formatters import (
 )
 from app.main.validators import (
     BroadcastLength,
+    CharactersNotAllowed,
     CommonlyUsedPassword,
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
@@ -1165,6 +1166,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
         StripWhitespaceStringField(
             "",
             validators=[
+                CharactersNotAllowed("@"),
                 Optional(),
             ],
             default="",

@@ -4,6 +4,7 @@
 {% from "components/list-entry.html" import list_entry %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/banner.html" import banner_wrapper %}
 
 {% block org_page_title %}
   Known email domains
@@ -14,6 +15,25 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+
+  {% if form.domains.errors %}
+    {% call banner_wrapper(type='dangerous') %}
+
+      <h1 class='banner-title'>
+        There is a problem
+      </h1>
+
+      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+        {% for field_errors in form.domains.errors %}
+          {% if field_errors %}
+            <li>Item {{ loop.index }}: {{ field_errors[0] }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+
+    {% endcall %}
+  {% endif %}
+
   {{ page_header("Known email domains") }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
