@@ -664,7 +664,8 @@ def edit_organisation_domains(org_id):
                 raise e
         return redirect(url_for(".organisation_settings", org_id=org_id))
 
-    form.populate(current_organisation.domains)
+    if request.method == 'GET':
+        form.populate(current_organisation.domains)
 
     return render_template(
         "views/organisations/organisation/settings/edit-domains.html",

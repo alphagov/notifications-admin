@@ -1452,11 +1452,18 @@ def test_update_organisation_domains_with_more_than_just_domain(
     mocker,
     client_request,
     fake_uuid,
-    organisation_one,
-    mock_get_organisation,
 ):
     user = create_platform_admin_user()
     client_request.login(user)
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            "Org 1",
+            domains=["test.example.gov.uk"],
+        ),
+    )
 
     page = client_request.post(
         'main.edit_organisation_domains',
@@ -1476,6 +1483,14 @@ def test_update_organisation_domains_with_more_than_just_domain(
         "Item 1: Cannot contain @ "
         "Item 3: Cannot contain @"
     )
+
+    assert [
+        field['value'] for field in page.select("input[type=text][value]")
+    ] == [
+        'test@example.gov.uk',
+        'example.gov.uk',
+        '@example.gov.uk',
+    ]
 
 
 def test_update_organisation_name(
