@@ -18,8 +18,6 @@ EVENT_SCHEMAS = {
         "provider_restriction",
     },  # noqa: E501 (length)
     "archive_service": {"service_id", "archived_by_id"},
-    "suspend_service": {"service_id", "suspended_by_id"},
-    "resume_service": {"service_id", "resumed_by_id"},
 }
 
 
