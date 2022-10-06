@@ -33,6 +33,9 @@ def user_information(user_id):
 @user_is_platform_admin
 def archive_user(user_id):
     if request.method == "POST":
+        user = User.from_id(user_id)
+        original_email_address = user.email_address
+
         try:
             user_api_client.archive_user(user_id)
         except HTTPError as e:
@@ -42,7 +45,10 @@ def archive_user(user_id):
                     "check all services have another team member with manage_settings"
                 )
                 return redirect(url_for("main.user_information", user_id=user_id))
-        create_archive_user_event(user_id=str(user_id), archived_by_id=current_user.id)
+
+        create_archive_user_event(
+            user_id=str(user_id), user_email_address=original_email_address, archived_by_id=current_user.id
+        )
 
         return redirect(url_for(".user_information", user_id=user_id))
     else:

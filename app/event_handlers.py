@@ -9,7 +9,7 @@ EVENT_SCHEMAS = {
     "remove_user_from_service": {"user_id", "removed_by_id", "service_id"},
     "add_user_to_service": {"user_id", "invited_by_id", "service_id", "ui_permissions"},
     "set_user_permissions": {"user_id", "service_id", "original_ui_permissions", "new_ui_permissions", "set_by_id"},
-    "archive_user": {"user_id", "archived_by_id"},
+    "archive_user": {"user_id", "user_email_address", "archived_by_id"},
     "change_broadcast_account_type": {
         "service_id",
         "changed_by_id",
