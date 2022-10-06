@@ -54,15 +54,26 @@
     width: 100%;
   }
 
+  .previous-page {
+    text-align: left;
+  }
+
+  .next-page {
+    text-align: right;
+  }
+
   @include govuk-media-query($from: tablet) {
+    .previous-page,
+    .next-page {
+      width: auto;
+    }
+
     .previous-page {
       float: left;
-      text-align: left;
     }
 
     .next-page {
       float: right;
-      text-align: right;
     }
   }
 
