@@ -31,7 +31,6 @@ const paths = {
   dist: 'app/static/',
   templates: 'app/templates/',
   npm: 'node_modules/',
-  toolkit: 'node_modules/govuk_frontend_toolkit/',
   govuk_frontend: 'node_modules/govuk-frontend/'
 };
 // Rewrite /static prefix for URLs in CSS files
@@ -212,7 +211,6 @@ const sass = () => {
     .pipe(plugins.sass.sync({
       includePaths: [
         paths.npm + 'govuk-elements-sass/public/sass/',
-        paths.toolkit + 'stylesheets/',
         paths.govuk_frontend,
         paths.npm
       ]
