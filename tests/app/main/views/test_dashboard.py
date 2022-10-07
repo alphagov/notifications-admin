@@ -206,7 +206,7 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert not page.select(".big-number-meta-wrapper")
+    assert not page.select("#total-received")
     assert mock_get_inbound_sms_summary.called is False
 
 

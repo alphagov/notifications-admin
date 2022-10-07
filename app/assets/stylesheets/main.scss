@@ -1,17 +1,12 @@
 // Path to assets for use with file-url()
 $path: '/static/images/';
 
-// Dependencies from GOV.UK Frontend Toolkit
-// https://github.com/alphagov/govuk_frontend_toolkit/
-@import 'conditionals';
-@import 'shims';
-
 // Dependencies from GOVU.UK Frontend Toolkit, rewritten for this application
-@import 'url-helpers';
+@import './url-helpers';
 
 // Specific to this application, needs to go at the top of the cascade
-@import 'reset';
-@import 'globals';
+@import './reset';
+@import './globals';
 
 // Dependencies from GOV.UK Frontend, packaged to be specific to this application
 @import './govuk-frontend/all';
@@ -27,55 +22,55 @@ $path: '/static/images/';
 @import './govuk-elements/tables';
 
 // Specific to this application
-@import 'local/typography';
-@import 'grids';
-@import 'components/cookie-message';
-@import 'components/placeholder';
-@import 'components/sms-message';
-@import 'components/page-footer';
-@import 'components/table';
-@import 'components/navigation';
-@import 'components/big-number';
-@import 'components/banner';
-@import 'components/textbox';
-@import 'components/file-upload';
-@import 'components/browse-list';
-@import 'components/email-message';
-@import 'components/copy-to-clipboard';
-@import 'components/vendor/previous-next-navigation';
-@import 'components/radios';
-@import 'components/checkboxes';
-@import 'components/pill';
-@import 'components/show-more';
-@import 'components/message';
-@import 'components/research-mode';
-@import 'components/tick-cross';
-@import 'components/list-entry';
-@import 'components/letter';
-@import 'components/live-search';
-@import 'components/stick-at-top-when-scrolling';
-@import 'components/fullscreen-table';
-@import 'components/conditional-radios';
-@import 'components/vendor/breadcrumbs';
-@import 'components/vendor/responsive-embed';
-@import 'components/preview-pane';
-@import 'components/task-list';
-@import 'components/loading-indicator';
-@import 'components/area-list';
-@import 'components/broadcast-message';
-@import 'components/content-metadata';
+@import './local/typography';
+@import './grids';
+@import './components/cookie-message';
+@import './components/placeholder';
+@import './components/sms-message';
+@import './components/page-footer';
+@import './components/table';
+@import './components/navigation';
+@import './components/big-number';
+@import './components/banner';
+@import './components/textbox';
+@import './components/file-upload';
+@import './components/browse-list';
+@import './components/email-message';
+@import './components/copy-to-clipboard';
+@import './components/vendor/previous-next-navigation';
+@import './components/radios';
+@import './components/checkboxes';
+@import './components/pill';
+@import './components/show-more';
+@import './components/message';
+@import './components/research-mode';
+@import './components/tick-cross';
+@import './components/list-entry';
+@import './components/letter';
+@import './components/live-search';
+@import './components/stick-at-top-when-scrolling';
+@import './components/fullscreen-table';
+@import './components/conditional-radios';
+@import './components/vendor/breadcrumbs';
+@import './components/vendor/responsive-embed';
+@import './components/preview-pane';
+@import './components/task-list';
+@import './components/loading-indicator';
+@import './components/area-list';
+@import './components/broadcast-message';
+@import './components/content-metadata';
 
-@import 'views/dashboard';
-@import 'views/users';
-@import 'views/api';
-@import 'views/product-page';
-@import 'views/template';
-@import 'views/notification';
-@import 'views/send';
-@import 'views/get_started';
-@import 'views/history';
-@import 'views/cookies';
-@import 'views/webauthn';
+@import './views/dashboard';
+@import './views/users';
+@import './views/api';
+@import './views/product-page';
+@import './views/template';
+@import './views/notification';
+@import './views/send';
+@import './views/get_started';
+@import './views/history';
+@import './views/cookies';
+@import './views/webauthn';
 
 // TODO: break this up
-@import 'app';
+@import './app';

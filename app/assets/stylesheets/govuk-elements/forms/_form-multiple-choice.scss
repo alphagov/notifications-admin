@@ -16,7 +16,7 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
   padding: 0 0 0 38px;
   margin-bottom: $govuk-gutter / 3;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     float: left;
   }
 
@@ -29,12 +29,6 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
     width: 38px;
     height: 38px;
     z-index: 1;
-
-    // IE8 doesn’t support pseudoelements, so we don’t want to hide native elements there.
-    @if ($is-ie == false) or ($ie-version == 9) {
-      margin: 0;
-      opacity: 0;
-    }
   }
 
   label {
@@ -46,7 +40,7 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
     -ms-touch-action: manipulation;
     touch-action: manipulation;
 
-    @include media(tablet) {
+    @include govuk-media-query($from: tablet) {
       float: left;
       padding-top: 7px;
       padding-bottom: 7px;
@@ -127,7 +121,7 @@ $govuk-radios-focus-width: $govuk-focus-width + 1px;
 .inline .multiple-choice {
   clear: none;
 
-  @include media (tablet) {
+  @include govuk-media-query($from: tablet) {
     margin-bottom: 0;
     margin-right: $govuk-gutter;
   }

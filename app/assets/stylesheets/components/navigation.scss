@@ -190,7 +190,7 @@
 
 // https://github.com/alphagov/product-page-example/blob/master/source/stylesheets/modules/_sub-navigation.scss
 .sub-navigation {
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     margin-top: govuk-spacing(6) * 1.5;
   }
 

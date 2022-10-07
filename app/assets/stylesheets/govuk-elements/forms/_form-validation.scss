@@ -7,7 +7,7 @@
   border-left: 4px solid $govuk-error-colour;
   padding-left: 10px;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     border-left: 5px solid $govuk-error-colour;
     padding-left: $govuk-gutter-half;
   }

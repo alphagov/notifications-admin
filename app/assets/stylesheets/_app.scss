@@ -7,7 +7,7 @@
 
   width: 100%;
 
-  @include media(tablet) {
+  @include govuk-media-query($from: tablet) {
     width: 5em;
   }
 
@@ -37,7 +37,7 @@
 
   .block-label {
 
-    @include media(tablet) {
+    @include govuk-media-query($from: tablet) {
       float: none;
       display: inline-block;
     }

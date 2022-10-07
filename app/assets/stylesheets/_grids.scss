@@ -21,7 +21,7 @@
 
 %top-gutter,
 .top-gutter {
-  @extend %contain-floats;
+  @include govuk-clearfix;
   display: block;
   margin-top: govuk-spacing(6);
   clear: both;
@@ -53,7 +53,7 @@
 
 %bottom-gutter,
 .bottom-gutter {
-  @extend %contain-floats;
+  @include govuk-clearfix;
   margin-bottom: govuk-spacing(6);
   clear: both;
 }
