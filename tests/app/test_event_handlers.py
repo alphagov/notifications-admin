@@ -73,7 +73,7 @@ def test_create_mobile_number_change_event_calls_events_api(client_request, mock
 
 
 def test_create_archive_user_event_calls_events_api(client_request, mock_events):
-    kwargs = {"user_id": str(uuid.uuid4()), "archived_by_id": str(uuid.uuid4())}
+    kwargs = {"user_id": str(uuid.uuid4()), "user_email_address": "user@gov.uk", "archived_by_id": str(uuid.uuid4())}
 
     create_archive_user_event(**kwargs)
     mock_events.assert_called_with("archive_user", event_dict(**kwargs))
