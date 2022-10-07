@@ -210,7 +210,6 @@ const sass = () => {
     .pipe(plugins.prettyerror())
     .pipe(plugins.sass.sync({
       includePaths: [
-        paths.npm + 'govuk-elements-sass/public/sass/',
         paths.govuk_frontend,
         paths.npm
       ]
