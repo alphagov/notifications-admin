@@ -1,6 +1,5 @@
 {% extends "template.njk" %}
 {% from "components/banner.html" import banner %}
-{% from "components/cookie-banner.html" import cookie_banner %}
 
 {% block headIcons %}
   <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ asset_url('images/favicon.ico') }}" type="image/x-icon" />
@@ -39,10 +38,6 @@
 
 {% block bodyStart %}
   {% block extra_javascripts_before_body %}
-  {% endblock %}
-
-  {% block cookie_message %}
-    {{ cookie_banner() }}
   {% endblock %}
 {% endblock %}
 

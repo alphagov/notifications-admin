@@ -356,11 +356,11 @@ def useful_headers_after_request(response):
         "Content-Security-Policy",
         (
             "default-src 'self' {asset_domain} 'unsafe-inline';"
-            "script-src 'self' {asset_domain} *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
-            "connect-src 'self' *.google-analytics.com;"
+            "script-src 'self' {asset_domain} 'unsafe-inline' 'unsafe-eval' data:;"
+            "connect-src 'self';"
             "object-src 'self';"
             "font-src 'self' {asset_domain} data:;"
-            "img-src 'self' {asset_domain} *.tile.openstreetmap.org *.google-analytics.com"
+            "img-src 'self' {asset_domain} *.tile.openstreetmap.org"
             " *.notifications.service.gov.uk {logo_domain} data:;"
             "frame-src 'self' www.youtube-nocookie.com;".format(
                 asset_domain=current_app.config["ASSET_DOMAIN"],
