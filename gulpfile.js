@@ -228,7 +228,6 @@ const sass = () => {
 const images = () => {
   return src([
       paths.src + 'images/**/*',
-      paths.template + 'assets/images/**/*',
       paths.govuk_frontend + 'assets/images/**/*'
     ])
     .pipe(dest(paths.dist + 'images/'))
