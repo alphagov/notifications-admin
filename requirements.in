@@ -20,7 +20,7 @@ pyexcel-ods3==0.6.1
 pytz==2022.4
 # Should be pinned until a new gunicorn release greater than 20.1.0 comes out. (Due to eventlet v0.33 compatibility issues)
 git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b864c64#egg=gunicorn[eventlet]==20.1.0
-notifications-python-client==6.3.0
+notifications-python-client==6.4.0
 rtreelib==0.2.0
 fido2==0.9.3
 pyproj==3.3.1
