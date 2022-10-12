@@ -49,8 +49,7 @@
 
 // Allow legends that contain the h1 to go full width
 .govuk-fieldset__legend.govuk-grid-column-full {
-  // $class parameter is deprecated but needed for v2 of GOVUK Frontend. Remove for v3 & above
-  @include govuk-grid-column(full, $class: false);
+  @include govuk-grid-column(full);
 }
 
 // Add override from future version of GOV.UK Frontend
