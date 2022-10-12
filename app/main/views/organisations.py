@@ -285,8 +285,17 @@ def cancel_invited_org_user(org_id, invited_user_id):
 @main.route("/organisations/<uuid:org_id>/settings/", methods=["GET"])
 @user_is_platform_admin
 def organisation_settings(org_id):
+    default_email_branding_name = current_organisation.email_branding_name
+    other_email_branding_options = [
+        email_branding_name
+        for email_branding_name in current_organisation.email_branding_pool_names
+        if email_branding_name != default_email_branding_name
+    ]
+
     return render_template(
         "views/organisations/organisation/settings/index.html",
+        default_email_branding_name=default_email_branding_name,
+        other_email_branding_options=other_email_branding_options,
     )
 
 

@@ -11,6 +11,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     SERVICE_TWO_ID,
     create_active_user_with_permissions,
+    create_email_branding,
     create_platform_admin_user,
     normalize_spaces,
 )
@@ -914,7 +915,7 @@ def test_organisation_settings_for_platform_admin(
         "Request to go live notes None Change go live notes for the organisation",
         "Billing details None Change billing details for the organisation",
         "Notes None Change the notes for the organisation",
-        "Email branding options None Change email branding options for the organisation",
+        "Email branding options GOV.UK Default Change email branding options for the organisation",
         "Default letter branding No branding Change default letter branding for the organisation",
         "Known email domains None Change known email domains for the organisation",
     ]
@@ -944,9 +945,64 @@ def test_organisation_settings_table_shows_email_branding_pool(
 
     assert normalize_spaces(email_branding_options_row.text) == (
         "Email branding options "
+        "GOV.UK Default "
         "Email branding name 1 "
         "Email branding name 2 "
         "Change email branding options for the organisation"
+    )
+
+
+def test_organisation_settings_table_shows_email_branding_pool_non_govuk_default(
+    client_request,
+    mocker,
+    mock_get_email_branding_pool,
+    mock_get_email_branding,
+    platform_admin_user,
+    organisation_one,
+):
+    email_branding_pool = mock_get_email_branding_pool(organisation_one["id"])
+    organisation_one["email_branding_id"] = email_branding_pool[0]["id"]
+    email_branding = create_email_branding(
+        email_branding_pool[0]["id"],
+        non_standard_values={
+            "name": email_branding_pool[0]["name"],
+            "text": email_branding_pool[0]["text"],
+        },
+    )
+
+    with (
+        mocker.patch("app.organisations_client.get_organisation", side_effect=lambda *args, **kwargs: organisation_one),
+        mocker.patch(
+            "app.email_branding_client.get_email_branding", side_effect=lambda *args, **kwargs: email_branding
+        ),
+    ):
+        client_request.login(platform_admin_user)
+        page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
+
+    email_branding_options_row = page.select("tr")[8]
+
+    assert normalize_spaces(email_branding_options_row.text) == (
+        "Email branding options "
+        "Email branding name 1 Default "
+        "Email branding name 2 "
+        "Change email branding options for the organisation"
+    )
+
+
+def test_organisation_settings_table_shows_email_branding_pool_govuk_default(
+    client_request,
+    platform_admin_user,
+    mock_get_organisation,
+    mock_get_empty_email_branding_pool,
+    organisation_one,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
+
+    email_branding_options_row = page.select("tr")[8]
+
+    assert normalize_spaces(email_branding_options_row.text) == (
+        "Email branding options GOV.UK Default Change email branding options for the organisation"
     )
 
 

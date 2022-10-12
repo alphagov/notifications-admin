@@ -1,5 +1,5 @@
 {% extends "org_template.html" %}
-{% from "components/table.html" import mapping_table, optional_text_field, row, text_field, edit_field with context %}
+{% from "components/table.html" import mapping_table, optional_text_field, row, field, text_field, edit_field with context %}
 
 {% block org_page_title %}
   Settings
@@ -100,7 +100,28 @@
       {% endcall %}
       {% call row() %}
         {{ text_field('Email branding options') }}
-        {{ optional_text_field(current_org.email_branding_pool_names, default="None") }}
+        {% set email_branding_html %}
+          <div {% if other_email_branding_options %}class="govuk-!-margin-bottom-5"{% endif %}>
+            {{ default_email_branding_name }}
+            <br>
+            <div class="table-field-status-default">
+              Default
+            </div>
+          </div>
+
+          {% if other_email_branding_options %}
+            <ul>
+            {% for item in other_email_branding_options %}
+              <li>
+                {{ item }}
+              </li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endset %}
+        {% call field() %}
+          {{ email_branding_html }}
+        {% endcall %}
         {{ edit_field(
             'Change',
             url_for('.organisation_email_branding', org_id=current_org.id),
