@@ -47,7 +47,7 @@ describe('Update content', () => {
         <span id="example-hint-text">Example hint text</span>
         <textarea name="template_content" id="template_content" aria-describedby="example-hint-text">Content of message</textarea>
       </form>
-      <div data-module="update-status" data-updates-url="${updatesURL}" data-target="template_content">
+      <div data-notify-module="update-status" data-updates-url="${updatesURL}" data-target="template_content">
         Initial content
       </div>
     `;
@@ -71,7 +71,7 @@ describe('Update content', () => {
     window.GOVUK.notifyModules.start();
 
     expect(
-      document.querySelectorAll('[data-module=update-status]')[0].id
+      document.querySelectorAll('[data-notify-module=update-status]')[0].id
     ).toEqual(
       "update-status"
     );
@@ -118,7 +118,7 @@ describe('Update content', () => {
     responseObj = {'html': 'Updated content'}
 
     expect(
-      document.querySelectorAll('[data-module=update-status]')[0].textContent.trim()
+      document.querySelectorAll('[data-notify-module=update-status]')[0].textContent.trim()
     ).toEqual(
       "Initial content"
     );
@@ -126,7 +126,7 @@ describe('Update content', () => {
     window.GOVUK.notifyModules.start();
 
     expect(
-      document.querySelectorAll('[data-module=update-status]')[0].textContent.trim()
+      document.querySelectorAll('[data-notify-module=update-status]')[0].textContent.trim()
     ).toEqual(
       "Updated content"
     );

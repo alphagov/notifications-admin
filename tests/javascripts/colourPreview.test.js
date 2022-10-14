@@ -22,7 +22,7 @@ describe('Colour preview', () => {
         <label class="govuk-form-label" for="colour">
           Colour
         </label>
-        <input class="govuk-input govuk-input--width-6" id="colour" name="colour" rows="8" type="text" value="" data-module="colour-preview">
+        <input class="govuk-input govuk-input--width-6" id="colour" name="colour" rows="8" type="text" value="" data-notify-module="colour-preview">
       </div>`;
 
     field = document.querySelector('.govuk-form-group');

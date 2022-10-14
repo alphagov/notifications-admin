@@ -89,7 +89,7 @@ describe('FullscreenTable', () => {
     // set up DOM
     document.body.innerHTML =
       `<main>
-        <div class="fullscreen-content" data-module="fullscreen-table">
+        <div class="fullscreen-content" data-notify-module="fullscreen-table">
           <table class="table table-font-xsmall">
             <caption class="heading-medium table-heading visuallyhidden">
               people.csv

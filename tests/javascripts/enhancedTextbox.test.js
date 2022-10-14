@@ -39,11 +39,11 @@ describe('Enhanced textbox', () => {
     document.body.innerHTML = `
       <div class="form-group">
         <label for="subject">Subject</label>
-        <input class="form-control textbox-highlight-textbox" data-module="enhanced-textbox" type="text" name="subject" id="subject" />
+        <input class="form-control textbox-highlight-textbox" data-notify-module="enhanced-textbox" type="text" name="subject" id="subject" />
       </div>
       <div class="form-group">
         <label for="template_content">Message</label>
-        <textarea class="form-control form-control-1-1 textbox-highlight-textbox" data-module="enhanced-textbox" id="template_content" name="template_content" rows="8">
+        <textarea class="form-control form-control-1-1 textbox-highlight-textbox" data-notify-module="enhanced-textbox" id="template_content" name="template_content" rows="8">
         </textarea>
       </div>`;
 

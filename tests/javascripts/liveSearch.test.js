@@ -64,7 +64,7 @@ describe('Live search', () => {
 
       // set up DOM
       document.body.innerHTML = `
-        <div class="live-search js-header" data-module="live-search" data-targets=".govuk-radios__item">
+        <div class="live-search js-header" data-notify-module="live-search" data-targets=".govuk-radios__item">
           <div class="govuk-form-group">
             <label class="govuk-label" for="search">
               ${searchLabelText}
@@ -262,7 +262,7 @@ describe('Live search', () => {
 
       // set up DOM
       document.body.innerHTML = `
-        <div class="live-search js-header" data-module="live-search" data-targets="#template-list .template-list-item">
+        <div class="live-search js-header" data-notify-module="live-search" data-targets="#template-list .template-list-item">
           <div class="form-group">
             <label class="form-label" for="search">
                 ${searchLabelText}
@@ -553,12 +553,12 @@ describe('Live search', () => {
 
       // set up DOM
       document.body.innerHTML = `
-        <div class="live-search js-header" data-module="live-search" data-targets=".user-list-item">
-          <div class="form-group" data-module="">
+        <div class="live-search js-header" data-notify-module="live-search" data-targets=".user-list-item">
+          <div class="form-group" data-notify-module="">
             <label class="form-label" for="search">
                 ${searchLabelText}
             </label>
-            <input autocomplete="off" class="form-control form-control-1-1 " data-module="" id="search" name="search" rows="8" type="search" value="">
+            <input autocomplete="off" class="form-control form-control-1-1 " data-notify-module="" id="search" name="search" rows="8" type="search" value="">
             <div role="region" aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
           </div>
         </div>

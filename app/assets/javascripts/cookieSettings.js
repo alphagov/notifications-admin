@@ -9,7 +9,7 @@ window.GOVUK.NotifyModules = window.GOVUK.NotifyModules || {};
 
     this.$module.submitSettingsForm = this.submitSettingsForm.bind(this);
 
-    document.querySelector('form[data-module=cookie-settings]')
+    document.querySelector('form[data-notify-module=cookie-settings]')
       .addEventListener('submit', this.$module.submitSettingsForm);
 
     this.setInitialFormValues();

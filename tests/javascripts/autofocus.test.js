@@ -24,7 +24,7 @@ describe('Autofocus', () => {
         <label class="form-label" for="search">
           ${labelText}
         </label>
-        <input autocomplete="off" class="form-control form-control-1-1" id="search" name="search" type="search" value="" data-module="autofocus">
+        <input autocomplete="off" class="form-control form-control-1-1" id="search" name="search" type="search" value="" data-notify-module="autofocus">
       </div>`;
 
     focusHandler = jest.fn();
@@ -52,8 +52,8 @@ describe('Autofocus', () => {
 
   test('is focused when attribute is set on outer element', () => {
 
-    document.getElementById('search').removeAttribute('data-module');
-    document.getElementById('wrapper').setAttribute('data-module', 'autofocus');
+    document.getElementById('search').removeAttribute('data-notify-module');
+    document.getElementById('wrapper').setAttribute('data-notify-module', 'autofocus');
 
     // start module
     window.GOVUK.notifyModules.start();

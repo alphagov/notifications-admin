@@ -47,7 +47,7 @@ afterAll(() => {
 describe('Update content', () => {
 
   const getInitialHTMLString = partial => `
-    <div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
+    <div data-notify-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
       ${partial}
     </div>`;
 
@@ -58,7 +58,7 @@ describe('Update content', () => {
       // Intentionally basic example because we're not testing changes to the partial
       document.body.innerHTML = getInitialHTMLString(`<p class="notification-status">Sending</p>`);
 
-      // default the response to match the content inside div[data-module]
+      // default the response to match the content inside div[data-notify-module]
       responseObj[updateKey] = `<p class="notification-status">Sending</p>`;
 
     });
@@ -135,7 +135,7 @@ describe('Update content', () => {
           </form>`;
 
         // Link the component to the form
-        document.querySelector('[data-module=update-content]').setAttribute('data-form', 'service');
+        document.querySelector('[data-notify-module=update-content]').setAttribute('data-form', 'service');
 
         // start the module
         window.GOVUK.notifyModules.start();
@@ -221,7 +221,7 @@ describe('Update content', () => {
 
     test("It should replace the original HTML with that of the partial, to match that returned from AJAX responses", () => {
 
-      // default the response to match the content inside div[data-module]
+      // default the response to match the content inside div[data-notify-module]
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
@@ -233,7 +233,7 @@ describe('Update content', () => {
 
     test("It should make requests to the URL specified in the data-resource attribute", () => {
 
-      // default the response to match the content inside div[data-module]
+      // default the response to match the content inside div[data-notify-module]
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
@@ -404,7 +404,7 @@ describe('Update content', () => {
       // remove the last item
       partialData.pop();
 
-      // default the response to match the content inside div[data-module]
+      // default the response to match the content inside div[data-notify-module]
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module

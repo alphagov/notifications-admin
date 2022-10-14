@@ -24,7 +24,7 @@ describe('copy to clipboard', () => {
       <h2 class="copy-to-clipboard__name">
         ${options.thing}
       </h2>
-      <div data-module="copy-to-clipboard" data-value="${apiKey}" data-thing="${options.thing}" data-name="${options.name}">
+      <div data-notify-module="copy-to-clipboard" data-value="${apiKey}" data-thing="${options.thing}" data-name="${options.name}">
         <span class="copy-to-clipboard__value" aria-live="assertive">${(options.name === options.thing) ? '<span class="govuk-visually-hidden">' + options.thing + ': </span>' : ''}${apiKey}</span>
         <span class="copy-to-clipboard__notice" aria-live="assertive"></span>
       </div>`;
@@ -60,7 +60,7 @@ describe('copy to clipboard', () => {
 
     setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
-    component = document.querySelector('[data-module=copy-to-clipboard]');
+    component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
     // start the module
     window.GOVUK.notifyModules.start();
@@ -97,11 +97,11 @@ describe('copy to clipboard', () => {
 
           setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
-          component = document.querySelector('[data-module=copy-to-clipboard]');
+          component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
           // set default style for component height (queried by jQuery before checking DOM APIs)
           const stylesheet = document.createElement('style');
-          stylesheet.innerHTML = '[data-module=copy-to-clipboard] { height: auto; }'; // set to browser default
+          stylesheet.innerHTML = '[data-notify-module=copy-to-clipboard] { height: auto; }'; // set to browser default
           document.getElementsByTagName('head')[0].appendChild(stylesheet);
 
           componentHeightOnLoad = 50;
@@ -166,7 +166,7 @@ describe('copy to clipboard', () => {
           // different, it will be one of others called the same 'thing'.
           setUpDOM({ 'thing': 'ID', 'name': 'Default' });
 
-          component = document.querySelector('[data-module=copy-to-clipboard]');
+          component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
           // start the module
           window.GOVUK.notifyModules.start();
@@ -202,7 +202,7 @@ describe('copy to clipboard', () => {
           // the only one of its type there
           setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
-          component = document.querySelector('[data-module=copy-to-clipboard]');
+          component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
           // start the module
           window.GOVUK.notifyModules.start();
@@ -235,7 +235,7 @@ describe('copy to clipboard', () => {
           // start the module
           window.GOVUK.notifyModules.start();
 
-          component = document.querySelector('[data-module=copy-to-clipboard]');
+          component = document.querySelector('[data-notify-module=copy-to-clipboard]');
           keyEl = component.querySelector('.copy-to-clipboard__value');
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
@@ -334,7 +334,7 @@ describe('copy to clipboard', () => {
           // start the module
           window.GOVUK.notifyModules.start();
 
-          component = document.querySelector('[data-module=copy-to-clipboard]');
+          component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
 
@@ -377,7 +377,7 @@ describe('copy to clipboard', () => {
           // start the module
           window.GOVUK.notifyModules.start();
 
-          component = document.querySelector('[data-module=copy-to-clipboard]');
+          component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
 

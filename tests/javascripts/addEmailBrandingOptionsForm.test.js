@@ -18,7 +18,7 @@ describe('AddEmailBrandingOptionsForm', () => {
   beforeEach(() => {
 
     const htmlFragment = `
-      <form method="post" autocomplete="off" data-module="add-email-branding-options-form" novalidate="">
+      <form method="post" autocomplete="off" data-notify-module="add-email-branding-options-form" novalidate="">
         <div class="brand-pool">
           <div class="govuk-form-group">
             <fieldset class="govuk-fieldset" id="branding_field">
@@ -61,7 +61,7 @@ describe('AddEmailBrandingOptionsForm', () => {
 
     document.body.innerHTML = htmlFragment;
 
-    addEmailBrandingOptionsForm = document.querySelector('form[data-module=add-email-branding-options-form]');
+    addEmailBrandingOptionsForm = document.querySelector('form[data-notify-module=add-email-branding-options-form]');
 
   });
 

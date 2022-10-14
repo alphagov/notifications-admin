@@ -40,7 +40,7 @@ describe('Collapsible fieldset', () => {
 
     // set up DOM
     document.body.innerHTML =
-      `<div class="selection-wrapper" data-module="collapsible-checkboxes" data-field-label="folder">
+      `<div class="selection-wrapper" data-notify-module="collapsible-checkboxes" data-field-label="folder">
         <div class="govuk-form-group">
           <fieldset class="govuk-fieldset" id="folder_permissions" aria-describedby="users_with_permission-hint">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">

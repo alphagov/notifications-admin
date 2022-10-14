@@ -11,7 +11,7 @@ describe('Error tracking', () => {
   beforeEach(() => {
 
     // set up DOM
-    document.body.innerHTML = `<div data-module="track-error" data-error-type="validation" data-error-label="missing field"></div>`;
+    document.body.innerHTML = `<div data-notify-module="track-error" data-error-type="validation" data-error-label="missing field"></div>`;
 
   });
 

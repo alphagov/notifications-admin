@@ -70,7 +70,7 @@ describe("List entry", () => {
         <span id="domains-hint" class="govuk-hint">
           For example cabinet-office.gov.uk
         </span>
-        <div class="input-list" data-module="list-entry" data-list-item-name="domain" id="list-entry-domains">
+        <div class="input-list" data-notify-module="list-entry" data-list-item-name="domain" id="list-entry-domains">
           ${entries()} }
         </div>
       </fieldset>`;

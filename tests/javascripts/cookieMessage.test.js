@@ -40,7 +40,7 @@ describe("Cookie message", () => {
     jest.spyOn(window.GOVUK, 'initAnalytics');
 
     cookieMessage = `
-      <div id="global-cookie-message" class="notify-cookie-banner" data-module="cookie-banner" role="region" aria-label="cookie banner" data-nosnippet="">
+      <div id="global-cookie-message" class="notify-cookie-banner" data-notify-module="cookie-banner" role="region" aria-label="cookie banner" data-nosnippet="">
         <div class="notify-cookie-banner__wrapper govuk-width-container govuk-!-padding-4">
           <h2 class="notify-cookie-banner__heading govuk-heading-m">Cookies on GOV.UK Notify</h2>
           <p class="notify-cookie-banner__message govuk-body">We use <a class="govuk-link govuk-link--no-visited-state" href="/cookies">small files called cookies</a> to make GOV.UK Notify work.</p>
