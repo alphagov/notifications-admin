@@ -63,7 +63,7 @@ describe('copy to clipboard', () => {
     component = document.querySelector('[data-module=copy-to-clipboard]');
 
     // start the module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(component.querySelector('button')).toBeNull();
 
@@ -120,7 +120,7 @@ describe('copy to clipboard', () => {
           });
 
           // start the module
-          window.GOVUK.modules.start();
+          window.GOVUK.notifyModules.start();
 
         });
 
@@ -169,7 +169,7 @@ describe('copy to clipboard', () => {
           component = document.querySelector('[data-module=copy-to-clipboard]');
 
           // start the module
-          window.GOVUK.modules.start();
+          window.GOVUK.notifyModules.start();
 
         });
 
@@ -205,7 +205,7 @@ describe('copy to clipboard', () => {
           component = document.querySelector('[data-module=copy-to-clipboard]');
 
           // start the module
-          window.GOVUK.modules.start();
+          window.GOVUK.notifyModules.start();
 
         });
 
@@ -233,7 +233,7 @@ describe('copy to clipboard', () => {
           setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
           // start the module
-          window.GOVUK.modules.start();
+          window.GOVUK.notifyModules.start();
 
           component = document.querySelector('[data-module=copy-to-clipboard]');
           keyEl = component.querySelector('.copy-to-clipboard__value');
@@ -332,7 +332,7 @@ describe('copy to clipboard', () => {
           setUpDOM({ 'thing': 'ID', 'name': 'Default' });
 
           // start the module
-          window.GOVUK.modules.start();
+          window.GOVUK.notifyModules.start();
 
           component = document.querySelector('[data-module=copy-to-clipboard]');
 
@@ -375,7 +375,7 @@ describe('copy to clipboard', () => {
           setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
           // start the module
-          window.GOVUK.modules.start();
+          window.GOVUK.notifyModules.start();
 
           component = document.querySelector('[data-module=copy-to-clipboard]');
 

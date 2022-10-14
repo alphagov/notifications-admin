@@ -105,7 +105,7 @@ describe("Cookie message", () => {
       // seen_cookie_message was set on the www domain, which setCookie defaults to
       helpers.setCookie('seen_cookie_message', 'true', { 'days': 365 });
 
-      window.GOVUK.Modules.CookieBanner.clearOldCookies({ "analytics": false });
+      window.GOVUK.NotifyModules.CookieBanner.clearOldCookies({ "analytics": false });
 
       expect(window.GOVUK.cookie('seen_cookie_message')).toBeNull();
 
@@ -117,7 +117,7 @@ describe("Cookie message", () => {
       helpers.setCookie('_ga', 'GA1.1.123.123', { 'days': 365, 'domain': '.notifications.service.gov.uk' });
       helpers.setCookie('_gid', 'GA1.1.456.456', { 'days': 1, 'domain': '.notifications.service.gov.uk' });
 
-      window.GOVUK.Modules.CookieBanner.clearOldCookies(null);
+      window.GOVUK.NotifyModules.CookieBanner.clearOldCookies(null);
 
       expect(window.GOVUK.cookie('_ga')).toBeNull();
       expect(window.GOVUK.cookie('_gid')).toBeNull();
@@ -129,7 +129,7 @@ describe("Cookie message", () => {
       helpers.setCookie('_ga', 'GA1.1.123.123', { 'days': 365 });
       helpers.setCookie('_gid', 'GA1.1.456.456', { 'days': 1 });
 
-      window.GOVUK.Modules.CookieBanner.clearOldCookies({ "analytics": true });
+      window.GOVUK.NotifyModules.CookieBanner.clearOldCookies({ "analytics": true });
 
       expect(window.GOVUK.cookie('_ga')).not.toBeNull();
       expect(window.GOVUK.cookie('_gid')).not.toBeNull();
@@ -142,7 +142,7 @@ describe("Cookie message", () => {
 
     window.GOVUK.setConsentCookie({ 'analytics': false });
 
-    window.GOVUK.modules.start()
+    window.GOVUK.notifyModules.start()
 
     expect(helpers.element(document.querySelector('.notify-cookie-banner')).is('hidden')).toBe(true);
 
@@ -152,7 +152,7 @@ describe("Cookie message", () => {
 
     beforeEach(() => {
 
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
     });
 

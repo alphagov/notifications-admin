@@ -65,7 +65,7 @@ describe('Enhanced textbox', () => {
       beforeEach(() => {
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
       });
 
@@ -100,7 +100,7 @@ describe('Enhanced textbox', () => {
       beforeEach(() => {
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
       });
 
@@ -137,7 +137,7 @@ describe('Enhanced textbox', () => {
 
         setDisplayPropertyOfFormGroups('none');
 
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         setDisplayPropertyOfFormGroups('block');
 
@@ -165,7 +165,7 @@ describe('Enhanced textbox', () => {
         textarea.textContent  = "Dear ((title)) ((name))";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = textarea.nextElementSibling;
 
@@ -182,7 +182,7 @@ describe('Enhanced textbox', () => {
         input.value = "Dear ((title)) ((name))";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = input.nextElementSibling;
 
@@ -200,7 +200,7 @@ describe('Enhanced textbox', () => {
         textarea.setAttribute('data-highlight-placeholders', 'false')
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = textarea.nextElementSibling;
 
@@ -219,7 +219,7 @@ describe('Enhanced textbox', () => {
         textarea.textContent = "When you arrive, please go to the ((weekday??main entrance))((weekend??side entrance))";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = textarea.nextElementSibling;
 
@@ -236,7 +236,7 @@ describe('Enhanced textbox', () => {
         input.value = "When you arrive, please go to the ((weekday??main entrance))((weekend??side entrance))";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = input.nextElementSibling;
 
@@ -272,7 +272,7 @@ describe('Enhanced textbox', () => {
       `;
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -290,7 +290,7 @@ describe('Enhanced textbox', () => {
 
     test("If a resize changes the textarea's width, the width of the element below should still match", () => {
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -312,7 +312,7 @@ describe('Enhanced textbox', () => {
         textarea.textContent = "Dear ((title)) ((name))";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = textarea.nextElementSibling;
 
@@ -332,7 +332,7 @@ describe('Enhanced textbox', () => {
         input.value = "Hospital appointment for ((name))";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = input.nextElementSibling;
 
@@ -357,7 +357,7 @@ describe('Enhanced textbox', () => {
         textarea.textContent = "Dear ((title)) ((name))";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = textarea.nextElementSibling;
 
@@ -380,7 +380,7 @@ describe('Enhanced textbox', () => {
         input.value = "Hospital appointment";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = input.nextElementSibling;
 
@@ -407,7 +407,7 @@ describe('Enhanced textbox', () => {
           Ref: ((reference))`;
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = textarea.nextElementSibling;
 
@@ -428,7 +428,7 @@ describe('Enhanced textbox', () => {
         input.value = "Hospital appointment for ((name)), ref: ((reference))";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = input.nextElementSibling;
 
@@ -455,7 +455,7 @@ describe('Enhanced textbox', () => {
           Your appointment will be on ((date)). When you arrive, please go to the ((weekday??main entrance))((weekend??side entrance)).`;
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = textarea.nextElementSibling;
 
@@ -484,7 +484,7 @@ describe('Enhanced textbox', () => {
         input.value = "Hospital appointment for ((name))((important?? - IMPORTANT))";
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         backgroundEl = input.nextElementSibling;
 

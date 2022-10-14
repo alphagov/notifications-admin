@@ -42,7 +42,7 @@ describe('Authenticate with security key', () => {
       <button type="submit" data-module="authenticate-security-key" data-csrf-token="abc123"></button>`
 
     button = document.querySelector('[data-module="authenticate-security-key"]')
-    window.GOVUK.modules.start()
+    window.GOVUK.notifyModules.start()
   })
 
   afterEach(() => {

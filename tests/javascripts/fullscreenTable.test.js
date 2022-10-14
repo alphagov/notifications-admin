@@ -121,7 +121,7 @@ describe('FullscreenTable', () => {
     test("it fixes the number column for each row without changing the semantics", () => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -137,7 +137,7 @@ describe('FullscreenTable', () => {
       const stickyJSSpy = jest.spyOn(window.GOVUK.stickAtBottomWhenScrolling, 'recalculate');
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       expect(stickyJSSpy.mock.calls.length).toBe(1);
 
@@ -148,7 +148,7 @@ describe('FullscreenTable', () => {
     test("the scrolling section is focusable and has an accessible name matching the table caption", () => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       caption = tableFrame.querySelector('caption');
@@ -163,7 +163,7 @@ describe('FullscreenTable', () => {
     test("the section providing the fixed row headers is not focusable and is hidden from assistive tech'", () => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       fixedRowHeaders = document.querySelector('.fullscreen-fixed-table');
 
@@ -194,7 +194,7 @@ describe('FullscreenTable', () => {
       });
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -254,7 +254,7 @@ describe('FullscreenTable', () => {
       rowNumberColumnCell.setAttribute('style', 'width: 40px');
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -301,7 +301,7 @@ describe('FullscreenTable', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       table = tableFrame.querySelector('table');
@@ -352,7 +352,7 @@ describe('FullscreenTable', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       tableFrame.focus();

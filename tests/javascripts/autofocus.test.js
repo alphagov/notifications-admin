@@ -44,7 +44,7 @@ describe('Autofocus', () => {
   test('is focused when modules start', () => {
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(focusHandler).toHaveBeenCalled();
 
@@ -56,7 +56,7 @@ describe('Autofocus', () => {
     document.getElementById('wrapper').setAttribute('data-module', 'autofocus');
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(focusHandler).toHaveBeenCalled();
 
@@ -68,7 +68,7 @@ describe('Autofocus', () => {
     $.prototype.scrollTop = jest.fn(() => 25);
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(focusHandler).not.toHaveBeenCalled();
 
@@ -83,7 +83,7 @@ describe('Autofocus', () => {
     document.querySelector('#search').setAttribute('data-force-focus', true);
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(focusHandler).toHaveBeenCalled();
 

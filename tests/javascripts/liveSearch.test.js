@@ -90,7 +90,7 @@ describe('Live search', () => {
       test("If there is no search term, the results should be unchanged", () => {
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -105,7 +105,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Department';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -121,7 +121,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Department for Work';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -141,7 +141,7 @@ describe('Live search', () => {
         checkedItem.checked = true;
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         expect(window.getComputedStyle(checkedItem).display).not.toEqual('none');
 
@@ -156,7 +156,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Department';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate the input of new search text
         searchTextbox.value = '';
@@ -175,7 +175,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Department';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate the input of new search text
         searchTextbox.value = 'Home';
@@ -194,7 +194,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Department';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate the input of new search text
         searchTextbox.value = 'Department for';
@@ -217,7 +217,7 @@ describe('Live search', () => {
         checkedItem.checked = true;
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate the input of new search text
         searchTextbox.value = 'Home Office';
@@ -288,7 +288,7 @@ describe('Live search', () => {
       test("If there is no search term, the results should be unchanged", () => {
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.template-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -303,7 +303,7 @@ describe('Live search', () => {
         searchTextbox.value = 'New';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.template-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -320,7 +320,7 @@ describe('Live search', () => {
         searchTextbox.value = 'New patient';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.template-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -340,7 +340,7 @@ describe('Live search', () => {
         checkedItem.checked = true;
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // should show despite not matching
         expect(window.getComputedStyle(checkedItem).display).not.toEqual('none');
@@ -352,7 +352,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Email template';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.template-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -373,7 +373,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Appointments';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate input of new search text
         searchTextbox.value = '';
@@ -392,7 +392,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Appointments';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate input of new search text
         searchTextbox.value = 'Prescriptions';
@@ -411,7 +411,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Appointments';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate input of new search text
         searchTextbox.value = 'New doctor';
@@ -434,7 +434,7 @@ describe('Live search', () => {
         checkedItem.checked = true;
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate input of new search text
         searchTextbox.value = 'Prescriptions';
@@ -450,7 +450,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Appointments';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate input of new search text
         searchTextbox.value = 'Email template';
@@ -577,7 +577,7 @@ describe('Live search', () => {
       test("If there is no search term, the results should be unchanged", () => {
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.user-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -592,7 +592,7 @@ describe('Live search', () => {
         searchTextbox.value = 'admin';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.user-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -608,7 +608,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Administrator (admin@nhs.uk)';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.user-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -624,7 +624,7 @@ describe('Live search', () => {
         searchTextbox.value = "Add and edit templates";
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         const listItems = list.querySelectorAll('.user-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -645,7 +645,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Admin';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate input of new search text
         searchTextbox.value = '';
@@ -663,7 +663,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Admin';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate input of new search text
         searchTextbox.value = 'Administrator';
@@ -682,7 +682,7 @@ describe('Live search', () => {
         searchTextbox.value = 'Admin';
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate input of new search text
         searchTextbox.value = 'Administrator (admin@nhs.uk)';
@@ -701,7 +701,7 @@ describe('Live search', () => {
         searchTextbox.value = "Admin";
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // simulate input of new search text
         searchTextbox.value = 'Add and edit templates';

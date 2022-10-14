@@ -29,7 +29,7 @@ describe('Error tracking', () => {
     };
 
     // start the module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(window.GOVUK.analytics.trackEvent).toHaveBeenCalled();
     expect(window.GOVUK.analytics.trackEvent.mock.calls[0]).toEqual(['Error', 'validation', {

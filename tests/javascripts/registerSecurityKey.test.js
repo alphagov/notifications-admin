@@ -44,7 +44,7 @@ describe('Register security key', () => {
       </a>`
 
     button = document.querySelector('[data-module="register-security-key"]')
-    window.GOVUK.modules.start()
+    window.GOVUK.notifyModules.start()
   })
 
   afterEach(() => {

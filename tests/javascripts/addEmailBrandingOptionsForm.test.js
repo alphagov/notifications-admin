@@ -88,7 +88,7 @@ describe('AddEmailBrandingOptionsForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       formControls = addEmailBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
       visibleCounter = getVisibleCounter();
@@ -141,7 +141,7 @@ describe('AddEmailBrandingOptionsForm', () => {
       beforeEach(() => {
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         EmailBrandingOptionsCheckboxes = getEmailBrandingOptionsCheckboxes();
 

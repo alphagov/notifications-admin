@@ -68,7 +68,7 @@ describe('Update content', () => {
 
   test("It should add attributes to the elements", () => {
 
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(
       document.querySelectorAll('[data-module=update-status]')[0].id
@@ -88,7 +88,7 @@ describe('Update content', () => {
 
     document.getElementById('template_content').removeAttribute('aria-describedby');
 
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(
       document.getElementById('template_content').getAttribute('aria-describedby')
@@ -100,7 +100,7 @@ describe('Update content', () => {
 
   test("It should make requests to the URL specified in the data-updates-url attribute", () => {
 
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect($.ajax.mock.calls[0][0]).toEqual(updatesURL);
     expect($.ajax.mock.calls[0]).toEqual([
@@ -123,7 +123,7 @@ describe('Update content', () => {
       "Initial content"
     );
 
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(
       document.querySelectorAll('[data-module=update-status]')[0].textContent.trim()
@@ -138,7 +138,7 @@ describe('Update content', () => {
     let textarea = document.getElementById('template_content');
 
     // Initial update triggered
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
     expect($.ajax.mock.calls.length).toEqual(1);
 
     // 150ms of inactivity
@@ -154,7 +154,7 @@ describe('Update content', () => {
     let textarea = document.getElementById('template_content');
 
     // Initial update triggered
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
     expect($.ajax.mock.calls.length).toEqual(1);
 
     helpers.triggerEvent(textarea, 'input');

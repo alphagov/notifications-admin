@@ -119,7 +119,7 @@ describe("Cookie settings", () => {
 
     test("If user has not chosen to accept or reject analytics, the radios for making that choice should be set to unchecked", () => {
 
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       expect(yesRadio.checked).toBe(false);
       expect(noRadio.checked).toBe(false);
@@ -130,7 +130,7 @@ describe("Cookie settings", () => {
 
       window.GOVUK.setConsentCookie({ 'analytics': true });
 
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       expect(yesRadio.checked).toBe(true);
       expect(noRadio.checked).toBe(false);
@@ -141,7 +141,7 @@ describe("Cookie settings", () => {
 
       window.GOVUK.setConsentCookie({ 'analytics': false });
 
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       expect(yesRadio.checked).toBe(false);
       expect(noRadio.checked).toBe(true);
@@ -154,7 +154,7 @@ describe("Cookie settings", () => {
 
     beforeEach(() => {
 
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
     });
 
@@ -222,7 +222,7 @@ describe("Cookie settings", () => {
 
       test("if user accepted analytics, the analytics code should initialise and register a pageview", () => {
 
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         yesRadio.checked = true;
 
@@ -238,7 +238,7 @@ describe("Cookie settings", () => {
 
       test("if user rejected analytics, the analytics code should not run", () => {
 
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         noRadio.checked = true;
 
