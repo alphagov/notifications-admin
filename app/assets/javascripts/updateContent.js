@@ -103,7 +103,7 @@
     );
   };
 
-  global.GOVUK.Modules.UpdateContent = function() {
+  global.GOVUK.NotifyModules.UpdateContent = function() {
 
     this.start = component => {
       var $component = $(component);
@@ -141,6 +141,6 @@
 
   };
 
-  global.GOVUK.Modules.UpdateContent.calculateBackoff = calculateBackoff;
+  global.GOVUK.NotifyModules.UpdateContent.calculateBackoff = calculateBackoff;
 
 })(window);

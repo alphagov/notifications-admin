@@ -1,5 +1,5 @@
 window.GOVUK = window.GOVUK || {};
-window.GOVUK.Modules = window.GOVUK.Modules || {};
+window.GOVUK.NotifyModules = window.GOVUK.NotifyModules || {};
 
 (function (Modules) {
   function CookieSettings () {}
@@ -80,5 +80,5 @@ window.GOVUK.Modules = window.GOVUK.Modules || {};
   };
 
   Modules.CookieSettings = CookieSettings;
-})(window.GOVUK.Modules);
+})(window.GOVUK.NotifyModules);
 

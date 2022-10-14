@@ -169,6 +169,6 @@
     this.summary.bindEvents(this);
   };
 
-  GOVUK.Modules.CollapsibleCheckboxes = CollapsibleCheckboxes;
+  GOVUK.NotifyModules.CollapsibleCheckboxes = CollapsibleCheckboxes;
 
 }(window));

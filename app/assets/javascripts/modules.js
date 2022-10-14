@@ -3,14 +3,14 @@
 
   var $ = global.jQuery;
   var GOVUK = global.GOVUK || {};
-  GOVUK.Modules = GOVUK.Modules || {};
+  GOVUK.NotifyModules = GOVUK.NotifyModules || {};
 
-  GOVUK.modules = {
+  GOVUK.notifyModules = {
     find: function (container) {
       container = container || $('body');
 
       var modules;
-      var moduleSelector = '[data-module]';
+      var moduleSelector = '[data-notify-module]';
 
       modules = container.find(moduleSelector);
 
@@ -28,11 +28,11 @@
       for (var i = 0, l = modules.length; i < l; i++) {
         var module;
         var element = $(modules[i]);
-        var type = camelCaseAndCapitalise(element.data('module'));
+        var type = camelCaseAndCapitalise(element.data('notifyModule'));
         var started = element.data('module-started');
 
-        if (typeof GOVUK.Modules[type] === 'function' && !started) {
-          module = new GOVUK.Modules[type]();
+        if (typeof GOVUK.NotifyModules[type] === 'function' && !started) {
+          module = new GOVUK.NotifyModules[type]();
           module.start(element);
           element.data('module-started', true);
         }
