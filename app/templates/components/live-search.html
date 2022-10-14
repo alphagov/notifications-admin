@@ -13,11 +13,11 @@
     } %}
 
     {% if autofocus %}
-      {% set x=param_extensions.__setitem__("attributes", {"data-module": "autofocus"}) %}
+      {% set x=param_extensions.__setitem__("attributes", {"data-notify-module": "autofocus"}) %}
     {% endif %}
 
     {% if show %}
-        <div class="live-search js-header" data-module="live-search" data-targets="{{ target_selector }}">
+        <div class="live-search js-header" data-notify-module="live-search" data-targets="{{ target_selector }}">
           {{ form.search(param_extensions=param_extensions) }}
           <div aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
         </div>

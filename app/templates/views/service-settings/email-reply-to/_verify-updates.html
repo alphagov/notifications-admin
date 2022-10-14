@@ -27,7 +27,7 @@
   {% elif verification_status == "failure" %}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
-        <h2 class='banner-title' data-module="track-error" data-error-type="reply-to-email-not-working" data-error-label="{{ upload_id }}">
+        <h2 class='banner-title' data-notify-module="track-error" data-error-type="reply-to-email-not-working" data-error-label="{{ upload_id }}">
           There’s a problem with your reply-to address
         </h2>
         <p class="govuk-body">

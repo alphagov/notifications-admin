@@ -18,14 +18,14 @@
   <div class="bottom-gutter-1-2">
     {% call banner_wrapper(type='dangerous') %}
       {% if row_errors|length == 1 %}
-        <h1 class='banner-title' data-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
           There’s a problem with {{ original_file_name }}
         </h1>
         <p class="govuk-body">
           You need to {{ row_errors[0] }}.
         </p>
       {% else %}
-        <h1 class='banner-title' data-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Bad rows" data-error-label="{{ upload_id }}">
           There are some problems with {{ original_file_name }}
         </h1>
         <p class="govuk-body">

@@ -20,7 +20,7 @@
 
       {% if not recipients|length %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="No rows" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="No rows" data-error-label="{{ upload_id }}">
           Your file is missing some rows
         </h1>
         <p class="govuk-body">
@@ -30,7 +30,7 @@
 
       {% elif recipients.column_headers|length == 1 %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file needs a column called ‘email address’ or ‘phone number’.
         </h1>
         <p class="govuk-body">
@@ -39,7 +39,7 @@
 
       {% else %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file has too many columns
         </h1>
         <p class="govuk-body">
@@ -70,7 +70,7 @@
 
     <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
 
-    <div class="fullscreen-content" data-module="fullscreen-table">
+    <div class="fullscreen-content" data-notify-module="fullscreen-table">
       {% call(item, row_number) list_table(
         recipients.displayed_rows,
         caption=original_file_name,

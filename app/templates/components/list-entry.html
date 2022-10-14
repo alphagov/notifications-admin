@@ -27,7 +27,7 @@
         {{ hint }}
       </div>
     {% endif %}
-    <div class="input-list" data-module="list-entry" data-list-item-name="{{ item_name }}" id="list-entry-{{ field.name }}">
+    <div class="input-list" data-notify-module="list-entry" data-list-item-name="{{ item_name }}" id="list-entry-{{ field.name }}">
       {% for entry in field.entries %}
         <div class="list-entry">
           {% if not autocomplete %}
