@@ -280,7 +280,7 @@ def test_nhs_local_can_create_own_organisations(
     assert normalize_spaces(page.select_one("main p").text) == (
         "Which NHS Trust or Clinical Commissioning Group do you work for?"
     )
-    assert page.select_one("[data-module=live-search]")["data-targets"] == (".govuk-radios__item")
+    assert page.select_one("[data-notify-module=live-search]")["data-targets"] == (".govuk-radios__item")
     assert [
         (normalize_spaces(radio.select_one("label").text), radio.select_one("input")["value"])
         for radio in page.select(".govuk-radios__item")
@@ -834,15 +834,15 @@ def test_manage_org_users_should_show_live_search_if_more_than_7_users(
         org_id=ORGANISATION_ID,
     )
 
-    assert page.select_one("div[data-module=live-search]")["data-targets"] == (".user-list-item")
+    assert page.select_one("div[data-notify-module=live-search]")["data-targets"] == (".user-list-item")
     assert len(page.select(".user-list-item")) == number_of_users
 
-    textbox = page.select_one("[data-module=autofocus] .govuk-input")
+    textbox = page.select_one("[data-notify-module=autofocus] .govuk-input")
     assert "value" not in textbox
     assert textbox["name"] == "search"
-    # data-module=autofocus is set on a containing element so it
+    # data-notify-module=autofocus is set on a containing element so it
     # shouldn’t also be set on the textbox itself
-    assert "data-module" not in textbox
+    assert "data-notify-module" not in textbox
     assert not page.select_one("[data-force-focus]")
     assert textbox["class"] == [
         "govuk-input",
@@ -2155,7 +2155,7 @@ def test_add_organisation_email_branding_options_shows_branding_not_in_branding_
     client_request.login(platform_admin_user)
     page = client_request.get(".add_organisation_email_branding_options", org_id=organisation_one["id"])
     assert page.h1.text == "Add email branding options"
-    assert page.select_one("[data-module=live-search]")["data-targets"] == (".govuk-checkboxes__item")
+    assert page.select_one("[data-notify-module=live-search]")["data-targets"] == (".govuk-checkboxes__item")
 
     assert [
         (checkbox.text.strip(), checkbox.input["value"], checkbox.input.has_attr("checked"))

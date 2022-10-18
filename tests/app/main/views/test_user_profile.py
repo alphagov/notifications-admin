@@ -469,7 +469,7 @@ def test_should_show_security_keys_page(
         ".user_profile_manage_security_key", key_id=webauthn_credential["id"]
     )
 
-    register_button = page.select_one("[data-module='register-security-key']")
+    register_button = page.select_one("[data-notify-module='register-security-key']")
     assert register_button.text.strip() == "Register a key"
 
 

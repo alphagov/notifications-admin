@@ -49,7 +49,7 @@
     %}
     {{ field(
       class=field_class,
-      data_module='enhanced-textbox' if highlight_placeholders or autosize else '',
+      data_notify_module='enhanced-textbox' if highlight_placeholders or autosize else '',
       data_highlight_placeholders='true' if highlight_placeholders else 'false',
       rows=rows|string,
       **kwargs

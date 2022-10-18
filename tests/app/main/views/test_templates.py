@@ -316,7 +316,7 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
     )
     search = page.select_one(".live-search")
 
-    assert search["data-module"] == "live-search"
+    assert search["data-notify-module"] == "live-search"
     assert search["data-targets"] == "#template-list .template-list-item"
     assert normalize_spaces(search.select_one("label").text) == ("Search by name")
 
@@ -489,23 +489,23 @@ def test_should_show_page_for_one_template(
 
     assert page.select_one("input[type=text]")["value"] == "Two week reminder"
     assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in str(page.select_one("textarea"))
-    assert page.select_one("textarea")["data-module"] == "enhanced-textbox"
+    assert page.select_one("textarea")["data-notify-module"] == "enhanced-textbox"
     assert page.select_one("textarea")["data-highlight-placeholders"] == "true"
     assert "priority" not in str(page.select_one("main"))
 
     assert (
-        (page.select_one("[data-module=update-status]")["data-target"])
+        (page.select_one("[data-notify-module=update-status]")["data-target"])
         == (page.select_one("textarea")["id"])
         == ("template_content")
     )
 
-    assert (page.select_one("[data-module=update-status]")["data-updates-url"]) == url_for(
+    assert (page.select_one("[data-notify-module=update-status]")["data-updates-url"]) == url_for(
         ".count_content_length",
         service_id=SERVICE_ONE_ID,
         template_type="sms",
     )
 
-    assert (page.select_one("[data-module=update-status]")["aria-live"]) == ("polite")
+    assert (page.select_one("[data-notify-module=update-status]")["aria-live"]) == ("polite")
 
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 
@@ -522,22 +522,22 @@ def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_charact
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
-    assert page.select_one("textarea")["data-module"] == "enhanced-textbox"
+    assert page.select_one("textarea")["data-notify-module"] == "enhanced-textbox"
     assert page.select_one("textarea")["data-highlight-placeholders"] == "false"
 
     assert (
-        (page.select_one("[data-module=update-status]")["data-target"])
+        (page.select_one("[data-notify-module=update-status]")["data-target"])
         == (page.select_one("textarea")["id"])
         == ("template_content")
     )
 
-    assert (page.select_one("[data-module=update-status]")["data-updates-url"]) == url_for(
+    assert (page.select_one("[data-notify-module=update-status]")["data-updates-url"]) == url_for(
         ".count_content_length",
         service_id=SERVICE_ONE_ID,
         template_type="broadcast",
     )
 
-    assert (page.select_one("[data-module=update-status]")["aria-live"]) == ("polite")
+    assert (page.select_one("[data-notify-module=update-status]")["aria-live"]) == ("polite")
 
 
 def test_caseworker_redirected_to_set_sender_for_one_off(

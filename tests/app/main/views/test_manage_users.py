@@ -224,15 +224,15 @@ def test_should_show_live_search_if_more_than_7_users(
 
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
 
-    assert page.select_one("div[data-module=live-search]")["data-targets"] == (".user-list-item")
+    assert page.select_one("div[data-notify-module=live-search]")["data-targets"] == (".user-list-item")
     assert len(page.select(".user-list-item")) == number_of_users
 
-    textbox = page.select_one("[data-module=autofocus] .govuk-input")
+    textbox = page.select_one("[data-notify-module=autofocus] .govuk-input")
     assert "value" not in textbox
     assert textbox["name"] == "search"
-    # data-module=autofocus is set on a containing element so it
+    # data-notify-module=autofocus is set on a containing element so it
     # shouldn’t also be set on the textbox itself
-    assert "data-module" not in textbox
+    assert "data-notify-module" not in textbox
     assert not page.select_one("[data-force-focus]")
     assert textbox["class"] == [
         "govuk-input",
