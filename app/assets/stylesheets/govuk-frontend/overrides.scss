@@ -13,7 +13,7 @@
 .govuk-footer__navigation {
   -webkit-flex-wrap: wrap;
   -ms-flex-wrap: wrap;
-  flex-wrap: wrap
+  flex-wrap: wrap;
 }
 
 .govuk-footer__section {
@@ -53,7 +53,21 @@
 }
 
 // Add override from future version of GOV.UK Frontend
-// Todo: remove this once we’ve upgraded past v3.11.0
+// TODO: remove this once we’ve upgraded past v3.11.0
 .govuk-\!-display-none {
   display: none !important;
+}
+
+// Give footer links back their underline
+// TODO: remove this once we've upgraded past v3.12.0
+.govuk-footer__list,
+.govuk-footer__inline-list {
+  .govuk-footer__link {
+    text-decoration: underline;
+
+    &:focus {
+      text-decoration: none;
+    }
+
+  }
 }
