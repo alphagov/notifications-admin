@@ -4,8 +4,7 @@ from flask import abort
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList, SerialisedModelCollection
-from app.notify_client.email_branding_client import email_branding_client
-from app.notify_client.letter_branding_client import letter_branding_client
+from app.models.branding import EmailBranding, EmailBrandingPool, LetterBranding
 from app.notify_client.organisations_api_client import organisations_client
 
 
@@ -107,6 +106,7 @@ class Organisation(JSONModel):
         super().__init__(_dict)
 
         if self._dict == {}:
+            self.id = None
             self.name = None
             self.crown = None
             self.agreement_signed = None
@@ -173,31 +173,15 @@ class Organisation(JSONModel):
 
     @cached_property
     def email_branding(self):
-        if self.email_branding_id:
-            return email_branding_client.get_email_branding(self.email_branding_id)["email_branding"]
+        return EmailBranding.from_id(self.email_branding_id)
 
-    @property
-    def email_branding_name(self):
-        if self.email_branding_id:
-            return self.email_branding["name"]
-        return "GOV.UK"
-
-    @property
+    @cached_property
     def email_branding_pool(self):
-        return organisations_client.get_email_branding_pool(self.id)
-
-    @property
-    def email_branding_pool_names(self):
-        return [branding["name"] for branding in self.email_branding_pool]
-
-    @property
-    def email_branding_pool_ids(self):
-        return [branding["id"] for branding in self.email_branding_pool]
+        return EmailBrandingPool(self.id)
 
     @cached_property
     def letter_branding(self):
-        if self.letter_branding_id:
-            return letter_branding_client.get_letter_branding(self.letter_branding_id)
+        return LetterBranding.from_id(self.letter_branding_id)
 
     @cached_property
     def agreement_signed_by(self):

@@ -102,7 +102,7 @@
         {{ text_field('Email branding options') }}
         {% set email_branding_html %}
           <div {% if other_email_branding_options %}class="govuk-!-margin-bottom-3"{% endif %}>
-            {{ default_email_branding_name }}
+            {{ current_org.email_branding.name }}
             <br>
             <div class="table-field-status-default">
               Default
@@ -132,7 +132,7 @@
       {% call row() %}
         {{ text_field('Default letter branding') }}
         {{ optional_text_field(
-          current_org.letter_branding.name,
+          current_org.letter_branding.name if current_org.letter_branding else None,
           default='No branding'
         ) }}
         {{ edit_field(

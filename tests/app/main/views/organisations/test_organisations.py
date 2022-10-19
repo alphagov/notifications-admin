@@ -2206,7 +2206,7 @@ def test_add_organisation_email_branding_options_shows_branding_not_in_branding_
             "brand_type": "org",
         },
     ]
-    mocker.patch("app.organisations_client.get_email_branding_pool", return_value=branding_pool)
+    mocker.patch("app.models.branding.EmailBrandingPool.client_method", return_value=branding_pool)
 
     client_request.login(platform_admin_user)
     page = client_request.get(".add_organisation_email_branding_options", org_id=organisation_one["id"])
