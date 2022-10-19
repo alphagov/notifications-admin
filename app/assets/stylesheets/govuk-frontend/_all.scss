@@ -2,12 +2,6 @@
 // Included to allow us to only include the components we need
 // All imports come from node_modules/govuk-frontend
 
-// turn on compatibility mode for all legacy frameworks
-// https://github.com/alphagov/govuk-frontend/blob/master/docs/installation/compatibility.md#turn-on-compatibility-mode
-// to be removed when these frameworks are removed.
-$govuk-compatibility-govukfrontendtoolkit: true;
-$govuk-compatibility-govukelements: true;
-
 // set asset URL root to match that of application
 $govuk-assets-path: "/static/";
 
