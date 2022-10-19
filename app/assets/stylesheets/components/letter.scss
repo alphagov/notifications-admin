@@ -52,7 +52,7 @@ $iso-paper-ratio: 141.42135624%;
     width: $fold-height * ($art-width / $art-height);
     height: $fold-height;
     margin: 0;
-    background-color: mix($envelope-colour,govuk-colour("grey-1"));
+    background-color: mix($envelope-colour,govuk-colour("dark-grey"));
     background-size: auto $fold-height;
     background-position: right 0;
     background-repeat: no-repeat;

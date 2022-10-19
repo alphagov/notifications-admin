@@ -30,13 +30,13 @@
 
     &--training {
       background: govuk-tint(govuk-colour("mid-grey"), 60%);
-      color: mix(govuk-colour("grey-1"), $govuk-text-colour);
+      color: mix(govuk-colour("dark-grey"), $govuk-text-colour);
       box-shadow: 0 -3px 0 0 govuk-tint(govuk-colour("mid-grey"), 60%);
     }
 
     &--suspended {
       background: govuk-tint(govuk-colour("mid-grey"), 60%);
-      color: mix(govuk-colour("grey-1"), $govuk-text-colour);
+      color: mix(govuk-colour("dark-grey"), $govuk-text-colour);
       box-shadow: 0 -3px 0 0 govuk-tint(govuk-colour("mid-grey"), 60%);
     }
 
