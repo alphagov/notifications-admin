@@ -7,8 +7,8 @@ $tail-angle: 20deg;
   max-width: 464px;
   box-sizing: border-box;
   padding: govuk-spacing(3);
-  background: govuk-colour("grey-3");
-  border: 1px solid govuk-colour("grey-3");
+  background: govuk-tint(govuk-colour("mid-grey"), 60%);
+  border: 1px solid govuk-tint(govuk-colour("mid-grey"), 60%);
   border-radius: 5px;
   white-space: normal;
   margin: 0 0 govuk-spacing(6) 0;
@@ -24,8 +24,8 @@ $tail-angle: 20deg;
     border: 10px solid transparent;
     border-left-width: 13px;
     border-right-width: 13px;
-    border-bottom-color: govuk-colour("grey-3");
-    border-left-color: govuk-colour("grey-3");
+    border-bottom-color: govuk-tint(govuk-colour("mid-grey"), 60%);
+    border-left-color: govuk-tint(govuk-colour("mid-grey"), 60%);
     transform: rotate($tail-angle);
   }
 
@@ -37,8 +37,8 @@ $tail-angle: 20deg;
 
     &:after {
       border-left-color: transparent;
-      border-bottom-color: govuk-colour("grey-3");
-      border-right-color: govuk-colour("grey-3");
+      border-bottom-color: govuk-tint(govuk-colour("mid-grey"), 60%);
+      border-right-color: govuk-tint(govuk-colour("mid-grey"), 60%);
       right: auto;
       left: -20px;
       transform: rotate(-$tail-angle);
