@@ -394,7 +394,7 @@ def _handle_remove_branding(remove_branding_id) -> Optional[Response]:
     """
     try:
         remove_branding = current_organisation.email_branding_pool.get_item_by_id(remove_branding_id)
-    except StopIteration:
+    except current_organisation.email_branding_pool.NotFound:
         abort(400, f"Invalid email branding ID {remove_branding_id} for {current_organisation}")
 
     if request.method == "POST":
@@ -461,7 +461,7 @@ def _handle_change_default_branding(form, new_default_branding_id) -> Optional[R
     def __get_email_branding_name(branding_id):
         try:
             return current_organisation.email_branding_pool.get_item_by_id(branding_id).name
-        except StopIteration:
+        except current_organisation.email_branding_pool.NotFound:
             current_app.logger.info(
                 f"Email branding ID {branding_id} is not present in organisation {current_organisation.name}'s "
                 f"email branding pool."

@@ -52,6 +52,9 @@ class LetterBranding(Branding):
 
 
 class AllBranding(ModelList):
+    class NotFound(Exception):
+        pass
+
     @property
     def ids(self):
         return tuple(branding.id for branding in self)
@@ -64,7 +67,7 @@ class AllBranding(ModelList):
         for branding in self:
             if branding.id == id:
                 return branding
-        raise StopIteration
+        raise self.NotFound
 
     def excluding(self, *ids_to_exclude):
         return tuple(branding for branding in self if branding.id not in ids_to_exclude)
