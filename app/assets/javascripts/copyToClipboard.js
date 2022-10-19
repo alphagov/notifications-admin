@@ -97,4 +97,4 @@
     };
   };
 
-})(window.GOVUK.Modules);
+})(window.GOVUK.NotifyModules);

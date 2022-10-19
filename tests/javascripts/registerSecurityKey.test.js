@@ -39,12 +39,12 @@ describe('Register security key', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {})
 
     document.body.innerHTML = `
-      <a href="#" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="register-security-key">
+      <a href="#" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-notify-module="register-security-key">
         Register a key
       </a>`
 
-    button = document.querySelector('[data-module="register-security-key"]')
-    window.GOVUK.modules.start()
+    button = document.querySelector('[data-notify-module="register-security-key"]')
+    window.GOVUK.notifyModules.start()
   })
 
   afterEach(() => {

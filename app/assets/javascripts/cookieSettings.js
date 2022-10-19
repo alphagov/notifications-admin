@@ -1,5 +1,5 @@
 window.GOVUK = window.GOVUK || {};
-window.GOVUK.Modules = window.GOVUK.Modules || {};
+window.GOVUK.NotifyModules = window.GOVUK.NotifyModules || {};
 
 (function (Modules) {
   function CookieSettings () {}
@@ -9,7 +9,7 @@ window.GOVUK.Modules = window.GOVUK.Modules || {};
 
     this.$module.submitSettingsForm = this.submitSettingsForm.bind(this);
 
-    document.querySelector('form[data-module=cookie-settings]')
+    document.querySelector('form[data-notify-module=cookie-settings]')
       .addEventListener('submit', this.$module.submitSettingsForm);
 
     this.setInitialFormValues();
@@ -80,5 +80,5 @@ window.GOVUK.Modules = window.GOVUK.Modules || {};
   };
 
   Modules.CookieSettings = CookieSettings;
-})(window.GOVUK.Modules);
+})(window.GOVUK.NotifyModules);
 

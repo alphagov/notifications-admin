@@ -47,7 +47,7 @@ afterAll(() => {
 describe('Update content', () => {
 
   const getInitialHTMLString = partial => `
-    <div data-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
+    <div data-notify-module="update-content" data-resource="${resourceURL}" data-key="${updateKey}">
       ${partial}
     </div>`;
 
@@ -58,7 +58,7 @@ describe('Update content', () => {
       // Intentionally basic example because we're not testing changes to the partial
       document.body.innerHTML = getInitialHTMLString(`<p class="notification-status">Sending</p>`);
 
-      // default the response to match the content inside div[data-module]
+      // default the response to match the content inside div[data-notify-module]
       responseObj[updateKey] = `<p class="notification-status">Sending</p>`;
 
     });
@@ -68,7 +68,7 @@ describe('Update content', () => {
       beforeEach(() => {
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
       });
 
@@ -115,7 +115,7 @@ describe('Update content', () => {
         [24000, 10000],
       ]).test('It calculates a delay of %dms if the API responds in %dms', (waitTime, responseTime) => {
           expect(
-            window.GOVUK.Modules.UpdateContent.calculateBackoff(responseTime)
+            window.GOVUK.NotifyModules.UpdateContent.calculateBackoff(responseTime)
           ).toBe(
             waitTime
           );
@@ -135,10 +135,10 @@ describe('Update content', () => {
           </form>`;
 
         // Link the component to the form
-        document.querySelector('[data-module=update-content]').setAttribute('data-form', 'service');
+        document.querySelector('[data-notify-module=update-content]').setAttribute('data-form', 'service');
 
         // start the module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
       });
 
@@ -221,11 +221,11 @@ describe('Update content', () => {
 
     test("It should replace the original HTML with that of the partial, to match that returned from AJAX responses", () => {
 
-      // default the response to match the content inside div[data-module]
+      // default the response to match the content inside div[data-notify-module]
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       expect(document.querySelector('.ajax-block-container').parentNode.hasAttribute('data-resource')).toBe(false);
 
@@ -233,11 +233,11 @@ describe('Update content', () => {
 
     test("It should make requests to the URL specified in the data-resource attribute", () => {
 
-      // default the response to match the content inside div[data-module]
+      // default the response to match the content inside div[data-notify-module]
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
       jest.advanceTimersByTime(2000);
 
       expect($.ajax.mock.calls[0][0]).toEqual(resourceURL);
@@ -250,7 +250,7 @@ describe('Update content', () => {
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
       jest.advanceTimersByTime(2000);
 
       // check a sample DOM node is unchanged
@@ -266,7 +266,7 @@ describe('Update content', () => {
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
       jest.advanceTimersByTime(2000);
 
       // check the right DOM node is updated
@@ -349,7 +349,7 @@ describe('Update content', () => {
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
       jest.advanceTimersByTime(2000);
 
       // check it has the same number of items
@@ -376,7 +376,7 @@ describe('Update content', () => {
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
       jest.advanceTimersByTime(2000);
 
       // check the node has been added
@@ -404,11 +404,11 @@ describe('Update content', () => {
       // remove the last item
       partialData.pop();
 
-      // default the response to match the content inside div[data-module]
+      // default the response to match the content inside div[data-notify-module]
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
       jest.advanceTimersByTime(2000);
 
       // check the node has been removed
@@ -442,7 +442,7 @@ describe('Update content', () => {
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
       jest.advanceTimersByTime(2000);
 
       // check the class is still there
@@ -480,7 +480,7 @@ describe('Update content', () => {
       responseObj[updateKey] = getPartial(partialData);
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
       jest.advanceTimersByTime(2000);
 
       // re-select in case nodes in partialsInPage have changed

@@ -16,7 +16,7 @@
 ) %}
   <div
     class="form-group{% if field.errors %} form-group-error{% endif %} {{ extra_form_group_classes }}"
-    data-module="{% if autofocus %}autofocus{% elif colour_preview %}colour-preview{% endif %}"
+    data-notify-module="{% if autofocus %}autofocus{% elif colour_preview %}colour-preview{% endif %}"
   >
     <label class="form-label" for="{{ field.name }}">
       {% if label %}
@@ -30,7 +30,7 @@
         </span>
       {% endif %}
       {% if field.errors %}
-        <span class="error-message" data-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">
+        <span class="error-message" data-notify-module="track-error" data-error-type="{{ field.errors[0] }}" data-error-label="{{ field.name }}">
           {% if not safe_error_message %}{{ field.errors[0] }}{% else %}{{ field.errors[0]|safe }}{% endif %}
         </span>
       {% endif %}
@@ -49,7 +49,7 @@
     %}
     {{ field(
       class=field_class,
-      data_module='enhanced-textbox' if highlight_placeholders or autosize else '',
+      data_notify_module='enhanced-textbox' if highlight_placeholders or autosize else '',
       data_highlight_placeholders='true' if highlight_placeholders else 'false',
       rows=rows|string,
       **kwargs

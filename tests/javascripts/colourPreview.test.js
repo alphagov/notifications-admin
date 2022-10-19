@@ -22,7 +22,7 @@ describe('Colour preview', () => {
         <label class="govuk-form-label" for="colour">
           Colour
         </label>
-        <input class="govuk-input govuk-input--width-6" id="colour" name="colour" rows="8" type="text" value="" data-module="colour-preview">
+        <input class="govuk-input govuk-input--width-6" id="colour" name="colour" rows="8" type="text" value="" data-notify-module="colour-preview">
       </div>`;
 
     field = document.querySelector('.govuk-form-group');
@@ -41,7 +41,7 @@ describe('Colour preview', () => {
     test("It should add a swatch element for the preview", () => {
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       swatchEl = document.querySelector('.textbox-colour-preview');
 
@@ -52,7 +52,7 @@ describe('Colour preview', () => {
     test("If the textbox is empty it should make the swatch white", () => {
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       swatchEl = document.querySelector('.textbox-colour-preview');
 
@@ -67,7 +67,7 @@ describe('Colour preview', () => {
       textbox.setAttribute('value', '#00FF00');
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       swatchEl = document.querySelector('.textbox-colour-preview');
 
@@ -81,7 +81,7 @@ describe('Colour preview', () => {
       textbox.setAttribute('value', 'green');
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       swatchEl = document.querySelector('.textbox-colour-preview');
 
@@ -97,7 +97,7 @@ describe('Colour preview', () => {
     beforeEach(() => {
 
       // start the module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       swatchEl = document.querySelector('.textbox-colour-preview');
 

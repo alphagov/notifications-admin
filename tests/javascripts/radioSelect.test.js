@@ -100,7 +100,7 @@ describe('RadioSelect', () => {
         <legend class="form-label">
           When should Notify send these messages?
         </legend>
-        <div class="radio-select" data-module="radio-select" data-categories="${CATEGORIES.join(',')}" data-show-now-as-default="true">
+        <div class="radio-select" data-notify-module="radio-select" data-categories="${CATEGORIES.join(',')}" data-show-now-as-default="true">
           <div class="govuk-radios__item">
             <input class="govuk-radios__input" checked="" id="scheduled_for-0" name="scheduled_for" type="radio" value="">
             <label class="govuk-label govuk-radios__label" for="scheduled_for-0">
@@ -128,7 +128,7 @@ describe('RadioSelect', () => {
         // default is for it to be set to true
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         expect(document.querySelectorAll('.radio-select__column').length).toEqual(2);
 
@@ -139,7 +139,7 @@ describe('RadioSelect', () => {
         document.querySelector('.radio-select').setAttribute('data-show-now-as-default', 'false');
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         expect(document.querySelectorAll('.radio-select__column').length).toEqual(1);
 
@@ -154,7 +154,7 @@ describe('RadioSelect', () => {
       beforeEach(() => {
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         categoryButtons = document.querySelectorAll('.radio-select__column:nth-child(2) .radio-select__button--category');
 
@@ -202,7 +202,7 @@ describe('RadioSelect', () => {
           originalOptionsForCategory = originalOptionsForAllCategories.filter(option => categoryRegExp.test(option.label));
 
           // start module
-          window.GOVUK.modules.start();
+          window.GOVUK.notifyModules.start();
 
           clickButtonForCategory(category);
 
@@ -237,7 +237,7 @@ describe('RadioSelect', () => {
     test(`clicking the button for a category should add a 'Done' button below its options`, () => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       clickButtonForCategory(CATEGORIES[0]);
 
@@ -256,7 +256,7 @@ describe('RadioSelect', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       clickButtonForCategory(CATEGORIES[0]);
 

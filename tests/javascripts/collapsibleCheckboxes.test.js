@@ -40,7 +40,7 @@ describe('Collapsible fieldset', () => {
 
     // set up DOM
     document.body.innerHTML =
-      `<div class="selection-wrapper" data-module="collapsible-checkboxes" data-field-label="folder">
+      `<div class="selection-wrapper" data-notify-module="collapsible-checkboxes" data-field-label="folder">
         <div class="govuk-form-group">
           <fieldset class="govuk-fieldset" id="folder_permissions" aria-describedby="users_with_permission-hint">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
@@ -75,7 +75,7 @@ describe('Collapsible fieldset', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
     });
 
@@ -172,7 +172,7 @@ describe('Collapsible fieldset', () => {
   test('has the right summary text when started with no checkboxes selected', () => {
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     const summaryText = document.querySelector('.selection-summary__text');
 
@@ -189,7 +189,7 @@ describe('Collapsible fieldset', () => {
     });
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     const summaryText = document.querySelector('.selection-summary__text');
 
@@ -203,7 +203,7 @@ describe('Collapsible fieldset', () => {
     checkboxes.forEach(el => el.setAttribute('checked', ''));
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     const summaryText = document.querySelector('.selection-summary__text');
 
@@ -216,7 +216,7 @@ describe('Collapsible fieldset', () => {
     wrapper.dataset.fieldLabel = 'team member';
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     const summaryText = document.querySelector('.selection-summary__text');
 
@@ -229,7 +229,7 @@ describe('Collapsible fieldset', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
 
@@ -266,7 +266,7 @@ describe('Collapsible fieldset', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       // show the checkboxes
       helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
@@ -308,7 +308,7 @@ describe('Collapsible fieldset', () => {
       test("after the fieldset", () => {
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // show the checkboxes
         helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
@@ -326,7 +326,7 @@ describe('Collapsible fieldset', () => {
         checkboxesContainer.querySelector('.govuk-checkboxes__item').appendChild(nestedCheckboxes);
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // show the checkboxes
         helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
@@ -345,7 +345,7 @@ describe('Collapsible fieldset', () => {
         window.GOVUK.stickAtBottomWhenScrolling.recalculate = jest.fn(() => {});
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         // show the checkboxes
         helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
@@ -409,7 +409,7 @@ describe('Collapsible fieldset', () => {
         checkFirstCheckbox();
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         showCheckboxes();
 
@@ -429,7 +429,7 @@ describe('Collapsible fieldset', () => {
         checkFirstCheckbox();
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         showCheckboxes();
 
@@ -449,7 +449,7 @@ describe('Collapsible fieldset', () => {
         checkFirstCheckbox();
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         showCheckboxes();
 
@@ -473,7 +473,7 @@ describe('Collapsible fieldset', () => {
         checkAllCheckboxes();
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         showCheckboxes();
 
@@ -493,7 +493,7 @@ describe('Collapsible fieldset', () => {
         checkAllCheckboxes();
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         showCheckboxes();
 
@@ -517,7 +517,7 @@ describe('Collapsible fieldset', () => {
         checkAllCheckboxesButTheLast();
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         showCheckboxes();
 
@@ -536,7 +536,7 @@ describe('Collapsible fieldset', () => {
         checkAllCheckboxesButTheLast();
 
         // start module
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         showCheckboxes();
 

@@ -34,7 +34,7 @@ describe("Cookie settings", () => {
     cookiesPageContent = `
       <div class="cookie-settings__confirmation banner banner-with-tick" data-cookie-confirmation="true" role="group" tabindex="-1">
         <h2 class="banner-title">Your cookie settings were saved</h2>
-        <a class="govuk_link govuk_link--no-visited-state cookie-settings__prev-page" href="#" data-module="track-click" data-track-category="cookieSettings" data-track-action="Back to previous page">
+        <a class="govuk_link govuk_link--no-visited-state cookie-settings__prev-page" href="#" data-notify-module="track-click" data-track-category="cookieSettings" data-track-action="Back to previous page">
           Go back to the page you were looking at
         </a>
       </div>
@@ -53,7 +53,7 @@ describe("Cookie settings", () => {
       </div>
       <h2 class="heading-medium">Analytics cookies (optional)</h2>
       <div class="cookie-settings__form-wrapper">
-        <form data-module="cookie-settings">
+        <form data-notify-module="cookie-settings">
           <div class="govuk-form-group govuk-!-margin-top-6">
             <fieldset class="govuk-fieldset" aria-describedby="changed-name-hint">
               <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
@@ -119,7 +119,7 @@ describe("Cookie settings", () => {
 
     test("If user has not chosen to accept or reject analytics, the radios for making that choice should be set to unchecked", () => {
 
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       expect(yesRadio.checked).toBe(false);
       expect(noRadio.checked).toBe(false);
@@ -130,7 +130,7 @@ describe("Cookie settings", () => {
 
       window.GOVUK.setConsentCookie({ 'analytics': true });
 
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       expect(yesRadio.checked).toBe(true);
       expect(noRadio.checked).toBe(false);
@@ -141,7 +141,7 @@ describe("Cookie settings", () => {
 
       window.GOVUK.setConsentCookie({ 'analytics': false });
 
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       expect(yesRadio.checked).toBe(false);
       expect(noRadio.checked).toBe(true);
@@ -154,7 +154,7 @@ describe("Cookie settings", () => {
 
     beforeEach(() => {
 
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
     });
 
@@ -222,7 +222,7 @@ describe("Cookie settings", () => {
 
       test("if user accepted analytics, the analytics code should initialise and register a pageview", () => {
 
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         yesRadio.checked = true;
 
@@ -238,7 +238,7 @@ describe("Cookie settings", () => {
 
       test("if user rejected analytics, the analytics code should not run", () => {
 
-        window.GOVUK.modules.start();
+        window.GOVUK.notifyModules.start();
 
         noRadio.checked = true;
 

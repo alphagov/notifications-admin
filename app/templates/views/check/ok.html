@@ -41,7 +41,7 @@
         {{ choose_time_form.scheduled_for(param_extensions={
           'formGroup': {'classes': 'bottom-gutter-2-3'},
           'attributes': {
-            'data-module': 'radio-select',
+            'data-notify-module': 'radio-select',
             'data-categories': choose_time_form.scheduled_for.categories|join(','),
             'data-show-now-as-default': 'true'
           }
@@ -66,7 +66,7 @@
 
     <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
 
-    <div class="fullscreen-content" data-module="fullscreen-table">
+    <div class="fullscreen-content" data-notify-module="fullscreen-table">
       {% call(item, row_number) list_table(
         recipients.displayed_rows,
         caption=original_file_name,

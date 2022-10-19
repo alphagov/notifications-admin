@@ -280,7 +280,7 @@ def test_two_factor_webauthn_should_have_auth_signin_button(
 
     page = client_request.get("main.two_factor_webauthn")
 
-    button = page.select_one("button[data-module=authenticate-security-key]")
+    button = page.select_one("button[data-notify-module=authenticate-security-key]")
 
     assert button.text.strip() == "Check security key"
 

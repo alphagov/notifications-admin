@@ -151,16 +151,16 @@ def test_should_show_empty_text_box(
 
     page = client_request.get("main.tour_step", service_id=SERVICE_ONE_ID, template_id=fake_uuid, step_index=1)
 
-    textbox = page.select_one("[data-module=autofocus][data-force-focus=True] .govuk-input")
+    textbox = page.select_one("[data-notify-module=autofocus][data-force-focus=True] .govuk-input")
     assert "value" not in textbox
     assert textbox["name"] == "placeholder_value"
     assert textbox["class"] == [
         "govuk-input",
         "govuk-!-width-full",
     ]
-    # data-module=autofocus is set on a containing element so it
+    # data-notify-module=autofocus is set on a containing element so it
     # shouldn’t also be set on the textbox itself
-    assert "data-module" not in textbox
+    assert "data-notify-module" not in textbox
     assert normalize_spaces(page.select_one("label[for=placeholder_value]").text) == "one"
 
 

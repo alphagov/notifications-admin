@@ -20,7 +20,7 @@
 
       {% if recipients.too_many_rows %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file has too many rows
         </h1>
         <p class="govuk-body">
@@ -31,7 +31,7 @@
 
       {% elif not count_of_recipients %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="No rows" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="No rows" data-error-label="{{ upload_id }}">
           Your file is missing some rows
         </h1>
         {% if recipients.missing_column_headers %}
@@ -49,7 +49,7 @@
 
       {% elif not recipients.has_recipient_columns %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
           There’s a problem with your column names
         </h1>
         {% if template.template_type == 'letter' %}
@@ -71,7 +71,7 @@
 
       {% elif recipients.duplicate_recipient_column_headers %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="Duplicate recipient columns" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Duplicate recipient columns" data-error-label="{{ upload_id }}">
           There’s a problem with your column names
         </h1>
            <p class="govuk-body">
@@ -89,7 +89,7 @@
 
       {% elif recipients.missing_column_headers %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
           Your column names need to match the double brackets in your template
         </h1>
           <p class="govuk-body">
@@ -153,7 +153,7 @@
 
     <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
 
-    <div class="fullscreen-content" data-module="fullscreen-table">
+    <div class="fullscreen-content" data-notify-module="fullscreen-table">
       {% call(item, row_number) list_table(
         recipients.displayed_rows,
         caption=original_file_name,

@@ -20,7 +20,7 @@
 
       {% if recipients.too_many_rows %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file has too many rows
         </h1>
         <p class="govuk-body">
@@ -31,7 +31,7 @@
 
       {% elif not recipients.allowed_to_send_to %}
 
-        <h1 class='banner-title' data-module="track-error" data-error-type="Trial mode: bad recipients" data-error-label="{{ upload_id }}">
+        <h1 class='banner-title' data-notify-module="track-error" data-error-type="Trial mode: bad recipients" data-error-label="{{ upload_id }}">
           You cannot save
           {{ 'this' if recipients|length == 1 else 'these' }}
           {{ recipients|length|recipient_count_label(recipients.template_type) }}

@@ -11,7 +11,7 @@ describe('Error tracking', () => {
   beforeEach(() => {
 
     // set up DOM
-    document.body.innerHTML = `<div data-module="track-error" data-error-type="validation" data-error-label="missing field"></div>`;
+    document.body.innerHTML = `<div data-notify-module="track-error" data-error-type="validation" data-error-label="missing field"></div>`;
 
   });
 
@@ -29,7 +29,7 @@ describe('Error tracking', () => {
     };
 
     // start the module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(window.GOVUK.analytics.trackEvent).toHaveBeenCalled();
     expect(window.GOVUK.analytics.trackEvent.mock.calls[0]).toEqual(['Error', 'validation', {

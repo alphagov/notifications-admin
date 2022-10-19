@@ -28,7 +28,7 @@ describe('File upload', () => {
 
     // set up DOM
     document.body.innerHTML = `
-      <form method="post" enctype="multipart/form-data" class="" data-module="file-upload">
+      <form method="post" enctype="multipart/form-data" class="" data-notify-module="file-upload">
         <label class="file-upload-label" for="file">
           Upload a PNG logo
         </label>
@@ -54,7 +54,7 @@ describe('File upload', () => {
     form.reset = jest.fn(() => {});
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     helpers.triggerEvent(window, 'pageshow');
 
@@ -65,7 +65,7 @@ describe('File upload', () => {
   test("An 'upload' button should be added", () => {
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     var uploadButton = form.querySelector('button[type=button]');
 
@@ -82,7 +82,7 @@ describe('File upload', () => {
     uploadLabel.innerHTML += '<span class="error-message">PNG images only!</span>';
 
     // start module
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     buttonLabel = form.querySelector('label.file-upload-button-label');
 
@@ -110,7 +110,7 @@ describe('File upload', () => {
       form.submit = jest.fn(() => {});
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       uploadControl.addEventListener('click', fileUploadClickCallback);
 

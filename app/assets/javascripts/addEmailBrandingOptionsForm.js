@@ -177,4 +177,4 @@
     `).get(0);
   };
 
-})(window.GOVUK.Modules);
+})(window.GOVUK.NotifyModules);

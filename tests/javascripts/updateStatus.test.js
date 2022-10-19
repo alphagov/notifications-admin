@@ -47,7 +47,7 @@ describe('Update content', () => {
         <span id="example-hint-text">Example hint text</span>
         <textarea name="template_content" id="template_content" aria-describedby="example-hint-text">Content of message</textarea>
       </form>
-      <div data-module="update-status" data-updates-url="${updatesURL}" data-target="template_content">
+      <div data-notify-module="update-status" data-updates-url="${updatesURL}" data-target="template_content">
         Initial content
       </div>
     `;
@@ -68,10 +68,10 @@ describe('Update content', () => {
 
   test("It should add attributes to the elements", () => {
 
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(
-      document.querySelectorAll('[data-module=update-status]')[0].id
+      document.querySelectorAll('[data-notify-module=update-status]')[0].id
     ).toEqual(
       "update-status"
     );
@@ -88,7 +88,7 @@ describe('Update content', () => {
 
     document.getElementById('template_content').removeAttribute('aria-describedby');
 
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(
       document.getElementById('template_content').getAttribute('aria-describedby')
@@ -100,7 +100,7 @@ describe('Update content', () => {
 
   test("It should make requests to the URL specified in the data-updates-url attribute", () => {
 
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect($.ajax.mock.calls[0][0]).toEqual(updatesURL);
     expect($.ajax.mock.calls[0]).toEqual([
@@ -118,15 +118,15 @@ describe('Update content', () => {
     responseObj = {'html': 'Updated content'}
 
     expect(
-      document.querySelectorAll('[data-module=update-status]')[0].textContent.trim()
+      document.querySelectorAll('[data-notify-module=update-status]')[0].textContent.trim()
     ).toEqual(
       "Initial content"
     );
 
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
 
     expect(
-      document.querySelectorAll('[data-module=update-status]')[0].textContent.trim()
+      document.querySelectorAll('[data-notify-module=update-status]')[0].textContent.trim()
     ).toEqual(
       "Updated content"
     );
@@ -138,7 +138,7 @@ describe('Update content', () => {
     let textarea = document.getElementById('template_content');
 
     // Initial update triggered
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
     expect($.ajax.mock.calls.length).toEqual(1);
 
     // 150ms of inactivity
@@ -154,7 +154,7 @@ describe('Update content', () => {
     let textarea = document.getElementById('template_content');
 
     // Initial update triggered
-    window.GOVUK.modules.start();
+    window.GOVUK.notifyModules.start();
     expect($.ajax.mock.calls.length).toEqual(1);
 
     helpers.triggerEvent(textarea, 'input');

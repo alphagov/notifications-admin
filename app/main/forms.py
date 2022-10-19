@@ -224,7 +224,7 @@ def govuk_text_input_field_widget(self, field, type=None, param_extensions=None,
         error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
         error_message = {
             "attributes": {
-                "data-module": "track-error",
+                "data-notify-module": "track-error",
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name,
             },
@@ -614,7 +614,7 @@ def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
     if field.errors:
         error_message = {
             "attributes": {
-                "data-module": "track-error",
+                "data-notify-module": "track-error",
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name,
             },
@@ -643,7 +643,7 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
         # wrap the checkboxes HTML in the HTML needed by the collapisble JS
         result = Markup(
             f'<div class="selection-wrapper"'
-            f'     data-module="collapsible-checkboxes"'
+            f'     data-notify-module="collapsible-checkboxes"'
             f'     data-field-label="{field_label}">'
             f"  {checkboxes_string}"
             f"</div>"
@@ -656,7 +656,7 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
     if field.errors:
         error_message = {
             "attributes": {
-                "data-module": "track-error",
+                "data-notify-module": "track-error",
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name,
             },
@@ -704,7 +704,7 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
     if field.errors:
         error_message = {
             "attributes": {
-                "data-module": "track-error",
+                "data-notify-module": "track-error",
                 "data-error-type": field.errors[0],
                 "data-error-label": field.name,
             },
@@ -1752,7 +1752,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         validators=[
             Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid color hex code (starting with #)")
         ],
-        param_extensions={"classes": "govuk-input--width-6", "attributes": {"data-module": "colour-preview"}},
+        param_extensions={"classes": "govuk-input--width-6", "attributes": {"data-notify-module": "colour-preview"}},
     )
     file = FileField_wtf("Upload a PNG logo", validators=[FileAllowed(["png"], "PNG Images only!")])
     brand_type = GovukRadiosField(

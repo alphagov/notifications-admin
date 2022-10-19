@@ -39,10 +39,10 @@ describe('Authenticate with security key', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {})
 
     document.body.innerHTML = `
-      <button type="submit" data-module="authenticate-security-key" data-csrf-token="abc123"></button>`
+      <button type="submit" data-notify-module="authenticate-security-key" data-csrf-token="abc123"></button>`
 
-    button = document.querySelector('[data-module="authenticate-security-key"]')
-    window.GOVUK.modules.start()
+    button = document.querySelector('[data-notify-module="authenticate-security-key"]')
+    window.GOVUK.notifyModules.start()
   })
 
   afterEach(() => {

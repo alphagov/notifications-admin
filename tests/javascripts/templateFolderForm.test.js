@@ -123,7 +123,7 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
   };
 
   document.body.innerHTML = `
-    <form method="post" data-module="template-folder-form">
+    <form method="post" data-notify-module="template-folder-form">
       ${helpers.templatesAndFoldersCheckboxes(hierarchy)}
       ${controlsHTML(newTemplateDataModules)}
     </form>`;
@@ -209,7 +209,7 @@ describe('TemplateFolderForm', () => {
 
     setFixtures(hierarchy);
 
-    templateFolderForm = document.querySelector('form[data-module=template-folder-form]');
+    templateFolderForm = document.querySelector('form[data-notify-module=template-folder-form]');
 
   });
 
@@ -252,7 +252,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
       visibleCounter = getVisibleCounter();
@@ -318,10 +318,10 @@ describe('TemplateFolderForm', () => {
   describe("Click 'New template' for single channel service", () => {
     test("should redirect to new template page", () => {
       setFixtures(hierarchy, "data-channel='sms' data-service='123'")
-      templateFolderForm = document.querySelector('form[data-module=template-folder-form]');
+      templateFolderForm = document.querySelector('form[data-notify-module=template-folder-form]');
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
 
@@ -351,7 +351,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
 
@@ -475,7 +475,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
 
@@ -582,7 +582,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       templateFolderCheckboxes = getTemplateFolderCheckboxes();
 
@@ -908,7 +908,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.modules.start();
+      window.GOVUK.notifyModules.start();
 
       templateFolderCheckboxes = getTemplateFolderCheckboxes();
       visibleCounterText = getVisibleCounter().textContent.trim();
