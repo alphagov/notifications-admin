@@ -1,44 +1,34 @@
-from app.models.organisation import Organisation
-
-NHS_EMAIL_BRANDING_ID = "a7dc4e56-660b-4db7-8cff-12c37b12b5ea"
+from app.models.branding import EmailBranding
 
 
 def get_email_choices(service):
-    if (
-        service.organisation_type == Organisation.TYPE_CENTRAL
-        and service.email_branding_id  # GOV.UK is not current branding
-        and not service.organisation.email_branding_id  # no default to supersede it (GOV.UK)
-    ):
+    if service.can_use_govuk_branding and not service.email_branding.is_govuk:
         yield ("govuk", "GOV.UK")
 
-    if service.is_nhs and service.email_branding_id != NHS_EMAIL_BRANDING_ID:
-        yield (NHS_EMAIL_BRANDING_ID, "NHS")
+    if service.is_nhs and not service.email_branding.is_nhs:
+        yield (EmailBranding.NHS_ID, "NHS")
 
-    if service.email_branding_pool:
-        for branding in service.email_branding_pool:
-            if not branding["id"] == service.email_branding_id:
-                yield (branding["id"], branding["name"])
-    else:
+    if service.organisation.email_branding_pool:
+        for branding in service.organisation.email_branding_pool:
+            if branding.id != service.email_branding_id:
+                yield (branding.id, branding.name)
+    elif service.organisation:
         # fake branding options
         if (
-            service.organisation_type == Organisation.TYPE_CENTRAL
-            and service.organisation
-            and not service.organisation.email_branding_id  # don't offer both if org has default
-            and service.email_branding_name.lower() != f"GOV.UK and {service.organisation.name}".lower()
+            service.can_use_govuk_branding
+            and service.email_branding.name.lower() != f"GOV.UK and {service.organisation.name}".lower()
         ):
             yield ("govuk_and_org", f"GOV.UK and {service.organisation.name}")
 
-        if (
-            service.organisation
-            and not service.is_nhs
-            and (not service.email_branding_id or service.email_branding_id != service.organisation.email_branding_id)
+        if not service.is_nhs and (
+            not service.email_branding_id or service.email_branding_id != service.organisation.email_branding_id
         ):
             yield ("organisation", service.organisation.name)
 
 
 def get_letter_choices(service):
 
-    if service.is_nhs and service.letter_branding_name != "NHS":
+    if service.is_nhs and not service.letter_branding.is_nhs:
         yield ("nhs", "NHS")
 
     if (

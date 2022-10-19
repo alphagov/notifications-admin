@@ -96,7 +96,7 @@
 
           {% call settings_row(if_has_permission='email') %}
             {{ text_field('Email branding') }}
-            {{ text_field(current_service.email_branding_name) }}
+            {{ text_field(current_service.email_branding.name) }}
             {{ edit_field(
               'Change',
               email_request_url,
@@ -386,7 +386,7 @@
           {% endcall %}
           {% call row() %}
             {{ text_field('Email branding' )}}
-            {{ text_field(current_service.email_branding_name) }}
+            {{ text_field(current_service.email_branding.name) }}
             {{ edit_field('Change', url_for('.service_set_email_branding', service_id=current_service.id), suffix='email branding (admin view)') }}
           {% endcall %}
           {% call row() %}
