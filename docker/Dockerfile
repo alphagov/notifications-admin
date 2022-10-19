@@ -23,7 +23,6 @@ RUN apt-get update \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/* /tmp/*
 
-RUN pip install --upgrade pip
 RUN groupadd -r notify && useradd -r -g notify notify
 
 WORKDIR /home/vcap/app
