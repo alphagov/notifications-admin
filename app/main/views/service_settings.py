@@ -1178,7 +1178,7 @@ def email_branding_pool_option(service_id):
         chosen_branding = current_service.organisation.email_branding_pool.get_item_by_id(
             request.args.get("branding_option")
         )
-    except StopIteration:
+    except current_service.organisation.email_branding_pool.NotFound:
         flash("No branding found for this id.")
         return redirect(url_for(".email_branding_request", service_id=current_service.id))
 
