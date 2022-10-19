@@ -13,7 +13,8 @@ RUN source ~/.nvm/nvm.sh \
 
 FROM python:3.9-slim-bullseye as python-build
 
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
