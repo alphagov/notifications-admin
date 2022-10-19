@@ -13,7 +13,7 @@ def get_email_choices(service):
     ):
         yield ("govuk", "GOV.UK")
 
-    if service.organisation_type in Organisation.NHS_TYPES and service.email_branding_id != NHS_EMAIL_BRANDING_ID:
+    if service.is_nhs and service.email_branding_id != NHS_EMAIL_BRANDING_ID:
         yield (NHS_EMAIL_BRANDING_ID, "NHS")
 
     if service.email_branding_pool:
@@ -32,7 +32,7 @@ def get_email_choices(service):
 
         if (
             service.organisation
-            and service.organisation_type not in Organisation.NHS_TYPES
+            and not service.is_nhs
             and (
                 service.email_branding_id is None  # GOV.UK is current branding
                 or service.email_branding_id != organisation_branding_id
@@ -44,12 +44,12 @@ def get_email_choices(service):
 def get_letter_choices(service):
     organisation_branding_id = service.organisation.letter_branding_id if service.organisation else None
 
-    if service.organisation_type in Organisation.NHS_TYPES and service.letter_branding_name != "NHS":
+    if service.is_nhs and service.letter_branding_name != "NHS":
         yield ("nhs", "NHS")
 
     if (
         service.organisation
-        and service.organisation_type not in Organisation.NHS_TYPES
+        and not service.is_nhs
         and (
             service.letter_branding_id is None  # GOV.UK is current branding
             or service.letter_branding_id != organisation_branding_id
