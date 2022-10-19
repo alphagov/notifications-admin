@@ -114,6 +114,7 @@ class Organisation(JSONModel):
             self.organisation_type = None
             self.request_to_go_live_notes = None
             self.email_branding_id = None
+            self.letter_branding_id = None
 
     @property
     def organisation_type_label(self):
