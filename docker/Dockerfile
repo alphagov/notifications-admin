@@ -7,7 +7,8 @@ WORKDIR /usr/frontend
 COPY app app
 COPY package-lock.json package.json gulpfile.js ./
 
-RUN npm install \
+RUN source ~/.nvm/nvm.sh \
+    && npm ci --no-audit \
     && npm run build
 
 FROM python:3.9-slim-bullseye as python-build
