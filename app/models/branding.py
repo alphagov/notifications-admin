@@ -66,6 +66,9 @@ class AllBranding(ModelList):
                 return branding
         raise StopIteration
 
+    def excluding(self, *ids_to_exclude):
+        return tuple(branding for branding in self if branding.id not in ids_to_exclude)
+
 
 class AllEmailBranding(AllBranding):
     client_method = email_branding_client.get_all_email_branding

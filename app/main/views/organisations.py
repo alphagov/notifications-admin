@@ -283,16 +283,7 @@ def cancel_invited_org_user(org_id, invited_user_id):
 @main.route("/organisations/<uuid:org_id>/settings/", methods=["GET"])
 @user_is_platform_admin
 def organisation_settings(org_id):
-    other_email_branding_options = [
-        email_branding.name
-        for email_branding in current_organisation.email_branding_pool
-        if email_branding != current_organisation.email_branding
-    ]
-
-    return render_template(
-        "views/organisations/organisation/settings/index.html",
-        other_email_branding_options=other_email_branding_options,
-    )
+    return render_template("views/organisations/organisation/settings/index.html")
 
 
 @main.route("/organisations/<uuid:org_id>/settings/edit-name", methods=["GET", "POST"])
@@ -530,11 +521,6 @@ def _handle_change_default_branding(form, new_default_branding_id) -> Optional[R
 @main.route("/organisations/<uuid:org_id>/settings/email-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def organisation_email_branding(org_id):
-    # We want to display email branding options apart from an option that has already been set as the default
-    email_branding_pool_options = [
-        option for option in current_organisation.email_branding_pool if option != current_organisation.email_branding
-    ]
-
     is_central_government = current_organisation.organisation_type == Organisation.TYPE_CENTRAL
     remove_branding_id = request.args.get("remove_branding_id")
     change_default_branding_to_govuk = "change_default_branding_to_govuk" in request.args
@@ -557,7 +543,6 @@ def organisation_email_branding(org_id):
 
     return render_template(
         "views/organisations/organisation/settings/email-branding-options.html",
-        email_branding_pool_options=email_branding_pool_options,
         form=form,
         show_use_govuk_as_default_link=show_use_govuk_as_default_link,
     )
@@ -570,8 +555,7 @@ def add_organisation_email_branding_options(org_id):
 
     form.branding_field.choices = [
         (branding.id, branding.name)
-        for branding in AllEmailBranding()
-        if branding not in current_organisation.email_branding_pool
+        for branding in sorted(AllEmailBranding().excluding(*current_organisation.email_branding_pool.ids))
     ]
 
     if form.validate_on_submit():

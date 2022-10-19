@@ -40,7 +40,7 @@
 
     <!--display the email-branding-pool options and the preview for each one -->
 
-    {% for option in email_branding_pool_options %}
+    {% for option in current_org.email_branding_pool_excluding_default %}
       <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
         {{ option.name }}
       </h2>

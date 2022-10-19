@@ -101,7 +101,7 @@
       {% call row() %}
         {{ text_field('Email branding options') }}
         {% set email_branding_html %}
-          <div {% if other_email_branding_options %}class="govuk-!-margin-bottom-3"{% endif %}>
+          <div {% if current_org.email_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
             {{ current_org.email_branding.name }}
             <br>
             <div class="table-field-status-default">
@@ -109,15 +109,13 @@
             </div>
           </div>
 
-          {% if other_email_branding_options %}
-            <ul>
-            {% for item in other_email_branding_options %}
+          {% for item in current_org.email_branding_pool_excluding_default %}
+            {% if loop.first %}<ul>{% endif %}
               <li>
-                {{ item }}
+                {{ item.name }}
               </li>
-            {% endfor %}
-            </ul>
-          {% endif %}
+            {% if loop.last %}</ul>{% endif %}
+          {% endfor %}
         {% endset %}
         {% call field() %}
           {{ email_branding_html }}

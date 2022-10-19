@@ -179,6 +179,10 @@ class Organisation(JSONModel):
     def email_branding_pool(self):
         return EmailBrandingPool(self.id)
 
+    @property
+    def email_branding_pool_excluding_default(self):
+        return self.email_branding_pool.excluding(self.email_branding_id)
+
     @cached_property
     def letter_branding(self):
         return LetterBranding.from_id(self.letter_branding_id)
