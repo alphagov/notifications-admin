@@ -8,8 +8,8 @@ def get_email_choices(service):
     if service.is_nhs and not service.email_branding.is_nhs:
         yield (EmailBranding.NHS_ID, "NHS")
 
-    if service.organisation.email_branding_pool:
-        for branding in service.organisation.email_branding_pool.excluding(service.email_branding_id):
+    if service.email_branding_pool:
+        for branding in service.email_branding_pool.excluding(service.email_branding_id):
             yield (branding.id, branding.name)
     elif service.organisation:
         # fake branding options
