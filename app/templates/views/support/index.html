@@ -15,9 +15,6 @@
     {% if current_user.is_authenticated %}
       {{ form.support_type }}
     {% else %}
-      <p class="govuk-body">
-        What do you need help with?
-      </p>
       {{ form.who }}
     {% endif %}
     {{ page_footer('Continue') }}

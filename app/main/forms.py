@@ -1513,7 +1513,6 @@ class SupportRedirect(StripWhitespaceForm):
             ("public-sector", "I work in the public sector and need to send emails, text messages or letters"),
             ("public", "I’m a member of the public with a question for the government"),
         ],
-        param_extensions={"fieldset": {"legend": {"classes": "govuk-visually-hidden"}}},
     )
 
 
