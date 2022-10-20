@@ -71,3 +71,9 @@
 
   }
 }
+
+// Fix issue with skiplink solved in v3.7.0
+// TODO: remove this once we've upgraded past v3.7.0
+.govuk-skip-link:focus {
+  outline-offset: 0;
+}
