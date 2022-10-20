@@ -1030,7 +1030,7 @@ def service_preview_email_branding(service_id):
         if (
             current_service.organisation
             and email_branding_id
-            and email_branding_id not in current_service.organisation.email_branding_pool.ids
+            and email_branding_id not in current_service.email_branding_pool.ids
         ):
             return redirect(
                 url_for(
@@ -1153,7 +1153,7 @@ def email_branding_request(service_id):
                     service_id=current_service.id,
                 )
             )
-        if branding_choice in current_service.organisation.email_branding_pool.ids:
+        if branding_choice in current_service.email_branding_pool.ids:
             return redirect(
                 url_for(".email_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
             )
@@ -1175,10 +1175,8 @@ def email_branding_request(service_id):
 @user_has_permissions("manage_service")
 def email_branding_pool_option(service_id):
     try:
-        chosen_branding = current_service.organisation.email_branding_pool.get_item_by_id(
-            request.args.get("branding_option")
-        )
-    except current_service.organisation.email_branding_pool.NotFound:
+        chosen_branding = current_service.email_branding_pool.get_item_by_id(request.args.get("branding_option"))
+    except current_service.email_branding_pool.NotFound:
         flash("No branding found for this id.")
         return redirect(url_for(".email_branding_request", service_id=current_service.id))
 
