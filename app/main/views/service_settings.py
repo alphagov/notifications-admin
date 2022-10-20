@@ -49,6 +49,7 @@ from app.main.forms import (
     ChooseEmailBrandingForm,
     ChooseLetterBrandingForm,
     EstimateUsageForm,
+    GovBrandingOrOwnLogoForm,
     GovernmentIdentityLogoForm,
     RenameServiceForm,
     SearchByNameForm,
@@ -67,7 +68,12 @@ from app.main.forms import (
 )
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.models.branding import AllEmailBranding, AllLetterBranding, EmailBranding
-from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
+from app.utils import (
+    DELIVERED_STATUSES,
+    FAILURE_STATUSES,
+    SENDING_STATUSES,
+    service_belongs_to_org_type,
+)
 from app.utils.branding import get_email_choices as get_email_branding_choices
 from app.utils.user import (
     user_has_permissions,
@@ -1287,10 +1293,7 @@ def email_branding_create_government_identity_logo(service_id):
     return render_template(
         "views/service-settings/branding/email-branding-create-government-identity-logo.html",
         service_id=service_id,
-        # TODO: Uncomment after https://github.com/alphagov/notifications-admin/pull/4401 merged
-        # back_link=url_for(
-        #     ".add_email_branding_choose_logo", service_id=service_id
-        # ),
+        back_link=url_for(".email_branding_choose_logo", service_id=service_id),
     )
 
 
@@ -1325,6 +1328,25 @@ def email_branding_enter_government_identity_logo_text(service_id):
         "views/service-settings/branding/email-branding-enter-government-identity-logo-text.html",
         form=form,
         back_link=url_for(".email_branding_create_government_identity_logo", service_id=service_id),
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/choose-logo", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+@service_belongs_to_org_type("central")
+def email_branding_choose_logo(service_id):
+    form = GovBrandingOrOwnLogoForm()
+
+    if form.validate_on_submit():
+        if form.options.data == "org":
+            return redirect(url_for(".email_branding_something_else", service_id=current_service.id))
+        elif form.options.data == "single_identity":
+            return redirect(url_for(".email_branding_create_government_identity_logo", service_id=current_service.id))
+
+    return render_template(
+        "views/service-settings/branding/add-new-branding/government-branding-or-own-logo.html",
+        form=form,
+        branding_options=GovBrandingOrOwnLogoForm(),
     )
 
 

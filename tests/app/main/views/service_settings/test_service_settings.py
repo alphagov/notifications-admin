@@ -3721,14 +3721,12 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
 def test_email_branding_create_government_identity_logo(client_request, service_one):
     page = client_request.get("main.email_branding_create_government_identity_logo", service_id=service_one["id"])
 
-    expected_href = (
-        "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings"
-        "/email-branding/create-government-identity-logo/enter-text"
-    )
     back_button = page.find("a", text="Back")
-    continue_button = page.find("a", href=expected_href)
+    continue_button = page.find(
+        "a", href=url_for(".email_branding_enter_government_identity_logo_text", service_id=SERVICE_ONE_ID)
+    )
 
-    assert back_button["href"] == "#"  # TODO: update this when we know the right back link
+    assert back_button["href"] == url_for(".email_branding_choose_logo", service_id=SERVICE_ONE_ID)
     assert "Continue" in continue_button.text
 
 

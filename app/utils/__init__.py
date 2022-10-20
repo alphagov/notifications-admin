@@ -39,6 +39,22 @@ def service_has_permission(permission):
     return wrap
 
 
+def service_belongs_to_org_type(org_type):
+
+    from app import current_service
+
+    def wrap(func):
+        @wraps(func)
+        def wrap_func(*args, **kwargs):
+            if not current_service or not current_service.organisation_type == org_type:
+                abort(403)
+            return func(*args, **kwargs)
+
+        return wrap_func
+
+    return wrap
+
+
 def get_help_argument():
     return request.args.get("help") if request.args.get("help") in ("1", "2", "3") else None
 
