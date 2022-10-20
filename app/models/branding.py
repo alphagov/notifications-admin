@@ -11,6 +11,10 @@ class Branding(JSONModel):
     def __bool__(self):
         return bool(self.id)
 
+    @classmethod
+    def with_default_values(cls, **kwargs):
+        return cls({key: None for key in cls.ALLOWED_PROPERTIES} | kwargs)
+
 
 class EmailBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {
@@ -25,7 +29,7 @@ class EmailBranding(Branding):
     @classmethod
     def from_id(cls, id):
         if id is None:
-            return cls({key: None for key in cls.ALLOWED_PROPERTIES} | {"name": "GOV.UK"})
+            return cls.with_default_values(name="GOV.UK")
         return cls(email_branding_client.get_email_branding(id)["email_branding"])
 
     @property
@@ -43,7 +47,7 @@ class LetterBranding(Branding):
     @classmethod
     def from_id(cls, id):
         if id is None:
-            return cls({key: None for key in cls.ALLOWED_PROPERTIES})
+            return cls.with_default_values()
         return cls(letter_branding_client.get_letter_branding(id))
 
     @property
