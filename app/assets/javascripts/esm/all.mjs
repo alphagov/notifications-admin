@@ -45,21 +45,21 @@ function initAll (options) {
   new Button(scope).init()
 
   // Find all global details elements to enhance.
-  var $details = scope.querySelectorAll('details')
+  var $details = scope.querySelectorAll('[data-module="govuk-details"]')
   nodeListForEach($details, function ($detail) {
     new Details($detail).init()
   })
 
   // Find first header module to enhance.
-  var $toggleButton = scope.querySelector('[data-module="header"]')
+  var $toggleButton = scope.querySelector('[data-module="govuk-header"]')
   new Header($toggleButton).init()
 
-  var $radios = scope.querySelectorAll('[data-module="radios"]')
+  var $radios = scope.querySelectorAll('[data-module="govuk-radios"]')
   nodeListForEach($radios, function ($radio) {
     new Radios($radio).init()
   })
 
-  var $errorSummary = scope.querySelector('[data-module="error-summary"]')
+  var $errorSummary = scope.querySelector('[data-module="govuk-error-summary"]')
   new ErrorSummary($errorSummary).init()
 }
 
