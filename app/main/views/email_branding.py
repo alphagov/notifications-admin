@@ -1,4 +1,4 @@
-from flask import current_app, redirect, render_template, session, url_for
+from flask import current_app, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
@@ -99,7 +99,12 @@ def update_email_branding(branding_id, logo=None):
 @main.route("/email-branding/create/<logo>", methods=["GET", "POST"])
 @user_is_platform_admin
 def create_email_branding(logo=None):
-    form = AdminEditEmailBrandingForm(brand_type="org")
+    form = AdminEditEmailBrandingForm(
+        name=request.args.get("name"),
+        text=request.args.get("text"),
+        colour=request.args.get("colour"),
+        brand_type="org",
+    )
 
     if form.validate_on_submit():
         if form.file.data:

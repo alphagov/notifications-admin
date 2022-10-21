@@ -72,6 +72,22 @@ def test_create_email_branding_does_not_show_any_branding_info(
     assert page.select_one("#colour").attrs.get("value") is None
 
 
+def test_create_email_branding_does_can_be_populated_from_querystring(
+    client_request, platform_admin_user, mock_no_email_branding
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        ".create_email_branding",
+        name="Example name",
+        text="Example text",
+        colour="Example colour",
+    )
+
+    assert page.select_one("#name")["value"] == "Example name"
+    assert page.select_one("#text")["value"] == "Example text"
+    assert page.select_one("#colour")["value"] == "Example colour"
+
+
 def test_create_new_email_branding_without_logo(
     client_request,
     platform_admin_user,
