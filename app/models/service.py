@@ -3,17 +3,16 @@ from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel
+from app.models.branding import EmailBranding, LetterBranding
 from app.models.contact_list import ContactLists
 from app.models.job import ImmediateJobs, PaginatedJobs, PaginatedUploads, ScheduledJobs
 from app.models.organisation import Organisation
 from app.models.user import InvitedUsers, User, Users
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
-from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.inbound_number_client import inbound_number_client
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.job_api_client import job_api_client
-from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
@@ -442,25 +441,11 @@ class Service(JSONModel):
 
     @cached_property
     def email_branding(self):
-        if self.email_branding_id:
-            return email_branding_client.get_email_branding(self.email_branding_id)["email_branding"]
-        return None
-
-    @cached_property
-    def email_branding_name(self):
-        if self.email_branding is None:
-            return "GOV.UK"
-        return self.email_branding["name"]
-
-    @cached_property
-    def letter_branding_name(self):
-        if self.letter_branding is None:
-            return "no"
-        return self.letter_branding["name"]
+        return EmailBranding.from_id(self.email_branding_id)
 
     @property
     def needs_to_change_email_branding(self):
-        return self.email_branding_id is None and self.organisation_type != Organisation.TYPE_CENTRAL
+        return self.email_branding.is_govuk and self.organisation_type != Organisation.TYPE_CENTRAL
 
     @property
     def letter_branding_id(self):
@@ -468,9 +453,7 @@ class Service(JSONModel):
 
     @cached_property
     def letter_branding(self):
-        if self.letter_branding_id:
-            return letter_branding_client.get_letter_branding(self.letter_branding_id)
-        return None
+        return LetterBranding.from_id(self.letter_branding_id)
 
     @cached_property
     def organisation(self):
@@ -493,6 +476,10 @@ class Service(JSONModel):
     @property
     def organisation_type_label(self):
         return Organisation.TYPE_LABELS.get(self.organisation_type)
+
+    @property
+    def is_nhs(self):
+        return self.organisation_type in Organisation.NHS_TYPES
 
     @cached_property
     def inbound_number(self):
@@ -600,14 +587,11 @@ class Service(JSONModel):
 
     @property
     def email_branding_pool(self):
-        if self.organisation_id:
-            return self.organisation.email_branding_pool
-        else:
-            return []
+        return self.organisation.email_branding_pool
 
     @property
-    def email_branding_pool_ids(self):
-        return [branding["id"] for branding in self.email_branding_pool]
+    def can_use_govuk_branding(self):
+        return self.organisation_type == Organisation.TYPE_CENTRAL and not self.organisation.email_branding
 
 
 class Services(SerialisedModelCollection):

@@ -21,7 +21,6 @@ from app import (
     current_service,
     email_branding_client,
     inbound_number_client,
-    letter_branding_client,
     notification_api_client,
     organisations_client,
     service_api_client,
@@ -66,8 +65,8 @@ from app.main.forms import (
     SomethingElseBrandingForm,
 )
 from app.main.views.pricing import CURRENT_SMS_RATE
+from app.models.branding import AllEmailBranding, AllLetterBranding, EmailBranding
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
-from app.utils.branding import NHS_EMAIL_BRANDING_ID
 from app.utils.branding import get_email_choices as get_email_branding_choices
 from app.utils.user import (
     user_has_permissions,
@@ -958,10 +957,8 @@ def set_rate_limit(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/set-email-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_set_email_branding(service_id):
-    email_branding = email_branding_client.get_all_email_branding()
-
     form = AdminSetEmailBrandingForm(
-        all_branding_options=get_branding_as_value_and_label(email_branding),
+        all_branding_options=AllEmailBranding().as_id_and_name,
         current_branding=current_service.email_branding_id,
     )
 
@@ -1033,7 +1030,7 @@ def service_preview_email_branding(service_id):
         if (
             current_service.organisation
             and email_branding_id
-            and email_branding_id not in current_service.organisation.email_branding_pool_ids
+            and email_branding_id not in current_service.email_branding_pool.ids
         ):
             return redirect(
                 url_for(
@@ -1057,10 +1054,8 @@ def service_preview_email_branding(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/set-letter-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_set_letter_branding(service_id):
-    letter_branding = letter_branding_client.get_all_letter_branding()
-
     form = AdminSetLetterBrandingForm(
-        all_branding_options=get_branding_as_value_and_label(letter_branding),
+        all_branding_options=AllLetterBranding().as_id_and_name,
         current_branding=current_service.letter_branding_id,
     )
 
@@ -1124,7 +1119,7 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
 
     ticket_message = render_template(
         "support-tickets/branding-request.txt",
-        current_branding=current_service.email_branding_name,
+        current_branding=current_service.email_branding.name,
         branding_requested=dict(form.options.choices)[form_option_selected],
         detail=detail,
     )
@@ -1147,19 +1142,18 @@ def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
     if form.something_else_is_only_option:
         return redirect(url_for(".email_branding_something_else", service_id=current_service.id))
-    branding_name = current_service.email_branding_name
     if form.validate_on_submit():
 
         branding_choice = form.options.data
 
-        if branding_choice == NHS_EMAIL_BRANDING_ID:
+        if branding_choice == EmailBranding.NHS_ID:
             return redirect(
                 url_for(
                     ".email_branding_nhs",
                     service_id=current_service.id,
                 )
             )
-        if branding_choice in current_service.email_branding_pool_ids:
+        if branding_choice in current_service.email_branding_pool.ids:
             return redirect(
                 url_for(".email_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
             )
@@ -1174,32 +1168,27 @@ def email_branding_request(service_id):
     return render_template(
         "views/service-settings/branding/email-branding-options.html",
         form=form,
-        branding_name=branding_name,
     )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/pool", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_pool_option(service_id):
-    chosen_branding_id = request.args.get("branding_option")
-    chosen_brandings = [
-        branding["name"] for branding in current_service.email_branding_pool if branding["id"] == chosen_branding_id
-    ]
-    if not chosen_brandings:
+    try:
+        chosen_branding = current_service.email_branding_pool.get_item_by_id(request.args.get("branding_option"))
+    except current_service.email_branding_pool.NotFound:
         flash("No branding found for this id.")
         return redirect(url_for(".email_branding_request", service_id=current_service.id))
 
-    chosen_branding_name = chosen_brandings[0]
-
     if request.method == "POST":
-        current_service.update(email_branding=chosen_branding_id)
+        current_service.update(email_branding=chosen_branding.id)
 
         flash("You’ve updated your email branding", "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
+
     return render_template(
         "views/service-settings/branding/email-branding-pool-option.html",
-        chosen_branding_id=chosen_branding_id,
-        chosen_branding_name=chosen_branding_name,
+        chosen_branding=chosen_branding,
     )
 
 
@@ -1241,16 +1230,16 @@ def email_branding_govuk_and_org(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_nhs(service_id):
-    check_email_branding_allowed_for_service(NHS_EMAIL_BRANDING_ID)
+    check_email_branding_allowed_for_service(EmailBranding.NHS_ID)
 
     if request.method == "POST":
-        current_service.update(email_branding=NHS_EMAIL_BRANDING_ID)
+        current_service.update(email_branding=EmailBranding.NHS_ID)
 
         flash("You’ve updated your email branding", "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/branding/email-branding-nhs.html", nhs_branding_id=NHS_EMAIL_BRANDING_ID
+        "views/service-settings/branding/email-branding-nhs.html", nhs_branding_id=EmailBranding.NHS_ID
     )
 
 
@@ -1291,11 +1280,10 @@ def email_branding_something_else(service_id):
 def letter_branding_request(service_id):
     form = ChooseLetterBrandingForm(current_service)
     from_template = request.args.get("from_template")
-    branding_name = current_service.letter_branding_name
     if form.validate_on_submit():
         ticket_message = render_template(
             "support-tickets/branding-request.txt",
-            current_branding=branding_name,
+            current_branding=current_service.letter_branding.name or "no",
             branding_requested=dict(form.options.choices)[form.options.data],
             detail=form.something_else.data,
         )
@@ -1320,7 +1308,6 @@ def letter_branding_request(service_id):
     return render_template(
         "views/service-settings/branding/letter-branding-options.html",
         form=form,
-        branding_name=branding_name,
         from_template=from_template,
     )
 
@@ -1405,10 +1392,6 @@ def edit_service_billing_details(service_id):
         "views/service-settings/edit-service-billing-details.html",
         form=form,
     )
-
-
-def get_branding_as_value_and_label(email_branding):
-    return [(branding["id"], branding["name"]) for branding in email_branding]
 
 
 def convert_dictionary_to_wtforms_choices_format(dictionary, value, label):

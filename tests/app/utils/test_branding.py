@@ -2,12 +2,9 @@ from unittest.mock import PropertyMock
 
 import pytest
 
+from app.models.branding import EmailBranding
 from app.models.service import Service
-from app.utils.branding import (
-    NHS_EMAIL_BRANDING_ID,
-    get_email_choices,
-    get_letter_choices,
-)
+from app.utils.branding import get_email_choices, get_letter_choices
 from tests import organisation_json
 from tests.conftest import create_email_branding
 
@@ -19,7 +16,7 @@ from tests.conftest import create_email_branding
         (get_letter_choices, "central", []),
         (get_email_choices, "local", []),
         (get_letter_choices, "local", []),
-        (get_email_choices, "nhs_central", [(NHS_EMAIL_BRANDING_ID, "NHS")]),
+        (get_email_choices, "nhs_central", [(EmailBranding.NHS_ID, "NHS")]),
         (get_letter_choices, "nhs_central", [("nhs", "NHS")]),
     ],
 )
@@ -59,10 +56,10 @@ def test_get_choices_service_not_assigned_to_org(
         ),
         ("local", None, [("organisation", "Test Organisation")]),
         ("local", "some-branding-id", [("organisation", "Test Organisation")]),
-        ("nhs_central", None, [(NHS_EMAIL_BRANDING_ID, "NHS")]),
+        ("nhs_central", None, [(EmailBranding.NHS_ID, "NHS")]),
         (
             "nhs_central",
-            NHS_EMAIL_BRANDING_ID,
+            EmailBranding.NHS_ID,
             [
                 # don't show NHS if it's the current branding
             ],
@@ -192,6 +189,7 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
     service_one,
     mock_get_email_branding_pool,
     mock_get_service_organisation,
+    mock_get_email_branding,
 ):
     service = Service(service_one)
 
@@ -227,7 +225,7 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
         ("govuk", "GOV.UK"),
         ("email-branding-2-id", "Email branding name 2"),
     ]
-    mocker.patch("app.organisations_client.get_email_branding_pool", return_value=branding_pool)
+    mocker.patch("app.models.branding.EmailBrandingPool.client_method", return_value=branding_pool)
 
     options = get_email_choices(service)
     assert list(options) == expected_options
