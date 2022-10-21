@@ -72,6 +72,10 @@ from app.main.validators import (
     ValidEmail,
     ValidGovEmail,
 )
+from app.models.branding import (
+    GOVERNMENT_IDENTITY_SYSTEM_COLOURS,
+    GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA,
+)
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.utils import branding, merge_jsonlike
@@ -2487,3 +2491,20 @@ class ChangeSecurityKeyNameForm(StripWhitespaceForm):
             Length(max=255, message="Name of key must be 255 characters or fewer"),
         ],
     )
+
+
+class GovernmentIdentityOptions(StripWhitespaceForm):
+
+    coat_of_arms_or_insignia = GovukRadiosField(
+        "Coat of arms or insignia",
+        choices=[(name, name) for name in sorted(GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA)],
+        validators=[DataRequired()],
+    )
+
+    colour = GovukRadiosField(
+        "Colour for stripe",
+        choices=[(item["colour"], item["name"]) for item in GOVERNMENT_IDENTITY_SYSTEM_COLOURS],
+        validators=[DataRequired()],
+    )
+
+    text = GovukTextInputField("Text to display")

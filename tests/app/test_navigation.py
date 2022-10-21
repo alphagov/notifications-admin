@@ -83,6 +83,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "create_and_send_messages",
             "create_api_key",
             "create_email_branding",
+            "create_email_branding_government_identity",
             "create_letter_branding",
             "data_retention",
             "delete_contact_list",

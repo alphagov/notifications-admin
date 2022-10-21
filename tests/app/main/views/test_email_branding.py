@@ -6,6 +6,7 @@ import pytest
 from flask import url_for
 from notifications_python_client.errors import HTTPError
 
+from app.models.branding import INSIGNIA_ASSETS_PATH
 from app.s3_client.s3_logo_client import EMAIL_LOGO_LOCATION_STRUCTURE, TEMP_TAG
 from tests.conftest import create_email_branding, normalize_spaces
 
@@ -478,3 +479,88 @@ def test_colour_regex_validation(
         _data=data,
         _expected_status=expected_status_code,
     )
+
+
+def test_create_email_branding_government_identity_form(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        ".create_email_branding_government_identity",
+    )
+    assert [
+        (
+            input["name"],
+            normalize_spaces(page.select_one("label[for=" + input["id"] + "]").text),
+            input["value"],
+        )
+        for input in page.select("input[type=radio]")
+    ] == [
+        ("coat_of_arms_or_insignia", "Department for International Trade", "Department for International Trade"),
+        (
+            "coat_of_arms_or_insignia",
+            "Foreign, Commonwealth & Development Office",
+            "Foreign, Commonwealth & Development Office",
+        ),
+        ("coat_of_arms_or_insignia", "HM Coastguard", "HM Coastguard"),
+        ("coat_of_arms_or_insignia", "HM Government", "HM Government"),
+        ("coat_of_arms_or_insignia", "HM Revenue & Customs", "HM Revenue & Customs"),
+        ("coat_of_arms_or_insignia", "Home Office", "Home Office"),
+        ("coat_of_arms_or_insignia", "Ministry of Defence", "Ministry of Defence"),
+        ("coat_of_arms_or_insignia", "Scotland Office", "Scotland Office"),
+        ("coat_of_arms_or_insignia", "Wales Office", "Wales Office"),
+        ("colour", "Attorney General’s Office", "#9f1888"),
+        ("colour", "Cabinet Office", "#005abb"),
+        ("colour", "Civil Service", "#af292e"),
+        ("colour", "Department for Business Innovation & Skills", "#003479"),
+        ("colour", "Department for Digital, Culture, Media & Sport", "#d40072"),
+        ("colour", "Department for Education", "#003a69"),
+        ("colour", "Department for Environment Food & Rural Affairs", "#00a33b"),
+        ("colour", "Department for International Development", "#002878"),
+        ("colour", "Department for International Trade", "#cf102d"),
+        ("colour", "Department for Levelling Up, Housing & Communities", "#012169"),
+        ("colour", "Department for Transport", "#006c56"),
+        ("colour", "Department for Work & Pensions", "#00beb7"),
+        ("colour", "Department of Health & Social Care", "#00ad93"),
+        ("colour", "Foreign, Commonwealth & Development Office", "#012169"),
+        ("colour", "Government Equalities Office", "#9325b2"),
+        ("colour", "HM Government", "#0076c0"),
+        ("colour", "HM Revenue & Customs", "#009390"),
+        ("colour", "HM Treasury", "#af292e"),
+        ("colour", "Home Office", "#9325b2"),
+        ("colour", "Ministry of Defence", "#4d2942"),
+        ("colour", "Ministry of Justice", "#231f20"),
+        ("colour", "Northern Ireland Office", "#002663"),
+        ("colour", "Office of the Advocate General for Scotland", "#002663"),
+        ("colour", "Office of the Leader of the House of Commons", "#317023"),
+        ("colour", "Office of the Leader of the House of Lords", "#9c132e"),
+        ("colour", "Scotland Office", "#002663"),
+        ("colour", "UK Export Finance", "#005747"),
+        ("colour", "Wales Office", "#a33038"),
+    ]
+
+
+def test_post_create_email_branding_government_identity_form(mocker, client_request, platform_admin_user):
+    mock_upload = mocker.patch(
+        "app.main.views.email_branding.upload_email_logo",
+        return_value="example.png",
+    )
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".create_email_branding_government_identity",
+        text="Department of Social Affairs and Citizenship",
+        _data={
+            "coat_of_arms_or_insignia": "HM Government",
+            "colour": "#005abb",
+        },
+        _expected_redirect=url_for(
+            ".create_email_branding",
+            logo="example.png",
+            colour="#005abb",
+            name="Department of Social Affairs and Citizenship",
+            text="Department of Social Affairs and Citizenship",
+        ),
+    )
+
+    assert mock_upload.call_args[0][0] == "hm.government.png"
+    assert mock_upload.call_args[0][1][:4] == b"\x89PNG"
+    assert mock_upload.call_args[0][1] == (INSIGNIA_ASSETS_PATH / "HM Government.png").resolve().read_bytes()

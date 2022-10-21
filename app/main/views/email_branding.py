@@ -4,9 +4,14 @@ from notifications_python_client.errors import HTTPError
 
 from app import email_branding_client
 from app.event_handlers import create_update_email_branding_event
+from app.formatters import email_safe
 from app.main import main
-from app.main.forms import AdminEditEmailBrandingForm, SearchByNameForm
-from app.models.branding import AllEmailBranding, EmailBranding
+from app.main.forms import (
+    AdminEditEmailBrandingForm,
+    GovernmentIdentityOptions,
+    SearchByNameForm,
+)
+from app.models.branding import INSIGNIA_ASSETS_PATH, AllEmailBranding, EmailBranding
 from app.s3_client.s3_logo_client import (
     TEMP_TAG,
     delete_email_temp_file,
@@ -92,6 +97,36 @@ def update_email_branding(branding_id, logo=None):
             logo=logo,
         ),
         400 if form.errors else 200,
+    )
+
+
+@main.route("/email-branding/create-government-identity", methods=["GET", "POST"])
+@user_is_platform_admin
+def create_email_branding_government_identity():
+    form = GovernmentIdentityOptions()
+
+    if form.validate_on_submit():
+        filename = f"{form.coat_of_arms_or_insignia.data}.png"
+        image_file = INSIGNIA_ASSETS_PATH / filename
+        upload_filename = upload_email_logo(
+            email_safe(filename),
+            image_file.resolve().read_bytes(),
+            current_app.config["AWS_REGION"],
+            user_id=session["user_id"],
+        )
+        return redirect(
+            url_for(
+                ".create_email_branding",
+                name=request.args.get("text"),
+                text=request.args.get("text"),
+                colour=form.colour.data,
+                logo=upload_filename,
+            )
+        )
+
+    return render_template(
+        "views/email-branding/government-identity-options.html",
+        form=form,
     )
 
 
