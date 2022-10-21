@@ -84,6 +84,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "create_api_key",
             "create_email_branding",
             "create_email_branding_government_identity",
+            "create_email_branding_government_identity_colour",
             "create_letter_branding",
             "data_retention",
             "delete_contact_list",

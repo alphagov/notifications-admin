@@ -2494,47 +2494,57 @@ class ChangeSecurityKeyNameForm(StripWhitespaceForm):
     )
 
 
-class GovernmentIdentityOptions(StripWhitespaceForm):
+def markup_for_crest_or_insignia(filename):
+    return Markup(
+        f"""
+        <img
+            src="{asset_fingerprinter.get_url(f"images/branding/insignia/{filename}")}"
+            alt=""
+            class="email-branding-crest-or-insignia"
+        >
+    """
+    )
+
+
+def markup_for_coloured_stripe(colour):
+    return Markup(
+        f"""
+        <span
+            class="email-branding-coloured-stripe"
+            style="background: {colour};"
+        ></span>
+    """
+    )
+
+
+class GovernmentIdentityCoatOfArmsOrInsignia(StripWhitespaceForm):
 
     coat_of_arms_or_insignia = GovukRadiosField(
         "Coat of arms or insignia",
         choices=[
-            (
-                name,
-                Markup(
-                    f"""
-                    <img
-                        src="{asset_fingerprinter.get_url(f"images/branding/insignia/{name}.png")}"
-                        alt=""
-                        class="email-branding-crest-or-insignia"
-                    >
-                    {name}
-                """
-                ),
-            )
+            (name, markup_for_crest_or_insignia(f"{name}.png") + name)
             for name in sorted(GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA)
         ],
         validators=[DataRequired()],
     )
 
-    colour = GovukRadiosField(
-        "Colour for stripe",
-        choices=[
+
+class GovernmentIdentityColour(StripWhitespaceForm):
+    def __init__(self, *args, crest_or_insignia_image_filename, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.colour.choices = [
             (
                 item["colour"],
-                Markup(
-                    f"""
-                    <span
-                        class="email-branding-coloured-stripe"
-                        style="background: {item["colour"]};"
-                    ></span>
-                    {item["name"]}
-                """
+                (
+                    markup_for_coloured_stripe(item["colour"])
+                    + markup_for_crest_or_insignia(crest_or_insignia_image_filename)
+                    + item["name"]
                 ),
             )
             for item in GOVERNMENT_IDENTITY_SYSTEM_COLOURS
-        ],
+        ]
+
+    colour = GovukRadiosField(
+        "Colour for stripe",
         validators=[DataRequired()],
     )
-
-    text = GovukTextInputField("Text to display")

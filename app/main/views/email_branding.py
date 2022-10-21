@@ -1,4 +1,12 @@
-from flask import current_app, redirect, render_template, request, session, url_for
+from flask import (
+    abort,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
@@ -8,10 +16,16 @@ from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
     AdminEditEmailBrandingForm,
-    GovernmentIdentityOptions,
+    GovernmentIdentityCoatOfArmsOrInsignia,
+    GovernmentIdentityColour,
     SearchByNameForm,
 )
-from app.models.branding import INSIGNIA_ASSETS_PATH, AllEmailBranding, EmailBranding
+from app.models.branding import (
+    GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA,
+    INSIGNIA_ASSETS_PATH,
+    AllEmailBranding,
+    EmailBranding,
+)
 from app.s3_client.s3_logo_client import (
     TEMP_TAG,
     delete_email_temp_file,
@@ -103,10 +117,35 @@ def update_email_branding(branding_id, logo=None):
 @main.route("/email-branding/create-government-identity", methods=["GET", "POST"])
 @user_is_platform_admin
 def create_email_branding_government_identity():
-    form = GovernmentIdentityOptions()
+    form = GovernmentIdentityCoatOfArmsOrInsignia()
 
     if form.validate_on_submit():
-        filename = f"{form.coat_of_arms_or_insignia.data}.png"
+        return redirect(
+            url_for(
+                ".create_email_branding_government_identity_colour",
+                text=request.args.get("text"),
+                filename=form.coat_of_arms_or_insignia.data,
+            )
+        )
+
+    return render_template(
+        "views/email-branding/government-identity-options.html",
+        form=form,
+    )
+
+
+@main.route("/email-branding/create-government-identity/colour", methods=["GET", "POST"])
+@user_is_platform_admin
+def create_email_branding_government_identity_colour():
+
+    filename = request.args.get("filename")
+    if filename not in GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA:
+        abort(400)
+
+    filename = f"{filename}.png"
+    form = GovernmentIdentityColour(crest_or_insignia_image_filename=filename)
+
+    if form.validate_on_submit():
         image_file = INSIGNIA_ASSETS_PATH / filename
         upload_filename = upload_email_logo(
             email_safe(filename),
@@ -125,7 +164,7 @@ def create_email_branding_government_identity():
         )
 
     return render_template(
-        "views/email-branding/government-identity-options.html",
+        "views/email-branding/government-identity-options-colour.html",
         form=form,
     )
 
