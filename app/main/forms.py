@@ -51,6 +51,7 @@ from wtforms.validators import (
     Regexp,
 )
 
+from app.asset_fingerprinter import asset_fingerprinter
 from app.formatters import (
     format_auth_type,
     format_thousands,
@@ -2497,13 +2498,42 @@ class GovernmentIdentityOptions(StripWhitespaceForm):
 
     coat_of_arms_or_insignia = GovukRadiosField(
         "Coat of arms or insignia",
-        choices=[(name, name) for name in sorted(GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA)],
+        choices=[
+            (
+                name,
+                Markup(
+                    f"""
+                    <img
+                        src="{asset_fingerprinter.get_url(f"images/branding/insignia/{name}.png")}"
+                        alt=""
+                        class="email-branding-crest-or-insignia"
+                    >
+                    {name}
+                """
+                ),
+            )
+            for name in sorted(GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA)
+        ],
         validators=[DataRequired()],
     )
 
     colour = GovukRadiosField(
         "Colour for stripe",
-        choices=[(item["colour"], item["name"]) for item in GOVERNMENT_IDENTITY_SYSTEM_COLOURS],
+        choices=[
+            (
+                item["colour"],
+                Markup(
+                    f"""
+                    <span
+                        class="email-branding-coloured-stripe"
+                        style="background: {item["colour"]};"
+                    ></span>
+                    {item["name"]}
+                """
+                ),
+            )
+            for item in GOVERNMENT_IDENTITY_SYSTEM_COLOURS
+        ],
         validators=[DataRequired()],
     )
 
