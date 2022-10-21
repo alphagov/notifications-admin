@@ -18,6 +18,7 @@ EVENT_SCHEMAS = {
         "provider_restriction",
     },  # noqa: E501 (length)
     "archive_service": {"service_id", "archived_by_id"},
+    "update_email_branding": {"email_branding_id", "updated_by_id", "old_email_branding"},
 }
 
 
@@ -55,6 +56,10 @@ def create_broadcast_account_type_change_event(**kwargs):
 
 def create_archive_service_event(**kwargs):
     _send_event("archive_service", **kwargs)
+
+
+def create_update_email_branding_event(**kwargs):
+    _send_event("update_email_branding", **kwargs)
 
 
 def _send_event(event_type, **kwargs):

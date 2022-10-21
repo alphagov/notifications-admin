@@ -45,13 +45,25 @@ def test_get_all_email_branding(mocker):
     )
 
 
-def test_create_email_branding(mocker):
-    org_data = {"logo": "test.png", "name": "test name", "text": "test name", "colour": "red", "brand_type": "org"}
+def test_create_email_branding(mocker, fake_uuid):
+    org_data = {
+        "logo": "test.png",
+        "name": "test name",
+        "text": "test name",
+        "colour": "red",
+        "brand_type": "org",
+        "created_by": fake_uuid,
+    }
 
     mock_post = mocker.patch("app.notify_client.email_branding_client.EmailBrandingClient.post")
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
     EmailBrandingClient().create_email_branding(
-        logo=org_data["logo"], name=org_data["name"], text=org_data["text"], colour=org_data["colour"], brand_type="org"
+        logo=org_data["logo"],
+        name=org_data["name"],
+        text=org_data["text"],
+        colour=org_data["colour"],
+        brand_type="org",
+        created_by_id=org_data["created_by"],
     )
 
     mock_post.assert_called_once_with(url="/email-branding", data=org_data)
@@ -60,7 +72,14 @@ def test_create_email_branding(mocker):
 
 
 def test_update_email_branding(mocker, fake_uuid):
-    org_data = {"logo": "test.png", "name": "test name", "text": "test name", "colour": "red", "brand_type": "org"}
+    org_data = {
+        "logo": "test.png",
+        "name": "test name",
+        "text": "test name",
+        "colour": "red",
+        "brand_type": "org",
+        "updated_by": fake_uuid,
+    }
 
     mock_post = mocker.patch("app.notify_client.email_branding_client.EmailBrandingClient.post")
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
@@ -71,6 +90,7 @@ def test_update_email_branding(mocker, fake_uuid):
         text=org_data["text"],
         colour=org_data["colour"],
         brand_type="org",
+        updated_by_id=org_data["updated_by"],
     )
 
     mock_post.assert_called_once_with(url="/email-branding/{}".format(fake_uuid), data=org_data)
