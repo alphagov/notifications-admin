@@ -156,7 +156,7 @@ pyexcel-xls==0.7.0
     # via -r requirements.in
 pyexcel-xlsx==0.6.0
     # via -r requirements.in
-pyjwt==2.4.0
+pyjwt==2.6.0
     # via notifications-python-client
 pyparsing==3.0.9
     # via packaging
