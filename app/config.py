@@ -70,7 +70,7 @@ class Config(object):
     ANTIVIRUS_ENABLED = True
 
     REDIS_URL = os.environ.get("REDIS_URL")
-    REDIS_ENABLED = True
+    REDIS_ENABLED = False if os.environ.get("REDIS_ENABLED") == "0" else True
 
     ASSET_DOMAIN = ""
     ASSET_PATH = "/static/"
@@ -91,6 +91,8 @@ class Config(object):
         ],
     }
 
+    NOTIFY_RUNTIME_PLATFORM = os.environ.get("NOTIFY_RUNTIME_PLATFORM", "paas")
+
 
 class Development(Config):
     NOTIFY_LOG_PATH = "application.log"
@@ -106,9 +108,9 @@ class Development(Config):
     PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "development-letters-precompiled-originals-backup"
 
     ADMIN_CLIENT_SECRET = "dev-notify-secret-key"
-    API_HOST_NAME = "http://localhost:6011"
     DANGEROUS_SALT = "dev-notify-salt"
     SECRET_KEY = "dev-notify-secret-key"
+    API_HOST_NAME = os.environ.get("API_HOST_NAME", "http://localhost:6011")
     ANTIVIRUS_API_HOST = "http://localhost:6016"
     ANTIVIRUS_API_KEY = "test-key"
     ANTIVIRUS_ENABLED = os.getenv("ANTIVIRUS_ENABLED") == "1"
@@ -117,6 +119,7 @@ class Development(Config):
 
     REDIS_URL = "redis://localhost:6379/0"
     REDIS_ENABLED = os.environ.get("REDIS_ENABLED") == "1"
+    NOTIFY_RUNTIME_PLATFORM = "local"
 
 
 class Test(Development):
