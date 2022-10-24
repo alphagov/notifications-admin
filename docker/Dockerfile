@@ -1,7 +1,6 @@
 FROM ghcr.io/alphagov/notify/unit-tests-image:python39-node16x-npm831 as frontend-build
 
 ARG NOTIFY_ENVIRONMENT=development
-ENV NOTIFY_ENVIRONMENT $NOTIFY_ENVIRONMENT
 
 WORKDIR /usr/frontend
 COPY app app
