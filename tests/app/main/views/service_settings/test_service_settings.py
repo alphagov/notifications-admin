@@ -3458,7 +3458,7 @@ def test_should_show_branding_styles(
     assert "checked" not in branding_style_choices[4].attrs
     assert "checked" not in branding_style_choices[5].attrs
 
-    app.models.branding.AllEmailBranding.client_method.assert_called_once_with()
+    app.email_branding_client.get_all_email_branding.assert_called_once_with()
     app.service_api_client.get_service.assert_called_once_with(service_one["id"])
 
 

@@ -1748,7 +1748,7 @@ def test_organisation_email_branding_page_is_not_accessible_by_non_platform_admi
     "default_email_branding, expected_branding_options",
     (
         [None, {"GOV.UK (default)", "Email branding name 1", "Email branding name 2"}],
-        ["email-branding-2-id", {"Email branding name 2 (default)", "Email branding name 1"}],
+        ["2", {"Email branding name 2 (default)", "Email branding name 1"}],
     ),
 )
 def test_organisation_email_branding_page_shows_all_branding_pool_options(
@@ -2198,15 +2198,15 @@ def test_add_organisation_email_branding_options_shows_branding_not_in_branding_
             "brand_type": "org",
         },
         {
-            "logo": "logo3.png",
-            "name": "org 3",
+            "logo": "logo4.png",
+            "name": "org 4",
             "text": None,
-            "id": "3",
+            "id": "4",
             "colour": None,
             "brand_type": "org",
         },
     ]
-    mocker.patch("app.models.branding.EmailBrandingPool.client_method", return_value=branding_pool)
+    mocker.patch("app.organisations_client.get_email_branding_pool", return_value=branding_pool)
 
     client_request.login(platform_admin_user)
     page = client_request.get(".add_organisation_email_branding_options", org_id=organisation_one["id"])
@@ -2218,7 +2218,7 @@ def test_add_organisation_email_branding_options_shows_branding_not_in_branding_
         for checkbox in page.select(".govuk-checkboxes__item")
     ] == [
         ("org 2", "2", False),
-        ("org 4", "4", False),
+        ("org 3", "3", False),
         ("org 5", "5", False),
     ]
     assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add options"

@@ -2404,7 +2404,7 @@ def mock_get_all_email_branding(mocker):
         return create_email_brandings(5, non_standard_values=non_standard_values, shuffle=shuffle)
 
     return mocker.patch(
-        "app.models.branding.AllEmailBranding.client_method",
+        "app.notify_client.email_branding_client.email_branding_client.get_all_email_branding",
         side_effect=_get_all_email_branding,
     )
 
@@ -2430,7 +2430,7 @@ def mock_get_all_letter_branding(mocker):
             },
         ]
 
-    return mocker.patch("app.models.branding.AllLetterBranding.client_method", side_effect=_get_letter_branding)
+    return mocker.patch("app.letter_branding_client.get_all_letter_branding", side_effect=_get_letter_branding)
 
 
 @pytest.fixture
@@ -2500,7 +2500,7 @@ def mock_get_email_branding_pool(mocker):
     def _get_email_branding_pool(org_id):
         return create_email_branding_pool()
 
-    return mocker.patch("app.models.branding.EmailBrandingPool.client_method", side_effect=_get_email_branding_pool)
+    return mocker.patch("app.organisations_client.get_email_branding_pool", side_effect=_get_email_branding_pool)
 
 
 @pytest.fixture(scope="function")
@@ -2508,15 +2508,15 @@ def mock_get_empty_email_branding_pool(mocker):
     def _get_email_branding_pool(org_id):
         return []
 
-    return mocker.patch("app.models.branding.EmailBrandingPool.client_method", side_effect=_get_email_branding_pool)
+    return mocker.patch("app.organisations_client.get_email_branding_pool", side_effect=_get_email_branding_pool)
 
 
 @pytest.fixture(scope="function")
 def mock_get_email_branding(mocker, fake_uuid):
     def _get_email_branding(id):
-        return create_email_branding(id)
+        return create_email_branding(fake_uuid)
 
-    return mocker.patch("app.models.branding.email_branding_client.get_email_branding", side_effect=_get_email_branding)
+    return mocker.patch("app.email_branding_client.get_email_branding", side_effect=_get_email_branding)
 
 
 @pytest.fixture(scope="function")

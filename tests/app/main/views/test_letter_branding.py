@@ -427,7 +427,6 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     mocker,
     client_request,
     platform_admin_user,
-    mock_get_all_letter_branding,
     fake_uuid,
 ):
     with client_request.session_transaction() as session:

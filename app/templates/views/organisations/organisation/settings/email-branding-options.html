@@ -21,7 +21,7 @@
 
     <!-- display default branding and it's preview -->
     <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
-      {{ current_org.email_branding.name }}<span class="hint govuk-!-font-weight-regular">&ensp;(default)</span>
+      {{ current_org.email_branding_name }}<span class="hint govuk-!-font-weight-regular">&ensp;(default)</span>
     </h2>
 
     {% if show_use_govuk_as_default_link %}
@@ -40,7 +40,7 @@
 
     <!--display the email-branding-pool options and the preview for each one -->
 
-    {% for option in current_org.email_branding_pool_excluding_default %}
+    {% for option in email_branding_pool_options %}
       <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
         {{ option.name }}
       </h2>

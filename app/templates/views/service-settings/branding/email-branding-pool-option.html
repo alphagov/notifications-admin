@@ -20,10 +20,10 @@
   {{ page_header('Change email branding') }}
 
   <p class="govuk-body">
-    If you confirm, your emails will come with {{ chosen_branding.name }} branding.
+    If you confirm, your emails will come with {{ chosen_branding_name }} branding.
   </p>
 
-  {{ email_branding_preview(chosen_branding.id) }}
+  {{ email_branding_preview(chosen_branding_id) }}
 
 
   {% call form_wrapper() %}
