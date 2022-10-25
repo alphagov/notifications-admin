@@ -1,7 +1,9 @@
 from flask import current_app, redirect, render_template, session, url_for
+from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import email_branding_client
+from app.event_handlers import create_update_email_branding_event
 from app.main import main
 from app.main.forms import AdminEditEmailBrandingForm, SearchByNameForm
 from app.s3_client.s3_logo_client import (
@@ -61,6 +63,10 @@ def update_email_branding(branding_id, logo=None):
                 text=form.text.data,
                 colour=form.colour.data,
                 brand_type=form.brand_type.data,
+                updated_by_id=current_user.id,
+            )
+            create_update_email_branding_event(
+                email_branding_id=branding_id, updated_by_id=str(current_user.id), old_email_branding=email_branding
             )
         except HTTPError as e:
             if e.status_code == 400 and "name" in e.response.json().get("message", {}):
@@ -114,6 +120,7 @@ def create_email_branding(logo=None):
                 text=form.text.data,
                 colour=form.colour.data,
                 brand_type=form.brand_type.data,
+                created_by_id=current_user.id,
             )
         except HTTPError as e:
             if e.status_code == 400 and "name" in e.response.json().get("message", {}):

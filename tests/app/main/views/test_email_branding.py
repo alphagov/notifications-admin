@@ -93,7 +93,12 @@ def test_create_new_email_branding_without_logo(
 
     assert mock_create_email_branding.called
     assert mock_create_email_branding.call_args == call(
-        logo=data["logo"], name=data["name"], text=data["text"], colour=data["colour"], brand_type=data["brand_type"]
+        logo=data["logo"],
+        name=data["name"],
+        text=data["text"],
+        colour=data["colour"],
+        brand_type=data["brand_type"],
+        created_by_id=fake_uuid,
     )
     assert mock_persist.call_args_list == []
 
@@ -211,6 +216,7 @@ def test_create_new_email_branding_when_branding_saved(
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
+        created_by_id=fake_uuid,
     )
 
 
@@ -259,12 +265,24 @@ def test_deletes_previous_temp_logo_after_uploading_logo(
 
 
 def test_update_existing_branding(
-    client_request, platform_admin_user, mocker, fake_uuid, mock_get_email_branding, mock_update_email_branding
+    client_request,
+    platform_admin_user,
+    mocker,
+    fake_uuid,
+    mock_get_email_branding,
+    mock_update_email_branding,
 ):
     with client_request.session_transaction() as session:
         user_id = session["user_id"]
 
-    data = {"logo": "test.png", "colour": "#0000ff", "text": "new text", "name": "new name", "brand_type": "both"}
+    data = {
+        "logo": "test.png",
+        "colour": "#0000ff",
+        "text": "new text",
+        "name": "new name",
+        "brand_type": "both",
+        "updated_by_id": user_id,
+    }
 
     temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename=data["logo"]
@@ -272,6 +290,9 @@ def test_update_existing_branding(
 
     mocker.patch("app.main.views.email_branding.persist_logo")
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+    mock_create_update_email_branding_event = mocker.patch(
+        "app.main.views.email_branding.create_update_email_branding_event"
+    )
 
     client_request.login(platform_admin_user)
     client_request.post(
@@ -298,7 +319,15 @@ def test_update_existing_branding(
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
+        updated_by_id=data["updated_by_id"],
     )
+    assert mock_create_update_email_branding_event.call_args_list == [
+        mocker.call(
+            email_branding_id=fake_uuid,
+            updated_by_id=user_id,
+            old_email_branding=mock_get_email_branding(fake_uuid)["email_branding"],
+        )
+    ]
 
 
 def test_updatee_email_branding_with_unique_name_conflict(
