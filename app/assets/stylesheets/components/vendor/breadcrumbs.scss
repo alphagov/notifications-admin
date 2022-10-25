@@ -29,7 +29,6 @@
 //
 
 .breadcrumbs {
-  @include govuk-width-container;
   @include govuk-font(16, $line-height: (25 / 16));
 
   padding: govuk-spacing(2) 0;
