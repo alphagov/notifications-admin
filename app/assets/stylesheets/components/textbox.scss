@@ -14,7 +14,7 @@
   &-background,
   &-foreground,
   &-mask {
-    font-size: 19px;
+    @include govuk-font(19);
     display: block;
     box-sizing: border-box;
     position: relative;
