@@ -101,21 +101,23 @@
       {% call row() %}
         {{ text_field('Email branding options') }}
         {% set email_branding_html %}
-          <div {% if current_org.email_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
-            {{ current_org.email_branding.name }}
+          <div {% if other_email_branding_options %}class="govuk-!-margin-bottom-3"{% endif %}>
+            {{ default_email_branding_name }}
             <br>
             <div class="table-field-status-default">
               Default
             </div>
           </div>
 
-          {% for item in current_org.email_branding_pool_excluding_default %}
-            {% if loop.first %}<ul>{% endif %}
+          {% if other_email_branding_options %}
+            <ul>
+            {% for item in other_email_branding_options %}
               <li>
-                {{ item.name }}
+                {{ item }}
               </li>
-            {% if loop.last %}</ul>{% endif %}
-          {% endfor %}
+            {% endfor %}
+            </ul>
+          {% endif %}
         {% endset %}
         {% call field() %}
           {{ email_branding_html }}
@@ -130,7 +132,7 @@
       {% call row() %}
         {{ text_field('Default letter branding') }}
         {{ optional_text_field(
-          current_org.letter_branding.name if current_org.letter_branding else None,
+          current_org.letter_branding.name,
           default='No branding'
         ) }}
         {{ edit_field(

@@ -5,7 +5,6 @@ from notifications_python_client.errors import HTTPError
 from app import letter_branding_client
 from app.main import main
 from app.main.forms import AdminEditLetterBrandingForm, SearchByNameForm, SVGFileUpload
-from app.models.branding import AllLetterBranding, LetterBranding
 from app.s3_client.s3_logo_client import (
     LETTER_TEMP_TAG,
     delete_letter_temp_file,
@@ -21,10 +20,11 @@ from app.utils.user import user_is_platform_admin
 @main.route("/letter-branding", methods=["GET"])
 @user_is_platform_admin
 def letter_branding():
+
+    brandings = letter_branding_client.get_all_letter_branding()
+
     return render_template(
-        "views/letter-branding/select-letter-branding.html",
-        letter_brandings=AllLetterBranding(),
-        search_form=SearchByNameForm(),
+        "views/letter-branding/select-letter-branding.html", letter_brandings=brandings, search_form=SearchByNameForm()
     )
 
 
@@ -32,17 +32,17 @@ def letter_branding():
 @main.route("/letter-branding/<uuid:branding_id>/edit/<path:logo>", methods=["GET", "POST"])
 @user_is_platform_admin
 def update_letter_branding(branding_id, logo=None):
-    letter_branding = LetterBranding.from_id(branding_id)
+    letter_branding = letter_branding_client.get_letter_branding(branding_id)
 
     file_upload_form = SVGFileUpload()
     letter_branding_details_form = AdminEditLetterBrandingForm(
-        name=letter_branding.name,
+        name=letter_branding["name"],
     )
 
     file_upload_form_submitted = file_upload_form.file.data
     details_form_submitted = request.form.get("operation") == "branding-details"
 
-    logo = logo or permanent_letter_logo_name(letter_branding.filename, "svg")
+    logo = logo if logo else permanent_letter_logo_name(letter_branding["filename"], "svg")
 
     if file_upload_form_submitted and file_upload_form.validate_on_submit():
         upload_filename = upload_letter_temp_logo(
@@ -61,7 +61,7 @@ def update_letter_branding(branding_id, logo=None):
         db_filename = letter_filename_for_db(logo, session["user_id"])
 
         try:
-            if db_filename == letter_branding.filename:
+            if db_filename == letter_branding["filename"]:
 
                 letter_branding_client.update_letter_branding(
                     branding_id=branding_id,
@@ -90,8 +90,8 @@ def update_letter_branding(branding_id, logo=None):
             # we had a problem saving the file - rollback the db changes
             letter_branding_client.update_letter_branding(
                 branding_id=branding_id,
-                filename=letter_branding.filename,
-                name=letter_branding.name,
+                filename=letter_branding["filename"],
+                name=letter_branding["name"],
             )
             file_upload_form.file.errors = ["Error saving uploaded file - try uploading again"]
 
