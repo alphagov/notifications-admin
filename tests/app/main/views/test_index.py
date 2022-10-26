@@ -348,7 +348,7 @@ def test_font_preload(
 
     preload_tags = page.select('link[rel=preload][as=font][type="font/woff2"][crossorigin]')
 
-    assert len(preload_tags) == 4, "Run `npm run build` to copy fonts into app/static/fonts/"
+    assert len(preload_tags) == 2, "Run `npm run build` to copy fonts into app/static/fonts/"
 
     for element in preload_tags:
         assert element["href"].startswith("https://static.example.com/fonts/")
