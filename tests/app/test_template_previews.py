@@ -6,6 +6,7 @@ import pytest
 from notifications_utils.template import LetterPreviewTemplate
 
 from app import load_service_before_request
+from app.models.branding import LetterBranding
 from app.template_previews import (
     TemplatePreview,
     get_page_count_for_letter,
@@ -53,7 +54,8 @@ def test_from_utils_template_calls_through(
     ],
 )
 @pytest.mark.parametrize(
-    "letter_branding, expected_filename", [({"filename": "hm-government"}, "hm-government"), (None, None)]
+    "letter_branding, expected_filename",
+    [(LetterBranding({"filename": "hm-government"}), "hm-government"), (LetterBranding.from_id(None), None)],
 )
 def test_from_database_object_makes_request(
     mocker,
