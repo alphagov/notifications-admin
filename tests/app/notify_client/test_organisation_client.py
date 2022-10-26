@@ -273,3 +273,19 @@ def test_remove_email_branding_from_organisation_pool(mocker):
 
     assert mock_redis_delete.call_args_list == [call(f"organisation-{org_id}-email-branding-pool")]
     mock_delete.assert_called_with(f"/organisations/{org_id}/email-branding-pool/{branding_id}")
+
+
+def test_get_letter_branding_pool(mocker):
+    mock_redis_set = mocker.patch("app.extensions.RedisClient.set")
+    mock_get = mocker.patch(
+        "app.notify_client.organisations_api_client.OrganisationsClient.get",
+        return_value={"data": {"filename": "gov.svg"}},
+    )
+
+    org_id = "abcd-1234"
+    organisations_client.get_letter_branding_pool(org_id)
+
+    mock_redis_set.assert_called_once_with(
+        f"organisation-{org_id}-letter-branding-pool", '{"filename": "gov.svg"}', ex=604800
+    )
+    mock_get.assert_called_with(url=f"/organisations/{org_id}/letter-branding-pool")
