@@ -9,6 +9,12 @@ from app import current_service
 
 
 class TemplatePreview:
+    @staticmethod
+    def get_allowed_headers(headers):
+        header_allowlist = {"content-type", "cache-control"}
+        allowed_headers = {header: value for header, value in headers.items() if header.lower() in header_allowlist}
+        return allowed_headers.items()
+
     @classmethod
     def from_database_object(cls, template, filetype, values=None, page=None):
         data = {
@@ -26,35 +32,33 @@ class TemplatePreview:
             json=data,
             headers={"Authorization": "Token {}".format(current_app.config["TEMPLATE_PREVIEW_API_KEY"])},
         )
-        return (resp.content, resp.status_code, resp.headers.items())
+        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
     @classmethod
     def from_valid_pdf_file(cls, pdf_file, page):
         pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)
 
-        response = requests.post(
+        resp = requests.post(
             "{}/precompiled-preview.png{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"], "?hide_notify=true" if page == "1" else ""
             ),
             data=base64.b64encode(pdf_page).decode("utf-8"),
             headers={"Authorization": "Token {}".format(current_app.config["TEMPLATE_PREVIEW_API_KEY"])},
         )
-
-        return (response.content, response.status_code, response.headers.items())
+        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
     @classmethod
     def from_invalid_pdf_file(cls, pdf_file, page):
         pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)
 
-        response = requests.post(
+        resp = requests.post(
             "{}/precompiled/overlay.png{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"], "?page_number={}".format(page)
             ),
             data=pdf_page,
             headers={"Authorization": "Token {}".format(current_app.config["TEMPLATE_PREVIEW_API_KEY"])},
         )
-
-        return (response.content, response.status_code, response.headers.items())
+        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
     @classmethod
     def from_example_template(cls, template, filename):
@@ -69,7 +73,7 @@ class TemplatePreview:
             json=data,
             headers={"Authorization": "Token {}".format(current_app.config["TEMPLATE_PREVIEW_API_KEY"])},
         )
-        return (resp.content, resp.status_code, resp.headers.items())
+        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
     @classmethod
     def from_utils_template(cls, template, filetype, page=None):
