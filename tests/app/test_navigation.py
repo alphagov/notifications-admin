@@ -115,6 +115,8 @@ EXCLUDED_ENDPOINTS = tuple(
             "edit_user_mobile_number",
             "edit_user_permissions",
             "email_branding",
+            "email_branding_create_government_identity_logo",
+            "email_branding_enter_government_identity_logo_text",
             "email_branding_govuk",
             "email_branding_govuk_and_org",
             "email_branding_nhs",

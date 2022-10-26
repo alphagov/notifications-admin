@@ -1,0 +1,48 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/button/macro.njk" import govukButton %}
+{% from "components/branding-preview.html" import email_branding_preview %}
+
+{% block service_page_title %}
+  Create a government identity logo
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Create a government identity logo') }}
+
+  {{ email_branding_preview('__NONE__') }}
+
+  <p class="govuk-body">
+    A government identity logo is made up of:
+    <ul class="govuk-list govuk-list--bullet">
+      <li>text, usually the organisation name</li>
+      <li>a symbol, for example the Royal Coat of Arms</li>
+      <li>a coloured line</li>
+    </ul>
+  </p>
+
+  <p class="govuk-body">
+    You will need to enter the text that will appear in the logo.
+  </p>
+  <p class="govuk-body">
+    We will select the appropriate symbol and coloured line for you.
+  </p>
+  <p class="govuk-body">
+    It can take up to 1 working day for us to create a new logo.
+  </p>
+
+  {{ govukButton({
+    "element": "a",
+    "text": "Continue",
+    "href": url_for('.email_branding_enter_government_identity_logo_text', service_id=service_id)
+  }) }}
+
+{% endblock %}
