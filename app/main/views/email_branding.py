@@ -65,7 +65,9 @@ def update_email_branding(branding_id, logo=None):
                 updated_by_id=current_user.id,
             )
             create_update_email_branding_event(
-                email_branding_id=branding_id, updated_by_id=str(current_user.id), old_email_branding=email_branding
+                email_branding_id=branding_id,
+                updated_by_id=str(current_user.id),
+                old_email_branding=email_branding.serialize(),
             )
         except HTTPError as e:
             if e.status_code == 400 and "name" in e.response.json().get("message", {}):

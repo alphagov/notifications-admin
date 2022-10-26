@@ -40,6 +40,9 @@ class EmailBranding(Branding):
     def is_govuk(self):
         return self.id is None
 
+    def serialize(self):
+        return self._dict.copy()
+
 
 class LetterBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {"filename"}
