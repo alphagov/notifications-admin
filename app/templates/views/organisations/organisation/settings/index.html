@@ -141,6 +141,16 @@
         }}
       {% endcall %}
       {% call row() %}
+        {{ text_field('Letter branding options') }}
+        {{ optional_text_field(letter_branding_pool_names, default="None") }}
+        {{ edit_field(
+            'Change',
+            url_for('.organisation_letter_branding', org_id=current_org.id),
+            suffix='letter branding options for the organisation'
+            )
+        }}
+      {% endcall %}
+      {% call row() %}
         {{ text_field('Known email domains') }}
         {{ optional_text_field(current_org.domains or None, default='None') }}
         {{ edit_field(

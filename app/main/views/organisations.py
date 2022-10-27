@@ -283,7 +283,10 @@ def cancel_invited_org_user(org_id, invited_user_id):
 @main.route("/organisations/<uuid:org_id>/settings/", methods=["GET"])
 @user_is_platform_admin
 def organisation_settings(org_id):
-    return render_template("views/organisations/organisation/settings/index.html")
+    letter_branding_pool_names = [option.name for option in current_organisation.letter_branding_pool]
+    return render_template(
+        "views/organisations/organisation/settings/index.html", letter_branding_pool_names=letter_branding_pool_names
+    )
 
 
 @main.route("/organisations/<uuid:org_id>/settings/edit-name", methods=["GET", "POST"])
