@@ -2278,6 +2278,28 @@ def test_add_organisation_email_branding_options_calls_api_client_with_chosen_br
     mock_update_pool.assert_called_once_with(organisation_one["id"], branding_ids_added)
 
 
+def test_organisation_letter_branding_is_platform_admin_only(client_request, organisation_one, mock_get_organisation):
+    client_request.get("main.organisation_letter_branding", org_id=organisation_one["id"], _expected_status=403)
+
+
+def test_organisation_letter_branding_page_shows_all_branding_pool_options(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+    mock_get_letter_branding_pool,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get("main.organisation_letter_branding", org_id=organisation_one["id"])
+
+    assert page.h1.text == "Letter branding"
+    assert [normalize_spaces(heading.text) for heading in page.select(".govuk-heading-s")] == [
+        "Cabinet Office",
+        "Department for Education",
+        "Government Digital Service",
+    ]
+
+
 def test_organisation_settings_links_to_edit_organisation_billing_details_page(
     mocker,
     mock_get_organisation,

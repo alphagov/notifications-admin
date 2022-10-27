@@ -621,6 +621,14 @@ def organisation_preview_letter_branding(org_id):
     )
 
 
+@main.route("/organisations/<uuid:org_id>/settings/letter-branding", methods=["GET"])
+@user_is_platform_admin
+def organisation_letter_branding(org_id):
+    return render_template(
+        "views/organisations/organisation/settings/letter-branding-options.html",
+    )
+
+
 @main.route("/organisations/<uuid:org_id>/settings/edit-organisation-domains", methods=["GET", "POST"])
 @user_is_platform_admin
 def edit_organisation_domains(org_id):

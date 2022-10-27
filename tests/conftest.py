@@ -2446,6 +2446,30 @@ def mock_get_letter_branding_by_id(mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_get_letter_branding_pool(mocker):
+    def _get_branding_pool(org_id):
+        return [
+            {
+                "id": "1234",
+                "name": "Cabinet Office",
+                "filename": "co",
+            },
+            {
+                "id": "5678",
+                "name": "Department for Education",
+                "filename": "dfe",
+            },
+            {
+                "id": "9abc",
+                "name": "Government Digital Service",
+                "filename": "gds",
+            },
+        ]
+
+    return mocker.patch("app.models.branding.LetterBrandingPool.client_method", side_effect=_get_branding_pool)
+
+
+@pytest.fixture(scope="function")
 def mock_no_email_branding(mocker):
     def _get_email_branding():
         return []
