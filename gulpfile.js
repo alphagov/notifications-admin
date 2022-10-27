@@ -65,6 +65,7 @@ const copy = {
         'details',
         'button',
         'error-message',
+        'error-summary',
         'fieldset',
         'hint',
         'label',
