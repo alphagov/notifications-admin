@@ -68,7 +68,7 @@ def test_from_database_object_makes_request(
     # `service` is in the `_request_ctx_stack` to avoid an error
     load_service_before_request()
 
-    resp = Mock(content="a", status_code="b", headers={"c": "d"})
+    resp = Mock(content="a", status_code="b", headers={"content-type": "image/png"})
     request_mock = mocker.patch("app.template_previews.requests.post", return_value=resp)
     mocker.patch("app.template_previews.current_service", letter_branding=letter_branding)
     template = mock_get_service_letter_template("123", "456")["data"]
@@ -77,7 +77,7 @@ def test_from_database_object_makes_request(
 
     assert ret[0] == "a"
     assert ret[1] == "b"
-    assert list(ret[2]) == [("c", "d")]
+    assert list(ret[2]) == [("content-type", "image/png")]
 
     data = {
         "letter_contact_block": None,
@@ -100,12 +100,13 @@ def test_from_database_object_makes_request(
 def test_from_valid_pdf_file_makes_request(mocker, page_number, expected_url):
     mocker.patch("app.template_previews.extract_page_from_pdf", return_value=b"pdf page")
     request_mock = mocker.patch(
-        "app.template_previews.requests.post", return_value=Mock(content="a", status_code="b", headers={"c": "d"})
+        "app.template_previews.requests.post",
+        return_value=Mock(content="a", status_code="b", headers={"content-type": "image/png"}),
     )
 
     response = TemplatePreview.from_valid_pdf_file(b"pdf file", page_number)
 
-    assert response == ("a", "b", {"c": "d"}.items())
+    assert response == ("a", "b", {"content-type": "image/png"}.items())
     request_mock.assert_called_once_with(
         expected_url,
         data=base64.b64encode(b"pdf page").decode("utf-8"),
@@ -116,12 +117,13 @@ def test_from_valid_pdf_file_makes_request(mocker, page_number, expected_url):
 def test_from_invalid_pdf_file_makes_request(mocker):
     mocker.patch("app.template_previews.extract_page_from_pdf", return_value=b"pdf page")
     request_mock = mocker.patch(
-        "app.template_previews.requests.post", return_value=Mock(content="a", status_code="b", headers={"c": "d"})
+        "app.template_previews.requests.post",
+        return_value=Mock(content="a", status_code="b", headers={"content-type": "image/png"}),
     )
 
     response = TemplatePreview.from_invalid_pdf_file(b"pdf file", "1")
 
-    assert response == ("a", "b", {"c": "d"}.items())
+    assert response == ("a", "b", {"content-type": "image/png"}.items())
     request_mock.assert_called_once_with(
         "http://localhost:9999/precompiled/overlay.png?page_number=1",
         data=b"pdf page",
