@@ -21,8 +21,6 @@ from werkzeug.exceptions import abort
 from app import (
     current_organisation,
     current_service,
-    email_branding_client,
-    letter_branding_client,
     org_invite_api_client,
     organisations_client,
 )
@@ -51,7 +49,7 @@ from app.main.views.dashboard import (
     get_tuples_of_financial_years,
     requested_and_current_financial_year,
 )
-from app.main.views.service_settings import get_branding_as_value_and_label
+from app.models.branding import AllEmailBranding, AllLetterBranding
 from app.models.organisation import AllOrganisations, Organisation
 from app.models.user import InvitedOrgUser, User
 from app.s3_client.s3_mou_client import get_mou
@@ -285,18 +283,7 @@ def cancel_invited_org_user(org_id, invited_user_id):
 @main.route("/organisations/<uuid:org_id>/settings/", methods=["GET"])
 @user_is_platform_admin
 def organisation_settings(org_id):
-    default_email_branding_name = current_organisation.email_branding_name
-    other_email_branding_options = [
-        email_branding_name
-        for email_branding_name in current_organisation.email_branding_pool_names
-        if email_branding_name != default_email_branding_name
-    ]
-
-    return render_template(
-        "views/organisations/organisation/settings/index.html",
-        default_email_branding_name=default_email_branding_name,
-        other_email_branding_options=other_email_branding_options,
-    )
+    return render_template("views/organisations/organisation/settings/index.html")
 
 
 @main.route("/organisations/<uuid:org_id>/settings/edit-name", methods=["GET", "POST"])
@@ -406,15 +393,13 @@ def _handle_remove_branding(remove_branding_id) -> Optional[Response]:
     or has clicked to confirm that flash message.
     """
     try:
-        remove_branding = next(
-            filter(lambda x: x["id"] == remove_branding_id, current_organisation.email_branding_pool)
-        )
-    except StopIteration:
+        remove_branding = current_organisation.email_branding_pool.get_item_by_id(remove_branding_id)
+    except current_organisation.email_branding_pool.NotFound:
         abort(400, f"Invalid email branding ID {remove_branding_id} for {current_organisation}")
 
     if request.method == "POST":
         organisations_client.remove_email_branding_from_pool(current_organisation.id, remove_branding_id)
-        confirmation_message = f'Email branding ‘{remove_branding["name"]}’ removed.'
+        confirmation_message = f"Email branding ‘{remove_branding.name}’ removed."
         flash(confirmation_message, "default_with_tick")
         return redirect(url_for("main.organisation_email_branding", org_id=current_organisation.id))
 
@@ -422,7 +407,7 @@ def _handle_remove_branding(remove_branding_id) -> Optional[Response]:
         confirmation_question = Markup(
             render_template(
                 "partials/flash_messages/email_branding_confirm_remove_brand.html",
-                branding_name=remove_branding["name"],
+                branding_name=remove_branding.name,
             )
         )
 
@@ -452,7 +437,7 @@ def _handle_change_default_branding_to_govuk(is_central_government) -> Optional[
         return redirect(url_for("main.organisation_email_branding", org_id=current_organisation.id))
 
     else:
-        current_brand = current_organisation.email_branding_name
+        current_brand = current_organisation.email_branding.name
         confirmation_question = Markup(
             render_template(
                 "partials/flash_messages/email_branding_confirm_change_default_to_govuk.html",
@@ -475,10 +460,8 @@ def _handle_change_default_branding(form, new_default_branding_id) -> Optional[R
 
     def __get_email_branding_name(branding_id):
         try:
-            return next(brand for brand in current_organisation.email_branding_pool if brand["id"] == branding_id)[
-                "name"
-            ]
-        except StopIteration:
+            return current_organisation.email_branding_pool.get_item_by_id(branding_id).name
+        except current_organisation.email_branding_pool.NotFound:
             current_app.logger.info(
                 f"Email branding ID {branding_id} is not present in organisation {current_organisation.name}'s "
                 f"email branding pool."
@@ -538,13 +521,6 @@ def _handle_change_default_branding(form, new_default_branding_id) -> Optional[R
 @main.route("/organisations/<uuid:org_id>/settings/email-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def organisation_email_branding(org_id):
-    # We want to display email branding options apart from an option that has already been set as the default
-    email_branding_pool_options = [
-        {"name": option["name"], "id": option["id"]}
-        for option in current_organisation.email_branding_pool
-        if option["name"] != current_organisation.email_branding_name
-    ]
-
     is_central_government = current_organisation.organisation_type == Organisation.TYPE_CENTRAL
     remove_branding_id = request.args.get("remove_branding_id")
     change_default_branding_to_govuk = "change_default_branding_to_govuk" in request.args
@@ -567,7 +543,6 @@ def organisation_email_branding(org_id):
 
     return render_template(
         "views/organisations/organisation/settings/email-branding-options.html",
-        email_branding_pool_options=email_branding_pool_options,
         form=form,
         show_use_govuk_as_default_link=show_use_govuk_as_default_link,
     )
@@ -579,9 +554,8 @@ def add_organisation_email_branding_options(org_id):
     form = AddEmailBrandingOptionsForm()
 
     form.branding_field.choices = [
-        (branding["id"], branding["name"])
-        for branding in email_branding_client.get_all_email_branding(sort_key="name")
-        if branding not in current_organisation.email_branding_pool
+        (branding.id, branding.name)
+        for branding in sorted(AllEmailBranding().excluding(*current_organisation.email_branding_pool.ids))
     ]
 
     if form.validate_on_submit():
@@ -607,10 +581,8 @@ def add_organisation_email_branding_options(org_id):
 @main.route("/organisations/<uuid:org_id>/settings/set-letter-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def edit_organisation_letter_branding(org_id):
-    letter_branding = letter_branding_client.get_all_letter_branding()
-
     form = AdminSetLetterBrandingForm(
-        all_branding_options=get_branding_as_value_and_label(letter_branding),
+        all_branding_options=AllLetterBranding().as_id_and_name,
         current_branding=current_organisation.letter_branding_id,
     )
 

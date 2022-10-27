@@ -6,6 +6,7 @@ from app import email_branding_client
 from app.event_handlers import create_update_email_branding_event
 from app.main import main
 from app.main.forms import AdminEditEmailBrandingForm, SearchByNameForm
+from app.models.branding import AllEmailBranding, EmailBranding
 from app.s3_client.s3_logo_client import (
     TEMP_TAG,
     delete_email_temp_file,
@@ -20,10 +21,8 @@ from app.utils.user import user_is_platform_admin
 @main.route("/email-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def email_branding():
-    brandings = email_branding_client.get_all_email_branding(sort_key="name")
-
     return render_template(
-        "views/email-branding/select-branding.html", email_brandings=brandings, search_form=SearchByNameForm()
+        "views/email-branding/select-branding.html", email_brandings=AllEmailBranding(), search_form=SearchByNameForm()
     )
 
 
@@ -31,16 +30,16 @@ def email_branding():
 @main.route("/email-branding/<uuid:branding_id>/edit/<logo>", methods=["GET", "POST"])
 @user_is_platform_admin
 def update_email_branding(branding_id, logo=None):
-    email_branding = email_branding_client.get_email_branding(branding_id)["email_branding"]
+    email_branding = EmailBranding.from_id(branding_id)
 
     form = AdminEditEmailBrandingForm(
-        name=email_branding["name"],
-        text=email_branding["text"],
-        colour=email_branding["colour"],
-        brand_type=email_branding["brand_type"],
+        name=email_branding.name,
+        text=email_branding.text,
+        colour=email_branding.colour,
+        brand_type=email_branding.brand_type,
     )
 
-    logo = logo if logo else email_branding.get("logo") if email_branding else None
+    logo = logo or email_branding.logo
 
     if form.validate_on_submit():
         if form.file.data:
@@ -66,7 +65,9 @@ def update_email_branding(branding_id, logo=None):
                 updated_by_id=current_user.id,
             )
             create_update_email_branding_event(
-                email_branding_id=branding_id, updated_by_id=str(current_user.id), old_email_branding=email_branding
+                email_branding_id=branding_id,
+                updated_by_id=str(current_user.id),
+                old_email_branding=email_branding.serialize(),
             )
         except HTTPError as e:
             if e.status_code == 400 and "name" in e.response.json().get("message", {}):

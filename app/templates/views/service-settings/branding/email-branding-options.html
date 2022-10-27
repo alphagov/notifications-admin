@@ -22,7 +22,7 @@
   {{ page_header('Change email branding') }}
 
   <p class="govuk-body">
-    Your emails currently have {{ branding_name }} branding.
+    Your emails currently have {{ current_service.email_branding.name }} branding.
   </p>
 
   {{ email_branding_preview(

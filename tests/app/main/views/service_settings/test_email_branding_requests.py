@@ -4,7 +4,7 @@ import pytest
 from flask import url_for
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app.utils.branding import NHS_EMAIL_BRANDING_ID
+from app.models.branding import EmailBranding
 from tests import sample_uuid
 from tests.conftest import (
     ORGANISATION_ID,
@@ -46,7 +46,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
     assert [
         (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
         for radio in page.select("input[type=radio]")
-    ] == [(NHS_EMAIL_BRANDING_ID, "NHS"), ("something_else", "Something else")]
+    ] == [(EmailBranding.NHS_ID, "NHS"), ("something_else", "Something else")]
 
     assert button_text == "Continue"
 
@@ -57,7 +57,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
         (
             "nhs_central",
             [
-                (NHS_EMAIL_BRANDING_ID, "NHS"),
+                (EmailBranding.NHS_ID, "NHS"),
                 ("email-branding-1-id", "Email branding name 1"),
                 ("email-branding-2-id", "Email branding name 2"),
                 ("something_else", "Something else"),
@@ -128,11 +128,11 @@ def test_email_branding_request_does_not_show_nhs_branding_twice(
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
-    nhs_branding = create_email_branding(NHS_EMAIL_BRANDING_ID, {"colour": None, "name": "NHS", "text": None})[
+    nhs_branding = create_email_branding(EmailBranding.NHS_ID, {"colour": None, "name": "NHS", "text": None})[
         "email_branding"
     ]
     updated_branding_pool = create_email_branding_pool(additional_values=nhs_branding)
-    mocker.patch("app.organisations_client.get_email_branding_pool", return_value=updated_branding_pool)
+    mocker.patch("app.models.branding.EmailBrandingPool.client_method", return_value=updated_branding_pool)
 
     page = client_request.get(".email_branding_request", service_id=SERVICE_ONE_ID)
 
@@ -140,7 +140,7 @@ def test_email_branding_request_does_not_show_nhs_branding_twice(
         (radio["value"], page.select_one(f'label[for={radio["id"]}]').text.strip())
         for radio in page.select("input[type=radio]")
     ] == [
-        (NHS_EMAIL_BRANDING_ID, "NHS"),
+        (EmailBranding.NHS_ID, "NHS"),
         ("email-branding-1-id", "Email branding name 1"),
         ("email-branding-2-id", "Email branding name 2"),
         ("something_else", "Something else"),
@@ -177,7 +177,6 @@ def test_email_branding_request_page_redirects_nhs_specific_page(
     mocker,
     service_one,
     client_request,
-    mock_get_email_branding,
     organisation_one,
 ):
     service_one["organisation"] = organisation_one["id"]
@@ -187,11 +186,11 @@ def test_email_branding_request_page_redirects_nhs_specific_page(
     )
 
     mocker.patch(
-        "app.organisations_client.get_email_branding_pool",
+        "app.models.branding.EmailBrandingPool.client_method",
         return_value=[
             {
                 "name": "NHS",
-                "id": NHS_EMAIL_BRANDING_ID,
+                "id": EmailBranding.NHS_ID,
             },
         ],
     )
@@ -199,7 +198,7 @@ def test_email_branding_request_page_redirects_nhs_specific_page(
     client_request.post(
         ".email_branding_request",
         service_id=SERVICE_ONE_ID,
-        _data={"options": NHS_EMAIL_BRANDING_ID},
+        _data={"options": EmailBranding.NHS_ID},
         _expected_redirect=url_for(
             "main.email_branding_nhs",
             service_id=SERVICE_ONE_ID,
@@ -376,7 +375,7 @@ def test_email_branding_request_page_back_link(
         ),
         (
             {
-                "options": NHS_EMAIL_BRANDING_ID,
+                "options": EmailBranding.NHS_ID,
             },
             "nhs_local",
             "main.email_branding_nhs",
@@ -470,7 +469,7 @@ def test_email_branding_description_pages_for_org_branding(
     "endpoint, service_org_type, branding_preview_id",
     [
         ("main.email_branding_govuk", "central", "__NONE__"),
-        ("main.email_branding_nhs", "nhs_local", NHS_EMAIL_BRANDING_ID),
+        ("main.email_branding_nhs", "nhs_local", EmailBranding.NHS_ID),
     ],
 )
 def test_email_branding_govuk_and_nhs_pages(
@@ -675,7 +674,7 @@ def test_email_branding_nhs_submit(
 
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        email_branding=NHS_EMAIL_BRANDING_ID,
+        email_branding=EmailBranding.NHS_ID,
     )
     assert page.h1.text == "Settings"
     assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your email branding"

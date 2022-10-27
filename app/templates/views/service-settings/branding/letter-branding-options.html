@@ -22,7 +22,7 @@
   {{ page_header('Change letter branding') }}
 
   <p class="govuk-body">
-    Your letters currently have {{ branding_name }} branding.
+    Your letters currently have {{ current_service.letter_branding.name }} branding.
   </p>
 
   {% call form_wrapper() %}
