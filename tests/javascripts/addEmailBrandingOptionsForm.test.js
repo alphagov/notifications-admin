@@ -1,16 +1,16 @@
   const helpers = require('./support/helpers');
 
 beforeAll(() => {
-  require('../../app/assets/javascripts/addEmailBrandingOptionsForm.js');
+  require('../../app/assets/javascripts/addBrandingOptionsForm.js');
 });
 
 afterAll(() => {
   require('./support/teardown.js');
 });
 
-describe('AddEmailBrandingOptionsForm', () => {
+describe('AddBrandingOptionsForm', () => {
 
-  let addEmailBrandingOptionsForm;
+  let addBrandingOptionsForm;
   let formControls;
   let visibleCounter;
   let hiddenCounter;
@@ -18,7 +18,7 @@ describe('AddEmailBrandingOptionsForm', () => {
   beforeEach(() => {
 
     const htmlFragment = `
-      <form method="post" autocomplete="off" data-notify-module="add-email-branding-options-form" novalidate="">
+      <form method="post" autocomplete="off" data-notify-module="add-branding-options-form" novalidate="">
         <div class="brand-pool">
           <div class="govuk-form-group">
             <fieldset class="govuk-fieldset" id="branding_field">
@@ -61,7 +61,7 @@ describe('AddEmailBrandingOptionsForm', () => {
 
     document.body.innerHTML = htmlFragment;
 
-    addEmailBrandingOptionsForm = document.querySelector('form[data-notify-module=add-email-branding-options-form]');
+    addBrandingOptionsForm = document.querySelector('form[data-notify-module=add-branding-options-form]');
 
   });
 
@@ -71,8 +71,8 @@ describe('AddEmailBrandingOptionsForm', () => {
 
   });
 
-  function getEmailBrandingOptionsCheckboxes () {
-    return addEmailBrandingOptionsForm.querySelectorAll('input[type=checkbox]');
+  function getBrandingOptionsCheckboxes () {
+    return addBrandingOptionsForm.querySelectorAll('input[type=checkbox]');
   };
 
   function getVisibleCounter () {
@@ -90,7 +90,7 @@ describe('AddEmailBrandingOptionsForm', () => {
       // start module
       window.GOVUK.notifyModules.start();
 
-      formControls = addEmailBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
+      formControls = addBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
       visibleCounter = getVisibleCounter();
 
     });
@@ -136,19 +136,19 @@ describe('AddEmailBrandingOptionsForm', () => {
 
     describe("When some branding options are selected", () => {
 
-      let EmailBrandingOptionsCheckboxes;
+      let BrandingOptionsCheckboxes;
 
       beforeEach(() => {
 
         // start module
         window.GOVUK.notifyModules.start();
 
-        EmailBrandingOptionsCheckboxes = getEmailBrandingOptionsCheckboxes();
+        BrandingOptionsCheckboxes = getBrandingOptionsCheckboxes();
 
-        formControls = addEmailBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
+        formControls = addBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
 
-        helpers.triggerEvent(EmailBrandingOptionsCheckboxes[0], 'click');
-        helpers.triggerEvent(EmailBrandingOptionsCheckboxes[2], 'click');
+        helpers.triggerEvent(BrandingOptionsCheckboxes[0], 'click');
+        helpers.triggerEvent(BrandingOptionsCheckboxes[2], 'click');
 
       });
 
@@ -173,7 +173,7 @@ describe('AddEmailBrandingOptionsForm', () => {
 
           helpers.triggerEvent(clearLink, 'click');
 
-          const checkedCheckboxes = Array.from(EmailBrandingOptionsCheckboxes).filter(checkbox => checkbox.checked);
+          const checkedCheckboxes = Array.from(BrandingOptionsCheckboxes).filter(checkbox => checkbox.checked);
 
           expect(checkedCheckboxes.length === 0).toBe(true);
 
@@ -183,7 +183,7 @@ describe('AddEmailBrandingOptionsForm', () => {
 
           helpers.triggerEvent(clearLink, 'click');
 
-          const firstCheckbox = EmailBrandingOptionsCheckboxes[0];
+          const firstCheckbox = BrandingOptionsCheckboxes[0];
 
           expect(document.activeElement).toBe(firstCheckbox);
 
