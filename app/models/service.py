@@ -590,6 +590,10 @@ class Service(JSONModel):
         return self.organisation.email_branding_pool
 
     @property
+    def letter_branding_pool(self):
+        return self.organisation.letter_branding_pool
+
+    @property
     def can_use_govuk_branding(self):
         return self.organisation_type == Organisation.TYPE_CENTRAL and not self.organisation.email_branding
 
