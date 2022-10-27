@@ -1,6 +1,6 @@
 [flake8]
 # Rule definitions: http://flake8.pycqa.org/en/latest/user/error-codes.html
-exclude = venv*,__pycache__,node_modules,cache
+exclude = venv*,__pycache__,node_modules,cache,vendor
 max-complexity = 14
 max-line-length = 120
 
