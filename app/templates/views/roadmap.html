@@ -31,7 +31,8 @@
   <ul class="govuk-list govuk-list--bullet">
 
     <li>Let services upload their own logo for emails and letters</li>
-    <li>Start to <a class="govuk-link govuk-link--no-visited-state" href="https://gds.blog.gov.uk/2022/07/12/why-weve-decided-to-decommission-gov-uk-paas-platform-as-a-service/">replace GOV.UK Paas</a> by migrating our database to <a class="govuk-link govuk-link--no-visited-state" href="https://aws.amazon.com/ecs/">Amazon ECS</a></li>
+    <li>Start to <a class="govuk-link govuk-link--no-visited-state" href="https://gds.blog.gov.uk/2022/07/12/why-weve-decided-to-decommission-gov-uk-paas-platform-as-a-service/">migrate our database from GOV.UK PaaS</a> to one hosted using <a class="govuk-link govuk-link--no-visited-state" href="https://aws.amazon.com/rds/">Amazon RDS</a></li>
+    <li>Migrate one of our applications from GOV.UK PaaS to <a class="govuk-link govuk-link--no-visited-state" href="https://aws.amazon.com/ecs/">Amazon ECS</a></li>
     <li>Make it quicker and easier to turn off <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.trial_mode')}}">trial mode restrictions</a></li>
     <li>Let services choose their own two-factor authentication method</li>
     <li>Let services <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.features_sms') }}#receive">receive text messages</a> without having to contact the Notify team first</li>
