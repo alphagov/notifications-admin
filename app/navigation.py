@@ -339,6 +339,7 @@ class OrgNavigation(Navigation):
         "settings": {
             "archive_organisation",
             "add_organisation_email_branding_options",
+            "add_organisation_letter_branding_options",
             "edit_organisation_agreement",
             "edit_organisation_billing_details",
             "edit_organisation_crown_status",

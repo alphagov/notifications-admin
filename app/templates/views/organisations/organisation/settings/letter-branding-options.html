@@ -1,5 +1,6 @@
 {% extends "org_template.html" %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
 {%  from "components/branding-preview.html" import letter_branding_preview %}
 
@@ -20,5 +21,16 @@
     </h2>
     {{ letter_branding_preview(option.id) }}
   {% endfor %}
+
+  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-4" />
+
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ page_footer(
+        button_text='Add branding options',
+        secondary_button=True,
+        secondary_button_url=url_for('.add_organisation_letter_branding_options', org_id=current_org.id)
+      )
+    }}
+  </div>
 
 {% endblock %}

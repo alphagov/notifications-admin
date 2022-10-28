@@ -1,3 +1,5 @@
+from uuid import UUID
+
 import pytest
 from flask import url_for
 from freezegun import freeze_time
@@ -2334,6 +2336,129 @@ def test_organisation_letter_branding_page_shows_all_branding_pool_options(
         "Department for Education",
         "Government Digital Service",
     ]
+
+    add_options_button = page.select(".govuk-button--secondary")[-1]
+    assert normalize_spaces(add_options_button.text) == "Add branding options"
+    assert add_options_button.attrs["href"] == url_for(
+        ".add_organisation_letter_branding_options", org_id=organisation_one["id"]
+    )
+
+
+def test_add_organisation_letter_branding_options_is_platform_admin_only(
+    client_request,
+    organisation_one,
+    mock_get_organisation,
+):
+    client_request.get(
+        "main.add_organisation_letter_branding_options", org_id=organisation_one["id"], _expected_status=403
+    )
+
+
+def test_add_organisation_letter_branding_options_shows_branding_not_in_branding_pool(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+    mock_get_letter_branding_pool,
+):
+    # The first 3 items in all_letter_branding are in the pool, the last 2 are not
+    all_letter_branding = [
+        {
+            "id": "1234",
+            "name": "Cabinet Office",
+            "filename": "co",
+        },
+        {
+            "id": "5678",
+            "name": "Department for Education",
+            "filename": "dfe",
+        },
+        {
+            "id": "9abc",
+            "name": "Government Digital Service",
+            "filename": "gds",
+        },
+        {
+            "id": "abcd",
+            "name": "Land Registry",
+            "filename": "land-registry",
+        },
+        {
+            "id": "efgh",
+            "name": "Animal and Plant Health Agency",
+            "filename": "apha",
+        },
+    ]
+    mocker.patch("app.models.branding.AllLetterBranding.client_method", return_value=all_letter_branding)
+
+    client_request.login(platform_admin_user)
+    page = client_request.get(".add_organisation_letter_branding_options", org_id=organisation_one["id"])
+    assert page.h1.text == "Add letter branding options"
+    assert page.select_one("[data-notify-module=live-search]")["data-targets"] == (".govuk-checkboxes__item")
+
+    assert [
+        (checkbox.text.strip(), checkbox.input["value"], checkbox.input.has_attr("checked"))
+        for checkbox in page.select(".govuk-checkboxes__item")
+    ] == [
+        ("Animal and Plant Health Agency", "efgh", False),
+        ("Land Registry", "abcd", False),
+    ]
+    assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add options"
+
+
+def test_add_organisation_letter_branding_options_shows_error_if_no_branding_selected(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+    mock_get_all_letter_branding,
+    mock_get_letter_branding_pool,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        ".add_organisation_letter_branding_options",
+        org_id=organisation_one["id"],
+        _data=[],
+        _expected_status=200,
+    )
+    assert (
+        normalize_spaces(page.select_one(".govuk-error-message").text)
+        == "Error: Select at least 1 letter branding option"
+    )
+
+
+@pytest.mark.parametrize(
+    "branding_ids_added, flash_message",
+    [
+        ([str(UUID(int=0)), str(UUID(int=1))], "2 letter branding options added"),
+        ([str(UUID(int=0))], "1 letter branding option added"),
+    ],
+)
+def test_add_organisation_letter_branding_options_calls_api_client_with_chosen_branding(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mocker,
+    mock_get_organisation,
+    mock_get_all_letter_branding,
+    mock_get_letter_branding_pool,
+    branding_ids_added,
+    flash_message,
+):
+    mock_update_pool = mocker.patch("app.organisations_client.add_brandings_to_letter_branding_pool")
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        ".add_organisation_letter_branding_options",
+        org_id=organisation_one["id"],
+        _data={"branding_field": branding_ids_added},
+        _follow_redirects=True,
+    )
+
+    assert page.h1.text == "Letter branding"
+    assert normalize_spaces(page.find("div", class_="banner-default-with-tick").text) == flash_message
+    mock_update_pool.assert_called_once_with(organisation_one["id"], branding_ids_added)
 
 
 def test_organisation_settings_links_to_edit_organisation_billing_details_page(

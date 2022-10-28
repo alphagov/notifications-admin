@@ -1,0 +1,35 @@
+{% extends "org_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/live-search.html" import live_search %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+
+{% block org_page_title %}
+  Add letter branding options
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.organisation_settings', org_id=current_org.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header("Add letter branding options") }}
+  {{ live_search(target_selector='.govuk-checkboxes__item', show=True, form=search_form, autofocus=True) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {% call form_wrapper(module='add-branding-options-form') %}
+        <div class="brand-pool">
+            {{ form.branding_field }}
+        </div>
+      <div class="js-stick-at-bottom-when-scrolling">
+        {{ page_footer('Add options') }}
+        <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite">
+          Nothing selected
+        </div>
+      </div>
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

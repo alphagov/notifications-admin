@@ -24,6 +24,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "add_organisation_email_branding_options",
             "add_organisation_from_gp_service",
             "add_organisation_from_nhs_local_service",
+            "add_organisation_letter_branding_options",
             "add_service",
             "add_service_template",
             "api_callbacks",

@@ -1785,6 +1785,14 @@ class AddEmailBrandingOptionsForm(StripWhitespaceForm):
     )
 
 
+class AddLetterBrandingOptionsForm(StripWhitespaceForm):
+    branding_field = GovukCheckboxesField(
+        "Branding options",
+        validators=[DataRequired(message="Select at least 1 letter branding option")],
+        param_extensions={"fieldset": {"legend": {"classes": "govuk-visually-hidden"}}},
+    )
+
+
 class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
     def __init__(self, *args, org_name, service_name, **kwargs):
         super().__init__(*args, **kwargs)
