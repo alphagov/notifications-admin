@@ -3718,6 +3718,53 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
         )
 
 
+def test_email_branding_create_government_identity_logo(client_request, service_one):
+    page = client_request.get("main.email_branding_create_government_identity_logo", service_id=service_one["id"])
+
+    expected_href = (
+        "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings"
+        "/email-branding/create-government-identity-logo/enter-text"
+    )
+    back_button = page.find("a", text="Back")
+    continue_button = page.find("a", href=expected_href)
+
+    assert back_button["href"] == "#"  # TODO: update this when we know the right back link
+    assert "Continue" in continue_button.text
+
+
+def test_GET_email_branding_enter_government_identity_logo_text(client_request, service_one):
+    page = client_request.get("main.email_branding_enter_government_identity_logo_text", service_id=service_one["id"])
+
+    back_button = page.find("a", text="Back")
+    form = page.find("form")
+    submit_button = form.find("button")
+    text_input = form.find("input")
+
+    assert back_button["href"] == url_for(
+        "main.email_branding_create_government_identity_logo", service_id=service_one["id"]
+    )
+    assert form["method"] == "post"
+    assert "Request new branding" in submit_button.text
+    assert text_input["name"] == "logo_text"
+
+
+def test_POST_email_branding_enter_government_identity_logo_text(mocker, client_request, service_one):
+    mock_send_ticket_to_zendesk = mocker.patch(
+        "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
+        autospec=True,
+    )
+    mock_flash = mocker.patch("app.main.views.service_settings.flash", autospec=True)
+
+    client_request.post(
+        "main.email_branding_enter_government_identity_logo_text",
+        service_id=service_one["id"],
+        _data={"logo_text": "My lovely government identity"},
+    )
+
+    assert "Thanks for your branding request." in mock_flash.call_args_list[0][0][0]
+    assert mock_send_ticket_to_zendesk.call_count == 1
+
+
 @pytest.mark.parametrize("method", ["get", "post"])
 @pytest.mark.parametrize(
     "endpoint",

@@ -12,6 +12,7 @@ import Header from 'govuk-frontend/components/header/header';
 import Details from 'govuk-frontend/components/details/details';
 import Button from 'govuk-frontend/components/button/button';
 import Radios from 'govuk-frontend/components/radios/radios';
+import ErrorSummary from 'govuk-frontend/components/error-summary/error-summary';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -57,6 +58,9 @@ function initAll (options) {
   nodeListForEach($radios, function ($radio) {
     new Radios($radio).init()
   })
+
+  var $errorSummary = scope.querySelector('[data-module="error-summary"]')
+  new ErrorSummary($errorSummary).init()
 }
 
 // Create separate namespace for GOVUK Frontend.

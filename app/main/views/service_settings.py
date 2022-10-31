@@ -49,6 +49,7 @@ from app.main.forms import (
     ChooseEmailBrandingForm,
     ChooseLetterBrandingForm,
     EstimateUsageForm,
+    GovernmentIdentityLogoForm,
     RenameServiceForm,
     SearchByNameForm,
     ServiceBroadcastAccountTypeForm,
@@ -81,6 +82,8 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict(
         ("international_letters", {"title": "Send international letters", "requires": "letter"}),
     ]
 )
+
+THANKS_FOR_BRANDING_REQUEST_MESSAGE = "Thanks for your branding request. We’ll get back to you within one working day."
 
 
 @main.route("/services/<uuid:service_id>/service-settings")
@@ -1221,7 +1224,7 @@ def email_branding_govuk_and_org(service_id):
     if request.method == "POST":
         create_email_branding_zendesk_ticket("govuk_and_org")
 
-        flash("Thanks for your branding request. We’ll get back to you within one working day.", "default")
+        flash(THANKS_FOR_BRANDING_REQUEST_MESSAGE, "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template("views/service-settings/branding/email-branding-govuk-org.html")
@@ -1251,7 +1254,7 @@ def email_branding_organisation(service_id):
     if request.method == "POST":
         create_email_branding_zendesk_ticket("organisation")
 
-        flash("Thanks for your branding request. We’ll get back to you within one working day.", "default")
+        flash(THANKS_FOR_BRANDING_REQUEST_MESSAGE, "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template("views/service-settings/branding/email-branding-organisation.html")
@@ -1265,13 +1268,63 @@ def email_branding_something_else(service_id):
     if form.validate_on_submit():
         create_email_branding_zendesk_ticket("something_else", detail=form.something_else.data)
 
-        flash("Thanks for your branding request. We’ll get back to you within one working day.", "default")
+        flash(THANKS_FOR_BRANDING_REQUEST_MESSAGE, "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
         "views/service-settings/branding/email-branding-something-else.html",
         form=form,
         branding_options=ChooseEmailBrandingForm(current_service),
+    )
+
+
+@main.route(
+    "/services/<uuid:service_id>/service-settings/email-branding/create-government-identity-logo",
+    methods=["GET"],
+)
+@user_has_permissions("manage_service")
+def email_branding_create_government_identity_logo(service_id):
+    return render_template(
+        "views/service-settings/branding/email-branding-create-government-identity-logo.html",
+        service_id=service_id,
+        # TODO: Uncomment after https://github.com/alphagov/notifications-admin/pull/4401 merged
+        # back_link=url_for(
+        #     ".add_email_branding_choose_logo", service_id=service_id
+        # ),
+    )
+
+
+@main.route(
+    "/services/<uuid:service_id>/service-settings/email-branding/create-government-identity-logo/enter-text",
+    methods=["GET", "POST"],
+)
+@user_has_permissions("manage_service")
+def email_branding_enter_government_identity_logo_text(service_id):
+    form = GovernmentIdentityLogoForm(organisation=current_service.organisation)
+
+    if form.validate_on_submit():
+        ticket_message = render_template(
+            "support-tickets/government-logo-branding-request.txt",
+            logo_text=form.logo_text.data,
+        )
+        ticket = NotifySupportTicket(
+            subject=f"Email branding request - {current_service.name}",
+            message=ticket_message,
+            ticket_type=NotifySupportTicket.TYPE_TASK,
+            user_name=current_user.name,
+            user_email=current_user.email_address,
+            org_id=current_service.organisation_id,
+            org_type=current_service.organisation_type,
+            service_id=current_service.id,
+        )
+        zendesk_client.send_ticket_to_zendesk(ticket)
+        flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
+        return redirect(url_for(".service_settings", service_id=current_service.id))
+
+    return render_template(
+        "views/service-settings/branding/email-branding-enter-government-identity-logo-text.html",
+        form=form,
+        back_link=url_for(".email_branding_create_government_identity_logo", service_id=service_id),
     )
 
 
@@ -1298,7 +1351,7 @@ def letter_branding_request(service_id):
             service_id=current_service.id,
         )
         zendesk_client.send_ticket_to_zendesk(ticket)
-        flash(("Thanks for your branding request. We’ll get back to you " "within one working day."), "default")
+        flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
         return redirect(
             url_for(".view_template", service_id=current_service.id, template_id=from_template)
             if from_template

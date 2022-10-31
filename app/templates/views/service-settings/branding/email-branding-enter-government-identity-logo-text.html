@@ -1,0 +1,30 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/branding-preview.html" import email_branding_preview %}
+{% from "components/textbox.html" import textbox %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block service_page_title %}
+  Enter the text that will appear in your logo
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% if form.logo_text.errors %}
+    {% set params = {"titleText": "There is a problem", "errorList": [{"href": "#" + form.logo_text.id, "text": form.logo_text.errors[0]}]} %}
+    {{ govukErrorSummary(params) }}
+  {% endif %}
+
+  {% call form_wrapper() %}
+    {{ form.logo_text }}
+    {{ page_footer('Request new branding') }}
+  {% endcall %}
+
+{% endblock %}
