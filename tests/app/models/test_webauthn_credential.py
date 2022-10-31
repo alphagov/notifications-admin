@@ -3,6 +3,7 @@ import base64
 import pytest
 from fido2 import cbor
 from fido2.cose import ES256
+from fido2.webauthn import Aaguid
 
 from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 
@@ -33,7 +34,8 @@ def test_from_registration_verifies_response(webauthn_dev_server):
 
     credential_data = credential.to_credential_data()
     assert type(credential_data.credential_id) is bytes
-    assert type(credential_data.aaguid) is bytes
+    assert type(credential_data.aaguid) is Aaguid
+    assert isinstance(credential_data.aaguid, bytes)
     assert credential_data.public_key[3] == ES256.ALGORITHM
 
 

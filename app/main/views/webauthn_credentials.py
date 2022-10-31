@@ -1,6 +1,5 @@
 from fido2 import cbor
-from fido2.client import ClientData
-from fido2.ctap2 import AuthenticatorData
+from fido2.webauthn import AuthenticatorData, CollectedClientData
 from flask import abort, current_app, flash, redirect, request, session, url_for
 from flask_login import current_user
 
@@ -119,7 +118,7 @@ def _verify_webauthn_authentication(user):
             state=state,
             credentials=user.webauthn_credentials.as_cbor,
             credential_id=request_data["credentialId"],
-            client_data=ClientData(request_data["clientDataJSON"]),
+            client_data=CollectedClientData(request_data["clientDataJSON"]),
             auth_data=AuthenticatorData(request_data["authenticatorData"]),
             signature=request_data["signature"],
         )
