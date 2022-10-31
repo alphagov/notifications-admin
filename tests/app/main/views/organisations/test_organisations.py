@@ -901,7 +901,12 @@ def test_organisation_settings_platform_admin_only(client_request, mock_get_orga
 
 
 def test_organisation_settings_for_platform_admin(
-    client_request, platform_admin_user, mock_get_organisation, mock_get_empty_email_branding_pool, organisation_one
+    client_request,
+    platform_admin_user,
+    mock_get_organisation,
+    mock_get_empty_email_branding_pool,
+    mock_get_empty_letter_branding_pool,
+    organisation_one,
 ):
     expected_rows = [
         "Label Value Action",
@@ -917,6 +922,7 @@ def test_organisation_settings_for_platform_admin(
         "Notes None Change the notes for the organisation",
         "Email branding options GOV.UK Default Change email branding options for the organisation",
         "Default letter branding No branding Change default letter branding for the organisation",
+        "Letter branding options None Change letter branding options for the organisation",
         "Known email domains None Change known email domains for the organisation",
     ]
 
@@ -936,6 +942,7 @@ def test_organisation_settings_table_shows_email_branding_pool(
     platform_admin_user,
     mock_get_organisation,
     mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
     organisation_one,
 ):
     client_request.login(platform_admin_user)
@@ -952,10 +959,33 @@ def test_organisation_settings_table_shows_email_branding_pool(
     )
 
 
+def test_organisation_settings_table_shows_letter_branding_pool(
+    client_request,
+    platform_admin_user,
+    mock_get_organisation,
+    mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
+    organisation_one,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
+
+    email_branding_options_row = page.select("tr")[10]
+
+    assert normalize_spaces(email_branding_options_row.text) == (
+        "Letter branding options "
+        "Cabinet Office "
+        "Department for Education "
+        "Government Digital Service "
+        "Change letter branding options for the organisation"
+    )
+
+
 def test_organisation_settings_table_shows_email_branding_pool_non_govuk_default(
     client_request,
     mocker,
     mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
     mock_get_email_branding,
     platform_admin_user,
     organisation_one,
@@ -994,6 +1024,7 @@ def test_organisation_settings_table_shows_email_branding_pool_govuk_default(
     platform_admin_user,
     mock_get_organisation,
     mock_get_empty_email_branding_pool,
+    mock_get_letter_branding_pool,
     organisation_one,
 ):
     client_request.login(platform_admin_user)
@@ -1012,6 +1043,7 @@ def test_organisation_settings_shows_delete_link(
     organisation_one,
     mock_get_organisation,
     mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
@@ -1029,6 +1061,7 @@ def test_organisation_settings_does_not_show_delete_link_for_archived_organisati
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
     mocker,
 ):
     organisation_one["active"] = False
@@ -1054,6 +1087,7 @@ def test_archive_organisation_prompts_user(
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
     mocker,
 ):
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
@@ -1122,6 +1156,7 @@ def test_archive_organisation_does_not_allow_orgs_with_team_members_or_services_
     organisation_one,
     mock_get_organisation,
     mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
     mock_get_users_for_organisation,
     mock_get_invited_users_for_organisation,
     mocker,
@@ -1656,6 +1691,7 @@ def test_organisation_settings_links_to_edit_organisation_notes_page(
     mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
     organisation_one,
     client_request,
     platform_admin_user,
@@ -2278,10 +2314,33 @@ def test_add_organisation_email_branding_options_calls_api_client_with_chosen_br
     mock_update_pool.assert_called_once_with(organisation_one["id"], branding_ids_added)
 
 
+def test_organisation_letter_branding_is_platform_admin_only(client_request, organisation_one, mock_get_organisation):
+    client_request.get("main.organisation_letter_branding", org_id=organisation_one["id"], _expected_status=403)
+
+
+def test_organisation_letter_branding_page_shows_all_branding_pool_options(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+    mock_get_letter_branding_pool,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get("main.organisation_letter_branding", org_id=organisation_one["id"])
+
+    assert page.h1.text == "Letter branding"
+    assert [normalize_spaces(heading.text) for heading in page.select(".govuk-heading-s")] == [
+        "Cabinet Office",
+        "Department for Education",
+        "Government Digital Service",
+    ]
+
+
 def test_organisation_settings_links_to_edit_organisation_billing_details_page(
     mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
     organisation_one,
     client_request,
     platform_admin_user,

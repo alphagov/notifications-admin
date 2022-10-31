@@ -4,7 +4,12 @@ from flask import abort
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList, SerialisedModelCollection
-from app.models.branding import EmailBranding, EmailBrandingPool, LetterBranding
+from app.models.branding import (
+    EmailBranding,
+    EmailBrandingPool,
+    LetterBranding,
+    LetterBrandingPool,
+)
 from app.notify_client.organisations_api_client import organisations_client
 
 
@@ -186,6 +191,14 @@ class Organisation(JSONModel):
     @cached_property
     def letter_branding(self):
         return LetterBranding.from_id(self.letter_branding_id)
+
+    @cached_property
+    def letter_branding_pool(self):
+        return LetterBrandingPool(self.id)
+
+    @property
+    def letter_branding_pool_excluding_default(self):
+        return self.letter_branding_pool.excluding(self.letter_branding_id)
 
     @cached_property
     def agreement_signed_by(self):

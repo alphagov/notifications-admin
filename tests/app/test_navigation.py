@@ -189,6 +189,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "organisation_dashboard",
             "organisation_download_agreement",
             "organisation_email_branding",
+            "organisation_letter_branding",
             "organisation_preview_letter_branding",
             "organisation_settings",
             "organisation_trial_mode_services",

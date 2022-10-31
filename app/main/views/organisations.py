@@ -283,7 +283,10 @@ def cancel_invited_org_user(org_id, invited_user_id):
 @main.route("/organisations/<uuid:org_id>/settings/", methods=["GET"])
 @user_is_platform_admin
 def organisation_settings(org_id):
-    return render_template("views/organisations/organisation/settings/index.html")
+    letter_branding_pool_names = [option.name for option in current_organisation.letter_branding_pool]
+    return render_template(
+        "views/organisations/organisation/settings/index.html", letter_branding_pool_names=letter_branding_pool_names
+    )
 
 
 @main.route("/organisations/<uuid:org_id>/settings/edit-name", methods=["GET", "POST"])
@@ -618,6 +621,14 @@ def organisation_preview_letter_branding(org_id):
         "views/organisations/organisation/settings/preview-letter-branding.html",
         form=form,
         action=url_for("main.organisation_preview_letter_branding", org_id=org_id),
+    )
+
+
+@main.route("/organisations/<uuid:org_id>/settings/letter-branding", methods=["GET"])
+@user_is_platform_admin
+def organisation_letter_branding(org_id):
+    return render_template(
+        "views/organisations/organisation/settings/letter-branding-options.html",
     )
 
 

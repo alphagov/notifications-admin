@@ -97,3 +97,12 @@ class EmailBrandingPool(AllEmailBranding):
 class AllLetterBranding(AllBranding):
     client_method = letter_branding_client.get_all_letter_branding
     model = LetterBranding
+
+
+class LetterBrandingPool(AllLetterBranding):
+    client_method = organisations_client.get_letter_branding_pool
+
+    def __init__(self, id):
+        self.items = tuple()
+        if id:
+            self.items = self.client_method(id)
