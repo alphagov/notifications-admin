@@ -303,3 +303,19 @@ def test_add_brandings_to_letter_branding_pool(mocker, fake_uuid):
         url=f"/organisations/{fake_uuid}/letter-branding-pool", data={"branding_ids": ["abcd", "efgh"]}
     )
     mock_redis_delete.assert_called_once_with(f"organisation-{fake_uuid}-letter-branding-pool")
+
+
+def test_remove_letter_branding_from_organisation_pool(mocker):
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
+    mock_delete = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.delete")
+
+    org_id = "abcd-1234"
+    branding_id = "efgh-5678"
+
+    organisations_client.remove_letter_branding_from_pool(
+        org_id=org_id,
+        branding_id=branding_id,
+    )
+
+    assert mock_redis_delete.call_args_list == [call(f"organisation-{org_id}-letter-branding-pool")]
+    mock_delete.assert_called_with(f"/organisations/{org_id}/letter-branding-pool/{branding_id}")
