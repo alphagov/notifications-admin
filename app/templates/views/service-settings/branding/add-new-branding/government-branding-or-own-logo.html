@@ -5,6 +5,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% set page_title = form.options.label %}
 
@@ -21,6 +22,15 @@
 {% block maincolumn_content %}
 
   {{ page_header(page_title) }}
+
+  {% if form.options.errors %}
+    {% set params = {
+        "titleText": "There is a problem",
+        "errorList": [{"href": "#" + form.options.id, "text": form.options.errors[0]}]
+      }
+    %}
+    {{ govukErrorSummary(params) }}
+  {% endif %}
 
   {% call form_wrapper() %}
     <fieldset class="form-group {% if form.options.errors %}form-group-error{% endif %} top-gutter">
