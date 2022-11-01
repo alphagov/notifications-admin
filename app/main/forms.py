@@ -1822,7 +1822,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
     colour = GovukTextInputField(
         "Colour",
         validators=[
-            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid color hex code (starting with #)")
+            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code, starting with #")
         ],
         param_extensions={"classes": "govuk-input--width-6", "attributes": {"data-notify-module": "colour-preview"}},
     )
@@ -2249,6 +2249,16 @@ class EmailBrandingChooseBanner(Form):
             "classes": "govuk-radios--inline",
             "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
         },
+    )
+
+
+class EmailBrandingChooseBannerColour(StripWhitespaceForm):
+    hex_colour = GovukTextInputField(
+        "Choose a colour for your banner",
+        validators=[
+            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code, starting with #"),
+            DataRequired(),
+        ],
     )
 
 

@@ -1,0 +1,42 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
+
+{% block service_page_title %}
+  {{ form.hex_colour.label.text }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% if form.hex_colour.errors %}
+    {% set params = {"titleText": "There is a problem", "errorList": [{"href": "#" + form.hex_colour.id, "text": form.hex_colour.errors[0]}]} %}
+    {{ govukErrorSummary(params) }}
+  {% endif %}
+
+  {% call form_wrapper() %}
+    {{
+      form.hex_colour(
+        param_extensions={
+          "label": {
+              "isPageHeading": True,
+              "classes": "govuk-label--l",
+          },
+          "hint": {"html": ("Enter a hex colour code. For example, #1d70b8")},
+          "classes": "govuk-input--width-6",
+          "attributes": {"data-notify-module": "colour-preview"},
+      })
+    }}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+  <p class="govuk-body">
+    If you do not know the hex colour code, you can
+    <a class="govuk-link" href="{{ url_for(".email_branding_upload_logo", service_id=current_service.id) }}">skip this step</a>.
+  </p>
+
+{% endblock %}

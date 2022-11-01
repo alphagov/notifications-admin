@@ -49,6 +49,7 @@ from app.main.forms import (
     ChooseEmailBrandingForm,
     ChooseLetterBrandingForm,
     EmailBrandingChooseBanner,
+    EmailBrandingChooseBannerColour,
     EmailBrandingChooseLogoForm,
     EstimateUsageForm,
     GovernmentIdentityLogoForm,
@@ -1428,7 +1429,21 @@ def email_branding_upload_logo(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/choose-banner-colour", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_choose_banner_colour(service_id):
-    return "work-in-progress"
+    form = EmailBrandingChooseBannerColour()
+
+    if form.validate_on_submit():
+        return redirect(
+            url_for(".email_branding_upload_logo", service_id=service_id, banner_colour=form.hex_colour.data)
+        )
+
+    return (
+        render_template(
+            "views/service-settings/branding/add-new-branding/email-branding-choose-banner-colour.html",
+            form=form,
+            back_link=url_for(".email_branding_choose_banner_type", service_id=service_id),
+        ),
+        400 if form.errors else 200,
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=["GET", "POST"])
