@@ -20,6 +20,18 @@
         {{ option.name }}
     </h2>
     {{ letter_branding_preview(option.id) }}
+    <div class="govuk-grid-row govuk-!-margin-top-2 govuk-!-margin-bottom-6">
+      <div class="govuk-grid-column-one-half">&nbsp;
+      </div>
+      <div class="govuk-grid-column-one-half">
+        <p class="govuk-body govuk-!-text-align-right">
+          <a href="{{ url_for('main.organisation_letter_branding', org_id=current_org.id) }}?remove_branding_id={{ option.id }}"
+           class="govuk-link govuk-link govuk-link--destructive govuk-link--no-visited-state">
+            Remove <span class="govuk-visually-hidden">this branding option</span>
+          </a>
+        </p>
+      </div>
+    </div>
   {% endfor %}
 
   <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-4" />

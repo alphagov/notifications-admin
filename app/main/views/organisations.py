@@ -625,9 +625,22 @@ def organisation_preview_letter_branding(org_id):
     )
 
 
-@main.route("/organisations/<uuid:org_id>/settings/letter-branding", methods=["GET"])
+@main.route("/organisations/<uuid:org_id>/settings/letter-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def organisation_letter_branding(org_id):
+    if remove_branding_id := request.args.get("remove_branding_id"):
+        try:
+            remove_branding = current_organisation.letter_branding_pool.get_item_by_id(remove_branding_id)
+        except current_organisation.letter_branding_pool.NotFound:
+            abort(400, f"Invalid letter branding ID {remove_branding_id} for {current_organisation}")
+
+        if request.method == "GET":
+            flash(f"Are you sure you want to remove the letter brand ‘{remove_branding.name}’?", "delete")
+        else:
+            organisations_client.remove_letter_branding_from_pool(current_organisation.id, remove_branding_id)
+            flash(f"Letter branding ‘{remove_branding.name}’ removed.", "default_with_tick")
+            return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
+
     return render_template(
         "views/organisations/organisation/settings/letter-branding-options.html",
     )

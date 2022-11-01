@@ -2344,6 +2344,99 @@ def test_organisation_letter_branding_page_shows_all_branding_pool_options(
     )
 
 
+def test_organisation_letter_branding_page_shows_remove_links(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_letter_branding_pool,
+    mock_get_organisation,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(".organisation_letter_branding", org_id=organisation_one["id"])
+
+    headers_and_remove_links = page.select("h2.govuk-heading-s, .govuk-\\!-text-align-right a")
+    assert [(element.name, normalize_spaces(element.text)) for element in headers_and_remove_links] == [
+        ("h2", "Cabinet Office"),
+        ("a", "Remove this branding option"),
+        ("h2", "Department for Education"),
+        ("a", "Remove this branding option"),
+        ("h2", "Government Digital Service"),
+        ("a", "Remove this branding option"),
+    ]
+
+    assert headers_and_remove_links[1].get("href") == url_for(
+        ".organisation_letter_branding", org_id=organisation_one["id"], remove_branding_id="1234"
+    )
+    assert headers_and_remove_links[3].get("href") == url_for(
+        ".organisation_letter_branding", org_id=organisation_one["id"], remove_branding_id="5678"
+    )
+    assert headers_and_remove_links[5].get("href") == url_for(
+        ".organisation_letter_branding", org_id=organisation_one["id"], remove_branding_id="9abc"
+    )
+
+
+def test_get_organisation_letter_branding_page_with_remove_param_shows_confirmation(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_letter_branding_pool,
+    mock_get_organisation,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(
+        ".organisation_letter_branding",
+        org_id=organisation_one["id"],
+        remove_branding_id="1234",
+    )
+
+    assert "Are you sure you want to remove the letter brand ‘Cabinet Office’?" in page.text
+    assert normalize_spaces(page.select_one(".banner-dangerous form button").text) == "Yes, delete"
+
+
+def test_post_organisation_letter_branding_page_with_remove_param_calls_client_and_redirects(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_letter_branding_pool,
+    mock_get_organisation,
+    mocker,
+):
+    remove_mock = mocker.patch("app.organisations_client.remove_letter_branding_from_pool")
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        ".organisation_letter_branding",
+        org_id=organisation_one["id"],
+        remove_branding_id="1234",
+        _follow_redirects=True,
+    )
+
+    assert remove_mock.call_args_list == [mocker.call(ORGANISATION_ID, "1234")]
+
+    assert page.select_one("h1").text == "Letter branding"
+    assert "Letter branding ‘Cabinet Office’ removed." in page.text
+
+
+def test_organisation_letter_branding_page_when_branding_is_not_in_pool(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_letter_branding_pool,
+    mock_get_organisation,
+    fake_uuid,
+):
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".organisation_letter_branding",
+        org_id=organisation_one["id"],
+        remove_branding_id=fake_uuid,
+        _expected_status=400,
+    )
+
+
 def test_add_organisation_letter_branding_options_is_platform_admin_only(
     client_request,
     organisation_one,
