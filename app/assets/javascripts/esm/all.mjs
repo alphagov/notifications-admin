@@ -8,11 +8,11 @@
 // For example, `export { Frontend }` will assign `Frontend` to `window.Frontend`
 
 // GOVUK Frontend modules
-import Header from 'govuk-frontend/components/header/header';
-import Details from 'govuk-frontend/components/details/details';
-import Button from 'govuk-frontend/components/button/button';
-import Radios from 'govuk-frontend/components/radios/radios';
-import ErrorSummary from 'govuk-frontend/components/error-summary/error-summary';
+import Header from 'govuk-frontend/govuk/components/header/header';
+import Details from 'govuk-frontend/govuk/components/details/details';
+import Button from 'govuk-frontend/govuk/components/button/button';
+import Radios from 'govuk-frontend/govuk/components/radios/radios';
+import ErrorSummary from 'govuk-frontend/govuk/components/error-summary/error-summary';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';

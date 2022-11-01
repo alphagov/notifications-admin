@@ -2,8 +2,8 @@
 // https://github.com/alphagov/govuk_publishing_components/blob/master/app/assets/stylesheets/govuk_publishing_components/components/_cookie-banner.scss
 
 // component uses .govuk-body and .govuk-button classes from govuk-frontend
-@import 'core/typography';
-@import 'components/button/_button';
+@import 'govuk/core/typography';
+@import 'govuk/components/button/_button';
 
 .notify-cookie-banner__wrapper {
   @include govuk-responsive-padding(4, "top");
