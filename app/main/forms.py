@@ -104,6 +104,7 @@ def render_govuk_frontend_macro(component, params):
     Then we render that template with any params to produce just the output of that macro.
     """
     govuk_frontend_components = {
+        "radios": {"path": "govuk_frontend_jinja/components/radios/macro.html", "macro": "govukRadios"},
         "text-input": {"path": "govuk_frontend_jinja/components/input/macro.html", "macro": "govukInput"},
     }
 
@@ -768,7 +769,7 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
     if param_extensions:
         merge_jsonlike(params, param_extensions)
 
-    return Markup(render_template("components/radios/template.njk", params=params))
+    return render_govuk_frontend_macro("radios", params=params)
 
 
 class GovukCheckboxField(BooleanField):
