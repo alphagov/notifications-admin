@@ -2101,6 +2101,19 @@ class GovernmentIdentityLogoForm(StripWhitespaceForm):
         )
 
 
+class GovBrandingOrOwnLogoForm(StripWhitespaceForm):
+    branding_options = (
+        ("single_identity", "Create a government identity logo"),
+        ("org", "Upload a logo"),
+    )
+
+    options = GovukRadiosField(
+        "Choose a logo for your emails",
+        choices=branding_options,
+        validators=[DataRequired()],
+    )
+
+
 class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
     notification_type = GovukRadiosField(
         "What notification type?",

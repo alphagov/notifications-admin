@@ -804,3 +804,51 @@ def test_email_branding_something_else_submit_shows_error_if_textbox_is_empty(
     )
     assert normalize_spaces(page.h1.text) == "Describe the branding you want"
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Cannot be empty"
+
+
+def test_email_branding_choose_logo_page(client_request, service_one):
+    page = client_request.get(
+        "main.email_branding_choose_logo",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.h1.text == "Choose a logo for your emails"
+
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.email_branding_request",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert [
+        (radio["value"], page.find_all("label", {"class": "block-label", "for": f"options-{i}"})[0].text.strip())
+        for i, radio in enumerate(page.select("input[type=radio]"))
+    ] == [
+        ("single_identity", "Create a government identity logo"),
+        ("org", "Upload a logo"),
+    ]
+
+
+def test_only_central_org_services_can_see_email_branding_choose_logo_page(client_request, service_one):
+    service_one["organisation_type"] = "local"
+
+    client_request.get(
+        "main.email_branding_choose_logo",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+
+
+@pytest.mark.parametrize(
+    "selected_option, expected_endpoint",
+    [("org", ".email_branding_something_else"), ("single_identity", ".email_branding_create_government_identity_logo")],
+)
+def test_email_branding_choose_logo_redirects_to_right_page(
+    client_request, service_one, selected_option, expected_endpoint
+):
+    client_request.post(
+        ".email_branding_choose_logo",
+        service_id=SERVICE_ONE_ID,
+        _data={"options": selected_option},
+        _expected_status=302,
+        _expected_redirect=url_for(expected_endpoint, service_id=SERVICE_ONE_ID),
+    )
