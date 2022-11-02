@@ -381,7 +381,6 @@
       background: transparent;
     }
 
-    &:active:before,
     &:focus:before {
       box-shadow: inset 0px -4px $govuk-focus-text-colour, inset 0px 15px $govuk-focus-colour, inset 15px 0px $govuk-focus-colour, inset 0px -11px $govuk-focus-colour;
     }
