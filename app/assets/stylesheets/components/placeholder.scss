@@ -9,7 +9,7 @@
   border-radius: 11px;
   box-shadow: inset 0.47em 0 0 0 #FFF, inset -0.47em 0 0 0 #FFF, inset 0 -0.05em 0 0 #FFF, inset 0 0.26em 0 0 #FFF;
   .sms-message-wrapper & {
-    box-shadow: inset 0.47em 0 0 0 govuk-tint(govuk-colour("mid-grey"), 60%), inset -0.47em 0 0 0 govuk-tint(govuk-colour("mid-grey"), 60%), inset 0 -0.18em 0 0 govuk-tint(govuk-colour("mid-grey"), 60%), inset 0 0.18em 0 0 govuk-tint(govuk-colour("mid-grey"), 60%);
+    box-shadow: inset 0.47em 0 0 0 govuk-shade(govuk-colour("light-grey"), 7%), inset -0.47em 0 0 0 govuk-shade(govuk-colour("light-grey"), 7%), inset 0 -0.18em 0 0 govuk-shade(govuk-colour("light-grey"), 7%), inset 0 0.18em 0 0 govuk-shade(govuk-colour("light-grey"), 7%);
   }
 
 }
@@ -33,7 +33,7 @@
   box-shadow: inset 0.47em 0 0 0 govuk-colour("white"), inset -0.89em 0 0 0 govuk-colour("white"), inset 0 -0.16em 0 0 govuk-colour("white"), inset 0 0.16em 0 0 govuk-colour("white");
 
   .sms-message-wrapper & {
-    box-shadow: inset 0.47em 0 0 0 govuk-tint(govuk-colour("mid-grey"), 60%), inset -0.89em 0 0 0 govuk-tint(govuk-colour("mid-grey"), 60%), inset 0 -0.18em 0 0 govuk-tint(govuk-colour("mid-grey"), 60%), inset 0 0.18em 0 0 govuk-tint(govuk-colour("mid-grey"), 60%);
+    box-shadow: inset 0.47em 0 0 0 govuk-shade(govuk-colour("light-grey"), 7%), inset -0.89em 0 0 0 govuk-shade(govuk-colour("light-grey"), 7%), inset 0 -0.18em 0 0 govuk-shade(govuk-colour("light-grey"), 7%), inset 0 0.18em 0 0 govuk-shade(govuk-colour("light-grey"), 7%);
   }
 
 }
@@ -48,7 +48,7 @@
   top: 0.1em;
 
   .sms-message-wrapper & {
-    box-shadow: inset 0 -0.35em 0 0 govuk-tint(govuk-colour("mid-grey"), 60%);
+    box-shadow: inset 0 -0.35em 0 0 govuk-shade(govuk-colour("light-grey"), 7%);
   }
 
   *:focus + p & {

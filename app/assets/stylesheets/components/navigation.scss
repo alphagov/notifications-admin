@@ -29,15 +29,15 @@
     letter-spacing: 0.05em;
 
     &--training {
-      background: govuk-tint(govuk-colour("mid-grey"), 60%);
+      background: govuk-shade(govuk-colour("light-grey"), 7%);
       color: mix(govuk-colour("dark-grey"), $govuk-text-colour);
-      box-shadow: 0 -3px 0 0 govuk-tint(govuk-colour("mid-grey"), 60%);
+      box-shadow: 0 -3px 0 0 govuk-shade(govuk-colour("light-grey"), 7%);
     }
 
     &--suspended {
-      background: govuk-tint(govuk-colour("mid-grey"), 60%);
+      background: govuk-shade(govuk-colour("light-grey"), 7%);
       color: mix(govuk-colour("dark-grey"), $govuk-text-colour);
-      box-shadow: 0 -3px 0 0 govuk-tint(govuk-colour("mid-grey"), 60%);
+      box-shadow: 0 -3px 0 0 govuk-shade(govuk-colour("light-grey"), 7%);
     }
 
     &--live, &--test, &--operator {
@@ -203,14 +203,14 @@
     ol,
     ul {
       margin-top: govuk-spacing(2);
-      border-top: 1px govuk-tint(govuk-colour("mid-grey"), 60%) solid;
+      border-top: 1px govuk-shade(govuk-colour("light-grey"), 7%) solid;
     }
   }
 
   &__item {
     @include govuk-font(16);
 
-    border-bottom: 1px govuk-tint(govuk-colour("mid-grey"), 60%) solid;
+    border-bottom: 1px govuk-shade(govuk-colour("light-grey"), 7%) solid;
     display: block;
     padding: govuk-spacing(2) 0;
 
