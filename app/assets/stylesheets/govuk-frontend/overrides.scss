@@ -1,5 +1,8 @@
 // Overrides for certain GOV.UK Frontend styles to make its components match this application's design
 
+$notify-secondary-button-colour: govuk-shade(govuk-colour("light-grey"), 7%);
+$notify-secondary-button-hover-colour: govuk-shade(govuk-colour("light-grey"), 18%);
+
 // Additional padding-bottom override, following the GOV.UK Frontend spacing scale:
 // https://design-system.service.gov.uk/styles/spacing/#the-responsive-spacing-scale
 .govuk-\!-padding-bottom-12 {
@@ -50,6 +53,14 @@
 // Allow legends that contain the h1 to go full width
 .govuk-fieldset__legend.govuk-grid-column-full {
   @include govuk-grid-column(full);
+}
+
+.govuk-button--secondary {
+  background-color: $notify-secondary-button-colour;
+
+  &:hover {
+    background-color: $notify-secondary-button-hover-colour;
+  }
 }
 
 // Add override from future version of GOV.UK Frontend
