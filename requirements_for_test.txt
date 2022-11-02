@@ -1,16 +1,16 @@
 -r requirements.txt
-black==22.8.0
+black==22.10.0
 isort==5.10.1
-pytest==7.1.2
-pytest-env==0.6.2
-pytest-mock==3.8.2
-pytest-xdist==2.5.0
+pytest==7.2.0
+pytest-env==0.8.1
+pytest-mock==3.10.0
+pytest-xdist==3.0.2
 beautifulsoup4==4.11.1
 freezegun==1.2.2
 flake8==5.0.4
-flake8-bugbear==22.7.1
+flake8-bugbear==22.10.27
 flake8-print==5.0.0
-moto==3.1.2
-requests-mock==1.9.3
+moto==4.0.8
+requests-mock==1.10.0
 # used for creating manifest file locally
 jinja2-cli[yaml]==0.8.2
