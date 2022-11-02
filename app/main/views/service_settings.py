@@ -1350,6 +1350,24 @@ def email_branding_choose_logo(service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_branding_upload_logo(service_id):
+    pass
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/name-logo", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_branding_name_logo(service_id):
+    pass
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo/confirm", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_branding_confirm_upload_logo(service_id):
+    pass
+
+
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def letter_branding_request(service_id):
