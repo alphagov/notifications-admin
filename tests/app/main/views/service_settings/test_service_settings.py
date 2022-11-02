@@ -3826,6 +3826,77 @@ def test_POST_email_branding_enter_government_identity_logo_text(mocker, client_
     )
 
 
+def test_email_branding_choose_banner_type_page(client_request, service_one):
+    page = client_request.get(
+        "main.email_branding_choose_banner_type",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    form = page.select_one("form")
+    submit_button = page.select_one("button.page-footer__button")
+
+    assert page.select_one("h1").text.strip() == "Add a banner to your logo"
+
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.email_branding_choose_logo",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert form["method"] == "post"
+    assert "Continue" in submit_button.text
+    assert [radio["value"] for radio in page.select("input[type=radio]")] == ["org", "org_banner"]
+
+
+@pytest.mark.parametrize(
+    "organisation_type, expected_status",
+    (
+        ("central", 200),
+        ("local", 200),
+    ),
+)
+def test_any_org_type_can_see_email_branding_choose_banner_type_page(
+    client_request, service_one, organisation_type, expected_status
+):
+    service_one["organisation_type"] = organisation_type
+
+    client_request.get(
+        ".email_branding_choose_banner_type",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+    )
+
+
+@pytest.mark.parametrize(
+    "selected_option, expected_endpoint",
+    [("org", ".email_branding_upload_logo"), ("org_banner", ".email_branding_choose_banner_colour")],
+)
+def test_email_branding_choose_banner_type_redirects_to_right_page(
+    client_request, service_one, selected_option, expected_endpoint
+):
+    client_request.post(
+        ".email_branding_choose_banner_type",
+        service_id=SERVICE_ONE_ID,
+        _data={"banner": selected_option},
+        _expected_status=302,
+        _expected_redirect=url_for(expected_endpoint, service_id=SERVICE_ONE_ID),
+    )
+
+
+def test_email_branding_choose_banner_type_shows_error_summary_on_invalid_data(client_request, service_one):
+    page = client_request.post(
+        ".email_branding_choose_banner_type",
+        service_id=SERVICE_ONE_ID,
+        _data={"banner": "invalid"},
+        _expected_status=400,
+    )
+
+    error_summary = page.select_one(".govuk-error-summary")
+    assert normalize_spaces(error_summary.text) == "There is a problem Select an option"
+    assert error_summary.select_one("a").get("href") == "#banner"
+
+    assert "Error: Select an option" in page.select_one("#banner").text
+
+
 @pytest.mark.parametrize("method", ["get", "post"])
 @pytest.mark.parametrize(
     "endpoint",

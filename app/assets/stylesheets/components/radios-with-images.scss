@@ -1,0 +1,25 @@
+.notify-radios-with-images {
+  display: flex;
+}
+
+.notify-radios-with-images__item {
+  // Override the lack of margin-right on smaller screens. Inline GOVUK Frontend radios only have it for larger screens.
+  @include govuk-responsive-margin(4, "right");
+
+  padding-left: 0;
+
+  &:last-of-type {
+    margin-right: 0;
+  }
+}
+
+.notify-radios-with-images__image {
+  max-width: 100%;
+  height: auto;
+}
+
+.notify-radios-with-images__radio {
+  display: block;
+  position: relative;
+  padding-left: govuk-spacing(7);
+}
