@@ -3719,15 +3719,18 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
 
 
 def test_email_branding_create_government_identity_logo(client_request, service_one):
-    page = client_request.get("main.email_branding_create_government_identity_logo", service_id=service_one["id"])
+    page = client_request.get("main.email_branding_request_government_identity_logo", service_id=service_one["id"])
 
-    back_button = page.find("a", text="Back")
-    continue_button = page.find(
-        "a", href=url_for(".email_branding_enter_government_identity_logo_text", service_id=SERVICE_ONE_ID)
-    )
+    back_button = page.select_one("a.govuk-back-link")
+    continue_button = page.select_one("main a.govuk-button")
 
     assert back_button["href"] == url_for(".email_branding_choose_logo", service_id=SERVICE_ONE_ID)
+    assert continue_button["href"] == url_for(
+        ".email_branding_enter_government_identity_logo_text",
+        service_id=SERVICE_ONE_ID,
+    )
     assert "Continue" in continue_button.text
+    assert "Back" in back_button.text
 
 
 def test_GET_email_branding_enter_government_identity_logo_text(client_request, service_one):
@@ -3739,7 +3742,7 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
     text_input = form.find("input")
 
     assert back_button["href"] == url_for(
-        "main.email_branding_create_government_identity_logo", service_id=service_one["id"]
+        "main.email_branding_request_government_identity_logo", service_id=service_one["id"]
     )
     assert form["method"] == "post"
     assert "Request new branding" in submit_button.text

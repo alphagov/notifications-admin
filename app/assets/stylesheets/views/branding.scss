@@ -1,0 +1,13 @@
+.email-branding-crest-or-insignia {
+  height: 27px;
+  margin: 0 govuk-spacing(1) govuk-spacing(1) * -1.5 0;
+}
+
+.email-branding-coloured-stripe {
+  display: inline-block;
+  height: govuk-spacing(5);
+  width: govuk-spacing(1) - 1;
+  margin-bottom: (-1 * govuk-spacing(1)) - 1;
+  margin-right: 1px;
+  margin-left: govuk-spacing(1);
+}

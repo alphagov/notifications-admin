@@ -6,6 +6,7 @@ import pytest
 from flask import url_for
 from notifications_python_client.errors import HTTPError
 
+from app.models.branding import INSIGNIA_ASSETS_PATH
 from app.s3_client.s3_logo_client import EMAIL_LOGO_LOCATION_STRUCTURE, TEMP_TAG
 from tests.conftest import create_email_branding, normalize_spaces
 
@@ -70,6 +71,22 @@ def test_create_email_branding_does_not_show_any_branding_info(
     assert page.select_one("#file").attrs.get("accept") == ".png"
     assert page.select_one("#text").attrs.get("value") is None
     assert page.select_one("#colour").attrs.get("value") is None
+
+
+def test_create_email_branding_does_can_be_populated_from_querystring(
+    client_request, platform_admin_user, mock_no_email_branding
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        ".create_email_branding",
+        name="Example name",
+        text="Example text",
+        colour="Example colour",
+    )
+
+    assert page.select_one("#name")["value"] == "Example name"
+    assert page.select_one("#text")["value"] == "Example text"
+    assert page.select_one("#colour")["value"] == "Example colour"
 
 
 def test_create_new_email_branding_without_logo(
@@ -462,3 +479,173 @@ def test_colour_regex_validation(
         _data=data,
         _expected_status=expected_status_code,
     )
+
+
+def test_create_email_branding_government_identity_logo_form(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        ".create_email_branding_government_identity_logo",
+    )
+    inputs = page.select("input[type=radio][name=coat_of_arms_or_insignia]")
+    values = [input["value"] for input in inputs]
+    images = [page.select_one("label[for=" + input["id"] + "] img")["src"] for input in inputs]
+
+    assert list(zip(values, images)) == [
+        (
+            "Department for International Trade",
+            "https://static.example.com/images/branding/insignia/"
+            "Department for International Trade.png?ec972edf4b61fe0a0064da65b0e2564b",
+        ),
+        (
+            "Foreign, Commonwealth & Development Office",
+            "https://static.example.com/images/branding/insignia/"
+            "Foreign, Commonwealth & Development Office.png?5f774527e45c4f03ca4a1167acdc0826",
+        ),
+        (
+            "HM Coastguard",
+            "https://static.example.com/images/branding/insignia/HM Coastguard.png?75bec666533897525a3545570d04e3d4",
+        ),
+        (
+            "HM Government",
+            "https://static.example.com/images/branding/insignia/HM Government.png?5f774527e45c4f03ca4a1167acdc0826",
+        ),
+        (
+            "HM Revenue & Customs",
+            "https://static.example.com/images/branding/insignia/"
+            "HM Revenue & Customs.png?6378474ceb33424b4e508a32ca4b6315",
+        ),
+        (
+            "Home Office",
+            "https://static.example.com/images/branding/insignia/Home Office.png?cc928b18d70992c0b85e01c6af30dcc2",
+        ),
+        (
+            "Ministry of Defence",
+            "https://static.example.com/images/branding/insignia/"
+            "Ministry of Defence.png?e58dccf7441c42356c5947a191a732ed",
+        ),
+        (
+            "Scotland Office",
+            "https://static.example.com/images/branding/insignia/"
+            "Scotland Office.png?9da8a4c042f1b0f0631bb4ff98330dde",
+        ),
+        (
+            "Wales Office",
+            "https://static.example.com/images/branding/insignia/Wales Office.png?82e7cde43c4448c6f0ddaa481fa7bb2a",
+        ),
+    ]
+
+    for input in inputs:
+        assert normalize_spaces(page.select_one("label[for=" + input["id"] + "]").text) == input["value"]
+
+
+def test_post_create_email_branding_government_identity_logo_form(mocker, client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        ".create_email_branding_government_identity_logo",
+        text="Department of Social Affairs and Citizenship",
+        _data={
+            "coat_of_arms_or_insignia": "HM Government",
+        },
+        _expected_redirect=url_for(
+            ".create_email_branding_government_identity_colour",
+            filename="HM Government",
+            text="Department of Social Affairs and Citizenship",
+        ),
+    )
+
+
+def test_create_email_branding_government_identity_colour(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        ".create_email_branding_government_identity_colour",
+        filename="HM Government",
+    )
+    inputs = page.select("input[type=radio][name=colour]")
+    labels = [normalize_spaces(page.select_one("label[for=" + input["id"] + "]").text) for input in inputs]
+    values = [input["value"] for input in inputs]
+
+    assert list(zip(labels, values)) == [
+        ("Attorney General’s Office", "#9f1888"),
+        ("Cabinet Office", "#005abb"),
+        ("Civil Service", "#af292e"),
+        ("Department for Business Innovation & Skills", "#003479"),
+        ("Department for Digital, Culture, Media & Sport", "#d40072"),
+        ("Department for Education", "#003a69"),
+        ("Department for Environment Food & Rural Affairs", "#00a33b"),
+        ("Department for International Development", "#002878"),
+        ("Department for International Trade", "#cf102d"),
+        ("Department for Levelling Up, Housing & Communities", "#012169"),
+        ("Department for Transport", "#006c56"),
+        ("Department for Work & Pensions", "#00beb7"),
+        ("Department of Health & Social Care", "#00ad93"),
+        ("Foreign, Commonwealth & Development Office", "#012169"),
+        ("Government Equalities Office", "#9325b2"),
+        ("HM Government", "#0076c0"),
+        ("HM Revenue & Customs", "#009390"),
+        ("HM Treasury", "#af292e"),
+        ("Home Office", "#9325b2"),
+        ("Ministry of Defence", "#4d2942"),
+        ("Ministry of Justice", "#231f20"),
+        ("Northern Ireland Office", "#002663"),
+        ("Office of the Advocate General for Scotland", "#002663"),
+        ("Office of the Leader of the House of Commons", "#317023"),
+        ("Office of the Leader of the House of Lords", "#9c132e"),
+        ("Scotland Office", "#002663"),
+        ("UK Export Finance", "#005747"),
+        ("Wales Office", "#a33038"),
+    ]
+
+    for input in inputs:
+        assert page.select_one("label[for=" + input["id"] + "] .email-branding-coloured-stripe")["style"] == (
+            "background: " + input["value"] + ";"
+        )
+        assert page.select_one("label[for=" + input["id"] + "] img")["src"] == (
+            "https://static.example.com/images/branding/insignia/HM Government.png?5f774527e45c4f03ca4a1167acdc0826"
+        )
+
+
+@pytest.mark.parametrize(
+    "extra_args",
+    (
+        {},
+        {"filename": "foo"},
+        {"filename": "foo.png"},
+    ),
+)
+def test_create_email_branding_government_identity_colour_400_if_no_filename_or_file_doesnt_exist(
+    client_request,
+    platform_admin_user,
+    extra_args,
+):
+    client_request.login(platform_admin_user)
+    client_request.get(
+        ".create_email_branding_government_identity_colour", _expected_status=400, _test_page_title=False, **extra_args
+    )
+
+
+def test_post_create_email_branding_government_identity_form_colour(mocker, client_request, platform_admin_user):
+    mock_upload = mocker.patch(
+        "app.main.views.email_branding.upload_email_logo",
+        return_value="example.png",
+    )
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".create_email_branding_government_identity_colour",
+        filename="HM Government",
+        text="Department of Social Affairs and Citizenship",
+        _data={
+            "colour": "#005abb",
+        },
+        _expected_redirect=url_for(
+            ".create_email_branding",
+            logo="example.png",
+            colour="#005abb",
+            name="Department of Social Affairs and Citizenship",
+            text="Department of Social Affairs and Citizenship",
+        ),
+    )
+
+    assert mock_upload.call_args[0][0] == "hm.government.png"
+    assert mock_upload.call_args[0][1][:4] == b"\x89PNG"
+    assert mock_upload.call_args[0][1] == (INSIGNIA_ASSETS_PATH / "HM Government.png").resolve().read_bytes()

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from app.models import JSONModel, ModelList
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
@@ -106,3 +108,41 @@ class LetterBrandingPool(AllLetterBranding):
         self.items = tuple()
         if id:
             self.items = self.client_method(id)
+
+
+GOVERNMENT_IDENTITY_SYSTEM_COLOURS = {
+    "Attorney General’s Office": "#9f1888",
+    "Cabinet Office": "#005abb",
+    "Civil Service": "#af292e",
+    "Department for Business Innovation & Skills": "#003479",
+    "Department for Digital, Culture, Media & Sport": "#d40072",
+    "Department for Education": "#003a69",
+    "Department for Environment Food & Rural Affairs": "#00a33b",
+    "Department for International Development": "#002878",
+    "Department for International Trade": "#cf102d",
+    "Department for Levelling Up, Housing & Communities": "#012169",
+    "Department for Transport": "#006c56",
+    "Department for Work & Pensions": "#00beb7",
+    "Department of Health & Social Care": "#00ad93",
+    "Foreign, Commonwealth & Development Office": "#012169",
+    "Government Equalities Office": "#9325b2",
+    "HM Government": "#0076c0",
+    "HM Revenue & Customs": "#009390",
+    "HM Treasury": "#af292e",
+    "Home Office": "#9325b2",
+    "Ministry of Defence": "#4d2942",
+    "Ministry of Justice": "#231f20",
+    "Northern Ireland Office": "#002663",
+    "Office of the Advocate General for Scotland": "#002663",
+    "Office of the Leader of the House of Commons": "#317023",
+    "Office of the Leader of the House of Lords": "#9c132e",
+    "Scotland Office": "#002663",
+    "UK Export Finance": "#005747",
+    "Wales Office": "#a33038",
+}
+
+INSIGNIA_ASSETS_PATH = Path(__file__) / "../../assets/images/branding/insignia/"
+
+GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA = tuple(
+    item.stem for item in INSIGNIA_ASSETS_PATH.resolve().iterdir() if item.is_file()
+)
