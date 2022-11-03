@@ -8,11 +8,11 @@
 // For example, `export { Frontend }` will assign `Frontend` to `window.Frontend`
 
 // GOVUK Frontend modules
-import Header from 'govuk-frontend/components/header/header';
-import Details from 'govuk-frontend/components/details/details';
-import Button from 'govuk-frontend/components/button/button';
-import Radios from 'govuk-frontend/components/radios/radios';
-import ErrorSummary from 'govuk-frontend/components/error-summary/error-summary';
+import Header from 'govuk-frontend/govuk/components/header/header';
+import Details from 'govuk-frontend/govuk/components/details/details';
+import Button from 'govuk-frontend/govuk/components/button/button';
+import Radios from 'govuk-frontend/govuk/components/radios/radios';
+import ErrorSummary from 'govuk-frontend/govuk/components/error-summary/error-summary';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -45,21 +45,21 @@ function initAll (options) {
   new Button(scope).init()
 
   // Find all global details elements to enhance.
-  var $details = scope.querySelectorAll('details')
+  var $details = scope.querySelectorAll('[data-module="govuk-details"]')
   nodeListForEach($details, function ($detail) {
     new Details($detail).init()
   })
 
   // Find first header module to enhance.
-  var $toggleButton = scope.querySelector('[data-module="header"]')
+  var $toggleButton = scope.querySelector('[data-module="govuk-header"]')
   new Header($toggleButton).init()
 
-  var $radios = scope.querySelectorAll('[data-module="radios"]')
+  var $radios = scope.querySelectorAll('[data-module="govuk-radios"]')
   nodeListForEach($radios, function ($radio) {
     new Radios($radio).init()
   })
 
-  var $errorSummary = scope.querySelector('[data-module="error-summary"]')
+  var $errorSummary = scope.querySelector('[data-module="govuk-error-summary"]')
   new ErrorSummary($errorSummary).init()
 }
 

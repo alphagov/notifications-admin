@@ -180,7 +180,7 @@ class Staging(Config):
 
 
 class Live(Config):
-    HEADER_COLOUR = "#005EA5"  # $govuk-blue
+    HEADER_COLOUR = "#1d70b8"  # $govuk-blue
     HTTP_PROTOCOL = "https"
     CSV_UPLOAD_BUCKET_NAME = "live-notifications-csv-upload"
     CONTACT_LIST_UPLOAD_BUCKET_NAME = "production-contact-list"

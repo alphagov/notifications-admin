@@ -11,7 +11,7 @@
 
   &-tick {
     @extend %tick-cross;
-    background-image: file-url('tick.png');
+    background-image: file-url('tick.svg');
   }
 
   &-cross {

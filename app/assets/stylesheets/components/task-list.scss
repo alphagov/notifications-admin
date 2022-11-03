@@ -47,7 +47,7 @@ $indicator-colour: govuk-colour("black");
   &-indicator-completed {
     @extend %task-list-indicator;
     background-color: $indicator-colour;
-    color: govuk-colour("grey-4");
+    color: govuk-colour("light-grey");
     // Just a pinch of letter spacing to make reversed-out text a bit
     // easier to read
     letter-spacing: 0.02em;

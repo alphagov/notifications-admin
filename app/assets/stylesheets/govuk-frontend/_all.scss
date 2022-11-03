@@ -1,54 +1,36 @@
-// Version of node_modules/govuk-frontend/components/all.scss specific to Notify
+// Version of node_modules/govuk-frontend/govuk/components/all.scss specific to Notify
 // Included to allow us to only include the components we need
 // All imports come from node_modules/govuk-frontend
-
-// turn on compatibility mode for all legacy frameworks
-// https://github.com/alphagov/govuk-frontend/blob/master/docs/installation/compatibility.md#turn-on-compatibility-mode
-// to be removed when these frameworks are removed.
-$govuk-compatibility-govukfrontendtoolkit: true;
-$govuk-compatibility-govukelements: true;
 
 // set asset URL root to match that of application
 $govuk-assets-path: "/static/";
 
-@import "settings/all";
-// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
-@import "./focus/settings";
-@import "tools/all";
-@import "helpers/all";
-// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
-@import "./focus/helpers";
-
-@import "core/all";
-// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
-@import "./focus/core";
-@import "objects/all";
+@import "govuk/settings/all";
+@import "govuk/tools/all";
+@import "govuk/helpers/all";
+@import "govuk/core/all";
+@import "govuk/objects/all";
 
 // section replacing @import "components/all", specifying which components to include
-@import "components/skip-link/_skip-link";
-@import "components/header/_header";
-@import "components/footer/_footer";
-@import "components/back-link/_back-link";
-@import "components/button/_button";
-@import "components/details/_details";
-@import "components/error-summary/_error-summary";
-@import "components/radios/_radios";
-@import "components/checkboxes/_checkboxes";
-@import "components/input/_input";
-@import "components/inset-text/_inset-text";
-@import "components/textarea/_textarea";
-@import "components/summary-list/_summary-list";
+@import "govuk/components/skip-link/_skip-link";
+@import "govuk/components/header/_header";
+@import "govuk/components/footer/_footer";
+@import "govuk/components/back-link/_back-link";
+@import "govuk/components/button/_button";
+@import "govuk/components/details/_details";
+@import "govuk/components/error-summary/_error-summary";
+@import "govuk/components/radios/_radios";
+@import "govuk/components/checkboxes/_checkboxes";
+@import "govuk/components/input/_input";
+@import "govuk/components/inset-text/_inset-text";
+@import "govuk/components/textarea/_textarea";
+@import "govuk/components/summary-list/_summary-list";
 
-// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
-@import "./focus/components";
-
-@import "utilities/all";
-@import "overrides/all";
+@import "govuk/utilities/all";
+@import "govuk/overrides/all";
 
 // Styles extending those from GOV.UK Frontend
 @import "./extensions";
-// update to focus styles, remove when upgrading to GOVUK Frontend 3.x.x
-@import "./focus/extensions";
 
 // Styles for GOV.UK Frontend components specific to this application
 @import "./overrides";

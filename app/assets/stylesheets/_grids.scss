@@ -1,22 +1,22 @@
 
 .govuk-grid-column-one-sixth {
-  @include govuk-grid-column(one-sixth, $class: false);
+  @include govuk-grid-column(one-sixth);
 }
 
 .govuk-grid-column-five-sixths {
-  @include govuk-grid-column(five-sixths, $class: false);
+  @include govuk-grid-column(five-sixths);
 }
 
 .govuk-grid-column-one-eighth {
-  @include govuk-grid-column(one-eighth, $class: false);
+  @include govuk-grid-column(one-eighth);
 }
 
 .govuk-grid-column-five-eighths {
-  @include govuk-grid-column(five-eighths, $class: false);
+  @include govuk-grid-column(five-eighths);
 }
 
 .govuk-grid-column-seven-eighths {
-  @include govuk-grid-column(seven-eighths, $class: false);
+  @include govuk-grid-column(seven-eighths);
 }
 
 %top-gutter,

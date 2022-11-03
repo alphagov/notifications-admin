@@ -1,12 +1,9 @@
 @import 'leaflet/dist/leaflet';
 
 // Styles to make the leaflet map match GOVUK (accessibility-focused) styling
+@import "govuk/settings/all";
+@import "govuk/helpers/all";
 
-@import "settings/all";
-@import "helpers/all";
-
-// Reset focus colour to latest version, to match the rest of the app
-$govuk-focus-colour: #FFDD00;
 $zoom-button-colour: govuk-colour("white");
 $zoom-button-hover-colour: govuk-shade($zoom-button-colour, 10%);
 

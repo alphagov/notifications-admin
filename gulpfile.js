@@ -51,7 +51,7 @@ const copy = {
   },
   govuk_frontend: {
     fonts: () => {
-      return src(paths.govuk_frontend + 'assets/fonts/**/*')
+      return src(paths.govuk_frontend + 'govuk/assets/fonts/**/*')
         .pipe(dest(paths.dist + 'fonts/'));
     },
     templates: (cb) => {
@@ -81,14 +81,14 @@ const copy = {
       // Copy the templates for each component across, preserving their folder structure
       _templates.forEach(name => {
         let _src = [
-          paths.govuk_frontend + 'components/' + name + '/macro.njk',
-          paths.govuk_frontend + 'components/' + name + '/template.njk'
+          paths.govuk_frontend + 'govuk/components/' + name + '/macro.njk',
+          paths.govuk_frontend + 'govuk/components/' + name + '/template.njk'
         ];
         let _dest = paths.templates + 'vendor/govuk-frontend/components/' + name;
 
         // template.njk isn't a component
         if (name === 'template') {
-          _src = paths.govuk_frontend + 'template.njk';
+          _src = paths.govuk_frontend + 'govuk/template.njk';
           _dest = paths.templates + 'vendor/govuk-frontend';
         }
 
@@ -228,7 +228,7 @@ const sass = () => {
 const images = () => {
   return src([
       paths.src + 'images/**/*',
-      paths.govuk_frontend + 'assets/images/**/*'
+      paths.govuk_frontend + 'govuk/assets/images/**/*'
     ])
     .pipe(dest(paths.dist + 'images/'))
 };

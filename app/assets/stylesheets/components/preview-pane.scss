@@ -8,8 +8,8 @@
 }
 
 #logo-img {
-  background-color: govuk-colour("grey-4");
-  background-image: linear-gradient(45deg, govuk-colour("grey-3") 25%, transparent 25%), linear-gradient(-45deg, govuk-colour("grey-3") 25%, transparent 25%), linear-gradient(45deg, transparent 75%, govuk-colour("grey-3") 75%), linear-gradient(-45deg, transparent 75%, govuk-colour("grey-3") 75%);
+  background-color: govuk-colour("light-grey");
+  background-image: linear-gradient(45deg, govuk-shade(govuk-colour("light-grey"), 7%) 25%, transparent 25%), linear-gradient(-45deg, govuk-shade(govuk-colour("light-grey"), 7%) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, govuk-shade(govuk-colour("light-grey"), 7%) 75%), linear-gradient(-45deg, transparent 75%, govuk-shade(govuk-colour("light-grey"), 7%) 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 

@@ -88,7 +88,6 @@ textarea {
 .form-control {
   box-sizing: border-box;
   @include govuk-font(19);
-  @include govuk-focusable; // hack to give GOVUK Frontend v3 focus styling.
   width: 100%;
 
   padding: 5px 4px 4px;
