@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from app import asset_fingerprinter
 from app.models import JSONModel, ModelList
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
@@ -141,7 +142,7 @@ GOVERNMENT_IDENTITY_SYSTEM_COLOURS = {
     "Wales Office": "#a33038",
 }
 
-INSIGNIA_ASSETS_PATH = Path(__file__) / "../../assets/images/branding/insignia/"
+INSIGNIA_ASSETS_PATH = Path(asset_fingerprinter._filesystem_path) / "images/branding/insignia/"
 
 GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA = tuple(
     item.stem for item in INSIGNIA_ASSETS_PATH.resolve().iterdir() if item.is_file()
