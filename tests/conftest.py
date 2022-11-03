@@ -2683,6 +2683,15 @@ def os_environ():
 
 @pytest.fixture  # noqa (C901 too complex)
 def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too complex)
+    def block_method(object, method_name, preferred_method_name):
+        def blocked_method(*args, **kwargs):
+            raise AttributeError(
+                f"Don’t use {object.__class__.__name__}.{method_name}"
+                f" – try {object.__class__.__name__}.{preferred_method_name} instead"
+            )
+
+        setattr(object, method_name, blocked_method)
+
     class ClientRequest:
         @staticmethod
         @contextmanager
@@ -2742,6 +2751,7 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
                 assert resp.location == _expected_redirect
 
             page = BeautifulSoup(resp.data.decode("utf-8"), "html.parser")
+            block_method(page, "find", preferred_method_name="select_one")
             if _test_page_title:
                 count_of_h1s = len(page.select("h1"))
                 if count_of_h1s != 1:

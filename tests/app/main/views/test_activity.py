@@ -155,7 +155,7 @@ def test_can_show_notifications(
         "Delivered 1 January at 1:01am"
     )
 
-    assert page_title in page.h1.text.strip()
+    assert page_title in page.select_one("h1").text.strip()
 
     path_to_json = page.select_one("div[data-key=notifications]")["data-resource"]
 
@@ -199,7 +199,7 @@ def test_can_show_notifications_if_data_retention_not_available(
         service_id=SERVICE_ONE_ID,
         status="sending,delivered,failed",
     )
-    assert page.h1.text.strip() == "Messages"
+    assert page.select_one("h1").text.strip() == "Messages"
 
 
 @pytest.mark.parametrize(

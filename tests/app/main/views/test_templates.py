@@ -1787,7 +1787,7 @@ def test_should_show_interstitial_when_making_breaking_change(
         _expected_status=200,
     )
 
-    assert page.h1.string.strip() == "Confirm changes"
+    assert page.select_one("h1").string.strip() == "Confirm changes"
     assert page.select_one("a.govuk-back-link")["href"] == url_for(
         ".edit_service_template",
         service_id=SERVICE_ONE_ID,

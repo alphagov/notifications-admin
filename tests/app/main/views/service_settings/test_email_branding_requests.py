@@ -303,7 +303,7 @@ def test_email_branding_pool_option_changes_email_branding_when_user_confirms(
         SERVICE_ONE_ID,
         email_branding="email-branding-1-id",
     )
-    assert page.h1.text == "Settings"
+    assert page.select_one("h1").text == "Settings"
     assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your email branding"
 
 
@@ -428,7 +428,7 @@ def test_email_branding_request_submit_when_no_radio_button_is_selected(
         _data={"options": ""},
         _follow_redirects=True,
     )
-    assert page.h1.text == "Change email branding"
+    assert page.select_one("h1").text == "Change email branding"
     assert normalize_spaces(page.select_one(".error-message").text) == "Select an option"
 
 
@@ -461,7 +461,7 @@ def test_email_branding_description_pages_for_org_branding(
         endpoint,
         service_id=SERVICE_ONE_ID,
     )
-    assert page.h1.text == expected_heading
+    assert page.select_one("h1").text == expected_heading
     assert normalize_spaces(page.select_one(".page-footer button").text) == "Request new branding"
 
 
@@ -496,7 +496,7 @@ def test_email_branding_govuk_and_nhs_pages(
         endpoint,
         service_id=SERVICE_ONE_ID,
     )
-    assert page.h1.text == "Check your new branding"
+    assert page.select_one("h1").text == "Check your new branding"
     assert "Emails from service one will look like this" in normalize_spaces(page.text)
     assert page.select_one("iframe")["src"] == url_for("main.email_template", branding_style=branding_preview_id)
     assert normalize_spaces(page.select_one(".page-footer button").text) == "Use this branding"
@@ -511,7 +511,7 @@ def test_email_branding_something_else_page(client_request, service_one, mock_ge
         "main.email_branding_something_else",
         service_id=SERVICE_ONE_ID,
     )
-    assert normalize_spaces(page.h1.text) == "Describe the branding you want"
+    assert normalize_spaces(page.select_one("h1").text) == "Describe the branding you want"
     assert page.select_one("textarea")["name"] == ("something_else")
     assert normalize_spaces(page.select_one(".page-footer button").text) == "Request new branding"
     assert page.select_one(".govuk-back-link")["href"] == url_for(
@@ -588,7 +588,7 @@ def test_email_branding_govuk_submit(
         SERVICE_ONE_ID,
         email_branding=None,
     )
-    assert page.h1.text == "Settings"
+    assert page.select_one("h1").text == "Settings"
     assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your email branding"
 
 
@@ -676,7 +676,7 @@ def test_email_branding_nhs_submit(
         SERVICE_ONE_ID,
         email_branding=EmailBranding.NHS_ID,
     )
-    assert page.h1.text == "Settings"
+    assert page.select_one("h1").text == "Settings"
     assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your email branding"
 
 
@@ -802,7 +802,7 @@ def test_email_branding_something_else_submit_shows_error_if_textbox_is_empty(
         _data={"something_else": ""},
         _follow_redirects=True,
     )
-    assert normalize_spaces(page.h1.text) == "Describe the branding you want"
+    assert normalize_spaces(page.select_one("h1").text) == "Describe the branding you want"
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Cannot be empty"
 
 
@@ -812,7 +812,7 @@ def test_email_branding_choose_logo_page(client_request, service_one):
         service_id=SERVICE_ONE_ID,
     )
 
-    assert page.h1.text == "Choose a logo for your emails"
+    assert page.select_one("h1").text == "Choose a logo for your emails"
 
     assert page.select_one(".govuk-back-link")["href"] == url_for(
         "main.email_branding_request",

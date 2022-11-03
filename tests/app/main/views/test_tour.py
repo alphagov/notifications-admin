@@ -477,7 +477,7 @@ def test_should_200_for_check_tour_notification(
     assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == ("service one: hello hi howdy")
 
     # post to send_notification keeps help argument
-    assert page.form.attrs["action"] == url_for(
+    assert page.select_one("form").attrs["action"] == url_for(
         "main.send_notification", service_id=SERVICE_ONE_ID, template_id=fake_uuid, help="3"
     )
 

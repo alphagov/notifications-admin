@@ -23,7 +23,7 @@ def test_should_return_verify_template(
         session["user_details"] = {"email_address": api_user_active["email_address"], "id": api_user_active["id"]}
     page = client_request.get("main.verify")
 
-    assert page.h1.text == "Check your phone"
+    assert page.select_one("h1").text == "Check your phone"
     message = page.select("main p")[0].text
     assert message == "We’ve sent you a text message with a security code."
 
@@ -179,7 +179,7 @@ def test_verify_email_redirects_to_sign_in_if_user_active(
 
     page = client_request.get("main.verify_email", token="notreal", _follow_redirects=True)
 
-    assert page.h1.text == "Sign in"
+    assert page.select_one("h1").text == "Sign in"
     flash_banner = page.select_one("div.banner-dangerous").string.strip()
     assert flash_banner == "That verification link has expired."
 

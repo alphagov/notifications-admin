@@ -163,7 +163,7 @@ def test_if_existing_user_accepts_twice_they_redirect_to_sign_in(
         _follow_redirects=True,
     )
 
-    assert (page.h1.string, page.select("main p")[0].text.strip(),) == (
+    assert (page.select_one("h1").string, page.select("main p")[0].text.strip(),) == (
         "You need to sign in again",
         "We signed you out because you have not used Notify for a while.",
     )
@@ -271,7 +271,7 @@ def test_existing_user_of_service_get_redirected_to_signin(
         _follow_redirects=True,
     )
 
-    assert (page.h1.string, page.select("main p")[0].text.strip(),) == (
+    assert (page.select_one("h1").string, page.select("main p")[0].text.strip(),) == (
         "You need to sign in again",
         "We signed you out because you have not used Notify for a while.",
     )
@@ -347,7 +347,7 @@ def test_existing_signed_out_user_accept_invite_redirects_to_sign_in(
         expected_service, api_user_active["id"], expected_permissions, sample_invite["folder_permissions"]
     )
     assert mock_accept_invite.call_count == 1
-    assert (page.h1.string, page.select("main p")[0].text.strip(),) == (
+    assert (page.select_one("h1").string, page.select("main p")[0].text.strip(),) == (
         "You need to sign in again",
         "We signed you out because you have not used Notify for a while.",
     )
@@ -397,7 +397,7 @@ def test_new_user_accept_invite_calls_api_and_views_registration_page(
     mock_dont_get_user_by_email.assert_called_with("invited_user@test.gov.uk")
     mock_get_invited_user_by_id.assert_called_once_with(sample_invite["id"])
 
-    assert page.h1.string.strip() == "Create an account"
+    assert page.select_one("h1").string.strip() == "Create an account"
 
     assert normalize_spaces(page.select_one("main p").text) == (
         "Your account will be created with this email address: " "invited_user@test.gov.uk"
@@ -432,7 +432,7 @@ def test_cancelled_invited_user_accepts_invited_redirect_to_cancelled_invitation
 
     app.invite_api_client.check_token.assert_called_with("thisisnotarealtoken")
 
-    assert page.h1.string.strip() == "The invitation you were sent has been cancelled"
+    assert page.select_one("h1").string.strip() == "The invitation you were sent has been cancelled"
     # We don’t let people update `email_access_validated_at` using an
     # cancelled invite
     assert mock_update_user_attribute.called is False
@@ -550,7 +550,7 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
         _follow_redirects=True,
         _expected_status=403,
     )
-    assert page.h1.string.strip() == "You’re not allowed to see this page"
+    assert page.select_one("h1").string.strip() == "You’re not allowed to see this page"
     flash_banners = page.select("div.banner-dangerous")
     assert len(flash_banners) == 1
     banner_contents = normalize_spaces(flash_banners[0].text)

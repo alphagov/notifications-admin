@@ -986,7 +986,7 @@ def test_upload_valid_csv_shows_preview_and_table(
         original_file_name="example.csv",
     )
 
-    assert page.h1.text.strip() == "Preview of Two week reminder"
+    assert page.select_one("h1").text.strip() == "Preview of Two week reminder"
     assert page.select_one(".sms-message-recipient").text.strip() == expected_recipient
     assert page.select_one(".sms-message-wrapper").text.strip() == expected_message
 
@@ -1264,7 +1264,7 @@ def test_send_one_off_has_correct_page_title(
         step_index=0,
         _follow_redirects=True,
     )
-    assert page.h1.text.strip() == "Send ‘Two week reminder’"
+    assert page.select_one("h1").text.strip() == "Send ‘Two week reminder’"
 
     assert len(page.select(".banner-tour")) == 0
 
@@ -3605,7 +3605,7 @@ def test_check_notification_shows_preview(client_request, service_one, fake_uuid
 
     page = client_request.get("main.check_notification", service_id=service_one["id"], template_id=fake_uuid)
 
-    assert page.h1.text.strip() == "Preview of ‘Two week reminder’"
+    assert page.select_one("h1").text.strip() == "Preview of ‘Two week reminder’"
     assert (page.select_one("a.govuk-back-link")["href"]) == url_for(
         "main.send_one_off_step",
         service_id=service_one["id"],
@@ -3617,7 +3617,7 @@ def test_check_notification_shows_preview(client_request, service_one, fake_uuid
     assert not page.select(".banner-tour")
 
     # post to send_notification with help=0 to ensure no back link is then shown
-    assert page.form.attrs["action"] == url_for(
+    assert page.select_one("form")["action"] == url_for(
         "main.send_notification", service_id=service_one["id"], template_id=fake_uuid, help="0"
     )
 
@@ -3657,7 +3657,7 @@ def test_check_notification_shows_back_link(mocker, client_request, service_one,
         template_id=fake_uuid,
     )
 
-    assert page.h1.text.strip() == "Preview of ‘Awkward letter’"
+    assert page.select_one("h1").text.strip() == "Preview of ‘Awkward letter’"
     back_link = page.select_one("a.govuk-back-link")["href"]
     assert back_link == url_for(
         "main.send_one_off_step",

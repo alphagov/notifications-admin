@@ -39,4 +39,4 @@ def test_inbound_sms_admin(
     mocker.patch("app.inbound_number_client.get_all_inbound_sms_number_service", return_value=sample_inbound_sms)
     client_request.login(platform_admin_user)
     page = client_request.get("main.inbound_sms_admin")
-    assert page.h1.string.strip() == "Inbound SMS"
+    assert page.select_one("h1").string.strip() == "Inbound SMS"

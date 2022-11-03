@@ -805,7 +805,7 @@ def test_should_check_if_estimated_volumes_provided(
     )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.h1.text == "Before you request to go live"
+    assert page.select_one("h1").text == "Before you request to go live"
 
     assert normalize_spaces(page.select_one(".task-list .task-list-item").text) == (expected_estimated_volumes_item)
 
@@ -855,7 +855,7 @@ def test_should_check_for_reply_to_on_go_live(
         )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.h1.text == "Before you request to go live"
+    assert page.select_one("h1").text == "Before you request to go live"
 
     checklist_items = page.select(".task-list .task-list-item")
     assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
@@ -927,7 +927,7 @@ def test_should_check_for_sending_things_right(
     )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.h1.text == "Before you request to go live"
+    assert page.select_one("h1").text == "Before you request to go live"
 
     checklist_items = page.select(".task-list .task-list-item")
     assert normalize_spaces(checklist_items[1].text) == expected_user_checklist_item
@@ -980,7 +980,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.h1.text == "Before you request to go live"
+    assert page.select_one("h1").text == "Before you request to go live"
 
     if expected_button:
         assert page.select_one("form")["method"] == "post"
@@ -1022,7 +1022,7 @@ def test_request_to_go_live_redirects_if_service_already_live(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert page.h1.text == "Your service is already live"
+    assert page.select_one("h1").text == "Your service is already live"
     assert normalize_spaces(page.select_one("main p").text) == message
 
 
@@ -1146,7 +1146,7 @@ def test_should_check_for_sms_sender_on_go_live(
         )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.h1.text == "Before you request to go live"
+    assert page.select_one("h1").text == "Before you request to go live"
 
     checklist_items = page.select(".task-list .task-list-item")
     assert normalize_spaces(checklist_items[3].text) == expected_sms_sender_checklist_item
@@ -1206,7 +1206,7 @@ def test_should_check_for_mou_on_request_to_go_live(
         "app.organisations_client.get_organisation", return_value=organisation_json(agreement_signed=agreement_signed)
     )
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.h1.text == "Before you request to go live"
+    assert page.select_one("h1").text == "Before you request to go live"
 
     checklist_items = page.select(".task-list .task-list-item")
     assert normalize_spaces(checklist_items[3].text) == expected_item
@@ -1261,7 +1261,7 @@ def test_gp_without_organisation_is_shown_agreement_step(
     )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.h1.text == "Before you request to go live"
+    assert page.select_one("h1").text == "Before you request to go live"
     assert normalize_spaces(page.select(".task-list .task-list-item")[3].text) == (
         "Accept our data sharing and financial agreement Not completed"
     )
@@ -1344,7 +1344,7 @@ def test_should_show_estimate_volumes(
         return_value=consent_to_research,
     )
     page = client_request.get("main.estimate_usage", service_id=SERVICE_ONE_ID)
-    assert page.h1.text == "Tell us how many messages you expect to send"
+    assert page.select_one("h1").text == "Tell us how many messages you expect to send"
     for channel, label, hint, value in (
         (
             "email",
@@ -3643,7 +3643,7 @@ def test_get_service_set_email_branding_add_to_branding_pool_step(
         service_id=SERVICE_ONE_ID,
         email_branding_id=email_branding_id,
     )
-    assert f"Apply ‘{email_branding_name}’ branding" in normalize_spaces(page.find("title").text)
+    assert f"Apply ‘{email_branding_name}’ branding" in normalize_spaces(page.select_one("title").text)
 
 
 def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_only(
@@ -3737,14 +3737,15 @@ def test_email_branding_create_government_identity_logo(client_request, service_
 def test_GET_email_branding_enter_government_identity_logo_text(client_request, service_one):
     page = client_request.get("main.email_branding_enter_government_identity_logo_text", service_id=service_one["id"])
 
-    back_button = page.find("a", text="Back")
-    form = page.find("form")
-    submit_button = form.find("button")
-    text_input = form.find("input")
+    back_button = page.select_one("a.govuk-back-link")
+    form = page.select_one("form")
+    submit_button = form.select_one("button")
+    text_input = form.select_one("input")
 
     assert back_button["href"] == url_for(
         "main.email_branding_request_government_identity_logo", service_id=service_one["id"]
     )
+    assert back_button.text == "Back"
     assert form["method"] == "post"
     assert "Request new branding" in submit_button.text
     assert text_input["name"] == "logo_text"
@@ -4306,7 +4307,7 @@ def test_send_files_by_email_contact_details_updates_contact_details_and_redirec
         _follow_redirects=True,
     )
 
-    assert page.h1.text == "Settings"
+    assert page.select_one("h1").text == "Settings"
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link=new_value)
 
 
@@ -4333,7 +4334,7 @@ def test_send_files_by_email_contact_details_uses_the_selected_field_when_multip
         _follow_redirects=True,
     )
 
-    assert page.h1.text == "Settings"
+    assert page.select_one("h1").text == "Settings"
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link="http://www.new-url.com")
 
 
@@ -4371,7 +4372,7 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
         _follow_redirects=True,
     )
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select an option"
-    assert normalize_spaces(page.h1.text) == "Send files by email"
+    assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
 
 
 @pytest.mark.parametrize(
@@ -4404,7 +4405,7 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
     )
 
     assert error in page.select_one(".govuk-error-message").text
-    assert normalize_spaces(page.h1.text) == "Send files by email"
+    assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
 
 
 @pytest.mark.parametrize(

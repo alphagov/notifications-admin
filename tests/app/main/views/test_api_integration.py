@@ -16,7 +16,7 @@ def test_should_show_api_page(
         "main.api_integration",
         service_id=SERVICE_ONE_ID,
     )
-    assert page.h1.string.strip() == "API integration"
+    assert page.select_one("h1").string.strip() == "API integration"
     rows = page.select("details")
     assert len(rows) == 5
     for row in rows:
@@ -454,7 +454,7 @@ def test_should_validate_guestlist_items(
         _expected_status=200,
     )
 
-    assert page.h1.string.strip() == "There was a problem with your guest list"
+    assert page.select_one("h1").string.strip() == "There was a problem with your guest list"
     jump_links = page.select(".banner-dangerous a")
 
     assert jump_links[0].string.strip() == "Enter valid email addresses"

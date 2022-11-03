@@ -91,7 +91,7 @@ def test_should_show_page_for_one_job(
 
     page = client_request.get("main.view_job", service_id=SERVICE_ONE_ID, job_id=fake_uuid, status=status_argument)
 
-    assert page.h1.text.strip() == "thisisatest.csv"
+    assert page.select_one("h1").text.strip() == "thisisatest.csv"
     assert page.select_one(".govuk-back-link")["href"] == url_for(
         "main.uploads",
         service_id=SERVICE_ONE_ID,
@@ -324,7 +324,7 @@ def test_should_show_letter_job(
         service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
     )
-    assert normalize_spaces(page.h1.text) == "thisisatest.csv"
+    assert normalize_spaces(page.select_one("h1").text) == "thisisatest.csv"
     assert normalize_spaces(page.select("p.bottom-gutter")[0].text) == (
         "Sent by Test User on 1 January at 11:09am Printing starts today at 5:30pm"
     )

@@ -865,7 +865,7 @@ def test_edit_organisation_user_shows_the_delete_confirmation_banner(
         ".edit_organisation_user", org_id=ORGANISATION_ID, user_id=active_user_with_permissions["id"]
     )
 
-    assert normalize_spaces(page.h1) == "Team members"
+    assert normalize_spaces(page.select_one("h1").text) == "Team members"
 
     banner = page.select_one(".banner-dangerous")
     assert "Are you sure you want to remove Test User?" in normalize_spaces(banner.contents[0])
@@ -1824,7 +1824,7 @@ def test_organisation_email_branding_page_shows_all_branding_pool_options(
 
     page = client_request.get(".organisation_email_branding", org_id=organisation_one["id"])
 
-    assert page.h1.text == "Email branding"
+    assert page.select_one("h1").text == "Email branding"
     assert (
         set(normalize_spaces(heading.text) for heading in page.select(".govuk-heading-s")) == expected_branding_options
     )
@@ -2248,7 +2248,7 @@ def test_add_organisation_email_branding_options_shows_branding_not_in_branding_
 
     client_request.login(platform_admin_user)
     page = client_request.get(".add_organisation_email_branding_options", org_id=organisation_one["id"])
-    assert page.h1.text == "Add email branding options"
+    assert page.select_one("h1").text == "Add email branding options"
     assert page.select_one("[data-notify-module=live-search]")["data-targets"] == (".govuk-checkboxes__item")
 
     assert [
@@ -2311,7 +2311,7 @@ def test_add_organisation_email_branding_options_calls_api_client_with_chosen_br
         _follow_redirects=True,
     )
 
-    assert page.h1.text == "Email branding"
+    assert page.select_one("h1").text == "Email branding"
     assert normalize_spaces(page.find("div", class_="banner-default-with-tick").text) == flash_message
     mock_update_pool.assert_called_once_with(organisation_one["id"], branding_ids_added)
 
@@ -2330,7 +2330,7 @@ def test_organisation_letter_branding_page_shows_all_branding_pool_options(
     client_request.login(platform_admin_user)
     page = client_request.get("main.organisation_letter_branding", org_id=organisation_one["id"])
 
-    assert page.h1.text == "Letter branding"
+    assert page.select_one("h1").text == "Letter branding"
     assert [normalize_spaces(heading.text) for heading in page.select(".govuk-heading-s")] == [
         "No branding (default)",
         "Cabinet Office",
@@ -2496,7 +2496,7 @@ def test_add_organisation_letter_branding_options_shows_branding_not_in_branding
 
     client_request.login(platform_admin_user)
     page = client_request.get(".add_organisation_letter_branding_options", org_id=organisation_one["id"])
-    assert page.h1.text == "Add letter branding options"
+    assert page.select_one("h1").text == "Add letter branding options"
     assert page.select_one("[data-notify-module=live-search]")["data-targets"] == (".govuk-checkboxes__item")
 
     assert [
@@ -2702,7 +2702,7 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_perso
         org_id=ORGANISATION_ID,
     )
 
-    assert page.h1.string == "Billing"
+    assert page.select_one("h1").string == "Billing"
     assert "2.5 of the GOV.UK Notify data sharing and financial agreement on 20 February 2020" in normalize_spaces(
         page.text
     )
@@ -2725,7 +2725,7 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_an_unknown_pe
         org_id=ORGANISATION_ID,
     )
 
-    assert page.h1.string == "Billing"
+    assert page.select_one("h1").string == "Billing"
     assert (
         f'{organisation_one["name"]} has accepted the GOV.UK Notify data ' "sharing and financial agreement."
     ) in page.text
@@ -2756,7 +2756,7 @@ def test_organisation_billing_page_when_the_agreement_is_not_signed(
         org_id=ORGANISATION_ID,
     )
 
-    assert page.h1.string == "Billing"
+    assert page.select_one("h1").string == "Billing"
     assert f'{organisation_one["name"]} {expected_content}' in page.text
 
 

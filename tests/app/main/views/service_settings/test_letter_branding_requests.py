@@ -199,7 +199,7 @@ def test_letter_branding_request_submit_when_form_has_missing_data(
         _data=data,
         _follow_redirects=True,
     )
-    assert page.h1.text == "Change letter branding"
+    assert page.select_one("h1").text == "Change letter branding"
     assert normalize_spaces(page.select_one(".error-message").text) == error_message
 
 
