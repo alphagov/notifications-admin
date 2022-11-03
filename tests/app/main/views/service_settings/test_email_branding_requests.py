@@ -820,7 +820,7 @@ def test_email_branding_choose_logo_page(client_request, service_one):
     )
 
     assert [
-        (radio["value"], page.find_all("label", {"class": "block-label", "for": f"options-{i}"})[0].text.strip())
+        (radio["value"], page.select_one(f"label.block-label[for=options-{i}]").text.strip())
         for i, radio in enumerate(page.select("input[type=radio]"))
     ] == [
         ("single_identity", "Create a government identity logo"),

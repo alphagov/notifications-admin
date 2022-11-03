@@ -185,7 +185,7 @@ def test_service_setting_links_not_displayed_for_archived_services(
     link_texts = ["Delete this service", "Service history"]
     service_one.update({"active": False})
     page = get_service_settings_page()
-    toggles = page.find_all("a", {"class": "govuk-link"})
+    toggles = page.select("a.govuk-link")
     assert not any(link for link in toggles if link.text.strip() in link_texts)
 
 

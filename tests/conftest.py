@@ -2752,6 +2752,7 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
 
             page = BeautifulSoup(resp.data.decode("utf-8"), "html.parser")
             block_method(page, "find", preferred_method_name="select_one")
+            block_method(page, "find_all", preferred_method_name="select")
             if _test_page_title:
                 count_of_h1s = len(page.select("h1"))
                 if count_of_h1s != 1:
