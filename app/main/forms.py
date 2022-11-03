@@ -2525,7 +2525,6 @@ class GovernmentIdentityCoatOfArmsOrInsignia(StripWhitespaceForm):
             (name, markup_for_crest_or_insignia(f"{name}.png") + name)
             for name in sorted(GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA)
         ],
-        validators=[DataRequired()],
     )
 
 
@@ -2544,7 +2543,4 @@ class GovernmentIdentityColour(StripWhitespaceForm):
             for name, colour in GOVERNMENT_IDENTITY_SYSTEM_COLOURS.items()
         ]
 
-    colour = GovukRadiosField(
-        "Colour for stripe",
-        validators=[DataRequired()],
-    )
+    colour = GovukRadiosField("Colour for stripe")

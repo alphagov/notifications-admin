@@ -6,7 +6,7 @@
 {% from "components/back-link/macro.njk" import govukBackLink %}
 
 {% block per_page_title %}
-  {{ '{} email branding'.format('Update' if email_branding else 'Add')}}
+  {{ form.colour.label.text }}
 {% endblock %}
 
 
@@ -16,10 +16,17 @@
 
 {% block platform_admin_content %}
 
-  {{ page_header('{} email branding'.format('Update' if email_branding else 'Add')) }}
-
   {% call form_wrapper() %}
-    {{ form.colour }}
+    {{ form.colour(
+      param_extensions={
+        'fieldset': {
+          'legend': {
+            'isPageHeading': True,
+            'classes': 'govuk-fieldset__legend--l'
+          }
+        }
+      }
+    ) }}
     {{ sticky_page_footer('Continue') }}
   {% endcall %}
 
