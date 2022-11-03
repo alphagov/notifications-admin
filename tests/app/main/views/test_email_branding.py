@@ -614,7 +614,7 @@ def test_create_email_branding_government_identity_colour(client_request, platfo
         {"filename": "foo.png"},
     ),
 )
-def test_create_email_branding_government_identity_colour_400_if_no_filename(
+def test_create_email_branding_government_identity_colour_400_if_no_filename_or_file_doesnt_exist(
     client_request,
     platform_admin_user,
     extra_args,
