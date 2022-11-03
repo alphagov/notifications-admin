@@ -3979,6 +3979,29 @@ def test_POST_email_branding_choose_banner_colour(client_request, service_one):
     )
 
 
+@pytest.mark.parametrize(
+    "hex_colour, expected_query_param",
+    (
+        ("#abc", "#abc"),
+        ("#abcdef", "#abcdef"),
+        ("abc", "#abc"),
+        ("abcdef", "#abcdef"),
+    ),
+)
+def test_POST_email_branding_choose_banner_colour_handles_hex_colour_variations(
+    client_request, service_one, hex_colour, expected_query_param
+):
+    client_request.post(
+        "main.email_branding_choose_banner_colour",
+        service_id=service_one["id"],
+        _data={"hex_colour": hex_colour},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.email_branding_upload_logo", service_id=service_one["id"], banner_colour=expected_query_param
+        ),
+    )
+
+
 def test_POST_email_branding_choose_banner_colour_invalid_hex_code(client_request, service_one):
     page = client_request.post(
         "main.email_branding_choose_banner_colour",
@@ -3987,7 +4010,7 @@ def test_POST_email_branding_choose_banner_colour_invalid_hex_code(client_reques
         _expected_status=400,
     )
 
-    assert "Must be a valid hex colour code, starting with #" in page.text
+    assert "Must be a valid hex colour code" in page.text
 
 
 @pytest.mark.parametrize("method", ["get", "post"])

@@ -464,6 +464,21 @@ class ForgivingIntegerField(GovukTextInputField):
         return super().__call__(value=value, **kwargs)
 
 
+class HexColourCodeField(GovukTextInputField):
+    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
+        if validators is None:
+            validators = []
+
+        validators.append(Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"))
+
+        super().__init__(label, validators, param_extensions=param_extensions, **kwargs)
+
+    def post_validate(self, form, validation_stopped):
+        if not self.errors:
+            if self.data and not self.data.startswith("#"):
+                self.data = "#" + self.data
+
+
 class FieldWithNoneOption:
 
     # This is a special value that is specific to our forms. This is
@@ -1819,11 +1834,8 @@ class AdminPreviewBrandingForm(StripWhitespaceForm):
 class AdminEditEmailBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField("Name of brand")
     text = GovukTextInputField("Text")
-    colour = GovukTextInputField(
+    colour = HexColourCodeField(
         "Colour",
-        validators=[
-            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code, starting with #")
-        ],
         param_extensions={"classes": "govuk-input--width-6", "attributes": {"data-notify-module": "colour-preview"}},
     )
     file = FileField_wtf("Upload a PNG logo", validators=[FileAllowed(["png"], "PNG Images only!")])
@@ -2253,13 +2265,7 @@ class EmailBrandingChooseBanner(Form):
 
 
 class EmailBrandingChooseBannerColour(StripWhitespaceForm):
-    hex_colour = GovukTextInputField(
-        "Choose a colour for your banner",
-        validators=[
-            Regexp(regex="^$|^#(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code, starting with #"),
-            DataRequired(),
-        ],
-    )
+    hex_colour = HexColourCodeField("Choose a colour for your banner", validators=[DataRequired()])
 
 
 class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
