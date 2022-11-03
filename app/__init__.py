@@ -1,5 +1,6 @@
 import os
 import pathlib
+import sys
 from functools import partial
 from time import monotonic
 
@@ -574,5 +575,16 @@ def init_jinja(application):
         os.path.join(repo_root, "app/templates"),
         os.path.join(repo_root, "app/templates/vendor/govuk-frontend"),
     ]
-    jinja_loader = jinja2.FileSystemLoader(template_folders)
-    application.jinja_loader = jinja_loader
+
+    # Add vendor directory to module search path so we can find the new govuk-frontend-jinja macros
+    # TODO: once CCS govuk_frontend_jinja is removed, remove this path hack
+    sys.path.append(str(pathlib.Path("./vendor")))
+
+    application.jinja_loader = jinja2.ChoiceLoader(
+        [
+            jinja2.FileSystemLoader(template_folders),
+            jinja2.PrefixLoader(
+                {"govuk_frontend_jinja": jinja2.PackageLoader("govuk_frontend_jinja_macros.govuk_frontend_jinja")}
+            ),
+        ]
+    )
