@@ -1285,11 +1285,11 @@ def email_branding_something_else(service_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/email-branding/create-government-identity-logo",
+    "/services/<uuid:service_id>/service-settings/email-branding/request-government-identity-logo",
     methods=["GET"],
 )
 @user_has_permissions("manage_service")
-def email_branding_create_government_identity_logo(service_id):
+def email_branding_request_government_identity_logo(service_id):
     return render_template(
         "views/service-settings/branding/email-branding-create-government-identity-logo.html",
         service_id=service_id,
@@ -1298,7 +1298,7 @@ def email_branding_create_government_identity_logo(service_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/email-branding/create-government-identity-logo/enter-text",
+    "/services/<uuid:service_id>/service-settings/email-branding/request-government-identity-logo/enter-text",
     methods=["GET", "POST"],
 )
 @user_has_permissions("manage_service")
@@ -1327,7 +1327,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
     return render_template(
         "views/service-settings/branding/email-branding-enter-government-identity-logo-text.html",
         form=form,
-        back_link=url_for(".email_branding_create_government_identity_logo", service_id=service_id),
+        back_link=url_for(".email_branding_request_government_identity_logo", service_id=service_id),
     )
 
 
@@ -1341,7 +1341,7 @@ def email_branding_choose_logo(service_id):
         if form.options.data == "org":
             return redirect(url_for(".email_branding_something_else", service_id=current_service.id))
         elif form.options.data == "single_identity":
-            return redirect(url_for(".email_branding_create_government_identity_logo", service_id=current_service.id))
+            return redirect(url_for(".email_branding_request_government_identity_logo", service_id=current_service.id))
 
     return render_template(
         "views/service-settings/branding/add-new-branding/government-branding-or-own-logo.html",

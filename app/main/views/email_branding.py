@@ -114,9 +114,9 @@ def update_email_branding(branding_id, logo=None):
     )
 
 
-@main.route("/email-branding/create-government-identity", methods=["GET", "POST"])
+@main.route("/email-branding/create-government-identity/logo", methods=["GET", "POST"])
 @user_is_platform_admin
-def create_email_branding_government_identity():
+def create_email_branding_government_identity_logo():
     form = GovernmentIdentityCoatOfArmsOrInsignia()
 
     if form.validate_on_submit():

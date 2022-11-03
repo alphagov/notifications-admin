@@ -840,7 +840,10 @@ def test_only_central_org_services_can_see_email_branding_choose_logo_page(clien
 
 @pytest.mark.parametrize(
     "selected_option, expected_endpoint",
-    [("org", ".email_branding_something_else"), ("single_identity", ".email_branding_create_government_identity_logo")],
+    [
+        ("org", ".email_branding_something_else"),
+        ("single_identity", ".email_branding_request_government_identity_logo"),
+    ],
 )
 def test_email_branding_choose_logo_redirects_to_right_page(
     client_request, service_one, selected_option, expected_endpoint

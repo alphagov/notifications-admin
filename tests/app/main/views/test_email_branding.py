@@ -481,10 +481,10 @@ def test_colour_regex_validation(
     )
 
 
-def test_create_email_branding_government_identity_form(client_request, platform_admin_user):
+def test_create_email_branding_government_identity_logo_form(client_request, platform_admin_user):
     client_request.login(platform_admin_user)
     page = client_request.get(
-        ".create_email_branding_government_identity",
+        ".create_email_branding_government_identity_logo",
     )
     inputs = page.select("input[type=radio][name=coat_of_arms_or_insignia]")
     values = [input["value"] for input in inputs]
@@ -538,10 +538,10 @@ def test_create_email_branding_government_identity_form(client_request, platform
         assert normalize_spaces(page.select_one("label[for=" + input["id"] + "]").text) == input["value"]
 
 
-def test_post_create_email_branding_government_identity_form(mocker, client_request, platform_admin_user):
+def test_post_create_email_branding_government_identity_logo_form(mocker, client_request, platform_admin_user):
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding_government_identity",
+        ".create_email_branding_government_identity_logo",
         text="Department of Social Affairs and Citizenship",
         _data={
             "coat_of_arms_or_insignia": "HM Government",
