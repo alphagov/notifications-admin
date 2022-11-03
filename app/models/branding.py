@@ -110,120 +110,36 @@ class LetterBrandingPool(AllLetterBranding):
             self.items = self.client_method(id)
 
 
-GOVERNMENT_IDENTITY_SYSTEM_COLOURS = [
-    {
-        "colour": "#9f1888",
-        "name": "Attorney General’s Office",
-    },
-    {
-        "colour": "#005abb",
-        "name": "Cabinet Office",
-    },
-    {
-        "colour": "#af292e",
-        "name": "Civil Service",
-    },
-    {
-        "colour": "#003479",
-        "name": "Department for Business Innovation & Skills",
-    },
-    {
-        "colour": "#d40072",
-        "name": "Department for Digital, Culture, Media & Sport",
-    },
-    {
-        "colour": "#003a69",
-        "name": "Department for Education",
-    },
-    {
-        "colour": "#00a33b",
-        "name": "Department for Environment Food & Rural Affairs",
-    },
-    {
-        "colour": "#002878",
-        "name": "Department for International Development",
-    },
-    {
-        "colour": "#cf102d",
-        "name": "Department for International Trade",
-    },
-    {
-        "colour": "#012169",
-        "name": "Department for Levelling Up, Housing & Communities",
-    },
-    {
-        "colour": "#006c56",
-        "name": "Department for Transport",
-    },
-    {
-        "colour": "#00beb7",
-        "name": "Department for Work & Pensions",
-    },
-    {
-        "colour": "#00ad93",
-        "name": "Department of Health & Social Care",
-    },
-    {
-        "colour": "#012169",
-        "name": "Foreign, Commonwealth & Development Office",
-    },
-    {
-        "colour": "#9325b2",
-        "name": "Government Equalities Office",
-    },
-    {
-        "colour": "#0076c0",
-        "name": "HM Government",
-    },
-    {
-        "colour": "#009390",
-        "name": "HM Revenue & Customs",
-    },
-    {
-        "colour": "#af292e",
-        "name": "HM Treasury",
-    },
-    {
-        "colour": "#9325b2",
-        "name": "Home Office",
-    },
-    {
-        "colour": "#4d2942",
-        "name": "Ministry of Defence",
-    },
-    {
-        "colour": "#231f20",
-        "name": "Ministry of Justice",
-    },
-    {
-        "colour": "#002663",
-        "name": "Northern Ireland Office",
-    },
-    {
-        "colour": "#002663",
-        "name": "Office of the Advocate General for Scotland",
-    },
-    {
-        "colour": "#317023",
-        "name": "Office of the Leader of the House of Commons",
-    },
-    {
-        "colour": "#9c132e",
-        "name": "Office of the Leader of the House of Lords",
-    },
-    {
-        "colour": "#002663",
-        "name": "Scotland Office",
-    },
-    {
-        "colour": "#005747",
-        "name": "UK Export Finance",
-    },
-    {
-        "colour": "#a33038",
-        "name": "Wales Office",
-    },
-]
+GOVERNMENT_IDENTITY_SYSTEM_COLOURS = {
+    "Attorney General’s Office": "#9f1888",
+    "Cabinet Office": "#005abb",
+    "Civil Service": "#af292e",
+    "Department for Business Innovation & Skills": "#003479",
+    "Department for Digital, Culture, Media & Sport": "#d40072",
+    "Department for Education": "#003a69",
+    "Department for Environment Food & Rural Affairs": "#00a33b",
+    "Department for International Development": "#002878",
+    "Department for International Trade": "#cf102d",
+    "Department for Levelling Up, Housing & Communities": "#012169",
+    "Department for Transport": "#006c56",
+    "Department for Work & Pensions": "#00beb7",
+    "Department of Health & Social Care": "#00ad93",
+    "Foreign, Commonwealth & Development Office": "#012169",
+    "Government Equalities Office": "#9325b2",
+    "HM Government": "#0076c0",
+    "HM Revenue & Customs": "#009390",
+    "HM Treasury": "#af292e",
+    "Home Office": "#9325b2",
+    "Ministry of Defence": "#4d2942",
+    "Ministry of Justice": "#231f20",
+    "Northern Ireland Office": "#002663",
+    "Office of the Advocate General for Scotland": "#002663",
+    "Office of the Leader of the House of Commons": "#317023",
+    "Office of the Leader of the House of Lords": "#9c132e",
+    "Scotland Office": "#002663",
+    "UK Export Finance": "#005747",
+    "Wales Office": "#a33038",
+}
 
 INSIGNIA_ASSETS_PATH = Path(__file__) / "../../assets/images/branding/insignia/"
 

@@ -2534,14 +2534,14 @@ class GovernmentIdentityColour(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.colour.choices = [
             (
-                item["colour"],
+                colour,
                 (
-                    markup_for_coloured_stripe(item["colour"])
+                    markup_for_coloured_stripe(colour)
                     + markup_for_crest_or_insignia(crest_or_insignia_image_filename)
-                    + item["name"]
+                    + name
                 ),
             )
-            for item in GOVERNMENT_IDENTITY_SYSTEM_COLOURS
+            for name, colour in GOVERNMENT_IDENTITY_SYSTEM_COLOURS.items()
         ]
 
     colour = GovukRadiosField(
