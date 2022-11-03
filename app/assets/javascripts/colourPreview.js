@@ -1,8 +1,9 @@
 (function(Modules) {
   "use strict";
 
-  let isSixDigitHex = value => value.match(/^#[0-9A-F]{6}$/i);
-  let colourOrWhite = value => isSixDigitHex(value) ? value : '#FFFFFF';
+  let isHexColourValue = value => value.match(/^#?(?:[0-9A-F]{3}){1,2}$/i);
+  let addHashIfNeeded = value => value.charAt(0) === '#' ? value : '#' + value;
+  let colourOrWhite = value => isHexColourValue(value) ? addHashIfNeeded(value) : '#FFFFFF';
 
   Modules.ColourPreview = function() {
 
