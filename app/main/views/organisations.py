@@ -28,6 +28,7 @@ from app.main import main
 from app.main.forms import (
     AddEmailBrandingOptionsForm,
     AddGPOrganisationForm,
+    AddLetterBrandingOptionsForm,
     AddNHSLocalOrganisationForm,
     AdminBillingDetailsForm,
     AdminChangeOrganisationDefaultEmailBrandingForm,
@@ -629,6 +630,36 @@ def organisation_preview_letter_branding(org_id):
 def organisation_letter_branding(org_id):
     return render_template(
         "views/organisations/organisation/settings/letter-branding-options.html",
+    )
+
+
+@main.route("/organisations/<uuid:org_id>/settings/letter-branding/add", methods=["GET", "POST"])
+@user_is_platform_admin
+def add_organisation_letter_branding_options(org_id):
+    form = AddLetterBrandingOptionsForm()
+
+    form.branding_field.choices = [
+        (branding.id, branding.name)
+        for branding in sorted(AllLetterBranding().excluding(*current_organisation.letter_branding_pool.ids))
+    ]
+
+    if form.validate_on_submit():
+        selected_letter_branding_ids = form.branding_field.data
+
+        organisations_client.add_brandings_to_letter_branding_pool(org_id, selected_letter_branding_ids)
+
+        if len(selected_letter_branding_ids) == 1:
+            msg = "1 letter branding option added"
+        else:
+            msg = f"{len(selected_letter_branding_ids)} letter branding options added"
+
+        flash(msg, "default_with_tick")
+        return redirect(url_for(".organisation_letter_branding", org_id=org_id))
+
+    return render_template(
+        "views/organisations/organisation/settings/add-letter-branding-options.html",
+        form=form,
+        search_form=SearchByNameForm(),
     )
 
 

@@ -1,10 +1,10 @@
 (function(Modules) {
   "use strict";
 
-  Modules.AddEmailBrandingOptionsForm = function() {
+  Modules.AddBrandingOptionsForm = function() {
 
-    this.start = function(addEmailBrandingOptionsForm) {
-      this.$form = $(addEmailBrandingOptionsForm);
+    this.start = function(addBrandingOptionsForm) {
+      this.$form = $(addBrandingOptionsForm);
 
       this.$liveRegionCounter = this.$form.find('.selection-counter');
 

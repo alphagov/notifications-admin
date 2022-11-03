@@ -64,6 +64,10 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def add_brandings_to_email_branding_pool(self, org_id, branding_ids):
         return self.post(url=f"/organisations/{org_id}/email-branding-pool", data={"branding_ids": branding_ids})
 
+    @cache.delete("organisation-{org_id}-letter-branding-pool")
+    def add_brandings_to_letter_branding_pool(self, org_id, branding_ids):
+        return self.post(url=f"/organisations/{org_id}/letter-branding-pool", data={"branding_ids": branding_ids})
+
     @cache.delete("service-{service_id}")
     @cache.delete("live-service-and-organisation-counts")
     @cache.delete("organisations")
