@@ -487,8 +487,10 @@ def test_create_email_branding_government_identity_form(client_request, platform
         ".create_email_branding_government_identity",
     )
     inputs = page.select("input[type=radio][name=coat_of_arms_or_insignia]")
+    values = [input["value"] for input in inputs]
+    images = [page.select_one("label[for=" + input["id"] + "] img")["src"] for input in inputs]
 
-    assert [(input["value"], page.select_one("label[for=" + input["id"] + "] img")["src"]) for input in inputs] == [
+    assert list(zip(values, images)) == [
         (
             "Department for International Trade",
             "https://static.example.com/images/branding/insignia/"
@@ -559,14 +561,10 @@ def test_create_email_branding_government_identity_colour(client_request, platfo
         filename="HM Government",
     )
     inputs = page.select("input[type=radio][name=colour]")
+    labels = [normalize_spaces(page.select_one("label[for=" + input["id"] + "]").text) for input in inputs]
+    values = [input["value"] for input in inputs]
 
-    assert [
-        (
-            normalize_spaces(page.select_one("label[for=" + input["id"] + "]").text),
-            input["value"],
-        )
-        for input in page.select("input[type=radio][name=colour]")
-    ] == [
+    assert list(zip(labels, values)) == [
         ("Attorney General’s Office", "#9f1888"),
         ("Cabinet Office", "#005abb"),
         ("Civil Service", "#af292e"),
