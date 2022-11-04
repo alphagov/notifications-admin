@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 from app import Organisation
-from tests import organisation_json, service_json
+from tests import find_element_by_tag_and_partial_text, organisation_json, service_json
 from tests.app.main.views.test_agreement import MockS3Object
 from tests.conftest import (
     ORGANISATION_ID,
@@ -923,8 +923,7 @@ def test_organisation_settings_for_platform_admin(
         "Billing details None Change billing details for the organisation",
         "Notes None Change the notes for the organisation",
         "Email branding options GOV.UK Default Manage email branding options for the organisation",
-        "Default letter branding No branding Change default letter branding for the organisation",
-        "Letter branding options None Manage letter branding options for the organisation",
+        "Letter branding options No branding Default Manage letter branding options for the organisation",
         "Known email domains None Change known email domains for the organisation",
     ]
 
@@ -972,15 +971,53 @@ def test_organisation_settings_table_shows_letter_branding_pool(
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    email_branding_options_row = page.select("tr")[10]
+    letter_branding_options_row = find_element_by_tag_and_partial_text(page, "tr", "Letter branding options")
 
-    assert normalize_spaces(email_branding_options_row.text) == (
+    assert normalize_spaces(letter_branding_options_row.text) == (
         "Letter branding options "
+        "No branding Default "
         "Cabinet Office "
         "Department for Education "
         "Government Digital Service "
         "Manage letter branding options for the organisation"
     )
+
+
+def test_organisation_settings_table_shows_letter_branding_pool_with_brand_as_default(
+    client_request,
+    platform_admin_user,
+    mock_get_organisation,
+    mock_get_empty_email_branding_pool,
+    mock_get_letter_branding_pool,
+    organisation_one,
+    mocker,
+):
+    organisation_one["letter_branding_id"] = "5678"
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    mocker.patch(
+        "app.models.branding.letter_branding_client.get_letter_branding",
+        return_value={
+            "id": "5678",
+            "name": "Department for Education",
+            "filename": "dfe",
+        },
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
+
+    letter_branding_options_row = find_element_by_tag_and_partial_text(page, "tr", "Letter branding options")
+
+    assert normalize_spaces(letter_branding_options_row.text) == (
+        "Letter branding options "
+        "Department for Education Default "
+        "Cabinet Office "
+        "Government Digital Service "
+        "Manage letter branding options for the organisation"
+    )
+    # check we're showing the styling for when there are multiple items in the pool
+    assert letter_branding_options_row.select_one("div.govuk-\\!-margin-bottom-3")
 
 
 def test_organisation_settings_table_shows_email_branding_pool_non_govuk_default(
