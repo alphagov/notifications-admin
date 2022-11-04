@@ -8,6 +8,3 @@ Service: {{ current_service.name }}
 
 ---
 Government logo text requested: {{ logo_text }}
-{% if detail %}
-{{ detail }}
-{% endif %}
