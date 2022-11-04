@@ -5,7 +5,7 @@ from itertools import chain
 from numbers import Number
 
 import pytz
-from flask import Markup, render_template, request
+from flask import Markup, render_template, render_template_string, request
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
@@ -86,6 +86,36 @@ from app.utils.user_permissions import (
     broadcast_permission_options,
     permission_options,
 )
+
+
+def render_govuk_frontend_macro(component, params):
+    """
+    jinja needs a template to render
+
+    This function creates a template string that just calls that macro on its own.
+
+    ```
+    {%- from <path> import <macro> -%}
+
+    {{ macro(params) }}
+    ```
+
+    This function dynamically fills in the path and macro based on the GOVUK_FRONTEND_MACROS dictionary.
+    Then we render that template with any params to produce just the output of that macro.
+    """
+    govuk_frontend_components = {
+        "text-input": {"path": "govuk_frontend_jinja/components/input/macro.html", "macro": "govukInput"},
+    }
+
+    # we need to duplicate all curly braces to escape them from the f string so jinja still sees them
+    template_string = f"""
+        {{%- from '{govuk_frontend_components[component]['path']}'
+        import {govuk_frontend_components[component]['macro']} -%}}
+
+        {{{{ {govuk_frontend_components[component]['macro']}(params) }}}}
+    """
+
+    return Markup(render_template_string(template_string, params=params))
 
 
 def get_time_value_and_label(future_time):
@@ -254,7 +284,7 @@ def govuk_text_input_field_widget(self, field, type=None, param_extensions=None,
     # add any sent in through use in templates
     merge_jsonlike(params, param_extensions)
 
-    return Markup(render_template("vendor/govuk-frontend/components/input/template.njk", params=params))
+    return render_govuk_frontend_macro("text-input", params=params)
 
 
 class GovukTextInputField(StringField):
