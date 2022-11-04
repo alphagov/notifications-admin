@@ -535,7 +535,7 @@ class NestedFieldMixin:
 
             params["items"].append(item)
 
-        return render_template("forms/fields/checkboxes/template.njk", params=params)
+        return render_govuk_frontend_macro("checkbox", params=params)
 
 
 class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
@@ -731,11 +731,9 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
         # add a blank hint to act as an ARIA live-region
         params.update({"hint": {"html": '<div class="selection-summary" role="region" aria-live="polite"></div>'}})
 
-        return _wrap_in_collapsible(
-            self.field_label, Markup(render_template("forms/fields/checkboxes/macro.njk", params=params))
-        )
+        return _wrap_in_collapsible(self.field_label, render_govuk_frontend_macro("checkbox", params=params))
     else:
-        return Markup(render_template("forms/fields/checkboxes/macro.njk", params=params))
+        return render_govuk_frontend_macro("checkbox", params=params)
 
 
 def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):

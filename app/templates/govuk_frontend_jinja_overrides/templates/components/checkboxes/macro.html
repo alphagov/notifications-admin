@@ -1,9 +1,10 @@
 {#- Copied from https://github.com/LandRegistry/govuk-frontend-jinja/blob/1.5.1/govuk_frontend_jinja/templates/components/checkboxes/macro.html
-    Changes we may want to make???:
+    Changes we have made
     - `classes` option added to `item` allow custom classes on the `.govuk-checkboxes__item` element
-    - `classes` option added to `item.hint` allow custom classes on the `.govuk-hint` element (added to GOVUK Frontend in v3.5.0 - remove when we update)
     - `asList` option added the root `params` object to allow setting of the `.govuk-checkboxes` and `.govuk-checkboxes__item` element types
-    - `children` option added to `item` allowing the sending in of prerendered child checkboxes (allowing the creation of tree structures through recursion) -#}
+    - `children` option added to `item` allowing the sending in of prerendered child checkboxes (allowing the creation of tree structures through recursion)
+    - `before` and `after` options added to `item` allowing the sending in of prerendered content for before and after the rest of the item.
+  -#}
 
 {% macro govukCheckboxes(params) %}
 {% from "govuk_frontend_jinja/components/error-message/macro.html" import govukErrorMessage -%}
@@ -26,6 +27,11 @@
 
 {#- fieldset is false by default -#}
 {% set hasFieldset = True if params.fieldset else False %}
+
+{#- set the types of element used for the checkboxes and their group based on
+   whether asList is set -#}
+{% set groupElement = 'ul' if params.asList else 'div' %}
+{% set groupItemElement = 'li' if params.asList else 'div' %}
 
 {#- Capture the HTML so we can optionally nest it in a fieldset -#}
 {% set innerHtml %}
@@ -52,7 +58,7 @@
     'visuallyHiddenText': params.errorMessage.visuallyHiddenText
   }) | trim }}
 {% endif %}
-  <div class="govuk-checkboxes {%- if params.classes %} {{ params.classes }}{% endif %}"
+  <{{ groupElement }} class="govuk-checkboxes {%- if params.classes %} {{ params.classes }}{% endif %}"
     {%- for attribute, value in (params.attributes.items() if params.attributes else {}.items()) %} {{ attribute }}="{{ value }}"{% endfor %}
     data-module="govuk-checkboxes">
     {% for item in params['items'] %}
@@ -77,7 +83,17 @@
           {% set itemHintId = id + "-item-hint" if hasHint else "" %}
           {% set itemDescribedBy = ns.describedBy if not hasFieldset else "" %}
           {% set itemDescribedBy = (itemDescribedBy + " " + itemHintId) | trim %}
-          <div class="govuk-checkboxes__item">
+
+          {% set conditionalHtml %}
+            {% if item.conditional and item.conditional.html %}
+              <div class="govuk-checkboxes__conditional{% if not item.checked %} govuk-checkboxes__conditional--hidden{% endif %}" id="{{ conditionalId }}">
+                {{ item.conditional.html | safe }}
+              </div>
+            {% endif %}
+          {% endset %}
+
+          <{{ groupItemElement }} class="govuk-checkboxes__item {%- if item.classes %} {{ item.classes }}{% endif %}">
+            {%- if item.before %}{{ item.before }}{% endif -%}
             <input class="govuk-checkboxes__input" id="{{ id }}" name="{{ name }}" type="checkbox" value="{{ item.value }}"
             {{-" checked" if item.checked }}
             {{-" disabled" if item.disabled }}
@@ -101,16 +117,19 @@
               'text': item.hint.text
             }) | trim }}
             {% endif %}
-          </div>
-          {% if item.conditional and item.conditional.html %}
-            <div class="govuk-checkboxes__conditional{% if not item.checked %} govuk-checkboxes__conditional--hidden{% endif %}" id="{{ conditionalId }}">
-              {{ item.conditional.html | safe }}
-            </div>
-          {% endif %}
+
+            {%- if item.children %}
+              {{ item.children | safe }}
+            {%- endif %}
+
+            {% if params.asList %} {{ conditionalHtml }} {% endif %}
+            {%- if item.after %}{{ item.after }}{% endif -%}
+          </{{ groupItemElement }}>
+          {% if not params.asList %} {{ conditionalHtml }} {% endif %}
         {% endif %}
       {% endif %}
     {% endfor %}
-  </div>
+  </{{ groupElement }}>
 {% endset -%}
 
 <div class="govuk-form-group {%- if params.errorMessage %} govuk-form-group--error{% endif %} {%- if params.formGroup and params.formGroup.classes %} {{ params.formGroup.classes }}{% endif %}">
