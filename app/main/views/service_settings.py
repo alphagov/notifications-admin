@@ -1151,7 +1151,9 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
 def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
     if form.something_else_is_only_option:
-        return redirect(url_for(".email_branding_something_else", service_id=current_service.id))
+        return redirect(
+            url_for(".email_branding_something_else", service_id=current_service.id, back_link=".service_settings")
+        )
     if form.validate_on_submit():
 
         branding_choice = form.options.data
@@ -1167,11 +1169,18 @@ def email_branding_request(service_id):
             return redirect(
                 url_for(".email_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
             )
+        if branding_choice == "govuk":
+            return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
+
+        if current_service.organisation_type == "central":
+            return redirect(url_for(".email_branding_choose_logo", service_id=current_service.id))
         else:
+            # TODO: change this to redirect to new logo upload flow once it's ready
             return redirect(
                 url_for(
                     f".email_branding_{branding_choice}",
                     service_id=current_service.id,
+                    back_link=".email_branding_request",
                 )
             )
 
@@ -1282,6 +1291,7 @@ def email_branding_something_else(service_id):
         "views/service-settings/branding/email-branding-something-else.html",
         form=form,
         branding_options=ChooseEmailBrandingForm(current_service),
+        back_link=request.args.get("back_link", ".email_branding_request"),
     )
 
 
@@ -1341,9 +1351,21 @@ def email_branding_choose_logo(service_id):
 
     if form.validate_on_submit():
         if form.branding_options.data == "org":
-            return redirect(url_for(".email_branding_something_else", service_id=current_service.id))
+            return redirect(
+                url_for(
+                    ".email_branding_something_else",
+                    service_id=current_service.id,
+                    back_link=".email_branding_choose_logo",
+                )
+            )
         elif form.branding_options.data == "single_identity":
-            return redirect(url_for(".email_branding_request_government_identity_logo", service_id=current_service.id))
+            return redirect(
+                url_for(
+                    ".email_branding_request_government_identity_logo",
+                    service_id=current_service.id,
+                    branding_choice=request.args.get("branding_choice"),
+                )
+            )
 
     return (
         render_template(

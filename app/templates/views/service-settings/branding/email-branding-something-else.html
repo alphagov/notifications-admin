@@ -11,7 +11,7 @@
 {% if branding_options.something_else_is_only_option %}
   {% set back_url = url_for('.service_settings', service_id=current_service.id) %}
 {% else %}
-  {% set back_url = url_for('.email_branding_request', service_id=current_service.id) %}
+  {% set back_url = url_for(back_link, service_id=current_service.id) %}
 {% endif %}
 
 {% block backLink %}

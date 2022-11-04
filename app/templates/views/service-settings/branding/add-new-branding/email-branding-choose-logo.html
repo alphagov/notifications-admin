@@ -23,7 +23,7 @@
   {% if form.branding_options.errors %}
     {% set params = {
         "titleText": "There is a problem",
-        "errorList": [{"href": "#" + form.options.id, "text": form.options.errors[0]}]
+        "errorList": [{"href": "#" + form.branding_options.id, "text": form.branding_options.errors[0]}]
       }
     %}
     {{ govukErrorSummary(params) }}
