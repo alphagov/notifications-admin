@@ -1,5 +1,6 @@
 from datetime import datetime
 from functools import partial
+from textwrap import dedent
 from unittest.mock import ANY, Mock, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
 from uuid import UUID, uuid4
@@ -3764,6 +3765,35 @@ def test_POST_email_branding_enter_government_identity_logo_text(mocker, client_
 
     assert "Thanks for your branding request." in mock_flash.call_args_list[0][0][0]
     assert mock_send_ticket_to_zendesk.call_count == 1
+    assert (
+        mock_send_ticket_to_zendesk.call_args[0][0].message
+        == dedent(
+            """
+            Organisation: Can’t tell (domain is user.gov.uk)
+            Service: service one
+            {service_dashboard}
+
+            ---
+            Government logo text requested: My lovely government identity
+
+            Create this logo: {create_email_branding_government_identity_logo}
+
+            Apply branding to this service: {service_set_email_branding}
+            """
+        )
+        .format(
+            service_dashboard=url_for("main.service_dashboard", service_id=SERVICE_ONE_ID, _external=True),
+            create_email_branding_government_identity_logo=url_for(
+                "main.create_email_branding_government_identity_logo",
+                text="My lovely government identity",
+                _external=True,
+            ),
+            service_set_email_branding=url_for(
+                "main.service_set_email_branding", service_id=SERVICE_ONE_ID, _external=True
+            ),
+        )
+        .strip()
+    )
 
 
 @pytest.mark.parametrize("method", ["get", "post"])
