@@ -8,3 +8,7 @@ Service: {{ current_service.name }}
 
 ---
 Government logo text requested: {{ logo_text }}
+
+Create this logo: {{ url_for('main.create_email_branding_government_identity_logo', text=logo_text, _external=True) }}
+
+Apply branding to this service: {{ url_for('main.service_set_email_branding', service_id=current_service.id, _external=True) }}
