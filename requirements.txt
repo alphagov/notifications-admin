@@ -83,7 +83,7 @@ greenlet==1.1.2
     # via eventlet
 gunicorn @ git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b864c64
     # via -r requirements.in
-humanize==4.3.0
+humanize==4.4.0
     # via -r requirements.in
 idna==3.3
     # via requests
@@ -119,7 +119,7 @@ markupsafe==2.1.1
     #   wtforms
 mistune==0.8.4
     # via notifications-utils
-notifications-python-client==6.3.0
+notifications-python-client==6.4.1
     # via -r requirements.in
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@57.1.0
     # via -r requirements.in
@@ -131,7 +131,7 @@ packaging==21.3
     # via redis
 phonenumbers==8.12.54
     # via notifications-utils
-prometheus-client==0.14.1
+prometheus-client==0.15.0
     # via
     #   -r requirements.in
     #   gds-metrics
@@ -162,7 +162,7 @@ pyparsing==3.0.9
     # via packaging
 pypdf2==2.10.3
     # via notifications-utils
-pyproj==3.3.1
+pyproj==3.4.0
     # via
     #   -r requirements.in
     #   notifications-utils
@@ -172,7 +172,7 @@ python-dateutil==2.8.2
     #   botocore
 python-json-logger==2.0.4
     # via notifications-utils
-pytz==2022.2.1
+pytz==2022.5
     # via
     #   -r requirements.in
     #   notifications-utils
