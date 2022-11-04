@@ -7,7 +7,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
 
-{% set page_title = form.options.label %}
+{% set page_title = form.options.label.text %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -21,8 +21,6 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header(page_title) }}
-
   {% if form.options.errors %}
     {% set params = {
         "titleText": "There is a problem",
@@ -30,6 +28,14 @@
       }
     %}
     {{ govukErrorSummary(params) }}
+  {% endif %}
+
+  {{ page_header(page_title) }}
+
+  {% if not current_service.email_branding_id %}
+    <p class="govuk-body">
+      {{ current_service.name }} branding is not set up yet.
+    </p>
   {% endif %}
 
   {% call form_wrapper() %}

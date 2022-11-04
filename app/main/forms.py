@@ -2190,7 +2190,7 @@ class GovBrandingOrOwnLogoForm(StripWhitespaceForm):
     options = GovukRadiosField(
         "Choose a logo for your emails",
         choices=branding_options,
-        validators=[DataRequired()],
+        validators=[],
     )
 
 
