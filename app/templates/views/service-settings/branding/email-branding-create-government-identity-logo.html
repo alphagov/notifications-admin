@@ -18,7 +18,9 @@
 
   {{ page_header('Create a government identity logo') }}
 
-  {{ email_branding_preview('__NONE__') }}
+  {% if example %}
+    {{ email_branding_preview(example.id) }}
+  {% endif %}
 
   <p class="govuk-body">
     A government identity logo is made up of:

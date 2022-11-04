@@ -27,6 +27,7 @@ from tests.conftest import (
     create_active_user_no_api_key_permission,
     create_active_user_no_settings_permission,
     create_active_user_with_permissions,
+    create_email_brandings,
     create_letter_contact_block,
     create_multiple_email_reply_to_addresses,
     create_multiple_letter_contact_blocks,
@@ -3719,11 +3720,35 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
         )
 
 
-def test_email_branding_create_government_identity_logo(client_request, service_one):
+@pytest.mark.parametrize(
+    "extra_brandings_to_create, expected_branding_id_in_iframe",
+    (
+        (
+            [],
+            None,
+        ),
+        (
+            [{"idx": 3, "id": "dfe1234", "name": "The Department for EDUCATION"}],
+            "dfe1234",
+        ),
+    ),
+)
+def test_email_branding_create_government_identity_logo(
+    mocker,
+    client_request,
+    service_one,
+    extra_brandings_to_create,
+    expected_branding_id_in_iframe,
+):
+    mocker.patch(
+        "app.models.branding.AllEmailBranding.client_method",
+        return_value=create_email_brandings(5, non_standard_values=extra_brandings_to_create),
+    )
     page = client_request.get("main.email_branding_request_government_identity_logo", service_id=service_one["id"])
 
     back_button = page.select_one("a.govuk-back-link")
     continue_button = page.select_one("main a.govuk-button")
+    iframe = page.select_one("iframe")
 
     assert back_button["href"] == url_for(".email_branding_choose_logo", service_id=SERVICE_ONE_ID)
     assert continue_button["href"] == url_for(
@@ -3732,6 +3757,10 @@ def test_email_branding_create_government_identity_logo(client_request, service_
     )
     assert "Continue" in continue_button.text
     assert "Back" in back_button.text
+    if expected_branding_id_in_iframe:
+        assert iframe["src"] == url_for("main.email_template", branding_style=expected_branding_id_in_iframe)
+    else:
+        assert not iframe
 
 
 def test_GET_email_branding_enter_government_identity_logo_text(client_request, service_one):

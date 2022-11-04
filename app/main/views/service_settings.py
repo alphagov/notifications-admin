@@ -1294,6 +1294,7 @@ def email_branding_request_government_identity_logo(service_id):
         "views/service-settings/branding/email-branding-create-government-identity-logo.html",
         service_id=service_id,
         back_link=url_for(".email_branding_choose_logo", service_id=service_id),
+        example=AllEmailBranding().example_government_identity_branding,
     )
 
 
