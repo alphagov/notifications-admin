@@ -37,8 +37,6 @@ from app.main.forms import (
     AdminNotesForm,
     AdminOrganisationDomainsForm,
     AdminOrganisationGoLiveNotesForm,
-    AdminPreviewBrandingForm,
-    AdminSetLetterBrandingForm,
     InviteOrgUserForm,
     OrganisationAgreementSignedForm,
     OrganisationCrownStatusForm,
@@ -568,49 +566,6 @@ def add_organisation_email_branding_options(org_id):
         "views/organisations/organisation/settings/add-email-branding-options.html",
         form=form,
         search_form=SearchByNameForm(),
-    )
-
-
-@main.route("/organisations/<uuid:org_id>/settings/set-letter-branding", methods=["GET", "POST"])
-@user_is_platform_admin
-def edit_organisation_letter_branding(org_id):
-    form = AdminSetLetterBrandingForm(
-        all_branding_options=AllLetterBranding().as_id_and_name,
-        current_branding=current_organisation.letter_branding_id,
-    )
-
-    if form.validate_on_submit():
-        return redirect(
-            url_for(
-                ".organisation_preview_letter_branding",
-                org_id=org_id,
-                branding_style=form.branding_style.data,
-            )
-        )
-
-    return render_template(
-        "views/organisations/organisation/settings/set-letter-branding.html", form=form, search_form=SearchByNameForm()
-    )
-
-
-@main.route("/organisations/<uuid:org_id>/settings/preview-letter-branding", methods=["GET", "POST"])
-@user_is_platform_admin
-def organisation_preview_letter_branding(org_id):
-    branding_style = request.args.get("branding_style")
-
-    form = AdminPreviewBrandingForm(branding_style=branding_style)
-
-    if form.validate_on_submit():
-        current_organisation.update(
-            letter_branding_id=form.branding_style.data,
-            delete_services_cache=True,
-        )
-        return redirect(url_for(".organisation_settings", org_id=org_id))
-
-    return render_template(
-        "views/organisations/organisation/settings/preview-letter-branding.html",
-        form=form,
-        action=url_for("main.organisation_preview_letter_branding", org_id=org_id),
     )
 
 
