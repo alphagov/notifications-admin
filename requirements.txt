@@ -53,7 +53,7 @@ et-xmlfile==1.1.0
     # via openpyxl
 eventlet==0.33.1
     # via gunicorn
-fido2==0.9.3
+fido2==1.1.0
     # via -r requirements.in
 flask==2.1.2
     # via
@@ -202,7 +202,6 @@ six==1.16.0
     # via
     #   awscli-cwlogs
     #   eventlet
-    #   fido2
     #   python-dateutil
 smartypants==2.0.1
     # via notifications-utils
