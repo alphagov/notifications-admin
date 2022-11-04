@@ -6,7 +6,6 @@
 
 {#- Copied from https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/checkboxes/template.njk
     Changes:
-    - `formGroup` option to control whether or not the checkboxes are wrapped with a `govuk-form-group` class
     - `classes` option added to `item` allow custom classes on the `.govuk-checkboxes__item` element
     - `classes` option added to `item.hint` allow custom classes on the `.govuk-hint` element (added to GOVUK Frontend in v3.5.0 - remove when we update)
     - `asList` option added the root `params` object to allow setting of the `.govuk-checkboxes` and `.govuk-checkboxes__item` element types
@@ -14,12 +13,6 @@
 {#- If an id 'prefix' is not passed, fall back to using the name attribute
    instead. We need this for error messages and hints as well -#}
 {% set idPrefix = params.idPrefix if params.idPrefix else params.name %}
-
-{% if 'formGroup' not in params %}
-  {% set formGroup = True %}
-{% else %}
-  {% set formGroup = params.formGroup %}
-{% endif %}
 
 {#- a record of other elements that we need to associate with the input using
    aria-describedby – for example hints or error messages -#}
@@ -127,7 +120,7 @@
   </{{ groupElement }}>
 {% endset -%}
 
-<div class="{% if formGroup %}govuk-form-group{% endif %} {%- if params.errorMessage %} govuk-form-group--error{% endif %} {%- if params.formGroup.classes %} {{ params.formGroup.classes }}{% endif %}">
+<div class="govuk-form-group {%- if params.errorMessage %} govuk-form-group--error{% endif %} {%- if params.formGroup.classes %} {{ params.formGroup.classes }}{% endif %}">
 {% if params.fieldset %}
   {% call govukFieldset({
     describedBy: describedBy,
