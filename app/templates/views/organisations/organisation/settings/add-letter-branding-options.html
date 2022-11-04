@@ -17,19 +17,16 @@
   {{ page_header("Add letter branding options") }}
   {{ live_search(target_selector='.govuk-checkboxes__item', show=True, form=search_form, autofocus=True) }}
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-five-sixths">
-      {% call form_wrapper(module='add-branding-options-form') %}
-        <div class="brand-pool">
-            {{ form.branding_field }}
-        </div>
-      <div class="js-stick-at-bottom-when-scrolling">
-        {{ page_footer('Add options') }}
-        <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite">
-          Nothing selected
-        </div>
-      </div>
-      {% endcall %}
+  {% call form_wrapper(module='add-branding-options-form') %}
+    <div class="brand-pool">
+        {{ form.branding_field }}
+    </div>
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ page_footer('Add options') }}
+    <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite">
+      Nothing selected
     </div>
   </div>
+  {% endcall %}
+
 {% endblock %}
