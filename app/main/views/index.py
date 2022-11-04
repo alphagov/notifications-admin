@@ -99,44 +99,7 @@ def email_template():
     template = {
         "template_type": "email",
         "subject": "Email branding preview",
-        "content": (
-            "Lorem Ipsum is simply dummy text of the printing and typesetting "
-            "industry.\n\nLorem Ipsum has been the industry’s standard dummy "
-            "text ever since the 1500s, when an unknown printer took a galley "
-            "of type and scrambled it to make a type specimen book. "
-            "\n\n"
-            "# History"
-            "\n\n"
-            "It has "
-            "survived not only"
-            "\n\n"
-            "* five centuries"
-            "\n"
-            "* but also the leap into electronic typesetting"
-            "\n\n"
-            "It was "
-            "popularised in the 1960s with the release of Letraset sheets "
-            "containing Lorem Ipsum passages, and more recently with desktop "
-            "publishing software like Aldus PageMaker including versions of "
-            "Lorem Ipsum."
-            "\n\n"
-            "^ It is a long established fact that a reader will be distracted "
-            "by the readable content of a page when looking at its layout."
-            "\n\n"
-            "The point of using Lorem Ipsum is that it has a more-or-less "
-            "normal distribution of letters, as opposed to using ‘Content "
-            "here, content here’, making it look like readable English."
-            "\n\n\n"
-            "1. One"
-            "\n"
-            "2. Two"
-            "\n"
-            "10. Three"
-            "\n\n"
-            "This is an example of an email sent using GOV.UK Notify."
-            "\n\n"
-            "https://www.notifications.service.gov.uk"
-        ),
+        "content": render_template("example-email.md"),
     }
 
     if not bool(request.args):
