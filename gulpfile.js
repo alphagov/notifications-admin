@@ -58,9 +58,11 @@ const copy = {
       // Put names of GOVUK Frontend templates here
       const _templates = [
         'template',
+        // skip-link, header and footer are used by template
         'skip-link',
         'header',
         'footer',
+
         'details',
         'button',
         'error-summary',
