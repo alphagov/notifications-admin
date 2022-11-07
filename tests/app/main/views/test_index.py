@@ -252,9 +252,9 @@ def test_resources_that_use_asset_path_variable_have_correct_path(client_request
 
     page = client_request.get("main.documentation")  # easy static page
 
-    logo_svg_fallback = page.select_one(".govuk-header__logotype-crown-fallback-image")
+    favicon = page.select_one('link[type="image/x-icon"]')
 
-    assert logo_svg_fallback["src"].startswith("https://static.example.com/images/govuk-logotype-crown.png")
+    assert favicon.attrs["href"].startswith("https://static.example.com/images/favicon.ico")
 
 
 @pytest.mark.parametrize(

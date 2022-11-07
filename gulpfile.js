@@ -57,12 +57,6 @@ const copy = {
     templates: (cb) => {
       // Put names of GOVUK Frontend templates here
       const _templates = [
-        'template',
-        // skip-link, header and footer are used by template
-        'skip-link',
-        'header',
-        'footer',
-
         'button',
       ];
       let done = 0;
@@ -74,12 +68,6 @@ const copy = {
           paths.govuk_frontend + 'govuk/components/' + name + '/template.njk'
         ];
         let _dest = paths.templates + 'vendor/govuk-frontend/components/' + name;
-
-        // template.njk isn't a component
-        if (name === 'template') {
-          _src = paths.govuk_frontend + 'govuk/template.njk';
-          _dest = paths.templates + 'vendor/govuk-frontend';
-        }
 
         src(_src)
         .pipe(
