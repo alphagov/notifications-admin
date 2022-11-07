@@ -63,7 +63,6 @@ const copy = {
         'header',
         'footer',
 
-        'details',
         'button',
         'error-summary',
         'fieldset',
