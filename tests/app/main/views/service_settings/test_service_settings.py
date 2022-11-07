@@ -991,10 +991,10 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         assert normalize_spaces(page.select("main p")[1].text) == (
             "By requesting to go live you’re agreeing to our terms of use."
         )
-        assert page.select_one("main [type=submit]").text.strip() == ("Request to go live")
+        assert page.select_one("form button").text.strip() == ("Request to go live")
     else:
         assert not page.select("form")
-        assert not page.select("main [type=submit]")
+        assert not page.select("form button")
         assert len(page.select("main p")) == 1
         assert normalize_spaces(page.select_one("main p").text) == (
             "You must complete these steps before you can request to go live."

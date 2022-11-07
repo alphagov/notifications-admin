@@ -75,7 +75,7 @@ describe("Cookie settings", () => {
               </div>
             </fieldset>
           </div>
-          <button class="govuk-button" type="submit">Save cookie settings</button>
+          <button class="govuk-button">Save cookie settings</button>
         </form>
       </div>`;
 
@@ -106,7 +106,7 @@ describe("Cookie settings", () => {
 
   });
 
-  /* 
+  /*
     Note: If no JS, the cookies page contains content to explain why JS is required to set analytics cookies.
           This is hidden if JS is available when the page loads.
 

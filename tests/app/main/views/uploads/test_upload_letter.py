@@ -15,7 +15,7 @@ def test_get_upload_letter(client_request):
     assert page.select_one("h1").text == "Upload a letter"
     assert page.select_one("input.file-upload-field")
     assert page.select_one("input.file-upload-field")["accept"] == ".pdf"
-    assert page.select("main button[type=submit]")
+    assert page.select("form button")
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
 
 
@@ -98,7 +98,10 @@ def test_post_upload_letter_redirects_for_valid_file(
     assert not page.select_one("#validation-error-message")
 
     assert not page.select_one("input[name=file_id]")
-    assert normalize_spaces(page.select("main button[type=submit]")[0].text) == "Send 1 letter"
+    assert normalize_spaces(page.select("form button")[0].text) == "Send 1 letter"
+    assert page.select_one("form").attrs["action"] == url_for(
+        "main.send_uploaded_letter", service_id=SERVICE_ONE_ID, file_id=fake_uuid
+    )
 
 
 def test_post_upload_letter_shows_letter_preview_for_valid_file(
@@ -328,7 +331,8 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
 
     mock_s3_backup.assert_not_called()
     assert page.select_one("div.banner-dangerous h1")["data-error-type"] == "content-outside-printable-area"
-    assert not page.select_one("button.page-footer__button[type=submit]")
+    assert page.select_one("form").attrs["action"] == url_for("main.upload_letter", service_id=SERVICE_ONE_ID)
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
 def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request, fake_uuid):
@@ -434,7 +438,7 @@ def test_uploaded_letter_preview(
     assert page.select_one("h1").text == "my_encoded_filename£.pdf"
     assert page.select_one("div.letter-sent")
     assert not page.select_one("label.file-upload-button")
-    assert page.select_one("button.page-footer__button[type=submit]")
+    assert page.select_one("form button")
 
 
 def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_mode(
@@ -466,7 +470,7 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
     assert page.select_one("div.letter-sent")
     assert normalize_spaces(page.select_one(".js-stick-at-bottom-when-scrolling p").text) == ("Recipient: The Queen")
     assert not page.select_one("form")
-    assert len(page.select("main button[type=submit]")) == 0
+    assert len(page.select("form button")) == 0
 
 
 def test_uploaded_letter_preview_redirects_if_file_not_in_s3(mocker, client_request, fake_uuid):

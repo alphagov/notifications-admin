@@ -30,7 +30,7 @@ def test_get_support_index_page(
     assert page.select_one("form input#support_type-0")["value"] == "report-problem"
     assert normalize_spaces(page.select_one("form label[for=support_type-1]").text) == "Ask a question or give feedback"
     assert page.select_one("form input#support_type-1")["value"] == "ask-question-give-feedback"
-    assert normalize_spaces(page.select_one("form button[type=submit]").text) == "Continue"
+    assert normalize_spaces(page.select_one("form button").text) == "Continue"
 
 
 def test_get_support_index_page_when_signed_out(
@@ -48,7 +48,7 @@ def test_get_support_index_page_when_signed_out(
         "I’m a member of the public with a question for the government"
     )
     assert page.select_one("form input#who-1")["value"] == "public"
-    assert normalize_spaces(page.select_one("form button[type=submit]").text) == "Continue"
+    assert normalize_spaces(page.select_one("form button").text) == "Continue"
 
 
 @freeze_time("2016-12-12 12:00:00.000000")
@@ -87,7 +87,7 @@ def test_get_support_as_someone_in_the_public_sector(
     assert page.select_one("form textarea[name=feedback]")
     assert page.select_one("form input[name=name]")
     assert page.select_one("form input[name=email_address]")
-    assert page.select_one("form button[type=submit]")
+    assert page.select_one("form button")
 
 
 def test_get_support_as_member_of_public(
@@ -103,7 +103,7 @@ def test_get_support_as_member_of_public(
     assert len(page.select("h2 a")) == 3
     assert not page.select("form")
     assert not page.select("input")
-    assert not page.select("form [type=submit]")
+    assert not page.select("form button")
 
 
 @freeze_time("2016-12-12 12:00:00.000000")

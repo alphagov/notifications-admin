@@ -341,7 +341,7 @@ def test_upload_csv_shows_ok_page(
         upload_id=fake_uuid,
     )
 
-    assert normalize_spaces(page.select_one("form [type=submit]").text) == ("Save contact list")
+    assert normalize_spaces(page.select_one("form button").text) == ("Save contact list")
     assert normalize_spaces(page.select_one("thead").text) == ("Row in file 1 email address")
     assert len(page.select("tbody tr")) == 50
     assert normalize_spaces(page.select_one("tbody tr").text) == ("2 test@example.com")
@@ -572,7 +572,6 @@ def test_confirm_delete_contact_list(
     )
     assert "action" not in page.select_one("form")
     assert page.select_one("form")["method"] == "post"
-    assert page.select_one("form button")["type"] == "submit"
 
 
 def test_delete_contact_list(

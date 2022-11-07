@@ -26,7 +26,7 @@ describe('Prevent duplicate form submissions', () => {
     // set up DOM
     document.body.innerHTML = `
       <form action="/" method="post">
-        <button class="govuk-button" type="submit">Continue</button>
+        <button class="govuk-button">Continue</button>
       </form>`;
 
     form = document.querySelector('form');
@@ -63,7 +63,7 @@ describe('Prevent duplicate form submissions', () => {
     // JSDOM doesn't implement form submissions
     // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
     //
-    // If a form submission is caused by a input/button[type=submit], this instead outputs a
+    // If a form submission is caused by a submit input/button, this instead outputs a
     // 'not implemented' error from the requestSubmit method.
     //
     // That means we can assume any errors of that type would be the same as a form submission in
@@ -84,7 +84,7 @@ describe('Prevent duplicate form submissions', () => {
     // JSDOM doesn't implement form submissions
     // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
     //
-    // If a form submission is caused by a input/button[type=submit], this instead outputs a
+    // If a form submission is caused by a submit input/button, this instead outputs a
     // 'not implemented' error from the requestSubmit method.
     //
     // That means we can assume any errors of that type would be the same as a form submission in

@@ -91,7 +91,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
                 </div>
               </div>
               <div class="page-footer">
-                <button type="submit" class="govuk-button">Continue</button>
+                <button class="govuk-button">Continue</button>
               </div>
             </form>
           </main>
@@ -756,7 +756,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
             </div>
             <div class="page-footer js-stick-at-bottom-when-scrolling">
               <form method="post" action="">
-                  <button type="submit" class="govuk-button">Send 1 email </button>
+                  <button class="govuk-button">Send 1 email </button>
               </form>
             </div>
           </div>

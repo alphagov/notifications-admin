@@ -33,7 +33,7 @@ describe('File upload', () => {
           Upload a PNG logo
         </label>
         <input class="file-upload-field" data-button-text="Upload logo" id="file" name="file" type="file">
-        <button type="submit" class="govuk-button file-upload-submit">Submit</button>
+        <button class="govuk-button file-upload-submit">Submit</button>
       </form>`;
 
     form = document.querySelector('form');

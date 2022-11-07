@@ -39,7 +39,7 @@ describe('Authenticate with security key', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {})
 
     document.body.innerHTML = `
-      <button type="submit" data-notify-module="authenticate-security-key" data-csrf-token="abc123"></button>`
+      <button data-notify-module="authenticate-security-key" data-csrf-token="abc123"></button>`
 
     button = document.querySelector('[data-notify-module="authenticate-security-key"]')
     window.GOVUK.notifyModules.start()
