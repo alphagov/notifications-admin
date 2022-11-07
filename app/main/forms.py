@@ -5,7 +5,7 @@ from itertools import chain
 from numbers import Number
 
 import pytz
-from flask import Markup, render_template, render_template_string, request
+from flask import Markup, render_template_string, request
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
@@ -106,6 +106,7 @@ def render_govuk_frontend_macro(component, params):
     govuk_frontend_components = {
         "radios": {"path": "govuk_frontend_jinja/components/radios/macro.html", "macro": "govukRadios"},
         "text-input": {"path": "govuk_frontend_jinja/components/input/macro.html", "macro": "govukInput"},
+        "textarea": {"path": "govuk_frontend_jinja/components/textarea/macro.html", "macro": "govukTextarea"},
         "checkbox": {
             "path": "govuk_frontend_jinja_overrides/templates/components/checkboxes/macro.html",
             "macro": "govukCheckboxes",
@@ -819,7 +820,7 @@ class GovukTextareaField(TextAreaField):
         if param_extensions:
             merge_jsonlike(params, param_extensions)
 
-        return Markup(render_template("components/textarea/template.njk", params=params))
+        return render_govuk_frontend_macro("textarea", params=params)
 
 
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
