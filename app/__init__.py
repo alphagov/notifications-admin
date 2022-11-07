@@ -1,6 +1,5 @@
 import os
 import pathlib
-import sys
 from functools import partial
 from time import monotonic
 
@@ -21,7 +20,6 @@ from flask_login import LoginManager, current_user
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
 from gds_metrics import GDSMetrics
-from govuk_frontend_jinja.flask_ext import init_govuk_frontend
 from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging, request_helper
@@ -159,7 +157,6 @@ def create_app(application):
     if "extensions" not in application.jinja_options:
         application.jinja_options["extensions"] = []
 
-    init_govuk_frontend(application)
     init_jinja(application)
 
     for client in (
@@ -577,15 +574,9 @@ def init_jinja(application):
         os.path.join(repo_root, "app/templates"),
     ]
 
-    # Add vendor directory to module search path so we can find the new govuk-frontend-jinja macros
-    # TODO: once CCS govuk_frontend_jinja is removed, remove this path hack
-    sys.path.append(str(pathlib.Path("./vendor")))
-
     application.jinja_loader = jinja2.ChoiceLoader(
         [
             jinja2.FileSystemLoader(template_folders),
-            jinja2.PrefixLoader(
-                {"govuk_frontend_jinja": jinja2.PackageLoader("govuk_frontend_jinja_macros.govuk_frontend_jinja")}
-            ),
+            jinja2.PrefixLoader({"govuk_frontend_jinja": jinja2.PackageLoader("govuk_frontend_jinja")}),
         ]
     )

@@ -77,7 +77,7 @@ govuk-bank-holidays==0.11
     # via
     #   -r requirements.in
     #   notifications-utils
-govuk-frontend-jinja @ git+https://github.com/Crown-Commercial-Service/govuk-frontend-jinja.git@v0.5.8-alpha
+govuk-frontend-jinja==1.5.1
     # via -r requirements.in
 greenlet==1.1.2
     # via eventlet
