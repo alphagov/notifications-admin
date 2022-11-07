@@ -126,7 +126,7 @@
         'nonvisualText': state.action
       });
 
-      state.$el.find('[type=submit]').after($cancel);
+      state.$el.find(selector).after($cancel);
     };
 
     this.addClearButton = function(state) {
