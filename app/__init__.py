@@ -575,7 +575,6 @@ def init_jinja(application):
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     template_folders = [
         os.path.join(repo_root, "app/templates"),
-        os.path.join(repo_root, "app/templates/vendor/govuk-frontend"),
     ]
 
     # Add vendor directory to module search path so we can find the new govuk-frontend-jinja macros
