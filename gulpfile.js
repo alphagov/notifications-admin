@@ -61,19 +61,10 @@ const copy = {
         'skip-link',
         'header',
         'footer',
-        'back-link',
         'details',
         'button',
-        'error-message',
         'error-summary',
         'fieldset',
-        'hint',
-        'label',
-        'checkboxes',
-        'radios',
-        'input',
-        'inset-text',
-        'textarea',
         'summary-list'
       ];
       let done = 0;
