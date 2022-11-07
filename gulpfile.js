@@ -65,7 +65,6 @@ const copy = {
         'button',
         'error-summary',
         'fieldset',
-        'summary-list'
       ];
       let done = 0;
 
