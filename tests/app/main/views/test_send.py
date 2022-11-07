@@ -270,7 +270,7 @@ def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
     )
 
     assert page.select("main p")[0].text.strip() == "Sending text messages has been disabled for your service."
-    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
         ".view_template",
         service_id=service_one["id"],
@@ -1228,7 +1228,7 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     )
 
     assert page.select("main p")[0].text.strip() == "Sending text messages has been disabled for your service."
-    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
         ".view_template",
         service_id=service_one["id"],
@@ -3496,7 +3496,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
     assert len(page.select(".letter img")) == 5
 
     assert not page.select("main [type=submit]")
-    assert page.select_one(".govuk-back-link").text == "Back"
+    assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select_one("a[download]").text == "Download as a PDF"
 
 

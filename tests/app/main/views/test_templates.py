@@ -1508,7 +1508,7 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
         _expected_status=403,
     )
     assert normalize_spaces(page.select("main p")[0].text) == expected_error
-    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
         ".choose_template",
         service_id=SERVICE_ONE_ID,
@@ -1543,7 +1543,7 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
         _expected_status=403,
     )
     assert page.select("main p")[0].text.strip() == expected_error
-    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
         ".choose_template",
         service_id=service_one["id"],
@@ -1665,7 +1665,7 @@ def test_should_not_allow_template_edits_without_correct_permission(
     )
 
     assert page.select("main p")[0].text.strip() == "Sending text messages has been disabled for your service."
-    assert page.select(".govuk-back-link")[0].text == "Back"
+    assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
         ".view_template",
         service_id=SERVICE_ONE_ID,

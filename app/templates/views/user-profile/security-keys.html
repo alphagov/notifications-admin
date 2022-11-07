@@ -1,7 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/button/macro.njk" import govukButton %}
-{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/table.html" import edit_field, mapping_table, row, field, row_heading %}
 {% from "components/webauthn-api-check.html" import webauthn_api_check %}
 {% from "vendor/govuk-frontend/components/error-message/macro.njk" import govukErrorMessage %}

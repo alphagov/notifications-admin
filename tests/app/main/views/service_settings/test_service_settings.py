@@ -2377,7 +2377,7 @@ def test_service_verify_reply_to_address(
     )
     assert page.select_one("h1").text == "{} email reply-to address".format(expected_header)
     back_link = page.select_one(".govuk-back-link")
-    assert back_link.text == "Back"
+    assert back_link.text.strip() == "Back"
     if replace:
         assert "/email-reply-to/123/edit" in back_link["href"]
     else:
@@ -3745,7 +3745,7 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
     assert back_button["href"] == url_for(
         "main.email_branding_request_government_identity_logo", service_id=service_one["id"]
     )
-    assert back_button.text == "Back"
+    assert back_button.text.strip() == "Back"
     assert form["method"] == "post"
     assert "Request new branding" in submit_button.text
     assert text_input["name"] == "logo_text"

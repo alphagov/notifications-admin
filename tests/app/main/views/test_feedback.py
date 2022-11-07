@@ -665,7 +665,7 @@ def test_bat_email_page(
     client_request.logout()
     page = client_request.get(bat_phone_page)
 
-    assert page.select_one(".govuk-back-link").text == "Back"
+    assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select_one(".govuk-back-link")["href"] == url_for("main.support")
     assert page.select("main a")[1].text == "Fill in this form"
     assert page.select("main a")[1]["href"] == url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no")
