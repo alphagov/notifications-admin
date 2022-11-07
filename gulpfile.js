@@ -64,7 +64,6 @@ const copy = {
         'footer',
 
         'button',
-        'fieldset',
       ];
       let done = 0;
 
