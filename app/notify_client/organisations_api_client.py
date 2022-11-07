@@ -113,5 +113,9 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def remove_email_branding_from_pool(self, org_id, branding_id):
         self.delete(f"/organisations/{org_id}/email-branding-pool/{branding_id}")
 
+    @cache.delete("organisation-{org_id}-letter-branding-pool")
+    def remove_letter_branding_from_pool(self, org_id, branding_id):
+        self.delete(f"/organisations/{org_id}/letter-branding-pool/{branding_id}")
+
 
 organisations_client = OrganisationsClient()
