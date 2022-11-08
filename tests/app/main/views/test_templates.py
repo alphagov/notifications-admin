@@ -3,12 +3,16 @@ from functools import partial
 from unittest.mock import ANY, Mock
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
-from tests import sample_uuid, template_json, validate_route_permission
+from tests import (
+    NotifyBeautifulSoup,
+    sample_uuid,
+    template_json,
+    validate_route_permission,
+)
 from tests.app.main.views.test_template_folders import (
     CHILD_FOLDER_ID,
     FOLDER_TWO_ID,
@@ -2737,7 +2741,7 @@ def test_content_count_json_endpoint(
     )
 
     html = json.loads(response.get_data(as_text=True))["html"]
-    snippet = BeautifulSoup(html, "html.parser").select_one("span")
+    snippet = NotifyBeautifulSoup(html, "html.parser").select_one("span")
 
     assert normalize_spaces(snippet.text) == expected_message
 
