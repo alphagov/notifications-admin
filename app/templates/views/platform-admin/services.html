@@ -4,7 +4,7 @@
 {% from "components/table.html" import mapping_table, field, stats_fields, row_group, row, right_aligned_field_heading, hidden_field_heading, text_field %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/button/macro.njk" import govukButton %}
-{% from "components/details/macro.njk" import govukDetails %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% macro services_table(services, caption) %}
   {% call(item, row_number) mapping_table(

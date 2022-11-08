@@ -2,7 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer, sticky_page_footer %}
 {% from "components/form.html" import form_wrapper %}
-{% from "components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% set page_title = "Apply ‘{}’ branding".format(email_branding_name) %}
 
@@ -24,4 +24,3 @@
     {% endcall %}
 
 {% endblock %}
-
