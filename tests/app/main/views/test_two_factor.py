@@ -25,7 +25,7 @@ def test_two_factor_email_sent_page(client_request, email_resent, page_title, re
         email_resent=email_resent,
     )
 
-    assert page.h1.string == page_title
+    assert page.select_one("h1").string == page_title
     # there shouldn't be a form for updating mobile number
     assert page.select_one("form") is None
     resend_email_link = page.select_one("a.govuk-link.govuk-link--no-visited-state.page-footer-secondary-link")
@@ -391,7 +391,7 @@ def test_two_factor_email_link_has_expired(
             _follow_redirects=True,
         )
 
-    assert page.h1.text.strip() == "The link has expired"
+    assert page.select_one("h1").text.strip() == "The link has expired"
     assert page.select_one('a:contains("Sign in again")')["href"] == url_for("main.sign_in", next=redirect_url)
 
     assert mock_send_verify_code.called is False
@@ -431,7 +431,7 @@ def test_two_factor_email_link_is_already_used(
         _follow_redirects=True,
     )
 
-    assert page.h1.text.strip() == "The link has expired"
+    assert page.select_one("h1").text.strip() == "The link has expired"
     assert page.select_one('a:contains("Sign in again")')["href"] == url_for("main.sign_in", next=redirect_url)
 
     assert mock_send_verify_code.called is False
@@ -446,7 +446,7 @@ def test_two_factor_email_link_when_user_is_locked_out(client_request, valid_tok
         _follow_redirects=True,
     )
 
-    assert page.h1.text.strip() == "The link has expired"
+    assert page.select_one("h1").text.strip() == "The link has expired"
     assert mock_send_verify_code.called is False
 
 

@@ -1,5 +1,4 @@
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
@@ -8,6 +7,7 @@ from app.utils.letters import (
     get_letter_validation_error,
     printing_today_or_tomorrow,
 )
+from tests import NotifyBeautifulSoup
 
 
 @pytest.mark.parametrize(
@@ -204,8 +204,8 @@ def test_get_letter_validation_error_for_known_errors(
     expected_summary,
 ):
     error = get_letter_validation_error(error_message, invalid_pages=invalid_pages, page_count=13)
-    detail = BeautifulSoup(error["detail"], "html.parser")
-    summary = BeautifulSoup(error["summary"], "html.parser")
+    detail = NotifyBeautifulSoup(error["detail"], "html.parser")
+    summary = NotifyBeautifulSoup(error["summary"], "html.parser")
 
     assert error["title"] == expected_title
 

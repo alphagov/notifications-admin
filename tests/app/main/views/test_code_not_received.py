@@ -16,7 +16,7 @@ def test_should_render_email_verification_resend_show_email_address_and_resend_v
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
     page = client_request.get("main.resend_email_verification")
 
-    assert page.h1.string == "Check your email"
+    assert page.select_one("h1").string == "Check your email"
     expected = "A new confirmation email has been sent to {}".format(api_user_active["email_address"])
 
     message = page.select("main p")[0].text
@@ -39,7 +39,7 @@ def test_should_render_correct_resend_template_for_active_user(
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
     page = client_request.get("main.check_and_resend_text_code", next=redirect_url)
 
-    assert page.h1.string == "Resend security code"
+    assert page.select_one("h1").string == "Resend security code"
     # there shouldn't be a form for updating mobile number
     assert page.select_one("form") is None
     assert page.select_one("a.govuk-button")["href"] == url_for(
@@ -60,7 +60,7 @@ def test_should_render_correct_resend_template_for_pending_user(
         session["user_details"] = {"id": api_user_pending["id"], "email": api_user_pending["email_address"]}
     page = client_request.get("main.check_and_resend_text_code")
 
-    assert page.h1.string == "Check your mobile number"
+    assert page.select_one("h1").string == "Check your mobile number"
 
     expected = "Check your mobile phone number is correct and then resend the security code."
     message = page.select("main p")[0].text
@@ -193,7 +193,7 @@ def test_should_render_correct_email_not_received_template_for_active_user(
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
     page = client_request.get("main.email_not_received", next=redirect_url)
 
-    assert page.h1.string == "Resend email link"
+    assert page.select_one("h1").string == "Resend email link"
     # there shouldn't be a form for updating mobile number
     assert page.select_one("form") is None
     assert page.select_one("a.govuk-button")["href"] == url_for("main.resend_email_link", next=redirect_url)

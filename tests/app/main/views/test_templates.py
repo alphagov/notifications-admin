@@ -3,12 +3,16 @@ from functools import partial
 from unittest.mock import ANY, Mock
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
-from tests import sample_uuid, template_json, validate_route_permission
+from tests import (
+    NotifyBeautifulSoup,
+    sample_uuid,
+    template_json,
+    validate_route_permission,
+)
 from tests.app.main.views.test_template_folders import (
     CHILD_FOLDER_ID,
     FOLDER_TWO_ID,
@@ -1787,7 +1791,7 @@ def test_should_show_interstitial_when_making_breaking_change(
         _expected_status=200,
     )
 
-    assert page.h1.string.strip() == "Confirm changes"
+    assert page.select_one("h1").string.strip() == "Confirm changes"
     assert page.select_one("a.govuk-back-link")["href"] == url_for(
         ".edit_service_template",
         service_id=SERVICE_ONE_ID,
@@ -2737,7 +2741,7 @@ def test_content_count_json_endpoint(
     )
 
     html = json.loads(response.get_data(as_text=True))["html"]
-    snippet = BeautifulSoup(html, "html.parser").select_one("span")
+    snippet = NotifyBeautifulSoup(html, "html.parser").select_one("span")
 
     assert normalize_spaces(snippet.text) == expected_message
 

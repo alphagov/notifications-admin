@@ -70,7 +70,7 @@ def test_cancel_invited_org_user_cancels_user_invitations(
         invited_user_id=sample_org_invite["id"],
         _follow_redirects=True,
     )
-    assert normalize_spaces(page.h1.text) == "Team members"
+    assert normalize_spaces(page.select_one("h1").text) == "Team members"
     flash_banner = normalize_spaces(page.select_one("div.banner-default-with-tick").text)
     assert flash_banner == f"Invitation cancelled for {sample_org_invite['email_address']}"
     mock_cancel.assert_called_once_with(

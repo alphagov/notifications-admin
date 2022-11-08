@@ -16,7 +16,7 @@ def test_non_logged_in_user_can_see_homepage(
     client_request.logout()
     page = client_request.get("main.index", _test_page_title=False)
 
-    assert page.h1.text.strip() == ("Send emails, text messages and letters to your users")
+    assert page.select_one("h1").text.strip() == ("Send emails, text messages and letters to your users")
 
     assert page.select_one("a[role=button][draggable=false]")["href"] == url_for("main.register")
 
@@ -281,7 +281,7 @@ def test_email_branding_preview(
     email_branding_retrieved,
 ):
     page = client_request.get("main.email_template", _test_page_title=False, **extra_args)
-    assert page.title.text == "Email branding preview"
+    assert page.select_one("title").text == "Email branding preview"
     assert mock_get_email_branding.called is email_branding_retrieved
 
 

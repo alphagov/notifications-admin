@@ -12,7 +12,7 @@ def test_find_users_by_email_page_loads_correctly(client_request, platform_admin
     client_request.login(platform_admin_user)
     document = client_request.get("main.find_users_by_email")
 
-    assert document.h1.text.strip() == "Find users by email"
+    assert document.select_one("h1").text.strip() == "Find users by email"
     assert len(document.select("input[type=search]")) > 0
 
 

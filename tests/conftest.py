@@ -8,7 +8,6 @@ from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import Flask, url_for
 from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
@@ -16,6 +15,7 @@ from notifications_utils.url_safe_token import generate_token
 from app import create_app, webauthn_server
 
 from . import (
+    NotifyBeautifulSoup,
     TestClient,
     api_key_json,
     assert_url_expected,
@@ -2683,6 +2683,15 @@ def os_environ():
 
 @pytest.fixture  # noqa (C901 too complex)
 def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too complex)
+    def block_method(object, method_name, preferred_method_name):
+        def blocked_method(*args, **kwargs):
+            raise AttributeError(
+                f"Don’t use {object.__class__.__name__}.{method_name}"
+                f" – try {object.__class__.__name__}.{preferred_method_name} instead"
+            )
+
+        setattr(object, method_name, blocked_method)
+
     class ClientRequest:
         @staticmethod
         @contextmanager
@@ -2741,7 +2750,8 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             if _expected_redirect:
                 assert resp.location == _expected_redirect
 
-            page = BeautifulSoup(resp.data.decode("utf-8"), "html.parser")
+            page = NotifyBeautifulSoup(resp.data.decode("utf-8"), "html.parser")
+
             if _test_page_title:
                 count_of_h1s = len(page.select("h1"))
                 if count_of_h1s != 1:
@@ -2806,7 +2816,7 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             if _expected_redirect:
                 assert_url_expected(resp.location, _expected_redirect)
 
-            return BeautifulSoup(resp.data.decode("utf-8"), "html.parser")
+            return NotifyBeautifulSoup(resp.data.decode("utf-8"), "html.parser")
 
         @staticmethod
         def get_response(endpoint, _expected_status=200, _optional_args="", **endpoint_kwargs):

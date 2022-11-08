@@ -67,7 +67,7 @@ def test_choose_support_type(
         _data={"support_type": support_type},
         _follow_redirects=True,
     )
-    assert page.h1.string.strip() == expected_h1
+    assert page.select_one("h1").string.strip() == expected_h1
     assert not page.select_one("input[name=name]")
     assert not page.select_one("input[name=email_address]")
     assert page.select_one("form").find("p").text.strip() == ("We’ll reply to test@user.gov.uk")
@@ -670,7 +670,7 @@ def test_bat_email_page(
     assert page.select("main a")[1].text == "Fill in this form"
     assert page.select("main a")[1]["href"] == url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no")
     next_page = client_request.get_url(page.select("main a")[1]["href"])
-    assert next_page.h1.text.strip() == "Report a problem"
+    assert next_page.select_one("h1").text.strip() == "Report a problem"
 
     client_request.login(active_user_with_permissions)
     client_request.get(bat_phone_page, _expected_redirect=url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE))

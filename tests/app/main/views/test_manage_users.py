@@ -1171,7 +1171,7 @@ def test_invite_user(
         },
         _follow_redirects=True,
     )
-    assert page.h1.string.strip() == "Team members"
+    assert page.select_one("h1").string.strip() == "Team members"
     flash_banner = page.select_one("div.banner-default-with-tick").string.strip()
     assert flash_banner == f"Invite sent to {email_address}"
 
@@ -1267,7 +1267,7 @@ def test_invite_user_with_email_auth_service(
         _expected_status=200,
     )
 
-    assert page.h1.string.strip() == "Team members"
+    assert page.select_one("h1").string.strip() == "Team members"
     flash_banner = page.select_one("div.banner-default-with-tick").string.strip()
     assert flash_banner == "Invite sent to test@example.gov.uk"
 
@@ -1382,7 +1382,7 @@ def test_cancel_invited_user_cancels_user_invitations(
         _follow_redirects=True,
     )
 
-    assert normalize_spaces(page.h1.text) == "Team members"
+    assert normalize_spaces(page.select_one("h1").text) == "Team members"
     flash_banner = normalize_spaces(page.select_one("div.banner-default-with-tick").text)
     assert flash_banner == f"Invitation cancelled for {sample_invite['email_address']}"
     mock_cancel.assert_called_once_with(
@@ -1449,7 +1449,7 @@ def test_manage_users_shows_invited_user(
     mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
 
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
-    assert page.h1.string.strip() == "Team members"
+    assert page.select_one("h1").string.strip() == "Team members"
     assert normalize_spaces(page.select(".user-list-item")[0].text) == expected_text
 
 
@@ -1468,7 +1468,7 @@ def test_manage_users_does_not_show_accepted_invite(
 
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
 
-    assert page.h1.string.strip() == "Team members"
+    assert page.select_one("h1").string.strip() == "Team members"
     user_lists = page.select("div.user-list")
     assert len(user_lists) == 1
     assert "invited_user@test.gov.uk" not in page.text
@@ -1491,7 +1491,7 @@ def test_user_cant_invite_themselves(
         _follow_redirects=True,
         _expected_status=200,
     )
-    assert page.h1.string.strip() == "Invite a team member"
+    assert page.select_one("h1").string.strip() == "Invite a team member"
     form_error = page.select_one(".govuk-error-message").text.strip()
     assert form_error == "Error: You cannot send an invitation to yourself"
     assert not mock_create_invite.called

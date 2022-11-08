@@ -78,9 +78,9 @@ def test_choose_account_should_show_choose_accounts_page(
     mock_get_organisation,
 ):
     resp = client_request.get("main.choose_account")
-    page = resp.find("main", {"id": "main-content"})
+    page = resp.select_one("main#main-content")
 
-    assert normalize_spaces(page.h1.text) == "Choose service"
+    assert normalize_spaces(page.select_one("h1").text) == "Choose service"
     outer_list_items = page.select("nav ul")[0].select("li")
     headings = page.select("main h2")
 
