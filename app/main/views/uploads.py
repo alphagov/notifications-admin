@@ -33,7 +33,6 @@ from app import (
     service_api_client,
     upload_api_client,
 )
-from app.extensions import antivirus_client
 from app.main import main
 from app.main.forms import CsvUploadForm, LetterUploadPostageForm, PDFUploadForm
 from app.models.contact_list import ContactList
@@ -151,11 +150,6 @@ def upload_letter(service_id):
         pdf_file_bytes = form.file.data.read()
         original_filename = form.file.data.filename
 
-        if current_app.config["ANTIVIRUS_ENABLED"]:
-            virus_free = antivirus_client.scan(BytesIO(pdf_file_bytes))
-            if not virus_free:
-                return invalid_upload_error("Your file contains a virus")
-
         if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
             return invalid_upload_error("Your file is too big", "Files must be smaller than 2MB.")
 
@@ -227,7 +221,7 @@ def upload_letter(service_id):
     if form.file.errors:
         error = _get_error_from_upload_form(form.file.errors[0])
 
-    return render_template("views/uploads/choose-file.html", error=error, form=form)
+    return render_template("views/uploads/choose-file.html", error=error, form=form), 400 if error else 200
 
 
 def invalid_upload_error(error_title, error_detail=None):

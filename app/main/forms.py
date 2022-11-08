@@ -63,6 +63,7 @@ from app.main.validators import (
     CommonlyUsedPassword,
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
+    FileIsVirusFree,
     LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
@@ -615,6 +616,21 @@ class PostalAddressField(TextAreaField):
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = PostalAddress(valuelist[0]).normalised
+
+
+class VirusScannedFileField(FileField_wtf):
+    def __init__(self, label=None, validators=None, *args, **kwargs):
+        if validators is None:
+            validators = []
+        else:
+            # Make a copy of the validators list, as field validators are usually instantiated at the class-level,
+            # meaning the list is shared between all instances. We want to potentially modify the validators, so we need
+            # to create a new list.
+            validators = validators[:]
+
+        validators.insert(0, FileIsVirusFree())
+
+        super().__init__(label, validators, *args, **kwargs)
 
 
 class LoginForm(StripWhitespaceForm):
@@ -1838,7 +1854,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         "Colour",
         param_extensions={"classes": "govuk-input--width-6", "attributes": {"data-notify-module": "colour-preview"}},
     )
-    file = FileField_wtf("Upload a PNG logo", validators=[FileAllowed(["png"], "PNG Images only!")])
+    file = VirusScannedFileField("Upload a PNG logo", validators=[FileAllowed(["png"], "PNG Images only!")])
     brand_type = GovukRadiosField(
         "Brand type",
         choices=[
@@ -1922,7 +1938,7 @@ class AdminEditLetterBrandingForm(StripWhitespaceForm):
 
 
 class SVGFileUpload(StripWhitespaceForm):
-    file = FileField_wtf(
+    file = VirusScannedFileField(
         "Upload an SVG logo",
         validators=[
             FileAllowed(["svg"], "SVG Images only!"),
@@ -1934,7 +1950,7 @@ class SVGFileUpload(StripWhitespaceForm):
 
 
 class PDFUploadForm(StripWhitespaceForm):
-    file = FileField_wtf(
+    file = VirusScannedFileField(
         "Upload a letter in PDF format",
         validators=[
             FileAllowed(["pdf"], "Save your letter as a PDF and try again."),
