@@ -106,6 +106,10 @@ def render_govuk_frontend_macro(component, params):
     govuk_frontend_components = {
         "radios": {"path": "govuk_frontend_jinja/components/radios/macro.html", "macro": "govukRadios"},
         "text-input": {"path": "govuk_frontend_jinja/components/input/macro.html", "macro": "govukInput"},
+        "checkbox": {
+            "path": "govuk_frontend_jinja_overrides/templates/components/checkboxes/macro.html",
+            "macro": "govukCheckboxes",
+        },
     }
 
     # we need to duplicate all curly braces to escape them from the f string so jinja still sees them
@@ -531,7 +535,7 @@ class NestedFieldMixin:
 
             params["items"].append(item)
 
-        return render_template("forms/fields/checkboxes/template.njk", params=params)
+        return render_govuk_frontend_macro("checkbox", params=params)
 
 
 class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
@@ -671,7 +675,7 @@ def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
     if param_extensions:
         merge_jsonlike(params, param_extensions)
 
-    return Markup(render_template("forms/fields/checkboxes/macro.njk", params=params))
+    return render_govuk_frontend_macro("checkbox", params=params)
 
 
 def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_extensions=None, **kwargs):
@@ -727,11 +731,9 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
         # add a blank hint to act as an ARIA live-region
         params.update({"hint": {"html": '<div class="selection-summary" role="region" aria-live="polite"></div>'}})
 
-        return _wrap_in_collapsible(
-            self.field_label, Markup(render_template("forms/fields/checkboxes/macro.njk", params=params))
-        )
+        return _wrap_in_collapsible(self.field_label, render_govuk_frontend_macro("checkbox", params=params))
     else:
-        return Markup(render_template("forms/fields/checkboxes/macro.njk", params=params))
+        return render_govuk_frontend_macro("checkbox", params=params)
 
 
 def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
