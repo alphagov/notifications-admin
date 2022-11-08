@@ -16,6 +16,7 @@ from notifications_utils.url_safe_token import generate_token
 from app import create_app, webauthn_server
 
 from . import (
+    NotifyBeautifulSoup,
     TestClient,
     api_key_json,
     assert_url_expected,
@@ -2750,9 +2751,8 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             if _expected_redirect:
                 assert resp.location == _expected_redirect
 
-            page = BeautifulSoup(resp.data.decode("utf-8"), "html.parser")
-            block_method(page, "find", preferred_method_name="select_one")
-            block_method(page, "find_all", preferred_method_name="select")
+            page = NotifyBeautifulSoup(resp.data.decode("utf-8"), "html.parser")
+
             if _test_page_title:
                 count_of_h1s = len(page.select("h1"))
                 if count_of_h1s != 1:

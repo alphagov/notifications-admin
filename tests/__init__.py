@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlparse
 
 import freezegun
 import pytest
+from bs4 import BeautifulSoup
 from flask import session as flask_session
 from flask import url_for
 from flask.testing import FlaskClient
@@ -41,6 +42,21 @@ class TestClient(FlaskClient):
 
     def logout(self, user):
         self.get(url_for("main.sign_out"))
+
+
+class NotifyBeautifulSoup(BeautifulSoup):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.override_method("find", "select_one")
+        self.override_method("find_all", "select")
+
+    def override_method(self, method_name, preferred_method_name):
+        def overridden_method(*args, **kwargs):
+            raise AttributeError(
+                f"Don’t use BeautifulSoup.{method_name}" f" – try BeautifulSoup.{preferred_method_name} instead"
+            )
+
+        setattr(self, method_name, overridden_method)
 
 
 def sample_uuid():
