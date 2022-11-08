@@ -1173,7 +1173,9 @@ def email_branding_request(service_id):
             return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
 
         if current_service.organisation_type == "central":
-            return redirect(url_for(".email_branding_choose_logo", service_id=current_service.id))
+            return redirect(
+                url_for(".email_branding_choose_logo", service_id=current_service.id, branding_choice=branding_choice)
+            )
         else:
             # TODO: change this to redirect to new logo upload flow once it's ready
             return redirect(
@@ -1301,10 +1303,12 @@ def email_branding_something_else(service_id):
 )
 @user_has_permissions("manage_service")
 def email_branding_request_government_identity_logo(service_id):
+    branding_choice = request.args.get("branding_choice")
     return render_template(
         "views/service-settings/branding/email-branding-create-government-identity-logo.html",
         service_id=service_id,
-        back_link=url_for(".email_branding_choose_logo", service_id=service_id),
+        back_link=url_for(".email_branding_choose_logo", service_id=service_id, branding_choice=branding_choice),
+        branding_choice=branding_choice,
         example=AllEmailBranding().example_government_identity_branding,
     )
 
@@ -1316,11 +1320,13 @@ def email_branding_request_government_identity_logo(service_id):
 @user_has_permissions("manage_service")
 def email_branding_enter_government_identity_logo_text(service_id):
     form = GovernmentIdentityLogoForm(organisation=current_service.organisation)
+    branding_choice = request.args.get("branding_choice")
 
     if form.validate_on_submit():
         ticket_message = render_template(
             "support-tickets/government-logo-branding-request.txt",
             logo_text=form.logo_text.data,
+            branding_choice=branding_choice,
         )
         ticket = NotifySupportTicket(
             subject=f"Email branding request - {current_service.name}",
@@ -1339,7 +1345,9 @@ def email_branding_enter_government_identity_logo_text(service_id):
     return render_template(
         "views/service-settings/branding/email-branding-enter-government-identity-logo-text.html",
         form=form,
-        back_link=url_for(".email_branding_request_government_identity_logo", service_id=service_id),
+        back_link=url_for(
+            ".email_branding_request_government_identity_logo", service_id=service_id, branding_choice=branding_choice
+        ),
     )
 
 

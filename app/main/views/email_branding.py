@@ -125,6 +125,7 @@ def create_email_branding_government_identity_logo():
                 ".create_email_branding_government_identity_colour",
                 text=request.args.get("text"),
                 filename=form.coat_of_arms_or_insignia.data,
+                brand_type=request.args.get("brand_type"),
             )
         )
 
@@ -160,6 +161,7 @@ def create_email_branding_government_identity_colour():
                 text=request.args.get("text"),
                 colour=form.colour.data,
                 logo=upload_filename,
+                brand_type=request.args.get("brand_type"),
             )
         )
 
@@ -177,7 +179,7 @@ def create_email_branding(logo=None):
         name=request.args.get("name"),
         text=request.args.get("text"),
         colour=request.args.get("colour"),
-        brand_type="org",
+        brand_type=request.args.get("brand_type", "org"),
     )
 
     if form.validate_on_submit():

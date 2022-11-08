@@ -341,7 +341,7 @@ def test_email_branding_request_page_back_link(
 
 
 @pytest.mark.parametrize(
-    "data, org_type, endpoint",
+    "data, org_type, endpoint, extra_args",
     (
         (
             {
@@ -349,6 +349,7 @@ def test_email_branding_request_page_back_link(
             },
             "central",
             "main.email_branding_govuk",
+            {},
         ),
         (
             {
@@ -356,6 +357,7 @@ def test_email_branding_request_page_back_link(
             },
             "central",
             "main.email_branding_choose_logo",
+            {"branding_choice": "govuk_and_org"},
         ),
         (
             {
@@ -363,6 +365,7 @@ def test_email_branding_request_page_back_link(
             },
             "central",
             "main.email_branding_choose_logo",
+            {"branding_choice": "organisation"},
         ),
         (
             {
@@ -370,6 +373,7 @@ def test_email_branding_request_page_back_link(
             },
             "central",
             "main.email_branding_choose_logo",
+            {"branding_choice": "something_else"},
         ),
         (
             {
@@ -377,6 +381,7 @@ def test_email_branding_request_page_back_link(
             },
             "local",
             "main.email_branding_something_else",
+            {"back_link": ".email_branding_request"},
         ),
         (
             {
@@ -384,6 +389,7 @@ def test_email_branding_request_page_back_link(
             },
             "nhs_local",
             "main.email_branding_nhs",
+            {},
         ),
     ),
 )
@@ -397,6 +403,7 @@ def test_email_branding_request_submit(
     data,
     org_type,
     endpoint,
+    extra_args,
 ):
     organisation_one["organisation_type"] = org_type
     service_one["email_branding"] = sample_uuid()
@@ -407,20 +414,16 @@ def test_email_branding_request_submit(
         return_value=organisation_one,
     )
 
-    if org_type == "local" and data["options"] == "something_else":
-        expected_url = url_for(endpoint, service_id=SERVICE_ONE_ID, back_link=".email_branding_request")
-    else:
-        expected_url = url_for(
-            endpoint,
-            service_id=SERVICE_ONE_ID,
-        )
-
     client_request.post(
         ".email_branding_request",
         service_id=SERVICE_ONE_ID,
         _data=data,
         _expected_status=302,
-        _expected_redirect=expected_url,
+        _expected_redirect=url_for(
+            endpoint,
+            service_id=SERVICE_ONE_ID,
+            **extra_args,
+        ),
     )
 
 

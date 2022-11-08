@@ -45,7 +45,11 @@
   {{ govukButton({
     "element": "a",
     "text": "Continue",
-    "href": url_for('.email_branding_enter_government_identity_logo_text', service_id=service_id)
+    "href": url_for(
+      '.email_branding_enter_government_identity_logo_text',
+      service_id=service_id,
+      branding_choice=branding_choice
+    )
   }) }}
 
 {% endblock %}

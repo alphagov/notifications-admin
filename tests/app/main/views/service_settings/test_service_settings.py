@@ -3780,7 +3780,66 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
     assert text_input["name"] == "logo_text"
 
 
-def test_POST_email_branding_enter_government_identity_logo_text(mocker, client_request, service_one):
+@pytest.mark.parametrize(
+    "extra_url_args,expected_ticket_content,expected_extra_url_args",
+    [
+        (
+            {"branding_choice": "something-else"},
+            """
+        Organisation: Can’t tell (domain is user.gov.uk)
+        Service: service one
+        {service_dashboard}
+
+        ---
+        Government logo text requested: My lovely government identity
+
+        Create this logo: {create_email_branding_government_identity_logo}
+
+        Apply branding to this service: {service_set_email_branding}
+    """,
+            {},
+        ),
+        (
+            {"branding_choice": "govuk_and_org"},
+            """
+        Organisation: Can’t tell (domain is user.gov.uk)
+        Service: service one
+        {service_dashboard}
+
+        ---
+        Government logo text requested: My lovely government identity
+
+        This service requested for both GOV.UK and organisation logo to be visible.
+
+        Create this logo: {create_email_branding_government_identity_logo}
+
+        Apply branding to this service: {service_set_email_branding}
+    """,
+            {"brand_type": "both"},
+        ),
+        (
+            {"branding_choice": "organisation"},
+            """
+        Organisation: Can’t tell (domain is user.gov.uk)
+        Service: service one
+        {service_dashboard}
+
+        ---
+        Government logo text requested: My lovely government identity
+
+        This service requested organisation branding.
+
+        Create this logo: {create_email_branding_government_identity_logo}
+
+        Apply branding to this service: {service_set_email_branding}
+    """,
+            {},
+        ),
+    ],
+)
+def test_POST_email_branding_enter_government_identity_logo_text(
+    mocker, client_request, service_one, extra_url_args, expected_ticket_content, expected_extra_url_args
+):
     mock_send_ticket_to_zendesk = mocker.patch(
         "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
@@ -3791,32 +3850,21 @@ def test_POST_email_branding_enter_government_identity_logo_text(mocker, client_
         "main.email_branding_enter_government_identity_logo_text",
         service_id=service_one["id"],
         _data={"logo_text": "My lovely government identity"},
+        **extra_url_args,
     )
 
     assert "Thanks for your branding request." in mock_flash.call_args_list[0][0][0]
     assert mock_send_ticket_to_zendesk.call_count == 1
     assert (
         mock_send_ticket_to_zendesk.call_args[0][0].message
-        == dedent(
-            """
-            Organisation: Can’t tell (domain is user.gov.uk)
-            Service: service one
-            {service_dashboard}
-
-            ---
-            Government logo text requested: My lovely government identity
-
-            Create this logo: {create_email_branding_government_identity_logo}
-
-            Apply branding to this service: {service_set_email_branding}
-            """
-        )
+        == dedent(expected_ticket_content)
         .format(
             service_dashboard=url_for("main.service_dashboard", service_id=SERVICE_ONE_ID, _external=True),
             create_email_branding_government_identity_logo=url_for(
                 "main.create_email_branding_government_identity_logo",
                 text="My lovely government identity",
                 _external=True,
+                **expected_extra_url_args,
             ),
             service_set_email_branding=url_for(
                 "main.service_set_email_branding", service_id=SERVICE_ONE_ID, _external=True

@@ -8,7 +8,15 @@ Service: {{ current_service.name }}
 
 ---
 Government logo text requested: {{ logo_text }}
+{% set create_logo_url = url_for(
+  'main.create_email_branding_government_identity_logo', text=logo_text, _external=True
+) %}
+{% if branding_choice == "govuk_and_org" %}This service requested for both GOV.UK and organisation logo to be visible.
+{% set create_logo_url = url_for(
+  'main.create_email_branding_government_identity_logo', text=logo_text, brand_type="both", _external=True
+) %}
+{% elif branding_choice == "organisation" %}This service requested organisation branding.
 
-Create this logo: {{ url_for('main.create_email_branding_government_identity_logo', text=logo_text, _external=True) }}
+{% endif %}Create this logo: {{ create_logo_url }}
 
 Apply branding to this service: {{ url_for('main.service_set_email_branding', service_id=current_service.id, _external=True) }}
