@@ -8,7 +8,6 @@ from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
 
 import pytest
-from bs4 import BeautifulSoup
 from flask import Flask, url_for
 from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
@@ -2817,7 +2816,7 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             if _expected_redirect:
                 assert_url_expected(resp.location, _expected_redirect)
 
-            return BeautifulSoup(resp.data.decode("utf-8"), "html.parser")
+            return NotifyBeautifulSoup(resp.data.decode("utf-8"), "html.parser")
 
         @staticmethod
         def get_response(endpoint, _expected_status=200, _optional_args="", **endpoint_kwargs):

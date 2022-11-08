@@ -495,7 +495,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
     assert "There’s a problem with example.csv" in page.text
     assert "+447700900986" in page.text
     assert "Missing" in page.text
-    assert normalize_spaces(page.find("input", {"type": "file"})["data-button-text"]) == "Upload your file again"
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
 def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(

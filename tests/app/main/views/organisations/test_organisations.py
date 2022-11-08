@@ -2312,7 +2312,7 @@ def test_add_organisation_email_branding_options_calls_api_client_with_chosen_br
     )
 
     assert page.select_one("h1").text == "Email branding"
-    assert normalize_spaces(page.find("div", class_="banner-default-with-tick").text) == flash_message
+    assert normalize_spaces(page.select_one("div.banner-default-with-tick").text) == flash_message
     mock_update_pool.assert_called_once_with(organisation_one["id"], branding_ids_added)
 
 
@@ -2558,8 +2558,8 @@ def test_add_organisation_letter_branding_options_calls_api_client_with_chosen_b
         _follow_redirects=True,
     )
 
-    assert page.h1.text == "Letter branding"
-    assert normalize_spaces(page.find("div", class_="banner-default-with-tick").text) == flash_message
+    assert page.select_one("h1").text == "Letter branding"
+    assert normalize_spaces(page.select_one("div.banner-default-with-tick").text) == flash_message
     mock_update_pool.assert_called_once_with(organisation_one["id"], branding_ids_added)
 
 

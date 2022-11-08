@@ -3706,7 +3706,7 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
     if add_to_pool == "yes":
         mock_add_to_branding_pool.assert_called_with(organisation_one["id"], [email_branding_id])
         assert (
-            normalize_spaces(page.find("div", class_="banner-default-with-tick").text)
+            normalize_spaces(page.select_one("div.banner-default-with-tick").text)
             == f"The email branding has been set to {email_branding_name} "
             f"and it has been added to {organisation_one['name']}'s email branding pool"
         )
@@ -3714,7 +3714,7 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
     elif add_to_pool == "no":
         mock_add_to_branding_pool.assert_not_called()
         assert (
-            normalize_spaces(page.find("div", class_="banner-default-with-tick").text)
+            normalize_spaces(page.select_one("div.banner-default-with-tick").text)
             == f"The email branding has been set to {email_branding_name}"
         )
 
