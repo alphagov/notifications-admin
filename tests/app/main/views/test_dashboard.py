@@ -885,20 +885,16 @@ def test_should_not_show_upcoming_jobs_on_dashboard_if_service_has_no_jobs(
 @pytest.mark.parametrize(
     "totals",
     [
-        (
-            {
-                "email": {"requested": 0, "delivered": 0, "failed": 0},
-                "sms": {"requested": 99999, "delivered": 0, "failed": 0},
-                "letter": {"requested": 99999, "delivered": 0, "failed": 0},
-            },
-        ),
-        (
-            {
-                "email": {"requested": 0, "delivered": 0, "failed": 0},
-                "sms": {"requested": 0, "delivered": 0, "failed": 0},
-                "letter": {"requested": 100000, "delivered": 0, "failed": 0},
-            },
-        ),
+        {
+            "email": {"requested": 0, "delivered": 0, "failed": 0},
+            "sms": {"requested": 99999, "delivered": 0, "failed": 0},
+            "letter": {"requested": 99999, "delivered": 0, "failed": 0},
+        },
+        {
+            "email": {"requested": 0, "delivered": 0, "failed": 0},
+            "sms": {"requested": 0, "delivered": 0, "failed": 0},
+            "letter": {"requested": 100000, "delivered": 0, "failed": 0},
+        },
     ],
 )
 def test_correct_font_size_for_big_numbers(
@@ -1407,6 +1403,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
         return_value={
             "email": {"requested": 123, "delivered": 0, "failed": 0},
             "sms": {"requested": 456, "delivered": 0, "failed": 0},
+            "letter": {"requested": 789, "delivered": 0, "failed": 0},
         },
     )
 
@@ -1418,6 +1415,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     numbers = [number.text.strip() for number in page.select("span.big-number-number")]
     assert "123" in numbers
     assert "456" in numbers
+    assert "789" in numbers
 
 
 def test_get_dashboard_totals_adds_percentages():
@@ -1445,7 +1443,7 @@ def test_format_monthly_stats_labels_month():
 
 
 def test_format_monthly_stats_has_stats_with_failure_rate():
-    resp = format_monthly_stats_to_list({"2016-07": {"sms": _stats(3, 1, 2)}})
+    resp = format_monthly_stats_to_list({"2016-07": {"sms": {"requested": 3, "delivered": 1, "failed": 2}}})
     assert resp[0]["sms_counts"] == {
         "failed": 2,
         "failed_percentage": "66.7",
@@ -1467,10 +1465,6 @@ def test_format_monthly_stats_works_for_email_letter():
     assert isinstance(resp[0]["sms_counts"], dict)
     assert isinstance(resp[0]["email_counts"], dict)
     assert isinstance(resp[0]["letter_counts"], dict)
-
-
-def _stats(requested, delivered, failed):
-    return {"requested": requested, "delivered": delivered, "failed": failed}
 
 
 @pytest.mark.parametrize(
