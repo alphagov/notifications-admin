@@ -15,7 +15,7 @@
   </p>
 {% endif %}
 
-{% if service_has_email_auth %}
+{% if current_service.has_permission('email_auth') %}
   {% if user.webauthn_auth %}
     <p class="bottom-gutter">
       This user will login with a security key.
