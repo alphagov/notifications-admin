@@ -1,3 +1,5 @@
+{% from "service_navigation.html" import service_navigation %}
+
 {% extends "admin_template.html" %}
 
 {% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
@@ -8,7 +10,7 @@
 
 {% block main %}
   <div class="govuk-width-container">
-    {% include "service_navigation.html" %}
+    {{ service_navigation(current_user, current_service) }}
     <div class="govuk-grid-row govuk-!-padding-bottom-12">
       {% if help %}
         <div class="govuk-grid-column-one-third">

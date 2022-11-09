@@ -1,4 +1,5 @@
 {% from "components/banner.html" import banner_wrapper %}
+{% from "service_navigation.html" import service_navigation %}
 
 {% extends "admin_template.html" %}
 
@@ -11,7 +12,7 @@
 {% block main %}
 
   <div class="govuk-width-container">
-    {% include "service_navigation.html" %}
+    {{ service_navigation(current_user, current_service) }}
     <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content" role="main">
       <div class="banner-tour banner-tour-no-fixed-height banner-tour-with-service-name">
         <div class="govuk-grid-row">
