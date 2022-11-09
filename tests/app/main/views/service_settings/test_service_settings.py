@@ -1,6 +1,8 @@
 from datetime import datetime
 from functools import partial
+from io import BytesIO
 from textwrap import dedent
+from unittest import mock
 from unittest.mock import ANY, Mock, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
 from uuid import UUID, uuid4
@@ -3915,18 +3917,21 @@ def test_any_org_type_can_see_email_branding_choose_banner_type_page(
 
 
 @pytest.mark.parametrize(
-    "selected_option, expected_endpoint",
-    [("org", ".email_branding_upload_logo"), ("org_banner", ".email_branding_choose_banner_colour")],
+    "selected_option, expected_endpoint, url_for_kwargs",
+    [
+        ("org", ".email_branding_upload_logo", {"previous_page": "add-banner"}),
+        ("org_banner", ".email_branding_choose_banner_colour", {}),
+    ],
 )
 def test_email_branding_choose_banner_type_redirects_to_right_page(
-    client_request, service_one, selected_option, expected_endpoint
+    client_request, service_one, selected_option, expected_endpoint, url_for_kwargs
 ):
     client_request.post(
         ".email_branding_choose_banner_type",
         service_id=SERVICE_ONE_ID,
         _data={"banner": selected_option},
         _expected_status=302,
-        _expected_redirect=url_for(expected_endpoint, service_id=SERVICE_ONE_ID),
+        _expected_redirect=url_for(expected_endpoint, service_id=SERVICE_ONE_ID, **url_for_kwargs),
     )
 
 
@@ -3943,6 +3948,100 @@ def test_email_branding_choose_banner_type_shows_error_summary_on_invalid_data(c
     assert error_summary.select_one("a").get("href") == "#banner"
 
     assert "Error: Select an option" in page.select_one("#banner").text
+
+
+@pytest.mark.parametrize(
+    "query_params, expected_back_link",
+    (
+        ({}, "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner"),
+        (
+            {"previous_page": ""},
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner",
+        ),
+        (
+            {"previous_page": "add-banner"},
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner",
+        ),
+        (
+            {"previous_page": "choose-colour"},
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/choose-banner-colour",
+        ),
+    ),
+)
+def test_GET_email_branding_upload_logo(client_request, service_one, query_params, expected_back_link):
+    page = client_request.get(
+        "main.email_branding_upload_logo",
+        service_id=service_one["id"],
+        **query_params,
+    )
+
+    back_button = page.select_one("a.govuk-back-link")
+    form = page.select_one("form")
+    submit_button = form.select_one("button")
+    file_input = form.select_one("input")
+
+    assert back_button["href"] == expected_back_link
+    assert form["method"] == "post"
+    assert "Submit" in submit_button.text
+    assert file_input["name"] == "file"
+
+
+def test_POST_email_branding_upload_logo_success(mocker, client_request, service_one):
+    antivirus_mock = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mock_upload_email_logo = mocker.patch("app.main.views.service_settings.upload_email_logo")
+    mocker.patch("app.main.views.service_settings.uuid.uuid4", return_value="my-logo-uuid")
+
+    client_request.post(
+        "main.email_branding_upload_logo",
+        _data={"file": (b"", "logo.png")},
+        service_id=service_one["id"],
+        _expected_redirect=url_for(
+            "main.email_branding_name_logo",
+            service_id=service_one["id"],
+            logo_id="my-logo-uuid",
+        ),
+    )
+
+    assert antivirus_mock.call_count == 1
+    assert mock_upload_email_logo.call_args_list == [
+        mocker.call(
+            "",
+            b"",
+            "eu-west-1",
+            user_id=ANY,
+            unique_id="my-logo-uuid",
+        )
+    ]
+
+
+@pytest.mark.parametrize(
+    "post_data, expected_error",
+    (
+        (
+            ({}, "You need to upload a file to submit"),
+            ({"file": (BytesIO(b""), "logo.svg")}, "That is not a PNG file"),
+            (
+                {"file": (BytesIO(b"a" * 3 * 1024 * 1024), "logo.png")},
+                "File must be smaller than 2MB",
+            ),
+        )
+    ),
+)
+def test_POST_email_branding_upload_logo_validation_errors(
+    mocker, client_request, service_one, post_data, expected_error
+):
+    mock_upload_email_logo = mocker.patch("app.main.views.service_settings.upload_email_logo")
+
+    with mock.patch.dict("app.main.validators.current_app.config", {"ANTIVIRUS_ENABLED": False}):
+        page = client_request.post(
+            "main.email_branding_upload_logo",
+            _data=post_data,
+            service_id=service_one["id"],
+            _expected_status=400,
+        )
+
+    assert expected_error in page.text
+    assert mock_upload_email_logo.call_args_list == []
 
 
 def test_GET_email_branding_choose_banner_colour(client_request, service_one):

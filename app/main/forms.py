@@ -1949,6 +1949,17 @@ class SVGFileUpload(StripWhitespaceForm):
     )
 
 
+class PNGFileUpload(StripWhitespaceForm):
+    file = VirusScannedFileField(
+        "Upload a logo",
+        validators=[
+            DataRequired(message="You need to upload a file to submit"),
+            FileSize(max_size=(2 * 1024 * 1024), message="File must be smaller than 2MB"),
+            FileAllowed(["png"], "That is not a PNG file"),
+        ],
+    )
+
+
 class PDFUploadForm(StripWhitespaceForm):
     file = VirusScannedFileField(
         "Upload a letter in PDF format",
