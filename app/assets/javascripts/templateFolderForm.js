@@ -299,10 +299,10 @@
     this.nothingSelectedButtons = $(`
       <div id="nothing_selected">
         <div class="js-stick-at-bottom-when-scrolling">
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="add-new-template" aria-expanded="false">
+          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="add-new-template" aria-expanded="false">
             New template
           </button>
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="add-new-folder" aria-expanded="false">New folder</button>
+          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="add-new-folder" aria-expanded="false">New folder</button>
           <div class="checkbox-list-selected-counter">
             <span class="checkbox-list-selected-counter__count" aria-hidden="true">
               ${this.selectionStatus.default}
@@ -315,10 +315,10 @@
     this.itemsSelectedButtons = $(`
       <div id="items_selected">
         <div class="js-stick-at-bottom-when-scrolling">
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="move-to-existing-folder" aria-expanded="false">
+          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="move-to-existing-folder" aria-expanded="false">
             Move<span class="govuk-visually-hidden"> selection to folder</span>
           </button>
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="move-to-new-folder" aria-expanded="false">Add to new folder</button>
+          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="move-to-new-folder" aria-expanded="false">Add to new folder</button>
           <div class="checkbox-list-selected-counter" aria-hidden="true">
             <span class="checkbox-list-selected-counter__count" aria-hidden="true">
               ${this.selectionStatus.selected(1)}

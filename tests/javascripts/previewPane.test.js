@@ -79,7 +79,7 @@ describe('Preview pane', () => {
           </div>
         </div>
         <div class="page-footer">
-          <button class="govuk-button">Preview</button>
+          <button class="page-footer__button govuk-button" data-module="govuk-button">Preview</button>
         </div>
       </form>`;
 

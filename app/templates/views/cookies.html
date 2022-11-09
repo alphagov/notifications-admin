@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/banner.html" import banner %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block per_page_title %}
   Cookies
@@ -142,7 +143,9 @@
             </div>
           </fieldset>
         </div>
-        <button class="govuk-button">Save cookie settings</button>
+        {{ govukButton({
+          "text": "Save cookie settings"
+        }) }}
       </form>
     </div>
   </div>

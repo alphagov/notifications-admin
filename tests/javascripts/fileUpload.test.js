@@ -67,7 +67,7 @@ describe('File upload', () => {
     // start module
     window.GOVUK.notifyModules.start();
 
-    var uploadButton = form.querySelector('button[type=button]');
+    var uploadButton = form.querySelector('button');
 
     expect(uploadButton).not.toBeNull();
 
@@ -115,7 +115,7 @@ describe('File upload', () => {
       uploadControl.addEventListener('click', fileUploadClickCallback);
 
       // click the 'upload' button
-      helpers.triggerEvent(form.querySelector('button[type=button]'), 'click');
+      helpers.triggerEvent(form.querySelector('button'), 'click');
 
       // fake the 'onchange' event triggered in browsers by selection of a file
       helpers.triggerEvent(uploadControl, 'change', { eventInit: { bubbles: true } });

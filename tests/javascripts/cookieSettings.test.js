@@ -75,7 +75,7 @@ describe("Cookie settings", () => {
               </div>
             </fieldset>
           </div>
-          <button class="govuk-button">Save cookie settings</button>
+          <button class="govuk-button" data-module="govuk-button">Save cookie settings</button>
         </form>
       </div>`;
 

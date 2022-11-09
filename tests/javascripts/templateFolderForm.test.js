@@ -45,8 +45,9 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
                   </div>
                 </div>
                 <div class="js-will-stick-at-bottom-when-scrolling">
+                  <input type="hidden" name="csrf_token" value="ImY1NTNlMGY1N2VkMjE3M2VmMzJhYjA4NDZjNzAwOWI4MjQ4MmI0YmEi.Y2ulgg.bNsKybu2SPmQ5FB7Zb4A1et8oHw">
                   <div class="page-footer">
-                    <button class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" name="operation" value="move-to-existing-folder">Move</button>
+                    <button class="govuk-button page-footer__button" name="operation" value="move-to-existing-folder" data-module="govuk-button">Move</button>
                   </div>
                 </div>
               </div>
@@ -59,7 +60,8 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
                     <input class="govuk-input govuk-!-width-full" id="move_to_new_folder_name" name="move_to_new_folder_name" type="text">
                   </div>
                   <div class="page-footer">
-                    <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" name="operation" value="move-to-new-folder">Add to new folder</button>
+                    <input type="hidden" name="csrf_token" value="ImY1NTNlMGY1N2VkMjE3M2VmMzJhYjA4NDZjNzAwOWI4MjQ4MmI0YmEi.Y2ulgg.bNsKybu2SPmQ5FB7Zb4A1et8oHw">
+                    <button class="govuk-button page-footer__button" name="operation" value="move-to-new-folder" data-module="govuk-button">Add to new folder</button>
                   </div>
                 </div>
               </div>
@@ -72,6 +74,7 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
                     <input class="govuk-input govuk-!-width-full" id="add_new_folder_name" name="add_new_folder_name" type="text">
                   </div>
                   <div class="page-footer">
+                    <input type="hidden" name="csrf_token" value="ImY1NTNlMGY1N2VkMjE3M2VmMzJhYjA4NDZjNzAwOWI4MjQ4MmI0YmEi.Y2ulgg.bNsKybu2SPmQ5FB7Zb4A1et8oHw">
                     <button class="govuk-button page-footer__button" name="operation" value="add-new-folder">Add new folder</button>
                   </div>
                 </div>
@@ -112,7 +115,8 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
                 </div>
                 <div class="js-will-stick-at-bottom-when-scrolling">
                   <div class="page-footer">
-                    <button class="govuk-button page-footer__button" name="operation" value="add-new-template">Continue</button>
+                    <input type="hidden" name="csrf_token" value="ImY1NTNlMGY1N2VkMjE3M2VmMzJhYjA4NDZjNzAwOWI4MjQ4MmI0YmEi.Y2ulgg.bNsKybu2SPmQ5FB7Zb4A1et8oHw">
+                    <button class="govuk-button page-footer__button" name="operation" value="add-new-template" data-module="govuk-button">Continue</button>
                   </div>
                 </div>
               </div>

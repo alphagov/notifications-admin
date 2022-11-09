@@ -91,7 +91,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
                 </div>
               </div>
               <div class="page-footer">
-                <button class="govuk-button">Continue</button>
+                <button class="page-footer__button govuk-button" data-module="govuk-button">Continue</button>
               </div>
             </form>
           </main>

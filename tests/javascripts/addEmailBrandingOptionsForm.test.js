@@ -48,7 +48,7 @@ describe('AddBrandingOptionsForm', () => {
       <div class="js-stick-at-bottom-when-scrolling">
         <div class="page-footer">
           <input type="hidden" name="csrf_token" value="ImYxODZjNDJkODcwMmEwZGZjZTA2OWQ2OTM3YmJhM2IxMWUyM2NlNDYi.YxicPg.8an7lw_jl4Q3pfURcMKAV7Ufps8">
-          <button class="govuk-button page-footer__button">
+          <button class="govuk-button page-footer__button" data-module="govuk-button">
             Add options
           </button>
         </div>

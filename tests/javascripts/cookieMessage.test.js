@@ -40,33 +40,26 @@ describe("Cookie message", () => {
     jest.spyOn(window.GOVUK, 'initAnalytics');
 
     cookieMessage = `
-      <div id="global-cookie-message" class="notify-cookie-banner" data-notify-module="cookie-banner" role="region" aria-label="cookie banner" data-nosnippet="">
-        <div class="notify-cookie-banner__wrapper govuk-width-container govuk-!-padding-4">
-          <h2 class="notify-cookie-banner__heading govuk-heading-m">Cookies on GOV.UK Notify</h2>
-          <p class="notify-cookie-banner__message govuk-body">We use <a class="govuk-link govuk-link--no-visited-state" href="/cookies">small files called cookies</a> to make GOV.UK Notify work.</p>
-          <div class="notify-cookie-banner__buttons notify-cookie-banner__no-js">
-            <div class="notify-cookie-banner__button">
-              <a href="/cookies" class="govuk-button notify-cookie-banner-button--inline" role="button" data-accept-cookies="true">Set cookie preferences</a>
-            </div>
-          </div>
-          <div class="notify-cookie-banner__with-js">
-            <p class="notify-cookie-banner__message govuk-body">We'd also like to use analytics cookies to help us improve our service.</p>
-            <p class="notify-cookie-banner__message govuk-body">Please let us know if this is OK.</p>
-            <div class="notify-cookie-banner__buttons">
-              <div class="notify-cookie-banner__button notify-cookie-banner__button-accept">
-                <button class="govuk-button notify-cookie-banner-button--secondary notify-cookie-banner-button--inline" type="submit" data-accept-cookies="true">Yes, I accept analytics cookies</button>
-              </div>
-              <div class="notify-cookie-banner__button notify-cookie-banner__button-reject">
-                <button class="govuk-button notify-cookie-banner-button--secondary notify-cookie-banner-button--inline" type="submit" data-accept-cookies="false">No, do not use analytics cookies</button>
-              </div>
-            </div>
+      <div id="global-cookie-message" class="notify-cookie-banner" data-notify-module="cookie-banner" role="region" aria-label="cookie banner">
+        <div class="notify-cookie-banner__wrapper govuk-width-container">
+          <h2 class="notify-cookie-banner__heading govuk-heading-m" id="notify-cookie-banner__heading">Can we store analytics cookies on your device?</h2>
+          <p class="govuk-body">Analytics cookies help us understand how our website is being used.</p>
+          <div class="notify-cookie-banner__buttons">
+            <button type="button" class="govuk-button notify-cookie-banner__button notify-cookie-banner__button-accept" type="button" data-accept-cookies="true" aria-describedby="notify-cookie-banner__heading">
+              Yes<span class="govuk-visually-hidden">, Notify can store analytics cookies on your device</span>
+            </button>
+            <button type="button" class="govuk-button notify-cookie-banner__button notify-cookie-banner__button-reject" type="button" data-accept-cookies="false" aria-describedby="notify-cookie-banner__heading">
+              No<span class="govuk-visually-hidden">, Notify cannot store analytics cookies on your device</span>
+            </button>
+            <a class="govuk-link notify-cookie-banner__link" href="/cookies">How Notify uses cookies</a>
           </div>
         </div>
+
         <div class="notify-cookie-banner__confirmation govuk-width-container" tabindex="-1">
           <p class="notify-cookie-banner__confirmation-message govuk-body">
-            You can <a class="govuk-link govuk-link--no-visited-state" href="/cookies">change your cookie settings</a> at any time.
+            You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.
           </p>
-          <button class="notify-cookie-banner__hide-button" data-hide-cookie-banner="true">Hide</button>
+          <button class="notify-cookie-banner__hide-button govuk-link" data-hide-cookie-banner="true" role="link">Hide<span class="govuk-visually-hidden"> cookies message</span></button>
         </div>
       </div>`;
 
@@ -174,7 +167,7 @@ describe("Cookie message", () => {
 
       beforeEach(() => {
 
-        const acceptButton = document.querySelector('.notify-cookie-banner__button-accept button');
+        const acceptButton = document.querySelector('.notify-cookie-banner__button-accept');
 
         helpers.triggerEvent(acceptButton, 'click');
 
@@ -218,7 +211,7 @@ describe("Cookie message", () => {
 
       beforeEach(() => {
 
-        const rejectButton = document.querySelector('.notify-cookie-banner__button-reject button');
+        const rejectButton = document.querySelector('.notify-cookie-banner__button-reject');
 
         helpers.triggerEvent(rejectButton, 'click');
 

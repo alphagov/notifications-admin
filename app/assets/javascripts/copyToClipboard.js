@@ -11,7 +11,7 @@
         <span class="copy-to-clipboard__notice govuk-visually-hidden" aria-live="assertive">
           ${options.onload ? '' : options.thing + ' returned to page, press button to copy to clipboard'}
         </span>
-        <button class="govuk-button govuk-button--secondary copy-to-clipboard__button--copy">
+        <button type="button" class="govuk-button govuk-button--secondary copy-to-clipboard__button--copy">
           Copy ${options.thing} to clipboard${options.name ? '<span class="govuk-visually-hidden"> for ' + options.name + '</span>' : ''}
         </button>
       `,
@@ -19,7 +19,7 @@
         <span class="copy-to-clipboard__notice" aria-live="assertive">
           <span class="govuk-visually-hidden">${options.thing} </span>Copied to clipboard<span class="govuk-visually-hidden">, press button to show in page</span>
         </span>
-        <button class="govuk-button govuk-button--secondary copy-to-clipboard__button--show">
+        <button type="button" class="govuk-button govuk-button--secondary copy-to-clipboard__button--show">
           Show ${options.thing}${options.name ? '<span class="govuk-visually-hidden"> for ' + options.name + '</span>' : ''}
         </button>
       `
