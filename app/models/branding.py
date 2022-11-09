@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from app import asset_fingerprinter
+from app.formatters import email_safe
 from app.models import JSONModel, ModelList
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
@@ -86,6 +87,12 @@ class AllBranding(ModelList):
 class AllEmailBranding(AllBranding):
     client_method = email_branding_client.get_all_email_branding
     model = EmailBranding
+
+    @property
+    def example_government_identity_branding(self):
+        for branding in self:
+            if "departmentforeducation" in email_safe(branding.name, whitespace=""):
+                return branding
 
 
 class EmailBrandingPool(AllEmailBranding):
