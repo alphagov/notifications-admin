@@ -109,10 +109,6 @@ def edit_user_permissions(service_id, user_id):
     service_has_email_auth = current_service.has_permission("email_auth")
     user = current_service.get_team_member(user_id)
 
-    mobile_number = None
-    if user.mobile_number:
-        mobile_number = redact_mobile_number(user.mobile_number, " ")
-
     if current_service.has_permission("broadcast"):
         form_class = BroadcastPermissionsForm
     else:
@@ -145,7 +141,6 @@ def edit_user_permissions(service_id, user_id):
         user=user,
         form=form,
         service_has_email_auth=service_has_email_auth,
-        mobile_number=mobile_number,
         delete=request.args.get("delete"),
     )
 
