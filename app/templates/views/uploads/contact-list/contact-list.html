@@ -114,9 +114,7 @@
       field_headings=[recipient_column],
       field_headings_visible=False,
     ) %}
-      {% if not loop.first %}
-        {{ text_field(item[recipient_column].data) }}
-      {% endif %}
+      {{ text_field(item[recipient_column].data) }}
     {% endcall %}
 
     {% if contact_list.recipients.displayed_rows|list|length < contact_list.recipients|length %}
