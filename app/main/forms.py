@@ -51,7 +51,7 @@ from wtforms.validators import (
     Regexp,
 )
 
-from app.asset_fingerprinter import asset_fingerprinter
+from app import asset_fingerprinter
 from app.formatters import (
     format_auth_type,
     format_thousands,
@@ -105,6 +105,10 @@ def render_govuk_frontend_macro(component, params):
     """
     govuk_frontend_components = {
         "radios": {"path": "govuk_frontend_jinja/components/radios/macro.html", "macro": "govukRadios"},
+        "radios-with-images": {
+            "path": "govuk_frontend_jinja_overrides/templates/components/radios-with-images/macro.html",
+            "macro": "govukRadiosWithImages",
+        },
         "text-input": {"path": "govuk_frontend_jinja/components/input/macro.html", "macro": "govukInput"},
         "textarea": {"path": "govuk_frontend_jinja/components/textarea/macro.html", "macro": "govukTextarea"},
         "checkbox": {
@@ -737,7 +741,7 @@ def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_
         return render_govuk_frontend_macro("checkbox", params=params)
 
 
-def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
+def govuk_radios_field_widget(self, field, param_extensions=None, component="radios", **kwargs):
     # error messages
     error_message = None
     if field.errors:
@@ -772,7 +776,7 @@ def govuk_radios_field_widget(self, field, param_extensions=None, **kwargs):
     if param_extensions:
         merge_jsonlike(params, param_extensions)
 
-    return render_govuk_frontend_macro("radios", params=params)
+    return render_govuk_frontend_macro(component, params=params)
 
 
 class GovukCheckboxField(BooleanField):
@@ -945,6 +949,36 @@ class OrganisationTypeField(GovukRadiosField):
 
 class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
     pass
+
+
+class GovukRadiosWithImagesField(GovukRadiosField):
+    def __init__(self, label="", validators=None, param_extensions=None, image_data=None, **kwargs):
+        if image_data is None:
+            raise RuntimeError("Must provide `image_data` to initialiser")
+
+        super(GovukRadiosField, self).__init__(label, validators, **kwargs)
+
+        self.param_extensions = param_extensions
+        self.image_data = image_data
+
+    def get_item_from_option(self, option):
+        return {
+            "name": option.name,
+            "id": option.id,
+            "text": option.label.text,
+            "value": str(option.data),  # to protect against non-string types like uuids
+            "checked": option.checked,
+            "image": self.image_data[option.data],
+        }
+
+    # self.__call__ renders the HTML for the field by:
+    # 1. delegating to self.meta.render_field which
+    # 2. calls field.widget
+    # this bypasses that by making self.widget a method with the same interface as widget.__call__
+    def widget(self, field, param_extensions=None, **kwargs):
+        return govuk_radios_field_widget(
+            self, field, param_extensions=param_extensions, component="radios-with-images", **kwargs
+        )
 
 
 # guard against data entries that aren't a known permission
@@ -2157,6 +2191,37 @@ class GovBrandingOrOwnLogoForm(StripWhitespaceForm):
         "Choose a logo for your emails",
         choices=branding_options,
         validators=[DataRequired()],
+    )
+
+
+class EmailBrandingChooseBanner(Form):
+    BANNER_CHOICES_DATA = {
+        "org": {
+            "label": "No banner",
+            "image": {
+                "url": asset_fingerprinter.get_url("images/branding/org.png"),
+                "alt_text": 'An example of an email with the heading "Your logo" in blue text on a white background.',
+                "dimensions": {"width": 404, "height": 454},
+            },
+        },
+        "org_banner": {
+            "label": "Coloured banner",
+            "image": {
+                "url": asset_fingerprinter.get_url("images/branding/org_banner.png"),
+                "alt_text": "An example of an email with a logo on a blue banner.",
+                "dimensions": {"width": 404, "height": 454},
+            },
+        },
+    }
+
+    banner = GovukRadiosWithImagesField(
+        "Add a banner to your logo",
+        choices=tuple((key, value["label"]) for key, value in BANNER_CHOICES_DATA.items()),
+        image_data={key: value["image"] for key, value in BANNER_CHOICES_DATA.items()},
+        param_extensions={
+            "classes": "govuk-radios--inline",
+            "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
+        },
     )
 
 

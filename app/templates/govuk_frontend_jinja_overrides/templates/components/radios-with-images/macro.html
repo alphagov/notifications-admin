@@ -1,0 +1,164 @@
+{#
+  A copy of the radios component from v1.5.1 of govuk_frontend_jinja
+  Blob permalink: https://raw.githubusercontent.com/LandRegistry/govuk-frontend-jinja/1.5.1/govuk_frontend_jinja/templates/components/radios/macro.html
+
+  Changes:
+  1) Rename macro to `govukRadiosWithImages`
+  2) Add the class `notify-radios-with-images` to `<div class="govuk-radios" ...>`.
+  3) Add these lines after the opening tag of <div class="govuk-radios__item">:
+          <img
+            src="{{ item.image.url }}"
+            alt="{{ item.image.alt_text }}"
+            width="{{ item.image.dimensions.width }}"
+            height="{{ item.image.dimensions.height }}"
+            id="{{ id }}-description"
+            class="notify-radios-with-images__image"
+            data-notify-module="radios-with-images"
+          />
+  4) Wrap the radio inout/label/hint to mimic the following structure:
+          <div class="govuk-radios__item">
+            <img ...>
+            <div class="notify-radios-with-images__radio">
+              <input ...>
+              <label ...>
+              <hint ...>
+            </div>
+          </div>
+  5) Add this to the end of the line starting <input class="govuk-radios__input" :
+          aria-describedby="{{ id }}-description"
+  6) Change <div class="govuk-radios__item"> to:
+          <div class="govuk-radios__item notify-radios-with-images__item">
+#}
+
+{% macro govukRadiosWithImages(params) %}
+{% from "govuk_frontend_jinja/components/error-message/macro.html" import govukErrorMessage -%}
+{% from "govuk_frontend_jinja/components/fieldset/macro.html" import govukFieldset %}
+{% from "govuk_frontend_jinja/components/hint/macro.html" import govukHint %}
+{% from "govuk_frontend_jinja/components/label/macro.html" import govukLabel %}
+
+{#- If an id 'prefix' is not passed, fall back to using the name attribute
+   instead. We need this for error messages and hints as well -#}
+{% set idPrefix = params.idPrefix if params.idPrefix else params.name %}
+
+{% set ns = namespace() %}
+
+{#- a record of other elements that we need to associate with the input using
+   aria-describedby – for example hints or error messages -#}
+{% set ns.describedBy = params.fieldset.describedBy if params.fieldset and params.fieldset.describedBy else "" %}
+
+{% set ns.isConditional = False %}
+{% for item in params['items'] %}
+  {% if item.conditional and item.conditional.html %}
+    {% set ns.isConditional = True %}
+  {% endif %}
+{% endfor %}
+
+{#- Capture the HTML so we can optionally nest it in a fieldset -#}
+{% set innerHtml %}
+{% if params.hint %}
+  {% set hintId = idPrefix + '-hint' %}
+  {% set ns.describedBy = ns.describedBy + ' ' + hintId if ns.describedBy else hintId %}
+  {{ govukHint({
+    'id': hintId,
+    'classes': (params.hint.classes if params.hint and params.hint.classes),
+    'attributes': params.hint.attributes,
+    'html': params.hint.html,
+    'text': params.hint.text
+  }) | trim }}
+{% endif %}
+{% if params.errorMessage %}
+  {% set errorId = idPrefix + '-error' %}
+  {% set ns.describedBy = ns.describedBy + ' ' + errorId if ns.describedBy else errorId %}
+  {{ govukErrorMessage({
+    'id': errorId,
+    'classes': params.errorMessage.classes,
+    'attributes': params.errorMessage.attributes,
+    'html': params.errorMessage.html,
+    'text': params.errorMessage.text,
+    'visuallyHiddenText': params.errorMessage.visuallyHiddenText
+  }) | trim }}
+{% endif %}
+  <div class="govuk-radios notify-radios-with-images {%- if params.classes %} {{ params.classes }}{% endif %}{%- if ns.isConditional %} govuk-radios--conditional{% endif -%}"
+    {%- for attribute, value in (params.attributes.items() if params.attributes else {}.items()) %} {{ attribute }}="{{ value }}"{% endfor %}
+    {%- if ns.isConditional %} data-module="govuk-radios"{% endif -%}>
+    {% for item in params['items'] %}
+      {% if item %}
+        {#- If the user explicitly sets an id, use this instead of the regular idPrefix -#}
+        {%- if item.id -%}
+          {%- set id = item.id -%}
+        {%- else -%}
+          {#- The first id should not have a number suffix so it's easy to link to from the error summary component -#}
+          {%- if loop.first -%}
+            {%- set id = idPrefix %}
+          {% else %}
+            {%- set id = idPrefix + "-" ~ loop.index -%}
+          {%- endif -%}
+        {%- endif -%}
+        {% set conditionalId = "conditional-" + id %}
+        {%- if item.divider %}
+        <div class="govuk-radios__divider">{{ item.divider }}</div>
+        {%- else %}
+        {% set hasHint = True if (item.hint.text if item.hint and item.hint.text) or (item.hint.html if item.hint and item.hint.html) %}
+        {% set itemHintId = id + '-item-hint' %}
+        <div class="govuk-radios__item notify-radios-with-images__item">
+          <img
+            src="{{ item.image.url }}"
+            alt="{{ item.image.alt_text }}"
+            width="{{ item.image.dimensions.width }}"
+            height="{{ item.image.dimensions.height }}"
+            id="{{ id }}-description"
+            class="notify-radios-with-images__image"
+            data-notify-module="radios-with-images"
+          />
+          <div class="notify-radios-with-images__radio">
+            <input class="govuk-radios__input" id="{{ id }}" name="{{ params.name }}" type="radio" value="{{ item.value }}" aria-describedby="{{ id }}-description"
+            {{-" checked" if item.checked }}
+            {{-" disabled" if item.disabled }}
+            {%- if item.conditional and item.conditional.html %} data-aria-controls="{{ conditionalId }}"{% endif -%}
+            {%- if hasHint %} aria-describedby="{{ itemHintId }}"{% endif -%}
+            {%- for attribute, value in (item.attributes.items() if item.attributes else {}.items()) %} {{ attribute }}="{{ value }}"{% endfor -%}>
+            {{ govukLabel({
+              'html': item.html,
+              'text': item.text,
+              'classes': 'govuk-radios__label' + (' ' + item.label.classes if item.label and item.label.classes else ''),
+              'attributes': (item.label.attributes if item.label and item.label.attributes),
+              'for': id
+            }) | trim }}
+            {% if hasHint %}
+            {{ govukHint({
+              'id': itemHintId,
+              'classes': 'govuk-radios__hint' + (' ' + item.hint.classes if item.hint.classes else ''),
+              'attributes': item.hint.attributes,
+              'html': item.hint.html,
+              'text': item.hint.text
+            }) | trim }}
+            {% endif %}
+          </div>
+        </div>
+        {% if item.conditional and item.conditional.html %}
+          <div class="govuk-radios__conditional{% if not item.checked %} govuk-radios__conditional--hidden{% endif %}" id="{{ conditionalId }}">
+            {{ item.conditional.html | safe }}
+          </div>
+        {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endset -%}
+
+<div class="govuk-form-group {%- if params.errorMessage %} govuk-form-group--error{% endif %} {%- if params.formGroup and params.formGroup.classes %} {{ params.formGroup.classes }}{% endif %}">
+{% if params.fieldset %}
+  {% call govukFieldset({
+    'describedBy': ns.describedBy,
+    'classes': params.fieldset.classes,
+    'attributes': params.fieldset.attributes,
+    'legend': params.fieldset.legend
+  }) %}
+  {{ innerHtml | trim | safe }}
+  {% endcall %}
+{% else %}
+  {{ innerHtml | trim | safe }}
+{% endif %}
+</div>
+
+{% endmacro %}

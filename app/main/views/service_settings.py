@@ -48,6 +48,7 @@ from app.main.forms import (
     AdminSetOrganisationForm,
     ChooseEmailBrandingForm,
     ChooseLetterBrandingForm,
+    EmailBrandingChooseBanner,
     EstimateUsageForm,
     GovBrandingOrOwnLogoForm,
     GovernmentIdentityLogoForm,
@@ -1351,12 +1352,6 @@ def email_branding_choose_logo(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def email_branding_upload_logo(service_id):
-    pass
-
-
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/name-logo", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_name_logo(service_id):
@@ -1367,6 +1362,40 @@ def email_branding_name_logo(service_id):
 @user_has_permissions("manage_service")
 def email_branding_confirm_upload_logo(service_id):
     pass
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/add-banner", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_branding_choose_banner_type(service_id):
+    form = EmailBrandingChooseBanner()
+
+    if form.validate_on_submit():
+        if form.banner.data == "org":
+            return redirect(url_for(".email_branding_upload_logo", service_id=service_id))
+
+        if form.banner.data == "org_banner":
+            return redirect(url_for(".email_branding_choose_banner_colour", service_id=service_id))
+
+    return (
+        render_template(
+            "views/service-settings/branding/add-new-branding/email-branding-choose-banner.html",
+            form=form,
+            back_link=url_for(".email_branding_choose_logo", service_id=service_id),
+        ),
+        400 if form.errors else 200,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_branding_upload_logo(service_id):
+    return "work-in-progress"
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/choose-banner-colour", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_branding_choose_banner_colour(service_id):
+    return "work-in-progress"
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=["GET", "POST"])
