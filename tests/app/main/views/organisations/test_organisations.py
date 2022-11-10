@@ -2259,7 +2259,7 @@ def test_add_organisation_email_branding_options_shows_branding_not_in_branding_
         ("org 4", "4", False),
         ("org 5", "5", False),
     ]
-    assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add options"
+    assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add selected options"
 
 
 def test_add_organisation_email_branding_options_shows_error_if_no_branding_selected(
@@ -2506,7 +2506,7 @@ def test_add_organisation_letter_branding_options_shows_branding_not_in_branding
         ("Animal and Plant Health Agency", "efgh", False),
         ("Land Registry", "abcd", False),
     ]
-    assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add options"
+    assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add selected options"
 
 
 def test_add_organisation_letter_branding_options_shows_error_if_no_branding_selected(
