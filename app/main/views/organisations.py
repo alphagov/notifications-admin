@@ -410,14 +410,14 @@ def _handle_remove_branding(remove_branding_id) -> Optional[Response]:
     else:
         confirmation_question = Markup(
             render_template(
-                "partials/flash_messages/email_branding_confirm_remove_brand.html",
+                "partials/flash_messages/branding_confirm_remove_brand.html",
                 branding_name=remove_branding.name,
             )
         )
 
         flash(
             confirmation_question,
-            "delete",
+            "remove",
         )
 
     return None
@@ -635,7 +635,15 @@ def organisation_letter_branding(org_id):
             abort(400, f"Invalid letter branding ID {remove_branding_id} for {current_organisation}")
 
         if request.method == "GET":
-            flash(f"Are you sure you want to remove the letter brand ‘{remove_branding.name}’?", "delete")
+            flash(
+                Markup(
+                    render_template(
+                        "partials/flash_messages/branding_confirm_remove_brand.html",
+                        branding_name=remove_branding.name,
+                    )
+                ),
+                "remove",
+            )
         else:
             organisations_client.remove_letter_branding_from_pool(current_organisation.id, remove_branding_id)
             flash(f"Letter branding ‘{remove_branding.name}’ removed.", "default_with_tick")

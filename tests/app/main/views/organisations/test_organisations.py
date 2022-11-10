@@ -1913,8 +1913,8 @@ def test_get_organisation_email_branding_page_with_remove_param(
         remove_branding_id="email-branding-1-id",
     )
 
-    assert "Are you sure you want to remove the email brand ‘Email branding name 1’?" in page.text
-    assert normalize_spaces(page.select_one(".banner-dangerous form button").text) == "Yes, delete"
+    assert "Are you sure you want to remove ‘Email branding name 1’ branding?" in page.text
+    assert normalize_spaces(page.select_one(".banner-dangerous form button").text) == "Yes, remove"
 
 
 def test_post_organisation_email_branding_page_with_remove_param(
@@ -2399,8 +2399,8 @@ def test_get_organisation_letter_branding_page_with_remove_param_shows_confirmat
         remove_branding_id="1234",
     )
 
-    assert "Are you sure you want to remove the letter brand ‘Cabinet Office’?" in page.text
-    assert normalize_spaces(page.select_one(".banner-dangerous form button").text) == "Yes, delete"
+    assert "Are you sure you want to remove ‘Cabinet Office’ branding?" in page.text
+    assert normalize_spaces(page.select_one(".banner-dangerous form button").text) == "Yes, remove"
 
 
 def test_post_organisation_letter_branding_page_with_remove_param_calls_client_and_redirects(
