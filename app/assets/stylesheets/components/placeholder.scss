@@ -43,7 +43,7 @@
   background: currentColor;
   padding: 0 0.5em;
   opacity: 0.8;
-  box-shadow: inset 0 -0.35em 0 0 govuk-colour("white");
+  box-shadow: inset 0 0.05em 0 0 govuk-colour("white"), inset 0 -0.25em 0 0 govuk-colour("white");
   position: relative;
   top: 0.1em;
 
