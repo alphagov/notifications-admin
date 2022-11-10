@@ -139,3 +139,8 @@ $govuk-grid-widths: (
   }
 
 }
+
+.notify-hint--paragraph {
+  color: black;
+  padding-top: govuk-spacing(3);
+}

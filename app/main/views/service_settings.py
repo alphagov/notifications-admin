@@ -49,8 +49,8 @@ from app.main.forms import (
     ChooseEmailBrandingForm,
     ChooseLetterBrandingForm,
     EmailBrandingChooseBanner,
+    EmailBrandingChooseLogoForm,
     EstimateUsageForm,
-    GovBrandingOrOwnLogoForm,
     GovernmentIdentityLogoForm,
     RenameServiceForm,
     SearchByNameForm,
@@ -1337,18 +1337,21 @@ def email_branding_enter_government_identity_logo_text(service_id):
 @user_has_permissions("manage_service")
 @service_belongs_to_org_type("central")
 def email_branding_choose_logo(service_id):
-    form = GovBrandingOrOwnLogoForm()
+    form = EmailBrandingChooseLogoForm(current_service)
 
     if form.validate_on_submit():
-        if form.options.data == "org":
+        if form.branding_options.data == "org":
             return redirect(url_for(".email_branding_something_else", service_id=current_service.id))
-        elif form.options.data == "single_identity":
+        elif form.branding_options.data == "single_identity":
             return redirect(url_for(".email_branding_request_government_identity_logo", service_id=current_service.id))
 
-    return render_template(
-        "views/service-settings/branding/add-new-branding/email-branding-choose-logo.html",
-        form=form,
-        branding_options=GovBrandingOrOwnLogoForm(),
+    return (
+        render_template(
+            "views/service-settings/branding/add-new-branding/email-branding-choose-logo.html",
+            form=form,
+            branding_options=form,
+        ),
+        400 if form.errors else 200,
     )
 
 

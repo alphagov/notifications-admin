@@ -812,7 +812,7 @@ def test_email_branding_choose_logo_page(client_request, service_one):
         service_id=SERVICE_ONE_ID,
     )
 
-    assert page.select_one("h1").text == "Choose a logo for your emails"
+    assert normalize_spaces(page.select_one("h1").text) == "Choose a logo for your emails"
 
     assert page.select_one(".govuk-back-link")["href"] == url_for(
         "main.email_branding_request",
@@ -820,7 +820,7 @@ def test_email_branding_choose_logo_page(client_request, service_one):
     )
 
     assert [
-        (radio["value"], page.select_one(f"label.block-label[for=options-{i}]").text.strip())
+        (radio["value"], page.select_one(f"label.govuk-label[for=branding_options-{i}]").text.strip())
         for i, radio in enumerate(page.select("input[type=radio]"))
     ] == [
         ("single_identity", "Create a government identity logo"),
@@ -851,7 +851,7 @@ def test_email_branding_choose_logo_redirects_to_right_page(
     client_request.post(
         ".email_branding_choose_logo",
         service_id=SERVICE_ONE_ID,
-        _data={"options": selected_option},
+        _data={"branding_options": selected_option},
         _expected_status=302,
         _expected_redirect=url_for(expected_endpoint, service_id=SERVICE_ONE_ID),
     )
