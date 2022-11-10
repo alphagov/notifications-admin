@@ -2026,7 +2026,7 @@ def test_view_pending_broadcast(
     form = page.select_one("form.banner")
     assert form["method"] == "post"
     assert "action" not in form
-    assert form.select_one("button[type=submit]")
+    assert form.select_one("button")
 
     link = form.select_one("a.govuk-link.govuk-link--destructive")
     assert link.text == "Reject this alert"
@@ -2280,7 +2280,7 @@ def test_can_approve_own_broadcast_in_training_mode(
     form = page.select_one(".banner details form")
     assert form["method"] == "post"
     assert "action" not in form
-    assert normalize_spaces(form.select_one("button[type=submit]").text) == ("Start broadcasting now")
+    assert normalize_spaces(form.select_one("button").text) == ("Start broadcasting now")
 
     link = page.select_one(".banner a.govuk-link.govuk-link--destructive")
     assert link.text == "Reject this alert"
@@ -2873,7 +2873,7 @@ def test_cancel_broadcast(
     form = page.select_one("form")
     assert form["method"] == "post"
     assert "action" not in form
-    assert normalize_spaces(form.select_one("button[type=submit]").text) == ("Yes, stop broadcasting")
+    assert normalize_spaces(form.select_one("button").text) == ("Yes, stop broadcasting")
     assert mock_update_broadcast_message_status.called is False
     assert (
         url_for(

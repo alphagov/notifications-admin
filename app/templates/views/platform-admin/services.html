@@ -3,7 +3,7 @@
 {% from "components/big-number.html" import big_number, big_number_with_status %}
 {% from "components/table.html" import mapping_table, field, stats_fields, row_group, row, right_aligned_field_heading, hidden_field_heading, text_field %}
 {% from "components/form.html" import form_wrapper %}
-{% from "components/button/macro.njk" import govukButton %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% macro services_table(services, caption) %}

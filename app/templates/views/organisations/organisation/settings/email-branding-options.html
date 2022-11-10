@@ -3,7 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper%}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "components/button/macro.njk" import govukButton %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {%  from "components/branding-preview.html" import email_branding_preview %}
 
 {% set page_title = "Email branding" %}
@@ -73,8 +73,7 @@
     <div class="js-stick-at-bottom-when-scrolling">
       {{ page_footer(
           button_text='Add branding options',
-          secondary_button=True,
-          secondary_button_url=url_for('.add_organisation_email_branding_options', org_id=current_org.id)
+          button_url=url_for('.add_organisation_email_branding_options', org_id=current_org.id)
         )
       }}
     </div>

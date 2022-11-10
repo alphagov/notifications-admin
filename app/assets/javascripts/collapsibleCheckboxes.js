@@ -65,6 +65,7 @@
 
     return $(`<div class="selection-footer${stickyClass}">
               <button
+                type="button"
                 class="govuk-button govuk-button--secondary selection-footer__button"
                 aria-expanded="${expanded ? 'true' : 'false'}"
                 aria-controls="${this.fieldsetId}">

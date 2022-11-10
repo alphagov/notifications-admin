@@ -1695,7 +1695,7 @@ def test_edit_user_email_page(
     assert page.select_one("h1").text == "Change team member’s email address"
     assert page.select("p[id=user_name]")[0].text == "This will change the email address for {}.".format(user["name"])
     assert page.select("input[type=email]")[0].attrs["value"] == user["email_address"]
-    assert normalize_spaces(page.select("main button[type=submit]")[0].text) == "Save"
+    assert normalize_spaces(page.select("form button")[0].text) == "Save"
 
 
 def test_edit_user_email_page_404_for_non_team_member(
@@ -1982,7 +1982,7 @@ def test_edit_user_mobile_number_page(
         active_user_with_permissions["name"]
     )
     assert page.select("input[name=mobile_number]")[0].attrs["value"] == "0770••••762"
-    assert normalize_spaces(page.select("main button[type=submit]")[0].text) == "Save"
+    assert normalize_spaces(page.select("form button")[0].text) == "Save"
 
 
 def test_edit_user_mobile_number_redirects_to_confirmation(

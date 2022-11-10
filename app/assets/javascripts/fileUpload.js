@@ -13,7 +13,7 @@
         </a>
       `);
 
-      $('button[type=button]', this.$form).replaceWith($cancelButton);
+      $('button.file-upload-button', this.$form).replaceWith($cancelButton);
 
       // add GOVUK Frontend behaviours
       new window.GOVUK.Frontend.Button(this.$form[0]).init();
@@ -30,7 +30,7 @@
       var buttonHTMLStr = `
         <button type="button" class="file-upload-button govuk-button govuk-!-margin-right-1" id="file-upload-button">
           ${buttonText}
-        </button>`;
+        </button>`; // Styled as a submit button to raise prominence. The type shouldn't change.
 
       // If errors with the upload, copy into a label above the button
       // Buttons don't need labels by default as the accessible name comes from their text but

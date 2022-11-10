@@ -33,7 +33,7 @@ describe('File upload', () => {
           Upload a PNG logo
         </label>
         <input class="file-upload-field" data-button-text="Upload logo" id="file" name="file" type="file">
-        <button type="submit" class="govuk-button file-upload-submit">Submit</button>
+        <button class="govuk-button file-upload-submit">Submit</button>
       </form>`;
 
     form = document.querySelector('form');
@@ -67,7 +67,7 @@ describe('File upload', () => {
     // start module
     window.GOVUK.notifyModules.start();
 
-    var uploadButton = form.querySelector('button[type=button]');
+    var uploadButton = form.querySelector('button');
 
     expect(uploadButton).not.toBeNull();
 
@@ -115,7 +115,7 @@ describe('File upload', () => {
       uploadControl.addEventListener('click', fileUploadClickCallback);
 
       // click the 'upload' button
-      helpers.triggerEvent(form.querySelector('button[type=button]'), 'click');
+      helpers.triggerEvent(form.querySelector('button'), 'click');
 
       // fake the 'onchange' event triggered in browsers by selection of a file
       helpers.triggerEvent(uploadControl, 'change', { eventInit: { bubbles: true } });

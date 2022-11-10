@@ -2,7 +2,7 @@
 {% from "components/page-footer.html" import page_footer %}
 
 <div id="sticky_template_forms">
-  <button type="submit" name="operation" value="unknown" hidden></button>
+  <button name="operation" value="unknown" hidden></button>
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   {% if templates_and_folders_form.move_to.choices and template_list.templates_to_show %}
     <div id="move_to_folder_radios" class="sticky-template-form" role="region" aria-label="Choose the folder to move selected items to">

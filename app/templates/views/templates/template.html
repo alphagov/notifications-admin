@@ -3,7 +3,7 @@
 {% from "components/folder-path.html" import folder_path, page_title_folder_path %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
-{% from "components/button/macro.njk" import govukButton %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block service_page_title %}
   {{ page_title_folder_path(current_service.get_template_path(template._template)) }}

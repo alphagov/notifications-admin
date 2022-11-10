@@ -467,7 +467,7 @@ def test_should_show_scheduled_job(
         template_id="5d729fbd-239c-44ab-b498-75a985f3198f",
         version=1,
     )
-    assert page.select_one("main button[type=submit]").text.strip() == "Cancel sending"
+    assert page.select_one("form button").text.strip() == "Cancel sending"
     assert not page.select_one(".govuk-back-link")
 
 

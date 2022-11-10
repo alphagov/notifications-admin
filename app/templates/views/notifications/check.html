@@ -2,7 +2,7 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "components/button/macro.njk" import govukButton %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block service_page_title %}
   {{ "Error" if error else "Preview of ‘{}’".format(template.name) }}

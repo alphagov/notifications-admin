@@ -79,7 +79,7 @@ describe('Preview pane', () => {
           </div>
         </div>
         <div class="page-footer">
-          <button type="submit" class="govuk-button">Preview</button>
+          <button class="page-footer__button govuk-button" data-module="govuk-button">Preview</button>
         </div>
       </form>`;
 
@@ -137,7 +137,7 @@ describe('Preview pane', () => {
         // run preview pane script
         require('../../app/assets/javascripts/previewPane.js');
 
-        expect(document.querySelector('button[type=submit]').textContent).toEqual('Save');
+        expect(document.querySelector('form button').textContent).toEqual('Save');
 
       });
 
@@ -208,7 +208,7 @@ describe('Preview pane', () => {
         // run preview pane script
         require('../../app/assets/javascripts/previewPane.js');
 
-        expect(document.querySelector('button[type=submit]').textContent).toEqual('Save');
+        expect(document.querySelector('form button').textContent).toEqual('Save');
 
       });
 

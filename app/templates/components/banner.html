@@ -1,5 +1,5 @@
 {% from "components/form.html" import form_wrapper %}
-{% from "components/button/macro.njk" import govukButton %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None, context=None, action=None, id=None, thing=None) %}
   <div

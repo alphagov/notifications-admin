@@ -2561,7 +2561,7 @@ def test_letter_can_only_be_sent_now(
     )
 
     assert 'name="scheduled_for"' not in page
-    assert normalize_spaces(page.select_one("main [type=submit]").text) == ("Send 1 letter")
+    assert normalize_spaces(page.select_one("form button").text) == ("Send 1 letter")
 
 
 def test_send_button_is_correctly_labelled(
@@ -2586,7 +2586,7 @@ def test_send_button_is_correctly_labelled(
         template_id=fake_uuid,
     )
 
-    assert normalize_spaces(page.select_one("main [type=submit]").text) == ("Send 1,000 text messages")
+    assert normalize_spaces(page.select_one("form button").text) == ("Send 1,000 text messages")
 
 
 @pytest.mark.parametrize("when", ["", "2016-08-25T13:04:21.767198"])
@@ -3119,7 +3119,7 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
     assert page.select_one("h1", {"data-error-type": "letter-too-long"})
 
     assert len(page.select(".letter img")) == 10  # if letter longer than 10 pages, only 10 first pages are displayed
-    assert not page.select("main [type=submit]")
+    assert not page.select("form button")
 
 
 def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
@@ -3495,7 +3495,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
 
     assert len(page.select(".letter img")) == 5
 
-    assert not page.select("main [type=submit]")
+    assert not page.select("form button")
     assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select_one("a[download]").text == "Download as a PDF"
 
@@ -3536,7 +3536,7 @@ def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
     assert page.select_one("h1", {"data-error-type": "letter-too-long"})
     assert len(page.select(".letter img")) == 10
 
-    assert not page.select("main [type=submit]")
+    assert not page.select("form button")
 
 
 def test_check_messages_shows_over_max_row_error(
