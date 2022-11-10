@@ -121,7 +121,7 @@
           {{ email_branding_html }}
         {% endcall %}
         {{ edit_field(
-            'Change',
+            'Manage',
             url_for('.organisation_email_branding', org_id=current_org.id),
             suffix='email branding options for the organisation'
           )
@@ -144,7 +144,7 @@
         {{ text_field('Letter branding options') }}
         {{ optional_text_field(letter_branding_pool_names, default="None") }}
         {{ edit_field(
-            'Change',
+            'Manage',
             url_for('.organisation_letter_branding', org_id=current_org.id),
             suffix='letter branding options for the organisation'
             )

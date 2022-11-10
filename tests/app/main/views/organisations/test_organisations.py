@@ -922,9 +922,9 @@ def test_organisation_settings_for_platform_admin(
         "Request to go live notes None Change go live notes for the organisation",
         "Billing details None Change billing details for the organisation",
         "Notes None Change the notes for the organisation",
-        "Email branding options GOV.UK Default Change email branding options for the organisation",
+        "Email branding options GOV.UK Default Manage email branding options for the organisation",
         "Default letter branding No branding Change default letter branding for the organisation",
-        "Letter branding options None Change letter branding options for the organisation",
+        "Letter branding options None Manage letter branding options for the organisation",
         "Known email domains None Change known email domains for the organisation",
     ]
 
@@ -957,7 +957,7 @@ def test_organisation_settings_table_shows_email_branding_pool(
         "GOV.UK Default "
         "Email branding name 1 "
         "Email branding name 2 "
-        "Change email branding options for the organisation"
+        "Manage email branding options for the organisation"
     )
 
 
@@ -979,7 +979,7 @@ def test_organisation_settings_table_shows_letter_branding_pool(
         "Cabinet Office "
         "Department for Education "
         "Government Digital Service "
-        "Change letter branding options for the organisation"
+        "Manage letter branding options for the organisation"
     )
 
 
@@ -1017,7 +1017,7 @@ def test_organisation_settings_table_shows_email_branding_pool_non_govuk_default
         "Email branding options "
         "Email branding name 1 Default "
         "Email branding name 2 "
-        "Change email branding options for the organisation"
+        "Manage email branding options for the organisation"
     )
 
 
@@ -1035,7 +1035,7 @@ def test_organisation_settings_table_shows_email_branding_pool_govuk_default(
     email_branding_options_row = page.select("tr")[8]
 
     assert normalize_spaces(email_branding_options_row.text) == (
-        "Email branding options GOV.UK Default Change email branding options for the organisation"
+        "Email branding options GOV.UK Default Manage email branding options for the organisation"
     )
 
 
