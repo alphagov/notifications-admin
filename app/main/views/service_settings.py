@@ -1346,7 +1346,7 @@ def email_branding_choose_logo(service_id):
             return redirect(url_for(".email_branding_request_government_identity_logo", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/branding/add-new-branding/government-branding-or-own-logo.html",
+        "views/service-settings/branding/add-new-branding/email-branding-choose-logo.html",
         form=form,
         branding_options=GovBrandingOrOwnLogoForm(),
     )
