@@ -595,36 +595,6 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
 
 
-def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
-    # error messages
-    error_message = None
-    if field.errors:
-        error_message = {
-            "attributes": {
-                "data-notify-module": "track-error",
-                "data-error-type": field.errors[0],
-                "data-error-label": field.name,
-            },
-            "text": field.errors[0],
-        }
-
-    params = {
-        "name": field.name,
-        "errorMessage": error_message,
-        "items": [{"name": field.name, "id": field.id, "text": field.label.text, "value": "y", "checked": field.data}],
-    }
-
-    # extend default params with any sent in during instantiation
-    if self.param_extensions:
-        merge_jsonlike(params, self.param_extensions)
-
-    # add any sent in though use in templates
-    if param_extensions:
-        merge_jsonlike(params, param_extensions)
-
-    return render_govuk_frontend_macro("checkbox", params=params)
-
-
 def govuk_radios_field_widget(self, field, param_extensions=None, component="radios", **kwargs):
     # error messages
     error_message = None
@@ -663,17 +633,31 @@ def govuk_radios_field_widget(self, field, param_extensions=None, component="rad
     return render_govuk_frontend_macro(component, params=params)
 
 
-class GovukCheckboxField(BooleanField):
+class GovukCheckboxField(GovukFrontendWidgetMixin, BooleanField):
+    govuk_frontend_component_name = "checkbox"
+
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(GovukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
         self.param_extensions = param_extensions
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_checkbox_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+    def prepare_params(self, **kwargs):
+        error_message = None
+        if self.errors:
+            error_message = {
+                "attributes": {
+                    "data-notify-module": "track-error",
+                    "data-error-type": self.errors[0],
+                    "data-error-label": self.name,
+                },
+                "text": self.errors[0],
+            }
+
+        params = {
+            "name": self.name,
+            "errorMessage": error_message,
+            "items": [{"name": self.name, "id": self.id, "text": self.label.text, "value": "y", "checked": self.data}],
+        }
+        return params
 
 
 class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
