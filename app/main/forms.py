@@ -2201,7 +2201,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
                 "url": asset_fingerprinter.get_url("images/branding/single_identity.png"),
                 "alt_text": "An example of an email with a government identity logo,"
                 " including a blue stripe, a crest and department's name",
-                "dimensions": {"width": 404, "height": 454},
+                "dimensions": {"width": 606, "height": 404},
             },
         },
         "org": {
@@ -2209,7 +2209,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
             "image": {
                 "url": asset_fingerprinter.get_url("images/branding/org.png"),
                 "alt_text": 'An example of an email with the heading "Your logo" in blue text on a white background.',
-                "dimensions": {"width": 404, "height": 454},
+                "dimensions": {"width": 606, "height": 404},
             },
         },
     }

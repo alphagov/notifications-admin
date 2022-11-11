@@ -14,12 +14,17 @@
 }
 
 .notify-radios-with-images__image {
+  display: block;
   max-width: 100%;
   height: auto;
+  box-sizing: border-box;
+  margin-bottom: govuk-spacing(4);
+  padding: govuk-spacing(1);
+  border: 1px solid $govuk-border-colour;
 }
 
 .notify-radios-with-images__radio {
   display: block;
   position: relative;
-  padding-left: govuk-spacing(7);
+  padding-left: govuk-spacing(7) - 3px;
 }

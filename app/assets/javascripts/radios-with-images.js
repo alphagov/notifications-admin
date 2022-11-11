@@ -14,7 +14,6 @@
     this.start = function ($radioImage) {
 
       var radioImageNode = $radioImage.get(0);
-      console.log(radioImageNode);
 
       radioImageNode.addEventListener('click', this.handleImageClick);
       radioImageNode.style.cursor = 'pointer';
