@@ -683,62 +683,35 @@ def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
     return render_govuk_frontend_macro("checkbox", params=params)
 
 
-def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_extensions=None, **kwargs):
-    def _wrap_in_collapsible(field_label, checkboxes_string):
-        # wrap the checkboxes HTML in the HTML needed by the collapisble JS
-        result = Markup(
-            f'<div class="selection-wrapper"'
-            f'     data-notify-module="collapsible-checkboxes"'
-            f'     data-field-label="{field_label}">'
-            f"  {checkboxes_string}"
-            f"</div>"
-        )
-
-        return result
-
+def prepare_params_for_govuk_checkboxes(self):
     # error messages
     error_message = None
-    if field.errors:
+    if self.errors:
         error_message = {
             "attributes": {
                 "data-notify-module": "track-error",
-                "data-error-type": field.errors[0],
-                "data-error-label": field.name,
+                "data-error-type": self.errors[0],
+                "data-error-label": self.name,
             },
-            "text": field.errors[0],
+            "text": self.errors[0],
         }
 
     # returns either a list or a hierarchy of lists
     # depending on how get_items_from_options is implemented
-    items = self.get_items_from_options(field)
+    items = self.get_items_from_options(self)
 
     params = {
-        "name": field.name,
+        "name": self.name,
         "fieldset": {
-            "attributes": {"id": field.name},
-            "legend": {"text": field.label.text, "classes": "govuk-fieldset__legend--s"},
+            "attributes": {"id": self.name},
+            "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
         },
         "asList": self.render_as_list,
         "errorMessage": error_message,
         "items": items,
     }
 
-    # extend default params with any sent in during instantiation
-    if self.param_extensions:
-        merge_jsonlike(params, self.param_extensions)
-
-    # add any sent in though use in templates
-    if param_extensions:
-        merge_jsonlike(params, param_extensions)
-
-    if wrap_in_collapsible:
-
-        # add a blank hint to act as an ARIA live-region
-        params.update({"hint": {"html": '<div class="selection-summary" role="region" aria-live="polite"></div>'}})
-
-        return _wrap_in_collapsible(self.field_label, render_govuk_frontend_macro("checkbox", params=params))
-    else:
-        return render_govuk_frontend_macro("checkbox", params=params)
+    return params
 
 
 def govuk_radios_field_widget(self, field, param_extensions=None, component="radios", **kwargs):
@@ -842,17 +815,41 @@ class GovukCheckboxesField(SelectMultipleField):
     # 2. calls field.widget
     # this bypasses that by making self.widget a method with the same interface as widget.__call__
     def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_checkboxes_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+        params = prepare_params_for_govuk_checkboxes(self)
+
+        # extend default params with any sent in during instantiation
+        if self.param_extensions:
+            merge_jsonlike(params, self.param_extensions)
+
+        # add any sent in though use in templates
+        if param_extensions:
+            merge_jsonlike(params, param_extensions)
+
+        return render_govuk_frontend_macro("checkbox", params=params)
 
 
 # Wraps checkboxes rendering in HTML needed by the collapsible JS
 class GovukCollapsibleCheckboxesField(GovukCheckboxesField):
+    param_extensions = {"hint": {"html": '<div class="selection-summary" role="region" aria-live="polite"></div>'}}
+
     def __init__(self, label="", validators=None, field_label="", param_extensions=None, **kwargs):
         super(GovukCollapsibleCheckboxesField, self).__init__(label, validators, param_extensions, **kwargs)
         self.field_label = field_label
+        merge_jsonlike(self.param_extensions, param_extensions)
 
-    def widget(self, field, **kwargs):
-        return govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=True, param_extensions=None, **kwargs)
+    def widget(self, *args, **kwargs):
+        checkboxes_string = super().widget(*args, **kwargs)
+
+        # wrap the checkboxes HTML in the HTML needed by the collapsible JS
+        result = Markup(
+            f'<div class="selection-wrapper"'
+            f'     data-notify-module="collapsible-checkboxes"'
+            f'     data-field-label="{self.field_label}">'
+            f"  {checkboxes_string}"
+            f"</div>"
+        )
+
+        return result
 
 
 # GovukCollapsibleCheckboxesField adds an ARIA live-region to the hint and wraps the render in HTML needed by the
