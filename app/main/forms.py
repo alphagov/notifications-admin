@@ -166,17 +166,47 @@ def email_address(label="Email address", gov_user=True, required=True):
     return GovukEmailField(label, validators)
 
 
-class UKMobileNumber(TelField):
+class GovukTextInputFieldMixin(GovukFrontendWidgetMixin):
+    input_type = "text"
+    govuk_frontend_component_name = "text-input"
+
+    def prepare_params(self, **kwargs):
+        value = kwargs["value"] if "value" in kwargs else self.data
+        value = str(value) if isinstance(value, Number) else value
+
+        # error messages
+        error_message = None
+        if self.errors:
+            error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
+            error_message = {
+                "attributes": {
+                    "data-notify-module": "track-error",
+                    "data-error-type": self.errors[0],
+                    "data-error-label": self.name,
+                },
+                error_message_format: self.errors[0],
+            }
+
+        # convert to parameters that govuk understands
+        params = {
+            "classes": "govuk-!-width-two-thirds",
+            "errorMessage": error_message,
+            "id": self.id,
+            "label": {"text": self.label.text},
+            "name": self.name,
+            "value": value,
+            "type": self.input_type,
+        }
+
+        return params
+
+
+class UKMobileNumber(GovukTextInputFieldMixin, TelField):
+    input_type = "tel"
+
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(UKMobileNumber, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
 
     def pre_validate(self, form):
         try:
@@ -185,18 +215,7 @@ class UKMobileNumber(TelField):
             raise ValidationError(str(e))
 
 
-class InternationalPhoneNumber(TelField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(InternationalPhoneNumber, self).__init__(label, validators=validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
-
+class InternationalPhoneNumber(UKMobileNumber, GovukTextInputFieldMixin, TelField):
     def pre_validate(self, form):
         try:
             if self.data:
@@ -224,131 +243,54 @@ def password(label="Password"):
     )
 
 
-def govuk_text_input_field_widget(self, field, type=None, param_extensions=None, **kwargs):
-    value = kwargs["value"] if "value" in kwargs else field.data
-    value = str(value) if isinstance(value, Number) else value
-
-    # error messages
-    error_message = None
-    if field.errors:
-        error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
-        error_message = {
-            "attributes": {
-                "data-notify-module": "track-error",
-                "data-error-type": field.errors[0],
-                "data-error-label": field.name,
-            },
-            error_message_format: field.errors[0],
-        }
-
-    # convert to parameters that govuk understands
-    params = {
-        "classes": "govuk-!-width-two-thirds",
-        "errorMessage": error_message,
-        "id": field.id,
-        "label": {"text": field.label.text},
-        "name": field.name,
-        "value": value,
-    }
-
-    if type:
-        params["type"] = type
-
-    # extend default params with any sent in
-    merge_jsonlike(params, self.param_extensions)
-    # add any sent in through use in templates
-    merge_jsonlike(params, param_extensions)
-
-    return render_govuk_frontend_macro("text-input", params=params)
-
-
-class GovukTextInputField(StringField):
+class GovukTextInputField(GovukTextInputFieldMixin, StringField):
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(GovukTextInputField, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, **kwargs):
-        return govuk_text_input_field_widget(self, field, **kwargs)
 
+class GovukPasswordField(GovukTextInputFieldMixin, PasswordField):
+    input_type = "password"
 
-class GovukPasswordField(PasswordField):
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(GovukPasswordField, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, type="password", param_extensions=param_extensions, **kwargs)
 
+class GovukEmailField(GovukTextInputFieldMixin, EmailField):
+    input_type = "email"
+    param_extensions = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
 
-class GovukEmailField(EmailField):
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(GovukEmailField, self).__init__(label, validators=validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-
-        params = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
-        merge_jsonlike(params, param_extensions)
-
-        return govuk_text_input_field_widget(self, field, type="email", param_extensions=params, **kwargs)
+        merge_jsonlike(self.param_extensions, param_extensions)
 
 
-class GovukSearchField(SearchField):
+class GovukSearchField(GovukTextInputFieldMixin, SearchField):
+    input_type = "search"
+    param_extensions = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
+
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(GovukSearchField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-
-        params = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
-        merge_jsonlike(params, param_extensions)
-
-        return govuk_text_input_field_widget(self, field, type="search", param_extensions=params, **kwargs)
+        merge_jsonlike(self.param_extensions, param_extensions)
 
 
-class GovukDateField(DateField):
+class GovukDateField(GovukTextInputFieldMixin, DateField):
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(GovukDateField, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
-
-class GovukIntegerField(IntegerField):
+class GovukIntegerField(GovukTextInputFieldMixin, IntegerField):
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(GovukIntegerField, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, param_extensions=param_extensions, **kwargs)
-
 
 class SMSCode(GovukTextInputField):
+    # the design system recommends against ever using `type="number"`. "tel" makes mobile browsers
+    # show a phone keypad input rather than a full qwerty keyboard.
+    input_type = "tel"
     validators = [
         DataRequired(message="Cannot be empty"),
         Regexp(regex=r"^\d+$", message="Numbers only"),
@@ -361,7 +303,7 @@ class SMSCode(GovukTextInputField):
         if "param_extensions" in kwargs:
             merge_jsonlike(kwargs["param_extensions"], params)
 
-        return super().__call__(type="tel", **kwargs)
+        return super().__call__(**kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
