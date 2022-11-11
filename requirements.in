@@ -4,11 +4,11 @@
 ago==0.0.95
 govuk-bank-holidays==0.11
 humanize==4.4.0
-Flask==2.1.2
+Flask==2.2.2
 Flask-WTF==1.0.1
 wtforms==3.0.1
-Flask-Login==0.6.1
-Werkzeug==2.1.2
+Flask-Login==0.6.2
+Werkzeug==2.2.2
 jinja2==3.1.2
 
 blinker==1.5
@@ -17,7 +17,7 @@ pyexcel-io==0.6.6
 pyexcel-xls==0.7.0
 pyexcel-xlsx==0.6.0
 pyexcel-ods3==0.6.1
-pytz==2022.5
+pytz==2022.6
 # Should be pinned until a new gunicorn release greater than 20.1.0 comes out. (Due to eventlet v0.33 compatibility issues)
 git+https://github.com/benoitc/gunicorn.git@1299ea9e967a61ae2edebe191082fd169b864c64#egg=gunicorn[eventlet]==20.1.0
 notifications-python-client==6.4.1
