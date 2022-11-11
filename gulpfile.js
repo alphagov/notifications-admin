@@ -29,7 +29,6 @@ plugins.uglify = require('gulp-uglify');
 const paths = {
   src: 'app/assets/',
   dist: 'app/static/',
-  templates: 'app/templates/',
   npm: 'node_modules/',
   govuk_frontend: 'node_modules/govuk-frontend/'
 };
@@ -54,33 +53,6 @@ const copy = {
       return src(paths.govuk_frontend + 'govuk/assets/fonts/**/*')
         .pipe(dest(paths.dist + 'fonts/'));
     },
-    templates: (cb) => {
-      // Put names of GOVUK Frontend templates here
-      const _templates = [
-        'button',
-      ];
-      let done = 0;
-
-      // Copy the templates for each component across, preserving their folder structure
-      _templates.forEach(name => {
-        let _src = [
-          paths.govuk_frontend + 'govuk/components/' + name + '/macro.njk',
-          paths.govuk_frontend + 'govuk/components/' + name + '/template.njk'
-        ];
-        let _dest = paths.templates + 'vendor/govuk-frontend/components/' + name;
-
-        src(_src)
-        .pipe(
-          dest(_dest)
-          .on('end', () => { // resolve promise if all copied
-            done = done + 1;
-            if (done === _templates.length) {
-              cb();
-            }
-          })
-        )
-      });
-    }
   },
   leaflet: {
     js: () => {
@@ -261,7 +233,6 @@ const lint = {
 const defaultTask = parallel(
   parallel(
     copy.govuk_frontend.fonts,
-    copy.govuk_frontend.templates,
     images,
     copy.leaflet.js
   ),

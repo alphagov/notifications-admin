@@ -76,8 +76,7 @@ def invite_user(service_id, user_id=None):
     else:
         user_to_invite = None
 
-    service_has_email_auth = current_service.has_permission("email_auth")
-    if not service_has_email_auth:
+    if not current_service.has_permission("email_auth"):
         form.login_authentication.data = "sms_auth"
 
     if form.validate_on_submit():
@@ -97,7 +96,6 @@ def invite_user(service_id, user_id=None):
     return render_template(
         "views/invite-user.html",
         form=form,
-        service_has_email_auth=service_has_email_auth,
         mobile_number=True,
         user_to_invite=user_to_invite,
     )
@@ -106,12 +104,7 @@ def invite_user(service_id, user_id=None):
 @main.route("/services/<uuid:service_id>/users/<uuid:user_id>", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def edit_user_permissions(service_id, user_id):
-    service_has_email_auth = current_service.has_permission("email_auth")
     user = current_service.get_team_member(user_id)
-
-    mobile_number = None
-    if user.mobile_number:
-        mobile_number = redact_mobile_number(user.mobile_number, " ")
 
     if current_service.has_permission("broadcast"):
         form_class = BroadcastPermissionsForm
@@ -136,7 +129,7 @@ def edit_user_permissions(service_id, user_id):
         )
         # Only change the auth type if this is supported for a service. If a user logs in with a
         # security key, we generally don't want them to be able to use something less secure.
-        if service_has_email_auth and not user.auth_type == "webauthn_auth":
+        if current_service.has_permission("email_auth") and not user.webauthn_auth:
             user.update(auth_type=form.login_authentication.data)
         return redirect(url_for(".manage_users", service_id=service_id))
 
@@ -144,8 +137,6 @@ def edit_user_permissions(service_id, user_id):
         "views/edit-user-permissions.html",
         user=user,
         form=form,
-        service_has_email_auth=service_has_email_auth,
-        mobile_number=mobile_number,
         delete=request.args.get("delete"),
     )
 

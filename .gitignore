@@ -111,7 +111,3 @@ environment.sh
 # Files/folders created by build so not present in .cfignore
 app/version.py
 app/static
-app/templates/vendor
-
-# TODO: remove once CCS govuk_frontend_jinja is removed and we get rid of vendoring hack
-vendor

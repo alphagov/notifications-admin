@@ -26,10 +26,6 @@ VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$V
 bootstrap: generate-version-file ## Set up everything to run the app
 	pip3 install -r requirements_for_test.txt
 
-	# TODO: once CCS govuk_frontend_jinja is removed, replace this with normal reqs.txt (and update PackageLoader)
-	mkdir -p vendor/govuk_frontend_jinja_macros
-	pip3 install govuk-frontend-jinja==1.5.1 --target ./vendor/govuk_frontend_jinja_macros
-
 	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci --no-audit
 	. environment.sh; source $(HOME)/.nvm/nvm.sh && npm run build
 

@@ -1,21 +1,26 @@
-{% from "components/radios.html" import radio, radios, conditional_radio_panel %}
+{% from "components/radios.html" import radios %}
+
+{# this may be called from invite page (where no user exists) #}
+{% if user is not defined %}
+  {% set user = {'platform_admin': False, 'webauthn_auth': False, 'mobile_number': 'truthy so we give auth option'} %}
+{% endif %}
 
 {{ form.permissions_field }}
 
 {% if form.folder_permissions.all_template_folders %}
   {{ form.folder_permissions }}
-{% elif user and user.platform_admin %}
+{% elif user.platform_admin %}
   <p class="bottom-gutter">
     Platform admin users can access all template folders.
   </p>
 {% endif %}
 
-{% if service_has_email_auth %}
+{% if current_service.has_permission('email_auth') %}
   {% if user.webauthn_auth %}
     <p class="bottom-gutter">
       This user will login with a security key.
     </p>
-  {% elif not mobile_number %}
+  {% elif not user.mobile_number %}
     {{ radios(
       form.login_authentication,
       disable=['sms_auth'],
