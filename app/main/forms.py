@@ -81,7 +81,10 @@ from app.models.branding import (
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.utils import branding, merge_jsonlike
-from app.utils.govuk_frontend_field import render_govuk_frontend_macro
+from app.utils.govuk_frontend_field import (
+    GovukFrontendWidgetMixin,
+    render_govuk_frontend_macro,
+)
 from app.utils.user import distinct_email_addresses
 from app.utils.user_permissions import (
     all_ui_permissions,
@@ -522,7 +525,7 @@ class NestedFieldMixin:
 
             params["items"].append(item)
 
-        return render_govuk_frontend_macro("checkbox", params=params)
+        return render_govuk_frontend_macro(self.govuk_frontend_component_name, params=params)
 
 
 class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
@@ -789,26 +792,24 @@ class GovukCheckboxField(BooleanField):
         return govuk_checkbox_field_widget(self, field, param_extensions=param_extensions, **kwargs)
 
 
-class GovukTextareaField(TextAreaField):
+class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
+    govuk_frontend_component_name = "textarea"
+
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(TextAreaField, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
+    def prepare_params(self, param_extensions=None, **kwargs):
         # error messages
         error_message = None
-        if field.errors:
-            error_message = {"text": field.errors[0]}
+        if self.errors:
+            error_message = {"text": self.errors[0]}
 
         params = {
-            "name": field.name,
-            "id": field.id,
+            "name": self.name,
+            "id": self.id,
             "rows": 8,
-            "label": {"text": field.label.text, "classes": None, "isPageHeading": False},
+            "label": {"text": self.label.text, "classes": None, "isPageHeading": False},
             "hint": {"text": None},
             "errorMessage": error_message,
         }
@@ -821,7 +822,7 @@ class GovukTextareaField(TextAreaField):
         if param_extensions:
             merge_jsonlike(params, param_extensions)
 
-        return render_govuk_frontend_macro("textarea", params=params)
+        return params
 
 
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6

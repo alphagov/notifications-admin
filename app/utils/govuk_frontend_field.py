@@ -1,4 +1,35 @@
+from abc import ABC, abstractmethod
+
 from flask import Markup, render_template_string
+
+
+class GovukFrontendWidgetMixin(ABC):
+    @property
+    @abstractmethod
+    def govuk_frontend_component_name(self):
+        """
+        Should be a string matching a key in the `govuk_frontend_components` dict - which roughly
+        matches up with URLs found in https://design-system.service.gov.uk/components/
+        """
+        pass
+
+    def prepare_params(self, **kwargs):
+        """
+        Should return a dictionary that will be passed through to the macro as `params` for use within the component
+        """
+        return {}
+
+    def widget(self, _field, **kwargs):
+        """
+        override the widget function, which is called from the html template when rendering
+
+        see https://wtforms.readthedocs.io/en/3.0.x/widgets/
+        """
+        # widget always has a `field` param passed in as a positional, however, we're in a member function of a
+        # Field class so can just discard it, `self == _field` is always true
+        params = self.prepare_params(**kwargs)
+
+        return render_govuk_frontend_macro(self.govuk_frontend_component_name, params)
 
 
 def render_govuk_frontend_macro(component, params):
