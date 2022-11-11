@@ -80,7 +80,7 @@ from app.models.branding import (
 )
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
-from app.utils import branding, merge_jsonlike
+from app.utils import branding
 from app.utils.govuk_frontend_field import (
     GovukFrontendWidgetMixin,
     render_govuk_frontend_macro,
@@ -193,10 +193,6 @@ class GovukTextInputFieldMixin(GovukFrontendWidgetMixin):
 class UKMobileNumber(GovukTextInputFieldMixin, TelField):
     input_type = "tel"
 
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(UKMobileNumber, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
-
     def pre_validate(self, form):
         try:
             validate_phone_number(self.data)
@@ -233,66 +229,42 @@ def password(label="Password"):
 
 
 class GovukTextInputField(GovukTextInputFieldMixin, StringField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukTextInputField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
+    pass
 
 
 class GovukPasswordField(GovukTextInputFieldMixin, PasswordField):
     input_type = "password"
-
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukPasswordField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
 
 
 class GovukEmailField(GovukTextInputFieldMixin, EmailField):
     input_type = "email"
     param_extensions = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
 
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukEmailField, self).__init__(label, validators=validators, **kwargs)
-        merge_jsonlike(self.param_extensions, param_extensions)
-
 
 class GovukSearchField(GovukTextInputFieldMixin, SearchField):
     input_type = "search"
     param_extensions = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
 
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukSearchField, self).__init__(label, validators, **kwargs)
-        merge_jsonlike(self.param_extensions, param_extensions)
-
 
 class GovukDateField(GovukTextInputFieldMixin, DateField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukDateField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
+    pass
 
 
 class GovukIntegerField(GovukTextInputFieldMixin, IntegerField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukIntegerField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
+    pass
 
 
 class SMSCode(GovukTextInputField):
     # the design system recommends against ever using `type="number"`. "tel" makes mobile browsers
     # show a phone keypad input rather than a full qwerty keyboard.
     input_type = "tel"
+    param_extensions = {"attributes": {"pattern": "[0-9]*"}}
     validators = [
         DataRequired(message="Cannot be empty"),
         Regexp(regex=r"^\d+$", message="Numbers only"),
         Length(min=5, message="Not enough numbers"),
         Length(max=5, message="Too many numbers"),
     ]
-
-    def __call__(self, **kwargs):
-        params = {"attributes": {"pattern": "[0-9]*"}}
-        if "param_extensions" in kwargs:
-            merge_jsonlike(kwargs["param_extensions"], params)
-
-        return super().__call__(**kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -361,7 +333,7 @@ class ForgivingIntegerField(GovukTextInputField):
 
 
 class HexColourCodeField(GovukTextInputField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
+    def __init__(self, label="", validators=None, **kwargs):
         if validators is None:
             validators = []
         else:
@@ -372,7 +344,7 @@ class HexColourCodeField(GovukTextInputField):
 
         validators.append(Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"))
 
-        super().__init__(label, validators, param_extensions=param_extensions, **kwargs)
+        super().__init__(label, validators, **kwargs)
 
     def post_validate(self, form, validation_stopped):
         if not self.errors:
@@ -501,7 +473,7 @@ class StripWhitespaceForm(Form):
 
 
 class StripWhitespaceStringField(GovukTextInputField):
-    def __init__(self, label=None, param_extensions=None, **kwargs):
+    def __init__(self, label=None, **kwargs):
         kwargs["filters"] = tuple(
             chain(
                 kwargs.get("filters", ()),
@@ -509,7 +481,6 @@ class StripWhitespaceStringField(GovukTextInputField):
             )
         )
         super(GovukTextInputField, self).__init__(label, **kwargs)
-        self.param_extensions = param_extensions
 
 
 class PostalAddressField(TextAreaField):
@@ -587,10 +558,6 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
 class GovukCheckboxField(GovukFrontendWidgetMixin, BooleanField):
     govuk_frontend_component_name = "checkbox"
 
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
-        self.param_extensions = param_extensions
-
     def prepare_params(self, **kwargs):
         params = {
             "name": self.name,
@@ -602,10 +569,6 @@ class GovukCheckboxField(GovukFrontendWidgetMixin, BooleanField):
 
 class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
     govuk_frontend_component_name = "textarea"
-
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(TextAreaField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
 
     def prepare_params(self, **kwargs):
         # error messages
@@ -629,10 +592,6 @@ class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
 class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
     govuk_frontend_component_name = "checkbox"
     render_as_list = False
-
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukCheckboxesField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
 
     def get_item_from_option(self, option):
         return {
@@ -669,10 +628,9 @@ class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
 class GovukCollapsibleCheckboxesField(GovukCheckboxesField):
     param_extensions = {"hint": {"html": '<div class="selection-summary" role="region" aria-live="polite"></div>'}}
 
-    def __init__(self, label="", validators=None, field_label="", param_extensions=None, **kwargs):
-        super(GovukCollapsibleCheckboxesField, self).__init__(label, validators, param_extensions, **kwargs)
+    def __init__(self, *args, field_label="", **kwargs):
         self.field_label = field_label
-        merge_jsonlike(self.param_extensions, param_extensions)
+        super().__init__(*args, **kwargs)
 
     def widget(self, *args, **kwargs):
         checkboxes_string = super().widget(*args, **kwargs)
@@ -699,10 +657,6 @@ class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCh
 
 class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
     govuk_frontend_component_name = "radios"
-
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukRadiosField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
 
     def get_item_from_option(self, option):
         return {
@@ -788,13 +742,12 @@ class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
 class GovukRadiosWithImagesField(GovukRadiosField):
     govuk_frontend_component_name = "radios-with-images"
 
-    def __init__(self, label="", validators=None, param_extensions=None, image_data=None, **kwargs):
+    def __init__(self, label="", validators=None, image_data=None, **kwargs):
         if image_data is None:
             raise RuntimeError("Must provide `image_data` to initialiser")
 
         super(GovukRadiosField, self).__init__(label, validators, **kwargs)
 
-        self.param_extensions = param_extensions
         self.image_data = image_data
 
     def get_item_from_option(self, option):

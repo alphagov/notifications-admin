@@ -8,6 +8,10 @@ from app.utils import merge_jsonlike
 class GovukFrontendWidgetMixin(ABC):
     param_extensions = {}
 
+    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
+        super().__init__(label, validators, **kwargs)
+        merge_jsonlike(self.param_extensions, param_extensions)
+
     @property
     @abstractmethod
     def govuk_frontend_component_name(self):
