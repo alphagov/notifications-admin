@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 from flask import Markup, render_template_string
 
+from app.utils import merge_jsonlike
+
 
 class GovukFrontendWidgetMixin(ABC):
     @property
@@ -28,6 +30,14 @@ class GovukFrontendWidgetMixin(ABC):
         # widget always has a `field` param passed in as a positional, however, we're in a member function of a
         # Field class so can just discard it, `self == _field` is always true
         params = self.prepare_params(**kwargs)
+
+        # extend default params with any sent in during instantiation
+        if self.param_extensions:
+            merge_jsonlike(params, self.param_extensions)
+
+        # add any sent in though use in templates
+        if "param_extensions" in kwargs:
+            merge_jsonlike(params, kwargs["param_extensions"])
 
         return render_govuk_frontend_macro(self.govuk_frontend_component_name, params)
 

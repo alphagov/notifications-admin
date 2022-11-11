@@ -799,7 +799,7 @@ class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
         super(TextAreaField, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
 
-    def prepare_params(self, param_extensions=None, **kwargs):
+    def prepare_params(self, **kwargs):
         # error messages
         error_message = None
         if self.errors:
@@ -813,14 +813,6 @@ class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
             "hint": {"text": None},
             "errorMessage": error_message,
         }
-
-        # extend default params with any sent in during instantiation
-        if self.param_extensions:
-            merge_jsonlike(params, self.param_extensions)
-
-        # add any sent in though use in templates
-        if param_extensions:
-            merge_jsonlike(params, param_extensions)
 
         return params
 
