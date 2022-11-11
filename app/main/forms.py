@@ -2181,17 +2181,44 @@ class GovernmentIdentityLogoForm(StripWhitespaceForm):
         )
 
 
-class GovBrandingOrOwnLogoForm(StripWhitespaceForm):
-    branding_options = (
-        ("single_identity", "Create a government identity logo"),
-        ("org", "Upload a logo"),
+class EmailBrandingChooseLogoForm(StripWhitespaceForm):
+    BRANDING_OPTIONS_DATA = {
+        "single_identity": {
+            "label": "Create a government identity logo",
+            "image": {
+                "url": asset_fingerprinter.get_url("images/branding/single_identity.png"),
+                "alt_text": "An example of an email with a government identity logo,"
+                " including a blue stripe, a crest and department's name",
+                "dimensions": {"width": 404, "height": 454},
+            },
+        },
+        "org": {
+            "label": "Upload a logo",
+            "image": {
+                "url": asset_fingerprinter.get_url("images/branding/org.png"),
+                "alt_text": 'An example of an email with the heading "Your logo" in blue text on a white background.',
+                "dimensions": {"width": 404, "height": 454},
+            },
+        },
+    }
+
+    branding_options = GovukRadiosWithImagesField(
+        "Choose a logo for your emails",
+        choices=tuple((key, value["label"]) for key, value in BRANDING_OPTIONS_DATA.items()),
+        image_data={key: value["image"] for key, value in BRANDING_OPTIONS_DATA.items()},
+        param_extensions={
+            "classes": "govuk-radios--inline",
+            "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
+        },
     )
 
-    options = GovukRadiosField(
-        "Choose a logo for your emails",
-        choices=branding_options,
-        validators=[DataRequired()],
-    )
+    def __init__(self, service, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not service.email_branding_id:
+            self.branding_options.param_extensions["hint"] = {
+                "html": (f"{service.name} branding is not set up yet."),
+                "classes": "notify-hint--paragraph",
+            }
 
 
 class EmailBrandingChooseBanner(Form):
