@@ -922,9 +922,9 @@ def test_organisation_settings_for_platform_admin(
         "Request to go live notes None Change go live notes for the organisation",
         "Billing details None Change billing details for the organisation",
         "Notes None Change the notes for the organisation",
-        "Email branding options GOV.UK Default Change email branding options for the organisation",
+        "Email branding options GOV.UK Default Manage email branding options for the organisation",
         "Default letter branding No branding Change default letter branding for the organisation",
-        "Letter branding options None Change letter branding options for the organisation",
+        "Letter branding options None Manage letter branding options for the organisation",
         "Known email domains None Change known email domains for the organisation",
     ]
 
@@ -957,7 +957,7 @@ def test_organisation_settings_table_shows_email_branding_pool(
         "GOV.UK Default "
         "Email branding name 1 "
         "Email branding name 2 "
-        "Change email branding options for the organisation"
+        "Manage email branding options for the organisation"
     )
 
 
@@ -979,7 +979,7 @@ def test_organisation_settings_table_shows_letter_branding_pool(
         "Cabinet Office "
         "Department for Education "
         "Government Digital Service "
-        "Change letter branding options for the organisation"
+        "Manage letter branding options for the organisation"
     )
 
 
@@ -1017,7 +1017,7 @@ def test_organisation_settings_table_shows_email_branding_pool_non_govuk_default
         "Email branding options "
         "Email branding name 1 Default "
         "Email branding name 2 "
-        "Change email branding options for the organisation"
+        "Manage email branding options for the organisation"
     )
 
 
@@ -1035,7 +1035,7 @@ def test_organisation_settings_table_shows_email_branding_pool_govuk_default(
     email_branding_options_row = page.select("tr")[8]
 
     assert normalize_spaces(email_branding_options_row.text) == (
-        "Email branding options GOV.UK Default Change email branding options for the organisation"
+        "Email branding options GOV.UK Default Manage email branding options for the organisation"
     )
 
 
@@ -1913,8 +1913,8 @@ def test_get_organisation_email_branding_page_with_remove_param(
         remove_branding_id="email-branding-1-id",
     )
 
-    assert "Are you sure you want to remove the email brand ‘Email branding name 1’?" in page.text
-    assert normalize_spaces(page.select_one(".banner-dangerous form button").text) == "Yes, delete"
+    assert "Are you sure you want to remove ‘Email branding name 1’ branding?" in page.text
+    assert normalize_spaces(page.select_one(".banner-dangerous form button").text) == "Yes, remove"
 
 
 def test_post_organisation_email_branding_page_with_remove_param(
@@ -2259,7 +2259,7 @@ def test_add_organisation_email_branding_options_shows_branding_not_in_branding_
         ("org 4", "4", False),
         ("org 5", "5", False),
     ]
-    assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add options"
+    assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add selected options"
 
 
 def test_add_organisation_email_branding_options_shows_error_if_no_branding_selected(
@@ -2399,8 +2399,8 @@ def test_get_organisation_letter_branding_page_with_remove_param_shows_confirmat
         remove_branding_id="1234",
     )
 
-    assert "Are you sure you want to remove the letter brand ‘Cabinet Office’?" in page.text
-    assert normalize_spaces(page.select_one(".banner-dangerous form button").text) == "Yes, delete"
+    assert "Are you sure you want to remove ‘Cabinet Office’ branding?" in page.text
+    assert normalize_spaces(page.select_one(".banner-dangerous form button").text) == "Yes, remove"
 
 
 def test_post_organisation_letter_branding_page_with_remove_param_calls_client_and_redirects(
@@ -2506,7 +2506,7 @@ def test_add_organisation_letter_branding_options_shows_branding_not_in_branding
         ("Animal and Plant Health Agency", "efgh", False),
         ("Land Registry", "abcd", False),
     ]
-    assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add options"
+    assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add selected options"
 
 
 def test_add_organisation_letter_branding_options_shows_error_if_no_branding_selected(
