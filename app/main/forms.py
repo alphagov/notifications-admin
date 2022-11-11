@@ -595,44 +595,6 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
 
 
-def govuk_radios_field_widget(self, field, param_extensions=None, component="radios", **kwargs):
-    # error messages
-    error_message = None
-    if field.errors:
-        error_message = {
-            "attributes": {
-                "data-notify-module": "track-error",
-                "data-error-type": field.errors[0],
-                "data-error-label": field.name,
-            },
-            "text": field.errors[0],
-        }
-
-    # returns either a list or a hierarchy of lists
-    # depending on how get_items_from_options is implemented
-    items = self.get_items_from_options(field)
-
-    params = {
-        "name": field.name,
-        "fieldset": {
-            "attributes": {"id": field.name},
-            "legend": {"text": field.label.text, "classes": "govuk-fieldset__legend--s"},
-        },
-        "errorMessage": error_message,
-        "items": items,
-    }
-
-    # extend default params with any sent in during instantiation
-    if self.param_extensions:
-        merge_jsonlike(params, self.param_extensions)
-
-    # add any sent in though use in templates
-    if param_extensions:
-        merge_jsonlike(params, param_extensions)
-
-    return render_govuk_frontend_macro(component, params=params)
-
-
 class GovukCheckboxField(GovukFrontendWidgetMixin, BooleanField):
     govuk_frontend_component_name = "checkbox"
 
@@ -769,7 +731,9 @@ class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCh
     render_as_list = True
 
 
-class GovukRadiosField(RadioField):
+class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
+    govuk_frontend_component_name = "radios"
+
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         super(GovukRadiosField, self).__init__(label, validators, **kwargs)
         self.param_extensions = param_extensions
@@ -786,12 +750,33 @@ class GovukRadiosField(RadioField):
     def get_items_from_options(self, field):
         return [self.get_item_from_option(option) for option in field]
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_radios_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+    def prepare_params(self, **kwargs):
+
+        # error messages
+        error_message = None
+        if self.errors:
+            error_message = {
+                "attributes": {
+                    "data-notify-module": "track-error",
+                    "data-error-type": self.errors[0],
+                    "data-error-label": self.name,
+                },
+                "text": self.errors[0],
+            }
+
+        # returns either a list or a hierarchy of lists
+        # depending on how get_items_from_options is implemented
+        items = self.get_items_from_options(self)
+
+        return {
+            "name": self.name,
+            "fieldset": {
+                "attributes": {"id": self.name},
+                "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
+            },
+            "errorMessage": error_message,
+            "items": items,
+        }
 
 
 class OptionalGovukRadiosField(GovukRadiosField):
@@ -848,6 +833,8 @@ class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
 
 
 class GovukRadiosWithImagesField(GovukRadiosField):
+    govuk_frontend_component_name = "radios-with-images"
+
     def __init__(self, label="", validators=None, param_extensions=None, image_data=None, **kwargs):
         if image_data is None:
             raise RuntimeError("Must provide `image_data` to initialiser")
@@ -866,15 +853,6 @@ class GovukRadiosWithImagesField(GovukRadiosField):
             "checked": option.checked,
             "image": self.image_data[option.data],
         }
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_radios_field_widget(
-            self, field, param_extensions=param_extensions, component="radios-with-images", **kwargs
-        )
 
 
 # guard against data entries that aren't a known permission
