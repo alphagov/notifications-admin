@@ -11,7 +11,11 @@
 
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.email_branding') }) }}
+  {{ govukBackLink({ "href": url_for(
+    '.create_email_branding_government_identity_logo',
+    text=request.args.get("text"),
+    brand_type=request.args.get("brand_type")
+  ) }) }}
 {% endblock %}
 
 {% block platform_admin_content %}

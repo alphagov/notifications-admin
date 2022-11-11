@@ -154,7 +154,6 @@ def test_email_branding_request_page_redirects_to_something_else_page_if_that_is
     mock_get_email_branding,
     mock_get_empty_email_branding_pool,
 ):
-
     service_one["organisation_type"] = "other"
     mocker.patch(
         "app.models.service.Service.email_branding_id",
@@ -167,8 +166,7 @@ def test_email_branding_request_page_redirects_to_something_else_page_if_that_is
         service_id=SERVICE_ONE_ID,
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.email_branding_something_else",
-            service_id=SERVICE_ONE_ID,
+            "main.email_branding_something_else", service_id=SERVICE_ONE_ID, back_link=".service_settings"
         ),
     )
 
@@ -343,7 +341,7 @@ def test_email_branding_request_page_back_link(
 
 
 @pytest.mark.parametrize(
-    "data, org_type, endpoint",
+    "data, org_type, endpoint, extra_args",
     (
         (
             {
@@ -351,27 +349,39 @@ def test_email_branding_request_page_back_link(
             },
             "central",
             "main.email_branding_govuk",
+            {},
         ),
         (
             {
                 "options": "govuk_and_org",
             },
             "central",
-            "main.email_branding_govuk_and_org",
+            "main.email_branding_choose_logo",
+            {"branding_choice": "govuk_and_org"},
         ),
         (
             {
                 "options": "organisation",
             },
             "central",
-            "main.email_branding_organisation",
+            "main.email_branding_choose_logo",
+            {"branding_choice": "organisation"},
         ),
         (
             {
                 "options": "something_else",
             },
             "central",
+            "main.email_branding_choose_logo",
+            {"branding_choice": "something_else"},
+        ),
+        (
+            {
+                "options": "something_else",
+            },
+            "local",
             "main.email_branding_something_else",
+            {"back_link": ".email_branding_request"},
         ),
         (
             {
@@ -379,6 +389,7 @@ def test_email_branding_request_page_back_link(
             },
             "nhs_local",
             "main.email_branding_nhs",
+            {},
         ),
     ),
 )
@@ -392,6 +403,7 @@ def test_email_branding_request_submit(
     data,
     org_type,
     endpoint,
+    extra_args,
 ):
     organisation_one["organisation_type"] = org_type
     service_one["email_branding"] = sample_uuid()
@@ -410,6 +422,7 @@ def test_email_branding_request_submit(
         _expected_redirect=url_for(
             endpoint,
             service_id=SERVICE_ONE_ID,
+            **extra_args,
         ),
     )
 
@@ -516,6 +529,22 @@ def test_email_branding_something_else_page(client_request, service_one, mock_ge
     assert normalize_spaces(page.select_one(".page-footer button").text) == "Request new branding"
     assert page.select_one(".govuk-back-link")["href"] == url_for(
         "main.email_branding_request",
+        service_id=SERVICE_ONE_ID,
+    )
+
+
+@pytest.mark.parametrize("back_link", [".service_settings", ".email_branding_request", ".email_branding_choose_logo"])
+def test_email_branding_something_else_page_back_link_from_args(
+    client_request, service_one, mock_get_empty_email_branding_pool, back_link
+):
+    # expect to have a "NHS" option as well as the
+    # fallback, so "something else" is not an only option
+    service_one["organisation_type"] = "nhs_central"
+
+    page = client_request.get("main.email_branding_something_else", service_id=SERVICE_ONE_ID, back_link=back_link)
+    assert normalize_spaces(page.select_one("h1").text) == "Describe the branding you want"
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        back_link,
         service_id=SERVICE_ONE_ID,
     )
 
@@ -839,19 +868,19 @@ def test_only_central_org_services_can_see_email_branding_choose_logo_page(clien
 
 
 @pytest.mark.parametrize(
-    "selected_option, expected_endpoint",
+    "selected_option, expected_endpoint, extra_url_args",
     [
-        ("org", ".email_branding_something_else"),
-        ("single_identity", ".email_branding_request_government_identity_logo"),
+        ("org", ".email_branding_something_else", {"back_link": ".email_branding_choose_logo"}),
+        ("single_identity", ".email_branding_request_government_identity_logo", {}),
     ],
 )
 def test_email_branding_choose_logo_redirects_to_right_page(
-    client_request, service_one, selected_option, expected_endpoint
+    client_request, service_one, selected_option, expected_endpoint, extra_url_args
 ):
     client_request.post(
         ".email_branding_choose_logo",
         service_id=SERVICE_ONE_ID,
         _data={"branding_options": selected_option},
         _expected_status=302,
-        _expected_redirect=url_for(expected_endpoint, service_id=SERVICE_ONE_ID),
+        _expected_redirect=url_for(expected_endpoint, service_id=SERVICE_ONE_ID, **extra_url_args),
     )
