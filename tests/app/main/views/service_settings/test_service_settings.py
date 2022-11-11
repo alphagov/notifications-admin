@@ -3956,7 +3956,9 @@ def test_GET_email_branding_choose_banner_colour(client_request, service_one):
     submit_button = form.select_one("button")
     text_input = form.select_one("input")
     page_links = page.select("a")
-    skip_link = next(filter(lambda link: link.text == "skip this step", page_links), None)
+    skip_link = next(
+        filter(lambda link: link.text == "I do not know the hex colour code for my banner", page_links), None
+    )
 
     assert back_button["href"] == url_for("main.email_branding_choose_banner_type", service_id=service_one["id"])
     assert form["method"] == "post"
