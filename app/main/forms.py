@@ -5,7 +5,7 @@ from itertools import chain
 from numbers import Number
 
 import pytz
-from flask import Markup, render_template_string, request
+from flask import Markup, request
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
@@ -81,52 +81,13 @@ from app.models.branding import (
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.utils import branding, merge_jsonlike
+from app.utils.govuk_frontend_field import render_govuk_frontend_macro
 from app.utils.user import distinct_email_addresses
 from app.utils.user_permissions import (
     all_ui_permissions,
     broadcast_permission_options,
     permission_options,
 )
-
-
-def render_govuk_frontend_macro(component, params):
-    """
-    jinja needs a template to render
-
-    This function creates a template string that just calls that macro on its own.
-
-    ```
-    {%- from <path> import <macro> -%}
-
-    {{ macro(params) }}
-    ```
-
-    This function dynamically fills in the path and macro based on the GOVUK_FRONTEND_MACROS dictionary.
-    Then we render that template with any params to produce just the output of that macro.
-    """
-    govuk_frontend_components = {
-        "radios": {"path": "govuk_frontend_jinja/components/radios/macro.html", "macro": "govukRadios"},
-        "radios-with-images": {
-            "path": "govuk_frontend_jinja_overrides/templates/components/radios-with-images/macro.html",
-            "macro": "govukRadiosWithImages",
-        },
-        "text-input": {"path": "govuk_frontend_jinja/components/input/macro.html", "macro": "govukInput"},
-        "textarea": {"path": "govuk_frontend_jinja/components/textarea/macro.html", "macro": "govukTextarea"},
-        "checkbox": {
-            "path": "govuk_frontend_jinja_overrides/templates/components/checkboxes/macro.html",
-            "macro": "govukCheckboxes",
-        },
-    }
-
-    # we need to duplicate all curly braces to escape them from the f string so jinja still sees them
-    template_string = f"""
-        {{%- from '{govuk_frontend_components[component]['path']}'
-        import {govuk_frontend_components[component]['macro']} -%}}
-
-        {{{{ {govuk_frontend_components[component]['macro']}(params) }}}}
-    """
-
-    return Markup(render_template_string(template_string, params=params))
 
 
 def get_time_value_and_label(future_time):
