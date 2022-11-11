@@ -3945,6 +3945,76 @@ def test_email_branding_choose_banner_type_shows_error_summary_on_invalid_data(c
     assert "Error: Select an option" in page.select_one("#banner").text
 
 
+def test_GET_email_branding_choose_banner_colour(client_request, service_one):
+    page = client_request.get(
+        "main.email_branding_choose_banner_colour",
+        service_id=service_one["id"],
+    )
+
+    back_button = page.select_one("a.govuk-back-link")
+    form = page.select_one("form")
+    submit_button = form.select_one("button")
+    text_input = form.select_one("input")
+    page_links = page.select("a")
+    skip_link = next(
+        filter(lambda link: link.text == "I do not know the hex colour code for my banner", page_links), None
+    )
+
+    assert back_button["href"] == url_for("main.email_branding_choose_banner_type", service_id=service_one["id"])
+    assert form["method"] == "post"
+    assert "Continue" in submit_button.text
+    assert text_input["name"] == "hex_colour"
+
+    assert skip_link is not None
+    assert skip_link["href"] == url_for("main.email_branding_upload_logo", service_id=service_one["id"])
+
+
+def test_POST_email_branding_choose_banner_colour(client_request, service_one):
+    client_request.post(
+        "main.email_branding_choose_banner_colour",
+        service_id=service_one["id"],
+        _data={"hex_colour": "#abcdef"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.email_branding_upload_logo", service_id=service_one["id"], banner_colour="#abcdef"
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "hex_colour, expected_query_param",
+    (
+        ("#abc", "#abc"),
+        ("#abcdef", "#abcdef"),
+        ("abc", "#abc"),
+        ("abcdef", "#abcdef"),
+    ),
+)
+def test_POST_email_branding_choose_banner_colour_handles_hex_colour_variations(
+    client_request, service_one, hex_colour, expected_query_param
+):
+    client_request.post(
+        "main.email_branding_choose_banner_colour",
+        service_id=service_one["id"],
+        _data={"hex_colour": hex_colour},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.email_branding_upload_logo", service_id=service_one["id"], banner_colour=expected_query_param
+        ),
+    )
+
+
+def test_POST_email_branding_choose_banner_colour_invalid_hex_code(client_request, service_one):
+    page = client_request.post(
+        "main.email_branding_choose_banner_colour",
+        service_id=service_one["id"],
+        _data={"hex_colour": "BAD-CODE"},
+        _expected_status=400,
+    )
+
+    assert "Must be a valid hex colour code" in page.text
+
+
 @pytest.mark.parametrize("method", ["get", "post"])
 @pytest.mark.parametrize(
     "endpoint",

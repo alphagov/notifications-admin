@@ -90,6 +90,34 @@ describe('Colour preview', () => {
 
     });
 
+    test("The textbox accepts hex codes without a leading #", () => {
+
+      textbox.setAttribute('value', '00FF00');
+
+      // start the module
+      window.GOVUK.notifyModules.start();
+
+      swatchEl = document.querySelector('.textbox-colour-preview');
+
+      // colours are output in RGB
+      expect(swatchEl.style.background).toEqual('rgb(0, 255, 0)');
+
+    });
+
+    test("The textbox accepts 3-character hex codes", () => {
+
+      textbox.setAttribute('value', '0F0');
+
+      // start the module
+      window.GOVUK.notifyModules.start();
+
+      swatchEl = document.querySelector('.textbox-colour-preview');
+
+      // colours are output in RGB
+      expect(swatchEl.style.background).toEqual('rgb(0, 255, 0)');
+
+    });
+
   });
 
   describe("When input is added to the textbox", () => {
