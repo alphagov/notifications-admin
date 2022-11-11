@@ -683,37 +683,6 @@ def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
     return render_govuk_frontend_macro("checkbox", params=params)
 
 
-def prepare_params_for_govuk_checkboxes(self):
-    # error messages
-    error_message = None
-    if self.errors:
-        error_message = {
-            "attributes": {
-                "data-notify-module": "track-error",
-                "data-error-type": self.errors[0],
-                "data-error-label": self.name,
-            },
-            "text": self.errors[0],
-        }
-
-    # returns either a list or a hierarchy of lists
-    # depending on how get_items_from_options is implemented
-    items = self.get_items_from_options(self)
-
-    params = {
-        "name": self.name,
-        "fieldset": {
-            "attributes": {"id": self.name},
-            "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
-        },
-        "asList": self.render_as_list,
-        "errorMessage": error_message,
-        "items": items,
-    }
-
-    return params
-
-
 def govuk_radios_field_widget(self, field, param_extensions=None, component="radios", **kwargs):
     # error messages
     error_message = None
@@ -791,7 +760,8 @@ class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
 
 
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
-class GovukCheckboxesField(SelectMultipleField):
+class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
+    govuk_frontend_component_name = "checkbox"
     render_as_list = False
 
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
@@ -810,22 +780,35 @@ class GovukCheckboxesField(SelectMultipleField):
     def get_items_from_options(self, field):
         return [self.get_item_from_option(option) for option in field]
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        params = prepare_params_for_govuk_checkboxes(self)
+    def prepare_params(self, **kwargs):
+        # error messages
+        error_message = None
+        if self.errors:
+            error_message = {
+                "attributes": {
+                    "data-notify-module": "track-error",
+                    "data-error-type": self.errors[0],
+                    "data-error-label": self.name,
+                },
+                "text": self.errors[0],
+            }
 
-        # extend default params with any sent in during instantiation
-        if self.param_extensions:
-            merge_jsonlike(params, self.param_extensions)
+        # returns either a list or a hierarchy of lists
+        # depending on how get_items_from_options is implemented
+        items = self.get_items_from_options(self)
 
-        # add any sent in though use in templates
-        if param_extensions:
-            merge_jsonlike(params, param_extensions)
+        params = {
+            "name": self.name,
+            "fieldset": {
+                "attributes": {"id": self.name},
+                "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
+            },
+            "asList": self.render_as_list,
+            "errorMessage": error_message,
+            "items": items,
+        }
 
-        return render_govuk_frontend_macro("checkbox", params=params)
+        return params
 
 
 # Wraps checkboxes rendering in HTML needed by the collapsible JS
