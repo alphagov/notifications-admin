@@ -174,23 +174,12 @@ class GovukTextInputFieldMixin(GovukFrontendWidgetMixin):
         value = kwargs["value"] if "value" in kwargs else self.data
         value = str(value) if isinstance(value, Number) else value
 
-        # error messages
-        error_message = None
-        if self.errors:
-            error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
-            error_message = {
-                "attributes": {
-                    "data-notify-module": "track-error",
-                    "data-error-type": self.errors[0],
-                    "data-error-label": self.name,
-                },
-                error_message_format: self.errors[0],
-            }
+        error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
 
         # convert to parameters that govuk understands
         params = {
             "classes": "govuk-!-width-two-thirds",
-            "errorMessage": error_message,
+            "errorMessage": self.get_error_message(error_message_format),
             "id": self.id,
             "label": {"text": self.label.text},
             "name": self.name,
@@ -603,20 +592,9 @@ class GovukCheckboxField(GovukFrontendWidgetMixin, BooleanField):
         self.param_extensions = param_extensions
 
     def prepare_params(self, **kwargs):
-        error_message = None
-        if self.errors:
-            error_message = {
-                "attributes": {
-                    "data-notify-module": "track-error",
-                    "data-error-type": self.errors[0],
-                    "data-error-label": self.name,
-                },
-                "text": self.errors[0],
-            }
-
         params = {
             "name": self.name,
-            "errorMessage": error_message,
+            "errorMessage": self.get_error_message(),
             "items": [{"name": self.name, "id": self.id, "text": self.label.text, "value": "y", "checked": self.data}],
         }
         return params
@@ -669,18 +647,6 @@ class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
         return [self.get_item_from_option(option) for option in field]
 
     def prepare_params(self, **kwargs):
-        # error messages
-        error_message = None
-        if self.errors:
-            error_message = {
-                "attributes": {
-                    "data-notify-module": "track-error",
-                    "data-error-type": self.errors[0],
-                    "data-error-label": self.name,
-                },
-                "text": self.errors[0],
-            }
-
         # returns either a list or a hierarchy of lists
         # depending on how get_items_from_options is implemented
         items = self.get_items_from_options(self)
@@ -692,7 +658,7 @@ class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
                 "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
             },
             "asList": self.render_as_list,
-            "errorMessage": error_message,
+            "errorMessage": self.get_error_message(),
             "items": items,
         }
 
@@ -751,19 +717,6 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
         return [self.get_item_from_option(option) for option in field]
 
     def prepare_params(self, **kwargs):
-
-        # error messages
-        error_message = None
-        if self.errors:
-            error_message = {
-                "attributes": {
-                    "data-notify-module": "track-error",
-                    "data-error-type": self.errors[0],
-                    "data-error-label": self.name,
-                },
-                "text": self.errors[0],
-            }
-
         # returns either a list or a hierarchy of lists
         # depending on how get_items_from_options is implemented
         items = self.get_items_from_options(self)
@@ -774,7 +727,7 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
                 "attributes": {"id": self.name},
                 "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
             },
-            "errorMessage": error_message,
+            "errorMessage": self.get_error_message(),
             "items": items,
         }
 

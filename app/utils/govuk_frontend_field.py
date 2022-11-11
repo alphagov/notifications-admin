@@ -6,6 +6,8 @@ from app.utils import merge_jsonlike
 
 
 class GovukFrontendWidgetMixin(ABC):
+    param_extensions = {}
+
     @property
     @abstractmethod
     def govuk_frontend_component_name(self):
@@ -14,6 +16,19 @@ class GovukFrontendWidgetMixin(ABC):
         matches up with URLs found in https://design-system.service.gov.uk/components/
         """
         pass
+
+    def get_error_message(self, error_message_format="text"):
+        if self.errors:
+            return {
+                "attributes": {
+                    "data-notify-module": "track-error",
+                    "data-error-type": self.errors[0],
+                    "data-error-label": self.name,
+                },
+                error_message_format: self.errors[0],
+            }
+        else:
+            return None
 
     def prepare_params(self, **kwargs):
         """
@@ -31,13 +46,11 @@ class GovukFrontendWidgetMixin(ABC):
         # Field class so can just discard it, `self == _field` is always true
         params = self.prepare_params(**kwargs)
 
-        # extend default params with any sent in during instantiation
-        if self.param_extensions:
-            merge_jsonlike(params, self.param_extensions)
+        # override params with any sent in during instantiation
+        merge_jsonlike(params, self.param_extensions)
 
-        # add any sent in though use in templates
-        if "param_extensions" in kwargs:
-            merge_jsonlike(params, kwargs["param_extensions"])
+        # override params with any sent in though use in templates
+        merge_jsonlike(params, kwargs.get("param_extensions"))
 
         return render_govuk_frontend_macro(self.govuk_frontend_component_name, params)
 
