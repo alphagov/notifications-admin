@@ -2218,17 +2218,17 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
         "Choose a logo for your emails",
         choices=tuple((key, value["label"]) for key, value in BRANDING_OPTIONS_DATA.items()),
         image_data={key: value["image"] for key, value in BRANDING_OPTIONS_DATA.items()},
-        param_extensions={
-            "classes": "govuk-radios--inline",
-            "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
-        },
     )
 
     def __init__(self, service, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.branding_options.param_extensions = {
+            "classes": "govuk-radios--inline",
+            "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
+        }
         if not service.email_branding_id:
             self.branding_options.param_extensions["hint"] = {
-                "html": (f"{service.name} branding is not set up yet."),
+                "html": f"{service.name} branding is not set up yet.",
                 "classes": "notify-hint--paragraph",
             }
 
