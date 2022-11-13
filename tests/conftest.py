@@ -1158,14 +1158,10 @@ def mock_register_user(mocker, api_user_pending):
 
 
 @pytest.fixture(scope="function")
-def mock_get_non_govuser(mocker, api_user_active):
+def login_non_govuser(client_request, api_user_active):
     api_user_active["email_address"] = "someuser@example.com"
 
-    def _get_user(id_):
-        api_user_active["id"] = id_
-        return api_user_active
-
-    return mocker.patch("app.user_api_client.get_user", side_effect=_get_user)
+    client_request.login(api_user_active)
 
 
 @pytest.fixture(scope="function")

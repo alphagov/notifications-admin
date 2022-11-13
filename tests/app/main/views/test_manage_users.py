@@ -139,7 +139,6 @@ def test_should_show_overview_page(
     other_user["name"] = "ZZZZZZZZ"
     other_user["id"] = "zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz"
 
-    mocker.patch("app.user_api_client.get_user", return_value=current_user)
     mock_get_users = mocker.patch(
         "app.models.user.Users.client_method",
         return_value=[
@@ -148,6 +147,7 @@ def test_should_show_overview_page(
         ],
     )
 
+    client_request.login(current_user)
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one("h1").text) == "Team members"
@@ -257,7 +257,6 @@ def test_should_show_caseworker_on_overview_page(
     other_user["id"] = uuid.uuid4()
     other_user["email_address"] = "zzzzzzz@example.gov.uk"
 
-    mocker.patch("app.user_api_client.get_user", return_value=current_user)
     mocker.patch(
         "app.models.user.Users.client_method",
         return_value=[
@@ -266,6 +265,7 @@ def test_should_show_caseworker_on_overview_page(
         ],
     )
 
+    client_request.login(current_user)
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one("h1").text) == "Team members"
@@ -974,16 +974,12 @@ def test_should_show_page_for_inviting_user_with_email_prefilled(
     mock_get_invites_for_service,
 ):
     service_one["organisation"] = ORGANISATION_ID
-    mocker.patch(
-        "app.models.user.user_api_client.get_user",
-        side_effect=[
-            # First call is to get the current user
-            active_user_with_permissions,
-            # Second call gets the user to invite
-            active_user_with_permission_to_other_service,
-        ],
-    )
 
+    client_request.login(active_user_with_permissions)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=active_user_with_permission_to_other_service,
+    )
     page = client_request.get(
         "main.invite_user",
         service_id=SERVICE_ONE_ID,
@@ -1039,14 +1035,10 @@ def test_should_show_page_if_prefilled_user_is_already_invited(
     mock_get_invites_for_service,
 ):
     active_user_with_permission_to_other_service["email_address"] = "user_1@testnotify.gov.uk"
+    client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.models.user.user_api_client.get_user",
-        side_effect=[
-            # First call is to get the current user
-            active_user_with_permissions,
-            # Second call gets the user to invite
-            active_user_with_permission_to_other_service,
-        ],
+        return_value=active_user_with_permission_to_other_service,
     )
     page = client_request.get(
         "main.invite_user",
@@ -1074,14 +1066,10 @@ def test_should_403_if_trying_to_prefill_email_address_for_user_with_no_organisa
     mock_get_no_organisation_by_domain,
 ):
     service_one["organisation"] = ORGANISATION_ID
+    client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.models.user.user_api_client.get_user",
-        side_effect=[
-            # First call is to get the current user
-            active_user_with_permissions,
-            # Second call gets the user to invite
-            active_user_with_permission_to_other_service,
-        ],
+        return_value=active_user_with_permission_to_other_service,
     )
     client_request.get(
         "main.invite_user",
@@ -1103,14 +1091,10 @@ def test_should_403_if_trying_to_prefill_email_address_for_user_from_other_organ
     mock_get_organisation_by_domain,
 ):
     service_one["organisation"] = ORGANISATION_TWO_ID
+    client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.models.user.user_api_client.get_user",
-        side_effect=[
-            # First call is to get the current user
-            active_user_with_permissions,
-            # Second call gets the user to invite
-            active_user_with_permission_to_other_service,
-        ],
+        return_value=active_user_with_permission_to_other_service,
     )
     client_request.get(
         "main.invite_user",
@@ -1121,7 +1105,7 @@ def test_should_403_if_trying_to_prefill_email_address_for_user_from_other_organ
 
 
 def test_should_show_folder_permission_form_if_service_has_folder_permissions_enabled(
-    client_request, mocker, mock_get_template_folders, service_one
+    client_request, mock_get_template_folders, service_one
 ):
     mock_get_template_folders.return_value = [
         {"id": "folder-id-1", "name": "folder_one", "parent_id": None, "users_with_permission": []},
@@ -1195,14 +1179,10 @@ def test_invite_user_when_email_address_is_prefilled(
     mock_get_organisation_by_domain,
 ):
     service_one["organisation"] = ORGANISATION_ID
+    client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.models.user.user_api_client.get_user",
-        side_effect=[
-            # First call is to get the current user
-            active_user_with_permissions,
-            # Second call gets the user to invite
-            active_user_with_permission_to_other_service,
-        ],
+        return_value=active_user_with_permission_to_other_service,
     )
     mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
     client_request.post(

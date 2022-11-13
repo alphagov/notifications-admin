@@ -245,7 +245,6 @@ def test_user_cannot_reject_broadcast_without_permission(
 
 
 def test_user_cannot_cancel_broadcast_without_permission(
-    mocker,
     client_request,
     service_one,
     active_user_view_permissions,
@@ -255,7 +254,6 @@ def test_user_cannot_cancel_broadcast_without_permission(
     """
     service_one["permissions"] += ["broadcast"]
 
-    mocker.patch("app.user_api_client.get_user", return_value=active_user_view_permissions)
     client_request.get(
         ".cancel_broadcast_message",
         service_id=SERVICE_ONE_ID,
@@ -1881,16 +1879,18 @@ def test_view_broadcast_message_page(
             **extra_fields,
         ),
     )
+    service_one["permissions"] += ["broadcast"]
+
+    client_request.login(active_user_view_permissions)
+
     mocker.patch(
         "app.user_api_client.get_user",
         side_effect=[
-            active_user_view_permissions,
             user_json(name="Alice"),
             user_json(name="Bob"),
             user_json(name="Carol"),
         ],
     )
-    service_one["permissions"] += ["broadcast"]
 
     page = client_request.get(
         endpoint,
@@ -2003,10 +2003,7 @@ def test_view_pending_broadcast(
     client_request.login(active_user_approve_broadcasts_permission)
     mocker.patch(
         "app.user_api_client.get_user",
-        side_effect=[
-            active_user_approve_broadcasts_permission,  # Current user
-            broadcast_creator,  # User who created broadcast
-        ],
+        return_value=broadcast_creator,
     )
     service_one["permissions"] += ["broadcast"]
 
@@ -2084,10 +2081,7 @@ def test_view_pending_broadcast_without_template(
     client_request.login(active_user_approve_broadcasts_permission)
     mocker.patch(
         "app.user_api_client.get_user",
-        side_effect=[
-            active_user_approve_broadcasts_permission,  # Current user
-            broadcast_creator,  # User who created broadcast
-        ],
+        return_value=broadcast_creator,
     )
     service_one["permissions"] += ["broadcast"]
 
@@ -2248,13 +2242,6 @@ def test_can_approve_own_broadcast_in_training_mode(
         ),
     )
     client_request.login(active_user_approve_broadcasts_permission)
-    mocker.patch(
-        "app.user_api_client.get_user",
-        side_effect=[
-            active_user_approve_broadcasts_permission,  # Current user
-            active_user_approve_broadcasts_permission,  # User who created broadcast (the same)
-        ],
-    )
     service_one["permissions"] += ["broadcast"]
 
     page = client_request.get(
@@ -2319,13 +2306,6 @@ def test_cant_approve_own_broadcast_if_service_is_live(
         ),
     )
     client_request.login(user)
-    mocker.patch(
-        "app.user_api_client.get_user",
-        side_effect=[
-            user,  # Current user
-            user,  # User who created broadcast (the same)
-        ],
-    )
     service_one["permissions"] += ["broadcast"]
 
     page = client_request.get(
@@ -2372,17 +2352,7 @@ def test_view_only_user_cant_approve_broadcast_created_by_someone_else(
             status="pending-approval",
         ),
     )
-    if user_is_platform_admin:
-        current_user = platform_admin_user_no_service_permissions
-    else:
-        current_user = active_user_view_permissions
-    mocker.patch(
-        "app.user_api_client.get_user",
-        side_effect=[
-            current_user,  # Current user
-            active_user_create_broadcasts_permission,  # User who created broadcast
-        ],
-    )
+
     service_one["permissions"] += ["broadcast"]
 
     page = client_request.get(
@@ -2392,7 +2362,7 @@ def test_view_only_user_cant_approve_broadcast_created_by_someone_else(
     )
 
     assert (normalize_spaces(page.select_one(".banner").text)) == (
-        "This alert is waiting for approval " "You don’t have permission to approve alerts."
+        "This alert is waiting for approval You don’t have permission to approve alerts."
     )
 
     assert not page.select_one("form")
@@ -2420,15 +2390,6 @@ def test_view_only_user_cant_approve_broadcasts_they_created(
     )
     client_request.login(active_user_view_permissions)
 
-    # active_user_view_permissions and active_user_create_broadcasts_permission have the same
-    # id. This mocks the same user being returned, but with different permissions each time.
-    mocker.patch(
-        "app.user_api_client.get_user",
-        side_effect=[
-            active_user_view_permissions,  # Current user
-            active_user_create_broadcasts_permission,  # User who created broadcast
-        ],
-    )
     service_one["permissions"] += ["broadcast"]
     service_one["restriced"] = False
 
@@ -2439,7 +2400,7 @@ def test_view_only_user_cant_approve_broadcasts_they_created(
     )
 
     assert (normalize_spaces(page.select_one(".banner").text)) == (
-        "This alert is waiting for approval " "You don’t have permission to approve alerts."
+        "This alert is waiting for approval You don’t have permission to approve alerts."
     )
 
     assert not page.select_one("form")
@@ -2492,10 +2453,7 @@ def test_user_without_approve_permission_cant_approve_broadcast_created_by_someo
     client_request.login(current_user)
     mocker.patch(
         "app.user_api_client.get_user",
-        side_effect=[
-            current_user,  # Current user
-            active_user_create_broadcasts_permission,  # User who created broadcast
-        ],
+        return_value=active_user_create_broadcasts_permission,
     )
     service_one["permissions"] += ["broadcast"]
     service_one["restricted"] = is_service_training_mode
@@ -2533,13 +2491,6 @@ def test_user_without_approve_permission_cant_approve_broadcast_they_created(
         ),
     )
     client_request.login(active_user_create_broadcasts_permission)
-    mocker.patch(
-        "app.user_api_client.get_user",
-        side_effect=[
-            active_user_create_broadcasts_permission,  # Current user
-            active_user_create_broadcasts_permission,  # Same created the broadcast
-        ],
-    )
     service_one["permissions"] += ["broadcast"]
 
     page = client_request.get(

@@ -2694,9 +2694,7 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_perso
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
     client_request.login(platform_admin_user)
-
-    mocker.patch("app.user_api_client.get_user", side_effect=[platform_admin_user, api_user_active])
-
+    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
     page = client_request.get(
         ".organisation_billing",
         org_id=ORGANISATION_ID,

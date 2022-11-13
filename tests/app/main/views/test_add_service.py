@@ -1,5 +1,6 @@
 import pytest
 from flask import url_for
+from flask_login import current_user
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
@@ -11,7 +12,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 def test_non_gov_user_cannot_see_add_service_button(
     client_request,
     mock_login,
-    mock_get_non_govuser,
+    login_non_govuser,
     api_nongov_user_active,
     mock_get_organisations,
     mock_get_organisations_and_services_for_user,
@@ -337,11 +338,11 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
 
 def test_non_government_user_cannot_access_create_service_page(
     client_request,
-    mock_get_non_govuser,
+    login_non_govuser,
     api_nongov_user_active,
     mock_get_organisations,
 ):
-    assert is_gov_user(api_nongov_user_active["email_address"]) is False
+    assert is_gov_user(current_user.email_address) is False
     client_request.get(
         "main.add_service",
         _expected_status=403,
@@ -350,11 +351,11 @@ def test_non_government_user_cannot_access_create_service_page(
 
 def test_non_government_user_cannot_create_service(
     client_request,
-    mock_get_non_govuser,
+    login_non_govuser,
     api_nongov_user_active,
     mock_get_organisations,
 ):
-    assert is_gov_user(api_nongov_user_active["email_address"]) is False
+    assert is_gov_user(current_user.email_address) is False
     client_request.post(
         "main.add_service",
         _data={"name": "SERVICE TWO"},
