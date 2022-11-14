@@ -391,7 +391,7 @@ def edit_organisation_agreement(org_id):
     )
 
 
-def _handle_remove_branding(remove_branding_id) -> Optional[Response]:
+def _handle_remove_email_branding(remove_branding_id) -> Optional[Response]:
     """
     The user has clicked 'remove' on a brand and is either going to see a confirmation flash message
     or has clicked to confirm that flash message.
@@ -423,7 +423,7 @@ def _handle_remove_branding(remove_branding_id) -> Optional[Response]:
     return None
 
 
-def _handle_change_default_branding_to_govuk(is_central_government) -> Optional[Response]:
+def _handle_change_default_email_branding_to_govuk(is_central_government) -> Optional[Response]:
     """
     This handles changing a central government organisation from a custom brand back to the default GOV.UK brand.
     If we're in here, then the user has either clicked the 'Reset to GOV.UK' link or they're clicking the
@@ -454,7 +454,7 @@ def _handle_change_default_branding_to_govuk(is_central_government) -> Optional[
     return None
 
 
-def _handle_change_default_branding(form, new_default_branding_id) -> Optional[Response]:
+def _handle_change_default_email_branding(form, new_default_branding_id) -> Optional[Response]:
     """
     Handle any change of branding to a non-default (GOV.UK) brand. This includes going from GOV.UK to a custom
     brand, and going from a custom brand to another custom brand. When moving from GOV.UK to a custom brand,
@@ -532,14 +532,14 @@ def organisation_email_branding(org_id):
     form = AdminChangeOrganisationDefaultEmailBrandingForm()
 
     if remove_branding_id:
-        if response := _handle_remove_branding(remove_branding_id):
+        if response := _handle_remove_email_branding(remove_branding_id):
             return response
 
     elif change_default_branding_to_govuk:
-        if response := _handle_change_default_branding_to_govuk(is_central_government):
+        if response := _handle_change_default_email_branding_to_govuk(is_central_government):
             return response
 
-    elif response := _handle_change_default_branding(form, new_default_branding_id):
+    elif response := _handle_change_default_email_branding(form, new_default_branding_id):
         return response
 
     # We only show this link to central government organisations.
