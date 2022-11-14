@@ -625,29 +625,41 @@ def organisation_preview_letter_branding(org_id):
     )
 
 
+def _handle_remove_letter_branding(remove_branding_id):
+    """
+    The user has clicked 'remove' on a brand and is either going to see a confirmation flash message
+    or has clicked to confirm that flash message.
+    """
+
+    try:
+        remove_branding = current_organisation.letter_branding_pool.get_item_by_id(remove_branding_id)
+    except current_organisation.letter_branding_pool.NotFound:
+        abort(400, f"Invalid letter branding ID {remove_branding_id} for {current_organisation}")
+
+    if request.method == "POST":
+        organisations_client.remove_letter_branding_from_pool(current_organisation.id, remove_branding_id)
+        flash(f"Letter branding ‘{remove_branding.name}’ removed.", "default_with_tick")
+        return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
+    else:
+        flash(
+            Markup(
+                render_template(
+                    "partials/flash_messages/branding_confirm_remove_brand.html",
+                    branding_name=remove_branding.name,
+                )
+            ),
+            "remove",
+        )
+
+
 @main.route("/organisations/<uuid:org_id>/settings/letter-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def organisation_letter_branding(org_id):
-    if remove_branding_id := request.args.get("remove_branding_id"):
-        try:
-            remove_branding = current_organisation.letter_branding_pool.get_item_by_id(remove_branding_id)
-        except current_organisation.letter_branding_pool.NotFound:
-            abort(400, f"Invalid letter branding ID {remove_branding_id} for {current_organisation}")
+    remove_branding_id = request.args.get("remove_branding_id")
 
-        if request.method == "GET":
-            flash(
-                Markup(
-                    render_template(
-                        "partials/flash_messages/branding_confirm_remove_brand.html",
-                        branding_name=remove_branding.name,
-                    )
-                ),
-                "remove",
-            )
-        else:
-            organisations_client.remove_letter_branding_from_pool(current_organisation.id, remove_branding_id)
-            flash(f"Letter branding ‘{remove_branding.name}’ removed.", "default_with_tick")
-            return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
+    if remove_branding_id:
+        if response := _handle_remove_letter_branding(remove_branding_id):
+            return response
 
     return render_template(
         "views/organisations/organisation/settings/letter-branding-options.html",
