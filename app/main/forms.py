@@ -1861,6 +1861,13 @@ class AdminChangeOrganisationDefaultEmailBrandingForm(StripWhitespaceForm):
     )
 
 
+class AdminChangeOrganisationDefaultLetterBrandingForm(StripWhitespaceForm):
+    letter_branding_id = HiddenField(
+        "Letter branding id",
+        validators=[DataRequired()],
+    )
+
+
 class AddEmailBrandingOptionsForm(StripWhitespaceForm):
     branding_field = GovukCheckboxesField(
         "Branding options",

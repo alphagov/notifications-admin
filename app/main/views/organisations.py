@@ -32,6 +32,7 @@ from app.main.forms import (
     AddNHSLocalOrganisationForm,
     AdminBillingDetailsForm,
     AdminChangeOrganisationDefaultEmailBrandingForm,
+    AdminChangeOrganisationDefaultLetterBrandingForm,
     AdminNewOrganisationForm,
     AdminNotesForm,
     AdminOrganisationDomainsForm,
@@ -449,7 +450,7 @@ def _handle_change_default_email_branding_to_govuk(is_central_government) -> Opt
                 current_brand=current_brand,
             )
         )
-        flash(confirmation_question, "yes, make this email branding the default")
+        flash(confirmation_question, "make this email branding the default")
 
     return None
 
@@ -495,7 +496,7 @@ def _handle_change_default_email_branding(form, new_default_branding_id) -> Opti
         )
         flash(
             confirmation_question,
-            "yes, make this email branding the default",
+            "make this email branding the default",
         )
 
     # This form submission handles users pressing `Make default` on a brand. We handle two cases here:
@@ -676,11 +677,78 @@ def _handle_change_default_letter_branding_to_none():
         )
 
 
+def _handle_change_default_letter_branding(form, new_default_branding_id):
+    """
+    Handle any change of branding to a real brand (all cases except for making the default no branding).
+    This includes going from no branding to a custom brand, and going from a custom brand to another custom brand.
+    When moving from no branding to a custom brand, there is a confirmation dialog step. When moving from a custom
+    brand to another custom brand, it happens without any further confirmation.
+    """
+
+    def __get_letter_branding_name(branding_id):
+        try:
+            return current_organisation.letter_branding_pool.get_item_by_id(branding_id).name
+        except current_organisation.letter_branding_pool.NotFound:
+            current_app.logger.info(
+                f"Letter branding ID {branding_id} is not present in organisation {current_organisation.name}'s "
+                "letter branding pool."
+            )
+            abort(400)
+
+    # This block handles the case where an organisation is changing from no branding to an explicit brand. We handle
+    # this as a confirmation dialog + POST in order to explain to platform admins making this change that other services
+    # without branding will be affected.
+    if new_default_branding_id:
+        # This also validates that the chosen brand is valid for the organisation.
+        letter_branding_name = __get_letter_branding_name(new_default_branding_id)
+
+        if request.method == "POST":
+            organisations_client.update_organisation(
+                current_organisation.id,
+                letter_branding_id=new_default_branding_id,
+            )
+            return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
+
+        confirmation_question = Markup(
+            render_template(
+                "partials/flash_messages/letter_branding_confirm_change_brand_from_none.html",
+                branding_name=letter_branding_name,
+            )
+        )
+        flash(
+            confirmation_question,
+            "make this letter branding the default",
+        )
+
+    # This form submission handles users pressing `Make default` on a brand. We handle two cases here:
+    # 1) If the org currently has no branding, we redirect them to the confirmation message explaining what happens when
+    #    changing from no branding to an explicit brand. This is handled by the block above.
+    # 2) If the org is currently on an explicit brand and is changing to another, we just handle that change immediately
+    #    and don't require confirmation.
+    if form.validate_on_submit():
+        if current_organisation.letter_branding_id is None:
+            return redirect(
+                url_for(
+                    "main.organisation_letter_branding",
+                    org_id=current_organisation.id,
+                    new_default_branding_id=form.letter_branding_id.data,
+                )
+            )
+
+        organisations_client.update_organisation(
+            current_organisation.id,
+            letter_branding_id=form.letter_branding_id.data,
+        )
+        return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
+
+
 @main.route("/organisations/<uuid:org_id>/settings/letter-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def organisation_letter_branding(org_id):
     remove_branding_id = request.args.get("remove_branding_id")
     change_default_branding_to_none = "change_default_branding_to_none" in request.args
+    new_default_branding_id = request.args.get("new_default_branding_id")
+    form = AdminChangeOrganisationDefaultLetterBrandingForm()
 
     if remove_branding_id:
         if response := _handle_remove_letter_branding(remove_branding_id):
@@ -690,8 +758,12 @@ def organisation_letter_branding(org_id):
         if response := _handle_change_default_letter_branding_to_none():
             return response
 
+    elif response := _handle_change_default_letter_branding(form, new_default_branding_id):
+        return response
+
     return render_template(
         "views/organisations/organisation/settings/letter-branding-options.html",
+        form=form,
     )
 
 
