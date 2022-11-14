@@ -469,6 +469,11 @@ class HexColourCodeField(GovukTextInputField):
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
         if validators is None:
             validators = []
+        else:
+            # Make a copy of the validators list, as field validators are usually instantiated at the class-level,
+            # meaning the list is shared between all instances. We want to potentially modify the validators, so we need
+            # to create a new list.
+            validators = validators[:]
 
         validators.append(Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"))
 
