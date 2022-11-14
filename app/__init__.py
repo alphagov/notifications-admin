@@ -294,7 +294,7 @@ def load_service_before_request():
 
     if service_id:
         try:
-            g.current_service = Service(service_api_client.get_service(service_id)["data"])
+            g.current_service = Service.from_id(service_id)
         except HTTPError as exc:
             # if service id isn't real, then 404 rather than 500ing later because we expect service to be set
             if exc.status_code == 404:
