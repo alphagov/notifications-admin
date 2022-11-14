@@ -661,7 +661,7 @@ def _handle_change_default_letter_branding_to_none():
                     "partials/flash_messages/letter_branding_confirm_change_default_to_none.html",
                 )
             ),
-            "remove",
+            "remove default letter branding",
         )
 
 
