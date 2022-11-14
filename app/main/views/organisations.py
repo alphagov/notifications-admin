@@ -652,13 +652,42 @@ def _handle_remove_letter_branding(remove_branding_id):
         )
 
 
+def _handle_change_default_letter_branding_to_none():
+    """
+    This handles settings an organisation's default letter branding to None.
+    If we're in here, then the user has either clicked the 'Use no branding as default instead' link
+    or they're clicking the button in the confirmation dialog.
+    """
+    if request.method == "POST":
+        organisations_client.update_organisation(
+            current_organisation.id,
+            letter_branding_id=None,
+        )
+        return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
+
+    else:
+        flash(
+            Markup(
+                render_template(
+                    "partials/flash_messages/letter_branding_confirm_change_default_to_none.html",
+                )
+            ),
+            "remove",
+        )
+
+
 @main.route("/organisations/<uuid:org_id>/settings/letter-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def organisation_letter_branding(org_id):
     remove_branding_id = request.args.get("remove_branding_id")
+    change_default_branding_to_none = "change_default_branding_to_none" in request.args
 
     if remove_branding_id:
         if response := _handle_remove_letter_branding(remove_branding_id):
+            return response
+
+    elif change_default_branding_to_none:
+        if response := _handle_change_default_letter_branding_to_none():
             return response
 
     return render_template(

@@ -2338,6 +2338,8 @@ def test_organisation_letter_branding_page_shows_all_branding_pool_options(
         "Government Digital Service",
     ]
 
+    assert "Use no branding as default instead" not in page.text
+
     add_options_button = page.select(".govuk-button--secondary")[-1]
     assert normalize_spaces(add_options_button.text) == "Add branding options"
     assert add_options_button.attrs["href"] == url_for(
@@ -2428,7 +2430,7 @@ def test_post_organisation_letter_branding_page_with_remove_param_calls_client_a
     assert "Letter branding ‘Cabinet Office’ removed." in page.text
 
 
-def test_organisation_letter_branding_page_when_branding_is_not_in_pool(
+def test_organisation_letter_branding_page_with_remove_param_when_branding_is_not_in_pool(
     client_request,
     platform_admin_user,
     organisation_one,
@@ -2444,6 +2446,53 @@ def test_organisation_letter_branding_page_when_branding_is_not_in_pool(
         remove_branding_id=fake_uuid,
         _expected_status=400,
     )
+
+
+def test_organisation_letter_branding_page_shows_confirmation_when_making_none_default(
+    platform_admin_user,
+    client_request,
+    organisation_one,
+    mock_get_letter_branding_pool,
+    mocker,
+):
+    organisation_one["letter_branding_id"] = "9abc"
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    mocker.patch(
+        "app.models.branding.letter_branding_client.get_letter_branding",
+        return_value={
+            "id": "9abc",
+            "name": "Government Digital Service",
+            "filename": "gds",
+        },
+    )
+
+    client_request.login(platform_admin_user)
+
+    url = url_for(".organisation_letter_branding", org_id=organisation_one["id"]) + "?change_default_branding_to_none"
+    page = client_request.get_url(url)
+
+    assert "Use no branding as default instead" in page.text
+    assert normalize_spaces(page.select_one(".banner-title").text) == (
+        "Are you sure you want to remove the default letter branding?"
+    )
+
+
+def test_organisation_letter_branding_page_makes_none_default_on_post_request(
+    platform_admin_user,
+    client_request,
+    organisation_one,
+    mock_get_organisation,
+    mocker,
+):
+    update_mock = mocker.patch("app.organisations_client.update_organisation")
+
+    client_request.login(platform_admin_user)
+
+    url = url_for(".organisation_letter_branding", org_id=organisation_one["id"]) + "?change_default_branding_to_none"
+    client_request.post_url(url)
+
+    update_mock.assert_called_once_with(organisation_one["id"], letter_branding_id=None)
 
 
 def test_add_organisation_letter_branding_options_is_platform_admin_only(
