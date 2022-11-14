@@ -2072,7 +2072,7 @@ def test_reset_org_email_branding_to_govuk_successfully(
 
     expected_calls = []
     if should_succeed:
-        expected_calls.append(mocker.call(organisation_one["id"], email_branding_id=None))
+        expected_calls.append(mocker.call(organisation_one["id"], cached_service_ids=None, email_branding_id=None))
 
     assert mock_update_organisation.call_args_list == expected_calls
 
@@ -2139,6 +2139,7 @@ def test_change_default_org_email_branding_successfully_from_govuk(
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
+    mock_get_organisation_services,
     mock_update_organisation,
 ):
     mocker.patch(
@@ -2159,7 +2160,11 @@ def test_change_default_org_email_branding_successfully_from_govuk(
     )
 
     assert mock_update_organisation.call_args_list == [
-        mocker.call(organisation_one["id"], email_branding_id="email-branding-1-id")
+        mocker.call(
+            organisation_one["id"],
+            cached_service_ids=["12345", "67890", SERVICE_ONE_ID],
+            email_branding_id="email-branding-1-id",
+        )
     ]
 
 
@@ -2203,7 +2208,7 @@ def test_change_default_org_email_branding_successfully_from_explicit_brand(
     )
 
     assert mock_update_organisation.call_args_list == [
-        mocker.call(organisation_one["id"], email_branding_id="email-branding-1-id")
+        mocker.call(organisation_one["id"], cached_service_ids=None, email_branding_id="email-branding-1-id")
     ]
 
 
@@ -2492,7 +2497,7 @@ def test_organisation_letter_branding_page_makes_none_default_on_post_request(
     url = url_for(".organisation_letter_branding", org_id=organisation_one["id"]) + "?change_default_branding_to_none"
     client_request.post_url(url)
 
-    update_mock.assert_called_once_with(organisation_one["id"], letter_branding_id=None)
+    update_mock.assert_called_once_with(organisation_one["id"], cached_service_ids=None, letter_branding_id=None)
 
 
 def test_add_organisation_letter_branding_options_is_platform_admin_only(
@@ -2567,6 +2572,7 @@ def test_change_default_org_letter_branding_successfully_from_no_branding(
     platform_admin_user,
     organisation_one,
     mock_get_letter_branding_pool,
+    mock_get_organisation_services,
     mock_update_organisation,
 ):
     mocker.patch(
@@ -2586,7 +2592,11 @@ def test_change_default_org_letter_branding_successfully_from_no_branding(
         new_default_branding_id="1234",
     )
 
-    assert mock_update_organisation.call_args_list == [mocker.call(organisation_one["id"], letter_branding_id="1234")]
+    assert mock_update_organisation.call_args_list == [
+        mocker.call(
+            organisation_one["id"], cached_service_ids=["12345", "67890", SERVICE_ONE_ID], letter_branding_id="1234"
+        )
+    ]
 
 
 def test_change_default_org_letter_branding_successfully_from_explicit_brand(
@@ -2614,7 +2624,9 @@ def test_change_default_org_letter_branding_successfully_from_explicit_brand(
         _data={"letter_branding_id": "5678"},
     )
 
-    assert mock_update_organisation.call_args_list == [mocker.call(organisation_one["id"], letter_branding_id="5678")]
+    assert mock_update_organisation.call_args_list == [
+        mocker.call(organisation_one["id"], cached_service_ids=None, letter_branding_id="5678")
+    ]
 
 
 def test_add_organisation_letter_branding_options_shows_branding_not_in_branding_pool(

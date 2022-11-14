@@ -435,10 +435,7 @@ def _handle_change_default_email_branding_to_govuk(is_central_government) -> Opt
         return None
 
     if request.method == "POST":
-        organisations_client.update_organisation(
-            current_organisation.id,
-            email_branding_id=None,
-        )
+        current_organisation.update(email_branding_id=None)
         return redirect(url_for("main.organisation_email_branding", org_id=current_organisation.id))
 
     else:
@@ -481,10 +478,7 @@ def _handle_change_default_email_branding(form, new_default_branding_id) -> Opti
         email_branding_name = __get_email_branding_name(new_default_branding_id)
 
         if request.method == "POST":
-            organisations_client.update_organisation(
-                current_organisation.id,
-                email_branding_id=new_default_branding_id,
-            )
+            current_organisation.update(delete_services_cache=True, email_branding_id=new_default_branding_id)
             return redirect(url_for("main.organisation_email_branding", org_id=current_organisation.id))
 
         confirmation_question = Markup(
@@ -514,10 +508,7 @@ def _handle_change_default_email_branding(form, new_default_branding_id) -> Opti
                 )
             )
 
-        organisations_client.update_organisation(
-            current_organisation.id,
-            email_branding_id=form.email_branding_id.data,
-        )
+        current_organisation.update(email_branding_id=form.email_branding_id.data)
         return redirect(url_for("main.organisation_email_branding", org_id=current_organisation.id))
 
     return None
@@ -660,10 +651,7 @@ def _handle_change_default_letter_branding_to_none():
     or they're clicking the button in the confirmation dialog.
     """
     if request.method == "POST":
-        organisations_client.update_organisation(
-            current_organisation.id,
-            letter_branding_id=None,
-        )
+        current_organisation.update(letter_branding_id=None)
         return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
 
     else:
@@ -703,10 +691,7 @@ def _handle_change_default_letter_branding(form, new_default_branding_id):
         letter_branding_name = __get_letter_branding_name(new_default_branding_id)
 
         if request.method == "POST":
-            organisations_client.update_organisation(
-                current_organisation.id,
-                letter_branding_id=new_default_branding_id,
-            )
+            current_organisation.update(delete_services_cache=True, letter_branding_id=new_default_branding_id)
             return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
 
         confirmation_question = Markup(
@@ -735,10 +720,7 @@ def _handle_change_default_letter_branding(form, new_default_branding_id):
                 )
             )
 
-        organisations_client.update_organisation(
-            current_organisation.id,
-            letter_branding_id=form.letter_branding_id.data,
-        )
+        current_organisation.update(letter_branding_id=form.letter_branding_id.data)
         return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
 
 
