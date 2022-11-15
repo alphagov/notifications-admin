@@ -145,6 +145,21 @@ def test_deletes_domain_cache(
                 call("domains"),
             ],
         ),
+        (
+            {"letter_branding_id": "new id"},
+            [
+                call("organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-letter-branding-pool"),
+                call("organisations"),
+                call("domains"),
+            ],
+        ),
+        (
+            {"letter_branding_id": None},
+            [
+                call("organisations"),
+                call("domains"),
+            ],
+        ),
     ),
 )
 def test_update_organisation_when_not_updating_org_type(
