@@ -1345,11 +1345,11 @@ def test_send_one_off_has_skip_link(
     expected_link_url,
     user,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=user)
     template_data = create_template(template_id=fake_uuid, template_type=template_type)
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
     mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
 
+    client_request.login(user)
     page = client_request.get(
         "main.send_one_off_step",
         service_id=SERVICE_ONE_ID,

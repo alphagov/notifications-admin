@@ -524,7 +524,6 @@ def test_navigation_urls(
 
 
 def test_navigation_for_services_with_broadcast_permission(
-    mocker,
     client_request,
     service_one,
     mock_get_service_templates,
@@ -533,7 +532,7 @@ def test_navigation_for_services_with_broadcast_permission(
     active_user_create_broadcasts_permission,
 ):
     service_one["permissions"] += ["broadcast"]
-    mocker.patch("app.user_api_client.get_user", return_value=active_user_create_broadcasts_permission)
+    client_request.login(active_user_create_broadcasts_permission)
 
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
     assert [a["href"] for a in page.select(".navigation a")] == [
@@ -546,7 +545,6 @@ def test_navigation_for_services_with_broadcast_permission(
 
 
 def test_navigation_for_services_with_broadcast_permission_platform_admin(
-    mocker,
     client_request,
     service_one,
     mock_get_service_templates,
@@ -555,11 +553,8 @@ def test_navigation_for_services_with_broadcast_permission_platform_admin(
     platform_admin_user,
 ):
     service_one["permissions"] += ["broadcast"]
-    mocker.patch(
-        "app.user_api_client.get_user",
-        return_value=platform_admin_user,
-    )
 
+    client_request.login(platform_admin_user)
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
     assert [a["href"] for a in page.select(".navigation a")] == [
         "/services/{}/current-alerts".format(SERVICE_ONE_ID),
@@ -574,14 +569,13 @@ def test_navigation_for_services_with_broadcast_permission_platform_admin(
 
 def test_caseworkers_get_caseworking_navigation(
     client_request,
-    mocker,
     mock_get_template_folders,
     mock_get_service_templates,
     mock_has_no_jobs,
     mock_get_api_keys,
     active_caseworking_user,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=active_caseworking_user)
+    client_request.login(active_caseworking_user)
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one("header + .govuk-width-container nav").text) == (
         "Templates Sent messages Uploads Team members"
@@ -590,14 +584,13 @@ def test_caseworkers_get_caseworking_navigation(
 
 def test_caseworkers_see_jobs_nav_if_jobs_exist(
     client_request,
-    mocker,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_has_jobs,
     active_caseworking_user,
     mock_get_api_keys,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=active_caseworking_user)
+    client_request.login(active_caseworking_user)
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one("header + .govuk-width-container nav").text) == (
         "Templates Sent messages Uploads Team members"

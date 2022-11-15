@@ -82,7 +82,7 @@ def test_user_information_page_shows_information_about_user(
     user_service_two = uuid.uuid4()
     mocker.patch(
         "app.user_api_client.get_user",
-        side_effect=[platform_admin_user, user_json(name="Apple Bloom", services=[user_service_one, user_service_two])],
+        return_value=user_json(name="Apple Bloom", services=[user_service_one, user_service_two]),
         autospec=True,
     )
 
@@ -129,10 +129,7 @@ def test_user_information_page_shows_change_auth_type_link(
     client_request.login(platform_admin_user)
     mocker.patch(
         "app.user_api_client.get_user",
-        side_effect=[
-            platform_admin_user,
-            user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type="sms_auth"),
-        ],
+        return_value=user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type="sms_auth"),
         autospec=True,
     )
 
@@ -170,10 +167,7 @@ def test_change_user_auth_preselects_current_auth_type(
 
     mocker.patch(
         "app.user_api_client.get_user",
-        side_effect=[
-            platform_admin_user,
-            user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type=current_auth_type),
-        ],
+        return_value=user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type=current_auth_type),
         autospec=True,
     )
 
@@ -192,10 +186,7 @@ def test_change_user_auth(client_request, platform_admin_user, api_user_active, 
 
     mocker.patch(
         "app.user_api_client.get_user",
-        side_effect=[
-            platform_admin_user,
-            user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type="sms_auth"),
-        ],
+        return_value=user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type="sms_auth"),
         autospec=True,
     )
 
@@ -223,7 +214,7 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
     client_request.login(platform_admin_user)
     mocker.patch(
         "app.user_api_client.get_user",
-        side_effect=[platform_admin_user, user_json(name="Apple Bloom", failed_login_count=2)],
+        return_value=user_json(name="Apple Bloom", failed_login_count=2),
         autospec=True,
     )
 

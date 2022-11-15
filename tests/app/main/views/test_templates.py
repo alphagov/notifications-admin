@@ -548,13 +548,10 @@ def test_caseworker_redirected_to_set_sender_for_one_off(
     client_request,
     mock_get_service_templates,
     mock_get_service_template,
-    mocker,
     fake_uuid,
     active_caseworking_user,
 ):
-
-    mocker.patch("app.user_api_client.get_user", return_value=active_caseworking_user)
-
+    client_request.login(active_caseworking_user)
     client_request.get(
         "main.view_template",
         service_id=SERVICE_ONE_ID,
@@ -908,8 +905,8 @@ def test_view_broadcast_template(
     fake_uuid,
     active_user_create_broadcasts_permission,
 ):
-    client_request.login(active_user_create_broadcasts_permission)
     active_user_create_broadcasts_permission["permissions"][SERVICE_ONE_ID].append("manage_templates")
+    client_request.login(active_user_create_broadcasts_permission)
     page = client_request.get(
         ".view_template",
         service_id=SERVICE_ONE_ID,

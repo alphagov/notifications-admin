@@ -660,9 +660,10 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_man
     ]
     mocker.patch(
         "app.models.user.Users.client_method",
-        return_value=[active_user_with_permissions, team_member, team_member_2],
+        return_value=[team_member, team_member_2],
     )
 
+    client_request.login(active_user_with_permissions)
     page = client_request.get(
         "main.manage_template_folder",
         service_id=service_one["id"],
@@ -875,9 +876,10 @@ def test_manage_folder_users_doesnt_change_permissions_current_user_cannot_manag
     ]
     mocker.patch(
         "app.models.user.Users.client_method",
-        return_value=[active_user_with_permissions, team_member],
+        return_value=[team_member],
     )
 
+    client_request.login(active_user_with_permissions)
     client_request.post(
         "main.manage_template_folder",
         service_id=service_one["id"],

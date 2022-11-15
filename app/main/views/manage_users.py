@@ -44,7 +44,6 @@ def manage_users(service_id):
 @main.route("/services/<uuid:service_id>/users/invite/<uuid:user_id>", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def invite_user(service_id, user_id=None):
-
     if current_service.has_permission("broadcast"):
         form_class = BroadcastInviteUserForm
     else:
