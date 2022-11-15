@@ -208,10 +208,9 @@ class Organisation(JSONModel):
             return User.from_id(self.agreement_signed_by_id)
 
     def update(self, delete_services_cache=False, **kwargs):
-        response = organisations_client.update_organisation(
+        organisations_client.update_organisation(
             self.id, cached_service_ids=self.service_ids if delete_services_cache else None, **kwargs
         )
-        self.__init__(response)
 
     def associate_service(self, service_id):
         organisations_client.update_service_organisation(service_id, self.id)

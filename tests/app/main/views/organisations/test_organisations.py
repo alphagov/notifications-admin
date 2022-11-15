@@ -2072,7 +2072,7 @@ def test_reset_org_email_branding_to_govuk_successfully(
 
     expected_calls = []
     if should_succeed:
-        expected_calls.append(mocker.call(organisation_one["id"], email_branding_id=None))
+        expected_calls.append(mocker.call(organisation_one["id"], cached_service_ids=None, email_branding_id=None))
 
     assert mock_update_organisation.call_args_list == expected_calls
 
@@ -2139,6 +2139,7 @@ def test_change_default_org_email_branding_successfully_from_govuk(
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
+    mock_get_organisation_services,
     mock_update_organisation,
 ):
     mocker.patch(
@@ -2159,7 +2160,11 @@ def test_change_default_org_email_branding_successfully_from_govuk(
     )
 
     assert mock_update_organisation.call_args_list == [
-        mocker.call(organisation_one["id"], email_branding_id="email-branding-1-id")
+        mocker.call(
+            organisation_one["id"],
+            cached_service_ids=["12345", "67890", SERVICE_ONE_ID],
+            email_branding_id="email-branding-1-id",
+        )
     ]
 
 
@@ -2203,7 +2208,7 @@ def test_change_default_org_email_branding_successfully_from_explicit_brand(
     )
 
     assert mock_update_organisation.call_args_list == [
-        mocker.call(organisation_one["id"], email_branding_id="email-branding-1-id")
+        mocker.call(organisation_one["id"], cached_service_ids=None, email_branding_id="email-branding-1-id")
     ]
 
 
@@ -2338,6 +2343,8 @@ def test_organisation_letter_branding_page_shows_all_branding_pool_options(
         "Government Digital Service",
     ]
 
+    assert "Use no branding as default instead" not in page.text
+
     add_options_button = page.select(".govuk-button--secondary")[-1]
     assert normalize_spaces(add_options_button.text) == "Add branding options"
     assert add_options_button.attrs["href"] == url_for(
@@ -2428,7 +2435,7 @@ def test_post_organisation_letter_branding_page_with_remove_param_calls_client_a
     assert "Letter branding ‘Cabinet Office’ removed." in page.text
 
 
-def test_organisation_letter_branding_page_when_branding_is_not_in_pool(
+def test_organisation_letter_branding_page_with_remove_param_when_branding_is_not_in_pool(
     client_request,
     platform_admin_user,
     organisation_one,
@@ -2446,6 +2453,53 @@ def test_organisation_letter_branding_page_when_branding_is_not_in_pool(
     )
 
 
+def test_organisation_letter_branding_page_shows_confirmation_when_making_none_default(
+    platform_admin_user,
+    client_request,
+    organisation_one,
+    mock_get_letter_branding_pool,
+    mocker,
+):
+    organisation_one["letter_branding_id"] = "9abc"
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    mocker.patch(
+        "app.models.branding.letter_branding_client.get_letter_branding",
+        return_value={
+            "id": "9abc",
+            "name": "Government Digital Service",
+            "filename": "gds",
+        },
+    )
+
+    client_request.login(platform_admin_user)
+
+    url = url_for(".organisation_letter_branding", org_id=organisation_one["id"]) + "?change_default_branding_to_none"
+    page = client_request.get_url(url)
+
+    assert "Use no branding as default instead" in page.text
+    assert normalize_spaces(page.select_one(".banner-title").text) == (
+        "Are you sure you want to remove the default letter branding?"
+    )
+
+
+def test_organisation_letter_branding_page_makes_none_default_on_post_request(
+    platform_admin_user,
+    client_request,
+    organisation_one,
+    mock_get_organisation,
+    mocker,
+):
+    update_mock = mocker.patch("app.organisations_client.update_organisation")
+
+    client_request.login(platform_admin_user)
+
+    url = url_for(".organisation_letter_branding", org_id=organisation_one["id"]) + "?change_default_branding_to_none"
+    client_request.post_url(url)
+
+    update_mock.assert_called_once_with(organisation_one["id"], cached_service_ids=None, letter_branding_id=None)
+
+
 def test_add_organisation_letter_branding_options_is_platform_admin_only(
     client_request,
     organisation_one,
@@ -2454,6 +2508,125 @@ def test_add_organisation_letter_branding_options_is_platform_admin_only(
     client_request.get(
         "main.add_organisation_letter_branding_options", org_id=organisation_one["id"], _expected_status=403
     )
+
+
+def test_change_default_org_letter_branding_invalid_brand_id(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_letter_branding_pool,
+):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            "Org 1",
+            letter_branding_id=None,
+        ),
+    )
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".organisation_letter_branding",
+        org_id=organisation_one["id"],
+        new_default_branding_id="bad-letter-branding-id",
+        _expected_status=400,
+    )
+
+
+def test_change_default_org_letter_branding_shows_confirmation_question_when_changing_from_no_branding(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_letter_branding_pool,
+    mock_update_organisation,
+):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            "Org 1",
+            letter_branding_id=None,
+        ),
+    )
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        ".organisation_letter_branding",
+        org_id=organisation_one["id"],
+        _data={"letter_branding_id": "1234"},
+        _follow_redirects=True,
+    )
+
+    assert "Are you sure you want to make ‘Cabinet Office’ the default letter branding?" in page.text
+    assert not mock_update_organisation.called
+
+
+def test_change_default_org_letter_branding_successfully_from_no_branding(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_letter_branding_pool,
+    mock_get_organisation_services,
+    mock_update_organisation,
+):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            "Org 1",
+            letter_branding_id=None,
+        ),
+    )
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".organisation_letter_branding",
+        org_id=organisation_one["id"],
+        new_default_branding_id="1234",
+    )
+
+    assert mock_update_organisation.call_args_list == [
+        mocker.call(
+            organisation_one["id"], cached_service_ids=["12345", "67890", SERVICE_ONE_ID], letter_branding_id="1234"
+        )
+    ]
+
+
+def test_change_default_org_letter_branding_successfully_from_explicit_brand(
+    mocker,
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_letter_branding_pool,
+    mock_update_organisation,
+):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            "Org 1",
+            letter_branding_id="1234",
+        ),
+    )
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".organisation_letter_branding",
+        org_id=organisation_one["id"],
+        _data={"letter_branding_id": "5678"},
+    )
+
+    assert mock_update_organisation.call_args_list == [
+        mocker.call(organisation_one["id"], cached_service_ids=None, letter_branding_id="5678")
+    ]
 
 
 def test_add_organisation_letter_branding_options_shows_branding_not_in_branding_pool(

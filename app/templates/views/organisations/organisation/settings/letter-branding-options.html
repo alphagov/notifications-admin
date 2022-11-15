@@ -1,7 +1,9 @@
 {% extends "org_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper%}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {%  from "components/branding-preview.html" import letter_branding_preview %}
 
 {% block org_page_title %}
@@ -19,15 +21,36 @@
     {{ current_org.letter_branding.name or "No branding" }}<span class="hint govuk-!-font-weight-regular">&ensp;(default)</span>
   </h2>
 
-  {{ letter_branding_preview(current_org.letter_branding_id, classes='govuk-!-margin-bottom-8') }}
+  {% if current_org.letter_branding_id %}
+    {{ letter_branding_preview(current_org.letter_branding_id, classes='govuk-!-margin-bottom-2') }}
+    <p class="govuk-body govuk-!-margin-bottom-6">
+      <a
+        class="govuk-link govuk-link--no-visited-state"
+        href="{{ url_for('main.organisation_letter_branding', org_id=current_org.id) }}?change_default_branding_to_none"
+      >
+        Use no branding as default instead
+      </a>
+    </p>
+  {% else %}
+    {{ letter_branding_preview(current_org.letter_branding_id, classes='govuk-!-margin-bottom-8') }}
+  {% endif %}
 
   {% for option in current_org.letter_branding_pool_excluding_default %}
     <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
-        {{ option.name }}
+      {{ option.name }}
     </h2>
-    {{ letter_branding_preview(option.id) }}
+    {{ letter_branding_preview(option.id, classes='govuk-!-margin-bottom-0') }}
     <div class="govuk-grid-row govuk-!-margin-top-2 govuk-!-margin-bottom-6">
-      <div class="govuk-grid-column-one-half">&nbsp;
+      <div class="govuk-grid-column-one-half">
+        {% call form_wrapper(action=url_for('main.organisation_letter_branding', org_id=current_org.id)) %}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {{ form.letter_branding_id(value=option.id) }}
+          {{ govukButton({
+            "element": "input",
+            "text": "Make default",
+            "classes": "govuk-button--secondary"
+          }) }}
+        {% endcall %}
       </div>
       <div class="govuk-grid-column-one-half">
         <p class="govuk-body govuk-!-text-align-right">
