@@ -1,3 +1,4 @@
+import uuid
 from collections import OrderedDict
 from datetime import datetime
 
@@ -53,6 +54,7 @@ from app.main.forms import (
     EmailBrandingChooseLogoForm,
     EstimateUsageForm,
     GovernmentIdentityLogoForm,
+    PNGFileUpload,
     RenameServiceForm,
     SearchByNameForm,
     ServiceBroadcastAccountTypeForm,
@@ -70,6 +72,7 @@ from app.main.forms import (
 )
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.models.branding import AllEmailBranding, AllLetterBranding, EmailBranding
+from app.s3_client.s3_logo_client import upload_email_logo
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -1386,6 +1389,47 @@ def email_branding_choose_logo(service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_branding_upload_logo(service_id):
+    form = PNGFileUpload()
+
+    if form.validate_on_submit():
+        # We don't need to care about the filename as we're providing a UUID, and if we include the filename then we
+        # have to filter that through subsequent pages in query params as well. Let's just use no filename.
+        filename = ""
+        upload_id = str(uuid.uuid4())
+
+        upload_email_logo(
+            filename,
+            form.file.data.read(),
+            current_app.config["AWS_REGION"],
+            user_id=current_user.id,
+            unique_id=upload_id,
+        )
+
+        return redirect(
+            url_for(
+                "main.email_branding_name_logo",
+                service_id=service_id,
+                logo_id=upload_id,
+            )
+        )
+
+    previous_page = request.args.get("previous_page", "add-banner").lower()
+    if previous_page == "choose-colour":
+        back_link = url_for(".email_branding_choose_banner_colour", service_id=service_id)
+    else:
+        back_link = url_for(".email_branding_choose_banner_type", service_id=service_id)
+
+    return (
+        render_template(
+            "views/service-settings/branding/add-new-branding/upload-logo.html", form=form, back_link=back_link
+        ),
+        400 if form.errors else 200,
+    )
+
+
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/name-logo", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_name_logo(service_id):
@@ -1405,7 +1449,7 @@ def email_branding_choose_banner_type(service_id):
 
     if form.validate_on_submit():
         if form.banner.data == "org":
-            return redirect(url_for(".email_branding_upload_logo", service_id=service_id))
+            return redirect(url_for(".email_branding_upload_logo", service_id=service_id, previous_page="add-banner"))
 
         if form.banner.data == "org_banner":
             return redirect(url_for(".email_branding_choose_banner_colour", service_id=service_id))
@@ -1418,12 +1462,6 @@ def email_branding_choose_banner_type(service_id):
         ),
         400 if form.errors else 200,
     )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def email_branding_upload_logo(service_id):
-    return "work-in-progress"
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/choose-banner-colour", methods=["GET", "POST"])

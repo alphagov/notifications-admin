@@ -1,6 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 
+from flask import current_app
 from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
 from notifications_utils.recipients import InvalidEmailError, validate_email_address
@@ -8,7 +9,9 @@ from notifications_utils.sanitise_text import SanitiseSMS
 from notifications_utils.template import BroadcastMessageTemplate
 from orderedset import OrderedSet
 from wtforms import ValidationError
+from wtforms.validators import StopValidation
 
+from app import antivirus_client
 from app.main._commonly_used_passwords import commonly_used_passwords
 from app.models.spreadsheet import Spreadsheet
 from app.utils.user import is_gov_user
@@ -201,3 +204,15 @@ class CharactersNotAllowed:
                 f"Cannot contain "
                 f'{formatted_list(illegal_characters, conjunction="or", before_each="", after_each="")}'
             )
+
+
+class FileIsVirusFree:
+    def __call__(self, form, field):
+        if field.data:
+            if current_app.config["ANTIVIRUS_ENABLED"]:
+                try:
+                    virus_free = antivirus_client.scan(field.data)
+                    if not virus_free:
+                        raise StopValidation("Your file contains a virus")
+                finally:
+                    field.data.seek(0)

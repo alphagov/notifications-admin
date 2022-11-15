@@ -71,6 +71,7 @@ def test_update_letter_branding_with_new_valid_file(
     mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
     mocker.patch("app.s3_client.s3_logo_client.uuid.uuid4", return_value=fake_uuid)
     mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -92,7 +93,10 @@ def test_update_letter_branding_when_uploading_invalid_file(
     platform_admin_user,
     mock_get_letter_branding_by_id,
     fake_uuid,
+    mocker,
 ):
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".update_letter_branding",
@@ -119,6 +123,7 @@ def test_update_letter_branding_deletes_any_temp_files_when_uploading_a_file(
 
     mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
     mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -281,6 +286,7 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
     mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
     mocker.patch("app.s3_client.s3_logo_client.uuid.uuid4", return_value=fake_uuid)
     mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -304,6 +310,44 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
     assert page.select_one("#logo-img > img").attrs["src"].endswith(expected_temp_filename)
     assert mock_s3_upload.called
     assert mock_delete_temp_files.called is False
+
+
+@pytest.mark.parametrize(
+    "scan_result, expected_status_code",
+    (
+        (True, 302),
+        (False, 200),
+    ),
+)
+def test_create_letter_branding_calls_antivirus_scan(
+    mocker, client_request, platform_admin_user, fake_uuid, scan_result, expected_status_code
+):
+    filename = "test.svg"
+    mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
+    mocker.patch("app.s3_client.s3_logo_client.uuid.uuid4", return_value=fake_uuid)
+    mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
+    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=scan_result)
+
+    client_request.login(platform_admin_user)
+    client_request.post(
+        ".create_letter_branding",
+        _data={
+            "file": (
+                BytesIO(
+                    """
+            <svg height="100" width="100">
+            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>
+        """.encode(
+                        "utf-8"
+                    )
+                ),
+                filename,
+            )
+        },
+        _expected_status=expected_status_code,
+    )
+
+    assert mock_antivirus.call_count == 1
 
 
 @pytest.mark.parametrize(
@@ -337,6 +381,7 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_ele
     filename = "test.svg"
 
     mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -356,7 +401,9 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_ele
 def test_create_letter_branding_when_uploading_invalid_file(
     client_request,
     platform_admin_user,
+    mocker,
 ):
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".create_letter_branding",
@@ -380,6 +427,7 @@ def test_create_letter_branding_deletes_temp_files_when_uploading_a_new_file(
 
     mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
     mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     client_request.login(platform_admin_user)
     page = client_request.post(

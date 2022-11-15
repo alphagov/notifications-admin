@@ -1,0 +1,49 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
+
+{% block service_page_title %}
+  {{ form.file.label.text }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {% if form.file.errors %}
+    {% set params = {
+        "titleText": "There is a problem",
+        "errorList": [{"href": "#" + form.file.id, "text": form.file.errors[0]}]
+      }
+    %}
+    {{ govukErrorSummary(params) }}
+  {% endif %}
+
+  {{ page_header(form.file.label.text) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <ul class="govuk-list govuk-list--bullet">
+        <li>a landscape image</li>
+        <li>at least 108 pixels high</li>
+        <li>saved as a PNG file</li>
+        <li>with a transparent background</li>
+      </ul>
+      <p class="govuk-body">
+        We do not recommend portrait images because they’ll look very small. This is because the space for email branding has a fixed height.
+      </p>
+        {{ file_upload(form.file, allowed_file_extensions=['png'], button_text='Upload logo') }}
+      <p class="govuk-body govuk-!-margin-top-4">
+        If you do not have a file, you can
+        <a class="govuk-link" href="{{ url_for('main.email_branding_name_logo', service_id=current_service.id) }}">skip this step</a>.
+      </p>
+    </div>
+
+{% endblock %}

@@ -182,6 +182,7 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
     platform_admin_user,
 ):
     mocker.patch("app.main.views.email_branding.upload_email_logo", return_value="temp_filename")
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     data = {
         "file": (BytesIO("".encode("utf-8")), "test.png"),
         "colour": "",
@@ -195,6 +196,37 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
     )
 
     assert not page.select_one(".error-message")
+
+
+@pytest.mark.parametrize(
+    "scan_result, expected_status_code",
+    (
+        (True, 302),
+        (False, 400),
+    ),
+)
+def test_create_email_branding_calls_antivirus_scan(
+    client_request,
+    mocker,
+    platform_admin_user,
+    scan_result,
+    expected_status_code,
+):
+    mocker.patch("app.main.views.email_branding.upload_email_logo", return_value="temp_filename")
+    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=scan_result)
+    data = {
+        "file": (BytesIO("".encode("utf-8")), "test.png"),
+        "colour": "",
+        "text": "",
+        "name": "",
+        "brand_type": "org",
+    }
+    client_request.login(platform_admin_user)
+    client_request.post(
+        ".create_email_branding", _content_type="multipart/form-data", _data=data, _expected_status=expected_status_code
+    )
+
+    assert mock_antivirus.call_count == 1
 
 
 def test_create_new_email_branding_when_branding_saved(
@@ -249,6 +281,8 @@ def test_create_new_email_branding_when_branding_saved(
 def test_deletes_previous_temp_logo_after_uploading_logo(
     client_request, platform_admin_user, mocker, endpoint, has_data, fake_uuid
 ):
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
     if has_data:
         mocker.patch("app.email_branding_client.get_email_branding", return_value=create_email_branding(fake_uuid))
 
@@ -393,6 +427,7 @@ def test_temp_logo_is_shown_after_uploading_logo(
 
     mocker.patch("app.main.views.email_branding.upload_email_logo", return_value=temp_filename)
     mocker.patch("app.main.views.email_branding.delete_email_temp_file")
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     client_request.login(platform_admin_user)
     page = client_request.post(

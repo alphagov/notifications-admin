@@ -43,9 +43,12 @@ def get_letter_filename_with_no_path_or_extension(filename):
     return filename[len(LETTER_PREFIX) : -4]
 
 
-def upload_email_logo(filename, filedata, region, user_id):
+def upload_email_logo(filename, filedata, region, user_id, unique_id: str = None):
+    if not unique_id:
+        unique_id = str(uuid.uuid4())
+
     upload_file_name = EMAIL_LOGO_LOCATION_STRUCTURE.format(
-        temp=TEMP_TAG.format(user_id=user_id), unique_id=str(uuid.uuid4()), filename=filename
+        temp=TEMP_TAG.format(user_id=user_id), unique_id=unique_id, filename=filename
     )
     bucket_name = current_app.config["LOGO_UPLOAD_BUCKET_NAME"]
     utils_s3upload(
@@ -59,8 +62,11 @@ def upload_email_logo(filename, filedata, region, user_id):
     return upload_file_name
 
 
-def upload_letter_temp_logo(filename, filedata, region, user_id):
-    upload_filename = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=str(uuid.uuid4()), filename=filename)
+def upload_letter_temp_logo(filename, filedata, region, user_id, unique_id: str = None):
+    if not unique_id:
+        unique_id = str(uuid.uuid4())
+
+    upload_filename = LETTER_TEMP_LOGO_LOCATION.format(user_id=user_id, unique_id=unique_id, filename=filename)
     bucket_name = current_app.config["LOGO_UPLOAD_BUCKET_NAME"]
     utils_s3upload(
         filedata=filedata,

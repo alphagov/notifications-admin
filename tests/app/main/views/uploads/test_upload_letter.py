@@ -36,7 +36,7 @@ def test_post_upload_letter_redirects_for_valid_file(
     expected_allow_international,
 ):
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    antivirus_mock = mocker.patch("app.main.views.uploads.antivirus_client.scan", return_value=True)
+    antivirus_mock = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_sanitise = mocker.patch(
         "app.main.views.uploads.sanitise_letter",
         return_value=Mock(
@@ -120,7 +120,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
     }
 
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.main.views.uploads.antivirus_client.scan", return_value=True)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mocker.patch(
         "app.main.views.uploads.sanitise_letter",
         return_value=Mock(
@@ -186,7 +186,6 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
     }
 
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.main.views.uploads.antivirus_client.scan", return_value=True)
     mocker.patch(
         "app.main.views.uploads.sanitise_letter",
         return_value=Mock(
@@ -209,6 +208,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
         ),
     )
     mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template", return_value=letter_template)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     service_one["restricted"] = False
     client_request.login(active_user_with_permissions, service=service_one)
@@ -229,10 +229,12 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
     )
 
 
-def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request):
+def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request, mocker):
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
     with open("tests/non_spreadsheet_files/actually_a_png.csv", "rb") as file:
         page = client_request.post(
-            "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": file}, _expected_status=200
+            "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": file}, _expected_status=400
         )
     assert page.select_one(".banner-dangerous h1").text == "Wrong file type"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
@@ -241,14 +243,14 @@ def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request):
 
 def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
     page = client_request.post(
-        "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": ""}, _expected_status=200
+        "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": ""}, _expected_status=400
     )
     assert page.select_one(".banner-dangerous h1").text == "You need to choose a file to upload"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
 def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_request):
-    mocker.patch("app.main.views.uploads.antivirus_client.scan", return_value=False)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=False)
     mock_s3_backup = mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
@@ -261,7 +263,7 @@ def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_
 
 
 def test_post_choose_upload_file_when_file_is_too_big(mocker, client_request):
-    mocker.patch("app.main.views.uploads.antivirus_client.scan", return_value=True)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     with open("tests/test_pdf_files/big.pdf", "rb") as file:
         page = client_request.post(
@@ -273,7 +275,7 @@ def test_post_choose_upload_file_when_file_is_too_big(mocker, client_request):
 
 
 def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
-    mocker.patch("app.main.views.uploads.antivirus_client.scan", return_value=True)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     with open("tests/test_pdf_files/no_eof_marker.pdf", "rb") as file:
         page = client_request.post(
@@ -289,7 +291,7 @@ def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request):
 
 def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid):
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.main.views.uploads.antivirus_client.scan", return_value=True)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_s3_upload = mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mock_s3_backup = mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
 
@@ -345,7 +347,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
     }
 
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.main.views.uploads.antivirus_client.scan", return_value=True)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
@@ -391,7 +393,7 @@ def test_post_upload_letter_does_not_upload_to_s3_if_template_preview_raises_unk
     fake_uuid,
 ):
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.main.views.uploads.antivirus_client.scan", return_value=True)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_s3 = mocker.patch("app.main.views.uploads.upload_letter_to_s3")
 
     mocker.patch("app.main.views.uploads.sanitise_letter", side_effect=RequestException())
