@@ -1705,8 +1705,8 @@ class SVGFileUpload(StripWhitespaceForm):
     )
 
 
-class PNGFileUpload(StripWhitespaceForm):
-    file = VirusScannedFileField(
+class EmailBrandingLogoUpload(StripWhitespaceForm):
+    logo = VirusScannedFileField(
         "Upload a logo",
         validators=[
             DataRequired(message="You need to upload a file to submit"),

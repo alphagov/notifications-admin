@@ -8,7 +8,7 @@
 {% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
 
 {% block service_page_title %}
-  {{ form.file.label.text }}
+  {{ form.logo.label.text }}
 {% endblock %}
 
 {% block backLink %}
@@ -17,16 +17,16 @@
 
 {% block maincolumn_content %}
 
-  {% if form.file.errors %}
+  {% if form.logo.errors %}
     {% set params = {
         "titleText": "There is a problem",
-        "errorList": [{"href": "#" + form.file.id, "text": form.file.errors[0]}]
+        "errorList": [{"href": "#" + form.logo.id, "text": form.logo.errors[0]}]
       }
     %}
     {{ govukErrorSummary(params) }}
   {% endif %}
 
-  {{ page_header(form.file.label.text) }}
+  {{ page_header(form.logo.label.text) }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">

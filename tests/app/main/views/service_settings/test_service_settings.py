@@ -3895,7 +3895,7 @@ def test_GET_email_branding_upload_logo(client_request, service_one, query_param
     assert back_button["href"] == expected_back_link
     assert form["method"] == "post"
     assert "Submit" in submit_button.text
-    assert file_input["name"] == "file"
+    assert file_input["name"] == "logo"
 
     assert skip_link is not None
     assert skip_link["href"] == url_for("main.email_branding_something_else", service_id=service_one["id"])
@@ -3909,7 +3909,7 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
 
     client_request.post(
         "main.email_branding_upload_logo",
-        _data={"file": (b"", "logo.png")},
+        _data={"logo": (b"", "logo.png")},
         service_id=service_one["id"],
         _expected_redirect=url_for(
             "main.email_branding_name_logo",
@@ -3935,9 +3935,9 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
     (
         (
             ({}, "You need to upload a file to submit"),
-            ({"file": (BytesIO(b""), "logo.svg")}, "That is not a PNG file"),
+            ({"logo": (BytesIO(b""), "logo.svg")}, "That is not a PNG file"),
             (
-                {"file": (BytesIO(b"a" * 3 * 1024 * 1024), "logo.png")},
+                {"logo": (BytesIO(b"a" * 3 * 1024 * 1024), "logo.png")},
                 "File must be smaller than 2MB",
             ),
         )

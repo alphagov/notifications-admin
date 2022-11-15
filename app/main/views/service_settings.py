@@ -52,9 +52,9 @@ from app.main.forms import (
     EmailBrandingChooseBanner,
     EmailBrandingChooseBannerColour,
     EmailBrandingChooseLogoForm,
+    EmailBrandingLogoUpload,
     EstimateUsageForm,
     GovernmentIdentityLogoForm,
-    PNGFileUpload,
     RenameServiceForm,
     SearchByNameForm,
     ServiceBroadcastAccountTypeForm,
@@ -1392,7 +1392,7 @@ def email_branding_choose_logo(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_upload_logo(service_id):
-    form = PNGFileUpload()
+    form = EmailBrandingLogoUpload()
 
     if form.validate_on_submit():
         # We don't need to care about the filename as we're providing a UUID, and if we include the filename then we
@@ -1402,7 +1402,7 @@ def email_branding_upload_logo(service_id):
 
         upload_email_logo(
             filename,
-            form.file.data.read(),
+            form.logo.data.read(),
             current_app.config["AWS_REGION"],
             user_id=current_user.id,
             unique_id=upload_id,
