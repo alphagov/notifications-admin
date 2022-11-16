@@ -748,11 +748,8 @@ class GovukRadiosWithImagesField(GovukRadiosField):
         "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
     }
 
-    def __init__(self, label="", validators=None, image_data=None, **kwargs):
-        if image_data is None:
-            raise RuntimeError("Must provide `image_data` to initialiser")
-
-        super(GovukRadiosField, self).__init__(label, validators, **kwargs)
+    def __init__(self, label="", *, image_data, **kwargs):
+        super(GovukRadiosField, self).__init__(label, **kwargs)
 
         self.image_data = image_data
 
