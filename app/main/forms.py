@@ -26,6 +26,7 @@ from wtforms import (
     BooleanField,
     DateField,
     EmailField,
+    Field,
     FieldList,
     FileField,
     HiddenField,
@@ -165,6 +166,31 @@ def email_address(label="Email address", gov_user=True, required=True):
         validators.append(DataRequired(message="Cannot be empty"))
 
     return GovukEmailField(label, validators)
+
+
+class RequiredValidatorsMixin(Field):
+    """
+    A mixin for use if there are ever required validators you want to always apply, regardless of what a subclass does
+    or how the field is invoked.
+
+    Normally if you pass `validators` in a Field.__init__, that list overrides any base class validators entirely.
+    This isn't always desirable, for example, we might want to ensure that all our files are virus scanned regardless
+    of whether they pass other validators (filesize, is the file openable, etc)
+
+    To set these, use this mixin then specify `required_validators` as a class variable.
+    Note that these validators will be run before any other validators passed in through the field constructor.
+
+    This inherits from Field to ensure that it gets invoked before the `Field` constructor
+    (which actually takes the validators and saves them)
+    """
+
+    required_validators = []
+
+    def __init__(self, *args, validators=None, **kwargs):
+        if validators is None:
+            validators = []
+        # make a copy of `self.required_validators` to ensure it's not shared with other instances of this field
+        super().__init__(*args, validators=(self.required_validators[:] + validators), **kwargs)
 
 
 class GovukTextInputFieldMixin(GovukFrontendWidgetMixin):
@@ -333,19 +359,10 @@ class ForgivingIntegerField(GovukTextInputField):
         return super().__call__(value=value, **kwargs)
 
 
-class HexColourCodeField(GovukTextInputField):
-    def __init__(self, label="", validators=None, **kwargs):
-        if validators is None:
-            validators = []
-        else:
-            # Make a copy of the validators list, as field validators are usually instantiated at the class-level,
-            # meaning the list is shared between all instances. We want to potentially modify the validators, so we need
-            # to create a new list.
-            validators = validators[:]
-
-        validators.append(Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"))
-
-        super().__init__(label, validators, **kwargs)
+class HexColourCodeField(GovukTextInputField, RequiredValidatorsMixin):
+    required_validators = [
+        Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"),
+    ]
 
     def post_validate(self, form, validation_stopped):
         if not self.errors:
@@ -490,19 +507,10 @@ class PostalAddressField(TextAreaField):
             self.data = PostalAddress(valuelist[0]).normalised
 
 
-class VirusScannedFileField(FileField_wtf):
-    def __init__(self, label=None, validators=None, *args, **kwargs):
-        if validators is None:
-            validators = []
-        else:
-            # Make a copy of the validators list, as field validators are usually instantiated at the class-level,
-            # meaning the list is shared between all instances. We want to potentially modify the validators, so we need
-            # to create a new list.
-            validators = validators[:]
-
-        validators.insert(0, FileIsVirusFree())
-
-        super().__init__(label, validators, *args, **kwargs)
+class VirusScannedFileField(FileField_wtf, RequiredValidatorsMixin):
+    required_validators = [
+        FileIsVirusFree(),
+    ]
 
 
 class LoginForm(StripWhitespaceForm):
