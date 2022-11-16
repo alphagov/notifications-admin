@@ -238,7 +238,7 @@ class GovukPasswordField(GovukTextInputFieldMixin, PasswordField):
 
 class GovukEmailField(GovukTextInputFieldMixin, EmailField):
     input_type = "email"
-    param_extensions = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
+    param_extensions = {"spellcheck": False}  # email addresses don't need to be spellchecked
 
 
 class GovukSearchField(GovukTextInputFieldMixin, SearchField):
