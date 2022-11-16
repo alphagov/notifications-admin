@@ -27,7 +27,7 @@ def webauthn_begin_register():
         },
         credentials=current_user.webauthn_credentials.as_cbor,
         user_verification="discouraged",  # don't ask for PIN
-        authenticator_attachment="cross-platform",
+        authenticator_attachment=None,
     )
 
     session["webauthn_registration_state"] = state

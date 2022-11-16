@@ -70,7 +70,7 @@ def test_begin_register_returns_encoded_options(
     assert webauthn_options["timeout"] == 30_000
 
     auth_selection = webauthn_options["authenticatorSelection"]
-    assert auth_selection["authenticatorAttachment"] == "cross-platform"
+    assert "authenticatorAttachment" not in auth_selection
     assert auth_selection["userVerification"] == "discouraged"
 
     user_options = webauthn_options["user"]
