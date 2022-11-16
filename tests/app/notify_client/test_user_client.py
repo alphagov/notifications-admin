@@ -194,7 +194,12 @@ def test_returns_value_from_cache(
         (user_api_client, "update_password", [user_id, "hunter2"], {}),
         (user_api_client, "verify_password", [user_id, "hunter2"], {}),
         (user_api_client, "check_verify_code", [user_id, "", ""], {}),
-        (user_api_client, "complete_webauthn_login_attempt", [user_id], {"is_successful": True}),
+        (
+            user_api_client,
+            "complete_webauthn_login_attempt",
+            [user_id],
+            {"is_successful": True, "webauthn_credential_id": "123"},
+        ),
         (user_api_client, "add_user_to_service", [SERVICE_ONE_ID, user_id, [], []], {}),
         (user_api_client, "add_user_to_organisation", [sample_uuid(), user_id], {}),
         (user_api_client, "set_user_permissions", [user_id, SERVICE_ONE_ID, []], {}),
@@ -263,10 +268,13 @@ def test_create_webauthn_credential_for_user(mocker, webauthn_credential, fake_u
 
 def test_complete_webauthn_login_attempt_returns_true_and_no_message_normally(fake_uuid, mocker):
     mock_post = mocker.patch("app.notify_client.user_api_client.UserApiClient.post")
+    webauthn_credential_id = str(uuid.uuid4())
 
-    resp = user_api_client.complete_webauthn_login_attempt(fake_uuid, is_successful=True)
+    resp = user_api_client.complete_webauthn_login_attempt(
+        fake_uuid, is_successful=True, webauthn_credential_id=webauthn_credential_id
+    )
 
-    expected_data = {"successful": True}
+    expected_data = {"successful": True, "webauthn_credential_id": webauthn_credential_id}
     mock_post.assert_called_once_with(f"/user/{fake_uuid}/complete/webauthn-login", data=expected_data)
     assert resp == (True, "")
 
@@ -276,10 +284,13 @@ def test_complete_webauthn_login_attempt_returns_false_and_message_on_403(fake_u
         "app.notify_client.user_api_client.UserApiClient.post",
         side_effect=HTTPError(response=Mock(status_code=403, json=Mock(return_value={"message": "forbidden"}))),
     )
+    webauthn_credential_id = str(uuid.uuid4())
 
-    resp = user_api_client.complete_webauthn_login_attempt(fake_uuid, is_successful=True)
+    resp = user_api_client.complete_webauthn_login_attempt(
+        fake_uuid, is_successful=True, webauthn_credential_id=webauthn_credential_id
+    )
 
-    expected_data = {"successful": True}
+    expected_data = {"successful": True, "webauthn_credential_id": webauthn_credential_id}
     mock_post.assert_called_once_with(f"/user/{fake_uuid}/complete/webauthn-login", data=expected_data)
 
     assert resp == (False, "forbidden")
@@ -292,7 +303,7 @@ def test_complete_webauthn_login_attempt_raises_on_api_error(fake_uuid, mocker):
     )
 
     with pytest.raises(HTTPError):
-        user_api_client.complete_webauthn_login_attempt(fake_uuid, is_successful=True)
+        user_api_client.complete_webauthn_login_attempt(fake_uuid, is_successful=True, webauthn_credential_id=fake_uuid)
 
 
 def test_reset_password(
