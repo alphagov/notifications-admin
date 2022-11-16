@@ -1360,7 +1360,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
 @user_has_permissions("manage_service")
 @service_belongs_to_org_type("central")
 def email_branding_choose_logo(service_id):
-    form = EmailBrandingChooseLogoForm(current_service)
+    form = EmailBrandingChooseLogoForm()
 
     if form.validate_on_submit():
         if form.branding_options.data == "org":

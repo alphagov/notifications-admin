@@ -743,6 +743,11 @@ class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
 class GovukRadiosWithImagesField(GovukRadiosField):
     govuk_frontend_component_name = "radios-with-images"
 
+    param_extensions = {
+        "classes": "govuk-radios--inline",
+        "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
+    }
+
     def __init__(self, label="", validators=None, image_data=None, **kwargs):
         if image_data is None:
             raise RuntimeError("Must provide `image_data` to initialiser")
@@ -2032,18 +2037,6 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
         image_data={key: value["image"] for key, value in BRANDING_OPTIONS_DATA.items()},
     )
 
-    def __init__(self, service, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.branding_options.param_extensions = {
-            "classes": "govuk-radios--inline",
-            "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
-        }
-        if not service.email_branding_id:
-            self.branding_options.param_extensions["hint"] = {
-                "html": f"{service.name} branding is not set up yet.",
-                "classes": "notify-hint--paragraph",
-            }
-
 
 class EmailBrandingChooseBanner(Form):
     BANNER_CHOICES_DATA = {
@@ -2069,10 +2062,6 @@ class EmailBrandingChooseBanner(Form):
         "Add a banner to your logo",
         choices=tuple((key, value["label"]) for key, value in BANNER_CHOICES_DATA.items()),
         image_data={key: value["image"] for key, value in BANNER_CHOICES_DATA.items()},
-        param_extensions={
-            "classes": "govuk-radios--inline",
-            "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
-        },
     )
 
 

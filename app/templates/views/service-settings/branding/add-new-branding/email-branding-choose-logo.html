@@ -30,7 +30,17 @@
   {% endif %}
 
   {% call form_wrapper() %}
-    {{ form.branding_options }}
+    {% if current_service.email_branding_id %}
+      {% set param_extensions = {} %}
+    {% else %}
+      {% set param_extensions = {
+        "hint":{
+          "html": current_service.name + " branding is not set up yet.",
+          "classes": "notify-hint--paragraph",
+        }
+      } %}
+    {% endif %}
+    {{ form.branding_options(param_extensions=param_extensions) }}
     {{ page_footer('Continue') }}
   {% endcall %}
 
