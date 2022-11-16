@@ -5,7 +5,7 @@ from itertools import chain
 from numbers import Number
 
 import pytz
-from flask import Markup, render_template_string, request
+from flask import Markup, request
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed
@@ -80,53 +80,17 @@ from app.models.branding import (
 )
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
-from app.utils import branding, merge_jsonlike
+from app.utils import branding
+from app.utils.govuk_frontend_field import (
+    GovukFrontendWidgetMixin,
+    render_govuk_frontend_macro,
+)
 from app.utils.user import distinct_email_addresses
 from app.utils.user_permissions import (
     all_ui_permissions,
     broadcast_permission_options,
     permission_options,
 )
-
-
-def render_govuk_frontend_macro(component, params):
-    """
-    jinja needs a template to render
-
-    This function creates a template string that just calls that macro on its own.
-
-    ```
-    {%- from <path> import <macro> -%}
-
-    {{ macro(params) }}
-    ```
-
-    This function dynamically fills in the path and macro based on the GOVUK_FRONTEND_MACROS dictionary.
-    Then we render that template with any params to produce just the output of that macro.
-    """
-    govuk_frontend_components = {
-        "radios": {"path": "govuk_frontend_jinja/components/radios/macro.html", "macro": "govukRadios"},
-        "radios-with-images": {
-            "path": "govuk_frontend_jinja_overrides/templates/components/radios-with-images/macro.html",
-            "macro": "govukRadiosWithImages",
-        },
-        "text-input": {"path": "govuk_frontend_jinja/components/input/macro.html", "macro": "govukInput"},
-        "textarea": {"path": "govuk_frontend_jinja/components/textarea/macro.html", "macro": "govukTextarea"},
-        "checkbox": {
-            "path": "govuk_frontend_jinja_overrides/templates/components/checkboxes/macro.html",
-            "macro": "govukCheckboxes",
-        },
-    }
-
-    # we need to duplicate all curly braces to escape them from the f string so jinja still sees them
-    template_string = f"""
-        {{%- from '{govuk_frontend_components[component]['path']}'
-        import {govuk_frontend_components[component]['macro']} -%}}
-
-        {{{{ {govuk_frontend_components[component]['macro']}(params) }}}}
-    """
-
-    return Markup(render_template_string(template_string, params=params))
 
 
 def get_time_value_and_label(future_time):
@@ -202,17 +166,32 @@ def email_address(label="Email address", gov_user=True, required=True):
     return GovukEmailField(label, validators)
 
 
-class UKMobileNumber(TelField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(UKMobileNumber, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
+class GovukTextInputFieldMixin(GovukFrontendWidgetMixin):
+    input_type = "text"
+    govuk_frontend_component_name = "text-input"
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
+    def prepare_params(self, **kwargs):
+        value = kwargs["value"] if "value" in kwargs else self.data
+        value = str(value) if isinstance(value, Number) else value
+
+        error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
+
+        # convert to parameters that govuk understands
+        params = {
+            "classes": "govuk-!-width-two-thirds",
+            "errorMessage": self.get_error_message(error_message_format),
+            "id": self.id,
+            "label": {"text": self.label.text},
+            "name": self.name,
+            "value": value,
+            "type": self.input_type,
+        }
+
+        return params
+
+
+class UKMobileNumber(GovukTextInputFieldMixin, TelField):
+    input_type = "tel"
 
     def pre_validate(self, form):
         try:
@@ -221,18 +200,7 @@ class UKMobileNumber(TelField):
             raise ValidationError(str(e))
 
 
-class InternationalPhoneNumber(TelField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(InternationalPhoneNumber, self).__init__(label, validators=validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, type="tel", param_extensions=param_extensions, **kwargs)
-
+class InternationalPhoneNumber(UKMobileNumber, GovukTextInputFieldMixin, TelField):
     def pre_validate(self, form):
         try:
             if self.data:
@@ -260,144 +228,43 @@ def password(label="Password"):
     )
 
 
-def govuk_text_input_field_widget(self, field, type=None, param_extensions=None, **kwargs):
-    value = kwargs["value"] if "value" in kwargs else field.data
-    value = str(value) if isinstance(value, Number) else value
-
-    # error messages
-    error_message = None
-    if field.errors:
-        error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
-        error_message = {
-            "attributes": {
-                "data-notify-module": "track-error",
-                "data-error-type": field.errors[0],
-                "data-error-label": field.name,
-            },
-            error_message_format: field.errors[0],
-        }
-
-    # convert to parameters that govuk understands
-    params = {
-        "classes": "govuk-!-width-two-thirds",
-        "errorMessage": error_message,
-        "id": field.id,
-        "label": {"text": field.label.text},
-        "name": field.name,
-        "value": value,
-    }
-
-    if type:
-        params["type"] = type
-
-    # extend default params with any sent in
-    merge_jsonlike(params, self.param_extensions)
-    # add any sent in through use in templates
-    merge_jsonlike(params, param_extensions)
-
-    return render_govuk_frontend_macro("text-input", params=params)
+class GovukTextInputField(GovukTextInputFieldMixin, StringField):
+    pass
 
 
-class GovukTextInputField(StringField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukTextInputField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, **kwargs):
-        return govuk_text_input_field_widget(self, field, **kwargs)
+class GovukPasswordField(GovukTextInputFieldMixin, PasswordField):
+    input_type = "password"
 
 
-class GovukPasswordField(PasswordField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukPasswordField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, type="password", param_extensions=param_extensions, **kwargs)
+class GovukEmailField(GovukTextInputFieldMixin, EmailField):
+    input_type = "email"
+    param_extensions = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
 
 
-class GovukEmailField(EmailField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukEmailField, self).__init__(label, validators=validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-
-        params = {"attributes": {"spellcheck": "false"}}  # email addresses don't need to be spellchecked
-        merge_jsonlike(params, param_extensions)
-
-        return govuk_text_input_field_widget(self, field, type="email", param_extensions=params, **kwargs)
+class GovukSearchField(GovukTextInputFieldMixin, SearchField):
+    input_type = "search"
+    param_extensions = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
 
 
-class GovukSearchField(SearchField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukSearchField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-
-        params = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
-        merge_jsonlike(params, param_extensions)
-
-        return govuk_text_input_field_widget(self, field, type="search", param_extensions=params, **kwargs)
+class GovukDateField(GovukTextInputFieldMixin, DateField):
+    pass
 
 
-class GovukDateField(DateField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukDateField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, param_extensions=param_extensions, **kwargs)
-
-
-class GovukIntegerField(IntegerField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukIntegerField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_text_input_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+class GovukIntegerField(GovukTextInputFieldMixin, IntegerField):
+    pass
 
 
 class SMSCode(GovukTextInputField):
+    # the design system recommends against ever using `type="number"`. "tel" makes mobile browsers
+    # show a phone keypad input rather than a full qwerty keyboard.
+    input_type = "tel"
+    param_extensions = {"attributes": {"pattern": "[0-9]*"}}
     validators = [
         DataRequired(message="Cannot be empty"),
         Regexp(regex=r"^\d+$", message="Numbers only"),
         Length(min=5, message="Not enough numbers"),
         Length(max=5, message="Too many numbers"),
     ]
-
-    def __call__(self, **kwargs):
-        params = {"attributes": {"pattern": "[0-9]*"}}
-        if "param_extensions" in kwargs:
-            merge_jsonlike(kwargs["param_extensions"], params)
-
-        return super().__call__(type="tel", **kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -466,7 +333,7 @@ class ForgivingIntegerField(GovukTextInputField):
 
 
 class HexColourCodeField(GovukTextInputField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
+    def __init__(self, label="", validators=None, **kwargs):
         if validators is None:
             validators = []
         else:
@@ -477,7 +344,7 @@ class HexColourCodeField(GovukTextInputField):
 
         validators.append(Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"))
 
-        super().__init__(label, validators, param_extensions=param_extensions, **kwargs)
+        super().__init__(label, validators, **kwargs)
 
     def post_validate(self, form, validation_stopped):
         if not self.errors:
@@ -561,7 +428,7 @@ class NestedFieldMixin:
 
             params["items"].append(item)
 
-        return render_govuk_frontend_macro("checkbox", params=params)
+        return render_govuk_frontend_macro(self.govuk_frontend_component_name, params=params)
 
 
 class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
@@ -606,7 +473,7 @@ class StripWhitespaceForm(Form):
 
 
 class StripWhitespaceStringField(GovukTextInputField):
-    def __init__(self, label=None, param_extensions=None, **kwargs):
+    def __init__(self, label=None, **kwargs):
         kwargs["filters"] = tuple(
             chain(
                 kwargs.get("filters", ()),
@@ -614,7 +481,6 @@ class StripWhitespaceStringField(GovukTextInputField):
             )
         )
         super(GovukTextInputField, self).__init__(label, **kwargs)
-        self.param_extensions = param_extensions
 
 
 class PostalAddressField(TextAreaField):
@@ -689,187 +555,43 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
 
 
-def govuk_checkbox_field_widget(self, field, param_extensions=None, **kwargs):
-    # error messages
-    error_message = None
-    if field.errors:
-        error_message = {
-            "attributes": {
-                "data-notify-module": "track-error",
-                "data-error-type": field.errors[0],
-                "data-error-label": field.name,
-            },
-            "text": field.errors[0],
+class GovukCheckboxField(GovukFrontendWidgetMixin, BooleanField):
+    govuk_frontend_component_name = "checkbox"
+
+    def prepare_params(self, **kwargs):
+        params = {
+            "name": self.name,
+            "errorMessage": self.get_error_message(),
+            "items": [{"name": self.name, "id": self.id, "text": self.label.text, "value": "y", "checked": self.data}],
         }
-
-    params = {
-        "name": field.name,
-        "errorMessage": error_message,
-        "items": [{"name": field.name, "id": field.id, "text": field.label.text, "value": "y", "checked": field.data}],
-    }
-
-    # extend default params with any sent in during instantiation
-    if self.param_extensions:
-        merge_jsonlike(params, self.param_extensions)
-
-    # add any sent in though use in templates
-    if param_extensions:
-        merge_jsonlike(params, param_extensions)
-
-    return render_govuk_frontend_macro("checkbox", params=params)
+        return params
 
 
-def govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=False, param_extensions=None, **kwargs):
-    def _wrap_in_collapsible(field_label, checkboxes_string):
-        # wrap the checkboxes HTML in the HTML needed by the collapisble JS
-        result = Markup(
-            f'<div class="selection-wrapper"'
-            f'     data-notify-module="collapsible-checkboxes"'
-            f'     data-field-label="{field_label}">'
-            f"  {checkboxes_string}"
-            f"</div>"
-        )
+class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
+    govuk_frontend_component_name = "textarea"
 
-        return result
-
-    # error messages
-    error_message = None
-    if field.errors:
-        error_message = {
-            "attributes": {
-                "data-notify-module": "track-error",
-                "data-error-type": field.errors[0],
-                "data-error-label": field.name,
-            },
-            "text": field.errors[0],
-        }
-
-    # returns either a list or a hierarchy of lists
-    # depending on how get_items_from_options is implemented
-    items = self.get_items_from_options(field)
-
-    params = {
-        "name": field.name,
-        "fieldset": {
-            "attributes": {"id": field.name},
-            "legend": {"text": field.label.text, "classes": "govuk-fieldset__legend--s"},
-        },
-        "asList": self.render_as_list,
-        "errorMessage": error_message,
-        "items": items,
-    }
-
-    # extend default params with any sent in during instantiation
-    if self.param_extensions:
-        merge_jsonlike(params, self.param_extensions)
-
-    # add any sent in though use in templates
-    if param_extensions:
-        merge_jsonlike(params, param_extensions)
-
-    if wrap_in_collapsible:
-
-        # add a blank hint to act as an ARIA live-region
-        params.update({"hint": {"html": '<div class="selection-summary" role="region" aria-live="polite"></div>'}})
-
-        return _wrap_in_collapsible(self.field_label, render_govuk_frontend_macro("checkbox", params=params))
-    else:
-        return render_govuk_frontend_macro("checkbox", params=params)
-
-
-def govuk_radios_field_widget(self, field, param_extensions=None, component="radios", **kwargs):
-    # error messages
-    error_message = None
-    if field.errors:
-        error_message = {
-            "attributes": {
-                "data-notify-module": "track-error",
-                "data-error-type": field.errors[0],
-                "data-error-label": field.name,
-            },
-            "text": field.errors[0],
-        }
-
-    # returns either a list or a hierarchy of lists
-    # depending on how get_items_from_options is implemented
-    items = self.get_items_from_options(field)
-
-    params = {
-        "name": field.name,
-        "fieldset": {
-            "attributes": {"id": field.name},
-            "legend": {"text": field.label.text, "classes": "govuk-fieldset__legend--s"},
-        },
-        "errorMessage": error_message,
-        "items": items,
-    }
-
-    # extend default params with any sent in during instantiation
-    if self.param_extensions:
-        merge_jsonlike(params, self.param_extensions)
-
-    # add any sent in though use in templates
-    if param_extensions:
-        merge_jsonlike(params, param_extensions)
-
-    return render_govuk_frontend_macro(component, params=params)
-
-
-class GovukCheckboxField(BooleanField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukCheckboxField, self).__init__(label, validators, false_values=None, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_checkbox_field_widget(self, field, param_extensions=param_extensions, **kwargs)
-
-
-class GovukTextareaField(TextAreaField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(TextAreaField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
+    def prepare_params(self, **kwargs):
         # error messages
         error_message = None
-        if field.errors:
-            error_message = {"text": field.errors[0]}
+        if self.errors:
+            error_message = {"text": self.errors[0]}
 
         params = {
-            "name": field.name,
-            "id": field.id,
+            "name": self.name,
+            "id": self.id,
             "rows": 8,
-            "label": {"text": field.label.text, "classes": None, "isPageHeading": False},
+            "label": {"text": self.label.text, "classes": None, "isPageHeading": False},
             "hint": {"text": None},
             "errorMessage": error_message,
         }
 
-        # extend default params with any sent in during instantiation
-        if self.param_extensions:
-            merge_jsonlike(params, self.param_extensions)
-
-        # add any sent in though use in templates
-        if param_extensions:
-            merge_jsonlike(params, param_extensions)
-
-        return render_govuk_frontend_macro("textarea", params=params)
+        return params
 
 
 # based on work done by @richardjpope: https://github.com/richardjpope/recourse/blob/master/recourse/forms.py#L6
-class GovukCheckboxesField(SelectMultipleField):
+class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
+    govuk_frontend_component_name = "checkbox"
     render_as_list = False
-
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukCheckboxesField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
 
     def get_item_from_option(self, option):
         return {
@@ -883,22 +605,46 @@ class GovukCheckboxesField(SelectMultipleField):
     def get_items_from_options(self, field):
         return [self.get_item_from_option(option) for option in field]
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_checkboxes_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+    def prepare_params(self, **kwargs):
+        # returns either a list or a hierarchy of lists
+        # depending on how get_items_from_options is implemented
+        items = self.get_items_from_options(self)
+
+        params = {
+            "name": self.name,
+            "fieldset": {
+                "attributes": {"id": self.name},
+                "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
+            },
+            "asList": self.render_as_list,
+            "errorMessage": self.get_error_message(),
+            "items": items,
+        }
+
+        return params
 
 
 # Wraps checkboxes rendering in HTML needed by the collapsible JS
 class GovukCollapsibleCheckboxesField(GovukCheckboxesField):
-    def __init__(self, label="", validators=None, field_label="", param_extensions=None, **kwargs):
-        super(GovukCollapsibleCheckboxesField, self).__init__(label, validators, param_extensions, **kwargs)
-        self.field_label = field_label
+    param_extensions = {"hint": {"html": '<div class="selection-summary" role="region" aria-live="polite"></div>'}}
 
-    def widget(self, field, **kwargs):
-        return govuk_checkboxes_field_widget(self, field, wrap_in_collapsible=True, param_extensions=None, **kwargs)
+    def __init__(self, *args, field_label="", **kwargs):
+        self.field_label = field_label
+        super().__init__(*args, **kwargs)
+
+    def widget(self, *args, **kwargs):
+        checkboxes_string = super().widget(*args, **kwargs)
+
+        # wrap the checkboxes HTML in the HTML needed by the collapsible JS
+        result = Markup(
+            f'<div class="selection-wrapper"'
+            f'     data-notify-module="collapsible-checkboxes"'
+            f'     data-field-label="{self.field_label}">'
+            f"  {checkboxes_string}"
+            f"</div>"
+        )
+
+        return result
 
 
 # GovukCollapsibleCheckboxesField adds an ARIA live-region to the hint and wraps the render in HTML needed by the
@@ -909,10 +655,8 @@ class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCh
     render_as_list = True
 
 
-class GovukRadiosField(RadioField):
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super(GovukRadiosField, self).__init__(label, validators, **kwargs)
-        self.param_extensions = param_extensions
+class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
+    govuk_frontend_component_name = "radios"
 
     def get_item_from_option(self, option):
         return {
@@ -926,12 +670,20 @@ class GovukRadiosField(RadioField):
     def get_items_from_options(self, field):
         return [self.get_item_from_option(option) for option in field]
 
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_radios_field_widget(self, field, param_extensions=param_extensions, **kwargs)
+    def prepare_params(self, **kwargs):
+        # returns either a list or a hierarchy of lists
+        # depending on how get_items_from_options is implemented
+        items = self.get_items_from_options(self)
+
+        return {
+            "name": self.name,
+            "fieldset": {
+                "attributes": {"id": self.name},
+                "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
+            },
+            "errorMessage": self.get_error_message(),
+            "items": items,
+        }
 
 
 class OptionalGovukRadiosField(GovukRadiosField):
@@ -988,13 +740,14 @@ class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
 
 
 class GovukRadiosWithImagesField(GovukRadiosField):
-    def __init__(self, label="", validators=None, param_extensions=None, image_data=None, **kwargs):
+    govuk_frontend_component_name = "radios-with-images"
+
+    def __init__(self, label="", validators=None, image_data=None, **kwargs):
         if image_data is None:
             raise RuntimeError("Must provide `image_data` to initialiser")
 
         super(GovukRadiosField, self).__init__(label, validators, **kwargs)
 
-        self.param_extensions = param_extensions
         self.image_data = image_data
 
     def get_item_from_option(self, option):
@@ -1006,15 +759,6 @@ class GovukRadiosWithImagesField(GovukRadiosField):
             "checked": option.checked,
             "image": self.image_data[option.data],
         }
-
-    # self.__call__ renders the HTML for the field by:
-    # 1. delegating to self.meta.render_field which
-    # 2. calls field.widget
-    # this bypasses that by making self.widget a method with the same interface as widget.__call__
-    def widget(self, field, param_extensions=None, **kwargs):
-        return govuk_radios_field_widget(
-            self, field, param_extensions=param_extensions, component="radios-with-images", **kwargs
-        )
 
 
 # guard against data entries that aren't a known permission
