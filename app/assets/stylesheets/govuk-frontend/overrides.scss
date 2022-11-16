@@ -62,17 +62,3 @@ $notify-secondary-button-hover-colour: govuk-shade(govuk-colour("light-grey"), 1
     background-color: $notify-secondary-button-hover-colour;
   }
 }
-
-// Give footer links back their underline
-// TODO: remove this once we've upgraded past v3.12.0
-.govuk-footer__list,
-.govuk-footer__inline-list {
-  .govuk-footer__link {
-    text-decoration: underline;
-
-    &:focus {
-      text-decoration: none;
-    }
-
-  }
-}
