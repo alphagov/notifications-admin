@@ -41,15 +41,23 @@ class ElementNotFound(Exception):
 
 
 @pytest.fixture(scope="session")
-def notify_admin():
+def notify_admin_without_context():
+    """
+    You probably won't need to use this fixture, unless you need to use the flask.appcontext_pushed hook. Possibly if
+    you're patching something on `g`. https://flask.palletsprojects.com/en/1.1.x/testing/#faking-resources-and-context
+    """
     app = Flask("app")
     create_app(app)
-
-    ctx = app.app_context()
-    ctx.push()
-
     app.test_client_class = TestClient
-    yield app
+
+    return app
+
+
+@pytest.fixture
+def notify_admin(notify_admin_without_context):
+
+    with notify_admin_without_context.app_context():
+        yield notify_admin_without_context
 
 
 @pytest.fixture(scope="function")
