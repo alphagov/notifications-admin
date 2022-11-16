@@ -40,6 +40,7 @@ from tests.conftest import (
     create_template,
     normalize_spaces,
 )
+from tests.utils import ComparablePropertyMock
 
 FAKE_TEMPLATE_ID = uuid4()
 
@@ -3907,9 +3908,13 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
     mock_upload_email_logo = mocker.patch("app.main.views.service_settings.upload_email_logo")
     mocker.patch("app.main.views.service_settings.uuid.uuid4", return_value="my-logo-uuid")
 
+    mocker.patch.dict(
+        "flask.current_app.config", {"EMAIL_BRANDING_MIN_LOGO_HEIGHT_PX": 1, "EMAIL_BRANDING_MAX_LOGO_WIDTH_PX": 1}
+    )
+
     client_request.post(
         "main.email_branding_upload_logo",
-        _data={"logo": (b"", "logo.png")},
+        _data={"logo": (open("tests/test_img_files/small-but-perfectly-formed.png", "rb"), "logo.png")},
         service_id=service_one["id"],
         _expected_redirect=url_for(
             "main.email_branding_name_logo",
@@ -3922,7 +3927,7 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
     assert mock_upload_email_logo.call_args_list == [
         mocker.call(
             "",
-            b"",
+            open("tests/test_img_files/small-but-perfectly-formed.png", "rb").read(),
             "eu-west-1",
             user_id=ANY,
             unique_id="my-logo-uuid",
@@ -3935,10 +3940,18 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
     (
         (
             ({}, "You need to upload a file to submit"),
-            ({"logo": (BytesIO(b""), "logo.svg")}, "That is not a PNG file"),
+            ({"logo": (BytesIO(b""), "logo.svg")}, "Logo must be a PNG file"),
             (
                 {"logo": (BytesIO(b"a" * 3 * 1024 * 1024), "logo.png")},
                 "File must be smaller than 2MB",
+            ),
+            (
+                lambda: {"logo": (open("tests/test_img_files/corrupt-magic-numbers.png", "rb"), "logo.png")},
+                "Logo must be a PNG file",
+            ),
+            (
+                lambda: {"logo": (open("tests/test_img_files/truncated.png", "rb"), "logo.png")},
+                "Notify cannot read this file",
             ),
         )
     ),
@@ -3946,6 +3959,10 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
 def test_POST_email_branding_upload_logo_validation_errors(
     mocker, client_request, service_one, post_data, expected_error
 ):
+    # File opens are wrapped in a lambda (we only want to do this during the test run, not when tests are gathered)
+    if callable(post_data):
+        post_data = post_data()
+
     mock_upload_email_logo = mocker.patch("app.main.views.service_settings.upload_email_logo")
 
     with mock.patch.dict("app.main.validators.current_app.config", {"ANTIVIRUS_ENABLED": False}):
@@ -3958,6 +3975,64 @@ def test_POST_email_branding_upload_logo_validation_errors(
 
     assert expected_error in page.text
     assert mock_upload_email_logo.call_args_list == []
+
+
+@pytest.mark.parametrize(
+    "min_logo_height, expect_error",
+    (
+        (3, False),
+        (5, False),
+        (10, True),
+    ),
+)
+def test_POST_email_branding_upload_logo_enforces_minimum_logo_height(
+    mocker, client_request, service_one, min_logo_height, expect_error
+):
+    mocker.patch("app.main.views.service_settings.upload_email_logo")
+    mocker.patch("app.utils.image_processing.ImageProcessor")
+
+    with mock.patch.dict(
+        "app.main.validators.current_app.config",
+        {
+            "ANTIVIRUS_ENABLED": False,
+            "EMAIL_BRANDING_MIN_LOGO_HEIGHT_PX": min_logo_height,
+            "EMAIL_BRANDING_MAX_LOGO_WIDTH_PX": 1,
+        },
+    ):
+        page = client_request.post(
+            "main.email_branding_upload_logo",
+            _data={"logo": (open("tests/test_img_files/its-a-tall-one.png", "rb"), "logo.png")},
+            service_id=service_one["id"],
+            _expected_status=400 if expect_error else 302,
+        )
+
+    if expect_error:
+        assert f"Logo must be at least {min_logo_height} pixels high" in page.text
+
+
+def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(mocker, client_request, service_one):
+    mocker.patch("app.main.views.service_settings.upload_email_logo")
+    mock_image_processor = mocker.patch("app.main.forms.ImageProcessor")
+    mock_image_processor().height = ComparablePropertyMock(side_effect=[26, 13])
+    mock_image_processor().width = 100
+
+    with mock.patch.dict(
+        "app.main.validators.current_app.config",
+        {
+            "ANTIVIRUS_ENABLED": False,
+            "EMAIL_BRANDING_MIN_LOGO_HEIGHT_PX": 25,
+            "EMAIL_BRANDING_MAX_LOGO_WIDTH_PX": 50,
+        },
+    ):
+        client_request.post(
+            "main.email_branding_upload_logo",
+            _data={"logo": (open("tests/test_img_files/small-but-perfectly-formed.png", "rb"), "logo.png")},
+            service_id=service_one["id"],
+            _expected_status=302,
+        )
+
+    assert mock_image_processor().resize.call_args_list == [mocker.call(new_width=50)]
+    assert mock_image_processor().pad.call_args_list == [mocker.call(to_height=25)]
 
 
 def test_GET_email_branding_choose_banner_colour(client_request, service_one):

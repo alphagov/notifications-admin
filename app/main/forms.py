@@ -85,6 +85,7 @@ from app.utils.govuk_frontend_field import (
     GovukFrontendWidgetMixin,
     render_govuk_frontend_macro,
 )
+from app.utils.image_processing import CorruptImage, ImageProcessor, WrongImageFormat
 from app.utils.user import distinct_email_addresses
 from app.utils.user_permissions import (
     all_ui_permissions,
@@ -1706,14 +1707,42 @@ class SVGFileUpload(StripWhitespaceForm):
 
 
 class EmailBrandingLogoUpload(StripWhitespaceForm):
+    EXPECTED_LOGO_FORMAT = "png"
+
     logo = VirusScannedFileField(
         "Upload a logo",
         validators=[
             DataRequired(message="You need to upload a file to submit"),
             FileSize(max_size=(2 * 1024 * 1024), message="File must be smaller than 2MB"),
-            FileAllowed(["png"], "That is not a PNG file"),
         ],
     )
+
+    def validate_logo(self, field):
+        from flask import current_app
+
+        try:
+            image_processor = ImageProcessor(field.data, img_format=self.EXPECTED_LOGO_FORMAT)
+        except WrongImageFormat:
+            raise ValidationError(f"Logo must be a {self.EXPECTED_LOGO_FORMAT.upper()} file")
+        except CorruptImage:
+            raise ValidationError("Notify cannot read this file")
+
+        min_height_px = current_app.config["EMAIL_BRANDING_MIN_LOGO_HEIGHT_PX"]
+        max_width_px = current_app.config["EMAIL_BRANDING_MAX_LOGO_WIDTH_PX"]
+
+        # If it's not tall enough, it's probably not high quality enough to look good if we scale it up.
+        if image_processor.height < min_height_px:
+            raise ValidationError(f"Logo must be at least {min_height_px} pixels high")
+
+        # If it's too wide, let's scale it down a bit.
+        if image_processor.width > max_width_px:
+            image_processor.resize(new_width=max_width_px)
+
+        # If after scaling it down, it's not tall enough, let's pad the height as this will probably still look OK.
+        if image_processor.height < min_height_px:
+            image_processor.pad(to_height=min_height_px)
+
+        field.data = image_processor.get_data()
 
 
 class PDFUploadForm(StripWhitespaceForm):

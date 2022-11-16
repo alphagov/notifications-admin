@@ -132,6 +132,8 @@ packaging==21.3
     # via redis
 phonenumbers==8.12.54
     # via notifications-utils
+pillow==9.3.0
+    # via -r requirements.in
 prometheus-client==0.15.0
     # via
     #   -r requirements.in
