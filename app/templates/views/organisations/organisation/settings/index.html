@@ -128,21 +128,27 @@
         }}
       {% endcall %}
       {% call row() %}
-        {{ text_field('Default letter branding') }}
-        {{ optional_text_field(
-          current_org.letter_branding.name if current_org.letter_branding else None,
-          default='No branding'
-        ) }}
-        {{ edit_field(
-            'Change',
-            url_for('.edit_organisation_letter_branding', org_id=current_org.id),
-            suffix='default letter branding for the organisation'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
         {{ text_field('Letter branding options') }}
-        {{ optional_text_field(letter_branding_pool_names, default="None") }}
+        {% set letter_branding_html %}
+          <div {% if current_org.letter_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
+            {{ current_org.letter_branding.name or "No branding" }}
+            <br>
+            <div class="table-field-status-default">
+              Default
+            </div>
+          </div>
+          {% for item in current_org.letter_branding_pool_excluding_default %}
+            {% if loop.first %}<ul>{% endif %}
+              <li>
+                {{ item.name }}
+              </li>
+            {% if loop.last %}</ul>{% endif %}
+          {% endfor %}
+        {% endset %}
+
+        {% call field() %}
+          {{ letter_branding_html }}
+        {% endcall %}
         {{ edit_field(
             'Manage',
             url_for('.organisation_letter_branding', org_id=current_org.id),

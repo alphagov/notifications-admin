@@ -3188,46 +3188,22 @@ def test_service_set_letter_branding_platform_admin_only(
         ),
     ],
 )
-@pytest.mark.parametrize(
-    "endpoint, extra_args",
-    (
-        (
-            "main.service_set_letter_branding",
-            {"service_id": SERVICE_ONE_ID},
-        ),
-        (
-            "main.edit_organisation_letter_branding",
-            {"org_id": ORGANISATION_ID},
-        ),
-    ),
-)
 def test_service_set_letter_branding_prepopulates(
     mocker,
     client_request,
     platform_admin_user,
     service_one,
-    mock_get_organisation,
     mock_get_all_letter_branding,
     letter_branding,
     expected_selected,
     expected_items,
-    endpoint,
-    extra_args,
 ):
     service_one["letter_branding"] = letter_branding
-    mocker.patch(
-        "app.organisations_client.get_organisation",
-        side_effect=lambda org_id: organisation_json(
-            org_id,
-            "Org 1",
-            letter_branding_id=letter_branding,
-        ),
-    )
 
     client_request.login(platform_admin_user)
     page = client_request.get(
-        endpoint,
-        **extra_args,
+        "main.service_set_letter_branding",
+        service_id=SERVICE_ONE_ID,
     )
 
     assert len(page.select("input[checked]")) == 1
@@ -3249,21 +3225,6 @@ def test_service_set_letter_branding_prepopulates(
         ("__NONE__", None),
     ],
 )
-@pytest.mark.parametrize(
-    "endpoint, extra_args, expected_redirect",
-    (
-        (
-            "main.service_set_letter_branding",
-            {"service_id": SERVICE_ONE_ID},
-            "main.service_preview_letter_branding",
-        ),
-        (
-            "main.edit_organisation_letter_branding",
-            {"org_id": ORGANISATION_ID},
-            "main.organisation_preview_letter_branding",
-        ),
-    ),
-)
 def test_service_set_letter_branding_redirects_to_preview_page_when_form_submitted(
     client_request,
     platform_admin_user,
@@ -3271,44 +3232,28 @@ def test_service_set_letter_branding_redirects_to_preview_page_when_form_submitt
     mock_get_all_letter_branding,
     selected_letter_branding,
     expected_post_data,
-    endpoint,
-    extra_args,
-    expected_redirect,
 ):
     client_request.login(platform_admin_user)
     client_request.post(
-        endpoint,
+        "main.service_set_letter_branding",
         _data={"branding_style": selected_letter_branding},
         _expected_status=302,
-        _expected_redirect=url_for(expected_redirect, branding_style=expected_post_data, **extra_args),
-        **extra_args,
+        _expected_redirect=url_for(
+            ".service_preview_letter_branding", branding_style=expected_post_data, service_id=SERVICE_ONE_ID
+        ),
+        service_id=SERVICE_ONE_ID,
     )
 
 
-@pytest.mark.parametrize(
-    "endpoint, extra_args",
-    (
-        (
-            "main.service_preview_letter_branding",
-            {"service_id": SERVICE_ONE_ID},
-        ),
-        (
-            "main.organisation_preview_letter_branding",
-            {"org_id": ORGANISATION_ID},
-        ),
-    ),
-)
 def test_service_preview_letter_branding_shows_preview_letter(
     client_request,
     platform_admin_user,
-    mock_get_organisation,
-    mock_get_all_letter_branding,
-    endpoint,
-    extra_args,
 ):
     client_request.login(platform_admin_user)
 
-    page = client_request.get(endpoint, branding_style="hm-government", **extra_args)
+    page = client_request.get(
+        "main.service_preview_letter_branding", branding_style="hm-government", service_id=SERVICE_ONE_ID
+    )
 
     assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="hm-government")
 
@@ -3320,21 +3265,6 @@ def test_service_preview_letter_branding_shows_preview_letter(
         ("__NONE__", None),
     ],
 )
-@pytest.mark.parametrize(
-    "endpoint, extra_args, expected_redirect",
-    (
-        (
-            "main.service_preview_letter_branding",
-            {"service_id": SERVICE_ONE_ID},
-            "main.service_settings",
-        ),
-        (
-            "main.organisation_preview_letter_branding",
-            {"org_id": ORGANISATION_ID},
-            "main.organisation_settings",
-        ),
-    ),
-)
 def test_service_preview_letter_branding_saves(
     client_request,
     platform_admin_user,
@@ -3345,40 +3275,21 @@ def test_service_preview_letter_branding_saves(
     mock_get_all_letter_branding,
     selected_letter_branding,
     expected_post_data,
-    endpoint,
-    extra_args,
-    expected_redirect,
 ):
     client_request.login(platform_admin_user)
     client_request.post(
-        endpoint,
+        "main.service_preview_letter_branding",
         _data={"branding_style": selected_letter_branding},
         _expected_status=302,
-        _expected_redirect=url_for(expected_redirect, **extra_args),
-        **extra_args,
+        _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
+        service_id=SERVICE_ONE_ID,
     )
 
-    if endpoint == "main.service_preview_letter_branding":
-        mock_update_service.assert_called_once_with(
-            SERVICE_ONE_ID,
-            letter_branding=expected_post_data,
-        )
-        assert mock_update_organisation.called is False
-
-    elif endpoint == "main.organisation_preview_letter_branding":
-        mock_update_organisation.assert_called_once_with(
-            ORGANISATION_ID,
-            letter_branding_id=expected_post_data,
-            cached_service_ids=[
-                "12345",
-                "67890",
-                "596364a0-858e-42c8-9062-a8fe822260eb",
-            ],
-        )
-        assert mock_update_service.called is False
-
-    else:
-        raise Exception
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        letter_branding=expected_post_data,
+    )
+    assert mock_update_organisation.called is False
 
 
 @pytest.mark.parametrize(
