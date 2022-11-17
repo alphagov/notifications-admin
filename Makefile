@@ -18,13 +18,14 @@ $(eval export CF_HOME)
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 
 VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$VIRTUAL_ENV)
+PYTHON_EXECUTABLE_PREFIX := $(shell test -d "$${VIRTUALENV_ROOT}" && echo "$${VIRTUALENV_ROOT}/bin/" || echo "")
 
 
 ## DEVELOPMENT
 
 .PHONY: bootstrap
 bootstrap: generate-version-file ## Set up everything to run the app
-	pip3 install -r requirements_for_test.txt
+	${PYTHON_EXECUTABLE_PREFIX}pip3 install -r requirements_for_test.txt
 
 	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci --no-audit
 	. environment.sh; source $(HOME)/.nvm/nvm.sh && npm run build
@@ -51,7 +52,7 @@ virtualenv:
 
 .PHONY: upgrade-pip
 upgrade-pip: virtualenv
-	${VIRTUALENV_ROOT}/bin/pip install --upgrade pip
+	${PYTHON_EXECUTABLE_PREFIX}pip3 install --upgrade pip
 
 .PHONY: generate-version-file
 generate-version-file: ## Generates the app version file
@@ -71,8 +72,8 @@ fix-imports: ## Fix imports using isort
 
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
-	${VIRTUALENV_ROOT}/bin/pip install --upgrade pip-tools
-	${VIRTUALENV_ROOT}/bin/pip-compile requirements.in
+	${PYTHON_EXECUTABLE_PREFIX}pip3 install --upgrade pip-tools
+	${PYTHON_EXECUTABLE_PREFIX}pip-compile requirements.in
 
 .PHONY: clean
 clean:
