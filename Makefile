@@ -71,7 +71,7 @@ fix-imports: ## Fix imports using isort
 
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
-	${VIRTUALENV_ROOT}/bin/pip install --upgrade pip-tools
+	${VIRTUALENV_ROOT}/bin/pip3 install --upgrade pip-tools
 	${VIRTUALENV_ROOT}/bin/pip-compile requirements.in
 
 .PHONY: clean
