@@ -4,7 +4,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
+{% from "components/error-summary.html" import errorSummary %}
 
 {% block service_page_title %}
   {{ form.banner.label.text }}
@@ -15,10 +15,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {% if form.banner.errors %}
-    {% set params = {"titleText": "There is a problem", "errorList": [{"href": "#" + form.banner.id, "text": form.banner.errors[0]}]} %}
-    {{ govukErrorSummary(params) }}
-  {% endif %}
+  {{ errorSummary(form) }}
 
   {% call form_wrapper() %}
     {{ form.banner }}

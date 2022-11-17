@@ -6,7 +6,7 @@
 {% from "components/branding-preview.html" import email_branding_preview %}
 {% from "components/textbox.html" import textbox %}
 {% from "components/banner.html" import banner_wrapper %}
-{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
+{% from "components/error-summary.html" import errorSummary %}
 
 {% block service_page_title %}
   Enter the text that will appear in your logo
@@ -17,10 +17,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {% if form.logo_text.errors %}
-    {% set params = {"titleText": "There is a problem", "errorList": [{"href": "#" + form.logo_text.id, "text": form.logo_text.errors[0]}]} %}
-    {{ govukErrorSummary(params) }}
-  {% endif %}
+  {{ errorSummary(form) }}
 
   {% call form_wrapper() %}
     {{ form.logo_text }}
