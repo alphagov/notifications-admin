@@ -471,8 +471,8 @@ def test_should_show_security_keys_page(
     cred_1_lhs = cred_1.select_one("td.table-field-left-aligned")
     cred_2_lhs = cred_2.select_one("td.table-field-left-aligned")
 
-    assert normalize_spaces(cred_1_lhs.text) == "Test credential Registered 4 years ago Last used 4 years ago"
-    assert normalize_spaces(cred_2_lhs.text) == "Another test credential Registered 1 year, 4 months ago Never used"
+    assert normalize_spaces(cred_1_lhs.text) == "Test credential Last used 4 years ago"
+    assert normalize_spaces(cred_2_lhs.text) == "Another test credential Never used (registered 1 year, 4 months ago)"
     manage_link = cred_1.select_one("td.table-field-right-aligned a")
     assert normalize_spaces(manage_link.text) == "Manage"
     assert manage_link["href"] == url_for(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
