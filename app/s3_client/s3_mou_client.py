@@ -14,7 +14,7 @@ def get_mou(organisation_is_crown):
         key = get_s3_object(bucket, filename)
         return {
             "path_or_file": key.get()["Body"],
-            "attachment_filename": attachment_filename,
+            "download_name": attachment_filename,
             "as_attachment": True,
         }
     except botocore.exceptions.ClientError as exception:
