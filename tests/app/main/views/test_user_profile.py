@@ -3,6 +3,7 @@ import uuid
 
 import pytest
 from flask import url_for
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
@@ -447,28 +448,34 @@ def test_user_doesnt_see_security_keys_unless_they_can_use_webauthn(client_reque
     )
 
 
+@freeze_time("2022-10-10")
 def test_should_show_security_keys_page(
     mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
+    webauthn_credential_2,
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
         "app.models.webauthn_credential.WebAuthnCredentials.client_method",
-        return_value=[webauthn_credential],
+        return_value=[webauthn_credential, webauthn_credential_2],
     )
 
     page = client_request.get(".user_profile_security_keys")
     assert page.select_one("h1").text.strip() == "Security keys"
 
-    credential_row = page.select("tr")[-1]
-    assert "Test credential" in credential_row.text
-    assert "Manage" in credential_row.find("a").text
-    assert credential_row.find("a")["href"] == url_for(
-        ".user_profile_manage_security_key", key_id=webauthn_credential["id"]
-    )
+    cred_1 = page.select("tr")[1]
+    cred_2 = page.select("tr")[2]
+    cred_1_lhs = cred_1.select_one("td.table-field-left-aligned")
+    cred_2_lhs = cred_2.select_one("td.table-field-left-aligned")
+
+    assert normalize_spaces(cred_1_lhs.text) == "Test credential Last used 4 years ago"
+    assert normalize_spaces(cred_2_lhs.text) == "Another test credential Never used (registered 1 year, 4 months ago)"
+    manage_link = cred_1.select_one("td.table-field-right-aligned a")
+    assert normalize_spaces(manage_link.text) == "Manage"
+    assert manage_link["href"] == url_for(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
 
     register_button = page.select_one("[data-notify-module='register-security-key']")
     assert register_button.text.strip() == "Register a key"

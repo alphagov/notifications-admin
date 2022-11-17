@@ -99,8 +99,8 @@ def webauthn_complete_authentication():
     user_id = session["user_details"]["id"]
     user_to_login = User.from_id(user_id)
 
-    _verify_webauthn_authentication(user_to_login)
-    redirect = _complete_webauthn_login_attempt(user_to_login)
+    webauthn_credential_used_for_login = _verify_webauthn_authentication(user_to_login)
+    redirect = _complete_webauthn_login_attempt(user_to_login, webauthn_credential_used_for_login.id)
 
     return cbor.encode({"redirect_url": redirect.location}), 200
 
@@ -114,7 +114,7 @@ def _verify_webauthn_authentication(user):
     request_data = cbor.decode(request.get_data())
 
     try:
-        current_app.webauthn_server.authenticate_complete(
+        attested_credential_data = current_app.webauthn_server.authenticate_complete(
             state=state,
             credentials=user.webauthn_credentials.as_cbor,
             credential_id=request_data["credentialId"],
@@ -122,6 +122,16 @@ def _verify_webauthn_authentication(user):
             auth_data=AuthenticatorData(request_data["authenticatorData"]),
             signature=request_data["signature"],
         )
+
+        # find the cred used - Fido2Server returns the attested credential that it matched with the login request,
+        # so we have to then compare that to all the users creds to find the one that they used to login
+        webauthn_credential_used_for_login = next(
+            webauthn_credential
+            for webauthn_credential in user.webauthn_credentials
+            if webauthn_credential.to_credential_data() == attested_credential_data
+        )
+        return webauthn_credential_used_for_login
+
     except ValueError as exc:
         # We don't expect to reach this case in normal situations - normally errors (such as using the wrong
         # security key) will be caught in the browser inside `window.navigator.credentials.get`, and the js will
@@ -134,7 +144,7 @@ def _verify_webauthn_authentication(user):
         abort(403)
 
 
-def _complete_webauthn_login_attempt(user):
+def _complete_webauthn_login_attempt(user, webauthn_credential_id_used_for_login):
     """
     * check the user hasn't gone over their max logins
     * check that the user's email is validated
@@ -144,7 +154,7 @@ def _complete_webauthn_login_attempt(user):
 
     # normally API handles this when verifying an sms or email code but since the webauthn logic happens in the
     # admin we need a separate call that just finalises the login in the database
-    logged_in, _ = user.complete_webauthn_login_attempt()
+    logged_in, _ = user.complete_webauthn_login_attempt(webauthn_credential_id=webauthn_credential_id_used_for_login)
     if not logged_in:
         # user account is locked as too many failed logins
         abort(403)

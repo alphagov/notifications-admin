@@ -4120,6 +4120,7 @@ def webauthn_credential():
         "credential_data": "WJ8AAAAAAAAAAAAAAAAAAAAAAECKU1ppjl9gmhHWyDkgHsUvZmhr6oF3/lD3llzLE2SaOSgOGIsIuAQqgp8JQSUu3r/oOaP8RS44dlQjrH+ALfYtpQECAyYgASFYIDGeoB8RJc5iMpRzZYAK5dndyHQkfFXRUWutPKPKMgdcIlggWfHwfzsvhsClHgz6E9xX58d6EQ55b4oLJ3Qf5YZjyzo=",  # noqa
         "registration_response": "anything",
         "created_at": "2017-10-18T16:57:14.154185Z",
+        "logged_in_at": "2017-10-19T00:00:00.000000Z",
     }
 
 
@@ -4131,4 +4132,5 @@ def webauthn_credential_2():
         "credential_data": "WJ0AAAAAAAAAAAAAAAAAAAAAAECKU1jppl9mhgHWyDkgHsUvZmhr6oF3/lD3llzLE2SaOSgOGIsIuAQqgp8JQSUu3r/oOaP8RS44dlQjrH+ALfYtpAECAyYhWCAxnqAfESXOYjKUc2WACuXZ3ch0JHxV0VFrrTyjyjIHXCJYIFnx8L4H87bApR4M+hPcV+fHehEOeW+KCyd0H+WGY8s6",  # noqa
         "registration_response": "stuff",
         "created_at": "2021-05-14T16:57:14.154185Z",
+        "logged_in_at": None,
     }

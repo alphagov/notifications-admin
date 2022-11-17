@@ -25,6 +25,7 @@ class WebAuthnCredential(JSONModel):
         "registration_response",  # sent to API for later auditing (not used)
         "created_at",
         "updated_at",
+        "logged_in_at",
     }
 
     __sort_attribute__ = "name"

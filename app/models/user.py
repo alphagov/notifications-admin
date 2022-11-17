@@ -428,8 +428,8 @@ class User(BaseUser, UserMixin):
             self.id,
         )
 
-    def complete_webauthn_login_attempt(self, is_successful=True):
-        return user_api_client.complete_webauthn_login_attempt(self.id, is_successful)
+    def complete_webauthn_login_attempt(self, is_successful=True, webauthn_credential_id=None):
+        return user_api_client.complete_webauthn_login_attempt(self.id, is_successful, webauthn_credential_id)
 
     def is_editable_by(self, other_user):
         if other_user == self:

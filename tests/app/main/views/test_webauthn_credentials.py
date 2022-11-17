@@ -326,7 +326,7 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
 
     assert mock_verify_webauthn_login.called is False
     # make sure we incremented the failed login count
-    mock_unsuccesful_login_api_call.assert_called_once_with(platform_admin_user["id"], False)
+    mock_unsuccesful_login_api_call.assert_called_once_with(platform_admin_user["id"], False, None)
 
 
 def test_complete_authentication_clears_session(
@@ -431,3 +431,32 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
         assert session["user_details"] == user_details
 
     mock_send_verify_code.assert_called_once_with(platform_admin_user["id"], "email", ANY, ANY)
+
+
+def test_verify_webauthn_login_passes_webauthn_credential_id_to_api(
+    client_request,
+    mocker,
+    mock_create_event,
+    platform_admin_user,
+):
+    client_request.logout()
+    with client_request.session_transaction() as session:
+        session["user_details"] = {"id": platform_admin_user["id"], "email": platform_admin_user["email_address"]}
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        "app.main.views.webauthn_credentials._verify_webauthn_authentication",
+        return_value=Mock(id="12345"),
+    )
+    mocker.patch("app.main.views.webauthn_credentials.email_needs_revalidating", return_value=False)
+    mock_succesful_login_api_call = mocker.patch(
+        "app.user_api_client.complete_webauthn_login_attempt", return_value=(True, None)
+    )
+
+    client_request.post_response("main.webauthn_complete_authentication", _expected_status=200)
+
+    # removes stuff from session
+    with client_request.session_transaction() as session:
+        assert "user_details" not in session
+
+    mock_succesful_login_api_call.assert_called_once_with(platform_admin_user["id"], True, "12345")
