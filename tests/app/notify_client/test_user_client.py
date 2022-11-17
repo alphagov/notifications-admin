@@ -12,6 +12,11 @@ from tests.conftest import SERVICE_ONE_ID
 user_id = sample_uuid()
 
 
+@pytest.fixture(autouse=True)
+def mock_notify_client_check_inactive_service(mocker):
+    mocker.patch("app.notify_client.NotifyAdminAPIClient.check_inactive_service")
+
+
 def test_client_gets_all_users_for_service(
     mocker,
     fake_uuid,
@@ -200,15 +205,7 @@ def test_returns_value_from_cache(
         (invite_api_client, "accept_invite", [SERVICE_ONE_ID, user_id], {}),
     ],
 )
-def test_deletes_user_cache(
-    notify_admin,
-    mock_get_user,
-    mocker,
-    client,
-    method,
-    extra_args,
-    extra_kwargs,
-):
+def test_deletes_user_cache(notify_admin, mock_get_user, mocker, client, method, extra_args, extra_kwargs):
     mocker.patch("app.notify_client.current_user", id="1")
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
     mock_request = mocker.patch("notifications_python_client.base.BaseAPIClient.request")

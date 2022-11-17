@@ -5,6 +5,11 @@ import pytest
 from app import organisations_client
 
 
+@pytest.fixture(autouse=True)
+def mock_notify_client_check_inactive_service(mocker):
+    mocker.patch("app.notify_client.NotifyAdminAPIClient.check_inactive_service")
+
+
 @pytest.mark.parametrize(
     (
         "client_method,"
