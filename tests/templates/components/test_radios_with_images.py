@@ -12,8 +12,8 @@ def test_govuk_frontend_jinja_overrides_on_design_system_v3():
     govuk_frontend_jinja_version = Version(metadata.version("govuk-frontend-jinja"))
 
     # Compatibility between these two libs is defined at https://github.com/LandRegistry/govuk-frontend-jinja/
-    correct_govuk_frontend_version = Version("3.14.0") == govuk_frontend_version
-    correct_govuk_frontend_jinja_version = Version("1.5.1") == govuk_frontend_jinja_version
+    correct_govuk_frontend_version = Version("4.2.0") == govuk_frontend_version
+    correct_govuk_frontend_jinja_version = Version("2.3.0") == govuk_frontend_jinja_version
 
     assert correct_govuk_frontend_version and correct_govuk_frontend_jinja_version, (
         "After upgrading either of the Design System packages, you must validate that "
