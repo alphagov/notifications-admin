@@ -342,14 +342,13 @@ def edit_organisation_crown_status(org_id):
     )
 
     if form.validate_on_submit():
-        organisations_client.update_organisation(
-            current_organisation.id,
-            crown={
-                "crown": True,
-                "non-crown": False,
-                "unknown": None,
-            }.get(form.crown_status.data),
-        )
+        crown_data = {
+            "crown": True,
+            "non-crown": False,
+            "unknown": None,
+        }.get(form.crown_status.data)
+
+        current_organisation.update(crown=crown_data, delete_services_cache=True)
         return redirect(url_for(".organisation_settings", org_id=org_id))
 
     return render_template(
