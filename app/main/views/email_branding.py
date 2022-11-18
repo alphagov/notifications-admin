@@ -74,10 +74,13 @@ def update_email_branding(branding_id, logo=None):
         updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
         try:
+            alt_text = form.name.data
+
             email_branding_client.update_email_branding(
                 branding_id=branding_id,
                 logo=updated_logo_name,
                 name=form.name.data,
+                alt_text=alt_text,
                 text=form.text.data,
                 colour=form.colour.data,
                 brand_type=form.brand_type.data,
@@ -196,9 +199,12 @@ def create_email_branding(logo=None):
         updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
         try:
+            alt_text = form.name.data
+
             email_branding_client.create_email_branding(
                 logo=updated_logo_name,
                 name=form.name.data,
+                alt_text=alt_text,
                 text=form.text.data,
                 colour=form.colour.data,
                 brand_type=form.brand_type.data,

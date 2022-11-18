@@ -98,7 +98,13 @@ def test_create_new_email_branding_without_logo(
     fake_uuid,
     mock_create_email_branding,
 ):
-    data = {"logo": None, "colour": "#ff0000", "text": "new text", "name": "new name", "brand_type": "org"}
+    data = {
+        "logo": None,
+        "colour": "#ff0000",
+        "text": "new text",
+        "name": "new name",
+        "brand_type": "org",
+    }
 
     mock_persist = mocker.patch("app.main.views.email_branding.persist_logo")
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
@@ -114,6 +120,7 @@ def test_create_new_email_branding_without_logo(
     assert mock_create_email_branding.call_args == call(
         logo=data["logo"],
         name=data["name"],
+        alt_text=data["name"],
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
@@ -235,7 +242,13 @@ def test_create_new_email_branding_when_branding_saved(
     with client_request.session_transaction() as session:
         user_id = session["user_id"]
 
-    data = {"logo": "test.png", "colour": "#ff0000", "text": "new text", "name": "new name", "brand_type": "org_banner"}
+    data = {
+        "logo": "test.png",
+        "colour": "#ff0000",
+        "text": "new text",
+        "name": "new name",
+        "brand_type": "org_banner",
+    }
 
     temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
         temp=TEMP_TAG.format(user_id=user_id), unique_id=fake_uuid, filename=data["logo"]
@@ -264,6 +277,7 @@ def test_create_new_email_branding_when_branding_saved(
     assert mock_create_email_branding.call_args == call(
         logo=updated_logo_name,
         name=data["name"],
+        alt_text=data["name"],
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
@@ -369,6 +383,7 @@ def test_update_existing_branding(
         branding_id=fake_uuid,
         logo=updated_logo_name,
         name=data["name"],
+        alt_text=data["name"],
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],

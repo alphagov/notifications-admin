@@ -49,6 +49,7 @@ def test_create_email_branding(mocker, fake_uuid):
     org_data = {
         "logo": "test.png",
         "name": "test name",
+        "alt_text": "test alt text",
         "text": "test name",
         "colour": "red",
         "brand_type": "org",
@@ -60,6 +61,7 @@ def test_create_email_branding(mocker, fake_uuid):
     EmailBrandingClient().create_email_branding(
         logo=org_data["logo"],
         name=org_data["name"],
+        alt_text=org_data["alt_text"],
         text=org_data["text"],
         colour=org_data["colour"],
         brand_type="org",
@@ -75,6 +77,7 @@ def test_update_email_branding(mocker, fake_uuid):
     org_data = {
         "logo": "test.png",
         "name": "test name",
+        "alt_text": "test alt text",
         "text": "test name",
         "colour": "red",
         "brand_type": "org",
@@ -87,6 +90,7 @@ def test_update_email_branding(mocker, fake_uuid):
         branding_id=fake_uuid,
         logo=org_data["logo"],
         name=org_data["name"],
+        alt_text=org_data["alt_text"],
         text=org_data["text"],
         colour=org_data["colour"],
         brand_type="org",
@@ -104,6 +108,7 @@ def test_create_email_branding_sends_none_values(mocker, fake_uuid):
     form_data = {
         "logo": "",
         "name": "test name",
+        "alt_text": "test alt text",
         "text": "",
         "colour": "",
         "brand_type": "org",
@@ -113,6 +118,7 @@ def test_create_email_branding_sends_none_values(mocker, fake_uuid):
     expected_data = {
         "logo": None,
         "name": "test name",
+        "alt_text": "test alt text",
         "text": None,
         "colour": None,
         "brand_type": "org",
@@ -129,6 +135,7 @@ def test_update_email_branding_sends_none_values(mocker, fake_uuid):
     form_data = {
         "logo": "",
         "name": "test name",
+        "alt_text": "test alt text",
         "text": "",
         "colour": "",
         "brand_type": "org",
@@ -139,6 +146,7 @@ def test_update_email_branding_sends_none_values(mocker, fake_uuid):
     expected_data = {
         "logo": None,
         "name": "test name",
+        "alt_text": "test alt text",
         "text": None,
         "colour": None,
         "brand_type": "org",

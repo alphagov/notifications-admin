@@ -24,6 +24,7 @@ class EmailBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {
         "colour",
         "logo",
+        "alt_text",
         "text",
         "brand_type",
     }
