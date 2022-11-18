@@ -1330,17 +1330,17 @@ def test_view_organisation_settings(
         (
             ".edit_organisation_crown_status",
             {"crown_status": "crown"},
-            {"crown": True},
+            {"cached_service_ids": [], "crown": True},
         ),
         (
             ".edit_organisation_crown_status",
             {"crown_status": "non-crown"},
-            {"crown": False},
+            {"cached_service_ids": [], "crown": False},
         ),
         (
             ".edit_organisation_crown_status",
             {"crown_status": "unknown"},
-            {"crown": None},
+            {"cached_service_ids": [], "crown": None},
         ),
         (
             ".edit_organisation_agreement",

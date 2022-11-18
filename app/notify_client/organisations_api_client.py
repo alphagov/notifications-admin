@@ -55,10 +55,18 @@ class OrganisationsClient(NotifyAdminAPIClient):
         if "name" in kwargs:
             redis_client.delete(f"organisation-{org_id}-name")
 
-        if "email_branding_id" in kwargs and kwargs["email_branding_id"]:
+        if kwargs.get("email_branding_id"):
             redis_client.delete(f"organisation-{org_id}-email-branding-pool")
 
         if kwargs.get("letter_branding_id"):
+            redis_client.delete(f"organisation-{org_id}-letter-branding-pool")
+
+        from app.models.organisation import Organisation
+
+        if kwargs.get("organisation_type") in Organisation.NHS_TYPES:
+            # If an org gets set to an NHS org type we add NHS branding to the branding pools, so need
+            # to clear those caches
+            redis_client.delete(f"organisation-{org_id}-email-branding-pool")
             redis_client.delete(f"organisation-{org_id}-letter-branding-pool")
 
         return api_response

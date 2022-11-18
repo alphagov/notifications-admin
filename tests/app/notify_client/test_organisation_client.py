@@ -165,6 +165,21 @@ def test_deletes_domain_cache(
                 call("domains"),
             ],
         ),
+        (
+            {"email_branding_id": "new id"},
+            [
+                call("organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-email-branding-pool"),
+                call("organisations"),
+                call("domains"),
+            ],
+        ),
+        (
+            {"email_branding_id": None},
+            [
+                call("organisations"),
+                call("domains"),
+            ],
+        ),
     ),
 )
 def test_update_organisation_when_not_updating_org_type(
@@ -208,12 +223,31 @@ def test_update_organisation_when_updating_org_type_but_org_has_no_services(mock
     organisations_client.update_organisation(
         fake_uuid,
         cached_service_ids=[],
-        email_branding_id=fake_uuid,
+        organisation_type="central",
     )
 
-    mock_post.assert_called_with(url="/organisations/{}".format(fake_uuid), data={"email_branding_id": fake_uuid})
+    mock_post.assert_called_with(url="/organisations/{}".format(fake_uuid), data={"organisation_type": "central"})
+    assert mock_redis_delete.call_args_list == [
+        call("organisations"),
+        call("domains"),
+    ]
+
+
+@pytest.mark.parametrize("org_type", ["nhs_central", "nhs_local", "nhs_gp"])
+def test_update_organisation_when_to_updating_to_an_nhs_org_type(mocker, org_type, fake_uuid):
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
+    mock_post = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.post")
+
+    organisations_client.update_organisation(
+        fake_uuid,
+        cached_service_ids=[],
+        organisation_type=org_type,
+    )
+
+    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"organisation_type": org_type})
     assert mock_redis_delete.call_args_list == [
         call(f"organisation-{fake_uuid}-email-branding-pool"),
+        call(f"organisation-{fake_uuid}-letter-branding-pool"),
         call("organisations"),
         call("domains"),
     ]
