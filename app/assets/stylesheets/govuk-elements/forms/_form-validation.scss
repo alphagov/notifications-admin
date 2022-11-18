@@ -15,7 +15,7 @@
 
 // Use .form-control-error to add a red border to .form-control
 .form-control-error {
-  border: 4px solid $govuk-error-colour;
+  border: 2px solid $govuk-error-colour;
 
   // Hack to give GOVUK Frontend styling
   &:focus {
