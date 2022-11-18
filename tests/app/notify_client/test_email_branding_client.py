@@ -98,3 +98,54 @@ def test_update_email_branding(mocker, fake_uuid):
         call("email_branding-{}".format(fake_uuid)),
         call("email_branding"),
     ]
+
+
+def test_create_email_branding_sends_none_values(mocker, fake_uuid):
+    form_data = {
+        "logo": "",
+        "name": "test name",
+        "text": "",
+        "colour": "",
+        "brand_type": "org",
+        "created_by_id": fake_uuid,
+    }
+
+    expected_data = {
+        "logo": None,
+        "name": "test name",
+        "text": None,
+        "colour": None,
+        "brand_type": "org",
+        "created_by": fake_uuid,
+    }
+
+    mock_post = mocker.patch("app.notify_client.email_branding_client.EmailBrandingClient.post")
+    EmailBrandingClient().create_email_branding(**form_data)
+
+    mock_post.assert_called_once_with(url="/email-branding", data=expected_data)
+
+
+def test_update_email_branding_sends_none_values(mocker, fake_uuid):
+    form_data = {
+        "logo": "",
+        "name": "test name",
+        "text": "",
+        "colour": "",
+        "brand_type": "org",
+        "branding_id": fake_uuid,
+        "updated_by_id": fake_uuid,
+    }
+
+    expected_data = {
+        "logo": None,
+        "name": "test name",
+        "text": None,
+        "colour": None,
+        "brand_type": "org",
+        "updated_by": fake_uuid,
+    }
+
+    mock_post = mocker.patch("app.notify_client.email_branding_client.EmailBrandingClient.post")
+    EmailBrandingClient().update_email_branding(**form_data)
+
+    mock_post.assert_called_once_with(url=f"/email-branding/{fake_uuid}", data=expected_data)

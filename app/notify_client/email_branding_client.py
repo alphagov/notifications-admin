@@ -13,10 +13,10 @@ class EmailBrandingClient(NotifyAdminAPIClient):
     @cache.delete("email_branding")
     def create_email_branding(self, logo, name, text, colour, brand_type, created_by_id: str):
         data = {
-            "logo": logo,
+            "logo": logo or None,
             "name": name,
-            "text": text,
-            "colour": colour,
+            "text": text or None,
+            "colour": colour or None,
             "brand_type": brand_type,
             "created_by": created_by_id,
         }
@@ -26,10 +26,10 @@ class EmailBrandingClient(NotifyAdminAPIClient):
     @cache.delete("email_branding-{branding_id}")
     def update_email_branding(self, branding_id, logo, name, text, colour, brand_type, updated_by_id: str):
         data = {
-            "logo": logo,
+            "logo": logo or None,
             "name": name,
-            "text": text,
-            "colour": colour,
+            "text": text or None,
+            "colour": colour or None,
             "brand_type": brand_type,
             "updated_by": updated_by_id,
         }
