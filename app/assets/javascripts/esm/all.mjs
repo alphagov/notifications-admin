@@ -13,6 +13,7 @@ import Details from 'govuk-frontend/govuk/components/details/details';
 import Button from 'govuk-frontend/govuk/components/button/button';
 import Radios from 'govuk-frontend/govuk/components/radios/radios';
 import ErrorSummary from 'govuk-frontend/govuk/components/error-summary/error-summary';
+import SkipLink from 'govuk-frontend/govuk/components/skip-link/skip-link';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -59,8 +60,13 @@ function initAll (options) {
     new Radios($radio).init()
   })
 
+  // There will only every be one error-summary per page
   var $errorSummary = scope.querySelector('[data-module="govuk-error-summary"]')
   new ErrorSummary($errorSummary).init()
+
+  // There will only ever be one skip-link per page
+  var skipLink = scope.querySelector('[data-module="govuk-skip-link"]')
+  new SkipLink(skipLink).init()
 }
 
 // Create separate namespace for GOVUK Frontend.
@@ -68,6 +74,9 @@ var Frontend = {
   "Header": Header,
   "Details": Details,
   "Button": Button,
+  "Radios": Radios,
+  "ErrorSummary": ErrorSummary,
+  "SkipLink": SkipLink,
   "initAll": initAll
 }
 
