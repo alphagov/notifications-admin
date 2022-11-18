@@ -5,26 +5,24 @@
 // set asset URL root to match that of application
 $govuk-assets-path: "/static/";
 
-@import "govuk/settings/all";
-@import "govuk/tools/all";
-@import "govuk/helpers/all";
+@import "govuk/base";
 @import "govuk/core/all";
 @import "govuk/objects/all";
 
 // section replacing @import "components/all", specifying which components to include
-@import "govuk/components/skip-link/_skip-link";
-@import "govuk/components/header/_header";
-@import "govuk/components/footer/_footer";
-@import "govuk/components/back-link/_back-link";
-@import "govuk/components/button/_button";
-@import "govuk/components/details/_details";
-@import "govuk/components/error-summary/_error-summary";
-@import "govuk/components/radios/_radios";
-@import "govuk/components/checkboxes/_checkboxes";
-@import "govuk/components/input/_input";
-@import "govuk/components/inset-text/_inset-text";
-@import "govuk/components/textarea/_textarea";
-@import "govuk/components/summary-list/_summary-list";
+@import "govuk/components/skip-link/index";
+@import "govuk/components/header/index";
+@import "govuk/components/footer/index";
+@import "govuk/components/back-link/index";
+@import "govuk/components/button/index";
+@import "govuk/components/details/index";
+@import "govuk/components/error-summary/index";
+@import "govuk/components/radios/index";
+@import "govuk/components/checkboxes/index";
+@import "govuk/components/input/index";
+@import "govuk/components/inset-text/index";
+@import "govuk/components/textarea/index";
+@import "govuk/components/summary-list/index";
 
 @import "govuk/utilities/all";
 @import "govuk/overrides/all";

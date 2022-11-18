@@ -1,3 +1,5 @@
+@use "sass:map";
+
 // Gives access to the Sass variables used in the GOVUK Frontend typographic styles
 // See: https://frontend.design-system.service.gov.uk/sass-api-reference/#govuk-typography-scale
 @function get-govuk-typography-style($size, $breakpoint, $property) {
@@ -48,19 +50,18 @@
 .govuk-link--destructive {
   @include govuk-link-style-destructive-no-visited-state;
 }
-$govuk-grid-widths: (
+
+// GOVUK Frontend's grid-column classes are built from the $govuk-grid-widths map
+// that means we can extend the map to get extra classes
+$notify-grid-widths: (
   one-eighth: 12.5%,
   one-sixth: 16.6666%,
-  one-quarter: 25%,
-  one-third: 33.3333%,
-  one-half: 50%,
   five-eighths: 62.5%,
-  two-thirds: 66.6666%,
-  three-quarters: 75%,
   five-sixths: 83.3333%,
-  seven-eighths: 87.5%,
-  full: 100%
+  seven-eighths: 87.5%
 );
+
+$govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 
 .govuk-input--width-6 {
   max-width: 14ex;
@@ -93,19 +94,6 @@ $govuk-grid-widths: (
   @include govuk-media-query(desktop) {
     bottom: 7px;
   }
-}
-
-// We can delete this code when we upgrade to a version >=3.14
-.govuk-\!-text-align-left {
-  text-align: left !important;
-}
-
-.govuk-\!-text-align-centre {
-  text-align: center !important;
-}
-
-.govuk-\!-text-align-right {
-  text-align: right !important;
 }
 
 // Extensions to the GOVUK Frontend summary-list component, to apply to all
