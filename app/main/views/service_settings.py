@@ -1437,10 +1437,38 @@ def email_branding_upload_logo(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo/confirm", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/email-branding/when-you-use-this-branding", methods=["GET", "POST"]
+)
 @user_has_permissions("manage_service")
 def email_branding_confirm_upload_logo(service_id):
-    pass
+    email_branding_data = _email_branding_flow_query_params(request)
+    if "type" not in email_branding_data:
+        return redirect(url_for("main.email_branding_choose_banner_type", service_id=service_id))
+    elif "logo" not in email_branding_data:
+        return redirect(url_for("main.email_branding_upload_logo", service_id=service_id, **email_branding_data))
+
+    if request.method == "POST":
+        # Can't create the branding yet - need to extend this page to accept and handle the logo name/alt text
+        pass
+
+    # Translate new brand form data into query params expected by the `/_email` endpoint
+    email_preview_data = {
+        "brand_type": email_branding_data["type"],
+        "logo": email_branding_data["logo"],
+    }
+    if "colour" in email_branding_data:
+        email_preview_data["colour"] = email_branding_data["colour"]
+
+    return render_template(
+        "views/service-settings/branding/add-new-branding/confirm.html",
+        back_link=url_for(
+            ".email_branding_upload_logo",
+            service_id=service_id,
+            **_email_branding_flow_query_params(request, logo=None),
+        ),
+        email_preview_data=email_preview_data,
+    )
 
 
 def _email_branding_flow_query_params(request, **kwargs):

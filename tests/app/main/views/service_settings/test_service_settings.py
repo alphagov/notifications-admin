@@ -4038,6 +4038,43 @@ def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(mocker
     assert mock_image_processor().pad.call_args_list == [mocker.call(to_height=25)]
 
 
+def test_GET_email_branding_confirm_upload_logo(client_request, service_one):
+    page = client_request.get(
+        "main.email_branding_confirm_upload_logo", service_id=service_one["id"], type="org_banner", logo="example.png"
+    )
+    form = page.select_one("main form")
+    email_preview = page.select_one("iframe")
+    confirm_button = page.select_one("main button")
+
+    assert "Check your branding" in page.text
+    assert form.get("method") == "post"
+    assert email_preview.get("src") == "/_email?branding_style=custom&brand_type=org_banner&logo=example.png"
+    assert confirm_button is not None
+    assert normalize_spaces(confirm_button.text) == "Use this branding"
+
+
+@pytest.mark.parametrize(
+    "request_params, expected_location",
+    (
+        (
+            {"type": "org"},
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/upload-logo?type=org",
+        ),
+        ({}, "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner"),
+    ),
+)
+def test_GET_email_branding_confirm_upload_logo_redirects_on_missing_query_params(
+    client_request, service_one, request_params, expected_location
+):
+    client_request.get(
+        "main.email_branding_confirm_upload_logo",
+        service_id=service_one["id"],
+        **request_params,
+        _expected_status=302,
+        _expected_redirect=expected_location,
+    )
+
+
 def test_GET_email_branding_choose_banner_colour(client_request, service_one):
     page = client_request.get(
         "main.email_branding_choose_banner_colour",
