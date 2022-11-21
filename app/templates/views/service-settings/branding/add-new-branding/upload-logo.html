@@ -39,10 +39,9 @@
       <p class="govuk-body">
         We do not recommend portrait images because they’ll look very small. This is because the space for email branding has a fixed height.
       </p>
-        {{ file_upload(form.file, allowed_file_extensions=['png'], button_text='Upload logo') }}
+      {{ file_upload(form.file, allowed_file_extensions=['png'], button_text='Upload logo') }}
       <p class="govuk-body govuk-!-margin-top-4">
-        If you do not have a file, you can
-        <a class="govuk-link" href="{{ url_for('main.email_branding_name_logo', service_id=current_service.id) }}">skip this step</a>.
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.email_branding_something_else', service_id=current_service.id) }}">I do not have a file to upload</a>
       </p>
     </div>
 
