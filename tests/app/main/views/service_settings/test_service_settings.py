@@ -3890,11 +3890,16 @@ def test_GET_email_branding_upload_logo(client_request, service_one, query_param
     form = page.select_one("form")
     submit_button = form.select_one("button")
     file_input = form.select_one("input")
+    skip_link = page.select("main a")[-1]
 
     assert back_button["href"] == expected_back_link
     assert form["method"] == "post"
     assert "Submit" in submit_button.text
     assert file_input["name"] == "file"
+
+    assert skip_link is not None
+    assert skip_link["href"] == url_for("main.email_branding_something_else", service_id=service_one["id"])
+    assert skip_link.text == "I do not have a file to upload"
 
 
 def test_POST_email_branding_upload_logo_success(mocker, client_request, service_one):
@@ -3965,10 +3970,7 @@ def test_GET_email_branding_choose_banner_colour(client_request, service_one):
     form = page.select_one("form")
     submit_button = form.select_one("button")
     text_input = form.select_one("input")
-    page_links = page.select("a")
-    skip_link = next(
-        filter(lambda link: link.text == "I do not know the hex colour code for my banner", page_links), None
-    )
+    skip_link = page.select("main a")[-1]
 
     assert back_button["href"] == url_for("main.email_branding_choose_banner_type", service_id=service_one["id"])
     assert form["method"] == "post"
@@ -3976,7 +3978,8 @@ def test_GET_email_branding_choose_banner_colour(client_request, service_one):
     assert text_input["name"] == "hex_colour"
 
     assert skip_link is not None
-    assert skip_link["href"] == url_for("main.email_branding_upload_logo", service_id=service_one["id"])
+    assert skip_link["href"] == url_for("main.email_branding_something_else", service_id=service_one["id"])
+    assert skip_link.text == "I do not know the hex colour code for my banner"
 
 
 def test_POST_email_branding_choose_banner_colour(client_request, service_one):
