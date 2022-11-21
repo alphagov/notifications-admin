@@ -8,7 +8,7 @@
 {% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
 
 {% block service_page_title %}
-  {{ form.file.label.text }}
+  {{ form.logo.label.text }}
 {% endblock %}
 
 {% block backLink %}
@@ -17,29 +17,28 @@
 
 {% block maincolumn_content %}
 
-  {% if form.file.errors %}
+  {% if form.logo.errors %}
     {% set params = {
         "titleText": "There is a problem",
-        "errorList": [{"href": "#" + form.file.id, "text": form.file.errors[0]}]
+        "errorList": [{"href": "#" + form.logo.id, "text": form.logo.errors[0]}]
       }
     %}
     {{ govukErrorSummary(params) }}
   {% endif %}
 
-  {{ page_header(form.file.label.text) }}
+  {{ page_header(form.logo.label.text) }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <ul class="govuk-list govuk-list--bullet">
-        <li>a landscape image</li>
+        <li>a PNG file</li>
         <li>at least 108 pixels high</li>
-        <li>saved as a PNG file</li>
-        <li>with a transparent background</li>
+        <li>a landscape image with a transparent background</li>
       </ul>
       <p class="govuk-body">
         We do not recommend portrait images because they’ll look very small. This is because the space for email branding has a fixed height.
       </p>
-      {{ file_upload(form.file, allowed_file_extensions=['png'], button_text='Upload logo') }}
+      {{ file_upload(form.logo, allowed_file_extensions=[form.EXPECTED_LOGO_FORMAT], button_text='Upload logo') }}
       <p class="govuk-body govuk-!-margin-top-4">
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.email_branding_something_else', service_id=current_service.id) }}">I do not have a file to upload</a>
       </p>

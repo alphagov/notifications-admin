@@ -1,3 +1,4 @@
+import base64
 import uuid
 from collections import OrderedDict
 from datetime import datetime
@@ -52,9 +53,9 @@ from app.main.forms import (
     EmailBrandingChooseBanner,
     EmailBrandingChooseBannerColour,
     EmailBrandingChooseLogoForm,
+    EmailBrandingLogoUpload,
     EstimateUsageForm,
     GovernmentIdentityLogoForm,
-    PNGFileUpload,
     RenameServiceForm,
     SearchByNameForm,
     ServiceBroadcastAccountTypeForm,
@@ -72,7 +73,7 @@ from app.main.forms import (
 )
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.models.branding import AllEmailBranding, AllLetterBranding, EmailBranding
-from app.s3_client.s3_logo_client import upload_email_logo
+from app.s3_client.s3_logo_client import get_s3_object, upload_email_logo
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -1392,7 +1393,7 @@ def email_branding_choose_logo(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_upload_logo(service_id):
-    form = PNGFileUpload()
+    form = EmailBrandingLogoUpload()
 
     if form.validate_on_submit():
         # We don't need to care about the filename as we're providing a UUID, and if we include the filename then we
@@ -1402,7 +1403,7 @@ def email_branding_upload_logo(service_id):
 
         upload_email_logo(
             filename,
-            form.file.data.read(),
+            form.logo.data.read(),
             current_app.config["AWS_REGION"],
             user_id=current_user.id,
             unique_id=upload_id,
@@ -1431,9 +1432,19 @@ def email_branding_upload_logo(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/name-logo", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
+@user_is_platform_admin
 def email_branding_name_logo(service_id):
-    pass
+    # TODO: Rip this all out when building the name-logo view and start from scratch.
+    unique_id = request.args["logo_id"]
+    upload_file_name = f"temp-{current_user.id}_{unique_id}-"
+    bucket_name = current_app.config["LOGO_UPLOAD_BUCKET_NAME"]
+    logo_object = get_s3_object(bucket_name, upload_file_name).get()
+    logo_data = (
+        logo_object["ResponseMetadata"]["HTTPHeaders"]["content-type"]
+        + f";base64,{base64.b64encode(logo_object['Body'].read()).decode('utf-8')}"
+    )
+
+    return render_template("views/service-settings/branding/add-new-branding/name-logo.html", logo_data=logo_data)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo/confirm", methods=["GET", "POST"])
