@@ -3913,7 +3913,7 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
         _data={"logo": (open("tests/test_img_files/small-but-perfectly-formed.png", "rb"), "logo.png")},
         service_id=service_one["id"],
         _expected_redirect=url_for(
-            "main.email_branding_name_logo",
+            "main.email_branding_confirm_upload_logo",
             service_id=service_one["id"],
             logo_id="my-logo-uuid",
         ),

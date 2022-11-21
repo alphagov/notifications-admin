@@ -1,4 +1,3 @@
-import base64
 import uuid
 from collections import OrderedDict
 from datetime import datetime
@@ -73,7 +72,7 @@ from app.main.forms import (
 )
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.models.branding import AllEmailBranding, AllLetterBranding, EmailBranding
-from app.s3_client.s3_logo_client import get_s3_object, upload_email_logo
+from app.s3_client.s3_logo_client import upload_email_logo
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -1411,7 +1410,7 @@ def email_branding_upload_logo(service_id):
 
         return redirect(
             url_for(
-                "main.email_branding_name_logo",
+                "main.email_branding_confirm_upload_logo",
                 service_id=service_id,
                 logo_id=upload_id,
             )
@@ -1429,22 +1428,6 @@ def email_branding_upload_logo(service_id):
         ),
         400 if form.errors else 200,
     )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/name-logo", methods=["GET", "POST"])
-@user_is_platform_admin
-def email_branding_name_logo(service_id):
-    # TODO: Rip this all out when building the name-logo view and start from scratch.
-    unique_id = request.args["logo_id"]
-    upload_file_name = f"temp-{current_user.id}_{unique_id}-"
-    bucket_name = current_app.config["LOGO_UPLOAD_BUCKET_NAME"]
-    logo_object = get_s3_object(bucket_name, upload_file_name).get()
-    logo_data = (
-        logo_object["ResponseMetadata"]["HTTPHeaders"]["content-type"]
-        + f";base64,{base64.b64encode(logo_object['Body'].read()).decode('utf-8')}"
-    )
-
-    return render_template("views/service-settings/branding/add-new-branding/name-logo.html", logo_data=logo_data)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo/confirm", methods=["GET", "POST"])
