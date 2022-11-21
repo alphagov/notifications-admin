@@ -10,7 +10,7 @@ class GovukFrontendWidgetMixin(ABC):
     param_extensions = {}
 
     def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
-        super().__init__(label, validators, **kwargs)
+        super().__init__(label, validators=validators, **kwargs)
         self._copy_params()
         merge_jsonlike(self.param_extensions, param_extensions)
 

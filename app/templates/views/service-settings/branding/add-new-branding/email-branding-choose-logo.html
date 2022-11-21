@@ -5,7 +5,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
+{% from "components/error-summary.html" import errorSummary %}
 
 {% set page_title = form.branding_options.label.text %}
 
@@ -20,17 +20,20 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {% if form.branding_options.errors %}
-    {% set params = {
-        "titleText": "There is a problem",
-        "errorList": [{"href": "#" + form.branding_options.id, "text": form.branding_options.errors[0]}]
-      }
-    %}
-    {{ govukErrorSummary(params) }}
-  {% endif %}
+  {{ errorSummary(form) }}
 
   {% call form_wrapper() %}
-    {{ form.branding_options }}
+    {% if current_service.email_branding_id %}
+      {% set param_extensions = {} %}
+    {% else %}
+      {% set param_extensions = {
+        "hint":{
+          "html": current_service.name + " branding is not set up yet.",
+          "classes": "notify-hint--paragraph",
+        }
+      } %}
+    {% endif %}
+    {{ form.branding_options(param_extensions=param_extensions) }}
     {{ page_footer('Continue') }}
   {% endcall %}
 
