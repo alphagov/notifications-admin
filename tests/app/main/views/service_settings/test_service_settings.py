@@ -3827,8 +3827,8 @@ def test_any_org_type_can_see_email_branding_choose_banner_type_page(
 @pytest.mark.parametrize(
     "selected_option, expected_endpoint, url_for_kwargs",
     [
-        ("org", ".email_branding_upload_logo", {"previous_page": "add-banner"}),
-        ("org_banner", ".email_branding_choose_banner_colour", {}),
+        ("org", ".email_branding_upload_logo", {"type": "org"}),
+        ("org_banner", ".email_branding_choose_banner_colour", {"type": "org_banner"}),
     ],
 )
 def test_email_branding_choose_banner_type_redirects_to_right_page(
@@ -3863,16 +3863,12 @@ def test_email_branding_choose_banner_type_shows_error_summary_on_invalid_data(c
     (
         ({}, "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner"),
         (
-            {"previous_page": ""},
+            {"type": "org"},
             "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner",
         ),
         (
-            {"previous_page": "add-banner"},
-            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner",
-        ),
-        (
-            {"previous_page": "choose-colour"},
-            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/choose-banner-colour",
+            {"type": "org_banner"},
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/choose-banner-colour?type=org_banner",  # noqa
         ),
     ),
 )
@@ -3899,9 +3895,18 @@ def test_GET_email_branding_upload_logo(client_request, service_one, query_param
     assert skip_link.text == "I do not have a file to upload"
 
 
-def test_POST_email_branding_upload_logo_success(mocker, client_request, service_one):
+@pytest.mark.parametrize(
+    "email_branding_data",
+    (
+        {},
+        {"type": "org"},
+        {"type": "org_banner", "colour": "#abcdef"},
+    ),
+)
+def test_POST_email_branding_upload_logo_success(mocker, client_request, service_one, email_branding_data):
     antivirus_mock = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_upload_email_logo = mocker.patch("app.main.views.service_settings.upload_email_logo")
+    mock_upload_email_logo.return_value = "my-logo-path"
     mocker.patch("app.main.views.service_settings.uuid.uuid4", return_value="my-logo-uuid")
 
     mocker.patch.dict(
@@ -3912,10 +3917,12 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
         "main.email_branding_upload_logo",
         _data={"logo": (open("tests/test_img_files/small-but-perfectly-formed.png", "rb"), "logo.png")},
         service_id=service_one["id"],
+        **email_branding_data,
         _expected_redirect=url_for(
             "main.email_branding_confirm_upload_logo",
             service_id=service_one["id"],
-            logo_id="my-logo-uuid",
+            **email_branding_data,
+            logo="my-logo-path",
         ),
     )
 
@@ -4034,6 +4041,7 @@ def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(mocker
 def test_GET_email_branding_choose_banner_colour(client_request, service_one):
     page = client_request.get(
         "main.email_branding_choose_banner_colour",
+        type="org_banner",
         service_id=service_one["id"],
     )
 
@@ -4057,10 +4065,11 @@ def test_POST_email_branding_choose_banner_colour(client_request, service_one):
     client_request.post(
         "main.email_branding_choose_banner_colour",
         service_id=service_one["id"],
+        type="org_banner",
         _data={"hex_colour": "#abcdef"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.email_branding_upload_logo", service_id=service_one["id"], banner_colour="#abcdef"
+            "main.email_branding_upload_logo", service_id=service_one["id"], type="org_banner", colour="#abcdef"
         ),
     )
 
@@ -4083,7 +4092,7 @@ def test_POST_email_branding_choose_banner_colour_handles_hex_colour_variations(
         _data={"hex_colour": hex_colour},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.email_branding_upload_logo", service_id=service_one["id"], banner_colour=expected_query_param
+            "main.email_branding_upload_logo", service_id=service_one["id"], colour=expected_query_param
         ),
     )
 

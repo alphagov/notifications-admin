@@ -1400,7 +1400,7 @@ def email_branding_upload_logo(service_id):
         filename = ""
         upload_id = str(uuid.uuid4())
 
-        upload_email_logo(
+        logo_filename = upload_email_logo(
             filename,
             form.logo.data.read(),
             current_app.config["AWS_REGION"],
@@ -1412,15 +1412,22 @@ def email_branding_upload_logo(service_id):
             url_for(
                 "main.email_branding_confirm_upload_logo",
                 service_id=service_id,
-                logo_id=upload_id,
+                **_email_branding_flow_query_params(request, logo=logo_filename),
             )
         )
 
-    previous_page = request.args.get("previous_page", "add-banner").lower()
-    if previous_page == "choose-colour":
-        back_link = url_for(".email_branding_choose_banner_colour", service_id=service_id)
+    if request.args.get("type") == "org_banner":
+        back_link = url_for(
+            ".email_branding_choose_banner_colour",
+            service_id=service_id,
+            **_email_branding_flow_query_params(request, colour=None),
+        )
     else:
-        back_link = url_for(".email_branding_choose_banner_type", service_id=service_id)
+        back_link = url_for(
+            ".email_branding_choose_banner_type",
+            service_id=service_id,
+            **_email_branding_flow_query_params(request, type=None),
+        )
 
     return (
         render_template(
@@ -1436,6 +1443,29 @@ def email_branding_confirm_upload_logo(service_id):
     pass
 
 
+def _email_branding_flow_query_params(request, **kwargs):
+    """Return a dictionary containing values for the new email branding flow.
+
+    In order to create a new email branding for a user we need to collect and remember a series of information:
+    - what kind of brand they want
+    - what colour banner they want (optional)
+    - what logo to use
+
+    We pass this information between pages uses request query params. This function will collect them all from the
+    URL, and optionally allows the caller to update or remove some of the options.
+
+    To set a new value:
+        _email_branding_flow_query_params(request, type='org')
+
+    To remove a value:
+        _email_branding_flow_query_params(request, type=None)
+
+    These values can get passed to the `/_email` endpoint to generate a preview of a new brand.
+    """
+    email_branding_data = {k: kwargs.get(k, request.args.get(k)) for k in ("type", "colour", "logo")}
+    return {k: v for k, v in email_branding_data.items() if v}
+
+
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/add-banner", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_choose_banner_type(service_id):
@@ -1443,10 +1473,22 @@ def email_branding_choose_banner_type(service_id):
 
     if form.validate_on_submit():
         if form.banner.data == "org":
-            return redirect(url_for(".email_branding_upload_logo", service_id=service_id, previous_page="add-banner"))
+            return redirect(
+                url_for(
+                    ".email_branding_upload_logo",
+                    service_id=service_id,
+                    **_email_branding_flow_query_params(request, type=form.banner.data),
+                )
+            )
 
-        if form.banner.data == "org_banner":
-            return redirect(url_for(".email_branding_choose_banner_colour", service_id=service_id))
+        elif form.banner.data == "org_banner":
+            return redirect(
+                url_for(
+                    ".email_branding_choose_banner_colour",
+                    service_id=service_id,
+                    **_email_branding_flow_query_params(request, type=form.banner.data),
+                )
+            )
 
     return (
         render_template(
@@ -1465,7 +1507,11 @@ def email_branding_choose_banner_colour(service_id):
 
     if form.validate_on_submit():
         return redirect(
-            url_for(".email_branding_upload_logo", service_id=service_id, banner_colour=form.hex_colour.data)
+            url_for(
+                ".email_branding_upload_logo",
+                service_id=service_id,
+                **_email_branding_flow_query_params(request, colour=form.hex_colour.data),
+            )
         )
 
     return (
