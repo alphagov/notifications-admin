@@ -6,9 +6,9 @@ from datetime import datetime
 def test_last_review_date():
     statement_file_path = "app/templates/views/accessibility_statement.html"
 
-    # test local changes against master for a full diff of what will be merged
+    # test local changes against main for a full diff of what will be merged
     statement_diff = subprocess.run(
-        [f"git diff --exit-code origin/master -- {statement_file_path}"], stdout=subprocess.PIPE, shell=True
+        [f"git diff --exit-code origin/main -- {statement_file_path}"], stdout=subprocess.PIPE, shell=True
     )
 
     # if statement has changed, test the review date was part of those changes
