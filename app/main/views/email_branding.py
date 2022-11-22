@@ -74,7 +74,7 @@ def update_email_branding(branding_id, logo=None):
         updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
         try:
-            alt_text = form.name.data
+            alt_text = None if form.text.data else form.name.data
 
             email_branding_client.update_email_branding(
                 branding_id=branding_id,
@@ -199,7 +199,7 @@ def create_email_branding(logo=None):
         updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
         try:
-            alt_text = form.name.data
+            alt_text = None if form.text.data else form.name.data
 
             email_branding_client.create_email_branding(
                 logo=updated_logo_name,

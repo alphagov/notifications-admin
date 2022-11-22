@@ -1,6 +1,6 @@
 from io import BytesIO
 from unittest import mock
-from unittest.mock import call
+from unittest.mock import ANY, call
 
 import pytest
 from flask import url_for
@@ -120,7 +120,7 @@ def test_create_new_email_branding_without_logo(
     assert mock_create_email_branding.call_args == call(
         logo=data["logo"],
         name=data["name"],
-        alt_text=data["name"],
+        alt_text=None,
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
@@ -277,11 +277,45 @@ def test_create_new_email_branding_when_branding_saved(
     assert mock_create_email_branding.call_args == call(
         logo=updated_logo_name,
         name=data["name"],
-        alt_text=data["name"],
+        alt_text=None,
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
         created_by_id=fake_uuid,
+    )
+
+
+@pytest.mark.parametrize("text,expected_alt_text", [("some text", None), ("", "some name")])
+def test_create_email_branding_sets_alt_text_if_text_not_set(
+    client_request,
+    mocker,
+    mock_create_email_branding,
+    platform_admin_user,
+    text,
+    expected_alt_text,
+):
+    data = {
+        "logo": "test.png",
+        "colour": "#ff0000",
+        "text": text,
+        "name": "some name",
+        "brand_type": "org_banner",
+    }
+
+    mocker.patch("app.main.views.email_branding.persist_logo")
+    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+
+    client_request.login(platform_admin_user)
+    client_request.post(".create_email_branding", _data=data)
+
+    mock_create_email_branding.assert_called_once_with(
+        logo=ANY,
+        name=data["name"],
+        alt_text=expected_alt_text,
+        text=data["text"],
+        colour=ANY,
+        brand_type=ANY,
+        created_by_id=ANY,
     )
 
 
@@ -383,7 +417,7 @@ def test_update_existing_branding(
         branding_id=fake_uuid,
         logo=updated_logo_name,
         name=data["name"],
-        alt_text=data["name"],
+        alt_text=None,
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
@@ -398,7 +432,44 @@ def test_update_existing_branding(
     ]
 
 
-def test_updatee_email_branding_with_unique_name_conflict(
+@pytest.mark.parametrize("text,expected_alt_text", [("some text", None), ("", "some name")])
+def test_update_email_branding_sets_alt_text_if_text_not_set(
+    client_request,
+    mocker,
+    mock_get_email_branding,
+    mock_update_email_branding,
+    platform_admin_user,
+    fake_uuid,
+    text,
+    expected_alt_text,
+):
+    data = {
+        "logo": "test.png",
+        "colour": "#ff0000",
+        "text": text,
+        "name": "some name",
+        "brand_type": "org_banner",
+    }
+
+    mocker.patch("app.main.views.email_branding.persist_logo")
+    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+
+    client_request.login(platform_admin_user)
+    client_request.post(".update_email_branding", branding_id=fake_uuid, _data=data)
+
+    mock_update_email_branding.assert_called_once_with(
+        branding_id=fake_uuid,
+        logo=ANY,
+        name=data["name"],
+        alt_text=expected_alt_text,
+        text=data["text"],
+        colour=ANY,
+        brand_type=ANY,
+        updated_by_id=ANY,
+    )
+
+
+def test_update_email_branding_with_unique_name_conflict(
     client_request,
     platform_admin_user,
     mocker,
