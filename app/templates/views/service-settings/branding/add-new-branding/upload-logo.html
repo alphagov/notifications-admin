@@ -32,7 +32,7 @@
       </p>
       {{ file_upload(form.logo, allowed_file_extensions=[form.EXPECTED_LOGO_FORMAT], button_text='Upload logo') }}
       <p class="govuk-body govuk-!-margin-top-4">
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.email_branding_something_else', service_id=current_service.id) }}">I do not have a file to upload</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ abandon_flow_link }}">I do not have a file to upload</a>
       </p>
     </div>
 

@@ -1294,11 +1294,21 @@ def email_branding_something_else(service_id):
         flash(THANKS_FOR_BRANDING_REQUEST_MESSAGE, "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
+    branding_options = ChooseEmailBrandingForm(current_service)
+    if branding_options.something_else_is_only_option:
+        back_link = url_for(".service_settings", service_id=current_service.id)
+    else:
+        back_link = url_for(
+            request.args.get("back_link", ".email_branding_request"),
+            service_id=current_service.id,
+            **_email_branding_flow_query_params(request),
+        )
+
     return render_template(
         "views/service-settings/branding/email-branding-something-else.html",
         form=form,
-        branding_options=ChooseEmailBrandingForm(current_service),
-        back_link=request.args.get("back_link", ".email_branding_request"),
+        branding_options=branding_options,
+        back_link=back_link,
     )
 
 
@@ -1417,6 +1427,12 @@ def email_branding_upload_logo(service_id):
             )
         )
 
+    abandon_flow_link = url_for(
+        "main.email_branding_something_else",
+        service_id=current_service.id,
+        back_link=".email_branding_upload_logo",
+        **_email_branding_flow_query_params(request),
+    )
     if request.args.get("brand_type") == "org_banner":
         back_link = url_for(
             ".email_branding_choose_banner_colour",
@@ -1432,7 +1448,10 @@ def email_branding_upload_logo(service_id):
 
     return (
         render_template(
-            "views/service-settings/branding/add-new-branding/upload-logo.html", form=form, back_link=back_link
+            "views/service-settings/branding/add-new-branding/upload-logo.html",
+            form=form,
+            back_link=back_link,
+            abandon_flow_link=abandon_flow_link,
         ),
         400 if form.errors else 200,
     )
@@ -1557,11 +1576,18 @@ def email_branding_choose_banner_colour(service_id):
             )
         )
 
+    abandon_flow_link = url_for(
+        ".email_branding_something_else",
+        service_id=current_service.id,
+        back_link=".email_branding_choose_banner_colour",
+        **_email_branding_flow_query_params(request),
+    )
     return (
         render_template(
             "views/service-settings/branding/add-new-branding/email-branding-choose-banner-colour.html",
             form=form,
             back_link=url_for(".email_branding_choose_banner_type", service_id=service_id),
+            abandon_flow_link=abandon_flow_link,
         ),
         400 if form.errors else 200,
     )

@@ -533,6 +533,29 @@ def test_email_branding_something_else_page(client_request, service_one, mock_ge
     )
 
 
+@pytest.mark.parametrize(
+    "back_view, back_view_args",
+    (
+        (".email_branding_choose_banner_type", {}),
+        (".email_branding_choose_banner_colour", {"brand_type": "org"}),
+        (".email_branding_upload_logo", {"brand_type": "org", "colour": "1ce"}),
+    ),
+)
+def test_email_branding_something_else_back_to_new_email_branding_query_params(
+    client_request, service_one, mock_get_empty_email_branding_pool, back_view, back_view_args
+):
+    service_one["organisation_type"] = "nhs_central"
+
+    page = client_request.get(
+        "main.email_branding_something_else",
+        service_id=SERVICE_ONE_ID,
+        back_link=back_view,
+        **back_view_args,
+    )
+    back_link = page.select_one(".govuk-back-link")
+    assert back_link["href"] == url_for(back_view, service_id=SERVICE_ONE_ID, **back_view_args)
+
+
 @pytest.mark.parametrize("back_link", [".service_settings", ".email_branding_request", ".email_branding_choose_logo"])
 def test_email_branding_something_else_page_back_link_from_args(
     client_request, service_one, mock_get_empty_email_branding_pool, back_link
