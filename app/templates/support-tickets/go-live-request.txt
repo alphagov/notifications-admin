@@ -27,8 +27,6 @@ Letters in next year: {{ service.volume_letter|format_thousands }}
 Consent to research: {{ service.consent_to_research|format_yes_no }}
 Other live services for that user: {{ user.live_services|format_yes_no }}
 
-Service reply-to address: {{ service.default_email_reply_to_address or "not set" }}
-
 ---
 Request sent by {{ user.email_address }}
 Requester’s user page: {{ url_for('main.user_information', user_id=user.id, _external=True) }}
