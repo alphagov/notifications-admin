@@ -78,7 +78,7 @@ def email_template():
         source = email_branding_client.get_email_branding(branding_style)["email_branding"]
 
     brand_type = source.get("brand_type")
-    brand_name = source.get("name")
+    brand_alt_text = source.get("alt_text")
     brand_text = source.get("text")
     brand_colour = source.get("colour")
     brand_logo = f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{source.get('logo')}" if source.get("logo") else None
@@ -104,7 +104,7 @@ def email_template():
                     brand_colour=brand_colour,
                     brand_logo=brand_logo,
                     brand_banner=brand_banner,
-                    brand_name=brand_name,
+                    brand_alt_text=brand_alt_text,
                 )
             )
         )
