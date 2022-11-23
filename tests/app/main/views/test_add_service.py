@@ -308,7 +308,7 @@ def test_add_service_fails_if_service_name_fails_validation(
         _data={"name": name},
         _expected_status=200,
     )
-    assert error_message in page.select_one("span.govuk-error-message").text
+    assert error_message in page.select_one(".govuk-error-message").text
 
 
 @freeze_time("2021-01-01")

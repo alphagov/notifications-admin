@@ -545,7 +545,7 @@ def test_service_name_change_fails_if_new_name_fails_validation(
         _expected_status=200,
     )
     assert not mock_update_service.called
-    assert error_message in page.select_one("span.govuk-error-message").text
+    assert error_message in page.select_one(".govuk-error-message").text
 
 
 @pytest.mark.parametrize(
@@ -5693,4 +5693,4 @@ def test_service_set_broadcast_channel_makes_you_choose(
         service_id=SERVICE_ONE_ID,
         _expected_status=200,
     )
-    assert "Error: Select mode or channel" in page.select_one("span.govuk-error-message").text
+    assert "Error: Select mode or channel" in page.select_one(".govuk-error-message").text
