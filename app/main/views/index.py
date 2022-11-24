@@ -66,35 +66,25 @@ def design_content():
 
 @main.route("/_email")
 def email_template():
-    branding_type = "govuk"
-    branding_style = request.args.get("branding_style", None)
+    branding_style = request.args.get("branding_style", "govuk")
 
-    if branding_style == FieldWithNoneOption.NONE_OPTION_VALUE:
-        branding_style = None
+    if not branding_style or branding_style in {"govuk", FieldWithNoneOption.NONE_OPTION_VALUE}:
+        source = {"brand_type": "govuk"}
 
-    if branding_style is not None:
-        email_branding = email_branding_client.get_email_branding(branding_style)["email_branding"]
-        branding_type = email_branding["brand_type"]
+    elif branding_style == "custom":
+        source = request.args
 
-    if branding_type == "govuk":
-        brand_text = None
-        brand_colour = None
-        brand_logo = None
-        govuk_banner = True
-        brand_banner = False
-        brand_name = None
     else:
-        colour = email_branding["colour"]
-        brand_text = email_branding["text"]
-        brand_colour = colour
-        brand_logo = (
-            f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{email_branding['logo']}"
-            if email_branding["logo"]
-            else None
-        )
-        govuk_banner = branding_type in ["govuk", "both"]
-        brand_banner = branding_type == "org_banner"
-        brand_name = email_branding["name"]
+        source = email_branding_client.get_email_branding(branding_style)["email_branding"]
+
+    brand_type = source.get("brand_type")
+    brand_name = source.get("name")
+    brand_text = source.get("text")
+    brand_colour = source.get("colour")
+    brand_logo = f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{source.get('logo')}" if source.get("logo") else None
+
+    govuk_banner = brand_type in ["govuk", "both"]
+    brand_banner = brand_type == "org_banner"
 
     template = {
         "template_type": "email",

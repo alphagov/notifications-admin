@@ -269,6 +269,10 @@ def test_resources_that_use_asset_path_variable_have_correct_path(client_request
             False,
         ),
         (
+            {"branding_style": "custom", "type": "org"},
+            False,
+        ),
+        (
             {"branding_style": sample_uuid()},
             True,
         ),

@@ -1,4 +1,3 @@
-import base64
 import uuid
 from collections import OrderedDict
 from datetime import datetime
@@ -73,7 +72,7 @@ from app.main.forms import (
 )
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.models.branding import AllEmailBranding, AllLetterBranding, EmailBranding
-from app.s3_client.s3_logo_client import get_s3_object, upload_email_logo
+from app.s3_client.s3_logo_client import upload_email_logo
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -1401,7 +1400,7 @@ def email_branding_upload_logo(service_id):
         filename = ""
         upload_id = str(uuid.uuid4())
 
-        upload_email_logo(
+        logo_filename = upload_email_logo(
             filename,
             form.logo.data.read(),
             current_app.config["AWS_REGION"],
@@ -1411,17 +1410,24 @@ def email_branding_upload_logo(service_id):
 
         return redirect(
             url_for(
-                "main.email_branding_name_logo",
+                "main.email_branding_confirm_upload_logo",
                 service_id=service_id,
-                logo_id=upload_id,
+                **_email_branding_flow_query_params(request, logo=logo_filename),
             )
         )
 
-    previous_page = request.args.get("previous_page", "add-banner").lower()
-    if previous_page == "choose-colour":
-        back_link = url_for(".email_branding_choose_banner_colour", service_id=service_id)
+    if request.args.get("type") == "org_banner":
+        back_link = url_for(
+            ".email_branding_choose_banner_colour",
+            service_id=service_id,
+            **_email_branding_flow_query_params(request, colour=None),
+        )
     else:
-        back_link = url_for(".email_branding_choose_banner_type", service_id=service_id)
+        back_link = url_for(
+            ".email_branding_choose_banner_type",
+            service_id=service_id,
+            **_email_branding_flow_query_params(request, type=None),
+        )
 
     return (
         render_template(
@@ -1431,26 +1437,61 @@ def email_branding_upload_logo(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/name-logo", methods=["GET", "POST"])
-@user_is_platform_admin
-def email_branding_name_logo(service_id):
-    # TODO: Rip this all out when building the name-logo view and start from scratch.
-    unique_id = request.args["logo_id"]
-    upload_file_name = f"temp-{current_user.id}_{unique_id}-"
-    bucket_name = current_app.config["LOGO_UPLOAD_BUCKET_NAME"]
-    logo_object = get_s3_object(bucket_name, upload_file_name).get()
-    logo_data = (
-        logo_object["ResponseMetadata"]["HTTPHeaders"]["content-type"]
-        + f";base64,{base64.b64encode(logo_object['Body'].read()).decode('utf-8')}"
-    )
-
-    return render_template("views/service-settings/branding/add-new-branding/name-logo.html", logo_data=logo_data)
-
-
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/upload-logo/confirm", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/email-branding/when-you-use-this-branding", methods=["GET", "POST"]
+)
 @user_has_permissions("manage_service")
 def email_branding_confirm_upload_logo(service_id):
-    pass
+    email_branding_data = _email_branding_flow_query_params(request)
+    if "type" not in email_branding_data:
+        return redirect(url_for("main.email_branding_choose_banner_type", service_id=service_id))
+    elif "logo" not in email_branding_data:
+        return redirect(url_for("main.email_branding_upload_logo", service_id=service_id, **email_branding_data))
+
+    if request.method == "POST":
+        # Can't create the branding yet - need to extend this page to accept and handle the logo name/alt text
+        pass
+
+    # Translate new brand form data into query params expected by the `/_email` endpoint
+    email_preview_data = {
+        "brand_type": email_branding_data["type"],
+        "logo": email_branding_data["logo"],
+    }
+    if "colour" in email_branding_data:
+        email_preview_data["colour"] = email_branding_data["colour"]
+
+    return render_template(
+        "views/service-settings/branding/add-new-branding/confirm.html",
+        back_link=url_for(
+            ".email_branding_upload_logo",
+            service_id=service_id,
+            **_email_branding_flow_query_params(request, logo=None),
+        ),
+        email_preview_data=email_preview_data,
+    )
+
+
+def _email_branding_flow_query_params(request, **kwargs):
+    """Return a dictionary containing values for the new email branding flow.
+
+    In order to create a new email branding for a user we need to collect and remember a series of information:
+    - what kind of brand they want
+    - what colour banner they want (optional)
+    - what logo to use
+
+    We pass this information between pages uses request query params. This function will collect them all from the
+    URL, and optionally allows the caller to update or remove some of the options.
+
+    To set a new value:
+        _email_branding_flow_query_params(request, type='org')
+
+    To remove a value:
+        _email_branding_flow_query_params(request, type=None)
+
+    These values can get passed to the `/_email` endpoint to generate a preview of a new brand.
+    """
+    email_branding_data = {k: kwargs.get(k, request.args.get(k)) for k in ("type", "colour", "logo")}
+    return {k: v for k, v in email_branding_data.items() if v}
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/add-banner", methods=["GET", "POST"])
@@ -1460,10 +1501,22 @@ def email_branding_choose_banner_type(service_id):
 
     if form.validate_on_submit():
         if form.banner.data == "org":
-            return redirect(url_for(".email_branding_upload_logo", service_id=service_id, previous_page="add-banner"))
+            return redirect(
+                url_for(
+                    ".email_branding_upload_logo",
+                    service_id=service_id,
+                    **_email_branding_flow_query_params(request, type=form.banner.data),
+                )
+            )
 
-        if form.banner.data == "org_banner":
-            return redirect(url_for(".email_branding_choose_banner_colour", service_id=service_id))
+        elif form.banner.data == "org_banner":
+            return redirect(
+                url_for(
+                    ".email_branding_choose_banner_colour",
+                    service_id=service_id,
+                    **_email_branding_flow_query_params(request, type=form.banner.data),
+                )
+            )
 
     return (
         render_template(
@@ -1482,7 +1535,11 @@ def email_branding_choose_banner_colour(service_id):
 
     if form.validate_on_submit():
         return redirect(
-            url_for(".email_branding_upload_logo", service_id=service_id, banner_colour=form.hex_colour.data)
+            url_for(
+                ".email_branding_upload_logo",
+                service_id=service_id,
+                **_email_branding_flow_query_params(request, colour=form.hex_colour.data),
+            )
         )
 
     return (
