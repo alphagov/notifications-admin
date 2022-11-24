@@ -22,7 +22,9 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
 
     assert normalize_spaces(page.select_one("h1").text) == "Email branding"
 
-    assert page.select(".govuk-grid-column-three-quarters a")[-1]["href"] == url_for("main.create_email_branding")
+    assert page.select(".govuk-grid-column-three-quarters a")[-1]["href"] == url_for(
+        "main.platform_admin_create_email_branding"
+    )
 
     assert brand_names == [
         "org 1",
@@ -32,11 +34,11 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
         "org 5",
     ]
     assert hrefs == [
-        url_for(".update_email_branding", branding_id=1),
-        url_for(".update_email_branding", branding_id=2),
-        url_for(".update_email_branding", branding_id=3),
-        url_for(".update_email_branding", branding_id=4),
-        url_for(".update_email_branding", branding_id=5),
+        url_for(".platform_admin_update_email_branding", branding_id=1),
+        url_for(".platform_admin_update_email_branding", branding_id=2),
+        url_for(".platform_admin_update_email_branding", branding_id=3),
+        url_for(".platform_admin_update_email_branding", branding_id=4),
+        url_for(".platform_admin_update_email_branding", branding_id=5),
     ]
 
 
@@ -45,7 +47,7 @@ def test_edit_email_branding_shows_the_correct_branding_info(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(
-        ".update_email_branding",
+        ".platform_admin_update_email_branding",
         branding_id=fake_uuid,
         _test_page_title=False,  # TODO: Fix page titles
     )
@@ -62,7 +64,7 @@ def test_create_email_branding_does_not_show_any_branding_info(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _test_page_title=False,  # TODO: Fix page titles
     )
 
@@ -78,7 +80,7 @@ def test_create_email_branding_can_be_populated_from_querystring(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         name="Example name",
         text="Example text",
         colour="Example colour",
@@ -111,7 +113,7 @@ def test_create_new_email_branding_without_logo(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _content_type="multipart/form-data",
         _data=data,
     )
@@ -146,7 +148,7 @@ def test_create_new_email_branding_with_unique_name_conflict(
     response_mock.json.return_value = {"message": {"name": ["An email branding with that name already exists."]}}
     mock_create_email_branding.side_effect = HTTPError(response=response_mock)
     resp = client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _content_type="multipart/form-data",
         _data=data,
         _expected_status=400,
@@ -173,7 +175,7 @@ def test_create_email_branding_requires_a_name_when_submitting_logo_details(
     }
     client_request.login(platform_admin_user)
     page = client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _content_type="multipart/form-data",
         _data=data,
         _expected_status=400,
@@ -199,7 +201,10 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
     }
     client_request.login(platform_admin_user)
     page = client_request.post(
-        ".create_email_branding", _content_type="multipart/form-data", _data=data, _follow_redirects=True
+        "main.platform_admin_create_email_branding",
+        _content_type="multipart/form-data",
+        _data=data,
+        _follow_redirects=True,
     )
 
     assert not page.select_one(".error-message")
@@ -230,7 +235,10 @@ def test_create_email_branding_calls_antivirus_scan(
     }
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding", _content_type="multipart/form-data", _data=data, _expected_status=expected_status_code
+        "main.platform_admin_create_email_branding",
+        _content_type="multipart/form-data",
+        _data=data,
+        _expected_status=expected_status_code,
     )
 
     assert mock_antivirus.call_count == 1
@@ -259,7 +267,7 @@ def test_create_new_email_branding_when_branding_saved(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         logo=temp_filename,
         _content_type="multipart/form-data",
         _data={
@@ -306,7 +314,7 @@ def test_create_email_branding_sets_alt_text_if_text_not_set(
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
 
     client_request.login(platform_admin_user)
-    client_request.post(".create_email_branding", _data=data)
+    client_request.post("main.platform_admin_create_email_branding", _data=data)
 
     mock_create_email_branding.assert_called_once_with(
         logo=ANY,
@@ -322,8 +330,8 @@ def test_create_email_branding_sets_alt_text_if_text_not_set(
 @pytest.mark.parametrize(
     "endpoint, has_data",
     [
-        ("main.create_email_branding", False),
-        ("main.update_email_branding", True),
+        ("main.platform_admin_create_email_branding", False),
+        ("main.platform_admin_update_email_branding", True),
     ],
 )
 def test_deletes_previous_temp_logo_after_uploading_logo(
@@ -353,7 +361,7 @@ def test_deletes_previous_temp_logo_after_uploading_logo(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        "main.create_email_branding",
+        "main.platform_admin_create_email_branding",
         logo=temp_old_filename,
         branding_id=fake_uuid,
         _data={"file": (BytesIO("".encode("utf-8")), "test.png")},
@@ -397,7 +405,7 @@ def test_update_existing_branding(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".update_email_branding",
+        ".platform_admin_update_email_branding",
         logo=temp_filename,
         branding_id=fake_uuid,
         _content_type="multipart/form-data",
@@ -455,7 +463,7 @@ def test_update_email_branding_sets_alt_text_if_text_not_set(
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
 
     client_request.login(platform_admin_user)
-    client_request.post(".update_email_branding", branding_id=fake_uuid, _data=data)
+    client_request.post(".platform_admin_update_email_branding", branding_id=fake_uuid, _data=data)
 
     mock_update_email_branding.assert_called_once_with(
         branding_id=fake_uuid,
@@ -488,7 +496,7 @@ def test_update_email_branding_with_unique_name_conflict(
     response_mock.json.return_value = {"message": {"name": ["An email branding with that name already exists."]}}
     mock_update_email_branding.side_effect = HTTPError(response=response_mock)
     resp = client_request.post(
-        ".update_email_branding",
+        ".platform_admin_update_email_branding",
         branding_id=fake_uuid,
         _content_type="multipart/form-data",
         _data=data,
@@ -517,7 +525,7 @@ def test_temp_logo_is_shown_after_uploading_logo(
 
     client_request.login(platform_admin_user)
     page = client_request.post(
-        "main.create_email_branding",
+        "main.platform_admin_create_email_branding",
         _data={"file": (BytesIO("".encode("utf-8")), "test.png")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
@@ -542,7 +550,7 @@ def test_logo_persisted_when_organisation_saved(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         logo=temp_filename,
         _content_type="multipart/form-data",
     )
@@ -570,7 +578,7 @@ def test_logo_does_not_get_persisted_if_updating_email_branding_client_throws_an
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         logo=temp_filename,
         _content_type="multipart/form-data",
         _expected_status=500,
@@ -597,7 +605,7 @@ def test_colour_regex_validation(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _content_type="multipart/form-data",
         _data=data,
         _expected_status=expected_status_code,
@@ -761,7 +769,7 @@ def test_post_create_email_branding_government_identity_form_colour(mocker, clie
             "colour": "#005abb",
         },
         _expected_redirect=url_for(
-            ".create_email_branding",
+            "main.platform_admin_create_email_branding",
             logo="example.png",
             colour="#005abb",
             name="Department of Social Affairs and Citizenship",

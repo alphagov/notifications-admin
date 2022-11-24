@@ -48,7 +48,7 @@ def email_branding():
 @main.route("/email-branding/<uuid:branding_id>/edit", methods=["GET", "POST"])
 @main.route("/email-branding/<uuid:branding_id>/edit/<logo>", methods=["GET", "POST"])
 @user_is_platform_admin
-def update_email_branding(branding_id, logo=None):
+def platform_admin_update_email_branding(branding_id, logo=None):
     email_branding = EmailBranding.from_id(branding_id)
 
     form = AdminEditEmailBrandingForm(
@@ -69,7 +69,9 @@ def update_email_branding(branding_id, logo=None):
             if logo and logo.startswith(TEMP_TAG.format(user_id=session["user_id"])):
                 delete_email_temp_file(logo)
 
-            return redirect(url_for(".update_email_branding", branding_id=branding_id, logo=upload_filename))
+            return redirect(
+                url_for(".platform_admin_update_email_branding", branding_id=branding_id, logo=upload_filename)
+            )
 
         updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
@@ -159,7 +161,7 @@ def create_email_branding_government_identity_colour():
         )
         return redirect(
             url_for(
-                ".create_email_branding",
+                "main.platform_admin_create_email_branding",
                 name=request.args.get("text"),
                 text=request.args.get("text"),
                 colour=form.colour.data,
@@ -177,7 +179,7 @@ def create_email_branding_government_identity_colour():
 @main.route("/email-branding/create", methods=["GET", "POST"])
 @main.route("/email-branding/create/<logo>", methods=["GET", "POST"])
 @user_is_platform_admin
-def create_email_branding(logo=None):
+def platform_admin_create_email_branding(logo=None):
     form = AdminEditEmailBrandingForm(
         name=request.args.get("name"),
         text=request.args.get("text"),
@@ -194,7 +196,7 @@ def create_email_branding(logo=None):
             if logo and logo.startswith(TEMP_TAG.format(user_id=session["user_id"])):
                 delete_email_temp_file(logo)
 
-            return redirect(url_for(".create_email_branding", logo=upload_filename))
+            return redirect(url_for("main.platform_admin_create_email_branding", logo=upload_filename))
 
         updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
