@@ -1627,7 +1627,10 @@ class AdminPreviewBrandingForm(StripWhitespaceForm):
 
 class AdminEditEmailBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField("Name of brand")
-    text = GovukTextInputField("Text")
+    text = GovukTextInputField("Text", param_extensions={"hint": {"text": "must provide one of alt_text and text"}})
+    alt_text = GovukTextInputField(
+        "Alt Text", param_extensions={"hint": {"text": "must provide one of alt_text and text"}}
+    )
     colour = HexColourCodeField("Colour")
     file = VirusScannedFileField("Upload a PNG logo", validators=[FileAllowed(["png"], "PNG Images only!")])
     brand_type = GovukRadiosField(
@@ -1643,6 +1646,26 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         op = request.form.get("operation")
         if op == "email-branding-details" and not self.name.data:
             raise ValidationError("This field is required")
+
+    def validate(self):
+        rv = super().validate()
+
+        op = request.form.get("operation")
+        if op == "email-branding-details":
+            # we only want to validate alt_text/text if we're editing the fields, not the file
+
+            err_msg = "Must have exactly one of alt_text and text"
+            if self.alt_text.data and self.text.data:
+                self.alt_text.errors.append(err_msg)
+                self.text.errors.append(err_msg)
+                return False
+
+            if not (self.alt_text.data or self.text.data):
+                self.alt_text.errors.append(err_msg)
+                self.text.errors.append(err_msg)
+                return False
+
+        return rv
 
 
 class AdminChangeOrganisationDefaultEmailBrandingForm(StripWhitespaceForm):

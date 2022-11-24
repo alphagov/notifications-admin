@@ -1,6 +1,6 @@
 from io import BytesIO
 from unittest import mock
-from unittest.mock import ANY, call
+from unittest.mock import call
 
 import pytest
 from flask import url_for
@@ -244,16 +244,31 @@ def test_create_email_branding_calls_antivirus_scan(
     assert mock_antivirus.call_count == 1
 
 
+@pytest.mark.parametrize(
+    "text,alt_text",
+    [
+        ("foo", ""),
+        ("", "bar"),
+    ],
+)
 def test_create_new_email_branding_when_branding_saved(
-    client_request, platform_admin_user, mocker, mock_create_email_branding, fake_uuid
+    client_request,
+    platform_admin_user,
+    mocker,
+    mock_create_email_branding,
+    fake_uuid,
+    text,
+    alt_text,
 ):
     with client_request.session_transaction() as session:
         user_id = session["user_id"]
 
     data = {
+        "operation": "email-branding-details",
         "logo": "test.png",
         "colour": "#ff0000",
-        "text": "new text",
+        "text": text,
+        "alt_text": alt_text,
         "name": "new name",
         "brand_type": "org_banner",
     }
@@ -274,6 +289,7 @@ def test_create_new_email_branding_when_branding_saved(
             "colour": data["colour"],
             "name": data["name"],
             "text": data["text"],
+            "alt_text": data["alt_text"],
             "cdn_url": "https://static-logos.cdn.com",
             "brand_type": data["brand_type"],
         },
@@ -285,7 +301,7 @@ def test_create_new_email_branding_when_branding_saved(
     assert mock_create_email_branding.call_args == call(
         logo=updated_logo_name,
         name=data["name"],
-        alt_text=None,
+        alt_text=data["alt_text"],
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
@@ -293,19 +309,27 @@ def test_create_new_email_branding_when_branding_saved(
     )
 
 
-@pytest.mark.parametrize("text,expected_alt_text", [("some text", None), ("", "some name")])
-def test_create_email_branding_sets_alt_text_if_text_not_set(
+@pytest.mark.parametrize(
+    "text,alt_text",
+    [
+        ("foo", "bar"),
+        ("", ""),
+    ],
+)
+def test_create_email_branding_requires_one_of_alt_text_and_text(
     client_request,
     mocker,
     mock_create_email_branding,
     platform_admin_user,
     text,
-    expected_alt_text,
+    alt_text,
 ):
     data = {
+        "operation": "email-branding-details",
         "logo": "test.png",
         "colour": "#ff0000",
         "text": text,
+        "alt_text": alt_text,
         "name": "some name",
         "brand_type": "org_banner",
     }
@@ -314,17 +338,15 @@ def test_create_email_branding_sets_alt_text_if_text_not_set(
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
 
     client_request.login(platform_admin_user)
-    client_request.post("main.platform_admin_create_email_branding", _data=data)
-
-    mock_create_email_branding.assert_called_once_with(
-        logo=ANY,
-        name=data["name"],
-        alt_text=expected_alt_text,
-        text=data["text"],
-        colour=ANY,
-        brand_type=ANY,
-        created_by_id=ANY,
+    response = client_request.post("main.platform_admin_create_email_branding", _data=data, _expected_status=400)
+    assert (
+        normalize_spaces(response.select_one("#alt_text-error").text)
+        == "Error: Must have exactly one of alt_text and text"
     )
+    assert (
+        normalize_spaces(response.select_one("#text-error").text) == "Error: Must have exactly one of alt_text and text"
+    )
+    assert not mock_create_email_branding.called
 
 
 @pytest.mark.parametrize(
@@ -412,6 +434,7 @@ def test_update_existing_branding(
         _data={
             "colour": data["colour"],
             "name": data["name"],
+            "alt_text": "",
             "text": data["text"],
             "cdn_url": "https://static-logos.cdn.com",
             "brand_type": data["brand_type"],
@@ -425,7 +448,7 @@ def test_update_existing_branding(
         branding_id=fake_uuid,
         logo=updated_logo_name,
         name=data["name"],
-        alt_text=None,
+        alt_text="",
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
@@ -440,8 +463,14 @@ def test_update_existing_branding(
     ]
 
 
-@pytest.mark.parametrize("text,expected_alt_text", [("some text", None), ("", "some name")])
-def test_update_email_branding_sets_alt_text_if_text_not_set(
+@pytest.mark.parametrize(
+    "text,alt_text",
+    [
+        ("foo", "bar"),
+        ("", ""),
+    ],
+)
+def test_update_email_branding_requires_one_of_alt_text_and_text(
     client_request,
     mocker,
     mock_get_email_branding,
@@ -449,12 +478,14 @@ def test_update_email_branding_sets_alt_text_if_text_not_set(
     platform_admin_user,
     fake_uuid,
     text,
-    expected_alt_text,
+    alt_text,
 ):
     data = {
+        "operation": "email-branding-details",
         "logo": "test.png",
         "colour": "#ff0000",
         "text": text,
+        "alt_text": alt_text,
         "name": "some name",
         "brand_type": "org_banner",
     }
@@ -463,18 +494,17 @@ def test_update_email_branding_sets_alt_text_if_text_not_set(
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
 
     client_request.login(platform_admin_user)
-    client_request.post(".platform_admin_update_email_branding", branding_id=fake_uuid, _data=data)
-
-    mock_update_email_branding.assert_called_once_with(
-        branding_id=fake_uuid,
-        logo=ANY,
-        name=data["name"],
-        alt_text=expected_alt_text,
-        text=data["text"],
-        colour=ANY,
-        brand_type=ANY,
-        updated_by_id=ANY,
+    response = client_request.post(
+        "main.platform_admin_update_email_branding", branding_id=fake_uuid, _data=data, _expected_status=400
     )
+    assert (
+        normalize_spaces(response.select_one("#alt_text-error").text)
+        == "Error: Must have exactly one of alt_text and text"
+    )
+    assert (
+        normalize_spaces(response.select_one("#text-error").text) == "Error: Must have exactly one of alt_text and text"
+    )
+    assert not mock_update_email_branding.called
 
 
 def test_update_email_branding_with_unique_name_conflict(
@@ -484,7 +514,15 @@ def test_update_email_branding_with_unique_name_conflict(
     fake_uuid,
     mock_get_email_branding,
 ):
-    data = {"logo": None, "colour": "#ff0000", "text": "new text", "name": "new name", "brand_type": "org"}
+    data = {
+        "operation": "email-branding-details",
+        "logo": None,
+        "colour": "#ff0000",
+        "text": "new text",
+        "alt_text": "",
+        "name": "new name",
+        "brand_type": "org",
+    }
 
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
 
@@ -503,7 +541,10 @@ def test_update_email_branding_with_unique_name_conflict(
         _expected_status=400,
     )
 
-    assert "An email branding with that name already exists." in resp.text
+    assert (
+        normalize_spaces(resp.select_one("#name-error").text)
+        == "Error: An email branding with that name already exists."
+    )
 
 
 def test_temp_logo_is_shown_after_uploading_logo(
@@ -582,6 +623,7 @@ def test_logo_does_not_get_persisted_if_updating_email_branding_client_throws_an
         logo=temp_filename,
         _content_type="multipart/form-data",
         _expected_status=500,
+        _data={"name": "foo"},
     )
 
     assert not mocked_persist_logo.called
