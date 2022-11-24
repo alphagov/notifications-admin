@@ -1505,7 +1505,7 @@ def test_broadcast_user_cant_invite_themselves_or_their_aliases(
         _data={"email_address": email_address, "permissions_field": []},
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one("span.govuk-error-message").text) == (
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
         "Error: You cannot send an invitation to yourself"
     )
     assert mock_create_invite.called is False
@@ -1535,7 +1535,7 @@ def test_platform_admin_cant_invite_themselves_to_broadcast_services(
         _data={"email_address": platform_admin_user["email_address"], "permissions_field": []},
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one("span.govuk-error-message").text) == (
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
         "Error: You cannot send an invitation to yourself"
     )
     assert mock_create_invite.called is False

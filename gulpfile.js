@@ -6,7 +6,6 @@
 // 1. LIBRARIES
 // - - - - - - - - - - - - - - -
 const { src, pipe, dest, series, parallel, watch } = require('gulp');
-const rollupPluginCommonjs = require('rollup-plugin-commonjs');
 const rollupPluginNodeResolve = require('rollup-plugin-node-resolve');
 const streamqueue = require('streamqueue');
 const stylish = require('jshint-stylish');
@@ -79,11 +78,6 @@ const javascripts = () => {
           // determine module entry points from either 'module' or 'main' fields in package.json
           rollupPluginNodeResolve({
             mainFields: ['module', 'main']
-          }),
-          // gulp rollup runs on nodeJS so reads modules in commonJS format
-          // this adds node_modules to the require path so it can find the GOVUK Frontend modules
-          rollupPluginCommonjs({
-            include: 'node_modules/**'
           })
         ]
       },
