@@ -59,15 +59,6 @@
   &-service-back-to,
   &-organisation-link {
 
-    &:link,
-    &:visited {
-      text-decoration: none;
-    }
-
-    &:hover {
-      text-decoration: underline;
-    }
-
     &:focus {
       text-decoration: none; // override the :hover style (the focus style has its own underline)
       // hack to make the focus style fit in the navigation bar
@@ -151,24 +142,10 @@
   }
 
   a {
-
     display: block;
     padding: 5px 0;
     position: relative;
     top: 5px;
-
-    &:link,
-    &:visited {
-      text-decoration: none;
-    }
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &:focus { // override the :hover style (the focus style has its own underline)
-      text-decoration: none;
-    }
 
     &.selected {
       @include govuk-font(19, $weight: bold);
@@ -208,15 +185,6 @@
     border-bottom: 1px govuk-shade(govuk-colour("light-grey"), 7%) solid;
     display: block;
     padding: govuk-spacing(2) 0;
-
-    a:link {
-      text-decoration: none;
-    }
-
-    a:hover,
-    a:active {
-      text-decoration: underline;
-    }
 
     ol ol & {
       padding-left: govuk-spacing(6);

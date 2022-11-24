@@ -7,7 +7,7 @@
       <div class="navigation-service-name govuk-!-font-weight-bold">
         Platform admin
       </div>
-      <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state navigation-service-switch">Switch service</a>
+      <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-switch">Switch service</a>
     </div>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-quarter">
@@ -29,7 +29,7 @@
             ('Clear cache', url_for('main.clear_cache')),
           ] %}
             <li>
-              <a class="govuk-link govuk-link--no-visited-state" href="{{ url }}">
+              <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline" href="{{ url }}">
                 {{ link_text }}
               </a>
             </li>
