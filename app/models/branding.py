@@ -45,6 +45,10 @@ class EmailBranding(Branding):
     def is_govuk(self):
         return self.id is None
 
+    @property
+    def has_govuk_banner(self):
+        return self.is_govuk or self.brand_type == "both"
+
     def serialize(self):
         return self._dict.copy()
 

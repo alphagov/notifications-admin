@@ -15,6 +15,7 @@ from app.main import main
 from app.main.forms import FieldWithNoneOption
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
+from app.models.branding import EmailBranding
 from app.utils import hide_from_search_engines
 
 
@@ -69,21 +70,21 @@ def email_template():
     branding_style = request.args.get("branding_style", "govuk")
 
     if not branding_style or branding_style in {"govuk", FieldWithNoneOption.NONE_OPTION_VALUE}:
-        source = {"brand_type": "govuk"}
+        source = EmailBranding.from_id(None)
 
     elif branding_style == "custom":
-        source = request.args
+        source = EmailBranding.with_default_values(**request.args)
 
     else:
-        source = email_branding_client.get_email_branding(branding_style)["email_branding"]
+        source = EmailBranding.from_id(branding_style)
 
-    brand_type = source.get("brand_type")
-    brand_alt_text = source.get("alt_text")
-    brand_text = source.get("text")
-    brand_colour = source.get("colour")
-    brand_logo = f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{source.get('logo')}" if source.get("logo") else None
+    brand_type = source.brand_type
+    brand_alt_text = source.alt_text
+    brand_text = source.text
+    brand_colour = source.colour
+    brand_logo = f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{source.logo}" if source.logo else None
 
-    govuk_banner = brand_type in ["govuk", "both"]
+    govuk_banner = brand_type in [None, "govuk", "both"]
     brand_banner = brand_type == "org_banner"
 
     template = {

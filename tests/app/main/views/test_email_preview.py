@@ -105,7 +105,7 @@ def test_displays_custom_brand_through_query_params(client_request, mocker):
         text="Some text",
         colour="#abcdef",
         logo="example.png",
-        type="org",
+        brand_type="org",
     )
 
     assert mock_get_email_branding.called is False
