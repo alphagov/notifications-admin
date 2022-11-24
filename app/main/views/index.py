@@ -84,22 +84,19 @@ def email_template():
         "content": render_template("example-email.md"),
     }
 
-    if not bool(request.args):
-        resp = make_response(str(HTMLEmailTemplate(template)))
-    else:
-        resp = make_response(
-            str(
-                HTMLEmailTemplate(
-                    template,
-                    govuk_banner=branding.has_govuk_banner,
-                    brand_text=branding.text,
-                    brand_colour=branding.colour,
-                    brand_logo=branding.get_logo_url(current_app.config["LOGO_CDN_DOMAIN"]),
-                    brand_banner=branding.has_brand_banner,
-                    brand_alt_text=branding.alt_text,
-                )
+    resp = make_response(
+        str(
+            HTMLEmailTemplate(
+                template,
+                govuk_banner=branding.has_govuk_banner,
+                brand_text=branding.text,
+                brand_colour=branding.colour,
+                brand_logo=branding.get_logo_url(current_app.config["LOGO_CDN_DOMAIN"]),
+                brand_banner=branding.has_brand_banner,
+                brand_alt_text=branding.alt_text,
             )
         )
+    )
 
     resp.headers["X-Frame-Options"] = "SAMEORIGIN"
     return resp
