@@ -34,7 +34,7 @@ class EmailBranding(Branding):
     @classmethod
     def from_id(cls, id):
         if id is None:
-            return cls.with_default_values(name="GOV.UK")
+            return cls.with_default_values(name="GOV.UK", brand_type="govuk")
         return cls(email_branding_client.get_email_branding(id)["email_branding"])
 
     @property
@@ -43,11 +43,11 @@ class EmailBranding(Branding):
 
     @property
     def is_govuk(self):
-        return self.id is None
+        return self.brand_type == "govuk"
 
     @property
     def has_govuk_banner(self):
-        return self.brand_type in {None, "govuk", "both"}
+        return self.is_govuk or self.brand_type == "both"
 
     @property
     def has_brand_banner(self):
