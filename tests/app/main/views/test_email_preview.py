@@ -58,6 +58,7 @@ def test_displays_org_branding(client_request, mock_get_email_branding):
 
     assert not any(a["href"] == "https://www.gov.uk" for a in page.select("a"))
     assert page.select_one("img")["src"] == "https://static-logos.test.com/example.png"
+    assert page.select_one("img")["alt"] == ""  # no alt text cos brand text is present
     assert not page.select("body > table > tr > td[bgcolor='#f00']")  # banner colour is not set
     assert (
         page.select("body > table:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2)")[0].get_text().strip()
@@ -89,6 +90,7 @@ def test_displays_org_branding_with_banner_without_brand_text(
 
     assert not any(a["href"] == "https://www.gov.uk" for a in page.select("a"))
     assert page.select_one("img")["src"] == "https://static-logos.test.com/example.png"
+    assert page.select_one("img")["alt"] == "Alt text"
     assert page.select("body > table > tr > td[bgcolor='#f00']")  # banner colour is set
     assert not page.select("body > table table > tr > td > span") == 0  # brand text is not set
 
