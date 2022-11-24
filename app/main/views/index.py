@@ -70,13 +70,13 @@ def email_template():
     branding_style = request.args.get("branding_style", "govuk")
 
     if not branding_style or branding_style in {"govuk", FieldWithNoneOption.NONE_OPTION_VALUE}:
-        source = EmailBranding.from_id(None)
+        branding = EmailBranding.from_id(None)
 
     elif branding_style == "custom":
-        source = EmailBranding.with_default_values(**request.args)
+        branding = EmailBranding.with_default_values(**request.args)
 
     else:
-        source = EmailBranding.from_id(branding_style)
+        branding = EmailBranding.from_id(branding_style)
 
     template = {
         "template_type": "email",
@@ -91,12 +91,12 @@ def email_template():
             str(
                 HTMLEmailTemplate(
                     template,
-                    govuk_banner=source.has_govuk_banner,
-                    brand_text=source.text,
-                    brand_colour=source.colour,
-                    brand_logo=source.get_logo_url(current_app.config["LOGO_CDN_DOMAIN"]),
-                    brand_banner=source.has_brand_banner,
-                    brand_alt_text=source.alt_text,
+                    govuk_banner=branding.has_govuk_banner,
+                    brand_text=branding.text,
+                    brand_colour=branding.colour,
+                    brand_logo=branding.get_logo_url(current_app.config["LOGO_CDN_DOMAIN"]),
+                    brand_banner=branding.has_brand_banner,
+                    brand_alt_text=branding.alt_text,
                 )
             )
         )
