@@ -55,13 +55,14 @@ function initAll (options) {
     new Radios($radio).init()
   })
 
+  var $skipLinks = scope.querySelectorAll('[data-module="govuk-skip-link"]')
+  nodeListForEach($skipLinks, function ($skipLink) {
+    new SkipLink($skipLink).init()
+  })
+
   // There will only every be one error-summary per page
   var $errorSummary = scope.querySelector('[data-module="govuk-error-summary"]')
   new ErrorSummary($errorSummary).init()
-
-  // There will only ever be one skip-link per page
-  var skipLink = scope.querySelector('[data-module="govuk-skip-link"]')
-  new SkipLink(skipLink).init()
 }
 
 // Create separate namespace for GOVUK Frontend.
