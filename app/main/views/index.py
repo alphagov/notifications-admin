@@ -59,7 +59,7 @@ def design_content():
 
 @main.route("/_email")
 def email_template():
-    branding_style = request.args.get("branding_style", "govuk")
+    branding_style = request.args.get("branding_style")
 
     if not branding_style or branding_style in {"govuk", FieldWithNoneOption.NONE_OPTION_VALUE}:
         branding = EmailBranding.from_id(None)
