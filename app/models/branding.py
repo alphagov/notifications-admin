@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from flask import current_app
+
 from app import asset_fingerprinter
 from app.formatters import email_safe
 from app.models import JSONModel, ModelList
@@ -44,6 +46,19 @@ class EmailBranding(Branding):
     @property
     def is_govuk(self):
         return self.brand_type == "govuk"
+
+    @property
+    def has_govuk_banner(self):
+        return self.is_govuk or self.brand_type == "both"
+
+    @property
+    def has_brand_banner(self):
+        return self.brand_type == "org_banner"
+
+    @property
+    def logo_url(self):
+        if self.logo:
+            return f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{self.logo}"
 
     def serialize(self):
         return self._dict.copy()
