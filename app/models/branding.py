@@ -34,7 +34,7 @@ class EmailBranding(Branding):
     @classmethod
     def from_id(cls, id):
         if id is None:
-            return cls.with_default_values(name="GOV.UK")
+            return cls.with_default_values(name="GOV.UK", brand_type="govuk")
         return cls(email_branding_client.get_email_branding(id)["email_branding"])
 
     @property
@@ -43,7 +43,7 @@ class EmailBranding(Branding):
 
     @property
     def is_govuk(self):
-        return self.id is None
+        return self.brand_type == "govuk"
 
     def serialize(self):
         return self._dict.copy()
