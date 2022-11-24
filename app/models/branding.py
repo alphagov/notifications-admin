@@ -47,7 +47,15 @@ class EmailBranding(Branding):
 
     @property
     def has_govuk_banner(self):
-        return self.is_govuk or self.brand_type == "both"
+        return self.brand_type in {None, "govuk", "both"}
+
+    @property
+    def has_brand_banner(self):
+        return self.brand_type == "org_banner"
+
+    def get_logo_url(self, cdn_domain):
+        if self.logo:
+            return f"https://{cdn_domain}/{self.logo}"
 
     def serialize(self):
         return self._dict.copy()

@@ -78,15 +78,6 @@ def email_template():
     else:
         source = EmailBranding.from_id(branding_style)
 
-    brand_type = source.brand_type
-    brand_alt_text = source.alt_text
-    brand_text = source.text
-    brand_colour = source.colour
-    brand_logo = f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{source.logo}" if source.logo else None
-
-    govuk_banner = brand_type in [None, "govuk", "both"]
-    brand_banner = brand_type == "org_banner"
-
     template = {
         "template_type": "email",
         "subject": "Email branding preview",
@@ -100,12 +91,12 @@ def email_template():
             str(
                 HTMLEmailTemplate(
                     template,
-                    govuk_banner=govuk_banner,
-                    brand_text=brand_text,
-                    brand_colour=brand_colour,
-                    brand_logo=brand_logo,
-                    brand_banner=brand_banner,
-                    brand_alt_text=brand_alt_text,
+                    govuk_banner=source.has_govuk_banner,
+                    brand_text=source.text,
+                    brand_colour=source.colour,
+                    brand_logo=source.get_logo_url(current_app.config["LOGO_CDN_DOMAIN"]),
+                    brand_banner=source.has_brand_banner,
+                    brand_alt_text=source.alt_text,
                 )
             )
         )
