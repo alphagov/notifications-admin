@@ -2074,6 +2074,14 @@ class EmailBrandingChooseBannerColour(StripWhitespaceForm):
     hex_colour = HexColourCodeField("Choose a colour for your banner", validators=[DataRequired()])
 
 
+class EmailBrandingAltTextForm(StripWhitespaceForm):
+    alt_text = GovukTextInputField("Alt text", validators=[DataRequired(message="Cannot be empty")])
+
+    def validate_alt_text(self, field):
+        if "logo" in field.data.lower():
+            raise ValidationError("Do not include the word ‘logo’ in your alt text")
+
+
 class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
     notification_type = GovukRadiosField(
         "What notification type?",
