@@ -13,7 +13,7 @@
         {% if current_value == option %}
           <a id="pill-selected-item" class="pill-item pill-item--selected govuk-link govuk-link--no-visited-state{% if not show_count %} pill-item--centered{% endif %}" href="{{ link }}" aria-current="page">
         {% else %}
-          <a class="pill-item govuk-link govuk-link--no-visited-state" href="{{ link }}">
+          <a class="pill-item govuk-link govuk-link--inverse" href="{{ link }}">
         {% endif %}
           {% if show_count %}
             {{ big_number(count, **big_number_args) }}
