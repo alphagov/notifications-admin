@@ -1416,7 +1416,7 @@ def email_branding_upload_logo(service_id):
             )
         )
 
-    if request.args.get("type") == "org_banner":
+    if request.args.get("brand_type") == "org_banner":
         back_link = url_for(
             ".email_branding_choose_banner_colour",
             service_id=service_id,
@@ -1426,7 +1426,7 @@ def email_branding_upload_logo(service_id):
         back_link = url_for(
             ".email_branding_choose_banner_type",
             service_id=service_id,
-            **_email_branding_flow_query_params(request, type=None),
+            **_email_branding_flow_query_params(request, brand_type=None),
         )
 
     return (
@@ -1443,7 +1443,7 @@ def email_branding_upload_logo(service_id):
 @user_has_permissions("manage_service")
 def email_branding_confirm_upload_logo(service_id):
     email_branding_data = _email_branding_flow_query_params(request)
-    if "type" not in email_branding_data:
+    if "brand_type" not in email_branding_data:
         return redirect(url_for("main.email_branding_choose_banner_type", service_id=service_id))
     elif "logo" not in email_branding_data:
         return redirect(url_for("main.email_branding_upload_logo", service_id=service_id, **email_branding_data))
@@ -1454,7 +1454,7 @@ def email_branding_confirm_upload_logo(service_id):
 
     # Translate new brand form data into query params expected by the `/_email` endpoint
     email_preview_data = {
-        "brand_type": email_branding_data["type"],
+        "brand_type": email_branding_data["brand_type"],
         "logo": email_branding_data["logo"],
     }
     if "colour" in email_branding_data:
@@ -1483,14 +1483,14 @@ def _email_branding_flow_query_params(request, **kwargs):
     URL, and optionally allows the caller to update or remove some of the options.
 
     To set a new value:
-        _email_branding_flow_query_params(request, type='org')
+        _email_branding_flow_query_params(request, brand_type='org')
 
     To remove a value:
-        _email_branding_flow_query_params(request, type=None)
+        _email_branding_flow_query_params(request, brand_type=None)
 
     These values can get passed to the `/_email` endpoint to generate a preview of a new brand.
     """
-    email_branding_data = {k: kwargs.get(k, request.args.get(k)) for k in ("type", "colour", "logo")}
+    email_branding_data = {k: kwargs.get(k, request.args.get(k)) for k in ("brand_type", "colour", "logo")}
     return {k: v for k, v in email_branding_data.items() if v}
 
 
@@ -1505,7 +1505,7 @@ def email_branding_choose_banner_type(service_id):
                 url_for(
                     ".email_branding_upload_logo",
                     service_id=service_id,
-                    **_email_branding_flow_query_params(request, type=form.banner.data),
+                    **_email_branding_flow_query_params(request, brand_type=form.banner.data),
                 )
             )
 
@@ -1514,7 +1514,7 @@ def email_branding_choose_banner_type(service_id):
                 url_for(
                     ".email_branding_choose_banner_colour",
                     service_id=service_id,
-                    **_email_branding_flow_query_params(request, type=form.banner.data),
+                    **_email_branding_flow_query_params(request, brand_type=form.banner.data),
                 )
             )
 

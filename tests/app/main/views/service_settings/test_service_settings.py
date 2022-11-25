@@ -3827,8 +3827,8 @@ def test_any_org_type_can_see_email_branding_choose_banner_type_page(
 @pytest.mark.parametrize(
     "selected_option, expected_endpoint, url_for_kwargs",
     [
-        ("org", ".email_branding_upload_logo", {"type": "org"}),
-        ("org_banner", ".email_branding_choose_banner_colour", {"type": "org_banner"}),
+        ("org", ".email_branding_upload_logo", {"brand_type": "org"}),
+        ("org_banner", ".email_branding_choose_banner_colour", {"brand_type": "org_banner"}),
     ],
 )
 def test_email_branding_choose_banner_type_redirects_to_right_page(
@@ -3863,12 +3863,12 @@ def test_email_branding_choose_banner_type_shows_error_summary_on_invalid_data(c
     (
         ({}, "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner"),
         (
-            {"type": "org"},
+            {"brand_type": "org"},
             "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner",
         ),
         (
-            {"type": "org_banner"},
-            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/choose-banner-colour?type=org_banner",  # noqa
+            {"brand_type": "org_banner"},
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/choose-banner-colour?brand_type=org_banner",  # noqa
         ),
     ),
 )
@@ -3899,8 +3899,8 @@ def test_GET_email_branding_upload_logo(client_request, service_one, query_param
     "email_branding_data",
     (
         {},
-        {"type": "org"},
-        {"type": "org_banner", "colour": "#abcdef"},
+        {"brand_type": "org"},
+        {"brand_type": "org_banner", "colour": "#abcdef"},
     ),
 )
 def test_POST_email_branding_upload_logo_success(mocker, client_request, service_one, email_branding_data):
@@ -4040,7 +4040,10 @@ def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(mocker
 
 def test_GET_email_branding_confirm_upload_logo(client_request, service_one):
     page = client_request.get(
-        "main.email_branding_confirm_upload_logo", service_id=service_one["id"], type="org_banner", logo="example.png"
+        "main.email_branding_confirm_upload_logo",
+        service_id=service_one["id"],
+        brand_type="org_banner",
+        logo="example.png",
     )
     form = page.select_one("main form")
     email_preview = page.select_one("iframe")
@@ -4057,8 +4060,8 @@ def test_GET_email_branding_confirm_upload_logo(client_request, service_one):
     "request_params, expected_location",
     (
         (
-            {"type": "org"},
-            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/upload-logo?type=org",
+            {"brand_type": "org"},
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/upload-logo?brand_type=org",
         ),
         ({}, "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner"),
     ),
@@ -4078,7 +4081,7 @@ def test_GET_email_branding_confirm_upload_logo_redirects_on_missing_query_param
 def test_GET_email_branding_choose_banner_colour(client_request, service_one):
     page = client_request.get(
         "main.email_branding_choose_banner_colour",
-        type="org_banner",
+        brand_type="org_banner",
         service_id=service_one["id"],
     )
 
@@ -4102,11 +4105,11 @@ def test_POST_email_branding_choose_banner_colour(client_request, service_one):
     client_request.post(
         "main.email_branding_choose_banner_colour",
         service_id=service_one["id"],
-        type="org_banner",
+        brand_type="org_banner",
         _data={"hex_colour": "#abcdef"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.email_branding_upload_logo", service_id=service_one["id"], type="org_banner", colour="#abcdef"
+            "main.email_branding_upload_logo", service_id=service_one["id"], brand_type="org_banner", colour="#abcdef"
         ),
     )
 
