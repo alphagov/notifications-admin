@@ -1443,22 +1443,14 @@ def email_branding_upload_logo(service_id):
 @user_has_permissions("manage_service")
 def email_branding_confirm_upload_logo(service_id):
     email_branding_data = _email_branding_flow_query_params(request)
-    if "brand_type" not in email_branding_data:
+    if not email_branding_data["brand_type"]:
         return redirect(url_for("main.email_branding_choose_banner_type", service_id=service_id))
-    elif "logo" not in email_branding_data:
+    elif not email_branding_data["logo"]:
         return redirect(url_for("main.email_branding_upload_logo", service_id=service_id, **email_branding_data))
 
     if request.method == "POST":
         # Can't create the branding yet - need to extend this page to accept and handle the logo name/alt text
         pass
-
-    # Translate new brand form data into query params expected by the `/_email` endpoint
-    email_preview_data = {
-        "brand_type": email_branding_data["brand_type"],
-        "logo": email_branding_data["logo"],
-    }
-    if "colour" in email_branding_data:
-        email_preview_data["colour"] = email_branding_data["colour"]
 
     return render_template(
         "views/service-settings/branding/add-new-branding/confirm.html",
@@ -1467,7 +1459,7 @@ def email_branding_confirm_upload_logo(service_id):
             service_id=service_id,
             **_email_branding_flow_query_params(request, logo=None),
         ),
-        email_preview_data=email_preview_data,
+        email_preview_data=email_branding_data,
     )
 
 
@@ -1490,8 +1482,7 @@ def _email_branding_flow_query_params(request, **kwargs):
 
     These values can get passed to the `/_email` endpoint to generate a preview of a new brand.
     """
-    email_branding_data = {k: kwargs.get(k, request.args.get(k)) for k in ("brand_type", "colour", "logo")}
-    return {k: v for k, v in email_branding_data.items() if v}
+    return {k: kwargs.get(k, request.args.get(k)) for k in ("brand_type", "colour", "logo")}
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/add-banner", methods=["GET", "POST"])
