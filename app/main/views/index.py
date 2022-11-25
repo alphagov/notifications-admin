@@ -1,20 +1,13 @@
-from flask import (
-    abort,
-    current_app,
-    make_response,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from flask import abort, make_response, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_utils.template import HTMLEmailTemplate, LetterImageTemplate
 
-from app import email_branding_client, letter_branding_client, status_api_client
+from app import letter_branding_client, status_api_client
 from app.main import main
 from app.main.forms import FieldWithNoneOption
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
+from app.models.branding import EmailBranding
 from app.utils import hide_from_search_engines
 
 
@@ -66,25 +59,16 @@ def design_content():
 
 @main.route("/_email")
 def email_template():
-    branding_style = request.args.get("branding_style", "govuk")
+    branding_style = request.args.get("branding_style")
 
     if not branding_style or branding_style in {"govuk", FieldWithNoneOption.NONE_OPTION_VALUE}:
-        source = {"brand_type": "govuk"}
+        branding = EmailBranding.govuk_branding()
 
     elif branding_style == "custom":
-        source = request.args
+        branding = EmailBranding.with_default_values(**request.args)
 
     else:
-        source = email_branding_client.get_email_branding(branding_style)["email_branding"]
-
-    brand_type = source.get("brand_type")
-    brand_alt_text = source.get("alt_text")
-    brand_text = source.get("text")
-    brand_colour = source.get("colour")
-    brand_logo = f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{source.get('logo')}" if source.get("logo") else None
-
-    govuk_banner = brand_type in ["govuk", "both"]
-    brand_banner = brand_type == "org_banner"
+        branding = EmailBranding.from_id(branding_style)
 
     template = {
         "template_type": "email",
@@ -92,22 +76,19 @@ def email_template():
         "content": render_template("example-email.md"),
     }
 
-    if not bool(request.args):
-        resp = make_response(str(HTMLEmailTemplate(template)))
-    else:
-        resp = make_response(
-            str(
-                HTMLEmailTemplate(
-                    template,
-                    govuk_banner=govuk_banner,
-                    brand_text=brand_text,
-                    brand_colour=brand_colour,
-                    brand_logo=brand_logo,
-                    brand_banner=brand_banner,
-                    brand_alt_text=brand_alt_text,
-                )
+    resp = make_response(
+        str(
+            HTMLEmailTemplate(
+                template,
+                govuk_banner=branding.has_govuk_banner,
+                brand_text=branding.text,
+                brand_colour=branding.colour,
+                brand_logo=branding.logo_url,
+                brand_banner=branding.has_brand_banner,
+                brand_alt_text=branding.alt_text,
             )
         )
+    )
 
     resp.headers["X-Frame-Options"] = "SAMEORIGIN"
     return resp
