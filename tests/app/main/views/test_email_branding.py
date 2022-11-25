@@ -309,27 +309,18 @@ def test_create_new_email_branding_when_branding_saved(
     )
 
 
-@pytest.mark.parametrize(
-    "text,alt_text",
-    [
-        ("foo", "bar"),
-        ("", ""),
-    ],
-)
-def test_create_email_branding_requires_one_of_alt_text_and_text(
+def test_create_email_branding_shows_error_with_neither_alt_text_and_text(
     client_request,
     mocker,
     mock_create_email_branding,
     platform_admin_user,
-    text,
-    alt_text,
 ):
     data = {
         "operation": "email-branding-details",
         "logo": "test.png",
         "colour": "#ff0000",
-        "text": text,
-        "alt_text": alt_text,
+        "text": "",
+        "alt_text": "",
         "name": "some name",
         "brand_type": "org_banner",
     }
@@ -339,12 +330,38 @@ def test_create_email_branding_requires_one_of_alt_text_and_text(
 
     client_request.login(platform_admin_user)
     response = client_request.post("main.platform_admin_create_email_branding", _data=data, _expected_status=400)
+    assert response.select_one("#text-error") is None
     assert (
         normalize_spaces(response.select_one("#alt_text-error").text)
-        == "Error: Must have exactly one of alt_text and text"
+        == "Error: Cannot be empty if you do not have logo text"
     )
+    assert not mock_create_email_branding.called
+
+
+def test_create_email_branding_shows_error_with_both_alt_text_and_text(
+    client_request,
+    mocker,
+    mock_create_email_branding,
+    platform_admin_user,
+):
+    data = {
+        "operation": "email-branding-details",
+        "logo": "test.png",
+        "colour": "#ff0000",
+        "text": "some text",
+        "alt_text": "some alt_text",
+        "name": "some name",
+        "brand_type": "org_banner",
+    }
+
+    mocker.patch("app.main.views.email_branding.persist_logo")
+    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+
+    client_request.login(platform_admin_user)
+    response = client_request.post("main.platform_admin_create_email_branding", _data=data, _expected_status=400)
+    assert response.select_one("#text-error") is None
     assert (
-        normalize_spaces(response.select_one("#text-error").text) == "Error: Must have exactly one of alt_text and text"
+        normalize_spaces(response.select_one("#alt_text-error").text) == "Error: Must be empty if you enter logo text"
     )
     assert not mock_create_email_branding.called
 
@@ -463,29 +480,20 @@ def test_update_existing_branding(
     ]
 
 
-@pytest.mark.parametrize(
-    "text,alt_text",
-    [
-        ("foo", "bar"),
-        ("", ""),
-    ],
-)
-def test_update_email_branding_requires_one_of_alt_text_and_text(
+def test_update_email_branding_shows_error_with_neither_alt_text_and_text(
     client_request,
     mocker,
     mock_get_email_branding,
     mock_update_email_branding,
     platform_admin_user,
     fake_uuid,
-    text,
-    alt_text,
 ):
     data = {
         "operation": "email-branding-details",
         "logo": "test.png",
         "colour": "#ff0000",
-        "text": text,
-        "alt_text": alt_text,
+        "text": "",
+        "alt_text": "",
         "name": "some name",
         "brand_type": "org_banner",
     }
@@ -497,12 +505,37 @@ def test_update_email_branding_requires_one_of_alt_text_and_text(
     response = client_request.post(
         "main.platform_admin_update_email_branding", branding_id=fake_uuid, _data=data, _expected_status=400
     )
+    assert response.select_one("#text-error") is None
     assert (
         normalize_spaces(response.select_one("#alt_text-error").text)
-        == "Error: Must have exactly one of alt_text and text"
+        == "Error: Cannot be empty if you do not have logo text"
     )
+    assert not mock_update_email_branding.called
+
+
+def test_update_email_branding_shows_error_with_both_alt_text_and_text(
+    client_request, mocker, mock_get_email_branding, mock_update_email_branding, platform_admin_user, fake_uuid
+):
+    data = {
+        "operation": "email-branding-details",
+        "logo": "test.png",
+        "colour": "#ff0000",
+        "text": "some text",
+        "alt_text": "some alt_text",
+        "name": "some name",
+        "brand_type": "org_banner",
+    }
+
+    mocker.patch("app.main.views.email_branding.persist_logo")
+    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+
+    client_request.login(platform_admin_user)
+    response = client_request.post(
+        "main.platform_admin_update_email_branding", branding_id=fake_uuid, _data=data, _expected_status=400
+    )
+    assert response.select_one("#text-error") is None
     assert (
-        normalize_spaces(response.select_one("#text-error").text) == "Error: Must have exactly one of alt_text and text"
+        normalize_spaces(response.select_one("#alt_text-error").text) == "Error: Must be empty if you enter logo text"
     )
     assert not mock_update_email_branding.called
 
