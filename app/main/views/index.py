@@ -62,7 +62,7 @@ def email_template():
     branding_style = request.args.get("branding_style")
 
     if not branding_style or branding_style in {"govuk", FieldWithNoneOption.NONE_OPTION_VALUE}:
-        branding = EmailBranding.from_id(None)
+        branding = EmailBranding.govuk_branding()
 
     elif branding_style == "custom":
         branding = EmailBranding.with_default_values(**request.args)

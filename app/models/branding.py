@@ -39,6 +39,10 @@ class EmailBranding(Branding):
             return cls.with_default_values(name="GOV.UK", brand_type="govuk")
         return cls(email_branding_client.get_email_branding(id)["email_branding"])
 
+    @classmethod
+    def govuk_branding(cls):
+        return cls.from_id(None)
+
     @property
     def is_nhs(self):
         return self.id == self.NHS_ID
