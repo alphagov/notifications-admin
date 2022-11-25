@@ -3919,7 +3919,7 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
         service_id=service_one["id"],
         **email_branding_data,
         _expected_redirect=url_for(
-            "main.email_branding_confirm_upload_logo",
+            "main.email_branding_set_alt_text",
             service_id=service_one["id"],
             **email_branding_data,
             logo="my-logo-path",
@@ -4038,9 +4038,9 @@ def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(mocker
     assert mock_image_processor().pad.call_args_list == [mocker.call(to_height=25)]
 
 
-def test_GET_email_branding_confirm_upload_logo(client_request, service_one):
+def test_GET_email_branding_set_alt_text(client_request, service_one):
     page = client_request.get(
-        "main.email_branding_confirm_upload_logo",
+        "main.email_branding_set_alt_text",
         service_id=service_one["id"],
         brand_type="org_banner",
         logo="example.png",
@@ -4066,11 +4066,11 @@ def test_GET_email_branding_confirm_upload_logo(client_request, service_one):
         ({}, "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner"),
     ),
 )
-def test_GET_email_branding_confirm_upload_logo_redirects_on_missing_query_params(
+def test_GET_email_branding_set_alt_text_redirects_on_missing_query_params(
     client_request, service_one, request_params, expected_location
 ):
     client_request.get(
-        "main.email_branding_confirm_upload_logo",
+        "main.email_branding_set_alt_text",
         service_id=service_one["id"],
         **request_params,
         _expected_status=302,

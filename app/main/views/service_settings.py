@@ -1410,7 +1410,7 @@ def email_branding_upload_logo(service_id):
 
         return redirect(
             url_for(
-                "main.email_branding_confirm_upload_logo",
+                "main.email_branding_set_alt_text",
                 service_id=service_id,
                 **_email_branding_flow_query_params(request, logo=logo_filename),
             )
@@ -1441,7 +1441,7 @@ def email_branding_upload_logo(service_id):
     "/services/<uuid:service_id>/service-settings/email-branding/when-you-use-this-branding", methods=["GET", "POST"]
 )
 @user_has_permissions("manage_service")
-def email_branding_confirm_upload_logo(service_id):
+def email_branding_set_alt_text(service_id):
     email_branding_data = _email_branding_flow_query_params(request)
     if not email_branding_data["brand_type"]:
         return redirect(url_for("main.email_branding_choose_banner_type", service_id=service_id))
@@ -1453,7 +1453,7 @@ def email_branding_confirm_upload_logo(service_id):
         pass
 
     return render_template(
-        "views/service-settings/branding/add-new-branding/confirm.html",
+        "views/service-settings/branding/add-new-branding/email-branding-set-alt-text.html",
         back_link=url_for(
             ".email_branding_upload_logo",
             service_id=service_id,
