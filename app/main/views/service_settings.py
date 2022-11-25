@@ -1452,9 +1452,9 @@ def email_branding_set_alt_text(service_id):
     form = EmailBrandingAltTextForm()
 
     if form.validate_on_submit():
+        name = email_branding_client.get_email_branding_name_for_alt_text(form.alt_text.data)
         email_branding_client.create_email_branding(
-            # TODO: handle if this name already exists in the db
-            name=form.alt_text.data,
+            name=name,
             alt_text=form.alt_text.data,
             text=None,
             created_by_id=current_user.id,

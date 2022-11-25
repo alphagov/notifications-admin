@@ -2601,6 +2601,17 @@ def mock_create_email_branding(mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_get_email_branding_name_for_alt_text(mocker):
+    def _get_email_branding_name_for_alt_text(alt_text):
+        return alt_text
+
+    return mocker.patch(
+        "app.email_branding_client.get_email_branding_name_for_alt_text",
+        side_effect=_get_email_branding_name_for_alt_text,
+    )
+
+
+@pytest.fixture(scope="function")
 def mock_update_email_branding(mocker):
     def _update_email_branding(branding_id, logo, name, alt_text, text, colour, brand_type, updated_by_id):
         return
