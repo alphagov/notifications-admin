@@ -3,9 +3,7 @@
 {% endmacro %}
 
 {% macro custom_email_branding_preview(preview_settings) %}
-  {% set query_params = (preview_settings | urlencode) %}
-  {% set query_params = 'branding_style=custom' + ('&' + query_params if query_params else '') %}
-  <iframe src="{{ url_for('main.email_template') }}?{{ query_params }}" class="branding-preview" scrolling="no"></iframe>
+  <iframe src="{{ url_for('main.email_template', branding_style='custom', **preview_settings) }}" class="branding-preview" scrolling="no"></iframe>
 {% endmacro %}
 
 {% macro email_branding_preview(branding_style, classes='') %}
