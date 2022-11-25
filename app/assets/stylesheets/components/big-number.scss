@@ -90,21 +90,15 @@
   .big-number-link {
 
     text-decoration: none;
-    background: $govuk-link-colour;
-    color: govuk-colour("white");
+    background: $govuk-link-colour; // text colour is set in the HTML, with the govuk-link--inverse class
     display: block;
     border: 2px solid $govuk-link-colour;
     margin-bottom: 5px;
 
     &:hover {
 
-      color: govuk-tint(govuk-colour("light-blue"), 75);
-
-      .big-number,
-      .big-number-number,
-      .big-number-smaller,
       .big-number-label {
-        color: govuk-tint(govuk-colour("light-blue"), 75);
+        @include govuk-link-hover-decoration;
       }
 
     }
@@ -131,7 +125,7 @@
     }
 
     .big-number-label {
-      text-decoration: underline;
+      @include govuk-link-decoration;
     }
 
   }
@@ -144,23 +138,6 @@
     background: govuk-colour("green");
     color: govuk-colour("white");
     padding: 15px;
-
-    a {
-
-      &:link,
-      &:visited,
-      &:active,
-      &:hover {
-        color: govuk-colour("white");
-        text-decoration: underline;
-      }
-
-      &:active,
-      &:focus {
-        color: $govuk-focus-text-colour;
-      }
-
-    }
 
   }
 
