@@ -178,9 +178,19 @@
   margin-bottom: govuk-spacing(6);
   text-decoration: none;
 
+  &:hover {
+    .banner-dashboard-count-label {
+      @include govuk-link-hover-decoration;
+    }
+  }
+
   &:focus {
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
+
+    .banner-dashboard-count-label {
+      text-decoration: none;
+    }
   }
 
   &-count,
@@ -200,7 +210,7 @@
 
   &-count-label {
     @include govuk-font(24, $weight: bold);
-    text-decoration: underline;
+    @include govuk-link-decoration;
     padding-right: govuk-spacing(6);
     margin: 10px 0px 5px; // 10px includes 5px extra to counter the -5px margin-top on the count item
     flex: 2 1 auto;
