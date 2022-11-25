@@ -7,7 +7,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Check your branding
+  Preview your email branding
 {% endblock %}
 
 {% block backLink %}
@@ -16,7 +16,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Check your branding') }}
+  {{ page_header('Preview your email branding') }}
 
   {{ errorSummary(form) }}
 
@@ -26,9 +26,33 @@
 
   {{ custom_email_branding_preview(email_preview_data) }}
 
+  <h2 class="heading-medium">Add alternative text (alt text)</h2>
   {% call form_wrapper() %}
-    {{ form.alt_text }}
-    {{ page_footer('Use this branding') }}
+    <p class="govuk-body">
+      Alt text is for people who cannot see your logo. It will be:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>read out by screen readers</li>
+      <li>displayed if your logo does not load</li>
+      <li>shown if your recipient has images switched off</li>
+    </ul>
+    <p class="govuk-body">
+      Alt text should tell people what your logo means, not what it looks like.
+    </p>
+
+    <p class="govuk-body">
+      For example, the alt text for the GOV.UK logo would be ‘GOV.UK’. It would not be ‘Royal crown above the word GOV.UK written in capital letters’.
+    </p>
+
+    <p class="govuk-body">
+      Do not include the word ‘logo’ in your alt text.
+    </p>
+
+    {{ form.alt_text(param_extensions={
+      'label': {'text': 'Enter alt text for your logo'},
+      'hint': {'text': 'For example, ' + (current_service.organisation_name if current_service.organisation_id else 'Department for Education')}
+    }) }}
+    {{ page_footer('Save') }}
   {% endcall %}
 
 {% endblock %}

@@ -1460,6 +1460,11 @@ def email_branding_set_alt_text(service_id):
             created_by_id=current_user.id,
             **email_branding_data,
         )
+
+        flash(
+            "You’ve changed your email branding. Send yourself an email to make sure it looks OK.", "default_with_tick"
+        )
+
         return redirect(url_for("main.service_settings", service_id=service_id))
 
     return render_template(
