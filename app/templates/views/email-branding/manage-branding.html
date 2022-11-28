@@ -29,9 +29,9 @@
       </p>
       {{ file_upload(form.file, allowed_file_extensions=['png'], button_text='{} logo'.format('Update' if email_branding else 'Upload')) }}
       {% call form_wrapper() %}
-        <div class="form-group">
-          <div style='margin-top:15px;'>{{form.name}}</div>
-          <div style='margin-top:15px;'>{{form.text}}</div>
+        <div class="form-group govuk-!-margin-top-3">
+          {{ form.name }}
+          {{ form.text }}
           {{ form.colour }}
           {{ form.brand_type }}
           {{ page_footer(
