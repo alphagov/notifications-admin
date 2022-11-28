@@ -54,7 +54,7 @@ def test_edit_email_branding_shows_the_correct_branding_info(
     assert page.select_one("#name").attrs.get("value") == "Organisation name"
     assert page.select_one("#file").attrs.get("accept") == ".png"
     assert page.select_one("#text").attrs.get("value") == "Organisation text"
-    assert page.select_one("#colour").attrs.get("value") == "#f00"
+    assert page.select_one("#colour").attrs.get("value") == "f00"
 
 
 def test_create_email_branding_does_not_show_any_branding_info(

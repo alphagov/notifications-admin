@@ -363,6 +363,16 @@ class HexColourCodeField(GovukTextInputField, RequiredValidatorsMixin):
     required_validators = [
         Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"),
     ]
+    param_extensions = {
+        "prefix": {
+            "text": "#",
+        },
+        "classes": "govuk-input--width-6",
+        "attributes": {"data-notify-module": "colour-preview"},
+    }
+
+    def _value(self):
+        return self.data[1:] if self.data and self.data.startswith("#") else self.data
 
     def post_validate(self, form, validation_stopped):
         if not self.errors:
@@ -1618,10 +1628,7 @@ class AdminPreviewBrandingForm(StripWhitespaceForm):
 class AdminEditEmailBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField("Name of brand")
     text = GovukTextInputField("Text")
-    colour = HexColourCodeField(
-        "Colour",
-        param_extensions={"classes": "govuk-input--width-6", "attributes": {"data-notify-module": "colour-preview"}},
-    )
+    colour = HexColourCodeField("Colour")
     file = VirusScannedFileField("Upload a PNG logo", validators=[FileAllowed(["png"], "PNG Images only!")])
     brand_type = GovukRadiosField(
         "Brand type",
