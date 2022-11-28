@@ -51,12 +51,7 @@ def email_branding():
 def platform_admin_update_email_branding(branding_id, logo=None):
     email_branding = EmailBranding.from_id(branding_id)
 
-    form = AdminEditEmailBrandingForm(
-        name=email_branding.name,
-        text=email_branding.text,
-        colour=email_branding.colour,
-        brand_type=email_branding.brand_type,
-    )
+    form = AdminEditEmailBrandingForm(obj=email_branding)
 
     logo = logo or email_branding.logo
 
