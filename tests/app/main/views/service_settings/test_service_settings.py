@@ -4128,6 +4128,8 @@ def test_POST_email_branding_set_alt_text_creates_branding_and_redirects_to_serv
     mock_create_email_branding,
     mock_get_email_branding_name_for_alt_text,
     active_user_with_permissions,
+    mock_update_service,
+    fake_uuid,
     mocker,
 ):
     mock_flash = mocker.patch("app.main.views.service_settings.flash")
@@ -4148,6 +4150,10 @@ def test_POST_email_branding_set_alt_text_creates_branding_and_redirects_to_serv
         colour=None,
         brand_type="org",
         created_by_id=active_user_with_permissions["id"],
+    )
+    mock_update_service.assert_called_once_with(
+        service_one["id"],
+        email_branding=fake_uuid,
     )
     mock_flash.assert_called_once_with(
         "You’ve changed your email branding. Send yourself an email to make sure it looks OK.",
