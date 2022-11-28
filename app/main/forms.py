@@ -198,7 +198,7 @@ class GovukTextInputFieldMixin(GovukFrontendWidgetMixin):
     govuk_frontend_component_name = "text-input"
 
     def prepare_params(self, **kwargs):
-        value = kwargs["value"] if "value" in kwargs else self.data
+        value = kwargs["value"] if "value" in kwargs else self._value()
         value = str(value) if isinstance(value, Number) else value
 
         error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
@@ -571,7 +571,15 @@ class GovukCheckboxField(GovukFrontendWidgetMixin, BooleanField):
         params = {
             "name": self.name,
             "errorMessage": self.get_error_message(),
-            "items": [{"name": self.name, "id": self.id, "text": self.label.text, "value": "y", "checked": self.data}],
+            "items": [
+                {
+                    "name": self.name,
+                    "id": self.id,
+                    "text": self.label.text,
+                    "value": self._value(),
+                    "checked": self.data,
+                }
+            ],
         }
         return params
 
@@ -607,7 +615,7 @@ class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
             "name": option.name,
             "id": option.id,
             "text": option.label.text,
-            "value": str(option.data),  # to protect against non-string types like uuids
+            "value": option._value(),
             "checked": option.checked,
         }
 
@@ -672,7 +680,7 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
             "name": option.name,
             "id": option.id,
             "text": option.label.text,
-            "value": str(option.data),  # to protect against non-string types like uuids
+            "value": option._value(),
             "checked": option.checked,
         }
 
