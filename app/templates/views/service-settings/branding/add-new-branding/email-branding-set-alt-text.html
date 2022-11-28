@@ -1,0 +1,58 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/branding-preview.html" import custom_email_branding_preview %}
+{% from "components/error-summary.html" import errorSummary %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Preview your email branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link}) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Preview your email branding') }}
+
+  {{ errorSummary(form) }}
+
+  <p class="govuk-body">
+    This is a preview of what emails from {{ current_service.name }} will look like.
+  </p>
+
+  {{ custom_email_branding_preview(email_preview_data) }}
+
+  <h2 class="heading-medium">Add alternative text (alt text)</h2>
+  {% call form_wrapper() %}
+    <p class="govuk-body">
+      Alt text is for people who cannot see your logo. It will be:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>read out by screen readers</li>
+      <li>displayed if your logo does not load</li>
+      <li>shown if your recipient has images switched off</li>
+    </ul>
+    <p class="govuk-body">
+      Alt text should tell people what your logo means, not what it looks like.
+    </p>
+
+    <p class="govuk-body">
+      For example, the alt text for the GOV.UK logo would be ‘GOV.UK’. It would not be ‘Royal crown above the word GOV.UK written in capital letters’.
+    </p>
+
+    <p class="govuk-body">
+      Do not include the word ‘logo’ in your alt text.
+    </p>
+
+    {{ form.alt_text(param_extensions={
+      'label': {'text': 'Enter alt text for your logo'},
+      'hint': {'text': 'For example, ' + (current_service.organisation_name if current_service.organisation_id else 'Department for Education')}
+    }) }}
+    {{ page_footer('Save') }}
+  {% endcall %}
+
+{% endblock %}

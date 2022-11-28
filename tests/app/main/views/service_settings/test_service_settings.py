@@ -3919,7 +3919,7 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
         service_id=service_one["id"],
         **email_branding_data,
         _expected_redirect=url_for(
-            "main.email_branding_confirm_upload_logo",
+            "main.email_branding_set_alt_text",
             service_id=service_one["id"],
             **email_branding_data,
             logo="my-logo-path",
@@ -4038,22 +4038,47 @@ def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(mocker
     assert mock_image_processor().pad.call_args_list == [mocker.call(to_height=25)]
 
 
-def test_GET_email_branding_confirm_upload_logo(client_request, service_one):
+def test_GET_email_branding_set_alt_text_shows_form(client_request, service_one):
     page = client_request.get(
-        "main.email_branding_confirm_upload_logo",
+        "main.email_branding_set_alt_text",
         service_id=service_one["id"],
         brand_type="org_banner",
         logo="example.png",
+        colour="#abcdef",
     )
-    form = page.select_one("main form")
-    email_preview = page.select_one("iframe")
-    confirm_button = page.select_one("main button")
 
-    assert "Check your branding" in page.text
-    assert form.get("method") == "post"
-    assert email_preview.get("src") == "/_email?branding_style=custom&brand_type=org_banner&logo=example.png"
-    assert confirm_button is not None
-    assert normalize_spaces(confirm_button.text) == "Use this branding"
+    email_preview = page.select_one("iframe")
+    email_preview_url = email_preview.get("src")
+    email_preview_query_args = parse_qs(urlparse(email_preview_url).query)
+
+    assert email_preview_query_args == {
+        "branding_style": ["custom"],
+        "brand_type": ["org_banner"],
+        "logo": ["example.png"],
+        "colour": ["#abcdef"],
+    }
+
+    assert normalize_spaces(page.select_one("h1").text) == "Preview your email branding"
+    assert normalize_spaces(page.select_one("label[for=alt_text]").text) == "Enter alt text for your logo"
+    assert normalize_spaces(page.select_one("main form button").text) == "Save"
+    assert normalize_spaces(page.select_one("div#alt_text-hint").text) == "For example, Department for Education"
+
+
+def test_GET_email_branding_set_alt_text_shows_current_org_in_hint_text(
+    client_request,
+    service_one,
+    mock_get_organisation,
+):
+    service_one["organisation"] = "1234"
+
+    page = client_request.get(
+        "main.email_branding_set_alt_text",
+        service_id=service_one["id"],
+        brand_type="org_banner",
+        logo="example.png",
+        colour="#abcdef",
+    )
+    assert normalize_spaces(page.select_one("div#alt_text-hint").text) == "For example, Test organisation"
 
 
 @pytest.mark.parametrize(
@@ -4066,15 +4091,66 @@ def test_GET_email_branding_confirm_upload_logo(client_request, service_one):
         ({}, "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner"),
     ),
 )
-def test_GET_email_branding_confirm_upload_logo_redirects_on_missing_query_params(
+def test_GET_email_branding_set_alt_text_redirects_on_missing_query_params(
     client_request, service_one, request_params, expected_location
 ):
     client_request.get(
-        "main.email_branding_confirm_upload_logo",
+        "main.email_branding_set_alt_text",
         service_id=service_one["id"],
         **request_params,
         _expected_status=302,
         _expected_redirect=expected_location,
+    )
+
+
+@pytest.mark.parametrize(
+    "alt_text, expected_error",
+    [
+        ("", "Error: Cannot be empty"),
+        ("My First Logo", "Error: Do not include the word ‘logo’ in your alt text"),
+    ],
+)
+def test_POST_email_branding_set_alt_text_shows_error(client_request, service_one, alt_text, expected_error):
+    page = client_request.post(
+        "main.email_branding_set_alt_text",
+        service_id=service_one["id"],
+        brand_type="org_banner",
+        logo="example.png",
+        _data={"alt_text": alt_text},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one("#alt_text-error").text) == expected_error
+
+
+def test_POST_email_branding_set_alt_text_creates_branding_and_redirects_to_service_settings(
+    client_request,
+    service_one,
+    mock_create_email_branding,
+    active_user_with_permissions,
+    mocker,
+):
+    mock_flash = mocker.patch("app.main.views.service_settings.flash")
+    client_request.post(
+        "main.email_branding_set_alt_text",
+        service_id=service_one["id"],
+        brand_type="org",
+        logo="example.png",
+        _data={"alt_text": "some alt text"},
+        _expected_status=302,
+        _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
+    )
+    mock_create_email_branding.assert_called_once_with(
+        logo="example.png",
+        name="some alt text",
+        alt_text="some alt text",
+        text=None,
+        colour=None,
+        brand_type="org",
+        created_by_id=active_user_with_permissions["id"],
+    )
+    mock_flash.assert_called_once_with(
+        "You’ve changed your email branding. Send yourself an email to make sure it looks OK.",
+        "default_with_tick",
     )
 
 

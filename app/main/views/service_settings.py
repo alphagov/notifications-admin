@@ -49,6 +49,7 @@ from app.main.forms import (
     AdminSetOrganisationForm,
     ChooseEmailBrandingForm,
     ChooseLetterBrandingForm,
+    EmailBrandingAltTextForm,
     EmailBrandingChooseBanner,
     EmailBrandingChooseBannerColour,
     EmailBrandingChooseLogoForm,
@@ -1410,7 +1411,7 @@ def email_branding_upload_logo(service_id):
 
         return redirect(
             url_for(
-                "main.email_branding_confirm_upload_logo",
+                "main.email_branding_set_alt_text",
                 service_id=service_id,
                 **_email_branding_flow_query_params(request, logo=logo_filename),
             )
@@ -1441,25 +1442,40 @@ def email_branding_upload_logo(service_id):
     "/services/<uuid:service_id>/service-settings/email-branding/when-you-use-this-branding", methods=["GET", "POST"]
 )
 @user_has_permissions("manage_service")
-def email_branding_confirm_upload_logo(service_id):
+def email_branding_set_alt_text(service_id):
     email_branding_data = _email_branding_flow_query_params(request)
     if not email_branding_data["brand_type"]:
         return redirect(url_for("main.email_branding_choose_banner_type", service_id=service_id))
     elif not email_branding_data["logo"]:
         return redirect(url_for("main.email_branding_upload_logo", service_id=service_id, **email_branding_data))
 
-    if request.method == "POST":
-        # Can't create the branding yet - need to extend this page to accept and handle the logo name/alt text
-        pass
+    form = EmailBrandingAltTextForm()
+
+    if form.validate_on_submit():
+        email_branding_client.create_email_branding(
+            # TODO: handle if this name already exists in the db
+            name=form.alt_text.data,
+            alt_text=form.alt_text.data,
+            text=None,
+            created_by_id=current_user.id,
+            **email_branding_data,
+        )
+
+        flash(
+            "You’ve changed your email branding. Send yourself an email to make sure it looks OK.", "default_with_tick"
+        )
+
+        return redirect(url_for("main.service_settings", service_id=service_id))
 
     return render_template(
-        "views/service-settings/branding/add-new-branding/confirm.html",
+        "views/service-settings/branding/add-new-branding/email-branding-set-alt-text.html",
         back_link=url_for(
             ".email_branding_upload_logo",
             service_id=service_id,
             **_email_branding_flow_query_params(request, logo=None),
         ),
         email_preview_data=email_branding_data,
+        form=form,
     )
 
 
