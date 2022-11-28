@@ -11,7 +11,10 @@
 
       this.$input = $(component);
 
-      this.$input.closest('.govuk-form-group').append(
+      // We expect the colour preview module to only ever be applied to a GOV.UK Design System text input with a prefix,
+      // which wraps the text input inside a `govuk-input__wrapper` div.
+      const $appendToElement = this.$input.parent();
+      $appendToElement.append(
         this.$preview = $('<span class="textbox-colour-preview"></span>')
       );
 

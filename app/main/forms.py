@@ -198,7 +198,7 @@ class GovukTextInputFieldMixin(GovukFrontendWidgetMixin):
     govuk_frontend_component_name = "text-input"
 
     def prepare_params(self, **kwargs):
-        value = kwargs["value"] if "value" in kwargs else self.data
+        value = kwargs["value"] if "value" in kwargs else self._value()
         value = str(value) if isinstance(value, Number) else value
 
         error_message_format = "html" if kwargs.get("error_message_with_html") else "text"
@@ -363,6 +363,16 @@ class HexColourCodeField(GovukTextInputField, RequiredValidatorsMixin):
     required_validators = [
         Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"),
     ]
+    param_extensions = {
+        "prefix": {
+            "text": "#",
+        },
+        "classes": "govuk-input--width-6",
+        "attributes": {"data-notify-module": "colour-preview"},
+    }
+
+    def _value(self):
+        return self.data[1:] if self.data and self.data.startswith("#") else self.data
 
     def post_validate(self, form, validation_stopped):
         if not self.errors:
@@ -571,7 +581,15 @@ class GovukCheckboxField(GovukFrontendWidgetMixin, BooleanField):
         params = {
             "name": self.name,
             "errorMessage": self.get_error_message(),
-            "items": [{"name": self.name, "id": self.id, "text": self.label.text, "value": "y", "checked": self.data}],
+            "items": [
+                {
+                    "name": self.name,
+                    "id": self.id,
+                    "text": self.label.text,
+                    "value": self._value(),
+                    "checked": self.data,
+                }
+            ],
         }
         return params
 
@@ -607,7 +625,7 @@ class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
             "name": option.name,
             "id": option.id,
             "text": option.label.text,
-            "value": str(option.data),  # to protect against non-string types like uuids
+            "value": option._value(),
             "checked": option.checked,
         }
 
@@ -672,7 +690,7 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
             "name": option.name,
             "id": option.id,
             "text": option.label.text,
-            "value": str(option.data),  # to protect against non-string types like uuids
+            "value": option._value(),
             "checked": option.checked,
         }
 
@@ -1610,10 +1628,7 @@ class AdminPreviewBrandingForm(StripWhitespaceForm):
 class AdminEditEmailBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField("Name of brand")
     text = GovukTextInputField("Text")
-    colour = HexColourCodeField(
-        "Colour",
-        param_extensions={"classes": "govuk-input--width-6", "attributes": {"data-notify-module": "colour-preview"}},
-    )
+    colour = HexColourCodeField("Colour")
     file = VirusScannedFileField("Upload a PNG logo", validators=[FileAllowed(["png"], "PNG Images only!")])
     brand_type = GovukRadiosField(
         "Brand type",
