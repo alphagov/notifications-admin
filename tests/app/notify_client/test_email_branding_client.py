@@ -105,10 +105,11 @@ def test_update_email_branding(mocker, fake_uuid):
 
 
 def test_create_email_branding_sends_none_values(mocker, fake_uuid):
+    # this would fail because neither of alt text and text are set, but the key is we're not sending empty strings
     form_data = {
         "logo": "",
         "name": "test name",
-        "alt_text": "test alt text",
+        "alt_text": "",
         "text": "",
         "colour": "",
         "brand_type": "org",
@@ -118,7 +119,7 @@ def test_create_email_branding_sends_none_values(mocker, fake_uuid):
     expected_data = {
         "logo": None,
         "name": "test name",
-        "alt_text": "test alt text",
+        "alt_text": None,
         "text": None,
         "colour": None,
         "brand_type": "org",
