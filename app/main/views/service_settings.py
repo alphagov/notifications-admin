@@ -1295,19 +1295,17 @@ def email_branding_something_else(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     branding_options = ChooseEmailBrandingForm(current_service)
-    if branding_options.something_else_is_only_option:
-        back_link = url_for(".service_settings", service_id=current_service.id)
-    else:
-        back_link = url_for(
-            request.args.get("back_link", ".email_branding_request"),
-            service_id=current_service.id,
-            **_email_branding_flow_query_params(request),
-        )
-
+    default_back_view = (
+        ".service_settings" if branding_options.something_else_is_only_option else ".email_branding_request"
+    )
+    back_link = url_for(
+        request.args.get("back_link", default_back_view),
+        service_id=current_service.id,
+        **_email_branding_flow_query_params(request),
+    )
     return render_template(
         "views/service-settings/branding/email-branding-something-else.html",
         form=form,
-        branding_options=branding_options,
         back_link=back_link,
     )
 
