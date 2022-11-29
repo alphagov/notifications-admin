@@ -2099,7 +2099,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
         "single_identity": {
             "label": "Create a government identity logo",
             "image": {
-                "url": asset_fingerprinter.get_url("images/branding/single_identity.png"),
+                "url": "images/branding/single_identity.png",
                 "alt_text": "An example of an email with a government identity logo,"
                 " including a blue stripe, a crest and department's name",
                 "dimensions": {"width": 606, "height": 404},
@@ -2108,7 +2108,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
         "org": {
             "label": "Upload a logo",
             "image": {
-                "url": asset_fingerprinter.get_url("images/branding/org.png"),
+                "url": "images/branding/org.png",
                 "alt_text": 'An example of an email with the heading "Your logo" in blue text on a white background.',
                 "dimensions": {"width": 606, "height": 404},
             },
@@ -2127,7 +2127,7 @@ class EmailBrandingChooseBanner(Form):
         "org_banner": {
             "label": "Yes",
             "image": {
-                "url": asset_fingerprinter.get_url("images/branding/org_banner.png"),
+                "url": "images/branding/org_banner.png",
                 "alt_text": "An example of an email with a logo on a blue banner.",
                 "dimensions": {"width": 404, "height": 454},
             },
@@ -2135,7 +2135,7 @@ class EmailBrandingChooseBanner(Form):
         "org": {
             "label": "No",
             "image": {
-                "url": asset_fingerprinter.get_url("images/branding/org.png"),
+                "url": "images/branding/org.png",
                 "alt_text": "An example of an email with a logo on a clear background.",
                 "dimensions": {"width": 404, "height": 454},
             },

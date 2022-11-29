@@ -102,7 +102,7 @@
         {% set itemHintId = id + '-item-hint' %}
         <div class="govuk-radios__item notify-radios-with-images__item">
           <img
-            src="{{ item.image.url }}"
+            src="{{ asset_fingerprinter.get_url(item.image.url) }}"
             alt="{{ item.image.alt_text }}"
             width="{{ item.image.dimensions.width }}"
             height="{{ item.image.dimensions.height }}"
