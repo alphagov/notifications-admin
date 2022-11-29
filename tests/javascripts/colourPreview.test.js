@@ -167,6 +167,16 @@ describe('Colour preview', () => {
 
     });
 
+    test("If there is leading and trailing space the preview still works", () => {
+
+      textbox.setAttribute('value', '  #00FF00 ');
+
+      helpers.triggerEvent(textbox, 'input');
+
+      expect(swatchEl.style.background).toEqual('rgb(0, 255, 0)');
+
+    });
+
   });
 
 });

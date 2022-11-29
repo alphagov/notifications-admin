@@ -25,7 +25,7 @@
     };
 
     this.update = () => this.$preview.css(
-      'background', colourOrWhite(this.$input.val())
+      'background', colourOrWhite(this.$input.val().trim())
     );
 
   };
