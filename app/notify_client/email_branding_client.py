@@ -27,7 +27,7 @@ class EmailBrandingClient(NotifyAdminAPIClient):
             "brand_type": brand_type,
             "created_by": created_by_id,
         }
-        return self.post(url="/email-branding", data=data)
+        return self.post(url="/email-branding", data=data)["data"]
 
     @cache.delete("email_branding")
     @cache.delete("email_branding-{branding_id}")

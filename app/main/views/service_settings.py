@@ -1453,12 +1453,20 @@ def email_branding_set_alt_text(service_id):
 
     if form.validate_on_submit():
         name = email_branding_client.get_email_branding_name_for_alt_text(form.alt_text.data)
-        email_branding_client.create_email_branding(
+        new_email_branding = email_branding_client.create_email_branding(
             name=name,
             alt_text=form.alt_text.data,
             text=None,
             created_by_id=current_user.id,
             **email_branding_data,
+        )
+
+        # set as service branding
+        current_service.update(email_branding=new_email_branding["id"])
+
+        # add to org pool
+        organisations_client.add_brandings_to_email_branding_pool(
+            current_service.organisation.id, [new_email_branding["id"]]
         )
 
         flash(
