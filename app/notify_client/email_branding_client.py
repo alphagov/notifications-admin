@@ -21,7 +21,7 @@ class EmailBrandingClient(NotifyAdminAPIClient):
         data = {
             "logo": logo or None,
             "name": name,
-            "alt_text": alt_text,
+            "alt_text": alt_text or None,
             "text": text or None,
             "colour": colour or None,
             "brand_type": brand_type,

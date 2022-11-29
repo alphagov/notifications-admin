@@ -3,6 +3,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/error-summary.html" import errorSummary %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
@@ -15,6 +16,8 @@
 {% endblock %}
 
 {% block platform_admin_content %}
+
+  {{ errorSummary(form) }}
 
   {{ page_header('{} email branding'.format('Update' if email_branding else 'Add')) }}
   <div class="govuk-grid-row">
@@ -29,9 +32,10 @@
       </p>
       {{ file_upload(form.file, allowed_file_extensions=['png'], button_text='{} logo'.format('Update' if email_branding else 'Upload')) }}
       {% call form_wrapper() %}
-        <div class="form-group">
-          <div style='margin-top:15px;'>{{form.name}}</div>
-          <div style='margin-top:15px;'>{{form.text}}</div>
+        <div class="form-group govuk-!-margin-top-3">
+          {{ form.name }}
+          {{ form.text }}
+          {{ form.alt_text }}
           {{ form.colour }}
           {{ form.brand_type }}
           {{ page_footer(

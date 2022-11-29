@@ -1627,7 +1627,10 @@ class AdminPreviewBrandingForm(StripWhitespaceForm):
 
 class AdminEditEmailBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField("Name of brand")
-    text = GovukTextInputField("Text")
+    text = GovukTextInputField("Logo text", param_extensions={"hint": {"text": "Text that appears beside the logo"}})
+    alt_text = GovukTextInputField(
+        "Alt text", param_extensions={"hint": {"text": "Text for people who cannot see the logo"}}
+    )
     colour = HexColourCodeField("Colour")
     file = VirusScannedFileField("Upload a PNG logo", validators=[FileAllowed(["png"], "PNG Images only!")])
     brand_type = GovukRadiosField(
@@ -1643,6 +1646,23 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         op = request.form.get("operation")
         if op == "email-branding-details" and not self.name.data:
             raise ValidationError("This field is required")
+
+    def validate(self):
+        rv = super().validate()
+
+        op = request.form.get("operation")
+        if op == "email-branding-details":
+            # we only want to validate alt_text/text if we're editing the fields, not the file
+
+            if self.alt_text.data and self.text.data:
+                self.alt_text.errors.append("Must be empty if you enter logo text")
+                return False
+
+            if not (self.alt_text.data or self.text.data):
+                self.alt_text.errors.append("Cannot be empty if you do not have logo text")
+                return False
+
+        return rv
 
 
 class AdminChangeOrganisationDefaultEmailBrandingForm(StripWhitespaceForm):

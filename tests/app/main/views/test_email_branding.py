@@ -1,6 +1,6 @@
 from io import BytesIO
 from unittest import mock
-from unittest.mock import ANY, call
+from unittest.mock import call
 
 import pytest
 from flask import url_for
@@ -22,7 +22,9 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
 
     assert normalize_spaces(page.select_one("h1").text) == "Email branding"
 
-    assert page.select(".govuk-grid-column-three-quarters a")[-1]["href"] == url_for("main.create_email_branding")
+    assert page.select(".govuk-grid-column-three-quarters a")[-1]["href"] == url_for(
+        "main.platform_admin_create_email_branding"
+    )
 
     assert brand_names == [
         "org 1",
@@ -32,11 +34,11 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
         "org 5",
     ]
     assert hrefs == [
-        url_for(".update_email_branding", branding_id=1),
-        url_for(".update_email_branding", branding_id=2),
-        url_for(".update_email_branding", branding_id=3),
-        url_for(".update_email_branding", branding_id=4),
-        url_for(".update_email_branding", branding_id=5),
+        url_for(".platform_admin_update_email_branding", branding_id=1),
+        url_for(".platform_admin_update_email_branding", branding_id=2),
+        url_for(".platform_admin_update_email_branding", branding_id=3),
+        url_for(".platform_admin_update_email_branding", branding_id=4),
+        url_for(".platform_admin_update_email_branding", branding_id=5),
     ]
 
 
@@ -45,7 +47,7 @@ def test_edit_email_branding_shows_the_correct_branding_info(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(
-        ".update_email_branding",
+        ".platform_admin_update_email_branding",
         branding_id=fake_uuid,
         _test_page_title=False,  # TODO: Fix page titles
     )
@@ -62,7 +64,7 @@ def test_create_email_branding_does_not_show_any_branding_info(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _test_page_title=False,  # TODO: Fix page titles
     )
 
@@ -78,7 +80,7 @@ def test_create_email_branding_can_be_populated_from_querystring(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         name="Example name",
         text="Example text",
         colour="Example colour",
@@ -111,7 +113,7 @@ def test_create_new_email_branding_without_logo(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _content_type="multipart/form-data",
         _data=data,
     )
@@ -146,7 +148,7 @@ def test_create_new_email_branding_with_unique_name_conflict(
     response_mock.json.return_value = {"message": {"name": ["An email branding with that name already exists."]}}
     mock_create_email_branding.side_effect = HTTPError(response=response_mock)
     resp = client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _content_type="multipart/form-data",
         _data=data,
         _expected_status=400,
@@ -173,7 +175,7 @@ def test_create_email_branding_requires_a_name_when_submitting_logo_details(
     }
     client_request.login(platform_admin_user)
     page = client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _content_type="multipart/form-data",
         _data=data,
         _expected_status=400,
@@ -199,7 +201,10 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
     }
     client_request.login(platform_admin_user)
     page = client_request.post(
-        ".create_email_branding", _content_type="multipart/form-data", _data=data, _follow_redirects=True
+        "main.platform_admin_create_email_branding",
+        _content_type="multipart/form-data",
+        _data=data,
+        _follow_redirects=True,
     )
 
     assert not page.select_one(".error-message")
@@ -230,22 +235,40 @@ def test_create_email_branding_calls_antivirus_scan(
     }
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding", _content_type="multipart/form-data", _data=data, _expected_status=expected_status_code
+        "main.platform_admin_create_email_branding",
+        _content_type="multipart/form-data",
+        _data=data,
+        _expected_status=expected_status_code,
     )
 
     assert mock_antivirus.call_count == 1
 
 
+@pytest.mark.parametrize(
+    "text,alt_text",
+    [
+        ("foo", ""),
+        ("", "bar"),
+    ],
+)
 def test_create_new_email_branding_when_branding_saved(
-    client_request, platform_admin_user, mocker, mock_create_email_branding, fake_uuid
+    client_request,
+    platform_admin_user,
+    mocker,
+    mock_create_email_branding,
+    fake_uuid,
+    text,
+    alt_text,
 ):
     with client_request.session_transaction() as session:
         user_id = session["user_id"]
 
     data = {
+        "operation": "email-branding-details",
         "logo": "test.png",
         "colour": "#ff0000",
-        "text": "new text",
+        "text": text,
+        "alt_text": alt_text,
         "name": "new name",
         "brand_type": "org_banner",
     }
@@ -259,13 +282,14 @@ def test_create_new_email_branding_when_branding_saved(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         logo=temp_filename,
         _content_type="multipart/form-data",
         _data={
             "colour": data["colour"],
             "name": data["name"],
             "text": data["text"],
+            "alt_text": data["alt_text"],
             "cdn_url": "https://static-logos.cdn.com",
             "brand_type": data["brand_type"],
         },
@@ -277,7 +301,7 @@ def test_create_new_email_branding_when_branding_saved(
     assert mock_create_email_branding.call_args == call(
         logo=updated_logo_name,
         name=data["name"],
-        alt_text=None,
+        alt_text=data["alt_text"],
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
@@ -285,19 +309,18 @@ def test_create_new_email_branding_when_branding_saved(
     )
 
 
-@pytest.mark.parametrize("text,expected_alt_text", [("some text", None), ("", "some name")])
-def test_create_email_branding_sets_alt_text_if_text_not_set(
+def test_create_email_branding_shows_error_with_neither_alt_text_and_text(
     client_request,
     mocker,
     mock_create_email_branding,
     platform_admin_user,
-    text,
-    expected_alt_text,
 ):
     data = {
+        "operation": "email-branding-details",
         "logo": "test.png",
         "colour": "#ff0000",
-        "text": text,
+        "text": "",
+        "alt_text": "",
         "name": "some name",
         "brand_type": "org_banner",
     }
@@ -306,24 +329,48 @@ def test_create_email_branding_sets_alt_text_if_text_not_set(
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
 
     client_request.login(platform_admin_user)
-    client_request.post(".create_email_branding", _data=data)
-
-    mock_create_email_branding.assert_called_once_with(
-        logo=ANY,
-        name=data["name"],
-        alt_text=expected_alt_text,
-        text=data["text"],
-        colour=ANY,
-        brand_type=ANY,
-        created_by_id=ANY,
+    response = client_request.post("main.platform_admin_create_email_branding", _data=data, _expected_status=400)
+    assert response.select_one("#text-error") is None
+    assert (
+        normalize_spaces(response.select_one("#alt_text-error").text)
+        == "Error: Cannot be empty if you do not have logo text"
     )
+    assert not mock_create_email_branding.called
+
+
+def test_create_email_branding_shows_error_with_both_alt_text_and_text(
+    client_request,
+    mocker,
+    mock_create_email_branding,
+    platform_admin_user,
+):
+    data = {
+        "operation": "email-branding-details",
+        "logo": "test.png",
+        "colour": "#ff0000",
+        "text": "some text",
+        "alt_text": "some alt_text",
+        "name": "some name",
+        "brand_type": "org_banner",
+    }
+
+    mocker.patch("app.main.views.email_branding.persist_logo")
+    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+
+    client_request.login(platform_admin_user)
+    response = client_request.post("main.platform_admin_create_email_branding", _data=data, _expected_status=400)
+    assert response.select_one("#text-error") is None
+    assert (
+        normalize_spaces(response.select_one("#alt_text-error").text) == "Error: Must be empty if you enter logo text"
+    )
+    assert not mock_create_email_branding.called
 
 
 @pytest.mark.parametrize(
     "endpoint, has_data",
     [
-        ("main.create_email_branding", False),
-        ("main.update_email_branding", True),
+        ("main.platform_admin_create_email_branding", False),
+        ("main.platform_admin_update_email_branding", True),
     ],
 )
 def test_deletes_previous_temp_logo_after_uploading_logo(
@@ -353,7 +400,7 @@ def test_deletes_previous_temp_logo_after_uploading_logo(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        "main.create_email_branding",
+        "main.platform_admin_create_email_branding",
         logo=temp_old_filename,
         branding_id=fake_uuid,
         _data={"file": (BytesIO("".encode("utf-8")), "test.png")},
@@ -397,13 +444,14 @@ def test_update_existing_branding(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".update_email_branding",
+        ".platform_admin_update_email_branding",
         logo=temp_filename,
         branding_id=fake_uuid,
         _content_type="multipart/form-data",
         _data={
             "colour": data["colour"],
             "name": data["name"],
+            "alt_text": "",
             "text": data["text"],
             "cdn_url": "https://static-logos.cdn.com",
             "brand_type": data["brand_type"],
@@ -417,7 +465,7 @@ def test_update_existing_branding(
         branding_id=fake_uuid,
         logo=updated_logo_name,
         name=data["name"],
-        alt_text=None,
+        alt_text="",
         text=data["text"],
         colour=data["colour"],
         brand_type=data["brand_type"],
@@ -432,21 +480,20 @@ def test_update_existing_branding(
     ]
 
 
-@pytest.mark.parametrize("text,expected_alt_text", [("some text", None), ("", "some name")])
-def test_update_email_branding_sets_alt_text_if_text_not_set(
+def test_update_email_branding_shows_error_with_neither_alt_text_and_text(
     client_request,
     mocker,
     mock_get_email_branding,
     mock_update_email_branding,
     platform_admin_user,
     fake_uuid,
-    text,
-    expected_alt_text,
 ):
     data = {
+        "operation": "email-branding-details",
         "logo": "test.png",
         "colour": "#ff0000",
-        "text": text,
+        "text": "",
+        "alt_text": "",
         "name": "some name",
         "brand_type": "org_banner",
     }
@@ -455,18 +502,42 @@ def test_update_email_branding_sets_alt_text_if_text_not_set(
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
 
     client_request.login(platform_admin_user)
-    client_request.post(".update_email_branding", branding_id=fake_uuid, _data=data)
-
-    mock_update_email_branding.assert_called_once_with(
-        branding_id=fake_uuid,
-        logo=ANY,
-        name=data["name"],
-        alt_text=expected_alt_text,
-        text=data["text"],
-        colour=ANY,
-        brand_type=ANY,
-        updated_by_id=ANY,
+    response = client_request.post(
+        "main.platform_admin_update_email_branding", branding_id=fake_uuid, _data=data, _expected_status=400
     )
+    assert response.select_one("#text-error") is None
+    assert (
+        normalize_spaces(response.select_one("#alt_text-error").text)
+        == "Error: Cannot be empty if you do not have logo text"
+    )
+    assert not mock_update_email_branding.called
+
+
+def test_update_email_branding_shows_error_with_both_alt_text_and_text(
+    client_request, mocker, mock_get_email_branding, mock_update_email_branding, platform_admin_user, fake_uuid
+):
+    data = {
+        "operation": "email-branding-details",
+        "logo": "test.png",
+        "colour": "#ff0000",
+        "text": "some text",
+        "alt_text": "some alt_text",
+        "name": "some name",
+        "brand_type": "org_banner",
+    }
+
+    mocker.patch("app.main.views.email_branding.persist_logo")
+    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+
+    client_request.login(platform_admin_user)
+    response = client_request.post(
+        "main.platform_admin_update_email_branding", branding_id=fake_uuid, _data=data, _expected_status=400
+    )
+    assert response.select_one("#text-error") is None
+    assert (
+        normalize_spaces(response.select_one("#alt_text-error").text) == "Error: Must be empty if you enter logo text"
+    )
+    assert not mock_update_email_branding.called
 
 
 def test_update_email_branding_with_unique_name_conflict(
@@ -476,7 +547,15 @@ def test_update_email_branding_with_unique_name_conflict(
     fake_uuid,
     mock_get_email_branding,
 ):
-    data = {"logo": None, "colour": "#ff0000", "text": "new text", "name": "new name", "brand_type": "org"}
+    data = {
+        "operation": "email-branding-details",
+        "logo": None,
+        "colour": "#ff0000",
+        "text": "new text",
+        "alt_text": "",
+        "name": "new name",
+        "brand_type": "org",
+    }
 
     mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
 
@@ -488,14 +567,17 @@ def test_update_email_branding_with_unique_name_conflict(
     response_mock.json.return_value = {"message": {"name": ["An email branding with that name already exists."]}}
     mock_update_email_branding.side_effect = HTTPError(response=response_mock)
     resp = client_request.post(
-        ".update_email_branding",
+        ".platform_admin_update_email_branding",
         branding_id=fake_uuid,
         _content_type="multipart/form-data",
         _data=data,
         _expected_status=400,
     )
 
-    assert "An email branding with that name already exists." in resp.text
+    assert (
+        normalize_spaces(resp.select_one("#name-error").text)
+        == "Error: An email branding with that name already exists."
+    )
 
 
 def test_temp_logo_is_shown_after_uploading_logo(
@@ -517,7 +599,7 @@ def test_temp_logo_is_shown_after_uploading_logo(
 
     client_request.login(platform_admin_user)
     page = client_request.post(
-        "main.create_email_branding",
+        "main.platform_admin_create_email_branding",
         _data={"file": (BytesIO("".encode("utf-8")), "test.png")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
@@ -542,7 +624,7 @@ def test_logo_persisted_when_organisation_saved(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         logo=temp_filename,
         _content_type="multipart/form-data",
     )
@@ -570,10 +652,11 @@ def test_logo_does_not_get_persisted_if_updating_email_branding_client_throws_an
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         logo=temp_filename,
         _content_type="multipart/form-data",
         _expected_status=500,
+        _data={"name": "foo"},
     )
 
     assert not mocked_persist_logo.called
@@ -597,7 +680,7 @@ def test_colour_regex_validation(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        ".create_email_branding",
+        "main.platform_admin_create_email_branding",
         _content_type="multipart/form-data",
         _data=data,
         _expected_status=expected_status_code,
@@ -761,7 +844,7 @@ def test_post_create_email_branding_government_identity_form_colour(mocker, clie
             "colour": "#005abb",
         },
         _expected_redirect=url_for(
-            ".create_email_branding",
+            "main.platform_admin_create_email_branding",
             logo="example.png",
             colour="#005abb",
             name="Department of Social Affairs and Citizenship",
