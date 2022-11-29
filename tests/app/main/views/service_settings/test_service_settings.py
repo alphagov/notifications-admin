@@ -4122,7 +4122,7 @@ def test_POST_email_branding_set_alt_text_shows_error(client_request, service_on
     assert normalize_spaces(page.select_one("#alt_text-error").text) == expected_error
 
 
-def test_POST_email_branding_set_alt_text_creates_branding_and_redirects_to_service_settings(
+def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redirects(
     client_request,
     service_one,
     mock_create_email_branding,
@@ -4133,6 +4133,9 @@ def test_POST_email_branding_set_alt_text_creates_branding_and_redirects_to_serv
     mocker,
 ):
     mock_flash = mocker.patch("app.main.views.service_settings.flash")
+    mock_add_to_branding_pool = mocker.patch(
+        "app.organisations_client.add_brandings_to_email_branding_pool", return_value=None
+    )
     client_request.post(
         "main.email_branding_set_alt_text",
         service_id=service_one["id"],
@@ -4151,6 +4154,7 @@ def test_POST_email_branding_set_alt_text_creates_branding_and_redirects_to_serv
         brand_type="org",
         created_by_id=active_user_with_permissions["id"],
     )
+    mock_add_to_branding_pool.assert_called_once_with(service_one["organisation"], [fake_uuid])
     mock_update_service.assert_called_once_with(
         service_one["id"],
         email_branding=fake_uuid,

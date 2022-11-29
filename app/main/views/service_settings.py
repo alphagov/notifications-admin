@@ -1461,7 +1461,13 @@ def email_branding_set_alt_text(service_id):
             **email_branding_data,
         )
 
+        # set as service branding
         current_service.update(email_branding=new_email_branding["id"])
+
+        # add to org pool
+        organisations_client.add_brandings_to_email_branding_pool(
+            current_service.organisation.id, [new_email_branding["id"]]
+        )
 
         flash(
             "You’ve changed your email branding. Send yourself an email to make sure it looks OK.", "default_with_tick"
