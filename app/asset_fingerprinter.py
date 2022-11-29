@@ -1,5 +1,7 @@
 import hashlib
 
+from flask import current_app
+
 
 class AssetFingerprinter:
     """
@@ -19,17 +21,19 @@ class AssetFingerprinter:
     * 'app/static' is assumed to be the root for all asset files
     """
 
-    def __init__(self, asset_root="/static/", filesystem_path="app/static/"):
+    def __init__(self, filesystem_path="app/static/"):
         self._cache = {}
-        self._asset_root = asset_root
         self._filesystem_path = filesystem_path
 
     def get_url(self, asset_path, with_querystring_hash=True):
+        # you can't get a URL without being in the app context
+        _asset_root = current_app.config["ASSET_ROOT"]
+
         if not with_querystring_hash:
-            return self._asset_root + asset_path
+            return _asset_root + asset_path
         if asset_path not in self._cache:
             self._cache[asset_path] = (
-                self._asset_root + asset_path + "?" + self.get_asset_fingerprint(self._filesystem_path + asset_path)
+                _asset_root + asset_path + "?" + self.get_asset_fingerprint(self._filesystem_path + asset_path)
             )
         return self._cache[asset_path]
 
