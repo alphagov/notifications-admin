@@ -147,7 +147,7 @@ def test_email_branding_request_does_not_show_nhs_branding_twice(
     ]
 
 
-def test_email_branding_request_page_redirects_to_something_else_page_if_that_is_only_option(
+def test_email_branding_request_page_redirects_to_choose_banner_type_page_if_something_else_is_only_option(
     mocker,
     service_one,
     client_request,
@@ -166,7 +166,7 @@ def test_email_branding_request_page_redirects_to_something_else_page_if_that_is
         service_id=SERVICE_ONE_ID,
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.email_branding_something_else", service_id=SERVICE_ONE_ID, back_link=".service_settings"
+            "main.email_branding_choose_banner_type", service_id=SERVICE_ONE_ID, back_link=".service_settings"
         ),
     )
 
@@ -380,7 +380,7 @@ def test_email_branding_request_page_back_link(
                 "options": "something_else",
             },
             "local",
-            "main.email_branding_something_else",
+            "main.email_branding_choose_banner_type",
             {"back_link": ".email_branding_request"},
         ),
         (
@@ -893,7 +893,7 @@ def test_only_central_org_services_can_see_email_branding_choose_logo_page(clien
 @pytest.mark.parametrize(
     "selected_option, expected_endpoint, extra_url_args",
     [
-        ("org", ".email_branding_something_else", {"back_link": ".email_branding_choose_logo"}),
+        ("org", ".email_branding_choose_banner_type", {"back_link": ".email_branding_choose_logo"}),
         ("single_identity", ".email_branding_request_government_identity_logo", {}),
     ],
 )

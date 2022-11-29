@@ -1157,7 +1157,7 @@ def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
     if form.something_else_is_only_option:
         return redirect(
-            url_for(".email_branding_something_else", service_id=current_service.id, back_link=".service_settings")
+            url_for(".email_branding_choose_banner_type", service_id=current_service.id, back_link=".service_settings")
         )
     if form.validate_on_submit():
 
@@ -1170,22 +1170,22 @@ def email_branding_request(service_id):
                     service_id=current_service.id,
                 )
             )
+        if branding_choice == "govuk":
+            return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
+
         if branding_choice in current_service.email_branding_pool.ids:
             return redirect(
                 url_for(".email_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
             )
-        if branding_choice == "govuk":
-            return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
 
         if current_service.organisation_type == "central":
             return redirect(
                 url_for(".email_branding_choose_logo", service_id=current_service.id, branding_choice=branding_choice)
             )
         else:
-            # TODO: change this to redirect to new logo upload flow once it's ready
             return redirect(
                 url_for(
-                    f".email_branding_{branding_choice}",
+                    ".email_branding_choose_banner_type",
                     service_id=current_service.id,
                     back_link=".email_branding_request",
                 )
@@ -1315,6 +1315,7 @@ def email_branding_something_else(service_id):
     methods=["GET"],
 )
 @user_has_permissions("manage_service")
+@service_belongs_to_org_type("central")
 def email_branding_request_government_identity_logo(service_id):
     branding_choice = request.args.get("branding_choice")
     return render_template(
@@ -1331,6 +1332,7 @@ def email_branding_request_government_identity_logo(service_id):
     methods=["GET", "POST"],
 )
 @user_has_permissions("manage_service")
+@service_belongs_to_org_type("central")
 def email_branding_enter_government_identity_logo_text(service_id):
     form = GovernmentIdentityLogoForm(organisation=current_service.organisation)
     branding_choice = request.args.get("branding_choice")
@@ -1374,7 +1376,7 @@ def email_branding_choose_logo(service_id):
         if form.branding_options.data == "org":
             return redirect(
                 url_for(
-                    ".email_branding_something_else",
+                    ".email_branding_choose_banner_type",
                     service_id=current_service.id,
                     back_link=".email_branding_choose_logo",
                 )
@@ -1554,7 +1556,11 @@ def email_branding_choose_banner_type(service_id):
         render_template(
             "views/service-settings/branding/add-new-branding/email-branding-choose-banner.html",
             form=form,
-            back_link=url_for(".email_branding_choose_logo", service_id=service_id),
+            back_link=url_for(
+                request.args.get("back_link", ".email_branding_choose_logo"),
+                service_id=current_service.id,
+                **_email_branding_flow_query_params(request),
+            ),
         ),
         400 if form.errors else 200,
     )
