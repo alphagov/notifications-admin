@@ -1,5 +1,13 @@
 @use "sass:map";
 
+// Custom colours for our destructive link
+// Based on the error colour in:
+// https://github.com/alphagov/govuk-frontend/blob/v4.2.0/src/govuk/settings/_colours-applied.scss
+// with :hover and :active variants based on those for links
+$govuk-destructive-link-colour: $govuk-error-colour;
+$govuk-destructive-link-hover-colour: #990a00;
+$govuk-destructive-link-active-colour: $govuk-text-colour;
+
 // Gives access to the Sass variables used in the GOVUK Frontend typographic styles
 // See: https://frontend.design-system.service.gov.uk/sass-api-reference/#govuk-typography-scale
 @function get-govuk-typography-style($size, $breakpoint, $property) {
@@ -25,17 +33,17 @@
 
 // Extends govuk-link to create a class of link that causes a destructive action
 // Based on styles of link in:
-// https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/helpers/_links.scss
+// https://github.com/alphagov/govuk-frontend/blob/v4.2.0/src/govuk/helpers/_links.scss
 //
 // Note: all destructive actions must have a confirmation step these links navigate to
 @mixin govuk-link-style-destructive-no-visited-state {
   &:link,
   &:visited {
-    color: $govuk-error-colour;
+    color: $govuk-destructive-link-colour;
   }
 
   &:hover {
-    color: govuk-tint($govuk-error-colour, 25%);
+    color: $govuk-destructive-link-hover-colour;
   }
 
   // When focussed, the text colour needs to be darker to ensure that colour
@@ -43,7 +51,7 @@
   // Activated links are usually focused so this applies to them as well
   &:active,
   &:focus {
-    color: $govuk-focus-text-colour;
+    color: $govuk-destructive-link-active-colour;
   }
 }
 
