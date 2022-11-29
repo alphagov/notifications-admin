@@ -4126,6 +4126,7 @@ def test_POST_email_branding_set_alt_text_creates_branding_and_redirects_to_serv
     client_request,
     service_one,
     mock_create_email_branding,
+    mock_get_email_branding_name_for_alt_text,
     active_user_with_permissions,
     mocker,
 ):

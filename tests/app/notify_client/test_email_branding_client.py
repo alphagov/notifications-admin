@@ -157,3 +157,12 @@ def test_update_email_branding_sends_none_values(mocker, fake_uuid):
     EmailBrandingClient().update_email_branding(**form_data)
 
     mock_post.assert_called_once_with(url=f"/email-branding/{fake_uuid}", data=expected_data)
+
+
+def test_get_email_branding_name_for_alt_text(mocker):
+    mock_post = mocker.patch(
+        "app.notify_client.email_branding_client.EmailBrandingClient.post", return_value={"name": "bar"}
+    )
+    resp = EmailBrandingClient().get_email_branding_name_for_alt_text("foo")
+    assert resp == "bar"
+    mock_post.assert_called_once_with(url="/email-branding/get-name-for-alt-text", data={"alt_text": "foo"})
