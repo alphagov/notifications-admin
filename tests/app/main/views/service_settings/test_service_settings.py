@@ -3859,20 +3859,37 @@ def test_email_branding_choose_banner_type_shows_error_summary_on_invalid_data(c
 
 
 @pytest.mark.parametrize(
-    "query_params, expected_back_link",
+    "query_params, expected_back_link, expected_skip_link",
     (
-        ({}, "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner"),
+        (
+            {},
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner",
+            (
+                "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/something-else"
+                "?back_link=.email_branding_upload_logo"
+            ),
+        ),
         (
             {"brand_type": "org"},
             "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner",
+            (
+                "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/something-else"
+                "?back_link=.email_branding_upload_logo&brand_type=org"
+            ),
         ),
         (
             {"brand_type": "org_banner"},
             "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/choose-banner-colour?brand_type=org_banner",  # noqa
+            (
+                "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/something-else"
+                "?back_link=.email_branding_upload_logo&brand_type=org_banner"
+            ),
         ),
     ),
 )
-def test_GET_email_branding_upload_logo(client_request, service_one, query_params, expected_back_link):
+def test_GET_email_branding_upload_logo(
+    client_request, service_one, query_params, expected_back_link, expected_skip_link
+):
     page = client_request.get(
         "main.email_branding_upload_logo",
         service_id=service_one["id"],
@@ -3891,7 +3908,7 @@ def test_GET_email_branding_upload_logo(client_request, service_one, query_param
     assert file_input["name"] == "logo"
 
     assert skip_link is not None
-    assert skip_link["href"] == url_for("main.email_branding_something_else", service_id=service_one["id"])
+    assert skip_link["href"] == expected_skip_link
     assert skip_link.text == "I do not have a file to upload"
 
 
@@ -4184,7 +4201,12 @@ def test_GET_email_branding_choose_banner_colour(client_request, service_one):
     assert text_input["name"] == "hex_colour"
 
     assert skip_link is not None
-    assert skip_link["href"] == url_for("main.email_branding_something_else", service_id=service_one["id"])
+    assert skip_link["href"] == url_for(
+        "main.email_branding_something_else",
+        service_id=service_one["id"],
+        back_link=".email_branding_choose_banner_colour",
+        brand_type="org_banner",
+    )
     assert skip_link.text == "I do not know the hex colour code for my banner"
 
 
