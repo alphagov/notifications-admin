@@ -132,20 +132,12 @@
     padding: 0 ;
     margin: 0 0 govuk-spacing(6) 0;
 
-    &:link,
-    &:visited {
-      color: govuk-colour("white");
-    }
-
     &:hover {
-      color: govuk-colour("white");
       background-color: $govuk-link-hover-colour;
       box-shadow: 0 0 0 10px $govuk-link-hover-colour;
     }
 
-    &:focus,
-    &:active {
-      color: $govuk-focus-text-colour;
+    &:focus {
       background-color: $govuk-focus-colour;
       box-shadow: 0 0 0 10px $govuk-focus-colour, 0 4px 0 10px $govuk-focus-text-colour;
     }
