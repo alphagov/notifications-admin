@@ -43,7 +43,7 @@ from app.main.forms import (
     AdminServiceMessageLimitForm,
     AdminServiceRateLimitForm,
     AdminServiceSMSAllowanceForm,
-    AdminSetEmailBrandingAddToBrandingPoolStepForm,
+    AdminSetBrandingAddToBrandingPoolStepForm,
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     AdminSetOrganisationForm,
@@ -999,7 +999,7 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
     email_branding_name = email_branding["name"]
     org_id = current_service.organisation.id
 
-    form = AdminSetEmailBrandingAddToBrandingPoolStepForm(
+    form = AdminSetBrandingAddToBrandingPoolStepForm(
         org_name=current_service.organisation.name,
         service_name=current_service.name,
     )

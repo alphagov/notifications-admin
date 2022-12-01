@@ -3567,7 +3567,7 @@ def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_
         "app.email_branding_client.get_email_branding", return_value={"email_branding": {"name": email_branding_name}}
     )
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
-    mocker.patch("app.main.forms.AdminSetEmailBrandingAddToBrandingPoolStepForm", return_value=None)
+    mocker.patch("app.main.forms.AdminSetBrandingAddToBrandingPoolStepForm", return_value=None)
     client_request.get(
         "main.service_set_email_branding_add_to_branding_pool_step",
         _expected_status=403,
