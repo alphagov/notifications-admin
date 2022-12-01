@@ -3649,6 +3649,106 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
         )
 
 
+def test_get_service_set_letter_branding_add_to_branding_pool_step(
+    mocker, client_request, platform_admin_user, service_one, organisation_one
+):
+    service_one["organisation"] = organisation_one
+    client_request.login(platform_admin_user)
+    letter_branding_id = "234"
+    letter_branding_name = "branding1"
+    mocker.patch(
+        "app.letter_branding_client.get_letter_branding",
+        return_value={"name": letter_branding_name},
+    )
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get(
+        "main.service_set_branding_add_to_branding_pool_step",
+        _expected_status=200,
+        service_id=SERVICE_ONE_ID,
+        notification_type="letter",
+        branding_id=letter_branding_id,
+    )
+    assert f"Apply ‘{letter_branding_name}’ branding" in normalize_spaces(page.select_one("title").text)
+
+
+def test_service_set_letter_branding_add_to_branding_pool_step_is_platform_admin_only(
+    mocker, client_request, service_one, organisation_one
+):
+    service_one["organisation"] = organisation_one
+    letter_branding_id = "234"
+    letter_branding_name = "branding1"
+    mocker.patch(
+        "app.letter_branding_client.get_letter_branding",
+        return_value={"name": letter_branding_name},
+    )
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch("app.main.forms.AdminSetBrandingAddToBrandingPoolStepForm", return_value=None)
+    client_request.get(
+        "main.service_set_branding_add_to_branding_pool_step",
+        _expected_status=403,
+        service_id=SERVICE_ONE_ID,
+        notification_type="letter",
+        branding_id=letter_branding_id,
+    )
+
+
+@pytest.mark.parametrize("add_to_pool", ["yes", "no"])
+def test_service_set_letter_branding_add_to_branding_pool_step_choices_yes_or_no(
+    mocker,
+    client_request,
+    platform_admin_user,
+    service_one,
+    organisation_one,
+    add_to_pool,
+    single_sms_sender,
+    single_reply_to_email_address,
+    mock_get_free_sms_fragment_limit,
+    mock_get_service_data_retention,
+    mock_update_service,
+):
+
+    client_request.login(platform_admin_user)
+    service_one["organisation"] = organisation_one
+    letter_branding_id = "234"
+    letter_branding_name = "branding_1"
+
+    mocker.patch(
+        "app.letter_branding_client.get_letter_branding",
+        return_value={"name": letter_branding_name},
+    )
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mock_add_to_branding_pool = mocker.patch(
+        "app.organisations_client.add_brandings_to_letter_branding_pool", return_value=None
+    )
+
+    page = client_request.post(
+        "main.service_set_branding_add_to_branding_pool_step",
+        _data={"add_to_pool": add_to_pool},
+        service_id=SERVICE_ONE_ID,
+        notification_type="letter",
+        branding_id=letter_branding_id,
+        _follow_redirects=True,
+    )
+
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, letter_branding=letter_branding_id)
+
+    if add_to_pool == "yes":
+        mock_add_to_branding_pool.assert_called_with(organisation_one["id"], [letter_branding_id])
+        assert (
+            normalize_spaces(page.select_one("div.banner-default-with-tick").text)
+            == f"The letter branding has been set to {letter_branding_name} "
+            f"and it has been added to {organisation_one['name']}'s letter branding pool"
+        )
+
+    elif add_to_pool == "no":
+        mock_add_to_branding_pool.assert_not_called()
+        assert (
+            normalize_spaces(page.select_one("div.banner-default-with-tick").text)
+            == f"The letter branding has been set to {letter_branding_name}"
+        )
+
+
 @pytest.mark.parametrize(
     "extra_brandings_to_create, expected_branding_id_in_iframe",
     (

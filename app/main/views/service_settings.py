@@ -22,6 +22,7 @@ from app import (
     current_service,
     email_branding_client,
     inbound_number_client,
+    letter_branding_client,
     notification_api_client,
     organisations_client,
     service_api_client,
@@ -1023,6 +1024,10 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
     if notification_type == "email":
         branding = email_branding_client.get_email_branding(branding_id)[branding_type]
         add_brandings_to_pool = organisations_client.add_brandings_to_email_branding_pool
+
+    elif notification_type == "letter":
+        branding = letter_branding_client.get_letter_branding(branding_id)
+        add_brandings_to_pool = organisations_client.add_brandings_to_letter_branding_pool
 
     else:
         abort(404)
