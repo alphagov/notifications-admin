@@ -88,16 +88,15 @@
     border-bottom: 1px govuk-colour("white") solid;
     border-bottom-color: rgba(govuk-colour("white"), 0.25);
 
-    .breadcrumbs__item {
-      &--active,
-      a:link,
-      a:hover,
-      a:active,
-      a:visited {
+    .govuk-link--inverse {
+      &:link,
+      &:hover,
+      &:active,
+      &:visited {
         color: govuk-colour("white");
       }
 
-      a:focus {
+      &:focus {
         color: $govuk-focus-text-colour;
       }
     }

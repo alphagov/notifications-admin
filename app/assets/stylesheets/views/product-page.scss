@@ -48,24 +48,6 @@ $button-shadow-size: $govuk-border-width-form-element;
       margin: govuk-spacing(3) 0 govuk-spacing(6);
     }
 
-    .govuk-link {
-
-      &:link,
-      &:visited {
-        color: govuk-colour("white");
-      }
-
-      &:hover {
-        color: govuk-tint(govuk-colour("light-blue"), 75);
-      }
-
-      &:active,
-      &:focus {
-        color: $govuk-focus-text-colour;
-      }
-
-    }
-
   }
 
   &-section {
