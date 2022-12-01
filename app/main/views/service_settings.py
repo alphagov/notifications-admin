@@ -990,13 +990,24 @@ def service_set_email_branding(service_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/set-email-branding/add-to-branding-pool-step", methods=["GET", "POST"]
+    "/services/<uuid:service_id>/service-settings/set-<notification_type>-branding/add-to-branding-pool-step",
+    methods=["GET", "POST"],
 )
 @user_is_platform_admin
-def service_set_email_branding_add_to_branding_pool_step(service_id):
-    email_branding_id = request.args.get("email_branding_id")
-    email_branding = email_branding_client.get_email_branding(email_branding_id)["email_branding"]
-    email_branding_name = email_branding["name"]
+def service_set_branding_add_to_branding_pool_step(service_id, notification_type):
+    branding_id = request.args.get("branding_id")
+    notification_type = notification_type.lower()
+    branding_type = f"{notification_type}_branding"
+
+    if notification_type == "email":
+        branding = email_branding_client.get_email_branding(branding_id)[branding_type]
+        add_brandings_to_pool = organisations_client.add_brandings_to_email_branding_pool
+        back_link_view = ".service_set_email_branding"
+
+    else:
+        abort(404)
+
+    branding_name = branding["name"]
     org_id = current_service.organisation.id
 
     form = AdminSetBrandingAddToBrandingPoolStepForm(
@@ -1006,26 +1017,26 @@ def service_set_email_branding_add_to_branding_pool_step(service_id):
 
     if form.validate_on_submit():
         # The service’s branding gets updated either way
-        current_service.update(email_branding=email_branding_id)
-        message = f"The email branding has been set to {email_branding_name}"
+        current_service.update(**{branding_type: branding_id})
+        message = f"The email branding has been set to {branding_name}"
 
-        # If the platform admin chose "yes" the branding is added to the organisation's
-        # branding pool
+        # If the platform admin chose "yes" the branding is added to the organisation's branding pool
         if form.add_to_pool.data == "yes":
-            email_branding_ids = [email_branding_id]
-            organisations_client.add_brandings_to_email_branding_pool(org_id, email_branding_ids)
+            branding_ids = [branding_id]
+            add_brandings_to_pool(org_id, branding_ids)
             message = (
-                f"The email branding has been set to {email_branding_name} and it has been "
-                f"added to {current_service.organisation.name}'s email branding pool"
+                f"The {notification_type} branding has been set to {branding_name} and it has been "
+                f"added to {current_service.organisation.name}'s {notification_type} branding pool"
             )
 
         flash(message, "default_with_tick")
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
-        "views/service-settings/set-email-branding-add-to-branding-pool-step.html",
+        "views/service-settings/set-branding-add-to-branding-pool-step.html",
+        back_link=url_for(back_link_view, service_id=current_service.id),
         form=form,
-        email_branding_name=email_branding_name,
+        branding_name=branding_name,
     )
 
 
@@ -1049,9 +1060,10 @@ def service_preview_email_branding(service_id):
         ):
             return redirect(
                 url_for(
-                    "main.service_set_email_branding_add_to_branding_pool_step",
+                    "main.service_set_branding_add_to_branding_pool_step",
                     service_id=service_id,
-                    email_branding_id=email_branding_id,
+                    notification_type="email",
+                    branding_id=email_branding_id,
                 )
             )
 

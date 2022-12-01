@@ -4,10 +4,10 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = "Apply ‘{}’ branding".format(email_branding_name) %}
+{% set page_title = "Apply ‘{}’ branding".format(branding_name) %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.service_set_email_branding', service_id=current_service.id) }) }}
+  {{ govukBackLink({ "href": back_link }) }}
 {% endblock %}
 
 {% block service_page_title %}

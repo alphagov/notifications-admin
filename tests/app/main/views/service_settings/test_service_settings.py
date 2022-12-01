@@ -3431,9 +3431,10 @@ def test_should_preview_email_branding(
             False,
             partial(
                 url_for,
-                "main.service_set_email_branding_add_to_branding_pool_step",
+                "main.service_set_branding_add_to_branding_pool_step",
                 service_id=SERVICE_ONE_ID,
-                email_branding_id="174",
+                notification_type="email",
+                branding_id="174",
             ),
             "174",
         ),
@@ -3549,10 +3550,11 @@ def test_get_service_set_email_branding_add_to_branding_pool_step(
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
     page = client_request.get(
-        "main.service_set_email_branding_add_to_branding_pool_step",
+        "main.service_set_branding_add_to_branding_pool_step",
         _expected_status=200,
         service_id=SERVICE_ONE_ID,
-        email_branding_id=email_branding_id,
+        notification_type="email",
+        branding_id=email_branding_id,
     )
     assert f"Apply ‘{email_branding_name}’ branding" in normalize_spaces(page.select_one("title").text)
 
@@ -3569,10 +3571,11 @@ def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
     mocker.patch("app.main.forms.AdminSetBrandingAddToBrandingPoolStepForm", return_value=None)
     client_request.get(
-        "main.service_set_email_branding_add_to_branding_pool_step",
+        "main.service_set_branding_add_to_branding_pool_step",
         _expected_status=403,
         service_id=SERVICE_ONE_ID,
-        email_branding_id=email_branding_id,
+        notification_type="email",
+        branding_id=email_branding_id,
     )
 
 
@@ -3605,10 +3608,11 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
     )
 
     page = client_request.post(
-        "main.service_set_email_branding_add_to_branding_pool_step",
+        "main.service_set_branding_add_to_branding_pool_step",
         _data={"add_to_pool": add_to_pool},
         service_id=SERVICE_ONE_ID,
-        email_branding_id=email_branding_id,
+        notification_type="email",
+        branding_id=email_branding_id,
         _follow_redirects=True,
     )
 
