@@ -7,22 +7,9 @@
 
   @include govuk-font(19);
   position: absolute;
-  background: $govuk-link-colour;
-  color: govuk-colour("white");
+  background-color: $govuk-link-colour; // text colour is set in the HTML by the govuk-link--inverse class
   padding: 10px govuk-spacing(3);
   z-index: 10000;
-
-  &:link, &:visited {
-    color: govuk-colour("white");
-  }
-
-  &:hover {
-    color: govuk-tint(govuk-colour("light-blue"), 75);
-  }
-
-  &:focus {
-    color: $govuk-text-colour;
-  }
 
 }
 
