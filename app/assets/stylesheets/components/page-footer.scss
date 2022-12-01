@@ -9,6 +9,9 @@
     padding: 1px 0 0 15px;
     font-weight: normal;
 
+    &:first-of-type {
+      padding-left: 0px;
+    }
   }
 
   &-delete-link-without-button {

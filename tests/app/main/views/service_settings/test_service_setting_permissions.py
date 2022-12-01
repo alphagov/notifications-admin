@@ -178,15 +178,22 @@ def test_service_setting_links_displayed_for_active_services(
     assert link["href"] == link_url
 
 
-def test_service_setting_links_not_displayed_for_archived_services(
+def test_service_settings_links_for_archived_service(
     get_service_settings_page,
     service_one,
 ):
-    link_texts = ["Delete this service", "Service history"]
     service_one.update({"active": False})
     page = get_service_settings_page()
-    toggles = page.select("a.govuk-link")
-    assert not any(link for link in toggles if link.text.strip() in link_texts)
+    links = page.select("a")
+
+    # There should be a link to the service history page
+    assert len([link for link in links if link.get("href") == url_for(".history", service_id=service_one["id"])]) == 1
+
+    # There shouldn't be a link to the archive/delete service page.
+    assert (
+        len([link for link in links if link.get("href") == url_for(".archive_service", service_id=service_one["id"])])
+        == 0
+    )
 
 
 @pytest.mark.parametrize(
