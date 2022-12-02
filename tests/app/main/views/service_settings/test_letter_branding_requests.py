@@ -4,6 +4,7 @@ import pytest
 from flask import url_for
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
+from app.models.branding import EmailBranding
 from tests import organisation_json, sample_uuid
 from tests.conftest import (
     ORGANISATION_ID,
@@ -14,16 +15,32 @@ from tests.conftest import (
 
 
 @pytest.mark.parametrize(
-    "organisation_type, expected_options",
+    "organisation_type, is_org_set, letter_branding_pool, expected_options",
     (
         (
             "nhs_central",
+            True,
             [
-                ("nhs", "NHS"),
+                {"id": "1234", "name": "Brand 1", "filename": "brand_1"},
+                {"id": "5678", "name": "Brand 2", "filename": "brand_2"},
+            ],
+            [
+                (EmailBranding.NHS_ID, "NHS"),
+                ("1234", "Brand 1"),
+                ("5678", "Brand 2"),
                 ("something_else", "Something else"),
             ],
         ),
-        ("other", None),
+        (
+            "nhs_central",
+            False,
+            [],
+            [
+                (EmailBranding.NHS_ID, "NHS"),
+                ("something_else", "Something else"),
+            ],
+        ),
+        ("other", False, [], None),
     ),
 )
 def test_letter_branding_request_page_when_no_branding_is_set(
@@ -31,11 +48,26 @@ def test_letter_branding_request_page_when_no_branding_is_set(
     client_request,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
+    mocker,
     organisation_type,
+    is_org_set,
+    letter_branding_pool,
     expected_options,
 ):
     service_one["letter_branding"] = None
     service_one["organisation_type"] = organisation_type
+
+    if is_org_set:
+        mocker.patch(
+            "app.models.service.Service.organisation_id",
+            new_callable=PropertyMock,
+            return_value=ORGANISATION_ID,
+        )
+        mocker.patch(
+            "app.organisations_client.get_organisation",
+            return_value=organisation_json(id_=ORGANISATION_ID, name="NHS Org 1", organisation_type=organisation_type),
+        )
+        mocker.patch("app.models.branding.LetterBrandingPool.client_method", side_effect=[letter_branding_pool])
 
     page = client_request.get(".letter_branding_request", service_id=SERVICE_ONE_ID)
 
@@ -111,6 +143,7 @@ def test_letter_branding_request_submit(
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
+    mock_get_empty_letter_branding_pool,
     org_name,
     expected_organisation,
 ):
@@ -182,9 +215,10 @@ def test_letter_branding_request_submit_when_form_has_missing_data(
     mocker,
     service_one,
     organisation_one,
+    mock_get_letter_branding_by_id,
+    mock_get_empty_letter_branding_pool,
     data,
     error_message,
-    mock_get_letter_branding_by_id,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -208,6 +242,7 @@ def test_letter_branding_request_submit_redirects_if_from_template_is_set(
     client_request,
     service_one,
     mocker,
+    mock_get_empty_letter_branding_pool,
     from_template,
 ):
     mocker.patch("app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk", autospec=True)

@@ -17,7 +17,7 @@ from tests.conftest import create_email_branding
         (get_email_choices, "local", []),
         (get_letter_choices, "local", []),
         (get_email_choices, "nhs_central", [(EmailBranding.NHS_ID, "NHS")]),
-        (get_letter_choices, "nhs_central", [("nhs", "NHS")]),
+        (get_letter_choices, "nhs_central", [(EmailBranding.NHS_ID, "NHS")]),
     ],
 )
 def test_get_choices_service_not_assigned_to_org(
@@ -237,7 +237,7 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
         ("central", None, [("organisation", "Test Organisation")]),
         ("local", None, [("organisation", "Test Organisation")]),
         ("local", "some-random-branding", [("organisation", "Test Organisation")]),
-        ("nhs_central", None, [("nhs", "NHS")]),
+        ("nhs_central", None, [(EmailBranding.NHS_ID, "NHS")]),
     ],
 )
 def test_get_letter_choices_service_assigned_to_org(
@@ -247,6 +247,7 @@ def test_get_letter_choices_service_assigned_to_org(
     branding_id,
     expected_options,
     mock_get_service_organisation,
+    mock_get_empty_letter_branding_pool,
 ):
     service = Service(service_one)
 
@@ -287,6 +288,7 @@ def test_get_letter_choices_org_has_default_branding(
     branding_id,
     expected_options,
     mock_get_service_organisation,
+    mock_get_empty_letter_branding_pool,
 ):
     service = Service(service_one)
 
@@ -307,7 +309,7 @@ def test_get_letter_choices_org_has_default_branding(
         (
             "NHS something else",
             [
-                ("nhs", "NHS"),
+                (EmailBranding.NHS_ID, "NHS"),
             ],
         ),
         (
@@ -324,6 +326,7 @@ def test_get_letter_choices_branding_name_in_use(
     branding_name,
     expected_options,
     mock_get_service_organisation,
+    mock_get_empty_letter_branding_pool,
 ):
     service = Service(service_one)
 
@@ -336,6 +339,45 @@ def test_get_letter_choices_branding_name_in_use(
         return_value="org-branding-id",
     )
     mocker.patch("app.letter_branding_client.get_letter_branding", return_value={"name": branding_name})
+
+    options = get_letter_choices(service)
+    assert list(options) == expected_options
+
+
+def test_current_letter_branding_is_not_displayed_in_letter_branding_pool_options(
+    mocker,
+    service_one,
+    mock_get_letter_branding_pool,
+    mock_get_service_organisation,
+):
+    service = Service(service_one)
+
+    mocker.patch(
+        "app.organisations_client.get_organisation", return_value=organisation_json(organisation_type="central")
+    )
+    mocker.patch(
+        "app.models.service.Service.letter_branding_id",
+        new_callable=PropertyMock,
+        side_effect=["letter-branding-1-id"],
+    )
+
+    branding_pool = [
+        {
+            "filename": "example_1.png",
+            "name": "Letter branding name 1",
+            "id": "letter-branding-1-id",
+        },
+        {
+            "filename": "example_2.png",
+            "name": "Letter branding name 2",
+            "id": "letter-branding-2-id",
+        },
+    ]
+
+    expected_options = [
+        ("letter-branding-2-id", "Letter branding name 2"),
+    ]
+    mocker.patch("app.models.branding.LetterBrandingPool.client_method", return_value=branding_pool)
 
     options = get_letter_choices(service)
     assert list(options) == expected_options
