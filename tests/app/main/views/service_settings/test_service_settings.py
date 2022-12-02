@@ -3143,8 +3143,9 @@ def test_service_set_letter_branding_platform_admin_only(
     client_request,
 ):
     client_request.get(
-        "main.service_set_letter_branding",
+        "main.service_set_branding",
         service_id=SERVICE_ONE_ID,
+        notification_type="letter",
         _expected_status=403,
     )
 
@@ -3199,8 +3200,9 @@ def test_service_set_letter_branding_prepopulates(
 
     client_request.login(platform_admin_user)
     page = client_request.get(
-        "main.service_set_letter_branding",
+        "main.service_set_branding",
         service_id=SERVICE_ONE_ID,
+        notification_type="letter",
     )
 
     assert len(page.select("input[checked]")) == 1
@@ -3232,7 +3234,8 @@ def test_service_set_letter_branding_redirects_to_preview_page_when_form_submitt
 ):
     client_request.login(platform_admin_user)
     client_request.post(
-        "main.service_set_letter_branding",
+        "main.service_set_branding",
+        notification_type="letter",
         _data={"branding_style": selected_letter_branding},
         _expected_status=302,
         _expected_redirect=url_for(
@@ -3353,7 +3356,7 @@ def test_should_show_branding_styles(
     )
 
     client_request.login(platform_admin_user)
-    page = client_request.get("main.service_set_email_branding", **{"service_id": SERVICE_ONE_ID})
+    page = client_request.get("main.service_set_branding", service_id=SERVICE_ONE_ID, notification_type="email")
 
     branding_style_choices = page.select("input[name=branding_style]")
 
@@ -3392,7 +3395,8 @@ def test_should_send_branding_and_organisations_to_preview(
     extra_args = {"service_id": SERVICE_ONE_ID}
     client_request.login(platform_admin_user)
     client_request.post(
-        "main.service_set_email_branding",
+        "main.service_set_branding",
+        notification_type="email",
         _data={"branding_type": "org", "branding_style": "1"},
         _expected_status=302,
         _expected_location=url_for(
@@ -3724,7 +3728,7 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
 
         Create this logo: {create_email_branding_government_identity_logo}
 
-        Apply branding to this service: {service_set_email_branding}
+        Apply branding to this service: {service_set_branding}
     """,
             {},
         ),
@@ -3742,7 +3746,7 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
 
         Create this logo: {create_email_branding_government_identity_logo}
 
-        Apply branding to this service: {service_set_email_branding}
+        Apply branding to this service: {service_set_branding}
     """,
             {"brand_type": "both"},
         ),
@@ -3760,7 +3764,7 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
 
         Create this logo: {create_email_branding_government_identity_logo}
 
-        Apply branding to this service: {service_set_email_branding}
+        Apply branding to this service: {service_set_branding}
     """,
             {},
         ),
@@ -3795,8 +3799,8 @@ def test_POST_email_branding_enter_government_identity_logo_text(
                 _external=True,
                 **expected_extra_url_args,
             ),
-            service_set_email_branding=url_for(
-                "main.service_set_email_branding", service_id=SERVICE_ONE_ID, _external=True
+            service_set_branding=url_for(
+                "main.service_set_branding", service_id=SERVICE_ONE_ID, notification_type="email", _external=True
             ),
         )
         .strip()

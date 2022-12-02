@@ -260,9 +260,9 @@ class MainNavigation(Navigation):
             "service_set_channel",
             "send_files_by_email_contact_details",
             "service_confirm_broadcast_account_type",
+            "service_set_branding",
             "service_set_broadcast_channel",
             "service_set_broadcast_network",
-            "service_set_email_branding",
             "service_set_inbound_number",
             "service_set_inbound_sms",
             "service_set_international_letters",
@@ -277,7 +277,6 @@ class MainNavigation(Navigation):
             "set_free_sms_allowance",
             "set_message_limit",
             "set_rate_limit",
-            "service_set_letter_branding",
             "submit_request_to_go_live",
         },
         "api-integration": {

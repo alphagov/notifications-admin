@@ -969,25 +969,45 @@ def set_rate_limit(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-email-branding", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/service-settings/set-<notification_type>-branding", methods=["GET", "POST"])
 @user_is_platform_admin
-def service_set_email_branding(service_id):
-    form = AdminSetEmailBrandingForm(
-        all_branding_options=AllEmailBranding().as_id_and_name,
-        current_branding=current_service.email_branding_id,
-    )
+def service_set_branding(service_id, notification_type):
+    notification_type = notification_type.lower()
+
+    if notification_type == "email":
+        form = AdminSetEmailBrandingForm(
+            all_branding_options=AllEmailBranding().as_id_and_name,
+            current_branding=current_service.email_branding_id,
+        )
+
+    elif notification_type == "letter":
+        form = AdminSetLetterBrandingForm(
+            all_branding_options=AllLetterBranding().as_id_and_name,
+            current_branding=current_service.letter_branding_id,
+        )
+
+    else:
+        abort(404)
 
     if form.validate_on_submit():
+        # As of 2022-12-02 we only get to this point (eg a POST on this endpoint) if JavaScript fails for the user on
+        # this page. With JS enabled, the preview is shown as part of this view, and so the 'save' action skips the
+        # separate preview page.
         return redirect(
             url_for(
                 ".service_preview_branding",
                 service_id=service_id,
-                notification_type="email",
+                notification_type=notification_type,
                 branding_style=form.branding_style.data,
             )
         )
 
-    return render_template("views/service-settings/set-email-branding.html", form=form, search_form=SearchByNameForm())
+    return render_template(
+        "views/service-settings/set-branding.html",
+        form=form,
+        search_form=SearchByNameForm(),
+        notification_type=notification_type,
+    )
 
 
 @main.route(
@@ -1003,7 +1023,6 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
     if notification_type == "email":
         branding = email_branding_client.get_email_branding(branding_id)[branding_type]
         add_brandings_to_pool = organisations_client.add_brandings_to_email_branding_pool
-        back_link_view = ".service_set_email_branding"
 
     else:
         abort(404)
@@ -1035,31 +1054,10 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
 
     return render_template(
         "views/service-settings/set-branding-add-to-branding-pool-step.html",
-        back_link=url_for(back_link_view, service_id=current_service.id),
+        back_link=url_for(".service_set_branding", service_id=current_service.id, notification_type=notification_type),
         form=form,
         branding_name=branding_name,
     )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/set-letter-branding", methods=["GET", "POST"])
-@user_is_platform_admin
-def service_set_letter_branding(service_id):
-    form = AdminSetLetterBrandingForm(
-        all_branding_options=AllLetterBranding().as_id_and_name,
-        current_branding=current_service.letter_branding_id,
-    )
-
-    if form.validate_on_submit():
-        return redirect(
-            url_for(
-                ".service_preview_branding",
-                service_id=service_id,
-                notification_type="letter",
-                branding_style=form.branding_style.data,
-            )
-        )
-
-    return render_template("views/service-settings/set-letter-branding.html", form=form, search_form=SearchByNameForm())
 
 
 @main.route(
