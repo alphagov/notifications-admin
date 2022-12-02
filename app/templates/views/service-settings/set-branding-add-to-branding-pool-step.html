@@ -2,6 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer, sticky_page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "components/error-summary.html" import errorSummary %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% set page_title = "Apply ‘{}’ branding".format(branding_name) %}
@@ -14,9 +15,9 @@
   {{ page_title }}
 {% endblock %}
 
-
 {% block maincolumn_content %}
-    {{page_header(page_title)}}
+    {{ errorSummary(form) }}
+    {{ page_header(page_title) }}
 
     {% call form_wrapper() %}
       {{ form.add_to_pool }}
