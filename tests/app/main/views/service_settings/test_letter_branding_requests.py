@@ -128,6 +128,35 @@ def test_letter_branding_request_page_back_link(
     assert back_link[0].attrs["href"] == back_link_url
 
 
+def test_letter_branding_request_redirects_to_branding_preview_for_a_branding_pool_option(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_letter_branding_pool,
+):
+    mocker.patch(
+        "app.models.service.Service.organisation_id",
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
+    )
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, name="Org 1"),
+    )
+
+    client_request.post(
+        ".letter_branding_request",
+        service_id=SERVICE_ONE_ID,
+        _data={"options": "1234"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.letter_branding_pool_option",
+            service_id=SERVICE_ONE_ID,
+            branding_option="1234",
+        ),
+    )
+
+
 @pytest.mark.parametrize(
     "org_name, expected_organisation",
     (
@@ -135,7 +164,7 @@ def test_letter_branding_request_page_back_link(
         ("Test Organisation", "Test Organisation"),
     ),
 )
-def test_letter_branding_request_submit(
+def test_letter_branding_request_submit_choose_something_else(
     client_request,
     service_one,
     mocker,

@@ -1597,35 +1597,48 @@ def letter_branding_request(service_id):
     form = ChooseLetterBrandingForm(current_service)
     from_template = request.args.get("from_template")
     if form.validate_on_submit():
-        ticket_message = render_template(
-            "support-tickets/branding-request.txt",
-            current_branding=current_service.letter_branding.name or "no",
-            branding_requested=dict(form.options.choices)[form.options.data],
-            detail=form.something_else.data,
-        )
-        ticket = NotifySupportTicket(
-            subject=f"Letter branding request - {current_service.name}",
-            message=ticket_message,
-            ticket_type=NotifySupportTicket.TYPE_QUESTION,
-            user_name=current_user.name,
-            user_email=current_user.email_address,
-            org_id=current_service.organisation_id,
-            org_type=current_service.organisation_type,
-            service_id=current_service.id,
-        )
-        zendesk_client.send_ticket_to_zendesk(ticket)
-        flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
-        return redirect(
-            url_for(".view_template", service_id=current_service.id, template_id=from_template)
-            if from_template
-            else url_for(".service_settings", service_id=current_service.id)
-        )
+        branding_choice = form.options.data
+
+        if branding_choice in current_service.letter_branding_pool.ids:
+            return redirect(
+                url_for(".letter_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
+            )
+        else:
+            ticket_message = render_template(
+                "support-tickets/branding-request.txt",
+                current_branding=current_service.letter_branding.name or "no",
+                branding_requested=dict(form.options.choices)[form.options.data],
+                detail=form.something_else.data,
+            )
+            ticket = NotifySupportTicket(
+                subject=f"Letter branding request - {current_service.name}",
+                message=ticket_message,
+                ticket_type=NotifySupportTicket.TYPE_QUESTION,
+                user_name=current_user.name,
+                user_email=current_user.email_address,
+                org_id=current_service.organisation_id,
+                org_type=current_service.organisation_type,
+                service_id=current_service.id,
+            )
+            zendesk_client.send_ticket_to_zendesk(ticket)
+            flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
+            return redirect(
+                url_for(".view_template", service_id=current_service.id, template_id=from_template)
+                if from_template
+                else url_for(".service_settings", service_id=current_service.id)
+            )
 
     return render_template(
         "views/service-settings/branding/letter-branding-options.html",
         form=form,
         from_template=from_template,
     )
+
+
+@user_has_permissions("manage_service")
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/pool", methods=["GET", "POST"])
+def letter_branding_pool_option(service_id):
+    return "WIP"
 
 
 @main.route("/services/<uuid:service_id>/data-retention", methods=["GET"])
