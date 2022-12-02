@@ -980,8 +980,9 @@ def service_set_email_branding(service_id):
     if form.validate_on_submit():
         return redirect(
             url_for(
-                ".service_preview_email_branding",
+                ".service_preview_branding",
                 service_id=service_id,
+                notification_type="email",
                 branding_style=form.branding_style.data,
             )
         )
@@ -1040,44 +1041,6 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/preview-email-branding", methods=["GET", "POST"])
-@user_is_platform_admin
-def service_preview_email_branding(service_id):
-    branding_style = request.args.get("branding_style", None)
-
-    form = AdminPreviewBrandingForm(branding_style=branding_style)
-    email_branding_id = form.branding_style.data
-    if email_branding_id == "__NONE__":
-        email_branding_id = None
-
-    if form.validate_on_submit():
-        # in addition to updating the email branding we want the option of adding it to the
-        # email branding pool if desirable
-        if (
-            current_service.organisation
-            and email_branding_id
-            and email_branding_id not in current_service.email_branding_pool.ids
-        ):
-            return redirect(
-                url_for(
-                    "main.service_set_branding_add_to_branding_pool_step",
-                    service_id=service_id,
-                    notification_type="email",
-                    branding_id=email_branding_id,
-                )
-            )
-
-        current_service.update(email_branding=email_branding_id)
-        return redirect(url_for(".service_settings", service_id=service_id))
-
-    return render_template(
-        "views/service-settings/preview-email-branding.html",
-        form=form,
-        service_id=service_id,
-        action=url_for("main.service_preview_email_branding", service_id=service_id),
-    )
-
-
 @main.route("/services/<uuid:service_id>/service-settings/set-letter-branding", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_set_letter_branding(service_id):
@@ -1089,8 +1052,9 @@ def service_set_letter_branding(service_id):
     if form.validate_on_submit():
         return redirect(
             url_for(
-                ".service_preview_letter_branding",
+                ".service_preview_branding",
                 service_id=service_id,
+                notification_type="letter",
                 branding_style=form.branding_style.data,
             )
         )
@@ -1098,22 +1062,50 @@ def service_set_letter_branding(service_id):
     return render_template("views/service-settings/set-letter-branding.html", form=form, search_form=SearchByNameForm())
 
 
-@main.route("/services/<uuid:service_id>/service-settings/preview-letter-branding", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/preview-<notification_type>-branding", methods=["GET", "POST"]
+)
 @user_is_platform_admin
-def service_preview_letter_branding(service_id):
+def service_preview_branding(service_id, notification_type):
     branding_style = request.args.get("branding_style")
+    notification_type = notification_type.lower()
+    branding_type = f"{notification_type}_branding"
+
+    if notification_type == "email":
+        service_branding_pool = current_service.email_branding_pool
+
+    elif notification_type == "letter":
+        service_branding_pool = current_service.letter_branding_pool
+
+    else:
+        abort(404)
 
     form = AdminPreviewBrandingForm(branding_style=branding_style)
 
     if form.validate_on_submit():
-        current_service.update(letter_branding=form.branding_style.data)
+        branding_id = form.branding_style.data
+        if branding_id == "__NONE__":  # This represents the email GOV.UK brand
+            branding_id = None
+
+        if current_service.organisation and branding_id and branding_id not in service_branding_pool.ids:
+            return redirect(
+                url_for(
+                    "main.service_set_branding_add_to_branding_pool_step",
+                    service_id=service_id,
+                    notification_type=notification_type,
+                    branding_id=branding_id,
+                )
+            )
+
+        current_service.update(**{branding_type: branding_id})
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
-        "views/service-settings/preview-letter-branding.html",
+        "views/service-settings/preview-branding.html",
         form=form,
         service_id=service_id,
-        action=url_for("main.service_preview_letter_branding", service_id=service_id),
+        notification_type=notification_type,
+        action=url_for("main.service_preview_branding", service_id=service_id, notification_type=notification_type),
     )
 
 

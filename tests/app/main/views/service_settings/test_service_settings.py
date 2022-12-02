@@ -3236,7 +3236,10 @@ def test_service_set_letter_branding_redirects_to_preview_page_when_form_submitt
         _data={"branding_style": selected_letter_branding},
         _expected_status=302,
         _expected_redirect=url_for(
-            ".service_preview_letter_branding", branding_style=expected_post_data, service_id=SERVICE_ONE_ID
+            ".service_preview_branding",
+            notification_type="letter",
+            branding_style=expected_post_data,
+            service_id=SERVICE_ONE_ID,
         ),
         service_id=SERVICE_ONE_ID,
     )
@@ -3249,7 +3252,10 @@ def test_service_preview_letter_branding_shows_preview_letter(
     client_request.login(platform_admin_user)
 
     page = client_request.get(
-        "main.service_preview_letter_branding", branding_style="hm-government", service_id=SERVICE_ONE_ID
+        "main.service_preview_branding",
+        notification_type="letter",
+        branding_style="hm-government",
+        service_id=SERVICE_ONE_ID,
     )
 
     assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="hm-government")
@@ -3275,7 +3281,8 @@ def test_service_preview_letter_branding_saves(
 ):
     client_request.login(platform_admin_user)
     client_request.post(
-        "main.service_preview_letter_branding",
+        "main.service_preview_branding",
+        notification_type="letter",
         _data={"branding_style": selected_letter_branding},
         _expected_status=302,
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
@@ -3388,7 +3395,9 @@ def test_should_send_branding_and_organisations_to_preview(
         "main.service_set_email_branding",
         _data={"branding_type": "org", "branding_style": "1"},
         _expected_status=302,
-        _expected_location=url_for("main.service_preview_email_branding", branding_style="1", **extra_args),
+        _expected_location=url_for(
+            "main.service_preview_branding", notification_type="email", branding_style="1", **extra_args
+        ),
         **extra_args,
     )
 
@@ -3399,8 +3408,8 @@ def test_should_send_branding_and_organisations_to_preview(
     "endpoint, extra_args",
     (
         (
-            "main.service_preview_email_branding",
-            {"service_id": SERVICE_ONE_ID},
+            "main.service_preview_branding",
+            {"service_id": SERVICE_ONE_ID, "notification_type": "email"},
         ),
     ),
 )
@@ -3492,7 +3501,8 @@ def test_should_set_branding_for_service_with_organisation(
 
     client_request.login(platform_admin_user)
     client_request.post(
-        "main.service_preview_email_branding",
+        "main.service_preview_branding",
+        notification_type="email",
         _data={"branding_style": email_branding_id},
         service_id=service_id,
         _expected_redirect=expected_redirect(),
@@ -3522,7 +3532,8 @@ def test_should_set_branding_for_service_with_no_organisation(
     email_branding_id = "174"
     client_request.login(platform_admin_user)
     client_request.post(
-        "main.service_preview_email_branding",
+        "main.service_preview_branding",
+        notification_type="email",
         _data={"branding_style": email_branding_id},
         service_id=service_id,
         _expected_redirect=url_for(
