@@ -1351,6 +1351,7 @@ def email_branding_choose_logo(service_id):
                     ".email_branding_choose_banner_type",
                     service_id=current_service.id,
                     back_link=".email_branding_choose_logo",
+                    **_email_branding_flow_query_params(request),
                 )
             )
         elif form.branding_options.data == "single_identity":
@@ -1358,7 +1359,7 @@ def email_branding_choose_logo(service_id):
                 url_for(
                     ".email_branding_request_government_identity_logo",
                     service_id=current_service.id,
-                    branding_choice=request.args.get("branding_choice"),
+                    **_email_branding_flow_query_params(request),
                 )
             )
 
@@ -1435,6 +1436,7 @@ def email_branding_upload_logo(service_id):
 @user_has_permissions("manage_service")
 def email_branding_set_alt_text(service_id):
     email_branding_data = _email_branding_flow_query_params(request)
+
     if not email_branding_data["brand_type"]:
         return redirect(url_for("main.email_branding_choose_banner_type", service_id=service_id))
     elif not email_branding_data["logo"]:
@@ -1443,6 +1445,9 @@ def email_branding_set_alt_text(service_id):
     form = EmailBrandingAltTextForm()
 
     if form.validate_on_submit():
+        # we use this key to keep track of user choices through the journey but we don't use it to save the branding
+        del email_branding_data["branding_choice"]
+
         name = email_branding_client.get_email_branding_name_for_alt_text(form.alt_text.data)
         new_email_branding = email_branding_client.create_email_branding(
             name=name,
@@ -1497,7 +1502,7 @@ def _email_branding_flow_query_params(request, **kwargs):
 
     These values can get passed to the `/_email` endpoint to generate a preview of a new brand.
     """
-    return {k: kwargs.get(k, request.args.get(k)) for k in ("brand_type", "colour", "logo")}
+    return {k: kwargs.get(k, request.args.get(k)) for k in ("brand_type", "branding_choice", "colour", "logo")}
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/add-banner", methods=["GET", "POST"])
@@ -1524,12 +1529,14 @@ def email_branding_choose_banner_type(service_id):
                 )
             )
 
+    org_type = current_service.organisation_type
+    back_link_fallback = ".email_branding_choose_logo" if org_type == "central" else ".service_settings"
     return (
         render_template(
             "views/service-settings/branding/add-new-branding/email-branding-choose-banner.html",
             form=form,
             back_link=url_for(
-                request.args.get("back_link", ".email_branding_choose_logo"),
+                request.args.get("back_link", back_link_fallback),
                 service_id=current_service.id,
                 **_email_branding_flow_query_params(request),
             ),
@@ -1562,7 +1569,11 @@ def email_branding_choose_banner_colour(service_id):
         render_template(
             "views/service-settings/branding/add-new-branding/email-branding-choose-banner-colour.html",
             form=form,
-            back_link=url_for(".email_branding_choose_banner_type", service_id=service_id),
+            back_link=url_for(
+                ".email_branding_choose_banner_type",
+                service_id=service_id,
+                **_email_branding_flow_query_params(request),
+            ),
             abandon_flow_link=abandon_flow_link,
         ),
         400 if form.errors else 200,
