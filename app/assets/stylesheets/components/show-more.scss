@@ -1,40 +1,88 @@
-%show-more,
+// container for the link which
+// - contains the absolutely positioned child pseudo elements
+// - sets text size and so line height
+// - allows alignment and vertical spacing
 .show-more {
-
   @include govuk-font(16);
-  display: block;
-  padding: 0 0;
-  margin: govuk-spacing(3) 0 govuk-spacing(3) 0;
+  position: relative; // contain all
   text-align: center;
-  border-top: 1px solid $govuk-border-colour;
+  margin: govuk-spacing(1) 0 govuk-spacing(5) 0;
+}
+
+.show-more__link {
+
+  // create the separator line the link sits in front of
+  &::before {
+
+    content: "";
+    position: absolute;
+    top: 11px;
+    left: 0;
+    width: 100%;
+    height: 0;
+    border-top: 1px solid $govuk-border-colour;
+
+  }
+
+  // create a click area matching the size of the containing div + 16px extra height
+  &::after {
+
+    content: "";
+    position: absolute;
+    top: govuk-spacing(1) * -1;
+    left: 0;
+    bottom: govuk-spacing(1) * -1;
+    width: 100%;
+
+  }
+
+  // make the link text sit in front of the separator line, with a gap on either side
+  span {
+
+    position: relative; // required for z-index
+    z-index: 1; // place above ::after pseudo-element
+    padding: 0 10px;
+    background: govuk-colour('white');
+
+  }
 
   &:focus {
 
-    border-color: transparent;
-    /* override default focus style to increase top yellow box-shadow */
-    box-shadow: 0 -15px $govuk-focus-colour, 0 4px $govuk-focus-text-colour;
+    box-shadow: none; // turn off the focus style (::after handles this)
 
+    &::before {
+
+      border-color: transparent; // hide the separator line
+
+    }
+
+    // make focus style fill click area
+    &::after {
+
+      box-shadow: 0 -2px $govuk-focus-colour, 0 4px $govuk-focus-text-colour;
+      background: $govuk-focus-colour;
+      outline: 3px solid transparent; // for forced-colour modes
+
+    }
+
+    // hide all styling around link text
     span {
-      outline: none;
-      border-color: transparent;
-      background-color: transparent;
+
+      background: transparent;
+
     }
 
   }
 
-  span {
-    position: relative;
-    top: -11px;
-    outline: 10px solid white;
-    background: govuk-colour("white");
-    display: inline-block;
-    border-bottom: 1px solid govuk-colour("light-blue");
-  }
-
 }
 
-.show-more-no-border {
-  @extend %show-more;
-  border-top: 1px solid transparent;
-  margin-top: -5px;
+.show-more--no-border {
+
+  margin-top: govuk-spacing(3) * -1;
+
+  & > .show-more__link::before {
+
+    border-color: transparent;
+
+  }
 }

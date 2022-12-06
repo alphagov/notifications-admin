@@ -132,20 +132,12 @@
     padding: 0 ;
     margin: 0 0 govuk-spacing(6) 0;
 
-    &:link,
-    &:visited {
-      color: govuk-colour("white");
-    }
-
     &:hover {
-      color: govuk-colour("white");
       background-color: $govuk-link-hover-colour;
       box-shadow: 0 0 0 10px $govuk-link-hover-colour;
     }
 
-    &:focus,
-    &:active {
-      color: $govuk-focus-text-colour;
+    &:focus {
       background-color: $govuk-focus-colour;
       box-shadow: 0 0 0 10px $govuk-focus-colour, 0 4px 0 10px $govuk-focus-text-colour;
     }
@@ -178,9 +170,19 @@
   margin-bottom: govuk-spacing(6);
   text-decoration: none;
 
+  &:hover {
+    .banner-dashboard-count-label {
+      @include govuk-link-hover-decoration;
+    }
+  }
+
   &:focus {
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
+
+    .banner-dashboard-count-label {
+      text-decoration: none;
+    }
   }
 
   &-count,
@@ -200,7 +202,7 @@
 
   &-count-label {
     @include govuk-font(24, $weight: bold);
-    text-decoration: underline;
+    @include govuk-link-decoration;
     padding-right: govuk-spacing(6);
     margin: 10px 0px 5px; // 10px includes 5px extra to counter the -5px margin-top on the count item
     flex: 2 1 auto;

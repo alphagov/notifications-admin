@@ -16,10 +16,10 @@
       <nav class="breadcrumbs breadcrumbs--inverse" aria-label="Breadcrumbs">
        <ol itemscope itemtype="http://schema.org/BreadcrumbList">
          <li class="breadcrumbs__item" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-           <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-toolkit#gov-uk-services" itemprop="item"><span itemprop="name">GOV.UK services</span></a>
+           <a class="govuk-link govuk-link--inverse" href="https://www.gov.uk/service-toolkit#gov-uk-services" itemprop="item"><span itemprop="name">GOV.UK services</span></a>
          </li>
          <li class="breadcrumbs__item breadcrumbs__item--active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-           <a class="govuk-link govuk-link--no-visited-state" href="#main" itemprop="item"><span itemprop="name">GOV.UK Notify</span></a>
+           <a class="govuk-link govuk-link--inverse" href="#main" itemprop="item"><span itemprop="name">GOV.UK Notify</span></a>
          </li>
        </ol>
       </nav>
@@ -38,7 +38,7 @@
               "classes": "product-page-button button-container__button govuk-!-margin-right-3",
               "href": url_for('main.register' )
             }) }}
-            or <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.sign_in' )}}">sign in</a> if you’ve used
+            or <a class="govuk-link govuk-link--inverse" href="{{ url_for('.sign_in' )}}">sign in</a> if you’ve used
             it before
           </div>
         </div>

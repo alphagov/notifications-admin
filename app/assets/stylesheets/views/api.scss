@@ -25,6 +25,11 @@
       &::before {
         top: -1.3em;
       }
+
+      // stretch focus style to fill containing row
+      &:focus {
+        box-shadow: 0 -10px $govuk-focus-colour, 0 11px $govuk-focus-colour, 0 15px $govuk-focus-text-colour;
+      }
     }
 
     &__meta {

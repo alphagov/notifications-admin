@@ -9,6 +9,7 @@ $path: '/static/images/';
 @import './globals';
 
 // Dependencies from GOV.UK Frontend, packaged to be specific to this application
+$govuk-new-link-styles: true;
 @import './govuk-frontend/all';
 
 // Dependencies from GOV.UK Elements, moved here until all components are migrated

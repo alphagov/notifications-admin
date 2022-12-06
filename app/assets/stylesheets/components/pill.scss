@@ -36,26 +36,18 @@
 
   &-item {
     $background: $govuk-link-colour;
-    background: $background;
-    color: govuk-colour("white");
+    background: $background; // text colour is set in the HTML by the govuk-link--inverse class
     border: 2px solid $background;
     position: relative;
     text-decoration: none;
     cursor: pointer;
 
-    &:link,
-    &:visited {
-      color: govuk-colour("white");
-    }
-
-    &:hover {
-      color: govuk-tint(govuk-colour("light-blue"), 75);
-    }
-
+    // give :active links the :focus style
     &:active,
     &:focus {
       z-index: 10;
-      color: $govuk-focus-text-colour;
+      background-color: $govuk-focus-colour;
+      color: $govuk-focus-text-colour; // required for Safari, which doesn't fire :focus on :active
       /* override default focus styles to inset bottom underline */
       box-shadow: inset 0 -4px $govuk-focus-text-colour;
       border: none;
@@ -79,10 +71,11 @@
       color: govuk-tint($govuk-text-colour, 25%);
     }
 
+    // give :active links the :focus style
     &:active,
     &:focus {
       z-index: 1000;
-      color: $govuk-focus-text-colour;
+      color: $govuk-focus-text-colour; // required for Safari, which doesn't fire :focus on :active
       border: solid 2px $govuk-focus-text-colour;
       padding: 10px 0px; /* reset padding to default */
       box-shadow: inset 0 -2px $govuk-focus-text-colour; /* remove bottom border from underline */
@@ -92,7 +85,7 @@
 
   &-item__label {
 
-    text-decoration: underline;
+    @include govuk-link-decoration;
     // reduce padding until screen is above 420px / zoomed below 300%
     padding-left: govuk-spacing(1);
 
@@ -104,6 +97,11 @@
 
   &-item,
   &-item--selected {
+    &:hover .pill-item__label {
+      @include govuk-link-hover-decoration;
+    }
+
+    &:active .pill-item__label,
     &:focus .pill-item__label {
       text-decoration: none;
     }
@@ -122,26 +120,17 @@
 
     display: block;
     text-align: left;
+    background-color: $govuk-link-colour; // text colour is set in the HTML by govuk-link--inverse
     padding: 9px (govuk-spacing(3) - 1);
     border: 1px solid transparent;
     text-align: center;
 
-    &:link,
-    &:visited {
-      background: $govuk-link-colour;
-      color: govuk-colour("white");
-      text-decoration: underline;
-    }
-
-    &:hover {
-      color: govuk-tint(govuk-colour("light-blue"), 75);
-    }
-
-    &:focus,
-    &:link:focus {
-      color: $govuk-focus-text-colour;
-      text-decoration: none;
-      background: $govuk-focus-colour;
+    // give :active links the :focus style
+    &:active,
+    &:focus {
+      background-color: $govuk-focus-colour;
+      color: $govuk-focus-text-colour; // required for Safari, which doesn't fire :focus on :active
+      text-decoration: none; // required for Safari, which doesn't fire :focus on :active
       /* override default focus style to inset bottom underline */
       box-shadow: inset 0 -4px $govuk-focus-text-colour;
     }

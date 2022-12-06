@@ -15,13 +15,13 @@
 
   <nav class="govuk-grid-row bottom-gutter-1-2">
     <div class="govuk-grid-column-one-third">
-      <a class="govuk-link govuk-link--no-visited-state pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
+      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
     </div>
     <div class="govuk-grid-column-one-third">
-      <a class="govuk-link govuk-link--no-visited-state pill-separate-item" href="{{ url_for('.guest_list', service_id=current_service.id) }}">Guest list</a>
+      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('.guest_list', service_id=current_service.id) }}">Guest list</a>
     </div>
     <div class="govuk-grid-column-one-third">
-      <a class="govuk-link govuk-link--no-visited-state pill-separate-item" href="{{ url_for(callbacks_link, service_id=current_service.id) }}">Callbacks</a>
+      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for(callbacks_link, service_id=current_service.id) }}">Callbacks</a>
     </div>
   </nav>
 
