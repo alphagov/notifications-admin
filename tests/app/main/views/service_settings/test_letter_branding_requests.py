@@ -321,3 +321,72 @@ def test_letter_branding_submit_when_something_else_is_only_option(
     assert (
         "Current branding: no\n" "Branding requested: Something else\n" "\n" "Homer Simpson"
     ) in mock_create_ticket.call_args_list[0][1]["message"]
+
+
+def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
+    service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
+):
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    page = client_request.get(".letter_branding_pool_option", service_id=SERVICE_ONE_ID, branding_option="1234")
+
+    assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="1234")
+
+
+def test_letter_branding_pool_option_page_redirects_to_branding_request_page_if_branding_option_not_found(
+    service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
+):
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    client_request.get(
+        ".letter_branding_pool_option",
+        service_id=SERVICE_ONE_ID,
+        branding_option="some-unknown-branding-id",
+        _expected_status=302,
+        _expected_redirect=url_for("main.letter_branding_request", service_id=SERVICE_ONE_ID),
+    )
+
+
+def test_letter_branding_pool_option_changes_letter_branding_when_user_confirms(
+    mocker,
+    service_one,
+    organisation_one,
+    client_request,
+    no_reply_to_email_addresses,
+    single_sms_sender,
+    mock_get_letter_branding_pool,
+    mock_update_service,
+):
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    page = client_request.post(
+        ".letter_branding_pool_option",
+        service_id=SERVICE_ONE_ID,
+        branding_option="1234",
+        _follow_redirects=True,
+    )
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        letter_branding="1234",
+    )
+    assert page.select_one("h1").text == "Settings"
+    assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your letter branding"

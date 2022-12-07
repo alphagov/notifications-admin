@@ -1638,7 +1638,22 @@ def letter_branding_request(service_id):
 @user_has_permissions("manage_service")
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/pool", methods=["GET", "POST"])
 def letter_branding_pool_option(service_id):
-    return "WIP"
+    try:
+        chosen_branding = current_service.letter_branding_pool.get_item_by_id(request.args.get("branding_option"))
+    except current_service.letter_branding_pool.NotFound:
+        flash("No branding found for this id.")
+        return redirect(url_for(".letter_branding_request", service_id=current_service.id))
+
+    if request.method == "POST":
+        current_service.update(letter_branding=chosen_branding.id)
+
+        flash("You’ve updated your letter branding", "default")
+        return redirect(url_for(".service_settings", service_id=current_service.id))
+
+    return render_template(
+        "views/service-settings/branding/letter-branding-pool-option.html",
+        chosen_branding=chosen_branding,
+    )
 
 
 @main.route("/services/<uuid:service_id>/data-retention", methods=["GET"])
