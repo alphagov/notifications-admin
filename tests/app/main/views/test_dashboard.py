@@ -1417,6 +1417,65 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     assert "789" in numbers
 
 
+def test_service_dashboard_totals_link_to_view_notifications(
+    mocker,
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_get_service_statistics,
+    mock_has_no_jobs,
+    mock_get_annual_usage_for_service,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+):
+    mocker.patch(
+        "app.main.views.dashboard.get_dashboard_totals",
+        return_value={
+            "email": {"requested": 123, "delivered": 23, "failed": 100, "failed_percentage": "81.3"},
+            "sms": {"requested": 456, "delivered": 455, "failed": 1, "failed_percentage": "0.2"},
+            "letter": {"requested": 789, "delivered": 788, "failed": 1, "failed_percentage": "0.1"},
+        },
+    )
+
+    page = client_request.get(
+        "main.service_dashboard",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    big_number_links = page.select("a.big-number-link")
+    email_link = next(filter(lambda a: normalize_spaces(a.text) == "123 emails sent", big_number_links))
+    sms_link = next(filter(lambda a: normalize_spaces(a.text) == "456 text messages sent", big_number_links))
+    letter_link = next(filter(lambda a: normalize_spaces(a.text) == "789 letters sent", big_number_links))
+
+    failed_links = page.select(
+        ".big-number-with-status .big-number-status a, .big-number-with-status .big-number-status-failing a"
+    )
+    failed_email_link = next(filter(lambda a: normalize_spaces(a.text) == "100 failed – 81.3%", failed_links))
+    failed_sms_link = next(filter(lambda a: normalize_spaces(a.text) == "1 failed – 0.2%", failed_links))
+    failed_letter_link = next(filter(lambda a: normalize_spaces(a.text) == "1 failed – 0.1%", failed_links))
+
+    assert email_link["href"] == url_for(
+        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="email", status="sending,delivered,failed"
+    )
+    assert sms_link["href"] == url_for(
+        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="sms", status="sending,delivered,failed"
+    )
+    assert letter_link["href"] == url_for(
+        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="letter", status=""
+    )
+
+    assert failed_email_link["href"] == url_for(
+        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="email", status="failed"
+    )
+    assert failed_sms_link["href"] == url_for(
+        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="sms", status="failed"
+    )
+    assert failed_letter_link["href"] == url_for(
+        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="letter", status="failed"
+    )
+
+
 def test_get_dashboard_totals_adds_percentages():
     stats = {
         "sms": {"requested": 3, "delivered": 0, "failed": 2},
