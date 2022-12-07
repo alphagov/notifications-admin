@@ -72,6 +72,7 @@ from app.main.validators import (
     NoPlaceholders,
     NoTextInSVG,
     OnlySMSCharacters,
+    StringsNotAllowed,
     ValidEmail,
     ValidGovEmail,
 )
@@ -1049,6 +1050,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
             "",
             validators=[
                 CharactersNotAllowed("@"),
+                StringsNotAllowed("nhs.uk", "nhs.net"),
                 Optional(),
             ],
             default="",
