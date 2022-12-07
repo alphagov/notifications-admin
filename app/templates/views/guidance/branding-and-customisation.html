@@ -17,7 +17,6 @@
 
   <ul class="govuk-list govuk-list--bullet">
     <li><a class="govuk-link govuk-link--no-visited-state" href="#email-branding">change your email branding</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="#reply-to-address">add a reply-to email address</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="#letter-branding">change your letter branding</a></li>
   </ul>
 
@@ -30,18 +29,6 @@
   <ol class="govuk-list govuk-list--number">
     <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the {{ service_link(current_service, 'main.service_settings', 'settings') }} page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">Email branding</b> row.</li>
-  </ol>
-
-  <h2 class="heading-medium" id="reply-to-address">Add a reply-to email address</h2>
-
-  <p class="govuk-body">You can choose the email address that your users reply to. You must add at least one reply-to address for your service before you can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.trial_mode_new') }}">request to go live</a>.</p>
-
-  <p class="govuk-body">To add a reply-to email address:</p>
-
-  <ol class="govuk-list govuk-list--number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Email settings</b> section of the {{ service_link(current_service, 'main.service_settings', 'settings') }} page.</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Manage</b> on the <b class="govuk-!-font-weight-bold">Reply-to email addresses</b> row.</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Add reply-to address</b>.</li>
   </ol>
 
   <h2 class="heading-medium" id="letter-branding">Change your letter branding</h2>
