@@ -5242,16 +5242,25 @@ def test_post_service_receive_text_messages_start_turns_on_feature_and_redirects
     mocker,
     service_one,
     mock_update_service,
+    active_user_with_permissions,
 ):
     service_one["permissions"] = []
 
-    mock_add_number = mocker.patch("app.inbound_number_client.add_inbound_number_to_service")
+    mock_add_number = mocker.patch(
+        "app.inbound_number_client.add_inbound_number_to_service",
+        return_value={"id": "abcd", "service_id": SERVICE_ONE_ID, "inbound_number_id": "1234"},
+    )
+    mock_event = mocker.patch("app.main.views.service_settings.create_set_inbound_sms_on_event")
+
     page = client_request.post(
         ".service_receive_text_messages_start", service_id=SERVICE_ONE_ID, _follow_redirects=True
     )
 
     mock_add_number.assert_called_once_with(SERVICE_ONE_ID)
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, permissions=["inbound_sms"])
+    mock_event.assert_called_once_with(
+        user_id=active_user_with_permissions["id"], service_id=SERVICE_ONE_ID, inbound_number_id="1234"
+    )
 
     assert page.select_one("h1").text == "Receive text messages"
     assert "You added a phone number to your service." in page.text
