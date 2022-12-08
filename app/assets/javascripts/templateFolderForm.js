@@ -299,7 +299,7 @@
     this.nothingSelectedButtons = $(`
       <div id="nothing_selected">
         <div class="js-stick-at-bottom-when-scrolling">
-          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="add-new-template">
+          <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-1" value="add-new-template" ${!this.$singleNotificationChannel ? 'aria-expanded="false"' : ''}>
             New template
           </button>
           <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-1" value="add-new-folder" aria-expanded="false">New folder</button>
