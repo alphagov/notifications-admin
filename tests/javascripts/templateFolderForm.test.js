@@ -275,6 +275,15 @@ describe('TemplateFolderForm', () => {
 
     });
 
+    // Single Channel Broadcasting uses the 'New template' button as a link to another page, not an expanding
+    // element, as is the case with Notify. This test ensures that the 'aria-expanded' attribute does not
+    // appear in the case of Single Channel Broadcasting, removing screen-reader ambiguity.
+    test("the 'New folder' button should not have an aria-expanded attribute", () => {
+      setFixtures(hierarchy, "data-channel='sms' data-service='123'")
+
+      expect(document.querySelector('button[value=add-new-template]').getAttribute('aria-expanded')).toBeNull();
+    });
+
     // Our counter needs to be wrapped in an ARIA live region so changes to its content are
     // communicated to assistive tech'.
     // ARIA live regions need to be in the HTML before JS loads.
