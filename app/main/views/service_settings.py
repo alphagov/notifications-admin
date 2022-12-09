@@ -1157,7 +1157,7 @@ def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
     if form.something_else_is_only_option:
         return redirect(
-            url_for(".email_branding_something_else", service_id=current_service.id, back_link=".service_settings")
+            url_for(".email_branding_choose_banner_type", service_id=current_service.id, back_link=".service_settings")
         )
     if form.validate_on_submit():
 
@@ -1170,22 +1170,22 @@ def email_branding_request(service_id):
                     service_id=current_service.id,
                 )
             )
+        if branding_choice == "govuk":
+            return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
+
         if branding_choice in current_service.email_branding_pool.ids:
             return redirect(
                 url_for(".email_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
             )
-        if branding_choice == "govuk":
-            return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
 
         if current_service.organisation_type == "central":
             return redirect(
                 url_for(".email_branding_choose_logo", service_id=current_service.id, branding_choice=branding_choice)
             )
         else:
-            # TODO: change this to redirect to new logo upload flow once it's ready
             return redirect(
                 url_for(
-                    f".email_branding_{branding_choice}",
+                    ".email_branding_choose_banner_type",
                     service_id=current_service.id,
                     back_link=".email_branding_request",
                 )
@@ -1239,20 +1239,6 @@ def email_branding_govuk(service_id):
     return render_template("views/service-settings/branding/email-branding-govuk.html")
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk-and-org", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def email_branding_govuk_and_org(service_id):
-    check_email_branding_allowed_for_service("govuk_and_org")
-
-    if request.method == "POST":
-        create_email_branding_zendesk_ticket("govuk_and_org")
-
-        flash(THANKS_FOR_BRANDING_REQUEST_MESSAGE, "default")
-        return redirect(url_for(".service_settings", service_id=current_service.id))
-
-    return render_template("views/service-settings/branding/email-branding-govuk-org.html")
-
-
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_nhs(service_id):
@@ -1267,20 +1253,6 @@ def email_branding_nhs(service_id):
     return render_template(
         "views/service-settings/branding/email-branding-nhs.html", nhs_branding_id=EmailBranding.NHS_ID
     )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/organisation", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def email_branding_organisation(service_id):
-    check_email_branding_allowed_for_service("organisation")
-
-    if request.method == "POST":
-        create_email_branding_zendesk_ticket("organisation")
-
-        flash(THANKS_FOR_BRANDING_REQUEST_MESSAGE, "default")
-        return redirect(url_for(".service_settings", service_id=current_service.id))
-
-    return render_template("views/service-settings/branding/email-branding-organisation.html")
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=["GET", "POST"])
@@ -1315,6 +1287,7 @@ def email_branding_something_else(service_id):
     methods=["GET"],
 )
 @user_has_permissions("manage_service")
+@service_belongs_to_org_type("central")
 def email_branding_request_government_identity_logo(service_id):
     branding_choice = request.args.get("branding_choice")
     return render_template(
@@ -1331,6 +1304,7 @@ def email_branding_request_government_identity_logo(service_id):
     methods=["GET", "POST"],
 )
 @user_has_permissions("manage_service")
+@service_belongs_to_org_type("central")
 def email_branding_enter_government_identity_logo_text(service_id):
     form = GovernmentIdentityLogoForm(organisation=current_service.organisation)
     branding_choice = request.args.get("branding_choice")
@@ -1374,9 +1348,10 @@ def email_branding_choose_logo(service_id):
         if form.branding_options.data == "org":
             return redirect(
                 url_for(
-                    ".email_branding_something_else",
+                    ".email_branding_choose_banner_type",
                     service_id=current_service.id,
                     back_link=".email_branding_choose_logo",
+                    **_email_branding_flow_query_params(request),
                 )
             )
         elif form.branding_options.data == "single_identity":
@@ -1384,7 +1359,7 @@ def email_branding_choose_logo(service_id):
                 url_for(
                     ".email_branding_request_government_identity_logo",
                     service_id=current_service.id,
-                    branding_choice=request.args.get("branding_choice"),
+                    **_email_branding_flow_query_params(request),
                 )
             )
 
@@ -1461,6 +1436,7 @@ def email_branding_upload_logo(service_id):
 @user_has_permissions("manage_service")
 def email_branding_set_alt_text(service_id):
     email_branding_data = _email_branding_flow_query_params(request)
+
     if not email_branding_data["brand_type"]:
         return redirect(url_for("main.email_branding_choose_banner_type", service_id=service_id))
     elif not email_branding_data["logo"]:
@@ -1469,6 +1445,9 @@ def email_branding_set_alt_text(service_id):
     form = EmailBrandingAltTextForm()
 
     if form.validate_on_submit():
+        # we use this key to keep track of user choices through the journey but we don't use it to save the branding
+        del email_branding_data["branding_choice"]
+
         name = email_branding_client.get_email_branding_name_for_alt_text(form.alt_text.data)
         new_email_branding = email_branding_client.create_email_branding(
             name=name,
@@ -1523,7 +1502,7 @@ def _email_branding_flow_query_params(request, **kwargs):
 
     These values can get passed to the `/_email` endpoint to generate a preview of a new brand.
     """
-    return {k: kwargs.get(k, request.args.get(k)) for k in ("brand_type", "colour", "logo")}
+    return {k: kwargs.get(k, request.args.get(k)) for k in ("brand_type", "branding_choice", "colour", "logo")}
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/add-banner", methods=["GET", "POST"])
@@ -1550,11 +1529,17 @@ def email_branding_choose_banner_type(service_id):
                 )
             )
 
+    org_type = current_service.organisation_type
+    back_link_fallback = ".email_branding_choose_logo" if org_type == "central" else ".service_settings"
     return (
         render_template(
             "views/service-settings/branding/add-new-branding/email-branding-choose-banner.html",
             form=form,
-            back_link=url_for(".email_branding_choose_logo", service_id=service_id),
+            back_link=url_for(
+                request.args.get("back_link", back_link_fallback),
+                service_id=current_service.id,
+                **_email_branding_flow_query_params(request),
+            ),
         ),
         400 if form.errors else 200,
     )
@@ -1584,7 +1569,11 @@ def email_branding_choose_banner_colour(service_id):
         render_template(
             "views/service-settings/branding/add-new-branding/email-branding-choose-banner-colour.html",
             form=form,
-            back_link=url_for(".email_branding_choose_banner_type", service_id=service_id),
+            back_link=url_for(
+                ".email_branding_choose_banner_type",
+                service_id=service_id,
+                **_email_branding_flow_query_params(request),
+            ),
             abandon_flow_link=abandon_flow_link,
         ),
         400 if form.errors else 200,

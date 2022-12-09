@@ -3784,25 +3784,34 @@ def test_POST_email_branding_enter_government_identity_logo_text(
     )
 
 
-def test_email_branding_choose_banner_type_page(client_request, service_one):
-    page = client_request.get(
-        "main.email_branding_choose_banner_type",
-        service_id=SERVICE_ONE_ID,
-    )
+@pytest.mark.parametrize(
+    "org_type, url_params, back_button_url",
+    [
+        ("central", {}, ".email_branding_choose_logo"),
+        ("local", {}, ".service_settings"),
+        ("local", {"back_link": ".email_branding_request"}, ".email_branding_request"),
+    ],
+)
+def test_email_branding_choose_banner_type_page(
+    client_request, mocker, service_one, organisation_one, org_type, url_params, back_button_url
+):
+    organisation_one["organisation_type"] = org_type
+    service_one["organisation"] = organisation_one
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get("main.email_branding_choose_banner_type", service_id=SERVICE_ONE_ID, **url_params)
 
     form = page.select_one("form")
     submit_button = page.select_one("button.page-footer__button")
+    back_button = page.select_one("a.govuk-back-link")
 
     assert page.select_one("h1").text.strip() == "Add a banner to your logo"
-
-    assert page.select_one(".govuk-back-link")["href"] == url_for(
-        "main.email_branding_choose_logo",
-        service_id=SERVICE_ONE_ID,
-    )
 
     assert form["method"] == "post"
     assert "Continue" in submit_button.text
     assert [radio["value"] for radio in page.select("input[type=radio]")] == ["org", "org_banner"]
+
+    assert back_button["href"] == url_for(back_button_url, service_id=SERVICE_ONE_ID)
 
 
 @pytest.mark.parametrize(
@@ -4195,7 +4204,9 @@ def test_GET_email_branding_choose_banner_colour(client_request, service_one):
     text_input = form.select_one("input")
     skip_link = page.select("main a")[-1]
 
-    assert back_button["href"] == url_for("main.email_branding_choose_banner_type", service_id=service_one["id"])
+    assert back_button["href"] == url_for(
+        "main.email_branding_choose_banner_type", service_id=service_one["id"], brand_type="org_banner"
+    )
     assert form["method"] == "post"
     assert "Continue" in submit_button.text
     assert text_input["name"] == "hex_colour"
