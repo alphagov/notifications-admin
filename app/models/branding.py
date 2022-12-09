@@ -70,6 +70,7 @@ class EmailBranding(Branding):
 
 class LetterBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {"filename"}
+    NHS_ID = "2cd354bb-6b85-eda3-c0ad-6b613150459f"
 
     @classmethod
     def from_id(cls, id):

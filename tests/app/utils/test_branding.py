@@ -2,7 +2,7 @@ from unittest.mock import PropertyMock
 
 import pytest
 
-from app.models.branding import EmailBranding
+from app.models.branding import EmailBranding, LetterBranding
 from app.models.service import Service
 from app.utils.branding import get_email_choices, get_letter_choices
 from tests import organisation_json
@@ -17,7 +17,7 @@ from tests.conftest import create_email_branding
         (get_email_choices, "local", []),
         (get_letter_choices, "local", []),
         (get_email_choices, "nhs_central", [(EmailBranding.NHS_ID, "NHS")]),
-        (get_letter_choices, "nhs_central", [(EmailBranding.NHS_ID, "NHS")]),
+        (get_letter_choices, "nhs_central", [(LetterBranding.NHS_ID, "NHS")]),
     ],
 )
 def test_get_choices_service_not_assigned_to_org(
@@ -237,7 +237,7 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
         ("central", None, [("organisation", "Test Organisation")]),
         ("local", None, [("organisation", "Test Organisation")]),
         ("local", "some-random-branding", [("organisation", "Test Organisation")]),
-        ("nhs_central", None, [(EmailBranding.NHS_ID, "NHS")]),
+        ("nhs_central", None, [(LetterBranding.NHS_ID, "NHS")]),
     ],
 )
 def test_get_letter_choices_service_assigned_to_org(
@@ -309,7 +309,7 @@ def test_get_letter_choices_org_has_default_branding(
         (
             "NHS something else",
             [
-                (EmailBranding.NHS_ID, "NHS"),
+                (LetterBranding.NHS_ID, "NHS"),
             ],
         ),
         (

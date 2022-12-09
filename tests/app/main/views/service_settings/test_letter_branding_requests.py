@@ -4,7 +4,7 @@ import pytest
 from flask import url_for
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app.models.branding import EmailBranding
+from app.models.branding import LetterBranding
 from tests import organisation_json, sample_uuid
 from tests.conftest import (
     ORGANISATION_ID,
@@ -25,7 +25,7 @@ from tests.conftest import (
                 {"id": "5678", "name": "Brand 2", "filename": "brand_2"},
             ],
             [
-                (EmailBranding.NHS_ID, "NHS"),
+                (LetterBranding.NHS_ID, "NHS"),
                 ("1234", "Brand 1"),
                 ("5678", "Brand 2"),
                 ("something_else", "Something else"),
@@ -36,7 +36,7 @@ from tests.conftest import (
             False,
             [],
             [
-                (EmailBranding.NHS_ID, "NHS"),
+                (LetterBranding.NHS_ID, "NHS"),
                 ("something_else", "Something else"),
             ],
         ),
