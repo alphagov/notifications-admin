@@ -77,12 +77,28 @@ def using_notify_nav():
                     "link": "main.edit_and_format_messages",
                 },
                 {
-                    "name": "Branding",
-                    "link": "main.branding_and_customisation",
+                    "name": "Email branding",
+                    "link": "main.email_branding",
+                },
+                {
+                    "name": "Letter branding",
+                    "link": "main.letter_branding",
+                },
+                {
+                    "name": "Receive text messages",
+                    "link": "main.receive_text_messages",
+                },
+                {
+                    "name": "Reply-to email address",
+                    "link": "main.reply_to_email_address",
                 },
                 {
                     "name": "Send files by email",
                     "link": "main.send_files_by_email",
+                },
+                {
+                    "name": "Templates",
+                    "link": "main.templates",
                 },
                 {
                     "name": "Upload a letter",
