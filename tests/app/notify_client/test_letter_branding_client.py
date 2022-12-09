@@ -57,6 +57,7 @@ def test_update_letter_branding(mocker, fake_uuid):
 
     mock_post = mocker.patch("app.notify_client.letter_branding_client.LetterBrandingClient.post")
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
+    mock_redis_delete_by_pattern = mocker.patch("app.extensions.RedisClient.delete_by_pattern")
     LetterBrandingClient().update_letter_branding(
         branding_id=fake_uuid, filename=branding["filename"], name=branding["name"]
     )
@@ -66,3 +67,4 @@ def test_update_letter_branding(mocker, fake_uuid):
         call("letter_branding-{}".format(fake_uuid)),
         call("letter_branding"),
     ]
+    assert mock_redis_delete_by_pattern.call_args_list == [call("organisation-*-letter-branding-pool")]
