@@ -77,6 +77,7 @@ from app.models.branding import (
     EmailBranding,
     LetterBranding,
 )
+from app.models.organisation import Organisation
 from app.s3_client.s3_logo_client import upload_email_logo
 from app.utils import (
     DELIVERED_STATUSES,
@@ -1453,6 +1454,24 @@ def email_branding_upload_logo(service_id):
     )
 
 
+def _should_set_default_org_branding(branding_choice):
+    # 1. the user has chosen ‘[organisation name]’ in the first page of the journey
+    user_chose_org_name = branding_choice == "organisation"
+    # 2. and the organisation doesn’t have default branding already
+    org_doesnt_have_default_branding = current_service.organisation.email_branding_id is None
+    # 3. and the organisation is not central government
+    #    (it might be appropriate for them to keep GOV.UK as a default instead)
+    org_not_central = current_service.organisation_type != Organisation.TYPE_CENTRAL
+    # 4. and the organisation has no other live services
+    no_other_live_services_in_org = not any(
+        service["id"] != current_service.id for service in current_service.organisation.live_services
+    )
+
+    return (
+        user_chose_org_name and org_doesnt_have_default_branding and org_not_central and no_other_live_services_in_org
+    )
+
+
 @main.route(
     "/services/<uuid:service_id>/service-settings/email-branding/when-you-use-this-branding", methods=["GET", "POST"]
 )
@@ -1469,7 +1488,7 @@ def email_branding_set_alt_text(service_id):
 
     if form.validate_on_submit():
         # we use this key to keep track of user choices through the journey but we don't use it to save the branding
-        del email_branding_data["branding_choice"]
+        branding_choice = email_branding_data.pop("branding_choice")
 
         new_email_branding = EmailBranding.create(
             alt_text=form.alt_text.data,
@@ -1483,6 +1502,9 @@ def email_branding_set_alt_text(service_id):
         organisations_client.add_brandings_to_email_branding_pool(
             current_service.organisation.id, [new_email_branding.id]
         )
+
+        if _should_set_default_org_branding(branding_choice):
+            current_service.organisation.update(email_branding_id=new_email_branding.id)
 
         flash(
             "You’ve changed your email branding. Send yourself an email to make sure it looks OK.", "default_with_tick"
