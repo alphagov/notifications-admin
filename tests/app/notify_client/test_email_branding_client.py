@@ -86,6 +86,7 @@ def test_update_email_branding(mocker, fake_uuid):
 
     mock_post = mocker.patch("app.notify_client.email_branding_client.EmailBrandingClient.post")
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
+    mock_redis_delete_by_pattern = mocker.patch("app.extensions.RedisClient.delete_by_pattern")
     EmailBrandingClient().update_email_branding(
         branding_id=fake_uuid,
         logo=org_data["logo"],
@@ -102,6 +103,7 @@ def test_update_email_branding(mocker, fake_uuid):
         call("email_branding-{}".format(fake_uuid)),
         call("email_branding"),
     ]
+    assert mock_redis_delete_by_pattern.call_args_list == [call("organisation-*-email-branding-pool")]
 
 
 def test_create_email_branding_sends_none_values(mocker, fake_uuid):
