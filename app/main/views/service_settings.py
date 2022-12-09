@@ -22,7 +22,6 @@ from app import (
     current_service,
     email_branding_client,
     inbound_number_client,
-    letter_branding_client,
     notification_api_client,
     organisations_client,
     service_api_client,
@@ -73,7 +72,12 @@ from app.main.forms import (
     SomethingElseBrandingForm,
 )
 from app.main.views.pricing import CURRENT_SMS_RATE
-from app.models.branding import AllEmailBranding, AllLetterBranding, EmailBranding
+from app.models.branding import (
+    AllEmailBranding,
+    AllLetterBranding,
+    EmailBranding,
+    LetterBranding,
+)
 from app.s3_client.s3_logo_client import upload_email_logo
 from app.utils import (
     DELIVERED_STATUSES,
@@ -1022,17 +1026,17 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
     branding_type = f"{notification_type}_branding"
 
     if notification_type == "email":
-        branding = email_branding_client.get_email_branding(branding_id)[branding_type]
+        branding = EmailBranding.from_id(branding_id)
         add_brandings_to_pool = organisations_client.add_brandings_to_email_branding_pool
 
     elif notification_type == "letter":
-        branding = letter_branding_client.get_letter_branding(branding_id)
+        branding = LetterBranding.from_id(branding_id)
         add_brandings_to_pool = organisations_client.add_brandings_to_letter_branding_pool
 
     else:
         abort(404)
 
-    branding_name = branding["name"]
+    branding_name = branding.name
     org_id = current_service.organisation.id
 
     form = AdminSetBrandingAddToBrandingPoolStepForm(
