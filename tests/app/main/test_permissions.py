@@ -5,7 +5,7 @@ import re
 import pytest
 from flask import current_app
 
-from tests import service_json
+from tests import sample_uuid, service_json
 from tests.conftest import (
     ORGANISATION_ID,
     ORGANISATION_TWO_ID,
@@ -27,6 +27,18 @@ from tests.conftest import (
         ([SERVICE_ONE_ID, SERVICE_TWO_ID], [ORGANISATION_ID], 200, False),
         ([], [ORGANISATION_TWO_ID], 403, True),
         ([], [ORGANISATION_ID, ORGANISATION_TWO_ID], 200, True),
+    ),
+)
+@pytest.mark.parametrize(
+    "endpoint, extra_args",
+    (
+        ("main.usage", {}),
+        ("main.manage_users", {}),
+        ("main.choose_template", {"template_id": sample_uuid()}),
+        ("main.view_template", {"template_id": sample_uuid()}),
+        ("main.view_template_versions", {"template_id": sample_uuid()}),
+        ("main.view_template_version", {"template_id": sample_uuid(), "version": 1}),
+        ("no_cookie.view_letter_template_preview", {"template_id": sample_uuid(), "filetype": "pdf"}),
     ),
 )
 def test_services_pages_that_org_users_are_allowed_to_see(
@@ -52,7 +64,8 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     user_organisations,
     expected_status,
     organisation_checked,
-    fake_uuid,
+    endpoint,
+    extra_args,
 ):
     api_user_active["services"] = user_services
     api_user_active["organisations"] = user_organisations
@@ -72,20 +85,9 @@ def test_services_pages_that_org_users_are_allowed_to_see(
         service=service if SERVICE_ONE_ID in user_services else None,
     )
 
-    endpoints = (
-        ("main.usage", {}),
-        ("main.manage_users", {}),
-        ("main.choose_template", {"template_id": fake_uuid}),
-        ("main.view_template", {"template_id": fake_uuid}),
-        ("main.view_template_versions", {"template_id": fake_uuid}),
-        ("main.view_template_version", {"template_id": fake_uuid, "version": 1}),
-        ("no_cookie.view_letter_template_preview", {"template_id": fake_uuid, "filetype": "pdf"}),
+    client_request.get(
+        endpoint, service_id=SERVICE_ONE_ID, _expected_status=expected_status, _test_page_title=False, **extra_args
     )
-
-    for endpoint, extra_args in endpoints:
-        client_request.get(
-            endpoint, service_id=SERVICE_ONE_ID, _expected_status=expected_status, _test_page_title=False, **extra_args
-        )
 
     assert mock_get_service.called is organisation_checked
 
