@@ -244,26 +244,41 @@ def guidance_index():
     )
 
 
-@main.route("/using-notify/guidance/branding-and-customisation")
-def branding_and_customisation():
-    return render_template(
-        "views/guidance/branding-and-customisation.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
-@main.route("/using-notify/guidance/create-and-send-messages")
-def create_and_send_messages():
-    return render_template(
-        "views/guidance/create-and-send-messages.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
 @main.route("/using-notify/guidance/edit-and-format-messages")
 def edit_and_format_messages():
     return render_template(
         "views/guidance/edit-and-format-messages.html",
+        navigation_links=using_notify_nav(),
+    )
+
+@main.route("/using-notify/guidance/email-branding")
+def email_branding():
+    return render_template(
+        "views/guidance/email-branding.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/letter-branding")
+def letter_branding():
+    return render_template(
+        "views/guidance/letter-branding.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/receive-text-messages")
+def receive_text_messages ():
+    return render_template(
+        "views/guidance/receive-text-messages.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/reply-to-email-address")
+def reply_to_email_address ():
+    return render_template(
+        "views/guidance/reply-to-email-address.html",
         navigation_links=using_notify_nav(),
     )
 
@@ -272,6 +287,22 @@ def edit_and_format_messages():
 def send_files_by_email():
     return render_template(
         "views/guidance/send-files-by-email.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/templates")
+def templates():
+    return render_template(
+        "views/guidance/templates.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/text-message-sender")
+def text_message_sender():
+    return render_template(
+        "views/guidance/text-message-sender.html",
         navigation_links=using_notify_nav(),
     )
 
@@ -288,6 +319,14 @@ def upload_a_letter():
 def letter_specification():
     return render_template(
         "views/guidance/letter-specification.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/create-and-send-messages")
+def create_and_send_messages():
+    return render_template(
+        "views/guidance/create-and-send-messages.html",
         navigation_links=using_notify_nav(),
     )
 
