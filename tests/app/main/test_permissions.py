@@ -42,10 +42,17 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     mock_get_template_folders,
     mock_get_organisation,
     mock_has_jobs,
+    mock_get_service_templates,
+    mock_get_service_template,
+    mock_get_template_versions,
+    mock_get_template_version,
+    mock_get_api_keys,
+    mock_template_preview,
     user_services,
     user_organisations,
     expected_status,
     organisation_checked,
+    fake_uuid,
 ):
     api_user_active["services"] = user_services
     api_user_active["organisations"] = user_organisations
@@ -66,15 +73,18 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     )
 
     endpoints = (
-        "main.usage",
-        "main.manage_users",
+        ("main.usage", {}),
+        ("main.manage_users", {}),
+        ("main.choose_template", {"template_id": fake_uuid}),
+        ("main.view_template", {"template_id": fake_uuid}),
+        ("main.view_template_versions", {"template_id": fake_uuid}),
+        ("main.view_template_version", {"template_id": fake_uuid, "version": 1}),
+        ("no_cookie.view_letter_template_preview", {"template_id": fake_uuid, "filetype": "pdf"}),
     )
 
-    for endpoint in endpoints:
+    for endpoint, extra_args in endpoints:
         client_request.get(
-            endpoint,
-            service_id=SERVICE_ONE_ID,
-            _expected_status=expected_status,
+            endpoint, service_id=SERVICE_ONE_ID, _expected_status=expected_status, _test_page_title=False, **extra_args
         )
 
     assert mock_get_service.called is organisation_checked
