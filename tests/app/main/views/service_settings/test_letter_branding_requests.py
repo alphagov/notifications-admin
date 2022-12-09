@@ -77,7 +77,7 @@ def test_letter_branding_request_page_when_no_branding_is_set(
     assert normalize_spaces(page.select_one("main p").text) == "Your letters currently have no branding."
 
     button_text = normalize_spaces(page.select_one(".page-footer button").text)
-    assert button_text == "Request new branding"
+    assert button_text == "Continue"
 
     if expected_options:
         assert [
