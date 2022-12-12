@@ -146,19 +146,21 @@ class Organisation(JSONModel):
 
     @cached_property
     def services(self):
-        return organisations_client.get_organisation_services(self.id)
+        from app.models.service import Services
+
+        return Services(organisations_client.get_organisation_services(self.id))
 
     @cached_property
     def service_ids(self):
-        return [s["id"] for s in self.services]
+        return [s.id for s in self.services]
 
     @property
     def live_services(self):
-        return [s for s in self.services if s["active"] and not s["restricted"]]
+        return [s for s in self.services if s.active and s.live]
 
     @property
     def trial_services(self):
-        return [s for s in self.services if not s["active"] or s["restricted"]]
+        return [s for s in self.services if not s.active or s.trial_mode]
 
     @cached_property
     def invited_users(self):

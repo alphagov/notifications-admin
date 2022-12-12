@@ -1464,7 +1464,7 @@ def _should_set_default_org_branding(branding_choice):
     org_not_central = current_service.organisation_type != Organisation.TYPE_CENTRAL
     # 4. and the organisation has no other live services
     no_other_live_services_in_org = not any(
-        service["id"] != current_service.id for service in current_service.organisation.live_services
+        service.id != current_service.id for service in current_service.organisation.live_services
     )
 
     return (
