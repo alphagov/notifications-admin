@@ -21,6 +21,9 @@ class Branding(JSONModel):
     def with_default_values(cls, **kwargs):
         return cls({key: None for key in cls.ALLOWED_PROPERTIES} | kwargs)
 
+    def name_like(self, name):
+        return email_safe(name, whitespace="") == email_safe(self.name, whitespace="")
+
 
 class EmailBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {
@@ -111,7 +114,7 @@ class AllEmailBranding(AllBranding):
     @property
     def example_government_identity_branding(self):
         for branding in self:
-            if email_safe(branding.name, whitespace="") == "departmentforeducation":
+            if branding.name_like("Department for Education"):
                 return branding
 
 
