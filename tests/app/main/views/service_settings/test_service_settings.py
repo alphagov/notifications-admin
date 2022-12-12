@@ -3638,7 +3638,11 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
             None,
         ),
         (
-            [{"idx": 3, "id": "dfe1234", "name": "The Department for EDUCATION"}],
+            [{"idx": 3, "id": "dfe1234", "name": "Department for Education - National Apprenticeship Service"}],
+            None,
+        ),
+        (
+            [{"idx": 3, "id": "dfe1234", "name": "Department for EDUCATION"}],
             "dfe1234",
         ),
     ),
