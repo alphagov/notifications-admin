@@ -19,10 +19,8 @@ def get_email_choices(service):
     if service.email_branding_pool:
         for branding in service.email_branding_pool.excluding(service.email_branding_id):
             yield (branding.id, branding.name)
-    elif (
-        service.organisation
-        and not service.is_nhs
-        and (not service.email_branding_id or service.email_branding_id != service.organisation.email_branding_id)
+    elif service.organisation and (
+        not service.email_branding_id or service.email_branding_id != service.organisation.email_branding_id
     ):
         yield ("organisation", service.organisation.name)
 

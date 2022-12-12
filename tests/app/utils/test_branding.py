@@ -56,12 +56,20 @@ def test_get_choices_service_not_assigned_to_org(
         ),
         ("local", None, [("organisation", "Test Organisation")]),
         ("local", "some-branding-id", [("organisation", "Test Organisation")]),
-        ("nhs_central", None, [(EmailBranding.NHS_ID, "NHS")]),
+        (
+            "nhs_central",
+            None,
+            [
+                (EmailBranding.NHS_ID, "NHS"),
+                ("organisation", "Test Organisation"),
+            ],
+        ),
         (
             "nhs_central",
             EmailBranding.NHS_ID,
             [
                 # don't show NHS if it's the current branding
+                ("organisation", "Test Organisation"),
             ],
         ),
     ],
