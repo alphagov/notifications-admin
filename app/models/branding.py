@@ -111,7 +111,7 @@ class AllEmailBranding(AllBranding):
     @property
     def example_government_identity_branding(self):
         for branding in self:
-            if "departmentforeducation" in email_safe(branding.name, whitespace=""):
+            if email_safe(branding.name, whitespace="") == "departmentforeducation":
                 return branding
 
 
