@@ -2,16 +2,16 @@ from app.models.branding import EmailBranding
 
 
 def get_email_choices(service):
-    if service.can_use_govuk_branding and not service.email_branding.is_govuk:
-        yield ("govuk", "GOV.UK")
+    if service.can_use_govuk_branding:
 
-    if (
-        service.organisation
-        and service.can_use_govuk_branding
-        and not service.email_branding.name_like(f"GOV.UK and {service.organisation.name}")
-        and not service.email_branding_pool.contains_name(f"GOV.UK and {service.organisation.name}")
-    ):
-        yield ("govuk_and_org", f"GOV.UK and {service.organisation.name}")
+        if not service.email_branding.is_govuk:
+            yield ("govuk", "GOV.UK")
+
+        if service.organisation and not (
+            service.email_branding.name_like(f"GOV.UK and {service.organisation.name}")
+            or service.email_branding_pool.contains_name(f"GOV.UK and {service.organisation.name}")
+        ):
+            yield ("govuk_and_org", f"GOV.UK and {service.organisation.name}")
 
     if service.is_nhs and not service.email_branding.is_nhs:
         yield (EmailBranding.NHS_ID, "NHS")
