@@ -1461,25 +1461,17 @@ def email_branding_set_alt_text(service_id):
         # we use this key to keep track of user choices through the journey but we don't use it to save the branding
         del email_branding_data["branding_choice"]
 
-        name = email_branding_client.get_email_branding_name_for_alt_text(form.alt_text.data)
-
-        if email_branding_data["brand_type"] == "both":
-            name = f"GOV.UK and {name}"
-
-        new_email_branding = email_branding_client.create_email_branding(
-            name=name,
+        new_email_branding = EmailBranding.create(
             alt_text=form.alt_text.data,
-            text=None,
-            created_by_id=current_user.id,
             **email_branding_data,
         )
 
         # set as service branding
-        current_service.update(email_branding=new_email_branding["id"])
+        current_service.update(email_branding=new_email_branding.id)
 
         # add to org pool
         organisations_client.add_brandings_to_email_branding_pool(
-            current_service.organisation.id, [new_email_branding["id"]]
+            current_service.organisation.id, [new_email_branding.id]
         )
 
         flash(
