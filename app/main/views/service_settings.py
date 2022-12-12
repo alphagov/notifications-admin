@@ -1462,6 +1462,10 @@ def email_branding_set_alt_text(service_id):
         del email_branding_data["branding_choice"]
 
         name = email_branding_client.get_email_branding_name_for_alt_text(form.alt_text.data)
+
+        if email_branding_data["brand_type"] == "both":
+            name = f"GOV.UK and {name}"
+
         new_email_branding = email_branding_client.create_email_branding(
             name=name,
             alt_text=form.alt_text.data,

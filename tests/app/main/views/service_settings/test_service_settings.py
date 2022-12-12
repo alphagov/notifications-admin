@@ -4148,6 +4148,13 @@ def test_POST_email_branding_set_alt_text_shows_error(client_request, service_on
     assert normalize_spaces(page.select_one("#alt_text-error").text) == expected_error
 
 
+@pytest.mark.parametrize(
+    "brand_type, expected_name",
+    (
+        ("org", "some alt text"),
+        ("both", "GOV.UK and some alt text"),
+    ),
+)
 def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redirects(
     client_request,
     service_one,
@@ -4157,6 +4164,8 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
     mock_update_service,
     fake_uuid,
     mocker,
+    brand_type,
+    expected_name,
 ):
     mock_flash = mocker.patch("app.main.views.service_settings.flash")
     mock_add_to_branding_pool = mocker.patch(
@@ -4165,7 +4174,7 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
     client_request.post(
         "main.email_branding_set_alt_text",
         service_id=service_one["id"],
-        brand_type="org",
+        brand_type=brand_type,
         logo="example.png",
         _data={"alt_text": "some alt text"},
         _expected_status=302,
@@ -4173,11 +4182,11 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
     )
     mock_create_email_branding.assert_called_once_with(
         logo="example.png",
-        name="some alt text",
+        name=expected_name,
         alt_text="some alt text",
         text=None,
         colour=None,
-        brand_type="org",
+        brand_type=brand_type,
         created_by_id=active_user_with_permissions["id"],
     )
     mock_add_to_branding_pool.assert_called_once_with(service_one["organisation"], [fake_uuid])
