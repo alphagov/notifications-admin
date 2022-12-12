@@ -1343,9 +1343,22 @@ def email_branding_enter_government_identity_logo_text(service_id):
 @service_belongs_to_org_type("central")
 def email_branding_choose_logo(service_id):
     form = EmailBrandingChooseLogoForm()
+    branding_choice = request.args.get("branding_choice")
 
     if form.validate_on_submit():
         if form.branding_options.data == "org":
+
+            if branding_choice == "govuk_and_org":
+                return redirect(
+                    url_for(
+                        ".email_branding_upload_logo",
+                        service_id=current_service.id,
+                        branding_choice=branding_choice,
+                        brand_type="both",
+                        back_link=".email_branding_choose_logo",
+                    )
+                )
+
             return redirect(
                 url_for(
                     ".email_branding_choose_banner_type",
