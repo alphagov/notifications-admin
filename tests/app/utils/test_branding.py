@@ -96,28 +96,20 @@ def test_get_email_choices_service_assigned_to_org(
 
 
 @pytest.mark.parametrize(
-    "org_type, branding_id, expected_options",
+    "org_type, expected_options",
     [
         (
             "central",
-            "some-branding-id",
             [
-                # don't show GOV.UK options as org default supersedes it
+                ("govuk", "GOV.UK"),
+                ("govuk_and_org", "GOV.UK and Test Organisation"),
                 ("organisation", "Test Organisation"),
             ],
         ),
         (
-            "central",
-            "org-branding-id",
-            [
-                # also don't show org option if it's the current branding
-            ],
-        ),
-        (
             "local",
-            "org-branding-id",
             [
-                # don't show org option if it's the current branding
+                ("organisation", "Test Organisation"),
             ],
         ),
     ],
@@ -126,7 +118,6 @@ def test_get_email_choices_org_has_default_branding(
     mocker,
     service_one,
     org_type,
-    branding_id,
     expected_options,
     mock_get_empty_email_branding_pool,
     mock_get_service_organisation,
@@ -136,9 +127,9 @@ def test_get_email_choices_org_has_default_branding(
 
     mocker.patch(
         "app.organisations_client.get_organisation",
-        return_value=organisation_json(organisation_type=org_type, email_branding_id="org-branding-id"),
+        return_value=organisation_json(organisation_type=org_type),
     )
-    mocker.patch("app.models.service.Service.email_branding_id", new_callable=PropertyMock, return_value=branding_id)
+    mocker.patch("app.models.service.Service.email_branding_id")
 
     options = get_email_choices(service)
     assert list(options) == expected_options
