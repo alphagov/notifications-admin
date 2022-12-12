@@ -2062,7 +2062,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
             },
         },
         "org": {
-            "label": "Use your own logo",
+            "label": "Upload a logo",
             "image": {
                 "url": asset_fingerprinter.get_url("images/branding/org.png"),
                 "alt_text": 'An example of an email with the heading "Your logo" in blue text on a white background.',
