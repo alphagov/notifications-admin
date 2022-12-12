@@ -1504,7 +1504,7 @@ def email_branding_set_alt_text(service_id):
         )
 
         if _should_set_default_org_branding(branding_choice):
-            current_service.organisation.update(email_branding_id=new_email_branding.id)
+            current_service.organisation.update(email_branding_id=new_email_branding.id, delete_services_cache=True)
 
         flash(
             "You’ve changed your email branding. Send yourself an email to make sure it looks OK.", "default_with_tick"

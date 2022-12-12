@@ -4337,6 +4337,7 @@ def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_a
     active_user_with_permissions,
     mock_update_service,
     mock_get_organisation,
+    mock_get_organisation_services,
     mock_update_organisation,
     fake_uuid,
     mocker,
