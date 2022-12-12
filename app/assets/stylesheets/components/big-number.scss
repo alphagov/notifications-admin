@@ -141,6 +141,31 @@
 
   }
 
+  // TODO: when the :has() pseudo-class gets enough support we can remove the
+  // .big-number-status--with-link and just do .big-number-status:has(> .govuk-link)
+  .big-number-status--with-link {
+    padding: 0;
+
+    & > .govuk-link {
+      display: block;
+      padding: 15px;
+
+      // override the default focus style to inset the underline
+      &:active,
+      &:focus {
+        box-shadow: inset 0 -4px $govuk-focus-text-colour;
+      }
+
+      // For Safari, which doesn't fire :focus when :active
+      &:active {
+        text-decoration: none;
+        background-color: $govuk-focus-colour;
+        color: $govuk-focus-text-colour;
+      }
+
+    }
+  }
+
   .big-number-status-failing {
     @extend %big-number-status;
     background: $govuk-error-colour;
