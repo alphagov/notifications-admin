@@ -106,6 +106,9 @@ class AllBranding(ModelList):
     def excluding(self, *ids_to_exclude):
         return tuple(branding for branding in self if branding.id not in ids_to_exclude)
 
+    def contains_name(self, name):
+        return any(branding.name_like(name) for branding in self)
+
 
 class AllEmailBranding(AllBranding):
     client_method = email_branding_client.get_all_email_branding

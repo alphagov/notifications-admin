@@ -67,6 +67,7 @@ def test_email_branding_request_page_when_no_branding_is_set(
             "central",
             [
                 ("govuk", "GOV.UK"),
+                ("govuk_and_org", "GOV.UK and organisation one"),
                 ("email-branding-1-id", "Email branding name 1"),
                 ("email-branding-2-id", "Email branding name 2"),
                 ("something_else", "Something else"),
