@@ -721,7 +721,7 @@ def test_email_branding_choose_logo_page(client_request, service_one):
         for i, radio in enumerate(page.select("input[type=radio]"))
     ] == [
         ("single_identity", "Create a government identity logo"),
-        ("org", "Use your own logo"),
+        ("org", "Upload a logo"),
     ]
 
 
