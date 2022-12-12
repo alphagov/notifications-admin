@@ -2,7 +2,7 @@ import re
 import unicodedata
 import urllib
 from datetime import datetime, timedelta, timezone
-from functools import partial
+from functools import lru_cache, partial
 from math import floor, log10
 from numbers import Number
 
@@ -309,6 +309,7 @@ def format_thousands(value):
     return value
 
 
+@lru_cache(maxsize=4)
 def email_safe(string, whitespace="."):
     # strips accents, diacritics etc
     string = "".join(c for c in unicodedata.normalize("NFD", string) if unicodedata.category(c) != "Mn")
