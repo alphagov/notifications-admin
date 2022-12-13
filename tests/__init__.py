@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlparse
 
 import freezegun
 import pytest
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Doctype
 from flask import session as flask_session
 from flask import url_for
 from flask.testing import FlaskClient
@@ -57,6 +57,13 @@ class NotifyBeautifulSoup(BeautifulSoup):
             )
 
         setattr(self, method_name, overridden_method)
+
+    @property
+    def doctype(self):
+        return next(
+            (item for item in self.contents if isinstance(item, Doctype)),
+            "",
+        )
 
 
 def sample_uuid():

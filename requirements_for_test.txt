@@ -14,3 +14,4 @@ moto==4.0.9
 requests-mock==1.10.0
 # used for creating manifest file locally
 jinja2-cli[yaml]==0.8.2
+html5lib==1.1

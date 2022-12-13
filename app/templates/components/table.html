@@ -49,9 +49,11 @@
 {%- endmacro %}
 
 {% macro row_group(id=None) %}
+  </tbody>
   <tbody class="table-row-group" {% if id %}id="{{id}}"{% endif %}>
     {{ caller() }}
   </tbody>
+  <tbody>
 {%- endmacro %}
 
 {% macro settings_row(if_has_permission='') -%}
