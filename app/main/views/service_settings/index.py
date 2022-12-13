@@ -965,13 +965,20 @@ def set_free_sms_allowance(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-message-limit", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/set-message-limit/<template_type:notification_type>",
+    methods=["GET", "POST"],
+)
 @user_is_platform_admin
-def set_message_limit(service_id):
+def set_message_limit(service_id, notification_type=None):
+    limit_attribute_name = "message_limit" if notification_type is None else f"{notification_type}_message_limit"
 
-    form = AdminServiceMessageLimitForm(message_limit=current_service.message_limit)
+    form = AdminServiceMessageLimitForm(
+        message_limit=getattr(current_service, limit_attribute_name), notification_type=notification_type
+    )
 
     if form.validate_on_submit():
-        current_service.update(message_limit=form.message_limit.data)
+        current_service.update(**{limit_attribute_name: form.message_limit.data})
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
