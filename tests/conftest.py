@@ -1577,7 +1577,7 @@ def mock_get_uploads(mocker, api_user_active):
                 "statistics": [{"count": 1, "status": "delivered"}],
                 "upload_type": "letter",
                 "template_type": None,
-                "recipient": ("Firstname Lastname\n" "123 Example Street\n" "City of Town\n" "XM4 5QQ"),
+                "recipient": "Firstname Lastname\n123 Example Street\nCity of Town\nXM4 5QQ",
             },
         ]
         return {

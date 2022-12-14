@@ -104,9 +104,9 @@ def test_sms_character_validation(client_request, msg):
     [
         (
             "∆ abc 📲 def 📵 ghi",
-            ("You cannot use ∆, 📲 or 📵 in text messages. " "They will not show up properly on everyone’s phones."),
+            "You cannot use ∆, 📲 or 📵 in text messages. They will not show up properly on everyone’s phones.",
         ),
-        ("📵", ("You cannot use 📵 in text messages. " "It will not show up properly on everyone’s phones.")),
+        ("📵", "You cannot use 📵 in text messages. It will not show up properly on everyone’s phones."),
     ],
 )
 def test_non_sms_character_validation(data, err_msg, client_request):

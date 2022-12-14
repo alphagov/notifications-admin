@@ -56,7 +56,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             ["Email", "Text message", "Letter"],
             [
                 "folder_one folder_one 2 folders",
-                ("folder_one folder_one_one " "folder_one folder_one_one " "1 template, 1 folder"),
+                "folder_one folder_one_one folder_one folder_one_one 1 template, 1 folder",
                 (
                     "folder_one folder_one_one folder_one_one_one "
                     "folder_one folder_one_one folder_one_one_one "
@@ -72,10 +72,10 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
                     "folder_one folder_one_one letter_template_nested "
                     "Letter template"
                 ),
-                ("folder_one folder_one_two " "folder_one folder_one_two " "Empty"),
+                "folder_one folder_one_two folder_one folder_one_two Empty",
                 "folder_two folder_two Empty",
-                ("sms_template_one " "sms_template_one " "Text message template"),
-                ("sms_template_two " "sms_template_two " "Text message template"),
+                "sms_template_one sms_template_one Text message template",
+                "sms_template_two sms_template_two Text message template",
                 "email_template_one email_template_one Email template",
                 "email_template_two email_template_two Email template",
                 "letter_template_one letter_template_one Letter template",
@@ -116,7 +116,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             ["Email", "Text message", "Letter"],
             [
                 "folder_one folder_one 2 folders",
-                ("folder_one folder_one_one " "folder_one folder_one_one " "1 template, 1 folder"),
+                "folder_one folder_one_one folder_one folder_one_one 1 template, 1 folder",
                 (
                     "folder_one folder_one_one folder_one_one_one "
                     "folder_one folder_one_one folder_one_one_one "
@@ -132,7 +132,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
                     "folder_one folder_one_one letter_template_nested "
                     "Letter template"
                 ),
-                ("folder_one folder_one_two " "folder_one folder_one_two " "Empty"),
+                "folder_one folder_one_two folder_one folder_one_two Empty",
                 "folder_two folder_two Empty",
                 "sms_template_one sms_template_one Text message template",
                 "sms_template_two sms_template_two Text message template",
@@ -176,7 +176,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             ["All", "Email", "Letter"],
             [
                 "folder_one folder_one 1 folder",
-                ("folder_one folder_one_one " "folder_one folder_one_one " "1 folder"),
+                "folder_one folder_one_one folder_one folder_one_one 1 folder",
                 (
                     "folder_one folder_one_one folder_one_one_one "
                     "folder_one folder_one_one folder_one_one_one "
@@ -213,13 +213,13 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             ["Email", "Text message", "Letter"],
             [
                 "folder_one_one folder_one_one 1 template, 1 folder",
-                ("folder_one_one folder_one_one_one " "folder_one_one folder_one_one_one " "1 template"),
+                "folder_one_one folder_one_one_one folder_one_one folder_one_one_one 1 template",
                 (
                     "folder_one_one folder_one_one_one sms_template_nested "
                     "folder_one_one folder_one_one_one sms_template_nested "
                     "Text message template"
                 ),
-                ("folder_one_one letter_template_nested " "folder_one_one letter_template_nested " "Letter template"),
+                "folder_one_one letter_template_nested folder_one_one letter_template_nested Letter template",
                 "folder_one_two folder_one_two Empty",
             ],
             [
@@ -243,7 +243,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             ["All", "Email", "Letter"],
             [
                 "folder_one_one folder_one_one 1 folder",
-                ("folder_one_one folder_one_one_one " "folder_one_one folder_one_one_one " "1 template"),
+                "folder_one_one folder_one_one_one folder_one_one folder_one_one_one 1 template",
                 (
                     "folder_one_one folder_one_one_one sms_template_nested "
                     "folder_one_one folder_one_one_one sms_template_nested "
@@ -586,7 +586,7 @@ def test_get_manage_folder_page(
         template_folder_id=folder_id,
         _test_page_title=False,
     )
-    assert normalize_spaces(page.select_one("title").text) == ("folder_two – Templates – service one – GOV.UK Notify")
+    assert normalize_spaces(page.select_one("title").text) == "folder_two – Templates – service one – GOV.UK Notify"
     assert page.select_one("input[name=name]")["value"] == "folder_two"
     delete_link = page.select_one("a.govuk-link--destructive")
     assert normalize_spaces(delete_link.text) == "Delete this folder"
@@ -620,7 +620,7 @@ def test_get_manage_folder_viewing_permissions_for_users(
         template_folder_id=folder_id,
         _test_page_title=False,
     )
-    assert normalize_spaces(page.select_one("title").text) == ("folder_two – Templates – service one – GOV.UK Notify")
+    assert normalize_spaces(page.select_one("title").text) == "folder_two – Templates – service one – GOV.UK Notify"
     form_labels = page.select("legend.govuk-fieldset__legend")
     assert normalize_spaces(form_labels[0].text) == "Team members who can see this folder"
     checkboxes = page.select("input[name=users_with_permission]")
@@ -670,7 +670,7 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_man
         template_folder_id=folder_id,
         _test_page_title=False,
     )
-    assert normalize_spaces(page.select_one("title").text) == ("folder_two – Templates – service one – GOV.UK Notify")
+    assert normalize_spaces(page.select_one("title").text) == "folder_two – Templates – service one – GOV.UK Notify"
     form_labels = page.select("legend[class=form-label]")
     assert len(form_labels) == 0
     checkboxes = page.select("input[name=users_with_permission]")
@@ -701,7 +701,7 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_for_service
         template_folder_id=folder_id,
         _test_page_title=False,
     )
-    assert normalize_spaces(page.select_one("title").text) == ("folder_two – Templates – service one – GOV.UK Notify")
+    assert normalize_spaces(page.select_one("title").text) == "folder_two – Templates – service one – GOV.UK Notify"
     form_labels = page.select("legend[class=form-label]")
     assert len(form_labels) == 0
 
@@ -919,7 +919,7 @@ def test_delete_template_folder_should_request_confirmation(
         _test_page_title=False,
     )
     assert normalize_spaces(page.select(".banner-dangerous")[0].text) == (
-        "Are you sure you want to delete the ‘sacrifice’ folder? " "Yes, delete"
+        "Are you sure you want to delete the ‘sacrifice’ folder? Yes, delete"
     )
 
     assert page.select_one("input[name=name]")["value"] == "sacrifice"
@@ -1546,7 +1546,7 @@ def test_show_custom_error_message(
 
 
 @pytest.mark.parametrize(
-    ("extra_args," "expected_displayed_items, " "expected_items, " "expected_empty_message "),
+    "extra_args,expected_displayed_items, expected_items, expected_empty_message ",
     [
         (
             {},

@@ -210,12 +210,12 @@ def test_show_accept_agreement_page(
     )
     assert page.select_one("input[name=version]").get("value") is None
 
-    assert normalize_spaces(page.select_one("#who legend").text) == ("Who are you accepting the agreement for?")
-    assert normalize_spaces(page.select_one("label[for=who-0]").text) == ("Yourself")
+    assert normalize_spaces(page.select_one("#who legend").text) == "Who are you accepting the agreement for?"
+    assert normalize_spaces(page.select_one("label[for=who-0]").text) == "Yourself"
     assert page.select("input[name=who]")[0]["value"] == "me"
     assert "checked" not in page.select("input[name=who]")[0]
     assert "data-target" not in page.select(".multiple-choice")[0]
-    assert normalize_spaces(page.select_one("label[for=who-1]").text) == ("Someone else")
+    assert normalize_spaces(page.select_one("label[for=who-1]").text) == "Someone else"
     assert page.select("input[name=who]")[1]["value"] == "someone-else"
     assert "checked" not in page.select("input[name=who]")[1]
     assert page.select(".multiple-choice")[1]["data-target"] == "on-behalf-of"
@@ -224,10 +224,10 @@ def test_show_accept_agreement_page(
         "on_behalf_of_email",
     ]
 
-    assert normalize_spaces(page.select_one("label[for=on_behalf_of_name]").text) == ("What’s their name?")
+    assert normalize_spaces(page.select_one("label[for=on_behalf_of_name]").text) == "What’s their name?"
     assert page.select_one("input[name=on_behalf_of_name]").get("value") is None
 
-    assert normalize_spaces(page.select_one("label[for=on_behalf_of_email]").text) == ("What’s their email address?")
+    assert normalize_spaces(page.select_one("label[for=on_behalf_of_email]").text) == "What’s their email address?"
     assert page.select_one("input[name=on_behalf_of_email]").get("value") is None
 
 

@@ -286,7 +286,7 @@ def test_example_spreadsheet(
 
     page = client_request.get(".send_messages", service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
-    assert normalize_spaces(page.select_one("tbody tr").text) == ("1 phone number name date")
+    assert normalize_spaces(page.select_one("tbody tr").text) == "1 phone number name date"
     assert page.select_one("input[type=file]").has_attr("accept")
     assert page.select_one("input[type=file]")["accept"] == ".csv,.xlsx,.xls,.ods,.xlsm,.tsv"
 
@@ -394,10 +394,10 @@ def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
     [
         (
             partial(UnicodeDecodeError, "codec", b"", 1, 2, "reason"),
-            ("Could not read example.xlsx. Try using a different file format."),
+            "Could not read example.xlsx. Try using a different file format.",
         ),
-        (BadZipFile, ("Could not read example.xlsx. Try using a different file format.")),
-        (XLRDError, ("Could not read example.xlsx. Try using a different file format.")),
+        (BadZipFile, "Could not read example.xlsx. Try using a different file format."),
+        (XLRDError, "Could not read example.xlsx. Try using a different file format."),
         (
             XLDateError,
             (
@@ -535,7 +535,7 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
         assert "file_uploads" not in session
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "There’s a problem with example.csv " "You need to check you have content for the empty message in 1 row."
+        "There’s a problem with example.csv You need to check you have content for the empty message in 1 row."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
         "3 No content for this message",
@@ -544,7 +544,7 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
     assert normalize_spaces(page.select_one(".table-field-index").text) == "3"
     assert page.select_one(".table-field-index")["rowspan"] == "2"
     assert normalize_spaces(page.select("tbody tr td")[0].text) == "3"
-    assert normalize_spaces(page.select("tbody tr td")[1].text) == ("No content for this message")
+    assert normalize_spaces(page.select("tbody tr td")[1].text) == "No content for this message"
     assert page.select("tbody tr td")[1]["colspan"] == "2"
 
 
@@ -585,7 +585,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
         assert "file_uploads" not in session
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "There’s a problem with example.csv " "You need to shorten the messages in 2 rows."
+        "There’s a problem with example.csv You need to shorten the messages in 2 rows."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
         "2 Message is too long",
@@ -596,7 +596,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
     assert normalize_spaces(page.select_one(".table-field-index").text) == "2"
     assert page.select_one(".table-field-index")["rowspan"] == "2"
     assert normalize_spaces(page.select("tbody tr td")[0].text) == "2"
-    assert normalize_spaces(page.select("tbody tr td")[1].text) == ("Message is too long")
+    assert normalize_spaces(page.select("tbody tr td")[1].text) == "Message is too long"
     assert page.select("tbody tr td")[1]["colspan"] == "2"
 
 
@@ -639,7 +639,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "There’s a problem with example.csv " "You need to fix 5 addresses."
+        "There’s a problem with example.csv You need to fix 5 addresses."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
         "3 Last line of the address must be a real UK postcode",
@@ -692,7 +692,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "There’s a problem with example.csv " "You need to fix 2 addresses."
+        "There’s a problem with example.csv You need to fix 2 addresses."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
         "4 Last line of the address must be a UK postcode or another country",
@@ -786,7 +786,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_correct_pos
             """
             phone number, name
         """,
-            ("Your file is missing some rows " "It needs at least one row of data."),
+            "Your file is missing some rows It needs at least one row of data.",
         ),
         (
             "+447700900986",
@@ -809,7 +809,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_correct_pos
             , example
             +447700900986, example
         """,
-            ("There’s a problem with example.csv " "You need to enter missing data in 1 row."),
+            "There’s a problem with example.csv You need to enter missing data in 1 row.",
         ),
         (
             """
@@ -818,7 +818,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_correct_pos
             +447700900986,
             +447700900986, example
         """,
-            ("There’s a problem with example.csv " "You need to enter missing data in 1 row."),
+            "There’s a problem with example.csv You need to enter missing data in 1 row.",
         ),
     ],
 )
@@ -1124,8 +1124,8 @@ def test_show_all_columns_if_there_are_duplicate_recipient_columns(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one("thead").text) == ("Row in file1 phone number phone_number PHONENUMBER")
-    assert normalize_spaces(page.select_one("tbody").text) == ("2 07700900003 07700900003 07700900003")
+    assert normalize_spaces(page.select_one("thead").text) == "Row in file1 phone number phone_number PHONENUMBER"
+    assert normalize_spaces(page.select_one("tbody").text) == "2 07700900003 07700900003 07700900003"
 
 
 @pytest.mark.parametrize(
@@ -2386,7 +2386,7 @@ def test_download_example_csv(
         template_id=fake_uuid,
         follow_redirects=True,
     )
-    assert response.get_data(as_text=True) == ("phone number,name,date\r\n" "07700 900321,example,example\r\n")
+    assert response.get_data(as_text=True) == "phone number,name,date\r\n07700 900321,example,example\r\n"
     assert "text/csv" in response.headers["Content-Type"]
 
 
@@ -2561,7 +2561,7 @@ def test_letter_can_only_be_sent_now(
     )
 
     assert 'name="scheduled_for"' not in page
-    assert normalize_spaces(page.select_one("form button").text) == ("Send 1 letter")
+    assert normalize_spaces(page.select_one("form button").text) == "Send 1 letter"
 
 
 def test_send_button_is_correctly_labelled(
@@ -2586,7 +2586,7 @@ def test_send_button_is_correctly_labelled(
         template_id=fake_uuid,
     )
 
-    assert normalize_spaces(page.select_one("form button").text) == ("Send 1,000 text messages")
+    assert normalize_spaces(page.select_one("form button").text) == "Send 1,000 text messages"
 
 
 @pytest.mark.parametrize("when", ["", "2016-08-25T13:04:21.767198"])
@@ -2986,7 +2986,7 @@ def test_check_messages_shows_trial_mode_error(
     )
 
     assert " ".join(page.select_one("div.banner-dangerous").text.split()) == (
-        "You cannot send to this phone number " "In trial mode you can only send to yourself and members of your team"
+        "You cannot send to this phone number In trial mode you can only send to yourself and members of your team"
     )
 
 
@@ -3056,7 +3056,7 @@ def test_check_messages_shows_trial_mode_error_for_letters(
 
     if error_should_be_shown:
         assert normalize_spaces(error[0].text) == (
-            "{} " "In trial mode you can only preview how your letters will look"
+            "{} In trial mode you can only preview how your letters will look"
         ).format(expected_error_message)
     else:
         assert not error
@@ -3166,7 +3166,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "There’s a problem with example.csv " "You need to fix 2 addresses."
+        "There’s a problem with example.csv You need to fix 2 addresses."
     )
     assert not page.select(".table-field-index a")
 
@@ -3402,7 +3402,7 @@ def test_letters_from_csv_files_dont_have_download_link(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == normalize_spaces(
-        "You cannot send this letter " "In trial mode you can only preview how your letters will look"
+        "You cannot send this letter In trial mode you can only preview how your letters will look"
     )
 
     assert len(page.select(".letter img")) == 5
@@ -3490,7 +3490,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
     )
 
     assert normalize_spaces(page.select(".banner-dangerous")) == normalize_spaces(
-        "You cannot send this letter " "In trial mode you can only preview how your letters will look"
+        "You cannot send this letter In trial mode you can only preview how your letters will look"
     )
 
     assert len(page.select(".letter img")) == 5
@@ -3573,7 +3573,7 @@ def test_check_messages_shows_over_max_row_error(
     )
 
     assert " ".join(page.select_one("div.banner-dangerous").text.split()) == (
-        "Your file has too many rows " "Notify can process up to 11,111 rows at once. " "Your file has 99,999 rows."
+        "Your file has too many rows Notify can process up to 11,111 rows at once. Your file has 99,999 rows."
     )
 
 
@@ -3886,7 +3886,7 @@ def test_send_notification_shows_email_error_in_trial_mode(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select(".banner-dangerous h1")[0].text) == ("You cannot send to this email address")
+    assert normalize_spaces(page.select(".banner-dangerous h1")[0].text) == "You cannot send to this email address"
     assert normalize_spaces(page.select(".banner-dangerous p")[0].text) == (
         "In trial mode you can only send to yourself and members of your team"
     )
@@ -4028,7 +4028,7 @@ def test_redirects_to_template_if_job_exists_already(
 
 
 @pytest.mark.parametrize(
-    ("template_type, " "expected_list_id, " "expected_filenames, " "expected_time, " "expected_count"),
+    "template_type, expected_list_id, expected_filenames, expected_time, expected_count",
     (
         (
             "email",

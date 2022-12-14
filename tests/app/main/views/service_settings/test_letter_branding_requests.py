@@ -52,9 +52,9 @@ def test_letter_branding_request_page_when_no_branding_is_set(
             (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
             for radio in page.select("input[type=radio]")
         ] == expected_options
-        assert page.select_one(".conditional-radios-panel#panel-something-else textarea")["name"] == ("something_else")
+        assert page.select_one(".conditional-radios-panel#panel-something-else textarea")["name"] == "something_else"
     else:
-        assert page.select_one("textarea")["name"] == ("something_else")
+        assert page.select_one("textarea")["name"] == "something_else"
         assert not page.select(".conditional-radios-panel")
 
 
@@ -166,7 +166,7 @@ def test_letter_branding_request_submit(
     )
     mock_send_ticket_to_zendesk.assert_called_once()
     assert normalize_spaces(page.select_one(".banner-default").text) == (
-        "Thanks for your branding request. We’ll get back to you " "within one working day."
+        "Thanks for your branding request. We’ll get back to you within one working day."
     )
 
 
@@ -255,5 +255,5 @@ def test_letter_branding_submit_when_something_else_is_only_option(
     )
 
     assert (
-        "Current branding: no\n" "Branding requested: Something else\n" "\n" "Homer Simpson"
+        "Current branding: no\nBranding requested: Something else\n" "\nHomer Simpson"
     ) in mock_create_ticket.call_args_list[0][1]["message"]

@@ -464,7 +464,7 @@ def test_should_show_service_name(
         == "Your service name should tell users what the message is about as well as who it’s from."
     )
     assert normalize_spaces(page.select_one("main ul").text) == (
-        "at the start of every text message " "as your email sender name"
+        "at the start of every text message as your email sender name"
     )
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
@@ -815,7 +815,7 @@ def test_should_check_if_estimated_volumes_provided(
 
 
 @pytest.mark.parametrize(
-    ("volume_email," "count_of_email_templates," "reply_to_email_addresses," "expected_reply_to_checklist_item"),
+    "volume_email,count_of_email_templates,reply_to_email_addresses,expected_reply_to_checklist_item",
     [
         pytest.param(None, 0, [], "", marks=pytest.mark.xfail(raises=IndexError)),
         pytest.param(0, 0, [], "", marks=pytest.mark.xfail(raises=IndexError)),
@@ -869,7 +869,7 @@ def test_should_check_for_reply_to_on_go_live(
 
 
 @pytest.mark.parametrize(
-    ("count_of_users_with_manage_service," "count_of_invites_with_manage_service," "expected_user_checklist_item"),
+    "count_of_users_with_manage_service,count_of_invites_with_manage_service,expected_user_checklist_item",
     [
         (1, 0, "Add a team member who can manage settings, team and usage Not completed"),
         (2, 0, "Add a team member who can manage settings, team and usage Completed"),
@@ -995,7 +995,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         assert normalize_spaces(page.select("main p")[1].text) == (
             "By requesting to go live you’re agreeing to our terms of use."
         )
-        assert page.select_one("form button").text.strip() == ("Request to go live")
+        assert page.select_one("form button").text.strip() == "Request to go live"
     else:
         assert not page.select("form")
         assert not page.select("form button")
@@ -1529,12 +1529,12 @@ def test_non_gov_users_cant_request_to_go_live(
         (
             (("email", None), ("sms", None), ("letter", None)),
             ", , ",
-            ("Emails in next year: \n" "Text messages in next year: \n" "Letters in next year: \n"),
+            "Emails in next year: \nText messages in next year: \nLetters in next year: \n",
         ),
         (
             (("email", 1234), ("sms", 0), ("letter", 999)),
             "0, 1234, 999",  # This is a different order to match the spreadsheet
-            ("Emails in next year: 1,234\n" "Text messages in next year: 0\n" "Letters in next year: 999\n"),
+            "Emails in next year: 1,234\nText messages in next year: 0\nLetters in next year: 999\n",
         ),
     ),
 )
@@ -1608,7 +1608,7 @@ def test_should_redirect_after_request_to_go_live(
     assert normalize_spaces(page.select_one(".banner-default").text) == (
         "Thanks for your request to go live. We’ll get back to you within one working day."
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("Settings")
+    assert normalize_spaces(page.select_one("h1").text) == "Settings"
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, go_live_user=active_user_with_permissions["id"])
 
 
@@ -2076,7 +2076,7 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
 
 
 @pytest.mark.parametrize(
-    ("sender_list_page," "endpoint_to_mock," "sample_data," "expected_items,"),
+    "sender_list_page,endpoint_to_mock,sample_data,expected_items,",
     [
         (
             "main.service_email_reply_to",
@@ -2760,7 +2760,7 @@ def test_confirm_delete_reply_to_email_address(fake_uuid, client_request, get_no
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Are you sure you want to delete this reply-to email address? " "Yes, delete"
+        "Are you sure you want to delete this reply-to email address? Yes, delete"
     )
     assert "action" not in page.select_one(".banner-dangerous form")
     assert page.select_one(".banner-dangerous form")["method"] == "post"
@@ -2823,7 +2823,7 @@ def test_confirm_delete_letter_contact_block(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Are you sure you want to delete this contact block? " "Yes, delete"
+        "Are you sure you want to delete this contact block? Yes, delete"
     )
     assert "action" not in page.select_one(".banner-dangerous form")
     assert page.select_one(".banner-dangerous form")["method"] == "post"
@@ -3023,7 +3023,7 @@ def test_confirm_delete_sms_sender(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Are you sure you want to delete this text message sender? " "Yes, delete"
+        "Are you sure you want to delete this text message sender? Yes, delete"
     )
     assert "action" not in page.select_one(".banner-dangerous form")
     assert page.select_one(".banner-dangerous form")["method"] == "post"
@@ -4465,7 +4465,7 @@ def test_should_show_page_to_set_message_limit(
     assert normalize_spaces(page.select_one("label").text) == (
         "Number of messages the service is allowed to send each day"
     )
-    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == ("1000")
+    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1000"
 
 
 def test_should_show_page_to_set_rate_limit(
@@ -4477,7 +4477,7 @@ def test_should_show_page_to_set_rate_limit(
     assert normalize_spaces(page.select_one("label").text) == (
         "Number of messages the service can send in a rolling 60 second window"
     )
-    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == ("3000")
+    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "3000"
 
 
 @pytest.mark.parametrize(
@@ -4780,7 +4780,7 @@ def test_archive_service_after_confirm(
     mock_event.assert_called_once_with(service_id=SERVICE_ONE_ID, archived_by_id=user["id"])
 
     assert normalize_spaces(page.select_one("h1").text) == "Choose service"
-    assert normalize_spaces(page.select_one(".banner-default-with-tick").text) == ("‘service one’ was deleted")
+    assert normalize_spaces(page.select_one(".banner-default-with-tick").text) == "‘service one’ was deleted"
     # The one user which is part of this service has the sample_uuid as it's user ID
     assert call(f"user-{sample_uuid()}") in redis_delete_mock.call_args_list
 
@@ -4823,7 +4823,7 @@ def test_archive_service_prompts_user(
         service_id=SERVICE_ONE_ID,
     )
     assert normalize_spaces(delete_page.select_one(".banner-dangerous").text) == (
-        "Are you sure you want to delete ‘service one’? " "There’s no way to undo this. " "Yes, delete"
+        "Are you sure you want to delete ‘service one’? There’s no way to undo this. Yes, delete"
     )
     assert mock_api.called is False
 
@@ -5008,15 +5008,15 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
         (
             "main.service_set_inbound_sms",
             ["sms"],
-            ("Contact us if you want to be able to receive text messages from your users."),
+            "Contact us if you want to be able to receive text messages from your users.",
         ),
         (
             "main.service_set_inbound_sms",
             ["sms", "inbound_sms"],
-            ("Your service can receive text messages sent to 0781239871."),
+            "Your service can receive text messages sent to 0781239871.",
         ),
-        ("main.service_set_auth_type", [], ("Text message code")),
-        ("main.service_set_auth_type", ["email_auth"], ("Email link or text message code")),
+        ("main.service_set_auth_type", [], "Text message code"),
+        ("main.service_set_auth_type", ["email_auth"], "Email link or text message code"),
     ],
 )
 def test_invitation_pages(
@@ -5125,7 +5125,7 @@ def test_show_sms_prefixing_setting_page(
     mock_update_service,
 ):
     page = client_request.get("main.service_set_sms_prefix", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("legend").text) == ("Start all text messages with ‘service one:’")
+    assert normalize_spaces(page.select_one("legend").text) == "Start all text messages with ‘service one:’"
     radios = page.select("input[type=radio]")
     assert len(radios) == 2
     assert radios[0]["value"] == "True"
@@ -5815,28 +5815,28 @@ def test_service_set_broadcast_network_makes_you_choose(
             "live-severe-all",
             [
                 "Live",
-                "Members of the public will receive alerts sent from this " "service.",
+                "Members of the public will receive alerts sent from this service.",
             ],
         ),
         (
             "live-severe-vodafone",
             [
                 "Live (Vodafone)",
-                "Members of the public will receive alerts sent from this " "service.",
+                "Members of the public will receive alerts sent from this service.",
             ],
         ),
         (
             "live-government-all",
             [
                 "Government",
-                "Members of the public will receive alerts sent from this " "service, even if they’ve opted out.",
+                "Members of the public will receive alerts sent from this service, even if they’ve opted out.",
             ],
         ),
         (
             "live-government-vodafone",
             [
                 "Government (Vodafone)",
-                "Members of the public will receive alerts sent from this " "service, even if they’ve opted out.",
+                "Members of the public will receive alerts sent from this service, even if they’ve opted out.",
             ],
         ),
     ],

@@ -43,7 +43,7 @@ def test_displays_both_branding(client_request, mock_get_email_branding_with_bot
     assert page.select("img")[0]["src"] == (
         "https://static.notifications.service.gov.uk/images/gov.uk_logotype_crown.png"
     )
-    assert page.select("img")[1]["src"] == ("https://static-logos.test.com/example.png")
+    assert page.select("img")[1]["src"] == "https://static-logos.test.com/example.png"
     assert (
         page.select("body > table:nth-of-type(3) table > tr:nth-of-type(1) > td:nth-of-type(2)")[0].get_text().strip()
         == "Organisation text"
