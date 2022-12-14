@@ -86,7 +86,7 @@ def using_notify_nav():
                 },
                 {
                     "name": "Receive text messages",
-                    "link": "main.receive_text_messages",
+                    "link": "main.guidance_receive_text_messages",
                 },
                 {
                     "name": "Reply-to email address",
