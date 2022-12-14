@@ -203,7 +203,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
                 "filename": "tests/test_pdf_files/one_page_pdf.pdf",
                 "page_count": "3",
                 "status": "valid",
-                "recipient": ("123 Example Street\n" "Andorra la Vella\n" "Andorra"),
+                "recipient": "123 Example Street\nAndorra la Vella\nAndorra",
             }
         ),
     )
@@ -225,7 +225,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
     assert not page.select(".letter-postage")
     assert not page.select("input[type=radio]")
     assert normalize_spaces(page.select_one(".js-stick-at-bottom-when-scrolling").text) == (
-        "Recipient: 123 Example Street, Andorra la Vella, Andorra " "Postage: international " "Send 1 letter"
+        "Recipient: 123 Example Street, Andorra la Vella, Andorra Postage: international Send 1 letter"
     )
 
 
@@ -470,7 +470,7 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
 
     assert normalize_spaces(page.select_one("h1").text) == "You cannot send this letter"
     assert page.select_one("div.letter-sent")
-    assert normalize_spaces(page.select_one(".js-stick-at-bottom-when-scrolling p").text) == ("Recipient: The Queen")
+    assert normalize_spaces(page.select_one(".js-stick-at-bottom-when-scrolling p").text) == "Recipient: The Queen"
     assert not page.select_one("form")
     assert len(page.select("form button")) == 0
 

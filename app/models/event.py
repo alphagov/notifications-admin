@@ -82,14 +82,14 @@ class ServiceEvent(Event):
         return "Updated the default letter contact block for this service"
 
     def format_message_limit(self):
-        return ("{} this service’s daily message limit from {} to {}").format(
+        return "{} this service’s daily message limit from {} to {}".format(
             "Reduced" if self.value_from > self.value_to else "Increased",
             format_thousands(self.value_from),
             format_thousands(self.value_to),
         )
 
     def format_name(self):
-        return ("Renamed this service from ‘{}’ to ‘{}’").format(self.value_from, self.value_to)
+        return "Renamed this service from ‘{}’ to ‘{}’".format(self.value_from, self.value_to)
 
     def format_permissions(self):
         added = list(sorted(set(self.value_to) - set(self.value_from)))
@@ -129,9 +129,9 @@ class APIKeyEvent(Event):
 
     def __str__(self):
         if self.item["updated_at"]:
-            return ("Revoked the ‘{}’ API key").format(self.item["name"])
+            return "Revoked the ‘{}’ API key".format(self.item["name"])
         else:
-            return ("Created an API key called ‘{}’").format(self.item["name"])
+            return "Created an API key called ‘{}’".format(self.item["name"])
 
 
 class APIKeyEvents(ModelList):

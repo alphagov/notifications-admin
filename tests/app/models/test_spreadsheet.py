@@ -13,12 +13,15 @@ def test_can_create_spreadsheet_from_large_excel_file():
 
 
 def test_can_create_spreadsheet_from_dict():
-    assert Spreadsheet.from_dict(
-        OrderedDict(
-            foo="bar",
-            name="Jane",
-        )
-    ).as_csv_data == ("foo,name\r\n" "bar,Jane\r\n")
+    assert (
+        Spreadsheet.from_dict(
+            OrderedDict(
+                foo="bar",
+                name="Jane",
+            )
+        ).as_csv_data
+        == "foo,name\r\nbar,Jane\r\n"
+    )
 
 
 def test_can_create_spreadsheet_from_dict_with_filename():

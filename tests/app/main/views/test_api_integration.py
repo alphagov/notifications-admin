@@ -469,8 +469,8 @@ def test_should_validate_guestlist_items(
 @pytest.mark.parametrize(
     "endpoint",
     [
-        ("main.delivery_status_callback"),
-        ("main.received_text_messages_callback"),
+        "main.delivery_status_callback",
+        "main.received_text_messages_callback",
     ],
 )
 @pytest.mark.parametrize(
@@ -651,8 +651,8 @@ def test_back_link_directs_to_api_integration_from_delivery_callback_if_no_inbou
 @pytest.mark.parametrize(
     "endpoint",
     [
-        ("main.delivery_status_callback"),
-        ("main.received_text_messages_callback"),
+        "main.delivery_status_callback",
+        "main.received_text_messages_callback",
     ],
 )
 def test_create_delivery_status_and_receive_text_message_callbacks(

@@ -338,11 +338,11 @@ def test_shows_message_when_no_notifications(
         message_type="sms",
     )
 
-    assert normalize_spaces(page.select("tbody tr")[0].text) == ("No messages found (messages are kept for 7 days)")
+    assert normalize_spaces(page.select("tbody tr")[0].text) == "No messages found (messages are kept for 7 days)"
 
 
 @pytest.mark.parametrize(
-    ("initial_query_arguments," "form_post_data," "expected_search_box_label," "expected_search_box_contents"),
+    "initial_query_arguments,form_post_data,expected_search_box_label,expected_search_box_contents",
     [
         (
             {},
@@ -535,7 +535,7 @@ def test_doesnt_show_pagination_with_search_term(
     assert len(page.select("tbody tr")) == 50
     assert not page.select_one("a[rel=next]")
     assert not page.select_one("a[rel=previous]")
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == ("Only showing the first 50 messages")
+    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 messages"
 
 
 @pytest.mark.parametrize(
@@ -623,8 +623,8 @@ def test_html_contains_links_for_failed_notifications(
 @pytest.mark.parametrize(
     "notification_type, expected_row_contents",
     (
-        ("sms", ("07123456789 hello & welcome hidden")),
-        ("email", ("example@gov.uk hidden, hello & welcome")),
+        ("sms", "07123456789 hello & welcome hidden"),
+        ("email", "example@gov.uk hidden, hello & welcome"),
         (
             "letter",
             (

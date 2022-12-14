@@ -94,7 +94,7 @@ LETTER_VALIDATION_MESSAGES = {
         "title": "There’s a problem with your file",
         "detail": ("Notify cannot read this PDF." "<br>Save a new copy of your file and try again."),
         "summary": (
-            "Validation failed because Notify cannot read this PDF.<br>" "Save a new copy of your file and try again."
+            "Validation failed because Notify cannot read this PDF.<br>Save a new copy of your file and try again."
         ),
     },
     "address-is-empty": {
@@ -116,38 +116,34 @@ LETTER_VALIDATION_MESSAGES = {
     },
     "not-a-real-uk-postcode": {
         "title": "There’s a problem with the address for this letter",
-        "detail": ("The last line of the address must be a real UK postcode."),
-        "summary": ("Validation failed because the last line of the address is not a real UK postcode."),
+        "detail": "The last line of the address must be a real UK postcode.",
+        "summary": "Validation failed because the last line of the address is not a real UK postcode.",
     },
     "cant-send-international-letters": {
         "title": "There’s a problem with the address for this letter",
-        "detail": ("You do not have permission to send letters to other countries."),
-        "summary": ("Validation failed because your service cannot send letters to other countries."),
+        "detail": "You do not have permission to send letters to other countries.",
+        "summary": "Validation failed because your service cannot send letters to other countries.",
     },
     "not-a-real-uk-postcode-or-country": {
         "title": "There’s a problem with the address for this letter",
-        "detail": ("The last line of the address must be a UK postcode or " "another country."),
-        "summary": (
-            "Validation failed because the last line of the address is " "not a UK postcode or another country."
-        ),
+        "detail": "The last line of the address must be a UK postcode or another country.",
+        "summary": "Validation failed because the last line of the address is not a UK postcode or another country.",
     },
     "not-enough-address-lines": {
         "title": "There’s a problem with the address for this letter",
-        "detail": (f"The address must be at least {PostalAddress.MIN_LINES} " f"lines long."),
-        "summary": (
-            f"Validation failed because the address must be at least " f"{PostalAddress.MIN_LINES} lines long."
-        ),
+        "detail": f"The address must be at least {PostalAddress.MIN_LINES} lines long.",
+        "summary": f"Validation failed because the address must be at least {PostalAddress.MIN_LINES} lines long.",
     },
     "too-many-address-lines": {
         "title": "There’s a problem with the address for this letter",
-        "detail": (f"The address must be no more than {PostalAddress.MAX_LINES} " f"lines long."),
+        "detail": f"The address must be no more than {PostalAddress.MAX_LINES} lines long.",
         "summary": (
-            f"Validation failed because the address must be no more " f"than {PostalAddress.MAX_LINES} lines long."
+            f"Validation failed because the address must be no more than {PostalAddress.MAX_LINES} lines long."
         ),
     },
     "invalid-char-in-address": {
         "title": "There’s a problem with the address for this letter",
-        "detail": ("Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~"),
+        "detail": "Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~",
         "summary": (
             "Validation failed because address lines must not start with any of the "
             "following characters: @ ( ) = [ ] ” \\ / , < > ~"
@@ -155,11 +151,9 @@ LETTER_VALIDATION_MESSAGES = {
     },
     "notify-tag-found-in-content": {
         "title": "There’s a problem with your letter",
-        "detail": (
-            "Your file includes a letter you’ve downloaded from Notify.<br>" "You need to edit {invalid_pages}."
-        ),
+        "detail": "Your file includes a letter you’ve downloaded from Notify.<br>You need to edit {invalid_pages}.",
         "summary": (
-            "Validation failed because your file includes a letter " "you’ve downloaded from Notify on {invalid_pages}."
+            "Validation failed because your file includes a letter you’ve downloaded from Notify on {invalid_pages}."
         ),
     },
 }

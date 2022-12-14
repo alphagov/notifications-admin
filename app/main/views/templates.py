@@ -680,7 +680,7 @@ def _get_content_count_error_and_message_for_template(template):
                 f"Will be charged as {message_count(template.fragment_count, template.template_type)} "
                 f"(not including personalisation)"
             )
-        return False, (f"Will be charged as {message_count(template.fragment_count, template.template_type)} ")
+        return False, f"Will be charged as {message_count(template.fragment_count, template.template_type)} "
 
     if template.template_type == "broadcast":
         if template.content_too_long:

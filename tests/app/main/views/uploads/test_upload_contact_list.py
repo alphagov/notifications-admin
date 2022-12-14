@@ -21,10 +21,8 @@ def test_upload_contact_list_page(client_request):
     assert page.select_one("form input")["type"] == "file"
     assert page.select_one("form input")["accept"] == ".csv,.xlsx,.xls,.ods,.xlsm,.tsv"
 
-    assert normalize_spaces(page.select(".spreadsheet")[0].text) == (
-        "Example A " "1 email address " "2 test@example.gov.uk"
-    )
-    assert normalize_spaces(page.select(".spreadsheet")[1].text) == ("Example A " "1 phone number " "2 07700 900123")
+    assert normalize_spaces(page.select(".spreadsheet")[0].text) == "Example A 1 email address 2 test@example.gov.uk"
+    assert normalize_spaces(page.select(".spreadsheet")[1].text) == "Example A 1 phone number 2 07700 900123"
 
 
 @pytest.mark.parametrize(
@@ -61,7 +59,7 @@ def test_upload_contact_list_page(client_request):
             email address
             +447700900986
         """,
-            ("There’s a problem with invalid.csv " "You need to fix 1 email address."),
+            "There’s a problem with invalid.csv You need to fix 1 email address.",
             "Row in file 1 email address",
             "2 Not a valid email address +447700900986",
         ),
@@ -70,7 +68,7 @@ def test_upload_contact_list_page(client_request):
             phone number
             test@example.com
         """,
-            ("There’s a problem with invalid.csv " "You need to fix 1 phone number."),
+            "There’s a problem with invalid.csv You need to fix 1 phone number.",
             "Row in file 1 phone number",
             "2 Must not contain letters or symbols test@example.com",
         ),
@@ -91,7 +89,7 @@ def test_upload_contact_list_page(client_request):
             """
             phone number
         """,
-            ("Your file is missing some rows " "It needs at least one row of data."),
+            "Your file is missing some rows It needs at least one row of data.",
             "Row in file 1 phone number",
             "",
         ),
@@ -122,16 +120,16 @@ def test_upload_contact_list_page(client_request):
 
             +447700900986
         """,
-            ("There’s a problem with invalid.csv " "You need to enter missing data in 1 row."),
+            "There’s a problem with invalid.csv You need to enter missing data in 1 row.",
             "Row in file 1 phone number",
-            ("3 Missing"),
+            "3 Missing",
         ),
         (
             """
             phone number
             +447700900
         """,
-            ("There’s a problem with invalid.csv " "You need to fix 1 phone number."),
+            "There’s a problem with invalid.csv You need to fix 1 phone number.",
             "Row in file 1 phone number",
             "2 Not enough digits +447700900",
         ),
@@ -142,9 +140,9 @@ def test_upload_contact_list_page(client_request):
             bad@example1
             bad@example2
         """,
-            ("There’s a problem with invalid.csv " "You need to fix 2 email addresses."),
+            "There’s a problem with invalid.csv You need to fix 2 email addresses.",
             "Row in file 1 email address",
-            ("3 Not a valid email address bad@example1 " "4 Not a valid email address bad@example2"),
+            "3 Not a valid email address bad@example1 4 Not a valid email address bad@example2",
         ),
     ],
 )
@@ -241,7 +239,7 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
         "Your file has 100,001 rows."
     )
     assert len(page.select("tbody tr")) == 50
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == ("Only showing the first 50 rows")
+    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"
 
 
 def test_upload_csv_shows_error_with_invalid_extension(
@@ -291,7 +289,7 @@ def test_upload_csv_shows_trial_mode_error(
     client_request, mock_get_users_by_service, mock_get_job_doesnt_exist, fake_uuid, mocker
 ):
     mocker.patch("app.models.contact_list.s3upload", return_value=fake_uuid)
-    mocker.patch("app.models.contact_list.s3download", return_value=("phone number\n" "07900900321"))  # Not in team
+    mocker.patch("app.models.contact_list.s3download", return_value=("phone number\n07900900321"))  # Not in team
     mocker.patch("app.models.contact_list.get_csv_metadata", return_value={"original_file_name": "invalid.csv"})
 
     page = client_request.get(
@@ -302,7 +300,7 @@ def test_upload_csv_shows_trial_mode_error(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "You cannot save this phone number " "In trial mode you can only send to yourself and members of your team"
+        "You cannot save this phone number In trial mode you can only send to yourself and members of your team"
     )
     assert page.select_one(".banner-dangerous a")["href"] == url_for("main.trial_mode_new")
 
@@ -333,19 +331,19 @@ def test_upload_csv_shows_ok_page(
         valid=True,
     )
 
-    assert normalize_spaces(page.select_one("h1").text) == ("good times.xlsx")
-    assert normalize_spaces(page.select_one("main p").text) == ("51 email addresses found")
+    assert normalize_spaces(page.select_one("h1").text) == "good times.xlsx"
+    assert normalize_spaces(page.select_one("main p").text) == "51 email addresses found"
     assert page.select_one("form")["action"] == url_for(
         "main.save_contact_list",
         service_id=SERVICE_ONE_ID,
         upload_id=fake_uuid,
     )
 
-    assert normalize_spaces(page.select_one("form button").text) == ("Save contact list")
-    assert normalize_spaces(page.select_one("thead").text) == ("Row in file 1 email address")
+    assert normalize_spaces(page.select_one("form button").text) == "Save contact list"
+    assert normalize_spaces(page.select_one("thead").text) == "Row in file 1 email address"
     assert len(page.select("tbody tr")) == 50
-    assert normalize_spaces(page.select_one("tbody tr").text) == ("2 test@example.com")
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == ("Only showing the first 50 rows")
+    assert normalize_spaces(page.select_one("tbody tr").text) == "2 test@example.com"
+    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"
 
 
 def test_save_contact_list(
@@ -449,10 +447,10 @@ def test_view_contact_list(
         },
         page=1,
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("EmergencyContactList.xls")
-    assert normalize_spaces(page.select("main p")[0].text) == ("Uploaded by Test User on 3 March at 12:12pm.")
+    assert normalize_spaces(page.select_one("h1").text) == "EmergencyContactList.xls"
+    assert normalize_spaces(page.select("main p")[0].text) == "Uploaded by Test User on 3 March at 12:12pm."
     assert normalize_spaces(page.select("main p")[1].text) == (expected_empty_message)
-    assert normalize_spaces(page.select_one("main h2").text) == ("51 saved email addresses")
+    assert normalize_spaces(page.select_one("main h2").text) == "51 saved email addresses"
     assert page.select_one(".js-stick-at-bottom-when-scrolling a[download]")["href"] == url_for(
         "main.download_contact_list",
         service_id=SERVICE_ONE_ID,
@@ -471,7 +469,7 @@ def test_view_contact_list(
         "test-49@example.com",
     ]
     assert "test-50@example.com" not in page.select_one("tbody").text
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == ("Only showing the first 50 rows")
+    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"
 
 
 @freeze_time("2015-12-31 16:51:56")
@@ -504,17 +502,17 @@ def test_view_jobs_for_contact_list(
         service_id=SERVICE_ONE_ID,
         contact_list_id=fake_uuid,
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("EmergencyContactList.xls")
-    assert normalize_spaces(page.select("main p")[0].text) == ("Uploaded by Test User today at 12:12pm.")
-    assert normalize_spaces(page.select("main p")[1].text) == ("Used 6 times in the last 7 days.")
+    assert normalize_spaces(page.select_one("h1").text) == "EmergencyContactList.xls"
+    assert normalize_spaces(page.select("main p")[0].text) == "Uploaded by Test User today at 12:12pm."
+    assert normalize_spaces(page.select("main p")[1].text) == "Used 6 times in the last 7 days."
     assert [normalize_spaces(row.text) for row in page.select_one("table").select("tr")] == [
         "Template Status",
-        ("Template Y " "Sending tomorrow at 11:09pm " "1 text message waiting to send"),
-        ("Template Z " "Sending tomorrow at 11:09am " "1 text message waiting to send"),
-        ("Template A " "Sent today at 4:51pm " "1 sending 0 delivered 0 failed"),
-        ("Template B " "Sent today at 4:51pm " "1 sending 0 delivered 0 failed"),
-        ("Template C " "Sent today at 4:51pm " "1 sending 0 delivered 0 failed"),
-        ("Template D " "Sent today at 4:51pm " "1 sending 0 delivered 0 failed"),
+        "Template Y Sending tomorrow at 11:09pm 1 text message waiting to send",
+        "Template Z Sending tomorrow at 11:09am 1 text message waiting to send",
+        "Template A Sent today at 4:51pm 1 sending 0 delivered 0 failed",
+        "Template B Sent today at 4:51pm 1 sending 0 delivered 0 failed",
+        "Template C Sent today at 4:51pm 1 sending 0 delivered 0 failed",
+        "Template D Sent today at 4:51pm 1 sending 0 delivered 0 failed",
     ]
     assert page.select_one("table a")["href"] == url_for(
         "main.view_job",
@@ -548,9 +546,9 @@ def test_download_contact_list(
         service_id=SERVICE_ONE_ID,
         contact_list_id=fake_uuid,
     )
-    assert response.headers["Content-Type"] == ("text/csv; " "charset=utf-8")
-    assert response.headers["Content-Disposition"] == ("attachment; " "filename=EmergencyContactList.csv")
-    assert response.get_data(as_text=True) == ("phone number\n" "07900900321")
+    assert response.headers["Content-Type"] == "text/csv; charset=utf-8"
+    assert response.headers["Content-Disposition"] == "attachment; filename=EmergencyContactList.csv"
+    assert response.get_data(as_text=True) == "phone number\n07900900321"
 
 
 def test_confirm_delete_contact_list(
@@ -568,7 +566,7 @@ def test_confirm_delete_contact_list(
         contact_list_id=fake_uuid,
     )
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Are you sure you want to delete ‘EmergencyContactList.xls’? " "Yes, delete"
+        "Are you sure you want to delete ‘EmergencyContactList.xls’? Yes, delete"
     )
     assert "action" not in page.select_one("form")
     assert page.select_one("form")["method"] == "post"

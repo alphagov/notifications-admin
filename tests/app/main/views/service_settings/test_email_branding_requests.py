@@ -492,7 +492,7 @@ def test_email_branding_something_else_page(client_request, service_one, mock_ge
         service_id=SERVICE_ONE_ID,
     )
     assert normalize_spaces(page.select_one("h1").text) == "Describe the branding you want"
-    assert page.select_one("textarea")["name"] == ("something_else")
+    assert page.select_one("textarea")["name"] == "something_else"
     assert normalize_spaces(page.select_one(".page-footer button").text) == "Request new branding"
     assert page.select_one(".govuk-back-link")["href"] == url_for(
         "main.email_branding_request",
@@ -559,8 +559,8 @@ def test_get_email_branding_something_else_page_is_only_option(
 @pytest.mark.parametrize(
     "endpoint",
     [
-        ("main.email_branding_govuk"),
-        ("main.email_branding_nhs"),
+        "main.email_branding_govuk",
+        "main.email_branding_nhs",
     ],
 )
 def test_email_branding_pages_give_404_if_selected_branding_not_allowed(
@@ -686,7 +686,7 @@ def test_email_branding_something_else_submit(
     )
     mock_send_ticket_to_zendesk.assert_called_once()
     assert normalize_spaces(page.select_one(".banner-default").text) == (
-        "Thanks for your branding request. We’ll get back to you " "within one working day."
+        "Thanks for your branding request. We’ll get back to you within one working day."
     )
 
 

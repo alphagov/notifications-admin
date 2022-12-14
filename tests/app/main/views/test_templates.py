@@ -36,11 +36,11 @@ from tests.conftest import (
 @pytest.mark.parametrize(
     "permissions, expected_message",
     (
-        (["email"], ("You need a template before you can send emails, text messages or letters.")),
-        (["sms"], ("You need a template before you can send emails, text messages or letters.")),
-        (["letter"], ("You need a template before you can send emails, text messages or letters.")),
-        (["email", "sms", "letter"], ("You need a template before you can send emails, text messages or letters.")),
-        (["broadcast"], ("You haven’t added any templates yet.")),
+        (["email"], "You need a template before you can send emails, text messages or letters."),
+        (["sms"], "You need a template before you can send emails, text messages or letters."),
+        (["letter"], "You need a template before you can send emails, text messages or letters."),
+        (["email", "sms", "letter"], "You need a template before you can send emails, text messages or letters."),
+        (["broadcast"], "You haven’t added any templates yet."),
     ),
 )
 def test_should_show_empty_page_when_no_templates(
@@ -60,7 +60,7 @@ def test_should_show_empty_page_when_no_templates(
         service_id=service_one["id"],
     )
 
-    assert normalize_spaces(page.select_one("h1").text) == ("Templates")
+    assert normalize_spaces(page.select_one("h1").text) == "Templates"
     assert normalize_spaces(page.select_one("main p").text) == (expected_message)
     assert page.select_one("#add_new_folder_form")
     assert page.select_one("#add_new_template_form")
@@ -78,7 +78,7 @@ def test_should_show_add_template_form_if_service_has_folder_permission(
         service_id=service_one["id"],
     )
 
-    assert normalize_spaces(page.select_one("h1").text) == ("Templates")
+    assert normalize_spaces(page.select_one("h1").text) == "Templates"
     assert normalize_spaces(page.select_one("main p").text) == (
         "You need a template before you can send emails, text messages or letters."
     )
@@ -322,7 +322,7 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
 
     assert search["data-notify-module"] == "live-search"
     assert search["data-targets"] == "#template-list .template-list-item"
-    assert normalize_spaces(search.select_one("label").text) == ("Search by name")
+    assert normalize_spaces(search.select_one("label").text) == "Search by name"
 
     assert len(page.select(search["data-targets"])) == len(page.select("#template-list .govuk-label")) == 14
 
@@ -337,7 +337,7 @@ def test_should_label_search_by_id_for_services_with_api_keys(
         "main.choose_template",
         service_id=SERVICE_ONE_ID,
     )
-    assert normalize_spaces(page.select_one(".live-search label").text) == ("Search by name or ID")
+    assert normalize_spaces(page.select_one(".live-search label").text) == "Search by name or ID"
 
 
 def test_should_show_live_search_if_service_has_lots_of_folders(
@@ -430,7 +430,7 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
     if not page.select("#add_new_template_form"):
         raise ElementNotFound()
 
-    assert normalize_spaces(page.select_one("#add_new_template_form fieldset legend").text) == ("New template")
+    assert normalize_spaces(page.select_one("#add_new_template_form fieldset legend").text) == "New template"
     assert [choice["value"] for choice in page.select("#add_new_template_form input[type=radio]")] == expected_values
     assert [normalize_spaces(choice.text) for choice in page.select("#add_new_template_form label")] == expected_labels
 
@@ -500,7 +500,7 @@ def test_should_show_page_for_one_template(
     assert (
         (page.select_one("[data-notify-module=update-status]")["data-target"])
         == (page.select_one("textarea")["id"])
-        == ("template_content")
+        == "template_content"
     )
 
     assert (page.select_one("[data-notify-module=update-status]")["data-updates-url"]) == url_for(
@@ -509,7 +509,7 @@ def test_should_show_page_for_one_template(
         template_type="sms",
     )
 
-    assert (page.select_one("[data-notify-module=update-status]")["aria-live"]) == ("polite")
+    assert (page.select_one("[data-notify-module=update-status]")["aria-live"]) == "polite"
 
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 
@@ -532,7 +532,7 @@ def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_charact
     assert (
         (page.select_one("[data-notify-module=update-status]")["data-target"])
         == (page.select_one("textarea")["id"])
-        == ("template_content")
+        == "template_content"
     )
 
     assert (page.select_one("[data-notify-module=update-status]")["data-updates-url"]) == url_for(
@@ -541,7 +541,7 @@ def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_charact
         template_type="broadcast",
     )
 
-    assert (page.select_one("[data-notify-module=update-status]")["aria-live"]) == ("polite")
+    assert (page.select_one("[data-notify-module=update-status]")["aria-live"]) == "polite"
 
 
 def test_caseworker_redirected_to_set_sender_for_one_off(
@@ -647,7 +647,7 @@ def test_user_with_only_send_and_view_sees_letter_page(
         template_id=fake_uuid,
         _test_page_title=False,
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("Templates Two week reminder")
+    assert normalize_spaces(page.select_one("h1").text) == "Templates Two week reminder"
     assert normalize_spaces(page.select_one("title").text) == (
         "Two week reminder – Templates – service one – GOV.UK Notify"
     )
@@ -877,7 +877,7 @@ def test_should_be_able_to_view_a_template_with_links(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one("h1").text) == ("Templates Two week reminder")
+    assert normalize_spaces(page.select_one("h1").text) == "Templates Two week reminder"
     assert normalize_spaces(page.select_one("title").text) == (
         "Two week reminder – Templates – service one – GOV.UK Notify"
     )
@@ -936,7 +936,7 @@ def test_view_broadcast_template(
     assert (
         (normalize_spaces(page.select_one(".template-container").text))
         == (normalize_spaces(page.select_one(".broadcast-message-wrapper").text))
-        == ("Emergency alert " "This is a test")
+        == "Emergency alert This is a test"
     )
 
 
@@ -1178,20 +1178,20 @@ def test_choose_a_template_to_copy(
     assert page.select(".folder-heading") == []
 
     expected = [
-        ("Service 1 " "6 templates"),
-        ("Service 1 sms_template_one " "Text message template"),
-        ("Service 1 sms_template_two " "Text message template"),
-        ("Service 1 email_template_one " "Email template"),
-        ("Service 1 email_template_two " "Email template"),
-        ("Service 1 letter_template_one " "Letter template"),
-        ("Service 1 letter_template_two " "Letter template"),
-        ("Service 2 " "6 templates"),
-        ("Service 2 sms_template_one " "Text message template"),
-        ("Service 2 sms_template_two " "Text message template"),
-        ("Service 2 email_template_one " "Email template"),
-        ("Service 2 email_template_two " "Email template"),
-        ("Service 2 letter_template_one " "Letter template"),
-        ("Service 2 letter_template_two " "Letter template"),
+        "Service 1 6 templates",
+        "Service 1 sms_template_one Text message template",
+        "Service 1 sms_template_two Text message template",
+        "Service 1 email_template_one Email template",
+        "Service 1 email_template_two Email template",
+        "Service 1 letter_template_one Letter template",
+        "Service 1 letter_template_two Letter template",
+        "Service 2 6 templates",
+        "Service 2 sms_template_one Text message template",
+        "Service 2 sms_template_two Text message template",
+        "Service 2 email_template_one Email template",
+        "Service 2 email_template_two Email template",
+        "Service 2 letter_template_one Letter template",
+        "Service 2 letter_template_two Letter template",
     ]
     actual = page.select(".template-list-item")
 
@@ -1234,12 +1234,12 @@ def test_choose_a_template_to_copy_when_user_has_one_service(
     assert page.select(".folder-heading") == []
 
     expected = [
-        ("sms_template_one " "Text message template"),
-        ("sms_template_two " "Text message template"),
-        ("email_template_one " "Email template"),
-        ("email_template_two " "Email template"),
-        ("letter_template_one " "Letter template"),
-        ("letter_template_two " "Letter template"),
+        "sms_template_one Text message template",
+        "sms_template_two Text message template",
+        "email_template_one Email template",
+        "email_template_two Email template",
+        "letter_template_one Letter template",
+        "letter_template_two Letter template",
     ]
     actual = page.select(".template-list-item")
 
@@ -1297,7 +1297,7 @@ def test_choose_a_template_to_copy_from_folder_within_service(
         from_folder=PARENT_FOLDER_ID,
     )
 
-    assert normalize_spaces(page.select_one(".folder-heading").text) == ("service one Parent folder")
+    assert normalize_spaces(page.select_one(".folder-heading").text) == "service one Parent folder"
     breadcrumb_links = page.select(".folder-heading a")
     assert len(breadcrumb_links) == 1
     assert breadcrumb_links[0]["href"] == url_for(
@@ -1307,10 +1307,10 @@ def test_choose_a_template_to_copy_from_folder_within_service(
     )
 
     expected = [
-        ("Child folder empty " "Empty"),
-        ("Child folder non-empty " "1 template"),
-        ("Child folder non-empty Should appear in list (nested) " "Text message template"),
-        ("Should appear in list (at same level) " "Text message template"),
+        "Child folder empty Empty",
+        "Child folder non-empty 1 template",
+        "Child folder non-empty Should appear in list (nested) Text message template",
+        "Should appear in list (at same level) Text message template",
     ]
     actual = page.select(".template-list-item")
 
@@ -1389,7 +1389,7 @@ def test_load_edit_template_with_copy_of_template(
     assert page.select_one("form")["method"] == "post"
 
     assert page.select_one("input")["value"] == (expected_name)
-    assert page.select_one("textarea").text == ("\r\nYour ((thing)) is due soon")
+    assert page.select_one("textarea").text == "\r\nYour ((thing)) is due soon"
     mock_get_service_email_template.assert_called_once_with(
         SERVICE_TWO_ID,
         TEMPLATE_ONE_ID,
@@ -1885,8 +1885,8 @@ def test_should_not_update_too_big_template(
 @pytest.mark.parametrize(
     "content, expected_error",
     (
-        (("ŴŶ" * 308), ("Content must be 615 characters or fewer because it contains Ŵ and Ŷ")),
-        (("ab" * 698), ("Content must be 1,395 characters or fewer")),
+        (("ŴŶ" * 308), "Content must be 615 characters or fewer because it contains Ŵ and Ŷ"),
+        (("ab" * 698), "Content must be 1,395 characters or fewer"),
     ),
 )
 def test_should_not_create_too_big_template_for_broadcasts(
@@ -1988,7 +1988,7 @@ def test_should_show_delete_template_page_with_time_block_for_empty_notification
             _test_page_title=False,
         )
     assert "Are you sure you want to delete ‘Two week reminder’?" in page.select(".banner-dangerous")[0].text
-    assert normalize_spaces(page.select(".banner-dangerous p")[0].text) == ("This template has never been used.")
+    assert normalize_spaces(page.select(".banner-dangerous p")[0].text) == "This template has never been used."
     assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == (
         "service one: Template <em>content</em> with & entity"
     )
@@ -2212,8 +2212,8 @@ def test_can_create_email_template_with_emoji(client_request, mock_create_servic
 @pytest.mark.parametrize(
     "template_type, expected_error",
     (
-        ("sms", ("You cannot use 🍜 in text messages.")),
-        ("broadcast", ("You cannot use 🍜 in broadcasts.")),
+        ("sms", "You cannot use 🍜 in text messages."),
+        ("broadcast", "You cannot use 🍜 in broadcasts."),
     ),
 )
 def test_should_not_create_sms_or_broadcast_template_with_emoji(
@@ -2244,8 +2244,8 @@ def test_should_not_create_sms_or_broadcast_template_with_emoji(
 @pytest.mark.parametrize(
     "template_type, expected_error",
     (
-        ("sms", ("You cannot use 🍔 in text messages.")),
-        ("broadcast", ("You cannot use 🍔 in broadcasts.")),
+        ("sms", "You cannot use 🍔 in text messages."),
+        ("broadcast", "You cannot use 🍔 in broadcasts."),
     ),
 )
 def test_should_not_update_sms_template_with_emoji(
@@ -2335,7 +2335,7 @@ def test_should_show_message_before_redacting_template(
         _test_page_title=False,
     )
 
-    assert ("Are you sure you want to hide personalisation after sending?") in page.select(".banner-dangerous")[0].text
+    assert "Are you sure you want to hide personalisation after sending?" in page.select(".banner-dangerous")[0].text
 
     form = page.select(".banner-dangerous form")[0]
 

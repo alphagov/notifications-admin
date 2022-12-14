@@ -193,7 +193,7 @@ def test_should_show_change_details_link(
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
     link = page.select(".user-list-item")[-1].select_one("a")
 
-    assert normalize_spaces(link.text) == ("Change details for Test User zzzzzzz@example.gov.uk")
+    assert normalize_spaces(link.text) == "Change details for Test User zzzzzzz@example.gov.uk"
     assert link["href"] == url_for(
         ".edit_user_permissions",
         service_id=SERVICE_ONE_ID,
@@ -224,7 +224,7 @@ def test_should_show_live_search_if_more_than_7_users(
 
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
 
-    assert page.select_one("div[data-notify-module=live-search]")["data-targets"] == (".user-list-item")
+    assert page.select_one("div[data-notify-module=live-search]")["data-targets"] == ".user-list-item"
     assert len(page.select(".user-list-item")) == number_of_users
 
     textbox = page.select_one("[data-notify-module=autofocus] .govuk-input")
@@ -777,7 +777,7 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
         user_id=platform_admin_user["id"],
     )
     assert normalize_spaces(page.select("main p")[0].text) == "platform@admin.gov.uk Change email address"
-    assert normalize_spaces(page.select("main p")[2].text) == ("Platform admin users can access all template folders.")
+    assert normalize_spaces(page.select("main p")[2].text) == "Platform admin users can access all template folders."
     assert page.select("input[name=folder_permissions]") == []
     client_request.post(
         "main.edit_user_permissions",
@@ -989,8 +989,8 @@ def test_should_show_page_for_inviting_user_with_email_prefilled(
         _test_page_title=False,
     )
     assert normalize_spaces(page.select_one("title").text).startswith("Invite a team member")
-    assert normalize_spaces(page.select_one("h1").text) == ("Invite Service Two User")
-    assert normalize_spaces(page.select_one("main .govuk-body").text) == ("service-two-user@test.gov.uk")
+    assert normalize_spaces(page.select_one("h1").text) == "Invite Service Two User"
+    assert normalize_spaces(page.select_one("main .govuk-body").text) == "service-two-user@test.gov.uk"
     assert not page.select("input#email_address") or page.select("input[type=email]")
 
 
@@ -1018,7 +1018,7 @@ def test_should_show_page_if_prefilled_user_is_already_a_team_member(
     )
 
     assert normalize_spaces(page.select_one("title").text).startswith("This person is already a team member")
-    assert normalize_spaces(page.select_one("h1").text) == ("This person is already a team member")
+    assert normalize_spaces(page.select_one("h1").text) == "This person is already a team member"
     assert normalize_spaces(page.select_one("main .govuk-body").text) == (
         "Test User is already member of ‘service one’."
     )
@@ -1047,7 +1047,7 @@ def test_should_show_page_if_prefilled_user_is_already_invited(
     )
 
     assert normalize_spaces(page.select_one("title").text).startswith("This person has already received an invite")
-    assert normalize_spaces(page.select_one("h1").text) == ("This person has already received an invite")
+    assert normalize_spaces(page.select_one("h1").text) == "This person has already received an invite"
     assert normalize_spaces(page.select_one("main .govuk-body").text) == (
         "Service Two User has not accepted their invitation to " "‘service one’ yet. You do not need to do anything."
     )
@@ -1207,7 +1207,7 @@ def test_invite_user_when_email_address_is_prefilled(
     )
 
 
-@pytest.mark.parametrize("auth_type", [("sms_auth"), ("email_auth")])
+@pytest.mark.parametrize("auth_type", [("sms_auth"), "email_auth"])
 @pytest.mark.parametrize("email_address, gov_user", [("test@example.gov.uk", True), ("test@example.com", False)])
 def test_invite_user_with_email_auth_service(
     client_request,
@@ -1958,7 +1958,7 @@ def test_edit_user_mobile_number_page(
     )
 
     assert page.select_one("h1").text == "Change team member’s mobile number"
-    assert page.select("p[id=user_name]")[0].text == ("This will change the mobile number for {}.").format(
+    assert page.select("p[id=user_name]")[0].text == "This will change the mobile number for {}.".format(
         active_user_with_permissions["name"]
     )
     assert page.select("input[name=mobile_number]")[0].attrs["value"] == "0770••••762"

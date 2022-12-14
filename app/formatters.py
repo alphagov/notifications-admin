@@ -425,7 +425,7 @@ def message_count_noun(count, template_type):
 
 
 def message_count(count, template_type):
-    return f"{format_thousands(count)} " f"{message_count_noun(count, template_type)}"
+    return f"{format_thousands(count)} {message_count_noun(count, template_type)}"
 
 
 def recipient_count_label(count, template_type):
@@ -456,7 +456,7 @@ def recipient_count_label(count, template_type):
 
 
 def recipient_count(count, template_type):
-    return f"{format_thousands(count)} " f"{recipient_count_label(count, template_type)}"
+    return f"{format_thousands(count)} {recipient_count_label(count, template_type)}"
 
 
 def iteration_count(count):

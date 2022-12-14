@@ -113,7 +113,7 @@ def test_should_show_page_for_one_job(
     assert page.select_one("span#time-left").text == "Data available for 7 days"
 
     assert normalize_spaces(page.select_one("tbody tr").text) == normalize_spaces(
-        "07123456789 " "template content " "Delivered 1 January at 11:10am"
+        "07123456789 template content Delivered 1 January at 11:10am"
     )
     assert page.select_one("tbody tr a")["href"] == url_for(
         "main.view_notification",
@@ -240,13 +240,13 @@ def test_should_show_job_with_sending_limit_exceeded_status(
     "created_at, processing_started, expected_message",
     (
         # Recently created, not yet started
-        (datetime(2020, 1, 10, 0, 0, 0), None, ("No messages to show yet…")),
+        (datetime(2020, 1, 10, 0, 0, 0), None, "No messages to show yet…"),
         # Just started
-        (datetime(2020, 1, 10, 0, 0, 0), datetime(2020, 1, 10, 0, 0, 1), ("No messages to show yet…")),
+        (datetime(2020, 1, 10, 0, 0, 0), datetime(2020, 1, 10, 0, 0, 1), "No messages to show yet…"),
         # Created a while ago, just started
-        (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 10, 0, 0, 1), ("No messages to show yet…")),
+        (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 10, 0, 0, 1), "No messages to show yet…"),
         # Created a while ago, started just within the last 24h
-        (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 9, 1, 0, 1), ("No messages to show yet…")),
+        (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 9, 1, 0, 1), "No messages to show yet…"),
         # Created a while ago, started exactly 24h ago
         # ---
         # It doesn’t matter that 24h (1 day) and 7 days (the service’s data
@@ -257,7 +257,7 @@ def test_should_show_job_with_sending_limit_exceeded_status(
         (
             datetime(2020, 1, 1, 0, 0, 0),
             datetime(2020, 1, 9, 1, 0, 0),
-            ("These messages have been deleted because they were sent more than 7 days ago"),
+            "These messages have been deleted because they were sent more than 7 days ago",
         ),
     ),
 )
@@ -332,8 +332,8 @@ def test_should_show_letter_job(
     assert normalize_spaces(page.select("tbody tr")[0].text) == (
         "1 Example Street template subject 1 January at 11:09am"
     )
-    assert normalize_spaces(page.select(".keyline-block")[0].text) == ("1 Letter")
-    assert normalize_spaces(page.select(".keyline-block")[1].text) == ("6 January Estimated delivery date")
+    assert normalize_spaces(page.select(".keyline-block")[0].text) == "1 Letter"
+    assert normalize_spaces(page.select(".keyline-block")[1].text) == "6 January Estimated delivery date"
     assert page.select_one("a[download]")["href"] == url_for(
         "main.view_job_csv",
         service_id=SERVICE_ONE_ID,
@@ -460,7 +460,7 @@ def test_should_show_scheduled_job(
         just_sent="yes",
     )
 
-    assert normalize_spaces(page.select("main p")[1].text) == ("Sending Two week reminder today at midnight")
+    assert normalize_spaces(page.select("main p")[1].text) == "Sending Two week reminder today at midnight"
     assert page.select("main p a")[0]["href"] == url_for(
         "main.view_template_version",
         service_id=SERVICE_ONE_ID,

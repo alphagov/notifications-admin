@@ -67,7 +67,7 @@ def test_all_users_have_upload_contact_list(
 @pytest.mark.parametrize(
     "extra_permissions, expected_empty_message",
     (
-        ([], ("You have not uploaded any files recently.")),
+        ([], "You have not uploaded any files recently."),
         (
             ["letter"],
             (
@@ -114,7 +114,7 @@ def test_get_upload_hub_page(
 
     assert len(uploads) == 3
 
-    assert normalize_spaces(uploads[0].text.strip()) == ("Uploaded letters " "Printing today at 5:30pm " "33 letters")
+    assert normalize_spaces(uploads[0].text.strip()) == "Uploaded letters Printing today at 5:30pm 33 letters"
     assert uploads[0].select_one("a.file-list-filename-large")["href"] == url_for(
         "main.uploaded_letters",
         service_id=SERVICE_ONE_ID,
@@ -122,17 +122,17 @@ def test_get_upload_hub_page(
     )
 
     assert normalize_spaces(uploads[1].text.strip()) == (
-        "some.csv " "Sent 1 January 2016 at 11:09am " "0 sending 8 delivered 2 failed"
+        "some.csv Sent 1 January 2016 at 11:09am 0 sending 8 delivered 2 failed"
     )
     assert uploads[1].select_one("a.file-list-filename-large")["href"] == (
         "/services/{}/jobs/job_id_1".format(SERVICE_ONE_ID)
     )
 
     assert normalize_spaces(uploads[2].text.strip()) == (
-        "some.pdf " "Sent 1 January 2016 at 11:09am " "Firstname Lastname " "123 Example Street"
+        "some.pdf Sent 1 January 2016 at 11:09am Firstname Lastname 123 Example Street"
     )
     assert normalize_spaces(str(uploads[2].select_one(".govuk-body"))) == (
-        '<p class="govuk-body letter-recipient-summary"> ' "Firstname Lastname<br/> " "123 Example Street<br/> " "</p>"
+        '<p class="govuk-body letter-recipient-summary"> ' "Firstname Lastname<br/> 123 Example Street<br/> " "</p>"
     )
     assert uploads[2].select_one("a.file-list-filename-large")["href"] == (
         "/services/{}/notification/letter_id_1".format(SERVICE_ONE_ID)
@@ -151,13 +151,13 @@ def test_get_uploaded_letters(
         "main.uploads",
         service_id=SERVICE_ONE_ID,
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("Uploaded letters")
-    assert normalize_spaces(page.select("main p")[0].text) == ("1,234 letters")
-    assert normalize_spaces(page.select("main p")[1].text) == ("Printing starts today at 5:30pm")
+    assert normalize_spaces(page.select_one("h1").text) == "Uploaded letters"
+    assert normalize_spaces(page.select("main p")[0].text) == "1,234 letters"
+    assert normalize_spaces(page.select("main p")[1].text) == "Printing starts today at 5:30pm"
 
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        ("Homer-Simpson.pdf " "742 Evergreen Terrace " "2 February at 1:59pm"),
-        ("Kevin-McCallister.pdf " "671 Lincoln Avenue, Winnetka " "2 February at 12:59pm"),
+        "Homer-Simpson.pdf 742 Evergreen Terrace 2 February at 1:59pm",
+        "Kevin-McCallister.pdf 671 Lincoln Avenue, Winnetka 2 February at 12:59pm",
     ]
 
     assert [link["href"] for link in page.select("tbody tr a")] == [
@@ -180,11 +180,11 @@ def test_get_uploaded_letters(
     assert next_page_link["href"] == url_for(
         "main.uploaded_letters", service_id=SERVICE_ONE_ID, letter_print_day="2020-02-02", page=2
     )
-    assert normalize_spaces(next_page_link.text) == ("Next page " "page 2")
+    assert normalize_spaces(next_page_link.text) == "Next page page 2"
     assert prev_page_link["href"] == url_for(
         "main.uploaded_letters", service_id=SERVICE_ONE_ID, letter_print_day="2020-02-02", page=0
     )
-    assert normalize_spaces(prev_page_link.text) == ("Previous page " "page 0")
+    assert normalize_spaces(prev_page_link.text) == "Previous page page 0"
 
     mock_get_uploaded_letters.assert_called_once_with(
         SERVICE_ONE_ID,
@@ -273,9 +273,9 @@ def test_uploads_page_shows_scheduled_jobs(
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
 
     assert [normalize_spaces(row.text) for row in page.select("tr")] == [
-        ("File Status"),
-        ("even_later.csv " "Sending 1 January 2016 at 11:09pm " "1 text message waiting to send"),
-        ("send_me_later.csv " "Sending 1 January 2016 at 11:09am " "1 text message waiting to send"),
+        "File Status",
+        "even_later.csv Sending 1 January 2016 at 11:09pm 1 text message waiting to send",
+        "send_me_later.csv Sending 1 January 2016 at 11:09am 1 text message waiting to send",
     ]
     assert not page.select(".table-empty-message")
 
@@ -292,12 +292,12 @@ def test_uploads_page_shows_contact_lists_first(
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
 
     assert [normalize_spaces(row.text) for row in page.select("tr")] == [
-        ("File Status"),
-        ("phone number list.csv " "Used twice in the last 7 days " "123 saved phone numbers"),
-        ("EmergencyContactList.xls " "Not used in the last 7 days " "100 saved email addresses"),
-        ("UnusedList.tsv " "Not used yet " "1 saved phone number"),
-        ("even_later.csv " "Sending 1 January 2016 at 11:09pm " "1 text message waiting to send"),
-        ("send_me_later.csv " "Sending 1 January 2016 at 11:09am " "1 text message waiting to send"),
+        "File Status",
+        "phone number list.csv Used twice in the last 7 days 123 saved phone numbers",
+        "EmergencyContactList.xls Not used in the last 7 days 100 saved email addresses",
+        "UnusedList.tsv Not used yet 1 saved phone number",
+        "even_later.csv Sending 1 January 2016 at 11:09pm 1 text message waiting to send",
+        "send_me_later.csv Sending 1 January 2016 at 11:09am 1 text message waiting to send",
     ]
     assert page.select_one(".file-list-filename-large")["href"] == url_for(
         "main.contact_list",
@@ -315,5 +315,5 @@ def test_get_uploads_shows_pagination(
 ):
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
 
-    assert normalize_spaces(page.select_one(".next-page").text) == ("Next page " "page 2")
-    assert normalize_spaces(page.select_one(".previous-page").text) == ("Previous page " "page 0")
+    assert normalize_spaces(page.select_one(".next-page").text) == "Next page page 2"
+    assert normalize_spaces(page.select_one(".previous-page").text) == "Previous page page 0"

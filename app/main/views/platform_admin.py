@@ -612,7 +612,7 @@ def clear_cache():
 
         num_deleted = sum(redis_client.delete_by_pattern(pattern) for pattern in patterns)
 
-        msg = f"Removed {num_deleted} objects " f"across {len(patterns)} key formats " f'for {", ".join(group_keys)}'
+        msg = f"Removed {num_deleted} objects across {len(patterns)} key formats " f'for {", ".join(group_keys)}'
 
         flash(msg, category="default")
 

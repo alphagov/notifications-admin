@@ -16,7 +16,7 @@ def test_non_logged_in_user_can_see_homepage(
     client_request.logout()
     page = client_request.get("main.index", _test_page_title=False)
 
-    assert page.select_one("h1").text.strip() == ("Send emails, text messages and letters to your users")
+    assert page.select_one("h1").text.strip() == "Send emails, text messages and letters to your users"
 
     assert page.select_one("a[role=button][draggable=false]")["href"] == url_for("main.register")
 
@@ -231,7 +231,7 @@ def test_old_integration_testing_page(
 def test_terms_page_has_correct_content(client_request):
     terms_page = client_request.get("main.terms")
     assert normalize_spaces(terms_page.select("main p")[0].text) == (
-        "These terms apply to your service’s use of GOV.UK Notify. " "You must be the service manager to accept them."
+        "These terms apply to your service’s use of GOV.UK Notify. You must be the service manager to accept them."
     )
 
 
@@ -372,9 +372,10 @@ def test_sms_price(
         home_page = client_request.get("main.index", _test_page_title=False)
         pricing_page = client_request.get("main.pricing")
 
-    assert normalize_spaces(
-        home_page.select(".product-page-section")[5].select(".govuk-grid-column-one-half")[1].text
-    ) == (f"Text messages " f"Up to 40,000 free text messages a year, " f"then {expected_rate} pence per message")
+    assert (
+        normalize_spaces(home_page.select(".product-page-section")[5].select(".govuk-grid-column-one-half")[1].text)
+        == f"Text messages Up to 40,000 free text messages a year, then {expected_rate} pence per message"
+    )
 
     assert normalize_spaces(pricing_page.select_one("#text-messages + p + p").text) == (
         f"When a service has used its annual allowance, it costs "

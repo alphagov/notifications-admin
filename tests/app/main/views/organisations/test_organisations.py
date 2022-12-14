@@ -67,7 +67,7 @@ def test_view_organisation_shows_the_correct_organisation(client_request, mocker
     )
 
     assert normalize_spaces(page.select_one("h1").text) == "Usage"
-    assert normalize_spaces(page.select_one(".govuk-hint").text) == ("Test 1 has no live services on GOV.UK Notify")
+    assert normalize_spaces(page.select_one(".govuk-hint").text) == "Test 1 has no live services on GOV.UK Notify"
     assert not page.select("a[download]")
 
 
@@ -238,7 +238,7 @@ def test_gps_can_create_own_organisations(
         return
 
     assert page.select_one("input[type=text]")["name"] == "name"
-    assert normalize_spaces(page.select_one("label[for=name]").text) == ("What’s your practice called?")
+    assert normalize_spaces(page.select_one("label[for=name]").text) == "What’s your practice called?"
 
 
 @pytest.mark.parametrize(
@@ -283,7 +283,7 @@ def test_nhs_local_can_create_own_organisations(
     assert normalize_spaces(page.select_one("main p").text) == (
         "Which NHS Trust or Clinical Commissioning Group do you work for?"
     )
-    assert page.select_one("[data-notify-module=live-search]")["data-targets"] == (".govuk-radios__item")
+    assert page.select_one("[data-notify-module=live-search]")["data-targets"] == ".govuk-radios__item"
     assert [
         (normalize_spaces(radio.select_one("label").text), radio.select_one("input")["value"])
         for radio in page.select(".govuk-radios__item")
@@ -291,7 +291,7 @@ def test_nhs_local_can_create_own_organisations(
         ("Trust 1", "t1"),
         ("Trust 2", "t2"),
     ]
-    assert normalize_spaces(page.select_one(".js-stick-at-bottom-when-scrolling button").text) == ("Continue")
+    assert normalize_spaces(page.select_one(".js-stick-at-bottom-when-scrolling button").text) == "Continue"
 
 
 @pytest.mark.parametrize(
@@ -547,7 +547,7 @@ def test_organisation_services_filters_by_financial_year(
     )
     mock.assert_called_once_with(ORGANISATION_ID, financial_year)
     assert normalize_spaces(page.select_one(".pill").text) == (
-        "2019 to 2020 financial year " "2018 to 2019 financial year " "2017 to 2018 financial year"
+        "2019 to 2020 financial year 2018 to 2019 financial year 2017 to 2018 financial year"
     )
     assert normalize_spaces(page.select_one(".pill-item--selected").text) == (expected_selected)
 
@@ -837,7 +837,7 @@ def test_manage_org_users_should_show_live_search_if_more_than_7_users(
         org_id=ORGANISATION_ID,
     )
 
-    assert page.select_one("div[data-notify-module=live-search]")["data-targets"] == (".user-list-item")
+    assert page.select_one("div[data-notify-module=live-search]")["data-targets"] == ".user-list-item"
     assert len(page.select(".user-list-item")) == number_of_users
 
     textbox = page.select_one("[data-notify-module=autofocus] .govuk-input")
@@ -1174,7 +1174,7 @@ def test_archive_organisation_after_confirmation(
     page = client_request.post("main.archive_organisation", org_id=organisation_one["id"], _follow_redirects=True)
     mock_api.assert_called_once_with(url=f"/organisations/{organisation_one['id']}/archive", data=None)
     assert normalize_spaces(page.select_one("h1").text) == "Choose service"
-    assert normalize_spaces(page.select_one(".banner-default-with-tick").text) == ("‘Test organisation’ was deleted")
+    assert normalize_spaces(page.select_one(".banner-default-with-tick").text) == "‘Test organisation’ was deleted"
     assert redis_delete_mock.call_args_list == [
         mocker.call(f'organisation-{organisation_one["id"]}-name'),
         mocker.call("domains"),
@@ -1607,7 +1607,7 @@ def test_update_organisation_domains_with_more_than_just_domain(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "There is a problem " "Item 1: Cannot contain @ " "Item 3: Cannot contain @"
+        "There is a problem Item 1: Cannot contain @ Item 3: Cannot contain @"
     )
 
     assert [field["value"] for field in page.select("input[type=text][value]")] == [
@@ -2291,7 +2291,7 @@ def test_add_organisation_email_branding_options_shows_branding_not_in_branding_
     client_request.login(platform_admin_user)
     page = client_request.get(".add_organisation_email_branding_options", org_id=organisation_one["id"])
     assert page.select_one("h1").text == "Add email branding options"
-    assert page.select_one("[data-notify-module=live-search]")["data-targets"] == (".govuk-checkboxes__item")
+    assert page.select_one("[data-notify-module=live-search]")["data-targets"] == ".govuk-checkboxes__item"
 
     assert [
         (checkbox.text.strip(), checkbox.input["value"], checkbox.input.has_attr("checked"))
@@ -2707,7 +2707,7 @@ def test_add_organisation_letter_branding_options_shows_branding_not_in_branding
     client_request.login(platform_admin_user)
     page = client_request.get(".add_organisation_letter_branding_options", org_id=organisation_one["id"])
     assert page.select_one("h1").text == "Add letter branding options"
-    assert page.select_one("[data-notify-module=live-search]")["data-targets"] == (".govuk-checkboxes__item")
+    assert page.select_one("[data-notify-module=live-search]")["data-targets"] == ".govuk-checkboxes__item"
 
     assert [
         (checkbox.text.strip(), checkbox.input["value"], checkbox.input.has_attr("checked"))

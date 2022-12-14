@@ -53,7 +53,7 @@ class NotifyBeautifulSoup(BeautifulSoup):
     def override_method(self, method_name, preferred_method_name):
         def overridden_method(*args, **kwargs):
             raise AttributeError(
-                f"Don’t use BeautifulSoup.{method_name}" f" – try BeautifulSoup.{preferred_method_name} instead"
+                f"Don’t use BeautifulSoup.{method_name} – try BeautifulSoup.{preferred_method_name} instead"
             )
 
         setattr(self, method_name, overridden_method)
@@ -668,7 +668,7 @@ def assert_url_expected(actual, expected):
             assert parse_qs(expected_parts.query) == parse_qs(actual_parts.query)
         else:
             assert getattr(actual_parts, attribute) == getattr(expected_parts, attribute), (
-                "Expected redirect: {}\n" "Actual redirect: {}"
+                "Expected redirect: {}\nActual redirect: {}"
             ).format(expected, actual)
 
 
