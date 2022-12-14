@@ -292,7 +292,7 @@ def send_files_by_email():
 
 
 @main.route("/using-notify/guidance/templates")
-def templates():
+def guidance_templates():
     return render_template(
         "views/guidance/templates.html",
         navigation_links=using_notify_nav(),
