@@ -300,7 +300,7 @@ def guidance_templates():
 
 
 @main.route("/using-notify/guidance/text-message-sender")
-def text_message_sender():
+def guidance_text_message_sender():
     return render_template(
         "views/guidance/text-message-sender.html",
         navigation_links=using_notify_nav(),
