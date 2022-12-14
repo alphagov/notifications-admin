@@ -276,7 +276,7 @@ def guidance_receive_text_messages():
 
 
 @main.route("/using-notify/guidance/reply-to-email-address")
-def reply_to_email_address():
+def guidance_reply_to_email_address():
     return render_template(
         "views/guidance/reply-to-email-address.html",
         navigation_links=using_notify_nav(),
