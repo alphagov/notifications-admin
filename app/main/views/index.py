@@ -245,7 +245,7 @@ def guidance_index():
 
 
 @main.route("/using-notify/guidance/edit-and-format-messages")
-def edit_and_format_messages():
+def guidance_edit_and_format_messages():
     return render_template(
         "views/guidance/edit-and-format-messages.html",
         navigation_links=using_notify_nav(),
