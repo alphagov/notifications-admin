@@ -252,7 +252,7 @@ def guidance_edit_and_format_messages():
     )
 
 @main.route("/using-notify/guidance/email-branding")
-def email_branding():
+def guidance_email_branding():
     return render_template(
         "views/guidance/email-branding.html",
         navigation_links=using_notify_nav(),
