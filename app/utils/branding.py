@@ -1,4 +1,4 @@
-from app.models.branding import EmailBranding
+from app.models.branding import EmailBranding, LetterBranding
 
 
 def get_email_choices(service):
@@ -26,9 +26,13 @@ def get_email_choices(service):
 def get_letter_choices(service):
 
     if service.is_nhs and not service.letter_branding.is_nhs:
-        yield ("nhs", "NHS")
+        yield (LetterBranding.NHS_ID, "NHS")
 
-    if (
+    if service.letter_branding_pool:
+        for branding in service.letter_branding_pool.excluding(service.letter_branding_id):
+            yield (branding.id, branding.name)
+
+    elif (
         service.organisation
         and not service.is_nhs
         and (not service.letter_branding_id or service.letter_branding_id != service.organisation.letter_branding_id)

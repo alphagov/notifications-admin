@@ -1999,7 +1999,7 @@ class ChooseLetterBrandingForm(ChooseBrandingForm):
     def __init__(self, service):
         super().__init__()
 
-        self.options.choices = tuple(list(branding.get_letter_choices(service)) + [self.FALLBACK_OPTION])
+        self.options.choices = tuple(OrderedSet(list(branding.get_letter_choices(service)) + [self.FALLBACK_OPTION]))
 
         if self.something_else_is_only_option:
             self.options.data = self.FALLBACK_OPTION_VALUE
