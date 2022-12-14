@@ -78,7 +78,7 @@ def using_notify_nav():
                 },
                 {
                     "name": "Email branding",
-                    "link": "main.email_branding",
+                    "link": "main.guidance_email_branding",
                 },
                 {
                     "name": "Letter branding",
