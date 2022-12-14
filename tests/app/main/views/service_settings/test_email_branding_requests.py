@@ -737,18 +737,48 @@ def test_only_central_org_services_can_see_email_branding_choose_logo_page(clien
 
 
 @pytest.mark.parametrize(
-    "selected_option, expected_endpoint, extra_url_args",
+    "branding_choice, selected_option, expected_endpoint, extra_url_args",
     [
-        ("org", ".email_branding_choose_banner_type", {"back_link": ".email_branding_choose_logo"}),
-        ("single_identity", ".email_branding_request_government_identity_logo", {}),
+        (
+            "something_else",
+            "org",
+            ".email_branding_choose_banner_type",
+            {"back_link": ".email_branding_choose_logo", "branding_choice": "something_else"},
+        ),
+        (
+            "something_else",
+            "single_identity",
+            ".email_branding_request_government_identity_logo",
+            {"branding_choice": "something_else"},
+        ),
+        (
+            "org",
+            "org",
+            ".email_branding_choose_banner_type",
+            {"back_link": ".email_branding_choose_logo", "branding_choice": "org"},
+        ),
+        ("org", "single_identity", ".email_branding_request_government_identity_logo", {"branding_choice": "org"}),
+        (
+            "govuk_and_org",
+            "org",
+            ".email_branding_upload_logo",
+            {"back_link": ".email_branding_choose_logo", "branding_choice": "govuk_and_org", "brand_type": "both"},
+        ),
+        (
+            "govuk_and_org",
+            "single_identity",
+            ".email_branding_request_government_identity_logo",
+            {"branding_choice": "govuk_and_org"},
+        ),
     ],
 )
 def test_email_branding_choose_logo_redirects_to_right_page(
-    client_request, service_one, selected_option, expected_endpoint, extra_url_args
+    client_request, service_one, branding_choice, selected_option, expected_endpoint, extra_url_args
 ):
     client_request.post(
         ".email_branding_choose_logo",
         service_id=SERVICE_ONE_ID,
+        branding_choice=branding_choice,
         _data={"branding_options": selected_option},
         _expected_status=302,
         _expected_redirect=url_for(expected_endpoint, service_id=SERVICE_ONE_ID, **extra_url_args),

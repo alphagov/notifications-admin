@@ -1354,9 +1354,22 @@ def email_branding_enter_government_identity_logo_text(service_id):
 @service_belongs_to_org_type("central")
 def email_branding_choose_logo(service_id):
     form = EmailBrandingChooseLogoForm()
+    branding_choice = request.args.get("branding_choice")
 
     if form.validate_on_submit():
         if form.branding_options.data == "org":
+
+            if branding_choice == "govuk_and_org":
+                return redirect(
+                    url_for(
+                        ".email_branding_upload_logo",
+                        service_id=current_service.id,
+                        branding_choice=branding_choice,
+                        brand_type="both",
+                        back_link=".email_branding_choose_logo",
+                    )
+                )
+
             return redirect(
                 url_for(
                     ".email_branding_choose_banner_type",
@@ -1459,21 +1472,17 @@ def email_branding_set_alt_text(service_id):
         # we use this key to keep track of user choices through the journey but we don't use it to save the branding
         del email_branding_data["branding_choice"]
 
-        name = email_branding_client.get_email_branding_name_for_alt_text(form.alt_text.data)
-        new_email_branding = email_branding_client.create_email_branding(
-            name=name,
+        new_email_branding = EmailBranding.create(
             alt_text=form.alt_text.data,
-            text=None,
-            created_by_id=current_user.id,
             **email_branding_data,
         )
 
         # set as service branding
-        current_service.update(email_branding=new_email_branding["id"])
+        current_service.update(email_branding=new_email_branding.id)
 
         # add to org pool
         organisations_client.add_brandings_to_email_branding_pool(
-            current_service.organisation.id, [new_email_branding["id"]]
+            current_service.organisation.id, [new_email_branding.id]
         )
 
         flash(
