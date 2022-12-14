@@ -1,18 +1,26 @@
 {% extends "views/platform-admin/_base_template.html" %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
-{% from "components/branding-preview.html" import letter_branding_preview %}
+{% from "components/branding-preview.html" import email_branding_preview, letter_branding_preview %}
 
 {% block per_page_title %}
-  Preview letter branding
+  Preview {{ notification_type }} branding
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-large">Preview letter branding</h1>
+  <h1 class="heading-large">Preview {{ notification_type }} branding</h1>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {{ letter_branding_preview(form.branding_style.data) }}
+      {% if notification_type == 'email' %}
+        {{ email_branding_preview(form.branding_style.data) }}
+      {% elif notification_type == 'letter' %}
+        {{ letter_branding_preview(form.branding_style.data) }}
+      {% else %}
+        {# Raise a DivideByZero exception in case we add a new thing and don't update the template #}
+        {{ ('unhandled notification type ' + notification_type) / 0 }}
+      {% endif %}
+
       {% call form_wrapper(action=action) %}
         <div class="form-group">
           {{ form.hidden_tag() }}

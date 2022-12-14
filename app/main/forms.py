@@ -1695,10 +1695,10 @@ class AddLetterBrandingOptionsForm(StripWhitespaceForm):
     )
 
 
-class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
+class AdminSetBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
     def __init__(self, *args, org_name, service_name, **kwargs):
         super().__init__(*args, **kwargs)
-        self.add_to_pool.label.text = f"Should other teams in {org_name} have the option to use " f"this branding?"
+        self.add_to_pool.label.text = f"Should other teams in {org_name} have the option to use this branding?"
 
         self.add_to_pool.param_extensions = {
             "fieldset": {
