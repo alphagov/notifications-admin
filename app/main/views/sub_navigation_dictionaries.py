@@ -82,7 +82,7 @@ def using_notify_nav():
                 },
                 {
                     "name": "Letter branding",
-                    "link": "main.letter_branding",
+                    "link": "main.guidance_letter_branding",
                 },
                 {
                     "name": "Receive text messages",
