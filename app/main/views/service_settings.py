@@ -20,7 +20,6 @@ from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from app import (
     billing_api_client,
     current_service,
-    email_branding_client,
     inbound_number_client,
     notification_api_client,
     organisations_client,
