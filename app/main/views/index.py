@@ -324,7 +324,7 @@ def letter_specification():
 
 
 @main.route("/using-notify/guidance/create-and-send-messages")
-def create_and_send_messages():
+def guidance_create_and_send_messages():
     return render_template(
         "views/guidance/create-and-send-messages.html",
         navigation_links=using_notify_nav(),
