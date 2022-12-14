@@ -1199,6 +1199,7 @@ def email_branding_request(service_id):
                     ".email_branding_choose_banner_type",
                     service_id=current_service.id,
                     back_link=".email_branding_request",
+                    branding_choice=branding_choice,
                 )
             )
 
