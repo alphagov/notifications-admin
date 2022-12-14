@@ -1617,6 +1617,42 @@ def test_update_organisation_domains_with_more_than_just_domain(
     ]
 
 
+@pytest.mark.parametrize(
+    "domain",
+    (
+        "nhs.net",
+        "NHS.NET",
+        "nhs.uk",
+        pytest.param(
+            "example.nhs.uk",
+            marks=pytest.mark.xfail(reason="Subdomains still allowed"),
+        ),
+    ),
+)
+def test_update_organisation_domains_nhs_domains(
+    client_request,
+    mock_get_organisation,
+    domain,
+):
+    user = create_platform_admin_user()
+    client_request.login(user)
+
+    page = client_request.post(
+        "main.edit_organisation_domains",
+        org_id=ORGANISATION_ID,
+        _data={"domains-0": domain},
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        f"There is a problem Item 1: Cannot be ‘{domain.lower()}’"
+    )
+
+    assert [field["value"] for field in page.select("input[type=text][value]")] == [
+        domain,
+    ]
+
+
 def test_update_organisation_name(
     client_request,
     platform_admin_user,
