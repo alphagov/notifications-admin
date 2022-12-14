@@ -393,35 +393,21 @@ def message_count_label(count, template_type, suffix="sent"):
 
 
 def message_count_noun(count, template_type):
-    if template_type is None:
-        if count == 1:
-            return "message"
-        else:
-            return "messages"
+    singular = count == 1
 
     if template_type == "sms":
-        if count == 1:
-            return "text message"
-        else:
-            return "text messages"
+        return "text message" if singular else "text messages"
 
-    elif template_type == "email":
-        if count == 1:
-            return "email"
-        else:
-            return "emails"
+    if template_type == "email":
+        return "email" if singular else "emails"
 
-    elif template_type == "letter":
-        if count == 1:
-            return "letter"
-        else:
-            return "letters"
+    if template_type == "letter":
+        return "letter" if singular else "letters"
 
-    elif template_type == "broadcast":
-        if count == 1:
-            return "broadcast"
-        else:
-            return "broadcasts"
+    if template_type == "broadcast":
+        return "broadcast" if singular else "broadcasts"
+
+    return "message" if singular else "messages"
 
 
 def message_count(count, template_type):
@@ -429,30 +415,18 @@ def message_count(count, template_type):
 
 
 def recipient_count_label(count, template_type):
-
-    if template_type is None:
-        if count == 1:
-            return "recipient"
-        else:
-            return "recipients"
+    singular = count == 1
 
     if template_type == "sms":
-        if count == 1:
-            return "phone number"
-        else:
-            return "phone numbers"
+        return "phone number" if singular else "phone numbers"
 
-    elif template_type == "email":
-        if count == 1:
-            return "email address"
-        else:
-            return "email addresses"
+    if template_type == "email":
+        return "email address" if singular else "email addresses"
 
-    elif template_type == "letter":
-        if count == 1:
-            return "address"
-        else:
-            return "addresses"
+    if template_type == "letter":
+        return "address" if singular else "addresses"
+
+    return "recipient" if singular else "recipients"
 
 
 def recipient_count(count, template_type):
@@ -462,10 +436,9 @@ def recipient_count(count, template_type):
 def iteration_count(count):
     if count == 1:
         return "once"
-    elif count == 2:
+    if count == 2:
         return "twice"
-    else:
-        return f"{count} times"
+    return f"{count} times"
 
 
 def character_count(count):
