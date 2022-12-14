@@ -98,7 +98,7 @@ def using_notify_nav():
                 },
                 {
                     "name": "Templates",
-                    "link": "main.templates",
+                    "link": "main.guidance_templates",
                 },
                 {
                     "name": "Upload a letter",
