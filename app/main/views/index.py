@@ -268,7 +268,7 @@ def guidance_letter_branding():
 
 
 @main.route("/using-notify/guidance/receive-text-messages")
-def receive_text_messages():
+def guidance_receive_text_messages():
     return render_template(
         "views/guidance/receive-text-messages.html",
         navigation_links=using_notify_nav(),
