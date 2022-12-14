@@ -90,7 +90,7 @@ def using_notify_nav():
                 },
                 {
                     "name": "Reply-to email address",
-                    "link": "main.reply_to_email_address",
+                    "link": "main.guidance_reply_to_email_address",
                 },
                 {
                     "name": "Send files by email",
