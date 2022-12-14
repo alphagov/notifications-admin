@@ -44,7 +44,7 @@ form_objects = {
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>")
-@user_has_permissions()
+@user_has_permissions(allow_org_user=True)
 def view_template(service_id, template_id):
     template = current_service.get_template(template_id)
     template_folder = current_service.get_template_folder(template["folder"])
@@ -86,7 +86,7 @@ def view_template(service_id, template_id):
     "/services/<uuid:service_id>/templates/<template_type:template_type>/folders/<uuid:template_folder_id>",
     methods=["GET", "POST"],
 )
-@user_has_permissions()
+@user_has_permissions(allow_org_user=True)
 def choose_template(service_id, template_type="all", template_folder_id=None):
     template_folder = current_service.get_template_folder(template_folder_id)
     user_has_template_folder_permission = current_user.has_template_folder_permission(template_folder)
@@ -205,7 +205,7 @@ def get_template_nav_items(template_folder_id):
 
 
 @no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>.<filetype>")
-@user_has_permissions()
+@user_has_permissions(allow_org_user=True)
 def view_letter_template_preview(service_id, template_id, filetype):
     if filetype not in ("pdf", "png"):
         abort(404)
@@ -262,7 +262,7 @@ def _view_template_version(service_id, template_id, version, letters_as_pdf=Fals
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>")
-@user_has_permissions()
+@user_has_permissions(allow_org_user=True)
 def view_template_version(service_id, template_id, version):
     return render_template(
         "views/templates/template_history.html",
@@ -271,7 +271,7 @@ def view_template_version(service_id, template_id, version):
 
 
 @no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<filetype>")
-@user_has_permissions()
+@user_has_permissions(allow_org_user=True)
 def view_template_version_preview(service_id, template_id, version, filetype):
     db_template = current_service.get_template(template_id, version=version)
     return TemplatePreview.from_database_object(db_template, filetype)
@@ -785,7 +785,7 @@ def redact_template(service_id, template_id):
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/versions")
-@user_has_permissions("view_activity")
+@user_has_permissions(allow_org_user=True)
 def view_template_versions(service_id, template_id):
     return render_template(
         "views/templates/choose_history.html",

@@ -34,6 +34,7 @@
     {% endif %}
   {% elif current_user.has_permissions(allow_org_user=True) %}
     <li><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ main_navigation.is_selected('usage') }}" href="{{ url_for('.usage', service_id=current_service.id) }}">Usage</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ main_navigation.is_selected('templates') }}" href="{{ url_for('.choose_template', service_id=current_service.id) }}">Templates</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ main_navigation.is_selected('team-members') }}" href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
   {% endif %}
   </ul>
