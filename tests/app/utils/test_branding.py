@@ -56,12 +56,20 @@ def test_get_choices_service_not_assigned_to_org(
         ),
         ("local", None, [("organisation", "Test Organisation")]),
         ("local", "some-branding-id", [("organisation", "Test Organisation")]),
-        ("nhs_central", None, [(EmailBranding.NHS_ID, "NHS")]),
+        (
+            "nhs_central",
+            None,
+            [
+                (EmailBranding.NHS_ID, "NHS"),
+                ("organisation", "Test Organisation"),
+            ],
+        ),
         (
             "nhs_central",
             EmailBranding.NHS_ID,
             [
                 # don't show NHS if it's the current branding
+                ("organisation", "Test Organisation"),
             ],
         ),
     ],
@@ -88,28 +96,20 @@ def test_get_email_choices_service_assigned_to_org(
 
 
 @pytest.mark.parametrize(
-    "org_type, branding_id, expected_options",
+    "org_type, expected_options",
     [
         (
             "central",
-            "some-branding-id",
             [
-                # don't show GOV.UK options as org default supersedes it
+                ("govuk", "GOV.UK"),
+                ("govuk_and_org", "GOV.UK and Test Organisation"),
                 ("organisation", "Test Organisation"),
             ],
         ),
         (
-            "central",
-            "org-branding-id",
-            [
-                # also don't show org option if it's the current branding
-            ],
-        ),
-        (
             "local",
-            "org-branding-id",
             [
-                # don't show org option if it's the current branding
+                ("organisation", "Test Organisation"),
             ],
         ),
     ],
@@ -118,7 +118,6 @@ def test_get_email_choices_org_has_default_branding(
     mocker,
     service_one,
     org_type,
-    branding_id,
     expected_options,
     mock_get_empty_email_branding_pool,
     mock_get_service_organisation,
@@ -128,9 +127,9 @@ def test_get_email_choices_org_has_default_branding(
 
     mocker.patch(
         "app.organisations_client.get_organisation",
-        return_value=organisation_json(organisation_type=org_type, email_branding_id="org-branding-id"),
+        return_value=organisation_json(organisation_type=org_type),
     )
-    mocker.patch("app.models.service.Service.email_branding_id", new_callable=PropertyMock, return_value=branding_id)
+    mocker.patch("app.models.service.Service.email_branding_id")
 
     options = get_email_choices(service)
     assert list(options) == expected_options
@@ -184,12 +183,60 @@ def test_get_email_choices_branding_name_in_use(
     assert list(options) == expected_options
 
 
+@pytest.mark.parametrize(
+    "branding_pool, expected_options",
+    (
+        (
+            [
+                {
+                    "logo": "example_1.png",
+                    "name": "Email branding name 1",
+                    "text": "Email branding text 1",
+                    "id": "email-branding-1-id",
+                    "colour": "#f00",
+                    "brand_type": "org",
+                },
+                {
+                    "logo": "example_2.png",
+                    "name": "Email branding name 2",
+                    "text": "Email branding text 2",
+                    "id": "email-branding-2-id",
+                    "colour": "#f00",
+                    "brand_type": "org",
+                },
+            ],
+            [
+                ("govuk", "GOV.UK"),
+                ("govuk_and_org", "GOV.UK and Test Organisation"),
+                ("email-branding-2-id", "Email branding name 2"),
+            ],
+        ),
+        (
+            [
+                {
+                    "logo": "example_1.png",
+                    "name": "GOV.UK and test organisation",
+                    "text": "test organisation",
+                    "id": "govuk-and-org-id",
+                    "colour": None,
+                    "brand_type": "both",
+                },
+            ],
+            [
+                ("govuk", "GOV.UK"),
+                ("govuk-and-org-id", "GOV.UK and test organisation"),
+            ],
+        ),
+    ),
+)
 def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
     mocker,
     service_one,
     mock_get_email_branding_pool,
     mock_get_service_organisation,
     mock_get_email_branding,
+    branding_pool,
+    expected_options,
 ):
     service = Service(service_one)
 
@@ -202,29 +249,6 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
         return_value="email-branding-1-id",
     )
 
-    branding_pool = [
-        {
-            "logo": "example_1.png",
-            "name": "Email branding name 1",
-            "text": "Email branding text 1",
-            "id": "email-branding-1-id",
-            "colour": "#f00",
-            "brand_type": "org",
-        },
-        {
-            "logo": "example_2.png",
-            "name": "Email branding name 2",
-            "text": "Email branding text 2",
-            "id": "email-branding-2-id",
-            "colour": "#f00",
-            "brand_type": "org",
-        },
-    ]
-
-    expected_options = [
-        ("govuk", "GOV.UK"),
-        ("email-branding-2-id", "Email branding name 2"),
-    ]
     mocker.patch("app.models.branding.EmailBrandingPool.client_method", return_value=branding_pool)
 
     options = get_email_choices(service)
