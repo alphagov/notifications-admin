@@ -260,7 +260,7 @@ def guidance_email_branding():
 
 
 @main.route("/using-notify/guidance/letter-branding")
-def letter_branding():
+def guidance_letter_branding():
     return render_template(
         "views/guidance/letter-branding.html",
         navigation_links=using_notify_nav(),
