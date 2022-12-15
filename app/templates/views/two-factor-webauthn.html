@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/webauthn-api-check.html" import webauthn_api_check %}
-{% from "govuk_frontend_jinja/components/error-message/macro.html" import govukErrorMessage %}
+{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
 
 {% set page_title = 'Get your security key' %}
 
@@ -21,15 +21,35 @@
 
 {% block maincolumn_content %}
 
-  <span class="govuk-error-message banner-dangerous govuk-!-display-none" aria-live="polite" tabindex="-1">
-    <span class="govuk-visually-hidden">Error:</span> There’s a problem with your security key
-    <p class="govuk-body">
-      Check you have the right key and try again. If this does not work, <a class="govuk-link govuk-link--no-visited-state" href="/support">contact us</a>.
-    </p>
-  </span>
+{% set errorSummaries %}
+  {{ govukErrorSummary({
+    "classes": "webauthn__api-missing",
+    "titleText": "There's a problem",
+    "descriptionText": "Your browser does not support security keys. Try signing in to Notify using a different browser."
+  }) }}
+
+  {{ govukErrorSummary({
+    "classes": "webauthn__no-js",
+    "titleText": "There's a problem",
+    "descriptionHtml": "JavaScript is not available for this page. Security keys need JavaScript to work."
+  }) }}
+
+  {% set keyProblemDescription %}
+    Check you have the right key and try again. If this does not work,
+     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
+  {% endset %}
+
+  {{ govukErrorSummary({
+    "classes": "govuk-!-display-none",
+    "attributes": { "aria-live": "polite", "tabindex":"-1" },
+    "titleText": "There's a problem with your security keys",
+    "descriptionHtml": keyProblemDescription
+  }) }}
+{% endset %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
+      {{ errorSummaries }}
       {{ page_header(page_title) }}
 
       <p class="govuk-body">
@@ -44,16 +64,6 @@
           "data-notify-module": "authenticate-security-key",
           "data-csrf-token": csrf_token(),
         }
-      }) }}
-
-      {{ govukErrorMessage({
-        "classes": "webauthn__api-missing",
-        "text": "Your browser does not support security keys. Try signing in to Notify using a different browser."
-      }) }}
-
-      {{ govukErrorMessage({
-        "classes": "webauthn__no-js",
-        "text": "JavaScript is not available for this page. Security keys need JavaScript to work."
       }) }}
     </div>
     <div class="govuk-grid-column-one-quarter">

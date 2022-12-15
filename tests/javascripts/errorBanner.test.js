@@ -14,24 +14,24 @@ describe("Error Banner", () => {
   describe("The `hideBanner` method", () => {
     test("Will hide the element", () => {
       document.body.innerHTML = `
-      <span class="govuk-error-message banner-dangerous js-error-visible">
-      </span>`;
+      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" aria-live="polite" tabindex="-1" data-module="govuk-error-summary">
+      </div>`;
       window.GOVUK.ErrorBanner.hideBanner();
-      expect(document.querySelector('.banner-dangerous').classList).toContain('govuk-!-display-none')
+      expect(document.querySelector('.govuk-error-summary').classList).toContain('govuk-!-display-none')
     });
   });
 
   describe("The `showBanner` method", () => {
     beforeEach(() => {
       document.body.innerHTML = `
-        <span class="govuk-error-message banner-dangerous js-error-visible govuk-!-display-none">
-        </span>`;
+      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" aria-live="polite" tabindex="-1" data-module="govuk-error-summary">
+      </div>`;
 
       window.GOVUK.ErrorBanner.showBanner('Some Err');
     });
 
     test("Will show the element", () => {
-      expect(document.querySelector('.banner-dangerous').classList).not.toContain('govuk-!-display-none')
+      expect(document.querySelector('.govuk-error-summary').classList).not.toContain('govuk-!-display-none')
     });
   });
 });
