@@ -2005,7 +2005,10 @@ class ChooseEmailBrandingForm(ChooseBrandingForm):
 
     def __init__(self, service):
         super().__init__()
-        self.options.choices = tuple(OrderedSet(branding.get_email_choices(service)) | {self.FALLBACK_OPTION})
+        choices = OrderedSet(branding.get_email_choices(service))
+        if len(choices) > 2:
+            choices = choices | {GovukRadiosField.Divider("or")}
+        self.options.choices = tuple(choices | {self.FALLBACK_OPTION})
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):
