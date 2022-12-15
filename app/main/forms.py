@@ -687,7 +687,21 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
     govuk_frontend_component_name = "radios"
 
     class Divider(str):
-        pass
+        """
+        Behaves like a normal string but can be used instead of a `(value, label)`
+        pair as one of the items in `GovukRadiosField.choices`, for example:
+
+            numbers = GovukRadiosField(choices=(
+                (1, "One"),
+                (2, "Two"),
+                GovukRadiosField.Divider("or")
+                (3, "Three"),
+            ))
+
+        When rendered it won’t appear as a choice the user can click, but instead
+        as text in between the choices, as per:
+        https://design-system.service.gov.uk/components/radios/#radio-items-with-a-text-divider
+        """
 
         def __iter__(self):
             # This is what WTForms will use as the value of the choice. We will
