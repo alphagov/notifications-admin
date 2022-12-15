@@ -686,7 +686,37 @@ class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCh
 class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
     govuk_frontend_component_name = "radios"
 
+    class Divider(str):
+        """
+        Behaves like a normal string but can be used instead of a `(value, label)`
+        pair as one of the items in `GovukRadiosField.choices`, for example:
+
+            numbers = GovukRadiosField(choices=(
+                (1, "One"),
+                (2, "Two"),
+                GovukRadiosField.Divider("or")
+                (3, "Three"),
+            ))
+
+        When rendered it won’t appear as a choice the user can click, but instead
+        as text in between the choices, as per:
+        https://design-system.service.gov.uk/components/radios/#radio-items-with-a-text-divider
+        """
+
+        def __iter__(self):
+            # This is what WTForms will use as the value of the choice. We will
+            # throw this away, but needs to be unique, unguessable and impossible
+            # to confuse with a real choice
+            yield object()
+            # This is what WTForms will use as the label, which we can later
+            # use to see if the choice is actually a divider
+            yield self
+
     def get_item_from_option(self, option):
+        if isinstance(option.label.text, self.Divider):
+            return {
+                "divider": option.label.text,
+            }
         return {
             "name": option.name,
             "id": option.id,
@@ -1985,11 +2015,25 @@ class ChooseBrandingForm(StripWhitespaceForm):
 
 
 class ChooseEmailBrandingForm(ChooseBrandingForm):
-    options = RadioField("Choose your new email branding")
+    options = GovukRadiosField(
+        "Choose your new email branding",
+        param_extensions={
+            "fieldset": {
+                "legend": {
+                    # This removes the `govuk-fieldset__legend--s` class, thereby
+                    # making the form label font regular weight, not bold
+                    "classes": "",
+                },
+            },
+        },
+    )
 
     def __init__(self, service):
         super().__init__()
-        self.options.choices = tuple(OrderedSet(branding.get_email_choices(service)) | {self.FALLBACK_OPTION})
+        choices = OrderedSet(branding.get_email_choices(service))
+        if len(choices) > 2:
+            choices = choices | {GovukRadiosField.Divider("or")}
+        self.options.choices = tuple(choices | {self.FALLBACK_OPTION})
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):

@@ -117,6 +117,59 @@ def test_email_branding_request_page_shows_branding_pool_options_if_branding_poo
     ] == expected_options
 
 
+@pytest.mark.parametrize(
+    "pool_contents, expected_options",
+    (
+        (
+            [],
+            [
+                ("govuk-radios__item", "GOV.UK and organisation one"),
+                ("govuk-radios__item", "organisation one"),
+                ("govuk-radios__item", "Something else"),
+            ],
+        ),
+        (
+            create_email_branding_pool(),
+            [
+                ("govuk-radios__item", "GOV.UK and organisation one"),
+                ("govuk-radios__item", "Email branding name 1"),
+                ("govuk-radios__item", "Email branding name 2"),
+                ("govuk-radios__divider", "or"),
+                ("govuk-radios__item", "Something else"),
+            ],
+        ),
+    ),
+)
+def test_email_branding_request_page_shows_divider_if_there_are_lots_of_options(
+    mocker,
+    service_one,
+    organisation_one,
+    client_request,
+    mock_get_email_branding,
+    mock_get_email_branding_pool,
+    pool_contents,
+    expected_options,
+):
+    service_one["organisation"] = organisation_one
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    mocker.patch(
+        "app.models.branding.EmailBrandingPool.client_method",
+        return_value=pool_contents,
+    )
+
+    page = client_request.get(".email_branding_request", service_id=SERVICE_ONE_ID)
+
+    assert [
+        (item["class"][0], normalize_spaces(item))
+        for item in page.select(".govuk-radios__item, .govuk-radios__divider")
+    ] == expected_options
+
+
 def test_email_branding_request_does_not_show_nhs_branding_twice(
     mocker,
     service_one,
@@ -437,7 +490,7 @@ def test_email_branding_request_submit_when_no_radio_button_is_selected(
         _follow_redirects=True,
     )
     assert page.select_one("h1").text == "Change email branding"
-    assert normalize_spaces(page.select_one(".error-message").text) == "Select an option"
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select an option"
 
 
 @pytest.mark.parametrize(
