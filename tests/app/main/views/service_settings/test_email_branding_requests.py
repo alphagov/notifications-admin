@@ -345,49 +345,43 @@ def test_email_branding_request_page_back_link(
     "data, org_type, endpoint, extra_args",
     (
         (
-            {
-                "options": "govuk",
-            },
+            {"options": "govuk"},
             "central",
             "main.email_branding_govuk",
             {},
         ),
         (
-            {
-                "options": "govuk_and_org",
-            },
+            {"options": "govuk_and_org"},
             "central",
             "main.email_branding_choose_logo",
             {"branding_choice": "govuk_and_org"},
         ),
         (
-            {
-                "options": "organisation",
-            },
+            {"options": "organisation"},
             "central",
             "main.email_branding_choose_logo",
             {"branding_choice": "organisation"},
         ),
         (
-            {
-                "options": "something_else",
-            },
+            {"options": "something_else"},
             "central",
             "main.email_branding_choose_logo",
             {"branding_choice": "something_else"},
         ),
         (
-            {
-                "options": "something_else",
-            },
+            {"options": "something_else"},
             "local",
             "main.email_branding_choose_banner_type",
-            {"back_link": ".email_branding_request"},
+            {"back_link": ".email_branding_request", "branding_choice": "something_else"},
         ),
         (
-            {
-                "options": EmailBranding.NHS_ID,
-            },
+            {"options": "organisation"},
+            "local",
+            "main.email_branding_choose_banner_type",
+            {"back_link": ".email_branding_request", "branding_choice": "organisation"},
+        ),
+        (
+            {"options": EmailBranding.NHS_ID},
             "nhs_local",
             "main.email_branding_nhs",
             {},
