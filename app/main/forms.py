@@ -2001,7 +2001,18 @@ class ChooseBrandingForm(StripWhitespaceForm):
 
 
 class ChooseEmailBrandingForm(ChooseBrandingForm):
-    options = GovukRadiosField("Choose your new email branding")
+    options = GovukRadiosField(
+        "Choose your new email branding",
+        param_extensions={
+            "fieldset": {
+                "legend": {
+                    # This removes the `govuk-fieldset__legend--s` class, thereby
+                    # making the form label font regular weight, not bold
+                    "classes": "",
+                },
+            },
+        },
+    )
 
     def __init__(self, service):
         super().__init__()
