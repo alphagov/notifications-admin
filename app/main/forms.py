@@ -686,7 +686,23 @@ class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCh
 class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
     govuk_frontend_component_name = "radios"
 
+    class Divider(str):
+        pass
+
+        def __iter__(self):
+            # This is what WTForms will use as the value of the choice. We will
+            # throw this away, but needs to be unique, unguessable and impossible
+            # to confuse with a real choice
+            yield object()
+            # This is what WTForms will use as the label, which we can later
+            # use to see if the choice is actually a divider
+            yield self
+
     def get_item_from_option(self, option):
+        if isinstance(option.label.text, self.Divider):
+            return {
+                "divider": option.label.text,
+            }
         return {
             "name": option.name,
             "id": option.id,
