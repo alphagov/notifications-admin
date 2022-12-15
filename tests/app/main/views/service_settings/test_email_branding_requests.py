@@ -443,7 +443,7 @@ def test_email_branding_request_submit_when_no_radio_button_is_selected(
         _follow_redirects=True,
     )
     assert page.select_one("h1").text == "Change email branding"
-    assert normalize_spaces(page.select_one(".error-message").text) == "Select an option"
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select an option"
 
 
 @pytest.mark.parametrize(

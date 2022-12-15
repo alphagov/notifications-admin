@@ -2001,7 +2001,7 @@ class ChooseBrandingForm(StripWhitespaceForm):
 
 
 class ChooseEmailBrandingForm(ChooseBrandingForm):
-    options = RadioField("Choose your new email branding")
+    options = GovukRadiosField("Choose your new email branding")
 
     def __init__(self, service):
         super().__init__()
