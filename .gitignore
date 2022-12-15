@@ -26,11 +26,7 @@
 !tests/spreadsheet_files/excel_97.xls
 !tests/non_spreadsheet_files/actually_a_png.xlsx
 !tests/spreadsheet_files/excel 2007.xlsx
-!app/broadcast_areas/source_files/Lower_Tier_Local_Authority_to_Upper_Tier_Local_Authority__December_2019__Lookup_in_England_and_Wales.csv
-!app/broadcast_areas/source_files/MYE1-2019.csv
-!app/broadcast_areas/source_files/Mid-2019_Persons_England_Wales.csv
-!app/broadcast_areas/source_files/Mid-2019_Persons_Scotland.csv
-!app/broadcast_areas/source_files/Ward-2014_Northern_Ireland.csv
+!app/broadcast_areas/source_files/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
