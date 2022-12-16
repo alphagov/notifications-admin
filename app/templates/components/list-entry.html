@@ -40,11 +40,14 @@
             {% set label_classes = "govuk-input--numbered__label" %}
           {% endif %}
           {% set field_name = field.name + "-" + loop.index|string %}
+          {% set html -%}
+            <span class="govuk-visually-hidden">{{ item_name }} number </span> + {{ loop.index }}.
+          {%- endset%}
           {{ entry(param_extensions={
             "id": "input-" + field_name,
             "name": field_name,
             "label": {
-              "html": '<span class="govuk-visually-hidden">' + item_name + ' number </span>' + loop.index|string + '.',
+              "html": html,
               "classes": label_classes
             },
             "classes": "govuk-input--numbered govuk-!-width-full",
