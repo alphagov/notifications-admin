@@ -403,11 +403,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete("service-{service_id}")
     @cache.delete_by_pattern("service-{service_id}-template-*")
-    def add_sms_sender(self, service_id, sms_sender, is_default=False, inbound_number_id=None):
+    def add_sms_sender(self, service_id, sms_sender, is_default=False):
         data = {"sms_sender": sms_sender, "is_default": is_default}
-        if inbound_number_id:
-            data["inbound_number_id"] = inbound_number_id
-        return self.post("/service/{}/sms-sender".format(service_id), data=data)
+
+        return self.post(f"/service/{service_id}/sms-sender", data=data)
 
     @cache.delete("service-{service_id}")
     @cache.delete_by_pattern("service-{service_id}-template-*")
