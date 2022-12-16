@@ -122,7 +122,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==6.4.1
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@59.3.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@60.0.0
     # via -r requirements.in
 openpyxl==3.0.10
     # via pyexcel-xlsx
@@ -165,10 +165,8 @@ pyparsing==3.0.9
     # via packaging
 pypdf2==2.10.3
     # via notifications-utils
-pyproj==3.4.0
-    # via
-    #   -r requirements.in
-    #   notifications-utils
+pyproj==3.4.1
+    # via notifications-utils
 python-dateutil==2.8.2
     # via
     #   awscli-cwlogs
