@@ -773,6 +773,18 @@ def test_email_branding_choose_logo_page(client_request, service_one):
     ]
 
 
+def test_email_branding_choose_logo_page_prevents_xss_attacks(client_request, service_one):
+    service_one["name"] = "<script>evil</script>"
+    page = client_request.get(
+        "main.email_branding_choose_logo",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    hint = page.select_one("form .govuk-hint")
+    assert not hint.select_one("script")
+    assert service_one["name"] in normalize_spaces(hint.text)
+
+
 def test_only_central_org_services_can_see_email_branding_choose_logo_page(client_request, service_one):
     service_one["organisation_type"] = "local"
 

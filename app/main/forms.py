@@ -1062,9 +1062,9 @@ class OrganisationAgreementSignedForm(StripWhitespaceForm):
         thing="whether this organisation has signed the agreement",
         param_extensions={
             "items": [
-                {"hint": {"html": "Users will be told their organisation has already signed the agreement"}},
-                {"hint": {"html": "Users will be prompted to sign the agreement before they can go live"}},
-                {"hint": {"html": "Users will not be prompted to sign the agreement"}},
+                {"hint": {"text": "Users will be told their organisation has already signed the agreement"}},
+                {"hint": {"text": "Users will be prompted to sign the agreement before they can go live"}},
+                {"hint": {"text": "Users will not be prompted to sign the agreement"}},
             ]
         },
     )
