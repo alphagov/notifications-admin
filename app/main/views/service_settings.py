@@ -1039,10 +1039,7 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
     branding_name = branding.name
     org_id = current_service.organisation.id
 
-    form = AdminSetBrandingAddToBrandingPoolStepForm(
-        org_name=current_service.organisation.name,
-        service_name=current_service.name,
-    )
+    form = AdminSetBrandingAddToBrandingPoolStepForm()
 
     if form.validate_on_submit():
         # The service’s branding gets updated either way

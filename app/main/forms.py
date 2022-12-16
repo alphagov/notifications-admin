@@ -1728,42 +1728,18 @@ class AddLetterBrandingOptionsForm(StripWhitespaceForm):
 
 
 class AdminSetBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
-    def __init__(self, *args, org_name, service_name, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.add_to_pool.label.text = f"Should other teams in {org_name} have the option to use this branding?"
-
-        self.add_to_pool.param_extensions = {
+    add_to_pool = GovukRadiosField(
+        choices=[("yes", "Yes"), ("no", "No")],
+        thing="yes or no",
+        param_extensions={
             "fieldset": {
                 "legend": {
                     # This removes the `govuk-fieldset__legend--s` class, thereby
                     # making the form label font regular weight, not bold
                     "classes": "",
                 },
-            },
-            "items": [
-                {"hint": {}},
-                {"hint": {}},
-            ],
-        }
-        self.add_to_pool.param_extensions["items"][0]["hint"]["html"] = Markup(
-            f"""
-            <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
-                <li>Apply this branding to ‘{service_name}’</li>
-                <li class="govuk-!-margin-bottom-0">Let other {org_name} teams apply this branding themselves</li>
-            </ul>
-        """
-        )
-        self.add_to_pool.param_extensions["items"][1]["hint"]["html"] = Markup(
-            f"""
-            <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
-                <li class="govuk-!-margin-bottom-0">Only apply this branding to ‘{service_name}’</li>
-            </ul>
-        """
-        )
-
-    add_to_pool = GovukRadiosField(
-        choices=[("yes", "Yes"), ("no", "No")],
-        thing="yes or no",
+            }
+        },
     )
 
 
