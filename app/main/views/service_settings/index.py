@@ -695,7 +695,6 @@ def service_set_international_letters(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-inbound-sms", methods=["GET"])
 @main.route("/services/<uuid:service_id>/service-settings/receive-text-messages", methods=["GET"])
 @user_has_permissions("manage_service")
 def service_receive_text_messages(service_id):
