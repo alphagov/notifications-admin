@@ -38,13 +38,13 @@
 {% set errorSummaries %}
   {{ govukErrorSummary({
     "classes": "webauthn__api-missing",
-    "titleText": "There's a problem",
+    "titleText": "There’s a problem",
     "descriptionText": "Your browser does not support security keys. Try signing in to Notify using a different browser."
   }) }}
 
   {{ govukErrorSummary({
     "classes": "webauthn__no-js",
-    "titleText": "There's a problem",
+    "titleText": "There’s a problem",
     "descriptionHtml": "JavaScript is not available for this page. Security keys need JavaScript to work."
   }) }}
 
@@ -56,7 +56,7 @@
   {{ govukErrorSummary({
     "classes": "govuk-!-display-none",
     "attributes": { "aria-live": "polite", "tabindex":"-1" },
-    "titleText": "There's a problem with your security keys",
+    "titleText": "There’s a problem with your security keys",
     "descriptionHtml": keyProblemDescription
   }) }}
 {% endset %}
