@@ -2050,26 +2050,7 @@ class GovernmentIdentityLogoForm(StripWhitespaceForm):
     logo_text = GovukTextInputField(
         "Enter the text that will appear in your logo",
         validators=[DataRequired("Cannot be empty")],
-        param_extensions={
-            "label": {
-                "isPageHeading": True,
-                "classes": "govuk-label--l",
-            },
-            "hint": {
-                "html": (
-                    "This is usually the full name of your organisation.<br/><br/>For example, {organisation_name}"
-                )
-            },
-        },
     )
-
-    def __init__(self, organisation=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        organisation_name = organisation.name if organisation else "Department of Education"
-        self.logo_text.param_extensions["hint"]["html"] = self.logo_text.param_extensions["hint"]["html"].format(
-            organisation_name=organisation_name
-        )
 
 
 class EmailBrandingChooseLogoForm(StripWhitespaceForm):

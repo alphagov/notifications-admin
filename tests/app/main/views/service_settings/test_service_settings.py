@@ -3837,6 +3837,20 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
     assert text_input["name"] == "logo_text"
 
 
+def test_GET_email_branding_enter_government_identity_logo_text_protects_against_xss(
+    client_request, service_one, organisation_one, mocker
+):
+    organisation_one["name"] = "<script>evil</script>"
+    service_one["organisation"] = organisation_one["id"]
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get("main.email_branding_enter_government_identity_logo_text", service_id=service_one["id"])
+
+    hint = page.select_one("form .govuk-hint")
+    assert not hint.select("script")
+    assert organisation_one["name"] in normalize_spaces(hint.text)
+
+
 @pytest.mark.parametrize(
     "extra_url_args,expected_ticket_content,expected_extra_url_args",
     [

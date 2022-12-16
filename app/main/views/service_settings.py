@@ -1315,7 +1315,7 @@ def email_branding_request_government_identity_logo(service_id):
 @user_has_permissions("manage_service")
 @service_belongs_to_org_type("central")
 def email_branding_enter_government_identity_logo_text(service_id):
-    form = GovernmentIdentityLogoForm(organisation=current_service.organisation)
+    form = GovernmentIdentityLogoForm()
     branding_choice = request.args.get("branding_choice")
 
     if form.validate_on_submit():
