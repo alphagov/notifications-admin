@@ -20,7 +20,34 @@
     {{ page_header(page_title) }}
 
     {% call form_wrapper() %}
-      {{ form.add_to_pool }}
+      {% set hint_1 %}
+        <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
+          <li>Apply this branding to ‘{{current_service.name}}’</li>
+          <li class="govuk-!-margin-bottom-0">Let other {{current_service.organisation.name}} teams apply this branding themselves</li>
+        </ul>
+      {% endset %}
+      {% set hint_2 %}
+        <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
+          <li class="govuk-!-margin-bottom-0">Only apply this branding to ‘{{current_service.name}}’</li>
+        </ul>
+      {% endset %}
+      {% set label_text %}
+        Should other teams in {{current_service.organisation.name}} have the option to use this branding?
+      {% endset %}
+
+      {{
+        form.add_to_pool(
+          param_extensions={
+            "fieldset": {
+              "legend": {"text": label_text}
+            },
+            "items": [
+              {"hint": {"html": hint_1} },
+              {"hint": {"html": hint_2} },
+            ]
+          }
+        )
+      }}
       {{ page_footer('Continue') }}
     {% endcall %}
 

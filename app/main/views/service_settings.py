@@ -1039,10 +1039,7 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
     branding_name = branding.name
     org_id = current_service.organisation.id
 
-    form = AdminSetBrandingAddToBrandingPoolStepForm(
-        org_name=current_service.organisation.name,
-        service_name=current_service.name,
-    )
+    form = AdminSetBrandingAddToBrandingPoolStepForm()
 
     if form.validate_on_submit():
         # The service’s branding gets updated either way
@@ -1318,7 +1315,7 @@ def email_branding_request_government_identity_logo(service_id):
 @user_has_permissions("manage_service")
 @service_belongs_to_org_type("central")
 def email_branding_enter_government_identity_logo_text(service_id):
-    form = GovernmentIdentityLogoForm(organisation=current_service.organisation)
+    form = GovernmentIdentityLogoForm()
     branding_choice = request.args.get("branding_choice")
 
     if form.validate_on_submit():

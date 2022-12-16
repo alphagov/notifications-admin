@@ -20,7 +20,23 @@
   {{ errorSummary(form) }}
 
   {% call form_wrapper() %}
-    {{ form.logo_text }}
+    {% set html %}
+      This is usually the full name of your organisation.
+      <br/>
+      <br/>
+      For example, {{ current_service.organisation.name }}
+    {% endset %}
+    {{
+      form.logo_text(
+        param_extensions={
+          "label": {
+            "isPageHeading": True,
+            "classes": "govuk-label--l",
+          },
+          "hint": {"html": html},
+        },
+      )
+    }}
     {{ page_footer('Request new branding') }}
   {% endcall %}
 

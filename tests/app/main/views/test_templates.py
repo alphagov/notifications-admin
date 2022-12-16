@@ -2020,6 +2020,19 @@ def test_should_show_delete_template_page_with_never_used_block(
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
+def test_should_show_delete_template_page_with_escaped_template_name(client_request, mocker, fake_uuid):
+    template = template_json(SERVICE_ONE_ID, fake_uuid, name="<script>evil</script>")
+
+    mocker.patch("app.template_statistics_client.get_last_used_date_for_template", return_value=None)
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template})
+
+    page = client_request.get(
+        ".delete_service_template", service_id=SERVICE_ONE_ID, template_id=fake_uuid, _test_page_title=False
+    )
+    banner = page.select_one(".banner-dangerous")
+    assert banner.select("script") == []
+
+
 @pytest.mark.parametrize("parent", (PARENT_FOLDER_ID, None))
 def test_should_redirect_when_deleting_a_template(
     mocker,

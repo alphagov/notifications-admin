@@ -3674,6 +3674,28 @@ def test_get_service_set_letter_branding_add_to_branding_pool_step(
     assert f"Apply ‘{letter_branding_name}’ branding" in normalize_spaces(page.select_one("title").text)
 
 
+def test_get_service_set_letter_branding_add_to_branding_pool_step_protects_against_xss(
+    mocker, client_request, platform_admin_user, service_one, organisation_one
+):
+    service_one["organisation"] = organisation_one
+    service_one["name"] = "<script>evil</script>"
+    client_request.login(platform_admin_user)
+    mocker.patch("app.letter_branding_client.get_letter_branding", return_value={"name": "branding 1"})
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get(
+        "main.service_set_branding_add_to_branding_pool_step",
+        _expected_status=200,
+        service_id=SERVICE_ONE_ID,
+        notification_type="letter",
+        branding_id="234",
+    )
+    form = page.select_one("form")
+    for hint in form.select(".govuk-hint"):
+        assert not hint.select("script")
+        assert "apply this branding to ‘<script>evil</script>’" in normalize_spaces(hint.text).lower()
+
+
 def test_service_set_letter_branding_add_to_branding_pool_step_is_platform_admin_only(
     mocker, client_request, service_one, organisation_one
 ):
@@ -3813,6 +3835,20 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
     assert form["method"] == "post"
     assert "Request new branding" in submit_button.text
     assert text_input["name"] == "logo_text"
+
+
+def test_GET_email_branding_enter_government_identity_logo_text_protects_against_xss(
+    client_request, service_one, organisation_one, mocker
+):
+    organisation_one["name"] = "<script>evil</script>"
+    service_one["organisation"] = organisation_one["id"]
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get("main.email_branding_enter_government_identity_logo_text", service_id=service_one["id"])
+
+    hint = page.select_one("form .govuk-hint")
+    assert not hint.select("script")
+    assert organisation_one["name"] in normalize_spaces(hint.text)
 
 
 @pytest.mark.parametrize(

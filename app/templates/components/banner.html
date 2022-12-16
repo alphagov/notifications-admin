@@ -22,11 +22,14 @@
     </p>
     {% endif %}
     {% if delete_button %}
+      {% set html %}
+        {{ delete_button }}<span class="govuk-visually-hidden"> ‘{{ thing }}’</span>
+      {% endset %}
       {% call form_wrapper(action=action) %}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         {{ govukButton({
           "text": "" if thing else delete_button,
-          "html": delete_button + "<span class=\"govuk-visually-hidden\"> ‘" + thing + "’</span>" if thing else "",
+          "html": html if thing else "",
           "name": "delete",
           "classes": "govuk-button--warning govuk-!-margin-top-2",
         }) }}

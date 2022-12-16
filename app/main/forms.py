@@ -1062,9 +1062,9 @@ class OrganisationAgreementSignedForm(StripWhitespaceForm):
         thing="whether this organisation has signed the agreement",
         param_extensions={
             "items": [
-                {"hint": {"html": "Users will be told their organisation has already signed the agreement"}},
-                {"hint": {"html": "Users will be prompted to sign the agreement before they can go live"}},
-                {"hint": {"html": "Users will not be prompted to sign the agreement"}},
+                {"hint": {"text": "Users will be told their organisation has already signed the agreement"}},
+                {"hint": {"text": "Users will be prompted to sign the agreement before they can go live"}},
+                {"hint": {"text": "Users will not be prompted to sign the agreement"}},
             ]
         },
     )
@@ -1728,42 +1728,18 @@ class AddLetterBrandingOptionsForm(StripWhitespaceForm):
 
 
 class AdminSetBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
-    def __init__(self, *args, org_name, service_name, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.add_to_pool.label.text = f"Should other teams in {org_name} have the option to use this branding?"
-
-        self.add_to_pool.param_extensions = {
+    add_to_pool = GovukRadiosField(
+        choices=[("yes", "Yes"), ("no", "No")],
+        thing="yes or no",
+        param_extensions={
             "fieldset": {
                 "legend": {
                     # This removes the `govuk-fieldset__legend--s` class, thereby
                     # making the form label font regular weight, not bold
                     "classes": "",
                 },
-            },
-            "items": [
-                {"hint": {}},
-                {"hint": {}},
-            ],
-        }
-        self.add_to_pool.param_extensions["items"][0]["hint"]["html"] = Markup(
-            f"""
-            <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
-                <li>Apply this branding to ‘{service_name}’</li>
-                <li class="govuk-!-margin-bottom-0">Let other {org_name} teams apply this branding themselves</li>
-            </ul>
-        """
-        )
-        self.add_to_pool.param_extensions["items"][1]["hint"]["html"] = Markup(
-            f"""
-            <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
-                <li class="govuk-!-margin-bottom-0">Only apply this branding to ‘{service_name}’</li>
-            </ul>
-        """
-        )
-
-    add_to_pool = GovukRadiosField(
-        choices=[("yes", "Yes"), ("no", "No")],
-        thing="yes or no",
+            }
+        },
     )
 
 
@@ -2074,26 +2050,7 @@ class GovernmentIdentityLogoForm(StripWhitespaceForm):
     logo_text = GovukTextInputField(
         "Enter the text that will appear in your logo",
         validators=[DataRequired("Cannot be empty")],
-        param_extensions={
-            "label": {
-                "isPageHeading": True,
-                "classes": "govuk-label--l",
-            },
-            "hint": {
-                "html": (
-                    "This is usually the full name of your organisation.<br/><br/>For example, {organisation_name}"
-                )
-            },
-        },
     )
-
-    def __init__(self, organisation=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        organisation_name = organisation.name if organisation else "Department of Education"
-        self.logo_text.param_extensions["hint"]["html"] = self.logo_text.param_extensions["hint"]["html"].format(
-            organisation_name=organisation_name
-        )
 
 
 class EmailBrandingChooseLogoForm(StripWhitespaceForm):
