@@ -194,10 +194,6 @@ def get_notifications_as_json(service_id, message_type=None):
     return jsonify(get_notifications(service_id, message_type))
 
 
-@main.route(
-    "/services/<uuid:service_id>/notifications/<template_type:message_type>.csv", endpoint="view_notifications_csv"
-)
-@user_has_permissions()
 def get_notifications(service_id, message_type):
     # TODO get the api to return count of pages as well.
     page = get_page_from_request()

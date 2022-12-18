@@ -357,7 +357,6 @@ EXCLUDED_ENDPOINTS = tuple(
             "view_notification",
             "view_notification_updates",
             "view_notifications",
-            "view_notifications_csv",
             "view_previous_broadcast",
             "view_provider",
             "view_providers",
