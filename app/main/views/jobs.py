@@ -243,16 +243,6 @@ def get_notifications(service_id, message_type, status_override=None):
     if "links" in notifications and notifications["links"].get("next", None):
         next_page = generate_next_dict("main.view_notifications", service_id, page, url_args)
 
-    if message_type:
-        download_link = url_for(
-            ".view_notifications_csv",
-            service_id=current_service.id,
-            message_type=message_type,
-            status=request.args.get("status"),
-        )
-    else:
-        download_link = None
-
     return {
         "service_data_retention_days": service_data_retention_days,
         "counts": render_template(
@@ -267,14 +257,10 @@ def get_notifications(service_id, message_type, status_override=None):
         "notifications": render_template(
             "views/activity/notifications.html",
             notifications=list(add_preview_of_content_to_notifications(notifications["notifications"])),
-            page=page,
             limit_days=service_data_retention_days,
             prev_page=prev_page,
             next_page=next_page,
             show_pagination=(not search_term),
-            status=request.args.get("status"),
-            message_type=message_type,
-            download_link=download_link,
             single_notification_url=partial(
                 url_for,
                 ".view_notification",
