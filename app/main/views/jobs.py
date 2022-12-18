@@ -158,7 +158,7 @@ def view_job_updates(service_id, job_id):
 def view_notifications(service_id, message_type=None):
     return render_template(
         "views/notifications.html",
-        partials=get_notifications(service_id, message_type),
+        partials=_get_notifications_dashboard_partials_data(service_id, message_type),
         message_type=message_type,
         status=request.args.get("status") or "sending,delivered,failed",
         page=request.args.get("page", 1),
@@ -190,12 +190,11 @@ def view_notifications(service_id, message_type=None):
 @main.route("/services/<uuid:service_id>/notifications.json", methods=["GET", "POST"])
 @main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>.json", methods=["GET", "POST"])
 @user_has_permissions()
-def get_notifications_as_json(service_id, message_type=None):
-    return jsonify(get_notifications(service_id, message_type))
+def get_notifications_page_partials_as_json(service_id, message_type=None):
+    return jsonify(_get_notifications_dashboard_partials_data(service_id, message_type))
 
 
-def get_notifications(service_id, message_type):
-    # TODO get the api to return count of pages as well.
+def _get_notifications_dashboard_partials_data(service_id, message_type):
     page = get_page_from_request()
     if page is None:
         abort(404, "Invalid page argument ({}).".format(request.args.get("page")))
