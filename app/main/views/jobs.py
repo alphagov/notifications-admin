@@ -195,7 +195,6 @@ def get_notifications_as_json(service_id, message_type=None):
     return jsonify(get_notifications(service_id, message_type, status_override=request.args.get("status")))
 
 
-@main.route("/services/<uuid:service_id>/notifications.csv", endpoint="view_notifications_csv")
 @main.route(
     "/services/<uuid:service_id>/notifications/<template_type:message_type>.csv", endpoint="view_notifications_csv"
 )
