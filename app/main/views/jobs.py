@@ -14,7 +14,6 @@ from flask import (
     stream_with_context,
     url_for,
 )
-from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils.template import (
     EmailPreviewTemplate,
@@ -212,19 +211,6 @@ def get_notifications(service_id, message_type):
     if message_type is not None:
         service_data_retention_days = current_service.get_days_of_retention(message_type)
 
-    if request.path.endswith("csv") and current_user.has_permissions("view_activity"):
-        return Response(
-            generate_notifications_csv(
-                service_id=service_id,
-                page=page,
-                page_size=5000,
-                template_type=[message_type],
-                status=filter_args.get("status"),
-                limit_days=service_data_retention_days,
-            ),
-            mimetype="text/csv",
-            headers={"Content-Disposition": 'inline; filename="notifications.csv"'},
-        )
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
         page=page,
