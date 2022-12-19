@@ -24,6 +24,18 @@ def letter_branding_request(service_id):
                 url_for(".letter_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
             )
 
+        # TODO: when the upload flow is ready:
+        # remove the platform admin check here
+        # remove the zendesk stuff from here
+        # remove the textbox that is hidden under the something else option from the form
+        # clean up the tests to remove all reference to the "something_else" field
+        if current_user.platform_admin:
+            return redirect(
+                url_for(
+                    ".letter_branding_upload_branding", service_id=current_service.id, branding_choice=branding_choice
+                )
+            )
+
         ticket_message = render_template(
             "support-tickets/branding-request.txt",
             current_branding=current_service.letter_branding.name or "no",
@@ -74,3 +86,8 @@ def letter_branding_pool_option(service_id):
         "views/service-settings/branding/letter-branding-pool-option.html",
         chosen_branding=chosen_branding,
     )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/upload-branding", methods=["GET", "POST"])
+def letter_branding_upload_branding(service_id):
+    return ("ok", 200)

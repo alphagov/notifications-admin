@@ -323,6 +323,26 @@ def test_letter_branding_submit_when_something_else_is_only_option(
     ) in mock_create_ticket.call_args_list[0][1]["message"]
 
 
+def test_letter_branding_request_redirects_to_upload_logo_for_platform_admins(
+    client_request, platform_admin_user, service_one, mocker
+):
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".letter_branding_request",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            "options": "something_else",
+            "something_else": "this text is unused but required to pass form validation",
+        },
+        _expected_redirect=url_for(
+            "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="something_else"
+        ),
+    )
+    mock_create_ticket.assert_not_called()
+
+
 def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
     service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
 ):
