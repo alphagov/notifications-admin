@@ -1762,7 +1762,7 @@ class AdminEditLetterBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField("Name of brand", validators=[DataRequired()])
 
 
-class SVGFileUpload(StripWhitespaceForm):
+class AdminEditLetterBrandingSVGUploadForm(StripWhitespaceForm):
     file = VirusScannedFileField(
         "Upload an SVG logo",
         validators=[

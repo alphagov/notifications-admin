@@ -4,7 +4,11 @@ from notifications_python_client.errors import HTTPError
 
 from app import letter_branding_client
 from app.main import main
-from app.main.forms import AdminEditLetterBrandingForm, SearchByNameForm, SVGFileUpload
+from app.main.forms import (
+    AdminEditLetterBrandingForm,
+    AdminEditLetterBrandingSVGUploadForm,
+    SearchByNameForm,
+)
 from app.models.branding import AllLetterBranding, LetterBranding
 from app.s3_client.s3_logo_client import (
     LETTER_TEMP_TAG,
@@ -34,7 +38,7 @@ def letter_branding():
 def update_letter_branding(branding_id, logo=None):
     letter_branding = LetterBranding.from_id(branding_id)
 
-    file_upload_form = SVGFileUpload()
+    file_upload_form = AdminEditLetterBrandingSVGUploadForm()
     letter_branding_details_form = AdminEditLetterBrandingForm(
         name=letter_branding.name,
     )
@@ -109,7 +113,7 @@ def update_letter_branding(branding_id, logo=None):
 @main.route("/letter-branding/create/<path:logo>", methods=["GET", "POST"])
 @user_is_platform_admin
 def create_letter_branding(logo=None):
-    file_upload_form = SVGFileUpload()
+    file_upload_form = AdminEditLetterBrandingSVGUploadForm()
     letter_branding_details_form = AdminEditLetterBrandingForm()
 
     file_upload_form_submitted = file_upload_form.file.data
