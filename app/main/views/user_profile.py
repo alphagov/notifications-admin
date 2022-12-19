@@ -23,7 +23,7 @@ from app.main.forms import (
     ChangePasswordForm,
     ChangeSecurityKeyNameForm,
     ConfirmPasswordForm,
-    ServiceOnOffSettingForm,
+    OnOffSettingForm,
     TwoFactorForm,
 )
 from app.models.user import User
@@ -214,7 +214,7 @@ def user_profile_disable_platform_admin_view():
     if not current_user.platform_admin and not session.get("disable_platform_admin_view"):
         abort(403)
 
-    form = ServiceOnOffSettingForm(
+    form = OnOffSettingForm(
         name="Use platform admin view",
         enabled=not session.get("disable_platform_admin_view"),
         truthy="Yes",
