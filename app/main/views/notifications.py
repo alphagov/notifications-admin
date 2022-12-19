@@ -140,7 +140,7 @@ def view_notification(service_id, notification_id):
             "main.view_notifications",
             service_id=current_service.id,
             message_type=template.template_type,
-            status="sending,delivered,failed",
+            status=request.args.get("from_statuses", "sending,delivered,failed"),
         )
 
     if notification["notification_type"] == "letter":

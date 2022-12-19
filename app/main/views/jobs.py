@@ -280,6 +280,7 @@ def get_notifications(service_id, message_type, status_override=None):
                 url_for,
                 ".view_notification",
                 service_id=current_service.id,
+                from_statuses=request.args.get("status"),
             ),
         ),
     }

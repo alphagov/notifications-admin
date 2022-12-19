@@ -186,6 +186,15 @@ def test_can_show_notifications(
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {"counts", "notifications", "service_data_retention_days"}
 
+    # All links to view individual notifications should pass through the statuses for the current view,
+    # so that backlinks can be generated correctly.
+    view_notification_links = page.select(".file-list-filename")
+    assert all(
+        parse_qs(urlparse(view_notification_link["href"]).query, keep_blank_values=True)["from_statuses"]
+        == [status_argument]
+        for view_notification_link in view_notification_links
+    )
+
 
 def test_can_show_notifications_if_data_retention_not_available(
     client_request,
