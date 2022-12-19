@@ -1473,7 +1473,7 @@ def email_branding_upload_logo(service_id):
 
     return (
         render_template(
-            "views/service-settings/branding/add-new-branding/upload-logo.html",
+            "views/service-settings/branding/add-new-branding/email-branding-upload-logo.html",
             form=form,
             back_link=back_link,
             abandon_flow_link=abandon_flow_link,
