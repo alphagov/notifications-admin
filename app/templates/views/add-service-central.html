@@ -1,0 +1,36 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+    About your service
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {{ page_header('About your service') }}
+
+    <p class="govuk-body">Give your service a name that tells users what your messages are about, as well as who they’re from. For example:</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>School admissions – {{ current_user.default_organisation.name }}</li>
+          <li>Electoral services – {{ current_user.default_organisation.name }}</li>
+          <li>Blue Badge – {{ current_user.default_organisation.name }}</li>
+        </ul>
+        <p class="govuk-body">You should only use an acronym or initialism if your users are already familiar with it.</p>
+
+    {% call form_wrapper() %}
+
+      {{ form.name(param_extensions={"hint": {"text": "You can change this later"}}) }}
+
+      {{ page_footer('Add service') }}
+
+    {% endcall %}
+
+  </div>
+</div>
+
+{% endblock %}

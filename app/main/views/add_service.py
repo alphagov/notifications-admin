@@ -97,6 +97,14 @@ def _render_add_service_page(form, default_organisation_type):
             default_organisation_type=default_organisation_type,
         )
 
+    elif default_organisation_type == "central":
+        return render_template(
+            "views/add-service-central.html",
+            form=form,
+            heading=heading,
+            default_organisation_type=default_organisation_type,
+        )
+
     return render_template(
         "views/add-service.html",
         form=form,
