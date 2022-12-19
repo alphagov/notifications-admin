@@ -23,8 +23,8 @@ from app.main.forms import (
     ChangePasswordForm,
     ChangeSecurityKeyNameForm,
     ConfirmPasswordForm,
-    OnOffSettingForm,
     TwoFactorForm,
+    YesNoSettingForm,
 )
 from app.models.user import User
 from app.utils.user import user_is_gov_user, user_is_logged_in
@@ -214,11 +214,9 @@ def user_profile_disable_platform_admin_view():
     if not current_user.platform_admin and not session.get("disable_platform_admin_view"):
         abort(403)
 
-    form = OnOffSettingForm(
+    form = YesNoSettingForm(
         name="Use platform admin view",
         enabled=not session.get("disable_platform_admin_view"),
-        truthy="Yes",
-        falsey="No",
     )
 
     form.enabled.param_extensions = {"hint": {"text": "Signing in again clears this setting"}}

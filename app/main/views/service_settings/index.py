@@ -70,6 +70,7 @@ from app.main.forms import (
     ServiceSwitchChannelForm,
     SMSPrefixForm,
     SomethingElseBrandingForm,
+    YesNoSettingForm,
 )
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.models.branding import (
@@ -236,11 +237,9 @@ def service_switch_live(service_id):
 @user_is_platform_admin
 def service_switch_count_as_live(service_id):
 
-    form = OnOffSettingForm(
+    form = YesNoSettingForm(
         name="Count in list of live services",
         enabled=current_service.count_as_live,
-        truthy="Yes",
-        falsey="No",
     )
 
     if form.validate_on_submit():

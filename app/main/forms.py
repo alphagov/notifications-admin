@@ -1613,6 +1613,11 @@ class OnOffSettingForm(StripWhitespaceForm):
     enabled = OnOffField("Choices")
 
 
+class YesNoSettingForm(OnOffSettingForm):
+    def __init__(self, name, *args, **kwargs):
+        super().__init__(name, *args, truthy="Yes", falsey="No", **kwargs)
+
+
 class ServiceSwitchChannelForm(OnOffSettingForm):
     def __init__(self, channel, *args, **kwargs):
         name = "Send {}".format(
