@@ -252,6 +252,7 @@ def organisation_json(
     billing_contact_names=None,
     billing_reference=None,
     purchase_order_number=None,
+    can_approve_own_go_live_requests=False,
 ):
     if users is None:
         users = []
@@ -281,6 +282,7 @@ def organisation_json(
         "billing_contact_names": billing_contact_names,
         "billing_reference": billing_reference,
         "purchase_order_number": purchase_order_number,
+        "can_approve_own_go_live_requests": can_approve_own_go_live_requests,
     }
 
 

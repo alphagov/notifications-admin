@@ -65,6 +65,7 @@ class Organisation(JSONModel):
         "billing_reference",
         "purchase_order_number",
         "notes",
+        "can_approve_own_go_live_requests",
     }
 
     __sort_attribute__ = "name"
