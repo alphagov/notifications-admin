@@ -1,4 +1,6 @@
-from flask import flash, redirect, render_template, request, url_for
+import uuid
+
+from flask import current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
@@ -6,6 +8,7 @@ from app import current_service
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import ChooseLetterBrandingForm, LetterBrandingUploadBranding
+from app.s3_client.s3_logo_client import upload_letter_temp_logo
 from app.utils.user import user_has_permissions
 
 from .index import THANKS_FOR_BRANDING_REQUEST_MESSAGE
@@ -92,7 +95,21 @@ def letter_branding_pool_option(service_id):
 def letter_branding_upload_branding(service_id):
     form = LetterBrandingUploadBranding()
     if form.validate_on_submit():
-        return ("ok", 200)
+        # We don't need to care about the filename as we're providing a UUID. This filename is never used to represent
+        # the branding again so we don't need to capture what the file on disk was called
+        filename = "branding.svg"
+        upload_id = str(uuid.uuid4())
+        branding_filename = upload_letter_temp_logo(
+            filename,
+            form.branding.data.read(),
+            current_app.config["AWS_REGION"],
+            user_id=current_user.id,
+            unique_id=upload_id,
+        )
+
+        # TODO: redirect to the next step of the flow instead. BTW you need to be on VPN for this to work
+        return redirect(f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{branding_filename}")
+
     return render_template(
         "views/service-settings/branding/add-new-branding/letter-branding-upload-branding.html",
         form=form,

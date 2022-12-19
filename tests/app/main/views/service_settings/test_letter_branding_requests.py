@@ -1,3 +1,4 @@
+from io import BytesIO
 from unittest.mock import ANY, PropertyMock
 
 import pytest
@@ -390,6 +391,91 @@ def test_GET_letter_branding_upload_branding_renders_form_without_prompt_if_user
         "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="something_else"
     )
     assert "branding is not set up yet" not in normalize_spaces(page.select_one("main").text)
+
+
+@pytest.mark.parametrize(
+    "svg_contents, expected_error",
+    (
+        (
+            """
+            <svg height="100" width="100">
+            <image href="someurlgoeshere" x="0" y="0" height="100" width="100"></image></svg>
+        """,
+            "This SVG has an embedded raster image in it and will not render well",
+        ),
+        (
+            """
+            <svg height="100" width="100">
+                <text>Will render differently depending on fonts installed</text>
+            </svg>
+        """,
+            "This SVG has text which has not been converted to paths and may not render well",
+        ),
+    ),
+)
+def test_POST_letter_branding_upload_branding_validates_svg_file(
+    client_request, svg_contents, expected_error, mock_antivirus_virus_free
+):
+    page = client_request.post(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+        _data={"branding": (BytesIO(svg_contents.encode("utf-8")), "some filename.svg")},
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Upload letter branding"
+    assert normalize_spaces(page.select_one(".error-message").text) == expected_error
+
+
+def test_POST_letter_branding_upload_branding_rejects_non_svg_files(client_request, mock_antivirus_virus_free):
+    svg_contents = "<svg> this can actually be an svg we just validate the extension </svg>"
+    page = client_request.post(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+        _data={"branding": (BytesIO(svg_contents.encode("utf-8")), "some filename.png")},
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Upload letter branding"
+    assert normalize_spaces(page.select_one(".error-message").text) == "Branding must be an SVG file"
+
+
+def test_POST_letter_branding_upload_branding_scans_for_viruses(client_request, mock_antivirus_virus_found):
+    svg_contents = "<svg></svg>"
+    page = client_request.post(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+        _data={"branding": (BytesIO(svg_contents.encode("utf-8")), "some filename.svg")},
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Upload letter branding"
+    assert normalize_spaces(page.select_one(".error-message").text) == "Your file contains a virus"
+
+
+def test_POST_letter_branding_upload_branding_redirects_on_success(
+    client_request, mock_antivirus_virus_free, fake_uuid, mocker
+):
+    mock_upload_email_logo = mocker.patch(
+        "app.main.views.service_settings.letter_branding.upload_letter_temp_logo",
+        return_value="some/path/temp-logo-url.svg",
+    )
+    svg_contents = "<svg></svg>"
+
+    client_request.post(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+        _data={"branding": (BytesIO(svg_contents.encode("utf-8")), "some filename.svg")},
+        _expected_redirect="https://static-logos.test.com/some/path/temp-logo-url.svg",
+    )
+
+    mock_upload_email_logo.assert_called_once_with(
+        "branding.svg",  # filename
+        b"<svg></svg>",  # file data
+        "eu-west-1",  # region
+        user_id=fake_uuid,
+        unique_id=ANY,
+    )
 
 
 def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(

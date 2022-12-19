@@ -4153,6 +4153,16 @@ def mock_get_invited_org_user_by_id(mocker, sample_org_invite):
 
 
 @pytest.fixture
+def mock_antivirus_virus_free(mocker):
+    yield mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
+
+@pytest.fixture
+def mock_antivirus_virus_found(mocker):
+    yield mocker.patch("app.extensions.antivirus_client.scan", return_value=False)
+
+
+@pytest.fixture
 def webauthn_credential():
     return {
         "id": str(uuid4()),
