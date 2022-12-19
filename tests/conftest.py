@@ -2798,6 +2798,7 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
                         element
                         and not element.has_attr("style")  # Elements with inline CSS are exempt
                         and element.text.strip()  # Empty elements are exempt
+                        and "govuk-error-summary__body" not in element.parent["class"]
                     ):
                         raise AssertionError(
                             f"Found a <{tag}> without a class attribute:\n"
