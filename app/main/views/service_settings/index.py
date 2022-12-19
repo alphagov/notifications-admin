@@ -136,15 +136,10 @@ def service_name_change(service_id):
         else:
             return redirect(url_for(".service_settings", service_id=service_id))
 
-    if current_service.organisation_type == "local":
-        return render_template(
-            "views/service-settings/name-local.html",
-            form=form,
-        )
-
     return render_template(
         "views/service-settings/name.html",
         form=form,
+        organisation_type=current_service.organisation_type,
     )
 
 

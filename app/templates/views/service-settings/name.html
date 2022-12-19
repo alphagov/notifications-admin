@@ -1,4 +1,3 @@
-
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
@@ -9,16 +8,23 @@
   Change your service name
 {% endblock %}
 
-
 {% block backLink %}
   {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
-
   {{ page_header('Change your service name') }}
 
-  <p class="govuk-body">Your service name should tell users what the message is about as well as who it’s from.</p>
+  {% if organisation_type == 'local' %}
+    <p class="govuk-body">Your service name should tell users what the message is about as well as who it’s from. For example:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>School admissions - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+      <li>Electoral services - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+      <li>Blue Badge - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+    </ul>
+  {% else %}
+    <p class="govuk-body">Your service name should tell users what the message is about as well as who it’s from.</p>
+  {% endif %}
 
   <p class="govuk-body">You should only use an acronym or initialism if your users are already familiar with it.</p>
 
@@ -38,5 +44,4 @@
     {{ form.name }}
     {{ page_footer('Save') }}
   {% endcall %}
-
 {% endblock %}
