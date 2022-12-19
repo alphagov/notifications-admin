@@ -699,7 +699,7 @@ def test_email_branding_something_else_submit(
 
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
-        "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
+        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
 

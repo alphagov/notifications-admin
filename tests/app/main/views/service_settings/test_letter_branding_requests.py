@@ -191,7 +191,7 @@ def test_letter_branding_request_submit_choose_something_else(
 
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
-        "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
+        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
 
@@ -274,7 +274,7 @@ def test_letter_branding_request_submit_redirects_if_from_template_is_set(
     mock_get_empty_letter_branding_pool,
     from_template,
 ):
-    mocker.patch("app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk", autospec=True)
+    mocker.patch("app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True)
     data = {"options": "something_else", "something_else": "Homer Simpson"}
 
     if from_template:
@@ -306,7 +306,7 @@ def test_letter_branding_submit_when_something_else_is_only_option(
 ):
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mocker.patch(
-        "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
+        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
 

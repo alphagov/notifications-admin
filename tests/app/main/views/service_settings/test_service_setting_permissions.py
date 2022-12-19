@@ -3,7 +3,7 @@ import functools
 import pytest
 from flask import url_for
 
-from app.main.views.service_settings import PLATFORM_ADMIN_SERVICE_PERMISSIONS
+from app.main.views.service_settings.index import PLATFORM_ADMIN_SERVICE_PERMISSIONS
 from tests.conftest import normalize_spaces
 
 

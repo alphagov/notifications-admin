@@ -3,7 +3,7 @@ from flask import Blueprint
 main = Blueprint("main", __name__)
 no_cookie = Blueprint("no_cookie", __name__)
 
-from app.main.views import (  # noqa isort:skip
+from app.main.views import (  # noqa
     add_service,
     agreement,
     api_keys,
@@ -35,7 +35,6 @@ from app.main.views import (  # noqa isort:skip
     returned_letters,
     security_policy,
     send,
-    service_settings,
     sign_in,
     sign_out,
     templates,
@@ -46,3 +45,4 @@ from app.main.views import (  # noqa isort:skip
     verify,
     webauthn_credentials,
 )
+from app.main.views.service_settings import index  # noqa
