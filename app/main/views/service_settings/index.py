@@ -206,7 +206,10 @@ def submit_request_to_go_live(service_id):
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 
-    current_service.update(go_live_user=current_user.id)
+    current_service.update(
+        go_live_user=current_user.id,
+        has_current_request_to_go_live=True,
+    )
 
     flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")
     return redirect(url_for(".service_settings", service_id=service_id))

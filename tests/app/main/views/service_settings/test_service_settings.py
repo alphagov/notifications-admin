@@ -630,7 +630,11 @@ def test_switch_service_to_live(
         ),
     )
     mock_update_service.assert_called_with(
-        SERVICE_ONE_ID, message_limit=250000, restricted=False, go_live_at="2017-04-01 11:09:00.061258"
+        SERVICE_ONE_ID,
+        message_limit=250000,
+        restricted=False,
+        go_live_at="2017-04-01 11:09:00.061258",
+        has_current_request_to_go_live=False,
     )
 
 
@@ -668,7 +672,13 @@ def test_switch_service_to_restricted(
             service_id=SERVICE_ONE_ID,
         ),
     )
-    mock_update_service.assert_called_with(SERVICE_ONE_ID, message_limit=50, restricted=True, go_live_at=None)
+    mock_update_service.assert_called_with(
+        SERVICE_ONE_ID,
+        message_limit=50,
+        restricted=True,
+        go_live_at=None,
+        has_current_request_to_go_live=False,
+    )
 
 
 @pytest.mark.parametrize(
@@ -1610,7 +1620,11 @@ def test_should_redirect_after_request_to_go_live(
         "Thanks for your request to go live. We’ll get back to you within one working day."
     )
     assert normalize_spaces(page.select_one("h1").text) == "Settings"
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, go_live_user=active_user_with_permissions["id"])
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        go_live_user=active_user_with_permissions["id"],
+        has_current_request_to_go_live=True,
+    )
 
 
 def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
