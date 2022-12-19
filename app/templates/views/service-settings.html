@@ -188,7 +188,7 @@
             {{ boolean_field('inbound_sms' in current_service.permissions) }}
             {{ edit_field(
                 'Change',
-                url_for('.service_set_inbound_sms', service_id=current_service.id),
+                url_for('.service_receive_text_messages', service_id=current_service.id),
                 permissions=['manage_service'],
                 suffix='your settings for receiving text messages',
             )

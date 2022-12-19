@@ -28,7 +28,6 @@ from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
     TEMPLATE_ONE_ID,
-    create_active_user_no_api_key_permission,
     create_active_user_no_settings_permission,
     create_active_user_with_permissions,
     create_email_brandings,
@@ -5102,16 +5101,6 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
 @pytest.mark.parametrize(
     "endpoint, permissions, expected_p",
     [
-        (
-            "main.service_set_inbound_sms",
-            ["sms"],
-            "Contact us if you want to be able to receive text messages from your users.",
-        ),
-        (
-            "main.service_set_inbound_sms",
-            ["sms", "inbound_sms"],
-            "Your service can receive text messages sent to 0781239871.",
-        ),
         ("main.service_set_auth_type", [], "Text message code"),
         ("main.service_set_auth_type", ["email_auth"], "Email link or text message code"),
     ],
@@ -5119,8 +5108,6 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
 def test_invitation_pages(
     client_request,
     service_one,
-    mock_get_inbound_number_for_service,
-    single_sms_sender,
     endpoint,
     permissions,
     expected_p,
@@ -5134,79 +5121,87 @@ def test_invitation_pages(
     assert normalize_spaces(page.select("main p")[0].text) == expected_p
 
 
-def test_service_settings_when_inbound_number_is_not_set(
+def test_service_settings_page_loads_when_inbound_number_is_not_set(
     client_request,
-    service_one,
     single_reply_to_email_address,
-    single_letter_contact_block,
-    mock_get_organisation,
     single_sms_sender,
-    mocker,
-    mock_get_all_letter_branding,
-    mock_get_free_sms_fragment_limit,
-    mock_get_service_data_retention,
+    mock_no_inbound_number_for_service,
 ):
-    mocker.patch("app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {}})
     client_request.get(
         "main.service_settings",
         service_id=SERVICE_ONE_ID,
     )
 
 
-def test_set_inbound_sms_when_inbound_number_is_not_set(
+def test_service_receive_text_messages_when_inbound_number_is_not_set(
     client_request,
-    service_one,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    single_sms_sender,
-    mocker,
-    mock_get_all_letter_branding,
+    mock_no_inbound_number_for_service,
 ):
-    mocker.patch("app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {}})
-    client_request.get(
-        "main.service_set_inbound_sms",
+    page = client_request.get(
+        "main.service_receive_text_messages",
         service_id=SERVICE_ONE_ID,
     )
 
+    assert page.select_one("h1").text == "Receive text messages"
+    assert (
+        normalize_spaces(page.select("main p")[0].text)
+        == "If you want to receive text messages, Notify will give you a unique 11-digit phone number."
+    )
+
+    button = page.select_one("a.govuk-button")
+    assert normalize_spaces(button.text) == "Start receiving text messages"
+    assert button["href"] == url_for(".service_receive_text_messages_start", service_id=SERVICE_ONE_ID)
+
 
 @pytest.mark.parametrize(
-    "user, expected_paragraphs",
+    "service_has_api_key, expected_paragraphs",
     [
         (
-            create_active_user_with_permissions(),
+            True,
             [
-                "Your service can receive text messages sent to 07700900123.",
-                "You can still send text messages from a sender name if you "
-                "need to, but users will not be able to reply to those messages.",
-                "Contact us if you want to switch this feature off.",
-                "You can set up callbacks for received text messages on the API integration page.",
+                "Your service will receive text messages sent to:",
+                "You can see the number of received messages on your dashboard.",
+                "You can also download the last 7 days’ worth of received text messages.",
+                "If you’re using the API, you can fetch received messages or set up a "
+                "callback to push the message to your service.",
+                "You can still send text messages from a sender name if you need to, but people "
+                "will not be able to reply to those messages.",
+                "Stop receiving text messages",
             ],
         ),
         (
-            create_active_user_no_api_key_permission(),
+            False,
             [
-                "Your service can receive text messages sent to 07700900123.",
-                "You can still send text messages from a sender name if you "
-                "need to, but users will not be able to reply to those messages.",
-                "Contact us if you want to switch this feature off.",
+                "Your service will receive text messages sent to:",
+                "You can see the number of received messages on your dashboard.",
+                "You can also download the last 7 days’ worth of received text messages.",
+                "You can still send text messages from a sender name if you need to, but people "
+                "will not be able to reply to those messages.",
+                "Stop receiving text messages",
             ],
         ),
     ],
 )
-def test_set_inbound_sms_when_inbound_number_is_set(
+def test_service_receive_text_messages_when_inbound_number_is_set(
     client_request,
     service_one,
     mocker,
-    user,
+    service_has_api_key,
     expected_paragraphs,
+    mock_get_service_data_retention,
 ):
     service_one["permissions"] = ["inbound_sms"]
     mocker.patch(
         "app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {"number": "07700900123"}}
     )
-    client_request.login(user)
+    mocker.patch(
+        "app.models.service.Service.api_keys",
+        new_callable=PropertyMock,
+        return_value=service_has_api_key,
+    )
+
     page = client_request.get(
-        "main.service_set_inbound_sms",
+        "main.service_receive_text_messages",
         service_id=SERVICE_ONE_ID,
     )
     paragraphs = page.select("main p")
@@ -5215,6 +5210,84 @@ def test_set_inbound_sms_when_inbound_number_is_set(
 
     for index, p in enumerate(expected_paragraphs):
         assert normalize_spaces(paragraphs[index].text) == p
+
+    assert normalize_spaces(page.select_one(".govuk-inset-text").text) == "07700900123"
+    stop_link = page.select_one("a.govuk-link--destructive")
+    assert stop_link["href"] == url_for(".service_receive_text_messages_stop", service_id=SERVICE_ONE_ID)
+
+
+def test_service_receive_text_messages_start_redirects_if_inbound_sms_already_on(
+    client_request,
+    service_one,
+):
+    service_one["permissions"] = ["inbound_sms"]
+
+    client_request.get(
+        ".service_receive_text_messages_start",
+        service_id=SERVICE_ONE_ID,
+        _expected_redirect=url_for(".service_receive_text_messages", service_id=SERVICE_ONE_ID),
+    )
+
+
+def test_get_service_receive_text_messages_start_shows_details(client_request, mock_get_service_data_retention):
+    page = client_request.get(".service_receive_text_messages_start", service_id=SERVICE_ONE_ID)
+
+    assert page.select_one("h1").text == "Before you start receiving text messages"
+    assert "The messages you receive will only be available to download for 7 days." in page.text
+    assert normalize_spaces(page.select_one(".page-footer button").text) == "I understand – continue"
+
+
+def test_post_service_receive_text_messages_start_turns_on_feature_and_redirects(
+    client_request,
+    mocker,
+    service_one,
+    mock_update_service,
+    active_user_with_permissions,
+):
+    service_one["permissions"] = []
+
+    mock_add_number = mocker.patch(
+        "app.inbound_number_client.add_inbound_number_to_service",
+        return_value={"id": "abcd", "service_id": SERVICE_ONE_ID, "inbound_number_id": "1234"},
+    )
+    mock_event = mocker.patch("app.main.views.service_settings.create_set_inbound_sms_on_event")
+
+    page = client_request.post(
+        ".service_receive_text_messages_start", service_id=SERVICE_ONE_ID, _follow_redirects=True
+    )
+
+    mock_add_number.assert_called_once_with(SERVICE_ONE_ID)
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, permissions=["inbound_sms"])
+    mock_event.assert_called_once_with(
+        user_id=active_user_with_permissions["id"], service_id=SERVICE_ONE_ID, inbound_number_id="1234"
+    )
+
+    assert page.select_one("h1").text == "Receive text messages"
+    assert "You added a phone number to your service." in page.text
+
+
+def test_service_receive_text_messages_stop_redirects_if_inbound_sms_not_enabled(client_request):
+    client_request.get(
+        ".service_receive_text_messages_stop",
+        service_id=SERVICE_ONE_ID,
+        _expected_redirect=url_for(".service_receive_text_messages", service_id=SERVICE_ONE_ID),
+    )
+
+
+def test_service_receive_text_messages_stop(client_request, service_one, mock_get_inbound_number_for_service):
+    service_one["permissions"] = ["inbound_sms"]
+
+    page = client_request.get(
+        ".service_receive_text_messages_stop",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.select_one("h1").text == "When you stop receiving text messages"
+    assert normalize_spaces(page.select_one(".govuk-inset-text").text) == "0781239871"
+    assert "You can make 0781239871 the default sender again at any time." in page.text
+
+    support_link = page.select("p a")[-1]
+    assert support_link["href"] == url_for(".support")
 
 
 def test_show_sms_prefixing_setting_page(

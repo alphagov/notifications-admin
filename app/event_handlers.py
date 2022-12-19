@@ -16,9 +16,10 @@ EVENT_SCHEMAS = {
         "service_mode",
         "broadcast_channel",
         "provider_restriction",
-    },  # noqa: E501 (length)
+    },
     "archive_service": {"service_id", "archived_by_id"},
     "update_email_branding": {"email_branding_id", "updated_by_id", "old_email_branding"},
+    "set_inbound_sms_on": {"user_id", "service_id", "inbound_number_id"},
 }
 
 
@@ -60,6 +61,10 @@ def create_archive_service_event(**kwargs):
 
 def create_update_email_branding_event(**kwargs):
     _send_event("update_email_branding", **kwargs)
+
+
+def create_set_inbound_sms_on_event(**kwargs):
+    _send_event("set_inbound_sms_on", **kwargs)
 
 
 def _send_event(event_type, **kwargs):

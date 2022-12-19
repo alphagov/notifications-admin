@@ -1,0 +1,73 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+
+
+{% block service_page_title %}
+  Receive text messages
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('Receive text messages') }}
+
+      {% if 'inbound_sms' in current_service.permissions %}
+        <p class="govuk-body">
+          Your service will receive text messages sent to:
+        </p>
+          {% set new_number = current_service.inbound_number %}
+          {{ govukInsetText({
+            "text": new_number,
+            "classes": "govuk-!-margin-top-0"})
+          }}
+        <p class="govuk-body">
+          You can see the number of received messages on your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_dashboard', service_id=current_service.id) }}">dashboard</a>.
+        </p>
+        <p class="govuk-body">
+          You can also download the last {{ current_service.get_days_of_retention('sms') }} days’ worth of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.inbox', service_id=current_service.id) }}">received text messages</a>.
+        </p>
+        {% if current_service.api_keys %}
+          <p class="govuk-body">
+            If you’re using the API, you can fetch received messages or set up a callback to push the message to your service.
+          </p>
+        {% endif %}
+        <p class="govuk-body">
+          You can still send text messages from a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_sms_senders', service_id=current_service.id) }}">sender name</a> if you need to, but people will not be able to reply to those messages.
+        </p>
+        <p class="govuk-body">
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('.service_receive_text_messages_stop', service_id=current_service.id) }}">Stop receiving text messages</a>
+        </p>
+
+      {% else %}
+
+        <p class="govuk-body">
+          If you want to receive text messages, Notify will give you a unique 11-digit phone number.
+        </p>
+        <p class="govuk-body">
+          You can send text messages from this number instead of your current sender name.
+        </p>
+        <p class="govuk-body">
+          When someone replies to the number, you’ll see it on your dashboard.
+        </p>
+        <p class="govuk-body">
+          It does not cost you anything to receive text messages. Your users will pay their standard text message rate.
+        </p>
+        {{ govukButton({
+          "element": "a",
+          "text": "Start receiving text messages",
+          "href": url_for('.service_receive_text_messages_start', service_id=current_service.id),
+        }) }}
+
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}

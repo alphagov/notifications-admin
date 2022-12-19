@@ -28,6 +28,7 @@ from app import (
 from app.event_handlers import (
     create_archive_service_event,
     create_broadcast_account_type_change_event,
+    create_set_inbound_sms_on_event,
 )
 from app.extensions import zendesk_client
 from app.formatters import email_safe
@@ -701,11 +702,40 @@ def service_set_international_letters(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-inbound-sms", methods=["GET"])
+@main.route("/services/<uuid:service_id>/service-settings/receive-text-messages", methods=["GET"])
 @user_has_permissions("manage_service")
-def service_set_inbound_sms(service_id):
-    return render_template(
-        "views/service-settings/set-inbound-sms.html",
-    )
+def service_receive_text_messages(service_id):
+    return render_template("views/service-settings/receive-text-messages.html")
+
+
+@main.route("/services/<uuid:service_id>/service-settings/receive-text-messages/start", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_receive_text_messages_start(service_id):
+    if current_service.has_permission("inbound_sms"):
+        return redirect(url_for(".service_receive_text_messages", service_id=service_id))
+
+    if request.method == "POST":
+        sms_sender = inbound_number_client.add_inbound_number_to_service(current_service.id)
+        current_service.force_permission("inbound_sms", on=True)
+        create_set_inbound_sms_on_event(
+            user_id=current_user.id,
+            service_id=current_service.id,
+            inbound_number_id=sms_sender["inbound_number_id"],
+        )
+
+        flash("You added a phone number to your service.", "default_with_tick")
+        return redirect(url_for(".service_receive_text_messages", service_id=service_id))
+
+    return render_template("views/service-settings/receive-text-messages-start.html")
+
+
+@main.route("/services/<uuid:service_id>/service-settings/receive-text-messages/stop", methods=["GET"])
+@user_has_permissions("manage_service")
+def service_receive_text_messages_stop(service_id):
+    if not current_service.has_permission("inbound_sms"):
+        return redirect(url_for(".service_receive_text_messages", service_id=service_id))
+
+    return render_template("views/service-settings/receive-text-messages-stop.html")
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-letters", methods=["GET"])

@@ -1,0 +1,57 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+
+{% block service_page_title %}
+  When you stop receiving text messages
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_receive_text_messages', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('When you stop receiving text messages') }}
+
+      <p class="govuk-body">
+        The Notify team will delete your unique phone number:
+      </p>
+      {% set new_number = current_service.inbound_number %}
+      {{ govukInsetText({
+        "text": new_number,
+        "classes": "govuk-!-margin-top-0"})
+      }}
+      <p class="govuk-body">
+        You will no longer be able to send text messages using this number.
+      </p>
+      <p class="govuk-body">
+        If one of your users sends you a text message:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>you will not receive it</li>
+        <li>the sender will not know this, and may still expect a response</li>
+      </ul>
+
+      <h2 class="heading heading-medium">If you might need to use this number again</h2>
+      <p class="govuk-body">
+        Change your text message sender to send messages that no one can reply to.
+      </p>
+      <p class="govuk-body">
+        You can make {{ current_service.inbound_number }} the default sender again at any time.
+      </p>
+      <p class="govuk-body">
+        Add a new <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_sms_senders', service_id=current_service.id) }}">text message sender</a>.
+      </p>
+
+      <h2 class="heading heading-medium">If you’re sure you want to delete your number</h2>
+      <p class="govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.support') }}">Contact the Notify team</a>.
+      </p>
+    </div>
+  </div>
+
+{% endblock %}
