@@ -1774,6 +1774,21 @@ class AdminEditLetterBrandingSVGUploadForm(StripWhitespaceForm):
     )
 
 
+class LetterBrandingUploadBranding(StripWhitespaceForm):
+    EXPECTED_BRANDING_FORMAT = "svg"
+
+    branding = VirusScannedFileField(
+        "Upload letter branding",
+        validators=[
+            FileAllowed(["svg"], "Branding must be an SVG file"),
+            DataRequired(message="You need to upload a file to submit"),
+            FileSize(max_size=(2 * 1024 * 1024), message="File must be smaller than 2MB"),
+            NoEmbeddedImagesInSVG(),
+            NoTextInSVG(),
+        ],
+    )
+
+
 class EmailBrandingLogoUpload(StripWhitespaceForm):
     EXPECTED_LOGO_FORMAT = "png"
 

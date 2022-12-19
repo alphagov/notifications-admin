@@ -343,6 +343,55 @@ def test_letter_branding_request_redirects_to_upload_logo_for_platform_admins(
     mock_create_ticket.assert_not_called()
 
 
+def test_GET_letter_branding_upload_branding_renders_form(
+    client_request,
+    service_one,
+):
+    page = client_request.get(
+        "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="something_else"
+    )
+    assert "branding is not set up yet" not in normalize_spaces(page.text)
+
+    back_button = page.select_one("a.govuk-back-link")
+    form = page.select_one("form")
+    submit_button = form.select_one("button")
+    file_input = form.select_one("input")
+    abandon_flow_link = page.select("main a")[-1]
+
+    assert back_button["href"] == url_for("main.letter_branding_request", service_id=SERVICE_ONE_ID)
+    assert form["method"] == "post"
+    assert "Submit" in submit_button.text
+    assert file_input["name"] == "branding"
+
+    assert abandon_flow_link is not None
+    assert abandon_flow_link["href"] == url_for("main.support")
+    assert abandon_flow_link.text == "I do not have a file to upload"
+
+
+def test_GET_letter_branding_upload_branding_renders_form_with_prompt_if_user_clicked_organisation_choice(
+    client_request, service_one, organisation_one, mocker
+):
+    service_one["organisation"] = organisation_one["id"]
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get(
+        "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="organisation"
+    )
+    assert "organisation one branding is not set up yet" in normalize_spaces(page.select_one("main").text)
+
+
+def test_GET_letter_branding_upload_branding_renders_form_without_prompt_if_user_clicked_something_else_choice(
+    client_request, service_one, organisation_one, mocker
+):
+    service_one["organisation"] = organisation_one["id"]
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get(
+        "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="something_else"
+    )
+    assert "branding is not set up yet" not in normalize_spaces(page.select_one("main").text)
+
+
 def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
     service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
 ):

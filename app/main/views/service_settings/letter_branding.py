@@ -5,7 +5,7 @@ from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTick
 from app import current_service
 from app.extensions import zendesk_client
 from app.main import main
-from app.main.forms import ChooseLetterBrandingForm
+from app.main.forms import ChooseLetterBrandingForm, LetterBrandingUploadBranding
 from app.utils.user import user_has_permissions
 
 from .index import THANKS_FOR_BRANDING_REQUEST_MESSAGE
@@ -90,4 +90,14 @@ def letter_branding_pool_option(service_id):
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/upload-branding", methods=["GET", "POST"])
 def letter_branding_upload_branding(service_id):
-    return ("ok", 200)
+    form = LetterBrandingUploadBranding()
+    if form.validate_on_submit():
+        return ("ok", 200)
+    return render_template(
+        "views/service-settings/branding/add-new-branding/letter-branding-upload-branding.html",
+        form=form,
+        branding_choice=request.args.get("branding_choice"),
+        back_link=url_for(".letter_branding_request", service_id=current_service.id),
+        # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
+        abandon_flow_link=url_for(".support"),
+    )
