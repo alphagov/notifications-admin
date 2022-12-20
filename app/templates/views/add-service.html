@@ -18,7 +18,7 @@
     {% call form_wrapper() %}
       {% if default_organisation_type == 'central' %}
         <p class="govuk-body">This is the name your emails will come from.</p>
-        <p class="govuk-body">You can also show it at the start of every text message you send.</p>
+        <p class="govuk-body">You can also display it at the start of every text message you send.</p>
 
         <p class="govuk-body">Your sender name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
           <ul class="govuk-list govuk-list--bullet">
@@ -34,7 +34,7 @@
             <li>Electoral services – {{ current_user.default_organisation.name }}</li>
             <li>Blue Badge – {{ current_user.default_organisation.name }}</li>
           </ul>
-        <p class="govuk-body">You should only use an acronym or initialism if your users are already familiar with it.</p>
+        <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
       {% endif %}
 
       {{ form.name(param_extensions={"hint": {"text": "You can change this later"} }) }}
