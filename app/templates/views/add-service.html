@@ -16,26 +16,23 @@
     {{ page_header(heading) }}
 
     {% call form_wrapper() %}
-      {% if default_organisation_type == 'central' %}
         <p class="govuk-body">This is the name your emails will come from.</p>
         <p class="govuk-body">You can also display it at the start of every text message you send.</p>
-
         <p class="govuk-body">Your sender name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
+      {% if default_organisation_type == 'central' %}
           <ul class="govuk-list govuk-list--bullet">
             <li>Register to vote</li>
             <li>Renew your Passport</li>
             <li>Check your state pension</li>
           </ul>
-        <p class="govuk-body">You should only use an acronym or initialism if your users are already familiar with it.</p>
       {% elif default_organisation_type == 'local' %}
-        <p class="govuk-body">Give your service a name that tells users what your messages are about, as well as who they’re from. For example:</p>
           <ul class="govuk-list govuk-list--bullet">
             <li>School admissions – {{ current_user.default_organisation.name }}</li>
             <li>Electoral services – {{ current_user.default_organisation.name }}</li>
             <li>Blue Badge – {{ current_user.default_organisation.name }}</li>
           </ul>
-        <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
       {% endif %}
+    <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
 
       {{ form.name(param_extensions={"hint": {"text": "You can change this later"} }) }}
 
