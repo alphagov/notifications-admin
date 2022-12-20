@@ -56,6 +56,7 @@ from app.main.forms import (
     EmailBrandingLogoUpload,
     EstimateUsageForm,
     GovernmentIdentityLogoForm,
+    OnOffSettingForm,
     RenameServiceForm,
     SearchByNameForm,
     ServiceBroadcastAccountTypeForm,
@@ -64,12 +65,12 @@ from app.main.forms import (
     ServiceContactDetailsForm,
     ServiceEditInboundNumberForm,
     ServiceLetterContactBlockForm,
-    ServiceOnOffSettingForm,
     ServiceReplyToEmailForm,
     ServiceSmsSenderForm,
     ServiceSwitchChannelForm,
     SMSPrefixForm,
     SomethingElseBrandingForm,
+    YesNoSettingForm,
 )
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.models.branding import (
@@ -214,7 +215,7 @@ def submit_request_to_go_live(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/switch-live", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_switch_live(service_id):
-    form = ServiceOnOffSettingForm(name="Make service live", enabled=not current_service.trial_mode)
+    form = OnOffSettingForm(name="Make service live", enabled=not current_service.trial_mode)
 
     if form.validate_on_submit():
         current_service.update_status(live=form.enabled.data)
@@ -231,11 +232,9 @@ def service_switch_live(service_id):
 @user_is_platform_admin
 def service_switch_count_as_live(service_id):
 
-    form = ServiceOnOffSettingForm(
+    form = YesNoSettingForm(
         name="Count in list of live services",
         enabled=current_service.count_as_live,
-        truthy="Yes",
-        falsey="No",
     )
 
     if form.validate_on_submit():
@@ -256,7 +255,7 @@ def service_set_permission(service_id, permission):
         abort(404)
 
     title = PLATFORM_ADMIN_SERVICE_PERMISSIONS[permission]["title"]
-    form = ServiceOnOffSettingForm(name=title, enabled=current_service.has_permission(permission))
+    form = OnOffSettingForm(name=title, enabled=current_service.has_permission(permission))
 
     if form.validate_on_submit():
         current_service.force_permission(permission, on=form.enabled.data)
@@ -661,7 +660,7 @@ def service_set_sms_prefix(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/set-international-sms", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_international_sms(service_id):
-    form = ServiceOnOffSettingForm(
+    form = OnOffSettingForm(
         "Send text messages to international phone numbers",
         enabled=current_service.has_permission("international_sms"),
     )
@@ -680,7 +679,7 @@ def service_set_international_sms(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/set-international-letters", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_international_letters(service_id):
-    form = ServiceOnOffSettingForm(
+    form = OnOffSettingForm(
         "Send letters to international addresses",
         enabled=current_service.has_permission("international_letters"),
     )

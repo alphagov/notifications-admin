@@ -1601,7 +1601,7 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             raise ValidationError("Contains {} lines, maximum is 10".format(line_count + 1))
 
 
-class ServiceOnOffSettingForm(StripWhitespaceForm):
+class OnOffSettingForm(StripWhitespaceForm):
     def __init__(self, name, *args, truthy="On", falsey="Off", **kwargs):
         super().__init__(*args, **kwargs)
         self.enabled.label.text = name
@@ -1613,7 +1613,12 @@ class ServiceOnOffSettingForm(StripWhitespaceForm):
     enabled = OnOffField("Choices")
 
 
-class ServiceSwitchChannelForm(ServiceOnOffSettingForm):
+class YesNoSettingForm(OnOffSettingForm):
+    def __init__(self, name, *args, **kwargs):
+        super().__init__(name, *args, truthy="Yes", falsey="No", **kwargs)
+
+
+class ServiceSwitchChannelForm(OnOffSettingForm):
     def __init__(self, channel, *args, **kwargs):
         name = "Send {}".format(
             {
