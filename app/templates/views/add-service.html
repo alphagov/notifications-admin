@@ -18,23 +18,26 @@
     {% call form_wrapper() %}
         <p class="govuk-body">This is the name your emails will come from.</p>
         <p class="govuk-body">You can also display it at the start of every text message you send.</p>
-      {% if default_organisation_type == 'central' %}
-          <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
-          <ul class="govuk-list govuk-list--bullet">
-            <li>Register to vote</li>
-            <li>Renew your Passport</li>
-            <li>Check your state pension</li>
-          </ul>
-      {% elif default_organisation_type == 'local' %}
-         <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
-          <ul class="govuk-list govuk-list--bullet">
-            <li>School admissions – {{ current_user.default_organisation.name }}</li>
-            <li>Electoral services – {{ current_user.default_organisation.name }}</li>
-            <li>Blue Badge – {{ current_user.default_organisation.name }}</li>
-          </ul>
-      {% else %}
-          <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from.</p>
+
+    {% if organisation_type == 'central' or organisation_type == 'local'  %}
+        <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+      {% if organisation_type == 'central' %}
+          <li>Register to vote</li>
+          <li>Renew your Passport</li>
+          <li>Check your state pension</li>
+      {% elif organisation_type == 'local' %}
+          <li>School admissions - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+          <li>Electoral services - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+          <li>Blue Badge - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+      {% endif %}
+      </ul>
+    
+    {% else %}
+      <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from.</p>
     {% endif %}
+
     <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
 
       {{ form.name(param_extensions={"hint": {"text": "You can change this later"} }) }}
