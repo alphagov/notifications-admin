@@ -14,6 +14,22 @@ from app.utils.user import user_has_permissions
 from .index import THANKS_FOR_BRANDING_REQUEST_MESSAGE
 
 
+def _letter_branding_flow_query_params(**kwargs):
+    """Return a dictionary containing values for the letter branding flow.
+
+    We've got a variety of query parameters we want to pass around between pages. Any params that are passed in, we
+    should pass through to ensure that back links continue to work the whole way through etc. In addition, we use the
+    branding_choice param (from the letter_branding_request page) later on so need to pass that through.
+
+    To set a new value:
+        _letter_branding_flow_query_params(request, branding_choice='organisation')
+
+    To remove a value:
+        _letter_branding_flow_query_params(request, branding_choice=None)
+    """
+    return {k: kwargs.get(k, request.args.get(k)) for k in ("from_template", "branding_choice")}
+
+
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def letter_branding_request(service_id):
@@ -35,7 +51,9 @@ def letter_branding_request(service_id):
         if current_user.platform_admin:
             return redirect(
                 url_for(
-                    ".letter_branding_upload_branding", service_id=current_service.id, branding_choice=branding_choice
+                    ".letter_branding_upload_branding",
+                    service_id=current_service.id,
+                    **_letter_branding_flow_query_params(branding_choice=branding_choice),
                 )
             )
 
@@ -107,14 +125,18 @@ def letter_branding_upload_branding(service_id):
             unique_id=upload_id,
         )
 
-        # TODO: redirect to the next step of the flow instead. BTW you need to be on VPN for this to work
+        # TODO: redirect to the next step of the flow instead (passing through the params)
         return redirect(f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{branding_filename}")
 
     return render_template(
         "views/service-settings/branding/add-new-branding/letter-branding-upload-branding.html",
         form=form,
         branding_choice=request.args.get("branding_choice"),
-        back_link=url_for(".letter_branding_request", service_id=current_service.id),
+        back_link=url_for(
+            ".letter_branding_request",
+            service_id=current_service.id,
+            **_letter_branding_flow_query_params(branding_choice=None),
+        ),
         # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
         abandon_flow_link=url_for(".support"),
     )
