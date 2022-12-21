@@ -340,6 +340,7 @@ def guidance_schedule_messages():
 @main.route("/information-security", endpoint="information_security")
 @main.route("/using_notify", endpoint="old_using_notify")
 @main.route("/using-notify/guidance/schedule-emails-and-text-messages", endpoint="old_schedule_messages")
+@main.route("/using-notify/guidance/branding-and-customisation", endpoint="old_branding_and_customisation")
 @main.route("/information-risk-management", endpoint="information_risk_management")
 @main.route("/integration_testing", endpoint="old_integration_testing")
 def old_page_redirects():
