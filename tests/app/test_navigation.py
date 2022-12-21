@@ -193,6 +193,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "no_cookie.view_letter_template_preview",
             "no_cookie.view_template_version_preview",
             "notifications_sent_by_service",
+            "old_branding_and_customisation",
             "old_guest_list",
             "old_integration_testing",
             "old_roadmap",
