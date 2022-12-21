@@ -298,6 +298,22 @@
           {{ "{:,}".format(current_service.message_limit) }} messages
           per day.
         </p>
+
+        {# TODO: Remove this check when we go-live with new limits - and probably the paragraph above #}
+        {% if current_user.platform_admin %}
+          <p class="govuk-body">
+            You can send up to:
+            </p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>{{ "{:,}".format(current_service.email_message_limit) }} {{ current_service.email_message_limit | message_count_noun('email') }} per day
+                </li>
+                <li>{{ "{:,}".format(current_service.sms_message_limit) }} {{ current_service.sms_message_limit | message_count_noun('sms') }} per day
+               </li>
+               <li>{{ "{:,}".format(current_service.letter_message_limit) }} {{ current_service.letter_message_limit | message_count_noun('letter') }} per day
+               </li>
+           </ul>
+        {% endif %}
+
         <p class="govuk-body">
           Problems or comments?
           <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Give feedback</a>.
@@ -373,6 +389,21 @@
             {{ text_field('Rate limit')}}
             {{ text_field('{:,} per minute'.format(current_service.rate_limit)) }}
             {{ edit_field('Change', url_for('.set_rate_limit', service_id=current_service.id), suffix='rate limit') }}
+          {% endcall %}
+          {% call row() %}
+            {{ text_field('Email limit')}}
+            {{ text_field('{:,} per day'.format(current_service.email_message_limit)) }}
+            {{ edit_field('Change', url_for('.set_message_limit', service_id=current_service.id, notification_type='email'), suffix='daily email limit') }}
+          {% endcall %}
+          {% call row() %}
+            {{ text_field('SMS limit')}}
+            {{ text_field('{:,} per day'.format(current_service.sms_message_limit)) }}
+            {{ edit_field('Change', url_for('.set_message_limit', service_id=current_service.id, notification_type='sms'), suffix='daily SMS limit') }}
+          {% endcall %}
+          {% call row() %}
+            {{ text_field('Letter limit')}}
+            {{ text_field('{:,} per day'.format(current_service.letter_message_limit)) }}
+            {{ edit_field('Change', url_for('.set_message_limit', service_id=current_service.id, notification_type='letter'), suffix='daily letter limit') }}
           {% endcall %}
           {% call row() %}
             {{ text_field('Message limit')}}

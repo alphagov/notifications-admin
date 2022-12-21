@@ -107,6 +107,9 @@ def mock_get_service_settings_page_common(
                 "Notes None Change the notes for the service",
                 "Organisation Test organisation Central government Change organisation for service",
                 "Rate limit 3,000 per minute Change rate limit",
+                "Email limit 1,000 per day Change daily email limit",
+                "SMS limit 1,000 per day Change daily SMS limit",
+                "Letter limit 1,000 per day Change daily letter limit",
                 "Message limit 1,000 per day Change daily message limit",
                 "Free text message allowance 250,000 per year Change free text message allowance",
                 "Email branding GOV.UK Change email branding (admin view)",
@@ -4560,9 +4563,7 @@ def test_should_show_page_to_set_message_limit(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get("main.set_message_limit", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("label").text) == (
-        "Number of messages the service is allowed to send each day"
-    )
+    assert normalize_spaces(page.select_one("label").text) == "Daily message limit"
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1000"
 
 
