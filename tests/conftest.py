@@ -451,7 +451,7 @@ def get_non_default_sms_sender(mocker):
 
 @pytest.fixture(scope="function")
 def mock_add_sms_sender(mocker):
-    def _add_sms_sender(service_id, sms_sender, is_default=False, inbound_number_id=None):
+    def _add_sms_sender(service_id, sms_sender, is_default=False):
         return
 
     return mocker.patch("app.service_api_client.add_sms_sender", side_effect=_add_sms_sender)

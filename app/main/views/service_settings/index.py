@@ -626,10 +626,8 @@ def service_set_inbound_number(service_id):
     form = AdminServiceInboundNumberForm(inbound_number_choices=inbound_numbers_value_and_label)
 
     if form.validate_on_submit():
-        service_api_client.add_sms_sender(
+        inbound_number_client.add_inbound_number_to_service(
             current_service.id,
-            sms_sender=form.inbound_number.data,
-            is_default=True,
             inbound_number_id=form.inbound_number.data,
         )
         current_service.force_permission("inbound_sms", on=True)
@@ -695,7 +693,6 @@ def service_set_international_letters(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-inbound-sms", methods=["GET"])
 @main.route("/services/<uuid:service_id>/service-settings/receive-text-messages", methods=["GET"])
 @user_has_permissions("manage_service")
 def service_receive_text_messages(service_id):
