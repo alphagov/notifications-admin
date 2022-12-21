@@ -351,6 +351,7 @@ def old_page_redirects():
         "main.information_risk_management": "main.security",
         "main.old_integration_testing": "main.integration_testing",
         "main.old_schedule_messages": "main.guidance_schedule_messages",
+        "main.old_branding_and_customisation": "main.guidance_index",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
 
