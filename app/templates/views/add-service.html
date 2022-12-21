@@ -28,9 +28,9 @@
           <li>Renew your Passport</li>
           <li>Check your state pension</li>
       {% elif organisation_type == 'local' %}
-          <li>School admissions - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
-          <li>Electoral services - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
-          <li>Blue Badge - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+          <li>School admissions - {{ current_user.default_organisation.name }}</li>
+          <li>Electoral services - {{ current_user.default_organisation.name }}</li>
+          <li>Blue Badge - {{ current_user.default_organisation.name }}</li>
       {% endif %}
       </ul>
     
