@@ -1,7 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
@@ -60,7 +59,7 @@
   {% endcall %}
 
   {% call form_wrapper(id="search-form") %}
-    <input type="hidden" name="to" {% if search_form.to.data %}value="{{ search_form.to.data }}{%  endif %}">
+    <input type="hidden" name="to" {% if search_form.to.data %}value="{{ search_form.to.data }}{% endif %}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   {% endcall %}
 
