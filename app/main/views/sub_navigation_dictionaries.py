@@ -73,12 +73,12 @@ def using_notify_nav():
             "link": "main.guidance_index",
             "sub_navigation_items": [
                 {
-                    "name": "Formatting",
-                    "link": "main.guidance_edit_and_format_messages",
-                },
-                {
                     "name": "Email branding",
                     "link": "main.guidance_email_branding",
+                },
+                {
+                    "name": "Formatting",
+                    "link": "main.guidance_edit_and_format_messages",
                 },
                 {
                     "name": "Letter branding",
