@@ -23,12 +23,20 @@ class NotifyAdminAPIClient(BaseAPIClient):
         self.api_key = app.config["ADMIN_CLIENT_SECRET"]
         self.route_secret = app.config["ROUTE_SECRET_KEY_1"]
 
+    @staticmethod
+    def _notify_profile():
+        if not has_request_context() or not current_user:
+            return "0"
+
+        return "1" if "debug" in request.args and current_user.platform_admin else "0"
+
     def generate_headers(self, api_token):
         headers = {
             "Content-type": "application/json",
             "Authorization": "Bearer {}".format(api_token),
             "X-Custom-Forwarder": self.route_secret,
             "User-agent": "NOTIFY-API-PYTHON-CLIENT/{}".format(__version__),
+            "X-Notify-Profile": self._notify_profile(),
         }
         return self._add_request_id_header(headers)
 
