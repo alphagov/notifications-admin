@@ -292,6 +292,14 @@ def letter_specification():
     )
 
 
+@main.route("/using-notify/guidance/schedule-emails-and-text-messages")
+def schedule_emails_and_text_messages():
+    return render_template(
+        "views/guidance/schedule-emails-and-text-messages.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 # --- Redirects --- #
 
 

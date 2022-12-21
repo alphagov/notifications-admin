@@ -92,6 +92,10 @@ def using_notify_nav():
                     "name": "Letter specification",
                     "link": "main.letter_specification",
                 },
+                {
+                    "name": "Schedule emails and text messages",
+                    "link": "main.schedule_emails_and_text_messages",
+                },
             ],
         },
         {
