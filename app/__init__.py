@@ -33,6 +33,7 @@ from werkzeug.local import LocalProxy
 
 from app import proxy_fix, webauthn_server
 from app.asset_fingerprinter import asset_fingerprinter
+from app.commands import setup_commands
 from app.config import configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
 from app.formatters import (
@@ -210,6 +211,8 @@ def create_app(application):
     add_template_filters(application)
 
     register_errorhandlers(application)
+
+    setup_commands(application)
 
     setup_event_handlers()
 
