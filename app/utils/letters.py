@@ -177,12 +177,12 @@ def get_letter_validation_error(validation_message, invalid_pages=None, page_cou
             invalid_pages=invalid_pages,
             invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
-            letter_spec_guidance=url_for(".letter_specification"),
+            letter_spec_guidance=url_for("main.guidance_letter_specification"),
         ),
         "summary": LETTER_VALIDATION_MESSAGES[validation_message]["summary"].format(
             invalid_pages=invalid_pages,
             invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
-            letter_spec_guidance=url_for(".letter_specification"),
+            letter_spec_guidance=url_for("main.guidance_letter_specification"),
         ),
     }

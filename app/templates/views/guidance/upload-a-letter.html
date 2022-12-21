@@ -13,10 +13,10 @@
 
   <h1 class="heading-large">Upload a letter</h1>
 
-  <p class="govuk-body">Upload a one-off letter as a PDF and we’ll print, pack and post it for you.</p>
+  <p class="govuk-body">Upload a PDF of a single letter and Notify will print, pack and post it for you.</p>
   <p class="govuk-body">You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
 
-  <p class="govuk-body">To upload and send a letter from a PDF file:</p>
+  <p class="govuk-body">To upload and send a letter:</p>
 
   <ol class="govuk-list govuk-list--number">
     <li>Go to the {{ service_link(current_service, 'main.uploads', 'uploads') }} page.</li>
@@ -24,6 +24,6 @@
     <li>Select <b class="govuk-!-font-weight-bold">Choose file</b>.</li>
   </ol>
 
-  <p class="govuk-body">Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.letter_specification') }}">letter specification</a>.</p>
+  <p class="govuk-body">Your PDF must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_letter_specification') }}">letter specification</a>.</p>
 
 {% endblock %}
