@@ -300,6 +300,14 @@ def schedule_emails_and_text_messages():
     )
 
 
+@main.route("/using-notify/guidance/team-members-and-permissions")
+def team_members_and_permissions():
+    return render_template(
+        "views/guidance/team-members-permissions.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 # --- Redirects --- #
 
 

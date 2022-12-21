@@ -306,6 +306,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "submit_request_to_go_live",
             "support",
             "support_public",
+            "team_members_and_permissions",
             "template_history",
             "template_usage",
             "terms",

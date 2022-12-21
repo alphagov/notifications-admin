@@ -96,6 +96,10 @@ def using_notify_nav():
                     "name": "Schedule emails and text messages",
                     "link": "main.schedule_emails_and_text_messages",
                 },
+                {
+                    "name": "Team members and permissions",
+                    "link": "main.team_members_and_permissions",
+                },
             ],
         },
         {

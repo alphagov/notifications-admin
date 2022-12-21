@@ -10,21 +10,21 @@
 {% endblock %}
 
 {% block content_column_content %}
-
   <h1 class="heading-large">Team members and permissions</h1>
 
   <p class="govuk-body">Notify lets you set different permissions for each member of your team.</p>
 
-<p class="govuk-body">Go to the <b class="govuk-!-font-weight-bold">Team members</b> page to:</p>
-<ul class="govuk-list govuk-list--bullet">
+  <p class="govuk-body">Go to the {{ service_link(current_service, 'main.manage_users', 'team members') }} page to:</p>
+  <ul class="govuk-list govuk-list--bullet">
     <li>invite people to your service</li>
     <li>control who can see, add, edit and send messages</li>
     <li>let other team members change your service settings</li>
     <li>amend team members’ sign-in details</li>
-    <li>remove team members who have left</li>  
-</ul>
-<p class="govuk-body">You must add at least one team member with the ‘manage settings, team and usage’ permission. This person will be responsible for your service if you’re unable to sign in to Notify.
-</p>
-<p class="govuk-body">You can invite team members who do not have a government email address.</p>
-
-  {% endblock %}
+    <li>remove team members who have left</li>
+  </ul>
+  <p class="govuk-body">
+    You must add at least one team member with the ‘manage settings, team and usage’ permission.
+    This person will be responsible for your service if you’re unable to sign in to Notify.
+  </p>
+  <p class="govuk-body">You can invite team members who do not have a government email address.</p>
+{% endblock %}
