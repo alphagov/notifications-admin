@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from flask import current_app
+from flask_login import current_user
 
 from app import asset_fingerprinter
 from app.formatters import email_safe
@@ -20,6 +21,9 @@ class Branding(JSONModel):
     @classmethod
     def with_default_values(cls, **kwargs):
         return cls({key: None for key in cls.ALLOWED_PROPERTIES} | kwargs)
+
+    def name_like(self, name):
+        return email_safe(name, whitespace="") == email_safe(self.name, whitespace="")
 
 
 class EmailBranding(Branding):
@@ -42,6 +46,30 @@ class EmailBranding(Branding):
     @classmethod
     def govuk_branding(cls):
         return cls.from_id(None)
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        logo,
+        alt_text,
+        colour,
+        brand_type,
+    ):
+        name = email_branding_client.get_email_branding_name_for_alt_text(alt_text)
+        if brand_type == "both":
+            name = f"GOV.UK and {name}"
+
+        new_email_branding = email_branding_client.create_email_branding(
+            name=name,
+            alt_text=alt_text,
+            text=None,
+            created_by_id=current_user.id,
+            logo=logo,
+            colour=colour,
+            brand_type=brand_type,
+        )
+        return cls(new_email_branding)
 
     @property
     def is_nhs(self):
@@ -70,6 +98,7 @@ class EmailBranding(Branding):
 
 class LetterBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {"filename"}
+    NHS_ID = "2cd354bb-6b85-eda3-c0ad-6b613150459f"
 
     @classmethod
     def from_id(cls, id):
@@ -103,6 +132,9 @@ class AllBranding(ModelList):
     def excluding(self, *ids_to_exclude):
         return tuple(branding for branding in self if branding.id not in ids_to_exclude)
 
+    def contains_name(self, name):
+        return any(branding.name_like(name) for branding in self)
+
 
 class AllEmailBranding(AllBranding):
     client_method = email_branding_client.get_all_email_branding
@@ -111,7 +143,7 @@ class AllEmailBranding(AllBranding):
     @property
     def example_government_identity_branding(self):
         for branding in self:
-            if "departmentforeducation" in email_safe(branding.name, whitespace=""):
+            if branding.name_like("Department for Education"):
                 return branding
 
 

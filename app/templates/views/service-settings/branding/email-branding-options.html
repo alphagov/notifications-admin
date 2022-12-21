@@ -36,11 +36,7 @@
   {% endif %}
 
   {% call form_wrapper() %}
-      {% call select_wrapper(form.options) %}
-        {% for option in form.options %}
-          {{ radio(option) }}
-        {% endfor %}
-      {% endcall %}
+    {{ form.options }}
     {{ page_footer('Continue') }}
   {% endcall %}
 

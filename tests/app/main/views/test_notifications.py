@@ -61,8 +61,8 @@ def test_notification_status_page_shows_details(
 
     page = client_request.get("main.view_notification", service_id=service_one["id"], notification_id=fake_uuid)
 
-    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == ("To: 07123456789")
-    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == ("service one: hello Jo")
+    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == "To: 07123456789"
+    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: hello Jo"
     assert normalize_spaces(page.select(".ajax-block-container p")[0].text) == (expected_status)
 
     _mock_get_notification.assert_called_with(service_one["id"], fake_uuid)
@@ -139,6 +139,14 @@ def test_notification_status_page_respects_redaction(
             partial(url_for, "main.view_notifications", message_type="sms", status="sending,delivered,failed"),
         ),
         (
+            {"from_statuses": "sending"},
+            partial(url_for, "main.view_notifications", message_type="sms", status="sending"),
+        ),
+        (
+            {"from_statuses": "failed"},
+            partial(url_for, "main.view_notifications", message_type="sms", status="failed"),
+        ),
+        (
             {"from_job": "job_id"},
             partial(url_for, "main.view_job", job_id="job_id"),
         ),
@@ -182,10 +190,10 @@ def test_notification_status_shows_expected_back_link(
 @pytest.mark.parametrize(
     "time_of_viewing_page, expected_message",
     (
-        ("2012-01-01 01:01", ("‘sample template’ was sent by Test User today at 1:01am")),
-        ("2012-01-02 01:01", ("‘sample template’ was sent by Test User yesterday at 1:01am")),
-        ("2012-01-03 01:01", ("‘sample template’ was sent by Test User on 1 January at 1:01am")),
-        ("2013-01-03 01:01", ("‘sample template’ was sent by Test User on 1 January 2012 at 1:01am")),
+        ("2012-01-01 01:01", "‘sample template’ was sent by Test User today at 1:01am"),
+        ("2012-01-02 01:01", "‘sample template’ was sent by Test User yesterday at 1:01am"),
+        ("2012-01-03 01:01", "‘sample template’ was sent by Test User on 1 January at 1:01am"),
+        ("2013-01-03 01:01", "‘sample template’ was sent by Test User on 1 January 2012 at 1:01am"),
     ),
 )
 def test_notification_page_doesnt_link_to_template_in_tour(
@@ -238,12 +246,12 @@ def test_notification_page_shows_page_for_letter_notification(
     assert normalize_spaces(page.select("main p:nth-of-type(1)")[0].text) == (
         "‘sample template’ was sent by Test User today at 1:01am"
     )
-    assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == ("Printing starts today at 5:30pm")
+    assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == "Printing starts today at 5:30pm"
     assert normalize_spaces(page.select("main p:nth-of-type(3)")[0].text) == (
         "Estimated delivery date: Wednesday 6 January"
     )
     assert len(page.select(".letter-postage")) == 1
-    assert normalize_spaces(page.select_one(".letter-postage").text) == ("Postage: second class")
+    assert normalize_spaces(page.select_one(".letter-postage").text) == "Postage: second class"
     assert page.select_one(".letter-postage")["class"] == ["letter-postage", "letter-postage-second"]
     assert page.select("p.notification-status") == []
 
@@ -291,7 +299,7 @@ def test_notification_page_shows_uploaded_letter(
     assert normalize_spaces(page.select("main p:nth-of-type(1)")[0].text) == (
         "Uploaded by Test User yesterday at midnight"
     )
-    assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == ("Printing starts today at 5:30pm")
+    assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == "Printing starts today at 5:30pm"
 
 
 @freeze_time("2016-01-01 01:01")
@@ -735,7 +743,7 @@ def test_notification_page_has_link_to_send_another_for_sms(
     )
 
     if link_expected:
-        assert normalize_spaces(last_paragraph.text) == ("See all text messages sent to this phone number")
+        assert normalize_spaces(last_paragraph.text) == "See all text messages sent to this phone number"
         assert last_paragraph.select_one("a")["href"] == conversation_link
     else:
         assert conversation_link not in str(page.select_one("main"))

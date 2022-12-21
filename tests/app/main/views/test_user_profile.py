@@ -218,7 +218,7 @@ def test_confirm_delete_mobile_number(client_request, api_user_active_email_auth
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Are you sure you want to delete your mobile number from Notify? " "Yes, delete"
+        "Are you sure you want to delete your mobile number from Notify? Yes, delete"
     )
     assert "action" not in page.select_one(".banner-dangerous form")
     assert page.select_one(".banner-dangerous form")["method"] == "post"
@@ -651,7 +651,7 @@ def test_confirm_delete_security_key(client_request, platform_admin_user, webaut
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Are you sure you want to delete this security key? " "Yes, delete"
+        "Are you sure you want to delete this security key? Yes, delete"
     )
     assert "action" not in page.select_one(".banner-dangerous form")
     assert page.select_one(".banner-dangerous form")["method"] == "post"

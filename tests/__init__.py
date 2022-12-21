@@ -53,7 +53,7 @@ class NotifyBeautifulSoup(BeautifulSoup):
     def override_method(self, method_name, preferred_method_name):
         def overridden_method(*args, **kwargs):
             raise AttributeError(
-                f"Don’t use BeautifulSoup.{method_name}" f" – try BeautifulSoup.{preferred_method_name} instead"
+                f"Don’t use BeautifulSoup.{method_name} – try BeautifulSoup.{preferred_method_name} instead"
             )
 
         setattr(self, method_name, overridden_method)
@@ -156,6 +156,9 @@ def service_json(
     name="Test Service",
     users=None,
     message_limit=1000,
+    email_message_limit=1000,
+    letter_message_limit=1000,
+    sms_message_limit=1000,
     active=True,
     restricted=True,
     email_from=None,
@@ -195,6 +198,9 @@ def service_json(
         "name": name,
         "users": users,
         "message_limit": message_limit,
+        "email_message_limit": email_message_limit,
+        "sms_message_limit": sms_message_limit,
+        "letter_message_limit": letter_message_limit,
         "rate_limit": rate_limit,
         "active": active,
         "restricted": restricted,
@@ -668,7 +674,7 @@ def assert_url_expected(actual, expected):
             assert parse_qs(expected_parts.query) == parse_qs(actual_parts.query)
         else:
             assert getattr(actual_parts, attribute) == getattr(expected_parts, attribute), (
-                "Expected redirect: {}\n" "Actual redirect: {}"
+                "Expected redirect: {}\nActual redirect: {}"
             ).format(expected, actual)
 
 

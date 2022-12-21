@@ -53,7 +53,7 @@ def webauthn_complete_register():
     current_user.update(auth_type="webauthn_auth")
 
     flash(
-        ("Registration complete. Next time you sign in to Notify " "you’ll be asked to use your security key."),
+        "Registration complete. Next time you sign in to Notify you’ll be asked to use your security key.",
         "default_with_tick",
     )
 

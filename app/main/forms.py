@@ -57,6 +57,7 @@ from app.formatters import (
     format_auth_type,
     format_thousands,
     guess_name_from_email_address,
+    message_count_noun,
 )
 from app.main.validators import (
     BroadcastLength,
@@ -72,6 +73,7 @@ from app.main.validators import (
     NoPlaceholders,
     NoTextInSVG,
     OnlySMSCharacters,
+    StringsNotAllowed,
     ValidEmail,
     ValidGovEmail,
 )
@@ -685,7 +687,37 @@ class GovukCollapsibleNestedCheckboxesField(NestedFieldMixin, GovukCollapsibleCh
 class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
     govuk_frontend_component_name = "radios"
 
+    class Divider(str):
+        """
+        Behaves like a normal string but can be used instead of a `(value, label)`
+        pair as one of the items in `GovukRadiosField.choices`, for example:
+
+            numbers = GovukRadiosField(choices=(
+                (1, "One"),
+                (2, "Two"),
+                GovukRadiosField.Divider("or")
+                (3, "Three"),
+            ))
+
+        When rendered it won’t appear as a choice the user can click, but instead
+        as text in between the choices, as per:
+        https://design-system.service.gov.uk/components/radios/#radio-items-with-a-text-divider
+        """
+
+        def __iter__(self):
+            # This is what WTForms will use as the value of the choice. We will
+            # throw this away, but needs to be unique, unguessable and impossible
+            # to confuse with a real choice
+            yield object()
+            # This is what WTForms will use as the label, which we can later
+            # use to see if the choice is actually a divider
+            yield self
+
     def get_item_from_option(self, option):
+        if isinstance(option.label.text, self.Divider):
+            return {
+                "divider": option.label.text,
+            }
         return {
             "name": option.name,
             "id": option.id,
@@ -1031,9 +1063,9 @@ class OrganisationAgreementSignedForm(StripWhitespaceForm):
         thing="whether this organisation has signed the agreement",
         param_extensions={
             "items": [
-                {"hint": {"html": "Users will be told their organisation has already signed the agreement"}},
-                {"hint": {"html": "Users will be prompted to sign the agreement before they can go live"}},
-                {"hint": {"html": "Users will not be prompted to sign the agreement"}},
+                {"hint": {"text": "Users will be told their organisation has already signed the agreement"}},
+                {"hint": {"text": "Users will be prompted to sign the agreement before they can go live"}},
+                {"hint": {"text": "Users will not be prompted to sign the agreement"}},
             ]
         },
     )
@@ -1049,6 +1081,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
             "",
             validators=[
                 CharactersNotAllowed("@"),
+                StringsNotAllowed("nhs.uk", "nhs.net"),
                 Optional(),
             ],
             default="",
@@ -1061,7 +1094,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
 
 class CreateServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
-        "What’s your service called?",
+        "Service name",
         validators=[
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
@@ -1096,10 +1129,19 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
 
 
 class AdminServiceMessageLimitForm(StripWhitespaceForm):
-    message_limit = GovukIntegerField(
-        "Number of messages the service is allowed to send each day",
-        validators=[DataRequired(message="Cannot be empty")],
-    )
+    message_limit = GovukIntegerField("", validators=[DataRequired(message="Cannot be empty")])
+
+    def __init__(self, notification_type=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.message_limit.label.text = f"Daily {message_count_noun(1, notification_type)} limit"
+        self.message_limit.param_extensions = {
+            "hint": {
+                "text": (
+                    f"Number of {message_count_noun(999, notification_type)} the service is allowed to send each day"
+                )
+            }
+        }
 
 
 class AdminServiceRateLimitForm(StripWhitespaceForm):
@@ -1150,9 +1192,9 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
     @staticmethod
     def generate_label(channel, max_phones):
         if channel in {"test", "operator"}:
-            return f"I understand this will alert anyone who has switched " f"on the {channel} channel"
+            return f"I understand this will alert anyone who has switched on the {channel} channel"
         if channel == "severe":
-            return f"I understand this will alert {ConfirmBroadcastForm.format_number_generic(max_phones)} " "of people"
+            return f"I understand this will alert {ConfirmBroadcastForm.format_number_generic(max_phones)} of people"
         if channel == "government":
             return (
                 f"I understand this will alert {ConfirmBroadcastForm.format_number_generic(max_phones)} "
@@ -1569,7 +1611,7 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
             raise ValidationError("Contains {} lines, maximum is 10".format(line_count + 1))
 
 
-class ServiceOnOffSettingForm(StripWhitespaceForm):
+class OnOffSettingForm(StripWhitespaceForm):
     def __init__(self, name, *args, truthy="On", falsey="Off", **kwargs):
         super().__init__(*args, **kwargs)
         self.enabled.label.text = name
@@ -1581,7 +1623,12 @@ class ServiceOnOffSettingForm(StripWhitespaceForm):
     enabled = OnOffField("Choices")
 
 
-class ServiceSwitchChannelForm(ServiceOnOffSettingForm):
+class YesNoSettingForm(OnOffSettingForm):
+    def __init__(self, name, *args, **kwargs):
+        super().__init__(name, *args, truthy="Yes", falsey="No", **kwargs)
+
+
+class ServiceSwitchChannelForm(OnOffSettingForm):
     def __init__(self, channel, *args, **kwargs):
         name = "Send {}".format(
             {
@@ -1695,43 +1742,19 @@ class AddLetterBrandingOptionsForm(StripWhitespaceForm):
     )
 
 
-class AdminSetEmailBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
-    def __init__(self, *args, org_name, service_name, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.add_to_pool.label.text = f"Should other teams in {org_name} have the option to use " f"this branding?"
-
-        self.add_to_pool.param_extensions = {
+class AdminSetBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
+    add_to_pool = GovukRadiosField(
+        choices=[("yes", "Yes"), ("no", "No")],
+        thing="yes or no",
+        param_extensions={
             "fieldset": {
                 "legend": {
                     # This removes the `govuk-fieldset__legend--s` class, thereby
                     # making the form label font regular weight, not bold
                     "classes": "",
                 },
-            },
-            "items": [
-                {"hint": {}},
-                {"hint": {}},
-            ],
-        }
-        self.add_to_pool.param_extensions["items"][0]["hint"]["html"] = Markup(
-            f"""
-            <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
-                <li>Apply this branding to ‘{service_name}’</li>
-                <li class="govuk-!-margin-bottom-0">Let other {org_name} teams apply this branding themselves</li>
-            </ul>
-        """
-        )
-        self.add_to_pool.param_extensions["items"][1]["hint"]["html"] = Markup(
-            f"""
-            <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
-                <li class="govuk-!-margin-bottom-0">Only apply this branding to ‘{service_name}’</li>
-            </ul>
-        """
-        )
-
-    add_to_pool = GovukRadiosField(
-        choices=[("yes", "Yes"), ("no", "No")],
-        thing="yes or no",
+            }
+        },
     )
 
 
@@ -1983,11 +2006,25 @@ class ChooseBrandingForm(StripWhitespaceForm):
 
 
 class ChooseEmailBrandingForm(ChooseBrandingForm):
-    options = RadioField("Choose your new email branding")
+    options = GovukRadiosField(
+        "Choose your new email branding",
+        param_extensions={
+            "fieldset": {
+                "legend": {
+                    # This removes the `govuk-fieldset__legend--s` class, thereby
+                    # making the form label font regular weight, not bold
+                    "classes": "",
+                },
+            },
+        },
+    )
 
     def __init__(self, service):
         super().__init__()
-        self.options.choices = tuple(OrderedSet(branding.get_email_choices(service)) | {self.FALLBACK_OPTION})
+        choices = OrderedSet(branding.get_email_choices(service))
+        if len(choices) > 2:
+            choices = choices | {GovukRadiosField.Divider("or")}
+        self.options.choices = tuple(choices | {self.FALLBACK_OPTION})
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):
@@ -1997,7 +2034,7 @@ class ChooseLetterBrandingForm(ChooseBrandingForm):
     def __init__(self, service):
         super().__init__()
 
-        self.options.choices = tuple(list(branding.get_letter_choices(service)) + [self.FALLBACK_OPTION])
+        self.options.choices = tuple(OrderedSet(list(branding.get_letter_choices(service)) + [self.FALLBACK_OPTION]))
 
         if self.something_else_is_only_option:
             self.options.data = self.FALLBACK_OPTION_VALUE
@@ -2028,26 +2065,7 @@ class GovernmentIdentityLogoForm(StripWhitespaceForm):
     logo_text = GovukTextInputField(
         "Enter the text that will appear in your logo",
         validators=[DataRequired("Cannot be empty")],
-        param_extensions={
-            "label": {
-                "isPageHeading": True,
-                "classes": "govuk-label--l",
-            },
-            "hint": {
-                "html": (
-                    "This is usually the full name of your organisation.<br/><br/>For example, {organisation_name}"
-                )
-            },
-        },
     )
-
-    def __init__(self, organisation=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        organisation_name = organisation.name if organisation else "Department of Education"
-        self.logo_text.param_extensions["hint"]["html"] = self.logo_text.param_extensions["hint"]["html"].format(
-            organisation_name=organisation_name
-        )
 
 
 class EmailBrandingChooseLogoForm(StripWhitespaceForm):
@@ -2062,7 +2080,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
             },
         },
         "org": {
-            "label": "Use your own logo",
+            "label": "Upload a logo",
             "image": {
                 "url": asset_fingerprinter.get_url("images/branding/org.png"),
                 "alt_text": 'An example of an email with the heading "Your logo" in blue text on a white background.',

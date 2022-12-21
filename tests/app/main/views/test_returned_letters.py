@@ -15,7 +15,7 @@ def test_returned_letter_summary(client_request, mocker):
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
     assert page.select_one("h1").string.strip() == "Returned letters"
-    assert normalize_spaces(page.select_one(".table-field").text) == ("24 December 2019 " "1,234 letters")
+    assert normalize_spaces(page.select_one(".table-field").text) == "24 December 2019 1,234 letters"
     assert page.select_one(".table-field a")["href"] == url_for(
         ".returned_letters",
         service_id=SERVICE_ONE_ID,
@@ -32,7 +32,7 @@ def test_returned_letter_summary_with_one_letter(client_request, mocker):
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
     assert page.select_one("h1").string.strip() == "Returned letters"
-    assert normalize_spaces(page.select_one(".table-field").text) == ("24 December 2019 " "1 letter")
+    assert normalize_spaces(page.select_one(".table-field").text) == "24 December 2019 1 letter"
 
 
 def test_returned_letters_page(client_request, mocker):
@@ -115,7 +115,7 @@ def test_returned_letters_page_with_many_letters(
     assert len(data) == number_of_letters
     assert len(page.select("tbody tr")) == 50
     assert normalize_spaces(page.select_one(".table-show-more-link").text) == (expected_message)
-    assert page.select_one("a[download]").text == ("Download this report (CSV)")
+    assert page.select_one("a[download]").text == "Download this report (CSV)"
     assert page.select_one("a[download]")["href"] == url_for(
         ".returned_letters_report",
         service_id=SERVICE_ONE_ID,

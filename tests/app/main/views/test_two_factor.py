@@ -49,8 +49,8 @@ def test_should_render_two_factor_page(client_request, api_user_active, mock_get
     mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
     page = client_request.get("main.two_factor_sms", next=redirect_url)
 
-    assert page.select_one("main p").text.strip() == ("We’ve sent you a text message with a security code.")
-    assert page.select_one("label").text.strip() == ("Text message code")
+    assert page.select_one("main p").text.strip() == "We’ve sent you a text message with a security code."
+    assert page.select_one("label").text.strip() == "Text message code"
     assert page.select_one("input")["type"] == "tel"
     assert page.select_one("input")["pattern"] == "[0-9]*"
 
@@ -345,7 +345,7 @@ def test_valid_two_factor_email_link_shows_interstitial(
     client_request.logout()
     page = client_request.get_url(token_url)
 
-    assert normalize_spaces(page.select_one("main .js-hidden").text) == ("Sign in " "Continue to dashboard")
+    assert normalize_spaces(page.select_one("main .js-hidden").text) == "Sign in Continue to dashboard"
 
     form = page.select_one("form")
     expected_form_id = "use-email-auth"

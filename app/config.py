@@ -182,7 +182,7 @@ class Staging(Config):
     ASSET_PATH = "https://static.staging-notify.works/"
 
 
-class Live(Config):
+class Production(Config):
     HEADER_COLOUR = "#1d70b8"  # $govuk-blue
     HTTP_PROTOCOL = "https"
     CSV_UPLOAD_BUCKET_NAME = "live-notifications-csv-upload"
@@ -192,7 +192,7 @@ class Live(Config):
     MOU_BUCKET_NAME = "notifications.service.gov.uk-mou"
     TRANSIENT_UPLOADED_LETTERS = "production-transient-uploaded-letters"
     PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "production-letters-precompiled-originals-backup"
-    NOTIFY_ENVIRONMENT = "live"
+    NOTIFY_ENVIRONMENT = "production"
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = "static.notifications.service.gov.uk"
     ASSET_PATH = "https://static.notifications.service.gov.uk/"
@@ -216,7 +216,6 @@ configs = {
     "test": Test,
     "preview": Preview,
     "staging": Staging,
-    "live": Live,
-    "production": Live,
+    "production": Production,
     "sandbox": Sandbox,
 }

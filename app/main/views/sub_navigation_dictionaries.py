@@ -74,7 +74,7 @@ def using_notify_nav():
             "sub_navigation_items": [
                 {
                     "name": "Formatting",
-                    "link": "main.edit_and_format_messages",
+                    "link": "main.guidance_edit_and_format_messages",
                 },
                 {
                     "name": "Email branding",
@@ -94,19 +94,27 @@ def using_notify_nav():
                 },
                 {
                     "name": "Send files by email",
-                    "link": "main.send_files_by_email",
+                    "link": "main.guidance_send_files_by_email",
                 },
                 {
                     "name": "Templates",
                     "link": "main.guidance_templates",
                 },
                 {
+                    "name": "Text message sender",
+                    "link": "main.guidance_text_message_sender",
+                },
+                {
                     "name": "Upload a letter",
-                    "link": "main.upload_a_letter",
+                    "link": "main.guidance_upload_a_letter",
                 },
                 {
                     "name": "Letter specification",
-                    "link": "main.letter_specification",
+                    "link": "main.guidance_letter_specification",
+                },
+                {
+                    "name": "Schedule emails and text messages",
+                    "link": "main.guidance_schedule_messages",
                 },
             ],
         },

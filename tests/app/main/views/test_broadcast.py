@@ -485,7 +485,7 @@ def test_empty_broadcast_dashboard(
         ".broadcast_dashboard",
         service_id=SERVICE_ONE_ID,
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("Current alerts")
+    assert normalize_spaces(page.select_one("h1").text) == "Current alerts"
     assert [normalize_spaces(row.text) for row in page.select(".table-empty-message")] == [
         "You do not have any current alerts",
     ]
@@ -626,7 +626,7 @@ def test_previous_broadcasts_page(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert normalize_spaces(page.select_one("main h1").text) == ("Past alerts")
+    assert normalize_spaces(page.select_one("main h1").text) == "Past alerts"
     assert len(page.select(".ajax-block-container")) == 1
     assert [normalize_spaces(row.text) for row in page.select(".ajax-block-container")[0].select(".file-list")] == [
         "Example template This is a test Yesterday at 2:20pm England Scotland",
@@ -655,7 +655,7 @@ def test_rejected_broadcasts_page(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert normalize_spaces(page.select_one("main h1").text) == ("Rejected alerts")
+    assert normalize_spaces(page.select_one("main h1").text) == "Rejected alerts"
     assert len(page.select(".ajax-block-container")) == 1
     assert [normalize_spaces(row.text) for row in page.select(".ajax-block-container")[0].select(".file-list")] == [
         "Example template This is a test Today at 1:20am England Scotland",
@@ -757,10 +757,10 @@ def test_write_new_broadcast_page(
     assert (
         (page.select_one("[data-notify-module=update-status]")["data-target"])
         == (page.select_one("textarea")["id"])
-        == ("template_content")
+        == "template_content"
     )
 
-    assert (page.select_one("[data-notify-module=update-status]")["aria-live"]) == ("polite")
+    assert (page.select_one("[data-notify-module=update-status]")["aria-live"]) == "polite"
 
 
 def test_write_new_broadcast_posts(
@@ -1283,7 +1283,7 @@ def test_choose_broadcast_area_page_for_area_with_sub_areas(
         broadcast_message_id=fake_uuid,
         library_slug="wd21-lad21-ctyua21",
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("Choose a local authority")
+    assert normalize_spaces(page.select_one("h1").text) == "Choose a local authority"
     live_search = page.select_one("[data-notify-module=live-search]")
     assert live_search["data-targets"] == ".file-list-item"
     assert live_search.select_one("input")["type"] == "search"
@@ -1353,7 +1353,7 @@ def test_choose_broadcast_sub_area_page_for_district_shows_checkboxes_for_wards(
         library_slug="wd21-lad21-ctyua21",
         area_slug="lad21-S12000033",
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("Choose an area of Aberdeen City")
+    assert normalize_spaces(page.select_one("h1").text) == "Choose an area of Aberdeen City"
     live_search = page.select_one("[data-notify-module=live-search]")
     assert live_search["data-targets"] == "#sub-areas .govuk-checkboxes__item"
     assert live_search.select_one("input")["type"] == "search"
@@ -1416,7 +1416,7 @@ def test_choose_broadcast_sub_area_page_for_district_has_back_link(
         area_slug="lad21-E07000105",  # Ashford
         prev_area_slug=prev_area_slug,
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("Choose an area of Ashford")
+    assert normalize_spaces(page.select_one("h1").text) == "Choose an area of Ashford"
     back_link = page.select_one(".govuk-back-link")
     assert back_link["href"] == url_for(
         expected_back_link_url,
@@ -1444,7 +1444,7 @@ def test_choose_broadcast_sub_area_page_for_county_shows_links_for_districts(
         library_slug="wd21-lad21-ctyua21",
         area_slug="ctyua21-E10000016",  # Kent
     )
-    assert normalize_spaces(page.select_one("h1").text) == ("Choose an area of Kent")
+    assert normalize_spaces(page.select_one("h1").text) == "Choose an area of Kent"
     live_search = page.select_one("[data-notify-module=live-search]")
     assert live_search["data-targets"] == ".file-list-item"
     assert live_search.select_one("input")["type"] == "search"
@@ -1709,9 +1709,9 @@ def test_preview_broadcast_message_page(
         "Scotland",
     ]
 
-    assert normalize_spaces(page.select_one("h2.broadcast-message-heading").text) == ("Emergency alert")
+    assert normalize_spaces(page.select_one("h2.broadcast-message-heading").text) == "Emergency alert"
 
-    assert normalize_spaces(page.select_one(".broadcast-message-wrapper").text) == ("Emergency alert " "This is a test")
+    assert normalize_spaces(page.select_one(".broadcast-message-wrapper").text) == "Emergency alert This is a test"
 
     form = page.select_one("form")
     assert form["method"] == "post"
@@ -2093,7 +2093,7 @@ def test_view_pending_broadcast_without_template(
 
     assert (normalize_spaces(page.select_one(".banner").text)) == expected_banner_text
 
-    assert (normalize_spaces(page.select_one(".broadcast-message-wrapper").text)) == ("Emergency alert " "Uh-oh")
+    assert (normalize_spaces(page.select_one(".broadcast-message-wrapper").text)) == "Emergency alert Uh-oh"
 
 
 def test_view_pending_broadcast_from_api_call(
@@ -2130,16 +2130,16 @@ def test_view_pending_broadcast_from_api_call(
         "No phones will get this alert. "
         "Start broadcasting now Reject this alert"
     )
-    assert (normalize_spaces(page.select_one(".broadcast-message-wrapper").text)) == ("Emergency alert " "Uh-oh")
+    assert (normalize_spaces(page.select_one(".broadcast-message-wrapper").text)) == "Emergency alert Uh-oh"
 
 
 @pytest.mark.parametrize(
     "channel, expected_label_text",
     (
-        ("test", ("I understand this will alert anyone who has switched on the test channel")),
-        ("operator", ("I understand this will alert anyone who has switched on the operator channel")),
-        ("severe", ("I understand this will alert millions of people")),
-        ("government", ("I understand this will alert millions of people, even if they’ve opted out")),
+        ("test", "I understand this will alert anyone who has switched on the test channel"),
+        ("operator", "I understand this will alert anyone who has switched on the operator channel"),
+        ("severe", "I understand this will alert millions of people"),
+        ("government", "I understand this will alert millions of people, even if they’ve opted out"),
     ),
 )
 def test_checkbox_to_confirm_non_training_broadcasts(
@@ -2216,7 +2216,7 @@ def test_confirm_approve_non_training_broadcasts_errors_if_not_ticked(
 
     error_message = page.select_one("form.banner .govuk-error-message")
     assert error_message["id"] == "confirm-error"
-    assert normalize_spaces(error_message.text) == ("Error: You need to confirm that you understand")
+    assert normalize_spaces(error_message.text) == "Error: You need to confirm that you understand"
 
     assert mock_update_broadcast_message.called is False
     assert mock_update_broadcast_message_status.called is False
@@ -2250,11 +2250,11 @@ def test_can_approve_own_broadcast_in_training_mode(
         broadcast_message_id=fake_uuid,
     )
 
-    assert (normalize_spaces(page.select_one(".banner h1").text)) == ("Example template is waiting for approval")
+    assert (normalize_spaces(page.select_one(".banner h1").text)) == "Example template is waiting for approval"
     assert (normalize_spaces(page.select_one(".banner p").text)) == (
-        "When you use a live account you’ll need another member of " "your team to approve your alert."
+        "When you use a live account you’ll need another member of your team to approve your alert."
     )
-    assert (normalize_spaces(page.select_one(".banner details summary").text)) == ("Approve your own alert")
+    assert (normalize_spaces(page.select_one(".banner details summary").text)) == "Approve your own alert"
     assert (normalize_spaces(page.select_one(".banner details ").text)) == (
         "Approve your own alert "
         "Because you’re in training mode you can approve your own "
@@ -2267,7 +2267,7 @@ def test_can_approve_own_broadcast_in_training_mode(
     form = page.select_one(".banner details form")
     assert form["method"] == "post"
     assert "action" not in form
-    assert normalize_spaces(form.select_one("button").text) == ("Start broadcasting now")
+    assert normalize_spaces(form.select_one("button").text) == "Start broadcasting now"
 
     link = page.select_one(".banner a.govuk-link.govuk-link--destructive")
     assert link.text == "Reject this alert"
@@ -2314,7 +2314,7 @@ def test_cant_approve_own_broadcast_if_service_is_live(
         broadcast_message_id=fake_uuid,
     )
 
-    assert (normalize_spaces(page.select_one(".banner h1").text)) == ("Example template is waiting for approval")
+    assert (normalize_spaces(page.select_one(".banner h1").text)) == "Example template is waiting for approval"
     assert (normalize_spaces(page.select_one(".banner p").text)) == (
         "You need another member of your team to approve your alert."
     )
@@ -2819,12 +2819,12 @@ def test_cancel_broadcast(
         broadcast_message_id=fake_uuid,
     )
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Are you sure you want to stop this broadcast now? " "Yes, stop broadcasting"
+        "Are you sure you want to stop this broadcast now? Yes, stop broadcasting"
     )
     form = page.select_one("form")
     assert form["method"] == "post"
     assert "action" not in form
-    assert normalize_spaces(form.select_one("button").text) == ("Yes, stop broadcasting")
+    assert normalize_spaces(form.select_one("button").text) == "Yes, stop broadcasting"
     assert mock_update_broadcast_message_status.called is False
     assert (
         url_for(

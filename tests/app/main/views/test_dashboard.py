@@ -426,7 +426,7 @@ def test_download_inbox(
         "main.inbox_download",
         service_id=SERVICE_ONE_ID,
     )
-    assert response.headers["Content-Type"] == ("text/csv; " "charset=utf-8")
+    assert response.headers["Content-Type"] == "text/csv; charset=utf-8"
     assert response.headers["Content-Disposition"] == ("inline; " 'filename="Received text messages 2016-07-01.csv"')
     assert response.get_data(as_text=True) == (
         "Phone number,Message,Received\r\n"
@@ -506,10 +506,10 @@ def test_returned_letters_not_visible_if_service_has_no_returned_letters(
 @pytest.mark.parametrize(
     "reporting_date, expected_message",
     (
-        ("2020-01-10 00:00:00.000000", ("4,000 returned letters latest report today")),
-        ("2020-01-09 23:59:59.000000", ("4,000 returned letters latest report yesterday")),
-        ("2020-01-08 12:12:12.000000", ("4,000 returned letters latest report 2 days ago")),
-        ("2019-12-10 00:00:00.000000", ("4,000 returned letters latest report 1 month ago")),
+        ("2020-01-10 00:00:00.000000", "4,000 returned letters latest report today"),
+        ("2020-01-09 23:59:59.000000", "4,000 returned letters latest report yesterday"),
+        ("2020-01-08 12:12:12.000000", "4,000 returned letters latest report 2 days ago"),
+        ("2019-12-10 00:00:00.000000", "4,000 returned letters latest report 1 month ago"),
     ),
 )
 @freeze_time("2020-01-10 12:34:00.000000")
@@ -547,14 +547,14 @@ def test_returned_letters_shows_count_of_recently_returned_letters(
 @pytest.mark.parametrize(
     "reporting_date, count, expected_message",
     (
-        ("2020-02-02", 1, ("1 returned letter latest report today")),
-        ("2020-02-01", 1, ("1 returned letter latest report yesterday")),
-        ("2020-01-31", 1, ("1 returned letter latest report 2 days ago")),
-        ("2020-01-26", 1, ("1 returned letter latest report 7 days ago")),
-        ("2020-01-25", 0, ("0 returned letters latest report 8 days ago")),
-        ("2020-01-01", 0, ("0 returned letters latest report 1 month ago")),
-        ("2019-09-09", 0, ("0 returned letters latest report 4 months ago")),
-        ("2010-10-10", 0, ("0 returned letters latest report 9 years ago")),
+        ("2020-02-02", 1, "1 returned letter latest report today"),
+        ("2020-02-01", 1, "1 returned letter latest report yesterday"),
+        ("2020-01-31", 1, "1 returned letter latest report 2 days ago"),
+        ("2020-01-26", 1, "1 returned letter latest report 7 days ago"),
+        ("2020-01-25", 0, "0 returned letters latest report 8 days ago"),
+        ("2020-01-01", 0, "0 returned letters latest report 1 month ago"),
+        ("2019-09-09", 0, "0 returned letters latest report 4 months ago"),
+        ("2010-10-10", 0, "0 returned letters latest report 9 years ago"),
     ),
 )
 @freeze_time("2020-02-02")
@@ -721,7 +721,7 @@ def test_should_show_monthly_breakdown_of_template_usage(
 
     table_rows = page.select("tbody tr")
 
-    assert " ".join(table_rows[0].text.split()) == ("My first template " "Text message template " "2")
+    assert " ".join(table_rows[0].text.split()) == "My first template Text message template 2"
 
     assert len(table_rows) == len(["April"])
     assert len(page.select(".table-no-data")) == len(["May", "June", "July"])
@@ -780,7 +780,7 @@ def test_stats_pages_show_last_3_years(
     )
 
     assert normalize_spaces(page.select_one(".pill").text) == (
-        "2014 to 2015 financial year " "2013 to 2014 financial year " "2012 to 2013 financial year"
+        "2014 to 2015 financial year 2013 to 2014 financial year 2012 to 2013 financial year"
     )
 
 
@@ -814,10 +814,10 @@ def test_should_show_upcoming_jobs_on_dashboard(
     mock_get_jobs.assert_called_once_with(SERVICE_ONE_ID)
     mock_get_scheduled_job_stats.assert_called_once_with(SERVICE_ONE_ID)
 
-    assert normalize_spaces(page.select_one("main h2").text) == ("In the next few days")
+    assert normalize_spaces(page.select_one("main h2").text) == "In the next few days"
 
     assert normalize_spaces(page.select_one("a.banner-dashboard").text) == (
-        "2 files waiting to send " "sending starts today at 11:09am"
+        "2 files waiting to send sending starts today at 11:09am"
     )
 
     assert page.select_one("a.banner-dashboard")["href"] == url_for("main.uploads", service_id=SERVICE_ONE_ID)
@@ -1741,7 +1741,7 @@ def test_service_dashboard_shows_usage(
     page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one("[data-key=usage]").text) == (
-        "Unlimited " "free email allowance " "£29.85 " "spent on text messages " "£30.00 " "spent on letters"
+        "Unlimited free email allowance " "£29.85 spent on text messages " "£30.00 spent on letters"
     )
 
 

@@ -16,7 +16,7 @@ def test_non_logged_in_user_can_see_homepage(
     client_request.logout()
     page = client_request.get("main.index", _test_page_title=False)
 
-    assert page.select_one("h1").text.strip() == ("Send emails, text messages and letters to your users")
+    assert page.select_one("h1").text.strip() == "Send emails, text messages and letters to your users"
 
     assert page.select_one("a[role=button][draggable=false]")["href"] == url_for("main.register")
 
@@ -105,11 +105,14 @@ def test_hiding_pages_from_search_engines(
         "how_to_pay",
         "get_started",
         "guidance_index",
-        "branding_and_customisation",
-        "create_and_send_messages",
-        "edit_and_format_messages",
-        "send_files_by_email",
-        "upload_a_letter",
+        "guidance_email_branding",
+        "guidance_letter_branding",
+        "guidance_reply_to_email_address",
+        "guidance_schedule_messages",
+        "guidance_edit_and_format_messages",
+        "guidance_send_files_by_email",
+        "guidance_text_message_sender",
+        "guidance_upload_a_letter",
         "who_can_use_notify",
         "billing_details",
     ],
@@ -141,7 +144,7 @@ def test_static_pages(
 def test_guidance_pages_link_to_service_pages_when_signed_in(
     client_request,
 ):
-    request = partial(client_request.get, "main.edit_and_format_messages")
+    request = partial(client_request.get, "main.guidance_edit_and_format_messages")
     selector = ".govuk-list--number li a"
 
     # Check the page loads when user is signed in
@@ -231,7 +234,7 @@ def test_old_integration_testing_page(
 def test_terms_page_has_correct_content(client_request):
     terms_page = client_request.get("main.terms")
     assert normalize_spaces(terms_page.select("main p")[0].text) == (
-        "These terms apply to your service’s use of GOV.UK Notify. " "You must be the service manager to accept them."
+        "These terms apply to your service’s use of GOV.UK Notify. You must be the service manager to accept them."
     )
 
 
@@ -372,9 +375,10 @@ def test_sms_price(
         home_page = client_request.get("main.index", _test_page_title=False)
         pricing_page = client_request.get("main.pricing")
 
-    assert normalize_spaces(
-        home_page.select(".product-page-section")[5].select(".govuk-grid-column-one-half")[1].text
-    ) == (f"Text messages " f"Up to 40,000 free text messages a year, " f"then {expected_rate} pence per message")
+    assert (
+        normalize_spaces(home_page.select(".product-page-section")[5].select(".govuk-grid-column-one-half")[1].text)
+        == f"Text messages Up to 40,000 free text messages a year, then {expected_rate} pence per message"
+    )
 
     assert normalize_spaces(pricing_page.select_one("#text-messages + p + p").text) == (
         f"When a service has used its annual allowance, it costs "

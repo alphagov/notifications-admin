@@ -31,6 +31,7 @@ class EmailBrandingClient(NotifyAdminAPIClient):
 
     @cache.delete("email_branding")
     @cache.delete("email_branding-{branding_id}")
+    @cache.delete_by_pattern("organisation-*-email-branding-pool")
     def update_email_branding(self, *, branding_id, logo, name, alt_text, text, colour, brand_type, updated_by_id: str):
         data = {
             "logo": logo or None,

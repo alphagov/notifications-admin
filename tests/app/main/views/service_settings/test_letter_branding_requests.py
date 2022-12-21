@@ -4,6 +4,7 @@ import pytest
 from flask import url_for
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
+from app.models.branding import LetterBranding
 from tests import organisation_json, sample_uuid
 from tests.conftest import (
     ORGANISATION_ID,
@@ -14,16 +15,32 @@ from tests.conftest import (
 
 
 @pytest.mark.parametrize(
-    "organisation_type, expected_options",
+    "organisation_type, is_org_set, letter_branding_pool, expected_options",
     (
         (
             "nhs_central",
+            True,
             [
-                ("nhs", "NHS"),
+                {"id": "1234", "name": "Brand 1", "filename": "brand_1"},
+                {"id": "5678", "name": "Brand 2", "filename": "brand_2"},
+            ],
+            [
+                (LetterBranding.NHS_ID, "NHS"),
+                ("1234", "Brand 1"),
+                ("5678", "Brand 2"),
                 ("something_else", "Something else"),
             ],
         ),
-        ("other", None),
+        (
+            "nhs_central",
+            False,
+            [],
+            [
+                (LetterBranding.NHS_ID, "NHS"),
+                ("something_else", "Something else"),
+            ],
+        ),
+        ("other", False, [], None),
     ),
 )
 def test_letter_branding_request_page_when_no_branding_is_set(
@@ -31,11 +48,26 @@ def test_letter_branding_request_page_when_no_branding_is_set(
     client_request,
     mock_get_email_branding,
     mock_get_letter_branding_by_id,
+    mocker,
     organisation_type,
+    is_org_set,
+    letter_branding_pool,
     expected_options,
 ):
     service_one["letter_branding"] = None
     service_one["organisation_type"] = organisation_type
+
+    if is_org_set:
+        mocker.patch(
+            "app.models.service.Service.organisation_id",
+            new_callable=PropertyMock,
+            return_value=ORGANISATION_ID,
+        )
+        mocker.patch(
+            "app.organisations_client.get_organisation",
+            return_value=organisation_json(id_=ORGANISATION_ID, name="NHS Org 1", organisation_type=organisation_type),
+        )
+        mocker.patch("app.models.branding.LetterBrandingPool.client_method", side_effect=[letter_branding_pool])
 
     page = client_request.get(".letter_branding_request", service_id=SERVICE_ONE_ID)
 
@@ -45,16 +77,16 @@ def test_letter_branding_request_page_when_no_branding_is_set(
     assert normalize_spaces(page.select_one("main p").text) == "Your letters currently have no branding."
 
     button_text = normalize_spaces(page.select_one(".page-footer button").text)
-    assert button_text == "Request new branding"
+    assert button_text == "Continue"
 
     if expected_options:
         assert [
             (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
             for radio in page.select("input[type=radio]")
         ] == expected_options
-        assert page.select_one(".conditional-radios-panel#panel-something-else textarea")["name"] == ("something_else")
+        assert page.select_one(".conditional-radios-panel#panel-something-else textarea")["name"] == "something_else"
     else:
-        assert page.select_one("textarea")["name"] == ("something_else")
+        assert page.select_one("textarea")["name"] == "something_else"
         assert not page.select(".conditional-radios-panel")
 
 
@@ -96,6 +128,35 @@ def test_letter_branding_request_page_back_link(
     assert back_link[0].attrs["href"] == back_link_url
 
 
+def test_letter_branding_request_redirects_to_branding_preview_for_a_branding_pool_option(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_letter_branding_pool,
+):
+    mocker.patch(
+        "app.models.service.Service.organisation_id",
+        new_callable=PropertyMock,
+        return_value=ORGANISATION_ID,
+    )
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, name="Org 1"),
+    )
+
+    client_request.post(
+        ".letter_branding_request",
+        service_id=SERVICE_ONE_ID,
+        _data={"options": "1234"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.letter_branding_pool_option",
+            service_id=SERVICE_ONE_ID,
+            branding_option="1234",
+        ),
+    )
+
+
 @pytest.mark.parametrize(
     "org_name, expected_organisation",
     (
@@ -103,7 +164,7 @@ def test_letter_branding_request_page_back_link(
         ("Test Organisation", "Test Organisation"),
     ),
 )
-def test_letter_branding_request_submit(
+def test_letter_branding_request_submit_choose_something_else(
     client_request,
     service_one,
     mocker,
@@ -111,6 +172,7 @@ def test_letter_branding_request_submit(
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
+    mock_get_empty_letter_branding_pool,
     org_name,
     expected_organisation,
 ):
@@ -129,7 +191,7 @@ def test_letter_branding_request_submit(
 
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
-        "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
+        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
 
@@ -166,7 +228,7 @@ def test_letter_branding_request_submit(
     )
     mock_send_ticket_to_zendesk.assert_called_once()
     assert normalize_spaces(page.select_one(".banner-default").text) == (
-        "Thanks for your branding request. We’ll get back to you " "within one working day."
+        "Thanks for your branding request. We’ll get back to you within one working day."
     )
 
 
@@ -182,9 +244,10 @@ def test_letter_branding_request_submit_when_form_has_missing_data(
     mocker,
     service_one,
     organisation_one,
+    mock_get_letter_branding_by_id,
+    mock_get_empty_letter_branding_pool,
     data,
     error_message,
-    mock_get_letter_branding_by_id,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -208,9 +271,10 @@ def test_letter_branding_request_submit_redirects_if_from_template_is_set(
     client_request,
     service_one,
     mocker,
+    mock_get_empty_letter_branding_pool,
     from_template,
 ):
-    mocker.patch("app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk", autospec=True)
+    mocker.patch("app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True)
     data = {"options": "something_else", "something_else": "Homer Simpson"}
 
     if from_template:
@@ -242,7 +306,7 @@ def test_letter_branding_submit_when_something_else_is_only_option(
 ):
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mocker.patch(
-        "app.main.views.service_settings.zendesk_client.send_ticket_to_zendesk",
+        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
 
@@ -255,5 +319,74 @@ def test_letter_branding_submit_when_something_else_is_only_option(
     )
 
     assert (
-        "Current branding: no\n" "Branding requested: Something else\n" "\n" "Homer Simpson"
+        "Current branding: no\nBranding requested: Something else\n" "\nHomer Simpson"
     ) in mock_create_ticket.call_args_list[0][1]["message"]
+
+
+def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
+    service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
+):
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    page = client_request.get(".letter_branding_pool_option", service_id=SERVICE_ONE_ID, branding_option="1234")
+
+    assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="1234")
+
+
+def test_letter_branding_pool_option_page_redirects_to_branding_request_page_if_branding_option_not_found(
+    service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
+):
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    client_request.get(
+        ".letter_branding_pool_option",
+        service_id=SERVICE_ONE_ID,
+        branding_option="some-unknown-branding-id",
+        _expected_status=302,
+        _expected_redirect=url_for("main.letter_branding_request", service_id=SERVICE_ONE_ID),
+    )
+
+
+def test_letter_branding_pool_option_changes_letter_branding_when_user_confirms(
+    mocker,
+    service_one,
+    organisation_one,
+    client_request,
+    no_reply_to_email_addresses,
+    single_sms_sender,
+    mock_get_letter_branding_pool,
+    mock_update_service,
+):
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    page = client_request.post(
+        ".letter_branding_pool_option",
+        service_id=SERVICE_ONE_ID,
+        branding_option="1234",
+        _follow_redirects=True,
+    )
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        letter_branding="1234",
+    )
+    assert page.select_one("h1").text == "Settings"
+    assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your letter branding"

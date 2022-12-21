@@ -75,6 +75,10 @@ freeze-requirements: ## create static requirements.txt
 	${PYTHON_EXECUTABLE_PREFIX}pip3 install --upgrade pip-tools
 	${PYTHON_EXECUTABLE_PREFIX}pip-compile requirements.in
 
+.PHONY: bump-utils
+bump-utils:  # Bump notifications-utils package to latest version
+	${PYTHON_EXECUTABLE_PREFIX}python -c "from notifications_utils.version_tools import upgrade_version; upgrade_version()"
+
 .PHONY: clean
 clean:
 	rm -rf node_modules cache target ${CF_MANIFEST_PATH}

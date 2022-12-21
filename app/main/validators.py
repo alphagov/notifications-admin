@@ -129,7 +129,7 @@ class OnlySMSCharacters:
 
 class NoPlaceholders:
     def __init__(self, message=None):
-        self.message = message or ("You can’t use ((double brackets)) to personalise this message")
+        self.message = message or "You can’t use ((double brackets)) to personalise this message"
 
     def __call__(self, form, field):
         if Field(field.data).placeholders:
@@ -153,7 +153,7 @@ class BroadcastLength:
                     f"characters or fewer because it contains "
                     f'{formatted_list(non_gsm_characters, conjunction="and", before_each="", after_each="")}'
                 )
-            raise ValidationError(f"Content must be {template.max_content_count:,.0f} " f"characters or fewer")
+            raise ValidationError(f"Content must be {template.max_content_count:,.0f} characters or fewer")
 
 
 class LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly:
@@ -204,6 +204,21 @@ class CharactersNotAllowed:
                 f"Cannot contain "
                 f'{formatted_list(illegal_characters, conjunction="or", before_each="", after_each="")}'
             )
+
+
+class StringsNotAllowed:
+    def __init__(self, *args, message=None, match_on_substrings=False):
+        self.strings_not_allowed = OrderedSet(string.lower() for string in args)
+        self.match_on_substrings = match_on_substrings
+        self.message = message
+
+    def __call__(self, form, field):
+        normalised = field.data.lower()
+        for not_allowed in self.strings_not_allowed:
+            if normalised == not_allowed or (self.match_on_substrings and not_allowed in normalised):
+                if self.message:
+                    raise ValidationError(self.message)
+                raise ValidationError(f"Cannot {'contain' if self.match_on_substrings else 'be'} ‘{not_allowed}’")
 
 
 class FileIsVirusFree:

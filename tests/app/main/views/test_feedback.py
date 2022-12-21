@@ -70,7 +70,7 @@ def test_choose_support_type(
     assert page.select_one("h1").string.strip() == expected_h1
     assert not page.select_one("input[name=name]")
     assert not page.select_one("input[name=email_address]")
-    assert page.select_one("form").find("p").text.strip() == ("We’ll reply to test@user.gov.uk")
+    assert page.select_one("form").find("p").text.strip() == "We’ll reply to test@user.gov.uk"
 
 
 @freeze_time("2016-12-12 12:00:00.000000")
@@ -83,7 +83,7 @@ def test_get_support_as_someone_in_the_public_sector(
         _data={"who": "public-sector"},
         _follow_redirects=True,
     )
-    assert normalize_spaces(page.select("h1")) == ("Contact GOV.UK Notify support")
+    assert normalize_spaces(page.select("h1")) == "Contact GOV.UK Notify support"
     assert page.select_one("form textarea[name=feedback]")
     assert page.select_one("form input[name=name]")
     assert page.select_one("form input[name=email_address]")
@@ -99,7 +99,7 @@ def test_get_support_as_member_of_public(
         _data={"who": "public"},
         _follow_redirects=True,
     )
-    assert normalize_spaces(page.select("h1")) == ("The GOV.UK Notify service is for people who work in the government")
+    assert normalize_spaces(page.select("h1")) == "The GOV.UK Notify service is for people who work in the government"
     assert len(page.select("h2 a")) == 3
     assert not page.select("form")
     assert not page.select("input")
@@ -253,7 +253,7 @@ def test_email_address_required_for_problems_and_questions(
     mocker.patch("app.main.views.feedback.zendesk_client")
     client_request.logout()
     page = client_request.post("main.feedback", ticket_type=ticket_type, _data=data, _expected_status=200)
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == ("Error: Cannot be empty")
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Cannot be empty"
 
 
 @freeze_time("2016-12-12 12:00:00.000000")
@@ -274,7 +274,7 @@ def test_email_address_must_be_valid_if_provided_to_support_form(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == ("Error: Enter a valid email address")
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Enter a valid email address"
 
 
 @pytest.mark.parametrize(
@@ -362,7 +362,7 @@ ids, params = zip(
 
 
 @pytest.mark.parametrize(
-    ("ticket_type, is_in_business_hours, logged_in, has_live_services," "expected_status, expected_redirect"),
+    "ticket_type, is_in_business_hours, logged_in, has_live_services,expected_status, expected_redirect",
     params,
     ids=ids,
 )

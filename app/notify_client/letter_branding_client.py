@@ -20,6 +20,7 @@ class LetterBrandingClient(NotifyAdminAPIClient):
 
     @cache.delete("letter_branding")
     @cache.delete("letter_branding-{branding_id}")
+    @cache.delete_by_pattern("organisation-*-letter-branding-pool")
     def update_letter_branding(self, branding_id, filename, name):
         data = {
             "filename": filename,

@@ -19,4 +19,4 @@ Government logo text requested: {{ logo_text }}
 
 {% endif %}Create this logo: {{ create_logo_url }}
 
-Apply branding to this service: {{ url_for('main.service_set_email_branding', service_id=current_service.id, _external=True) }}
+Apply branding to this service: {{ url_for('main.service_set_branding', service_id=current_service.id, notification_type='email', _external=True) }}

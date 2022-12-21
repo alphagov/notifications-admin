@@ -186,6 +186,15 @@ def test_can_show_notifications(
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {"counts", "notifications", "service_data_retention_days"}
 
+    # All links to view individual notifications should pass through the statuses for the current view,
+    # so that backlinks can be generated correctly.
+    view_notification_links = page.select(".file-list-filename")
+    assert all(
+        parse_qs(urlparse(view_notification_link["href"]).query, keep_blank_values=True)["from_statuses"]
+        == [status_argument]
+        for view_notification_link in view_notification_links
+    )
+
 
 def test_can_show_notifications_if_data_retention_not_available(
     client_request,
@@ -338,11 +347,11 @@ def test_shows_message_when_no_notifications(
         message_type="sms",
     )
 
-    assert normalize_spaces(page.select("tbody tr")[0].text) == ("No messages found (messages are kept for 7 days)")
+    assert normalize_spaces(page.select("tbody tr")[0].text) == "No messages found (messages are kept for 7 days)"
 
 
 @pytest.mark.parametrize(
-    ("initial_query_arguments," "form_post_data," "expected_search_box_label," "expected_search_box_contents"),
+    "initial_query_arguments,form_post_data,expected_search_box_label,expected_search_box_contents",
     [
         (
             {},
@@ -535,7 +544,7 @@ def test_doesnt_show_pagination_with_search_term(
     assert len(page.select("tbody tr")) == 50
     assert not page.select_one("a[rel=next]")
     assert not page.select_one("a[rel=previous]")
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == ("Only showing the first 50 messages")
+    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 messages"
 
 
 @pytest.mark.parametrize(
@@ -623,8 +632,8 @@ def test_html_contains_links_for_failed_notifications(
 @pytest.mark.parametrize(
     "notification_type, expected_row_contents",
     (
-        ("sms", ("07123456789 hello & welcome hidden")),
-        ("email", ("example@gov.uk hidden, hello & welcome")),
+        ("sms", "07123456789 hello & welcome hidden"),
+        ("email", "example@gov.uk hidden, hello & welcome"),
         (
             "letter",
             (

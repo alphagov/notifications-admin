@@ -39,7 +39,7 @@ def test_get_should_render_add_service_template(
         return_value=org_json,
     )
     page = client_request.get("main.add_service")
-    assert page.select_one("h1").text.strip() == "About your service"
+    assert page.select_one("h1").text.strip() == "Enter a service name"
     assert page.select_one("input[name=name]").get("value") is None
     assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
         "Central government",
@@ -72,7 +72,7 @@ def test_get_should_not_render_radios_if_org_type_known(
         return_value=organisation_json(organisation_type="central"),
     )
     page = client_request.get("main.add_service")
-    assert page.select_one("h1").text.strip() == "About your service"
+    assert page.select_one("h1").text.strip() == "Enter a service name"
     assert page.select_one("input[name=name]").get("value") is None
     assert not page.select(".multiple-choice")
 
@@ -86,7 +86,7 @@ def test_show_different_page_if_user_org_type_is_local(
         return_value=organisation_json(organisation_type="local"),
     )
     page = client_request.get("main.add_service")
-    assert page.select_one("h1").text.strip() == "About your service"
+    assert page.select_one("h1").text.strip() == "Enter a service name"
     assert page.select_one("input[name=name]").get("value") is None
     assert page.select_one("main .govuk-body").text.strip() == (
         "Give your service a name that tells users what your "
@@ -196,7 +196,7 @@ def test_add_service_has_to_choose_org_type(
         },
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == ("Error: Select the type of organisation")
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select the type of organisation"
     assert mock_create_service.called is False
     assert mock_create_service_template.called is False
 
@@ -223,7 +223,7 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
         return_value=None,
     )
     page = client_request.get("main.add_service")
-    assert page.select_one("h1").text.strip() == "About your service"
+    assert page.select_one("h1").text.strip() == "Enter a service name"
     assert page.select_one("input[name=name]").get("value") is None
     assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
         "NHS – central government agency or public body",

@@ -94,8 +94,8 @@ def test_view_conversation(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one("title").text) == ("Received text message – service one – GOV.UK Notify")
-    assert normalize_spaces(page.select_one("h1").text) == ("07123 456789")
+    assert normalize_spaces(page.select_one("title").text) == "Received text message – service one – GOV.UK Notify"
+    assert normalize_spaces(page.select_one("h1").text) == "07123 456789"
 
     messages = page.select(".sms-message-wrapper")
     statuses = page.select(".sms-message-status")

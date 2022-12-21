@@ -26,8 +26,8 @@ def test_should_200_for_tour_start(
     assert "greyed-out-step" not in selected_hint["class"]
     assert selected_hint_text == "Every message is sent from a template"
 
-    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == ("To: 07700 900762")
-    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == ("service one: ((one)) ((two)) ((three))")
+    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == "To: 07700 900762"
+    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: ((one)) ((two)) ((three))"
 
     assert page.select("a.govuk-button")[0]["href"] == url_for(
         ".tour_step", service_id=SERVICE_ONE_ID, template_id=fake_uuid, step_index=1
@@ -135,9 +135,9 @@ def test_should_200_for_get_tour_step(
     assert "greyed-out-step" not in selected_hint["class"]
     assert selected_hint_text == "The template pulls in the data you provide"
 
-    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == ("To: 07700 900762")
+    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == "To: 07700 900762"
 
-    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == ("service one: ((one)) ((two)) ((three))")
+    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: ((one)) ((two)) ((three))"
 
 
 def test_should_show_empty_text_box(
@@ -361,11 +361,11 @@ def test_post_tour_step_raises_validation_error_for_form_error(
         _expected_status=200,  # should this be 400
     )
 
-    assert normalize_spaces(page.select(".govuk-error-message")[0].text) == ("Error: Cannot be empty")
+    assert normalize_spaces(page.select(".govuk-error-message")[0].text) == "Error: Cannot be empty"
 
-    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == ("To: 07700 900762")
+    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == "To: 07700 900762"
 
-    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == ("service one: hi ((two)) ((three))")
+    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: hi ((two)) ((three))"
 
     with client_request.session_transaction() as session:
         assert session["placeholders"] == {"one": "hi", "phone number": "07700 900762"}
@@ -473,8 +473,8 @@ def test_should_200_for_check_tour_notification(
     assert "greyed-out-step" not in selected_hint["class"]
     assert selected_hint_text == "The template pulls in the data you provide"
 
-    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == ("To: 07700 900762")
-    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == ("service one: hello hi howdy")
+    assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == "To: 07700 900762"
+    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: hello hi howdy"
 
     # post to send_notification keeps help argument
     assert page.select_one("form").attrs["action"] == url_for(

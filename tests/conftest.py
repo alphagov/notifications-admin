@@ -451,7 +451,7 @@ def get_non_default_sms_sender(mocker):
 
 @pytest.fixture(scope="function")
 def mock_add_sms_sender(mocker):
-    def _add_sms_sender(service_id, sms_sender, is_default=False, inbound_number_id=None):
+    def _add_sms_sender(service_id, sms_sender, is_default=False):
         return
 
     return mocker.patch("app.service_api_client.add_sms_sender", side_effect=_add_sms_sender)
@@ -1577,7 +1577,7 @@ def mock_get_uploads(mocker, api_user_active):
                 "statistics": [{"count": 1, "status": "delivered"}],
                 "upload_type": "letter",
                 "template_type": None,
-                "recipient": ("Firstname Lastname\n" "123 Example Street\n" "City of Town\n" "XM4 5QQ"),
+                "recipient": "Firstname Lastname\n123 Example Street\nCity of Town\nXM4 5QQ",
             },
         ]
         return {
@@ -2798,6 +2798,7 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
                         element
                         and not element.has_attr("style")  # Elements with inline CSS are exempt
                         and element.text.strip()  # Empty elements are exempt
+                        and "govuk-error-summary__body" not in element.parent["class"]
                     ):
                         raise AssertionError(
                             f"Found a <{tag}> without a class attribute:\n"
