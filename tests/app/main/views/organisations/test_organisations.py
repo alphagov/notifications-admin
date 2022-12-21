@@ -1774,7 +1774,11 @@ def test_organisation_settings_links_to_edit_organisation_notes_page(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
-    assert len(page.select(f"""a[href="/organisations/{organisation_one['id']}/settings/notes"]""")) == 1
+
+    assert page.select(".table-field-right-aligned a")[4]["href"] == url_for(
+        ".edit_organisation_go_live_notes",
+        org_id=organisation_one["id"],
+    )
 
 
 def test_view_edit_organisation_notes(
@@ -1838,8 +1842,10 @@ def test_organisation_settings_links_to_edit_can_approve_own_go_live_request(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
-    assert page.select(
-        f"a[href=\"/organisations/{organisation_one['id']}/settings/edit-can-approve-own-go-live-requests\"]"
+
+    assert page.select(".table-field-right-aligned a")[5]["href"] == url_for(
+        ".edit_organisation_can_approve_own_go_live_requests",
+        org_id=organisation_one["id"],
     )
 
 
