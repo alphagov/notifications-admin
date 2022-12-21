@@ -93,6 +93,10 @@ def using_notify_nav():
                     "link": "main.guidance_reply_to_email_address",
                 },
                 {
+                    "name": "Schedule messages",
+                    "link": "main.guidance_schedule_messages",
+                },
+                {
                     "name": "Send files by email",
                     "link": "main.guidance_send_files_by_email",
                 },
@@ -111,10 +115,6 @@ def using_notify_nav():
                 {
                     "name": "Letter specification",
                     "link": "main.guidance_letter_specification",
-                },
-                {
-                    "name": "Schedule emails and text messages",
-                    "link": "main.guidance_schedule_messages",
                 },
             ],
         },
