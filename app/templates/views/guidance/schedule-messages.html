@@ -23,5 +23,5 @@
     <li>Set the date and time you want to send your messages.</li>
   </ol>
 
-  <p class="govuk-body">Your scheduled messages will appear on the dashboard and uploads pages.</p>
+  <p class="govuk-body">Your scheduled messages will appear on the {{ service_link(current_service, 'main.dashboard', 'dashboard') }} and {{ service_link(current_service, 'main.uploads', 'uploads') }} pages.</p>
 {% endblock %}
