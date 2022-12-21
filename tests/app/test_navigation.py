@@ -234,6 +234,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "revoke_api_key",
             "roadmap",
             "save_contact_list",
+            "schedule_emails_and_text_messages",
             "security",
             "security_policy",
             "send_files_by_email",

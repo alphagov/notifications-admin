@@ -1,7 +1,7 @@
-{% macro service_link(service, endpoint, link_text) %}
-  {% if service %}
+{% macro service_link(service, endpoint, link_text) -%}
+  {%- if service -%}
     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(endpoint, service_id=service.id) }}">{{ link_text }}</a>
-  {% else %}
+  {%- else -%}
     <b class="govuk-!-font-weight-bold">{{ link_text|capitalize }}</b>
-  {% endif %}
-{% endmacro %}
+  {%- endif -%}
+{%- endmacro %}
