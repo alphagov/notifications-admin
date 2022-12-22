@@ -300,7 +300,7 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
     )
 
     table = page.select_one("table")
-    service_row_group = table.select("tbody")[1].select("tr")
+    service_row_group = table.select_one("tbody").select("tr")
     email_stats = service_row_group[1].select(".big-number-number")[0]
     sms_stats = service_row_group[1].select(".big-number-number")[1]
 
