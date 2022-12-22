@@ -7,8 +7,15 @@ from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTick
 from app import current_service
 from app.extensions import zendesk_client
 from app.main import main
-from app.main.forms import ChooseLetterBrandingForm, LetterBrandingUploadBranding
-from app.s3_client.s3_logo_client import upload_letter_temp_logo
+from app.main.forms import (
+    ChooseLetterBrandingForm,
+    LetterBrandingNameForm,
+    LetterBrandingUploadBranding,
+)
+from app.s3_client.s3_logo_client import (
+    get_letter_filename_with_no_path_or_extension,
+    upload_letter_temp_logo,
+)
 from app.utils.user import user_has_permissions
 
 from .index import THANKS_FOR_BRANDING_REQUEST_MESSAGE
@@ -27,7 +34,7 @@ def _letter_branding_flow_query_params(**kwargs):
     To remove a value:
         _letter_branding_flow_query_params(request, branding_choice=None)
     """
-    return {k: kwargs.get(k, request.args.get(k)) for k in ("from_template", "branding_choice")}
+    return {k: kwargs.get(k, request.args.get(k)) for k in ("from_template", "branding_choice", "temp_filename")}
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=["GET", "POST"])
@@ -124,9 +131,14 @@ def letter_branding_upload_branding(service_id):
             user_id=current_user.id,
             unique_id=upload_id,
         )
-
-        # TODO: redirect to the next step of the flow instead (passing through the params)
-        return redirect(f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{branding_filename}")
+        temp_filename = get_letter_filename_with_no_path_or_extension(branding_filename)
+        return redirect(
+            url_for(
+                "main.letter_branding_set_name",
+                service_id=current_service.id,
+                **_letter_branding_flow_query_params(temp_filename=temp_filename),
+            )
+        )
 
     return render_template(
         "views/service-settings/branding/add-new-branding/letter-branding-upload-branding.html",
@@ -139,4 +151,29 @@ def letter_branding_upload_branding(service_id):
         ),
         # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
         abandon_flow_link=url_for(".support"),
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/set-name", methods=["GET", "POST"])
+def letter_branding_set_name(service_id):
+    letter_branding_data = _letter_branding_flow_query_params()
+    temp_filename = letter_branding_data["temp_filename"]
+
+    if not temp_filename:
+        return redirect(url_for("main.letter_branding_upload_branding", service_id=service_id, **letter_branding_data))
+
+    form = LetterBrandingNameForm()
+
+    if form.validate_on_submit():
+        pass
+
+    return render_template(
+        "views/service-settings/branding/add-new-branding/letter-branding-set-name.html",
+        back_link=url_for(
+            ".letter_branding_upload_branding",
+            service_id=service_id,
+            **_letter_branding_flow_query_params(temp_filename=None),
+        ),
+        temp_filename=temp_filename,
+        form=form,
     )

@@ -1,0 +1,38 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/branding-preview.html" import custom_letter_branding_preview %}
+{% from "components/error-summary.html" import errorSummary %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Preview your letter branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link}) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Preview your letter branding') }}
+
+  {{ errorSummary(form) }}
+
+  <p class="govuk-body">
+    This is a preview of what letters from {{ current_service.name }} will look like.
+  </p>
+
+  {{ custom_letter_branding_preview(temp_filename) }}
+
+  <h2 class="heading-medium">Add name</h2>
+  {% call form_wrapper() %}
+    {{ form.name(param_extensions={
+      'label': {'text': 'Enter the name of your branding'},
+      'hint': {'text': 'For example, ' + (current_service.organisation_name if current_service.organisation_id else 'Department for Education')}
+    }) }}
+    {{ page_footer('Save') }}
+  {% endcall %}
+
+{% endblock %}

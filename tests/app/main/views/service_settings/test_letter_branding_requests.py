@@ -1,5 +1,6 @@
 from io import BytesIO
 from unittest.mock import ANY, PropertyMock
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import url_for
@@ -476,15 +477,25 @@ def test_POST_letter_branding_upload_branding_redirects_on_success(
 ):
     mock_upload_email_logo = mocker.patch(
         "app.main.views.service_settings.letter_branding.upload_letter_temp_logo",
-        return_value="some/path/temp-logo-url.svg",
+        return_value="some/path/temp_logo_url.svg",
     )
+
+    mock_get_filename = mocker.patch(
+        "app.main.views.service_settings.letter_branding.get_letter_filename_with_no_path_or_extension",
+        return_value="temp_logo_url",
+    )
+
     svg_contents = "<svg></svg>"
 
     client_request.post(
         "main.letter_branding_upload_branding",
         service_id=SERVICE_ONE_ID,
         _data={"branding": (BytesIO(svg_contents.encode("utf-8")), "some filename.svg")},
-        _expected_redirect="https://static-logos.test.com/some/path/temp-logo-url.svg",
+        _expected_redirect=url_for(
+            "main.letter_branding_set_name",
+            service_id=SERVICE_ONE_ID,
+            temp_filename="temp_logo_url",
+        ),
     )
 
     mock_upload_email_logo.assert_called_once_with(
@@ -493,6 +504,55 @@ def test_POST_letter_branding_upload_branding_redirects_on_success(
         "eu-west-1",  # region
         user_id=fake_uuid,
         unique_id=ANY,
+    )
+    mock_get_filename.assert_called_once_with(mock_upload_email_logo.return_value)
+
+
+def test_GET_letter_branding_set_name_renders(client_request, service_one):
+    page = client_request.get(
+        "main.letter_branding_set_name",
+        service_id=SERVICE_ONE_ID,
+        temp_filename="temp_something",
+    )
+
+    letter_preview = page.select_one("iframe")
+    letter_preview_url = letter_preview.get("src")
+    letter_preview_query_args = parse_qs(urlparse(letter_preview_url).query)
+
+    assert letter_preview_query_args == {"filename": ["temp_something"]}
+
+    assert normalize_spaces(page.select_one("h1").text) == "Preview your letter branding"
+    assert normalize_spaces(page.select_one("label[for=name]").text) == "Enter the name of your branding"
+    assert normalize_spaces(page.select_one("main form button").text) == "Save"
+    assert normalize_spaces(page.select_one("div#name-hint").text) == "For example, Department for Education"
+
+
+def test_GET_letter_branding_set_name_shows_current_org_in_hint_text(
+    client_request,
+    service_one,
+    mock_get_organisation,
+):
+    service_one["organisation"] = "1234"
+
+    page = client_request.get(
+        "main.letter_branding_set_name",
+        service_id=SERVICE_ONE_ID,
+        temp_filename="temp_something.svg",
+    )
+    assert normalize_spaces(page.select_one("div#name-hint").text) == "For example, Test organisation"
+
+
+def test_GET_letter_branding_set_name_redirects_if_temp_filename_not_provided(client_request):
+    client_request.get(
+        "main.letter_branding_set_name",
+        service_id=SERVICE_ONE_ID,
+        branding_choice="something_else",
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.letter_branding_upload_branding",
+            service_id=SERVICE_ONE_ID,
+            branding_choice="something_else",
+        ),
     )
 
 

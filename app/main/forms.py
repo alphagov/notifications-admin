@@ -1789,6 +1789,10 @@ class LetterBrandingUploadBranding(StripWhitespaceForm):
     )
 
 
+class LetterBrandingNameForm(StripWhitespaceForm):
+    name = GovukTextInputField("Branding name", validators=[DataRequired(message="Cannot be empty")])
+
+
 class EmailBrandingLogoUpload(StripWhitespaceForm):
     EXPECTED_LOGO_FORMAT = "png"
 
