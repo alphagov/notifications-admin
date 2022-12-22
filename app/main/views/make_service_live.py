@@ -14,7 +14,11 @@ def make_service_live(service_id):
     if not current_user.can_make_service_live(current_service):
         abort(403)
 
-    form = OnOffSettingForm(name="Make service live")
+    form = OnOffSettingForm(
+        name="What would you like to do?",
+        truthy="Approve the request and make this service live",
+        falsey="Reject the request",
+    )
 
     if form.validate_on_submit():
         current_service.update_status(live=form.enabled.data)

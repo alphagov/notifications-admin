@@ -33,7 +33,6 @@ class Service(JSONModel):
         "count_as_live",
         "email_from",
         "go_live_at",
-        "go_live_user",
         "has_active_go_live_request",
         "id",
         "inbound_api",
@@ -408,6 +407,10 @@ class Service(JSONModel):
         )
 
     @property
+    def volumes_by_channel(self):
+        return ((channel, getattr(self, f"volume_{channel}")) for channel in ("email", "sms", "letter"))
+
+    @property
     def go_live_checklist_completed(self):
         return all(
             (
@@ -422,6 +425,10 @@ class Service(JSONModel):
     @property
     def go_live_checklist_completed_as_yes_no(self):
         return "Yes" if self.go_live_checklist_completed else "No"
+
+    @property
+    def go_live_user(self):
+        return User.from_id(self._dict["go_live_user"])
 
     @cached_property
     def free_sms_fragment_limit(self):

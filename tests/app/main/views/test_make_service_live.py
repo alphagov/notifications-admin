@@ -67,6 +67,7 @@ def test_get_make_service_live_page(
 
     service_one["has_active_go_live_request"] = service_has_active_go_live_request
     service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
 
     client_request.login(user)
 
@@ -77,12 +78,21 @@ def test_get_make_service_live_page(
     )
 
     if expected_status < 300:
+        assert (
+            normalize_spaces(page.select_one("main p")) == "Test User has requested for this service to be made live."
+        )
+        assert [normalize_spaces(li) for li in page.select("main li")] == [
+            "111,111 emails per year",
+            "222,222 text messages per year",
+            "No letters",
+        ]
+
         assert [
             (radio.select_one("input[type=radio]")["value"], normalize_spaces(radio.select_one("label").text))
             for radio in page.select(".govuk-radios__item")
         ] == [
-            ("True", "On"),
-            ("False", "Off"),
+            ("True", "Approve the request and make this service live"),
+            ("False", "Reject the request"),
         ]
 
 
