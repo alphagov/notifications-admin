@@ -4,8 +4,10 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
+{% set heading = 'Change your service name' %}
+
 {% block service_page_title %}
-  Change your service name
+  {{ heading }}
 {% endblock %}
 
 {% block backLink %}
@@ -13,7 +15,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header('Change your service name') }}
+  {{ page_header(heading) }}
   <p class="govuk-body">This is the name your emails will come from.</p>
   <p class="govuk-body">You can also display it at the start of every text message you send.</p>
 
