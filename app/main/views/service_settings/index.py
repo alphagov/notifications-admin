@@ -208,7 +208,7 @@ def submit_request_to_go_live(service_id):
 
     current_service.update(
         go_live_user=current_user.id,
-        has_current_request_to_go_live=True,
+        has_active_go_live_request=True,
     )
 
     flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")

@@ -637,7 +637,7 @@ def test_switch_service_to_live(
         message_limit=250000,
         restricted=False,
         go_live_at="2017-04-01 11:09:00.061258",
-        has_current_request_to_go_live=False,
+        has_active_go_live_request=False,
     )
 
 
@@ -680,7 +680,7 @@ def test_switch_service_to_restricted(
         message_limit=50,
         restricted=True,
         go_live_at=None,
-        has_current_request_to_go_live=False,
+        has_active_go_live_request=False,
     )
 
 
@@ -1626,7 +1626,7 @@ def test_should_redirect_after_request_to_go_live(
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
         go_live_user=active_user_with_permissions["id"],
-        has_current_request_to_go_live=True,
+        has_active_go_live_request=True,
     )
 
 
