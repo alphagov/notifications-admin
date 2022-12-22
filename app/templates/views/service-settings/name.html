@@ -4,8 +4,10 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
+{% set heading = 'Change your service name' %}
+
 {% block service_page_title %}
-  Change your service name
+  {{ heading }}
 {% endblock %}
 
 {% block backLink %}
@@ -13,40 +15,29 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header('Change your service name') }}
+  {{ page_header(heading) }}
+  <p class="govuk-body">This is the name your emails will come from.</p>
+  <p class="govuk-body">You can also display it at the start of every text message you send.</p>
 
-  {% if organisation_type == 'central' %}
-    <p class="govuk-body">This is the name your emails will come from.</p>
-    <p class="govuk-body">You can also show it at the start of every text message you send.</p>
-    <p class="govuk-body">Your sender name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
+  {% if organisation_type == 'central' or organisation_type == 'local'  %}
+    <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
+
     <ul class="govuk-list govuk-list--bullet">
+    {% if organisation_type == 'central' %}
       <li>Register to vote</li>
       <li>Renew your Passport</li>
       <li>Check your state pension</li>
-    </ul>
-  {% elif organisation_type == 'local' %}
-    <p class="govuk-body">Your service name should tell users what the message is about as well as who it’s from. For example:</p>
-    <ul class="govuk-list govuk-list--bullet">
+    {% elif organisation_type == 'local' %}
       <li>School admissions - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
       <li>Electoral services - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
       <li>Blue Badge - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+    {% endif %}
     </ul>
   {% else %}
-    <p class="govuk-body">Your service name should tell users what the message is about as well as who it’s from.</p>
+    <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from.</p>
   {% endif %}
 
-  {% if organisation_type != 'central' %}
-    <p class="govuk-body">You should only use an acronym or initialism if your users are already familiar with it.</p>
-    {% if current_service.prefix_sms %}
-      <p class="govuk-body">Users will see your service name:</p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>at the start of every text message</li>
-        <li>as your email sender name</li>
-      </ul>
-    {% else %}
-      <p class="govuk-body">Users will see your service name as your email sender name.</p>
-    {% endif %}
-  {% endif %}
+  <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
 
   {% call form_wrapper() %}
     {{ form.name }}

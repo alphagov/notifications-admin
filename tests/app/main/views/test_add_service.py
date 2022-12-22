@@ -77,21 +77,23 @@ def test_get_should_not_render_radios_if_org_type_known(
     assert not page.select(".multiple-choice")
 
 
-def test_show_different_page_if_user_org_type_is_local(
-    client_request,
-    mocker,
-):
+@pytest.mark.parametrize(
+    "org_type, expected_content_lines",
+    (
+        ("central", ["Register to vote", "Renew your Passport", "Check your state pension"]),
+        ("local", ["School admissions", "Electoral services", "Blue Badge"]),
+        ("nhs", ["Your service name should tell the recipient what your message is about, as well as who it’s from."]),
+    ),
+)
+def test_show_different_page_content_based_on_user_org_type(client_request, mocker, org_type, expected_content_lines):
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
-        return_value=organisation_json(organisation_type="local"),
+        return_value=organisation_json(organisation_type=org_type),
     )
     page = client_request.get("main.add_service")
     assert page.select_one("h1").text.strip() == "Enter a service name"
     assert page.select_one("input[name=name]").get("value") is None
-    assert page.select_one("main .govuk-body").text.strip() == (
-        "Give your service a name that tells users what your "
-        "messages are about, as well as who they’re from. For example:"
-    )
+    assert all(content in page.select_one("main").text for content in expected_content_lines)
 
 
 @pytest.mark.parametrize(

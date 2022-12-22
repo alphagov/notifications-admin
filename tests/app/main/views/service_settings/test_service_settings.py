@@ -458,18 +458,27 @@ def test_escapes_letter_contact_block(
 
 
 @pytest.mark.parametrize(
-    "organisation_type, expected_first_paragraph",
+    "organisation_type, expected_content_lines",
     [
-        ("central", "This is the name your emails will come from."),
+        (
+            "central",
+            [
+                "Your service name should tell the recipient what your message is about, as well as who it’s from. For example:",  # noqa
+                "Register to vote",
+            ],
+        ),
         (
             "local",
-            "Your service name should tell users what the message is about as well as who it’s from. For example:",  # noqa
+            [
+                "Your service name should tell the recipient what your message is about, as well as who it’s from. For example",  # noqa
+                "School admissions - Test Organisation",
+            ],
         ),
-        ("nhs", "Your service name should tell users what the message is about as well as who it’s from."),
+        ("nhs", ["Your service name should tell the recipient what your message is about, as well as who it’s from."]),
     ],
 )
 def test_change_service_name_content_varies_by_organisation_type(
-    client_request, mocker, service_one, organisation_type, expected_first_paragraph
+    client_request, mocker, service_one, organisation_type, expected_content_lines
 ):
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
@@ -479,14 +488,8 @@ def test_change_service_name_content_varies_by_organisation_type(
     page = client_request.get("main.service_name_change", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Change your service name"
     assert page.select_one("input", attrs={"type": "text"})["value"] == "service one"
-    assert page.select_one("main p").text == expected_first_paragraph
+    assert all(content in page.select_one("main").text for content in expected_content_lines)
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
-
-    if organisation_type == "central":
-        assert "Register to vote" in page.select_one("ul.govuk-list.govuk-list--bullet").text
-
-    elif organisation_type == "local":
-        assert "School admissions - Test Org" in page.select_one("ul.govuk-list.govuk-list--bullet").text
 
 
 def test_should_show_service_org_in_hint_on_change_service_name_page_for_local_services_if_service_has_org(
@@ -523,8 +526,8 @@ def test_should_show_service_name_with_no_prefixing(
     page = client_request.get("main.service_name_change", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Change your service name"
     assert (
-        page.select_one("main p").text
-        == "Your service name should tell users what the message is about as well as who it’s from."
+        "Your service name should tell the recipient what your message is about, as well as who it’s from."
+        in page.select_one("main").text
     )
 
 
