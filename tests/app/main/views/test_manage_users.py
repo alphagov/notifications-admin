@@ -971,6 +971,7 @@ def test_should_show_page_for_inviting_user_with_email_prefilled(
     active_user_with_permissions,
     active_user_with_permission_to_other_service,
     mock_get_organisation_by_domain,
+    mock_get_organisation,
     mock_get_invites_for_service,
 ):
     service_one["organisation"] = ORGANISATION_ID

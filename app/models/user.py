@@ -438,6 +438,15 @@ class User(BaseUser, UserMixin):
             return True
         return False
 
+    def can_make_service_live(self, service):
+        return (
+            self.platform_admin
+            or (
+                self.belongs_to_organisation(service.organisation_id)
+                and service.organisation.can_approve_own_go_live_requests
+            )
+        ) and service.has_active_go_live_request
+
 
 class InvitedUser(BaseUser):
 

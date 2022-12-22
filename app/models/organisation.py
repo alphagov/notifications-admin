@@ -121,6 +121,7 @@ class Organisation(JSONModel):
             self.request_to_go_live_notes = None
             self.email_branding_id = None
             self.letter_branding_id = None
+            self.can_approve_own_go_live_requests = False
 
     @property
     def organisation_type_label(self):

@@ -1,5 +1,5 @@
 import pytest
-from flask import Flask
+from flask import Flask, url_for
 
 from app import create_app
 from app.navigation import (
@@ -181,6 +181,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "link_service_to_organisation",
             "live_services",
             "live_services_csv",
+            "make_service_live",
             "manage_org_users",
             "manage_template_folder",
             "manage_users",
@@ -598,4 +599,30 @@ def test_caseworkers_see_jobs_nav_if_jobs_exist(
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one("header + .govuk-width-container nav").text) == (
         "Templates Sent messages Uploads Team members"
+    )
+
+
+def test_make_service_live_link_is_shown_in_limited_circumstances(
+    client_request,
+    service_one,
+    platform_admin_user,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_get_api_keys,
+    mock_get_organisation,
+    fake_uuid,
+):
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = fake_uuid
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
+
+    last_navigation_item = page.select(".navigation a")[-1]
+
+    assert normalize_spaces(last_navigation_item.text) == "Make service live"
+    assert last_navigation_item["href"] == url_for(
+        "main.make_service_live",
+        service_id=SERVICE_ONE_ID,
     )

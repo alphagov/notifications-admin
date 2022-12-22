@@ -34,6 +34,7 @@ class Service(JSONModel):
         "email_from",
         "go_live_at",
         "go_live_user",
+        "has_active_go_live_request",
         "id",
         "inbound_api",
         "message_limit",

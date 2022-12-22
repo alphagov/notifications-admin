@@ -37,6 +37,9 @@
     <li><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ main_navigation.is_selected('templates') }}" href="{{ url_for('.choose_template', service_id=current_service.id) }}">Templates</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ main_navigation.is_selected('team-members') }}" href="{{ url_for('.manage_users', service_id=current_service.id) }}">Team members</a></li>
   {% endif %}
+  {% if current_user.can_make_service_live(current_service) %}
+    <li><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ main_navigation.is_selected('make-service-live') }}" href="{{ url_for('.make_service_live', service_id=current_service.id) }}">Make service live</a></li>
+  {% endif %}
   </ul>
 </nav>
 {% endif %}

@@ -23,6 +23,7 @@ from app.main.views import (  # noqa
     invites,
     jobs,
     letter_branding,
+    make_service_live,
     manage_users,
     new_password,
     notifications,
