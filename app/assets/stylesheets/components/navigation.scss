@@ -136,11 +136,6 @@
 
   }
 
-  li {
-    margin: 0;
-    list-style-type: none;
-  }
-
   a {
     display: block;
     padding: 5px 0;
@@ -154,6 +149,19 @@
       // between selected and unselected states
       left: -0.5px;
       letter-spacing: -0.01em;
+    }
+
+  }
+
+  &__item {
+
+    margin: 0;
+    list-style-type: none;
+
+    &--with-separator {
+      margin-top: govuk-spacing(3);
+      border-top: 1px solid $govuk-border-colour;
+      padding-top: govuk-spacing(1);
     }
 
   }

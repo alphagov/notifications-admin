@@ -619,10 +619,11 @@ def test_make_service_live_link_is_shown_in_limited_circumstances(
 
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
 
-    last_navigation_item = page.select(".navigation a")[-1]
+    last_navigation_item = page.select(".navigation li")[-1]
 
+    assert last_navigation_item["class"] == ["navigation__item", "navigation__item--with-separator"]
     assert normalize_spaces(last_navigation_item.text) == "Make service live"
-    assert last_navigation_item["href"] == url_for(
+    assert last_navigation_item.select_one("a")["href"] == url_for(
         "main.make_service_live",
         service_id=SERVICE_ONE_ID,
     )
