@@ -175,6 +175,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "letter_branding",
             "letter_branding_pool_option",
             "letter_branding_request",
+            "letter_branding_upload_branding",
             "letter_spec",
             "letter_template",
             "link_service_to_organisation",

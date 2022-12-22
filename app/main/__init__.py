@@ -45,4 +45,4 @@ from app.main.views import (  # noqa
     verify,
     webauthn_credentials,
 )
-from app.main.views.service_settings import index  # noqa
+from app.main.views.service_settings import index, letter_branding  # noqa

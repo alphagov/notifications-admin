@@ -1,3 +1,4 @@
+from io import BytesIO
 from unittest.mock import ANY, PropertyMock
 
 import pytest
@@ -124,7 +125,7 @@ def test_letter_branding_request_page_back_link(
     else:
         page = client_request.get(".letter_branding_request", service_id=SERVICE_ONE_ID)
 
-    back_link = page.select("a[class=govuk-back-link]")
+    back_link = page.select("a.govuk-back-link")
     assert back_link[0].attrs["href"] == back_link_url
 
 
@@ -321,6 +322,178 @@ def test_letter_branding_submit_when_something_else_is_only_option(
     assert (
         "Current branding: no\nBranding requested: Something else\n" "\nHomer Simpson"
     ) in mock_create_ticket.call_args_list[0][1]["message"]
+
+
+def test_letter_branding_request_redirects_to_upload_logo_for_platform_admins(
+    client_request, platform_admin_user, service_one, mocker
+):
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".letter_branding_request",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            "options": "something_else",
+            "something_else": "this text is unused but required to pass form validation",
+        },
+        _expected_redirect=url_for(
+            "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="something_else"
+        ),
+    )
+    mock_create_ticket.assert_not_called()
+
+
+def test_GET_letter_branding_upload_branding_renders_form(
+    client_request,
+    service_one,
+):
+    page = client_request.get(
+        "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="something_else"
+    )
+    assert "branding is not set up yet" not in normalize_spaces(page.text)
+
+    back_button = page.select_one("a.govuk-back-link")
+    form = page.select_one("form")
+    submit_button = form.select_one("button")
+    file_input = form.select_one("input")
+    abandon_flow_link = page.select("main a")[-1]
+
+    assert back_button["href"] == url_for("main.letter_branding_request", service_id=SERVICE_ONE_ID)
+    assert form["method"] == "post"
+    assert "Submit" in submit_button.text
+    assert file_input["name"] == "branding"
+
+    assert abandon_flow_link is not None
+    assert abandon_flow_link["href"] == url_for("main.support")
+    assert abandon_flow_link.text == "I do not have a file to upload"
+
+
+def test_GET_letter_branding_upload_branding_renders_form_with_prompt_if_user_clicked_organisation_choice(
+    client_request, service_one, organisation_one, mocker
+):
+    service_one["organisation"] = organisation_one["id"]
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get(
+        "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="organisation"
+    )
+    assert "organisation one branding is not set up yet" in normalize_spaces(page.select_one("main").text)
+
+
+def test_GET_letter_branding_upload_branding_renders_form_without_prompt_if_user_clicked_something_else_choice(
+    client_request, service_one, organisation_one, mocker
+):
+    service_one["organisation"] = organisation_one["id"]
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get(
+        "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="something_else"
+    )
+    assert "branding is not set up yet" not in normalize_spaces(page.select_one("main").text)
+
+
+@pytest.mark.parametrize("query_params", [{"from_template": "1234-1234-1234"}, {}])
+def test_GET_letter_branding_upload_branding_passes_from_template_through_to_back_link(
+    client_request, service_one, query_params
+):
+    page = client_request.get(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+        branding_choice="something_else",
+        **query_params,
+    )
+    back_link = page.select("a.govuk-back-link")
+    assert back_link[0].attrs["href"] == url_for(
+        "main.letter_branding_request",
+        service_id=SERVICE_ONE_ID,
+        **query_params,
+    )
+
+
+@pytest.mark.parametrize(
+    "svg_contents, expected_error",
+    (
+        (
+            """
+            <svg height="100" width="100">
+            <image href="someurlgoeshere" x="0" y="0" height="100" width="100"></image></svg>
+        """,
+            "This SVG has an embedded raster image in it and will not render well",
+        ),
+        (
+            """
+            <svg height="100" width="100">
+                <text>Will render differently depending on fonts installed</text>
+            </svg>
+        """,
+            "This SVG has text which has not been converted to paths and may not render well",
+        ),
+    ),
+)
+def test_POST_letter_branding_upload_branding_validates_svg_file(
+    client_request, svg_contents, expected_error, mock_antivirus_virus_free
+):
+    page = client_request.post(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+        _data={"branding": (BytesIO(svg_contents.encode("utf-8")), "some filename.svg")},
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Upload letter branding"
+    assert normalize_spaces(page.select_one(".error-message").text) == expected_error
+
+
+def test_POST_letter_branding_upload_branding_rejects_non_svg_files(client_request, mock_antivirus_virus_free):
+    svg_contents = "<svg> this can actually be an svg we just validate the extension </svg>"
+    page = client_request.post(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+        _data={"branding": (BytesIO(svg_contents.encode("utf-8")), "some filename.png")},
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Upload letter branding"
+    assert normalize_spaces(page.select_one(".error-message").text) == "Branding must be an SVG file"
+
+
+def test_POST_letter_branding_upload_branding_scans_for_viruses(client_request, mock_antivirus_virus_found):
+    svg_contents = "<svg></svg>"
+    page = client_request.post(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+        _data={"branding": (BytesIO(svg_contents.encode("utf-8")), "some filename.svg")},
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Upload letter branding"
+    assert normalize_spaces(page.select_one(".error-message").text) == "Your file contains a virus"
+
+
+def test_POST_letter_branding_upload_branding_redirects_on_success(
+    client_request, mock_antivirus_virus_free, fake_uuid, mocker
+):
+    mock_upload_email_logo = mocker.patch(
+        "app.main.views.service_settings.letter_branding.upload_letter_temp_logo",
+        return_value="some/path/temp-logo-url.svg",
+    )
+    svg_contents = "<svg></svg>"
+
+    client_request.post(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+        _data={"branding": (BytesIO(svg_contents.encode("utf-8")), "some filename.svg")},
+        _expected_redirect="https://static-logos.test.com/some/path/temp-logo-url.svg",
+    )
+
+    mock_upload_email_logo.assert_called_once_with(
+        "branding.svg",  # filename
+        b"<svg></svg>",  # file data
+        "eu-west-1",  # region
+        user_id=fake_uuid,
+        unique_id=ANY,
+    )
 
 
 def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
