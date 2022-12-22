@@ -1,4 +1,4 @@
-{% macro mapping_table(caption='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False) -%}
+{% macro mapping_table(caption='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False, output_tbody_tags=True) -%}
   <table class="table table-font-xsmall">
     <caption class="heading-medium table-heading{{ ' govuk-visually-hidden' if not caption_visible}}">
       {{ caption }}
@@ -16,9 +16,13 @@
         {% endfor %}
       </tr>
     </thead>
+    {% if output_tbody_tags %}
     <tbody>
+    {% endif %}
       {{ caller() }}
+    {% if output_tbody_tags %}
     </tbody>
+    {% endif %}
   </table>
 {%- endmacro %}
 

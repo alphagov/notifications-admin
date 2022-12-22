@@ -1,6 +1,6 @@
 <div class="ajax-block">
   {% if current_service.inbound_sms_summary != None %}
-    <a id="total-received" class="govuk-link govuk-link--no-visited-state banner-dashboard" class="banner-dashboard" href="{{ url_for('.inbox', service_id=current_service.id) }}">
+    <a id="total-received" class="govuk-link govuk-link--no-visited-state banner-dashboard" href="{{ url_for('.inbox', service_id=current_service.id) }}">
       <span class="banner-dashboard-count">
         {{ current_service.inbound_sms_summary.count|format_thousands }}
       </span>

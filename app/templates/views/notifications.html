@@ -60,7 +60,7 @@
   {% endcall %}
 
   {% call form_wrapper(id="search-form") %}
-    <input type="hidden" name="to" {% if search_form.to.data %}value="{{ search_form.to.data }}{%  endif %}">
+    <input type="hidden" name="to" {% if search_form.to.data %}value="{{ search_form.to.data }}"{%  endif %}>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   {% endcall %}
 

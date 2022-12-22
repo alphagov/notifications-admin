@@ -30,7 +30,7 @@
     <p class="govuk-body">You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
     {% endif %}
 
-  <p class="govuk-body">
+  <div class="govuk-body">
     {{ file_upload(
       form.file,
       allowed_file_extensions=['pdf'],
@@ -38,7 +38,7 @@
       button_text='Upload your file again' if error else 'Choose file',
       show_errors=False
     )}}
-  </p>
+  </div>
 
     <p class="govuk-body">Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_letter_specification') }}">letter specification</a>.</p>
   </div>

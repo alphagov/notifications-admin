@@ -7,6 +7,7 @@ from functools import partial
 from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
 
+import html5lib
 import pytest
 from flask import Flask, url_for
 from notifications_python_client.errors import HTTPError
@@ -34,6 +35,8 @@ from . import (
     template_version_json,
     user_json,
 )
+
+html5parser = html5lib.HTMLParser()
 
 
 class ElementNotFound(Exception):
@@ -2778,7 +2781,19 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             if _expected_redirect:
                 assert resp.location == _expected_redirect
 
-            page = NotifyBeautifulSoup(resp.data.decode("utf-8"), "html.parser")
+            html = resp.data.decode("utf-8")
+            page = NotifyBeautifulSoup(html, "html.parser")
+
+            if page.doctype == "html":
+                html5parser.parse(html)
+
+                if html5parser.errors:
+                    location, error, _extra_info = html5parser.errors[-1]
+                    line_number, character_number = location
+                    line_with_context = "\n".join(html.splitlines()[line_number - 10 : line_number])
+                    raise html5lib.html5parser.ParseError(
+                        f"\n\n{line_with_context}\n{' ' * (character_number - 1)}^ {error}"
+                    )
 
             if _test_page_title:
                 # Page should have one H1
