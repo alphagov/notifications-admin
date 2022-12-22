@@ -147,3 +147,27 @@ def test_post_make_service_live_page(
         SERVICE_ONE_ID,
         **expected_arguments_to_update_service,
     )
+
+
+def test_post_make_service_live_page_error(
+    mocker,
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_organisation,
+    mock_update_service,
+):
+
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        "main.make_service_live",
+        service_id=SERVICE_ONE_ID,
+        _data={},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one(".govuk-error-message")) == "Error: Select approve or reject"
+    assert mock_update_service.called is False

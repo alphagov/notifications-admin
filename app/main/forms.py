@@ -753,7 +753,7 @@ class OptionalGovukRadiosField(GovukRadiosField):
 
 
 class OnOffField(GovukRadiosField):
-    def __init__(self, label, choices=None, *args, **kwargs):
+    def __init__(self, label, choices=None, thing=None, *args, **kwargs):
         choices = choices or [
             (True, "On"),
             (False, "Off"),
@@ -761,7 +761,7 @@ class OnOffField(GovukRadiosField):
         super().__init__(
             label,
             choices=choices,
-            thing=f"{choices[0][1].lower()} or {choices[1][1].lower()}",
+            thing=thing or f"{choices[0][1].lower()} or {choices[1][1].lower()}",
             *args,
             **kwargs,
         )
@@ -1612,13 +1612,15 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
 
 
 class OnOffSettingForm(StripWhitespaceForm):
-    def __init__(self, name, *args, truthy="On", falsey="Off", **kwargs):
+    def __init__(self, name, *args, truthy="On", falsey="Off", thing=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.enabled.label.text = name
         self.enabled.choices = [
             (True, truthy),
             (False, falsey),
         ]
+        if thing:
+            self.enabled.thing = thing
 
     enabled = OnOffField("Choices")
 
