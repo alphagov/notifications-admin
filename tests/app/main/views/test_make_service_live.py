@@ -97,6 +97,44 @@ def test_get_make_service_live_page(
 
 
 @pytest.mark.parametrize(
+    "method",
+    ("get", "post"),
+)
+@pytest.mark.parametrize(
+    "user",
+    (
+        create_user(id=sample_uuid(), organisations=[ORGANISATION_ID]),
+        create_user(id=sample_uuid(), platform_admin=True),
+    ),
+)
+def test_service_is_already_live(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    mock_update_service,
+    user,
+    method,
+):
+    organisation_one["can_approve_own_go_live_requests"] = True
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["restricted"] = False
+    service_one["organisation"] = ORGANISATION_ID
+
+    client_request.login(user)
+
+    page = getattr(client_request, method)(
+        "main.make_service_live",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=410,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "This service is already live"
+    assert mock_update_service.called is False
+
+
+@pytest.mark.parametrize(
     "post_data, expected_arguments_to_update_service",
     (
         (

@@ -11,6 +11,9 @@ from app.utils.user import user_has_permissions
 @user_has_permissions(allow_org_user=True)
 def make_service_live(service_id):
 
+    if current_service.live:
+        return render_template("views/service-settings/service-already-live.html"), 410
+
     if not current_user.can_make_service_live(current_service):
         abort(403)
 
