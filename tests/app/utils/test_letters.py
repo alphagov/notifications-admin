@@ -211,8 +211,8 @@ def test_get_letter_validation_error_for_known_errors(
 
     assert detail.text == expected_content
     if detail.select_one("a"):
-        assert detail.select_one("a")["href"] == url_for(".letter_specification")
+        assert detail.select_one("a")["href"] == url_for("main.guidance_letter_specification")
 
     assert summary.text == expected_summary
     if summary.select_one("a"):
-        assert summary.select_one("a")["href"] == url_for(".letter_specification")
+        assert summary.select_one("a")["href"] == url_for("main.guidance_letter_specification")

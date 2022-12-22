@@ -206,7 +206,10 @@ def submit_request_to_go_live(service_id):
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 
-    current_service.update(go_live_user=current_user.id)
+    current_service.update(
+        go_live_user=current_user.id,
+        has_active_go_live_request=True,
+    )
 
     flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")
     return redirect(url_for(".service_settings", service_id=service_id))
@@ -626,10 +629,8 @@ def service_set_inbound_number(service_id):
     form = AdminServiceInboundNumberForm(inbound_number_choices=inbound_numbers_value_and_label)
 
     if form.validate_on_submit():
-        service_api_client.add_sms_sender(
+        inbound_number_client.add_inbound_number_to_service(
             current_service.id,
-            sms_sender=form.inbound_number.data,
-            is_default=True,
             inbound_number_id=form.inbound_number.data,
         )
         current_service.force_permission("inbound_sms", on=True)
@@ -695,7 +696,6 @@ def service_set_international_letters(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-inbound-sms", methods=["GET"])
 @main.route("/services/<uuid:service_id>/service-settings/receive-text-messages", methods=["GET"])
 @user_has_permissions("manage_service")
 def service_receive_text_messages(service_id):
@@ -965,13 +965,20 @@ def set_free_sms_allowance(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-message-limit", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/set-message-limit/<template_type:notification_type>",
+    methods=["GET", "POST"],
+)
 @user_is_platform_admin
-def set_message_limit(service_id):
+def set_message_limit(service_id, notification_type=None):
+    limit_attribute_name = "message_limit" if notification_type is None else f"{notification_type}_message_limit"
 
-    form = AdminServiceMessageLimitForm(message_limit=current_service.message_limit)
+    form = AdminServiceMessageLimitForm(
+        message_limit=getattr(current_service, limit_attribute_name), notification_type=notification_type
+    )
 
     if form.validate_on_submit():
-        current_service.update(message_limit=form.message_limit.data)
+        current_service.update(**{limit_attribute_name: form.message_limit.data})
 
         return redirect(url_for(".service_settings", service_id=service_id))
 

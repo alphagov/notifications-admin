@@ -32,7 +32,7 @@
 
   <p class="govuk-body">
     {% if not current_user.is_authenticated %}
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> then add as many unique services as you need to.</p>
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> then add as many unique services as you need to.
     {% else %}
       You can add as many unique services as you need to.
     {% endif %}
@@ -264,6 +264,15 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
+  </div>
+
+  <div class="govuk-inset-text">
+    <p class="govuk-body">From Monday 23 January 2023:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>second class postage will go up by 6 pence, plus VAT</li>
+      <li>first class postage will go up by 9 pence, plus VAT</li>
+      <li>international postage will go up by 9 pence, plus VAT</li>
+    </ul>
   </div>
 
 {% endblock %}

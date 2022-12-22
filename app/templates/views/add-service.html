@@ -10,11 +10,9 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     {{ page_header(heading) }}
-
     <p class="govuk-body">This is the name your emails will come from.</p>
     <p class="govuk-body">You can also display it at the start of every text message you send.</p>
 
@@ -32,7 +30,6 @@
           <li>Blue Badge - {{ current_user.default_organisation.name }}</li>
         {% endif %}
       </ul>
-
     {% else %}
       <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from.</p>
     {% endif %}

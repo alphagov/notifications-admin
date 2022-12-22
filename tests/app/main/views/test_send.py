@@ -3276,7 +3276,7 @@ def test_check_messages_adds_sender_id_in_session_to_metadata(
     fake_uuid,
 ):
     mocker.patch("app.main.views.send.s3download", return_value=("phone number,\n07900900321"))
-    mocker.patch("app.main.views.send.get_sms_sender_from_session")
+    mocker.patch("app.main.views.send.get_sms_sender_from_session", return_value="Fake Sender")
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {fake_uuid: {"template_id": fake_uuid}}

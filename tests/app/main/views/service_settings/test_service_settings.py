@@ -107,6 +107,9 @@ def mock_get_service_settings_page_common(
                 "Notes None Change the notes for the service",
                 "Organisation Test organisation Central government Change organisation for service",
                 "Rate limit 3,000 per minute Change rate limit",
+                "Email limit 1,000 per day Change daily email limit",
+                "SMS limit 1,000 per day Change daily SMS limit",
+                "Letter limit 1,000 per day Change daily letter limit",
                 "Message limit 1,000 per day Change daily message limit",
                 "Free text message allowance 250,000 per year Change free text message allowance",
                 "Email branding GOV.UK Change email branding (admin view)",
@@ -633,7 +636,11 @@ def test_switch_service_to_live(
         ),
     )
     mock_update_service.assert_called_with(
-        SERVICE_ONE_ID, message_limit=250000, restricted=False, go_live_at="2017-04-01 11:09:00.061258"
+        SERVICE_ONE_ID,
+        message_limit=250000,
+        restricted=False,
+        go_live_at="2017-04-01 11:09:00.061258",
+        has_active_go_live_request=False,
     )
 
 
@@ -671,7 +678,13 @@ def test_switch_service_to_restricted(
             service_id=SERVICE_ONE_ID,
         ),
     )
-    mock_update_service.assert_called_with(SERVICE_ONE_ID, message_limit=50, restricted=True, go_live_at=None)
+    mock_update_service.assert_called_with(
+        SERVICE_ONE_ID,
+        message_limit=50,
+        restricted=True,
+        go_live_at=None,
+        has_active_go_live_request=False,
+    )
 
 
 @pytest.mark.parametrize(
@@ -1613,7 +1626,11 @@ def test_should_redirect_after_request_to_go_live(
         "Thanks for your request to go live. We’ll get back to you within one working day."
     )
     assert normalize_spaces(page.select_one("h1").text) == "Settings"
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, go_live_user=active_user_with_permissions["id"])
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        go_live_user=active_user_with_permissions["id"],
+        has_active_go_live_request=True,
+    )
 
 
 def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
@@ -4563,9 +4580,7 @@ def test_should_show_page_to_set_message_limit(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get("main.set_message_limit", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("label").text) == (
-        "Number of messages the service is allowed to send each day"
-    )
+    assert normalize_spaces(page.select_one("label").text) == "Daily message limit"
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1000"
 
 

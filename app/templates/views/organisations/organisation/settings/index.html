@@ -76,6 +76,16 @@
           )
         }}
       {% endcall %}
+      {% call row() %}
+        {{ text_field('Can approve own go-live requests') }}
+        {{ text_field(current_org.can_approve_own_go_live_requests|format_yes_no) }}
+        {{ edit_field(
+            'Change',
+            url_for('.edit_organisation_can_approve_own_go_live_requests', org_id=current_org.id),
+            suffix='whether this organisation can approve its own go-live requests'
+          )
+        }}
+      {% endcall %}
 
       {% call row() %}
         {{ text_field('Billing details')}}
