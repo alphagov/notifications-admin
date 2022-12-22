@@ -121,6 +121,7 @@ def test_get_make_service_live_page(
 )
 @freeze_time("2022-12-22 12:12:12")
 def test_post_make_service_live_page(
+    mocker,
     client_request,
     platform_admin_user,
     service_one,
@@ -129,6 +130,7 @@ def test_post_make_service_live_page(
     post_data,
     expected_arguments_to_update_service,
 ):
+
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
 
@@ -171,3 +173,38 @@ def test_post_make_service_live_page_error(
     )
     assert normalize_spaces(page.select_one(".govuk-error-message")) == "Error: Select approve or reject"
     assert mock_update_service.called is False
+
+
+@pytest.mark.parametrize(
+    "post_data, expected_banner_class, expected_flash_message",
+    (
+        (True, ".banner-default-with-tick", "‘service one’ is now live"),
+        (False, ".banner-default", "Request to go live rejected"),
+    ),
+)
+def test_post_make_service_live_page_has_flash_message_after_redirect(
+    mocker,
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_organisation,
+    mock_update_service,
+    post_data,
+    expected_banner_class,
+    expected_flash_message,
+):
+    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": []})
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        "main.make_service_live",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            "enabled": post_data,
+        },
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select_one(expected_banner_class).text) == expected_flash_message
