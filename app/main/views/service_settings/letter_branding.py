@@ -4,7 +4,7 @@ from flask import current_app, flash, redirect, render_template, request, url_fo
 from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app import current_service
+from app import current_service, organisations_client
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
@@ -12,6 +12,7 @@ from app.main.forms import (
     LetterBrandingNameForm,
     LetterBrandingUploadBranding,
 )
+from app.models.branding import LetterBranding
 from app.s3_client.s3_logo_client import (
     get_letter_filename_with_no_path_or_extension,
     upload_letter_temp_logo,
@@ -165,7 +166,24 @@ def letter_branding_set_name(service_id):
     form = LetterBrandingNameForm()
 
     if form.validate_on_submit():
-        pass
+        # TODO: Handle name already existing
+        new_letter_branding = LetterBranding.create(name=form.name.data, filename=temp_filename)
+
+        # set as service branding
+        current_service.update(letter_branding=new_letter_branding.id)
+
+        # add to org pool
+        organisations_client.add_brandings_to_letter_branding_pool(
+            current_service.organisation.id, [new_letter_branding.id]
+        )
+
+        # TODO: implement _should_set_default_org_branding for letter branding
+        # if _should_set_default_org_letter_branding(letter_branding_data["branding_choice"]):
+        #     current_service.organisation.update(letter_branding_id=new_letter_branding.id, delete_services_cache=True)
+
+        flash("You’ve changed your letter branding.", "default_with_tick")
+
+        return redirect(url_for("main.service_settings", service_id=service_id))
 
     return render_template(
         "views/service-settings/branding/add-new-branding/letter-branding-set-name.html",

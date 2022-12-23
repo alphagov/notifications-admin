@@ -2509,6 +2509,19 @@ def create_email_branding(id, non_standard_values=None):
     return {"email_branding": branding}
 
 
+def create_letter_branding(id, non_standard_values=None):
+    branding = {
+        "id": id,
+        "filename": "example",
+        "name": "Organisation name",
+    }
+
+    if non_standard_values:
+        branding.update(non_standard_values)
+
+    return {"letter_branding": branding}
+
+
 def create_email_branding_pool(additional_values=None):
     branding_pool = [
         {
@@ -2611,6 +2624,20 @@ def mock_create_email_branding(mocker, fake_uuid):
         )["email_branding"]
 
     return mocker.patch("app.email_branding_client.create_email_branding", side_effect=_create_email_branding)
+
+
+@pytest.fixture(scope="function")
+def mock_create_letter_branding(mocker, fake_uuid):
+    def _create_letter_branding(filename, name):
+        return create_letter_branding(
+            fake_uuid,
+            {
+                "name": name,
+                "filename": filename,
+            },
+        )["letter_branding"]
+
+    return mocker.patch("app.letter_branding_client.create_letter_branding", side_effect=_create_letter_branding)
 
 
 @pytest.fixture(scope="function")

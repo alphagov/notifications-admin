@@ -101,6 +101,17 @@ class LetterBranding(Branding):
     NHS_ID = "2cd354bb-6b85-eda3-c0ad-6b613150459f"
 
     @classmethod
+    def create(
+        cls,
+        *,
+        name,
+        filename,
+    ):
+        # TODO: rename temp to non-temp and clean up temp files
+        new_letter_branding = letter_branding_client.create_letter_branding(name=name, filename=filename)
+        return cls(new_letter_branding)
+
+    @classmethod
     def from_id(cls, id):
         if id is None:
             return cls.with_default_values()

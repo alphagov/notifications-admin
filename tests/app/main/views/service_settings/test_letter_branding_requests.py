@@ -556,6 +556,55 @@ def test_GET_letter_branding_set_name_redirects_if_temp_filename_not_provided(cl
     )
 
 
+def test_POST_letter_branding_set_name_shows_error(client_request, service_one):
+    page = client_request.post(
+        "main.letter_branding_set_name",
+        service_id=SERVICE_ONE_ID,
+        temp_filename="temp_example",
+        _data={"name": ""},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one("#name-error").text) == "Error: Cannot be empty"
+
+
+def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirects(
+    client_request,
+    service_one,
+    mock_create_letter_branding,
+    active_user_with_permissions,
+    mock_update_service,
+    fake_uuid,
+    mocker,
+):
+    mock_flash = mocker.patch("app.main.views.service_settings.letter_branding.flash")
+    mock_add_to_branding_pool = mocker.patch(
+        "app.organisations_client.add_brandings_to_letter_branding_pool", return_value=None
+    )
+    client_request.post(
+        "main.letter_branding_set_name",
+        service_id=SERVICE_ONE_ID,
+        temp_filename="temp_example",
+        _data={"name": "some name"},
+        _expected_status=302,
+        _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
+    )
+    mock_create_letter_branding.assert_called_once_with(
+        filename="temp_example",
+        name="some name",
+    )
+    mock_add_to_branding_pool.assert_called_once_with(service_one["organisation"], [fake_uuid])
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, letter_branding=fake_uuid)
+    mock_flash.assert_called_once_with(
+        "You’ve changed your letter branding.",
+        "default_with_tick",
+    )
+
+
+def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appropriate():
+    # TODO: this
+    pass
+
+
 def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
     service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
 ):
