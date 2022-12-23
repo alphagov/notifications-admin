@@ -62,3 +62,6 @@ applications:
       TEMPLATE_PREVIEW_API_KEY: '{{ TEMPLATE_PREVIEW_API_KEY }}'
 
       NOTIFY_BILLING_DETAILS: '{{ NOTIFY_BILLING_DETAILS | tojson }}'
+
+      NEW_RELIC_APP_NAME: '{{ environment }}.{{ CF_APP }}'
+      NEW_RELIC_LICENSE_KEY: '{{ NEW_RELIC_LICENSE_KEY }}'
