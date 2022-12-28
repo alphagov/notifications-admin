@@ -1,6 +1,7 @@
 import functools
 import json
 import os
+import sys
 
 import click
 import flask
@@ -44,16 +45,46 @@ def setup_commands(application):
 
 
 @notify_command(name="save-app-routes")
-def save_app_routes():
+@click.option(
+    "--acknowledge-removed-routes",
+    is_flag=True,
+    default=False,
+)
+def save_app_routes_command(acknowledge_removed_routes: bool):
+    try:
+        num_routes = save_app_routes(acknowledge_removed_routes=acknowledge_removed_routes)
+        click.echo(f"Updated tests/route-list.json with {num_routes} routes.")
+    except ValueError as e:
+        click.echo(str(e))
+        sys.exit(1)
+
+
+def save_app_routes(acknowledge_removed_routes: bool) -> int:
     """
     Creates or updates a file containing a list of all of the routes served by the admin app.
 
-    This powers a test that nudges us when routes are added/removed in case we need/want to set up appropriate
-    redirects.
+    By default, this command will fail if any routes have been removed. The flag `acknowledge_removed_routes` can be
+    used to force the new route list to be saved to disk.
+
+    This powers a test that nudges us when routes are removed in case we should set up appropriate redirects.
     """
     current_routes = {r.rule for r in current_app.url_map.iter_rules()}
+    with open("tests/route-list.json") as infile:
+        expected_routes = set(json.load(infile))
+
+    if acknowledge_removed_routes is False:
+        removed_routes = expected_routes.difference(current_routes)
+        if removed_routes:
+            raise ValueError(
+                "\nSome routes have been removed:\n"
+                + "\n".join(f" -> {path}" for path in removed_routes)
+                + "\n\n"
+                + "Make sure there are appropriate redirects in place, "
+                + "and then run `flask command save-app-routes --acknowledge-removed-routes`."
+            )
+
     sorted_current_routes = sorted(list(current_routes))
     with open("tests/route-list.json", "w") as outfile:
         outfile.write(json.dumps(sorted_current_routes, indent=4) + "\n")
 
-    current_app.logger.info(f"Updated tests/route-list.json with {len(sorted_current_routes)} routes.")
+    return len(sorted_current_routes)
