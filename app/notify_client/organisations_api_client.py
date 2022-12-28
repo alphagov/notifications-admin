@@ -128,5 +128,11 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def remove_letter_branding_from_pool(self, org_id, branding_id):
         self.delete(f"/organisations/{org_id}/letter-branding-pool/{branding_id}")
 
+    def notify_users_of_request_to_go_live_for_service(self, service_id):
+        self.post(
+            url=f"/organisations/notify-users-of-request-to-go-live/{service_id}",
+            data=None,
+        )
+
 
 organisations_client = OrganisationsClient()

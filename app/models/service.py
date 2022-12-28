@@ -430,6 +430,10 @@ class Service(JSONModel):
     def go_live_user(self):
         return User.from_id(self._dict["go_live_user"])
 
+    def notify_organisation_users_of_request_to_go_live(self):
+        if self.organisation.can_approve_own_go_live_requests:
+            return organisations_client.notify_users_of_request_to_go_live_for_service(self.id)
+
     @cached_property
     def free_sms_fragment_limit(self):
         return billing_api_client.get_free_sms_fragment_limit_for_year(self.id) or 0

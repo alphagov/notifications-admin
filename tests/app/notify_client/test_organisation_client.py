@@ -373,3 +373,14 @@ def test_remove_letter_branding_from_organisation_pool(mocker):
 
     assert mock_redis_delete.call_args_list == [call(f"organisation-{org_id}-letter-branding-pool")]
     mock_delete.assert_called_with(f"/organisations/{org_id}/letter-branding-pool/{branding_id}")
+
+
+def test_notify_users_of_request_to_go_live_for_service(mocker, fake_uuid):
+    mock_post = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.post")
+
+    organisations_client.notify_users_of_request_to_go_live_for_service(fake_uuid)
+
+    mock_post.assert_called_with(
+        url=f"/organisations/notify-users-of-request-to-go-live/{fake_uuid}",
+        data=None,
+    )
