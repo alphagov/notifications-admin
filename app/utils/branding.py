@@ -32,9 +32,5 @@ def get_letter_choices(service):
         for branding in service.letter_branding_pool.excluding(service.letter_branding_id):
             yield (branding.id, branding.name)
 
-    elif (
-        service.organisation
-        and not service.is_nhs
-        and (not service.letter_branding_id or service.letter_branding_id != service.organisation.letter_branding_id)
-    ):
+    if service.organisation and not service.letter_branding_pool:
         yield ("organisation", service.organisation.name)

@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlparse
 
 import freezegun
 import pytest
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Doctype
 from flask import session as flask_session
 from flask import url_for
 from flask.testing import FlaskClient
@@ -57,6 +57,13 @@ class NotifyBeautifulSoup(BeautifulSoup):
             )
 
         setattr(self, method_name, overridden_method)
+
+    @property
+    def doctype(self):
+        return next(
+            (item for item in self.contents if isinstance(item, Doctype)),
+            "",
+        )
 
 
 def sample_uuid():
@@ -258,6 +265,7 @@ def organisation_json(
     billing_contact_names=None,
     billing_reference=None,
     purchase_order_number=None,
+    can_approve_own_go_live_requests=False,
 ):
     if users is None:
         users = []
@@ -287,6 +295,7 @@ def organisation_json(
         "billing_contact_names": billing_contact_names,
         "billing_reference": billing_reference,
         "purchase_order_number": purchase_order_number,
+        "can_approve_own_go_live_requests": can_approve_own_go_live_requests,
     }
 
 

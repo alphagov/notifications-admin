@@ -44,6 +44,7 @@ from app.main.forms import (
     RenameOrganisationForm,
     SearchByNameForm,
     SearchUsersForm,
+    YesNoSettingForm,
 )
 from app.main.views.dashboard import (
     get_tuples_of_financial_years,
@@ -778,6 +779,25 @@ def edit_organisation_go_live_notes(org_id):
 
     return render_template(
         "views/organisations/organisation/settings/edit-go-live-notes.html",
+        form=form,
+    )
+
+
+@main.route("/organisations/<uuid:org_id>/settings/edit-can-approve-own-go-live-requests", methods=["GET", "POST"])
+@user_is_platform_admin
+def edit_organisation_can_approve_own_go_live_requests(org_id):
+
+    form = YesNoSettingForm(
+        name="Can this organisation approve its own go live requests?",
+        enabled=current_organisation.can_approve_own_go_live_requests,
+    )
+
+    if form.validate_on_submit():
+        current_organisation.update(can_approve_own_go_live_requests=form.enabled.data)
+        return redirect(url_for(".organisation_settings", org_id=org_id))
+
+    return render_template(
+        "views/organisations/organisation/settings/edit-can-approve-own-go-live-requests.html",
         form=form,
     )
 

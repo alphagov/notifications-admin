@@ -73,32 +73,52 @@ def using_notify_nav():
             "link": "main.guidance_index",
             "sub_navigation_items": [
                 {
-                    "name": "Formatting",
-                    "link": "main.edit_and_format_messages",
+                    "name": "Email branding",
+                    "link": "main.guidance_email_branding",
                 },
                 {
-                    "name": "Branding",
-                    "link": "main.branding_and_customisation",
+                    "name": "Formatting",
+                    "link": "main.guidance_edit_and_format_messages",
+                },
+                {
+                    "name": "Letter branding",
+                    "link": "main.guidance_letter_branding",
+                },
+                {
+                    "name": "Receive text messages",
+                    "link": "main.guidance_receive_text_messages",
+                },
+                {
+                    "name": "Reply-to email address",
+                    "link": "main.guidance_reply_to_email_address",
+                },
+                {
+                    "name": "Schedule messages",
+                    "link": "main.guidance_schedule_messages",
                 },
                 {
                     "name": "Send files by email",
-                    "link": "main.send_files_by_email",
-                },
-                {
-                    "name": "Upload a letter",
-                    "link": "main.upload_a_letter",
-                },
-                {
-                    "name": "Letter specification",
-                    "link": "main.letter_specification",
-                },
-                {
-                    "name": "Schedule emails and text messages",
-                    "link": "main.schedule_emails_and_text_messages",
+                    "link": "main.guidance_send_files_by_email",
                 },
                 {
                     "name": "Team members and permissions",
-                    "link": "main.team_members_and_permissions",
+                    "link": "main.guidance_team_members_and_permissions",
+                },
+                {
+                    "name": "Templates",
+                    "link": "main.guidance_templates",
+                },
+                {
+                    "name": "Text message sender",
+                    "link": "main.guidance_text_message_sender",
+                },
+                {
+                    "name": "Upload a letter",
+                    "link": "main.guidance_upload_a_letter",
+                },
+                {
+                    "name": "Letter specification",
+                    "link": "main.guidance_letter_specification",
                 },
             ],
         },

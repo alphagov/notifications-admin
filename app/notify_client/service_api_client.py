@@ -84,6 +84,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "free_sms_fragment_limit",
             "go_live_at",
             "go_live_user",
+            "has_active_go_live_request",
             "letter_branding",
             "letter_contact_block",
             "message_limit",
@@ -118,6 +119,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             message_limit=250000 if live else 50,
             restricted=(not live),
             go_live_at=str(datetime.utcnow()) if live else None,
+            has_active_go_live_request=False,
         )
 
     @cache.delete("live-service-and-organisation-counts")

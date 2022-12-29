@@ -1,0 +1,47 @@
+{% extends "withnav_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/error-summary.html" import errorSummary %}
+
+{% block service_page_title %}
+  {{ form.branding.label.text }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ errorSummary(form) }}
+
+  {{ page_header(form.branding.label.text) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <p class="govuk-body">
+        {% if branding_choice == 'organisation' %}
+          {{ current_service.organisation.name }} branding is not set up yet.
+        {% endif %}
+      </p>
+      <p class="govuk-body">
+        Your letter branding logo must be saved as an SVG file.
+      </p>
+      <p class="govuk-body">
+        The file must not contain:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>an embedded raster image</li>
+        <li>text that has not been converted into paths</li>
+      </ul>
+      <p class="govuk-body">
+        We do not recommend portrait images because they’ll look very small. This is because the space for letter branding has a fixed height.
+      </p>
+      {{ file_upload(form.branding, allowed_file_extensions=[form.EXPECTED_BRANDING_FORMAT], button_text='Upload branding') }}
+      <p class="govuk-body govuk-!-margin-top-4">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ abandon_flow_link }}">I do not have a file to upload</a>
+      </p>
+    </div>
+  </div>
+
+{% endblock %}

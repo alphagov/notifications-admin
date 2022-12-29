@@ -244,40 +244,72 @@ def guidance_index():
     )
 
 
-@main.route("/using-notify/guidance/branding-and-customisation")
-def branding_and_customisation():
-    return render_template(
-        "views/guidance/branding-and-customisation.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
-@main.route("/using-notify/guidance/create-and-send-messages")
-def create_and_send_messages():
-    return render_template(
-        "views/guidance/create-and-send-messages.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
 @main.route("/using-notify/guidance/edit-and-format-messages")
-def edit_and_format_messages():
+def guidance_edit_and_format_messages():
     return render_template(
         "views/guidance/edit-and-format-messages.html",
         navigation_links=using_notify_nav(),
     )
 
 
+@main.route("/using-notify/guidance/email-branding")
+def guidance_email_branding():
+    return render_template(
+        "views/guidance/email-branding.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/letter-branding")
+def guidance_letter_branding():
+    return render_template(
+        "views/guidance/letter-branding.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/receive-text-messages")
+def guidance_receive_text_messages():
+    return render_template(
+        "views/guidance/receive-text-messages.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/reply-to-email-address")
+def guidance_reply_to_email_address():
+    return render_template(
+        "views/guidance/reply-to-email-address.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/guidance/send-files-by-email")
-def send_files_by_email():
+def guidance_send_files_by_email():
     return render_template(
         "views/guidance/send-files-by-email.html",
         navigation_links=using_notify_nav(),
     )
 
 
+@main.route("/using-notify/guidance/templates")
+def guidance_templates():
+    return render_template(
+        "views/guidance/templates.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/text-message-sender")
+def guidance_text_message_sender():
+    return render_template(
+        "views/guidance/text-message-sender.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/guidance/upload-a-letter")
-def upload_a_letter():
+def guidance_upload_a_letter():
     return render_template(
         "views/guidance/upload-a-letter.html",
         navigation_links=using_notify_nav(),
@@ -285,23 +317,23 @@ def upload_a_letter():
 
 
 @main.route("/using-notify/guidance/letter-specification")
-def letter_specification():
+def guidance_letter_specification():
     return render_template(
         "views/guidance/letter-specification.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/schedule-emails-and-text-messages")
-def schedule_emails_and_text_messages():
+@main.route("/using-notify/guidance/schedule-messages")
+def guidance_schedule_messages():
     return render_template(
-        "views/guidance/schedule-emails-and-text-messages.html",
+        "views/guidance/schedule-messages.html",
         navigation_links=using_notify_nav(),
     )
 
 
 @main.route("/using-notify/guidance/team-members-and-permissions")
-def team_members_and_permissions():
+def guidance_team_members_and_permissions():
     return render_template(
         "views/guidance/team-members-permissions.html",
         navigation_links=using_notify_nav(),
@@ -315,6 +347,8 @@ def team_members_and_permissions():
 @main.route("/terms", endpoint="old_terms")
 @main.route("/information-security", endpoint="information_security")
 @main.route("/using_notify", endpoint="old_using_notify")
+@main.route("/using-notify/guidance/schedule-emails-and-text-messages", endpoint="old_schedule_messages")
+@main.route("/using-notify/guidance/branding-and-customisation", endpoint="old_branding_and_customisation")
 @main.route("/information-risk-management", endpoint="information_risk_management")
 @main.route("/integration_testing", endpoint="old_integration_testing")
 def old_page_redirects():
@@ -325,6 +359,8 @@ def old_page_redirects():
         "main.old_using_notify": "main.using_notify",
         "main.information_risk_management": "main.security",
         "main.old_integration_testing": "main.integration_testing",
+        "main.old_schedule_messages": "main.guidance_schedule_messages",
+        "main.old_branding_and_customisation": "main.guidance_index",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
 

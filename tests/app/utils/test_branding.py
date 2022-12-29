@@ -261,7 +261,7 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
         ("central", None, [("organisation", "Test Organisation")]),
         ("local", None, [("organisation", "Test Organisation")]),
         ("local", "some-random-branding", [("organisation", "Test Organisation")]),
-        ("nhs_central", None, [(LetterBranding.NHS_ID, "NHS")]),
+        ("nhs_central", None, [(LetterBranding.NHS_ID, "NHS"), ("organisation", "Test Organisation")]),
     ],
 )
 def test_get_letter_choices_service_assigned_to_org(
@@ -288,29 +288,9 @@ def test_get_letter_choices_service_assigned_to_org(
     assert list(options) == expected_options
 
 
-@pytest.mark.parametrize(
-    "branding_id, expected_options",
-    [
-        (
-            "some-branding-id",
-            [
-                # show org option if it's not the current branding
-                ("organisation", "Test Organisation"),
-            ],
-        ),
-        (
-            "org-branding-id",
-            [
-                # don't show org option if it's the current branding
-            ],
-        ),
-    ],
-)
-def test_get_letter_choices_org_has_default_branding(
+def test_get_letter_choices_shows_org_branding_if_org_has_empty_pool(
     mocker,
     service_one,
-    branding_id,
-    expected_options,
     mock_get_service_organisation,
     mock_get_empty_letter_branding_pool,
 ):
@@ -320,11 +300,13 @@ def test_get_letter_choices_org_has_default_branding(
         "app.organisations_client.get_organisation",
         return_value=organisation_json(organisation_type="central", letter_branding_id="org-branding-id"),
     )
-    mocker.patch("app.models.service.Service.letter_branding_id", new_callable=PropertyMock, return_value=branding_id)
-
+    mocker.patch(
+        "app.models.service.Service.letter_branding_id", new_callable=PropertyMock, return_value="some-branding-id"
+    )
     options = get_letter_choices(service)
-    # don't show org option if it's the current branding
-    assert list(options) == expected_options
+    assert list(options) == [
+        ("organisation", "Test Organisation"),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -334,17 +316,19 @@ def test_get_letter_choices_org_has_default_branding(
             "NHS something else",
             [
                 (LetterBranding.NHS_ID, "NHS"),
+                ("organisation", "Test Organisation"),
             ],
         ),
         (
             "NHS",
             [
                 # don't show NHS option if it's the current branding
+                ("organisation", "Test Organisation"),
             ],
         ),
     ],
 )
-def test_get_letter_choices_branding_name_in_use(
+def test_get_letter_choices_shows_nhs_branding_for_nhs_services(
     mocker,
     service_one,
     branding_name,
@@ -398,6 +382,7 @@ def test_current_letter_branding_is_not_displayed_in_letter_branding_pool_option
         },
     ]
 
+    # note: no organisation option visible since the org already has a branding pool
     expected_options = [
         ("letter-branding-2-id", "Letter branding name 2"),
     ]
