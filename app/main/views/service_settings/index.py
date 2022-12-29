@@ -1420,6 +1420,7 @@ def email_branding_choose_logo(service_id):
             "views/service-settings/branding/add-new-branding/email-branding-choose-logo.html",
             form=form,
             branding_options=form,
+            branding_choice=branding_choice,
         ),
         400 if form.errors else 200,
     )
