@@ -77,7 +77,7 @@ def test_get_make_service_live_page(
         _expected_status=expected_status,
     )
 
-    if expected_status < 300:
+    if expected_status == 200:
         assert (
             normalize_spaces(page.select_one("main p")) == "Test User has requested for this service to be made live."
         )
