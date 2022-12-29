@@ -12,7 +12,7 @@ from app.utils.user import user_has_permissions
 def make_service_live(service_id):
 
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html"), 410
+        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
 
     if not current_user.can_make_service_live(current_service):
         abort(403)
