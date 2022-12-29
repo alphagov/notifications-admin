@@ -45,8 +45,8 @@ from tests.conftest import (
         (
             # If the service doesn’t have an active go live request then the user is blocked
             create_user(id=sample_uuid(), organisations=[ORGANISATION_ID]),
-            False,
             True,
+            False,
             403,
         ),
     ),
