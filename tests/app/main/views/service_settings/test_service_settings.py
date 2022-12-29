@@ -3987,11 +3987,11 @@ def test_email_branding_choose_banner_type_page(
     submit_button = page.select_one("button.page-footer__button")
     back_button = page.select_one("a.govuk-back-link")
 
-    assert page.select_one("h1").text.strip() == "Add a banner to your logo"
+    assert page.select_one("h1").text.strip() == "Does your logo appear on a coloured background?"
 
     assert form["method"] == "post"
     assert "Continue" in submit_button.text
-    assert [radio["value"] for radio in page.select("input[type=radio]")] == ["org", "org_banner"]
+    assert [radio["value"] for radio in page.select("input[type=radio]")] == ["org_banner", "org"]
 
     assert back_button["href"] == url_for(back_button_url, service_id=SERVICE_ONE_ID)
 
@@ -4459,7 +4459,7 @@ def test_GET_email_branding_choose_banner_colour(client_request, service_one):
         back_link=".email_branding_choose_banner_colour",
         brand_type="org_banner",
     )
-    assert skip_link.text == "I do not know the hex colour code for my banner"
+    assert skip_link.text == "I do not know the hex colour code"
 
 
 def test_POST_email_branding_choose_banner_colour(client_request, service_one):
