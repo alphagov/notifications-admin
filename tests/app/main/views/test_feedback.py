@@ -454,7 +454,7 @@ def test_doesnt_lose_message_if_post_across_closing(
         ("2016-12-12 17:30:00+0000", False),
         ("2016-12-10 12:00:00+0000", False),  # Saturday
         ("2016-12-11 12:00:00+0000", False),  # Sunday
-        ("2016-01-01 12:00:00+0000", False),  # Bank holiday
+        ("2022-12-27 12:00:00+0000", False),  # Bank holiday - substitute boxing day (Tuesday)
     ],
 )
 def test_in_business_hours(when, is_in_business_hours):
