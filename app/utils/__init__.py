@@ -157,3 +157,10 @@ def merge_jsonlike(source, destination):
                 source[key] = value
 
     merge_items(source, destination)
+
+
+def format_provider(provider):
+    if provider == "firetext":
+        return provider.title()
+
+    return provider.upper()
