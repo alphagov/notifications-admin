@@ -35,6 +35,10 @@ def _get_org_id_from_view_args():
 class BaseUser(JSONModel):
     __sort_attribute__ = "email_address"
 
+    @property
+    def is_invited_user(self):
+        return self.__class__ is InvitedUser
+
 
 class User(BaseUser, UserMixin):
 
