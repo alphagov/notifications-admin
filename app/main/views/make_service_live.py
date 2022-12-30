@@ -21,7 +21,7 @@ def make_service_live(service_id):
         name="What would you like to do?",
         truthy="Approve the request and make this service live",
         falsey="Reject the request",
-        thing="approve or reject",
+        choices_for_error_message="approve or reject",
     )
 
     if form.validate_on_submit():
