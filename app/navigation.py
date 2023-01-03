@@ -103,6 +103,7 @@ class HeaderNavigation(Navigation):
             "platform_admin_splash_page",
             "platform_admin_create_email_branding",
             "platform_admin_update_email_branding",
+            "platform_admin_find_by_uuid",
             "trial_services",
             "update_letter_branding",
             "user_information",

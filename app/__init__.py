@@ -108,6 +108,7 @@ from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.performance_dashboard_api_client import (
     performance_dashboard_api_client,
 )
+from app.notify_client.platform_admin_api_client import admin_api_client
 from app.notify_client.platform_stats_api_client import platform_stats_api_client
 from app.notify_client.provider_client import provider_client
 from app.notify_client.service_api_client import service_api_client
@@ -190,6 +191,7 @@ def create_app(application):
         template_statistics_client,
         upload_api_client,
         user_api_client,
+        admin_api_client,
         # External API clients
         antivirus_client,
         redis_client,

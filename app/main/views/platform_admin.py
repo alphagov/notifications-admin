@@ -22,8 +22,10 @@ from app.main.forms import (
     AdminReturnedLettersForm,
     BillingReportDateFilterForm,
     DateFilterForm,
+    PlatformAdminFindByUuidForm,
     RequiredDateFilterForm,
 )
+from app.notify_client.platform_admin_api_client import admin_api_client
 from app.statistics_utils import (
     get_formatted_percentage,
     get_formatted_percentage_two_dp,
@@ -46,6 +48,126 @@ ZERO_FAILURE_THRESHOLD = 0
 def platform_admin_splash_page():
     return render_template(
         "views/platform-admin/splash-page.html",
+    )
+
+
+@main.route("/platform-admin/find-by-uuid", methods=["GET", "POST"])
+@user_is_platform_admin
+def platform_admin_find_by_uuid():
+    form = PlatformAdminFindByUuidForm()
+    if form.validate_on_submit():
+        uuid_ = form.uuid.data
+
+        found = False
+        try:
+            result = admin_api_client.find_by_uuid(uuid_)
+            found = True
+        except HTTPError as e:
+            if e.status_code != 404:
+                raise e
+
+        if found:
+            url_for_data = {
+                "organisation": dict(
+                    endpoint=".organisation_dashboard",
+                    org_id=uuid_,
+                ),
+                "service": dict(
+                    endpoint=".service_dashboard",
+                    service_id=uuid_,
+                ),
+                "notification": dict(
+                    endpoint=".view_notification",
+                    notification_id=uuid_,
+                    service_id=result["context"].get("service_id"),
+                ),
+                "template": dict(
+                    endpoint=".view_template",
+                    template_id=uuid_,
+                    service_id=result["context"].get("service_id"),
+                ),
+                "email_branding": dict(
+                    endpoint=".platform_admin_update_email_branding",
+                    branding_id=uuid_,
+                ),
+                "letter_branding": dict(
+                    endpoint=".update_letter_branding",
+                    branding_id=uuid_,
+                ),
+                "user": dict(
+                    endpoint=".user_information",
+                    user_id=uuid_,
+                ),
+                "provider": dict(
+                    endpoint=".view_provider",
+                    provider_id=uuid_,
+                ),
+                "reply_to_email": dict(
+                    endpoint=".service_edit_email_reply_to",
+                    reply_to_email_id=uuid_,
+                    service_id=result["context"].get("service_id"),
+                ),
+                "job": dict(
+                    endpoint=".view_job",
+                    job_id=uuid_,
+                    service_id=result["context"].get("service_id"),
+                ),
+                "service_contact_list": dict(
+                    endpoint=".contact_list",
+                    contact_list_id=uuid_,
+                    service_id=result["context"].get("service_id"),
+                ),
+                "service_data_retention": dict(
+                    endpoint=".edit_data_retention",
+                    data_retention_id=uuid_,
+                    service_id=result["context"].get("service_id"),
+                ),
+                "service_sms_sender": dict(
+                    endpoint=".service_edit_sms_sender",
+                    sms_sender_id=uuid_,
+                    service_id=result["context"].get("service_id"),
+                ),
+                "inbound_number": dict(
+                    endpoint=".inbound_sms_admin",
+                ),
+                "api_key": dict(
+                    endpoint=".api_keys",
+                    service_id=result["context"].get("service_id"),
+                ),
+                "template_folder": dict(
+                    endpoint=".choose_template",
+                    template_folder_id=uuid_,
+                    service_id=result["context"].get("service_id"),
+                ),
+                "service_inbound_api": dict(
+                    endpoint=".received_text_messages_callback",
+                    service_id=result["context"].get("service_id"),
+                ),
+                "service_callback_api": dict(
+                    endpoint=".delivery_status_callback",
+                    service_id=result["context"].get("service_id"),
+                ),
+                "complaint": dict(
+                    endpoint=".platform_admin_list_complaints",
+                ),
+                "inbound_sms": dict(
+                    endpoint=".conversation",
+                    notification_id=uuid_,
+                    service_id=result["context"].get("service_id"),
+                    _anchor=f"#n{uuid_}",
+                ),
+            }
+
+            if not (url_for_kwargs := url_for_data.get(result["type"])):
+                raise ValueError(f"Don't know how to redirect to {result['type']}")
+
+            return redirect(url_for(**url_for_kwargs))
+
+        form.uuid.errors.append("Could not find a thing with that UUID")
+
+    return render_template(
+        "views/platform-admin/find-by-uuid.html",
+        form=form,
     )
 
 

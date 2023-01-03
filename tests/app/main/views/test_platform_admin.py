@@ -39,6 +39,7 @@ def test_should_redirect_if_not_logged_in(client_request, endpoint):
     [
         "main.platform_admin",
         "main.platform_admin_splash_page",
+        "main.platform_admin_find_by_uuid",
         "main.live_services",
         "main.trial_services",
     ],

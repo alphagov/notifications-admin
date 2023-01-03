@@ -2590,3 +2590,21 @@ class GovernmentIdentityColour(StripWhitespaceForm):
         "Colour for stripe",
         thing="a colour for the stripe",
     )
+
+
+class PlatformAdminFindByUuidForm(StripWhitespaceForm):
+    uuid = GovukTextInputField(
+        "Find by UUID",
+        validators=[
+            DataRequired(message="Cannot be empty"),
+            validators.UUID(message="Enter a UUID"),
+        ],
+        param_extensions={
+            "hint": {
+                "text": (
+                    "Find a record in Notify by UUID. "
+                    "This could be for an organisation, a service, a notification, or anything else."
+                )
+            }
+        },
+    )
