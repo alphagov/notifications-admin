@@ -3,7 +3,7 @@ from datetime import datetime
 import pytz
 from flask import redirect, render_template, request, session, url_for
 from flask_login import current_user
-from govuk_bank_holidays.bank_holidays import BankHolidays
+from notifications_utils.bank_holidays import BankHolidays
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
 from app import convert_to_boolean, current_service
