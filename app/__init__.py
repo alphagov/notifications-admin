@@ -121,6 +121,7 @@ from app.url_converters import (
     TemplateTypeConverter,
     TicketTypeConverter,
 )
+from app.utils import format_provider
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -574,3 +575,5 @@ def init_jinja(application):
             jinja2.PrefixLoader({"govuk_frontend_jinja": jinja2.PackageLoader("govuk_frontend_jinja")}),
         ]
     )
+
+    application.jinja_env.filters["format_provider"] = format_provider

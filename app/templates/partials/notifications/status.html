@@ -11,6 +11,9 @@
     {% if status_url %}
       </a>
     {% endif %}
+    {% if current_user.platform_admin and notification.sent_by %}
+      via {{ notification.sent_by | format_provider }}
+    {% endif %}
     {% if sent_with_test_key %}
       (test)
     {% endif %}
