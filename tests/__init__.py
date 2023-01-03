@@ -191,6 +191,8 @@ def service_json(
     purchase_order_number=None,
     broadcast_channel=None,
     allowed_broadcast_provider=None,
+    has_active_go_live_request=False,
+    go_live_user=None,
 ):
     if users is None:
         users = []
@@ -239,6 +241,8 @@ def service_json(
         "purchase_order_number": purchase_order_number,
         "broadcast_channel": broadcast_channel,
         "allowed_broadcast_provider": allowed_broadcast_provider,
+        "has_active_go_live_request": has_active_go_live_request,
+        "go_live_user": go_live_user,
     }
 
 

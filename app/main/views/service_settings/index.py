@@ -181,7 +181,7 @@ def estimate_usage(service_id):
 @user_has_permissions("manage_service")
 def request_to_go_live(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html")
+        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=True)
 
     return render_template("views/service-settings/request-to-go-live.html")
 

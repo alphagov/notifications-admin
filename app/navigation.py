@@ -294,6 +294,9 @@ class MainNavigation(Navigation):
             "guest_list",
             "old_guest_list",
         },
+        "make-service-live": {
+            "make_service_live",
+        },
     }
 
 

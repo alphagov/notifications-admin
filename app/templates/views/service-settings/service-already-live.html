@@ -1,14 +1,16 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 
+{% set title = "Your service is already live" if current_user.belongs_to_service(current_service.id) else "This service is already live" %}
+
 {% block service_page_title %}
-  Your service is already live
+  {{ title }}
 {% endblock %}
 
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {{ page_header('Your service is already live') }}
+      {{ page_header(title) }}
 
       <p class="govuk-body">
         {% if current_service.go_live_at %}
@@ -18,10 +20,12 @@
         {% endif %}
         </p>
 
+      {% if prompt_to_switch_service %}
       <p class="govuk-body">
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_account') }}">Switch service</a>
          if you want to make a different service live.
       </p>
+      {% endif %}
 
     </div>
   </div>
