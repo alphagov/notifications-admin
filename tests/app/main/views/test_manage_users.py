@@ -433,6 +433,56 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
     assert bool(page.select_one(".tick-cross-list-hint")) == displays_auth_type
 
 
+def test_manage_users_page_does_not_link_to_user_profile_page_if_not_platform_admins(
+    client_request,
+    active_user_with_permissions,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+):
+    active_user_with_permissions["platform_admin"] = False
+    client_request.login(active_user_with_permissions)
+    page = client_request.get("main.manage_users", service_id=service_one["id"])
+    user_links = page.select("h2.user-list-item-heading a")
+
+    assert len(user_links) == 0
+
+
+def test_manage_users_page_links_to_user_profile_page_for_platform_admins(
+    client_request,
+    active_user_with_permissions,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+):
+    active_user_with_permissions["platform_admin"] = True
+    client_request.login(active_user_with_permissions)
+    page = client_request.get("main.manage_users", service_id=service_one["id"])
+    user_links = page.select("h2.user-list-item-heading a")
+
+    assert len(user_links) == 1
+    assert user_links[0]["href"] == "/users/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6"
+
+
+def test_manage_users_page_does_not_links_to_user_profile_page_if_user_only_invited(
+    mocker,
+    client_request,
+    active_user_with_permissions,
+    service_one,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+):
+    active_user_with_permissions["platform_admin"] = True
+    mocker.patch("app.models.user.Users.client_method", return_value=[])
+    client_request.login(active_user_with_permissions)
+    page = client_request.get("main.manage_users", service_id=service_one["id"])
+    user_links = page.select("h2.user-list-item-heading a")
+
+    assert len(user_links) == 0
+
+
 @pytest.mark.parametrize(
     "sms_option_disabled, mobile_number, expected_label",
     [

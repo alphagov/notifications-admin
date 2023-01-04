@@ -196,3 +196,11 @@ def test_add_to_service(client_request, mocker, api_user_active, fake_uuid):
         invited_by_id=fake_uuid,
         ui_permissions={"manage_templates"},
     )
+
+
+def test_is_invited_user(client_request, mocker, api_user_active, mock_get_invited_user_by_id):
+    session_dict = {"invited_user_id": USER_ONE_ID}
+    mocker.patch.dict("app.models.user.session", values=session_dict, clear=True)
+
+    assert User(api_user_active).is_invited_user is False
+    assert InvitedUser.from_session().is_invited_user is True
