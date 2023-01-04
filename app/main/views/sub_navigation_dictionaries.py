@@ -73,6 +73,10 @@ def using_notify_nav():
             "link": "main.guidance_index",
             "sub_navigation_items": [
                 {
+                    "name": "Bulk sending",
+                    "link": "main.guidance_bulk_sending",
+                },
+                {
                     "name": "Formatting",
                     "link": "main.edit_and_format_messages",
                 },
