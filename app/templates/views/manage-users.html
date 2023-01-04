@@ -25,28 +25,28 @@
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-three-quarters">
             <h2 class="user-list-item-heading" title="{{ user.email_address }}">
-              {% if current_user.platform_admin and not user.is_invited_user %}
-              <a
-                class="govuk-link govuk-link--text-colour"
-                href="{{ url_for('.user_information', user_id=user.id) }}">
+              {%- if user.name -%}
+                <span class="heading-small live-search-relevant">
+                  {% if current_user.platform_admin and not user.is_invited_user %}
+                    <a class="govuk-link govuk-link--text-colour" href="{{ url_for('.user_information', user_id=user.id) }}">
+                      {{ user.name }}
+                    </a>
+                  {% else %}
+                    {{ user.name }}
+                  {% endif %}
+                </span>&ensp;
+              {%- endif -%}
+              <span class="hint">
+              {%- if user.status == 'pending' -%}
+                <span class="live-search-relevant">{{ user.email_address }}</span> (invited)
+              {%- elif user.status == 'cancelled' -%}
+                <span class="live-search-relevant">{{ user.email_address }}</span> (cancelled invite)
+              {%- elif user.id == current_user.id -%}
+                <span class="live-search-relevant">(you)</span>
+              {% else %}
+                <span class="live-search-relevant">{{ user.email_address }}</span>
               {% endif %}
-                {%- if user.name -%}
-                <span class="heading-small live-search-relevant">{{ user.name }}</span>&ensp;
-                {%- endif -%}
-                <span class="hint">
-                {%- if user.status == 'pending' -%}
-                  <span class="live-search-relevant">{{ user.email_address }}</span> (invited)
-                {%- elif user.status == 'cancelled' -%}
-                  <span class="live-search-relevant">{{ user.email_address }}</span> (cancelled invite)
-                {%- elif user.id == current_user.id -%}
-                  <span class="live-search-relevant">(you)</span>
-                {% else %}
-                  <span class="live-search-relevant">{{ user.email_address }}</span>
-                {% endif %}
-                </span>
-              {% if current_user.platform_admin and not user.is_invited_user %}
-              </a>
-              {% endif %}
+              </span>
             </h2>
             <ul class="tick-cross-list-permissions">
               {% for permission, label in permissions %}
