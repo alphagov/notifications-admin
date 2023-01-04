@@ -49,7 +49,7 @@ def view_template(service_id, template_id):
     template = current_service.get_template(template_id)
     template_folder = current_service.get_template_folder(template["folder"])
 
-    user_has_template_permission = current_user.has_template_folder_permission(template_folder)
+    user_has_template_permission = current_user.has_template_folder_permission(template_folder, service=current_service)
     if should_skip_template_page(template):
         return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
@@ -89,8 +89,9 @@ def view_template(service_id, template_id):
 @user_has_permissions(allow_org_user=True)
 def choose_template(service_id, template_type="all", template_folder_id=None):
     template_folder = current_service.get_template_folder(template_folder_id)
-    user_has_template_folder_permission = current_user.has_template_folder_permission(template_folder)
-
+    user_has_template_folder_permission = current_user.has_template_folder_permission(
+        template_folder, service=current_service
+    )
     template_list = UserTemplateList(
         service=current_service, template_type=template_type, template_folder_id=template_folder_id, user=current_user
     )
@@ -355,7 +356,7 @@ def copy_template(service_id, template_id):
     template = service_api_client.get_service_template(from_service, template_id)["data"]
 
     template_folder = template_folder_api_client.get_template_folder(from_service, template["folder"])
-    if not current_user.has_template_folder_permission(template_folder):
+    if not current_user.has_template_folder_permission(template_folder, service=current_service):
         abort(403)
 
     if request.method == "POST":

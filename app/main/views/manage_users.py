@@ -115,7 +115,11 @@ def edit_user_permissions(service_id, user_id):
         service_id,
         folder_permissions=None
         if user.platform_admin
-        else [f["id"] for f in current_service.all_template_folders if user.has_template_folder_permission(f)],
+        else [
+            f["id"]
+            for f in current_service.all_template_folders
+            if user.has_template_folder_permission(f, service=current_service)
+        ],
         all_template_folders=None if user.platform_admin else current_service.all_template_folders,
     )
 

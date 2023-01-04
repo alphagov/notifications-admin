@@ -11,6 +11,7 @@ from tests.conftest import (
     ORGANISATION_TWO_ID,
     SERVICE_ONE_ID,
     SERVICE_TWO_ID,
+    create_folder,
 )
 
 
@@ -35,6 +36,7 @@ from tests.conftest import (
         ("main.usage", {}),
         ("main.manage_users", {}),
         ("main.choose_template", {"template_id": sample_uuid()}),
+        ("main.choose_template", {"template_folder_id": sample_uuid()}),
         ("main.view_template", {"template_id": sample_uuid()}),
         ("main.view_template_versions", {"template_id": sample_uuid()}),
         ("main.view_template_version", {"template_id": sample_uuid(), "version": 1}),
@@ -51,7 +53,6 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     mock_get_service,
     mock_get_invites_for_service,
     mock_get_users_by_service,
-    mock_get_template_folders,
     mock_get_organisation,
     mock_has_jobs,
     mock_get_service_templates,
@@ -80,6 +81,8 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     mock_get_service = mocker.patch(
         "app.notify_client.service_api_client.service_api_client.get_service", return_value={"data": service}
     )
+    mocker.patch("app.template_folder_api_client.get_template_folders", return_value=[create_folder(id=sample_uuid())])
+
     client_request.login(
         api_user_active,
         service=service if SERVICE_ONE_ID in user_services else None,

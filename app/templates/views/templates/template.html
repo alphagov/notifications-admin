@@ -32,7 +32,7 @@
       <div class="govuk-grid-column-full">
         {{ folder_path(
           folders=current_service.get_template_path(template._template),
-          service_id=current_service.id,
+          service=current_service,
           template_type='all',
           current_user=current_user
         ) }}
