@@ -177,6 +177,7 @@
     "/services/<uuid:service_id>/jobs/<uuid:job_id>.csv",
     "/services/<uuid:service_id>/jobs/<uuid:job_id>.json",
     "/services/<uuid:service_id>/jobs/<uuid:job_id>/cancel",
+    "/services/<uuid:service_id>/make-service-live",
     "/services/<uuid:service_id>/monthly",
     "/services/<uuid:service_id>/new-broadcast",
     "/services/<uuid:service_id>/new-broadcast/<uuid:template_id>",
