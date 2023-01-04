@@ -1200,7 +1200,7 @@ def test_choose_a_template_to_copy(
     for actual, expected in zip(actual, expected):  # noqa: B020
         assert normalize_spaces(actual.text) == expected
 
-    links = page.select("main nav a")
+    links = page.select(".template-list-item a")
     assert links[0]["href"] == url_for(
         "main.choose_template_to_copy",
         service_id=SERVICE_ONE_ID,
@@ -1248,7 +1248,7 @@ def test_choose_a_template_to_copy_when_user_has_one_service(
     for actual, expected in zip(actual, expected):  # noqa: B020
         assert normalize_spaces(actual.text) == expected
 
-    assert page.select("main nav a")[0]["href"] == url_for(
+    assert page.select(".template-list-item a")[0]["href"] == url_for(
         "main.copy_template",
         service_id=SERVICE_ONE_ID,
         template_id=TEMPLATE_ONE_ID,
@@ -1319,7 +1319,7 @@ def test_choose_a_template_to_copy_from_folder_within_service(
     for actual, expected in zip(actual, expected):  # noqa: B020
         assert normalize_spaces(actual.text) == expected
 
-    links = page.select("main nav a")
+    links = page.select(".template-list-item a")
     assert links[0]["href"] == url_for(
         "main.choose_template_to_copy",
         service_id=SERVICE_ONE_ID,

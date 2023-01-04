@@ -25,7 +25,7 @@
         form=search_form,
         autofocus=True
       ) }}
-      <nav id="template-list">
+      <div id="template-list">
         <ul>
         {% for item in services_templates_and_folders %}
           <li class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
@@ -57,7 +57,7 @@
           </li>
         {% endfor %}
         </ul>
-      </nav>
+      </div>
     {% endif %}
 
 {% endblock %}
