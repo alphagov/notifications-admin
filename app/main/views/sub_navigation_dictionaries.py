@@ -101,6 +101,10 @@ def using_notify_nav():
                     "link": "main.guidance_send_files_by_email",
                 },
                 {
+                    "name": "Team members and permissions",
+                    "link": "main.guidance_team_members_and_permissions",
+                },
+                {
                     "name": "Templates",
                     "link": "main.guidance_templates",
                 },

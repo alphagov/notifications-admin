@@ -332,6 +332,14 @@ def guidance_schedule_messages():
     )
 
 
+@main.route("/using-notify/guidance/team-members-and-permissions")
+def guidance_team_members_and_permissions():
+    return render_template(
+        "views/guidance/team-members-permissions.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 # --- Redirects --- #
 
 
