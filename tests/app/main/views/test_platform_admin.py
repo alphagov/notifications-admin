@@ -1020,6 +1020,14 @@ def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     )
 
 
+def test_get_volumes_by_service_report_page(client_request, platform_admin_user, mocker):
+    client_request.login(platform_admin_user)
+    client_request.get(
+        "main.get_volumes_by_service",
+        _test_page_title=False,
+    )
+
+
 def test_get_volumes_by_service_report_calls_api_and_download_data(client_request, platform_admin_user, mocker):
     mocker.patch(
         "app.main.views.platform_admin.billing_api_client.get_data_for_volumes_by_service_report",
@@ -1070,6 +1078,14 @@ def test_get_volumes_by_service_report_calls_api_and_download_data(client_reques
     )
 
 
+def test_get_daily_volumes_report_page(client_request, platform_admin_user, mocker):
+    client_request.login(platform_admin_user)
+    client_request.get(
+        "main.get_daily_volumes",
+        _test_page_title=False,
+    )
+
+
 def test_get_daily_volumes_report_calls_api_and_download_data(client_request, platform_admin_user, mocker):
     mocker.patch(
         "app.main.views.platform_admin.billing_api_client.get_data_for_daily_volumes_report",
@@ -1109,6 +1125,11 @@ def test_get_daily_volumes_report_calls_api_and_download_data(client_request, pl
         + "20"
         + "\r\n"
     )
+
+
+def test_get_daily_sms_provider_volumes_report_page(client_request, platform_admin_user, mocker):
+    client_request.login(platform_admin_user)
+    client_request.get("main.get_daily_sms_provider_volumes")
 
 
 def test_get_daily_sms_provider_volumes_report_calls_api_and_download_data(client_request, platform_admin_user, mocker):
