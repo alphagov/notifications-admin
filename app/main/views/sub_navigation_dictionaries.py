@@ -75,8 +75,8 @@ def using_notify_nav():
                 {
                     "name": "Bulk sending",
                     "link": "main.guidance_bulk_sending",
-                 },
-                 {
+                },
+                {
                     "name": "Email branding",
                     "link": "main.guidance_email_branding",
                 },
