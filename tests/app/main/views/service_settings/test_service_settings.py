@@ -107,6 +107,9 @@ def mock_get_service_settings_page_common(
                 "Notes None Change the notes for the service",
                 "Organisation Test organisation Central government Change organisation for service",
                 "Rate limit 3,000 per minute Change rate limit",
+                "Email limit 1,000 per day Change daily email limit",
+                "SMS limit 1,000 per day Change daily SMS limit",
+                "Letter limit 1,000 per day Change daily letter limit",
                 "Message limit 1,000 per day Change daily message limit",
                 "Free text message allowance 250,000 per year Change free text message allowance",
                 "Email branding GOV.UK Change email branding (admin view)",
@@ -455,18 +458,27 @@ def test_escapes_letter_contact_block(
 
 
 @pytest.mark.parametrize(
-    "organisation_type, expected_first_paragraph",
+    "organisation_type, expected_content_lines",
     [
-        ("central", "This is the name your emails will come from."),
+        (
+            "central",
+            [
+                "Your service name should tell the recipient what your message is about, as well as who it’s from. For example:",  # noqa
+                "Register to vote",
+            ],
+        ),
         (
             "local",
-            "Your service name should tell users what the message is about as well as who it’s from. For example:",  # noqa
+            [
+                "Your service name should tell the recipient what your message is about, as well as who it’s from. For example",  # noqa
+                "School admissions - Test Organisation",
+            ],
         ),
-        ("nhs", "Your service name should tell users what the message is about as well as who it’s from."),
+        ("nhs", ["Your service name should tell the recipient what your message is about, as well as who it’s from."]),
     ],
 )
 def test_change_service_name_content_varies_by_organisation_type(
-    client_request, mocker, service_one, organisation_type, expected_first_paragraph
+    client_request, mocker, service_one, organisation_type, expected_content_lines
 ):
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
@@ -476,14 +488,8 @@ def test_change_service_name_content_varies_by_organisation_type(
     page = client_request.get("main.service_name_change", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Change your service name"
     assert page.select_one("input", attrs={"type": "text"})["value"] == "service one"
-    assert page.select_one("main p").text == expected_first_paragraph
+    assert all(content in page.select_one("main").text for content in expected_content_lines)
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
-
-    if organisation_type == "central":
-        assert "Register to vote" in page.select_one("ul.govuk-list.govuk-list--bullet").text
-
-    elif organisation_type == "local":
-        assert "School admissions - Test Org" in page.select_one("ul.govuk-list.govuk-list--bullet").text
 
 
 def test_should_show_service_org_in_hint_on_change_service_name_page_for_local_services_if_service_has_org(
@@ -520,8 +526,8 @@ def test_should_show_service_name_with_no_prefixing(
     page = client_request.get("main.service_name_change", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Change your service name"
     assert (
-        page.select_one("main p").text
-        == "Your service name should tell users what the message is about as well as who it’s from."
+        "Your service name should tell the recipient what your message is about, as well as who it’s from."
+        in page.select_one("main").text
     )
 
 
@@ -630,7 +636,11 @@ def test_switch_service_to_live(
         ),
     )
     mock_update_service.assert_called_with(
-        SERVICE_ONE_ID, message_limit=250000, restricted=False, go_live_at="2017-04-01 11:09:00.061258"
+        SERVICE_ONE_ID,
+        message_limit=250000,
+        restricted=False,
+        go_live_at="2017-04-01 11:09:00.061258",
+        has_active_go_live_request=False,
     )
 
 
@@ -668,7 +678,13 @@ def test_switch_service_to_restricted(
             service_id=SERVICE_ONE_ID,
         ),
     )
-    mock_update_service.assert_called_with(SERVICE_ONE_ID, message_limit=50, restricted=True, go_live_at=None)
+    mock_update_service.assert_called_with(
+        SERVICE_ONE_ID,
+        message_limit=50,
+        restricted=True,
+        go_live_at=None,
+        has_active_go_live_request=False,
+    )
 
 
 @pytest.mark.parametrize(
@@ -1610,7 +1626,11 @@ def test_should_redirect_after_request_to_go_live(
         "Thanks for your request to go live. We’ll get back to you within one working day."
     )
     assert normalize_spaces(page.select_one("h1").text) == "Settings"
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, go_live_user=active_user_with_permissions["id"])
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        go_live_user=active_user_with_permissions["id"],
+        has_active_go_live_request=True,
+    )
 
 
 def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
@@ -4560,9 +4580,7 @@ def test_should_show_page_to_set_message_limit(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get("main.set_message_limit", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("label").text) == (
-        "Number of messages the service is allowed to send each day"
-    )
+    assert normalize_spaces(page.select_one("label").text) == "Daily message limit"
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1000"
 
 

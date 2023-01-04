@@ -1,5 +1,5 @@
 import pytest
-from flask import Flask
+from flask import Flask, url_for
 
 from app import create_app
 from app.navigation import (
@@ -38,7 +38,6 @@ EXCLUDED_ENDPOINTS = tuple(
             "bat_phone",
             "begin_tour",
             "billing_details",
-            "branding_and_customisation",
             "broadcast",
             "broadcast_dashboard",
             "broadcast_dashboard_previous",
@@ -80,7 +79,6 @@ EXCLUDED_ENDPOINTS = tuple(
             "cookies",
             "copy_template",
             "count_content_length",
-            "create_and_send_messages",
             "create_api_key",
             "create_email_branding_government_identity_logo",
             "create_email_branding_government_identity_colour",
@@ -96,10 +94,10 @@ EXCLUDED_ENDPOINTS = tuple(
             "download_contact_list",
             "download_notifications_csv",
             "download_organisation_usage_report",
-            "edit_and_format_messages",
             "edit_data_retention",
             "edit_organisation_agreement",
             "edit_organisation_billing_details",
+            "edit_organisation_can_approve_own_go_live_requests",
             "edit_organisation_crown_status",
             "edit_organisation_domains",
             "edit_organisation_go_live_notes",
@@ -145,12 +143,24 @@ EXCLUDED_ENDPOINTS = tuple(
             "get_daily_sms_provider_volumes",
             "get_volumes_by_service",
             "get_example_csv",
-            "get_notifications_as_json",
+            "get_notifications_page_partials_as_json",
             "get_started",
             "get_started_old",
             "go_to_dashboard_after_tour",
             "guest_list",
+            "guidance_email_branding",
+            "guidance_edit_and_format_messages",
             "guidance_index",
+            "guidance_letter_branding",
+            "guidance_letter_specification",
+            "guidance_receive_text_messages",
+            "guidance_reply_to_email_address",
+            "guidance_schedule_messages",
+            "guidance_send_files_by_email",
+            "guidance_team_members_and_permissions",
+            "guidance_templates",
+            "guidance_text_message_sender",
+            "guidance_upload_a_letter",
             "history",
             "how_to_pay",
             "inbound_sms_admin",
@@ -166,12 +176,13 @@ EXCLUDED_ENDPOINTS = tuple(
             "letter_branding",
             "letter_branding_pool_option",
             "letter_branding_request",
+            "letter_branding_upload_branding",
             "letter_spec",
-            "letter_specification",
             "letter_template",
             "link_service_to_organisation",
             "live_services",
             "live_services_csv",
+            "make_service_live",
             "manage_org_users",
             "manage_template_folder",
             "manage_users",
@@ -186,9 +197,11 @@ EXCLUDED_ENDPOINTS = tuple(
             "no_cookie.view_letter_template_preview",
             "no_cookie.view_template_version_preview",
             "notifications_sent_by_service",
+            "old_branding_and_customisation",
             "old_guest_list",
             "old_integration_testing",
             "old_roadmap",
+            "old_schedule_messages",
             "old_service_dashboard",
             "old_terms",
             "old_using_notify",
@@ -236,7 +249,6 @@ EXCLUDED_ENDPOINTS = tuple(
             "save_contact_list",
             "security",
             "security_policy",
-            "send_files_by_email",
             "send_files_by_email_contact_details",
             "send_from_contact_list",
             "send_messages",
@@ -320,7 +332,6 @@ EXCLUDED_ENDPOINTS = tuple(
             "two_factor_email_sent",
             "two_factor_webauthn",
             "update_letter_branding",
-            "upload_a_letter",
             "upload_contact_list",
             "upload_letter",
             "uploaded_letter_preview",
@@ -357,7 +368,6 @@ EXCLUDED_ENDPOINTS = tuple(
             "view_notification",
             "view_notification_updates",
             "view_notifications",
-            "view_notifications_csv",
             "view_previous_broadcast",
             "view_provider",
             "view_providers",
@@ -590,4 +600,31 @@ def test_caseworkers_see_jobs_nav_if_jobs_exist(
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one("header + .govuk-width-container nav").text) == (
         "Templates Sent messages Uploads Team members"
+    )
+
+
+def test_make_service_live_link_is_shown_in_limited_circumstances(
+    client_request,
+    service_one,
+    platform_admin_user,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_get_api_keys,
+    mock_get_organisation,
+    fake_uuid,
+):
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = fake_uuid
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
+
+    last_navigation_item = page.select(".navigation li")[-1]
+
+    assert last_navigation_item["class"] == ["navigation__item", "navigation__item--with-separator"]
+    assert normalize_spaces(last_navigation_item.text) == "Make service live"
+    assert last_navigation_item.select_one("a")["href"] == url_for(
+        "main.make_service_live",
+        service_id=SERVICE_ONE_ID,
     )

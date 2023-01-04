@@ -3,12 +3,12 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 def test_set_inbound_sms_sets_a_number_for_service(
     client_request,
-    mock_add_sms_sender,
     multiple_available_inbound_numbers,
     fake_uuid,
     mock_no_inbound_number_for_service,
     mocker,
 ):
+    mock_add_inbound_number = mocker.patch("app.inbound_number_client.add_inbound_number_to_service")
     mocker.patch("app.service_api_client.update_service")
     data = {
         "inbound_number": "781d9c60-7a7e-46b7-9896-7b045b992fa5",
@@ -21,10 +21,8 @@ def test_set_inbound_sms_sets_a_number_for_service(
         _expected_status=302,
     )
 
-    mock_add_sms_sender.assert_called_once_with(
+    mock_add_inbound_number.assert_called_once_with(
         SERVICE_ONE_ID,
-        sms_sender="781d9c60-7a7e-46b7-9896-7b045b992fa5",
-        is_default=True,
         inbound_number_id="781d9c60-7a7e-46b7-9896-7b045b992fa5",
     )
 

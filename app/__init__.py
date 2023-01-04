@@ -33,6 +33,7 @@ from werkzeug.local import LocalProxy
 
 from app import proxy_fix, webauthn_server
 from app.asset_fingerprinter import asset_fingerprinter
+from app.commands import setup_commands
 from app.config import configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
 from app.formatters import (
@@ -120,6 +121,7 @@ from app.url_converters import (
     TemplateTypeConverter,
     TicketTypeConverter,
 )
+from app.utils import format_provider
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -210,6 +212,8 @@ def create_app(application):
     add_template_filters(application)
 
     register_errorhandlers(application)
+
+    setup_commands(application)
 
     setup_event_handlers()
 
@@ -571,3 +575,5 @@ def init_jinja(application):
             jinja2.PrefixLoader({"govuk_frontend_jinja": jinja2.PackageLoader("govuk_frontend_jinja")}),
         ]
     )
+
+    application.jinja_env.filters["format_provider"] = format_provider

@@ -920,6 +920,7 @@ def test_organisation_settings_for_platform_admin(
             "Not signed Change data sharing and financial agreement for the organisation"
         ),
         "Request to go live notes None Change go live notes for the organisation",
+        "Can approve own go-live requests No Change whether this organisation can approve its own go-live requests",
         "Billing details None Change billing details for the organisation",
         "Notes None Change the notes for the organisation",
         "Email branding options GOV.UK Default Manage email branding options for the organisation",
@@ -949,7 +950,7 @@ def test_organisation_settings_table_shows_email_branding_pool(
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    email_branding_options_row = page.select("tr")[8]
+    email_branding_options_row = page.select("tr")[9]
 
     assert normalize_spaces(email_branding_options_row.text) == (
         "Email branding options "
@@ -1048,7 +1049,7 @@ def test_organisation_settings_table_shows_email_branding_pool_non_govuk_default
         client_request.login(platform_admin_user)
         page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    email_branding_options_row = page.select("tr")[8]
+    email_branding_options_row = page.select("tr")[9]
 
     assert normalize_spaces(email_branding_options_row.text) == (
         "Email branding options "
@@ -1069,7 +1070,7 @@ def test_organisation_settings_table_shows_email_branding_pool_govuk_default(
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    email_branding_options_row = page.select("tr")[8]
+    email_branding_options_row = page.select("tr")[9]
 
     assert normalize_spaces(email_branding_options_row.text) == (
         "Email branding options GOV.UK Default Manage email branding options for the organisation"
@@ -1773,7 +1774,11 @@ def test_organisation_settings_links_to_edit_organisation_notes_page(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
-    assert len(page.select(f"""a[href="/organisations/{organisation_one['id']}/settings/notes"]""")) == 1
+
+    assert page.select(".table-field-right-aligned a")[4]["href"] == url_for(
+        ".edit_organisation_go_live_notes",
+        org_id=organisation_one["id"],
+    )
 
 
 def test_view_edit_organisation_notes(
@@ -1822,6 +1827,112 @@ def test_update_organisation_notes_errors_when_user_not_platform_admin(
         "main.edit_organisation_notes",
         org_id=organisation_one["id"],
         _data={"notes": "Very fluffy"},
+        _expected_status=403,
+    )
+
+
+def test_organisation_settings_links_to_edit_can_approve_own_go_live_request(
+    mocker,
+    mock_get_organisation,
+    mock_get_email_branding_pool,
+    mock_get_letter_branding_pool,
+    organisation_one,
+    client_request,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
+
+    assert page.select(".table-field-right-aligned a")[5]["href"] == url_for(
+        ".edit_organisation_can_approve_own_go_live_requests",
+        org_id=organisation_one["id"],
+    )
+
+
+@pytest.mark.parametrize(
+    "value_from_api, expected_checked_value, expected_label",
+    (
+        (True, "True", "Yes"),
+        (False, "False", "No"),
+    ),
+)
+def test_get_can_approve_own_go_live_requests(
+    mocker,
+    client_request,
+    fake_uuid,
+    platform_admin_user,
+    value_from_api,
+    expected_checked_value,
+    expected_label,
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            org_id,
+            "Org 1",
+            can_approve_own_go_live_requests=value_from_api,
+        ),
+    )
+
+    page = client_request.get(
+        "main.edit_organisation_can_approve_own_go_live_requests",
+        org_id=fake_uuid,
+    )
+    checked_radio = page.select_one("input[checked]")
+    assert checked_radio["value"] == expected_checked_value
+    assert normalize_spaces(page.select_one(f"label[for={checked_radio['id']}]").text) == expected_label
+
+
+@pytest.mark.parametrize(
+    "post_data, expected_value_sent_to_api",
+    (
+        (
+            {"enabled": "True"},
+            True,
+        ),
+        (
+            {"enabled": "False"},
+            False,
+        ),
+    ),
+)
+def test_update_can_approve_own_go_live_requests(
+    client_request,
+    platform_admin_user,
+    organisation_one,
+    mock_get_organisation,
+    mock_update_organisation,
+    post_data,
+    expected_value_sent_to_api,
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.edit_organisation_can_approve_own_go_live_requests",
+        org_id=organisation_one["id"],
+        _data=post_data,
+        _expected_redirect=url_for(
+            "main.organisation_settings",
+            org_id=organisation_one["id"],
+        ),
+    )
+    mock_update_organisation.assert_called_with(
+        organisation_one["id"], cached_service_ids=None, can_approve_own_go_live_requests=expected_value_sent_to_api
+    )
+
+
+@pytest.mark.parametrize("method", ("get", "post"))
+def test_update_can_approve_own_go_live_requests_errors_when_user_not_platform_admin(
+    client_request,
+    organisation_one,
+    mock_get_organisation,
+    mock_update_organisation,
+    method,
+):
+    getattr(client_request, method)(
+        "main.edit_organisation_can_approve_own_go_live_requests",
+        org_id=organisation_one["id"],
         _expected_status=403,
     )
 

@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set title = "Make service live" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      <p class="govuk-body">
+        {{ current_service.go_live_user.name }} has requested for this service to be made live.
+      </p>
+
+      <p class="govuk-body">
+        They estimate this service will send:
+      </p>
+      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+        {% for channel, volumes in current_service.volumes_by_channel %}
+          <li>
+            {% if volumes %}
+              {{ volumes|message_count(channel) }} per year
+            {% else %}
+              No {{ 0|message_count_noun(channel) }}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% call form_wrapper() %}
+        {{ form.enabled(param_extensions={
+          "items": [
+            {"hint": {"text": "We’ll email this service’s team members to let them know"} },
+            {"hint": {"html": "You should contact " + current_service.go_live_user.name + " to explain why the request has not been approved"} },
+          ]
+        }) }}
+        {{ page_footer('Confirm') }}
+      {% endcall %}
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -48,7 +48,6 @@ from app.main.forms import (
     AdminSetLetterBrandingForm,
     AdminSetOrganisationForm,
     ChooseEmailBrandingForm,
-    ChooseLetterBrandingForm,
     EmailBrandingAltTextForm,
     EmailBrandingChooseBanner,
     EmailBrandingChooseBannerColour,
@@ -182,7 +181,7 @@ def estimate_usage(service_id):
 @user_has_permissions("manage_service")
 def request_to_go_live(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html")
+        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=True)
 
     return render_template("views/service-settings/request-to-go-live.html")
 
@@ -206,7 +205,10 @@ def submit_request_to_go_live(service_id):
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 
-    current_service.update(go_live_user=current_user.id)
+    current_service.update(
+        go_live_user=current_user.id,
+        has_active_go_live_request=True,
+    )
 
     flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")
     return redirect(url_for(".service_settings", service_id=service_id))
@@ -626,10 +628,8 @@ def service_set_inbound_number(service_id):
     form = AdminServiceInboundNumberForm(inbound_number_choices=inbound_numbers_value_and_label)
 
     if form.validate_on_submit():
-        service_api_client.add_sms_sender(
+        inbound_number_client.add_inbound_number_to_service(
             current_service.id,
-            sms_sender=form.inbound_number.data,
-            is_default=True,
             inbound_number_id=form.inbound_number.data,
         )
         current_service.force_permission("inbound_sms", on=True)
@@ -695,7 +695,6 @@ def service_set_international_letters(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-inbound-sms", methods=["GET"])
 @main.route("/services/<uuid:service_id>/service-settings/receive-text-messages", methods=["GET"])
 @user_has_permissions("manage_service")
 def service_receive_text_messages(service_id):
@@ -965,13 +964,20 @@ def set_free_sms_allowance(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-message-limit", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/set-message-limit/<template_type:notification_type>",
+    methods=["GET", "POST"],
+)
 @user_is_platform_admin
-def set_message_limit(service_id):
+def set_message_limit(service_id, notification_type=None):
+    limit_attribute_name = "message_limit" if notification_type is None else f"{notification_type}_message_limit"
 
-    form = AdminServiceMessageLimitForm(message_limit=current_service.message_limit)
+    form = AdminServiceMessageLimitForm(
+        message_limit=getattr(current_service, limit_attribute_name), notification_type=notification_type
+    )
 
     if form.validate_on_submit():
-        current_service.update(message_limit=form.message_limit.data)
+        current_service.update(**{limit_attribute_name: form.message_limit.data})
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
@@ -1467,7 +1473,7 @@ def email_branding_upload_logo(service_id):
 
     return (
         render_template(
-            "views/service-settings/branding/add-new-branding/upload-logo.html",
+            "views/service-settings/branding/add-new-branding/email-branding-upload-logo.html",
             form=form,
             back_link=back_link,
             abandon_flow_link=abandon_flow_link,
@@ -1640,71 +1646,6 @@ def email_branding_choose_banner_colour(service_id):
             abandon_flow_link=abandon_flow_link,
         ),
         400 if form.errors else 200,
-    )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def letter_branding_request(service_id):
-    form = ChooseLetterBrandingForm(current_service)
-    from_template = request.args.get("from_template")
-    if form.validate_on_submit():
-        branding_choice = form.options.data
-
-        if branding_choice in current_service.letter_branding_pool.ids:
-            return redirect(
-                url_for(".letter_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
-            )
-
-        ticket_message = render_template(
-            "support-tickets/branding-request.txt",
-            current_branding=current_service.letter_branding.name or "no",
-            branding_requested=dict(form.options.choices)[form.options.data],
-            detail=form.something_else.data,
-        )
-        ticket = NotifySupportTicket(
-            subject=f"Letter branding request - {current_service.name}",
-            message=ticket_message,
-            ticket_type=NotifySupportTicket.TYPE_QUESTION,
-            user_name=current_user.name,
-            user_email=current_user.email_address,
-            org_id=current_service.organisation_id,
-            org_type=current_service.organisation_type,
-            service_id=current_service.id,
-        )
-        zendesk_client.send_ticket_to_zendesk(ticket)
-        flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
-        return redirect(
-            url_for(".view_template", service_id=current_service.id, template_id=from_template)
-            if from_template
-            else url_for(".service_settings", service_id=current_service.id)
-        )
-
-    return render_template(
-        "views/service-settings/branding/letter-branding-options.html",
-        form=form,
-        from_template=from_template,
-    )
-
-
-@user_has_permissions("manage_service")
-@main.route("/services/<uuid:service_id>/service-settings/letter-branding/pool", methods=["GET", "POST"])
-def letter_branding_pool_option(service_id):
-    try:
-        chosen_branding = current_service.letter_branding_pool.get_item_by_id(request.args.get("branding_option"))
-    except current_service.letter_branding_pool.NotFound:
-        flash("No branding found for this id.")
-        return redirect(url_for(".letter_branding_request", service_id=current_service.id))
-
-    if request.method == "POST":
-        current_service.update(letter_branding=chosen_branding.id)
-
-        flash("You’ve updated your letter branding", "default")
-        return redirect(url_for(".service_settings", service_id=current_service.id))
-
-    return render_template(
-        "views/service-settings/branding/letter-branding-pool-option.html",
-        chosen_branding=chosen_branding,
     )
 
 

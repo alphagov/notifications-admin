@@ -45,7 +45,7 @@
   {{ govukErrorSummary({
     "classes": "webauthn__no-js",
     "titleText": "There’s a problem",
-    "descriptionHtml": "JavaScript is not available for this page. Security keys need JavaScript to work."
+    "descriptionText": "JavaScript is not available for this page. Security keys need JavaScript to work."
   }) }}
 
   {% set keyProblemDescription %}
@@ -109,7 +109,6 @@
       <div class="govuk-grid-column-one-quarter">
         <img src="{{ asset_url('images/security-key.svg') }}" alt="" class="webauthn-illustration" width="149" height="150">
       </div>
-      {% endif %}
-    </div>
+    {% endif %}
   </div>
 {% endblock %}

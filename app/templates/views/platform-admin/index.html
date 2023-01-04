@@ -19,7 +19,7 @@
     {% call form_wrapper(method="get") %}
       {{ form.start_date(param_extensions={"hint": {"text":"Enter start date in format YYYY-MM-DD"}}) }}
       {{ form.end_date(param_extensions={"hint": {"text":"Enter end date in format YYYY-MM-DD"}}) }}
-      </br>
+      <br>
       {{ govukButton({ "text": "Filter" }) }}
     {% endcall %}
   {% endset %}

@@ -294,6 +294,9 @@ class MainNavigation(Navigation):
             "guest_list",
             "old_guest_list",
         },
+        "make-service-live": {
+            "make_service_live",
+        },
     }
 
 
@@ -346,6 +349,7 @@ class OrgNavigation(Navigation):
             "add_organisation_letter_branding_options",
             "edit_organisation_agreement",
             "edit_organisation_billing_details",
+            "edit_organisation_can_approve_own_go_live_requests",
             "edit_organisation_crown_status",
             "edit_organisation_domains",
             "edit_organisation_domains",

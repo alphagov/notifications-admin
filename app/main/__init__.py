@@ -23,6 +23,7 @@ from app.main.views import (  # noqa
     invites,
     jobs,
     letter_branding,
+    make_service_live,
     manage_users,
     new_password,
     notifications,
@@ -45,4 +46,4 @@ from app.main.views import (  # noqa
     verify,
     webauthn_credentials,
 )
-from app.main.views.service_settings import index  # noqa
+from app.main.views.service_settings import index, letter_branding  # noqa

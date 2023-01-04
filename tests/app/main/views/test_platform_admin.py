@@ -299,8 +299,8 @@ def test_should_show_email_and_sms_stats_for_all_service_types(
         {"detailed": True, "include_from_test_key": True, "only_active": ANY}
     )
 
-    table_body = page.select("table tbody")[0]
-    service_row_group = table_body.select_one("tbody").select("tr")
+    table = page.select_one("table")
+    service_row_group = table.select_one("tbody").select("tr")
     email_stats = service_row_group[1].select(".big-number-number")[0]
     sms_stats = service_row_group[1].select(".big-number-number")[1]
 
@@ -335,8 +335,7 @@ def test_should_show_archived_services_last(
         {"detailed": True, "include_from_test_key": True, "only_active": ANY}
     )
 
-    table_body = page.select_one("table tbody")
-    services = [service.tr for service in table_body.select("tbody")]
+    services = page.select("table tbody tr:first-child")
     assert len(services) == 3
     assert normalize_spaces(services[0].td.text) == "A"
     assert normalize_spaces(services[1].td.text) == "B"
@@ -380,7 +379,7 @@ def test_should_order_services_by_usage_with_inactive_last(
         {"detailed": True, "include_from_test_key": True, "only_active": ANY}
     )
 
-    services = page.select("table tbody tbody tr:first-child")
+    services = page.select("table tbody tr:first-child")
     assert len(services) == 3
     assert normalize_spaces(services[0].td.text) == "My Service 2"
     assert normalize_spaces(services[1].td.text) == "My Service 1"

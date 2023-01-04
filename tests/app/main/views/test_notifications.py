@@ -18,20 +18,32 @@ from tests.conftest import (
 
 
 @pytest.mark.parametrize(
-    "key_type, notification_status, expected_status",
+    "key_type, notification_status, platform_admin, expected_status",
     [
-        (None, "created", "Sending"),
-        (None, "sending", "Sending"),
-        (None, "delivered", "Delivered"),
-        (None, "failed", "Failed"),
-        (None, "temporary-failure", "Phone not accepting messages right now"),
-        (None, "permanent-failure", "Not delivered"),
-        (None, "technical-failure", "Technical failure"),
-        ("team", "delivered", "Delivered"),
-        ("live", "delivered", "Delivered"),
-        ("test", "sending", "Sending (test)"),
-        ("test", "delivered", "Delivered (test)"),
-        ("test", "permanent-failure", "Not delivered (test)"),
+        (None, "created", False, "Sending"),
+        (None, "created", True, "Sending via MMG"),
+        (None, "sending", False, "Sending"),
+        (None, "sending", True, "Sending via MMG"),
+        (None, "delivered", False, "Delivered"),
+        (None, "delivered", True, "Delivered via MMG"),
+        (None, "failed", False, "Failed"),
+        (None, "failed", True, "Failed via MMG"),
+        (None, "temporary-failure", False, "Phone not accepting messages right now"),
+        (None, "temporary-failure", True, "Phone not accepting messages right now via MMG"),
+        (None, "permanent-failure", False, "Not delivered"),
+        (None, "permanent-failure", True, "Not delivered via MMG"),
+        (None, "technical-failure", False, "Technical failure"),
+        (None, "technical-failure", True, "Technical failure via MMG"),
+        ("team", "delivered", False, "Delivered"),
+        ("team", "delivered", True, "Delivered via MMG"),
+        ("live", "delivered", False, "Delivered"),
+        ("live", "delivered", True, "Delivered via MMG"),
+        ("test", "sending", False, "Sending (test)"),
+        ("test", "sending", True, "Sending via MMG (test)"),
+        ("test", "delivered", False, "Delivered (test)"),
+        ("test", "delivered", True, "Delivered via MMG (test)"),
+        ("test", "permanent-failure", False, "Not delivered (test)"),
+        ("test", "permanent-failure", True, "Not delivered via MMG (test)"),
     ],
 )
 @pytest.mark.parametrize(
@@ -44,6 +56,7 @@ from tests.conftest import (
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_notification_status_page_shows_details(
     client_request,
+    active_user_with_permissions,
     mocker,
     mock_has_no_jobs,
     service_one,
@@ -52,18 +65,22 @@ def test_notification_status_page_shows_details(
     key_type,
     notification_status,
     expected_status,
+    platform_admin,
 ):
-
+    user["platform_admin"] = platform_admin
     mocker.patch("app.user_api_client.get_user", return_value=user)
 
     notification = create_notification(notification_status=notification_status, key_type=key_type)
+    notification["sent_by"] = "mmg"  # Just use this sender every time
     _mock_get_notification = mocker.patch("app.notification_api_client.get_notification", return_value=notification)
 
+    client_request.login(user)
     page = client_request.get("main.view_notification", service_id=service_one["id"], notification_id=fake_uuid)
 
     assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == "To: 07123456789"
     assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: hello Jo"
-    assert normalize_spaces(page.select(".ajax-block-container p")[0].text) == (expected_status)
+
+    assert normalize_spaces(page.select(".ajax-block-container p")[0].text) == expected_status
 
     _mock_get_notification.assert_called_with(service_one["id"], fake_uuid)
 

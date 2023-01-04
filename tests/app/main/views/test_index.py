@@ -90,28 +90,34 @@ def test_hiding_pages_from_search_engines(
 @pytest.mark.parametrize(
     "view",
     [
-        "cookies",
-        "privacy",
-        "pricing",
-        "terms",
-        "roadmap",
-        "features",
-        "documentation",
-        "security",
-        "message_status",
-        "features_email",
-        "features_sms",
-        "features_letters",
-        "how_to_pay",
-        "get_started",
-        "guidance_index",
-        "branding_and_customisation",
-        "create_and_send_messages",
-        "edit_and_format_messages",
-        "send_files_by_email",
-        "upload_a_letter",
-        "who_can_use_notify",
         "billing_details",
+        "cookies",
+        "documentation",
+        "features",
+        "features_email",
+        "features_letters",
+        "features_sms",
+        "get_started",
+        "guidance_edit_and_format_messages",
+        "guidance_email_branding",
+        "guidance_index",
+        "guidance_letter_branding",
+        "guidance_letter_specification",
+        "guidance_receive_text_messages",
+        "guidance_reply_to_email_address",
+        "guidance_schedule_messages",
+        "guidance_send_files_by_email",
+        "guidance_templates",
+        "guidance_text_message_sender",
+        "guidance_upload_a_letter",
+        "how_to_pay",
+        "message_status",
+        "pricing",
+        "privacy",
+        "roadmap",
+        "security",
+        "terms",
+        "who_can_use_notify",
     ],
 )
 def test_static_pages(
@@ -141,7 +147,7 @@ def test_static_pages(
 def test_guidance_pages_link_to_service_pages_when_signed_in(
     client_request,
 ):
-    request = partial(client_request.get, "main.edit_and_format_messages")
+    request = partial(client_request.get, "main.guidance_edit_and_format_messages")
     selector = ".govuk-list--number li a"
 
     # Check the page loads when user is signed in

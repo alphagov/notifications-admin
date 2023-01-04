@@ -21,3 +21,12 @@ repos:
   hooks:
     - id: black
       name: black (python)
+- repo: local
+  hooks:
+    - id: check-removed-routes
+      name: check-removed-routes
+      entry: flask command save-app-routes
+      language: system
+      types: [python]
+      pass_filenames: false
+      always_run: true

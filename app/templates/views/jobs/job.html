@@ -33,6 +33,8 @@
           <span class="page-footer-link page-footer-delete-link-without-button">
             <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Cancel sending these letters</a>
           </span>
+        </div>
+      </div>
     {% else %}
       <div>&nbsp;</div>
     {% endif %}

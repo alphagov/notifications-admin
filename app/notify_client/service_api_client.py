@@ -84,9 +84,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "free_sms_fragment_limit",
             "go_live_at",
             "go_live_user",
+            "has_active_go_live_request",
             "letter_branding",
             "letter_contact_block",
             "message_limit",
+            "email_message_limit",
+            "sms_message_limit",
+            "letter_message_limit",
             "name",
             "notes",
             "organisation_type",
@@ -115,6 +119,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             message_limit=250000 if live else 50,
             restricted=(not live),
             go_live_at=str(datetime.utcnow()) if live else None,
+            has_active_go_live_request=False,
         )
 
     @cache.delete("live-service-and-organisation-counts")
@@ -400,11 +405,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete("service-{service_id}")
     @cache.delete_by_pattern("service-{service_id}-template-*")
-    def add_sms_sender(self, service_id, sms_sender, is_default=False, inbound_number_id=None):
+    def add_sms_sender(self, service_id, sms_sender, is_default=False):
         data = {"sms_sender": sms_sender, "is_default": is_default}
-        if inbound_number_id:
-            data["inbound_number_id"] = inbound_number_id
-        return self.post("/service/{}/sms-sender".format(service_id), data=data)
+
+        return self.post(f"/service/{service_id}/sms-sender", data=data)
 
     @cache.delete("service-{service_id}")
     @cache.delete_by_pattern("service-{service_id}-template-*")

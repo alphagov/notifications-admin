@@ -57,6 +57,7 @@ from app.formatters import (
     format_auth_type,
     format_thousands,
     guess_name_from_email_address,
+    message_count_noun,
 )
 from app.main.validators import (
     BroadcastLength,
@@ -752,7 +753,7 @@ class OptionalGovukRadiosField(GovukRadiosField):
 
 
 class OnOffField(GovukRadiosField):
-    def __init__(self, label, choices=None, *args, **kwargs):
+    def __init__(self, label, choices=None, choices_for_error_message=None, *args, **kwargs):
         choices = choices or [
             (True, "On"),
             (False, "Off"),
@@ -760,7 +761,7 @@ class OnOffField(GovukRadiosField):
         super().__init__(
             label,
             choices=choices,
-            thing=f"{choices[0][1].lower()} or {choices[1][1].lower()}",
+            thing=choices_for_error_message or f"{choices[0][1].lower()} or {choices[1][1].lower()}",
             *args,
             **kwargs,
         )
@@ -1128,10 +1129,19 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
 
 
 class AdminServiceMessageLimitForm(StripWhitespaceForm):
-    message_limit = GovukIntegerField(
-        "Number of messages the service is allowed to send each day",
-        validators=[DataRequired(message="Cannot be empty")],
-    )
+    message_limit = GovukIntegerField("", validators=[DataRequired(message="Cannot be empty")])
+
+    def __init__(self, notification_type=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.message_limit.label.text = f"Daily {message_count_noun(1, notification_type)} limit"
+        self.message_limit.param_extensions = {
+            "hint": {
+                "text": (
+                    f"Number of {message_count_noun(999, notification_type)} the service is allowed to send each day"
+                )
+            }
+        }
 
 
 class AdminServiceRateLimitForm(StripWhitespaceForm):
@@ -1602,13 +1612,15 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
 
 
 class OnOffSettingForm(StripWhitespaceForm):
-    def __init__(self, name, *args, truthy="On", falsey="Off", **kwargs):
+    def __init__(self, name, *args, truthy="On", falsey="Off", choices_for_error_message=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.enabled.label.text = name
         self.enabled.choices = [
             (True, truthy),
             (False, falsey),
         ]
+        if choices_for_error_message:
+            self.enabled.thing = choices_for_error_message
 
     enabled = OnOffField("Choices")
 
@@ -1752,12 +1764,27 @@ class AdminEditLetterBrandingForm(StripWhitespaceForm):
     name = GovukTextInputField("Name of brand", validators=[DataRequired()])
 
 
-class SVGFileUpload(StripWhitespaceForm):
+class AdminEditLetterBrandingSVGUploadForm(StripWhitespaceForm):
     file = VirusScannedFileField(
         "Upload an SVG logo",
         validators=[
             FileAllowed(["svg"], "SVG Images only!"),
             DataRequired(message="You need to upload a file to submit"),
+            NoEmbeddedImagesInSVG(),
+            NoTextInSVG(),
+        ],
+    )
+
+
+class LetterBrandingUploadBranding(StripWhitespaceForm):
+    EXPECTED_BRANDING_FORMAT = "svg"
+
+    branding = VirusScannedFileField(
+        "Upload letter branding",
+        validators=[
+            FileAllowed(["svg"], "Branding must be an SVG file"),
+            DataRequired(message="You need to upload a file to submit"),
+            FileSize(max_size=(2 * 1024 * 1024), message="File must be smaller than 2MB"),
             NoEmbeddedImagesInSVG(),
             NoTextInSVG(),
         ],

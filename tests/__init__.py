@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlparse
 
 import freezegun
 import pytest
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Doctype
 from flask import session as flask_session
 from flask import url_for
 from flask.testing import FlaskClient
@@ -57,6 +57,13 @@ class NotifyBeautifulSoup(BeautifulSoup):
             )
 
         setattr(self, method_name, overridden_method)
+
+    @property
+    def doctype(self):
+        return next(
+            (item for item in self.contents if isinstance(item, Doctype)),
+            "",
+        )
 
 
 def sample_uuid():
@@ -156,6 +163,9 @@ def service_json(
     name="Test Service",
     users=None,
     message_limit=1000,
+    email_message_limit=1000,
+    letter_message_limit=1000,
+    sms_message_limit=1000,
     active=True,
     restricted=True,
     email_from=None,
@@ -181,6 +191,8 @@ def service_json(
     purchase_order_number=None,
     broadcast_channel=None,
     allowed_broadcast_provider=None,
+    has_active_go_live_request=False,
+    go_live_user=None,
 ):
     if users is None:
         users = []
@@ -195,6 +207,9 @@ def service_json(
         "name": name,
         "users": users,
         "message_limit": message_limit,
+        "email_message_limit": email_message_limit,
+        "sms_message_limit": sms_message_limit,
+        "letter_message_limit": letter_message_limit,
         "rate_limit": rate_limit,
         "active": active,
         "restricted": restricted,
@@ -226,6 +241,8 @@ def service_json(
         "purchase_order_number": purchase_order_number,
         "broadcast_channel": broadcast_channel,
         "allowed_broadcast_provider": allowed_broadcast_provider,
+        "has_active_go_live_request": has_active_go_live_request,
+        "go_live_user": go_live_user,
     }
 
 
@@ -252,6 +269,7 @@ def organisation_json(
     billing_contact_names=None,
     billing_reference=None,
     purchase_order_number=None,
+    can_approve_own_go_live_requests=False,
 ):
     if users is None:
         users = []
@@ -281,6 +299,7 @@ def organisation_json(
         "billing_contact_names": billing_contact_names,
         "billing_reference": billing_reference,
         "purchase_order_number": purchase_order_number,
+        "can_approve_own_go_live_requests": can_approve_own_go_live_requests,
     }
 
 

@@ -14,7 +14,6 @@ from flask import (
     stream_with_context,
     url_for,
 )
-from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils.template import (
     EmailPreviewTemplate,
@@ -159,7 +158,7 @@ def view_job_updates(service_id, job_id):
 def view_notifications(service_id, message_type=None):
     return render_template(
         "views/notifications.html",
-        partials=get_notifications(service_id, message_type),
+        partials=_get_notifications_dashboard_partials_data(service_id, message_type),
         message_type=message_type,
         status=request.args.get("status") or "sending,delivered,failed",
         page=request.args.get("page", 1),
@@ -191,17 +190,11 @@ def view_notifications(service_id, message_type=None):
 @main.route("/services/<uuid:service_id>/notifications.json", methods=["GET", "POST"])
 @main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>.json", methods=["GET", "POST"])
 @user_has_permissions()
-def get_notifications_as_json(service_id, message_type=None):
-    return jsonify(get_notifications(service_id, message_type, status_override=request.args.get("status")))
+def get_notifications_page_partials_as_json(service_id, message_type=None):
+    return jsonify(_get_notifications_dashboard_partials_data(service_id, message_type))
 
 
-@main.route("/services/<uuid:service_id>/notifications.csv", endpoint="view_notifications_csv")
-@main.route(
-    "/services/<uuid:service_id>/notifications/<template_type:message_type>.csv", endpoint="view_notifications_csv"
-)
-@user_has_permissions()
-def get_notifications(service_id, message_type, status_override=None):
-    # TODO get the api to return count of pages as well.
+def _get_notifications_dashboard_partials_data(service_id, message_type):
     page = get_page_from_request()
     if page is None:
         abort(404, "Invalid page argument ({}).".format(request.args.get("page")))
@@ -213,19 +206,6 @@ def get_notifications(service_id, message_type, status_override=None):
     if message_type is not None:
         service_data_retention_days = current_service.get_days_of_retention(message_type)
 
-    if request.path.endswith("csv") and current_user.has_permissions("view_activity"):
-        return Response(
-            generate_notifications_csv(
-                service_id=service_id,
-                page=page,
-                page_size=5000,
-                template_type=[message_type],
-                status=filter_args.get("status"),
-                limit_days=service_data_retention_days,
-            ),
-            mimetype="text/csv",
-            headers={"Content-Disposition": 'inline; filename="notifications.csv"'},
-        )
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
         page=page,
@@ -244,16 +224,6 @@ def get_notifications(service_id, message_type, status_override=None):
     if "links" in notifications and notifications["links"].get("next", None):
         next_page = generate_next_dict("main.view_notifications", service_id, page, url_args)
 
-    if message_type:
-        download_link = url_for(
-            ".view_notifications_csv",
-            service_id=current_service.id,
-            message_type=message_type,
-            status=request.args.get("status"),
-        )
-    else:
-        download_link = None
-
     return {
         "service_data_retention_days": service_data_retention_days,
         "counts": render_template(
@@ -268,14 +238,10 @@ def get_notifications(service_id, message_type, status_override=None):
         "notifications": render_template(
             "views/activity/notifications.html",
             notifications=list(add_preview_of_content_to_notifications(notifications["notifications"])),
-            page=page,
             limit_days=service_data_retention_days,
             prev_page=prev_page,
             next_page=next_page,
             show_pagination=(not search_term),
-            status=request.args.get("status"),
-            message_type=message_type,
-            download_link=download_link,
             single_notification_url=partial(
                 url_for,
                 ".view_notification",
