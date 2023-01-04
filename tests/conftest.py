@@ -3198,6 +3198,17 @@ def mock_get_organisation_services(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
+def mock_notify_users_of_request_to_go_live_for_service(mocker, api_user_active):
+    def _notify_users_of_request_to_go_live_for_service(service_id):
+        return
+
+    return mocker.patch(
+        "app.organisations_client.notify_users_of_request_to_go_live_for_service",
+        side_effect=_notify_users_of_request_to_go_live_for_service,
+    )
+
+
+@pytest.fixture(scope="function")
 def mock_get_users_for_organisation(mocker):
     def _get_users_for_organisation(org_id):
         return [

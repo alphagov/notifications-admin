@@ -1777,6 +1777,33 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
 
 
 @pytest.mark.parametrize(
+    "can_approve_own_go_live_requests, expected_call_args",
+    (
+        (True, [call(SERVICE_ONE_ID)]),
+        (False, []),
+    ),
+)
+def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organisation(
+    client_request,
+    mocker,
+    mock_get_organisations_and_services_for_user,
+    mock_get_service_organisation,
+    mock_update_service,
+    mock_notify_users_of_request_to_go_live_for_service,
+    organisation_one,
+    can_approve_own_go_live_requests,
+    expected_call_args,
+):
+    organisation_one["can_approve_own_go_live_requests"] = can_approve_own_go_live_requests
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch("app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True)
+
+    client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+
+    assert mock_notify_users_of_request_to_go_live_for_service.call_args_list == expected_call_args
+
+
+@pytest.mark.parametrize(
     (
         "has_team_members,"
         "has_templates,"
