@@ -292,6 +292,14 @@ def letter_specification():
     )
 
 
+@main.route("/using-notify/guidance/bulk-sending")
+def guidance_bulk_sending():
+    return render_template(
+        "views/guidance/bulk-sending.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 # --- Redirects --- #
 
 
