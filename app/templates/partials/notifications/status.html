@@ -12,6 +12,15 @@
       </a>
     {% endif %}
     {% if current_user.platform_admin and notification.sent_by %}
+      {#
+      We considered various other ways of adding this information, including `by <provider>` or `(provider)` in brackets.
+
+      We have intentionally settled on `via` for now. It's only for a technical audience (platform admins), so forming
+      a perfectly naturally-flowing sentence isn't as consequential.
+
+      Using parens would look a bit gross considering we already use parens below. For now we're happy with this
+      language but could reconsider it if we revisit any of these points in the future.
+      #}
       via {{ notification.sent_by | format_provider }}
     {% endif %}
     {% if sent_with_test_key %}
