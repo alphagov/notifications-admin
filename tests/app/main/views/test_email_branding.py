@@ -59,7 +59,25 @@ def test_edit_email_branding_shows_the_correct_branding_info(
     assert page.select_one("#colour").attrs.get("value") == "f00"
 
 
-def test_create_email_branding_does_not_show_any_branding_info(client_request, platform_admin_user):
+def test_edit_email_branding_shows_the_archive_button(
+    client_request, platform_admin_user, mock_get_email_branding, fake_uuid
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        ".platform_admin_update_email_branding",
+        branding_id=fake_uuid,
+        _test_page_title=False,  # TODO: Fix page titles
+    )
+
+    archive_link = page.select_one(".govuk-link--destructive")
+
+    assert archive_link.text.strip() == "Archive this branding"
+    assert archive_link["href"] == url_for(".platform_admin_archive_email_branding", branding_id=fake_uuid)
+
+
+def test_create_email_branding_does_not_show_any_branding_info(
+    client_request, platform_admin_user
+):
     client_request.login(platform_admin_user)
     page = client_request.get(
         "main.platform_admin_create_email_branding",

@@ -99,6 +99,12 @@ def platform_admin_update_email_branding(branding_id, logo=None):
     )
 
 
+@main.route("/email-branding/<uuid:branding_id>/archive", methods=["GET", "POST"])
+@user_is_platform_admin
+def platform_admin_archive_email_branding():
+    pass
+
+
 @main.route("/email-branding/create-government-identity/logo", methods=["GET", "POST"])
 @user_is_platform_admin
 def create_email_branding_government_identity_logo():
