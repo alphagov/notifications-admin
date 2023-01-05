@@ -25,10 +25,9 @@
         form=search_form,
         autofocus=True
       ) }}
-      <nav id="template-list">
-        <ul>
+      <div id="template-list">
         {% for item in services_templates_and_folders %}
-          <li class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
+          <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
             {% for ancestor in item.ancestors %}
               {% if ancestor.is_service %}
                 <a href="{{ url_for('.choose_template_to_copy', service_id=current_service.id, from_service=ancestor.service_id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
@@ -54,10 +53,9 @@
             <p class="template-list-item-hint govuk-hint">
               {{ item.hint }}
             </p>
-          </li>
+          </div>
         {% endfor %}
-        </ul>
-      </nav>
+      </div>
     {% endif %}
 
 {% endblock %}

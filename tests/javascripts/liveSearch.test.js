@@ -272,9 +272,9 @@ describe('Live search', () => {
           </div>
         </div>
         <form method="post" autocomplete="off" novalidate>
-          <nav id="template-list">
+          <div id="template-list">
             ${helpers.templatesAndFoldersCheckboxes(templatesAndFolders)}
-          </nav>
+          </div>
         </form>`;
 
       searchTextbox = document.getElementById('search');

@@ -37,10 +37,9 @@
 
     {{ live_search(target_selector='#template-list .template-list-item', show=True, form=search_form) }}
 
-    <nav id="template-list">
-      <ul class="govuk-list">
+    <div id="template-list">
       {% for item in templates_and_folders %}
-        <li class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
+        <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
           {% for ancestor in item.ancestors %}
               <a href="{{ url_for('.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
               {{ ancestor.name }}
@@ -58,10 +57,9 @@
           <p class="template-list-item-hint govuk-hint">
             {{ item.hint }}
           </p>
-        </li>
+        </div>
       {% endfor %}
-      </ul>
-    </nav>
+    </div>
 
 
   {% endif %}

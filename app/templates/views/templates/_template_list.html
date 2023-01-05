@@ -24,10 +24,6 @@
   <div id="template-list" class="{{ 'govuk-!-margin-top-1' if (not show_template_nav and not show_search_box) else 'govuk-!-margin-top-6' }}">
     {% set checkboxes_data = [] %}
 
-    {% if not current_user.has_permissions('manage_templates') %}
-    <ul>
-    {% endif %}
-
     {% for item in template_list %}
 
       {% set item_link_content %}
@@ -80,18 +76,14 @@
       {% set _ = checkboxes_data.append(checkbox_config) %}
 
       {% if not current_user.has_permissions('manage_templates') %}
-        <li class="template-list-item {%- if item.ancestors %} template-list-item-hidden-by-default {%- else %} template-list-item-without-ancestors{%- endif %}">
+        <div class="template-list-item {%- if item.ancestors %} template-list-item-hidden-by-default {%- else %} template-list-item-without-ancestors{%- endif %}">
           {{ item_link_content }}
           <p class="template-list-item-hint govuk-!-margin-bottom-4">
             {{ item.hint }}
           </p>
-        </li>
+        </div>
       {% endif %}
     {% endfor %}
-
-    {% if not current_user.has_permissions('manage_templates') %}
-    </ul>
-    {% endif %}
 
     {% if current_user.has_permissions('manage_templates') %}
       {{ templates_and_folders_form.templates_and_folders(param_extensions={
