@@ -10,11 +10,6 @@ from tests.conftest import SERVICE_ONE_ID
 FAKE_TEMPLATE_ID = uuid4()
 
 
-@pytest.fixture(autouse=True)
-def mock_notify_client_check_inactive_service(mocker):
-    mocker.patch("app.notify_client.NotifyAdminAPIClient.check_inactive_service")
-
-
 def test_client_posts_archived_true_when_deleting_template(mocker):
     mocker.patch("app.notify_client.current_user", id="1")
     mock_redis_delete_by_pattern = mocker.patch("app.extensions.RedisClient.delete_by_pattern")

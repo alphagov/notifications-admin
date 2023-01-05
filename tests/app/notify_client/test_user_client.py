@@ -12,11 +12,6 @@ from tests.conftest import SERVICE_ONE_ID
 user_id = sample_uuid()
 
 
-@pytest.fixture(autouse=True)
-def mock_notify_client_check_inactive_service(mocker):
-    mocker.patch("app.notify_client.NotifyAdminAPIClient.check_inactive_service")
-
-
 def test_client_gets_all_users_for_service(
     mocker,
     fake_uuid,
