@@ -4,7 +4,7 @@ from app.notify_client import NotifyAdminAPIClient, cache
 class EmailBrandingClient(NotifyAdminAPIClient):
     @cache.set("email_branding-{branding_id}")
     def get_email_branding(self, branding_id):
-        return self.get(url="/email-branding/{}".format(branding_id))
+        return self.get(url=f"/email-branding/{branding_id}")
 
     @cache.set("email_branding")
     def get_all_email_branding(self):
@@ -42,7 +42,13 @@ class EmailBrandingClient(NotifyAdminAPIClient):
             "brand_type": brand_type,
             "updated_by": updated_by_id,
         }
-        return self.post(url="/email-branding/{}".format(branding_id), data=data)
+        return self.post(url=f"/email-branding/{branding_id}", data=data)
+
+    @cache.delete("email_branding")
+    @cache.delete("email_branding-{branding_id}")
+    @cache.delete_by_pattern("organisation-*-email-branding-pool")
+    def archive_email_branding(self, branding_id):
+        return self.post(url=f"/email-branding/{branding_id}/delete", data=None)
 
 
 email_branding_client = EmailBrandingClient()

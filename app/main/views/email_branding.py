@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 
-from flask import abort, current_app, redirect, render_template, request, url_for
+from flask import abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
@@ -32,8 +32,19 @@ def email_branding():
     )
 
 
-@main.route("/email-branding/<uuid:branding_id>/edit", methods=["GET", "POST"])
-@main.route("/email-branding/<uuid:branding_id>/edit/<logo>", methods=["GET", "POST"])
+@main.route(
+    "/email-branding/<uuid:branding_id>/edit", methods=["GET", "POST"], endpoint="platform_admin_update_email_branding"
+)
+@main.route(
+    "/email-branding/<uuid:branding_id>/edit/<logo>",
+    methods=["GET", "POST"],
+    endpoint="platform_admin_update_email_branding",
+)
+@main.route(
+    "/email-branding/<uuid:branding_id>/archive",
+    methods=["GET"],
+    endpoint="platform_admin_confirm_archive_email_branding",
+)
 @user_is_platform_admin
 def platform_admin_update_email_branding(branding_id, logo=None):
     email_branding = EmailBranding.from_id(branding_id)
@@ -87,6 +98,9 @@ def platform_admin_update_email_branding(branding_id, logo=None):
         if not form.errors:
             return redirect(url_for(".email_branding", branding_id=branding_id))
 
+    if request.endpoint == "main.platform_admin_confirm_archive_email_branding":
+        flash("Are you sure you want to archive this email branding?", "archive")
+
     return (
         render_template(
             "views/email-branding/manage-branding.html",
@@ -99,7 +113,7 @@ def platform_admin_update_email_branding(branding_id, logo=None):
     )
 
 
-@main.route("/email-branding/<uuid:branding_id>/archive", methods=["GET", "POST"])
+@main.route("/email-branding/<uuid:branding_id>/archive", methods=["POST"])
 @user_is_platform_admin
 def platform_admin_archive_email_branding():
     pass

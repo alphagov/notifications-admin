@@ -102,6 +102,7 @@ class HeaderNavigation(Navigation):
             "platform_admin_returned_letters",
             "platform_admin_splash_page",
             "platform_admin_archive_email_branding",
+            "platform_admin_confirm_archive_email_branding",
             "platform_admin_create_email_branding",
             "platform_admin_update_email_branding",
             "trial_services",

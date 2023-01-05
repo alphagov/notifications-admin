@@ -50,7 +50,7 @@
       {% if email_branding %}
         <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter-2-3">
           <a class="govuk-link govuk-link--destructive"
-            href="{{ url_for('.platform_admin_archive_email_branding', branding_id=email_branding.id) }}">
+            href="{{ url_for('.platform_admin_confirm_archive_email_branding', branding_id=email_branding.id) }}">
             Archive this branding</a>
         </span>
       {% endif %}
