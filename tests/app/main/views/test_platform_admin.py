@@ -657,6 +657,14 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
     )
 
 
+def test_platform_admin_show_submit_returned_letters_page(
+    client_request,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
+    client_request.get("main.platform_admin_returned_letters")
+
+
 def test_platform_admin_submit_returned_letters(
     mocker,
     client_request,
