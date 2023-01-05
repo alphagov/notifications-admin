@@ -13,7 +13,3 @@
     {% endif %}
   </li>
 {% endmacro %}
-
-{% macro tick_cross_done_not_done(yes, label) %}
-  {{ tick_cross(yes, label, truthy_hint='Done: ', falsey_hint='Not done: ') }}
-{% endmacro %}
