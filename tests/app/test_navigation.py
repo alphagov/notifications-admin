@@ -148,6 +148,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "get_started_old",
             "go_to_dashboard_after_tour",
             "guest_list",
+            "guidance_bulk_sending",
             "guidance_email_branding",
             "guidance_edit_and_format_messages",
             "guidance_index",

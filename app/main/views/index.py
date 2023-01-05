@@ -244,10 +244,10 @@ def guidance_index():
     )
 
 
-@main.route("/using-notify/guidance/edit-and-format-messages")
-def guidance_edit_and_format_messages():
+@main.route("/using-notify/guidance/bulk-sending")
+def guidance_bulk_sending():
     return render_template(
-        "views/guidance/edit-and-format-messages.html",
+        "views/guidance/bulk-sending.html",
         navigation_links=using_notify_nav(),
     )
 
@@ -256,6 +256,14 @@ def guidance_edit_and_format_messages():
 def guidance_email_branding():
     return render_template(
         "views/guidance/email-branding.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/edit-and-format-messages")
+def guidance_edit_and_format_messages():
+    return render_template(
+        "views/guidance/edit-and-format-messages.html",
         navigation_links=using_notify_nav(),
     )
 
@@ -284,10 +292,26 @@ def guidance_reply_to_email_address():
     )
 
 
+@main.route("/using-notify/guidance/schedule-messages")
+def guidance_schedule_messages():
+    return render_template(
+        "views/guidance/schedule-messages.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/guidance/send-files-by-email")
 def guidance_send_files_by_email():
     return render_template(
         "views/guidance/send-files-by-email.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/team-members-and-permissions")
+def guidance_team_members_and_permissions():
+    return render_template(
+        "views/guidance/team-members-permissions.html",
         navigation_links=using_notify_nav(),
     )
 
@@ -320,22 +344,6 @@ def guidance_upload_a_letter():
 def guidance_letter_specification():
     return render_template(
         "views/guidance/letter-specification.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
-@main.route("/using-notify/guidance/schedule-messages")
-def guidance_schedule_messages():
-    return render_template(
-        "views/guidance/schedule-messages.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
-@main.route("/using-notify/guidance/team-members-and-permissions")
-def guidance_team_members_and_permissions():
-    return render_template(
-        "views/guidance/team-members-permissions.html",
         navigation_links=using_notify_nav(),
     )
 

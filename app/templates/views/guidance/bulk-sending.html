@@ -1,0 +1,30 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Bulk sending
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Bulk sending</h1>
+
+  <p class="govuk-body">You can send a batch of up to 100,000 messages at once.</p>
+
+  <!-- <p class="govuk-body">There’s a maximum daily limit of 250,000 emails, 250,000 text messages and 20,000 letters. If you need to discuss these limits, <a href="https://www.notifications.service.gov.uk/support">contact us</a>.</p> -->
+
+  <p class="govuk-body">To send a batch of messages:</p>
+  
+  <ol class="govuk-list govuk-list--number">
+    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
+    <li>Add a new template or choose an existing template and select <b class="govuk-!-font-weight-bold">Get ready to send</b>.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">Upload a list of email addresses</b>, <b class="govuk-!-font-weight-bold">Upload a list of phone numbers</b>, or <b class="govuk-!-font-weight-bold">Upload a list of addresses</b>.</li>
+  </ol>
+
+  <p class="govuk-body">You can also <a href="https://www.notifications.service.gov.uk/using-notify/guidance/schedule-emails-and-text-messages">schedule a batch of emails and text messages</a>.</p>
+
+{% endblock %}
