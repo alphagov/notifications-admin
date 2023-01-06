@@ -637,7 +637,7 @@ def test_switch_service_to_live(
     )
     mock_update_service.assert_called_with(
         SERVICE_ONE_ID,
-        message_limit=250_000,
+        message_limit=999_999_999,
         email_message_limit=250_000,
         sms_message_limit=250_000,
         letter_message_limit=20_000,

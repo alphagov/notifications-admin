@@ -140,7 +140,7 @@ def test_service_is_already_live(
         (
             True,
             {
-                "message_limit": 250_000,
+                "message_limit": 999_999_999,
                 "email_message_limit": 250_000,
                 "sms_message_limit": 250_000,
                 "letter_message_limit": 20_000,

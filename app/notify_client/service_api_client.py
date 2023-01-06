@@ -124,7 +124,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
         return self.update_service(
             service_id,
-            message_limit=250_000 if live else current_app.config["DEFAULT_SERVICE_LIMIT"],
+            message_limit=999_999_999 if live else current_app.config["DEFAULT_SERVICE_LIMIT"],
             email_message_limit=current_app.config["DEFAULT_LIVE_SERVICE_EMAIL_RATE_LIMIT"]
             if live
             else current_app.config["DEFAULT_SERVICE_LIMIT"],
