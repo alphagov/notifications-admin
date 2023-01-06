@@ -637,7 +637,10 @@ def test_switch_service_to_live(
     )
     mock_update_service.assert_called_with(
         SERVICE_ONE_ID,
-        message_limit=250000,
+        message_limit=250_000,
+        email_message_limit=250_000,
+        sms_message_limit=250_000,
+        letter_message_limit=20_000,
         restricted=False,
         go_live_at="2017-04-01 11:09:00.061258",
         has_active_go_live_request=False,
@@ -681,6 +684,9 @@ def test_switch_service_to_restricted(
     mock_update_service.assert_called_with(
         SERVICE_ONE_ID,
         message_limit=50,
+        email_message_limit=50,
+        sms_message_limit=50,
+        letter_message_limit=50,
         restricted=True,
         go_live_at=None,
         has_active_go_live_request=False,
