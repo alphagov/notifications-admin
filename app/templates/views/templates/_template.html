@@ -1,4 +1,5 @@
 {% from "components/banner.html" import banner_wrapper %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 <div class="govuk-grid-column-full">
   {% if template._template.archived %}
@@ -76,4 +77,30 @@
     {% endif %}
   {% endif %}
   {{ template|string }}
+  {% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %}
+    {% if extra_pages %}
+      <div class="letter" id="extra-pages">
+        {% if extra_pages == "welsh.png" %}
+        <a
+          href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}"
+          class="govuk-link govuk-link--inverse edit-template-link"
+          style="top: 400px; left: -20px"
+        >Edit</a>
+        <a
+          href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}"
+          class="govuk-link govuk-link--inverse edit-template-link"
+          style="top: 232px; right: -25px"
+        >Edit</a>
+        {% endif %}
+        <img src="{{ asset_url('images/letter-examples/' + extra_pages) }}" alt="" loading="eager">
+      </div>
+      <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter">
+        <a class="govuk-link govuk-link--destructive" href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">Delete {{ "Welsh translation" if extra_pages == "welsh.png" else "extra pages" }}</a>
+      </span>
+    {% else %}
+    <div class="js-stick-at-bottom-when-scrolling">
+      {{ govukButton({ "text": "Insert pages", "classes": "govuk-button--secondary", "href": url_for(".insert_pages", service_id=current_service.id, template_id=template.id) }) }}
+    </div>
+    {% endif %}
+  {% endif %}
 </div>

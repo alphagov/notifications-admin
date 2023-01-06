@@ -1,0 +1,33 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ form.page_type.label.text }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('.view_template', service_id=current_service.id, template_id=template_id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {% call form_wrapper() %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-five-sixths">
+          {{ form.page_type(param_extensions={
+            "fieldset": {
+              "legend": {
+                "isPageHeading": True,
+                "classes": "govuk-fieldset__legend--l"
+              }
+            }
+          }) }}
+          {{ page_footer('Continue') }}
+        </div>
+      </div>
+    {% endcall %}
+
+{% endblock %}
