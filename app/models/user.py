@@ -232,15 +232,20 @@ class User(BaseUser, UserMixin):
         if org_id:
             return self.belongs_to_organisation(org_id)
 
+        # if theres no org id, we're dealing with a service endpoint. The service has already been set on
+        # current_service from `load_service_before_request` which happens before this decorator
+        from app import current_service
+
+        if not current_service.active:
+            return False
+
         if not permissions and self.belongs_to_service(service_id):
             return True
 
-        if any(self.permissions_for_service(service_id) & set(permissions)):
+        if self.permissions_for_service(service_id) & set(permissions):
             return True
 
-        from app.models.service import Service
-
-        return allow_org_user and self.belongs_to_organisation(Service.from_id(service_id).organisation_id)
+        return allow_org_user and self.belongs_to_organisation(current_service.organisation_id)
 
     def permissions_for_service(self, service_id):
         return self._permissions.get(service_id, set())

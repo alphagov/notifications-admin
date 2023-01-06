@@ -1704,16 +1704,12 @@ def test_breadcrumb_shows_if_service_is_suspended(
     mock_get_annual_usage_for_service,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
-    active_user_with_permissions,
+    platform_admin_user,
     client_request,
 ):
-    service_one_json = service_json(
-        SERVICE_ONE_ID,
-        active=False,
-        users=[active_user_with_permissions["id"]],
-    )
+    service_one_json = service_json(SERVICE_ONE_ID, active=False)
+    client_request.login(platform_admin_user, service=service_one_json)
 
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one_json})
     page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
 
     assert "Suspended" in page.select_one(".navigation-service-name").text
