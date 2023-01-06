@@ -115,8 +115,11 @@ def platform_admin_update_email_branding(branding_id, logo=None):
 
 @main.route("/email-branding/<uuid:branding_id>/archive", methods=["POST"])
 @user_is_platform_admin
-def platform_admin_archive_email_branding():
-    pass
+def platform_admin_archive_email_branding(branding_id):
+    # TODO: if branding used by active services, don't archive it.
+
+    email_branding_client.archive_email_branding(branding_id=branding_id)
+    return redirect(url_for(".email_branding"))
 
 
 @main.route("/email-branding/create-government-identity/logo", methods=["GET", "POST"])

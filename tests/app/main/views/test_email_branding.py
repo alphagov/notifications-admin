@@ -576,6 +576,25 @@ def test_platform_admin_confirm_archive_email_branding(
     assert page.select_one(".banner-dangerous form")["method"] == "post"
 
 
+def test_platform_admin_archive_email_branding_happy_path(
+    client_request,
+    platform_admin_user,
+    mocker,
+    fake_uuid,
+    mock_get_email_branding,
+):
+    mock_archive = mocker.patch("app.email_branding_client.archive_email_branding")
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".platform_admin_archive_email_branding",
+        branding_id=fake_uuid,
+        _expected_redirect=url_for(".email_branding"),
+    )
+    mock_archive.assert_called_once_with(branding_id=fake_uuid)
+
+
 def test_temp_logo_is_shown_after_uploading_logo(
     client_request,
     platform_admin_user,
