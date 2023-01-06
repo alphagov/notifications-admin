@@ -19,8 +19,10 @@ from app.main import main, no_cookie
 from app.main.forms import (
     BroadcastTemplateForm,
     EmailTemplateForm,
+    LetterInsertPagesForm,
     LetterTemplateForm,
     LetterTemplatePostageForm,
+    PDFUploadForm,
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
@@ -74,6 +76,7 @@ def view_template(service_id, template_id):
         letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
         page_count=page_count,
+        extra_pages=request.args.get("extra_pages"),
     )
 
 
@@ -850,6 +853,76 @@ def edit_template_postage(service_id, template_id):
         service_id=service_id,
         template_id=template_id,
         template_postage=template["postage"],
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/insert-pages", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def insert_pages(service_id, template_id):
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    if template["template_type"] != "letter":
+        abort(404)
+    form = LetterInsertPagesForm()
+    if form.validate_on_submit():
+        if form.page_type.data == "upload":
+            return redirect(url_for(".insert_pages_upload", service_id=service_id, template_id=template_id))
+        if form.page_type.data == "translation":
+            return redirect(
+                url_for(
+                    ".view_template",
+                    service_id=service_id,
+                    template_id=template_id,
+                    extra_pages="welsh.png",
+                    _anchor="extra-pages",
+                )
+            )
+
+    return render_template(
+        "views/templates/insert-pages.html",
+        form=form,
+        template_id=template_id,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/insert-pages-upload", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def insert_pages_upload(service_id, template_id):
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    if template["template_type"] != "letter":
+        abort(404)
+    form = PDFUploadForm()
+    if form.validate_on_submit():
+        return redirect(
+            url_for(
+                ".view_template",
+                service_id=service_id,
+                template_id=template_id,
+                extra_pages="example.png",
+                _anchor="extra-pages",
+            )
+        )
+
+    return render_template(
+        "views/templates/insert-pages-upload.html",
+        form=form,
+        template_id=template_id,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/insert-pages-welsh", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def insert_pages_welsh(service_id, template_id):
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    if template["template_type"] != "letter":
+        abort(404)
+    form = LetterInsertPagesForm()
+    if form.validate_on_submit():
+        pass
+
+    return render_template(
+        "views/templates/insert-pages-welsh.html",
+        form=form,
+        template_id=template_id,
     )
 
 

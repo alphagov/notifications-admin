@@ -1295,6 +1295,18 @@ class LetterTemplateForm(EmailTemplateForm):
     )
 
 
+class LetterInsertPagesForm(StripWhitespaceForm):
+    page_type = GovukRadiosField(
+        "What pages?",
+        choices=[
+            ("upload", "Upload a PDF"),
+            ("translation", "Welsh translation"),
+        ],
+        thing="type of page",
+        validators=[DataRequired()],
+    )
+
+
 class LetterTemplatePostageForm(StripWhitespaceForm):
     postage = GovukRadiosField(
         "Choose the postage for this letter template",
