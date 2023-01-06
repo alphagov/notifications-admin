@@ -276,18 +276,18 @@ def guidance_letter_branding():
     )
 
 
-@main.route("/using-notify/guidance/personalisation")
-def guidance_personalisation():
-    return render_template(
-        "views/guidance/personalisation.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
 @main.route("/using-notify/guidance/optional-content")
 def guidance_optional_content():
     return render_template(
         "views/guidance/optional-content.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/personalisation")
+def guidance_personalisation():
+    return render_template(
+        "views/guidance/personalisation.html",
         navigation_links=using_notify_nav(),
     )
 
