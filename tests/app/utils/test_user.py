@@ -2,6 +2,7 @@ import pytest
 from flask import request
 from werkzeug.exceptions import Forbidden
 
+from app import load_service_before_request
 from app.utils.user import user_has_permissions
 
 
@@ -50,6 +51,7 @@ def test_permissions(
     def index():
         pass
 
+    load_service_before_request()
     index()
 
 
@@ -64,6 +66,7 @@ def test_restrict_admin_usage(
     def index():
         pass
 
+    load_service_before_request()
     with pytest.raises(Forbidden):
         index()
 
@@ -158,4 +161,5 @@ def test_user_with_no_permissions_to_service_goes_to_templates(
     def index():
         pass
 
+    load_service_before_request()
     index()

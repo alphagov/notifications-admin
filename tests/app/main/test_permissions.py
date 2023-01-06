@@ -92,6 +92,51 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     assert mock_get_service.called is organisation_checked
 
 
+# check both regular users and org users
+@pytest.mark.parametrize("user_organisations", [[], [ORGANISATION_ID]])
+def test_users_cannot_see_inactive_service(client_request, api_user_active, user_organisations):
+    service = service_json(
+        name="SERVICE WITH ORG",
+        id_=SERVICE_ONE_ID,
+        users=[api_user_active["id"]],
+        organisation_id=ORGANISATION_ID,
+        active=False,
+    )
+    # the API removes inactive services from user["services"] and removes all permissions too, so even if the user
+    # is a member of the service their user json will return empty
+    api_user_active["services"] = []
+    api_user_active["permissions"] = {SERVICE_ONE_ID: []}
+    api_user_active["organisations"] = user_organisations
+    client_request.login(api_user_active, service=service)
+
+    client_request.get("main.choose_template", service_id=SERVICE_ONE_ID, _expected_status=403)
+
+
+def test_platform_admin_can_still_update_inactive_service(
+    client_request,
+    api_user_active,
+    mock_update_service,
+):
+    service = service_json(
+        name="SERVICE WITH ORG",
+        id_=SERVICE_ONE_ID,
+        users=[api_user_active["id"]],
+        organisation_id=ORGANISATION_ID,
+        active=False,
+    )
+    api_user_active["services"] = []
+    api_user_active["permissions"] = {}
+    api_user_active["organisations"] = []
+    api_user_active["platform_admin"] = True
+    client_request.login(api_user_active, service=service)
+
+    client_request.post(
+        "main.service_name_change", service_id=SERVICE_ONE_ID, _data={"name": "New Name"}, _expected_status=302
+    )
+
+    assert mock_update_service.called
+
+
 def test_service_navigation_for_org_user(
     client_request,
     mocker,
