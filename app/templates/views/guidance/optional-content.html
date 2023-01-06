@@ -1,0 +1,44 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Optional content
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Optional content</h1>
+
+  <p class="govuk-body">Add optional content to a template to tailor your messages for different audiences.</p>
+
+  <p class="govuk-body">For example, if you only want to show a sentence to people who are under 18:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>put it inside double brackets</li>
+    <li>give it a unique placeholder name, followed by ‘??’</li>
+  </ul>
+
+  <p class="govuk-body">Your optional content should look like this:</p>
+
+  <div class="govuk-inset-text">
+    
+    <p class="govuk-body">((under18??Please get your application signed by a parent or guardian.))</p>
+
+  </div>
+
+  <p class="govuk-body">For each person you send the message to, specify ‘yes’ or ‘no’ to show or hide the optional content.</p>
+
+  <p class="govuk-body">You can either:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>do this yourself when you send the message</li>
+    <li>upload a list of personal details and let Notify do it for you</li>
+  </ul>
+
+  <p class="govuk-body">If you upload a list of personal details, the column names need to match the placeholder names in your template.</p>
+
+{% endblock %}
