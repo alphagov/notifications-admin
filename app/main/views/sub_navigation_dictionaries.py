@@ -89,6 +89,14 @@ def using_notify_nav():
                     "link": "main.guidance_letter_branding",
                 },
                 {
+                    "name": "Optional content",
+                    "link": "main.guidance_optional_content",
+                },
+                {
+                    "name": "Personalisation",
+                    "link": "main.guidance_personalisation",
+                },
+                {
                     "name": "Receive text messages",
                     "link": "main.guidance_receive_text_messages",
                 },
