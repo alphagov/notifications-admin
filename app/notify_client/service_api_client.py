@@ -488,9 +488,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
         return self.post("/service/{}/set-as-broadcast-service".format(service_id), data)
 
-    def get_notification_count(self, service_id):
+    def get_notification_count(self, service_id, notification_type):
         # if cache is not set return 0
-        count = redis_client.get(daily_limit_cache_key(service_id)) or 0
+        count = redis_client.get(daily_limit_cache_key(service_id, notification_type=notification_type)) or 0
         return int(count)
 
     @classmethod

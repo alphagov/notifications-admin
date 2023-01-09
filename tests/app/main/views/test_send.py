@@ -2441,7 +2441,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     assert "07700 900750" not in page.text
     assert "Only showing the first 50 rows" in page.text
 
-    mock_get_notification_count.assert_called_once_with(service_one["id"])
+    mock_get_notification_count.assert_called_once_with(service_one["id"], notification_type="sms")
 
 
 @pytest.mark.parametrize(
@@ -2915,7 +2915,7 @@ def test_check_messages_back_link(
     [
         (None, "‘example.csv’ contains 1,234 phone numbers."),
         ("0", "‘example.csv’ contains 1,234 phone numbers."),
-        ("1", "You can still send 49 messages today, but ‘example.csv’ contains 1,234 phone numbers."),
+        ("1", "You can still send 49 text messages today, but ‘example.csv’ contains 1,234 phone numbers."),
     ],
     ids=["none_sent", "none_sent", "some_sent"],
 )
@@ -3812,7 +3812,7 @@ TRIAL_MODE_MSG = (
     "see https://www.notifications.service.gov.uk/trial-mode"
 )
 TOO_LONG_MSG = "Text messages cannot be longer than 918 characters. Your message is 954 characters."
-SERVICE_DAILY_LIMIT_MSG = "Exceeded send limits (1000) for today"
+SERVICE_DAILY_LIMIT_MSG = "Exceeded send limits (sms: 1000) for today"
 
 
 @pytest.mark.parametrize(
@@ -3828,7 +3828,11 @@ SERVICE_DAILY_LIMIT_MSG = "Exceeded send limits (1000) for today"
             "Message too long",
             "Text messages cannot be longer than 918 characters. Your message is 954 characters.",
         ),
-        (SERVICE_DAILY_LIMIT_MSG, "Daily limit reached", "You can only send 1,000 messages per day in trial mode."),
+        (
+            SERVICE_DAILY_LIMIT_MSG,
+            "Daily limit reached",
+            "You can only send 1,000 messages per day in trial mode.",
+        ),
     ],
 )
 def test_send_notification_shows_error_if_400(
