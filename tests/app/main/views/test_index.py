@@ -438,3 +438,14 @@ def test_sms_price(
         f"{expected_rate} pence (plus VAT) for each text message you "
         f"send."
     )
+
+
+def test_bulk_sending_limits(client_request):
+    page = client_request.get("main.guidance_bulk_sending")
+    paragraphs = page.select("main p")
+
+    assert normalize_spaces(paragraphs[0].text) == "You can send a batch of up to 100,000 messages at once."
+    assert normalize_spaces(paragraphs[1].text) == (
+        "There’s a maximum daily limit of 250,000 emails, 250,000 text messages and 20,000 letters. "
+        "If you need to discuss these limits, contact us."
+    )
