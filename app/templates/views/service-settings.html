@@ -292,14 +292,19 @@
       {% else %}
         <h2 class="heading-medium top-gutter-0">Your service is live</h2>
 
-        <p class="govuk-body">
-          You can send up to
-          {{ "{:,}".format(current_service.message_limit) }} messages
-          per day.
-        </p>
-
-        {# TODO: Remove this check when we go-live with new limits - and probably the paragraph above #}
-        {% if current_user.platform_admin %}
+        {% if (
+            current_service.email_message_limit > current_service.message_limit
+          ) and (
+            current_service.sms_message_limit > current_service.message_limit
+          ) and (
+            current_service.letter_message_limit > current_service.message_limit
+        ) %}
+          <p class="govuk-body">
+            You can send up to
+            {{ "{:,}".format(current_service.message_limit) }} messages
+            per day.
+          </p>
+          {% else %}
           <p class="govuk-body">
             You can send up to:
             </p>
@@ -307,10 +312,10 @@
                 <li>{{ "{:,}".format(current_service.email_message_limit) }} {{ current_service.email_message_limit | message_count_noun('email') }} per day
                 </li>
                 <li>{{ "{:,}".format(current_service.sms_message_limit) }} {{ current_service.sms_message_limit | message_count_noun('sms') }} per day
-               </li>
-               <li>{{ "{:,}".format(current_service.letter_message_limit) }} {{ current_service.letter_message_limit | message_count_noun('letter') }} per day
-               </li>
-           </ul>
+              </li>
+              <li>{{ "{:,}".format(current_service.letter_message_limit) }} {{ current_service.letter_message_limit | message_count_noun('letter') }} per day
+              </li>
+          </ul>
         {% endif %}
 
         <p class="govuk-body">

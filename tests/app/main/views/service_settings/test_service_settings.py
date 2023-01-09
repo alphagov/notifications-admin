@@ -601,6 +601,42 @@ def test_show_restricted_service(
         assert not request_to_live_link
 
 
+@pytest.mark.parametrize(
+    "message_limit, email_message_limit, sms_message_limit, letter_message_limit, selector, expected_text",
+    (
+        (1_000, 9_999, 9_999, 9_999, "p", "You can send up to 1,000 messages per day."),
+        (9_999, 1_000, 2_000, 3_000, "ul", "1,000 emails per day 2,000 text messages per day 3,000 letters per day"),
+    ),
+)
+def test_show_limits_for_live_service(
+    client_request,
+    service_one,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    message_limit,
+    email_message_limit,
+    sms_message_limit,
+    letter_message_limit,
+    selector,
+    expected_text,
+):
+    service_one["restricted"] = False
+    service_one["message_limit"] = message_limit
+    service_one["email_message_limit"] = email_message_limit
+    service_one["sms_message_limit"] = sms_message_limit
+    service_one["letter_message_limit"] = letter_message_limit
+
+    page = client_request.get(
+        "main.service_settings",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.select_one("main h2").text == "Your service is live"
+    assert normalize_spaces(page.select_one(f"main {selector}")) == expected_text
+
+
 def test_broadcast_service_in_training_mode_doesnt_show_trial_mode_content(
     client_request,
     service_one,
