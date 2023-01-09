@@ -882,10 +882,22 @@ class BasePermissionsForm(StripWhitespaceForm):
         return set(self.permissions_field.data)
 
     @classmethod
-    def from_user(cls, user, service_id, **kwargs):
+    def from_user_and_service(cls, user, service):
+        if user.platform_admin:
+            all_template_folders = None
+            folder_permissions = None
+        else:
+            all_template_folders = service.all_template_folders
+            folder_permissions = [
+                folder["id"]
+                for folder in all_template_folders
+                if user.has_template_folder_permission(folder, service=service)
+            ]
+
         form = cls(
-            **kwargs,
-            **{"permissions_field": (user.permissions_for_service(service_id) & all_ui_permissions)},
+            folder_permissions=folder_permissions,
+            all_template_folders=all_template_folders,
+            permissions_field=user.permissions_for_service(service.id) & all_ui_permissions,
             login_authentication=user.auth_type,
         )
 

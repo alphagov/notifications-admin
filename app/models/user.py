@@ -253,8 +253,9 @@ class User(BaseUser, UserMixin):
     def has_permission_for_service(self, service_id, permission):
         return permission in self._permissions.get(service_id, [])
 
-    def has_template_folder_permission(self, template_folder, service=None):
-        if self.platform_admin:
+    def has_template_folder_permission(self, template_folder, *, service):
+        # These users can see all folders
+        if self.platform_admin or self.belongs_to_organisation(service.organisation_id):
             return True
 
         # Top-level templates are always visible

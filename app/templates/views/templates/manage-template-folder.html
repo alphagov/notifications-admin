@@ -13,7 +13,7 @@
     <div class="govuk-grid-column-full">
       {{ folder_path(
         folders=template_folder_path,
-        service_id=current_service.id,
+        service=current_service,
         template_type='all',
         current_user=current_user,
         link_current_item=True

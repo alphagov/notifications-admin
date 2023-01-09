@@ -216,7 +216,7 @@ class Service(JSONModel):
     def get_template_folder_with_user_permission_or_403(self, folder_id, user):
         template_folder = self.get_template_folder(folder_id)
 
-        if not user.has_template_folder_permission(template_folder):
+        if not user.has_template_folder_permission(template_folder, service=self):
             abort(403)
 
         return template_folder
