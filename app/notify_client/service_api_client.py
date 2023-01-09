@@ -13,6 +13,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         service_name,
         organisation_type,
         message_limit,
+        email_message_limit,
+        sms_message_limit,
+        letter_message_limit,
         restricted,
         user_id,
         email_from,
@@ -25,6 +28,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "organisation_type": organisation_type,
             "active": True,
             "message_limit": message_limit,
+            "email_message_limit": email_message_limit,
+            "sms_message_limit": sms_message_limit,
+            "letter_message_limit": letter_message_limit,
             "user_id": user_id,
             "restricted": restricted,
             "email_from": email_from,
@@ -114,9 +120,20 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete("live-service-and-organisation-counts")
     def update_status(self, service_id, live):
+        from flask import current_app
+
         return self.update_service(
             service_id,
-            message_limit=250000 if live else 50,
+            message_limit=999_999_999 if live else current_app.config["DEFAULT_SERVICE_LIMIT"],
+            email_message_limit=current_app.config["DEFAULT_LIVE_SERVICE_EMAIL_RATE_LIMIT"]
+            if live
+            else current_app.config["DEFAULT_SERVICE_LIMIT"],
+            sms_message_limit=current_app.config["DEFAULT_LIVE_SERVICE_SMS_RATE_LIMIT"]
+            if live
+            else current_app.config["DEFAULT_SERVICE_LIMIT"],
+            letter_message_limit=current_app.config["DEFAULT_LIVE_SERVICE_LETTER_RATE_LIMIT"]
+            if live
+            else current_app.config["DEFAULT_SERVICE_LIMIT"],
             restricted=(not live),
             go_live_at=str(datetime.utcnow()) if live else None,
             has_active_go_live_request=False,

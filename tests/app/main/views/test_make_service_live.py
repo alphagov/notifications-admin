@@ -140,7 +140,10 @@ def test_service_is_already_live(
         (
             True,
             {
-                "message_limit": 250000,
+                "message_limit": 999_999_999,
+                "email_message_limit": 250_000,
+                "sms_message_limit": 250_000,
+                "letter_message_limit": 20_000,
                 "restricted": False,
                 "go_live_at": "2022-12-22 12:12:12",
                 "has_active_go_live_request": False,
@@ -150,6 +153,9 @@ def test_service_is_already_live(
             False,
             {
                 "message_limit": 50,
+                "email_message_limit": 50,
+                "sms_message_limit": 50,
+                "letter_message_limit": 50,
                 "restricted": True,
                 "go_live_at": None,
                 "has_active_go_live_request": False,

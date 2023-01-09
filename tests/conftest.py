@@ -522,7 +522,14 @@ def fake_uuid():
 @pytest.fixture(scope="function")
 def mock_get_service(mocker, api_user_active):
     def _get(service_id):
-        service = service_json(service_id, users=[api_user_active["id"]], message_limit=50)
+        service = service_json(
+            service_id,
+            users=[api_user_active["id"]],
+            message_limit=50,
+            email_message_limit=50,
+            sms_message_limit=50,
+            letter_message_limit=50,
+        )
         return {"data": service}
 
     return mocker.patch("app.service_api_client.get_service", side_effect=_get)
@@ -547,6 +554,9 @@ def mock_get_detailed_services(mocker, fake_uuid):
         name="service_one",
         users=[fake_uuid],
         message_limit=1000,
+        email_message_limit=1000,
+        sms_message_limit=1000,
+        letter_message_limit=1000,
         active=True,
         restricted=False,
     )
@@ -555,6 +565,9 @@ def mock_get_detailed_services(mocker, fake_uuid):
         name="service_two",
         users=[fake_uuid],
         message_limit=1000,
+        email_message_limit=1000,
+        sms_message_limit=1000,
+        letter_message_limit=1000,
         active=True,
         restricted=True,
     )
@@ -588,6 +601,9 @@ def mock_create_service(mocker):
         service_name,
         organisation_type,
         message_limit,
+        email_message_limit,
+        sms_message_limit,
+        letter_message_limit,
         restricted,
         user_id,
         email_from,
