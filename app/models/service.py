@@ -365,15 +365,6 @@ class Service(JSONModel):
             None,
         )
 
-    @property
-    def default_letter_contact_block_html(self):
-        # import in the function to prevent cyclical imports
-        from app import nl2br
-
-        if self.default_letter_contact_block:
-            return nl2br(self.default_letter_contact_block["contact_block"])
-        return ""
-
     def edit_letter_contact_block(self, id, contact_block, is_default):
         service_api_client.update_letter_contact(
             self.id,
