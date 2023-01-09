@@ -17,7 +17,13 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header("Upload a PDF") }}
+      {{ page_header("Upload pages") }}
+      <p class="govuk-body">
+        Upload a PDF and we’ll print it as part of your letter.
+      </p>
+      <p class="govuk-body">
+        In total, your letter must be 10 pages or less (5 double-sided sheets of paper).
+      </p>
       {{ file_upload(
         form.file,
         button_text='Choose file',

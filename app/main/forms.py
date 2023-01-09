@@ -1301,6 +1301,21 @@ class LetterInsertPagesForm(StripWhitespaceForm):
     )
 
 
+class InsertContentForm(StripWhitespaceForm):
+    thing = GovukRadiosField(
+        "Select an option",
+        choices=[
+            ("Image", "Image"),
+            ("Optional content", "Optional content"),
+            ("Link to file", "Link to file"),
+            ("QR code", "QR code"),
+            ("Reusable block of content", "Reusable block of content"),
+        ],
+        thing="an option",
+        validators=[DataRequired()],
+    )
+
+
 class LetterTemplatePostageForm(StripWhitespaceForm):
     postage = GovukRadiosField(
         "Choose the postage for this letter template",

@@ -1,0 +1,43 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ form.thing.label.text }}
+{% endblock %}
+
+{% block backLink %}
+  {% if choice %}
+    {{ govukBackLink({ "href": url_for('.insert_content', service_id=current_service.id, template_id=template_id) }) }}
+  {% else %}
+    {{ govukBackLink({ "href": url_for('.view_template', service_id=current_service.id, template_id=template_id) }) }}
+  {% endif %}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {% if choice %}
+    <p class="govuk-body govuk-!-margin-top-6">You chose: {{ choice }}</p>
+  {% else %}
+
+    {% call form_wrapper() %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-five-sixths">
+          {{ form.thing(param_extensions={
+            "fieldset": {
+              "legend": {
+                "isPageHeading": True,
+                "classes": "govuk-fieldset__legend--l"
+              }
+            }
+          }) }}
+          {{ page_footer('Continue') }}
+        </div>
+      </div>
+    {% endcall %}
+
+  {% endif %}
+
+{% endblock %}
