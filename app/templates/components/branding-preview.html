@@ -1,15 +1,19 @@
-{% macro branding_preview(branding_style, endpoint, classes) %}
-  <iframe src="{{ url_for(endpoint, branding_style=branding_style) }}" class="branding-preview {{ classes }}" scrolling="no"></iframe>
+{% macro branding_preview(endpoint, branding_style, url_kwargs=None, classes='') %}
+  <iframe src="{{ url_for(endpoint, branding_style=branding_style, **(url_kwargs or {})) }}" class="branding-preview {{ classes }}" scrolling="no"></iframe>
 {% endmacro %}
 
 {% macro custom_email_branding_preview(preview_settings) %}
-  <iframe src="{{ url_for('main.email_template', branding_style='custom', **preview_settings) }}" class="branding-preview" scrolling="no"></iframe>
+  {{ branding_preview('main.email_template', branding_style='custom', url_kwargs=preview_settings) }}
+{% endmacro %}
+
+{% macro custom_letter_branding_preview(filename) %}
+  {{ branding_preview('main.letter_template', branding_style=None, url_kwargs={"filename": filename}) }}
 {% endmacro %}
 
 {% macro email_branding_preview(branding_style, classes='') %}
-  {{ branding_preview(branding_style, 'main.email_template', classes) }}
+  {{ branding_preview('main.email_template', branding_style, classes=classes) }}
 {% endmacro %}
 
 {% macro letter_branding_preview(branding_style, classes='') %}
-  {{ branding_preview(branding_style, 'main.letter_template', classes) }}
+  {{ branding_preview('main.letter_template', branding_style, classes=classes) }}
 {% endmacro %}

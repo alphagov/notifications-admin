@@ -97,13 +97,18 @@ def email_template():
 @main.route("/_letter")
 def letter_template():
     branding_style = request.args.get("branding_style")
+    filename = request.args.get("filename")
 
     if branding_style == FieldWithNoneOption.NONE_OPTION_VALUE:
         branding_style = None
+    if filename == FieldWithNoneOption.NONE_OPTION_VALUE:
+        filename = None
 
     if branding_style:
+        if filename:
+            abort(400, "Cannot provide both branding_style and filename")
         filename = letter_branding_client.get_letter_branding(branding_style)["filename"]
-    else:
+    elif not filename:
         filename = "no-branding"
 
     template = {"subject": "", "content": "", "template_type": "letter"}
