@@ -415,6 +415,15 @@ def message_count(count, template_type):
     return f"{format_thousands(count)} {message_count_noun(count, template_type)}"
 
 
+def message_rate_limit_label(service, template_type):
+    message_limit = service.get_message_limit(template_type)
+
+    if message_limit == service.message_limit:
+        template_type = "message"
+
+    return message_count(message_limit, template_type)
+
+
 def recipient_count_label(count, template_type):
     singular = count == 1
 

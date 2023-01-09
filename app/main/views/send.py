@@ -589,12 +589,14 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
         if e.status_code != 404:
             raise
 
-    notification_count = service_api_client.get_notification_count(service_id)
-    remaining_messages = current_service.message_limit - notification_count
-
     contents = s3download(service_id, upload_id)
 
     db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
+    notification_count = service_api_client.get_notification_count(
+        service_id, notification_type=db_template["template_type"]
+    )
+    remaining_messages = current_service.get_message_limit(db_template["template_type"]) - notification_count
 
     email_reply_to = None
     sms_sender = None
