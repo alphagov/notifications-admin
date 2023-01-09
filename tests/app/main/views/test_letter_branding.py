@@ -231,10 +231,10 @@ def test_update_letter_branding_with_new_file_and_new_details(
     assert page.select_one("h1").text == "Letter branding"
 
     mock_client_update.assert_called_once_with(
-        branding_id=fake_uuid, filename="{}-new_file".format(fake_uuid), name="Updated name"
+        branding_id=fake_uuid, filename=f"{fake_uuid}-new_file", name="Updated name", updated_by_id=fake_uuid
     )
     mock_persist_logo.assert_called_once_with(
-        temp_logo, "letters/static/images/letter-template/{}-new_file.svg".format(fake_uuid)
+        temp_logo, f"letters/static/images/letter-template/{fake_uuid}-new_file.svg"
     )
     mock_delete_temp_files.assert_called_once_with(fake_uuid)
 
@@ -259,7 +259,7 @@ def test_update_letter_branding_rolls_back_db_changes_and_shows_error_if_saving_
 
     assert mock_client_update.call_count == 2
     assert mock_client_update.call_args_list == [
-        call(branding_id=fake_uuid, filename="{}-new_file".format(fake_uuid), name="Updated name"),
+        call(branding_id=fake_uuid, filename=f"{fake_uuid}-new_file", name="Updated name", updated_by_id=fake_uuid),
         call(branding_id=fake_uuid, filename="hm-government", name="HM Government"),
     ]
 
@@ -498,7 +498,7 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     assert page.select_one("h1").text == "Letter branding"
 
     mock_letter_client.create_letter_branding.assert_called_once_with(
-        filename="{}-test".format(fake_uuid), name="Test brand"
+        filename=f"{fake_uuid}-test", name="Test brand", created_by_id=user_id
     )
     mock_persist_logo.assert_called_once_with(
         temp_logo, "letters/static/images/letter-template/{}-test.svg".format(fake_uuid)

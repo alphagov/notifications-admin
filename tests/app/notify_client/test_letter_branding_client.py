@@ -38,14 +38,13 @@ def test_get_all_letter_branding(mocker):
 
 
 def test_create_letter_branding(mocker):
-    new_branding = {"filename": "uuid-test", "name": "my letters"}
+    new_branding = {"filename": "uuid-test", "name": "my letters", "created_by_id": "user-uuid"}
 
     mock_post = mocker.patch("app.notify_client.letter_branding_client.LetterBrandingClient.post")
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
 
     LetterBrandingClient().create_letter_branding(
-        filename=new_branding["filename"],
-        name=new_branding["name"],
+        filename=new_branding["filename"], name=new_branding["name"], created_by_id=new_branding["created_by_id"]
     )
     mock_post.assert_called_once_with(url="/letter-branding", data=new_branding)
 
@@ -53,16 +52,19 @@ def test_create_letter_branding(mocker):
 
 
 def test_update_letter_branding(mocker, fake_uuid):
-    branding = {"filename": "uuid-test", "name": "my letters"}
+    branding = {"filename": "uuid-test", "name": "my letters", "updated_by_id": "user-uuid"}
 
     mock_post = mocker.patch("app.notify_client.letter_branding_client.LetterBrandingClient.post")
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
     mock_redis_delete_by_pattern = mocker.patch("app.extensions.RedisClient.delete_by_pattern")
     LetterBrandingClient().update_letter_branding(
-        branding_id=fake_uuid, filename=branding["filename"], name=branding["name"]
+        branding_id=fake_uuid,
+        filename=branding["filename"],
+        name=branding["name"],
+        updated_by_id=branding["updated_by_id"],
     )
 
-    mock_post.assert_called_once_with(url="/letter-branding/{}".format(fake_uuid), data=branding)
+    mock_post.assert_called_once_with(url=f"/letter-branding/{fake_uuid}", data=branding)
     assert mock_redis_delete.call_args_list == [
         call("letter_branding-{}".format(fake_uuid)),
         call("letter_branding"),
