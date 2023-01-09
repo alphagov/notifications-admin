@@ -265,8 +265,8 @@ def guidance_bulk_sending():
         "views/guidance/bulk-sending.html",
         max_spreadsheet_rows=RecipientCSV.max_rows,
         rate_limits=[
-            message_count(current_app.config[f"DEFAULT_LIVE_SERVICE_{channel.upper()}_RATE_LIMIT"], channel)
-            for channel in ("email", "sms", "letter")
+            message_count(limit, channel)
+            for channel, limit in current_app.config["DEFAULT_LIVE_SERVICE_RATE_LIMITS"].items()
         ],
         navigation_links=using_notify_nav(),
     )

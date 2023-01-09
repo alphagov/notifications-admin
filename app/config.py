@@ -34,9 +34,11 @@ class Config(object):
     ASSETS_DEBUG = False
     AWS_REGION = "eu-west-1"
     DEFAULT_SERVICE_LIMIT = 50
-    DEFAULT_LIVE_SERVICE_EMAIL_RATE_LIMIT = 250_000
-    DEFAULT_LIVE_SERVICE_SMS_RATE_LIMIT = 250_000
-    DEFAULT_LIVE_SERVICE_LETTER_RATE_LIMIT = 20_000
+    DEFAULT_LIVE_SERVICE_RATE_LIMITS = {
+        "email": 250_000,
+        "sms": 250_000,
+        "letter": 20_000,
+    }
 
     EMAIL_EXPIRY_SECONDS = 3600  # 1 hour
     INVITATION_EXPIRY_SECONDS = 3600 * 24 * 2  # 2 days - also set on api
