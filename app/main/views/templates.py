@@ -19,6 +19,7 @@ from app.main import main, no_cookie
 from app.main.forms import (
     BroadcastTemplateForm,
     EmailTemplateForm,
+    InsertContentForm,
     LetterInsertPagesForm,
     LetterTemplateForm,
     LetterTemplatePostageForm,
@@ -884,6 +885,23 @@ def insert_pages(service_id, template_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/insert-content", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def insert_content(service_id, template_id):
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    if template["template_type"] != "email":
+        abort(404)
+    form = InsertContentForm()
+    if form.validate_on_submit():
+        return redirect(
+            url_for(".insert_content", service_id=service_id, template_id=template_id, choice=form.thing.data)
+        )
+
+    return render_template(
+        "views/templates/insert-content.html", form=form, template_id=template_id, choice=request.args.get("choice")
+    )
+
+
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/insert-pages-upload", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def insert_pages_upload(service_id, template_id):
@@ -904,23 +922,6 @@ def insert_pages_upload(service_id, template_id):
 
     return render_template(
         "views/templates/insert-pages-upload.html",
-        form=form,
-        template_id=template_id,
-    )
-
-
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/insert-pages-welsh", methods=["GET", "POST"])
-@user_has_permissions("manage_templates")
-def insert_pages_welsh(service_id, template_id):
-    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-    if template["template_type"] != "letter":
-        abort(404)
-    form = LetterInsertPagesForm()
-    if form.validate_on_submit():
-        pass
-
-    return render_template(
-        "views/templates/insert-pages-welsh.html",
         form=form,
         template_id=template_id,
     )

@@ -94,13 +94,19 @@
         {% endif %}
         <img src="{{ asset_url('images/letter-examples/' + extra_pages) }}" alt="" loading="eager">
       </div>
-      <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter">
-        <a class="govuk-link govuk-link--destructive" href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">Delete {{ "Welsh translation" if extra_pages == "welsh.png" else "extra pages" }}</a>
+      <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter" style="margin-top: -10px; position: relative; top: -10px;">
+        <a class="govuk-link govuk-link--destructive" href="{{ url_for('.view_template', service_id=current_service.id, template_id=template.id) }}">Delete {{ "Welsh translation" if extra_pages == "welsh.png" else "uploaded pages" }}</a>
       </span>
     {% else %}
     <div class="js-stick-at-bottom-when-scrolling">
-      {{ govukButton({ "text": "Insert pages", "classes": "govuk-button--secondary", "href": url_for(".insert_pages", service_id=current_service.id, template_id=template.id) }) }}
+      {{ govukButton({ "text": "Upload pages", "classes": "govuk-button--secondary", "href": url_for(".insert_pages_upload", service_id=current_service.id, template_id=template.id) }) }}
+      {{ govukButton({ "text": "Add Welsh language version", "classes": "govuk-button--secondary govuk-!-margin-left-3", "href": url_for(".view_template", service_id=current_service.id, template_id=template.id, extra_pages="welsh.png", _anchor="extra-pages") }) }}
     </div>
     {% endif %}
+  {% endif %}
+  {% if current_user.has_permissions('manage_templates') and template.template_type == 'email' %}
+    <div class="js-stick-at-bottom-when-scrolling">
+      {{ govukButton({ "text": "Add another type of content", "classes": "govuk-button--secondary", "href": url_for(".insert_content", service_id=current_service.id, template_id=template.id) }) }}
+    </div>
   {% endif %}
 </div>
