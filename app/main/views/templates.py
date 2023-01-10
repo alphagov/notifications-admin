@@ -524,8 +524,6 @@ def add_service_template(service_id, template_type, template_folder_id=None):
 
     form = form_objects[template_type]()
     if form.validate_on_submit():
-        if form.process_type.data == "priority":
-            abort_403_if_not_admin_user()
         try:
             new_template = service_api_client.create_service_template(
                 form.name.data,
@@ -533,7 +531,6 @@ def add_service_template(service_id, template_type, template_folder_id=None):
                 form.template_content.data,
                 service_id,
                 form.subject.data if hasattr(form, "subject") else None,
-                form.process_type.data,
                 template_folder_id,
             )
         except HTTPError as e:
@@ -570,9 +567,6 @@ def edit_service_template(service_id, template_id):
     template["template_content"] = template["content"]
     form = form_objects[template["template_type"]](**template)
     if form.validate_on_submit():
-        if form.process_type.data != template["process_type"]:
-            abort_403_if_not_admin_user()
-
         subject = form.subject.data if hasattr(form, "subject") else None
 
         new_template_data = {
@@ -581,7 +575,6 @@ def edit_service_template(service_id, template_id):
             "subject": subject,
             "template_type": template["template_type"],
             "id": template["id"],
-            "process_type": form.process_type.data,
             "reply_to_text": template["reply_to_text"],
         }
 
@@ -603,7 +596,6 @@ def edit_service_template(service_id, template_id):
                 form.template_content.data,
                 service_id,
                 subject,
-                form.process_type.data,
             )
         except HTTPError as e:
             if e.status_code == 400:

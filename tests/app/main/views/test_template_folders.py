@@ -543,7 +543,6 @@ def test_can_create_email_template_with_parent_folder(client_request, mock_creat
         "template_content": "here's a burrito 🌯",
         "template_type": "email",
         "service": SERVICE_ONE_ID,
-        "process_type": "normal",
         "parent_folder_id": PARENT_FOLDER_ID,
     }
     client_request.post(
@@ -564,7 +563,6 @@ def test_can_create_email_template_with_parent_folder(client_request, mock_creat
         data["template_content"],
         SERVICE_ONE_ID,
         data["subject"],
-        data["process_type"],
         data["parent_folder_id"],
     )
 
