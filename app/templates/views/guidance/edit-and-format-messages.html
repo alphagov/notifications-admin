@@ -17,8 +17,6 @@
   <ul class="govuk-list govuk-list--bullet">
     <li><a class="govuk-link govuk-link--no-visited-state" href="#formatting">format your content</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="#links">add links</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="#personalised-content">personalise your content</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="#optional-content">add optional content</a></li>
   </ul>
 
   <h2 class="heading-medium" id="formatting">Format your content</h2>
@@ -55,49 +53,5 @@
     <li>your link might stop working if there’s a service outage</li>
     <li>you can no longer control where the redirect goes</li>
   </ul>
-
-  <h2 class="heading-medium" id="personalised-content">Personalise your content</h2>
-
-  <p class="govuk-body">To personalise the content of your messages, add a placeholder to the template.</p>
-
-  <p class="govuk-body">Placeholders are filled in with details, like a name or reference number, each time you send a message.</p>
-
-  <p class="govuk-body">To add a placeholder to the template:</p>
-
-  <ol class="govuk-list govuk-list--number">
-    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
-    <li>Add a new template or choose an existing template and select <b class="govuk-!-font-weight-bold">Edit</b>.</li>
-    <li>Add a placeholder using double brackets. For example: Hello ((first&nbsp;name)), your reference is ((ref&nbsp;number)).</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Save</b>.</li>
-  </ol>
-
-  <p class="govuk-body">When you send a message you can either:</p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>manually fill in the placeholders yourself</li>
-    <li>upload a list of personal details and let Notify do it for you</li>
-  </ul>
-
-  <p class="govuk-body">If you upload a list, the column names need to match the placeholders in your template.</p>
-
-  <h2 class="heading-medium" id="optional-content">Add optional content</h2>
-
-  <p class="govuk-body">To add optional content to your messages:</p>
-
-  <ol class="govuk-list govuk-list--number">
-    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
-    <li>Add a new template or choose an existing template and select <b class="govuk-!-font-weight-bold">Edit</b>.</li>
-    <li>Use double brackets and ?? to define optional content. For example, if you only want to show something to people who are under 18: ((under18??Please get your application signed by a parent or guardian.))</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Save</b>.</li>
-  </ol>
-
-  <p class="govuk-body">For each person you send this message to, specify ‘yes’ or ‘no’ to show or hide this content. You can either:</p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>do this yourself</li>
-    <li>upload a list of personal details and let Notify do it for you</li>
-  </ul>
-
-  <p class="govuk-body">If you upload a list, the column names need to match the optional content in your template.</p>
 
 {% endblock %}
