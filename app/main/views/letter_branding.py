@@ -4,6 +4,7 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import letter_branding_client
+from app.event_handlers import create_update_letter_branding_event
 from app.main import main
 from app.main.forms import (
     AdminEditLetterBrandingForm,
@@ -82,7 +83,11 @@ def update_letter_branding(branding_id, logo=None):
                     name=letter_branding_details_form.name.data,
                     updated_by_id=current_user.id,
                 )
-
+                create_update_letter_branding_event(
+                    letter_branding_id=branding_id,
+                    updated_by_id=current_user.id,
+                    old_letter_branding=letter_branding.serialize(),
+                )
                 upload_letter_svg_logo(logo, db_filename, session["user_id"])
 
                 return redirect(url_for("main.letter_branding"))
