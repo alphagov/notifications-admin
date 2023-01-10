@@ -291,6 +291,7 @@ def guidance_personalisation():
         navigation_links=using_notify_nav(),
     )
 
+
 @main.route("/using-notify/guidance/receive-text-messages")
 def guidance_receive_text_messages():
     return render_template(
