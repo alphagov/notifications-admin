@@ -17,8 +17,10 @@ from flask import (
     stream_with_context,
     url_for,
 )
+from markupsafe import Markup
 from notifications_python_client.errors import APIError, HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT
+from notifications_utils.formatters import nl2br
 from notifications_utils.letter_timings import (
     get_letter_timings,
     letter_can_be_cancelled,
@@ -150,6 +152,35 @@ def view_notification(service_id, notification_id):
     else:
         estimated_letter_delivery_date = None
 
+    events = notification_api_client.get_notification_events(notification_id)["events"]
+    FROM_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+    events_table_data = (
+        {
+            "caption": "Events",
+            "captionClasses": "govuk-table__caption--m govuk-!-margin-top-5",
+            "firstCellIsHeader": False,
+            "head": [
+                {"text": "timestamp", "classes": "govuk-!-width-one-third"},
+                {"text": "status"},
+                {"text": "notes", "classes": "govuk-!-width-one-half"},
+            ],
+            "rows": [
+                [
+                    {
+                        "text": datetime.strptime(event["created_at"], FROM_DATETIME_FORMAT).isoformat(
+                            sep=" ", timespec="milliseconds"
+                        )
+                    },
+                    {"text": event["status"]},
+                    {"text": Markup(nl2br(event["notes"] or ""))},
+                ]
+                for event in events[::-1]
+            ],
+        }
+        if events
+        else None
+    )
+
     return render_template(
         "views/notifications/notification.html",
         finished=(notification["status"] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
@@ -179,6 +210,7 @@ def view_notification(service_id, notification_id):
         show_cancel_button=show_cancel_button,
         sent_with_test_key=(notification.get("key_type") == KEY_TYPE_TEST),
         back_link=back_link,
+        events_table_data=events_table_data,
     )
 
 

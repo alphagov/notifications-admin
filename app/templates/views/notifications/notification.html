@@ -2,6 +2,7 @@
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block service_page_title %}
   {{ 1|message_count_label(template.template_type, suffix='') | capitalize }}
@@ -113,6 +114,10 @@
       <p class="govuk-body">
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.conversation', service_id=current_service.id, notification_id=notification_id, _anchor='n{}'.format(notification_id)) }}">See all text messages sent to this phone number</a>
       </p>
+    {% endif %}
+
+    {% if events_table_data %}
+      {{ govukTable(events_table_data) }}
     {% endif %}
 
 {% endblock %}
