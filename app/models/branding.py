@@ -95,6 +95,12 @@ class EmailBranding(Branding):
         if self.logo:
             return f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{self.logo}"
 
+    @property
+    def is_used_by_orgs_or_services(self):
+        orgs_and_services = email_branding_client.get_orgs_and_services_associated_with_branding(self.id)["data"]
+
+        return len(orgs_and_services["services"]) > 0 or len(orgs_and_services["organisations"]) > 0
+
 
 class LetterBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {"filename"}

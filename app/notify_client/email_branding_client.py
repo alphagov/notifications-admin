@@ -50,5 +50,8 @@ class EmailBrandingClient(NotifyAdminAPIClient):
     def archive_email_branding(self, branding_id):
         return self.post(url=f"/email-branding/{branding_id}/delete", data=None)
 
+    def get_orgs_and_services_associated_with_branding(self, branding_id):
+        return self.get(url=f"/email-branding/{branding_id}/orgs_and_services")
+
 
 email_branding_client = EmailBrandingClient()

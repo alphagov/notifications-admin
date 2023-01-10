@@ -560,9 +560,14 @@ def test_update_email_branding_with_unique_name_conflict(
 
 
 def test_platform_admin_confirm_archive_email_branding(
-    client_request, platform_admin_user, mock_get_email_branding, fake_uuid
+    client_request, platform_admin_user, mock_get_email_branding, fake_uuid, mocker
 ):
     client_request.login(platform_admin_user)
+    mocker.patch(
+        "app.email_branding_client.get_orgs_and_services_associated_with_branding",
+        return_value={"data": {"services": [], "organisations": []}},
+    )
+
     page = client_request.get(
         ".platform_admin_confirm_archive_email_branding",
         branding_id=fake_uuid,
@@ -576,7 +581,28 @@ def test_platform_admin_confirm_archive_email_branding(
     assert page.select_one(".banner-dangerous form")["method"] == "post"
 
 
-def test_platform_admin_archive_email_branding_happy_path(
+def test_platform_admin_confirm_archive_email_branding_that_is_in_use(
+    client_request, platform_admin_user, mock_get_email_branding, fake_uuid, mocker
+):
+    client_request.login(platform_admin_user)
+
+    mocker.patch(
+        "app.email_branding_client.get_orgs_and_services_associated_with_branding",
+        return_value={"data": {"services": [{"name": "ABC", "id": "1234"}], "organisations": []}},
+    )
+
+    page = client_request.get(
+        ".platform_admin_confirm_archive_email_branding",
+        branding_id=fake_uuid,
+        _test_page_title=False,  # TODO: Fix page titles
+    )
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        "This email branding is in use. You cannot delete it."
+    )
+
+
+def test_platform_admin_archive_email_branding(
     client_request,
     platform_admin_user,
     mocker,

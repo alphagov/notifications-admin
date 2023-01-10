@@ -99,7 +99,10 @@ def platform_admin_update_email_branding(branding_id, logo=None):
             return redirect(url_for(".email_branding", branding_id=branding_id))
 
     if request.endpoint == "main.platform_admin_confirm_archive_email_branding":
-        flash("Are you sure you want to archive this email branding?", "archive")
+        if email_branding.is_used_by_orgs_or_services:
+            flash("This branding is used and so it can't be archived.")
+        else:
+            flash("Are you sure you want to archive this email branding?", "archive")
 
     return (
         render_template(
@@ -116,8 +119,6 @@ def platform_admin_update_email_branding(branding_id, logo=None):
 @main.route("/email-branding/<uuid:branding_id>/archive", methods=["POST"])
 @user_is_platform_admin
 def platform_admin_archive_email_branding(branding_id):
-    # TODO: if branding used by active services, don't archive it.
-
     email_branding_client.archive_email_branding(branding_id=branding_id)
     return redirect(url_for(".email_branding"))
 
