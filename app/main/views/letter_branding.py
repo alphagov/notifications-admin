@@ -65,25 +65,17 @@ def update_letter_branding(branding_id, logo=None):
         db_filename = letter_filename_for_db(logo, session["user_id"])
 
         try:
-            if db_filename == letter_branding.filename:
+            letter_branding_client.update_letter_branding(
+                branding_id=branding_id,
+                filename=db_filename,
+                name=letter_branding_details_form.name.data,
+            )
 
-                letter_branding_client.update_letter_branding(
-                    branding_id=branding_id,
-                    filename=db_filename,
-                    name=letter_branding_details_form.name.data,
-                )
-
-                return redirect(url_for("main.letter_branding"))
-            else:
-                letter_branding_client.update_letter_branding(
-                    branding_id=branding_id,
-                    filename=db_filename,
-                    name=letter_branding_details_form.name.data,
-                )
-
+            # If a new file has been uploaded, db_filename and letter_branding.filename will be different
+            if db_filename != letter_branding.filename:
                 upload_letter_svg_logo(logo, db_filename, session["user_id"])
 
-                return redirect(url_for("main.letter_branding"))
+            return redirect(url_for("main.letter_branding"))
 
         except HTTPError as e:
             if "name" in e.message:
