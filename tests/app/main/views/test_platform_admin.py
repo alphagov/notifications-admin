@@ -274,19 +274,16 @@ def test_format_stats_by_service_returns_correct_values(fake_uuid):
     assert ret[0]["stats"]["letter"]["failed"] == 7
 
 
-@pytest.mark.parametrize(
-    "endpoint, restricted, research_mode", [("main.trial_services", True, False), ("main.live_services", False, False)]
-)
+@pytest.mark.parametrize("endpoint, restricted", [("main.trial_services", True), ("main.live_services", False)])
 def test_should_show_email_and_sms_stats_for_all_service_types(
     endpoint,
     restricted,
-    research_mode,
     client_request,
     platform_admin_user,
     mock_get_detailed_services,
     fake_uuid,
 ):
-    services = [service_json(fake_uuid, "My Service", [], restricted=restricted, research_mode=research_mode)]
+    services = [service_json(fake_uuid, "My Service", [], restricted=restricted)]
     services[0]["statistics"] = create_stats(
         emails_requested=10, emails_delivered=3, emails_failed=5, sms_requested=50, sms_delivered=7, sms_failed=11
     )
@@ -342,22 +339,19 @@ def test_should_show_archived_services_last(
     assert normalize_spaces(services[2].td.text) == "C Archived"
 
 
-@pytest.mark.parametrize(
-    "endpoint, restricted, research_mode", [("main.trial_services", True, False), ("main.live_services", False, False)]
-)
+@pytest.mark.parametrize("endpoint, restricted", [("main.trial_services", True), ("main.live_services", False)])
 def test_should_order_services_by_usage_with_inactive_last(
     endpoint,
     restricted,
-    research_mode,
     client_request,
     platform_admin_user,
     mock_get_detailed_services,
     fake_uuid,
 ):
     services = [
-        service_json(fake_uuid, "My Service 1", [], restricted=restricted, research_mode=research_mode),
-        service_json(fake_uuid, "My Service 2", [], restricted=restricted, research_mode=research_mode),
-        service_json(fake_uuid, "My Service 3", [], restricted=restricted, research_mode=research_mode, active=False),
+        service_json(fake_uuid, "My Service 1", [], restricted=restricted),
+        service_json(fake_uuid, "My Service 2", [], restricted=restricted),
+        service_json(fake_uuid, "My Service 3", [], restricted=restricted, active=False),
     ]
     services[0]["statistics"] = create_stats(
         emails_requested=100, emails_delivered=25, emails_failed=25, sms_requested=100, sms_delivered=25, sms_failed=25

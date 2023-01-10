@@ -585,7 +585,6 @@ def test_client_updates_service_with_allowed_attributes(
         "prefix_sms",
         "rate_limit",
         "reply_to_email_address",
-        "research_mode",
         "restricted",
         "sms_sender",
         "volume_email",

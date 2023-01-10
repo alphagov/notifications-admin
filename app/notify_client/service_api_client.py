@@ -105,7 +105,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "purchase_order_number",
             "rate_limit",
             "reply_to_email_address",
-            "research_mode",
             "restricted",
             "sms_sender",
             "volume_email",

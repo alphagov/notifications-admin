@@ -660,7 +660,6 @@ def format_stats_by_service(services):
             "name": service["name"],
             "stats": service["statistics"],
             "restricted": service["restricted"],
-            "research_mode": service["research_mode"],
             "created_at": service["created_at"],
             "active": service["active"],
         }

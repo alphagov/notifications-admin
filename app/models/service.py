@@ -45,7 +45,6 @@ class Service(JSONModel):
         "notes",
         "prefix_sms",
         "purchase_order_number",
-        "research_mode",
         "service_callback_api",
         "volume_email",
         "volume_sms",
@@ -117,9 +116,6 @@ class Service(JSONModel):
 
     def update_permissions(self, permissions):
         return self.update(permissions=list(permissions))
-
-    def toggle_research_mode(self):
-        self.update(research_mode=not self.research_mode)
 
     @property
     def trial_mode(self):
