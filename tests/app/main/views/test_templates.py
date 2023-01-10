@@ -2272,13 +2272,15 @@ def test_should_not_update_sms_template_with_emoji(
     expected_error,
 ):
     service_one["permissions"] += [template_type]
-    return mocker.patch(
+    mocker.patch(
         "app.service_api_client.get_service_template",
-        return_value=template_json(
-            SERVICE_ONE_ID,
-            fake_uuid,
-            type_=template_type,
-        ),
+        return_value={
+            "data": template_json(
+                SERVICE_ONE_ID,
+                fake_uuid,
+                type_=template_type,
+            )
+        },
     )
     page = client_request.post(
         ".edit_service_template",
