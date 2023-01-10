@@ -160,8 +160,8 @@ class Preview(Config):
     PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "preview-letters-precompiled-originals-backup"
     NOTIFY_ENVIRONMENT = "preview"
     CHECK_PROXY_HEADER = False
-    ASSET_DOMAIN = "static.notify.works"
-    ASSET_PATH = "https://static.notify.works/"
+    ASSET_DOMAIN = "notify-admin-prototype-preview.cloudapps.digital"
+    ASSET_PATH = "https://notify-admin-prototype-preview.cloudapps.digital/static/"
 
     # On preview, extend the validation timeout to allow more leniency when running functional tests
     REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT = 120
@@ -196,8 +196,8 @@ class Production(Config):
     PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "production-letters-precompiled-originals-backup"
     NOTIFY_ENVIRONMENT = "production"
     CHECK_PROXY_HEADER = False
-    ASSET_DOMAIN = "static.notifications.service.gov.uk"
-    ASSET_PATH = "https://static.notifications.service.gov.uk/"
+    ASSET_DOMAIN = "notify-admin-prototype-production.cloudapps.digital"
+    ASSET_PATH = "https://notify-admin-prototype-production.cloudapps.digital/static/"
 
 
 class CloudFoundryConfig(Config):
