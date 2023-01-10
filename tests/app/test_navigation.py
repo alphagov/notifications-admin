@@ -206,7 +206,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "old_service_dashboard",
             "old_terms",
             "old_using_notify",
-            "optional content",
+            "guidance_optional_content",
             "organisation_billing",
             "organisation_dashboard",
             "organisation_download_agreement",
