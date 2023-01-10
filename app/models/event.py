@@ -110,12 +110,6 @@ class ServiceEvent(Event):
         else:
             return "Set text messages to not start with the name of this service"
 
-    def format_research_mode(self):
-        if self.value_to is True:
-            return "Put this service into research mode"
-        else:
-            return "Took this service out of research mode"
-
     def format_service_callback_api(self):
         return "Updated the callback for delivery receipts"
 

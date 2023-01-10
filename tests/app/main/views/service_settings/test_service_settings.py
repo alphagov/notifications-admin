@@ -3194,43 +3194,6 @@ def test_inbound_sms_sender_is_not_editable(client_request, service_one, fake_uu
         )
 
 
-def test_shows_research_mode_indicator(
-    client_request,
-    service_one,
-    mocker,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-):
-    service_one["research_mode"] = True
-    mocker.patch("app.service_api_client.update_service", return_value=service_one)
-
-    page = client_request.get(
-        "main.service_settings",
-        service_id=SERVICE_ONE_ID,
-    )
-
-    element = page.select_one("span#research-mode")
-    assert element.text == "research mode"
-
-
-def test_does_not_show_research_mode_indicator(
-    client_request,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-):
-    page = client_request.get(
-        "main.service_settings",
-        service_id=SERVICE_ONE_ID,
-    )
-
-    element = page.select_one("span#research-mode")
-    assert not element
-
-
 def test_service_set_letter_branding_platform_admin_only(
     client_request,
 ):

@@ -30,8 +30,6 @@ from tests.conftest import sample_uuid
         ),
         ("prefix_sms", True, False, "Set text messages to not start with the name of this service"),
         ("prefix_sms", False, True, "Set text messages to start with the name of this service"),
-        ("research_mode", True, False, "Took this service out of research mode"),
-        ("research_mode", False, True, "Put this service into research mode"),
         ("service_callback_api", "foo", "bar", "Updated the callback for delivery receipts"),
     ),
 )
