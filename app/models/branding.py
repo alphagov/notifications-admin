@@ -108,7 +108,11 @@ class LetterBranding(Branding):
         filename,
     ):
         # TODO: rename temp to non-temp and clean up temp files
-        new_letter_branding = letter_branding_client.create_letter_branding(name=name, filename=filename)
+        new_letter_branding = letter_branding_client.create_letter_branding(
+            name=name,
+            filename=filename,
+            created_by_id=current_user.id,
+        )
         return cls(new_letter_branding)
 
     @classmethod

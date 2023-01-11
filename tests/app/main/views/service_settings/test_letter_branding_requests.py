@@ -591,6 +591,7 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     mock_create_letter_branding.assert_called_once_with(
         filename="temp_example",
         name="some name",
+        created_by_id=fake_uuid,
     )
     mock_add_to_branding_pool.assert_called_once_with(service_one["organisation"], [fake_uuid])
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, letter_branding=fake_uuid)

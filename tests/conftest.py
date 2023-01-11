@@ -2526,11 +2526,7 @@ def create_email_branding(id, non_standard_values=None):
 
 
 def create_letter_branding(id, non_standard_values=None):
-    branding = {
-        "id": id,
-        "filename": "example",
-        "name": "Organisation name",
-    }
+    branding = {"id": id, "filename": "example", "name": "Organisation name", "created_by_id": "abcd-1234"}
 
     if non_standard_values:
         branding.update(non_standard_values)
@@ -2644,12 +2640,13 @@ def mock_create_email_branding(mocker, fake_uuid):
 
 @pytest.fixture(scope="function")
 def mock_create_letter_branding(mocker, fake_uuid):
-    def _create_letter_branding(filename, name):
+    def _create_letter_branding(filename, name, created_by_id):
         return create_letter_branding(
             fake_uuid,
             {
                 "name": name,
                 "filename": filename,
+                "created_by_id": created_by_id,
             },
         )["letter_branding"]
 

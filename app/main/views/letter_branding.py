@@ -1,5 +1,6 @@
 from botocore.exceptions import ClientError as BotoClientError
 from flask import current_app, redirect, render_template, request, session, url_for
+from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import letter_branding_client
@@ -69,6 +70,7 @@ def update_letter_branding(branding_id, logo=None):
                 branding_id=branding_id,
                 filename=db_filename,
                 name=letter_branding_details_form.name.data,
+                updated_by_id=current_user.id,
             )
 
             # If a new file has been uploaded, db_filename and letter_branding.filename will be different
@@ -129,10 +131,7 @@ def create_letter_branding(logo=None):
             db_filename = letter_filename_for_db(logo, session["user_id"])
 
             try:
-                letter_branding_client.create_letter_branding(
-                    filename=db_filename,
-                    name=letter_branding_details_form.name.data,
-                )
+                LetterBranding.create(filename=db_filename, name=letter_branding_details_form.name.data)
 
                 upload_letter_svg_logo(logo, db_filename, session["user_id"])
 
