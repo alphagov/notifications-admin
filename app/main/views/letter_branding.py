@@ -4,6 +4,7 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import letter_branding_client
+from app.event_handlers import create_update_letter_branding_event
 from app.main import main
 from app.main.forms import (
     AdminEditLetterBrandingForm,
@@ -56,6 +57,11 @@ def update_letter_branding(branding_id, logo=None):
             current_app.config["AWS_REGION"],
             user_id=session["user_id"],
         )
+        create_update_letter_branding_event(
+            letter_branding_id=branding_id,
+            updated_by_id=current_user.id,
+            old_letter_branding=letter_branding.serialize(),
+        )
 
         if logo.startswith(LETTER_TEMP_TAG.format(user_id=session["user_id"])):
             delete_letter_temp_file(logo)
@@ -75,6 +81,11 @@ def update_letter_branding(branding_id, logo=None):
                 filename=db_filename,
                 name=letter_branding_details_form.name.data,
                 updated_by_id=current_user.id,
+            )
+            create_update_letter_branding_event(
+                letter_branding_id=branding_id,
+                updated_by_id=current_user.id,
+                old_letter_branding=letter_branding.serialize(),
             )
 
             return redirect(url_for("main.letter_branding"))

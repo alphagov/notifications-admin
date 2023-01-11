@@ -72,6 +72,9 @@ def test_update_letter_branding_with_new_valid_file(
     mocker.patch("app.s3_client.s3_logo_client.uuid.uuid4", return_value=fake_uuid)
     mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mock_create_update_letter_branding_event = mocker.patch(
+        "app.main.views.letter_branding.create_update_letter_branding_event"
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -86,6 +89,12 @@ def test_update_letter_branding_with_new_valid_file(
 
     assert mock_s3_upload.called
     assert mock_delete_temp_files.called is False
+
+    mock_create_update_letter_branding_event.assert_called_once_with(
+        letter_branding_id=fake_uuid,
+        updated_by_id=fake_uuid,
+        old_letter_branding={"id": fake_uuid, "name": "HM Government", "filename": "hm-government"},
+    )
 
 
 def test_update_letter_branding_when_uploading_invalid_file(
@@ -144,6 +153,9 @@ def test_update_letter_branding_with_original_file_and_new_details(
 ):
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
     mock_upload_logos = mocker.patch("app.main.views.letter_branding.upload_letter_svg_logo")
+    mock_create_update_letter_branding_event = mocker.patch(
+        "app.main.views.letter_branding.create_update_letter_branding_event"
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -161,6 +173,11 @@ def test_update_letter_branding_with_original_file_and_new_details(
         filename="hm-government",
         name="Updated name",
         updated_by_id=fake_uuid,
+    )
+    mock_create_update_letter_branding_event.assert_called_once_with(
+        letter_branding_id=fake_uuid,
+        updated_by_id=fake_uuid,
+        old_letter_branding={"id": fake_uuid, "name": "HM Government", "filename": "hm-government"},
     )
 
 
@@ -224,6 +241,9 @@ def test_update_letter_branding_with_new_file_and_new_details(
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
     mock_persist_logo = mocker.patch("app.main.views.letter_branding.persist_logo")
     mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_files_created_by")
+    mock_create_update_letter_branding_event = mocker.patch(
+        "app.main.views.letter_branding.create_update_letter_branding_event"
+    )
 
     branding_id = str(UUID(int=0))
 
@@ -244,6 +264,11 @@ def test_update_letter_branding_with_new_file_and_new_details(
         temp_logo, f"letters/static/images/letter-template/{fake_uuid}-new_file.svg"
     )
     mock_delete_temp_files.assert_called_once_with(fake_uuid)
+    mock_create_update_letter_branding_event.assert_called_once_with(
+        letter_branding_id=branding_id,
+        updated_by_id=fake_uuid,
+        old_letter_branding={"id": branding_id, "name": "HM Government", "filename": "hm-government"},
+    )
 
 
 def test_update_letter_branding_does_not_save_to_db_if_uploading_fails(
@@ -254,6 +279,9 @@ def test_update_letter_branding_does_not_save_to_db_if_uploading_fails(
     fake_uuid,
 ):
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
+    mock_create_update_letter_branding_event = mocker.patch(
+        "app.main.views.letter_branding.create_update_letter_branding_event"
+    )
     mocker.patch("app.main.views.letter_branding.upload_letter_svg_logo", side_effect=BotoClientError({}, "error"))
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="new_file.svg")
 
@@ -268,6 +296,7 @@ def test_update_letter_branding_does_not_save_to_db_if_uploading_fails(
     assert page.select_one("h1").text == "Update letter branding"
     assert page.select_one(".error-message").text.strip() == "Error saving uploaded file - try uploading again"
     assert not mock_client_update.called
+    assert not mock_create_update_letter_branding_event.called
 
 
 def test_create_letter_branding_does_not_show_branding_info(

@@ -25,6 +25,9 @@ class Branding(JSONModel):
     def name_like(self, name):
         return email_safe(name, whitespace="") == email_safe(self.name, whitespace="")
 
+    def serialize(self):
+        return self._dict.copy()
+
 
 class EmailBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {
@@ -91,9 +94,6 @@ class EmailBranding(Branding):
     def logo_url(self):
         if self.logo:
             return f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{self.logo}"
-
-    def serialize(self):
-        return self._dict.copy()
 
 
 class LetterBranding(Branding):
