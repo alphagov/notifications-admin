@@ -391,7 +391,6 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_ele
     mocker,
     client_request,
     platform_admin_user,
-    fake_uuid,
     svg_contents,
     expected_error,
 ):
@@ -455,7 +454,7 @@ def test_create_letter_branding_deletes_temp_files_when_uploading_a_new_file(
     assert page.select_one("h1").text == "Add letter branding"
 
 
-def test_create_new_letter_branding_shows_preview_of_logo(mocker, client_request, platform_admin_user, fake_uuid):
+def test_create_new_letter_branding_shows_preview_of_logo(client_request, platform_admin_user, fake_uuid):
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="temp.svg")
 
     client_request.login(platform_admin_user)
@@ -469,7 +468,7 @@ def test_create_new_letter_branding_shows_preview_of_logo(mocker, client_request
 
 
 def test_create_letter_branding_shows_an_error_when_submitting_details_with_no_logo(
-    client_request, platform_admin_user, fake_uuid
+    client_request, platform_admin_user
 ):
     client_request.login(platform_admin_user)
     page = client_request.post(
