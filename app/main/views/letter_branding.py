@@ -66,16 +66,16 @@ def update_letter_branding(branding_id, logo=None):
         db_filename = letter_filename_for_db(logo, session["user_id"])
 
         try:
+            # If a new file has been uploaded, db_filename and letter_branding.filename will be different
+            if db_filename != letter_branding.filename:
+                upload_letter_svg_logo(logo, db_filename, session["user_id"])
+
             letter_branding_client.update_letter_branding(
                 branding_id=branding_id,
                 filename=db_filename,
                 name=letter_branding_details_form.name.data,
                 updated_by_id=current_user.id,
             )
-
-            # If a new file has been uploaded, db_filename and letter_branding.filename will be different
-            if db_filename != letter_branding.filename:
-                upload_letter_svg_logo(logo, db_filename, session["user_id"])
 
             return redirect(url_for("main.letter_branding"))
 
@@ -85,12 +85,6 @@ def update_letter_branding(branding_id, logo=None):
             else:
                 raise e
         except BotoClientError:
-            # we had a problem saving the file - rollback the db changes
-            letter_branding_client.update_letter_branding(
-                branding_id=branding_id,
-                filename=letter_branding.filename,
-                name=letter_branding.name,
-            )
             file_upload_form.file.errors = ["Error saving uploaded file - try uploading again"]
 
     return render_template(

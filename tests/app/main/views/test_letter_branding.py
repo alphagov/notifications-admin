@@ -1,5 +1,5 @@
 from io import BytesIO
-from unittest.mock import Mock, call
+from unittest.mock import Mock
 from uuid import UUID
 
 import pytest
@@ -246,29 +246,28 @@ def test_update_letter_branding_with_new_file_and_new_details(
     mock_delete_temp_files.assert_called_once_with(fake_uuid)
 
 
-def test_update_letter_branding_rolls_back_db_changes_and_shows_error_if_saving_to_s3_fails(
-    mocker, client_request, platform_admin_user, mock_get_letter_branding_by_id, fake_uuid
+def test_update_letter_branding_does_not_save_to_db_if_uploading_fails(
+    mocker,
+    client_request,
+    platform_admin_user,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
 ):
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
     mocker.patch("app.main.views.letter_branding.upload_letter_svg_logo", side_effect=BotoClientError({}, "error"))
-
     temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="new_file.svg")
+
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".update_letter_branding",
         branding_id=fake_uuid,
         logo=temp_logo,
         _data={"name": "Updated name", "operation": "branding-details"},
-        _follow_redirects=True,
+        _expected_status=200,
     )
     assert page.select_one("h1").text == "Update letter branding"
     assert page.select_one(".error-message").text.strip() == "Error saving uploaded file - try uploading again"
-
-    assert mock_client_update.call_count == 2
-    assert mock_client_update.call_args_list == [
-        call(branding_id=fake_uuid, filename=f"{fake_uuid}-new_file", name="Updated name", updated_by_id=fake_uuid),
-        call(branding_id=fake_uuid, filename="hm-government", name="HM Government"),
-    ]
+    assert not mock_client_update.called
 
 
 def test_create_letter_branding_does_not_show_branding_info(
