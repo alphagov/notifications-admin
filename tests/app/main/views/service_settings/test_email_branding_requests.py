@@ -247,7 +247,6 @@ def test_email_branding_request_page_redirects_to_choose_banner_type_page_if_som
         _expected_redirect=url_for(
             "main.email_branding_choose_banner_type",
             service_id=SERVICE_ONE_ID,
-            back_link=".email_branding_request",
             branding_choice="something_else",
         ),
     )

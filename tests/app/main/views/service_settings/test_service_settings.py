@@ -30,6 +30,7 @@ from tests.conftest import (
     TEMPLATE_ONE_ID,
     create_active_user_no_settings_permission,
     create_active_user_with_permissions,
+    create_email_branding_pool,
     create_email_brandings,
     create_letter_contact_block,
     create_multiple_email_reply_to_addresses,
@@ -3970,12 +3971,19 @@ def test_POST_email_branding_enter_government_identity_logo_text(
     "org_type, url_params, back_button_url",
     [
         ("central", {}, ".email_branding_choose_logo"),
-        ("local", {}, ".service_settings"),
+        ("local", {}, ".email_branding_request"),
         ("local", {"back_link": ".email_branding_request"}, ".email_branding_request"),
     ],
 )
 def test_email_branding_choose_banner_type_page(
-    client_request, mocker, service_one, organisation_one, org_type, url_params, back_button_url
+    client_request,
+    mocker,
+    service_one,
+    organisation_one,
+    mock_get_empty_email_branding_pool,
+    org_type,
+    url_params,
+    back_button_url,
 ):
     organisation_one["organisation_type"] = org_type
     service_one["organisation"] = organisation_one
@@ -3994,6 +4002,39 @@ def test_email_branding_choose_banner_type_page(
     assert [radio["value"] for radio in page.select("input[type=radio]")] == ["org_banner", "org"]
 
     assert back_button["href"] == url_for(back_button_url, service_id=SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "organisation_type",
+    (
+        # Anything not Central Government or NHS
+        "emergency_service",
+        "local",
+        "other",
+        "school_or_college",
+    ),
+)
+@pytest.mark.parametrize(
+    "pool_contents",
+    (
+        ".email_branding_request",
+        create_email_branding_pool(),
+    ),
+)
+def test_email_branding_choose_banner_type_page_when_no_organisation(
+    client_request,
+    mocker,
+    service_one,
+    organisation_type,
+    pool_contents,
+):
+    service_one["organisation_type"] = organisation_type
+    service_one["organisation"] = None
+
+    page = client_request.get("main.email_branding_choose_banner_type", service_id=SERVICE_ONE_ID)
+
+    back_button = page.select_one("a.govuk-back-link")
+    assert back_button["href"] == url_for(".email_branding_request", service_id=SERVICE_ONE_ID)
 
 
 @pytest.mark.parametrize(

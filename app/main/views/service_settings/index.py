@@ -1199,7 +1199,6 @@ def email_branding_request(service_id):
             url_for(
                 ".email_branding_choose_banner_type",
                 service_id=current_service.id,
-                back_link=".email_branding_request",
                 branding_choice="something_else",
             )
         )
@@ -1606,13 +1605,19 @@ def email_branding_choose_banner_type(service_id):
             )
 
     org_type = current_service.organisation_type
-    back_link_fallback = ".email_branding_choose_logo" if org_type == "central" else ".service_settings"
+
+    if any(get_email_branding_choices(current_service)):
+        back_view_fallback = ".email_branding_choose_logo" if org_type == "central" else ".email_branding_request"
+        back_view = request.args.get("back_link", back_view_fallback)
+    else:
+        back_view = ".email_branding_request"
+
     return (
         render_template(
             "views/service-settings/branding/add-new-branding/email-branding-choose-banner.html",
             form=form,
             back_link=url_for(
-                request.args.get("back_link", back_link_fallback),
+                back_view,
                 service_id=current_service.id,
                 **_email_branding_flow_query_params(request),
             ),
