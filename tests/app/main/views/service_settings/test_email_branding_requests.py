@@ -800,16 +800,60 @@ def test_email_branding_choose_logo_page(client_request, service_one):
     ]
 
 
-def test_email_branding_choose_logo_page_prevents_xss_attacks(client_request, service_one):
-    service_one["name"] = "<script>evil</script>"
+@pytest.mark.parametrize(
+    "branding_choice, expected_hint",
+    (
+        ("org", "Test organisation branding is not set up yet."),
+        ("govuk_and_org", "GOV.UK and Test organisation branding is not set up yet."),
+        ("something_else", ""),
+        ("", ""),
+    ),
+)
+def test_email_branding_choose_logo_page_shows_not_setup_message(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_organisation,
+    branding_choice,
+    expected_hint,
+):
+    service_one["organisation"] = fake_uuid
     page = client_request.get(
         "main.email_branding_choose_logo",
         service_id=SERVICE_ONE_ID,
+        branding_choice=branding_choice,
+    )
+
+    hint = page.select_one("#branding_options-hint")
+
+    if expected_hint:
+        assert normalize_spaces(hint.text) == expected_hint
+    else:
+        assert not hint
+
+
+def test_email_branding_choose_logo_page_prevents_xss_attacks(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+):
+    service_one["organisation"] = organisation_one
+    organisation_one["name"] = "<script>evil</script>"
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    page = client_request.get(
+        "main.email_branding_choose_logo",
+        service_id=SERVICE_ONE_ID,
+        branding_choice="org",
     )
 
     hint = page.select_one("form .govuk-hint")
     assert not hint.select_one("script")
-    assert service_one["name"] in normalize_spaces(hint.text)
+    assert organisation_one["name"] in normalize_spaces(hint.text)
 
 
 def test_only_central_org_services_can_see_email_branding_choose_logo_page(client_request, service_one):

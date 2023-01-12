@@ -16,19 +16,27 @@
   }) }}
 {% endblock %}
 
+{% set prompt_text -%}
+  {% if branding_choice == "org" %}
+    {{ current_service.organisation_name }} branding is not set up yet.
+  {% elif branding_choice == "govuk_and_org" %}
+    GOV.UK and {{ current_service.organisation_name }} branding is not set up yet.
+  {% endif %}
+{%- endset %}
+
 {% block maincolumn_content %}
   {{ errorSummary(form) }}
 
   {% call form_wrapper() %}
-    {% if current_service.email_branding_id %}
-      {% set param_extensions = {} %}
-    {% else %}
+    {% if prompt_text %}
       {% set param_extensions = {
         "hint":{
-          "text": current_service.name + " branding is not set up yet.",
+          "text": prompt_text,
           "classes": "notify-hint--paragraph",
         }
       } %}
+    {% else %}
+      {% set param_extensions = {} %}
     {% endif %}
     {{ form.branding_options(param_extensions=param_extensions) }}
     {{ page_footer('Continue') }}
