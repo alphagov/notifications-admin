@@ -2131,33 +2131,33 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
 
 class EmailBrandingChooseBanner(Form):
     BANNER_CHOICES_DATA = {
-        "org": {
-            "label": "No banner",
-            "image": {
-                "url": asset_fingerprinter.get_url("images/branding/org.png"),
-                "alt_text": 'An example of an email with the heading "Your logo" in blue text on a white background.',
-                "dimensions": {"width": 404, "height": 454},
-            },
-        },
         "org_banner": {
-            "label": "Coloured banner",
+            "label": "Yes",
             "image": {
                 "url": asset_fingerprinter.get_url("images/branding/org_banner.png"),
                 "alt_text": "An example of an email with a logo on a blue banner.",
                 "dimensions": {"width": 404, "height": 454},
             },
         },
+        "org": {
+            "label": "No",
+            "image": {
+                "url": asset_fingerprinter.get_url("images/branding/org.png"),
+                "alt_text": "An example of an email with a logo on a clear background.",
+                "dimensions": {"width": 404, "height": 454},
+            },
+        },
     }
 
     banner = GovukRadiosWithImagesField(
-        "Add a banner to your logo",
+        "Does your logo appear on a coloured background?",
         choices=tuple((key, value["label"]) for key, value in BANNER_CHOICES_DATA.items()),
         image_data={key: value["image"] for key, value in BANNER_CHOICES_DATA.items()},
     )
 
 
 class EmailBrandingChooseBannerColour(StripWhitespaceForm):
-    hex_colour = HexColourCodeField("Choose a colour for your banner", validators=[DataRequired()])
+    hex_colour = HexColourCodeField("Choose a background colour", validators=[DataRequired()])
 
 
 class EmailBrandingAltTextForm(StripWhitespaceForm):

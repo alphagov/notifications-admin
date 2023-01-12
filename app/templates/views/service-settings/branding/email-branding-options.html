@@ -34,7 +34,9 @@
   {% endif %}
 
   {% call form_wrapper() %}
-    {{ form.options }}
+    {% if not form.something_else_is_only_option %}
+      {{ form.options }}
+    {% endif %}
     {{ page_footer('Continue') }}
   {% endcall %}
 

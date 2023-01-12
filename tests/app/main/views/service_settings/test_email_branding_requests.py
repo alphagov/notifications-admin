@@ -201,6 +201,31 @@ def test_email_branding_request_does_not_show_nhs_branding_twice(
     ]
 
 
+def test_email_branding_request_page_shows_preview_if_something_else_is_only_option(
+    mocker,
+    service_one,
+    client_request,
+    mock_get_email_branding,
+    mock_get_empty_email_branding_pool,
+):
+    service_one["organisation_type"] = "other"
+    mocker.patch(
+        "app.models.service.Service.email_branding_id",
+        new_callable=PropertyMock,
+        return_value="some-random-branding",
+    )
+
+    page = client_request.get(
+        ".email_branding_request",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Change email branding"
+    assert page.select("iframe.branding-preview")
+    assert not page.select("input[type=radio]")
+    assert normalize_spaces(page.select_one("form[method=post] button").text) == "Continue"
+
+
 def test_email_branding_request_page_redirects_to_choose_banner_type_page_if_something_else_is_only_option(
     mocker,
     service_one,
@@ -215,12 +240,14 @@ def test_email_branding_request_page_redirects_to_choose_banner_type_page_if_som
         return_value="some-random-branding",
     )
 
-    client_request.get(
+    client_request.post(
         ".email_branding_request",
         service_id=SERVICE_ONE_ID,
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.email_branding_choose_banner_type", service_id=SERVICE_ONE_ID, back_link=".service_settings"
+            "main.email_branding_choose_banner_type",
+            service_id=SERVICE_ONE_ID,
+            branding_choice="something_else",
         ),
     )
 

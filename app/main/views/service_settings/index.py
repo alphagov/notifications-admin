@@ -1195,10 +1195,16 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
 @user_has_permissions("manage_service")
 def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
-    if form.something_else_is_only_option:
+
+    if form.something_else_is_only_option and request.method == "POST":
         return redirect(
-            url_for(".email_branding_choose_banner_type", service_id=current_service.id, back_link=".service_settings")
+            url_for(
+                ".email_branding_choose_banner_type",
+                service_id=current_service.id,
+                branding_choice="something_else",
+            )
         )
+
     if form.validate_on_submit():
 
         branding_choice = form.options.data
@@ -1601,13 +1607,19 @@ def email_branding_choose_banner_type(service_id):
             )
 
     org_type = current_service.organisation_type
-    back_link_fallback = ".email_branding_choose_logo" if org_type == "central" else ".service_settings"
+
+    if any(get_email_branding_choices(current_service)):
+        back_view_fallback = ".email_branding_choose_logo" if org_type == "central" else ".email_branding_request"
+        back_view = request.args.get("back_link", back_view_fallback)
+    else:
+        back_view = ".email_branding_request"
+
     return (
         render_template(
             "views/service-settings/branding/add-new-branding/email-branding-choose-banner.html",
             form=form,
             back_link=url_for(
-                request.args.get("back_link", back_link_fallback),
+                back_view,
                 service_id=current_service.id,
                 **_email_branding_flow_query_params(request),
             ),
