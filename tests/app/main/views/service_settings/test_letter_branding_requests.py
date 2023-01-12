@@ -3,11 +3,15 @@ from unittest.mock import ANY, PropertyMock
 from urllib.parse import parse_qs, urlparse
 
 import pytest
-from flask import url_for
+from flask import g, url_for
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
+from app.main.views.service_settings.letter_branding import (
+    _should_set_default_org_letter_branding,
+)
 from app.models.branding import LetterBranding
-from tests import organisation_json, sample_uuid
+from app.models.service import Service
+from tests import organisation_json, sample_uuid, service_json
 from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
@@ -581,6 +585,11 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
         "app.main.views.service_settings.letter_branding.letter_branding_client.get_unique_name_for_letter_branding",
         return_value="some unique name",
     )
+
+    mock_should_set_default_org_letter_branding = mocker.patch(
+        "app.main.views.service_settings.letter_branding._should_set_default_org_letter_branding", return_value=False
+    )
+
     mock_add_to_branding_pool = mocker.patch(
         "app.organisations_client.add_brandings_to_letter_branding_pool", return_value=None
     )
@@ -589,6 +598,7 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
         "main.letter_branding_set_name",
         service_id=SERVICE_ONE_ID,
         temp_filename="temp_example",
+        branding_choice="something else",
         _data={"name": "some name"},
         _expected_status=302,
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
@@ -601,6 +611,7 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
         created_by_id=fake_uuid,
     )
     mock_add_to_branding_pool.assert_called_once_with(service_one["organisation"], [fake_uuid])
+    mock_should_set_default_org_letter_branding.assert_called_once_with("something else")
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, letter_branding=fake_uuid)
     mock_flash.assert_called_once_with(
         "You’ve changed your letter branding.",
@@ -608,9 +619,45 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     )
 
 
-def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appropriate():
-    # TODO: this
-    pass
+def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appropriate(
+    client_request,
+    service_one,
+    mock_create_letter_branding,
+    mock_update_service,
+    mock_get_organisation,
+    mock_get_organisation_services,
+    mock_update_organisation,
+    fake_uuid,
+    mocker,
+):
+    service_one["organisation"] = ORGANISATION_ID
+    mock_get_unique_name = mocker.patch(
+        "app.main.views.service_settings.letter_branding.letter_branding_client.get_unique_name_for_letter_branding",
+    )
+    mock_add_to_branding_pool = mocker.patch("app.organisations_client.add_brandings_to_letter_branding_pool")
+
+    mock_should_set_default_org_letter_branding = mocker.patch(
+        "app.main.views.service_settings.letter_branding._should_set_default_org_letter_branding", return_value=True
+    )
+
+    client_request.post(
+        "main.letter_branding_set_name",
+        service_id=SERVICE_ONE_ID,
+        temp_filename="temp_example",
+        branding_choice="organisation",
+        _data={"name": "some name"},
+        _expected_status=302,
+        _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
+    )
+
+    assert mock_get_unique_name.called
+    assert mock_create_letter_branding.called
+    assert mock_add_to_branding_pool.called
+
+    mock_should_set_default_org_letter_branding.assert_called_once_with("organisation")
+    mock_update_organisation.assert_called_once_with(
+        ORGANISATION_ID, cached_service_ids=ANY, letter_branding_id=fake_uuid
+    )
 
 
 def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
@@ -680,3 +727,67 @@ def test_letter_branding_pool_option_changes_letter_branding_when_user_confirms(
     )
     assert page.select_one("h1").text == "Settings"
     assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your letter branding"
+
+
+@pytest.mark.parametrize("branding_choice", [None, "something_else"])
+def test_should_set_default_org_letter_branding_fails_if_branding_choice_is_not_org(
+    client_request, mocker, branding_choice
+):
+    organisation = organisation_json(letter_branding_id=None)
+    service = service_json(organisation_id=organisation["id"])
+    mocker.patch(
+        "app.organisations_client.get_organisation_services",
+        return_value=[service, service_json(id_="5678", restricted=True)],
+    )
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    g.current_service = Service(service)
+
+    assert _should_set_default_org_letter_branding(branding_choice) is False
+
+
+def test_should_set_default_org_letter_branding_fails_if_org_already_has_a_default_branding(client_request, mocker):
+    organisation = organisation_json(letter_branding_id="12345")
+    service = service_json(organisation_id=organisation["id"])
+    mocker.patch(
+        "app.organisations_client.get_organisation_services",
+        return_value=[service, service_json(id_="5678", restricted=True)],
+    )
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    g.current_service = Service(service)
+
+    assert _should_set_default_org_letter_branding("organisation") is False
+
+
+def test_should_set_default_org_letter_branding_fails_if_other_live_services_in_org(client_request, mocker):
+    organisation = organisation_json(letter_branding_id=None)
+    service = service_json(organisation_id=organisation["id"])
+    mocker.patch(
+        "app.organisations_client.get_organisation_services",
+        return_value=[service, service_json(id_="5678", restricted=False)],
+    )
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    g.current_service = Service(service)
+
+    assert _should_set_default_org_letter_branding("organisation") is False
+
+
+# regardless of whether this service is live, we're only interested in other services with
+# different ids when checking for other live services
+@pytest.mark.parametrize("is_service_trial", [True, False])
+def test_should_set_default_org_letter_branding_succeeds_if_all_conditions_are_met(
+    client_request, mocker, is_service_trial
+):
+    organisation = organisation_json(letter_branding_id=None)
+    service = service_json(organisation_id=organisation["id"], restricted=is_service_trial)
+    mocker.patch(
+        "app.organisations_client.get_organisation_services",
+        return_value=[service, service_json(id_="5678", restricted=True)],
+    )
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    g.current_service = Service(service)
+
+    assert _should_set_default_org_letter_branding("organisation") is True

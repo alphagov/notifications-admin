@@ -155,6 +155,19 @@ def letter_branding_upload_branding(service_id):
     )
 
 
+def _should_set_default_org_letter_branding(branding_choice):
+    # 1. the user has chosen ‘[organisation name]’ in the first page of the journey
+    user_chose_org_name = branding_choice == "organisation"
+    # 2. and the organisation doesn’t have default branding already
+    org_doesnt_have_default_branding = current_service.organisation.letter_branding_id is None
+    # 3. and the organisation has no other live services
+    no_other_live_services_in_org = not any(
+        service.id != current_service.id for service in current_service.organisation.live_services
+    )
+
+    return user_chose_org_name and org_doesnt_have_default_branding and no_other_live_services_in_org
+
+
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/set-name", methods=["GET", "POST"])
 def letter_branding_set_name(service_id):
     letter_branding_data = _letter_branding_flow_query_params()
@@ -178,9 +191,8 @@ def letter_branding_set_name(service_id):
             current_service.organisation.id, [new_letter_branding.id]
         )
 
-        # TODO: implement _should_set_default_org_branding for letter branding
-        # if _should_set_default_org_letter_branding(letter_branding_data["branding_choice"]):
-        #     current_service.organisation.update(letter_branding_id=new_letter_branding.id, delete_services_cache=True)
+        if _should_set_default_org_letter_branding(letter_branding_data["branding_choice"]):
+            current_service.organisation.update(letter_branding_id=new_letter_branding.id, delete_services_cache=True)
 
         flash("You’ve changed your letter branding.", "default_with_tick")
 
