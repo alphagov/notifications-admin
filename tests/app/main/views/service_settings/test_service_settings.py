@@ -14,7 +14,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
 import app
-from app.main.views.service_settings.index import _should_set_default_org_branding
+from app.main.views.service_settings.index import _should_set_default_org_email_branding
 from app.models.service import Service
 from tests import (
     find_element_by_tag_and_partial_text,
@@ -4423,8 +4423,8 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
     expected_name,
 ):
     mock_flash = mocker.patch("app.main.views.service_settings.index.flash")
-    mock_should_set_default_org_branding = mocker.patch(
-        "app.main.views.service_settings.index._should_set_default_org_branding", return_value=False
+    mock_should_set_default_org_email_branding = mocker.patch(
+        "app.main.views.service_settings.index._should_set_default_org_email_branding", return_value=False
     )
     mock_add_to_branding_pool = mocker.patch(
         "app.organisations_client.add_brandings_to_email_branding_pool", return_value=None
@@ -4456,7 +4456,7 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
         "You’ve changed your email branding. Send yourself an email to make sure it looks OK.",
         "default_with_tick",
     )
-    mock_should_set_default_org_branding.assert_called_once_with(None)
+    mock_should_set_default_org_email_branding.assert_called_once_with(None)
 
 
 def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_appropriate(
@@ -4473,8 +4473,8 @@ def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_a
     mocker,
 ):
     service_one["organisation"] = ORGANISATION_ID
-    mock_should_set_default_org_branding = mocker.patch(
-        "app.main.views.service_settings.index._should_set_default_org_branding", return_value=True
+    mock_should_set_default_org_email_branding = mocker.patch(
+        "app.main.views.service_settings.index._should_set_default_org_email_branding", return_value=True
     )
     mock_add_to_branding_pool = mocker.patch(
         "app.organisations_client.add_brandings_to_email_branding_pool", return_value=None
@@ -4499,7 +4499,7 @@ def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_a
         created_by_id=active_user_with_permissions["id"],
     )
     mock_add_to_branding_pool.assert_called_once_with(service_one["organisation"], [fake_uuid])
-    mock_should_set_default_org_branding.assert_called_once_with("organisation")
+    mock_should_set_default_org_email_branding.assert_called_once_with("organisation")
     mock_update_organisation.assert_called_once_with(
         ORGANISATION_ID, cached_service_ids=ANY, email_branding_id=fake_uuid
     )
@@ -6210,7 +6210,9 @@ def test_service_set_broadcast_channel_makes_you_choose(
 
 
 @pytest.mark.parametrize("branding_choice", [None, "govuk_and_org", "something_else"])
-def test_should_set_default_org_branding_fails_if_branding_choice_is_not_org(client_request, mocker, branding_choice):
+def test_should_set_default_org_email_branding_fails_if_branding_choice_is_not_org(
+    client_request, mocker, branding_choice
+):
     organisation = organisation_json(email_branding_id=None, organisation_type="local")
     service = service_json(organisation_id=organisation["id"], organisation_type="local")
     mocker.patch(
@@ -6221,10 +6223,10 @@ def test_should_set_default_org_branding_fails_if_branding_choice_is_not_org(cli
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
     g.current_service = Service(service)
 
-    assert _should_set_default_org_branding(branding_choice) is False
+    assert _should_set_default_org_email_branding(branding_choice) is False
 
 
-def test_should_set_default_org_branding_fails_if_org_already_has_a_default_branding(client_request, mocker):
+def test_should_set_default_org_email_branding_fails_if_org_already_has_a_default_branding(client_request, mocker):
     organisation = organisation_json(email_branding_id="12345", organisation_type="local")
     service = service_json(organisation_id=organisation["id"], organisation_type="local")
     mocker.patch(
@@ -6235,10 +6237,10 @@ def test_should_set_default_org_branding_fails_if_org_already_has_a_default_bran
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
     g.current_service = Service(service)
 
-    assert _should_set_default_org_branding("organisation") is False
+    assert _should_set_default_org_email_branding("organisation") is False
 
 
-def test_should_set_default_org_branding_fails_if_org_is_central(client_request, mocker):
+def test_should_set_default_org_email_branding_fails_if_org_is_central(client_request, mocker):
     organisation = organisation_json(email_branding_id=None, organisation_type="central")
     service = service_json(organisation_id=organisation["id"], organisation_type="central")
     mocker.patch(
@@ -6249,10 +6251,10 @@ def test_should_set_default_org_branding_fails_if_org_is_central(client_request,
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
     g.current_service = Service(service)
 
-    assert _should_set_default_org_branding("organisation") is False
+    assert _should_set_default_org_email_branding("organisation") is False
 
 
-def test_should_set_default_org_branding_fails_if_other_live_services_in_org(client_request, mocker):
+def test_should_set_default_org_email_branding_fails_if_other_live_services_in_org(client_request, mocker):
     organisation = organisation_json(email_branding_id=None, organisation_type="local")
     service = service_json(organisation_id=organisation["id"], organisation_type="local")
     mocker.patch(
@@ -6263,13 +6265,15 @@ def test_should_set_default_org_branding_fails_if_other_live_services_in_org(cli
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
     g.current_service = Service(service)
 
-    assert _should_set_default_org_branding("organisation") is False
+    assert _should_set_default_org_email_branding("organisation") is False
 
 
 # regardless of whether this service is live, we're only interested in other services with
 # different ids when checking for other live services
 @pytest.mark.parametrize("is_service_trial", [True, False])
-def test_should_set_default_org_branding_succeeds_if_all_conditions_are_met(client_request, mocker, is_service_trial):
+def test_should_set_default_org_email_branding_succeeds_if_all_conditions_are_met(
+    client_request, mocker, is_service_trial
+):
     organisation = organisation_json(email_branding_id=None, organisation_type="local")
     service = service_json(organisation_id=organisation["id"], organisation_type="local", restricted=is_service_trial)
     mocker.patch(
@@ -6280,4 +6284,4 @@ def test_should_set_default_org_branding_succeeds_if_all_conditions_are_met(clie
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
     g.current_service = Service(service)
 
-    assert _should_set_default_org_branding("organisation") is True
+    assert _should_set_default_org_email_branding("organisation") is True
