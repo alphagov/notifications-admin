@@ -37,6 +37,17 @@ def test_get_all_letter_branding(mocker):
     )
 
 
+def test_get_unique_name_for_letter_branding(mocker):
+    mock_post = mocker.patch(
+        "app.notify_client.letter_branding_client.LetterBrandingClient.post", return_value={"name": "some unique name"}
+    )
+
+    ret = LetterBrandingClient().get_unique_name_for_letter_branding("some name")
+
+    mock_post.assert_called_once_with(url="/letter-branding/get-unique-name", data={"name": "some name"})
+    assert ret == "some unique name"
+
+
 def test_create_letter_branding(mocker):
     new_branding = {"filename": "uuid-test", "name": "my letters", "created_by_id": "1234"}
 

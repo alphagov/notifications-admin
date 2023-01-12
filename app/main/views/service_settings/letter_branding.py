@@ -4,7 +4,7 @@ from flask import current_app, flash, redirect, render_template, request, url_fo
 from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app import current_service, organisations_client
+from app import current_service, letter_branding_client, organisations_client
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
@@ -166,8 +166,9 @@ def letter_branding_set_name(service_id):
     form = LetterBrandingNameForm()
 
     if form.validate_on_submit():
-        # TODO: Handle name already existing
-        new_letter_branding = LetterBranding.create(name=form.name.data, filename=temp_filename)
+        name = letter_branding_client.get_unique_name_for_letter_branding(form.name.data)
+
+        new_letter_branding = LetterBranding.create(name=name, filename=temp_filename)
 
         # set as service branding
         current_service.update(letter_branding=new_letter_branding.id)

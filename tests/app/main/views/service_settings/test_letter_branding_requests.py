@@ -475,7 +475,7 @@ def test_POST_letter_branding_upload_branding_scans_for_viruses(client_request, 
 def test_POST_letter_branding_upload_branding_redirects_on_success(
     client_request, mock_antivirus_virus_free, fake_uuid, mocker
 ):
-    mock_upload_email_logo = mocker.patch(
+    mock_upload_letter_logo = mocker.patch(
         "app.main.views.service_settings.letter_branding.upload_letter_temp_logo",
         return_value="some/path/temp_logo_url.svg",
     )
@@ -498,14 +498,14 @@ def test_POST_letter_branding_upload_branding_redirects_on_success(
         ),
     )
 
-    mock_upload_email_logo.assert_called_once_with(
+    mock_upload_letter_logo.assert_called_once_with(
         "branding.svg",  # filename
         b"<svg></svg>",  # file data
         "eu-west-1",  # region
         user_id=fake_uuid,
         unique_id=ANY,
     )
-    mock_get_filename.assert_called_once_with(mock_upload_email_logo.return_value)
+    mock_get_filename.assert_called_once_with(mock_upload_letter_logo.return_value)
 
 
 def test_GET_letter_branding_set_name_renders(client_request, service_one):
@@ -577,9 +577,14 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     mocker,
 ):
     mock_flash = mocker.patch("app.main.views.service_settings.letter_branding.flash")
+    mock_get_unique_name = mocker.patch(
+        "app.main.views.service_settings.letter_branding.letter_branding_client.get_unique_name_for_letter_branding",
+        return_value="some unique name",
+    )
     mock_add_to_branding_pool = mocker.patch(
         "app.organisations_client.add_brandings_to_letter_branding_pool", return_value=None
     )
+
     client_request.post(
         "main.letter_branding_set_name",
         service_id=SERVICE_ONE_ID,
@@ -588,9 +593,11 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
         _expected_status=302,
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
     )
+
+    mock_get_unique_name.assert_called_once_with("some name")
     mock_create_letter_branding.assert_called_once_with(
         filename="temp_example",
-        name="some name",
+        name="some unique name",
         created_by_id=fake_uuid,
     )
     mock_add_to_branding_pool.assert_called_once_with(service_one["organisation"], [fake_uuid])
