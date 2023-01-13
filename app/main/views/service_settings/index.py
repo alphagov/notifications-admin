@@ -1321,7 +1321,7 @@ def email_branding_something_else(service_id):
         **_email_branding_flow_query_params(request),
     )
     return render_template(
-        "views/service-settings/branding/email-branding-something-else.html",
+        "views/service-settings/branding/branding-something-else.html",
         form=form,
         back_link=back_link,
     )
