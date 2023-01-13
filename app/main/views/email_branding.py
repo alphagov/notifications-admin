@@ -33,18 +33,33 @@ def email_branding():
 
 
 @main.route(
-    "/email-branding/<uuid:branding_id>/edit", methods=["GET", "POST"], endpoint="platform_admin_update_email_branding"
-)
-@main.route(
-    "/email-branding/<uuid:branding_id>/edit/<logo>",
-    methods=["GET", "POST"],
-    endpoint="platform_admin_update_email_branding",
+    "/email-branding/<uuid:branding_id>", methods=["GET", "POST"], endpoint="platform_admin_view_email_branding"
 )
 @main.route(
     "/email-branding/<uuid:branding_id>/archive",
     methods=["GET"],
     endpoint="platform_admin_confirm_archive_email_branding",
 )
+def platform_admin_view_email_branding(branding_id):
+    email_branding = EmailBranding.from_id(branding_id)
+
+    if request.endpoint == "main.platform_admin_confirm_archive_email_branding":
+        if email_branding.is_used_by_orgs_or_services:
+            flash("This email branding is in use. You cannot delete it.")
+        else:
+            flash("Are you sure you want to delete this email branding?", "delete")
+
+    return render_template(
+        "views/email-branding/view-branding.html",
+        email_branding=email_branding,
+        cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
+        branding_orgs=email_branding.organisations,
+        branding_services=email_branding.services,
+    )
+
+
+@main.route("/email-branding/<uuid:branding_id>/edit", methods=["GET", "POST"])
+@main.route("/email-branding/<uuid:branding_id>/edit/<logo>", methods=["GET", "POST"])
 @user_is_platform_admin
 def platform_admin_update_email_branding(branding_id, logo=None):
     email_branding = EmailBranding.from_id(branding_id)
@@ -97,12 +112,6 @@ def platform_admin_update_email_branding(branding_id, logo=None):
 
         if not form.errors:
             return redirect(url_for(".email_branding", branding_id=branding_id))
-
-    if request.endpoint == "main.platform_admin_confirm_archive_email_branding":
-        if email_branding.is_used_by_orgs_or_services:
-            flash("This branding is used and so it can't be archived.")
-        else:
-            flash("Are you sure you want to archive this email branding?", "archive")
 
     return (
         render_template(

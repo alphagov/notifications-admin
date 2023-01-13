@@ -34,12 +34,78 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
         "org 5",
     ]
     assert hrefs == [
-        url_for(".platform_admin_update_email_branding", branding_id=1),
-        url_for(".platform_admin_update_email_branding", branding_id=2),
-        url_for(".platform_admin_update_email_branding", branding_id=3),
-        url_for(".platform_admin_update_email_branding", branding_id=4),
-        url_for(".platform_admin_update_email_branding", branding_id=5),
+        url_for(".platform_admin_view_email_branding", branding_id=1),
+        url_for(".platform_admin_view_email_branding", branding_id=2),
+        url_for(".platform_admin_view_email_branding", branding_id=3),
+        url_for(".platform_admin_view_email_branding", branding_id=4),
+        url_for(".platform_admin_view_email_branding", branding_id=5),
     ]
+
+
+def test_view_email_branding_with_services_but_no_orgs(
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_no_orgs,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_view_email_branding", branding_id=fake_uuid)
+
+    assert page.select_one(".hint").text.strip() == "No organisations use this branding as their default."
+
+    list_of_service_links = page.select(".browse-list-item")
+
+    link_1 = list_of_service_links[0].select_one("a")
+    assert link_1.text.strip() == "service 1"
+    assert link_1["href"] == url_for(".service_settings", service_id="1234")
+
+    link_2 = list_of_service_links[1].select_one("a")
+    assert link_2.text.strip() == "service 2"
+    assert link_2["href"] == url_for(".service_settings", service_id="5678")
+
+
+def test_view_email_branding_with_org_but_no_services(
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_no_services,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_view_email_branding", branding_id=fake_uuid)
+
+    assert page.select_one(".hint").text.strip() == "No services use this branding."
+
+    list_of_organisation_links = page.select(".browse-list-item")
+
+    link_1 = list_of_organisation_links[0].select_one("a")
+    assert link_1.text.strip() == "organisation 1"
+    assert link_1["href"] == url_for(".organisation_settings", org_id="1234")
+
+
+def test_view_email_branding_bottom_links(
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_empty,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_view_email_branding", branding_id=fake_uuid)
+
+    bottom_links = page.select(".page-footer-link")
+
+    edit_link = bottom_links[0].select_one("a")
+    assert edit_link.text.strip() == "Edit this branding"
+    assert edit_link["href"] == url_for(".platform_admin_update_email_branding", branding_id=fake_uuid)
+
+    archive_link = bottom_links[1].select_one("a")
+    assert archive_link.text.strip() == "Delete this branding"
+    assert archive_link["href"] == url_for(".platform_admin_confirm_archive_email_branding", branding_id=fake_uuid)
 
 
 def test_edit_email_branding_shows_the_correct_branding_info(
@@ -57,22 +123,6 @@ def test_edit_email_branding_shows_the_correct_branding_info(
     assert page.select_one("#file").attrs.get("accept") == ".png"
     assert page.select_one("#text").attrs.get("value") == "Organisation text"
     assert page.select_one("#colour").attrs.get("value") == "f00"
-
-
-def test_edit_email_branding_shows_the_archive_button(
-    client_request, platform_admin_user, mock_get_email_branding, fake_uuid
-):
-    client_request.login(platform_admin_user)
-    page = client_request.get(
-        ".platform_admin_update_email_branding",
-        branding_id=fake_uuid,
-        _test_page_title=False,  # TODO: Fix page titles
-    )
-
-    archive_link = page.select_one(".govuk-link--destructive")
-
-    assert archive_link.text.strip() == "Archive this branding"
-    assert archive_link["href"] == url_for(".platform_admin_confirm_archive_email_branding", branding_id=fake_uuid)
 
 
 def test_create_email_branding_does_not_show_any_branding_info(client_request, platform_admin_user):
@@ -560,19 +610,15 @@ def test_update_email_branding_with_unique_name_conflict(
 
 
 def test_platform_admin_confirm_archive_email_branding(
-    client_request, platform_admin_user, mock_get_email_branding, fake_uuid, mocker
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_empty,
 ):
     client_request.login(platform_admin_user)
-    mocker.patch(
-        "app.email_branding_client.get_orgs_and_services_associated_with_branding",
-        return_value={"data": {"services": [], "organisations": []}},
-    )
 
-    page = client_request.get(
-        ".platform_admin_confirm_archive_email_branding",
-        branding_id=fake_uuid,
-        _test_page_title=False,  # TODO: Fix page titles
-    )
+    page = client_request.get(".platform_admin_confirm_archive_email_branding", branding_id=fake_uuid)
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
         "Are you sure you want to delete this email branding? Yes, delete"
@@ -582,20 +628,15 @@ def test_platform_admin_confirm_archive_email_branding(
 
 
 def test_platform_admin_confirm_archive_email_branding_that_is_in_use(
-    client_request, platform_admin_user, mock_get_email_branding, fake_uuid, mocker
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_no_orgs,
 ):
     client_request.login(platform_admin_user)
 
-    mocker.patch(
-        "app.email_branding_client.get_orgs_and_services_associated_with_branding",
-        return_value={"data": {"services": [{"name": "ABC", "id": "1234"}], "organisations": []}},
-    )
-
-    page = client_request.get(
-        ".platform_admin_confirm_archive_email_branding",
-        branding_id=fake_uuid,
-        _test_page_title=False,  # TODO: Fix page titles
-    )
+    page = client_request.get(".platform_admin_confirm_archive_email_branding", branding_id=fake_uuid)
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
         "This email branding is in use. You cannot delete it."

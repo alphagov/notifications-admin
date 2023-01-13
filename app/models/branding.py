@@ -101,6 +101,18 @@ class EmailBranding(Branding):
 
         return len(orgs_and_services["services"]) > 0 or len(orgs_and_services["organisations"]) > 0
 
+    @property
+    def organisations(self):
+        orgs_and_services = email_branding_client.get_orgs_and_services_associated_with_branding(self.id)["data"]
+
+        return orgs_and_services["organisations"]
+
+    @property
+    def services(self):
+        orgs_and_services = email_branding_client.get_orgs_and_services_associated_with_branding(self.id)["data"]
+
+        return orgs_and_services["services"]
+
 
 class LetterBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {"filename"}
