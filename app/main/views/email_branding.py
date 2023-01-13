@@ -1,12 +1,4 @@
-from flask import (
-    abort,
-    current_app,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
+from flask import abort, current_app, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
@@ -58,17 +50,17 @@ def platform_admin_update_email_branding(branding_id, logo=None):
     if form.validate_on_submit():
         if form.file.data:
             upload_filename = upload_email_logo(
-                form.file.data.filename, form.file.data, current_app.config["AWS_REGION"], user_id=session["user_id"]
+                form.file.data.filename, form.file.data, current_app.config["AWS_REGION"], user_id=current_user.id
             )
 
-            if logo and logo.startswith(TEMP_TAG.format(user_id=session["user_id"])):
+            if logo and logo.startswith(TEMP_TAG.format(user_id=current_user.id)):
                 delete_email_temp_file(logo)
 
             return redirect(
                 url_for(".platform_admin_update_email_branding", branding_id=branding_id, logo=upload_filename)
             )
 
-        updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
+        updated_logo_name = permanent_email_logo_name(logo, current_user.id) if logo else None
 
         try:
             email_branding_client.update_email_branding(
@@ -95,7 +87,7 @@ def platform_admin_update_email_branding(branding_id, logo=None):
         if logo:
             persist_logo(logo, updated_logo_name)
 
-        delete_email_temp_files_created_by(session["user_id"])
+        delete_email_temp_files_created_by(current_user.id)
 
         if not form.errors:
             return redirect(url_for(".email_branding", branding_id=branding_id))
@@ -150,7 +142,7 @@ def create_email_branding_government_identity_colour():
             email_safe(filename),
             image_file.resolve().read_bytes(),
             current_app.config["AWS_REGION"],
-            user_id=session["user_id"],
+            user_id=current_user.id,
         )
         return redirect(
             url_for(
@@ -183,15 +175,15 @@ def platform_admin_create_email_branding(logo=None):
     if form.validate_on_submit():
         if form.file.data:
             upload_filename = upload_email_logo(
-                form.file.data.filename, form.file.data, current_app.config["AWS_REGION"], user_id=session["user_id"]
+                form.file.data.filename, form.file.data, current_app.config["AWS_REGION"], user_id=current_user.id
             )
 
-            if logo and logo.startswith(TEMP_TAG.format(user_id=session["user_id"])):
+            if logo and logo.startswith(TEMP_TAG.format(user_id=current_user.id)):
                 delete_email_temp_file(logo)
 
             return redirect(url_for("main.platform_admin_create_email_branding", logo=upload_filename))
 
-        updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
+        updated_logo_name = permanent_email_logo_name(logo, current_user.id) if logo else None
 
         try:
             email_branding_client.create_email_branding(
@@ -212,7 +204,7 @@ def platform_admin_create_email_branding(logo=None):
         if logo:
             persist_logo(logo, updated_logo_name)
 
-        delete_email_temp_files_created_by(session["user_id"])
+        delete_email_temp_files_created_by(current_user.id)
 
         if not form.errors:
             return redirect(url_for(".email_branding"))

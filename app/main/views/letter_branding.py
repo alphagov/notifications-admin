@@ -1,5 +1,5 @@
 from botocore.exceptions import ClientError as BotoClientError
-from flask import current_app, redirect, render_template, request, session, url_for
+from flask import current_app, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
@@ -55,21 +55,21 @@ def update_letter_branding(branding_id, logo=None):
             file_upload_form.file.data.filename,
             file_upload_form.file.data,
             current_app.config["AWS_REGION"],
-            user_id=session["user_id"],
+            user_id=current_user.id,
         )
 
-        if logo.startswith(LETTER_TEMP_TAG.format(user_id=session["user_id"])):
+        if logo.startswith(LETTER_TEMP_TAG.format(user_id=current_user.id)):
             delete_letter_temp_file(logo)
 
         return redirect(url_for(".update_letter_branding", branding_id=branding_id, logo=upload_filename))
 
     if details_form_submitted and letter_branding_details_form.validate_on_submit():
-        db_filename = letter_filename_for_db(logo, session["user_id"])
+        db_filename = letter_filename_for_db(logo, current_user.id)
 
         try:
             # If a new file has been uploaded, db_filename and letter_branding.filename will be different
             if db_filename != letter_branding.filename:
-                upload_letter_svg_logo(logo, db_filename, session["user_id"])
+                upload_letter_svg_logo(logo, db_filename, current_user.id)
 
             letter_branding_client.update_letter_branding(
                 branding_id=branding_id,
@@ -118,22 +118,22 @@ def create_letter_branding(logo=None):
             file_upload_form.file.data.filename,
             file_upload_form.file.data,
             current_app.config["AWS_REGION"],
-            user_id=session["user_id"],
+            user_id=current_user.id,
         )
 
-        if logo and logo.startswith(LETTER_TEMP_TAG.format(user_id=session["user_id"])):
+        if logo and logo.startswith(LETTER_TEMP_TAG.format(user_id=current_user.id)):
             delete_letter_temp_file(logo)
 
         return redirect(url_for(".create_letter_branding", logo=upload_filename))
 
     if details_form_submitted and letter_branding_details_form.validate_on_submit():
         if logo:
-            db_filename = letter_filename_for_db(logo, session["user_id"])
+            db_filename = letter_filename_for_db(logo, current_user.id)
 
             try:
                 LetterBranding.create(filename=db_filename, name=letter_branding_details_form.name.data)
 
-                upload_letter_svg_logo(logo, db_filename, session["user_id"])
+                upload_letter_svg_logo(logo, db_filename, current_user.id)
 
                 return redirect(url_for("main.letter_branding"))
 
