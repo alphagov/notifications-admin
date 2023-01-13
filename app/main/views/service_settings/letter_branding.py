@@ -11,6 +11,7 @@ from app.main.forms import (
     ChooseLetterBrandingForm,
     LetterBrandingNameForm,
     LetterBrandingUploadBranding,
+    SomethingElseBrandingForm,
 )
 from app.models.branding import LetterBranding
 from app.s3_client.s3_logo_client import (
@@ -62,7 +63,6 @@ def letter_branding_request(service_id):
 
         # TODO: when the upload flow is ready:
         # remove the platform admin check here
-        # remove the zendesk stuff from here
         # remove the textbox that is hidden under the something else option from the form
         # clean up the tests to remove all reference to the "something_else" field
         if current_user.platform_admin:
@@ -74,6 +74,19 @@ def letter_branding_request(service_id):
                 )
             )
 
+    return render_template(
+        "views/service-settings/branding/letter-branding-options.html",
+        form=form,
+        from_template=from_template,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/something-else", methods=["GET", "POST"])
+def letter_branding_something_else(service_id):
+    form = SomethingElseBrandingForm()
+    from_template = _letter_branding_flow_query_params()["from_template"]
+
+    if form.validate_on_submit():
         ticket_message = render_template(
             "support-tickets/branding-request.txt",
             current_branding=current_service.letter_branding.name or "no",
@@ -91,6 +104,7 @@ def letter_branding_request(service_id):
         )
         zendesk_client.send_ticket_to_zendesk(ticket)
         flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
+
         return redirect(
             url_for(".view_template", service_id=current_service.id, template_id=from_template)
             if from_template
@@ -98,9 +112,14 @@ def letter_branding_request(service_id):
         )
 
     return render_template(
-        "views/service-settings/branding/letter-branding-options.html",
+        "views/service-settings/branding/branding-something-else.html",
         form=form,
         from_template=from_template,
+        back_link=url_for(
+            ".letter_branding_upload_branding",
+            service_id=current_service.id,
+            **_letter_branding_flow_query_params(),
+        ),
     )
 
 
@@ -182,7 +201,7 @@ def letter_branding_upload_branding(service_id):
             **_letter_branding_flow_query_params(branding_choice=None),
         ),
         # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
-        abandon_flow_link=url_for(".support"),
+        abandon_flow_link=url_for(".letter_branding_something_else", service_id=current_service.id),
     )
 
 

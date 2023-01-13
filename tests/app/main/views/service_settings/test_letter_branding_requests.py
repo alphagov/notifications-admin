@@ -168,81 +168,6 @@ def test_letter_branding_request_redirects_to_branding_preview_for_a_branding_po
 
 
 @pytest.mark.parametrize(
-    "org_name, expected_organisation",
-    (
-        (None, "Can’t tell (domain is user.gov.uk)"),
-        ("Test Organisation", "Test Organisation"),
-    ),
-)
-def test_letter_branding_request_submit_choose_something_else(
-    client_request,
-    service_one,
-    mocker,
-    mock_get_letter_branding_by_id,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
-    mock_get_empty_letter_branding_pool,
-    org_name,
-    expected_organisation,
-):
-    service_one["letter_branding"] = sample_uuid()
-    organisation_id = ORGANISATION_ID if org_name else None
-
-    mocker.patch(
-        "app.models.service.Service.organisation_id",
-        new_callable=PropertyMock,
-        return_value=organisation_id,
-    )
-    mocker.patch(
-        "app.organisations_client.get_organisation",
-        return_value=organisation_json(name=org_name),
-    )
-
-    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
-    mock_send_ticket_to_zendesk = mocker.patch(
-        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
-        autospec=True,
-    )
-
-    page = client_request.post(
-        ".letter_branding_request",
-        service_id=SERVICE_ONE_ID,
-        _data={
-            "options": "something_else",
-            "something_else": "Homer Simpson",
-        },
-        _follow_redirects=True,
-    )
-
-    mock_create_ticket.assert_called_once_with(
-        ANY,
-        message="\n".join(
-            [
-                "Organisation: {}",
-                "Service: service one",
-                "http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb",
-                "",
-                "---",
-                "Current branding: HM Government",
-                "Branding requested:\n\nHomer Simpson",
-            ]
-        ).format(expected_organisation),
-        subject="Letter branding request - service one",
-        ticket_type="question",
-        user_name="Test User",
-        user_email="test@user.gov.uk",
-        org_id=organisation_id,
-        org_type="central",
-        service_id=SERVICE_ONE_ID,
-    )
-    mock_send_ticket_to_zendesk.assert_called_once()
-    assert normalize_spaces(page.select_one(".banner-default").text) == (
-        "Thanks for your branding request. We’ll get back to you within one working day."
-    )
-
-
-@pytest.mark.parametrize(
     "data, error_message",
     (
         ({"options": "something_else"}, "Cannot be empty"),  # no data in 'something_else' textbox
@@ -274,64 +199,6 @@ def test_letter_branding_request_submit_when_form_has_missing_data(
     )
     assert page.select_one("h1").text == "Change letter branding"
     assert normalize_spaces(page.select_one(".error-message").text) == error_message
-
-
-@pytest.mark.parametrize("from_template", [None, TEMPLATE_ONE_ID])
-def test_letter_branding_request_submit_redirects_if_from_template_is_set(
-    client_request,
-    service_one,
-    mocker,
-    mock_get_empty_letter_branding_pool,
-    from_template,
-):
-    mocker.patch("app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True)
-    data = {"options": "something_else", "something_else": "Homer Simpson"}
-
-    if from_template:
-        client_request.post(
-            ".letter_branding_request",
-            service_id=SERVICE_ONE_ID,
-            from_template=from_template,
-            _data=data,
-            _expected_redirect=url_for(
-                "main.view_template",
-                service_id=SERVICE_ONE_ID,
-                template_id=from_template,
-            ),
-        )
-    else:
-        client_request.post(
-            ".letter_branding_request",
-            service_id=SERVICE_ONE_ID,
-            _data=data,
-            _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
-        )
-
-
-def test_letter_branding_submit_when_something_else_is_only_option(
-    client_request,
-    service_one,
-    mocker,
-    mock_get_letter_branding_by_id,
-):
-    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
-    mocker.patch(
-        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
-        autospec=True,
-    )
-
-    client_request.post(
-        ".letter_branding_request",
-        service_id=SERVICE_ONE_ID,
-        _data={
-            "something_else": "Homer Simpson",
-        },
-    )
-
-    assert (
-        "Current branding: no\nBranding requested:\n\nHomer Simpson"
-        in mock_create_ticket.call_args_list[0][1]["message"]
-    )
 
 
 def test_letter_branding_request_redirects_to_upload_logo_for_platform_admins(
@@ -378,6 +245,78 @@ def test_letter_branding_request_redirects_to_nhs_page(
     )
 
 
+def test_GET_letter_branding_something_else_renders_form(
+    client_request,
+    mock_get_letter_branding_by_id,
+):
+    page = client_request.get(".letter_branding_something_else", service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one("h1").text) == "Describe the branding you want"
+    assert page.select_one("textarea")["name"] == "something_else"
+    assert normalize_spaces(page.select_one(".page-footer button").text) == "Request new branding"
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.letter_branding_upload_branding",
+        service_id=SERVICE_ONE_ID,
+    )
+
+
+@pytest.mark.parametrize(
+    "org_id, expected_org_name",
+    [
+        (ORGANISATION_ID, "Test organisation"),
+        (None, "Can’t tell (domain is user.gov.uk)"),
+    ],
+)
+@pytest.mark.parametrize("query_params", [{"from_template": "1234-1234-1234"}, {}])
+def test_POST_letter_branding_something_else_creates_zendesk_ticket(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_letter_branding_by_id,
+    mock_get_organisation,
+    query_params,
+    org_id,
+    expected_org_name,
+):
+    mock_send_zendesk = mocker.patch("app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk")
+    service_one["organisation"] = org_id
+
+    client_request.post(
+        ".letter_branding_something_else",
+        service_id=SERVICE_ONE_ID,
+        **query_params,
+        _data={
+            "something_else": "Homer Simpson",
+        },
+        _expected_redirect=(
+            url_for("main.view_template", service_id=SERVICE_ONE_ID, template_id=query_params["from_template"])
+            if query_params
+            else url_for("main.service_settings", service_id=SERVICE_ONE_ID)
+        ),
+    )
+
+    mock_send_zendesk.assert_called_once()
+    zendesk_ticket = mock_send_zendesk.call_args[0][0]
+    assert zendesk_ticket.message.split("\n") == [
+        f"Organisation: {expected_org_name}",
+        "Service: service one",
+        "http://localhost/services/596364a0-858e-42c8-9062-a8fe822260eb",
+        "",
+        "---",
+        "Current branding: no",
+        "Branding requested:",
+        "",
+        "Homer Simpson",
+    ]
+    assert zendesk_ticket.subject == "Letter branding request - service one"
+    assert zendesk_ticket.ticket_type == "question"
+    assert zendesk_ticket.user_name == "Test User"
+    assert zendesk_ticket.user_email == "test@user.gov.uk"
+    assert zendesk_ticket.org_id == org_id
+    assert zendesk_ticket.org_type == "central"
+    assert zendesk_ticket.service_id == SERVICE_ONE_ID
+
+
 def test_GET_letter_branding_upload_branding_renders_form(
     client_request,
     service_one,
@@ -399,7 +338,7 @@ def test_GET_letter_branding_upload_branding_renders_form(
     assert file_input["name"] == "branding"
 
     assert abandon_flow_link is not None
-    assert abandon_flow_link["href"] == url_for("main.support")
+    assert abandon_flow_link["href"] == url_for("main.letter_branding_something_else", service_id=SERVICE_ONE_ID)
     assert abandon_flow_link.text == "I do not have a file to upload"
 
 

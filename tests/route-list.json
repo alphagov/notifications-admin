@@ -236,6 +236,7 @@
     "/services/<uuid:service_id>/service-settings/letter-branding/nhs",
     "/services/<uuid:service_id>/service-settings/letter-branding/pool",
     "/services/<uuid:service_id>/service-settings/letter-branding/set-name",
+    "/services/<uuid:service_id>/service-settings/letter-branding/something-else",
     "/services/<uuid:service_id>/service-settings/letter-branding/upload-branding",
     "/services/<uuid:service_id>/service-settings/letter-contact/<uuid:letter_contact_id>/delete",
     "/services/<uuid:service_id>/service-settings/letter-contact/<uuid:letter_contact_id>/edit",
