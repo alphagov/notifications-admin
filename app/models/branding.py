@@ -25,6 +25,9 @@ class Branding(JSONModel):
     def name_like(self, name):
         return email_safe(name, whitespace="") == email_safe(self.name, whitespace="")
 
+    def serialize(self):
+        return self._dict.copy()
+
 
 class EmailBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {
@@ -92,9 +95,6 @@ class EmailBranding(Branding):
         if self.logo:
             return f"https://{current_app.config['LOGO_CDN_DOMAIN']}/{self.logo}"
 
-    def serialize(self):
-        return self._dict.copy()
-
 
 class LetterBranding(Branding):
     ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {"filename"}
@@ -108,7 +108,11 @@ class LetterBranding(Branding):
         filename,
     ):
         # TODO: rename temp to non-temp and clean up temp files
-        new_letter_branding = letter_branding_client.create_letter_branding(name=name, filename=filename)
+        new_letter_branding = letter_branding_client.create_letter_branding(
+            name=name,
+            filename=filename,
+            created_by_id=current_user.id,
+        )
         return cls(new_letter_branding)
 
     @classmethod

@@ -1,8 +1,10 @@
 from botocore.exceptions import ClientError as BotoClientError
 from flask import current_app, redirect, render_template, request, session, url_for
+from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import letter_branding_client
+from app.event_handlers import create_update_letter_branding_event
 from app.main import main
 from app.main.forms import (
     AdminEditLetterBrandingForm,
@@ -65,25 +67,23 @@ def update_letter_branding(branding_id, logo=None):
         db_filename = letter_filename_for_db(logo, session["user_id"])
 
         try:
-            if db_filename == letter_branding.filename:
-
-                letter_branding_client.update_letter_branding(
-                    branding_id=branding_id,
-                    filename=db_filename,
-                    name=letter_branding_details_form.name.data,
-                )
-
-                return redirect(url_for("main.letter_branding"))
-            else:
-                letter_branding_client.update_letter_branding(
-                    branding_id=branding_id,
-                    filename=db_filename,
-                    name=letter_branding_details_form.name.data,
-                )
-
+            # If a new file has been uploaded, db_filename and letter_branding.filename will be different
+            if db_filename != letter_branding.filename:
                 upload_letter_svg_logo(logo, db_filename, session["user_id"])
 
-                return redirect(url_for("main.letter_branding"))
+            letter_branding_client.update_letter_branding(
+                branding_id=branding_id,
+                filename=db_filename,
+                name=letter_branding_details_form.name.data,
+                updated_by_id=current_user.id,
+            )
+            create_update_letter_branding_event(
+                letter_branding_id=branding_id,
+                updated_by_id=current_user.id,
+                old_letter_branding=letter_branding.serialize(),
+            )
+
+            return redirect(url_for("main.letter_branding"))
 
         except HTTPError as e:
             if "name" in e.message:
@@ -91,12 +91,6 @@ def update_letter_branding(branding_id, logo=None):
             else:
                 raise e
         except BotoClientError:
-            # we had a problem saving the file - rollback the db changes
-            letter_branding_client.update_letter_branding(
-                branding_id=branding_id,
-                filename=letter_branding.filename,
-                name=letter_branding.name,
-            )
             file_upload_form.file.errors = ["Error saving uploaded file - try uploading again"]
 
     return render_template(
@@ -137,10 +131,7 @@ def create_letter_branding(logo=None):
             db_filename = letter_filename_for_db(logo, session["user_id"])
 
             try:
-                letter_branding_client.create_letter_branding(
-                    filename=db_filename,
-                    name=letter_branding_details_form.name.data,
-                )
+                LetterBranding.create(filename=db_filename, name=letter_branding_details_form.name.data)
 
                 upload_letter_svg_logo(logo, db_filename, session["user_id"])
 
