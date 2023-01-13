@@ -62,17 +62,15 @@ def letter_branding_request(service_id):
             )
 
         # TODO: when the upload flow is ready:
-        # remove the platform admin check here
         # remove the textbox that is hidden under the something else option from the form
         # clean up the tests to remove all reference to the "something_else" field
-        if current_user.platform_admin:
-            return redirect(
-                url_for(
-                    ".letter_branding_upload_branding",
-                    service_id=current_service.id,
-                    **_letter_branding_flow_query_params(branding_choice=branding_choice),
-                )
+        return redirect(
+            url_for(
+                ".letter_branding_upload_branding",
+                service_id=current_service.id,
+                **_letter_branding_flow_query_params(branding_choice=branding_choice),
             )
+        )
 
     return render_template(
         "views/service-settings/branding/letter-branding-options.html",

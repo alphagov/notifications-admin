@@ -201,11 +201,8 @@ def test_letter_branding_request_submit_when_form_has_missing_data(
     assert normalize_spaces(page.select_one(".error-message").text) == error_message
 
 
-def test_letter_branding_request_redirects_to_upload_logo_for_platform_admins(
-    client_request, platform_admin_user, service_one, mocker
-):
+def test_letter_branding_request_redirects_to_upload_logo(client_request, mocker):
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
-    client_request.login(platform_admin_user)
 
     client_request.post(
         ".letter_branding_request",
