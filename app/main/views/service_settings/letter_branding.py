@@ -132,6 +132,7 @@ def letter_branding_upload_branding(service_id):
             user_id=current_user.id,
             unique_id=upload_id,
         )
+        f'{upload_id}.svg'
         temp_filename = get_letter_filename_with_no_path_or_extension(branding_filename)
         return redirect(
             url_for(

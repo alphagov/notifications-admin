@@ -1,3 +1,5 @@
+import uuid
+
 from flask import (
     abort,
     current_app,
@@ -32,7 +34,9 @@ from app.s3_client.s3_logo_client import (
     delete_email_temp_files_created_by,
     permanent_email_logo_name,
     persist_logo,
+    persist_logo_2,
     upload_email_logo,
+    upload_email_logo_2,
 )
 from app.utils.user import user_is_platform_admin
 
@@ -182,20 +186,26 @@ def platform_admin_create_email_branding(logo=None):
 
     if form.validate_on_submit():
         if form.file.data:
-            upload_filename = upload_email_logo(
-                form.file.data.filename, form.file.data, current_app.config["AWS_REGION"], user_id=session["user_id"]
-            )
 
-            if logo and logo.startswith(TEMP_TAG.format(user_id=session["user_id"])):
-                delete_email_temp_file(logo)
+            # NOTE: what do we want to name the logo?
+            upload_filename = str(uuid.uuid4())
+            upload_email_logo_2(upload_filename, form.file.data)
+
+            # upload_filename = upload_email_logo(
+            #     form.file.data.filename, form.file.data, current_app.config["AWS_REGION"], user_id=session["user_id"]
+            # )
+
+            # if logo and logo.startswith(TEMP_TAG.format(user_id=session["user_id"])):
+            #     delete_email_temp_file(logo)
 
             return redirect(url_for("main.platform_admin_create_email_branding", logo=upload_filename))
 
-        updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
+        # updated_logo_name = permanent_email_logo_name(logo, session["user_id"]) if logo else None
 
         try:
+            # logo can be None because a brand doesn't need a logo
             email_branding_client.create_email_branding(
-                logo=updated_logo_name,
+                logo=logo or None,
                 name=form.name.data,
                 alt_text=form.alt_text.data,
                 text=form.text.data,
@@ -209,10 +219,14 @@ def platform_admin_create_email_branding(logo=None):
             else:
                 raise e
 
-        if logo:
-            persist_logo(logo, updated_logo_name)
+        # copy the logo to a version without the tag
+        # either delete the old version, or don't bother
 
-        delete_email_temp_files_created_by(session["user_id"])
+        if logo:
+            # persist_logo(logo, updated_logo_name)
+            persist_logo_2(logo)
+
+        # delete_email_temp_files_created_by(session["user_id"])
 
         if not form.errors:
             return redirect(url_for(".email_branding"))

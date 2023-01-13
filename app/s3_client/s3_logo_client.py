@@ -1,6 +1,6 @@
 import uuid
 
-from boto3 import resource
+from boto3 import client, resource
 from flask import current_app
 from notifications_utils.s3 import s3upload as utils_s3upload
 
@@ -27,6 +27,15 @@ def persist_logo(old_name, new_name):
     bucket_name = current_app.config["LOGO_UPLOAD_BUCKET_NAME"]
     get_s3_object(bucket_name, new_name).copy_from(CopySource="{}/{}".format(bucket_name, old_name))
     delete_s3_object(old_name)
+
+
+def persist_logo_2(logo):
+    """
+    This removes all tags from a given logo
+    """
+    s3 = client("s3")
+    bucket_name = current_app.config["LOGO_UPLOAD_BUCKET_NAME"]
+    return s3.delete_object_tagging(bucket_name, logo)
 
 
 def get_s3_objects_filter_by_prefix(prefix):
@@ -60,6 +69,18 @@ def upload_email_logo(filename, filedata, region, user_id, unique_id: str = None
     )
 
     return upload_file_name
+
+
+def upload_email_logo_2(filename, filedata):
+    bucket_name = current_app.config["LOGO_UPLOAD_BUCKET_NAME"]
+    utils_s3upload(
+        filedata=filedata,
+        region=current_app.config["AWS_REGION"],
+        bucket_name=bucket_name,
+        file_location=filename,
+        tags={"temporary": "true"},
+        content_type="image/png",
+    )
 
 
 def upload_letter_temp_logo(filename, filedata, region, user_id, unique_id: str = None):
