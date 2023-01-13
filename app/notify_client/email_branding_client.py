@@ -48,7 +48,7 @@ class EmailBrandingClient(NotifyAdminAPIClient):
     @cache.delete("email_branding-{branding_id}")
     @cache.delete_by_pattern("organisation-*-email-branding-pool")
     def archive_email_branding(self, branding_id):
-        return self.post(url=f"/email-branding/{branding_id}/delete", data=None)
+        return self.post(url=f"/email-branding/{branding_id}/archive", data=None)
 
     def get_orgs_and_services_associated_with_branding(self, branding_id):
         return self.get(url=f"/email-branding/{branding_id}/orgs_and_services")
