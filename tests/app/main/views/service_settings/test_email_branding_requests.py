@@ -747,8 +747,8 @@ def test_email_branding_something_else_submit(
                 "",
                 "---",
                 "Current branding: Organisation name",
-                "Branding requested: Something else\n",
-                "Homer Simpson\n",
+                "Branding requested:\n",
+                "Homer Simpson",
             ]
         ),
         subject="Email branding request - service one",

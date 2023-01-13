@@ -1167,13 +1167,10 @@ def link_service_to_organisation(service_id):
     )
 
 
-def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
-    form = ChooseEmailBrandingForm(current_service)
-
+def create_email_branding_zendesk_ticket(detail=None):
     ticket_message = render_template(
         "support-tickets/branding-request.txt",
         current_branding=current_service.email_branding.name,
-        branding_requested=dict(form.options.choices)[form_option_selected],
         detail=detail,
     )
     ticket = NotifySupportTicket(
@@ -1306,7 +1303,7 @@ def email_branding_something_else(service_id):
     form = SomethingElseBrandingForm()
 
     if form.validate_on_submit():
-        create_email_branding_zendesk_ticket("something_else", detail=form.something_else.data)
+        create_email_branding_zendesk_ticket(detail=form.something_else.data)
 
         flash(THANKS_FOR_BRANDING_REQUEST_MESSAGE, "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))

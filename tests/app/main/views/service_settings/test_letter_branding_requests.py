@@ -225,7 +225,7 @@ def test_letter_branding_request_submit_choose_something_else(
                 "",
                 "---",
                 "Current branding: HM Government",
-                "Branding requested: Something else\n\nHomer Simpson\n",
+                "Branding requested:\n\nHomer Simpson",
             ]
         ).format(expected_organisation),
         subject="Letter branding request - service one",
@@ -329,8 +329,9 @@ def test_letter_branding_submit_when_something_else_is_only_option(
     )
 
     assert (
-        "Current branding: no\nBranding requested: Something else\n" "\nHomer Simpson"
-    ) in mock_create_ticket.call_args_list[0][1]["message"]
+        "Current branding: no\nBranding requested:\n\nHomer Simpson"
+        in mock_create_ticket.call_args_list[0][1]["message"]
+    )
 
 
 def test_letter_branding_request_redirects_to_upload_logo_for_platform_admins(

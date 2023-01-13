@@ -77,7 +77,6 @@ def letter_branding_request(service_id):
         ticket_message = render_template(
             "support-tickets/branding-request.txt",
             current_branding=current_service.letter_branding.name or "no",
-            branding_requested=dict(form.options.choices)[form.options.data],
             detail=form.something_else.data,
         )
         ticket = NotifySupportTicket(

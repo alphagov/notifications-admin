@@ -8,7 +8,6 @@ Service: {{ current_service.name }}
 
 ---
 Current branding: {{ current_branding }}
-Branding requested: {{ branding_requested }}
-{% if detail %}
+Branding requested:
+
 {{ detail }}
-{% endif %}
