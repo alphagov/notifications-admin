@@ -10,6 +10,9 @@ class LetterBrandingClient(NotifyAdminAPIClient):
     def get_all_letter_branding(self):
         return self.get(url="/letter-branding")
 
+    def get_unique_name_for_letter_branding(self, name):
+        return self.post(url="/letter-branding/get-unique-name", data={"name": name})["name"]
+
     @cache.delete("letter_branding")
     def create_letter_branding(self, *, filename, name, created_by_id):
         data = {

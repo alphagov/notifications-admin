@@ -1491,7 +1491,7 @@ def email_branding_upload_logo(service_id):
     )
 
 
-def _should_set_default_org_branding(branding_choice):
+def _should_set_default_org_email_branding(branding_choice):
     # 1. the user has chosen ‘[organisation name]’ in the first page of the journey
     user_chose_org_name = branding_choice == "organisation"
     # 2. and the organisation doesn’t have default branding already
@@ -1540,7 +1540,7 @@ def email_branding_set_alt_text(service_id):
             current_service.organisation.id, [new_email_branding.id]
         )
 
-        if _should_set_default_org_branding(branding_choice):
+        if _should_set_default_org_email_branding(branding_choice):
             current_service.organisation.update(email_branding_id=new_email_branding.id, delete_services_cache=True)
 
         flash(

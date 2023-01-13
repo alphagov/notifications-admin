@@ -4,7 +4,7 @@ from flask import current_app, flash, redirect, render_template, request, url_fo
 from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app import current_service, organisations_client
+from app import current_service, letter_branding_client, organisations_client
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
@@ -155,6 +155,19 @@ def letter_branding_upload_branding(service_id):
     )
 
 
+def _should_set_default_org_letter_branding(branding_choice):
+    # 1. the user has chosen ‘[organisation name]’ in the first page of the journey
+    user_chose_org_name = branding_choice == "organisation"
+    # 2. and the organisation doesn’t have default branding already
+    org_doesnt_have_default_branding = current_service.organisation.letter_branding_id is None
+    # 3. and the organisation has no other live services
+    no_other_live_services_in_org = not any(
+        service.id != current_service.id for service in current_service.organisation.live_services
+    )
+
+    return user_chose_org_name and org_doesnt_have_default_branding and no_other_live_services_in_org
+
+
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/set-name", methods=["GET", "POST"])
 def letter_branding_set_name(service_id):
     letter_branding_data = _letter_branding_flow_query_params()
@@ -166,8 +179,9 @@ def letter_branding_set_name(service_id):
     form = LetterBrandingNameForm()
 
     if form.validate_on_submit():
-        # TODO: Handle name already existing
-        new_letter_branding = LetterBranding.create(name=form.name.data, filename=temp_filename)
+        name = letter_branding_client.get_unique_name_for_letter_branding(form.name.data)
+
+        new_letter_branding = LetterBranding.create(name=name, filename=temp_filename)
 
         # set as service branding
         current_service.update(letter_branding=new_letter_branding.id)
@@ -177,9 +191,8 @@ def letter_branding_set_name(service_id):
             current_service.organisation.id, [new_letter_branding.id]
         )
 
-        # TODO: implement _should_set_default_org_branding for letter branding
-        # if _should_set_default_org_letter_branding(letter_branding_data["branding_choice"]):
-        #     current_service.organisation.update(letter_branding_id=new_letter_branding.id, delete_services_cache=True)
+        if _should_set_default_org_letter_branding(letter_branding_data["branding_choice"]):
+            current_service.organisation.update(letter_branding_id=new_letter_branding.id, delete_services_cache=True)
 
         flash("You’ve changed your letter branding.", "default_with_tick")
 
