@@ -79,7 +79,7 @@ from app.models.branding import (
     LetterBranding,
 )
 from app.models.organisation import Organisation
-from app.s3_client.s3_logo_client import upload_email_logo
+from app.s3_client.s3_logo_client import permanent_email_logo_name, upload_email_logo
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -1526,6 +1526,8 @@ def email_branding_set_alt_text(service_id):
     if form.validate_on_submit():
         # we use this key to keep track of user choices through the journey but we don't use it to save the branding
         branding_choice = email_branding_data.pop("branding_choice")
+
+        email_branding_data["logo"] = permanent_email_logo_name(email_branding_data["logo"], current_user.id)
 
         new_email_branding = EmailBranding.create(
             alt_text=form.alt_text.data,

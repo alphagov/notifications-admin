@@ -4433,13 +4433,13 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
         "main.email_branding_set_alt_text",
         service_id=service_one["id"],
         brand_type=brand_type,
-        logo="example.png",
+        logo=f"temp-{fake_uuid}_{fake_uuid}-example.png",
         _data={"alt_text": "some alt text"},
         _expected_status=302,
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
     )
     mock_create_email_branding.assert_called_once_with(
-        logo="example.png",
+        logo=f"{fake_uuid}-example.png",
         name=expected_name,
         alt_text="some alt text",
         text=None,
@@ -4483,14 +4483,14 @@ def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_a
         "main.email_branding_set_alt_text",
         service_id=service_one["id"],
         brand_type="org",
-        logo="example.png",
+        logo=f"temp-{fake_uuid}_{fake_uuid}-example.png",
         branding_choice="organisation",
         _data={"alt_text": "some alt text"},
         _expected_status=302,
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
     )
     mock_create_email_branding.assert_called_once_with(
-        logo="example.png",
+        logo=f"{fake_uuid}-example.png",
         name="some alt text",
         alt_text="some alt text",
         text=None,

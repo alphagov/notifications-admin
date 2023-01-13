@@ -15,6 +15,7 @@ from app.main.forms import (
 from app.models.branding import LetterBranding
 from app.s3_client.s3_logo_client import (
     get_letter_filename_with_no_path_or_extension,
+    letter_filename_for_db,
     upload_letter_temp_logo,
 )
 from app.utils.user import user_has_permissions
@@ -181,7 +182,8 @@ def letter_branding_set_name(service_id):
     if form.validate_on_submit():
         name = letter_branding_client.get_unique_name_for_letter_branding(form.name.data)
 
-        new_letter_branding = LetterBranding.create(name=name, filename=temp_filename)
+        db_filename = letter_filename_for_db(temp_filename, current_user.id)
+        new_letter_branding = LetterBranding.create(name=name, filename=db_filename)
 
         # set as service branding
         current_service.update(letter_branding=new_letter_branding.id)

@@ -11,6 +11,7 @@ from app.main.views.service_settings.letter_branding import (
 )
 from app.models.branding import LetterBranding
 from app.models.service import Service
+from app.s3_client.s3_logo_client import LETTER_PREFIX
 from tests import organisation_json, sample_uuid, service_json
 from tests.conftest import (
     ORGANISATION_ID,
@@ -597,7 +598,7 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     client_request.post(
         "main.letter_branding_set_name",
         service_id=SERVICE_ONE_ID,
-        temp_filename="temp_example",
+        temp_filename=f"{LETTER_PREFIX}temp-{fake_uuid}_{fake_uuid}_example.svg",
         branding_choice="something else",
         _data={"name": "some name"},
         _expected_status=302,
@@ -606,7 +607,7 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
 
     mock_get_unique_name.assert_called_once_with("some name")
     mock_create_letter_branding.assert_called_once_with(
-        filename="temp_example",
+        filename=f"{fake_uuid}_example",
         name="some unique name",
         created_by_id=fake_uuid,
     )
