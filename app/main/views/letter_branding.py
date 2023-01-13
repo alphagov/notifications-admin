@@ -57,11 +57,6 @@ def update_letter_branding(branding_id, logo=None):
             current_app.config["AWS_REGION"],
             user_id=session["user_id"],
         )
-        create_update_letter_branding_event(
-            letter_branding_id=branding_id,
-            updated_by_id=current_user.id,
-            old_letter_branding=letter_branding.serialize(),
-        )
 
         if logo.startswith(LETTER_TEMP_TAG.format(user_id=session["user_id"])):
             delete_letter_temp_file(logo)

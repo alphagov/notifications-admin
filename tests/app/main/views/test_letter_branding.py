@@ -59,7 +59,7 @@ def test_update_letter_branding_shows_the_current_letter_brand(
     assert page.select_one("#file").attrs.get("accept") == ".svg"
 
 
-def test_update_letter_branding_with_new_valid_file(
+def test_update_letter_branding_with_new_valid_file_shows_page_with_file_preview(
     mocker, client_request, platform_admin_user, mock_get_letter_branding_by_id, fake_uuid
 ):
     with client_request.session_transaction() as session:
@@ -72,9 +72,6 @@ def test_update_letter_branding_with_new_valid_file(
     mocker.patch("app.s3_client.s3_logo_client.uuid.uuid4", return_value=fake_uuid)
     mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-    mock_create_update_letter_branding_event = mocker.patch(
-        "app.main.views.letter_branding.create_update_letter_branding_event"
-    )
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -89,12 +86,6 @@ def test_update_letter_branding_with_new_valid_file(
 
     assert mock_s3_upload.called
     assert mock_delete_temp_files.called is False
-
-    mock_create_update_letter_branding_event.assert_called_once_with(
-        letter_branding_id=fake_uuid,
-        updated_by_id=fake_uuid,
-        old_letter_branding={"id": fake_uuid, "name": "HM Government", "filename": "hm-government"},
-    )
 
 
 def test_update_letter_branding_when_uploading_invalid_file(
