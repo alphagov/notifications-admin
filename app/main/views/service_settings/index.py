@@ -1191,15 +1191,6 @@ def create_email_branding_zendesk_ticket(detail=None):
 def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
 
-    if form.something_else_is_only_option and request.method == "POST":
-        return redirect(
-            url_for(
-                ".email_branding_choose_banner_type",
-                service_id=current_service.id,
-                branding_choice="something_else",
-            )
-        )
-
     if form.validate_on_submit():
 
         branding_choice = form.options.data

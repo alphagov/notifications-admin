@@ -28,7 +28,10 @@
   {% endif %}
 
   {% call form_wrapper() %}
-    {% if not form.something_else_is_only_option %}
+    {# make something_else always selected if it's the only thing available #}
+    {% if form.something_else_is_only_option %}
+      <input type="hidden" name="options" value="something_else"/>
+    {% else %}
       {{ form.options }}
     {% endif %}
 

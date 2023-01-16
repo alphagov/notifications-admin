@@ -243,11 +243,13 @@ def test_email_branding_request_page_redirects_to_choose_banner_type_page_if_som
     client_request.post(
         ".email_branding_request",
         service_id=SERVICE_ONE_ID,
+        _data={"options": "something_else"},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.email_branding_choose_banner_type",
             service_id=SERVICE_ONE_ID,
             branding_choice="something_else",
+            back_link=".email_branding_request",
         ),
     )
 

@@ -202,7 +202,7 @@ def test_letter_branding_request_does_not_error_when_no_options_available_at_all
     client_request.post(
         ".letter_branding_request",
         service_id=SERVICE_ONE_ID,
-        _data={},
+        _data={"options": "something_else"},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.letter_branding_upload_branding",

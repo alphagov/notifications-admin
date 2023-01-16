@@ -46,15 +46,6 @@ def letter_branding_request(service_id):
     form = ChooseLetterBrandingForm(current_service)
     from_template = request.args.get("from_template")
 
-    if form.something_else_is_only_option and request.method == "POST":
-        return redirect(
-            url_for(
-                ".letter_branding_upload_branding",
-                service_id=current_service.id,
-                **_letter_branding_flow_query_params(branding_choice="something_else"),
-            )
-        )
-
     if form.validate_on_submit():
         branding_choice = form.options.data
 
