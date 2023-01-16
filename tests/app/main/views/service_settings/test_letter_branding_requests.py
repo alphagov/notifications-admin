@@ -162,7 +162,7 @@ def test_letter_branding_request_redirects_to_branding_preview_for_a_branding_po
     )
 
 
-def test_letter_branding_request_submit_when_form_has_missing_data(
+def test_letter_branding_request_errors_when_no_option_selected(
     client_request,
     mocker,
     service_one,
@@ -177,14 +177,39 @@ def test_letter_branding_request_submit_when_form_has_missing_data(
     service_one["letter_branding"] = sample_uuid()
     service_one["organisation"] = organisation_one
 
-    page = client_request.post(
-        ".letter_branding_request",
-        service_id=SERVICE_ONE_ID,
-        _data={"options": ""},
-        _follow_redirects=True,
-    )
+    page = client_request.post(".letter_branding_request", service_id=SERVICE_ONE_ID, _data={}, _expected_status=200)
     assert page.select_one("h1").text == "Change letter branding"
     assert normalize_spaces(page.select_one(".error-message").text) == "Select an option"
+
+
+def test_letter_branding_request_does_not_error_when_no_options_available_at_all(
+    client_request,
+    mocker,
+    service_one,
+    organisation_one,
+    mock_get_letter_branding_by_id,
+    mock_get_empty_letter_branding_pool,
+):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+    # a non-nhs service with no org and no existing branding will only have "something else" available
+    # so we won't show them any options
+    service_one["letter_branding"] = None
+    service_one["organisation"] = None
+
+    client_request.post(
+        ".letter_branding_request",
+        service_id=SERVICE_ONE_ID,
+        _data={},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.letter_branding_upload_branding",
+            service_id=SERVICE_ONE_ID,
+            branding_choice="something_else",
+        ),
+    )
 
 
 def test_letter_branding_request_redirects_to_upload_logo(client_request, mocker):
