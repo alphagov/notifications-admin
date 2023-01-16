@@ -1,6 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radio %}
-{% from "components/select-input.html" import select_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -31,11 +29,7 @@
 
   {% call form_wrapper() %}
     {% if not form.something_else_is_only_option %}
-      {% call select_wrapper(form.options) %}
-        {% for option in form.options %}
-          {{ radio(option) }}
-        {% endfor %}
-      {% endcall %}
+      {{ form.options }}
     {% endif %}
 
     {{ page_footer('Continue') }}

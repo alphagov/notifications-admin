@@ -179,7 +179,7 @@ def test_letter_branding_request_errors_when_no_option_selected(
 
     page = client_request.post(".letter_branding_request", service_id=SERVICE_ONE_ID, _data={}, _expected_status=200)
     assert page.select_one("h1").text == "Change letter branding"
-    assert normalize_spaces(page.select_one(".error-message").text) == "Select an option"
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select an option"
 
 
 def test_letter_branding_request_does_not_error_when_no_options_available_at_all(

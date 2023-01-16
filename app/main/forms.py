@@ -2061,12 +2061,25 @@ class ChooseEmailBrandingForm(ChooseBrandingForm):
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):
-    options = RadioField("Choose your new letter branding")
+    options = GovukRadiosField(
+        "Choose your new letter branding",
+        param_extensions={
+            "fieldset": {
+                "legend": {
+                    # This removes the `govuk-fieldset__legend--s` class, thereby
+                    # making the form label font regular weight, not bold
+                    "classes": "",
+                },
+            },
+        },
+    )
 
     def __init__(self, service):
         super().__init__()
-
-        self.options.choices = tuple(OrderedSet(list(branding.get_letter_choices(service)) + [self.FALLBACK_OPTION]))
+        choices = OrderedSet(branding.get_letter_choices(service))
+        if len(choices) > 2:
+            choices = choices | {GovukRadiosField.Divider("or")}
+        self.options.choices = tuple(choices | {self.FALLBACK_OPTION})
 
 
 class SomethingElseBrandingForm(StripWhitespaceForm):
