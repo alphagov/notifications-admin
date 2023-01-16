@@ -45,7 +45,7 @@ from tests.conftest import (
                 ("something_else", "Something else"),
             ],
         ),
-        ("other", False, [], None),
+        ("other", False, [], []),
     ),
 )
 def test_letter_branding_request_page_when_no_branding_is_set(
@@ -87,15 +87,10 @@ def test_letter_branding_request_page_when_no_branding_is_set(
     button_text = normalize_spaces(page.select_one(".page-footer button").text)
     assert button_text == "Continue"
 
-    if expected_options:
-        assert [
-            (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
-            for radio in page.select("input[type=radio]")
-        ] == expected_options
-        assert page.select_one(".conditional-radios-panel#panel-something-else textarea")["name"] == "something_else"
-    else:
-        assert page.select_one("textarea")["name"] == "something_else"
-        assert not page.select(".conditional-radios-panel")
+    assert [
+        (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
+        for radio in page.select("input[type=radio]")
+    ] == expected_options
 
 
 def test_letter_branding_request_page_when_branding_is_set_already(
@@ -167,13 +162,6 @@ def test_letter_branding_request_redirects_to_branding_preview_for_a_branding_po
     )
 
 
-@pytest.mark.parametrize(
-    "data, error_message",
-    (
-        ({"options": "something_else"}, "Cannot be empty"),  # no data in 'something_else' textbox
-        ({"options": ""}, "Select an option"),  # no radio button selected
-    ),
-)
 def test_letter_branding_request_submit_when_form_has_missing_data(
     client_request,
     mocker,
@@ -181,8 +169,6 @@ def test_letter_branding_request_submit_when_form_has_missing_data(
     organisation_one,
     mock_get_letter_branding_by_id,
     mock_get_empty_letter_branding_pool,
-    data,
-    error_message,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -194,11 +180,11 @@ def test_letter_branding_request_submit_when_form_has_missing_data(
     page = client_request.post(
         ".letter_branding_request",
         service_id=SERVICE_ONE_ID,
-        _data=data,
+        _data={"options": ""},
         _follow_redirects=True,
     )
     assert page.select_one("h1").text == "Change letter branding"
-    assert normalize_spaces(page.select_one(".error-message").text) == error_message
+    assert normalize_spaces(page.select_one(".error-message").text) == "Select an option"
 
 
 def test_letter_branding_request_redirects_to_upload_logo(client_request, mocker):
@@ -207,10 +193,7 @@ def test_letter_branding_request_redirects_to_upload_logo(client_request, mocker
     client_request.post(
         ".letter_branding_request",
         service_id=SERVICE_ONE_ID,
-        _data={
-            "options": "something_else",
-            "something_else": "this text is unused but required to pass form validation",
-        },
+        _data={"options": "something_else"},
         _expected_redirect=url_for(
             "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="something_else"
         ),

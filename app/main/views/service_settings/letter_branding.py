@@ -61,9 +61,6 @@ def letter_branding_request(service_id):
                 url_for(".letter_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
             )
 
-        # TODO: when the upload flow is ready:
-        # remove the textbox that is hidden under the something else option from the form
-        # clean up the tests to remove all reference to the "something_else" field
         return redirect(
             url_for(
                 ".letter_branding_upload_branding",

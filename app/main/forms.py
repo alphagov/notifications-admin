@@ -2062,22 +2062,11 @@ class ChooseEmailBrandingForm(ChooseBrandingForm):
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):
     options = RadioField("Choose your new letter branding")
-    something_else = TextAreaField("Describe the branding you want")
 
     def __init__(self, service):
         super().__init__()
 
         self.options.choices = tuple(OrderedSet(list(branding.get_letter_choices(service)) + [self.FALLBACK_OPTION]))
-
-        if self.something_else_is_only_option:
-            self.options.data = self.FALLBACK_OPTION_VALUE
-
-    def validate_something_else(self, field):
-        if (self.something_else_is_only_option or self.options.data == self.FALLBACK_OPTION_VALUE) and not field.data:
-            raise ValidationError("Cannot be empty")
-
-        if self.options.data != self.FALLBACK_OPTION_VALUE:
-            field.data = ""
 
 
 class SomethingElseBrandingForm(StripWhitespaceForm):
