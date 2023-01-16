@@ -1,6 +1,6 @@
 import uuid
 
-from flask import current_app, flash, redirect, render_template, request, url_for
+from flask import abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
@@ -17,6 +17,7 @@ from app.s3_client.s3_logo_client import (
     get_letter_filename_with_no_path_or_extension,
     upload_letter_temp_logo,
 )
+from app.utils.branding import get_letter_choices as get_letter_branding_choices
 from app.utils.user import user_has_permissions
 
 from .index import THANKS_FOR_BRANDING_REQUEST_MESSAGE
@@ -45,6 +46,14 @@ def letter_branding_request(service_id):
     from_template = request.args.get("from_template")
     if form.validate_on_submit():
         branding_choice = form.options.data
+
+        if branding_choice == LetterBranding.NHS_ID:
+            return redirect(
+                url_for(
+                    ".letter_branding_nhs",
+                    service_id=current_service.id,
+                )
+            )
 
         if branding_choice in current_service.letter_branding_pool.ids:
             return redirect(
@@ -93,6 +102,29 @@ def letter_branding_request(service_id):
         "views/service-settings/branding/letter-branding-options.html",
         form=form,
         from_template=from_template,
+    )
+
+
+def check_letter_branding_allowed_for_service(branding):
+    allowed_branding_for_service = dict(get_letter_branding_choices(current_service))
+
+    if branding not in allowed_branding_for_service:
+        abort(404)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/nhs", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def letter_branding_nhs(service_id):
+    check_letter_branding_allowed_for_service(LetterBranding.NHS_ID)
+
+    if request.method == "POST":
+        current_service.update(letter_branding=LetterBranding.NHS_ID)
+
+        flash("You’ve updated your letter branding", "default")
+        return redirect(url_for(".service_settings", service_id=current_service.id))
+
+    return render_template(
+        "views/service-settings/branding/letter-branding-nhs.html", nhs_branding_id=LetterBranding.NHS_ID
     )
 
 

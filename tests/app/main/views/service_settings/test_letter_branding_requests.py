@@ -349,6 +349,30 @@ def test_letter_branding_request_redirects_to_upload_logo_for_platform_admins(
     mock_create_ticket.assert_not_called()
 
 
+def test_letter_branding_request_redirects_to_nhs_page(
+    client_request,
+    service_one,
+    organisation_one,
+    mocker,
+):
+    service_one["organisation"] = organisation_one["id"]
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.models.branding.LetterBrandingPool.client_method",
+        return_value=[{"name": "NHS", "id": LetterBranding.NHS_ID}],
+    )
+
+    client_request.post(
+        ".letter_branding_request",
+        service_id=SERVICE_ONE_ID,
+        _data={"options": LetterBranding.NHS_ID},
+        _expected_redirect=url_for(
+            "main.letter_branding_nhs",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
+
 def test_GET_letter_branding_upload_branding_renders_form(
     client_request,
     service_one,
@@ -727,6 +751,67 @@ def test_letter_branding_pool_option_changes_letter_branding_when_user_confirms(
     )
     assert page.select_one("h1").text == "Settings"
     assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your letter branding"
+
+
+def test_letter_branding_nhs_page_displays_preview(
+    service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
+):
+    organisation_one["organisation_type"] = "nhs_central"
+    service_one["organisation"] = organisation_one
+    x = mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    page = client_request.get(".letter_branding_nhs", service_id=SERVICE_ONE_ID)
+
+    assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style=LetterBranding.NHS_ID)
+    assert x.called
+    assert mock_get_letter_branding_pool.called
+
+
+def test_letter_branding_nhs_page_returns_404_if_service_not_nhs(
+    service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
+):
+    organisation_one["organisation_type"] = "central"
+    service_one["organisation"] = organisation_one
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    client_request.get(
+        ".letter_branding_nhs",
+        service_id=SERVICE_ONE_ID,
+        branding_option="some-unknown-branding-id",
+        _expected_status=404,
+    )
+
+
+def test_letter_branding_nhs_changes_letter_branding_when_user_confirms(
+    mocker,
+    service_one,
+    organisation_one,
+    client_request,
+    no_reply_to_email_addresses,
+    single_sms_sender,
+    mock_get_letter_branding_pool,
+    mock_update_service,
+):
+    organisation_one["organisation_type"] = "nhs_central"
+    service_one["organisation"] = organisation_one
+
+    mock_flash = mocker.patch("app.main.views.service_settings.letter_branding.flash")
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+
+    client_request.post(
+        ".letter_branding_nhs",
+        service_id=SERVICE_ONE_ID,
+        _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
+    )
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        letter_branding=LetterBranding.NHS_ID,
+    )
+    mock_flash.assert_called_once_with("You’ve updated your letter branding", "default")
 
 
 @pytest.mark.parametrize("branding_choice", [None, "something_else"])
