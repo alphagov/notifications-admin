@@ -5,30 +5,18 @@ def features_nav():
             "link": "main.features",
             "sub_navigation_items": [
                 {
-                    "name": "Emails",
-                    "link": "main.features_email",
+                    "name": "Who can use Notify",
+                    "link": "main.who_can_use_notify",
                 },
                 {
-                    "name": "Text messages",
-                    "link": "main.features_sms",
+                    "name": "Security",
+                    "link": "main.security",
                 },
-                {
-                    "name": "Letters",
-                    "link": "main.features_letters",
-                },
-            ],
+            ],      
         },
         {
             "name": "Roadmap",
             "link": "main.roadmap",
-        },
-        {
-            "name": "Who can use Notify",
-            "link": "main.who_can_use_notify",
-        },
-        {
-            "name": "Security",
-            "link": "main.security",
         },
         {
             "name": "Terms of use",

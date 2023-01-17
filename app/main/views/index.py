@@ -169,22 +169,6 @@ def roadmap():
     return render_template("views/roadmap.html", navigation_links=features_nav())
 
 
-@main.route("/features/email")
-@hide_from_search_engines
-def features_email():
-    return render_template("views/features/emails.html", navigation_links=features_nav())
-
-
-@main.route("/features/sms")
-def features_sms():
-    return render_template("views/features/text-messages.html", navigation_links=features_nav())
-
-
-@main.route("/features/letters")
-def features_letters():
-    return render_template("views/features/letters.html", navigation_links=features_nav())
-
-
 @main.route("/features/security", endpoint="security")
 def security():
     return render_template("views/security.html", navigation_links=features_nav())
@@ -224,12 +208,12 @@ def get_started():
     )
 
 
-@main.route("/using-notify/who-its-for")
+@main.route("/features/who-its-for")
 def who_its_for():
     return redirect(url_for(".who_can_use_notify"), 301)
 
 
-@main.route("/using-notify/who-can-use-notify")
+@main.route("/features/who-can-use-notify")
 def who_can_use_notify():
     return render_template(
         "views/guidance/who-can-use-notify.html",
