@@ -6,6 +6,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/branding-preview.html" import letter_branding_preview %}
 
 {% block service_page_title %}
   Change letter branding
@@ -24,6 +25,10 @@
   <p class="govuk-body">
     Your letters currently have {{ current_service.letter_branding.name or 'no' }} branding.
   </p>
+
+  {% if current_service.letter_branding %}
+    {{ letter_branding_preview(current_service.letter_branding_id) }}
+  {% endif %}
 
   {% call form_wrapper() %}
     {% if form.something_else_is_only_option %}
