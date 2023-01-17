@@ -275,8 +275,9 @@
           <p class="govuk-body">You can only:</p>
 
           <ul class="govuk-list govuk-list--bullet">
-            <li>send {{ current_service.message_limit }} text messages and emails per day</li>
             <li>send messages to yourself and other people in your team</li>
+            <li>send {{ current_service.email_message_limit | message_count('email') }} per day</li>
+            <li>send {{ current_service.sms_message_limit | message_count('sms') }} per day</li>
             <li>create letter templates, but not send them</li>
           </ul>
 
