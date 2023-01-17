@@ -1,8 +1,18 @@
-from flask import abort, make_response, redirect, render_template, request, url_for
+from flask import (
+    abort,
+    current_app,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user
+from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import HTMLEmailTemplate, LetterImageTemplate
 
 from app import letter_branding_client, status_api_client
+from app.formatters import message_count
 from app.main import main
 from app.main.forms import FieldWithNoneOption
 from app.main.views.pricing import CURRENT_SMS_RATE
@@ -253,6 +263,11 @@ def guidance_index():
 def guidance_bulk_sending():
     return render_template(
         "views/guidance/bulk-sending.html",
+        max_spreadsheet_rows=RecipientCSV.max_rows,
+        rate_limits=[
+            message_count(limit, channel)
+            for channel, limit in current_app.config["DEFAULT_LIVE_SERVICE_RATE_LIMITS"].items()
+        ],
         navigation_links=using_notify_nav(),
     )
 
