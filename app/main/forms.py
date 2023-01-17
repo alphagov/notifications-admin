@@ -1143,7 +1143,7 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
 class AdminServiceMessageLimitForm(StripWhitespaceForm):
     message_limit = GovukIntegerField("", validators=[DataRequired(message="Cannot be empty")])
 
-    def __init__(self, notification_type=None, *args, **kwargs):
+    def __init__(self, notification_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.message_limit.label.text = f"Daily {message_count_noun(1, notification_type)} limit"

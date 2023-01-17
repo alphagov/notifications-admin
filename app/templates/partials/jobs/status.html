@@ -26,7 +26,7 @@
     {% endif %}
   {% if job.status == 'sending limits exceeded'%}
     <p class="govuk-error-message">
-        Notify cannot send these messages because you have reached your daily limit. You can only send {{ current_service | message_rate_limit_label(job.template.template_type) }} per day.
+        Notify cannot send these messages because you have reached your daily limit. You can only send {{ current_service.get_message_limit(job.template.template_type) | message_count(job.template.template_type) }} per day.
     </p>
     <p class="govuk-error-message govuk-!-margin-bottom-6">
         Upload this spreadsheet again tomorrow or <a class="govuk-link" href="https://www.notifications.service.gov.uk/support">contact the GOV.UK Notify team</a> to raise the limit.

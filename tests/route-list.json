@@ -260,7 +260,6 @@
     "/services/<uuid:service_id>/service-settings/set-international-letters",
     "/services/<uuid:service_id>/service-settings/set-international-sms",
     "/services/<uuid:service_id>/service-settings/set-letters",
-    "/services/<uuid:service_id>/service-settings/set-message-limit",
     "/services/<uuid:service_id>/service-settings/set-message-limit/<template_type:notification_type>",
     "/services/<uuid:service_id>/service-settings/set-rate-limit",
     "/services/<uuid:service_id>/service-settings/set-reply-to-email",

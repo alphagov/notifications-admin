@@ -111,7 +111,6 @@ def mock_get_service_settings_page_common(
                 "Email limit 1,000 per day Change daily email limit",
                 "SMS limit 1,000 per day Change daily SMS limit",
                 "Letter limit 1,000 per day Change daily letter limit",
-                "Message limit 1,000 per day Change daily message limit",
                 "Free text message allowance 250,000 per year Change free text message allowance",
                 "Email branding GOV.UK Change email branding (admin view)",
                 "Letter branding Not set Change letter branding (admin view)",
@@ -4585,21 +4584,23 @@ def test_POST_email_branding_choose_banner_colour_invalid_hex_code(client_reques
 
 @pytest.mark.parametrize("method", ["get", "post"])
 @pytest.mark.parametrize(
-    "endpoint",
+    "endpoint, extra_args",
     [
-        "main.set_free_sms_allowance",
-        "main.set_message_limit",
-        "main.set_rate_limit",
+        ("main.set_free_sms_allowance", {}),
+        ("main.set_message_limit", {"notification_type": "email"}),
+        ("main.set_rate_limit", {}),
     ],
 )
 def test_organisation_type_pages_are_platform_admin_only(
     client_request,
     method,
     endpoint,
+    extra_args,
 ):
     getattr(client_request, method)(
         endpoint,
         service_id=SERVICE_ONE_ID,
+        **extra_args,
         _expected_status=403,
         _test_page_title=False,
     )
@@ -4648,13 +4649,23 @@ def test_should_set_sms_allowance(
     mock_create_or_update_free_sms_fragment_limit.assert_called_with(SERVICE_ONE_ID, expected_api_argument)
 
 
+@pytest.mark.parametrize(
+    "notification_type, expected_label",
+    (
+        ("email", "Daily email limit"),
+        ("sms", "Daily text message limit"),
+        ("letter", "Daily letter limit"),
+    ),
+)
 def test_should_show_page_to_set_message_limit(
     client_request,
     platform_admin_user,
+    notification_type,
+    expected_label,
 ):
     client_request.login(platform_admin_user)
-    page = client_request.get("main.set_message_limit", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("label").text) == "Daily message limit"
+    page = client_request.get("main.set_message_limit", service_id=SERVICE_ONE_ID, notification_type=notification_type)
+    assert normalize_spaces(page.select_one("label").text) == expected_label
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1000"
 
 
@@ -4671,13 +4682,6 @@ def test_should_show_page_to_set_rate_limit(
 
 
 @pytest.mark.parametrize(
-    "endpoint, field_name",
-    (
-        ("main.set_message_limit", "message_limit"),
-        ("main.set_rate_limit", "rate_limit"),
-    ),
-)
-@pytest.mark.parametrize(
     "new_limit, expected_api_argument",
     [
         ("1", 1),
@@ -4691,20 +4695,18 @@ def test_should_set_message_limit(
     new_limit,
     expected_api_argument,
     mock_update_service,
-    endpoint,
-    field_name,
 ):
     client_request.login(platform_admin_user)
     client_request.post(
-        endpoint,
+        "main.set_rate_limit",
         service_id=SERVICE_ONE_ID,
         _data={
-            field_name: new_limit,
+            "rate_limit": new_limit,
         },
     )
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        **{field_name: expected_api_argument},
+        rate_limit=expected_api_argument,
     )
 
 
