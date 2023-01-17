@@ -275,8 +275,9 @@
           <p class="govuk-body">You can only:</p>
 
           <ul class="govuk-list govuk-list--bullet">
-            <li>send {{ current_service.message_limit }} text messages and emails per day</li>
             <li>send messages to yourself and other people in your team</li>
+            <li>send {{ current_service.email_message_limit | message_count('email') }} per day</li>
+            <li>send {{ current_service.sms_message_limit | message_count('sms') }} per day</li>
             <li>create letter templates, but not send them</li>
           </ul>
 
@@ -291,33 +292,14 @@
 
       {% else %}
         <h2 class="heading-medium top-gutter-0">Your service is live</h2>
-
-        {% if (
-            current_service.email_message_limit > current_service.message_limit
-          ) and (
-            current_service.sms_message_limit > current_service.message_limit
-          ) and (
-            current_service.letter_message_limit > current_service.message_limit
-        ) %}
-          <p class="govuk-body">
-            You can send up to
-            {{ "{:,}".format(current_service.message_limit) }} messages
-            per day.
-          </p>
-          {% else %}
-          <p class="govuk-body">
-            You can send up to:
-            </p>
-            <ul class="govuk-list govuk-list--bullet">
-                <li>{{ "{:,}".format(current_service.email_message_limit) }} {{ current_service.email_message_limit | message_count_noun('email') }} per day
-                </li>
-                <li>{{ "{:,}".format(current_service.sms_message_limit) }} {{ current_service.sms_message_limit | message_count_noun('sms') }} per day
-              </li>
-              <li>{{ "{:,}".format(current_service.letter_message_limit) }} {{ current_service.letter_message_limit | message_count_noun('letter') }} per day
-              </li>
-          </ul>
-        {% endif %}
-
+        <p class="govuk-body">
+          You can send up to:
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>{{ current_service.email_message_limit | message_count('email') }} per day</li>
+          <li>{{ current_service.sms_message_limit | message_count('sms') }} per day</li>
+          <li>{{ current_service.letter_message_limit | message_count('letter') }} per day</li>
+        </ul>
         <p class="govuk-body">
           Problems or comments?
           <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Give feedback</a>.
