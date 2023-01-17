@@ -4683,9 +4683,9 @@ def test_should_show_page_to_set_rate_limit(
     "new_limit, expected_api_argument",
     [
         ("1", 1),
-        ("250000", 250000),
-        ("250,000 ", 250000),
-        (" 250 000", 250000),
+        ("250000", 250_000),
+        ("250,000 ", 250_000),
+        (" 250 000", 250_000),
         pytest.param("foo", "foo", marks=pytest.mark.xfail),
         pytest.param("", "", marks=pytest.mark.xfail),
     ],
