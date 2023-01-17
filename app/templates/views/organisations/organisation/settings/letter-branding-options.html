@@ -46,8 +46,7 @@
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           {{ form.letter_branding_id(value=option.id) }}
           {{ govukButton({
-            "element": "input",
-            "text": "Make default",
+            "html": "Make <span class=\"govuk-visually-hidden\">" + option.name + " the </span> default",
             "classes": "govuk-button--secondary"
           }) }}
         {% endcall %}
@@ -56,7 +55,7 @@
         <p class="govuk-body govuk-!-text-align-right">
           <a href="{{ url_for('main.organisation_letter_branding', org_id=current_org.id) }}?remove_branding_id={{ option.id }}"
            class="govuk-link govuk-link govuk-link--destructive govuk-link--no-visited-state">
-            Remove <span class="govuk-visually-hidden">this branding option</span>
+            Remove <span class="govuk-visually-hidden">{{ option.name }} branding</span>
           </a>
         </p>
       </div>
