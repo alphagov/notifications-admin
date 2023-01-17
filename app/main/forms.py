@@ -302,8 +302,8 @@ class SMSCode(GovukTextInputField):
 
 class ForgivingIntegerField(GovukTextInputField):
 
-    #  Actual value is 2147483647 but this is a scary looking arbitrary number
-    POSTGRES_MAX_INT = 2000000000
+    #  Actual value is 2,147,483,647 but this is a scary looking arbitrary number
+    POSTGRES_MAX_INT = 2_000_000_000
 
     def __init__(self, label=None, things="items", format_error_suffix="", **kwargs):
         self.things = things
@@ -1141,7 +1141,7 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
 
 
 class AdminServiceMessageLimitForm(StripWhitespaceForm):
-    message_limit = GovukIntegerField("", validators=[DataRequired(message="Cannot be empty")])
+    message_limit = ForgivingIntegerField("", validators=[DataRequired(message="Cannot be empty")])
 
     def __init__(self, notification_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1157,7 +1157,7 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
 
 
 class AdminServiceRateLimitForm(StripWhitespaceForm):
-    rate_limit = GovukIntegerField(
+    rate_limit = ForgivingIntegerField(
         "Number of messages the service can send in a rolling 60 second window",
         validators=[DataRequired(message="Cannot be empty")],
     )

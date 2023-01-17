@@ -4664,7 +4664,7 @@ def test_should_show_page_to_set_message_limit(
     client_request.login(platform_admin_user)
     page = client_request.get("main.set_message_limit", service_id=SERVICE_ONE_ID, notification_type=notification_type)
     assert normalize_spaces(page.select_one("label").text) == expected_label
-    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1000"
+    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1,000"
 
 
 def test_should_show_page_to_set_rate_limit(
@@ -4676,7 +4676,7 @@ def test_should_show_page_to_set_rate_limit(
     assert normalize_spaces(page.select_one("label").text) == (
         "Number of messages the service can send in a rolling 60 second window"
     )
-    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "3000"
+    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "3,000"
 
 
 @pytest.mark.parametrize(
@@ -4684,7 +4684,10 @@ def test_should_show_page_to_set_rate_limit(
     [
         ("1", 1),
         ("250000", 250000),
+        ("250,000 ", 250000),
+        (" 250 000", 250000),
         pytest.param("foo", "foo", marks=pytest.mark.xfail),
+        pytest.param("", "", marks=pytest.mark.xfail),
     ],
 )
 def test_should_set_message_limit(
