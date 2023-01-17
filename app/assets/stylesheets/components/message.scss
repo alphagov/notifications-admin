@@ -12,7 +12,7 @@ $app-body-text-line-height-tablet: get-govuk-typography-style($size: 19, $breakp
     content: "";
     display: block;
     position: absolute;
-    top: -5px;
+    top: 0;
     bottom: 1px;
     right: 7px;
     width: 9px;
@@ -277,7 +277,7 @@ a {
 
       display: inline;
       background-image: file-url('folder-blue-bold.svg');
-      background-position: 0px 4px;
+      background-position: 0px 3px;
       overflow: hidden;
       text-overflow: ellipsis;
 
@@ -289,7 +289,7 @@ a {
 
     &.folder-heading-folder-truncated {
       display: inline-block;
-      background-position: 0px 2px;
+      background-position: 0px 3px;
     }
 
     &:hover {
