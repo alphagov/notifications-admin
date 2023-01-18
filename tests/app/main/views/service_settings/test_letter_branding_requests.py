@@ -1,6 +1,5 @@
 from io import BytesIO
 from unittest.mock import ANY, PropertyMock
-from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import g, url_for
@@ -82,6 +81,9 @@ def test_letter_branding_request_page_when_no_branding_is_set(
 
     assert normalize_spaces(page.select_one("main p").text) == "Your letters currently have no branding."
 
+    # no preview if no existing branding
+    assert not page.select_one("iframe")
+
     button_text = normalize_spaces(page.select_one(".page-footer button").text)
     assert button_text == "Continue"
 
@@ -105,6 +107,8 @@ def test_letter_branding_request_page_when_branding_is_set_already(
     service_one["letter_branding"] = fake_uuid
     page = client_request.get(".letter_branding_request", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one("main p").text) == "Your letters currently have HM Government branding."
+
+    assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style=fake_uuid)
 
 
 @pytest.mark.parametrize(
@@ -543,11 +547,7 @@ def test_GET_letter_branding_set_name_renders(client_request, service_one):
         temp_filename="temp_something",
     )
 
-    letter_preview = page.select_one("iframe")
-    letter_preview_url = letter_preview.get("src")
-    letter_preview_query_args = parse_qs(urlparse(letter_preview_url).query)
-
-    assert letter_preview_query_args == {"filename": ["temp_something"]}
+    assert page.select_one("iframe")["src"] == url_for("main.letter_template", filename="temp_something")
 
     assert normalize_spaces(page.select_one("h1").text) == "Preview your letter branding"
     assert normalize_spaces(page.select_one("label[for=name]").text) == "Enter the name of your branding"
