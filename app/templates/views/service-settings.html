@@ -392,11 +392,6 @@
             {{ edit_field('Change', url_for('.set_message_limit', service_id=current_service.id, notification_type='letter'), suffix='daily letter limit') }}
           {% endcall %}
           {% call row() %}
-            {{ text_field('Message limit')}}
-            {{ text_field('{:,} per day'.format(current_service.message_limit)) }}
-            {{ edit_field('Change', url_for('.set_message_limit', service_id=current_service.id), suffix='daily message limit') }}
-          {% endcall %}
-          {% call row() %}
             {{ text_field('Free text message allowance')}}
             {{ text_field('{:,} per year'.format(current_service.free_sms_fragment_limit)) }}
             {{ edit_field('Change', url_for('.set_free_sms_allowance', service_id=current_service.id), suffix='free text message allowance') }}

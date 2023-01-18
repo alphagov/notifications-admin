@@ -4,13 +4,11 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app import Service
 from app.formatters import (
     email_safe,
     format_datetime_relative,
     format_notification_status_as_url,
     format_number_in_pounds_as_currency,
-    message_rate_limit_label,
     round_to_significant_figures,
 )
 
@@ -135,42 +133,3 @@ def test_round_to_significant_figures(value, significant_figures, expected_resul
 )
 def test_email_safe_return_dot_separated_email_domain(service_name, safe_email):
     assert email_safe(service_name) == safe_email
-
-
-class TestMessageRateLimitLabel:
-    @pytest.mark.parametrize(
-        "template_type, expected_message",
-        (
-            ("invalid", "10,000 messages"),
-            ("email", "5,000 emails"),
-            ("sms", "4,000 text messages"),
-            ("letter", "3,000 letters"),
-        ),
-    )
-    def test_appropriate_rate_limit_selected(self, service_one, template_type, expected_message):
-        service_one["message_limit"] = 10_000
-        service_one["email_message_limit"] = 5_000
-        service_one["sms_message_limit"] = 4_000
-        service_one["letter_message_limit"] = 3_000
-        service = Service(service_one)
-
-        assert message_rate_limit_label(service, template_type) == expected_message
-
-    @pytest.mark.parametrize(
-        "template_type, expected_message",
-        (
-            ("email", "1,000 messages"),
-            ("sms", "1,000 messages"),
-            ("letter", "1,000 messages"),
-        ),
-    )
-    def test_message_rate_limit_label_drops_down_to_message_limit_if_lower(
-        self, service_one, template_type, expected_message
-    ):
-        service_one["message_limit"] = 1_000
-        service_one["email_message_limit"] = 5_000
-        service_one["sms_message_limit"] = 5_000
-        service_one["letter_message_limit"] = 5_000
-        service = Service(service_one)
-
-        assert message_rate_limit_label(service, template_type) == expected_message

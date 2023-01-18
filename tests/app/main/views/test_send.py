@@ -3831,7 +3831,7 @@ SERVICE_DAILY_LIMIT_MSG = "Exceeded send limits (sms: 1000) for today"
         (
             SERVICE_DAILY_LIMIT_MSG,
             "Daily limit reached",
-            "You can only send 1,000 messages per day in trial mode.",
+            "You can only send 1,000 text messages per day in trial mode.",
         ),
     ],
 )

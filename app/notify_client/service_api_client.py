@@ -122,17 +122,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         from flask import current_app
 
         def get_daily_limit(live, channel):
-            if not live:
-                return current_app.config["DEFAULT_SERVICE_LIMIT"]
-
-            if channel:
+            if live:
                 return current_app.config["DEFAULT_LIVE_SERVICE_RATE_LIMITS"][channel]
-
-            return 999_999_999
+            return current_app.config["DEFAULT_SERVICE_LIMIT"]
 
         return self.update_service(
             service_id,
-            message_limit=get_daily_limit(live, None),
             email_message_limit=get_daily_limit(live, "email"),
             sms_message_limit=get_daily_limit(live, "sms"),
             letter_message_limit=get_daily_limit(live, "letter"),

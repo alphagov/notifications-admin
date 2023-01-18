@@ -36,7 +36,6 @@ class Service(JSONModel):
         "has_active_go_live_request",
         "id",
         "inbound_api",
-        "message_limit",
         "email_message_limit",
         "sms_message_limit",
         "letter_message_limit",
@@ -600,16 +599,7 @@ class Service(JSONModel):
         return self.organisation_type == Organisation.TYPE_CENTRAL and not self.organisation.email_branding
 
     def get_message_limit(self, notification_type):
-        message_limit = self.message_limit
-
-        if notification_type == "email":
-            message_limit = min(message_limit, self.email_message_limit)
-        elif notification_type == "sms":
-            message_limit = min(message_limit, self.sms_message_limit)
-        elif notification_type == "letter":
-            message_limit = min(message_limit, self.letter_message_limit)
-
-        return message_limit
+        return getattr(self, f"{notification_type}_message_limit")
 
 
 class Services(SerialisedModelCollection):
