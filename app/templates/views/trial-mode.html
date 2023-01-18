@@ -13,11 +13,12 @@
 
   <p class="govuk-body">When you add a new service it will start in trial mode. This lets you try out GOV.UK Notify, with a few restrictions.</p>
   <p class="govuk-body">While your service is in trial mode you can only:</p>
-    <ul class="govuk-list govuk-list--bullet">
-     <li>send 50 text messages and emails per day</li>
-      <li>send messages to yourself and other people in your team</li>
-     <li>create letter templates, but not send them</li>
-   </ul>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>send messages to yourself and other people in your team</li>
+    <li>send {{ email_and_sms_daily_limit | message_count('email') }} per day</li>
+    <li>send {{ email_and_sms_daily_limit | message_count('sms') }} per day</li>
+    <li>create letter templates, but not send them</li>
+  </ul>
 
     {% if current_service and current_service.trial_mode %}
   <p class="govuk-body">
