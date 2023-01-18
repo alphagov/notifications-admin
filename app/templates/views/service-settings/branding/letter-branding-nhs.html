@@ -1,0 +1,39 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/branding-preview.html" import letter_branding_preview %}
+
+{% block service_page_title %}
+  Check your new branding
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('.letter_branding_request', service_id=current_service.id)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Check your new branding') }}
+
+  <p class="govuk-body">
+    Letters from {{ current_service.name }} will look like this.
+  </p>
+  {{ letter_branding_preview(nhs_branding_id) }}
+
+  <h2 class="heading-medium">Before you continue</h2>
+
+  <p class="govuk-body">Make sure you’re allowed to use NHS branding.</p>
+
+  <p class="govuk-body">
+    If you’re not sure, <a class="govuk-link govuk-link--no-visited-state" href="https://www.england.nhs.uk/nhsidentity/identity-guidelines/who-can-use-the-nhs-identity/">check the guidance on the NHS website</a>.
+  </p>
+
+  {% call form_wrapper() %}
+    {{ page_footer('Use this branding') }}
+  {% endcall %}
+
+{% endblock %}
