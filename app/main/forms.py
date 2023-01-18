@@ -30,7 +30,6 @@ from wtforms import (
     FieldList,
     FileField,
     HiddenField,
-    IntegerField,
     PasswordField,
 )
 from wtforms import RadioField as WTFormsRadioField
@@ -279,10 +278,6 @@ class GovukDateField(GovukTextInputFieldMixin, DateField):
     pass
 
 
-class GovukIntegerField(GovukTextInputFieldMixin, IntegerField):
-    pass
-
-
 class SMSCode(GovukTextInputField):
     # the design system recommends against ever using `type="number"`. "tel" makes mobile browsers
     # show a phone keypad input rather than a full qwerty keyboard.
@@ -300,7 +295,7 @@ class SMSCode(GovukTextInputField):
             self.data = InsensitiveDict.make_key(valuelist[0])
 
 
-class ForgivingIntegerField(GovukTextInputField):
+class GovukIntegerField(GovukTextInputField):
 
     #  Actual value is 2,147,483,647 but this is a scary looking arbitrary number
     POSTGRES_MAX_INT = 2_000_000_000
@@ -348,6 +343,11 @@ class ForgivingIntegerField(GovukTextInputField):
         return super().pre_validate(form)
 
     def __call__(self, **kwargs):
+
+        if not hasattr(self, "get_form"):
+            # If the field is unbound – not yet attached to a Form instance – then
+            # it won’t have a submitted value yet so we can return early
+            return super().__call__(**kwargs)
 
         if self.get_form().is_submitted() and not self.get_form().validate():
             return super().__call__(value=(self.raw_data or [None])[0], **kwargs)
@@ -1141,7 +1141,7 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
 
 
 class AdminServiceMessageLimitForm(StripWhitespaceForm):
-    message_limit = ForgivingIntegerField("", validators=[DataRequired(message="Cannot be empty")])
+    message_limit = GovukIntegerField("", validators=[DataRequired(message="Cannot be empty")])
 
     def __init__(self, notification_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1157,7 +1157,7 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
 
 
 class AdminServiceRateLimitForm(StripWhitespaceForm):
-    rate_limit = ForgivingIntegerField(
+    rate_limit = GovukIntegerField(
         "Number of messages the service can send in a rolling 60 second window",
         validators=[DataRequired(message="Cannot be empty")],
     )
@@ -1470,17 +1470,17 @@ class Triage(StripWhitespaceForm):
 
 
 class EstimateUsageForm(StripWhitespaceForm):
-    volume_email = ForgivingIntegerField(
+    volume_email = GovukIntegerField(
         "How many emails do you expect to send in the next year?",
         things="emails",
         format_error_suffix="you expect to send",
     )
-    volume_sms = ForgivingIntegerField(
+    volume_sms = GovukIntegerField(
         "How many text messages do you expect to send in the next year?",
         things="text messages",
         format_error_suffix="you expect to send",
     )
-    volume_letter = ForgivingIntegerField(
+    volume_letter = GovukIntegerField(
         "How many letters do you expect to send in the next year?",
         things="letters",
         format_error_suffix="you expect to send",
