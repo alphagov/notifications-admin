@@ -111,7 +111,7 @@ def platform_admin_update_email_branding(branding_id, logo=None):
                 raise e
 
         if not form.errors:
-            return redirect(url_for(".email_branding", branding_id=branding_id))
+            return redirect(url_for(".platform_admin_view_email_branding", branding_id=branding_id))
 
     return (
         render_template(

@@ -441,6 +441,10 @@ def test_update_existing_branding(
             "cdn_url": "https://static-logos.cdn.com",
             "brand_type": data["brand_type"],
         },
+        _expected_redirect=url_for(
+            ".platform_admin_view_email_branding",
+            branding_id=fake_uuid,
+        ),
     )
 
     assert mock_update_email_branding.called
