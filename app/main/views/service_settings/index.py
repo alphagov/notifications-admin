@@ -1167,13 +1167,10 @@ def link_service_to_organisation(service_id):
     )
 
 
-def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
-    form = ChooseEmailBrandingForm(current_service)
-
+def create_email_branding_zendesk_ticket(detail=None):
     ticket_message = render_template(
         "support-tickets/branding-request.txt",
         current_branding=current_service.email_branding.name,
-        branding_requested=dict(form.options.choices)[form_option_selected],
         detail=detail,
     )
     ticket = NotifySupportTicket(
@@ -1193,15 +1190,6 @@ def create_email_branding_zendesk_ticket(form_option_selected, detail=None):
 @user_has_permissions("manage_service")
 def email_branding_request(service_id):
     form = ChooseEmailBrandingForm(current_service)
-
-    if form.something_else_is_only_option and request.method == "POST":
-        return redirect(
-            url_for(
-                ".email_branding_choose_banner_type",
-                service_id=current_service.id,
-                branding_choice="something_else",
-            )
-        )
 
     if form.validate_on_submit():
 
@@ -1306,7 +1294,7 @@ def email_branding_something_else(service_id):
     form = SomethingElseBrandingForm()
 
     if form.validate_on_submit():
-        create_email_branding_zendesk_ticket("something_else", detail=form.something_else.data)
+        create_email_branding_zendesk_ticket(detail=form.something_else.data)
 
         flash(THANKS_FOR_BRANDING_REQUEST_MESSAGE, "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
@@ -1321,7 +1309,7 @@ def email_branding_something_else(service_id):
         **_email_branding_flow_query_params(request),
     )
     return render_template(
-        "views/service-settings/branding/email-branding-something-else.html",
+        "views/service-settings/branding/branding-something-else.html",
         form=form,
         back_link=back_link,
     )

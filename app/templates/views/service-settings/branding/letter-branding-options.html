@@ -1,7 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radio, conditional_radio_panel %}
-{% from "components/select-input.html" import select_wrapper %}
-{% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -31,26 +28,11 @@
   {% endif %}
 
   {% call form_wrapper() %}
+    {# make something_else always selected if it's the only thing available #}
     {% if form.something_else_is_only_option %}
-      {{ textbox(
-        form.something_else,
-        hint='Include links to your brand guidelines or examples of how to use your branding.',
-        width='1-1',
-      ) }}
+      <input type="hidden" name="options" value="something_else"/>
     {% else %}
-      {% call select_wrapper(form.options) %}
-        {% for option in form.options %}
-          {{ radio(option, data_target='panel-something-else' if option.data == form.FALLBACK_OPTION_VALUE else '') }}
-        {% endfor %}
-      {% endcall %}
-      {% call conditional_radio_panel('panel-something-else') %}
-        {{ textbox(
-          form.something_else,
-          hint='Include links to your brand guidelines or examples of how to use your branding.',
-          width='1-1',
-          autosize=True,
-        ) }}
-      {% endcall %}
+      {{ form.options }}
     {% endif %}
 
     {{ page_footer('Continue') }}

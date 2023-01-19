@@ -2029,55 +2029,47 @@ class AdminSetOrganisationForm(StripWhitespaceForm):
     organisations = GovukRadiosField("Select an organisation", validators=[DataRequired()])
 
 
-class ChooseBrandingForm(StripWhitespaceForm):
+class ChooseBrandingField(GovukRadiosField):
     FALLBACK_OPTION_VALUE = "something_else"
     FALLBACK_OPTION = (FALLBACK_OPTION_VALUE, "Something else")
 
+    param_extensions = {
+        "fieldset": {
+            "legend": {
+                # This removes the `govuk-fieldset__legend--s` class, thereby
+                # making the form label font regular weight, not bold
+                "classes": "",
+            },
+        },
+    }
+
+    def set_choices(self, choices):
+        choices = OrderedSet(choices)
+        if len(choices) > 2:
+            choices = choices | {ChooseBrandingField.Divider("or")}
+        self.choices = tuple(choices | {self.FALLBACK_OPTION})
+
+
+class ChooseBrandingForm(StripWhitespaceForm):
     @property
     def something_else_is_only_option(self):
-        return self.options.choices == (self.FALLBACK_OPTION,)
+        return self.options.choices == (self.options.FALLBACK_OPTION,)
 
 
 class ChooseEmailBrandingForm(ChooseBrandingForm):
-    options = GovukRadiosField(
-        "Choose your new email branding",
-        param_extensions={
-            "fieldset": {
-                "legend": {
-                    # This removes the `govuk-fieldset__legend--s` class, thereby
-                    # making the form label font regular weight, not bold
-                    "classes": "",
-                },
-            },
-        },
-    )
+    options = ChooseBrandingField("Choose your new email branding")
 
     def __init__(self, service):
         super().__init__()
-        choices = OrderedSet(branding.get_email_choices(service))
-        if len(choices) > 2:
-            choices = choices | {GovukRadiosField.Divider("or")}
-        self.options.choices = tuple(choices | {self.FALLBACK_OPTION})
+        self.options.set_choices(branding.get_email_choices(service))
 
 
 class ChooseLetterBrandingForm(ChooseBrandingForm):
-    options = RadioField("Choose your new letter branding")
-    something_else = TextAreaField("Describe the branding you want")
+    options = ChooseBrandingField("Choose your new letter branding")
 
     def __init__(self, service):
         super().__init__()
-
-        self.options.choices = tuple(OrderedSet(list(branding.get_letter_choices(service)) + [self.FALLBACK_OPTION]))
-
-        if self.something_else_is_only_option:
-            self.options.data = self.FALLBACK_OPTION_VALUE
-
-    def validate_something_else(self, field):
-        if (self.something_else_is_only_option or self.options.data == self.FALLBACK_OPTION_VALUE) and not field.data:
-            raise ValidationError("Cannot be empty")
-
-        if self.options.data != self.FALLBACK_OPTION_VALUE:
-            field.data = ""
+        self.options.set_choices(branding.get_letter_choices(service))
 
 
 class SomethingElseBrandingForm(StripWhitespaceForm):
