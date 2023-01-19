@@ -2922,7 +2922,7 @@ def test_check_messages_back_link(
 def test_check_messages_shows_too_many_messages_errors(
     mocker,
     client_request,
-    mock_get_service,  # set message_limit to 50
+    mock_get_service,  # set sms_message_limit to 50
     mock_get_users_by_service,
     mock_get_service_template,
     mock_get_job_doesnt_exist,

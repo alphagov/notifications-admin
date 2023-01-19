@@ -16,7 +16,6 @@ def _create_service(service_name, organisation_type, email_from, form):
         service_id = service_api_client.create_service(
             service_name=service_name,
             organisation_type=organisation_type,
-            message_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
             email_message_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
             sms_message_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
             letter_message_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
