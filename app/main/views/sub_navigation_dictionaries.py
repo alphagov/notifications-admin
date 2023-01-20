@@ -12,7 +12,7 @@ def features_nav():
                     "name": "Security",
                     "link": "main.security",
                 },
-            ],      
+            ],
         },
         {
             "name": "Roadmap",

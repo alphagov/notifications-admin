@@ -18,7 +18,6 @@ from app.main.forms import FieldWithNoneOption
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
-from app.utils import hide_from_search_engines
 
 
 @main.route("/")
@@ -380,6 +379,11 @@ def guidance_letter_specification():
 @main.route("/using-notify/guidance/branding-and-customisation", endpoint="old_branding_and_customisation")
 @main.route("/information-risk-management", endpoint="information_risk_management")
 @main.route("/integration_testing", endpoint="old_integration_testing")
+@main.route("/features/sms", endpoint="old_features_sms")
+@main.route("/features/email", endpoint="old_features_email")
+@main.route("/features/letters", endpoint="old_features_letters")
+@main.route("/using-notify/who-can-use-notify", endpoint="old_who_can_use_notify")
+@main.route("/using-notify/who-its-for", endpoint="old_who_its_for")
 def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.roadmap",
@@ -390,6 +394,11 @@ def old_page_redirects():
         "main.old_integration_testing": "main.integration_testing",
         "main.old_schedule_messages": "main.guidance_schedule_messages",
         "main.old_branding_and_customisation": "main.guidance_index",
+        "main.old_features_sms": "main.features",
+        "main.old_features_email": "main.features",
+        "main.old_features_letters": "main.features",
+        "main.old_who_can_use_notify": "main.who_can_use_notify",
+        "main.old_who_its_for": "main.who_its_for",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
 

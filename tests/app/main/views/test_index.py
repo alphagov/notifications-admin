@@ -67,7 +67,6 @@ def test_robots(client_request):
         ("bat_phone", {}),
         ("thanks", {}),
         ("register", {}),
-        ("features_email", {}),
         pytest.param("index", {}, marks=pytest.mark.xfail(raises=AssertionError)),
     ),
 )
@@ -94,9 +93,6 @@ def test_hiding_pages_from_search_engines(
         "cookies",
         "documentation",
         "features",
-        "features_email",
-        "features_letters",
-        "features_sms",
         "get_started",
         "guidance_edit_and_format_messages",
         "guidance_email_branding",
