@@ -33,7 +33,7 @@ from app.models.template_list import TemplateList, UserTemplateList, UserTemplat
 from app.template_previews import TemplatePreview, get_page_count_for_letter
 from app.utils import NOTIFICATION_TYPES, should_skip_template_page
 from app.utils.templates import get_template
-from app.utils.user import user_has_permissions, user_is_platform_admin
+from app.utils.user import user_has_permissions
 
 form_objects = {
     "email": EmailTemplateForm,
@@ -217,7 +217,6 @@ def view_letter_template_preview(service_id, template_id, filetype):
 
 
 @no_cookie.route("/templates/letter-preview-image/<filename>")
-@user_is_platform_admin
 def letter_branding_preview_image(filename):
     template = {
         "subject": "An example letter",

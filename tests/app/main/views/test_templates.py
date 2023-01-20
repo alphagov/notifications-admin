@@ -1123,12 +1123,10 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 def test_letter_branding_preview_image(
     mocker,
     client_request,
-    platform_admin_user,
     original_filename,
     new_filename,
 ):
     mocked_preview = mocker.patch("app.main.views.templates.TemplatePreview.from_example_template", return_value="foo")
-    client_request.login(platform_admin_user)
     resp = client_request.get_response(
         "no_cookie.letter_branding_preview_image",
         filename=original_filename,
