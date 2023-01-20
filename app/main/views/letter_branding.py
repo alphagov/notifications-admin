@@ -1,9 +1,11 @@
+import os
+
 from botocore.exceptions import ClientError as BotoClientError
 from flask import current_app, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
-from app import letter_branding_client
+from app import letter_branding_client, logo_client
 from app.event_handlers import create_update_letter_branding_event
 from app.main import main
 from app.main.forms import (
@@ -12,15 +14,7 @@ from app.main.forms import (
     SearchByNameForm,
 )
 from app.models.branding import AllLetterBranding, LetterBranding
-from app.s3_client.s3_logo_client import (
-    LETTER_TEMP_TAG,
-    delete_letter_temp_file,
-    delete_letter_temp_files_created_by,
-    letter_filename_for_db,
-    permanent_letter_logo_name,
-    persist_logo,
-    upload_letter_temp_logo,
-)
+from app.s3_client.s3_logo_client import permanent_letter_logo_name
 from app.utils.user import user_is_platform_admin
 
 
@@ -61,28 +55,31 @@ def update_letter_branding(branding_id, logo=None):
     file_upload_form_submitted = file_upload_form.file.data
     details_form_submitted = request.form.get("operation") == "branding-details"
 
-    logo = logo or permanent_letter_logo_name(letter_branding.filename, "svg")
+    # TODO: remove the `logo`-based URL path
+    # `logo_key` here can either be a temporary logo key which has been uploaded but not saved,
+    # or a reference to the existing logo if nothing has been uploaded to overwrite
+    logo_key = request.args.get("logo_key", logo or permanent_letter_logo_name(letter_branding.filename, "svg"))
+    logo_changed = ("logo_key" in request.args) or logo
 
     if file_upload_form_submitted and file_upload_form.validate_on_submit():
-        upload_filename = upload_letter_temp_logo(
-            file_upload_form.file.data.filename,
+        file_extension = os.path.splitext(file_upload_form.file.data.filename)[1]
+        temporary_logo_key = logo_client.save_temporary_logo(
             file_upload_form.file.data,
-            current_app.config["AWS_REGION"],
-            user_id=current_user.id,
+            logo_type="letter",
+            file_extension=file_extension,
+            content_type=file_upload_form.file.data.content_type,
         )
 
-        if logo.startswith(LETTER_TEMP_TAG.format(user_id=current_user.id)):
-            delete_letter_temp_file(logo)
-
-        return redirect(url_for(".update_letter_branding", branding_id=branding_id, logo=upload_filename))
+        return redirect(url_for(".update_letter_branding", branding_id=branding_id, logo_key=temporary_logo_key))
 
     if details_form_submitted and letter_branding_details_form.validate_on_submit():
-        db_filename = letter_filename_for_db(logo, current_user.id)
-
         try:
-            # If a new file has been uploaded, db_filename and letter_branding.filename will be different
-            if db_filename != letter_branding.filename:
-                upload_letter_svg_logo(logo, db_filename, current_user.id)
+            db_filename = letter_branding.filename
+            if logo_changed:
+                permanent_logo_key = logo_client.save_permanent_logo(
+                    logo_key, logo_type="letter", logo_key_extra=letter_branding_details_form.name.data
+                )
+                db_filename = letter_filename_for_db_from_logo_key(permanent_logo_key)
 
             letter_branding_client.update_letter_branding(
                 branding_id=branding_id,
@@ -103,6 +100,7 @@ def update_letter_branding(branding_id, logo=None):
                 letter_branding_details_form.name.errors.append(e.message["name"][0])
             else:
                 raise e
+
         except BotoClientError:
             file_upload_form.file.errors = ["Error saving uploaded file - try uploading again"]
 
@@ -112,7 +110,7 @@ def update_letter_branding(branding_id, logo=None):
         file_upload_form=file_upload_form,
         letter_branding_details_form=letter_branding_details_form,
         cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
-        logo=logo,
+        logo=logo_key,
         is_update=True,
     )
 
@@ -127,29 +125,33 @@ def create_letter_branding(logo=None):
     file_upload_form_submitted = file_upload_form.file.data
     details_form_submitted = request.form.get("operation") == "branding-details"
 
+    # TODO: remove the `logo`-based URL path
+    temporary_logo_key = request.args.get("logo_key", logo)
+
     if file_upload_form_submitted and file_upload_form.validate_on_submit():
-        upload_filename = upload_letter_temp_logo(
-            file_upload_form.file.data.filename,
+        file_extension = os.path.splitext(file_upload_form.file.data.filename)[1]
+        temporary_logo_key = logo_client.save_temporary_logo(
             file_upload_form.file.data,
-            current_app.config["AWS_REGION"],
-            user_id=current_user.id,
+            logo_type="letter",
+            file_extension=file_extension,
+            content_type=file_upload_form.file.data.content_type,
         )
 
-        if logo and logo.startswith(LETTER_TEMP_TAG.format(user_id=current_user.id)):
-            delete_letter_temp_file(logo)
-
-        return redirect(url_for(".create_letter_branding", logo=upload_filename))
+        return redirect(url_for(".create_letter_branding", logo_key=temporary_logo_key))
 
     if details_form_submitted and letter_branding_details_form.validate_on_submit():
-        if logo:
-            db_filename = letter_filename_for_db(logo, current_user.id)
+        if temporary_logo_key:
 
             try:
-                letter_branding = LetterBranding.create(
-                    filename=db_filename, name=letter_branding_details_form.name.data
+                permanent_logo_key = logo_client.save_permanent_logo(
+                    temporary_logo_key,
+                    logo_type="letter",
+                    logo_key_extra=letter_branding_details_form.name.data,
                 )
-
-                upload_letter_svg_logo(logo, db_filename, current_user.id)
+                letter_branding = LetterBranding.create(
+                    filename=letter_filename_for_db_from_logo_key(permanent_logo_key),
+                    name=letter_branding_details_form.name.data,
+                )
 
                 return redirect(url_for("main.platform_admin_view_letter_branding", branding_id=letter_branding.id))
 
@@ -168,11 +170,12 @@ def create_letter_branding(logo=None):
         file_upload_form=file_upload_form,
         letter_branding_details_form=letter_branding_details_form,
         cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
-        logo=logo,
+        logo=temporary_logo_key,
     )
 
 
-def upload_letter_svg_logo(old_filename, new_filename, user_id):
-    persist_logo(old_filename, permanent_letter_logo_name(new_filename, "svg"))
-
-    delete_letter_temp_files_created_by(user_id)
+def letter_filename_for_db_from_logo_key(logo_key):
+    # For letters, in the DB we store the filename without the extension.
+    # Note: this is to maintain backwards compatibility and does deviate from what we do for EmailBranding.
+    # But we aren't taking on this migration effort right now. Ideally this might be different.
+    return os.path.splitext(os.path.basename(logo_key))[0]
