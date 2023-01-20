@@ -356,12 +356,7 @@ def test_update_existing_branding(
         "updated_by_id": fake_uuid,
     }
 
-    temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
-        temp=TEMP_TAG.format(user_id=fake_uuid), unique_id=fake_uuid, filename=data["logo"]
-    )
-
-    mocker.patch("app.main.views.email_branding.persist_logo")
-    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+    mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo", return_value="email/test.png")
     mock_create_update_email_branding_event = mocker.patch(
         "app.main.views.email_branding.create_update_email_branding_event"
     )
@@ -369,7 +364,7 @@ def test_update_existing_branding(
     client_request.login(platform_admin_user)
     client_request.post(
         ".platform_admin_update_email_branding",
-        logo=temp_filename,
+        logo_key="email/test.png",
         branding_id=fake_uuid,
         _content_type="multipart/form-data",
         _data={
@@ -382,12 +377,10 @@ def test_update_existing_branding(
         },
     )
 
-    updated_logo_name = "{}-{}".format(fake_uuid, data["logo"])
-
     assert mock_update_email_branding.called
     assert mock_update_email_branding.call_args == call(
         branding_id=fake_uuid,
-        logo=updated_logo_name,
+        logo="email/test.png",
         name=data["name"],
         alt_text="",
         text=data["text"],
@@ -402,6 +395,55 @@ def test_update_existing_branding(
             old_email_branding=mock_get_email_branding(fake_uuid)["email_branding"],
         )
     ]
+
+
+def test_update_existing_branding_does_not_reupload_logo_if_unchanged(
+    client_request,
+    platform_admin_user,
+    mocker,
+    fake_uuid,
+    mock_get_email_branding,
+    mock_update_email_branding,
+):
+    data = {
+        "logo": "test.png",
+        "colour": "#0000ff",
+        "text": "new text",
+        "name": "new name",
+        "brand_type": "both",
+        "updated_by_id": fake_uuid,
+    }
+
+    mock_save_permanent = mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo")
+    mocker.patch("app.main.views.email_branding.create_update_email_branding_event")
+
+    client_request.login(platform_admin_user)
+    client_request.post(
+        ".platform_admin_update_email_branding",
+        branding_id=fake_uuid,
+        _content_type="multipart/form-data",
+        _data={
+            "colour": data["colour"],
+            "name": data["name"],
+            "alt_text": "",
+            "text": data["text"],
+            "cdn_url": "https://static-logos.cdn.com",
+            "brand_type": data["brand_type"],
+        },
+    )
+
+    assert mock_update_email_branding.called
+    assert mock_update_email_branding.call_args == call(
+        branding_id=fake_uuid,
+        logo="example.png",
+        name=data["name"],
+        alt_text="",
+        text=data["text"],
+        colour=data["colour"],
+        brand_type=data["brand_type"],
+        updated_by_id=data["updated_by_id"],
+    )
+    assert not mock_save_permanent.called
 
 
 def test_update_email_branding_shows_error_with_neither_alt_text_and_text(
@@ -422,8 +464,7 @@ def test_update_email_branding_shows_error_with_neither_alt_text_and_text(
         "brand_type": "org_banner",
     }
 
-    mocker.patch("app.main.views.email_branding.persist_logo")
-    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+    mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo")
 
     client_request.login(platform_admin_user)
     response = client_request.post(
@@ -450,8 +491,7 @@ def test_update_email_branding_shows_error_with_both_alt_text_and_text(
         "brand_type": "org_banner",
     }
 
-    mocker.patch("app.main.views.email_branding.persist_logo")
-    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
+    mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo")
 
     client_request.login(platform_admin_user)
     response = client_request.post(
@@ -481,10 +521,9 @@ def test_update_email_branding_with_unique_name_conflict(
         "brand_type": "org",
     }
 
-    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
-
     client_request.login(platform_admin_user)
 
+    mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo")
     mock_update_email_branding = mocker.patch("app.email_branding_client.update_email_branding")
     response_mock = mock.Mock()
     response_mock.status_code = 400
@@ -510,11 +549,7 @@ def test_temp_logo_is_shown_after_uploading_logo(
     mocker,
     fake_uuid,
 ):
-    temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
-        temp=TEMP_TAG.format(user_id=fake_uuid), unique_id=fake_uuid, filename="test.png"
-    )
-
-    mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo", return_value=temp_filename)
+    mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo", return_value="email/test.png")
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     client_request.login(platform_admin_user)
@@ -525,7 +560,7 @@ def test_temp_logo_is_shown_after_uploading_logo(
         _follow_redirects=True,
     )
 
-    assert page.select_one("#logo-img > img").attrs["src"].endswith(temp_filename)
+    assert page.select_one("#logo-img > img").attrs["src"].endswith("email/test.png")
 
 
 def test_logo_persisted_when_organisation_saved(
@@ -559,11 +594,9 @@ def test_logo_persisted_when_organisation_saved(
     ],
 )
 def test_colour_regex_validation(
-    client_request, platform_admin_user, mocker, colour_hex, expected_status_code, mock_create_email_branding
+    client_request, platform_admin_user, colour_hex, expected_status_code, mock_create_email_branding
 ):
     data = {"logo": None, "colour": colour_hex, "text": "new text", "name": "new name", "brand_type": "org"}
-
-    mocker.patch("app.main.views.email_branding.delete_email_temp_files_created_by")
 
     client_request.login(platform_admin_user)
     client_request.post(

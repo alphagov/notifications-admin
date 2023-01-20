@@ -21,14 +21,7 @@ from app.models.branding import (
     EmailBranding,
 )
 from app.s3_client.logo_client import logo_client
-from app.s3_client.s3_logo_client import (
-    TEMP_TAG,
-    delete_email_temp_file,
-    delete_email_temp_files_created_by,
-    permanent_email_logo_name,
-    persist_logo,
-    upload_email_logo,
-)
+from app.s3_client.s3_logo_client import upload_email_logo
 from app.utils.user import user_is_platform_admin
 
 
@@ -48,27 +41,32 @@ def platform_admin_update_email_branding(branding_id, logo=None):
 
     form = AdminEditEmailBrandingForm(obj=email_branding)
 
-    logo = logo or email_branding.logo
+    # TODO: remove the `logo`-based URL path
+    # `logo_key` here can either be a temporary logo key which has been uploaded but not saved,
+    # or a reference to the existing logo if nothing has been uploaded to overwrite
+    logo_key = request.args.get("logo_key", logo or email_branding.logo)
+    logo_changed = ("logo_key" in request.args) or logo
 
     if form.validate_on_submit():
         if form.file.data:
-            upload_filename = upload_email_logo(
-                form.file.data.filename, form.file.data, current_app.config["AWS_REGION"], user_id=current_user.id
+            file_extension = os.path.splitext(form.file.data.filename)[1]
+            temporary_logo_key = logo_client.save_temporary_logo(
+                form.file.data, "email", file_extension=file_extension, content_type=form.file.data.content_type
             )
-
-            if logo and logo.startswith(TEMP_TAG.format(user_id=current_user.id)):
-                delete_email_temp_file(logo)
-
             return redirect(
-                url_for(".platform_admin_update_email_branding", branding_id=branding_id, logo=upload_filename)
+                url_for(".platform_admin_update_email_branding", branding_id=branding_id, logo_key=temporary_logo_key)
             )
 
-        updated_logo_name = permanent_email_logo_name(logo, current_user.id) if logo else None
+        permanent_logo_key = email_branding.logo
+        if logo_changed:
+            permanent_logo_key = logo_client.save_permanent_logo(
+                logo_key, logo_type="email", logo_key_extra=form.name.data
+            )
 
         try:
             email_branding_client.update_email_branding(
                 branding_id=branding_id,
-                logo=updated_logo_name,
+                logo=permanent_logo_key,
                 name=form.name.data,
                 alt_text=form.alt_text.data,
                 text=form.text.data,
@@ -87,11 +85,6 @@ def platform_admin_update_email_branding(branding_id, logo=None):
             else:
                 raise e
 
-        if logo:
-            persist_logo(logo, updated_logo_name)
-
-        delete_email_temp_files_created_by(current_user.id)
-
         if not form.errors:
             return redirect(url_for(".email_branding", branding_id=branding_id))
 
@@ -101,7 +94,7 @@ def platform_admin_update_email_branding(branding_id, logo=None):
             form=form,
             email_branding=email_branding,
             cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
-            logo=logo,
+            logo=logo_key,
         ),
         400 if form.errors else 200,
     )
