@@ -750,9 +750,9 @@ def test_create_email_branding_government_identity_colour_400_if_no_filename_or_
 
 
 def test_post_create_email_branding_government_identity_form_colour(mocker, client_request, platform_admin_user):
-    mock_upload = mocker.patch(
-        "app.main.views.email_branding.upload_email_logo",
-        return_value="example.png",
+    mock_save_temporary = mocker.patch(
+        "app.main.views.email_branding.logo_client.save_temporary_logo",
+        return_value="temporary/email/example.png",
     )
     client_request.login(platform_admin_user)
 
@@ -765,13 +765,15 @@ def test_post_create_email_branding_government_identity_form_colour(mocker, clie
         },
         _expected_redirect=url_for(
             "main.platform_admin_create_email_branding",
-            logo_key="example.png",
+            logo_key="temporary/email/example.png",
             colour="#005abb",
             name="Department of Social Affairs and Citizenship",
             text="Department of Social Affairs and Citizenship",
         ),
     )
 
-    assert mock_upload.call_args[0][0] == "hm.government.png"
-    assert mock_upload.call_args[0][1][:4] == b"\x89PNG"
-    assert mock_upload.call_args[0][1] == (INSIGNIA_ASSETS_PATH / "HM Government.png").resolve().read_bytes()
+    assert mock_save_temporary.call_args_list == [
+        mocker.call(file_data=mocker.ANY, logo_type="email", file_extension=".png", content_type="image/png")
+    ]
+    logo_bytes_io = mock_save_temporary.call_args_list[0][1]["file_data"]
+    assert logo_bytes_io.read() == (INSIGNIA_ASSETS_PATH / "HM Government.png").resolve().read_bytes()

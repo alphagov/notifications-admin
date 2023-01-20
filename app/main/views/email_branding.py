@@ -1,4 +1,5 @@
 import os
+from io import BytesIO
 
 from flask import abort, current_app, redirect, render_template, request, url_for
 from flask_login import current_user
@@ -6,7 +7,6 @@ from notifications_python_client.errors import HTTPError
 
 from app import email_branding_client
 from app.event_handlers import create_update_email_branding_event
-from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
     AdminEditEmailBrandingForm,
@@ -21,7 +21,6 @@ from app.models.branding import (
     EmailBranding,
 )
 from app.s3_client.logo_client import logo_client
-from app.s3_client.s3_logo_client import upload_email_logo
 from app.utils.user import user_is_platform_admin
 
 
@@ -129,16 +128,18 @@ def create_email_branding_government_identity_colour():
     if filename not in GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA:
         abort(400)
 
-    filename = f"{filename}.png"
+    file_extension = ".png"
+    content_type = "image/png"
+    filename = f"{filename}{file_extension}"
     form = GovernmentIdentityColour(crest_or_insignia_image_filename=filename)
 
     if form.validate_on_submit():
-        image_file = INSIGNIA_ASSETS_PATH / filename
-        upload_filename = upload_email_logo(
-            email_safe(filename),
-            image_file.resolve().read_bytes(),
-            current_app.config["AWS_REGION"],
-            user_id=current_user.id,
+        image_file_path = INSIGNIA_ASSETS_PATH / filename
+        temporary_logo_key = logo_client.save_temporary_logo(
+            file_data=BytesIO(image_file_path.resolve().read_bytes()),
+            logo_type="email",
+            file_extension=file_extension,
+            content_type=content_type,
         )
         return redirect(
             url_for(
@@ -146,7 +147,7 @@ def create_email_branding_government_identity_colour():
                 name=request.args.get("text"),
                 text=request.args.get("text"),
                 colour=form.colour.data,
-                logo_key=upload_filename,
+                logo_key=temporary_logo_key,
                 brand_type=request.args.get("brand_type"),
             )
         )
