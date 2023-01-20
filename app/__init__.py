@@ -115,6 +115,7 @@ from app.notify_client.template_folder_api_client import template_folder_api_cli
 from app.notify_client.template_statistics_api_client import template_statistics_client
 from app.notify_client.upload_api_client import upload_api_client
 from app.notify_client.user_api_client import user_api_client
+from app.s3_client.logo_client import logo_client
 from app.url_converters import (
     LetterFileExtensionConverter,
     SimpleDateTypeConverter,
@@ -193,6 +194,7 @@ def create_app(application):
         antivirus_client,
         redis_client,
         zendesk_client,
+        logo_client,
     ):
         client.init_app(application)
 

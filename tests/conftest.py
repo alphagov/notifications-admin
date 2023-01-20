@@ -4235,3 +4235,10 @@ def webauthn_credential_2():
         "created_at": "2021-05-14T16:57:14.154185Z",
         "logged_in_at": None,
     }
+
+
+@pytest.fixture
+def logo_client(notify_admin):
+    from app import logo_client
+
+    yield logo_client
