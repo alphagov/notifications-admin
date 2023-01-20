@@ -9,6 +9,7 @@ from app.models import JSONModel, ModelList
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
+from app.notify_client.user_api_client import user_api_client
 
 
 class Branding(JSONModel):
@@ -36,6 +37,9 @@ class EmailBranding(Branding):
         "alt_text",
         "text",
         "brand_type",
+        "created_by",
+        "created_at",
+        "updated_at",
     }
 
     NHS_ID = "a7dc4e56-660b-4db7-8cff-12c37b12b5ea"
@@ -112,6 +116,12 @@ class EmailBranding(Branding):
         orgs_and_services = email_branding_client.get_orgs_and_services_associated_with_branding(self.id)["data"]
 
         return orgs_and_services["services"]
+
+    @property
+    def created_by_user(self):
+        if self.created_by:
+            return user_api_client.get_user(self.created_by)
+        return None
 
 
 class LetterBranding(Branding):

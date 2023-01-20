@@ -8,7 +8,7 @@ from notifications_python_client.errors import HTTPError
 
 from app.models.branding import INSIGNIA_ASSETS_PATH
 from app.s3_client.s3_logo_client import EMAIL_LOGO_LOCATION_STRUCTURE, TEMP_TAG
-from tests.conftest import normalize_spaces
+from tests.conftest import create_email_branding, normalize_spaces
 
 
 def test_email_branding_page_shows_full_branding_list(client_request, platform_admin_user, mock_get_all_email_branding):
@@ -84,6 +84,48 @@ def test_view_email_branding_with_org_but_no_services(
     link_1 = list_of_organisation_links[0].select_one("a")
     assert link_1.text.strip() == "organisation 1"
     assert link_1["href"] == url_for(".organisation_settings", org_id="1234")
+
+
+@pytest.mark.parametrize(
+    "created_at, updated_at", [("2022-12-06T09:59:56.000000Z", "2023-01-20T11:59:56.000000Z"), (None, None)]
+)
+def test_view_email_branding_shows_created_by_and_helpful_dates_if_available(
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_empty,
+    mocker,
+    created_at,
+    updated_at,
+):
+    client_request.login(platform_admin_user)
+
+    def _get_email_branding(id):
+        return create_email_branding(
+            id,
+            non_standard_values={
+                "created_by": "1234-5678-abcd-efgh",
+                "created_at": created_at,
+                "updated_at": updated_at,
+            },
+        )
+
+    mocker.patch("app.models.branding.email_branding_client.get_email_branding", side_effect=_get_email_branding)
+
+    user = {"id": "1234-5678-abcd-efgh", "name": "Arwa Suren"}
+    mocker.patch("app.models.branding.user_api_client.get_user", return_value=user)
+
+    page = client_request.get(".platform_admin_view_email_branding", branding_id=fake_uuid)
+
+    created_by_link = page.select("p > a")[1]
+    assert created_by_link.text.strip() == user["name"]
+    assert created_by_link["href"] == url_for(".user_information", user_id=user["id"])
+
+    if created_at:
+        assert "on Tuesday 06 December 2022" in page.select("p")[-2].text
+
+    if updated_at:
+        assert "on Friday 20 January 2023" in page.select("p")[-1].text
 
 
 def test_view_email_branding_bottom_links(

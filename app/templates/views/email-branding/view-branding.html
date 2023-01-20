@@ -57,6 +57,24 @@
             {% endif %}
         </nav>
 
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-4" />
+
+        {% if email_branding.created_by %}
+            <p class="govuk-body">
+                Created by <a class="govuk-link govuk-link--no-visited-state"
+                    href="{{ url_for('.user_information', user_id=email_branding.created_by) }}">
+                    {{ email_branding.created_by_user.name }}
+                </a> {% if email_branding.created_at %}on {{ email_branding.created_at | format_date }}{% endif %}
+            </p>
+        {% endif %}
+        {% if email_branding.updated_at %}
+            <p class="govuk-body">
+                Last updated on {{ email_branding.updated_at | format_date }}
+            </p>
+        {% endif %}
+
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-4" />
+
         <div class="js-stick-at-bottom-when-scrolling">
             <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter-2-3">
                 <a class="govuk-link"
