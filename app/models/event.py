@@ -88,6 +88,27 @@ class ServiceEvent(Event):
             format_thousands(self.value_to),
         )
 
+    def format_sms_message_limit(self):
+        return "{} this service’s daily text message limit from {} to {}".format(
+            "Reduced" if self.value_from > self.value_to else "Increased",
+            format_thousands(self.value_from),
+            format_thousands(self.value_to),
+        )
+
+    def format_email_message_limit(self):
+        return "{} this service’s daily email limit from {} to {}".format(
+            "Reduced" if self.value_from > self.value_to else "Increased",
+            format_thousands(self.value_from),
+            format_thousands(self.value_to),
+        )
+
+    def format_letter_message_limit(self):
+        return "{} this service’s daily letter limit from {} to {}".format(
+            "Reduced" if self.value_from > self.value_to else "Increased",
+            format_thousands(self.value_from),
+            format_thousands(self.value_to),
+        )
+
     def format_name(self):
         return "Renamed this service from ‘{}’ to ‘{}’".format(self.value_from, self.value_to)
 

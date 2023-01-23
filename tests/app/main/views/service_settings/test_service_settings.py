@@ -4694,6 +4694,38 @@ def test_should_set_message_limit(
     )
 
 
+@pytest.mark.parametrize("notification_type", ["sms", "email", "letter"])
+@pytest.mark.parametrize(
+    "new_limit, expected_api_argument",
+    [
+        ("1", 1),
+        ("250000", 250_000),
+        pytest.param("foo", "foo", marks=pytest.mark.xfail),
+    ],
+)
+def test_set_message_limit(
+    client_request,
+    platform_admin_user,
+    new_limit,
+    expected_api_argument,
+    mock_update_service,
+    mocker,
+    notification_type,
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.set_message_limit",
+        service_id=SERVICE_ONE_ID,
+        notification_type=notification_type,
+        _data={
+            "message_limit": new_limit,
+        },
+    )
+    assert mock_update_service.call_args_list == [
+        mocker.call(SERVICE_ONE_ID, **{f"{notification_type}_message_limit": expected_api_argument})
+    ]
+
+
 def test_should_show_page_to_set_rate_limit(
     client_request,
     platform_admin_user,
@@ -4721,6 +4753,7 @@ def test_should_set_rate_limit(
     new_limit,
     expected_api_argument,
     mock_update_service,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     client_request.post(
@@ -4730,10 +4763,12 @@ def test_should_set_rate_limit(
             "rate_limit": new_limit,
         },
     )
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        rate_limit=expected_api_argument,
-    )
+    assert mock_update_service.call_args_list == [
+        mocker.call(
+            SERVICE_ONE_ID,
+            rate_limit=expected_api_argument,
+        )
+    ]
 
 
 @pytest.mark.parametrize(
