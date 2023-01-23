@@ -22,8 +22,11 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
 
     assert normalize_spaces(page.select_one("h1").text) == "Email branding"
 
-    assert page.select(".govuk-grid-column-three-quarters a")[-1]["href"] == url_for(
+    assert page.select(".govuk-grid-column-three-quarters a")[-2]["href"] == url_for(
         "main.platform_admin_create_email_branding"
+    )
+    assert page.select(".govuk-grid-column-three-quarters a")[-1]["href"] == url_for(
+        "main.create_email_branding_government_identity_logo"
     )
 
     assert brand_names == [
