@@ -14,12 +14,10 @@
   {{ live_search(target_selector='.letter-brand', show=True, form=search_form, autofocus=True) }}
   <nav>
     {% for brand in letter_brandings %}
-      <div class="letter-brand">
-        <div class="message-name">
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.update_letter_branding', branding_id=brand.id) }}">
-            {{ brand.name }}
-          </a>
-        </div>
+      <div class="letter-brand browse-list-item">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.update_letter_branding', branding_id=brand.id) }}">
+          {{ brand.name }}
+        </a>
       </div>
     {% endfor %}
   </nav>

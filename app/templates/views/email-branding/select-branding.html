@@ -14,12 +14,10 @@
   {{ live_search(target_selector='.email-brand', show=True, form=search_form, autofocus=True) }}
   <nav>
     {% for brand in email_brandings|sort %}
-      <div class="email-brand">
-        <div class="message-name">
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.platform_admin_update_email_branding', branding_id=brand.id) }}">
-            {{ brand.name or 'Unnamed' }}
-          </a>
-        </div>
+      <div class="email-brand browse-list-item">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.platform_admin_update_email_branding', branding_id=brand.id) }}">
+          {{ brand.name or 'Unnamed' }}
+        </a>
       </div>
     {% endfor %}
   </nav>
