@@ -449,3 +449,14 @@ def test_bulk_sending_limits(client_request):
         "There’s a maximum daily limit of 250,000 emails, 250,000 text messages and 20,000 letters. "
         "If you need to discuss these limits, contact us."
     )
+
+
+def test_trial_mode_sending_limits(client_request):
+    page = client_request.get("main.trial_mode_new")
+
+    assert [normalize_spaces(li.text) for li in page.select_one("main ul").select("li")] == [
+        "send messages to yourself and other people in your team",
+        "send 50 emails per day",
+        "send 50 text messages per day",
+        "create letter templates, but not send them",
+    ]
