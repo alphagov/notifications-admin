@@ -479,3 +479,8 @@ def format_auth_type(auth_type, with_indefinite_article=False):
         return f"{indefinite_article} {auth_type.lower()}"
 
     return auth_type
+
+
+def sentence_case(sentence):
+    first_word, rest_of_sentence = (sentence + " ").split(" ", 1)
+    return f"{first_word.title()} {rest_of_sentence}"[:-1]

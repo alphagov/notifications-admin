@@ -10,6 +10,7 @@ from app.formatters import (
     format_notification_status_as_url,
     format_number_in_pounds_as_currency,
     round_to_significant_figures,
+    sentence_case,
 )
 
 
@@ -133,3 +134,26 @@ def test_round_to_significant_figures(value, significant_figures, expected_resul
 )
 def test_email_safe_return_dot_separated_email_domain(service_name, safe_email):
     assert email_safe(service_name) == safe_email
+
+
+@pytest.mark.parametrize(
+    "sentence, sentence_case_sentence",
+    [
+        ("", ""),
+        ("a", "A"),
+        ("foo", "Foo"),
+        ("foo bar", "Foo bar"),
+        ("Foo bar", "Foo bar"),
+        ("FOO BAR", "Foo BAR"),
+        ("fOO BAR", "Foo BAR"),
+        ("2numeral", "2Numeral"),
+        (".punctuation", ".Punctuation"),
+        ("üńïçödë wördś", "Üńïçödë wördś"),
+        # Only one sentence per string is supported
+        ("multiple. sentences in one. string", "Multiple. sentences in one. string"),
+        # Naïve around camelcase words
+        ("eMail", "Email"),
+    ],
+)
+def test_sentence_case(sentence, sentence_case_sentence):
+    assert sentence_case(sentence) == sentence_case_sentence

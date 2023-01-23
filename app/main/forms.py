@@ -58,6 +58,7 @@ from app.formatters import (
     format_thousands,
     guess_name_from_email_address,
     message_count_noun,
+    sentence_case,
 )
 from app.main.validators import (
     BroadcastLength,
@@ -326,10 +327,12 @@ class GovukIntegerField(GovukTextInputField):
         if self.data:
 
             if not isinstance(self.data, int):
-                raise ValidationError(f"{self.things} must be a whole number")
+                raise ValidationError(f"{sentence_case(self.things)} must be a whole number")
 
             if self.data > self.POSTGRES_MAX_INT:
-                raise ValidationError(f"{self.things} must be {format_thousands(self.POSTGRES_MAX_INT)} or less")
+                raise ValidationError(
+                    f"{sentence_case(self.things)} must be {format_thousands(self.POSTGRES_MAX_INT)} or less"
+                )
 
         return super().pre_validate(form)
 
@@ -1136,7 +1139,7 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
 class AdminServiceMessageLimitForm(StripWhitespaceForm):
     message_limit = GovukIntegerField(
         "",
-        things="Number of messages",
+        things="number of messages",
         validators=[DataRequired(message="Cannot be empty")],
     )
 
@@ -1157,7 +1160,7 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
 class AdminServiceRateLimitForm(StripWhitespaceForm):
     rate_limit = GovukIntegerField(
         "Number of messages the service can send in a rolling 60 second window",
-        things="Number of messages",
+        things="number of messages",
         validators=[DataRequired(message="Cannot be empty")],
     )
 
@@ -1471,15 +1474,15 @@ class Triage(StripWhitespaceForm):
 class EstimateUsageForm(StripWhitespaceForm):
     volume_email = GovukIntegerField(
         "How many emails do you expect to send in the next year?",
-        things="Number of emails",
+        things="number of emails",
     )
     volume_sms = GovukIntegerField(
         "How many text messages do you expect to send in the next year?",
-        things="Number of text messages",
+        things="number of text messages",
     )
     volume_letter = GovukIntegerField(
         "How many letters do you expect to send in the next year?",
-        things="Number of letters",
+        things="number of letters",
     )
     consent_to_research = GovukRadiosField(
         "Can we contact you when we’re doing user research?",
@@ -1511,7 +1514,7 @@ class AdminProviderRatioForm(Form):
                 provider["identifier"],
                 GovukIntegerField(
                     f"{provider['display_name']} (%)",
-                    things="Percentage",
+                    things="percentage",
                     validators=[validators.NumberRange(min=0, max=100, message="Must be between 0 and 100")],
                     param_extensions={
                         "classes": "govuk-input--width-3",
@@ -2169,7 +2172,7 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
     )
     days_of_retention = GovukIntegerField(
         label="Days of retention",
-        things="Days of retention",
+        things="days of retention",
         validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
     )
 
@@ -2177,7 +2180,7 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
 class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
     days_of_retention = GovukIntegerField(
         label="Days of retention",
-        things="Days of retention",
+        things="days of retention",
         validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
     )
 
