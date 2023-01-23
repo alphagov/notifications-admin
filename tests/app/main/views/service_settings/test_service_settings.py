@@ -1561,9 +1561,8 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
     assert page.select("input[type=text]")[0]["value"] == "1234"
     assert page.select("input[type=text]")[1].get("value") is None
     assert page.select("input[type=text]")[2]["value"] == "aaaaaaaaaaaaa"
-    assert (
-        normalize_spaces(page.select_one("#volume_letter-error").text)
-        == "Error: Enter the number of letters you expect to send"
+    assert normalize_spaces(page.select_one("#volume_letter-error").text) == (
+        "Error: Number of letters must be a whole number"
     )
     assert mock_update_service.called is False
 
@@ -4667,6 +4666,34 @@ def test_should_show_page_to_set_message_limit(
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1,000"
 
 
+@pytest.mark.parametrize(
+    "notification_type, expected_api_field_updated",
+    (
+        ("email", "email_message_limit"),
+        ("sms", "sms_message_limit"),
+        ("letter", "letter_message_limit"),
+    ),
+)
+def test_should_set_message_limit(
+    client_request,
+    platform_admin_user,
+    notification_type,
+    expected_api_field_updated,
+    mock_update_service,
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.set_message_limit",
+        service_id=SERVICE_ONE_ID,
+        notification_type=notification_type,
+        _data={"message_limit": "1,234"},
+    )
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        **{expected_api_field_updated: 1234},
+    )
+
+
 def test_should_show_page_to_set_rate_limit(
     client_request,
     platform_admin_user,
@@ -4686,11 +4713,9 @@ def test_should_show_page_to_set_rate_limit(
         ("250000", 250_000),
         ("250,000 ", 250_000),
         (" 250 000", 250_000),
-        pytest.param("foo", "foo", marks=pytest.mark.xfail),
-        pytest.param("", "", marks=pytest.mark.xfail),
     ],
 )
-def test_should_set_message_limit(
+def test_should_set_rate_limit(
     client_request,
     platform_admin_user,
     new_limit,
@@ -4709,6 +4734,60 @@ def test_should_set_message_limit(
         SERVICE_ONE_ID,
         rate_limit=expected_api_argument,
     )
+
+
+@pytest.mark.parametrize(
+    "endpoint, extra_args, form_data, expected_error_message",
+    (
+        (
+            "main.set_rate_limit",
+            {},
+            {"rate_limit": ""},
+            "Error: Cannot be empty",
+        ),
+        (
+            "main.set_rate_limit",
+            {},
+            {"rate_limit": "foo"},
+            "Error: Number of messages must be a whole number",
+        ),
+        (
+            "main.set_message_limit",
+            {"notification_type": "sms"},
+            {"message_limit": ""},
+            "Error: Cannot be empty",
+        ),
+        (
+            "main.set_message_limit",
+            {"notification_type": "email"},
+            {"message_limit": "foo"},
+            "Error: Number of emails must be a whole number",
+        ),
+        (
+            "main.set_message_limit",
+            {"notification_type": "letter"},
+            {"message_limit": "12.34"},
+            "Error: Number of letters must be a whole number",
+        ),
+    ),
+)
+def test_should_show_error_for_invalid_rate_or_message_limits(
+    client_request,
+    platform_admin_user,
+    endpoint,
+    extra_args,
+    form_data,
+    expected_error_message,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        **extra_args,
+        _data=form_data,
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == expected_error_message
 
 
 def test_old_set_letters_page_redirects(
