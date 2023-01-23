@@ -11,10 +11,10 @@
 {% block platform_admin_content %}
 
   <h1 class="heading-medium">{{ page_title }}</h1>
-  {{ live_search(target_selector='.letter-brand', show=True, form=search_form, autofocus=True) }}
+  {{ live_search(target_selector='.browse-list-item', show=True, form=search_form, autofocus=True) }}
   <nav>
     {% for brand in letter_brandings %}
-      <div class="letter-brand browse-list-item">
+      <div class="browse-list-item">
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.update_letter_branding', branding_id=brand.id) }}">
           {{ brand.name }}
         </a>

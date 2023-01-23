@@ -20,7 +20,7 @@ def test_letter_branding_page_shows_full_branding_list(
     client_request.login(platform_admin_user)
     page = client_request.get(".letter_branding")
 
-    links = page.select(".letter-brand a")
+    links = page.select(".browse-list-item a")
     brand_names = [normalize_spaces(link.text) for link in links]
     hrefs = [link["href"] for link in links]
 
