@@ -4183,9 +4183,9 @@ def test_GET_email_branding_upload_logo(
 )
 def test_POST_email_branding_upload_logo_success(mocker, client_request, service_one, email_branding_data):
     antivirus_mock = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-    mock_upload_email_logo = mocker.patch("app.main.views.service_settings.index.upload_email_logo")
-    mock_upload_email_logo.return_value = "my-logo-path"
-    mocker.patch("app.main.views.service_settings.index.uuid.uuid4", return_value="my-logo-uuid")
+    mock_save_temporary = mocker.patch(
+        "app.main.views.service_settings.index.logo_client.save_temporary_logo", return_value="my-logo-path"
+    )
 
     mocker.patch.dict(
         "flask.current_app.config", {"EMAIL_BRANDING_MIN_LOGO_HEIGHT_PX": 1, "EMAIL_BRANDING_MAX_LOGO_WIDTH_PX": 1}
@@ -4205,13 +4205,12 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
     )
 
     assert antivirus_mock.call_count == 1
-    assert mock_upload_email_logo.call_args_list == [
+    assert mock_save_temporary.call_args_list == [
         mocker.call(
-            "",
-            open("tests/test_img_files/small-but-perfectly-formed.png", "rb").read(),
-            "eu-west-1",
-            user_id=ANY,
-            unique_id="my-logo-uuid",
+            mocker.ANY,
+            logo_type="email",
+            file_extension=".png",
+            content_type="image/png",
         )
     ]
 
@@ -4244,7 +4243,7 @@ def test_POST_email_branding_upload_logo_validation_errors(
     if callable(post_data):
         post_data = post_data()
 
-    mock_upload_email_logo = mocker.patch("app.main.views.service_settings.index.upload_email_logo")
+    mock_save_temporary = mocker.patch("app.main.views.service_settings.index.logo_client.save_temporary_logo")
 
     with mock.patch.dict("app.main.validators.current_app.config", {"ANTIVIRUS_ENABLED": False}):
         page = client_request.post(
@@ -4255,7 +4254,7 @@ def test_POST_email_branding_upload_logo_validation_errors(
         )
 
     assert expected_error in page.text
-    assert mock_upload_email_logo.call_args_list == []
+    assert mock_save_temporary.call_args_list == []
 
 
 @pytest.mark.parametrize(
@@ -4269,7 +4268,7 @@ def test_POST_email_branding_upload_logo_validation_errors(
 def test_POST_email_branding_upload_logo_enforces_minimum_logo_height(
     mocker, client_request, service_one, min_logo_height, expect_error
 ):
-    mocker.patch("app.main.views.service_settings.index.upload_email_logo")
+    mocker.patch("app.main.views.service_settings.index.logo_client.save_temporary_logo")
     mocker.patch("app.utils.image_processing.ImageProcessor")
 
     with mock.patch.dict(
@@ -4292,7 +4291,7 @@ def test_POST_email_branding_upload_logo_enforces_minimum_logo_height(
 
 
 def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(mocker, client_request, service_one):
-    mocker.patch("app.main.views.service_settings.index.upload_email_logo")
+    mocker.patch("app.main.views.service_settings.index.logo_client.save_temporary_logo")
     mock_image_processor = mocker.patch("app.main.forms.ImageProcessor")
     mock_image_processor().height = ComparablePropertyMock(side_effect=[26, 13])
     mock_image_processor().width = 100
@@ -4420,6 +4419,9 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
     expected_name,
 ):
     mock_flash = mocker.patch("app.main.views.service_settings.index.flash")
+    mock_save_permanent = mocker.patch(
+        "app.main.views.service_settings.index.logo_client.save_permanent_logo", return_value="permanent-example.png"
+    )
     mock_should_set_default_org_email_branding = mocker.patch(
         "app.main.views.service_settings.index._should_set_default_org_email_branding", return_value=False
     )
@@ -4436,7 +4438,7 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
     )
     mock_create_email_branding.assert_called_once_with(
-        logo="example.png",
+        logo="permanent-example.png",
         name=expected_name,
         alt_text="some alt text",
         text=None,
@@ -4454,6 +4456,13 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
         "default_with_tick",
     )
     mock_should_set_default_org_email_branding.assert_called_once_with(None)
+    assert mock_save_permanent.call_args_list == [
+        mocker.call(
+            "example.png",
+            logo_type="email",
+            logo_key_extra="some alt text",
+        )
+    ]
 
 
 def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_appropriate(
@@ -4470,6 +4479,9 @@ def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_a
     mocker,
 ):
     service_one["organisation"] = ORGANISATION_ID
+    mock_save_permanent = mocker.patch(
+        "app.main.views.service_settings.index.logo_client.save_permanent_logo", return_value="permanent-example.png"
+    )
     mock_should_set_default_org_email_branding = mocker.patch(
         "app.main.views.service_settings.index._should_set_default_org_email_branding", return_value=True
     )
@@ -4487,7 +4499,7 @@ def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_a
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
     )
     mock_create_email_branding.assert_called_once_with(
-        logo="example.png",
+        logo="permanent-example.png",
         name="some alt text",
         alt_text="some alt text",
         text=None,
@@ -4500,6 +4512,13 @@ def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_a
     mock_update_organisation.assert_called_once_with(
         ORGANISATION_ID, cached_service_ids=ANY, email_branding_id=fake_uuid
     )
+    assert mock_save_permanent.call_args_list == [
+        mocker.call(
+            "example.png",
+            logo_type="email",
+            logo_key_extra="some alt text",
+        )
+    ]
 
 
 def test_GET_email_branding_choose_banner_colour(client_request, service_one):
