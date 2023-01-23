@@ -1,10 +1,12 @@
+import os
+from io import BytesIO
+
 from flask import abort, current_app, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import email_branding_client
 from app.event_handlers import create_update_email_branding_event
-from app.formatters import email_safe
 from app.main import main
 from app.main.forms import (
     AdminEditEmailBrandingForm,
@@ -18,14 +20,7 @@ from app.models.branding import (
     AllEmailBranding,
     EmailBranding,
 )
-from app.s3_client.s3_logo_client import (
-    TEMP_TAG,
-    delete_email_temp_file,
-    delete_email_temp_files_created_by,
-    permanent_email_logo_name,
-    persist_logo,
-    upload_email_logo,
-)
+from app.s3_client.logo_client import logo_client
 from app.utils.user import user_is_platform_admin
 
 
@@ -45,27 +40,32 @@ def platform_admin_update_email_branding(branding_id, logo=None):
 
     form = AdminEditEmailBrandingForm(obj=email_branding)
 
-    logo = logo or email_branding.logo
+    # TODO: remove the `logo`-based URL path
+    # `logo_key` here can either be a temporary logo key which has been uploaded but not saved,
+    # or a reference to the existing logo if nothing has been uploaded to overwrite
+    logo_key = request.args.get("logo_key", logo or email_branding.logo)
+    logo_changed = ("logo_key" in request.args) or logo
 
     if form.validate_on_submit():
         if form.file.data:
-            upload_filename = upload_email_logo(
-                form.file.data.filename, form.file.data, current_app.config["AWS_REGION"], user_id=current_user.id
+            file_extension = os.path.splitext(form.file.data.filename)[1]
+            temporary_logo_key = logo_client.save_temporary_logo(
+                form.file.data, "email", file_extension=file_extension, content_type=form.file.data.content_type
             )
-
-            if logo and logo.startswith(TEMP_TAG.format(user_id=current_user.id)):
-                delete_email_temp_file(logo)
-
             return redirect(
-                url_for(".platform_admin_update_email_branding", branding_id=branding_id, logo=upload_filename)
+                url_for(".platform_admin_update_email_branding", branding_id=branding_id, logo_key=temporary_logo_key)
             )
 
-        updated_logo_name = permanent_email_logo_name(logo, current_user.id) if logo else None
+        permanent_logo_key = email_branding.logo
+        if logo_changed:
+            permanent_logo_key = logo_client.save_permanent_logo(
+                logo_key, logo_type="email", logo_key_extra=form.name.data
+            )
 
         try:
             email_branding_client.update_email_branding(
                 branding_id=branding_id,
-                logo=updated_logo_name,
+                logo=permanent_logo_key,
                 name=form.name.data,
                 alt_text=form.alt_text.data,
                 text=form.text.data,
@@ -84,11 +84,6 @@ def platform_admin_update_email_branding(branding_id, logo=None):
             else:
                 raise e
 
-        if logo:
-            persist_logo(logo, updated_logo_name)
-
-        delete_email_temp_files_created_by(current_user.id)
-
         if not form.errors:
             return redirect(url_for(".email_branding", branding_id=branding_id))
 
@@ -98,7 +93,7 @@ def platform_admin_update_email_branding(branding_id, logo=None):
             form=form,
             email_branding=email_branding,
             cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
-            logo=logo,
+            logo=logo_key,
         ),
         400 if form.errors else 200,
     )
@@ -133,16 +128,18 @@ def create_email_branding_government_identity_colour():
     if filename not in GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA:
         abort(400)
 
-    filename = f"{filename}.png"
+    file_extension = ".png"
+    content_type = "image/png"
+    filename = f"{filename}{file_extension}"
     form = GovernmentIdentityColour(crest_or_insignia_image_filename=filename)
 
     if form.validate_on_submit():
-        image_file = INSIGNIA_ASSETS_PATH / filename
-        upload_filename = upload_email_logo(
-            email_safe(filename),
-            image_file.resolve().read_bytes(),
-            current_app.config["AWS_REGION"],
-            user_id=current_user.id,
+        image_file_path = INSIGNIA_ASSETS_PATH / filename
+        temporary_logo_key = logo_client.save_temporary_logo(
+            file_data=BytesIO(image_file_path.resolve().read_bytes()),
+            logo_type="email",
+            file_extension=file_extension,
+            content_type=content_type,
         )
         return redirect(
             url_for(
@@ -150,7 +147,7 @@ def create_email_branding_government_identity_colour():
                 name=request.args.get("text"),
                 text=request.args.get("text"),
                 colour=form.colour.data,
-                logo=upload_filename,
+                logo_key=temporary_logo_key,
                 brand_type=request.args.get("brand_type"),
             )
         )
@@ -172,22 +169,26 @@ def platform_admin_create_email_branding(logo=None):
         brand_type=request.args.get("brand_type", "org"),
     )
 
+    # TODO: remove the `logo`-based URL path
+    temporary_logo_key = request.args.get("logo_key", logo)
+
     if form.validate_on_submit():
         if form.file.data:
-            upload_filename = upload_email_logo(
-                form.file.data.filename, form.file.data, current_app.config["AWS_REGION"], user_id=current_user.id
+            file_extension = os.path.splitext(form.file.data.filename)[1]
+            temporary_logo_key = logo_client.save_temporary_logo(
+                form.file.data, "email", file_extension=file_extension, content_type=form.file.data.content_type
             )
+            return redirect(url_for("main.platform_admin_create_email_branding", logo_key=temporary_logo_key))
 
-            if logo and logo.startswith(TEMP_TAG.format(user_id=current_user.id)):
-                delete_email_temp_file(logo)
-
-            return redirect(url_for("main.platform_admin_create_email_branding", logo=upload_filename))
-
-        updated_logo_name = permanent_email_logo_name(logo, current_user.id) if logo else None
+        permanent_logo_key = None
+        if temporary_logo_key:
+            permanent_logo_key = logo_client.save_permanent_logo(
+                temporary_logo_key, logo_type="email", logo_key_extra=form.name.data
+            )
 
         try:
             email_branding_client.create_email_branding(
-                logo=updated_logo_name,
+                logo=permanent_logo_key,
                 name=form.name.data,
                 alt_text=form.alt_text.data,
                 text=form.text.data,
@@ -201,11 +202,6 @@ def platform_admin_create_email_branding(logo=None):
             else:
                 raise e
 
-        if logo:
-            persist_logo(logo, updated_logo_name)
-
-        delete_email_temp_files_created_by(current_user.id)
-
         if not form.errors:
             return redirect(url_for(".email_branding"))
 
@@ -214,7 +210,7 @@ def platform_admin_create_email_branding(logo=None):
             "views/email-branding/manage-branding.html",
             form=form,
             cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
-            logo=logo,
+            logo=temporary_logo_key,
         ),
         400 if form.errors else 200,
     )
