@@ -1,5 +1,6 @@
 import math
 import weakref
+from contextlib import suppress
 from datetime import datetime, timedelta
 from itertools import chain
 from numbers import Number
@@ -30,7 +31,6 @@ from wtforms import (
     FieldList,
     FileField,
     HiddenField,
-    IntegerField,
     PasswordField,
 )
 from wtforms import RadioField as WTFormsRadioField
@@ -58,6 +58,7 @@ from app.formatters import (
     format_thousands,
     guess_name_from_email_address,
     message_count_noun,
+    sentence_case,
 )
 from app.main.validators import (
     BroadcastLength,
@@ -279,10 +280,6 @@ class GovukDateField(GovukTextInputFieldMixin, DateField):
     pass
 
 
-class GovukIntegerField(GovukTextInputFieldMixin, IntegerField):
-    pass
-
-
 class SMSCode(GovukTextInputField):
     # the design system recommends against ever using `type="number"`. "tel" makes mobile browsers
     # show a phone keypad input rather than a full qwerty keyboard.
@@ -300,14 +297,13 @@ class SMSCode(GovukTextInputField):
             self.data = InsensitiveDict.make_key(valuelist[0])
 
 
-class ForgivingIntegerField(GovukTextInputField):
+class GovukIntegerField(GovukTextInputField):
 
-    #  Actual value is 2147483647 but this is a scary looking arbitrary number
-    POSTGRES_MAX_INT = 2000000000
+    #  Actual value is 2,147,483,647 but this is a scary looking arbitrary number
+    POSTGRES_MAX_INT = 2_000_000_000
 
-    def __init__(self, label=None, things="items", format_error_suffix="", **kwargs):
+    def __init__(self, label=None, *, things, **kwargs):
         self.things = things
-        self.format_error_suffix = format_error_suffix
         super().__init__(label, **kwargs)
 
     def process_formdata(self, valuelist):
@@ -316,10 +312,10 @@ class ForgivingIntegerField(GovukTextInputField):
 
             value = valuelist[0].replace(",", "").replace(" ", "")
 
-            try:
-                value = int(value)
-            except ValueError:
-                pass
+            for type_ in (int, float):
+                with suppress(ValueError):
+                    value = type_(value)
+                    break
 
             if value == "":
                 value = 0
@@ -329,25 +325,23 @@ class ForgivingIntegerField(GovukTextInputField):
     def pre_validate(self, form):
 
         if self.data:
-            error = None
-            try:
-                if int(self.data) > self.POSTGRES_MAX_INT:
-                    error = "Number of {} must be {} or less".format(
-                        self.things,
-                        format_thousands(self.POSTGRES_MAX_INT),
-                    )
-            except ValueError:
-                error = "Enter the number of {} {}".format(
-                    self.things,
-                    self.format_error_suffix,
-                )
 
-            if error:
-                raise ValidationError(error)
+            if not isinstance(self.data, int):
+                raise ValidationError(f"{sentence_case(self.things)} must be a whole number")
+
+            if self.data > self.POSTGRES_MAX_INT:
+                raise ValidationError(
+                    f"{sentence_case(self.things)} must be {format_thousands(self.POSTGRES_MAX_INT)} or less"
+                )
 
         return super().pre_validate(form)
 
     def __call__(self, **kwargs):
+
+        if not hasattr(self, "get_form"):
+            # If the field is unbound – not yet attached to a Form instance – then
+            # it won’t have a submitted value yet so we can return early
+            return super().__call__(**kwargs)
 
         if self.get_form().is_submitted() and not self.get_form().validate():
             return super().__call__(value=(self.raw_data or [None])[0], **kwargs)
@@ -1136,17 +1130,24 @@ class AdminNewOrganisationForm(
 
 class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
-        "Numbers of text message fragments per year", validators=[InputRequired(message="Cannot be empty")]
+        "Numbers of text message fragments per year",
+        things="text message fragments",
+        validators=[InputRequired(message="Cannot be empty")],
     )
 
 
 class AdminServiceMessageLimitForm(StripWhitespaceForm):
-    message_limit = GovukIntegerField("", validators=[DataRequired(message="Cannot be empty")])
+    message_limit = GovukIntegerField(
+        "",
+        things="number of messages",
+        validators=[DataRequired(message="Cannot be empty")],
+    )
 
     def __init__(self, notification_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.message_limit.label.text = f"Daily {message_count_noun(1, notification_type)} limit"
+        self.message_limit.things = f"Number of {message_count_noun(999, notification_type)}"
         self.message_limit.param_extensions = {
             "hint": {
                 "text": (
@@ -1159,6 +1160,7 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
 class AdminServiceRateLimitForm(StripWhitespaceForm):
     rate_limit = GovukIntegerField(
         "Number of messages the service can send in a rolling 60 second window",
+        things="number of messages",
         validators=[DataRequired(message="Cannot be empty")],
     )
 
@@ -1470,20 +1472,17 @@ class Triage(StripWhitespaceForm):
 
 
 class EstimateUsageForm(StripWhitespaceForm):
-    volume_email = ForgivingIntegerField(
+    volume_email = GovukIntegerField(
         "How many emails do you expect to send in the next year?",
-        things="emails",
-        format_error_suffix="you expect to send",
+        things="number of emails",
     )
-    volume_sms = ForgivingIntegerField(
+    volume_sms = GovukIntegerField(
         "How many text messages do you expect to send in the next year?",
-        things="text messages",
-        format_error_suffix="you expect to send",
+        things="number of text messages",
     )
-    volume_letter = ForgivingIntegerField(
+    volume_letter = GovukIntegerField(
         "How many letters do you expect to send in the next year?",
-        things="letters",
-        format_error_suffix="you expect to send",
+        things="number of letters",
     )
     consent_to_research = GovukRadiosField(
         "Can we contact you when we’re doing user research?",
@@ -1515,6 +1514,7 @@ class AdminProviderRatioForm(Form):
                 provider["identifier"],
                 GovukIntegerField(
                     f"{provider['display_name']} (%)",
+                    things="percentage",
                     validators=[validators.NumberRange(min=0, max=100, message="Must be between 0 and 100")],
                     param_extensions={
                         "classes": "govuk-input--width-3",
@@ -2172,6 +2172,7 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
     )
     days_of_retention = GovukIntegerField(
         label="Days of retention",
+        things="days of retention",
         validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
     )
 
@@ -2179,6 +2180,7 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
 class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
     days_of_retention = GovukIntegerField(
         label="Days of retention",
+        things="days of retention",
         validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
     )
 
