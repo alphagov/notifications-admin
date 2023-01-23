@@ -3035,6 +3035,35 @@ def valid_token(notify_admin, fake_uuid):
 
 
 @pytest.fixture(scope="function")
+def mock_get_orgs_and_services_associated_with_branding_empty(mocker):
+    def _get(email_branding_id):
+        return {"data": {"services": [], "organisations": []}}
+
+    return mocker.patch("app.email_branding_client.get_orgs_and_services_associated_with_branding", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
+def mock_get_orgs_and_services_associated_with_branding_no_orgs(mocker):
+    def _get(email_branding_id):
+        return {
+            "data": {
+                "services": [{"name": "service 1", "id": "1234"}, {"name": "service 2", "id": "5678"}],
+                "organisations": [],
+            }
+        }
+
+    return mocker.patch("app.email_branding_client.get_orgs_and_services_associated_with_branding", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
+def mock_get_orgs_and_services_associated_with_branding_no_services(mocker):
+    def _get(email_branding_id):
+        return {"data": {"services": [], "organisations": [{"name": "organisation 1", "id": "1234"}]}}
+
+    return mocker.patch("app.email_branding_client.get_orgs_and_services_associated_with_branding", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
 def mock_get_valid_service_inbound_api(mocker):
     def _get(service_id, inbound_api_id):
         return {

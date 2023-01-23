@@ -8,7 +8,7 @@ from notifications_python_client.errors import HTTPError
 
 from app.models.branding import INSIGNIA_ASSETS_PATH
 from app.s3_client.s3_logo_client import EMAIL_LOGO_LOCATION_STRUCTURE, TEMP_TAG
-from tests.conftest import normalize_spaces
+from tests.conftest import create_email_branding, normalize_spaces
 
 
 def test_email_branding_page_shows_full_branding_list(client_request, platform_admin_user, mock_get_all_email_branding):
@@ -34,12 +34,120 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
         "org 5",
     ]
     assert hrefs == [
-        url_for(".platform_admin_update_email_branding", branding_id=1),
-        url_for(".platform_admin_update_email_branding", branding_id=2),
-        url_for(".platform_admin_update_email_branding", branding_id=3),
-        url_for(".platform_admin_update_email_branding", branding_id=4),
-        url_for(".platform_admin_update_email_branding", branding_id=5),
+        url_for(".platform_admin_view_email_branding", branding_id=1),
+        url_for(".platform_admin_view_email_branding", branding_id=2),
+        url_for(".platform_admin_view_email_branding", branding_id=3),
+        url_for(".platform_admin_view_email_branding", branding_id=4),
+        url_for(".platform_admin_view_email_branding", branding_id=5),
     ]
+
+
+def test_view_email_branding_with_services_but_no_orgs(
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_no_orgs,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_view_email_branding", branding_id=fake_uuid)
+
+    assert page.select_one(".hint").text.strip() == "No organisations use this branding as their default."
+
+    list_of_service_links = page.select(".browse-list-item")
+
+    link_1 = list_of_service_links[0].select_one("a")
+    assert link_1.text.strip() == "service 1"
+    assert link_1["href"] == url_for(".service_settings", service_id="1234")
+
+    link_2 = list_of_service_links[1].select_one("a")
+    assert link_2.text.strip() == "service 2"
+    assert link_2["href"] == url_for(".service_settings", service_id="5678")
+
+
+def test_view_email_branding_with_org_but_no_services(
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_no_services,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_view_email_branding", branding_id=fake_uuid)
+
+    assert page.select_one(".hint").text.strip() == "No services use this branding."
+
+    list_of_organisation_links = page.select(".browse-list-item")
+
+    link_1 = list_of_organisation_links[0].select_one("a")
+    assert link_1.text.strip() == "organisation 1"
+    assert link_1["href"] == url_for(".organisation_settings", org_id="1234")
+
+
+@pytest.mark.parametrize(
+    "created_at, updated_at", [("2022-12-06T09:59:56.000000Z", "2023-01-20T11:59:56.000000Z"), (None, None)]
+)
+def test_view_email_branding_shows_created_by_and_helpful_dates_if_available(
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_empty,
+    mocker,
+    created_at,
+    updated_at,
+):
+    client_request.login(platform_admin_user)
+
+    def _get_email_branding(id):
+        return create_email_branding(
+            id,
+            non_standard_values={
+                "created_by": "1234-5678-abcd-efgh",
+                "created_at": created_at,
+                "updated_at": updated_at,
+            },
+        )
+
+    mocker.patch("app.models.branding.email_branding_client.get_email_branding", side_effect=_get_email_branding)
+
+    user = {"id": "1234-5678-abcd-efgh", "name": "Arwa Suren"}
+    mocker.patch("app.models.branding.user_api_client.get_user", return_value=user)
+
+    page = client_request.get(".platform_admin_view_email_branding", branding_id=fake_uuid)
+
+    created_by_link = page.select("p > a")[1]
+    assert created_by_link.text.strip() == user["name"]
+    assert created_by_link["href"] == url_for(".user_information", user_id=user["id"])
+
+    if created_at:
+        assert "on Tuesday 06 December 2022" in page.select("p")[-2].text
+
+    if updated_at:
+        assert "on Friday 20 January 2023" in page.select("p")[-1].text
+
+
+def test_view_email_branding_bottom_links(
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_empty,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_view_email_branding", branding_id=fake_uuid)
+
+    bottom_links = page.select(".page-footer-link")
+
+    edit_link = bottom_links[0].select_one("a")
+    assert edit_link.text.strip() == "Edit this branding"
+    assert edit_link["href"] == url_for(".platform_admin_update_email_branding", branding_id=fake_uuid)
+
+    archive_link = bottom_links[1].select_one("a")
+    assert archive_link.text.strip() == "Delete this branding"
+    assert archive_link["href"] == url_for(".platform_admin_confirm_archive_email_branding", branding_id=fake_uuid)
 
 
 def test_edit_email_branding_shows_the_correct_branding_info(
@@ -375,6 +483,10 @@ def test_update_existing_branding(
             "cdn_url": "https://static-logos.cdn.com",
             "brand_type": data["brand_type"],
         },
+        _expected_redirect=url_for(
+            ".platform_admin_view_email_branding",
+            branding_id=fake_uuid,
+        ),
     )
 
     assert mock_update_email_branding.called
@@ -541,6 +653,59 @@ def test_update_email_branding_with_unique_name_conflict(
         normalize_spaces(resp.select_one("#name-error").text)
         == "Error: An email branding with that name already exists."
     )
+
+
+def test_platform_admin_confirm_archive_email_branding(
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_empty,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_confirm_archive_email_branding", branding_id=fake_uuid)
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        "Are you sure you want to delete this email branding? Yes, delete"
+    )
+    assert "action" not in page.select_one(".banner-dangerous form")
+    assert page.select_one(".banner-dangerous form")["method"] == "post"
+
+
+def test_platform_admin_confirm_archive_email_branding_that_is_in_use(
+    client_request,
+    platform_admin_user,
+    mock_get_email_branding,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_branding_no_orgs,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_confirm_archive_email_branding", branding_id=fake_uuid)
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        "This email branding is in use. You cannot delete it."
+    )
+
+
+def test_platform_admin_archive_email_branding(
+    client_request,
+    platform_admin_user,
+    mocker,
+    fake_uuid,
+    mock_get_email_branding,
+):
+    mock_archive = mocker.patch("app.email_branding_client.archive_email_branding")
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".platform_admin_archive_email_branding",
+        branding_id=fake_uuid,
+        _expected_redirect=url_for(".email_branding"),
+    )
+    mock_archive.assert_called_once_with(branding_id=fake_uuid)
 
 
 def test_temp_logo_is_shown_after_uploading_logo(

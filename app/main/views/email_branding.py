@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 
-from flask import abort, current_app, redirect, render_template, request, url_for
+from flask import abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
@@ -29,6 +29,32 @@ from app.utils.user import user_is_platform_admin
 def email_branding():
     return render_template(
         "views/email-branding/select-branding.html", email_brandings=AllEmailBranding(), search_form=SearchByNameForm()
+    )
+
+
+@main.route(
+    "/email-branding/<uuid:branding_id>", methods=["GET", "POST"], endpoint="platform_admin_view_email_branding"
+)
+@main.route(
+    "/email-branding/<uuid:branding_id>/archive",
+    methods=["GET"],
+    endpoint="platform_admin_confirm_archive_email_branding",
+)
+def platform_admin_view_email_branding(branding_id):
+    email_branding = EmailBranding.from_id(branding_id)
+
+    if request.endpoint == "main.platform_admin_confirm_archive_email_branding":
+        if email_branding.is_used_by_orgs_or_services:
+            flash("This email branding is in use. You cannot delete it.")
+        else:
+            flash("Are you sure you want to delete this email branding?", "delete")
+
+    return render_template(
+        "views/email-branding/view-branding.html",
+        email_branding=email_branding,
+        cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
+        branding_orgs=email_branding.organisations,
+        branding_services=email_branding.services,
     )
 
 
@@ -85,7 +111,7 @@ def platform_admin_update_email_branding(branding_id, logo=None):
                 raise e
 
         if not form.errors:
-            return redirect(url_for(".email_branding", branding_id=branding_id))
+            return redirect(url_for(".platform_admin_view_email_branding", branding_id=branding_id))
 
     return (
         render_template(
@@ -97,6 +123,13 @@ def platform_admin_update_email_branding(branding_id, logo=None):
         ),
         400 if form.errors else 200,
     )
+
+
+@main.route("/email-branding/<uuid:branding_id>/archive", methods=["POST"])
+@user_is_platform_admin
+def platform_admin_archive_email_branding(branding_id):
+    email_branding_client.archive_email_branding(branding_id=branding_id)
+    return redirect(url_for(".email_branding"))
 
 
 @main.route("/email-branding/create-government-identity/logo", methods=["GET", "POST"])

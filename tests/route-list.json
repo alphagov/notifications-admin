@@ -18,6 +18,8 @@
     "/documentation",
     "/email-auth/<token>",
     "/email-branding",
+    "/email-branding/<uuid:branding_id>",
+    "/email-branding/<uuid:branding_id>/archive",
     "/email-branding/<uuid:branding_id>/edit",
     "/email-branding/<uuid:branding_id>/edit/<logo>",
     "/email-branding/create",
