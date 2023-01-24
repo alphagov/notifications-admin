@@ -53,16 +53,22 @@ def using_notify_nav():
             "link": "main.trial_mode_new",
         },
         {
-            "name": "Delivery status",
-            "link": "main.message_status",
-        },
-        {
             "name": "Guidance",
             "link": "main.guidance_index",
             "sub_navigation_items": [
                 {
                     "name": "Bulk sending",
                     "link": "main.guidance_bulk_sending",
+                },
+                {
+                    "name": "Delivery information",
+                    "link": "main.guidance_delivery_information",
+                    "sub_navigation_items": [
+                        {
+                            "name": "Delivery status",
+                            "link": "main.message_status",
+                        },
+                    ]
                 },
                 {
                     "name": "Email branding",
