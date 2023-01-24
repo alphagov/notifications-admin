@@ -18,7 +18,7 @@
 
     {{ content_metadata(
       data={
-        "Last updated": "1 May 2022"
+        "Last updated": "24 January 2023"
       }
     ) }}
 
@@ -250,11 +250,11 @@
       caption_visible=False
     ) %}
       {% for sheets, second, first, international in [
-        ('1 sheet', '41p', '63p', '96p'),
-        ('2 sheets', '46p', '68p', '£1.04'),
-        ('3 sheets', '51p', '73p', '£1.12'),
-        ('4 sheets', '56p', '78p', '£1.20'),
-        ('5 sheets', '61p', '83p', '£1.28'),
+        ('1 sheet', '47p', '72p', '£1.05'),
+        ('2 sheets', '52p', '77p', '£1.13'),
+        ('3 sheets', '57p', '82p', '£1.21'),
+        ('4 sheets', '62p', '87p', '£1.29'),
+        ('5 sheets', '67p', '92p', '£1.37'),
       ] %}
         {% call row() %}
           {% call row_heading() %} {{ sheets }} {% endcall %}
@@ -264,15 +264,6 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
-  </div>
-
-  <div class="govuk-inset-text">
-    <p class="govuk-body">From Monday 23 January 2023:</p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>second class postage will go up by 6 pence, plus VAT</li>
-      <li>first class postage will go up by 9 pence, plus VAT</li>
-      <li>international postage will go up by 9 pence, plus VAT</li>
-    </ul>
   </div>
 
 {% endblock %}
