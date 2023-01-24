@@ -45,9 +45,6 @@ class HeaderNavigation(Navigation):
         },
         "features": {
             "features",
-            "features_email",
-            "features_letters",
-            "features_sms",
             "message_status",
             "roadmap",
             "security",

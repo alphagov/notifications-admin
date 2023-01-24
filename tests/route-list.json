@@ -39,6 +39,8 @@
     "/features/terms",
     "/features/trial-mode",
     "/features/using-notify",
+    "/features/who-can-use-notify",
+    "/features/who-its-for",
     "/find-services-by-name",
     "/find-users-by-email",
     "/forgot-password",
