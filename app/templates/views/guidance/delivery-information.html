@@ -1,0 +1,44 @@
+{% extends "content_template.html" %}
+
+{% from "components/table.html" import mapping_table, row, text_field %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Delivery information
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Delivery information</h1>
+
+  <p class="govuk-body">The <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.dashboard") }}">dashboard</a> lets you check the status of any message, to see when it was delivered.</p>
+  <p class="govuk-body">For <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.security") }}">security</a>, this information is only available for 7 days after a message has been sent. You can download a report, including a list of sent messages, for your own records.</p>
+  <p class="govuk-body">See a list of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.message_status') }}">status descriptions</a>.</p>
+
+  <h2 id="delivery-times" class="heading-medium">Expected delivery times</h2>
+
+  <h3 id="emails-text-messages-delivery-times"  class="heading-small">Emails and text messages</h3>
+  <p class="govuk-body">Notify commits to sending 95% of emails and text messages within 10 seconds.</p>
+  <p class="govuk-body">We send messages through several different providers. If one provider fails, Notify switches to another so that your messages are not affected.</p>
+  <p class="govuk-body">Once an email or text message has been sent, the provider will try to deliver it to the recipient for up to 72 hours.</p>
+  <p class="govuk-body">See the latest <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.performance') }}">performance data</a>.</p>
+
+  <h4 id="open-rates" class="heading-small">Open rates and click-throughs</h4>
+  <p class="govuk-body">Notify cannot tell you if your users open an email or click on the links in an email. We do not track open rates and click-throughs because there are privacy issues. Tracking emails without asking permission from users could breach General Data Protection Regulations (GDPR).</p>
+
+  <h4 id="spam" class="heading-small">Spam</h4>
+  <p class="govuk-body">If an email is marked as spam, Notify receives a ‘complaint’ from the email provider. We’ll contact you if we receive a complaint about any of your emails. When this happens you should remove the recipient’s email address from your list.</p>
+
+  <h3 id="letters-delivery-times" class="heading-medium">Letters</h3>
+  <p class="govuk-body">Letters are printed at 5:30pm and dispatched the next working day (Monday to Friday).</p>
+  <p class="govuk-body">First class letters are delivered one day after they’re dispatched. Second class letters are delivered 2 days after they’re dispatched. Royal Mail delivers from Monday to Saturday, excluding bank holidays.</p>
+  <p class="govuk-body">Letters to Europe are delivered 3 to 5 days after they’re dispatched. Letters sent anywhere else in the world take 5 to 7 days to arrive.</p>
+
+  <h4 id="returned-mail" class="heading-small">Undelivered letters and returned mail</h4>
+  <p class="govuk-body">Every letter we send includes our printer’s address on the back of the envelope. It’s not possible to customise the return address.</p>
+  <p class="govuk-body">Returned mail is destroyed by our printer.</p>
+  <p class="govuk-body">Each letter has a unique ID. Our printer sends us the ID of every letter they destroy. We’ll contact you if the IDs match any of your letters. This is a partly manual process, so it can take a few weeks.</p>
+  
+{% endblock %}
