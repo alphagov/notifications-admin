@@ -982,8 +982,6 @@ def test_post_create_email_branding_government_identity_form_colour(mocker, clie
         ),
     )
 
-    assert mock_save_temporary.call_args_list == [
-        mocker.call(file_data=mocker.ANY, logo_type="email", file_extension=".png", content_type="image/png")
-    ]
-    logo_bytes_io = mock_save_temporary.call_args_list[0][1]["file_data"]
+    assert mock_save_temporary.call_args_list == [mocker.call(mocker.ANY, logo_type="email")]
+    logo_bytes_io = mock_save_temporary.call_args_list[0][0][0]
     assert logo_bytes_io.read() == (INSIGNIA_ASSETS_PATH / "HM Government.png").resolve().read_bytes()

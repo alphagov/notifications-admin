@@ -1,5 +1,3 @@
-import os
-
 from botocore.exceptions import ClientError as BotoClientError
 from flask import current_app, redirect, render_template, request, url_for
 from flask_login import current_user
@@ -63,12 +61,9 @@ def update_letter_branding(branding_id, logo=None):
     logo_changed = ("logo_key" in request.args) or logo
 
     if file_upload_form_submitted and file_upload_form.validate_on_submit():
-        file_extension = os.path.splitext(file_upload_form.file.data.filename)[1]
         temporary_logo_key = logo_client.save_temporary_logo(
             file_upload_form.file.data,
             logo_type="letter",
-            file_extension=file_extension,
-            content_type=file_upload_form.file.data.content_type,
         )
 
         return redirect(url_for(".update_letter_branding", branding_id=branding_id, logo_key=temporary_logo_key))
@@ -130,12 +125,9 @@ def create_letter_branding(logo=None):
     temporary_logo_key = request.args.get("logo_key", logo)
 
     if file_upload_form_submitted and file_upload_form.validate_on_submit():
-        file_extension = os.path.splitext(file_upload_form.file.data.filename)[1]
         temporary_logo_key = logo_client.save_temporary_logo(
             file_upload_form.file.data,
             logo_type="letter",
-            file_extension=file_extension,
-            content_type=file_upload_form.file.data.content_type,
         )
 
         return redirect(url_for(".create_letter_branding", logo_key=temporary_logo_key))

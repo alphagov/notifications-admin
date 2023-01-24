@@ -1,9 +1,9 @@
-import os
 from io import BytesIO
 
 from flask import abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
+from werkzeug.datastructures import FileStorage
 
 from app import email_branding_client
 from app.event_handlers import create_update_email_branding_event
@@ -75,9 +75,9 @@ def platform_admin_update_email_branding(branding_id, logo=None):
 
     if form.validate_on_submit():
         if form.file.data:
-            file_extension = os.path.splitext(form.file.data.filename)[1]
             temporary_logo_key = logo_client.save_temporary_logo(
-                form.file.data, "email", file_extension=file_extension, content_type=form.file.data.content_type
+                form.file.data,
+                logo_type="email",
             )
             return redirect(
                 url_for(".platform_admin_update_email_branding", branding_id=branding_id, logo_key=temporary_logo_key)
@@ -163,18 +163,17 @@ def create_email_branding_government_identity_colour():
     if filename not in GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA:
         abort(400)
 
-    file_extension = ".png"
-    content_type = "image/png"
-    filename = f"{filename}{file_extension}"
+    filename = f"{filename}.png"
     form = GovernmentIdentityColour(crest_or_insignia_image_filename=filename)
 
     if form.validate_on_submit():
         image_file_path = INSIGNIA_ASSETS_PATH / filename
+        logo_data = FileStorage(
+            BytesIO(image_file_path.resolve().read_bytes()), filename=filename, content_type="image/png"
+        )
         temporary_logo_key = logo_client.save_temporary_logo(
-            file_data=BytesIO(image_file_path.resolve().read_bytes()),
+            logo_data,
             logo_type="email",
-            file_extension=file_extension,
-            content_type=content_type,
         )
         return redirect(
             url_for(
@@ -211,9 +210,9 @@ def platform_admin_create_email_branding(logo=None):
 
     if form.validate_on_submit():
         if form.file.data:
-            file_extension = os.path.splitext(form.file.data.filename)[1]
             temporary_logo_key = logo_client.save_temporary_logo(
-                form.file.data, "email", file_extension=file_extension, content_type=form.file.data.content_type
+                form.file.data,
+                logo_type="email",
             )
             return redirect(url_for("main.platform_admin_create_email_branding", logo_key=temporary_logo_key))
 

@@ -5,6 +5,7 @@ import uuid
 
 from boto3 import resource
 from notifications_utils.s3 import s3upload as utils_s3upload
+from werkzeug.datastructures import FileStorage
 
 LOGO_TYPES = typing.Literal["email", "letter"]
 
@@ -67,25 +68,23 @@ class LogoClient:
 
         return self.LOGO_PATHS[logo_type].format(filename=logo_file_name)
 
-    def save_temporary_logo(
-        self, file_data: typing.IO, logo_type: LOGO_TYPES, file_extension: str, content_type: str
-    ) -> str:
+    def save_temporary_logo(self, file_data: FileStorage, logo_type: LOGO_TYPES) -> str:
         """Returns the S3 object key of the uploaded temporary logo.
 
         args:
             file_data: file-like object
             logo_type: one of: 'email' or 'letter'
-            file_extension: eg `.png` - notably should include the full-stop
-            content_type: eg 'image/png'
 
         returns:
             S3 object key (excluding bucket name)
         """
+        file_extension = os.path.splitext(file_data.filename)[1]
+        content_type = file_data.content_type
         unique_id = str(uuid.uuid4())
         logo_file_name = f"{unique_id}{file_extension}"
         temporary_logo_key = self.get_logo_key(logo_file_name=logo_file_name, logo_type=logo_type, temporary=True)
         utils_s3upload(
-            filedata=file_data,
+            filedata=file_data.stream,
             region=self.region,
             bucket_name=self.bucket_name,
             file_location=temporary_logo_key,

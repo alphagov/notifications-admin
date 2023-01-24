@@ -2,6 +2,7 @@ from io import BytesIO
 
 import boto3
 import pytest
+from werkzeug.datastructures import FileStorage
 
 LOGO_TYPES = ["email", "letter"]
 
@@ -66,15 +67,13 @@ class TestLogoClientSaveTemporaryLogo:
         mock_uui4 = mocker.patch("app.s3_client.logo_client.uuid.uuid4")
         mock_uui4.return_value = "uuid"
 
-        file_data = BytesIO()
+        file_data = FileStorage(stream=BytesIO(), filename=f"{logo_type}{file_extension}", content_type=content_type)
 
-        retval = logo_client.save_temporary_logo(
-            file_data, logo_type=logo_type, file_extension=file_extension, content_type=content_type
-        )
+        retval = logo_client.save_temporary_logo(file_data, logo_type=logo_type)
 
         assert mock_utils_s3upload.call_args_list == [
             mocker.call(
-                filedata=file_data,
+                filedata=file_data.stream,
                 region="eu-west-1",
                 bucket_name="public-logos-test",
                 file_location=expected_location,

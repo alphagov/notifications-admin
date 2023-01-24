@@ -226,9 +226,7 @@ def test_update_letter_branding_with_new_valid_file_shows_page_with_file_preview
     assert page.select_one("#logo-img > img")["src"].endswith("temporary.svg")
     assert page.select_one("#name").attrs.get("value") == "HM Government"
 
-    assert mock_save_temporary.call_args_list == [
-        mocker.call(mocker.ANY, logo_type="letter", file_extension=".svg", content_type="image/svg+xml")
-    ]
+    assert mock_save_temporary.call_args_list == [mocker.call(mocker.ANY, logo_type="letter")]
 
 
 def test_update_letter_branding_when_uploading_invalid_file(
@@ -445,9 +443,7 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
     )
 
     assert page.select_one("#logo-img > img").attrs["src"].endswith("temporary.svg")
-    assert mock_save_temporary.call_args_list == [
-        mocker.call(mocker.ANY, logo_type="letter", file_extension=".svg", content_type="image/svg+xml")
-    ]
+    assert mock_save_temporary.call_args_list == [mocker.call(mocker.ANY, logo_type="letter")]
 
 
 @pytest.mark.parametrize(
