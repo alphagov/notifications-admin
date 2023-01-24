@@ -1,3 +1,5 @@
+import os
+
 from app.models.branding import EmailBranding, LetterBranding
 
 
@@ -34,3 +36,10 @@ def get_letter_choices(service):
 
     if service.organisation and not service.letter_branding_pool:
         yield ("organisation", service.organisation.name)
+
+
+def letter_filename_for_db_from_logo_key(logo_key):
+    # For letters, in the DB we store the filename without the extension.
+    # Note: this is to maintain backwards compatibility and does deviate from what we do for EmailBranding.
+    # But we aren't taking on this migration effort right now. Ideally this might be different.
+    return os.path.splitext(os.path.basename(logo_key))[0]

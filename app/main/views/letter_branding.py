@@ -15,6 +15,7 @@ from app.main.forms import (
 )
 from app.models.branding import AllLetterBranding, LetterBranding
 from app.s3_client.s3_logo_client import permanent_letter_logo_name
+from app.utils.branding import letter_filename_for_db_from_logo_key
 from app.utils.user import user_is_platform_admin
 
 
@@ -172,10 +173,3 @@ def create_letter_branding(logo=None):
         cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
         logo=temporary_logo_key,
     )
-
-
-def letter_filename_for_db_from_logo_key(logo_key):
-    # For letters, in the DB we store the filename without the extension.
-    # Note: this is to maintain backwards compatibility and does deviate from what we do for EmailBranding.
-    # But we aren't taking on this migration effort right now. Ideally this might be different.
-    return os.path.splitext(os.path.basename(logo_key))[0]
