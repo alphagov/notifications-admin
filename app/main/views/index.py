@@ -256,6 +256,14 @@ def guidance_bulk_sending():
     )
 
 
+@main.route("/using-notify/guidance/delivery-information")
+def guidance_delivery_information():
+    return render_template(
+        "views/guidance/delivery-information.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/guidance/email-branding")
 def guidance_email_branding():
     return render_template(
