@@ -6,16 +6,14 @@
 {% set navigation_label_prefix = 'Using Notify' %}
 
 {% block per_page_title %}
-  Delivery status
+  Delivery status descriptions
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Delivery status</h1>
+  <h1 class="heading-large">Delivery status descriptions</h1>
 
-  <p class="govuk-body">Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered.</p>
-  <p class="govuk-body">For <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.security") }}">security</a>, this information is only available for 7 days after a message has been sent. You can download a report, including a list of sent messages, for your own records.</p>
-  <p class="govuk-body">This page describes the statuses you’ll see when you’re signed in to Notify.</p>
+  <p class="govuk-body">This page describes the statuses you’ll see when you’re signed-in to GOV.UK Notify.</p>
   <p class="govuk-body">If you’re using the Notify API, read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.documentation') }}">documentation</a> for a list of API statuses.</p>
 
   <h2 id="email-statuses" class="heading-medium">Emails</h2>
@@ -40,12 +38,6 @@
       {% endfor %}
     {% endcall %}
   </div>
-
-  <h3 id="spam" class="heading-small">Spam</h3>
-  <p class="govuk-body">If an email is marked as spam, Notify receives a ‘complaint’ from the email provider. We’ll contact you if we receive a complaint about any of your emails. When this happens you should remove the recipient’s email address from your list.</p>
-
-  <h3 id="open-rates" class="heading-small">Open rates and click-throughs</h3>
-  <p class="govuk-body">Notify cannot tell you if your users open an email or click on the links in an email. We do not track open rates and click-throughs because there are privacy issues. Tracking emails without asking permission from users could breach General Data Protection Regulations (GDPR).</p>
 
   <h2 id="text-message-statuses" class="heading-medium">Text messages</h2>
   <div class="bottom-gutter-3-2">
@@ -93,11 +85,5 @@
       {% endfor %}
     {% endcall %}
   </div>
-
-  <h3 id="returned-mail" class="heading-small">Undelivered letters and returned mail</h3>
-
-  <p class="govuk-body">Every letter we send includes our printer’s address on the back of the envelope. It’s not possible to customise the return address.</p>
-  <p class="govuk-body">Returned mail is destroyed by our printer.</p>
-  <p class="govuk-body">Each letter has a unique ID. Our printer sends us the ID of every letter they destroy. We’ll contact you if the IDs match any of your letters. This is a partly manual process, so it can take a few weeks.</p>
 
 {% endblock %}
