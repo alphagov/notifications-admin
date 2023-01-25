@@ -163,7 +163,6 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     mock_create_service.assert_called_once_with(
         service_name="testing the post",
         organisation_type=persisted,
-        message_limit=50,
         email_message_limit=50,
         sms_message_limit=50,
         letter_message_limit=50,
@@ -284,7 +283,6 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     mock_create_service.assert_called_once_with(
         service_name="testing the post",
         organisation_type=organisation_type,
-        message_limit=notify_admin.config["DEFAULT_SERVICE_LIMIT"],
         email_message_limit=notify_admin.config["DEFAULT_SERVICE_LIMIT"],
         sms_message_limit=notify_admin.config["DEFAULT_SERVICE_LIMIT"],
         letter_message_limit=notify_admin.config["DEFAULT_SERVICE_LIMIT"],

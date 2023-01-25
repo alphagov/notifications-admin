@@ -4584,8 +4584,8 @@ def test_POST_email_branding_choose_banner_colour_invalid_hex_code(client_reques
     "endpoint, extra_args",
     [
         ("main.set_free_sms_allowance", {}),
-        ("main.set_message_limit", {"notification_type": "email"}),
-        ("main.set_rate_limit", {}),
+        ("main.set_per_day_message_limit", {"notification_type": "email"}),
+        ("main.set_per_minute_rate_limit", {}),
     ],
 )
 def test_organisation_type_pages_are_platform_admin_only(
@@ -4654,14 +4654,16 @@ def test_should_set_sms_allowance(
         ("letter", "Daily letter limit"),
     ),
 )
-def test_should_show_page_to_set_message_limit(
+def test_should_show_page_to_set_per_day_message_limit(
     client_request,
     platform_admin_user,
     notification_type,
     expected_label,
 ):
     client_request.login(platform_admin_user)
-    page = client_request.get("main.set_message_limit", service_id=SERVICE_ONE_ID, notification_type=notification_type)
+    page = client_request.get(
+        "main.set_per_day_message_limit", service_id=SERVICE_ONE_ID, notification_type=notification_type
+    )
     assert normalize_spaces(page.select_one("label").text) == expected_label
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1,000"
 
@@ -4683,7 +4685,7 @@ def test_should_set_message_limit(
 ):
     client_request.login(platform_admin_user)
     client_request.post(
-        "main.set_message_limit",
+        "main.set_per_day_message_limit",
         service_id=SERVICE_ONE_ID,
         notification_type=notification_type,
         _data={"message_limit": "1,234"},
@@ -4694,12 +4696,44 @@ def test_should_set_message_limit(
     )
 
 
-def test_should_show_page_to_set_rate_limit(
+@pytest.mark.parametrize("notification_type", ["sms", "email", "letter"])
+@pytest.mark.parametrize(
+    "new_limit, expected_api_argument",
+    [
+        ("1", 1),
+        ("250000", 250_000),
+        pytest.param("foo", "foo", marks=pytest.mark.xfail),
+    ],
+)
+def test_set_per_day_message_limit(
+    client_request,
+    platform_admin_user,
+    new_limit,
+    expected_api_argument,
+    mock_update_service,
+    mocker,
+    notification_type,
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.set_per_day_message_limit",
+        service_id=SERVICE_ONE_ID,
+        notification_type=notification_type,
+        _data={
+            "message_limit": new_limit,
+        },
+    )
+    assert mock_update_service.call_args_list == [
+        mocker.call(SERVICE_ONE_ID, **{f"{notification_type}_message_limit": expected_api_argument})
+    ]
+
+
+def test_should_show_page_to_set_per_minute_rate_limit(
     client_request,
     platform_admin_user,
 ):
     client_request.login(platform_admin_user)
-    page = client_request.get("main.set_rate_limit", service_id=SERVICE_ONE_ID)
+    page = client_request.get("main.set_per_minute_rate_limit", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one("label").text) == (
         "Number of messages the service can send in a rolling 60 second window"
     )
@@ -4715,63 +4749,66 @@ def test_should_show_page_to_set_rate_limit(
         (" 250 000", 250_000),
     ],
 )
-def test_should_set_rate_limit(
+def test_should_set_per_minute_rate_limit(
     client_request,
     platform_admin_user,
     new_limit,
     expected_api_argument,
     mock_update_service,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     client_request.post(
-        "main.set_rate_limit",
+        "main.set_per_minute_rate_limit",
         service_id=SERVICE_ONE_ID,
         _data={
             "rate_limit": new_limit,
         },
     )
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        rate_limit=expected_api_argument,
-    )
+    assert mock_update_service.call_args_list == [
+        mocker.call(
+            SERVICE_ONE_ID,
+            rate_limit=expected_api_argument,
+        )
+    ]
 
 
 @pytest.mark.parametrize(
     "endpoint, extra_args, form_data, expected_error_message",
     (
         (
-            "main.set_rate_limit",
+            "main.set_per_minute_rate_limit",
             {},
             {"rate_limit": ""},
             "Error: Cannot be empty",
         ),
         (
-            "main.set_rate_limit",
+            "main.set_per_minute_rate_limit",
             {},
             {"rate_limit": "foo"},
             "Error: Number of messages must be a whole number",
         ),
         (
-            "main.set_message_limit",
+            "main.set_per_day_message_limit",
             {"notification_type": "sms"},
             {"message_limit": ""},
             "Error: Cannot be empty",
         ),
         (
-            "main.set_message_limit",
+            "main.set_per_day_message_limit",
             {"notification_type": "email"},
             {"message_limit": "foo"},
             "Error: Number of emails must be a whole number",
         ),
         (
-            "main.set_message_limit",
+            "main.set_per_day_message_limit",
             {"notification_type": "letter"},
             {"message_limit": "12.34"},
             "Error: Number of letters must be a whole number",
         ),
     ),
 )
-def test_should_show_error_for_invalid_rate_or_message_limits(
+def test_should_show_error_for_invalid_message_limits(
     client_request,
     platform_admin_user,
     endpoint,

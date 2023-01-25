@@ -525,7 +525,6 @@ def mock_get_service(mocker, api_user_active):
         service = service_json(
             service_id,
             users=[api_user_active["id"]],
-            message_limit=50,
             email_message_limit=50,
             sms_message_limit=50,
             letter_message_limit=50,
@@ -553,7 +552,6 @@ def mock_get_detailed_services(mocker, fake_uuid):
         id_=SERVICE_ONE_ID,
         name="service_one",
         users=[fake_uuid],
-        message_limit=1000,
         email_message_limit=1000,
         sms_message_limit=1000,
         letter_message_limit=1000,
@@ -564,7 +562,6 @@ def mock_get_detailed_services(mocker, fake_uuid):
         id_=fake_uuid,
         name="service_two",
         users=[fake_uuid],
-        message_limit=1000,
         email_message_limit=1000,
         sms_message_limit=1000,
         letter_message_limit=1000,
@@ -600,7 +597,6 @@ def mock_create_service(mocker):
     def _create(
         service_name,
         organisation_type,
-        message_limit,
         email_message_limit,
         sms_message_limit,
         letter_message_limit,
@@ -609,7 +605,14 @@ def mock_create_service(mocker):
         email_from,
     ):
         service = service_json(
-            101, service_name, [user_id], message_limit=message_limit, restricted=restricted, email_from=email_from
+            101,
+            service_name,
+            [user_id],
+            restricted=restricted,
+            email_from=email_from,
+            email_message_limit=email_message_limit,
+            sms_message_limit=sms_message_limit,
+            letter_message_limit=letter_message_limit,
         )
         return service["id"]
 
@@ -625,7 +628,18 @@ def mock_update_service(mocker):
                 key: kwargs[key]
                 for key in kwargs
                 if key
-                in ["name", "users", "message_limit", "active", "restricted", "email_from", "sms_sender", "permissions"]
+                in [
+                    "name",
+                    "users",
+                    "active",
+                    "sms_message_limit",
+                    "email_message_limit",
+                    "letter_message_limit",
+                    "restricted",
+                    "email_from",
+                    "sms_sender",
+                    "permissions",
+                ]
             },
         )
         return {"data": service}

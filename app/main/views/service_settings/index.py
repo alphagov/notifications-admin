@@ -970,7 +970,7 @@ def set_free_sms_allowance(service_id):
     methods=["GET", "POST"],
 )
 @user_is_platform_admin
-def set_message_limit(service_id, notification_type):
+def set_per_day_message_limit(service_id, notification_type):
     form = AdminServiceMessageLimitForm(
         message_limit=current_service.get_message_limit(notification_type),
         notification_type=notification_type,
@@ -989,7 +989,7 @@ def set_message_limit(service_id, notification_type):
 
 @main.route("/services/<uuid:service_id>/service-settings/set-rate-limit", methods=["GET", "POST"])
 @user_is_platform_admin
-def set_rate_limit(service_id):
+def set_per_minute_rate_limit(service_id):
 
     form = AdminServiceRateLimitForm(rate_limit=current_service.rate_limit)
 
