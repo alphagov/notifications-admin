@@ -61,14 +61,12 @@ def using_notify_nav():
                     "link": "main.guidance_bulk_sending",
                 },
                 {
-                    "name": "Delivery information",
-                    "link": "main.guidance_delivery_information",
-                    "sub_navigation_items": [
-                        {
-                            "name": "Delivery status",
-                            "link": "main.message_status",
-                        },
-                    ]
+                    "name": "Delivery status",
+                    "link": "main.message_status",
+                 },
+                {
+                    "name": "Delivery times",
+                    "link": "main.guidance_delivery_times",
                 },
                 {
                     "name": "Email branding",
