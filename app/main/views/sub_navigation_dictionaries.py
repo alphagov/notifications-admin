@@ -63,7 +63,7 @@ def using_notify_nav():
                 {
                     "name": "Delivery status",
                     "link": "main.message_status",
-                 },
+                },
                 {
                     "name": "Delivery times",
                     "link": "main.guidance_delivery_times",
