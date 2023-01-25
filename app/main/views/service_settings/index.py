@@ -1,4 +1,4 @@
-import uuid
+import os
 from collections import OrderedDict
 from datetime import datetime
 
@@ -21,6 +21,7 @@ from app import (
     billing_api_client,
     current_service,
     inbound_number_client,
+    logo_client,
     notification_api_client,
     organisations_client,
     service_api_client,
@@ -79,7 +80,6 @@ from app.models.branding import (
     LetterBranding,
 )
 from app.models.organisation import Organisation
-from app.s3_client.s3_logo_client import upload_email_logo
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -1426,24 +1426,16 @@ def email_branding_upload_logo(service_id):
     form = EmailBrandingLogoUpload()
 
     if form.validate_on_submit():
-        # We don't need to care about the filename as we're providing a UUID, and if we include the filename then we
-        # have to filter that through subsequent pages in query params as well. Let's just use no filename.
-        filename = ""
-        upload_id = str(uuid.uuid4())
-
-        logo_filename = upload_email_logo(
-            filename,
-            form.logo.data.read(),
-            current_app.config["AWS_REGION"],
-            user_id=current_user.id,
-            unique_id=upload_id,
+        file_extension = os.path.splitext(form.logo.data.filename)[1]
+        temporary_logo_key = logo_client.save_temporary_logo(
+            form.logo.data, logo_type="email", file_extension=file_extension, content_type=form.logo.data.content_type
         )
 
         return redirect(
             url_for(
                 "main.email_branding_set_alt_text",
                 service_id=service_id,
-                **_email_branding_flow_query_params(request, logo=logo_filename),
+                **_email_branding_flow_query_params(request, logo=temporary_logo_key),
             )
         )
 
@@ -1512,6 +1504,12 @@ def email_branding_set_alt_text(service_id):
     if form.validate_on_submit():
         # we use this key to keep track of user choices through the journey but we don't use it to save the branding
         branding_choice = email_branding_data.pop("branding_choice")
+
+        # Copy the temporary logo to its permanent location in S3 and overwrite the temporary logo key in the
+        # email data to use in creating the logo in the DB.
+        email_branding_data["logo"] = logo_client.save_permanent_logo(
+            email_branding_data["logo"], logo_type="email", logo_key_extra=form.alt_text.data
+        )
 
         new_email_branding = EmailBranding.create(
             alt_text=form.alt_text.data,

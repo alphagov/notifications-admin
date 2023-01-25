@@ -24,25 +24,13 @@ class TestLogoClientSlugify:
         assert logo_client._slugify(text) == expected_slug
 
 
-class TestLogoClientGetTemporaryLogoAbsolutePath:
-    @pytest.mark.parametrize(
-        "file_name, logo_type, expected_path",
-        (
-            ("my-logo.png", "email", "temporary/email/my-logo.png"),
-            ("my-logo.svg", "letter", "temporary/letter/my-logo.svg"),
-        ),
-    )
-    def test_expected_path(self, logo_client, file_name, logo_type, expected_path):
-        assert logo_client._get_temporary_logo_key(file_name, logo_type=logo_type) == expected_path
-
-
-class TestLogoClientGetPermanentLogoAbsolutePath:
+class TestLogoClientGetLogoKey:
     @pytest.mark.parametrize(
         "file_name, logo_type, file_name_extra, expected_path",
         (
-            ("my-logo.png", "email", None, "email/my-logo.png"),
-            ("my-logo.png", "email", "extra-stuff", "email/my-logo-extra-stuff.png"),
-            ("my-logo.png", "email", "NON standard *&^%$£ extras", "email/my-logo-non-standard-extras.png"),
+            ("my-logo.png", "email", None, "my-logo.png"),
+            ("my-logo.png", "email", "extra-stuff", "my-logo-extra-stuff.png"),
+            ("my-logo.png", "email", "NON standard *&^%$£ extras", "my-logo-non-standard-extras.png"),
             ("my-logo.svg", "letter", None, "letters/static/images/letter-template/my-logo.svg"),
             ("my-logo.svg", "letter", "extra-stuff", "letters/static/images/letter-template/my-logo-extra-stuff.svg"),
             (
@@ -53,19 +41,24 @@ class TestLogoClientGetPermanentLogoAbsolutePath:
             ),
         ),
     )
-    def test_expected_path(self, logo_client, file_name, logo_type, file_name_extra, expected_path):
+    def test_expected_key(self, logo_client, file_name, logo_type, file_name_extra, expected_path):
         assert (
-            logo_client._get_permanent_logo_key(file_name, logo_type=logo_type, logo_key_extra=file_name_extra)
-            == expected_path
+            logo_client._get_logo_key(file_name, logo_type=logo_type, logo_key_extra=file_name_extra) == expected_path
         )
+
+    def test_strips_temp_prefix_for_permanent_key(self, logo_client):
+        temporary_key = logo_client._get_logo_key("blah.png", logo_type="email", temporary=True)
+        assert temporary_key.startswith("temp-")
+        permanent_key = logo_client._get_logo_key(temporary_key, logo_type="email")
+        assert not permanent_key.startswith("temp-")
 
 
 class TestLogoClientSaveTemporaryLogo:
     @pytest.mark.parametrize(
         "logo_type, file_extension, content_type, expected_location",
         (
-            ("email", ".png", "image/png", "temporary/email/uuid.png"),
-            ("letter", ".svg", "image/svg+xml", "temporary/letter/uuid.svg"),
+            ("email", ".png", "image/png", "temp-uuid.png"),
+            ("letter", ".svg", "image/svg+xml", "letters/static/images/letter-template/temp-uuid.svg"),
         ),
     )
     def test_expected_s3upload_call(
@@ -88,6 +81,7 @@ class TestLogoClientSaveTemporaryLogo:
                 bucket_name="public-logos-test",
                 file_location=expected_location,
                 content_type=content_type,
+                tags={"delete-after-7-days": True},
             )
         ]
         assert retval == expected_location
@@ -101,8 +95,8 @@ class TestLogoClientSavePermanentLogo:
     @pytest.mark.parametrize(
         "temporary_logo_key, logo_type, logo_key_extra, expected_location",
         (
-            ("temporary/email/uuid.png", "email", None, "email/uuid.png"),
-            ("temporary/email/uuid.png", "email", "some extra", "email/uuid-some-extra.png"),
+            ("uuid.png", "email", None, "uuid.png"),
+            ("uuid.png", "email", "some extra", "uuid-some-extra.png"),
             ("temporary/letter/uuid.png", "letter", None, "letters/static/images/letter-template/uuid.png"),
             (
                 "temporary/letter/uuid.png",
@@ -128,6 +122,6 @@ class TestLogoClientSavePermanentLogo:
         retval = logo_client.save_permanent_logo(temporary_logo_key, logo_type=logo_type, logo_key_extra=logo_key_extra)
 
         assert mock_s3_object.copy_from.call_args_list == [
-            mocker.call(CopySource=f"public-logos-test/{temporary_logo_key}")
+            mocker.call(CopySource=f"public-logos-test/{temporary_logo_key}", TaggingDirective="REPLACE")
         ]
         assert retval == expected_location
