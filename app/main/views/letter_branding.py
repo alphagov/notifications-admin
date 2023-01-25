@@ -12,7 +12,6 @@ from app.main.forms import (
     SearchByNameForm,
 )
 from app.models.branding import AllLetterBranding, LetterBranding
-from app.s3_client.s3_logo_client import permanent_letter_logo_name
 from app.utils.branding import letter_filename_for_db_from_logo_key
 from app.utils.user import user_is_platform_admin
 
@@ -55,9 +54,11 @@ def update_letter_branding(branding_id, logo=None):
     details_form_submitted = request.form.get("operation") == "branding-details"
 
     # TODO: remove the `logo`-based URL path
-    # `logo_key` here can either be a temporary logo key which has been uploaded but not saved,
+    # `logo_key` here can either be a temporary logo key which has been uploaded but not reference in the DB yet,
     # or a reference to the existing logo if nothing has been uploaded to overwrite
-    logo_key = request.args.get("logo_key", logo or permanent_letter_logo_name(letter_branding.filename, "svg"))
+    logo_key = request.args.get(
+        "logo_key", logo or logo_client.get_logo_key(f"{letter_branding.filename}.svg", logo_type="letter")
+    )
     logo_changed = ("logo_key" in request.args) or logo
 
     if file_upload_form_submitted and file_upload_form.validate_on_submit():
