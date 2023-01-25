@@ -43,7 +43,7 @@ class LogoClient:
         text = text.strip("-")
         return text.lower()
 
-    def _get_logo_key(
+    def get_logo_key(
         self,
         logo_file_name: str,
         logo_type: LOGO_TYPES,
@@ -83,7 +83,7 @@ class LogoClient:
         """
         unique_id = str(uuid.uuid4())
         logo_file_name = f"{unique_id}{file_extension}"
-        temporary_logo_key = self._get_logo_key(logo_file_name=logo_file_name, logo_type=logo_type, temporary=True)
+        temporary_logo_key = self.get_logo_key(logo_file_name=logo_file_name, logo_type=logo_type, temporary=True)
         utils_s3upload(
             filedata=file_data,
             region=self.region,
@@ -109,7 +109,7 @@ class LogoClient:
         """
         logo_key = os.path.basename(temporary_logo_key)
 
-        permanent_logo_key = self._get_logo_key(
+        permanent_logo_key = self.get_logo_key(
             logo_file_name=logo_key, logo_type=logo_type, logo_key_extra=logo_key_extra
         )
 
