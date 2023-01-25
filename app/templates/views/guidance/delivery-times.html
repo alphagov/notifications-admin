@@ -6,12 +6,12 @@
 {% set navigation_label_prefix = 'Using Notify' %}
 
 {% block per_page_title %}
-  Delivery information
+  Delivery times
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Delivery information</h1>
+  <h1 class="heading-large">Delivery times</h1>
 
   <p class="govuk-body">The <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.dashboard") }}">dashboard</a> lets you check the status of any message, to see when it was delivered.</p>
   <p class="govuk-body">For <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.security") }}">security</a>, this information is only available for 7 days after a message has been sent. You can download a report, including a list of sent messages, for your own records.</p>
