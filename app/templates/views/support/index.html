@@ -10,6 +10,8 @@
 
   <h1 class="heading-large">Support</h1>
   <p class="govuk-body">GOV.UK Notify provides 24-hour online support.</p>
+  <p class="govuk-body">If it’s an emergency, we’ll reply within 30 minutes and update you every hour until we fix the problem.</p>
+<p class="govuk-body">If it’s not an emergency, we’ll reply within 1 working day.</p>
 
   {% call form_wrapper() %}
     {% if current_user.is_authenticated %}
@@ -22,16 +24,8 @@
 
   <p class="govuk-body">You can also <a class="govuk-link govuk-link--no-visited-state" href="https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC">contact us on Slack</a>.</p>
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <h2 class="heading-medium">Office hours</h2>
-    <p class="govuk-body">Our office hours are 9:30am to 5:30pm, Monday to Friday.</p>
-    <p class="govuk-body">When you report a problem in office hours, we’ll aim to read it within 30 minutes and reply within one working day.</p>
 
-    <h2 class="heading-medium">Out-of-hours</h2>
-    <p class="govuk-body">Outside office hours, response times depend on whether you’re reporting an emergency.</p>
-    <p class="govuk-body">If it’s an emergency, we’ll reply within 30 minutes and update you every hour until the problem’s fixed.</p>
-    <p class="govuk-body">If your problem is not an emergency, we’ll reply within one working day.</p>
+    <h2 class="heading-medium">What counts as an emergency?</h2>
     <p class="govuk-body">A problem is only classed as an emergency if you have a live service and:</p>
     <ul class="govuk-list govuk-list--bullet">
       <li>nobody on your team can sign in</li>
