@@ -251,7 +251,7 @@ def guidance_bulk_sending():
 @main.route("/using-notify/guidance/delivery-status")
 def message_status():
     return render_template(
-        "views/message-status.html",
+        "views/guidance/message-status.html",
         navigation_links=using_notify_nav(),
     )
 
