@@ -22,8 +22,11 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
 
     assert normalize_spaces(page.select_one("h1").text) == "Email branding"
 
-    assert page.select(".govuk-grid-column-three-quarters a")[-1]["href"] == url_for(
+    assert page.select(".govuk-grid-column-three-quarters a")[-2]["href"] == url_for(
         "main.platform_admin_create_email_branding"
+    )
+    assert page.select(".govuk-grid-column-three-quarters a")[-1]["href"] == url_for(
+        "main.create_email_branding_government_identity_logo"
     )
 
     assert brand_names == [
@@ -195,6 +198,30 @@ def test_create_email_branding_can_be_populated_from_querystring(client_request,
     assert page.select_one("#text")["value"] == "Example text"
     assert page.select_one("#colour")["value"] == "Example colour"
     assert page.select_one("#brand_type input")["value"] == "both"
+
+
+@pytest.mark.parametrize(
+    "extra_kwargs, expected_backlink",
+    (
+        ({}, "/email-branding"),
+        (
+            {"back": "government-identity", "government_identity": "HM Government"},
+            "/email-branding/create-government-identity/colour?filename=HM+Government",
+        ),
+    ),
+)
+def test_create_email_branding_backlinks(client_request, platform_admin_user, extra_kwargs, expected_backlink):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        "main.platform_admin_create_email_branding",
+        name="Example name",
+        text="Example text",
+        colour="Example colour",
+        brand_type="both",
+        **extra_kwargs
+    )
+
+    assert page.select_one("a.govuk-back-link")["href"] == expected_backlink
 
 
 def test_create_new_email_branding_without_logo(
@@ -934,6 +961,8 @@ def test_post_create_email_branding_government_identity_form_colour(mocker, clie
             colour="#005abb",
             name="Department of Social Affairs and Citizenship",
             text="Department of Social Affairs and Citizenship",
+            back="government-identity",
+            government_identity="HM Government",
         ),
     )
 

@@ -120,6 +120,7 @@ def platform_admin_update_email_branding(branding_id, logo=None):
             email_branding=email_branding,
             cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
             logo=logo_key,
+            back_link=url_for("main.email_branding"),
         ),
         400 if form.errors else 200,
     )
@@ -182,6 +183,8 @@ def create_email_branding_government_identity_colour():
                 colour=form.colour.data,
                 logo_key=temporary_logo_key,
                 brand_type=request.args.get("brand_type"),
+                back="government-identity",
+                government_identity=request.args.get("filename"),
             )
         )
 
@@ -238,12 +241,20 @@ def platform_admin_create_email_branding(logo=None):
         if not form.errors:
             return redirect(url_for(".email_branding"))
 
+    if request.args.get("back") == "government-identity":
+        back_link = url_for(
+            "main.create_email_branding_government_identity_colour", filename=request.args.get("government_identity")
+        )
+    else:
+        back_link = url_for("main.email_branding")
+
     return (
         render_template(
             "views/email-branding/manage-branding.html",
             form=form,
             cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
             logo=temporary_logo_key,
+            back_link=back_link,
         ),
         400 if form.errors else 200,
     )
