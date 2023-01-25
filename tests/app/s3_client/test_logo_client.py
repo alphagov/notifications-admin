@@ -46,13 +46,19 @@ class TestLogoClientGetLogoKey:
             logo_client._get_logo_key(file_name, logo_type=logo_type, logo_key_extra=file_name_extra) == expected_path
         )
 
+    def test_strips_temp_prefix_for_permanent_key(self, logo_client):
+        temporary_key = logo_client._get_logo_key("blah.png", logo_type="email", temporary=True)
+        assert temporary_key.startswith("temp-")
+        permanent_key = logo_client._get_logo_key(temporary_key, logo_type="email")
+        assert not permanent_key.startswith("temp-")
+
 
 class TestLogoClientSaveTemporaryLogo:
     @pytest.mark.parametrize(
         "logo_type, file_extension, content_type, expected_location",
         (
-            ("email", ".png", "image/png", "uuid.png"),
-            ("letter", ".svg", "image/svg+xml", "letters/static/images/letter-template/uuid.svg"),
+            ("email", ".png", "image/png", "temp-uuid.png"),
+            ("letter", ".svg", "image/svg+xml", "letters/static/images/letter-template/temp-uuid.svg"),
         ),
     )
     def test_expected_s3upload_call(
