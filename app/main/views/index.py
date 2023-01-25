@@ -186,14 +186,6 @@ def using_notify():
     return render_template("views/using-notify.html", navigation_links=features_nav()), 410
 
 
-@main.route("/using-notify/delivery-status")
-def message_status():
-    return render_template(
-        "views/message-status.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
 @main.route("/features/get-started")
 def get_started_old():
     return redirect(url_for(".get_started"), 301)
@@ -252,6 +244,14 @@ def guidance_bulk_sending():
             message_count(limit, channel)
             for channel, limit in current_app.config["DEFAULT_LIVE_SERVICE_RATE_LIMITS"].items()
         ],
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/guidance/delivery-status")
+def message_status():
+    return render_template(
+        "views/message-status.html",
         navigation_links=using_notify_nav(),
     )
 
@@ -392,6 +392,7 @@ def guidance_letter_specification():
 @main.route("/features/letters", endpoint="old_features_letters")
 @main.route("/using-notify/who-can-use-notify", endpoint="old_who_can_use_notify")
 @main.route("/using-notify/who-its-for", endpoint="old_who_its_for")
+@main.route("/using-notify/delivery-status", endpoint="old_delivery_status")
 def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.roadmap",
@@ -407,6 +408,7 @@ def old_page_redirects():
         "main.old_features_letters": "main.features",
         "main.old_who_can_use_notify": "main.who_can_use_notify",
         "main.old_who_its_for": "main.who_its_for",
+        "main.old_delivery_status": "main.message_status",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
 
