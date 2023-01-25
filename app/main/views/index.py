@@ -360,14 +360,6 @@ def guidance_upload_a_letter():
     )
 
 
-@main.route("/using-notify/guidance/letter-specification")
-def guidance_letter_specification():
-    return render_template(
-        "views/guidance/letter-specification.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
 # --- Redirects --- #
 
 
