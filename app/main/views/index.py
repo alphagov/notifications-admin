@@ -256,10 +256,10 @@ def guidance_bulk_sending():
     )
 
 
-@main.route("/using-notify/guidance/delivery-information")
-def guidance_delivery_information():
+@main.route("/using-notify/guidance/delivery-times")
+def guidance_delivery_times():
     return render_template(
-        "views/guidance/delivery-information.html",
+        "views/guidance/delivery-times.html",
         navigation_links=using_notify_nav(),
     )
 
