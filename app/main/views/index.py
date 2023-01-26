@@ -376,6 +376,7 @@ def guidance_upload_a_letter():
 @main.route("/features/letters", endpoint="old_features_letters")
 @main.route("/using-notify/who-can-use-notify", endpoint="old_who_can_use_notify")
 @main.route("/using-notify/who-its-for", endpoint="old_who_its_for")
+@main.route("/using-notify/guidance/letter-specification", endpoint="old_letter_specification")
 def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.roadmap",
@@ -391,6 +392,7 @@ def old_page_redirects():
         "main.old_features_letters": "main.features",
         "main.old_who_can_use_notify": "main.who_can_use_notify",
         "main.old_who_its_for": "main.who_its_for",
+        "main.old_letter_specification": "main.guidance_upload_a_letter",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
 
