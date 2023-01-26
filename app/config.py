@@ -9,7 +9,7 @@ if os.environ.get("VCAP_APPLICATION"):
     extract_cloudfoundry_config()
 
 
-class Config(object):
+class Config:
     ADMIN_CLIENT_SECRET = os.environ.get("ADMIN_CLIENT_SECRET")
     API_HOST_NAME = os.environ.get("API_HOST_NAME")
     SECRET_KEY = os.environ.get("SECRET_KEY")

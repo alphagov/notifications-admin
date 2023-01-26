@@ -8,7 +8,7 @@ rtree_index_path = Path(__file__).parent / "rtree.pickle"
 rtree_index = pickle.loads(rtree_index_path.read_bytes())
 
 
-class BroadcastAreasRepository(object):
+class BroadcastAreasRepository:
     def __init__(self):
         self.database = Path(__file__).resolve().parent / "broadcast-areas.sqlite3"
 
