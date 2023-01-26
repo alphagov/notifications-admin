@@ -1,7 +1,7 @@
 import hashlib
 
 
-class AssetFingerprinter(object):
+class AssetFingerprinter:
     """
     Get a unique hash for an asset file, so that it doesn't stay cached
     when it changes

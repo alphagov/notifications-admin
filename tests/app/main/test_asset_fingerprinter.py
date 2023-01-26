@@ -3,7 +3,7 @@
 from app.asset_fingerprinter import AssetFingerprinter
 
 
-class TestAssetFingerprint(object):
+class TestAssetFingerprint:
     def test_url_format(self, mocker):
         get_file_content_mock = mocker.patch.object(AssetFingerprinter, "get_asset_file_contents")
         get_file_content_mock.return_value = """
@@ -94,7 +94,7 @@ class TestAssetFingerprint(object):
         assert fingerprinter._cache == {}
 
 
-class TestAssetFingerprintWithUnicode(object):
+class TestAssetFingerprintWithUnicode:
     def test_can_read_self(self):
         "Ralph’s apostrophe is a string containing a unicode character"
         AssetFingerprinter(filesystem_path="tests/app/main/").get_url("test_asset_fingerprinter.py")
