@@ -262,7 +262,7 @@ ORGANISATION_ID_ARGUMENT = "org_id"
 def get_routes_and_decorators(argument_name=None):
     import app.main.views as views
 
-    for module_name, module in inspect.getmembers(views):
+    for module_name, module in inspect.getmembers(views) + inspect.getmembers(views.organisations):
         for function_name, function in inspect.getmembers(module):
             if inspect.isfunction(function):
                 decorators = list(get_decorators_for_function(function))
@@ -282,7 +282,7 @@ def test_code_to_extract_decorators_works_with_known_examples():
         ["main.route", "main.route", "main.route", "main.route", "main.route", "main.route", "user_has_permissions"],
     ) in list(get_routes_and_decorators(SERVICE_ID_ARGUMENT))
     assert (
-        "organisations.organisation_dashboard",
+        "index.organisation_dashboard",
         ["main.route", "user_has_permissions"],
     ) in list(get_routes_and_decorators(ORGANISATION_ID_ARGUMENT))
     assert (

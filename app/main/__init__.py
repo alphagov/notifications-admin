@@ -27,7 +27,6 @@ from app.main.views import (  # noqa
     manage_users,
     new_password,
     notifications,
-    organisations,
     performance,
     platform_admin,
     pricing,
@@ -46,4 +45,5 @@ from app.main.views import (  # noqa
     verify,
     webauthn_credentials,
 )
+from app.main.views.organisations import branding, index  # noqa
 from app.main.views.service_settings import index, letter_branding  # noqa
