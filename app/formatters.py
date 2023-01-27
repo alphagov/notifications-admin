@@ -2,7 +2,7 @@ import re
 import unicodedata
 import urllib
 from datetime import datetime, timedelta, timezone
-from functools import lru_cache, partial
+from functools import lru_cache
 from math import floor, log10
 from numbers import Number
 
@@ -256,8 +256,6 @@ def format_notification_status_as_field_status(status, notification_type):
 
 
 def format_notification_status_as_url(status, notification_type):
-    url = partial(url_for, "main.message_status")
-
     if status not in {
         "technical-failure",
         "temporary-failure",
@@ -265,10 +263,7 @@ def format_notification_status_as_url(status, notification_type):
     }:
         return None
 
-    return {
-        "email": url(notification_type="email"),
-        "sms": url(notification_type="sms")
-    }.get(notification_type)
+    return url_for("main.message_status", notification_type=notification_type)
 
 
 def nl2br(value):
