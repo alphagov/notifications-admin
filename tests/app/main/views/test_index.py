@@ -98,7 +98,6 @@ def test_hiding_pages_from_search_engines(
         "guidance_email_branding",
         "guidance_index",
         "guidance_letter_branding",
-        "guidance_letter_specification",
         "guidance_receive_text_messages",
         "guidance_reply_to_email_address",
         "guidance_schedule_messages",
