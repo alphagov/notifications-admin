@@ -1,6 +1,7 @@
 {% extends "content_template.html" %}
 
 {% from "components/service-link.html" import service_link %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -25,7 +26,7 @@
   </ol>
 
   <h2 id="letter-specification" class="heading-medium">Letter specification</h2>
-  
+
   <p class="govuk-body">Your PDF must meet our letter specification.</p>
 
   <p class="govuk-body">Page size and layout: A4 portrait (210 × 297 mm)</p>
