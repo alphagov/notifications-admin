@@ -249,10 +249,14 @@ def guidance_bulk_sending():
 
 
 @main.route("/using-notify/guidance/delivery-status")
-def message_status():
+@main.route("/using-notify/guidance/delivery-status/<template_type:notification_type>")
+def message_status(notification_type=None):
+    if not notification_type:
+        return redirect(url_for(".message_status", notification_type="email"))
     return render_template(
         "views/guidance/message-status.html",
         navigation_links=using_notify_nav(),
+        notification_type=notification_type,
     )
 
 

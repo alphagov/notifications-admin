@@ -265,7 +265,10 @@ def format_notification_status_as_url(status, notification_type):
     }:
         return None
 
-    return {"email": url(_anchor="email-statuses"), "sms": url(_anchor="text-message-statuses")}.get(notification_type)
+    return {
+        "email": url(notification_type="email"),
+        "sms": url(notification_type="sms")
+    }.get(notification_type)
 
 
 def nl2br(value):

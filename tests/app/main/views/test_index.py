@@ -107,7 +107,6 @@ def test_hiding_pages_from_search_engines(
         "guidance_text_message_sender",
         "guidance_upload_a_letter",
         "how_to_pay",
-        "message_status",
         "pricing",
         "privacy",
         "roadmap",
@@ -194,18 +193,19 @@ def test_old_static_pages_redirect(client_request, view, expected_view):
     )
 
 
-def test_message_status_page_contains_message_status_ids(client_request):
-    # The 'email-statuses' and 'sms-statuses' id are linked to when we display a message status,
-    # so this test ensures we don't accidentally remove them
-    page = client_request.get("main.message_status")
-
-    assert page.select_one("#email-statuses")
-    assert page.select_one("#text-message-statuses")
+def test_message_status_page_redirects_without_notification_type_specified(client_request):
+    client_request.get(
+        "main.message_status",
+        _expected_redirect=url_for(
+            "main.message_status",
+            notification_type="email",
+        ),
+    )
 
 
 def test_message_status_page_contains_link_to_support(client_request):
-    page = client_request.get("main.message_status")
-    sms_status_table = page.select_one("#text-message-statuses").findNext("tbody")
+    page = client_request.get("main.message_status", notification_type="sms")
+    sms_status_table = page.select_one("tbody")
 
     temp_fail_details_cell = sms_status_table.select_one("tr:nth-child(4) > td:nth-child(2)")
     assert temp_fail_details_cell.select_one("a")["href"] == url_for("main.support")

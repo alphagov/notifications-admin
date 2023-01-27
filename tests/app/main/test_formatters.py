@@ -22,12 +22,12 @@ from app.formatters import (
         ("sending", "email", lambda: None),
         ("delivered", "email", lambda: None),
         # Failures are linked to the channel-specific page
-        ("temporary-failure", "email", partial(url_for, "main.message_status", _anchor="email-statuses")),
-        ("permanent-failure", "email", partial(url_for, "main.message_status", _anchor="email-statuses")),
-        ("technical-failure", "email", partial(url_for, "main.message_status", _anchor="email-statuses")),
-        ("temporary-failure", "sms", partial(url_for, "main.message_status", _anchor="text-message-statuses")),
-        ("permanent-failure", "sms", partial(url_for, "main.message_status", _anchor="text-message-statuses")),
-        ("technical-failure", "sms", partial(url_for, "main.message_status", _anchor="text-message-statuses")),
+        ("temporary-failure", "email", partial(url_for, "main.message_status", notification_type="email")),
+        ("permanent-failure", "email", partial(url_for, "main.message_status", notification_type="email")),
+        ("technical-failure", "email", partial(url_for, "main.message_status", notification_type="email")),
+        ("temporary-failure", "sms", partial(url_for, "main.message_status", notification_type="sms")),
+        ("permanent-failure", "sms", partial(url_for, "main.message_status", notification_type="sms")),
+        ("technical-failure", "sms", partial(url_for, "main.message_status", notification_type="sms")),
         # Letter statuses are never linked
         ("technical-failure", "letter", lambda: None),
         ("cancelled", "letter", lambda: None),

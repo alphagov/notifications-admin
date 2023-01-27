@@ -1,5 +1,6 @@
 {% extends "content_template.html" %}
 
+{% from "components/pill.html" import pill %}
 {% from "components/table.html" import mapping_table, row, text_field %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
@@ -16,8 +17,19 @@
   <p class="govuk-body">This page describes the statuses you’ll see when you’re signed-in to GOV.UK Notify.</p>
   <p class="govuk-body">If you’re using the Notify API, read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.documentation') }}">documentation</a> for a list of API statuses.</p>
 
-  <h2 id="email-statuses" class="heading-medium">Emails</h2>
-  <div class="bottom-gutter-3-2">
+  <div class="govuk-!-margin-bottom-3">
+    {{ pill(
+      (
+        ("Email", "email", url_for(".message_status"), 0),
+        ("Text messages", "sms", url_for(".message_status", notification_type="sms"), 0),
+        ("Letters", "letter", url_for(".message_status", notification_type="letter"), 0),
+      ),
+      current_value=notification_type,
+      show_count=False,
+    ) }}
+  </div>
+
+  {% if notification_type == "email" %}
     {% call mapping_table(
       caption='Message statuses – emails',
       field_headings=['Status', 'Description'],
@@ -37,10 +49,10 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
-  </div>
 
-  <h2 id="text-message-statuses" class="heading-medium">Text messages</h2>
-  <div class="bottom-gutter-3-2">
+  {% endif %}
+  {% if notification_type == "sms" %}
+
     {% call mapping_table(
       caption='Message statuses – text messages',
       field_headings=['Status', 'Description'],
@@ -61,10 +73,10 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
-  </div>
 
-  <h2 id="letter-statuses" class="heading-medium">Letters</h2>
-  <div class="bottom-gutter-3-2">
+  {% endif %}
+  {% if notification_type == "letter" %}
+
     {% call mapping_table(
       caption='Message statuses – letters',
       field_headings=['Status', 'Description'],
@@ -84,6 +96,7 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
-  </div>
+
+  {% endif %}
 
 {% endblock %}

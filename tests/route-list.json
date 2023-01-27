@@ -368,6 +368,7 @@
     "/using-notify/guidance/branding-and-customisation",
     "/using-notify/guidance/bulk-sending",
     "/using-notify/guidance/delivery-status",
+    "/using-notify/guidance/delivery-status/<template_type:notification_type>",
     "/using-notify/guidance/delivery-times",
     "/using-notify/guidance/edit-and-format-messages",
     "/using-notify/guidance/email-branding",
