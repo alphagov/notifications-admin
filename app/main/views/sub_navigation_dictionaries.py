@@ -61,10 +61,6 @@ def using_notify_nav():
                     "link": "main.guidance_bulk_sending",
                 },
                 {
-                    "name": "Delivery status",
-                    "link": "main.message_status",
-                },
-                {
                     "name": "Delivery times",
                     "link": "main.guidance_delivery_times",
                 },
@@ -79,6 +75,10 @@ def using_notify_nav():
                 {
                     "name": "Letter branding",
                     "link": "main.guidance_letter_branding",
+                },
+                {
+                    "name": "Message status",
+                    "link": "main.message_status",
                 },
                 {
                     "name": "Optional content",
