@@ -20,7 +20,7 @@
   <div class="govuk-!-margin-bottom-3">
     {{ pill(
       (
-        ("Email", "email", url_for(".message_status"), 0),
+        ("Emails", "email", url_for(".message_status"), 0),
         ("Text messages", "sms", url_for(".message_status", notification_type="sms"), 0),
         ("Letters", "letter", url_for(".message_status", notification_type="letter"), 0),
       ),
