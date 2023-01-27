@@ -15,7 +15,7 @@
 
   <p class="govuk-body">You can send a batch of up to {{ max_spreadsheet_rows|format_thousands }} messages at once.</p>
 
-  <p class="govuk-body">There’s a maximum daily limit of {{ rate_limits|formatted_list(before_each="", after_each="") }}. If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/support">contact us</a>.</p>
+  <p class="govuk-body">There’s a maximum daily limit of {{ rate_limits|formatted_list(before_each="", after_each="") }}. If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.support") }}>contact us</a>.</p>
 
   <p class="govuk-body">To send a batch of messages:</p>
 
@@ -25,6 +25,6 @@
     <li>Select <b class="govuk-!-font-weight-bold">Upload a list of email addresses</b>, <b class="govuk-!-font-weight-bold">Upload a list of phone numbers</b>, or <b class="govuk-!-font-weight-bold">Upload a list of addresses</b>.</li>
   </ol>
 
-  <p class="govuk-body">You can also <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/using-notify/guidance/schedule-emails-and-text-messages">schedule a batch of emails and text messages</a>.</p>
+  <p class="govuk-body">You can also <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_schedule_messages" )}}>schedule a batch of emails and text messages</a>.</p>
 
 {% endblock %}
