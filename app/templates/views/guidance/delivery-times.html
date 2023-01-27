@@ -1,3 +1,5 @@
+{% from "components/service-link.html" import service_link %}
+
 {% extends "content_template.html" %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
@@ -38,5 +40,5 @@
   <p class="govuk-body">Every letter we send includes our printer’s address on the back of the envelope. It’s not possible to customise the return address.</p>
   <p class="govuk-body">Returned mail is destroyed by our printer.</p>
   <p class="govuk-body">Each letter has a unique ID. Our printer sends us the ID of every letter they destroy. We’ll contact you if the IDs match any of your letters. This is a partly manual process, so it can take a few weeks.</p>
-  
+
 {% endblock %}

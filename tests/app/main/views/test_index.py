@@ -94,6 +94,7 @@ def test_hiding_pages_from_search_engines(
         "documentation",
         "features",
         "get_started",
+        "guidance_delivery_times",
         "guidance_edit_and_format_messages",
         "guidance_email_branding",
         "guidance_index",
