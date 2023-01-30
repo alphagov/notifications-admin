@@ -175,10 +175,7 @@ def security():
 
 @main.route("/features/terms", endpoint="terms")
 def terms():
-    return render_template(
-        "views/terms-of-use.html",
-        navigation_links=features_nav(),
-    )
+    return render_template("views/terms-of-use.html")
 
 
 @main.route("/features/using-notify")

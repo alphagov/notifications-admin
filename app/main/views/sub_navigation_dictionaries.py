@@ -18,10 +18,6 @@ def features_nav():
             "name": "Roadmap",
             "link": "main.roadmap",
         },
-        {
-            "name": "Terms of use",
-            "link": "main.terms",
-        },
     ]
 
 
