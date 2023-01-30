@@ -25,7 +25,6 @@ from tests.conftest import normalize_spaces
                 ("Support", ".support"),
                 ("Documentation", ".documentation"),
                 ("Test User", ".user_profile"),
-                ("Sign out", ".sign_out"),
             ),
         ),
         (
@@ -36,7 +35,6 @@ from tests.conftest import normalize_spaces
                 ("Documentation", ".documentation"),
                 ("Platform admin", ".platform_admin_splash_page"),
                 ("Test User", ".user_profile"),
-                ("Sign out", ".sign_out"),
             ),
         ),
     ),

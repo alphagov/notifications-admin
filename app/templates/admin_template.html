@@ -69,10 +69,6 @@
           "text": current_user.name,
           "active": header_navigation.is_selected('user-profile')
         },
-        {
-          "href": url_for('main.sign_out'),
-          "text": "Sign out"
-        }
       ] %}
     {% else %}
       {% set navigation = [
@@ -91,10 +87,6 @@
           "text": current_user.name,
           "active": header_navigation.is_selected('user-profile')
         },
-        {
-          "href": url_for('main.sign_out'),
-          "text": "Sign out"
-        }
       ] %}
     {% endif %}
   {% else %}
