@@ -48,7 +48,7 @@ class HeaderNavigation(Navigation):
             "message_status",
             "roadmap",
             "security",
-            "terms",
+            "terms_of_use",
             "trial_mode_new",
             "using_notify",
         },

@@ -173,8 +173,8 @@ def security():
     return render_template("views/security.html", navigation_links=features_nav())
 
 
-@main.route("/features/terms", endpoint="terms")
-def terms():
+@main.route("/terms-of-use", endpoint="terms_of_use")
+def terms_of_use():
     return render_template("views/terms-of-use.html")
 
 
@@ -379,12 +379,13 @@ def guidance_letter_specification():
 @main.route("/features/sms", endpoint="old_features_sms")
 @main.route("/features/email", endpoint="old_features_email")
 @main.route("/features/letters", endpoint="old_features_letters")
+@main.route("/features/terms", endpoint="old_features_terms")
 @main.route("/using-notify/who-can-use-notify", endpoint="old_who_can_use_notify")
 @main.route("/using-notify/who-its-for", endpoint="old_who_its_for")
 def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.roadmap",
-        "main.old_terms": "main.terms",
+        "main.old_terms": "main.terms_of_use",
         "main.information_security": "main.using_notify",
         "main.old_using_notify": "main.using_notify",
         "main.information_risk_management": "main.security",
@@ -394,6 +395,7 @@ def old_page_redirects():
         "main.old_features_sms": "main.features",
         "main.old_features_email": "main.features",
         "main.old_features_letters": "main.features",
+        "main.old_features_terms": "main.terms_of_use",
         "main.old_who_can_use_notify": "main.who_can_use_notify",
         "main.old_who_its_for": "main.who_its_for",
     }
