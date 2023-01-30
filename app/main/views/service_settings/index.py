@@ -59,6 +59,7 @@ from app.main.forms import (
     ServiceReplyToEmailForm,
     ServiceSmsSenderForm,
     ServiceSwitchChannelForm,
+    SetAuthTypeForm,
     SMSPrefixForm,
     YesNoSettingForm,
 )
@@ -70,6 +71,7 @@ from app.models.branding import (
     LetterBranding,
 )
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
+from app.utils.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.utils.user import (
     user_has_permissions,
     user_is_gov_user,
@@ -755,12 +757,46 @@ def service_set_channel(service_id, channel):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-auth-type", methods=["GET"])
+@main.route("/services/<uuid:service_id>/service-settings/set-auth-type", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_auth_type(service_id):
+    form = SetAuthTypeForm(sign_in_method=current_service.sign_in_method)
+    if form.validate_on_submit():
+        if (
+            current_service.sign_in_method == SIGN_IN_METHOD_TEXT_OR_EMAIL
+            and form.sign_in_method.data != SIGN_IN_METHOD_TEXT_OR_EMAIL
+        ):
+            return redirect(url_for(".service_confirm_disable_email_auth", service_id=service_id))
+
+        current_service.force_permission(
+            "email_auth",
+            on=form.sign_in_method.data == SIGN_IN_METHOD_TEXT_OR_EMAIL,
+        )
+        return redirect(url_for(".service_settings", service_id=service_id))
+
     return render_template(
         "views/service-settings/set-auth-type.html",
+        form=form,
     )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/set-auth-type/confirm", methods=["GET", "POST"])
+def service_confirm_disable_email_auth(service_id):
+    if current_service.sign_in_method != SIGN_IN_METHOD_TEXT_OR_EMAIL:
+        return redirect(url_for(".service_set_auth_type", service_id=service_id))
+
+    if request.method == "POST":
+        for user in current_service.active_users:
+            if user.email_auth:
+                user.update(auth_type="sms_auth")
+
+        current_service.force_permission(
+            "email_auth",
+            on=False,
+        )
+        return redirect(url_for(".service_settings", service_id=service_id))
+
+    return render_template("views/service-settings/confirm-disable-email-auth.html")
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-contacts", methods=["GET"])

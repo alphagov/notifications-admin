@@ -85,6 +85,7 @@ from app.models.branding import (
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.utils import branding
+from app.utils.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.utils.govuk_frontend_field import (
     GovukFrontendWidgetMixin,
     render_govuk_frontend_macro,
@@ -2583,4 +2584,14 @@ class GovernmentIdentityColour(StripWhitespaceForm):
     colour = GovukRadiosField(
         "Colour for stripe",
         thing="a colour for the stripe",
+    )
+
+
+class SetAuthTypeForm(StripWhitespaceForm):
+    sign_in_method = GovukRadiosField(
+        "Sign in method",
+        choices=(
+            (SIGN_IN_METHOD_TEXT, "Text message code"),
+            (SIGN_IN_METHOD_TEXT_OR_EMAIL, "Email link or text message code"),
+        ),
     )

@@ -15,6 +15,7 @@ from app.main.views.service_settings.email_branding import (
     _should_set_default_org_email_branding,
 )
 from app.models.service import Service
+from app.utils.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
 from tests import (
     find_element_by_tag_and_partial_text,
     invite_json,
@@ -4552,27 +4553,138 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
     assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
 
 
-@pytest.mark.parametrize(
-    "endpoint, permissions, expected_p",
-    [
-        ("main.service_set_auth_type", [], "Text message code"),
-        ("main.service_set_auth_type", ["email_auth"], "Email link or text message code"),
-    ],
-)
-def test_invitation_pages(
-    client_request,
-    service_one,
-    endpoint,
-    permissions,
-    expected_p,
-):
-    service_one["permissions"] = permissions
-    page = client_request.get(
-        endpoint,
-        service_id=SERVICE_ONE_ID,
-    )
+class TestSetAuthType:
+    def test_page_requires_manage_settings_permission(
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+    ):
+        active_user_with_permissions["permissions"][service_one["id"]].remove("manage_settings")
+        client_request.login(active_user_with_permissions)
+        client_request.get(
+            "main.service_set_auth_type",
+            service_id=SERVICE_ONE_ID,
+            _expected_status=403,
+        )
 
-    assert normalize_spaces(page.select("main p")[0].text) == expected_p
+    def test_page_loads(
+        self,
+        client_request,
+        service_one,
+    ):
+        client_request.get(
+            "main.service_set_auth_type",
+            service_id=SERVICE_ONE_ID,
+        )
+
+    def test_current_setting_selected(
+        self,
+        client_request,
+        service_one,
+    ):
+        page = client_request.get(
+            "main.service_set_auth_type",
+            service_id=SERVICE_ONE_ID,
+        )
+        radio_items = page.select(".govuk-radios__item")
+        assert normalize_spaces(radio_items[0].select_one("label").text) == "Text message code"
+        assert radio_items[0].select_one("input").has_attr("checked")
+        assert normalize_spaces(radio_items[1].select_one("label").text) == "Email link or text message code"
+        assert not radio_items[1].select_one("input").has_attr("checked")
+
+    def test_redirects_back_to_service_settings_on_success(self, mocker, client_request, service_one):
+        mock_update_service = mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
+        client_request.post(
+            "main.service_set_auth_type",
+            service_id=SERVICE_ONE_ID,
+            _data={"sign_in_method": SIGN_IN_METHOD_TEXT_OR_EMAIL},
+            _expected_redirect=url_for(".service_settings", service_id=service_one["id"]),
+        )
+        assert mock_update_service.call_count == 1
+        mock_update_call = mock_update_service.call_args_list[0]
+        assert mock_update_call[0] == (service_one["id"],)
+        assert set(mock_update_call[1]["permissions"]) == {"email_auth", "email", "sms"}
+
+    def test_redirects_to_confirmation_when_disabling_email_auth(self, mocker, client_request, service_one):
+        service_one["permissions"] += ["email_auth"]
+        mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
+        client_request.post(
+            "main.service_set_auth_type",
+            service_id=SERVICE_ONE_ID,
+            _data={"sign_in_method": SIGN_IN_METHOD_TEXT},
+            _expected_redirect=url_for(".service_confirm_disable_email_auth", service_id=service_one["id"]),
+        )
+
+
+class TestConfirmDisableEmailAuth:
+    def test_page_loads(self, client_request, service_one):
+        service_one["permissions"] += ["email_auth"]
+        client_request.get(
+            "main.service_confirm_disable_email_auth",
+            service_id=SERVICE_ONE_ID,
+        )
+
+    def test_page_redirects_to_set_auth_type_if_service_doesnt_use_email_auth(self, client_request, service_one):
+        client_request.get(
+            "main.service_confirm_disable_email_auth",
+            service_id=SERVICE_ONE_ID,
+            _expected_redirect=url_for(".service_set_auth_type", service_id=service_one["id"]),
+        )
+
+    def test_save_redirects_to_service_settings(
+        self, mocker, client_request, service_one, active_user_with_permissions
+    ):
+        service_one["permissions"] += ["email_auth"]
+        mocker.patch(
+            "app.models.user.Users.client_method",
+            return_value=[active_user_with_permissions],
+        )
+        mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
+        client_request.post(
+            "main.service_confirm_disable_email_auth",
+            service_id=SERVICE_ONE_ID,
+            _expected_redirect=url_for(".service_settings", service_id=service_one["id"]),
+        )
+
+    def test_save_disables_email_auth_for_service_users(
+        self, mocker, client_request, service_one, active_user_with_permissions
+    ):
+        active_user_with_permissions["auth_type"] = "email_auth"
+        active_user_with_permissions["permissions"][service_one["id"]].append("email_auth")
+        mock_update_service = mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
+        mock_update_user = mocker.patch("app.notify_client.user_api_client.user_api_client.update_user_attribute")
+        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        service_one["permissions"] += ["email_auth"]
+        client_request.post(
+            "main.service_confirm_disable_email_auth",
+            service_id=SERVICE_ONE_ID,
+            _expected_redirect=url_for(".service_settings", service_id=service_one["id"]),
+        )
+        assert mock_update_service.call_count == 1
+        mock_update_call = mock_update_service.call_args_list[0]
+        assert mock_update_call[0] == (service_one["id"],)
+        assert set(mock_update_call[1]["permissions"]) == {"email", "sms"}
+
+        assert mock_update_user.call_args_list == [
+            mocker.call(active_user_with_permissions["id"], auth_type="sms_auth")
+        ]
+
+    def test_save_does_not_disable_webauthn_sign_in_for_service_users(
+        self, mocker, client_request, service_one, active_user_with_permissions
+    ):
+        active_user_with_permissions["auth_type"] = "webauthn_auth"
+        mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
+        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        mock_update_user = mocker.patch("app.notify_client.user_api_client.user_api_client.update_user_attribute")
+        service_one["permissions"] += ["email_auth"]
+        client_request.post(
+            "main.service_confirm_disable_email_auth",
+            service_id=SERVICE_ONE_ID,
+            _expected_redirect=url_for(".service_settings", service_id=service_one["id"]),
+        )
+
+        assert mock_update_user.call_args_list == []
 
 
 def test_service_settings_page_loads_when_inbound_number_is_not_set(

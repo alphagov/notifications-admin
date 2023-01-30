@@ -17,6 +17,7 @@ from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.utils import get_default_sms_sender
+from app.utils.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
 
 
 class Service(JSONModel):
@@ -600,6 +601,13 @@ class Service(JSONModel):
 
     def get_message_limit(self, notification_type):
         return getattr(self, f"{notification_type}_message_limit")
+
+    @property
+    def sign_in_method(self) -> str:
+        if "email_auth" in self.permissions:
+            return SIGN_IN_METHOD_TEXT_OR_EMAIL
+
+        return SIGN_IN_METHOD_TEXT
 
 
 class Services(SerialisedModelCollection):
