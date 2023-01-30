@@ -25,7 +25,7 @@ def test_find_users_by_email_displays_users_found(client_request, platform_admin
         autospec=True,
     )
     document = client_request.post(
-        "main.find_users_by_email", _data={"search": "twilight.sparkle"}, _expected_status=200
+        "main.find_users_by_email", _data={"users-search": "twilight.sparkle"}, _expected_status=200
     )
 
     links = document.select("a.browse-list-link")
@@ -45,7 +45,7 @@ def test_find_users_by_email_displays_multiple_users(client_request, platform_ad
         return_value={"data": [user_json(name="Apple Jack"), user_json(name="Apple Bloom")]},
         autospec=True,
     )
-    document = client_request.post("main.find_users_by_email", _data={"search": "apple"}, _expected_status=200)
+    document = client_request.post("main.find_users_by_email", _data={"users-search": "apple"}, _expected_status=200)
 
     assert [element.text.strip() for element in document.select("p.browse-list-hint")] == [
         "Apple Jack",
@@ -57,15 +57,15 @@ def test_find_users_by_email_displays_message_if_no_users_found(client_request, 
     client_request.login(platform_admin_user)
     mocker.patch("app.user_api_client.find_users_by_full_or_partial_email", return_value={"data": []}, autospec=True)
     document = client_request.post(
-        "main.find_users_by_email", _data={"search": "twilight.sparkle"}, _expected_status=200
+        "main.find_users_by_email", _data={"users-search": "twilight.sparkle"}, _expected_status=200
     )
 
     assert document.select_one("p.browse-list-hint").text.strip() == "No users found."
 
 
-def test_find_users_by_email_validates_against_empty_search_submission(client_request, platform_admin_user, mocker):
+def test_find_users_by_email_validates_against_empty_search_submission(client_request, platform_admin_user):
     client_request.login(platform_admin_user)
-    document = client_request.post("main.find_users_by_email", _data={"search": ""}, _expected_status=200)
+    document = client_request.post("main.find_users_by_email", _data={"users-search": ""}, _expected_status=200)
 
     expected_message = "Error: You need to enter full or partial email address to search by."
     assert document.select_one(".govuk-error-message").text.strip() == expected_message

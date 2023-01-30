@@ -45,6 +45,7 @@ from wtforms import (
 )
 from wtforms.validators import (
     URL,
+    UUID,
     DataRequired,
     InputRequired,
     Length,
@@ -2609,3 +2610,10 @@ class SetEmailAuthForUsersForm(StripWhitespaceForm):
             )
 
     users = GovukCheckboxesField("Choose who can sign in using an email link")
+
+
+class FindByUuidForm(StripWhitespaceForm):
+    search = GovukSearchField(
+        "Find anything by UUID",
+        validators=[UUID("Enter a valid UUID")],
+    )

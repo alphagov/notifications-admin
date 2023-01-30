@@ -39,6 +39,7 @@ def test_should_redirect_if_not_logged_in(client_request, endpoint):
     [
         "main.platform_admin",
         "main.platform_admin_splash_page",
+        "main.platform_admin_find",
         "main.live_services",
         "main.trial_services",
     ],
@@ -1171,3 +1172,94 @@ def test_get_daily_sms_provider_volumes_report_calls_api_and_download_data(clien
         + "80"
         + "\r\n"
     )
+
+
+class TestPlatformAdminFind:
+    def test_page_requires_platform_admin(self, client_request):
+        client_request.get(".platform_admin_find", _expected_status=403)
+
+    def test_page_loads(self, client_request, platform_admin_user):
+        client_request.login(platform_admin_user)
+        client_request.get(".platform_admin_find")
+
+    def test_page_has_find_services_form(self, client_request, platform_admin_user):
+        client_request.login(platform_admin_user)
+        page = client_request.get(".platform_admin_find")
+        assert any(form["action"] == url_for(".find_services_by_name") for form in page.select("form"))
+
+    def test_page_has_find_users_form(self, client_request, platform_admin_user):
+        client_request.login(platform_admin_user)
+        page = client_request.get(".platform_admin_find")
+        assert any(form["action"] == url_for(".find_users_by_email") for form in page.select("form"))
+
+    def test_page_has_find_uuid_form(self, client_request, platform_admin_user):
+        client_request.login(platform_admin_user)
+        page = client_request.get(".platform_admin_find")
+        assert any(form["action"] == url_for(".platform_admin_find") for form in page.select("form"))
+
+    @pytest.mark.parametrize(
+        "api_response, expected_redirect",
+        (
+            ({"type": "organisation"}, "/organisations/abcdef12-3456-7890-abcd-ef1234567890"),
+            ({"type": "service"}, "/services/abcdef12-3456-7890-abcd-ef1234567890"),
+            (
+                {"type": "notification", "context": {"service_id": "abc"}},
+                "/services/abc/notification/abcdef12-3456-7890-abcd-ef1234567890",
+            ),
+            (
+                {"type": "template", "context": {"service_id": "abc"}},
+                "/services/abc/templates/abcdef12-3456-7890-abcd-ef1234567890",
+            ),
+            ({"type": "email_branding"}, "/email-branding/abcdef12-3456-7890-abcd-ef1234567890/edit"),
+            ({"type": "letter_branding"}, "/letter-branding/abcdef12-3456-7890-abcd-ef1234567890/edit"),
+            ({"type": "user"}, "/users/abcdef12-3456-7890-abcd-ef1234567890"),
+            ({"type": "provider"}, "/provider/abcdef12-3456-7890-abcd-ef1234567890"),
+            (
+                {"type": "reply_to_email", "context": {"service_id": "abc"}},
+                "/services/abc/service-settings/email-reply-to/abcdef12-3456-7890-abcd-ef1234567890/edit",
+            ),
+            (
+                {"type": "job", "context": {"service_id": "abc"}},
+                "/services/abc/jobs/abcdef12-3456-7890-abcd-ef1234567890",
+            ),
+            (
+                {"type": "service_contact_list", "context": {"service_id": "abc"}},
+                "/services/abc/contact-list/abcdef12-3456-7890-abcd-ef1234567890",
+            ),
+            (
+                {"type": "service_data_retention", "context": {"service_id": "abc"}},
+                "/services/abc/data-retention/abcdef12-3456-7890-abcd-ef1234567890/edit",
+            ),
+            (
+                {"type": "service_sms_sender", "context": {"service_id": "abc"}},
+                "/services/abc/service-settings/sms-sender/abcdef12-3456-7890-abcd-ef1234567890/edit",
+            ),
+            ({"type": "inbound_number"}, "/inbound-sms-admin"),
+            ({"type": "api_key", "context": {"service_id": "abc"}}, "/services/abc/api/keys"),
+            (
+                {"type": "template_folder", "context": {"service_id": "abc"}},
+                "/services/abc/templates/all/folders/abcdef12-3456-7890-abcd-ef1234567890",
+            ),
+            (
+                {"type": "service_inbound_api", "context": {"service_id": "abc"}},
+                "/services/abc/api/callbacks/received-text-messages-callback",
+            ),
+            (
+                {"type": "service_callback_api", "context": {"service_id": "abc"}},
+                "/services/abc/api/callbacks/delivery-status-callback",
+            ),
+            ({"type": "complaint"}, "/platform-admin/complaints"),
+            (
+                {"type": "inbound_sms", "context": {"service_id": "abc"}},
+                "/services/abc/conversation/abcdef12-3456-7890-abcd-ef1234567890#nabcdef12-3456-7890-abcd-ef1234567890",  # noqa
+            ),
+        ),
+    )
+    def test_find_uuid_redirects(self, mocker, client_request, platform_admin_user, api_response, expected_redirect):
+        mocker.patch("app.main.views.platform_admin.admin_api_client.find_by_uuid", return_value=api_response)
+        client_request.login(platform_admin_user)
+        client_request.post(
+            ".platform_admin_find",
+            _data={"uuid-search": "abcdef12-3456-7890-abcd-ef1234567890"},
+            _expected_redirect=expected_redirect,
+        )
