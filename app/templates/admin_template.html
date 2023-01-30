@@ -60,14 +60,14 @@
           "active": header_navigation.is_selected('documentation')
         },
         {
-          "href": url_for('main.user_profile'),
-          "text": current_user.name,
-          "active": header_navigation.is_selected('user-profile')
-        },
-        {
           "href": url_for('main.platform_admin_splash_page'),
           "text": "Platform admin",
           "active": header_navigation.is_selected('platform-admin')
+        },
+        {
+          "href": url_for('main.user_profile'),
+          "text": current_user.name,
+          "active": header_navigation.is_selected('user-profile')
         },
         {
           "href": url_for('main.sign_out'),
