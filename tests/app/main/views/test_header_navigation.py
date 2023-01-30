@@ -24,7 +24,7 @@ from tests.conftest import normalize_spaces
             (
                 ("Support", ".support"),
                 ("Documentation", ".documentation"),
-                ("Test User", ".user_profile"),
+                ("Your profile", ".user_profile"),
             ),
         ),
         (
@@ -34,7 +34,7 @@ from tests.conftest import normalize_spaces
                 ("Support", ".support"),
                 ("Documentation", ".documentation"),
                 ("Platform admin", ".platform_admin_splash_page"),
-                ("Test User", ".user_profile"),
+                ("Your profile", ".user_profile"),
             ),
         ),
     ),
