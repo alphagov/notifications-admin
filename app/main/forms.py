@@ -1235,15 +1235,6 @@ class BaseTemplateForm(StripWhitespaceForm):
     template_content = TextAreaField(
         "Message", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
     )
-    process_type = GovukRadiosField(
-        "Use priority queue?",
-        choices=[
-            ("priority", "Yes"),
-            ("normal", "No"),
-        ],
-        thing="yes or no",
-        default="normal",
-    )
 
 
 class SMSTemplateForm(BaseTemplateForm):
