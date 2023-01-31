@@ -65,10 +65,6 @@ def triage(ticket_type=PROBLEM_TICKET_TYPE):
     return render_template(
         "views/support/triage.html",
         form=form,
-        page_title={
-            PROBLEM_TICKET_TYPE: "Report a problem",
-            GENERAL_TICKET_TYPE: "Contact GOV.UK Notify support",
-        }.get(ticket_type),
     )
 
 

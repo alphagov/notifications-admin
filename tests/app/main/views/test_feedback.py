@@ -396,19 +396,18 @@ def test_redirects_to_triage(
 
 
 @pytest.mark.parametrize(
-    "ticket_type, expected_h1",
-    (
-        (PROBLEM_TICKET_TYPE, "Report a problem"),
-        (GENERAL_TICKET_TYPE, "Contact GOV.UK Notify support"),
-    ),
+    "ticket_type",
+    [
+        PROBLEM_TICKET_TYPE,
+        GENERAL_TICKET_TYPE,
+    ],
 )
 def test_options_on_triage_page(
     client_request,
     ticket_type,
-    expected_h1,
 ):
     page = client_request.get("main.triage", ticket_type=ticket_type)
-    assert normalize_spaces(page.select_one("h1").text) == expected_h1
+    assert normalize_spaces(page.select_one("h1").text) == "Is it an emergency?"
     assert page.select("form input[type=radio]")[0]["value"] == "yes"
     assert page.select("form input[type=radio]")[1]["value"] == "no"
 
@@ -688,13 +687,13 @@ def test_bat_email_page(
             True,
             True,
             True,
-            "We’ll reply in the next 30 minutes.",
+            "We’ll reply in the next 30 minutes and update you every hour until we fix the problem.",
         ),
         (
             True,
             False,
             False,  # Not a real scenario
-            "We’ll reply in the next 30 minutes.",
+            "We’ll reply in the next 30 minutes and update you every hour until we fix the problem.",
         ),
         # Anonymous tickets don’t promise a reply
         (
