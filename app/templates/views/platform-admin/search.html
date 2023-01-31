@@ -4,14 +4,14 @@
 {% from "components/error-summary.html" import errorSummary %}
 
 {% block per_page_title %}
-  Find
+  Search
 {% endblock %}
 
 {% block platform_admin_content %}
   {{ errorSummary(find_uuid_form) }}
 
   <h1 class="heading-medium">
-    Find
+    Search
   </h1>
 
   {% call form_wrapper(action=url_for('.find_services_by_name'), class='govuk-grid-row') %}
@@ -34,13 +34,16 @@
     </div>
   {% endcall %}
 
-  {% call form_wrapper(action=url_for('.platform_admin_find'), class='govuk-grid-row') %}
-    <div class="govuk-grid-column-three-quarters">
-      {{ find_uuid_form.search }}
-    </div>
-    <div class="govuk-grid-column-one-quarter">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      {{ govukButton({"text": "Search", "classes": "search-form__button"}) }}
+  {% call form_wrapper(action=url_for('.platform_admin_search'), class='govuk-grid-row') %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="govuk-grid-column-full">
+      {{
+        find_uuid_form.search(
+          param_extensions={
+            "button": {"html": "Search <div class='govuk-visually-hidden'>by UUID</div>"}
+          }
+        )
+      }}
     </div>
   {% endcall %}
 {% endblock %}

@@ -686,7 +686,7 @@ def get_url_for_notify_record(uuid_):
 
 @main.route("/platform-admin/find", methods=["GET", "POST"])
 @user_is_platform_admin
-def platform_admin_find():
+def platform_admin_search():
     # The services/users form prefixes must match those on the forms on their dedicated views.
     find_services_form = SearchByNameForm(prefix="services")
     find_users_form = AdminSearchUsersByEmailForm(prefix="users")
@@ -701,7 +701,7 @@ def platform_admin_find():
             find_uuid_form.search.errors.append(str(e))
 
     return render_template(
-        "views/platform-admin/find.html",
+        "views/platform-admin/search.html",
         find_services_form=find_services_form,
         find_users_form=find_users_form,
         find_uuid_form=find_uuid_form,

@@ -39,7 +39,7 @@ def test_should_redirect_if_not_logged_in(client_request, endpoint):
     [
         "main.platform_admin",
         "main.platform_admin_splash_page",
-        "main.platform_admin_find",
+        "main.platform_admin_search",
         "main.live_services",
         "main.trial_services",
     ],
@@ -1176,26 +1176,26 @@ def test_get_daily_sms_provider_volumes_report_calls_api_and_download_data(clien
 
 class TestPlatformAdminFind:
     def test_page_requires_platform_admin(self, client_request):
-        client_request.get(".platform_admin_find", _expected_status=403)
+        client_request.get(".platform_admin_search", _expected_status=403)
 
     def test_page_loads(self, client_request, platform_admin_user):
         client_request.login(platform_admin_user)
-        client_request.get(".platform_admin_find")
+        client_request.get(".platform_admin_search")
 
     def test_page_has_find_services_form(self, client_request, platform_admin_user):
         client_request.login(platform_admin_user)
-        page = client_request.get(".platform_admin_find")
+        page = client_request.get(".platform_admin_search")
         assert any(form["action"] == url_for(".find_services_by_name") for form in page.select("form"))
 
     def test_page_has_find_users_form(self, client_request, platform_admin_user):
         client_request.login(platform_admin_user)
-        page = client_request.get(".platform_admin_find")
+        page = client_request.get(".platform_admin_search")
         assert any(form["action"] == url_for(".find_users_by_email") for form in page.select("form"))
 
     def test_page_has_find_uuid_form(self, client_request, platform_admin_user):
         client_request.login(platform_admin_user)
-        page = client_request.get(".platform_admin_find")
-        assert any(form["action"] == url_for(".platform_admin_find") for form in page.select("form"))
+        page = client_request.get(".platform_admin_search")
+        assert any(form["action"] == url_for(".platform_admin_search") for form in page.select("form"))
 
     @pytest.mark.parametrize(
         "api_response, expected_redirect",
@@ -1259,7 +1259,7 @@ class TestPlatformAdminFind:
         mocker.patch("app.main.views.platform_admin.admin_api_client.find_by_uuid", return_value=api_response)
         client_request.login(platform_admin_user)
         client_request.post(
-            ".platform_admin_find",
+            ".platform_admin_search",
             _data={"uuid-search": "abcdef12-3456-7890-abcd-ef1234567890"},
             _expected_redirect=expected_redirect,
         )
