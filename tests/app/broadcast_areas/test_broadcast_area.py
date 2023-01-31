@@ -21,6 +21,11 @@ def close_enough(a, b):
 def test_loads_libraries():
     assert [(library.id, library.name, library.is_group) for library in sorted(broadcast_area_libraries)] == [
         (
+            "additional",
+            "Additional areas",
+            False,
+        ),
+        (
             "ctry19",
             "Countries",
             False,
@@ -147,8 +152,9 @@ def test_repository_has_all_libraries():
     repo = BroadcastAreasRepository()
     libraries = repo.get_libraries()
 
-    assert len(libraries) == 4
+    assert len(libraries) == 5
     assert [
+        ("Additional areas", "additional area"),
         ("Countries", "country"),
         ("Police forces in England and Wales", "police force"),
         ("Test areas", "test area"),
@@ -159,7 +165,7 @@ def test_repository_has_all_libraries():
 @pytest.mark.parametrize("library", (broadcast_area_libraries))
 def test_every_area_has_count_of_phones(library):
     for area in library:
-        if library.id == "test":
+        if library.id == "test" or library.id == "additional":
             assert area.count_of_phones == 0
         else:
             assert area.count_of_phones > 0
