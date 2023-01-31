@@ -761,6 +761,14 @@ def service_set_channel(service_id, channel):
 @user_has_permissions("manage_service")
 def service_set_auth_type(service_id):
     form = SetAuthTypeForm(sign_in_method=current_service.sign_in_method)
+
+    if current_service.sign_in_method == SIGN_IN_METHOD_TEXT_OR_EMAIL:
+        if users_without_phone_numbers := [user for user in current_service.active_users if not user.mobile_number]:
+            return render_template(
+                "views/service-settings/disable-email-auth-blocked.html",
+                users_without_phone_numbers=users_without_phone_numbers,
+            )
+
     if form.validate_on_submit():
         if (
             current_service.sign_in_method == SIGN_IN_METHOD_TEXT_OR_EMAIL
@@ -783,6 +791,9 @@ def service_set_auth_type(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/set-auth-type/confirm", methods=["GET", "POST"])
 def service_confirm_disable_email_auth(service_id):
     if current_service.sign_in_method != SIGN_IN_METHOD_TEXT_OR_EMAIL:
+        return redirect(url_for(".service_set_auth_type", service_id=service_id))
+
+    if any(not user.mobile_number for user in current_service.active_users):
         return redirect(url_for(".service_set_auth_type", service_id=service_id))
 
     if request.method == "POST":

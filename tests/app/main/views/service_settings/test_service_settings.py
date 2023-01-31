@@ -4570,19 +4570,24 @@ class TestSetAuthType:
 
     def test_page_loads(
         self,
+        mocker,
         client_request,
         service_one,
     ):
-        client_request.get(
+        mocker.patch("app.models.user.Users.client_method")
+        page = client_request.get(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
         )
+        assert page.select_one("form")
 
     def test_current_setting_selected(
         self,
+        mocker,
         client_request,
         service_one,
     ):
+        mocker.patch("app.models.user.Users.client_method")
         page = client_request.get(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
@@ -4595,6 +4600,7 @@ class TestSetAuthType:
 
     def test_redirects_back_to_service_settings_on_success(self, mocker, client_request, service_one):
         mock_update_service = mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
+        mocker.patch("app.models.user.Users.client_method")
         client_request.post(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
@@ -4606,9 +4612,12 @@ class TestSetAuthType:
         assert mock_update_call[0] == (service_one["id"],)
         assert set(mock_update_call[1]["permissions"]) == {"email_auth", "email", "sms"}
 
-    def test_redirects_to_confirmation_when_disabling_email_auth(self, mocker, client_request, service_one):
+    def test_redirects_to_confirmation_when_disabling_email_auth(
+        self, mocker, client_request, service_one, active_user_with_permissions
+    ):
         service_one["permissions"] += ["email_auth"]
         mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
+        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
         client_request.post(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
@@ -4616,16 +4625,42 @@ class TestSetAuthType:
             _expected_redirect=url_for(".service_confirm_disable_email_auth", service_id=service_one["id"]),
         )
 
+    def test_cannot_disable_email_auth_if_some_users_dont_have_a_mobile_number(
+        self, mocker, client_request, service_one, active_user_with_permissions
+    ):
+        active_user_with_permissions["mobile_number"] = None
+        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        service_one["permissions"] += ["email_auth"]
+        mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
+        page = client_request.get("main.service_set_auth_type", service_id=SERVICE_ONE_ID)
+        assert active_user_with_permissions["name"] in page.select_one("main").text
+        assert not page.select_one("main form")
+
 
 class TestConfirmDisableEmailAuth:
-    def test_page_loads(self, client_request, service_one):
+    def test_page_loads(self, mocker, client_request, service_one, active_user_with_permissions):
         service_one["permissions"] += ["email_auth"]
+        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
         client_request.get(
             "main.service_confirm_disable_email_auth",
             service_id=SERVICE_ONE_ID,
         )
 
-    def test_page_redirects_to_set_auth_type_if_service_doesnt_use_email_auth(self, client_request, service_one):
+    def test_page_redirects_to_set_auth_type_if_service_doesnt_use_email_auth(
+        self, mocker, client_request, service_one, active_user_with_permissions
+    ):
+        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        client_request.get(
+            "main.service_confirm_disable_email_auth",
+            service_id=SERVICE_ONE_ID,
+            _expected_redirect=url_for(".service_set_auth_type", service_id=service_one["id"]),
+        )
+
+    def test_redirects_to_set_auth_type_if_some_users_dont_have_mobile_number(
+        self, mocker, client_request, service_one, active_user_with_permissions
+    ):
+        active_user_with_permissions["mobile_number"] = None
+        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
         client_request.get(
             "main.service_confirm_disable_email_auth",
             service_id=SERVICE_ONE_ID,
