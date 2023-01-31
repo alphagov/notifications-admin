@@ -1155,7 +1155,6 @@ def test_choose_broadcast_library_page(
         broadcast_message_id=fake_uuid,
     )
 
-    print(repr(page.select(".file-list-hint-large")[1]))
     assert [normalize_spaces(title.text) for title in page.select("main a.govuk-link")] == expected_list
 
     assert normalize_spaces(page.select(".file-list-hint-large")[1].text) == (
