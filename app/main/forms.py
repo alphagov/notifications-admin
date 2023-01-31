@@ -2615,5 +2615,5 @@ class SetEmailAuthForUsersForm(StripWhitespaceForm):
 class FindByUuidForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Find anything by UUID",
-        validators=[UUID("Enter a valid UUID")],
+        validators=[DataRequired("Cannot be empty"), UUID("Enter a valid UUID")],
     )
