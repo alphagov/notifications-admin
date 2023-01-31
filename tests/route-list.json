@@ -90,7 +90,6 @@
     "/platform-admin",
     "/platform-admin/clear-cache",
     "/platform-admin/complaints",
-    "/platform-admin/find",
     "/platform-admin/live-services",
     "/platform-admin/reports",
     "/platform-admin/reports/daily-sms-provider-volumes-report",

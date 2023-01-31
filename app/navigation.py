@@ -100,7 +100,6 @@ class HeaderNavigation(Navigation):
             "platform_admin_list_complaints",
             "platform_admin_reports",
             "platform_admin_returned_letters",
-            "platform_admin_splash_page",
             "platform_admin_update_email_branding",
             "platform_admin_view_email_branding",
             "trial_services",

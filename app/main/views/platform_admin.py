@@ -47,11 +47,27 @@ FAILURE_THRESHOLD = 3
 ZERO_FAILURE_THRESHOLD = 0
 
 
-@main.route("/platform-admin")
+@main.route("/platform-admin", methods=["GET", "POST"])
 @user_is_platform_admin
-def platform_admin_splash_page():
+def platform_admin_search():
+    # The services/users form prefixes must match those on the forms on their dedicated views.
+    find_services_form = SearchByNameForm(prefix="services")
+    find_users_form = AdminSearchUsersByEmailForm(prefix="users")
+    find_uuid_form = FindByUuidForm(prefix="uuid")
+
+    # Only the find_uuid_form POSTs to this endpoint - the others all POST to their existing dedicated pages.
+    if find_uuid_form.validate_on_submit():
+        try:
+            redirect_url = get_url_for_notify_record(find_uuid_form.search.data)
+            return redirect(redirect_url)
+        except ValueError as e:
+            find_uuid_form.search.errors.append(str(e))
+
     return render_template(
-        "views/platform-admin/splash-page.html",
+        "views/platform-admin/search.html",
+        find_services_form=find_services_form,
+        find_users_form=find_users_form,
+        find_uuid_form=find_uuid_form,
     )
 
 
@@ -682,30 +698,6 @@ def get_url_for_notify_record(uuid_):
         return url_for(**url_for_kwargs)
 
     raise ValueError("Could not find a thing with that UUID")
-
-
-@main.route("/platform-admin/find", methods=["GET", "POST"])
-@user_is_platform_admin
-def platform_admin_search():
-    # The services/users form prefixes must match those on the forms on their dedicated views.
-    find_services_form = SearchByNameForm(prefix="services")
-    find_users_form = AdminSearchUsersByEmailForm(prefix="users")
-    find_uuid_form = FindByUuidForm(prefix="uuid")
-
-    # Only the find_uuid_form POSTs to this endpoint - the others all POST to their existing dedicated pages.
-    if find_uuid_form.validate_on_submit():
-        try:
-            redirect_url = get_url_for_notify_record(find_uuid_form.search.data)
-            return redirect(redirect_url)
-        except ValueError as e:
-            find_uuid_form.search.errors.append(str(e))
-
-    return render_template(
-        "views/platform-admin/search.html",
-        find_services_form=find_services_form,
-        find_users_form=find_users_form,
-        find_uuid_form=find_uuid_form,
-    )
 
 
 def sum_service_usage(service):
