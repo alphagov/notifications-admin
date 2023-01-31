@@ -789,6 +789,7 @@ def service_set_auth_type(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-auth-type/confirm", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
 def service_confirm_disable_email_auth(service_id):
     if current_service.sign_in_method != SIGN_IN_METHOD_TEXT_OR_EMAIL:
         return redirect(url_for(".service_set_auth_type", service_id=service_id))

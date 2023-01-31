@@ -4558,10 +4558,9 @@ class TestSetAuthType:
         self,
         client_request,
         service_one,
-        active_user_with_permissions,
+        active_user_view_permissions,
     ):
-        active_user_with_permissions["permissions"][service_one["id"]].remove("manage_settings")
-        client_request.login(active_user_with_permissions)
+        client_request.login(active_user_view_permissions)
         client_request.get(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
@@ -4638,6 +4637,19 @@ class TestSetAuthType:
 
 
 class TestConfirmDisableEmailAuth:
+    def test_page_requires_manage_settings_permission(
+        self,
+        client_request,
+        service_one,
+        active_user_view_permissions,
+    ):
+        client_request.login(active_user_view_permissions)
+        client_request.get(
+            "main.service_confirm_disable_email_auth",
+            service_id=SERVICE_ONE_ID,
+            _expected_status=403,
+        )
+
     def test_page_loads(self, mocker, client_request, service_one, active_user_with_permissions):
         service_one["permissions"] += ["email_auth"]
         mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
