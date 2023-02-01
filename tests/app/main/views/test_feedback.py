@@ -495,12 +495,16 @@ def test_triage_redirects_to_correct_url(
 
 
 @pytest.mark.parametrize(
-    "extra_args, expected_back_link",
+    "extra_args, expected_back_link, expected_page_title",
     [
-        ({"severe": "yes"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE)),
-        ({"severe": "no"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE)),
-        ({"severe": "foo"}, partial(url_for, "main.support")),  # hacking the URL
-        ({}, partial(url_for, "main.support")),
+        (
+            {"severe": "yes"},
+            partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
+            "Tell us about the emergency",
+        ),
+        ({"severe": "no"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE), "Report a problem"),
+        ({"severe": "foo"}, partial(url_for, "main.support"), "Report a problem"),  # hacking the URL
+        ({}, partial(url_for, "main.support"), "Report a problem"),
     ],
 )
 @freeze_time("2012-12-12 12:12")
@@ -509,10 +513,11 @@ def test_back_link_from_form(
     mock_get_non_empty_organisations_and_services_for_user,
     extra_args,
     expected_back_link,
+    expected_page_title,
 ):
     page = client_request.get("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, **extra_args)
     assert page.select_one(".govuk-back-link")["href"] == expected_back_link()
-    assert normalize_spaces(page.select_one("h1").text) == "Report a problem"
+    assert normalize_spaces(page.select_one("h1").text) == expected_page_title
 
 
 @pytest.mark.parametrize(
