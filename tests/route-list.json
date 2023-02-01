@@ -51,6 +51,7 @@
     "/integration_testing",
     "/invitation/<token>",
     "/letter-branding",
+    "/letter-branding/<uuid:branding_id>",
     "/letter-branding/<uuid:branding_id>/edit",
     "/letter-branding/<uuid:branding_id>/edit/<path:logo>",
     "/letter-branding/create",

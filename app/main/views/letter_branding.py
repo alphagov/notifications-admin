@@ -34,6 +34,20 @@ def letter_branding():
     )
 
 
+@main.route("/letter-branding/<uuid:branding_id>", methods=["GET", "POST"])
+def platform_admin_view_letter_branding(branding_id):
+    letter_branding = LetterBranding.from_id(branding_id)
+
+    return render_template(
+        "views/letter-branding/view-branding.html",
+        letter_branding=letter_branding,
+        cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
+        logo=permanent_letter_logo_name(letter_branding.filename, "svg"),
+        branding_orgs=letter_branding.organisations,
+        branding_services=letter_branding.services,
+    )
+
+
 @main.route("/letter-branding/<uuid:branding_id>/edit", methods=["GET", "POST"])
 @main.route("/letter-branding/<uuid:branding_id>/edit/<path:logo>", methods=["GET", "POST"])
 @user_is_platform_admin
@@ -83,7 +97,7 @@ def update_letter_branding(branding_id, logo=None):
                 old_letter_branding=letter_branding.serialize(),
             )
 
-            return redirect(url_for("main.letter_branding"))
+            return redirect(url_for("main.platform_admin_view_letter_branding", branding_id=letter_branding.id))
 
         except HTTPError as e:
             if "name" in e.message:
@@ -95,6 +109,7 @@ def update_letter_branding(branding_id, logo=None):
 
     return render_template(
         "views/letter-branding/manage-letter-branding.html",
+        back_link=url_for("main.platform_admin_view_letter_branding", branding_id=letter_branding.id),
         file_upload_form=file_upload_form,
         letter_branding_details_form=letter_branding_details_form,
         cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
@@ -131,11 +146,13 @@ def create_letter_branding(logo=None):
             db_filename = letter_filename_for_db(logo, current_user.id)
 
             try:
-                LetterBranding.create(filename=db_filename, name=letter_branding_details_form.name.data)
+                letter_branding = LetterBranding.create(
+                    filename=db_filename, name=letter_branding_details_form.name.data
+                )
 
                 upload_letter_svg_logo(logo, db_filename, current_user.id)
 
-                return redirect(url_for("main.letter_branding"))
+                return redirect(url_for("main.platform_admin_view_letter_branding", branding_id=letter_branding.id))
 
             except HTTPError as e:
                 if "name" in e.message:
@@ -148,6 +165,7 @@ def create_letter_branding(logo=None):
 
     return render_template(
         "views/letter-branding/manage-letter-branding.html",
+        back_link=url_for("main.letter_branding"),
         file_upload_form=file_upload_form,
         letter_branding_details_form=letter_branding_details_form,
         cdn_url=current_app.config["LOGO_CDN_DOMAIN"],

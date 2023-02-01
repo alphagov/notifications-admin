@@ -33,5 +33,8 @@ class LetterBrandingClient(NotifyAdminAPIClient):
         }
         return self.post(url=f"/letter-branding/{branding_id}", data=data)
 
+    def get_orgs_and_services_associated_with_branding(self, branding_id):
+        return self.get(url=f"/letter-branding/{branding_id}/orgs_and_services")
+
 
 letter_branding_client = LetterBrandingClient()

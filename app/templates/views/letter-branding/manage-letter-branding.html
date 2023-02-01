@@ -10,11 +10,10 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.letter_branding') }) }}
+  {{ govukBackLink({ "href": back_link }) }}
 {% endblock %}
 
 {% block platform_admin_content %}
-
   {{ page_header('{} letter branding'.format('Update' if is_update else 'Add')) }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
