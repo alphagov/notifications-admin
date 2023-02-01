@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Out of hours emergencies
+  Report an emergency out of hours
 {% endblock %}
 
 {% block backLink %}
@@ -12,31 +12,36 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Out of hours emergencies')}}
+    {{ page_header('Report an emergency out of hours')}}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <p class="govuk-body">
           First, check the
-          <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">system status page</a>.
-          You do not need to contact us if
-          the problem you’re having is listed on that page.
+          <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">GOV.UK Notify status page</a>.
         </p>
         <p class="govuk-body">
-          Otherwise, contact us using the emergency email address we
-          gave you or your service manager when we made your service live.
+          You do not need to contact us if your problem is already listed on that page.
         </p>
         <p class="govuk-body">
-          We’ll reply within 30 minutes and give you hourly updates
-          until the problem’s fixed.
+          If your problem is not listed on the status page, contact us using our emergency email address.
+        </p>
+        <p class="govuk-body">
+          This is the email address we sent to your service manager in an email called ‘Your service is live’.
         </p>
         <p class="govuk-body">
           We do not offer out of hours support if your service is in
-          trial mode.
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.trial_mode_new') }}">trial mode</a>.
         </p>
-        <h2 class="heading-medium">Any other problems</h2>
+
+        <h2 class="heading-medium">When you report an emergency</h2>
+        <p class="govuk-body">
+          We’ll reply within 30 minutes and update you every hour until we fix the problem.
+        </p>
+
+        <h2 class="heading-medium">If it’s not an emergency</h2>
         <p class="bottom-gutter-2">
           <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.feedback', ticket_type='report-problem', severe='no') }}">Fill in this form</a>
-          and we’ll get back to you by the next working day.
+          and we’ll reply within 1 working day.
         </p>
       </div>
     </div>

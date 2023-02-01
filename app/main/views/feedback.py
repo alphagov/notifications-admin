@@ -65,10 +65,6 @@ def triage(ticket_type=PROBLEM_TICKET_TYPE):
     return render_template(
         "views/support/triage.html",
         form=form,
-        page_title={
-            PROBLEM_TICKET_TYPE: "Report a problem",
-            GENERAL_TICKET_TYPE: "Contact GOV.UK Notify support",
-        }.get(ticket_type),
     )
 
 
@@ -135,16 +131,22 @@ def feedback(ticket_type):
             )
         )
 
+    if severe:
+        page_title = "Tell us about the emergency"
+
+    else:
+        page_title = {
+            GENERAL_TICKET_TYPE: "Contact GOV.UK Notify support",
+            PROBLEM_TICKET_TYPE: "Report a problem",
+            QUESTION_TICKET_TYPE: "Ask a question or give feedback",
+        }.get(ticket_type)
+
     return render_template(
         "views/support/form.html",
         form=form,
         back_link=(url_for(".support") if severe is None else url_for(".triage", ticket_type=ticket_type)),
         show_status_page_banner=(ticket_type == PROBLEM_TICKET_TYPE),
-        page_title={
-            GENERAL_TICKET_TYPE: "Contact GOV.UK Notify support",
-            PROBLEM_TICKET_TYPE: "Report a problem",
-            QUESTION_TICKET_TYPE: "Ask a question or give feedback",
-        }.get(ticket_type),
+        page_title=page_title,
     )
 
 

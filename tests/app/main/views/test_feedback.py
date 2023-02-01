@@ -99,8 +99,8 @@ def test_get_support_as_member_of_public(
         _data={"who": "public"},
         _follow_redirects=True,
     )
-    assert normalize_spaces(page.select("h1")) == "The GOV.UK Notify service is for people who work in the government"
-    assert len(page.select("h2 a")) == 3
+    assert normalize_spaces(page.select("h1")) == "GOV.UK Notify is for people who work in the government"
+    assert len(page.select("h2 a")) == 2
     assert not page.select("form")
     assert not page.select("input")
     assert not page.select("form button")
@@ -396,19 +396,18 @@ def test_redirects_to_triage(
 
 
 @pytest.mark.parametrize(
-    "ticket_type, expected_h1",
-    (
-        (PROBLEM_TICKET_TYPE, "Report a problem"),
-        (GENERAL_TICKET_TYPE, "Contact GOV.UK Notify support"),
-    ),
+    "ticket_type",
+    [
+        PROBLEM_TICKET_TYPE,
+        GENERAL_TICKET_TYPE,
+    ],
 )
 def test_options_on_triage_page(
     client_request,
     ticket_type,
-    expected_h1,
 ):
     page = client_request.get("main.triage", ticket_type=ticket_type)
-    assert normalize_spaces(page.select_one("h1").text) == expected_h1
+    assert normalize_spaces(page.select_one("h1").text) == "Is it an emergency?"
     assert page.select("form input[type=radio]")[0]["value"] == "yes"
     assert page.select("form input[type=radio]")[1]["value"] == "no"
 
@@ -496,12 +495,16 @@ def test_triage_redirects_to_correct_url(
 
 
 @pytest.mark.parametrize(
-    "extra_args, expected_back_link",
+    "extra_args, expected_back_link, expected_page_title",
     [
-        ({"severe": "yes"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE)),
-        ({"severe": "no"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE)),
-        ({"severe": "foo"}, partial(url_for, "main.support")),  # hacking the URL
-        ({}, partial(url_for, "main.support")),
+        (
+            {"severe": "yes"},
+            partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
+            "Tell us about the emergency",
+        ),
+        ({"severe": "no"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE), "Report a problem"),
+        ({"severe": "foo"}, partial(url_for, "main.support"), "Report a problem"),  # hacking the URL
+        ({}, partial(url_for, "main.support"), "Report a problem"),
     ],
 )
 @freeze_time("2012-12-12 12:12")
@@ -510,10 +513,11 @@ def test_back_link_from_form(
     mock_get_non_empty_organisations_and_services_for_user,
     extra_args,
     expected_back_link,
+    expected_page_title,
 ):
     page = client_request.get("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, **extra_args)
     assert page.select_one(".govuk-back-link")["href"] == expected_back_link()
-    assert normalize_spaces(page.select_one("h1").text) == "Report a problem"
+    assert normalize_spaces(page.select_one("h1").text) == expected_page_title
 
 
 @pytest.mark.parametrize(
@@ -657,7 +661,6 @@ def test_should_be_shown_the_bat_email_for_general_questions(
 def test_bat_email_page(
     client_request,
     active_user_with_permissions,
-    mocker,
     service_one,
 ):
     bat_phone_page = "main.bat_phone"
@@ -667,10 +670,15 @@ def test_bat_email_page(
 
     assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select_one(".govuk-back-link")["href"] == url_for("main.support")
-    assert page.select("main a")[1].text == "Fill in this form"
-    assert page.select("main a")[1]["href"] == url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no")
-    next_page = client_request.get_url(page.select("main a")[1]["href"])
-    assert next_page.select_one("h1").text.strip() == "Report a problem"
+
+    page_links = page.select("main a")
+    form_link = next(
+        filter(
+            lambda l: l["href"] == url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no"), page_links
+        ),
+        None,
+    )
+    assert form_link is not None
 
     client_request.login(active_user_with_permissions)
     client_request.get(bat_phone_page, _expected_redirect=url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE))
@@ -684,13 +692,13 @@ def test_bat_email_page(
             True,
             True,
             True,
-            "We’ll reply in the next 30 minutes.",
+            "We’ll reply in the next 30 minutes and update you every hour until we fix the problem.",
         ),
         (
             True,
             False,
             False,  # Not a real scenario
-            "We’ll reply in the next 30 minutes.",
+            "We’ll reply in the next 30 minutes and update you every hour until we fix the problem.",
         ),
         # Anonymous tickets don’t promise a reply
         (
