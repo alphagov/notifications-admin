@@ -21,13 +21,6 @@
                 {% include "partials/check/letter-too-long.html" %}
             {% endcall %}
           {% endif %}
-          {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not letter_too_long %}
-            <div class="govuk-grid-column-one-half">
-              <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
-                Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
-              </a>
-            </div>
-          {% endif %}
         {% elif template.template_type == 'broadcast' %}
           {% if current_user.has_permissions('create_broadcasts') %}
             <div class="govuk-grid-column-one-half">
@@ -64,16 +57,21 @@
   {% endif %}
 </div>
 <div class="govuk-grid-column-full template-container">
+  {% if template.template_type == 'letter' and current_user.has_permissions('send_messages', restrict_admin_usage=True) and not letter_too_long %}
+    <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-send">
+      Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
+    </a>
+  {% endif %}
   {% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %}
     {% if not current_service.letter_branding_id %}
-      <a href="{{ url_for(".letter_branding_request", service_id=current_service.id, from_template=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-branding">Add logo</a>
+      <a href="{{ url_for(".letter_branding_request", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-branding">Add logo</a>
     {% endif %}
-    <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-postage">Change<span class="govuk-visually-hidden"> postage</span></a>
-    <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> letter template</span></a>
+    <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-postage">Change<span class="govuk-visually-hidden"> postage</span></a>
+    <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> letter template</span></a>
     {% if current_service.count_letter_contact_details %}
-      <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-contact">Edit<span class="govuk-visually-hidden"> letter contact block</span></a>
+      <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Edit<span class="govuk-visually-hidden"> letter contact block</span></a>
     {% else %}
-      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-contact">Edit<span class="govuk-visually-hidden"> letter contact block</span></a>
+      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Edit<span class="govuk-visually-hidden"> letter contact block</span></a>
     {% endif %}
   {% endif %}
   {{ template|string }}
@@ -99,7 +97,7 @@
       </span>
     {% else %}
     <div class="js-stick-at-bottom-when-scrolling">
-      {{ govukButton({ "text": "Upload pages", "classes": "govuk-button--secondary", "href": url_for(".insert_pages_upload", service_id=current_service.id, template_id=template.id) }) }}
+      {{ govukButton({ "text": "Attach pages", "classes": "govuk-button--secondary", "href": url_for(".insert_pages_upload", service_id=current_service.id, template_id=template.id) }) }}
       {{ govukButton({ "text": "Add Welsh language version", "classes": "govuk-button--secondary govuk-!-margin-left-3", "href": url_for(".view_template", service_id=current_service.id, template_id=template.id, extra_pages="welsh.png", _anchor="extra-pages") }) }}
     </div>
     {% endif %}

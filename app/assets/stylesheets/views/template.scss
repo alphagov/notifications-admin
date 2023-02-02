@@ -5,42 +5,78 @@
 %edit-template-link,
 .edit-template-link {
 
-  @include govuk-font(19);
+  //@include govuk-font(19);
   position: absolute;
-  background-color: $govuk-link-colour; // text colour is set in the HTML by the govuk-link--inverse class
-  padding: 10px govuk-spacing(3);
+  //background-color: $govuk-link-colour; // text colour is set in the HTML by the govuk-link--inverse class
+  //padding: 10px govuk-spacing(3);
   z-index: 10000;
 
+}
+
+.edit-template-link-send {
+  @extend %edit-template-link;
+  top: 15.5%; // align bottom edge to bottom of address
+  left: 190px;
+
+  &:active {
+    margin-top: -2px;
+    top: 15.5% !important;
+  }
 }
 
 .edit-template-link-letter-contact {
   @extend %edit-template-link;
   right: -25px;
   top: 232px; // align to bottom of contact block
+
+  &:active {
+    margin-top: -2px;
+    top: 232px !important;
+  }
 }
 
 .edit-template-link-letter-address {
   @extend %edit-template-link;
   top: 14.65%; // align bottom edge to bottom of address
   left: -5px;
+
+  &:active {
+    margin-top: -2px;
+    top: 14.65% !important;
+  }
+
 }
 
 .edit-template-link-letter-body {
   @extend %edit-template-link;
   top: 400px; // aligns to top of subject
   left: -5px;
+  &:active {
+    margin-top: -2px;
+    top: 400px !important;
+  }
 }
 
 .edit-template-link-letter-postage {
   @extend %edit-template-link;
   top: 51px; // aligns bottom edge to bottom of postmark
   right: 145px; // Aligns right edge to midpoint of postmark and fold
+
+  &:active {
+    margin-top: -2px;
+    top: 51px !important;
+  }
 }
 
 .edit-template-link-letter-branding {
   @extend %edit-template-link;
   top: 51px; // aligns with ‘change postage’ link
   left: 66px; // Aligns to left of logo area
+
+  &:active {
+    margin-top: -2px;
+    top: 51px !important;
+  }
 }
 
 .template-content-count {
