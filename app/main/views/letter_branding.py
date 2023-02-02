@@ -42,8 +42,6 @@ def platform_admin_view_letter_branding(branding_id):
     return render_template(
         "views/letter-branding/view-branding.html",
         letter_branding=letter_branding,
-        cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
-        logo=permanent_letter_logo_name(letter_branding.filename, "svg"),
         branding_orgs=letter_branding.organisations,
         branding_services=letter_branding.services,
     )

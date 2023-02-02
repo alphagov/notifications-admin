@@ -52,9 +52,13 @@ def test_view_letter_branding_requires_platform_admin(
     )
     user = request.getfixturevalue(user_fixture)
     client_request.login(user)
-    client_request.get(
+    page = client_request.get(
         ".platform_admin_view_letter_branding", branding_id=fake_uuid, _expected_status=expected_response_status
     )
+
+    if expected_response_status == 200:
+        preview = page.select_one("iframe")
+        assert preview["src"] == "/_letter?branding_style=6ce466d0-fd6a-11e5-82f5-e0accb9d11a6"
 
 
 def test_view_letter_branding_with_services_but_no_orgs(
