@@ -1067,6 +1067,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
         (
             [],
             [
+                "Additional areas",
                 "Countries",
                 "Local authorities",
                 "Police forces in England and Wales",
@@ -1080,6 +1081,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
                 "ctry19-S92000003",
             ],
             [
+                "Additional areas",
                 "Countries",
                 "Local authorities",
                 "Police forces in England and Wales",
@@ -1094,6 +1096,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
                 "lad21-E06000052",  # Cornwall, a unitary authority
             ],
             [
+                "Additional areas",
                 "Countries",
                 "Local authorities",
                 "Police forces in England and Wales",
@@ -1115,6 +1118,7 @@ def test_preview_broadcast_areas_page_with_custom_polygons(
                 "Gloucestershire",
                 "Shetland Islands",
                 # ---
+                "Additional areas",
                 "Countries",
                 "Local authorities",
                 "Police forces in England and Wales",
@@ -1153,11 +1157,11 @@ def test_choose_broadcast_library_page(
 
     assert [normalize_spaces(title.text) for title in page.select("main a.govuk-link")] == expected_list
 
-    assert normalize_spaces(page.select(".file-list-hint-large")[0].text) == (
+    assert normalize_spaces(page.select(".file-list-hint-large")[1].text) == (
         "England, Northern Ireland, Scotland and Wales"
     )
 
-    assert page.select_one("a.file-list-filename-large.govuk-link")["href"] == url_for(
+    assert page.select("a.file-list-filename-large.govuk-link")[1]["href"] == url_for(
         ".choose_broadcast_area",
         service_id=SERVICE_ONE_ID,
         broadcast_message_id=fake_uuid,
