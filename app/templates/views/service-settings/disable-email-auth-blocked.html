@@ -1,7 +1,5 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import page_footer %}
-{% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% set heading = 'Sign-in method' %}
@@ -15,30 +13,26 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       {{ page_header(heading) }}
 
       <p class="govuk-body">
-        The most secure way to sign in to Notify is with a text message code.
+        Your team members can sign in with an email link or text message code.
       </p>
       <p class="govuk-body">
-        Team members can also sign in using a link that’s sent in an email.
-        For security, you should only do this if they access their email accounts using:
+        You cannot switch off the email link sign-in method for the whole team until these members add a mobile phone number:
       </p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>a work-issued device</li>
-        <li>an office network or VPN</li>
-        <li>another type of two-factor authentication</li>
+      {% for user in users_without_phone_numbers %}
+        <li>{{ user.name }}</li>
+      {% endfor %}
       </ul>
-
-      {% call form_wrapper() %}
-        {{ form.sign_in_method }}
-        {{ page_footer('Continue') }}
-      {% endcall %}
-
+      <p class="govuk-body">
+        If you need to change an individual’s sign-in method, go to the
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.manage_users', service_id=current_service.id) }}">team members</a>
+        page.
+      </p>
     </div>
   </div>
-
 {% endblock %}

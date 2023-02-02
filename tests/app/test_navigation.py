@@ -279,6 +279,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "service_confirm_delete_email_reply_to",
             "service_confirm_delete_letter_contact",
             "service_confirm_delete_sms_sender",
+            "service_confirm_disable_email_auth",
             "service_dashboard",
             "service_dashboard_updates",
             "service_delete_email_reply_to",
