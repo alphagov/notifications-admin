@@ -1424,6 +1424,38 @@ def test_cant_copy_template_from_non_member_service(
 
 
 @pytest.mark.parametrize(
+    "template_type, expected_page_heading",
+    [
+        ("email", "New email template"),
+        ("sms", "New text message template"),
+        ("letter", "Templates"),
+    ],
+)
+def test_choose_template_for_each_template_type(
+    client_request,
+    mock_get_api_keys,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    template_type,
+    expected_page_heading,
+):
+    service_one["permissions"].append("letter")
+
+    page = client_request.post(
+        "main.choose_template",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            "operation": "add-new-template",
+            "add_template_by_template_type": template_type,
+        },
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == expected_page_heading
+
+
+@pytest.mark.parametrize(
     "service_permissions, data, expected_error",
     (
         (
