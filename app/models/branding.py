@@ -125,7 +125,12 @@ class EmailBranding(Branding):
 
 
 class LetterBranding(Branding):
-    ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {"filename"}
+    ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {
+        "filename",
+        "created_by",
+        "created_at",
+        "updated_at",
+    }
     NHS_ID = "2cd354bb-6b85-eda3-c0ad-6b613150459f"
 
     @classmethod
@@ -152,6 +157,24 @@ class LetterBranding(Branding):
     @property
     def is_nhs(self):
         return self.name == "NHS"
+
+    @property
+    def organisations(self):
+        orgs_and_services = letter_branding_client.get_orgs_and_services_associated_with_branding(self.id)["data"]
+
+        return orgs_and_services["organisations"]
+
+    @property
+    def services(self):
+        orgs_and_services = letter_branding_client.get_orgs_and_services_associated_with_branding(self.id)["data"]
+
+        return orgs_and_services["services"]
+
+    @property
+    def created_by_user(self):
+        if self.created_by:
+            return user_api_client.get_user(self.created_by)
+        return None
 
 
 class AllBranding(ModelList):

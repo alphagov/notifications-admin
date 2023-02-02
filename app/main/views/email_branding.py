@@ -40,6 +40,7 @@ def email_branding():
     methods=["GET"],
     endpoint="platform_admin_confirm_archive_email_branding",
 )
+@user_is_platform_admin
 def platform_admin_view_email_branding(branding_id):
     email_branding = EmailBranding.from_id(branding_id)
 

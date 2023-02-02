@@ -11,7 +11,7 @@ from app.s3_client.s3_logo_client import (
     LETTER_TEMP_LOGO_LOCATION,
     permanent_letter_logo_name,
 )
-from tests.conftest import normalize_spaces
+from tests.conftest import create_letter_branding, normalize_spaces
 
 
 def test_letter_branding_page_shows_full_branding_list(
@@ -35,10 +35,154 @@ def test_letter_branding_page_shows_full_branding_list(
     ]
 
     assert hrefs == [
-        url_for(".update_letter_branding", branding_id=str(UUID(int=0))),
-        url_for(".update_letter_branding", branding_id=str(UUID(int=1))),
-        url_for(".update_letter_branding", branding_id=str(UUID(int=2))),
+        url_for(".platform_admin_view_letter_branding", branding_id=str(UUID(int=0))),
+        url_for(".platform_admin_view_letter_branding", branding_id=str(UUID(int=1))),
+        url_for(".platform_admin_view_letter_branding", branding_id=str(UUID(int=2))),
     ]
+
+
+@pytest.mark.parametrize(
+    "user_fixture, expected_response_status", (("api_user_active_email_auth", 403), ("platform_admin_user", 200))
+)
+def test_view_letter_branding_requires_platform_admin(
+    mocker, client_request, mock_get_letter_branding_by_id, user_fixture, expected_response_status, request, fake_uuid
+):
+    mocker.patch(
+        "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
+    )
+    user = request.getfixturevalue(user_fixture)
+    client_request.login(user)
+    client_request.get(
+        ".platform_admin_view_letter_branding", branding_id=fake_uuid, _expected_status=expected_response_status
+    )
+
+
+def test_view_letter_branding_with_services_but_no_orgs(
+    mocker,
+    client_request,
+    platform_admin_user,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
+):
+    mocker.patch(
+        "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
+        side_effect=lambda letter_branding_id: {
+            "data": {
+                "services": [{"name": "service 1", "id": "1234"}, {"name": "service 2", "id": "5678"}],
+                "organisations": [],
+            }
+        },
+    )
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_view_letter_branding", branding_id=fake_uuid)
+
+    assert page.select_one(".hint").text.strip() == "No organisations use this branding as their default."
+
+    list_of_service_links = page.select(".browse-list-item")
+
+    link_1 = list_of_service_links[0].select_one("a")
+    assert link_1.text.strip() == "service 1"
+    assert link_1["href"] == url_for(".service_settings", service_id="1234")
+
+    link_2 = list_of_service_links[1].select_one("a")
+    assert link_2.text.strip() == "service 2"
+    assert link_2["href"] == url_for(".service_settings", service_id="5678")
+
+
+def test_view_letter_branding_with_org_but_no_services(
+    mocker,
+    client_request,
+    platform_admin_user,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
+):
+    mocker.patch(
+        "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
+        side_effect=lambda letter_branding_id: {
+            "data": {"services": [], "organisations": [{"name": "organisation 1", "id": "1234"}]}
+        },
+    )
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_view_letter_branding", branding_id=fake_uuid)
+
+    assert page.select_one(".hint").text.strip() == "No services use this branding."
+
+    list_of_organisation_links = page.select(".browse-list-item")
+
+    link_1 = list_of_organisation_links[0].select_one("a")
+    assert link_1.text.strip() == "organisation 1"
+    assert link_1["href"] == url_for(".organisation_settings", org_id="1234")
+
+
+@pytest.mark.parametrize(
+    "created_at, updated_at", [("2022-12-06T09:59:56.000000Z", "2023-01-20T11:59:56.000000Z"), (None, None)]
+)
+def test_view_letter_branding_shows_created_by_and_helpful_dates_if_available(
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+    mocker,
+    created_at,
+    updated_at,
+):
+    mocker.patch(
+        "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
+        side_effect=lambda letter_branding_id: {"data": {"services": [], "organisations": []}},
+    )
+    client_request.login(platform_admin_user)
+
+    def _get_letter_branding(id):
+        return create_letter_branding(
+            id,
+            non_standard_values={
+                "created_by": "1234-5678-abcd-efgh",
+                "created_at": created_at,
+                "updated_at": updated_at,
+            },
+        )["letter_branding"]
+
+    mocker.patch("app.models.branding.letter_branding_client.get_letter_branding", side_effect=_get_letter_branding)
+
+    user = {"id": "1234-5678-abcd-efgh", "name": "Arwa Suren"}
+    mocker.patch("app.models.branding.user_api_client.get_user", return_value=user)
+
+    page = client_request.get(".platform_admin_view_letter_branding", branding_id=fake_uuid)
+
+    created_by_link = page.select("main p > a")[0]
+    assert created_by_link.text.strip() == user["name"]
+    assert created_by_link["href"] == url_for(".user_information", user_id=user["id"])
+
+    if created_at:
+        assert "on Tuesday 06 December 2022" in page.select("p")[-2].text
+
+    if updated_at:
+        assert "on Friday 20 January 2023" in page.select("p")[-1].text
+
+
+def test_view_letter_branding_bottom_links(
+    mocker,
+    client_request,
+    platform_admin_user,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
+):
+    mocker.patch(
+        "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
+        side_effect=lambda letter_branding_id: {"data": {"services": [], "organisations": []}},
+    )
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_view_letter_branding", branding_id=fake_uuid)
+
+    bottom_links = page.select(".page-footer-link")
+
+    edit_link = bottom_links[0].select_one("a")
+    assert edit_link.text.strip() == "Edit this branding"
+    assert edit_link["href"] == url_for(".update_letter_branding", branding_id=fake_uuid)
 
 
 def test_update_letter_branding_shows_the_current_letter_brand(
@@ -143,14 +287,14 @@ def test_update_letter_branding_with_original_file_and_new_details(
     )
 
     client_request.login(platform_admin_user)
-    page = client_request.post(
+    client_request.post(
         ".update_letter_branding",
         branding_id=fake_uuid,
         _data={"name": "Updated name", "operation": "branding-details"},
-        _follow_redirects=True,
+        _follow_redirects=False,
+        _expected_redirect=url_for(".platform_admin_view_letter_branding", branding_id=fake_uuid),
     )
 
-    assert page.select_one("h1").text == "Letter branding"
     assert mock_upload_logos.called is False
 
     mock_client_update.assert_called_once_with(
@@ -233,14 +377,14 @@ def test_update_letter_branding_with_new_file_and_new_details(
     branding_id = str(UUID(int=0))
 
     client_request.login(platform_admin_user)
-    page = client_request.post(
+    client_request.post(
         ".update_letter_branding",
         branding_id=branding_id,
         logo=temp_logo,
         _data={"name": "Updated name", "operation": "branding-details"},
-        _follow_redirects=True,
+        _follow_redirects=False,
+        _expected_redirect=url_for(".platform_admin_view_letter_branding", branding_id=branding_id),
     )
-    assert page.select_one("h1").text == "Letter branding"
 
     mock_client_update.assert_called_once_with(
         branding_id=branding_id, filename=f"{fake_uuid}-new_file", name="Updated name", updated_by_id=fake_uuid
@@ -495,14 +639,13 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_files_created_by")
 
     client_request.login(platform_admin_user)
-    page = client_request.post(
+    client_request.post(
         ".create_letter_branding",
         logo=temp_logo,
         _data={"name": "Test brand", "operation": "branding-details"},
-        _follow_redirects=True,
+        _follow_redirects=False,
+        _expected_redirect=url_for(".platform_admin_view_letter_branding", branding_id=fake_uuid),
     )
-
-    assert page.select_one("h1").text == "Letter branding"
 
     mock_create_letter_branding.assert_called_once_with(
         filename=f"{fake_uuid}-test", name="Test brand", created_by_id=fake_uuid

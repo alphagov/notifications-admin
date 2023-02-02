@@ -232,6 +232,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "platform_admin_create_email_branding",
             "platform_admin_update_email_branding",
             "platform_admin_view_email_branding",
+            "platform_admin_view_letter_branding",
             "preview_broadcast_areas",
             "preview_broadcast_message",
             "pricing",

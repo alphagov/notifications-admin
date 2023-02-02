@@ -1,0 +1,88 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = letter_branding.name %}
+
+{% block per_page_title %}
+{{ page_title }}
+{% endblock %}
+
+
+{% block backLink %}
+{{ govukBackLink({ "href": url_for('.letter_branding') }) }}
+{% endblock %}
+
+{% block platform_admin_content %}
+
+<div class="govuk-grid-row bottom-gutter">
+    <div class="govuk-grid-column-three-quarters">
+        {{ page_header(letter_branding.name) }}
+
+        <div id="logo-img">
+          <img src="https://{{ cdn_url }}/{{ logo }}"/>
+        </div>
+
+        <h2 class="heading-medium">Organisations using this branding as their default</h2>
+        <nav class="browse-list">
+            {% if branding_orgs %}
+                <ul>
+                    {% for organisation in branding_orgs %}
+                        <li class="browse-list-item">
+                            <a class="govuk-link govuk-link--no-visited-state browse-list-hint"
+                                href="{{ url_for('.organisation_settings', org_id=organisation.id) }}">
+                                {{ organisation.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="hint">No organisations use this branding as their default.</p>
+            {% endif %}
+        </nav>
+
+        <h2 class="heading-medium">Services using this branding</h2>
+        <nav class="browse-list">
+            {% if branding_services %}
+            <ul>
+                {% for service in branding_services %}
+                <li class="browse-list-item">
+                    <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href="{{ url_for('.service_settings', service_id=service.id) }}">
+                        {{ service.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="hint">No services use this branding.</p>
+            {% endif %}
+        </nav>
+
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-4" />
+
+        {% if letter_branding.created_by %}
+            <p class="govuk-body">
+                Created by
+                <a class="govuk-link govuk-link--no-visited-state"
+                   href="{{ url_for('.user_information', user_id=letter_branding.created_by) }}">
+                   {{ letter_branding.created_by_user.name }}
+                </a>
+              {% if letter_branding.created_at %}on {{ letter_branding.created_at | format_date }}{% endif %}
+            </p>
+        {% endif %}
+        {% if letter_branding.updated_at %}
+            <p class="govuk-body">
+                Last updated on {{ letter_branding.updated_at | format_date }}
+            </p>
+        {% endif %}
+
+        <div class="js-stick-at-bottom-when-scrolling">
+            <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter-2-3">
+                <a class="govuk-link govuk-link--no-visited-state"
+                    href="{{ url_for('.update_letter_branding', branding_id=letter_branding.id) }}">
+                    Edit this branding</a>
+            </span>
+        </div>
+    </div>
+</div>
+{% endblock %}
