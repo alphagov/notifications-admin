@@ -45,6 +45,22 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
     ]
 
 
+@pytest.mark.parametrize(
+    "user_fixture, expected_response_status", (("api_user_active_email_auth", 403), ("platform_admin_user", 200))
+)
+def test_view_email_branding_requires_platform_admin(
+    mocker, client_request, mock_get_email_branding, user_fixture, expected_response_status, request, fake_uuid
+):
+    mocker.patch(
+        "app.email_branding_client.get_orgs_and_services_associated_with_branding",
+    )
+    user = request.getfixturevalue(user_fixture)
+    client_request.login(user)
+    client_request.get(
+        ".platform_admin_view_email_branding", branding_id=fake_uuid, _expected_status=expected_response_status
+    )
+
+
 def test_view_email_branding_with_services_but_no_orgs(
     client_request,
     platform_admin_user,

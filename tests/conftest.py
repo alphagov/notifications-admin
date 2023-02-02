@@ -2650,16 +2650,6 @@ def mock_create_letter_branding(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_letter_branding(mocker, fake_uuid):
-    def _get_letter_branding(id):
-        return create_letter_branding(id)["letter_branding"]
-
-    return mocker.patch(
-        "app.models.branding.letter_branding_client.get_letter_branding", side_effect=_get_letter_branding
-    )
-
-
-@pytest.fixture(scope="function")
 def mock_get_email_branding_name_for_alt_text(mocker):
     def _get_email_branding_name_for_alt_text(alt_text):
         return alt_text

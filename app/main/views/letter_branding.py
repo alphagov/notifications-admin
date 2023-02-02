@@ -35,6 +35,7 @@ def letter_branding():
 
 
 @main.route("/letter-branding/<uuid:branding_id>", methods=["GET", "POST"])
+@user_is_platform_admin
 def platform_admin_view_letter_branding(branding_id):
     letter_branding = LetterBranding.from_id(branding_id)
 

@@ -19,12 +19,9 @@
     <div class="govuk-grid-column-three-quarters">
         {{ page_header(letter_branding.name) }}
 
-
-        {% if logo %}
-          <div id="logo-img">
-            <img src="https://{{ cdn_url }}/{{ logo }}"/>
-          </div>
-        {% endif %}
+        <div id="logo-img">
+          <img src="https://{{ cdn_url }}/{{ logo }}"/>
+        </div>
 
         <h2 class="heading-medium">Organisations using this branding as their default</h2>
         <nav class="browse-list">

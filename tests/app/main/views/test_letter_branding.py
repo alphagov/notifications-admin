@@ -41,11 +41,27 @@ def test_letter_branding_page_shows_full_branding_list(
     ]
 
 
+@pytest.mark.parametrize(
+    "user_fixture, expected_response_status", (("api_user_active_email_auth", 403), ("platform_admin_user", 200))
+)
+def test_view_letter_branding_requires_platform_admin(
+    mocker, client_request, mock_get_letter_branding_by_id, user_fixture, expected_response_status, request, fake_uuid
+):
+    mocker.patch(
+        "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
+    )
+    user = request.getfixturevalue(user_fixture)
+    client_request.login(user)
+    client_request.get(
+        ".platform_admin_view_letter_branding", branding_id=fake_uuid, _expected_status=expected_response_status
+    )
+
+
 def test_view_letter_branding_with_services_but_no_orgs(
     mocker,
     client_request,
     platform_admin_user,
-    mock_get_letter_branding,
+    mock_get_letter_branding_by_id,
     fake_uuid,
 ):
     mocker.patch(
@@ -79,7 +95,7 @@ def test_view_letter_branding_with_org_but_no_services(
     mocker,
     client_request,
     platform_admin_user,
-    mock_get_letter_branding,
+    mock_get_letter_branding_by_id,
     fake_uuid,
 ):
     mocker.patch(
@@ -151,7 +167,7 @@ def test_view_letter_branding_bottom_links(
     mocker,
     client_request,
     platform_admin_user,
-    mock_get_letter_branding,
+    mock_get_letter_branding_by_id,
     fake_uuid,
 ):
     mocker.patch(
