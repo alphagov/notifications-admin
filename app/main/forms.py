@@ -1235,15 +1235,6 @@ class BaseTemplateForm(StripWhitespaceForm):
     template_content = TextAreaField(
         "Message", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
     )
-    process_type = GovukRadiosField(
-        "Use priority queue?",
-        choices=[
-            ("priority", "Yes"),
-            ("normal", "No"),
-        ],
-        thing="yes or no",
-        default="normal",
-    )
 
 
 class SMSTemplateForm(BaseTemplateForm):
@@ -1843,7 +1834,7 @@ class EmailBrandingLogoUpload(StripWhitespaceForm):
         if image_processor.height < min_height_px:
             image_processor.pad(to_height=min_height_px)
 
-        field.data = image_processor.get_data()
+        field.data.stream = image_processor.get_data()
 
 
 class PDFUploadForm(StripWhitespaceForm):

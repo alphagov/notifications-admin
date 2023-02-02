@@ -525,7 +525,6 @@ def mock_get_service(mocker, api_user_active):
         service = service_json(
             service_id,
             users=[api_user_active["id"]],
-            message_limit=50,
             email_message_limit=50,
             sms_message_limit=50,
             letter_message_limit=50,
@@ -553,7 +552,6 @@ def mock_get_detailed_services(mocker, fake_uuid):
         id_=SERVICE_ONE_ID,
         name="service_one",
         users=[fake_uuid],
-        message_limit=1000,
         email_message_limit=1000,
         sms_message_limit=1000,
         letter_message_limit=1000,
@@ -564,7 +562,6 @@ def mock_get_detailed_services(mocker, fake_uuid):
         id_=fake_uuid,
         name="service_two",
         users=[fake_uuid],
-        message_limit=1000,
         email_message_limit=1000,
         sms_message_limit=1000,
         letter_message_limit=1000,
@@ -600,7 +597,6 @@ def mock_create_service(mocker):
     def _create(
         service_name,
         organisation_type,
-        message_limit,
         email_message_limit,
         sms_message_limit,
         letter_message_limit,
@@ -609,7 +605,14 @@ def mock_create_service(mocker):
         email_from,
     ):
         service = service_json(
-            101, service_name, [user_id], message_limit=message_limit, restricted=restricted, email_from=email_from
+            101,
+            service_name,
+            [user_id],
+            restricted=restricted,
+            email_from=email_from,
+            email_message_limit=email_message_limit,
+            sms_message_limit=sms_message_limit,
+            letter_message_limit=letter_message_limit,
         )
         return service["id"]
 
@@ -625,7 +628,18 @@ def mock_update_service(mocker):
                 key: kwargs[key]
                 for key in kwargs
                 if key
-                in ["name", "users", "message_limit", "active", "restricted", "email_from", "sms_sender", "permissions"]
+                in [
+                    "name",
+                    "users",
+                    "active",
+                    "sms_message_limit",
+                    "email_message_limit",
+                    "letter_message_limit",
+                    "restricted",
+                    "email_from",
+                    "sms_sender",
+                    "permissions",
+                ]
             },
         )
         return {"data": service}
@@ -687,24 +701,6 @@ def mock_get_service_template(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id, template_id, "Two week reminder", "sms", "Template <em>content</em> with & entity"
-        )
-        if version:
-            template.update({"version": version})
-        return {"data": template}
-
-    return mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
-
-
-@pytest.fixture(scope="function")
-def mock_get_service_template_with_priority(mocker):
-    def _get(service_id, template_id, version=None):
-        template = template_json(
-            service_id,
-            template_id,
-            "Two week reminder",
-            "sms",
-            "Template <em>content</em> with & entity",
-            process_type="priority",
         )
         if version:
             template.update({"version": version})
@@ -878,8 +874,8 @@ def mock_get_service_letter_template_with_placeholders(mocker):
 
 @pytest.fixture(scope="function")
 def mock_create_service_template(mocker, fake_uuid):
-    def _create(name, type_, content, service, subject=None, process_type=None, parent_folder_id=None):
-        template = template_json(fake_uuid, name, type_, content, service, process_type, parent_folder_id)
+    def _create(name, type_, content, service, subject=None, parent_folder_id=None):
+        template = template_json(fake_uuid, name, type_, content, service, parent_folder_id)
         return {"data": template}
 
     return mocker.patch("app.service_api_client.create_service_template", side_effect=_create)
@@ -887,8 +883,8 @@ def mock_create_service_template(mocker, fake_uuid):
 
 @pytest.fixture(scope="function")
 def mock_update_service_template(mocker):
-    def _update(id_, name, type_, content, service, subject=None, process_type=None, postage=None):
-        template = template_json(service, id_, name, type_, content, subject, process_type, postage)
+    def _update(id_, name, type_, content, service, subject=None, postage=None):
+        template = template_json(service, id_, name, type_, content, subject, postage)
         return {"data": template}
 
     return mocker.patch("app.service_api_client.update_service_template", side_effect=_update)
@@ -896,7 +892,7 @@ def mock_update_service_template(mocker):
 
 @pytest.fixture(scope="function")
 def mock_create_service_template_content_too_big(mocker):
-    def _create(name, type_, content, service, subject=None, process_type=None, parent_folder_id=None):
+    def _create(name, type_, content, service, subject=None, parent_folder_id=None):
         json_mock = Mock(
             return_value={
                 "message": {"content": ["Content has a character count greater than the limit of 459"]},
@@ -914,7 +910,7 @@ def mock_create_service_template_content_too_big(mocker):
 
 @pytest.fixture(scope="function")
 def mock_update_service_template_400_content_too_big(mocker):
-    def _update(id_, name, type_, content, service, subject=None, process_type=None, postage=None):
+    def _update(id_, name, type_, content, service, subject=None, postage=None):
         json_mock = Mock(
             return_value={
                 "message": {"content": ["Content has a character count greater than the limit of 459"]},

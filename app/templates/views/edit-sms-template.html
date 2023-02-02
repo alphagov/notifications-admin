@@ -38,9 +38,6 @@
             rows=5,
             extra_form_group_classes='govuk-!-margin-bottom-2'
           ) }}
-          {% if current_user.platform_admin %}
-            {{ form.process_type }}
-          {% endif %}
         </div>
         <div class="govuk-grid-column-full">
           <div class="template-content-count">

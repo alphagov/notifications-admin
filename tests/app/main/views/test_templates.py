@@ -495,7 +495,6 @@ def test_should_show_page_for_one_template(
     assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in str(page.select_one("textarea"))
     assert page.select_one("textarea")["data-notify-module"] == "enhanced-textbox"
     assert page.select_one("textarea")["data-highlight-placeholders"] == "true"
-    assert "priority" not in str(page.select_one("main"))
 
     assert (
         (page.select_one("[data-notify-module=update-status]")["data-target"])
@@ -1057,29 +1056,6 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
     assert "Your message will start with your service name" in page.text
 
 
-def test_should_show_page_template_with_priority_select_if_platform_admin(
-    client_request,
-    platform_admin_user,
-    mocker,
-    mock_get_service_template,
-    service_one,
-    fake_uuid,
-):
-    mocker.patch("app.user_api_client.get_users_for_service", return_value=[platform_admin_user])
-    template_id = fake_uuid
-    client_request.login(platform_admin_user)
-    page = client_request.get(
-        ".edit_service_template",
-        service_id=service_one["id"],
-        template_id=template_id,
-    )
-
-    assert page.select_one("input[name=name]")["value"] == "Two week reminder"
-    assert "Template &lt;em&gt;content&lt;/em&gt; with &amp; entity" in str(page.select_one("textarea"))
-    assert "Use priority queue?" in page.text
-    mock_get_service_template.assert_called_with(service_one["id"], template_id, None)
-
-
 @pytest.mark.parametrize("filetype", ["pdf", "png"])
 @pytest.mark.parametrize(
     "view, extra_view_args",
@@ -1448,6 +1424,38 @@ def test_cant_copy_template_from_non_member_service(
 
 
 @pytest.mark.parametrize(
+    "template_type, expected_page_heading",
+    [
+        ("email", "New email template"),
+        ("sms", "New text message template"),
+        ("letter", "Templates"),
+    ],
+)
+def test_choose_template_for_each_template_type(
+    client_request,
+    mock_get_api_keys,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    template_type,
+    expected_page_heading,
+):
+    service_one["permissions"].append("letter")
+
+    page = client_request.post(
+        "main.choose_template",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            "operation": "add-new-template",
+            "add_template_by_template_type": template_type,
+        },
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == expected_page_heading
+
+
+@pytest.mark.parametrize(
     "service_permissions, data, expected_error",
     (
         (
@@ -1593,7 +1601,6 @@ def test_should_redirect_when_saving_a_template(
             "template_content": content,
             "template_type": "sms",
             "service": SERVICE_ONE_ID,
-            "process_type": "normal",
         },
         _expected_status=302,
         _expected_redirect=url_for(
@@ -1609,37 +1616,6 @@ def test_should_redirect_when_saving_a_template(
         content,
         SERVICE_ONE_ID,
         None,
-        "normal",
-    )
-
-
-def test_should_edit_content_when_process_type_is_priority_not_platform_admin(
-    client_request,
-    mock_get_service_template_with_priority,
-    mock_update_service_template,
-    fake_uuid,
-):
-    client_request.post(
-        ".edit_service_template",
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        _data={
-            "id": fake_uuid,
-            "name": "new name",
-            "template_content": "new template <em>content</em> with & entity",
-            "template_type": "sms",
-            "service": SERVICE_ONE_ID,
-            "process_type": "priority",
-        },
-        _expected_status=302,
-        _expected_redirect=url_for(
-            ".view_template",
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-        ),
-    )
-    mock_update_service_template.assert_called_with(
-        fake_uuid, "new name", "sms", "new template <em>content</em> with & entity", SERVICE_ONE_ID, None, "priority"
     )
 
 
@@ -1666,68 +1642,6 @@ def test_should_not_allow_template_edits_without_correct_permission(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
-
-
-def test_should_403_when_edit_template_with_process_type_of_priority_for_non_platform_admin(
-    client_request,
-    active_user_with_permissions,
-    mocker,
-    mock_get_service_template,
-    mock_update_service_template,
-    fake_uuid,
-    service_one,
-):
-    service_one["users"] = [active_user_with_permissions]
-    client_request.login(active_user_with_permissions)
-    mocker.patch("app.user_api_client.get_users_for_service", return_value=[active_user_with_permissions])
-    template_id = fake_uuid
-    data = {
-        "id": template_id,
-        "name": "new name",
-        "template_content": "template <em>content</em> with & entity",
-        "template_type": "sms",
-        "service": service_one["id"],
-        "process_type": "priority",
-    }
-    client_request.post(
-        ".edit_service_template",
-        service_id=service_one["id"],
-        template_id=template_id,
-        _data=data,
-        _expected_status=403,
-    )
-    assert mock_update_service_template.called is False
-
-
-def test_should_403_when_create_template_with_process_type_of_priority_for_non_platform_admin(
-    client_request,
-    active_user_with_permissions,
-    mocker,
-    mock_get_service_template,
-    mock_update_service_template,
-    fake_uuid,
-    service_one,
-):
-    service_one["users"] = [active_user_with_permissions]
-    client_request.login(active_user_with_permissions, service_one)
-    mocker.patch("app.user_api_client.get_users_for_service", return_value=[active_user_with_permissions])
-    template_id = fake_uuid
-    data = {
-        "id": template_id,
-        "name": "new name",
-        "template_content": "template <em>content</em> with & entity",
-        "template_type": "sms",
-        "service": service_one["id"],
-        "process_type": "priority",
-    }
-    client_request.post(
-        ".add_service_template",
-        service_id=service_one["id"],
-        template_type="sms",
-        _data=data,
-        _expected_status=403,
-    )
-    assert mock_update_service_template.called is False
 
 
 @pytest.mark.parametrize(
@@ -1775,7 +1689,6 @@ def test_should_show_interstitial_when_making_breaking_change(
         "template_type": "email",
         "subject": "reminder '\" <span> & ((thing))",
         "service": SERVICE_ONE_ID,
-        "process_type": "normal",
     }
 
     page = client_request.post(
@@ -1850,7 +1763,6 @@ def test_should_not_create_too_big_template(
             "template_content": "template content",
             "template_type": "sms",
             "service": SERVICE_ONE_ID,
-            "process_type": "normal",
         },
         _expected_status=200,
     )
@@ -1873,7 +1785,6 @@ def test_should_not_update_too_big_template(
             "template_content": "template content",
             "service": SERVICE_ONE_ID,
             "template_type": "sms",
-            "process_type": "normal",
         },
         _expected_status=200,
     )
@@ -1903,7 +1814,6 @@ def test_should_not_create_too_big_template_for_broadcasts(
             "template_content": content,
             "template_type": "broadcast",
             "service": SERVICE_ONE_ID,
-            "process_type": "normal",
         },
         _expected_status=200,
     )
@@ -1931,7 +1841,6 @@ def test_should_redirect_when_saving_a_template_email(
             "template_type": "email",
             "service": SERVICE_ONE_ID,
             "subject": subject,
-            "process_type": "normal",
         },
         _expected_status=302,
         _expected_redirect=url_for(
@@ -1947,7 +1856,6 @@ def test_should_redirect_when_saving_a_template_email(
         content,
         SERVICE_ONE_ID,
         subject,
-        "normal",
     )
 
 
@@ -2213,7 +2121,6 @@ def test_can_create_email_template_with_emoji(client_request, mock_create_servic
             "template_content": "here's a burrito 🌯",
             "template_type": "email",
             "service": SERVICE_ONE_ID,
-            "process_type": "normal",
         },
         _expected_status=302,
     )
@@ -2244,7 +2151,6 @@ def test_should_not_create_sms_or_broadcast_template_with_emoji(
             "template_content": "here are some noodles 🍜",
             "template_type": "sms",
             "service": SERVICE_ONE_ID,
-            "process_type": "normal",
         },
         _expected_status=200,
     )
@@ -2263,7 +2169,6 @@ def test_should_not_update_sms_template_with_emoji(
     mocker,
     client_request,
     service_one,
-    mock_get_service_template,
     mock_update_service_template,
     fake_uuid,
     template_type,
@@ -2290,7 +2195,6 @@ def test_should_not_update_sms_template_with_emoji(
             "template_content": "here's a burger 🍔",
             "service": SERVICE_ONE_ID,
             "template_type": template_type,
-            "process_type": "normal",
         },
         _expected_status=200,
     )
@@ -2318,7 +2222,6 @@ def test_should_create_sms_or_broadcast_template_without_downgrading_unicode_cha
             "template_content": msg,
             "template_type": template_type,
             "service": SERVICE_ONE_ID,
-            "process_type": "normal",
         },
         expected_status=302,
     )
@@ -2329,7 +2232,6 @@ def test_should_create_sms_or_broadcast_template_without_downgrading_unicode_cha
         msg,  # content
         ANY,  # service_id
         ANY,  # subject
-        ANY,  # process_type
         ANY,  # parent_folder_id
     )
 

@@ -12,7 +12,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         self,
         service_name,
         organisation_type,
-        message_limit,
         email_message_limit,
         sms_message_limit,
         letter_message_limit,
@@ -27,7 +26,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "name": service_name,
             "organisation_type": organisation_type,
             "active": True,
-            "message_limit": message_limit,
             "email_message_limit": email_message_limit,
             "sms_message_limit": sms_message_limit,
             "letter_message_limit": letter_message_limit,
@@ -93,7 +91,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "has_active_go_live_request",
             "letter_branding",
             "letter_contact_block",
-            "message_limit",
             "email_message_limit",
             "sms_message_limit",
             "letter_message_limit",
@@ -166,9 +163,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.delete(endpoint, data)
 
     @cache.delete("service-{service_id}-templates")
-    def create_service_template(
-        self, name, type_, content, service_id, subject=None, process_type="normal", parent_folder_id=None
-    ):
+    def create_service_template(self, name, type_, content, service_id, subject=None, parent_folder_id=None):
         """
         Create a service template.
         """
@@ -177,7 +172,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "template_type": type_,
             "content": content,
             "service": service_id,
-            "process_type": process_type,
+            "process_type": "normal",
         }
         if subject:
             data.update({"subject": subject})
@@ -189,15 +184,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete("service-{service_id}-templates")
     @cache.delete_by_pattern("service-{service_id}-template-*")
-    def update_service_template(self, id_, name, type_, content, service_id, subject=None, process_type=None):
+    def update_service_template(self, id_, name, type_, content, service_id, subject=None):
         """
         Update a service template.
         """
         data = {"id": id_, "name": name, "template_type": type_, "content": content, "service": service_id}
         if subject:
             data.update({"subject": subject})
-        if process_type:
-            data.update({"process_type": process_type})
         data = _attach_current_user(data)
         endpoint = "/service/{0}/template/{1}".format(service_id, id_)
         return self.post(endpoint, data)

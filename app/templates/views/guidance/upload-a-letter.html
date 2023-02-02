@@ -1,6 +1,7 @@
 {% extends "content_template.html" %}
 
 {% from "components/service-link.html" import service_link %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -24,6 +25,51 @@
     <li>Select <b class="govuk-!-font-weight-bold">Choose file</b>.</li>
   </ol>
 
-  <p class="govuk-body">Your PDF must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_letter_specification') }}">letter specification</a>.</p>
+  <h2 id="letter-specification" class="heading-medium">Letter specification</h2>
+
+  <p class="govuk-body">Your PDF must meet our letter specification.</p>
+
+  <p class="govuk-body">Page size and layout: A4 portrait (210 × 297 mm)</p>
+  <p class="govuk-body">Maximum file size: 2 MB</p>
+  <p class="govuk-body">Your letter must be 10 pages or less (5 double-sided sheets of paper).</p>
+  <p class="govuk-body">The content of your letter must appear inside the printable area.</p>
+
+  <p class="govuk-body">To help you set up your letter, you can download our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.letter_spec') }}">letter specification as a PDF</a>.</p>
+
+  {% set letter_spec %}
+    <h3 class="heading-small">Page 1 of 10</h3>
+
+    <p class="govuk-body">Left margin 15mm</p>
+    <p class="govuk-body">Right margin 15mm</p>
+    <p class="govuk-body">Top margin 5mm</p>
+    <p class="govuk-body">Bottom margin 5mm</p>
+
+    <h3 class="heading-small">Logo block</h3>
+
+    <p class="govuk-body">Position: 15mm from left edge, 5mm from top edge</p>
+    <p class="govuk-body">Size: 200mm wide by 25mm high</p>
+
+    <h3 class="heading-small">Address block</h3>
+
+    <p class="govuk-body">Position: 24.6mm from left edge, 39.5mm from top edge</p>
+    <p class="govuk-body">Size: 95.4mm wide by 26.8mm high</p>
+
+    <h3 class="heading-small">Letter contact block</h3>
+
+    <p class="govuk-body">Position: 125mm from left edge, 30mm from top edge</p>
+    <p class="govuk-body">Size: 65mm wide by 65mm high</p>
+
+    <h2 class="heading-medium">Pages 2 to 10</h2>
+
+    <p class="govuk-body">Left margin 15mm</p>
+    <p class="govuk-body">Right margin 15mm</p>
+    <p class="govuk-body">Top margin 5mm</p>
+    <p class="govuk-body">Bottom margin 5mm</p>
+  {% endset %}
+
+  {{ govukDetails({
+    "summaryText": "See a text version of the letter specification",
+    "html": letter_spec
+  }) }}
 
 {% endblock %}
