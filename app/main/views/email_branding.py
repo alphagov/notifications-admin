@@ -121,7 +121,7 @@ def platform_admin_update_email_branding(branding_id, logo=None):
             email_branding=email_branding,
             cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
             logo=logo_key,
-            back_link=url_for("main.email_branding"),
+            back_link=url_for("main.platform_admin_view_email_branding", branding_id=email_branding.id),
         ),
         400 if form.errors else 200,
     )
