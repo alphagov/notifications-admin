@@ -25,6 +25,11 @@ def test_should_show_overview_page(
     assert "Use platform admin view" not in page
     assert "Security keys" not in page
 
+    sign_out_link = page.select("main a")[-1]
+    assert normalize_spaces(sign_out_link.text) == "Sign out"
+    assert sign_out_link["href"] == url_for("main.sign_out")
+    assert "govuk-!-font-weight-bold" in sign_out_link["class"]
+
 
 def test_overview_page_shows_disable_for_platform_admin(client_request, platform_admin_user, mocker):
     mocker.patch("app.models.webauthn_credential.WebAuthnCredentials.client_method")
