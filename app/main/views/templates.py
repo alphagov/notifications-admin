@@ -293,13 +293,35 @@ def _add_template_by_type(template_type, template_folder_id):
 
     if template_type == "letter":
         blank_letter = service_api_client.create_service_template(
-            "New letter template", "letter", "Body", current_service.id, "Main heading", template_folder_id
+            "Unnamed letter template",
+            "letter",
+            "Body",
+            current_service.id,
+            "Main heading",
+            template_folder_id,
         )
         return redirect(
             url_for(
                 ".view_template",
                 service_id=current_service.id,
                 template_id=blank_letter["data"]["id"],
+            )
+        )
+
+    if template_type == "email":
+        blank_email = service_api_client.create_service_template(
+            "Unnamed email template",
+            "email",
+            "Body",
+            current_service.id,
+            "Subject",
+            template_folder_id,
+        )
+        return redirect(
+            url_for(
+                ".view_template",
+                service_id=current_service.id,
+                template_id=blank_email["data"]["id"],
             )
         )
 
