@@ -29,6 +29,7 @@ from app.main.forms import (
     SMSTemplateForm,
     TemplateAndFoldersSelectionForm,
     TemplateFolderForm,
+    TemplateNameForm,
 )
 from app.main.views.send import get_sender_details
 from app.models.service import Service
@@ -652,6 +653,31 @@ def edit_service_template(service_id, template_id):
             heading_action="Edit",
             back_link=url_for("main.view_template", service_id=current_service.id, template_id=template["id"]),
         )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit-name", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def edit_service_template_name(service_id, template_id):
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    form = TemplateNameForm(name=template["name"])
+    back_link = url_for("main.view_template", service_id=current_service.id, template_id=template["id"])
+    if form.validate_on_submit():
+        service_api_client.update_service_template(
+            template_id,
+            form.name.data,
+            template["template_type"],
+            template["content"],
+            service_id,
+            template["subject"],
+        )
+        return redirect(back_link)
+    return render_template(
+        "views/edit-template-name.html",
+        form=form,
+        template=template,
+        heading_action="Edit",
+        back_link=back_link,
+    )
 
 
 @main.route(
