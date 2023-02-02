@@ -51,7 +51,7 @@
               </a>
             </div>
           {% endif %}
-          {% if current_user.has_permissions('manage_templates') %}
+          {% if template.template_type != 'email' and current_user.has_permissions('manage_templates') %}
             <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
                 Edit

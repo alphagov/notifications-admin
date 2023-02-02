@@ -29,13 +29,18 @@
     </div>
   {% else %}
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full">
+      <div class="govuk-grid-column-five-sixths">
         {{ folder_path(
           folders=current_service.get_template_path(template._template),
           service=current_service,
           template_type='all',
           current_user=current_user
         ) }}
+      </div>
+      <div class="govuk-grid-column-one-sixth">
+        <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-manage-link">
+          Manage
+        </a>
       </div>
     </div>
   {% endif %}
