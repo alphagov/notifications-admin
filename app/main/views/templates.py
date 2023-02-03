@@ -315,7 +315,7 @@ def _add_template_by_type(template_type, template_folder_id):
         blank_email = service_api_client.create_service_template(
             "Unnamed email template",
             "email",
-            "Body",
+            "Body text",
             current_service.id,
             "Subject",
             template_folder_id,
