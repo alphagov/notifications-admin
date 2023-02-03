@@ -97,6 +97,10 @@
         {% else %}
           <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Add contact block</span></a>
         {% endif %}
+      {% else %}
+        <p class="letter-postage letter-postage-second">
+          Postage: second class
+        </p>
       {% endif %}
       <img src="{{ url_for('no_cookie.view_letter_template_preview', template_id=template.id, service_id=current_service.id, filetype='png', page=1) }}" alt="" loading="eager">
     </div>
