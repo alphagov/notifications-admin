@@ -1291,6 +1291,10 @@ class EmailTemplateForm(BaseTemplateForm):
     pass
 
 
+class EmailTemplateSubjectForm(StripWhitespaceForm):
+    subject = GovukTextInputField("Subject", validators=[DataRequired(message="Cannot be empty")])
+
+
 class LetterTemplateForm(EmailTemplateForm):
     subject = TextAreaField("Main heading", validators=[DataRequired(message="Cannot be empty")])
 
