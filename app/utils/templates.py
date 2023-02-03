@@ -52,6 +52,7 @@ def get_template(
                             ".edit_service_template_subject", service_id=service.id, template_id=template["id"]
                         ),
                         "send_link": url_for(".set_sender", service_id=service.id, template_id=template["id"]),
+                        "insert_link": url_for(".insert_content", service_id=service.id, template_id=template["id"]),
                     }
                 )
             )
