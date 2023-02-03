@@ -24,6 +24,13 @@
         "classes": "govuk-!-width-full",
         "hint": {"text": "Your recipients will not see this"}
       }) }}
+
+      {% if form.language %}
+        {{ form.language(param_extensions={
+          "fieldset": {"legend": {"classes": "govuk-!-font-weight-normal"}},
+          "hint": {"text": "This controls the language of the page numbers and date"}
+        }) }}
+      {% endif %}
       {{ page_footer('Save') }}
     {% endcall %}
 

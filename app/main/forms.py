@@ -1234,6 +1234,19 @@ class TemplateNameForm(StripWhitespaceForm):
     name = GovukTextInputField("Template name", validators=[DataRequired(message="Cannot be empty")])
 
 
+class LetterTemplateNameForm(TemplateNameForm):
+    language = GovukRadiosField(
+        "Language",
+        choices=(
+            ("en", "English only"),
+            ("cy", "Welsh only"),
+            ("cy-en", "Welsh then English"),
+            ("en-cy", "English then Welsh"),
+        ),
+        validators=[DataRequired(message="Cannot be empty")],
+    )
+
+
 class BaseTemplateForm(StripWhitespaceForm):
     name = GovukTextInputField("Template name", validators=[DataRequired(message="Cannot be empty")])
 

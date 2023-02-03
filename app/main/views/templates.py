@@ -22,6 +22,7 @@ from app.main.forms import (
     InsertContentForm,
     LetterInsertPagesForm,
     LetterTemplateForm,
+    LetterTemplateNameForm,
     LetterTemplatePostageForm,
     PDFUploadForm,
     SearchTemplatesForm,
@@ -660,7 +661,11 @@ def edit_service_template(service_id, template_id):
 @user_has_permissions("manage_templates")
 def edit_service_template_name(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-    form = TemplateNameForm(name=template["name"])
+    if template["template_type"] == "letter":
+        form_object = LetterTemplateNameForm
+    else:
+        form_object = TemplateNameForm
+    form = form_object(name=template["name"], language="en")
     back_link = url_for("main.view_template", service_id=current_service.id, template_id=template["id"])
     if form.validate_on_submit():
         service_api_client.update_service_template(

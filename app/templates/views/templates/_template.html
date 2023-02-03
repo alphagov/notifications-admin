@@ -98,7 +98,7 @@
     {% else %}
     <div class="js-stick-at-bottom-when-scrolling">
       {{ govukButton({ "text": "Attach pages", "classes": "govuk-button--secondary", "href": url_for(".insert_pages_upload", service_id=current_service.id, template_id=template.id) }) }}
-      {{ govukButton({ "text": "Add Welsh language version", "classes": "govuk-button--secondary govuk-!-margin-left-3", "href": url_for(".view_template", service_id=current_service.id, template_id=template.id, extra_pages="welsh.png", _anchor="extra-pages") }) }}
+      <!-- {{ govukButton({ "text": "Add Welsh language version", "classes": "govuk-button--secondary govuk-!-margin-left-3", "href": url_for(".view_template", service_id=current_service.id, template_id=template.id, extra_pages="welsh.png", _anchor="extra-pages") }) }} -->
     </div>
     {% endif %}
   {% endif %}
