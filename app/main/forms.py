@@ -1335,6 +1335,7 @@ class InsertContentForm(StripWhitespaceForm):
     thing = GovukRadiosField(
         "Select an option",
         choices=[
+            ("Text", "Text"),
             ("Image", "Image"),
             ("Optional content", "Optional content"),
             ("Link to file", "Link to file"),

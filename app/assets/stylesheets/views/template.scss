@@ -15,23 +15,23 @@
 
 .edit-template-link-send {
   @extend %edit-template-link;
-  top: 15.5%; // align bottom edge to bottom of address
-  left: 190px;
+  top: 235px;
+  left: 98px;
 
   &:active {
     margin-top: -2px;
-    top: 15.5% !important;
+    top: 235px !important;
   }
 }
 
 .edit-template-link-letter-contact {
   @extend %edit-template-link;
-  right: -25px;
-  top: 232px; // align to bottom of contact block
+  left: 452px;
+  top: 285px;
 
   &:active {
     margin-top: -2px;
-    top: 232px !important;
+    top: 285px !important;
   }
 }
 
