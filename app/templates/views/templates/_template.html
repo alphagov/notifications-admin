@@ -57,6 +57,9 @@
   {% endif %}
 </div>
 <div class="govuk-grid-column-full template-container">
+  {% if template.template_type != 'letter' %}
+    {{ template|string }}
+  {% endif %}
   {% if template.template_type == 'letter' and current_user.has_permissions('send_messages', restrict_admin_usage=True) and not letter_too_long %}
     <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-send">
       Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
@@ -88,7 +91,7 @@
       <img src="{{ asset_url('images/letter-examples/welsh.png') }}" alt="" loading="eager">
     </div>
   {% endif %}
-  {% if request.args.get('language') != "cy" %}
+  {% if template.template_type == 'letter' and request.args.get('language') != "cy" %}
     <div class="letter">
       {% if request.args.get('language') == "cy-en" %}
         <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> letter template</span></a>
