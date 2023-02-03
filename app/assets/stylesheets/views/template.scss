@@ -60,7 +60,7 @@
 .edit-template-link-letter-postage {
   @extend %edit-template-link;
   top: 51px; // aligns bottom edge to bottom of postmark
-  right: 145px; // Aligns right edge to midpoint of postmark and fold
+  right: 133px; // Aligns right edge to midpoint of postmark and fold
 
   &:active {
     margin-top: -2px;
@@ -71,7 +71,7 @@
 .edit-template-link-letter-branding {
   @extend %edit-template-link;
   top: 51px; // aligns with ‘change postage’ link
-  left: 66px; // Aligns to left of logo area
+  left: 68px; // Aligns to left of logo area
 
   &:active {
     margin-top: -2px;
