@@ -13,7 +13,7 @@
       or edit this template, contact your manager.
     </p>
   {% else %}
-    <div class="bottom-gutter-2-3">
+    <div class="">
       <div class="govuk-grid-row">
         {% if template.template_type == 'letter' %}
           {% if letter_too_long %}
@@ -36,7 +36,7 @@
               </a>
             </div>
           {% endif %}
-        {% else %}
+        {% elif template.template_type != 'email' %}
           {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
             <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
@@ -44,7 +44,7 @@
               </a>
             </div>
           {% endif %}
-          {% if template.template_type != 'email' and current_user.has_permissions('manage_templates') %}
+          {% if current_user.has_permissions('manage_templates') %}
             <div class="govuk-grid-column-one-half">
               <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
                 Edit
@@ -101,10 +101,5 @@
       {{ govukButton({ "text": "Add Welsh language version", "classes": "govuk-button--secondary govuk-!-margin-left-3", "href": url_for(".view_template", service_id=current_service.id, template_id=template.id, extra_pages="welsh.png", _anchor="extra-pages") }) }}
     </div>
     {% endif %}
-  {% endif %}
-  {% if current_user.has_permissions('manage_templates') and template.template_type == 'email' %}
-    <div class="js-stick-at-bottom-when-scrolling">
-      {{ govukButton({ "text": "Add another type of content", "classes": "govuk-button--secondary", "href": url_for(".insert_content", service_id=current_service.id, template_id=template.id) }) }}
-    </div>
   {% endif %}
 </div>

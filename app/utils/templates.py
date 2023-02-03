@@ -1,4 +1,6 @@
-from flask import current_app
+from flask import current_app, Markup, url_for
+from notifications_utils.field import Field
+from notifications_utils.formatters import escape_html
 from notifications_utils.template import (
     BroadcastPreviewTemplate,
     EmailPreviewTemplate,
@@ -29,8 +31,30 @@ def get_template(
     email_reply_to=None,
     sms_sender=None,
 ):
+    class CustomEmailPreviewTemplate(EmailPreviewTemplate):
+        jinja_template = current_app.jinja_env.get_template("custom-email-preview.jinja2")
+
+        def __str__(self):
+            return Markup(
+                self.jinja_template.render(
+                    {
+                        "body": self.html_body,
+                        "subject": self.subject,
+                        "from_name": escape_html(self.from_name),
+                        "from_address": self.from_address,
+                        "reply_to": self.reply_to,
+                        "recipient": Field("((email address))", self.values, with_brackets=False),
+                        "show_recipient": self.show_recipient,
+                        "edit_link": url_for(
+                            ".edit_service_template", service_id=service.id, template_id=template["id"]
+                        ),
+                        "send_link": url_for(".set_sender", service_id=service.id, template_id=template["id"]),
+                    }
+                )
+            )
+
     if "email" == template["template_type"]:
-        return EmailPreviewTemplate(
+        return CustomEmailPreviewTemplate(
             template,
             from_name=service.name,
             from_address="{}@notifications.service.gov.uk".format(service.email_from),

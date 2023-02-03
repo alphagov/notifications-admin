@@ -1,0 +1,64 @@
+<div class="email-message">
+  <table class="email-message-meta">
+    <tbody>
+      {% if show_recipient %}
+        {% if from_name %}
+          <tr>
+            <th scope="row">From</th>
+            <td>
+              {{ from_name }}
+            </td>
+          </tr>
+        {% endif %}
+        {% if reply_to %}
+          <tr>
+            <th scope="row">Reply&nbsp;to</th>
+            <td>
+              {{ reply_to }}
+            </td>
+          </tr>
+        {% endif %}
+        <tr>
+          {% if '@' in recipient|string %}
+            <th scope="row">To</th>
+            <td>
+              {{ recipient }}
+              {% if '@' not in recipient|string %}
+              <a href="{{ send_link }}" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                Get ready to send
+              </a>
+              {% endif %}
+            </td>
+          {% else %}
+            <th scope="row"><span style="position: relative; top: 7px;">To</span></th>
+            <td>
+              <span style="position: relative; top: 7px;">
+              {{ recipient }}
+              </span>
+              <a href="{{ send_link }}" role="button" draggable="false" class="govuk-button govuk-button--secondary govuk-!-margin-left-3 govuk-!-margin-bottom-1" data-module="govuk-button">
+                Get ready to send
+              </a>
+            </td>
+          {% endif %}
+        </tr>
+      {% endif %}
+      <tr class="email-message-meta">
+        <th scope="row">Subject</th>
+        <td>
+          {{ subject }}
+          <a class="govuk-link govuk-link--no-visited-state" style="position:absolute;right:25px;" href="#">Edit</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="email-message-body">
+    <a class="govuk-link govuk-link--no-visited-state" style="position:absolute;right:10px;" href="{{ edit_link }}">Edit</a>
+    {{ body }}
+
+    <div class="govuk-!-margin-bottom-5">
+    <a href="/services/fd8d189f-4caf-4420-b9a4-11a45b5b2c7c/templates/f6234c22-299b-42e3-825d-1a9213789e7e/insert-content" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+      Add another section
+    </a>
+    </div>
+  </div>
+</div>

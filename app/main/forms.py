@@ -1288,7 +1288,7 @@ class LetterAddressForm(StripWhitespaceForm):
 
 
 class EmailTemplateForm(BaseTemplateForm):
-    subject = TextAreaField("Subject", validators=[DataRequired(message="Cannot be empty")])
+    pass
 
 
 class LetterTemplateForm(EmailTemplateForm):
