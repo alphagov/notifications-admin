@@ -71,12 +71,13 @@ def update_letter_branding(branding_id, logo=None):
 
     if details_form_submitted and letter_branding_details_form.validate_on_submit():
         try:
-            db_filename = letter_branding.filename
             if logo_changed:
                 permanent_logo_key = logo_client.save_permanent_logo(
                     logo_key, logo_type="letter", logo_key_extra=letter_branding_details_form.name.data
                 )
                 db_filename = letter_filename_for_db_from_logo_key(permanent_logo_key)
+            else:
+                db_filename = letter_branding.filename
 
             letter_branding_client.update_letter_branding(
                 branding_id=branding_id,

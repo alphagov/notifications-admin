@@ -39,7 +39,7 @@ def get_letter_choices(service):
 
 
 def letter_filename_for_db_from_logo_key(logo_key):
-    # For letters, in the DB we store the filename without the extension.
-    # Note: this is to maintain backwards compatibility and does deviate from what we do for EmailBranding.
-    # But we aren't taking on this migration effort right now. Ideally this might be different.
+    # For letters, we store just the filename without extension - note this is different to EmailBranding where we
+    # store a full filepathFor letters, in the DB we store the filename without the extension.
+    # TODO: store full filepath with folder and extension
     return os.path.splitext(os.path.basename(logo_key))[0]
