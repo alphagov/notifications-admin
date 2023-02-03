@@ -20,11 +20,16 @@
     {{ page_header('Edit template subject') }}
 
     {% call form_wrapper() %}
-      {{ form.subject(param_extensions={
-        "classes": "govuk-!-width-full"
-      }) }}
+      {{ textbox(form.subject, highlight_placeholders=True, width='1-1', rows=2, label=' ') }}
       {{ page_footer('Save') }}
     {% endcall %}
 
+    <p class="govuk-!-margin-top-7 govuk-!-margin-bottom-3 ">
+      Use double brackets to personalise your subject line, for example:
+    </p>
+
+    <div class="govuk-inset-text govuk-!-margin-top-0">
+      Hello ((first name)), your reference is ((ref number))
+    </div>
 
 {% endblock %}

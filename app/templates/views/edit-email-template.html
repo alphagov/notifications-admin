@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  {{ heading_action }} email template
+  Edit email body email template
 {% endblock %}
 
 {% block backLink %}
@@ -17,12 +17,12 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('{} email template'.format(heading_action)) }}
+    {{ page_header('Edit email body') }}
 
     {% call form_wrapper() %}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-five-sixths">
-          {{ textbox(form.template_content, highlight_placeholders=True, width='1-1', rows=8) }}
+          {{ textbox(form.template_content, highlight_placeholders=True, width='1-1', rows=8, label=' ') }}
           {{ sticky_page_footer('Save') }}
         </div>
         <div class="govuk-grid-column-full">

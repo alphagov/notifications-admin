@@ -1308,7 +1308,7 @@ class EmailTemplateForm(BaseTemplateForm):
 
 
 class EmailTemplateSubjectForm(StripWhitespaceForm):
-    subject = GovukTextInputField("Subject", validators=[DataRequired(message="Cannot be empty")])
+    subject = TextAreaField("Subject", validators=[DataRequired(message="Cannot be empty")])
 
 
 class LetterTemplateForm(EmailTemplateForm):
@@ -1333,7 +1333,7 @@ class LetterInsertPagesForm(StripWhitespaceForm):
 
 class InsertContentForm(StripWhitespaceForm):
     thing = GovukRadiosField(
-        "Select an option",
+        "Insert another content type",
         choices=[
             ("Text", "Text"),
             ("Image", "Image"),
@@ -1342,7 +1342,7 @@ class InsertContentForm(StripWhitespaceForm):
             ("QR code", "QR code"),
             ("Reusable block of content", "Reusable block of content"),
         ],
-        thing="an option",
+        thing="a type of content",
         validators=[DataRequired()],
     )
 
