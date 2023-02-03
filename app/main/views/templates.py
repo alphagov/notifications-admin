@@ -676,7 +676,7 @@ def edit_service_template_name(service_id, template_id):
             service_id,
             template["subject"],
         )
-        return redirect(back_link)
+        return redirect(back_link + "?language=" + form.language.data)
     return render_template(
         "views/edit-template-name.html",
         form=form,

@@ -1233,6 +1233,9 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
 class TemplateNameForm(StripWhitespaceForm):
     name = GovukTextInputField("Template name", validators=[DataRequired(message="Cannot be empty")])
 
+    class language:
+        data = "en"
+
 
 class LetterTemplateNameForm(TemplateNameForm):
     language = GovukRadiosField(

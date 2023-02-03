@@ -74,7 +74,19 @@
       <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Edit<span class="govuk-visually-hidden"> letter contact block</span></a>
     {% endif %}
   {% endif %}
-  {{ template|string }}
+  {% if request.args.get('language') == "cy-en" %}
+    <div class="letter">
+      <img src="{{ asset_url('images/letter-examples/welsh.png') }}" alt="" loading="eager">
+    </div>
+  {% endif %}
+  {% if request.args.get('language') != "cy" %}
+    {{ template|string }}
+  {% endif %}
+  {% if request.args.get('language') == "en-cy" or request.args.get('language') == "cy" %}
+    <div class="letter">
+      <img src="{{ asset_url('images/letter-examples/welsh.png') }}" alt="" loading="eager">
+    </div>
+  {% endif %}
   {% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %}
     {% if extra_pages %}
       <div class="letter" id="extra-pages">
