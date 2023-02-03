@@ -1329,15 +1329,24 @@ class LetterInsertPagesForm(StripWhitespaceForm):
 
 
 class InsertContentForm(StripWhitespaceForm):
+    _option_hints = (
+        "Add another block of text",
+        "Upload an image",
+        "Show or hide this text to tailor your message for each recipient",
+        "Insert an encrypted link that recipients can use to download a file",
+        "Add a unique QR code",
+        "Create a block of content that you can add to other templates",
+    )
+
     thing = GovukRadiosField(
         "Insert another content type",
         choices=[
-            ("Text", "Text"),
+            ("Body text", "Body text"),
             ("Image", "Image"),
-            ("Optional content", "Optional content"),
-            ("Link to file", "Link to file"),
+            ("Optional text", "Optional text"),
+            ("Link to download a file", "Link to download a file"),
             ("QR code", "QR code"),
-            ("Reusable block of content", "Reusable block of content"),
+            ("Reusable block of text", "Reusable block of text"),
         ],
         thing="a type of content",
         validators=[DataRequired()],

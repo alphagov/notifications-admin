@@ -23,19 +23,15 @@
   {% else %}
 
     {% call form_wrapper() %}
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-five-sixths">
-          {{ form.thing(param_extensions={
-            "fieldset": {
-              "legend": {
-                "isPageHeading": True,
-                "classes": "govuk-fieldset__legend--l"
-              }
-            }
-          }) }}
-          {{ page_footer('Continue') }}
-        </div>
-      </div>
+      {{ form.thing(param_extensions={
+        "fieldset": {
+          "legend": {
+            "isPageHeading": True,
+            "classes": "govuk-fieldset__legend--l"
+          }
+        }
+      }) }}
+      {{ page_footer('Continue') }}
     {% endcall %}
 
   {% endif %}

@@ -984,6 +984,11 @@ def insert_content(service_id, template_id):
     if template["template_type"] != "email":
         abort(404)
     form = InsertContentForm()
+
+    form.thing.param_extensions = {"items": []}
+    for hint in form._option_hints:
+        form.thing.param_extensions["items"].append({"hint": {"text": hint}})
+
     if form.validate_on_submit():
         return redirect(
             url_for(".insert_content", service_id=service_id, template_id=template_id, choice=form.thing.data)
