@@ -7,7 +7,6 @@ from flask import url_for
 from notifications_python_client.errors import HTTPError
 
 from app.models.branding import INSIGNIA_ASSETS_PATH
-from app.s3_client.s3_logo_client import EMAIL_LOGO_LOCATION_STRUCTURE, TEMP_TAG
 from tests.conftest import create_email_branding, normalize_spaces
 
 
@@ -774,17 +773,13 @@ def test_temp_logo_is_shown_after_uploading_logo(
 def test_logo_persisted_when_organisation_saved(
     client_request, platform_admin_user, mock_create_email_branding, mocker, fake_uuid
 ):
-    temp_filename = EMAIL_LOGO_LOCATION_STRUCTURE.format(
-        temp=TEMP_TAG.format(user_id=fake_uuid), unique_id=fake_uuid, filename="test.png"
-    )
-
     mock_save_temporary = mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo")
     mock_save_permanent = mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo")
 
     client_request.login(platform_admin_user)
     client_request.post(
         "main.platform_admin_create_email_branding",
-        logo=temp_filename,
+        logo="test.png",
         _content_type="multipart/form-data",
     )
 
@@ -982,8 +977,6 @@ def test_post_create_email_branding_government_identity_form_colour(mocker, clie
         ),
     )
 
-    assert mock_save_temporary.call_args_list == [
-        mocker.call(file_data=mocker.ANY, logo_type="email", file_extension=".png", content_type="image/png")
-    ]
-    logo_bytes_io = mock_save_temporary.call_args_list[0][1]["file_data"]
+    assert mock_save_temporary.call_args_list == [mocker.call(mocker.ANY, logo_type="email")]
+    logo_bytes_io = mock_save_temporary.call_args_list[0][0][0]
     assert logo_bytes_io.read() == (INSIGNIA_ASSETS_PATH / "HM Government.png").resolve().read_bytes()

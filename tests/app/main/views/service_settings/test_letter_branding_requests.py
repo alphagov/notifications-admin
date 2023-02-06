@@ -452,14 +452,9 @@ def test_POST_letter_branding_upload_branding_scans_for_viruses(client_request, 
 def test_POST_letter_branding_upload_branding_redirects_on_success(
     client_request, mock_antivirus_virus_free, fake_uuid, mocker
 ):
-    mock_upload_letter_logo = mocker.patch(
-        "app.main.views.service_settings.letter_branding.upload_letter_temp_logo",
-        return_value="some/path/temp_logo_url.svg",
-    )
-
-    mock_get_filename = mocker.patch(
-        "app.main.views.service_settings.letter_branding.get_letter_filename_with_no_path_or_extension",
-        return_value="temp_logo_url",
+    mock_save_temporary = mocker.patch(
+        "app.main.views.service_settings.letter_branding.logo_client.save_temporary_logo",
+        return_value="temporary.svg",
     )
 
     svg_contents = "<svg></svg>"
@@ -471,18 +466,14 @@ def test_POST_letter_branding_upload_branding_redirects_on_success(
         _expected_redirect=url_for(
             "main.letter_branding_set_name",
             service_id=SERVICE_ONE_ID,
-            temp_filename="temp_logo_url",
+            temp_filename="temporary.svg",
         ),
     )
 
-    mock_upload_letter_logo.assert_called_once_with(
-        "branding.svg",  # filename
-        b"<svg></svg>",  # file data
-        "eu-west-1",  # region
-        user_id=fake_uuid,
-        unique_id=ANY,
+    mock_save_temporary.assert_called_once_with(
+        mocker.ANY,
+        logo_type="letter",
     )
-    mock_get_filename.assert_called_once_with(mock_upload_letter_logo.return_value)
 
 
 def test_GET_letter_branding_set_name_renders(client_request, service_one):
@@ -558,6 +549,9 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     mock_should_set_default_org_letter_branding = mocker.patch(
         "app.main.views.service_settings.letter_branding._should_set_default_org_letter_branding", return_value=False
     )
+    mock_save_permanent = mocker.patch(
+        "app.main.views.service_settings.letter_branding.logo_client.save_permanent_logo", return_value="permanent.svg"
+    )
 
     mock_add_to_branding_pool = mocker.patch(
         "app.organisations_client.add_brandings_to_letter_branding_pool", return_value=None
@@ -566,7 +560,7 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     client_request.post(
         "main.letter_branding_set_name",
         service_id=SERVICE_ONE_ID,
-        temp_filename="temp_example",
+        temp_filename="temporary.svg",
         branding_choice="something else",
         _data={"name": "some name"},
         _expected_status=302,
@@ -575,7 +569,7 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
 
     mock_get_unique_name.assert_called_once_with("some name")
     mock_create_letter_branding.assert_called_once_with(
-        filename="temp_example",
+        filename="permanent",
         name="some unique name",
         created_by_id=fake_uuid,
     )
@@ -586,6 +580,13 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
         "You’ve changed your letter branding.",
         "default_with_tick",
     )
+    assert mock_save_permanent.call_args_list == [
+        mocker.call(
+            "temporary.svg",
+            logo_type="letter",
+            logo_key_extra="some unique name",
+        )
+    ]
 
 
 def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appropriate(
@@ -604,6 +605,9 @@ def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appr
         "app.main.views.service_settings.letter_branding.letter_branding_client.get_unique_name_for_letter_branding",
     )
     mock_add_to_branding_pool = mocker.patch("app.organisations_client.add_brandings_to_letter_branding_pool")
+    mock_save_permanent = mocker.patch(
+        "app.main.views.service_settings.letter_branding.logo_client.save_permanent_logo"
+    )
 
     mock_should_set_default_org_letter_branding = mocker.patch(
         "app.main.views.service_settings.letter_branding._should_set_default_org_letter_branding", return_value=True
@@ -612,7 +616,7 @@ def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appr
     client_request.post(
         "main.letter_branding_set_name",
         service_id=SERVICE_ONE_ID,
-        temp_filename="temp_example",
+        temp_filename="temporary.svg",
         branding_choice="organisation",
         _data={"name": "some name"},
         _expected_status=302,
@@ -622,6 +626,7 @@ def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appr
     assert mock_get_unique_name.called
     assert mock_create_letter_branding.called
     assert mock_add_to_branding_pool.called
+    assert mock_save_permanent.called
 
     mock_should_set_default_org_letter_branding.assert_called_once_with("organisation")
     mock_update_organisation.assert_called_once_with(

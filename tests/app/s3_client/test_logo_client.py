@@ -2,6 +2,7 @@ from io import BytesIO
 
 import boto3
 import pytest
+from werkzeug.datastructures import FileStorage
 
 LOGO_TYPES = ["email", "letter"]
 
@@ -42,14 +43,12 @@ class TestLogoClientGetLogoKey:
         ),
     )
     def test_expected_key(self, logo_client, file_name, logo_type, file_name_extra, expected_path):
-        assert (
-            logo_client._get_logo_key(file_name, logo_type=logo_type, logo_key_extra=file_name_extra) == expected_path
-        )
+        assert logo_client.get_logo_key(file_name, logo_type=logo_type, logo_key_extra=file_name_extra) == expected_path
 
     def test_strips_temp_prefix_for_permanent_key(self, logo_client):
-        temporary_key = logo_client._get_logo_key("blah.png", logo_type="email", temporary=True)
+        temporary_key = logo_client.get_logo_key("blah.png", logo_type="email", temporary=True)
         assert temporary_key.startswith("temp-")
-        permanent_key = logo_client._get_logo_key(temporary_key, logo_type="email")
+        permanent_key = logo_client.get_logo_key(temporary_key, logo_type="email")
         assert not permanent_key.startswith("temp-")
 
 
@@ -68,15 +67,13 @@ class TestLogoClientSaveTemporaryLogo:
         mock_uui4 = mocker.patch("app.s3_client.logo_client.uuid.uuid4")
         mock_uui4.return_value = "uuid"
 
-        file_data = BytesIO()
+        file_data = FileStorage(stream=BytesIO(), filename=f"{logo_type}{file_extension}", content_type=content_type)
 
-        retval = logo_client.save_temporary_logo(
-            file_data, logo_type=logo_type, file_extension=file_extension, content_type=content_type
-        )
+        retval = logo_client.save_temporary_logo(file_data, logo_type=logo_type)
 
         assert mock_utils_s3upload.call_args_list == [
             mocker.call(
-                filedata=file_data,
+                filedata=file_data.stream,
                 region="eu-west-1",
                 bucket_name="public-logos-test",
                 file_location=expected_location,

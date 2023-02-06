@@ -1,7 +1,7 @@
 import botocore
 from flask import current_app
 
-from app.s3_client.s3_logo_client import get_s3_object
+from app.s3_client import get_s3_object
 
 
 def get_mou(organisation_is_crown):

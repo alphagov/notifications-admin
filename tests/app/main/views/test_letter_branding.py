@@ -7,10 +7,6 @@ from botocore.exceptions import ClientError as BotoClientError
 from flask import url_for
 from notifications_python_client.errors import HTTPError
 
-from app.s3_client.s3_logo_client import (
-    LETTER_TEMP_LOGO_LOCATION,
-    permanent_letter_logo_name,
-)
 from tests.conftest import create_letter_branding, normalize_spaces
 
 
@@ -210,27 +206,23 @@ def test_update_letter_branding_shows_the_current_letter_brand(
 def test_update_letter_branding_with_new_valid_file_shows_page_with_file_preview(
     mocker, client_request, platform_admin_user, mock_get_letter_branding_by_id, fake_uuid
 ):
-    filename = "new_file.svg"
-    expected_temp_filename = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename=filename)
-
-    mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
-    mocker.patch("app.s3_client.s3_logo_client.uuid.uuid4", return_value=fake_uuid)
-    mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
+    mock_save_temporary = mocker.patch(
+        "app.main.views.letter_branding.logo_client.save_temporary_logo", return_value="temporary.svg"
+    )
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".update_letter_branding",
         branding_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), filename)},
+        _data={"file": (BytesIO("".encode("utf-8")), "logo.svg")},
         _follow_redirects=True,
     )
 
-    assert page.select_one("#logo-img > img")["src"].endswith(expected_temp_filename)
+    assert page.select_one("#logo-img > img")["src"].endswith("temporary.svg")
     assert page.select_one("#name").attrs.get("value") == "HM Government"
 
-    assert mock_s3_upload.called
-    assert mock_delete_temp_files.called is False
+    assert mock_save_temporary.call_args_list == [mocker.call(mocker.ANY, logo_type="letter")]
 
 
 def test_update_letter_branding_when_uploading_invalid_file(
@@ -254,38 +246,12 @@ def test_update_letter_branding_when_uploading_invalid_file(
     assert page.select_one(".error-message").text.strip() == "SVG Images only!"
 
 
-def test_update_letter_branding_deletes_any_temp_files_when_uploading_a_file(
-    mocker,
-    client_request,
-    platform_admin_user,
-    mock_get_letter_branding_by_id,
-    fake_uuid,
-):
-    temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="temp.svg")
-
-    mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
-    mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        ".update_letter_branding",
-        branding_id=fake_uuid,
-        logo=temp_logo,
-        _data={"file": (BytesIO("".encode("utf-8")), "new_uploaded_file.svg")},
-        _follow_redirects=True,
-    )
-
-    assert mock_s3_upload.called
-    assert mock_delete_temp_files.called
-    assert page.select_one("h1").text == "Update letter branding"
-
-
 def test_update_letter_branding_with_original_file_and_new_details(
     mocker, client_request, platform_admin_user, mock_get_all_letter_branding, mock_get_letter_branding_by_id, fake_uuid
 ):
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
-    mock_upload_logos = mocker.patch("app.main.views.letter_branding.upload_letter_svg_logo")
+    mock_save_temporary = mocker.patch("app.main.views.letter_branding.logo_client.save_temporary_logo")
+    mock_save_permanent = mocker.patch("app.main.views.letter_branding.logo_client.save_permanent_logo")
     mock_create_update_letter_branding_event = mocker.patch(
         "app.main.views.letter_branding.create_update_letter_branding_event"
     )
@@ -299,7 +265,8 @@ def test_update_letter_branding_with_original_file_and_new_details(
         _expected_redirect=url_for(".platform_admin_view_letter_branding", branding_id=fake_uuid),
     )
 
-    assert mock_upload_logos.called is False
+    assert mock_save_temporary.called is False
+    assert mock_save_permanent.called is False
 
     mock_client_update.assert_called_once_with(
         branding_id=fake_uuid,
@@ -315,17 +282,15 @@ def test_update_letter_branding_with_original_file_and_new_details(
 
 
 def test_update_letter_branding_shows_form_errors_on_name_fields(
-    mocker, client_request, platform_admin_user, mock_get_letter_branding_by_id, fake_uuid
+    mocker, client_request, platform_admin_user, mock_get_letter_branding_by_id, fake_uuid, logo_client
 ):
     mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
-
-    logo = permanent_letter_logo_name("hm-government", "svg")
 
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".update_letter_branding",
         branding_id=fake_uuid,
-        logo=logo,
+        logo=logo_client.get_logo_key("hm-government.svg", logo_type="letter"),
         _data={"name": "", "operation": "branding-details"},
         _follow_redirects=True,
     )
@@ -369,11 +334,11 @@ def test_update_letter_branding_shows_database_errors_on_name_field(
 def test_update_letter_branding_with_new_file_and_new_details(
     mocker, client_request, platform_admin_user, mock_get_all_letter_branding, mock_get_letter_branding_by_id, fake_uuid
 ):
-    temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="new_file.svg")
-
+    mock_save_temporary = mocker.patch("app.main.views.letter_branding.logo_client.save_temporary_logo")
+    mock_save_permanent = mocker.patch(
+        "app.main.views.letter_branding.logo_client.save_permanent_logo", return_value="permanent.svg"
+    )
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
-    mock_persist_logo = mocker.patch("app.main.views.letter_branding.persist_logo")
-    mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_files_created_by")
     mock_create_update_letter_branding_event = mocker.patch(
         "app.main.views.letter_branding.create_update_letter_branding_event"
     )
@@ -384,19 +349,19 @@ def test_update_letter_branding_with_new_file_and_new_details(
     client_request.post(
         ".update_letter_branding",
         branding_id=branding_id,
-        logo=temp_logo,
+        logo="temporary-logo.svg",
         _data={"name": "Updated name", "operation": "branding-details"},
         _follow_redirects=False,
         _expected_redirect=url_for(".platform_admin_view_letter_branding", branding_id=branding_id),
     )
 
     mock_client_update.assert_called_once_with(
-        branding_id=branding_id, filename=f"{fake_uuid}-new_file", name="Updated name", updated_by_id=fake_uuid
+        branding_id=branding_id, filename="permanent", name="Updated name", updated_by_id=fake_uuid
     )
-    mock_persist_logo.assert_called_once_with(
-        temp_logo, f"letters/static/images/letter-template/{fake_uuid}-new_file.svg"
-    )
-    mock_delete_temp_files.assert_called_once_with(fake_uuid)
+    assert mock_save_temporary.called is False
+    assert mock_save_permanent.call_args_list == [
+        mocker.call("temporary-logo.svg", logo_type="letter", logo_key_extra="Updated name")
+    ]
     mock_create_update_letter_branding_event.assert_called_once_with(
         letter_branding_id=branding_id,
         updated_by_id=fake_uuid,
@@ -410,19 +375,23 @@ def test_update_letter_branding_does_not_save_to_db_if_uploading_fails(
     platform_admin_user,
     mock_get_letter_branding_by_id,
     fake_uuid,
+    logo_client,
 ):
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
     mock_create_update_letter_branding_event = mocker.patch(
         "app.main.views.letter_branding.create_update_letter_branding_event"
     )
-    mocker.patch("app.main.views.letter_branding.upload_letter_svg_logo", side_effect=BotoClientError({}, "error"))
-    temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="new_file.svg")
+    mocker.patch(
+        "app.main.views.letter_branding.logo_client.save_permanent_logo", side_effect=BotoClientError({}, "error")
+    )
+
+    logo_path = logo_client.get_logo_key("logo.svg", logo_type="letter")
 
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".update_letter_branding",
         branding_id=fake_uuid,
-        logo=temp_logo,
+        logo=logo_path,
         _data={"name": "Updated name", "operation": "branding-details"},
         _expected_status=200,
     )
@@ -445,12 +414,9 @@ def test_create_letter_branding_does_not_show_branding_info(
 
 
 def test_create_letter_branding_when_uploading_valid_file(mocker, client_request, platform_admin_user, fake_uuid):
-    filename = "test.svg"
-    expected_temp_filename = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename=filename)
-
-    mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
-    mocker.patch("app.s3_client.s3_logo_client.uuid.uuid4", return_value=fake_uuid)
-    mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
+    mock_save_temporary = mocker.patch(
+        "app.main.views.letter_branding.logo_client.save_temporary_logo", return_value="temporary.svg"
+    )
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     client_request.login(platform_admin_user)
@@ -466,15 +432,14 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
                         "utf-8"
                     )
                 ),
-                filename,
+                "logo.svg",
             )
         },
         _follow_redirects=True,
     )
 
-    assert page.select_one("#logo-img > img").attrs["src"].endswith(expected_temp_filename)
-    assert mock_s3_upload.called
-    assert mock_delete_temp_files.called is False
+    assert page.select_one("#logo-img > img").attrs["src"].endswith("temporary.svg")
+    assert mock_save_temporary.call_args_list == [mocker.call(mocker.ANY, logo_type="letter")]
 
 
 @pytest.mark.parametrize(
@@ -487,11 +452,10 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
 def test_create_letter_branding_calls_antivirus_scan(
     mocker, client_request, platform_admin_user, fake_uuid, scan_result, expected_status_code
 ):
-    filename = "test.svg"
-    mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
-    mocker.patch("app.s3_client.s3_logo_client.uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
     mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=scan_result)
+    mock_save_temporary = mocker.patch(
+        "app.main.views.letter_branding.logo_client.save_temporary_logo", return_value="temporary.svg"
+    )
 
     client_request.login(platform_admin_user)
     client_request.post(
@@ -506,13 +470,14 @@ def test_create_letter_branding_calls_antivirus_scan(
                         "utf-8"
                     )
                 ),
-                filename,
+                "logo.svg",
             )
         },
         _expected_status=expected_status_code,
     )
 
     assert mock_antivirus.call_count == 1
+    assert mock_save_temporary.call_count == (1 if scan_result else 0)
 
 
 @pytest.mark.parametrize(
@@ -542,15 +507,13 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_ele
     svg_contents,
     expected_error,
 ):
-    filename = "test.svg"
-
-    mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mock_save_temporary = mocker.patch("app.main.views.letter_branding.logo_client.save_temporary_logo")
 
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".create_letter_branding",
-        _data={"file": (BytesIO(svg_contents.encode("utf-8")), filename)},
+        _data={"file": (BytesIO(svg_contents.encode("utf-8")), "test.svg")},
         _follow_redirects=True,
     )
 
@@ -559,7 +522,7 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_ele
 
     assert page.select("div#logo-img") == []
 
-    assert mock_s3_upload.called is False
+    assert mock_save_temporary.called is False
 
 
 def test_create_letter_branding_when_uploading_invalid_file(
@@ -578,32 +541,8 @@ def test_create_letter_branding_when_uploading_invalid_file(
     assert page.select_one(".error-message").text.strip() == "SVG Images only!"
 
 
-def test_create_letter_branding_deletes_temp_files_when_uploading_a_new_file(
-    mocker,
-    client_request,
-    platform_admin_user,
-    fake_uuid,
-):
-    temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="temp.svg")
-
-    mock_s3_upload = mocker.patch("app.s3_client.s3_logo_client.utils_s3upload")
-    mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_file")
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        ".create_letter_branding",
-        logo=temp_logo,
-        _data={"file": (BytesIO("".encode("utf-8")), "new.svg")},
-        _follow_redirects=True,
-    )
-    assert mock_s3_upload.called
-    assert mock_delete_temp_files.called
-    assert page.select_one("h1").text == "Add letter branding"
-
-
-def test_create_new_letter_branding_shows_preview_of_logo(client_request, platform_admin_user, fake_uuid):
-    temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="temp.svg")
+def test_create_new_letter_branding_shows_preview_of_logo(client_request, platform_admin_user, fake_uuid, logo_client):
+    temp_logo = logo_client.get_logo_key("temp.svg", logo_type="letter")
 
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -637,31 +576,31 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     fake_uuid,
     mock_create_letter_branding,
 ):
-    temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="test.svg")
-
-    mock_persist_logo = mocker.patch("app.main.views.letter_branding.persist_logo")
-    mock_delete_temp_files = mocker.patch("app.main.views.letter_branding.delete_letter_temp_files_created_by")
+    mock_save_permanent = mocker.patch(
+        "app.main.views.letter_branding.logo_client.save_permanent_logo", return_value="permanent.svg"
+    )
 
     client_request.login(platform_admin_user)
     client_request.post(
         ".create_letter_branding",
-        logo=temp_logo,
+        logo="temporary.svg",
         _data={"name": "Test brand", "operation": "branding-details"},
         _follow_redirects=False,
         _expected_redirect=url_for(".platform_admin_view_letter_branding", branding_id=fake_uuid),
     )
 
     mock_create_letter_branding.assert_called_once_with(
-        filename=f"{fake_uuid}-test", name="Test brand", created_by_id=fake_uuid
+        filename="permanent", name="Test brand", created_by_id=fake_uuid
     )
-    mock_persist_logo.assert_called_once_with(
-        temp_logo, "letters/static/images/letter-template/{}-test.svg".format(fake_uuid)
-    )
-    mock_delete_temp_files.assert_called_once_with(fake_uuid)
+    assert mock_save_permanent.call_args_list == [
+        mocker.call("temporary.svg", logo_type="letter", logo_key_extra="Test brand")
+    ]
 
 
-def test_create_letter_branding_shows_form_errors_on_name_field(client_request, platform_admin_user, fake_uuid):
-    temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="test.svg")
+def test_create_letter_branding_shows_form_errors_on_name_field(
+    client_request, platform_admin_user, fake_uuid, logo_client
+):
+    temp_logo = logo_client.get_logo_key("test.svg", logo_type="letter")
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -691,13 +630,12 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
             message={"name": ["name already in use"]},
         ),
     )
-
-    temp_logo = LETTER_TEMP_LOGO_LOCATION.format(user_id=fake_uuid, unique_id=fake_uuid, filename="test.svg")
+    mock_save_permanent = mocker.patch("app.main.views.letter_branding.logo_client.save_permanent_logo")
 
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".create_letter_branding",
-        logo=temp_logo,
+        logo="logo.svg",
         _data={"name": "my brand", "operation": "branding-details"},
         _expected_status=200,
     )
@@ -706,3 +644,7 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
 
     assert page.select_one("h1").text == "Add letter branding"
     assert "name already in use" in error_message
+
+    assert (
+        mock_save_permanent.called is True
+    ), "The logo should be persisted to S3 before the DB call so that we know it's there before creating the branding."

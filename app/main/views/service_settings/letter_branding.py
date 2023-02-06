@@ -1,10 +1,13 @@
-import uuid
-
-from flask import abort, current_app, flash, redirect, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app import current_service, letter_branding_client, organisations_client
+from app import (
+    current_service,
+    letter_branding_client,
+    logo_client,
+    organisations_client,
+)
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
@@ -14,11 +17,8 @@ from app.main.forms import (
     SomethingElseBrandingForm,
 )
 from app.models.branding import LetterBranding
-from app.s3_client.s3_logo_client import (
-    get_letter_filename_with_no_path_or_extension,
-    upload_letter_temp_logo,
-)
 from app.utils.branding import get_letter_choices as get_letter_branding_choices
+from app.utils.branding import letter_filename_for_db_from_logo_key
 from app.utils.user import user_has_permissions
 
 from .index import THANKS_FOR_BRANDING_REQUEST_MESSAGE
@@ -167,23 +167,15 @@ def letter_branding_pool_option(service_id):
 def letter_branding_upload_branding(service_id):
     form = LetterBrandingUploadBranding()
     if form.validate_on_submit():
-        # We don't need to care about the filename as we're providing a UUID. This filename is never used to represent
-        # the branding again so we don't need to capture what the file on disk was called
-        filename = "branding.svg"
-        upload_id = str(uuid.uuid4())
-        branding_filename = upload_letter_temp_logo(
-            filename,
-            form.branding.data.read(),
-            current_app.config["AWS_REGION"],
-            user_id=current_user.id,
-            unique_id=upload_id,
+        temporary_logo_key = logo_client.save_temporary_logo(
+            form.branding.data,
+            logo_type="letter",
         )
-        temp_filename = get_letter_filename_with_no_path_or_extension(branding_filename)
         return redirect(
             url_for(
                 "main.letter_branding_set_name",
                 service_id=current_service.id,
-                **_letter_branding_flow_query_params(temp_filename=temp_filename),
+                **_letter_branding_flow_query_params(temp_filename=temporary_logo_key),
             )
         )
 
@@ -217,9 +209,9 @@ def _should_set_default_org_letter_branding(branding_choice):
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/set-name", methods=["GET", "POST"])
 def letter_branding_set_name(service_id):
     letter_branding_data = _letter_branding_flow_query_params()
-    temp_filename = letter_branding_data["temp_filename"]
+    temporary_logo_key = letter_branding_data["temp_filename"]
 
-    if not temp_filename:
+    if not temporary_logo_key:
         return redirect(url_for("main.letter_branding_upload_branding", service_id=service_id, **letter_branding_data))
 
     form = LetterBrandingNameForm()
@@ -227,7 +219,13 @@ def letter_branding_set_name(service_id):
     if form.validate_on_submit():
         name = letter_branding_client.get_unique_name_for_letter_branding(form.name.data)
 
-        new_letter_branding = LetterBranding.create(name=name, filename=temp_filename)
+        permanent_logo_key = logo_client.save_permanent_logo(
+            temporary_logo_key, logo_type="letter", logo_key_extra=name
+        )
+
+        new_letter_branding = LetterBranding.create(
+            name=name, filename=letter_filename_for_db_from_logo_key(permanent_logo_key)
+        )
 
         # set as service branding
         current_service.update(letter_branding=new_letter_branding.id)
@@ -251,6 +249,6 @@ def letter_branding_set_name(service_id):
             service_id=service_id,
             **_letter_branding_flow_query_params(temp_filename=None),
         ),
-        temp_filename=temp_filename,
+        temp_filename=letter_filename_for_db_from_logo_key(temporary_logo_key),
         form=form,
     )
