@@ -20,9 +20,11 @@ from app import (
     billing_api_client,
     current_service,
     inbound_number_client,
+    invite_api_client,
     notification_api_client,
     organisations_client,
     service_api_client,
+    user_api_client,
 )
 from app.event_handlers import (
     create_archive_service_event,
@@ -60,6 +62,7 @@ from app.main.forms import (
     ServiceSmsSenderForm,
     ServiceSwitchChannelForm,
     SetAuthTypeForm,
+    SetEmailAuthForUsersForm,
     SMSPrefixForm,
     YesNoSettingForm,
 )
@@ -780,6 +783,10 @@ def service_set_auth_type(service_id):
             "email_auth",
             on=form.sign_in_method.data == SIGN_IN_METHOD_TEXT_OR_EMAIL,
         )
+
+        if form.sign_in_method.data == SIGN_IN_METHOD_TEXT_OR_EMAIL:
+            return redirect(url_for(".service_set_auth_type_for_users", service_id=service_id))
+
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
@@ -809,6 +816,41 @@ def service_confirm_disable_email_auth(service_id):
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template("views/service-settings/confirm-disable-email-auth.html")
+
+
+@main.route("/services/<uuid:service_id>/service-settings/set-auth-type/users", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_set_auth_type_for_users(service_id):
+    if current_service.sign_in_method != SIGN_IN_METHOD_TEXT_OR_EMAIL:
+        return redirect(url_for(".service_set_auth_type", service_id=service_id))
+
+    all_service_users = [
+        user
+        for user in current_service.active_users
+        if user.id != current_user.id and user.auth_type != "webauthn_auth"
+    ]
+    all_service_users.extend(current_service.invited_users)
+
+    form = SetEmailAuthForUsersForm(
+        all_service_users=all_service_users, users=[user.id for user in all_service_users if user.email_auth]
+    )
+
+    if form.validate_on_submit():
+        for user in all_service_users:
+            should_use_email_auth = user.id in form.users.data
+            new_auth_type = "email_auth" if should_use_email_auth else "sms_auth"
+
+            if user.email_auth != should_use_email_auth:
+                if user.is_invited_user:
+                    invite_api_client.update_invite(
+                        service_id=current_service.id, invite_id=user.id, auth_type=new_auth_type
+                    )
+                else:
+                    user_api_client.update_user_attribute(user.id, auth_type=new_auth_type)
+
+        return redirect(url_for(".service_settings", service_id=service_id))
+
+    return render_template("views/service-settings/set-auth-type-for-users.html", form=form)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-contacts", methods=["GET"])
