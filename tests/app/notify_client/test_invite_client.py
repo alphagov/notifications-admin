@@ -48,6 +48,30 @@ def test_client_creates_invite(
     )
 
 
+def test_client_update_invite(
+    notify_admin,
+    mocker,
+    fake_uuid,
+    sample_invite,
+):
+
+    mocker.patch("app.notify_client.current_user")
+
+    mock_post = mocker.patch(
+        "app.invite_api_client.post",
+        return_value={"data": sample_invite},
+    )
+
+    invite_api_client.update_invite(service_id="67890", invite_id="12345", auth_type="email_auth")
+
+    mock_post.assert_called_once_with(
+        url="/service/67890/invite/12345",
+        data={
+            "auth_type": "email_auth",
+        },
+    )
+
+
 def test_client_returns_invite(mocker, sample_invite):
 
     sample_invite["status"] = "pending"
