@@ -111,7 +111,7 @@ def test_hiding_pages_from_search_engines(
         "privacy",
         "roadmap",
         "security",
-        "terms",
+        "terms_of_use",
         "who_can_use_notify",
     ],
 )
@@ -174,12 +174,13 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("old_integration_testing", "integration_testing"),
         ("old_roadmap", "roadmap"),
         ("information_risk_management", "security"),
-        ("old_terms", "terms"),
+        ("old_terms", "terms_of_use"),
         ("information_security", "using_notify"),
         ("old_using_notify", "using_notify"),
         ("delivery_and_failure", "message_status"),
         ("callbacks", "documentation"),
         ("who_its_for", "who_can_use_notify"),
+        ("old_features_terms", "terms_of_use"),
     ],
 )
 def test_old_static_pages_redirect(client_request, view, expected_view):
@@ -230,7 +231,7 @@ def test_old_integration_testing_page(
 
 
 def test_terms_page_has_correct_content(client_request):
-    terms_page = client_request.get("main.terms")
+    terms_page = client_request.get("main.terms_of_use")
     assert normalize_spaces(terms_page.select("main p")[0].text) == (
         "These terms apply to your service’s use of GOV.UK Notify. You must be the service manager to accept them."
     )

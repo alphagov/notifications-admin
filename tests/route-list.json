@@ -342,6 +342,7 @@
     "/support/triage/<ticket_type:ticket_type>",
     "/templates/letter-preview-image/<filename>",
     "/terms",
+    "/terms-of-use",
     "/text-not-received",
     "/trial-mode",
     "/two-factor-email-sent",
