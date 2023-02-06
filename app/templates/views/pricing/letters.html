@@ -1,0 +1,57 @@
+{% extends "content_template.html" %}
+
+{% from "components/content-metadata.html" import content_metadata %}
+{% from "components/table.html" import mapping_table, row, text_field, row_heading %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Pricing information' %}
+
+{% block per_page_title %}
+  Letters
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Letters</h1>
+
+    {{ content_metadata(
+      data={
+        "Last updated": "24 January 2023"
+      }
+    ) }}
+
+  <p class="govuk-body">The cost of sending a letter depends on the postage you choose and how many sheets of paper you need.</p>
+
+  <p class="govuk-body">Prices include:</p>
+  <ul class="govuk-list govuk-list--bullet">
+     <li>paper</li>
+     <li>postage</li>
+     <li>double-sided colour printing</li>
+     <li>C5 size envelopes with an address window</li>
+  </ul>
+
+  <div>
+    {% call mapping_table(
+      caption='Letter pricing',
+      field_headings=['Paper', 'Second class', 'First class', 'International'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for sheets, second, first, international in [
+        ('1 sheet', '47p', '72p', '£1.05'),
+        ('2 sheets', '52p', '77p', '£1.13'),
+        ('3 sheets', '57p', '82p', '£1.21'),
+        ('4 sheets', '62p', '87p', '£1.29'),
+        ('5 sheets', '67p', '92p', '£1.37'),
+      ] %}
+        {% call row() %}
+          {% call row_heading() %} {{ sheets }} {% endcall %}
+          {{ text_field(second + ' + VAT') }}
+          {{ text_field(first + ' + VAT') }}
+          {{ text_field(international + ' + VAT') }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+{% endblock %}
