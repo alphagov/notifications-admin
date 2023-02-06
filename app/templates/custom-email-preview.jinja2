@@ -50,8 +50,45 @@
     <a class="govuk-link govuk-link--no-visited-state" style="position:absolute;right:10px;" href="{{ edit_link }}">Edit</a>
     {{ body }}
 
-    <div class="govuk-!-margin-bottom-5">
-    <a href="{{ insert_link }}" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+    {% for choice in choices %}
+      {% if choice == "Body text" %}
+        <div style="postion: relative" class="govuk-!-margin-bottom-5" {% if loop.last %}id="just-added"{% endif %}>
+          <a class="govuk-link govuk-link--no-visited-state" style="position:absolute;right:10px;" href="#">Edit</a>
+          <p class="govuk-body">Body text</p>
+        </div>
+      {% elif choice == "Image" %}
+        <div style="postion: relative" class="govuk-!-margin-bottom-5" {% if loop.last %}id="just-added"{% endif %}>
+          <a class="govuk-link govuk-link--no-visited-state" style="position:absolute;right:10px;" href="#">Edit</a>
+          <div style="width: 100%; padding: 160px 0 0 0; text-align: center; background: #2091b9; color: #fff; overflow:hidden;letter-spacing:1em;">Image<div style="width: 120%; margin: -5px 0 -10% -10%; height: 220px; filter: blur(24px); background: #53911b;"></div></div>
+        </div>
+      {% elif choice == "Optional text" %}
+        <div style="postion: relative" class="govuk-!-margin-bottom-5" {% if loop.last %}id="just-added"{% endif %}>
+          <a class="govuk-link govuk-link--no-visited-state" style="position:absolute;right:10px;" href="#">Edit</a>
+          <div>Optional text</div>
+        </div>
+      {% elif choice == "QR code" %}
+        <div style="postion: relative" {% if loop.last %}id="just-added"{% endif %}>
+          <a class="govuk-link govuk-link--no-visited-state" style="position:absolute;right:10px;" href="#">Edit</a>
+          <div style="width: 290px; margin: 0 auto">{% include "qr.svg" %}</div>
+        </div>
+      {% elif choice == "Link to download a file" %}
+        <div style="postion: relative" class="govuk-!-margin-bottom-5" {% if loop.last %}id="just-added"{% endif %}>
+          <a class="govuk-link govuk-link--no-visited-state" style="position:absolute;right:10px;" href="#">Edit</a>
+          <p class="govuk-body">
+            <a class="govuk-link govuk-link--no-visited-state" href="#">https://documents.service.gov.uk/example…</a>
+          </p>
+        </div>
+      {% elif choice == "Reusable block of text" %}
+        <div style="postion: relative" class="govuk-!-margin-bottom-5" {% if loop.last %}id="just-added"{% endif %}>
+          <a class="govuk-link govuk-link--no-visited-state" style="position:absolute;right:10px;" href="#">Edit</a>
+          <p class="govuk-body">
+            Reusable block of text
+          </p>
+        </div>
+      {% endif %}
+    {% endfor %}
+    <div class="govuk-!-margin-bottom-6">
+    <a href="{{ insert_link }}?{% for choice in choices %}&choices={{ choice }}{% endfor %}" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">
       Insert another content type
     </a>
     </div>

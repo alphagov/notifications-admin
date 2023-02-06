@@ -18,22 +18,16 @@
 
 {% block maincolumn_content %}
 
-  {% if choice %}
-    <p class="govuk-body govuk-!-margin-top-6">You chose: {{ choice }}</p>
-  {% else %}
-
-    {% call form_wrapper() %}
-      {{ form.thing(param_extensions={
-        "fieldset": {
-          "legend": {
-            "isPageHeading": True,
-            "classes": "govuk-fieldset__legend--l"
-          }
+  {% call form_wrapper() %}
+    {{ form.thing(param_extensions={
+      "fieldset": {
+        "legend": {
+          "isPageHeading": True,
+          "classes": "govuk-fieldset__legend--l"
         }
-      }) }}
-      {{ page_footer('Continue') }}
-    {% endcall %}
-
-  {% endif %}
+      }
+    }) }}
+    {{ page_footer('Continue') }}
+  {% endcall %}
 
 {% endblock %}

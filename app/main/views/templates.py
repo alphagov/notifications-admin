@@ -991,11 +991,17 @@ def insert_content(service_id, template_id):
 
     if form.validate_on_submit():
         return redirect(
-            url_for(".insert_content", service_id=service_id, template_id=template_id, choice=form.thing.data)
+            url_for(
+                ".view_template",
+                service_id=service_id,
+                template_id=template_id,
+                choices=request.args.getlist("choices") + [form.thing.data],
+                _anchor="just-added",
+            )
         )
 
     return render_template(
-        "views/templates/insert-content.html", form=form, template_id=template_id, choice=request.args.get("choice")
+        "views/templates/insert-content.html", form=form, template_id=template_id, choices=request.args.get("choice")
     )
 
 

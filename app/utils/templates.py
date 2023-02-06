@@ -1,4 +1,4 @@
-from flask import current_app, Markup, url_for
+from flask import current_app, Markup, url_for, request
 from notifications_utils.field import Field
 from notifications_utils.formatters import escape_html
 from notifications_utils.template import (
@@ -53,6 +53,7 @@ def get_template(
                         ),
                         "send_link": url_for(".set_sender", service_id=service.id, template_id=template["id"]),
                         "insert_link": url_for(".insert_content", service_id=service.id, template_id=template["id"]),
+                        "choices": request.args.getlist("choices"),
                     }
                 )
             )
