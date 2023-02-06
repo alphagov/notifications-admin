@@ -1,5 +1,3 @@
-import os
-
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
@@ -285,10 +283,7 @@ def email_branding_upload_logo(service_id):
     form = EmailBrandingLogoUpload()
 
     if form.validate_on_submit():
-        file_extension = os.path.splitext(form.logo.data.filename)[1]
-        temporary_logo_key = logo_client.save_temporary_logo(
-            form.logo.data, logo_type="email", file_extension=file_extension, content_type=form.logo.data.content_type
-        )
+        temporary_logo_key = logo_client.save_temporary_logo(form.logo.data, logo_type="email")
 
         return redirect(
             url_for(

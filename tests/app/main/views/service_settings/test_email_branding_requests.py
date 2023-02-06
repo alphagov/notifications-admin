@@ -1185,8 +1185,6 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
         mocker.call(
             mocker.ANY,
             logo_type="email",
-            file_extension=".png",
-            content_type="image/png",
         )
     ]
 
