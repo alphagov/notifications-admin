@@ -45,7 +45,6 @@ class HeaderNavigation(Navigation):
         },
         "features": {
             "features",
-            "message_status",
             "roadmap",
             "security",
             "terms_of_use",

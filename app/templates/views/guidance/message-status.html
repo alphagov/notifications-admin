@@ -1,25 +1,38 @@
 {% extends "content_template.html" %}
 
+{% from "components/pill.html" import pill %}
+{% from "components/service-link.html" import service_link %}
 {% from "components/table.html" import mapping_table, row, text_field %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
+{% set page_title = 'Message status' %}
 
 {% block per_page_title %}
-  Delivery status
+  {{ page_title }}
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Delivery status</h1>
+  <h1 class="heading-large">{{ page_title }}</h1>
 
-  <p class="govuk-body">Notify’s real-time dashboard lets you check the status of any message, to see when it was delivered.</p>
-  <p class="govuk-body">For <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.security") }}">security</a>, this information is only available for 7 days after a message has been sent. You can download a report, including a list of sent messages, for your own records.</p>
-  <p class="govuk-body">This page describes the statuses you’ll see when you’re signed in to Notify.</p>
+  <p class="govuk-body">Use the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} to check the status of a message.</p>
+      <p class="govuk-body">This page describes the statuses you’ll see when you’re signed-in to GOV.UK Notify.</p>
   <p class="govuk-body">If you’re using the Notify API, read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.documentation') }}">documentation</a> for a list of API statuses.</p>
 
-  <h2 id="email-statuses" class="heading-medium">Emails</h2>
-  <div class="bottom-gutter-3-2">
+  <div class="govuk-!-margin-bottom-3">
+    {{ pill(
+      (
+        ("Emails", "email", url_for(".message_status"), 0),
+        ("Text messages", "sms", url_for(".message_status", notification_type="sms"), 0),
+        ("Letters", "letter", url_for(".message_status", notification_type="letter"), 0),
+      ),
+      current_value=notification_type,
+      show_count=False,
+    ) }}
+  </div>
+
+  {% if notification_type == "email" %}
     {% call mapping_table(
       caption='Message statuses – emails',
       field_headings=['Status', 'Description'],
@@ -39,16 +52,10 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
-  </div>
 
-  <h3 id="spam" class="heading-small">Spam</h3>
-  <p class="govuk-body">If an email is marked as spam, Notify receives a ‘complaint’ from the email provider. We’ll contact you if we receive a complaint about any of your emails. When this happens you should remove the recipient’s email address from your list.</p>
+  {% endif %}
+  {% if notification_type == "sms" %}
 
-  <h3 id="open-rates" class="heading-small">Open rates and click-throughs</h3>
-  <p class="govuk-body">Notify cannot tell you if your users open an email or click on the links in an email. We do not track open rates and click-throughs because there are privacy issues. Tracking emails without asking permission from users could breach General Data Protection Regulations (GDPR).</p>
-
-  <h2 id="text-message-statuses" class="heading-medium">Text messages</h2>
-  <div class="bottom-gutter-3-2">
     {% call mapping_table(
       caption='Message statuses – text messages',
       field_headings=['Status', 'Description'],
@@ -69,10 +76,10 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
-  </div>
 
-  <h2 id="letter-statuses" class="heading-medium">Letters</h2>
-  <div class="bottom-gutter-3-2">
+  {% endif %}
+  {% if notification_type == "letter" %}
+
     {% call mapping_table(
       caption='Message statuses – letters',
       field_headings=['Status', 'Description'],
@@ -92,12 +99,7 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
-  </div>
 
-  <h3 id="returned-mail" class="heading-small">Undelivered letters and returned mail</h3>
-
-  <p class="govuk-body">Every letter we send includes our printer’s address on the back of the envelope. It’s not possible to customise the return address.</p>
-  <p class="govuk-body">Returned mail is destroyed by our printer.</p>
-  <p class="govuk-body">Each letter has a unique ID. Our printer sends us the ID of every letter they destroy. We’ll contact you if the IDs match any of your letters. This is a partly manual process, so it can take a few weeks.</p>
+  {% endif %}
 
 {% endblock %}

@@ -49,16 +49,16 @@ def using_notify_nav():
             "link": "main.trial_mode_new",
         },
         {
-            "name": "Delivery status",
-            "link": "main.message_status",
-        },
-        {
             "name": "Guidance",
             "link": "main.guidance_index",
             "sub_navigation_items": [
                 {
                     "name": "Bulk sending",
                     "link": "main.guidance_bulk_sending",
+                },
+                {
+                    "name": "Delivery times",
+                    "link": "main.guidance_delivery_times",
                 },
                 {
                     "name": "Email branding",
@@ -71,6 +71,10 @@ def using_notify_nav():
                 {
                     "name": "Letter branding",
                     "link": "main.guidance_letter_branding",
+                },
+                {
+                    "name": "Message status",
+                    "link": "main.message_status",
                 },
                 {
                     "name": "Optional content",
