@@ -633,6 +633,8 @@ def test_show_limits_for_live_service(
         "2,000 text messages per day",
         "3,000 letters per day",
     ]
+    assert normalize_spaces(page.select_one("main ul + p").text) == "If you need to discuss these limits, contact us."
+    assert page.select_one("main ul + p a")["href"] == url_for("main.support")
 
 
 def test_broadcast_service_in_training_mode_doesnt_show_trial_mode_content(
