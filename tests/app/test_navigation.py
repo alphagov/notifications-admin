@@ -239,6 +239,8 @@ EXCLUDED_ENDPOINTS = tuple(
             "preview_broadcast_areas",
             "preview_broadcast_message",
             "pricing",
+            "pricing_letters",
+            "pricing_text_messages",
             "privacy",
             "public_agreement",
             "public_download_agreement",

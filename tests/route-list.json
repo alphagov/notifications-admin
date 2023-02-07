@@ -104,6 +104,8 @@
     "/pricing",
     "/pricing/billing-details",
     "/pricing/how-to-pay",
+    "/pricing/letters",
+    "/pricing/text-messages",
     "/privacy",
     "/provider/<uuid:provider_id>",
     "/provider/edit-sms-provider-ratio",

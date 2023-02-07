@@ -26,6 +26,16 @@ def pricing_nav():
         {
             "name": "Pricing",
             "link": "main.pricing",
+            "sub_navigation_items": [
+                {
+                    "name": "Text messages",
+                    "link": "main.pricing_text_messages",
+                },
+                {
+                    "name": "Letters",
+                    "link": "main.pricing_letters",
+                },
+            ],
         },
         {
             "name": "How to pay",
