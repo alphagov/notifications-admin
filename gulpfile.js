@@ -123,6 +123,7 @@ const javascripts = () => {
     paths.src + 'javascripts/colourPreview.js',
     paths.src + 'javascripts/templateFolderForm.js',
     paths.src + 'javascripts/addBrandingOptionsForm.js',
+    paths.src + 'javascripts/setAuthTypeForm.js',
     paths.src + 'javascripts/collapsibleCheckboxes.js',
     paths.src + 'javascripts/registerSecurityKey.js',
     paths.src + 'javascripts/authenticateSecurityKey.js',

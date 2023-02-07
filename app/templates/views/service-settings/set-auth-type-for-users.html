@@ -17,7 +17,7 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {% call form_wrapper() %}
+      {% call form_wrapper(module='set-auth-type-form') %}
         {{
           form.users(
             param_extensions={
@@ -33,7 +33,12 @@
         If you need to change someone's sign-in method later, go to the team members page.
         </p>
 
-        {{ page_footer('Save') }}
+        <div class="js-stick-at-bottom-when-scrolling">
+          {{ page_footer('Save') }}
+          <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite">
+            Nothing selected
+          </div>
+        </div>
       {% endcall %}
     </div>
   </div>
