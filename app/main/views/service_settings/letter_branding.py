@@ -11,10 +11,10 @@ from app import (
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
+    BrandingRequestForm,
     ChooseLetterBrandingForm,
     LetterBrandingNameForm,
     LetterBrandingUploadBranding,
-    SomethingElseBrandingForm,
 )
 from app.models.branding import LetterBranding
 from app.utils.branding import get_letter_choices as get_letter_branding_choices
@@ -29,7 +29,7 @@ def _letter_branding_flow_query_params(**kwargs):
 
     We've got a variety of query parameters we want to pass around between pages. Any params that are passed in, we
     should pass through to ensure that back links continue to work the whole way through etc. In addition, we use the
-    branding_choice param (from the letter_branding_request page) later on so need to pass that through.
+    branding_choice param (from the letter_branding_options page) later on so need to pass that through.
 
     To set a new value:
         _letter_branding_flow_query_params(request, branding_choice='organisation')
@@ -42,7 +42,7 @@ def _letter_branding_flow_query_params(**kwargs):
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
-def letter_branding_request(service_id):
+def letter_branding_options(service_id):
     form = ChooseLetterBrandingForm(current_service)
     from_template = request.args.get("from_template")
 
@@ -79,14 +79,20 @@ def letter_branding_request(service_id):
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/something-else", methods=["GET", "POST"])
 def letter_branding_something_else(service_id):
-    form = SomethingElseBrandingForm()
+    # TODO: remove this view, it's temporary
+    return redirect(url_for("letter_branding_request", service_id=service_id), code=301)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/request", methods=["GET", "POST"])
+def letter_branding_request(service_id):
+    form = BrandingRequestForm()
     from_template = _letter_branding_flow_query_params()["from_template"]
 
     if form.validate_on_submit():
         ticket_message = render_template(
             "support-tickets/branding-request.txt",
             current_branding=current_service.letter_branding.name or "no",
-            detail=form.something_else.data,
+            detail=form.branding_request.data,
         )
         ticket = NotifySupportTicket(
             subject=f"Letter branding request - {current_service.name}",
@@ -108,7 +114,7 @@ def letter_branding_something_else(service_id):
         )
 
     return render_template(
-        "views/service-settings/branding/branding-something-else.html",
+        "views/service-settings/branding/branding-request.html",
         form=form,
         from_template=from_template,
         back_link=url_for(
@@ -149,7 +155,7 @@ def letter_branding_pool_option(service_id):
         chosen_branding = current_service.letter_branding_pool.get_item_by_id(request.args.get("branding_option"))
     except current_service.letter_branding_pool.NotFound:
         flash("No branding found for this id.")
-        return redirect(url_for(".letter_branding_request", service_id=current_service.id))
+        return redirect(url_for(".letter_branding_options", service_id=current_service.id))
 
     if request.method == "POST":
         current_service.update(letter_branding=chosen_branding.id)
@@ -184,12 +190,12 @@ def letter_branding_upload_branding(service_id):
         form=form,
         branding_choice=request.args.get("branding_choice"),
         back_link=url_for(
-            ".letter_branding_request",
+            ".letter_branding_options",
             service_id=current_service.id,
             **_letter_branding_flow_query_params(branding_choice=None),
         ),
         # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
-        abandon_flow_link=url_for(".letter_branding_something_else", service_id=current_service.id),
+        abandon_flow_link=url_for(".letter_branding_request", service_id=current_service.id),
     )
 
 

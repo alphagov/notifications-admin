@@ -6,6 +6,7 @@ from app import current_service, logo_client, organisations_client
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
+    BrandingRequestForm,
     ChooseEmailBrandingForm,
     EmailBrandingAltTextForm,
     EmailBrandingChooseBanner,
@@ -13,7 +14,6 @@ from app.main.forms import (
     EmailBrandingChooseLogoForm,
     EmailBrandingLogoUpload,
     GovernmentIdentityLogoForm,
-    SomethingElseBrandingForm,
 )
 from app.models.branding import AllEmailBranding, EmailBranding
 from app.models.organisation import Organisation
@@ -163,10 +163,10 @@ def email_branding_something_else(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/request", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_request(service_id):
-    form = SomethingElseBrandingForm()
+    form = BrandingRequestForm()
 
     if form.validate_on_submit():
-        create_email_branding_zendesk_ticket(detail=form.something_else.data)
+        create_email_branding_zendesk_ticket(detail=form.branding_request.data)
 
         flash(THANKS_FOR_BRANDING_REQUEST_MESSAGE, "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))

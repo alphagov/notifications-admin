@@ -258,7 +258,7 @@
             {{ optional_text_field(current_service.letter_branding.name) }}
             {{ edit_field(
               'Change',
-              url_for('.letter_branding_request', service_id=current_service.id),
+              url_for('.letter_branding_options', service_id=current_service.id),
               permissions=['manage_service'],
               suffix='letter branding',
             )}}

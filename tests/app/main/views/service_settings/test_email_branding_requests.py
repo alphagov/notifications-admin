@@ -656,7 +656,7 @@ def test_email_branding_request_page(client_request, service_one, mock_get_empty
         service_id=SERVICE_ONE_ID,
     )
     assert normalize_spaces(page.select_one("h1").text) == "Describe the branding you want"
-    assert page.select_one("textarea")["name"] == "something_else"
+    assert page.select_one("textarea")["name"] == "branding_request"
     assert normalize_spaces(page.select_one(".page-footer button").text) == "Request new branding"
     assert page.select_one(".govuk-back-link")["href"] == url_for(
         "main.email_branding_options",
@@ -741,7 +741,7 @@ def test_email_branding_request_submit(
     page = client_request.post(
         ".email_branding_request",
         service_id=SERVICE_ONE_ID,
-        _data={"something_else": "Homer Simpson"},
+        _data={"branding_request": "Homer Simpson"},
         _follow_redirects=True,
     )
 
@@ -779,7 +779,7 @@ def test_email_branding_request_submit_shows_error_if_textbox_is_empty(
     page = client_request.post(
         ".email_branding_request",
         service_id=SERVICE_ONE_ID,
-        _data={"something_else": ""},
+        _data={"branding_request": ""},
         _follow_redirects=True,
     )
     assert normalize_spaces(page.select_one("h1").text) == "Describe the branding you want"
