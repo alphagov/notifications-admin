@@ -155,7 +155,7 @@ def test_letter_branding_options_redirects_to_branding_preview_for_a_branding_po
         _data={"options": "1234"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.letter_branding_pool_option",
+            "main.letter_branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="1234",
         ),
@@ -634,7 +634,7 @@ def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appr
     )
 
 
-def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
+def test_letter_branding_option_preview_page_displays_preview_of_chosen_branding(
     service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
 ):
     organisation_one["organisation_type"] = "central"
@@ -645,12 +645,12 @@ def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
         return_value=organisation_one,
     )
 
-    page = client_request.get(".letter_branding_pool_option", service_id=SERVICE_ONE_ID, branding_option="1234")
+    page = client_request.get(".letter_branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="1234")
 
     assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="1234")
 
 
-def test_letter_branding_pool_option_page_redirects_to_branding_options_page_if_branding_option_not_found(
+def test_letter_branding_option_preview_page_redirects_to_branding_options_page_if_branding_option_not_found(
     service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
 ):
     organisation_one["organisation_type"] = "central"
@@ -662,7 +662,7 @@ def test_letter_branding_pool_option_page_redirects_to_branding_options_page_if_
     )
 
     client_request.get(
-        ".letter_branding_pool_option",
+        ".letter_branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="some-unknown-branding-id",
         _expected_status=302,
@@ -670,7 +670,7 @@ def test_letter_branding_pool_option_page_redirects_to_branding_options_page_if_
     )
 
 
-def test_letter_branding_pool_option_changes_letter_branding_when_user_confirms(
+def test_letter_branding_option_preview_changes_letter_branding_when_user_confirms(
     mocker,
     service_one,
     organisation_one,
@@ -689,7 +689,7 @@ def test_letter_branding_pool_option_changes_letter_branding_when_user_confirms(
     )
 
     page = client_request.post(
-        ".letter_branding_pool_option",
+        ".letter_branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="1234",
         _follow_redirects=True,

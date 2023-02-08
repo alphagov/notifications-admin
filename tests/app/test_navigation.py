@@ -177,6 +177,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "invite_user",
             "letter_branding",
             "letter_branding_nhs",
+            "letter_branding_option_preview",
             "letter_branding_options",
             "letter_branding_pool_option",
             "letter_branding_something_else",

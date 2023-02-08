@@ -237,6 +237,7 @@ class MainNavigation(Navigation):
             "email_branding_something_else",
             "email_branding_upload_logo",
             "estimate_usage",
+            "letter_branding_option_preview",
             "letter_branding_options",
             "letter_branding_pool_option",
             "letter_branding_request",
