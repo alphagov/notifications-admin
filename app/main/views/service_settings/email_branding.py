@@ -45,7 +45,7 @@ def create_email_branding_zendesk_ticket(detail=None):
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
-def email_branding_request(service_id):
+def email_branding_options(service_id):
     form = ChooseEmailBrandingForm(current_service)
 
     if form.validate_on_submit():
@@ -64,7 +64,9 @@ def email_branding_request(service_id):
 
         if branding_choice in current_service.email_branding_pool.ids:
             return redirect(
-                url_for(".email_branding_pool_option", service_id=current_service.id, branding_option=branding_choice)
+                url_for(
+                    ".email_branding_option_preview", service_id=current_service.id, branding_option=branding_choice
+                )
             )
 
         if current_service.organisation_type == "central":
@@ -76,7 +78,7 @@ def email_branding_request(service_id):
                 url_for(
                     ".email_branding_choose_banner_type",
                     service_id=current_service.id,
-                    back_link=".email_branding_request",
+                    back_link=".email_branding_options",
                     branding_choice=branding_choice,
                 )
             )
@@ -90,11 +92,18 @@ def email_branding_request(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/pool", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_pool_option(service_id):
+    # TODO: remove this view, it's temporary
+    return redirect(url_for("email_branding_option_preview", service_id=service_id), code=301)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/option-preview", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_branding_option_preview(service_id):
     try:
         chosen_branding = current_service.email_branding_pool.get_item_by_id(request.args.get("branding_option"))
     except current_service.email_branding_pool.NotFound:
         flash("No branding found for this id.")
-        return redirect(url_for(".email_branding_request", service_id=current_service.id))
+        return redirect(url_for(".email_branding_options", service_id=current_service.id))
 
     if request.method == "POST":
         current_service.update(email_branding=chosen_branding.id)
@@ -103,7 +112,7 @@ def email_branding_pool_option(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/branding/email-branding-pool-option.html",
+        "views/service-settings/branding/email-branding-option-preview.html",
         chosen_branding=chosen_branding,
     )
 
@@ -146,8 +155,14 @@ def email_branding_nhs(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
 def email_branding_something_else(service_id):
+    # TODO: remove this view, it's temporary
+    return redirect(url_for("email_branding_request", service_id=service_id), code=301)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/request", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_branding_request(service_id):
     form = SomethingElseBrandingForm()
 
     if form.validate_on_submit():
@@ -158,7 +173,7 @@ def email_branding_something_else(service_id):
 
     branding_options = ChooseEmailBrandingForm(current_service)
     default_back_view = (
-        ".service_settings" if branding_options.something_else_is_only_option else ".email_branding_request"
+        ".service_settings" if branding_options.something_else_is_only_option else ".email_branding_options"
     )
     back_link = url_for(
         request.args.get("back_link", default_back_view),
@@ -166,7 +181,7 @@ def email_branding_something_else(service_id):
         **_email_branding_flow_query_params(request),
     )
     return render_template(
-        "views/service-settings/branding/branding-something-else.html",
+        "views/service-settings/branding/branding-request.html",
         form=form,
         back_link=back_link,
     )
@@ -294,7 +309,7 @@ def email_branding_upload_logo(service_id):
         )
 
     abandon_flow_link = url_for(
-        "main.email_branding_something_else",
+        "main.email_branding_request",
         service_id=current_service.id,
         back_link=".email_branding_upload_logo",
         **_email_branding_flow_query_params(request),
@@ -448,10 +463,10 @@ def email_branding_choose_banner_type(service_id):
     org_type = current_service.organisation_type
 
     if any(get_email_branding_choices(current_service)):
-        back_view_fallback = ".email_branding_choose_logo" if org_type == "central" else ".email_branding_request"
+        back_view_fallback = ".email_branding_choose_logo" if org_type == "central" else ".email_branding_options"
         back_view = request.args.get("back_link", back_view_fallback)
     else:
-        back_view = ".email_branding_request"
+        back_view = ".email_branding_options"
 
     return (
         render_template(
@@ -482,7 +497,7 @@ def email_branding_choose_banner_colour(service_id):
         )
 
     abandon_flow_link = url_for(
-        ".email_branding_something_else",
+        ".email_branding_request",
         service_id=current_service.id,
         back_link=".email_branding_choose_banner_colour",
         **_email_branding_flow_query_params(request),

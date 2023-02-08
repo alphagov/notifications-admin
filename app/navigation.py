@@ -228,6 +228,8 @@ class MainNavigation(Navigation):
             "email_branding_enter_government_identity_logo_text",
             "email_branding_govuk",
             "email_branding_nhs",
+            "email_branding_option_preview",
+            "email_branding_options",
             "email_branding_pool_option",
             "email_branding_request",
             "email_branding_request_government_identity_logo",
