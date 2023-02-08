@@ -996,7 +996,6 @@ def insert_content(service_id, template_id):
                 service_id=service_id,
                 template_id=template_id,
                 choices=request.args.getlist("choices") + [form.thing.data],
-                _anchor="just-added",
             )
         )
 
