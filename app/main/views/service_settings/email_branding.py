@@ -196,7 +196,7 @@ def email_branding_request(service_id):
 def email_branding_request_government_identity_logo(service_id):
     branding_choice = request.args.get("branding_choice")
     return render_template(
-        "views/service-settings/branding/email-branding-create-government-identity-logo.html",
+        "views/service-settings/branding/add-new-branding/email-branding-create-government-identity-logo.html",
         service_id=service_id,
         back_link=url_for(".email_branding_choose_logo", service_id=service_id, branding_choice=branding_choice),
         branding_choice=branding_choice,
@@ -235,7 +235,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/branding/email-branding-enter-government-identity-logo-text.html",
+        "views/service-settings/branding/add-new-branding/email-branding-enter-government-identity-logo-text.html",
         form=form,
         back_link=url_for(
             ".email_branding_request_government_identity_logo", service_id=service_id, branding_choice=branding_choice
