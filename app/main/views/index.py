@@ -211,17 +211,9 @@ def who_can_use_notify():
 
 @main.route("/trial-mode")
 @main.route("/features/trial-mode")
+@main.route("/using-notify/trial-mode")
 def trial_mode():
     return redirect(url_for(".trial_mode_new"), 301)
-
-
-@main.route("/using-notify/trial-mode")
-def trial_mode_new():
-    return render_template(
-        "views/trial-mode.html",
-        navigation_links=using_notify_nav(),
-        email_and_sms_daily_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
-    )
 
 
 @main.route("/using-notify/guidance")

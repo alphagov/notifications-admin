@@ -106,6 +106,7 @@
     "/pricing/how-to-pay",
     "/pricing/letters",
     "/pricing/text-messages",
+    "/pricing/trial-mode",
     "/privacy",
     "/provider/<uuid:provider_id>",
     "/provider/edit-sms-provider-ratio",

@@ -35,15 +35,19 @@ def pricing_nav():
                     "name": "Letters",
                     "link": "main.pricing_letters",
                 },
+                {
+                    "name": "Trial mode",
+                    "link": "main.trial_mode_new",
+                },
+                {
+                    "name": "How to pay",
+                    "link": "main.how_to_pay",
+                },
+                {
+                    "name": "Billing details",
+                    "link": "main.billing_details",
+                },
             ],
-        },
-        {
-            "name": "How to pay",
-            "link": "main.how_to_pay",
-        },
-        {
-            "name": "Billing details",
-            "link": "main.billing_details",
         },
     ]
 
@@ -53,10 +57,6 @@ def using_notify_nav():
         {
             "name": "Get started",
             "link": "main.get_started",
-        },
-        {
-            "name": "Trial mode",
-            "link": "main.trial_mode_new",
         },
         {
             "name": "Guidance",

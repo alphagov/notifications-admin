@@ -39,6 +39,15 @@ def pricing_letters():
     )
 
 
+@main.route("/pricing/trial-mode")
+def trial_mode_new():
+    return render_template(
+        "views/trial-mode.html",
+        navigation_links=pricing_nav(),
+        email_and_sms_daily_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
+    )
+
+
 @main.route("/pricing/how-to-pay")
 def how_to_pay():
     return render_template(
