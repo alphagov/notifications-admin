@@ -17,7 +17,12 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {% call form_wrapper(module='set-auth-type-form') %}
+      {% call form_wrapper(
+          module='set-auth-type-form',
+          data_kwargs={
+            'thing-singular': 'team member',
+            'thing-plural': 'team members'
+          }) %}
         {{
           form.users(
             param_extensions={

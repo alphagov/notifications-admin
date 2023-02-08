@@ -1,6 +1,7 @@
-  const helpers = require('./support/helpers');
+const helpers = require('./support/helpers');
 
 beforeAll(() => {
+  require('../../app/assets/javascripts/liveCheckboxControls.js');
   require('../../app/assets/javascripts/setAuthTypeForm.js');
 });
 
@@ -18,7 +19,7 @@ describe('SetAuthTypeForm', () => {
   beforeEach(() => {
 
     const htmlFragment = `
-      <form method="post" autocomplete="off" data-notify-module="set-auth-type-form" novalidate="" class="sticky-scroll-area">
+      <form method="post" autocomplete="off" data-notify-module="set-auth-type-form" data-thing-singular="team member" data-thing-plural="team members" novalidate="" class="sticky-scroll-area">
         <div class="govuk-form-group">
           <fieldset class="govuk-fieldset" aria-describedby="users-hint" id="users">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -47,14 +48,6 @@ describe('SetAuthTypeForm', () => {
         <div class="js-stick-at-bottom-when-scrolling">
           <div class="page-footer">
             <button class="govuk-button page-footer__button" data-module="govuk-button">Save</button>
-          </div>
-          <div id="nothing_selected">
-            <div class="checkbox-list-selected-counter">
-              <span class="checkbox-list-selected-counter__count" aria-hidden="true">No team members selected</span>
-              <a href="" class="govuk-link govuk-link--no-visited-state js-cancel" tabindex="0">
-                Select all<span class="govuk-visually-hidden"> selection</span>
-              </a>
-            </div>
           </div>
           <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite">No team members selected</div>
         </div>
@@ -99,6 +92,15 @@ describe('SetAuthTypeForm', () => {
     test("the counter should be showing", () => {
 
       expect(visibleCounter).not.toBeNull();
+
+    });
+
+    test("the 'Select all' link should be showing", () => {
+
+      var selectAllLink = formControls.querySelector('.js-action');
+
+      expect(selectAllLink).not.toBeNull();
+      expect(selectAllLink.textContent.trim()).toEqual('Select all team members');
 
     });
 
@@ -159,7 +161,7 @@ describe('SetAuthTypeForm', () => {
 
         beforeEach(() => {
 
-          clearLink = formControls.querySelector('.js-cancel');
+          clearLink = formControls.querySelector('.js-action');
 
         });
 

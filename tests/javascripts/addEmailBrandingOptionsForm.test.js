@@ -1,6 +1,7 @@
-  const helpers = require('./support/helpers');
+const helpers = require('./support/helpers');
 
 beforeAll(() => {
+  require('../../app/assets/javascripts/liveCheckboxControls.js');
   require('../../app/assets/javascripts/addBrandingOptionsForm.js');
 });
 
@@ -101,6 +102,12 @@ describe('AddBrandingOptionsForm', () => {
 
     });
 
+    test("the 'Select all' link should not exist", () => {
+
+      expect(document.querySelector('.js-action')).toBeNull();
+
+    });
+
     // Our counter needs to be wrapped in an ARIA live region so changes to its content are
     // communicated to assistive tech'.
     // ARIA live regions need to be in the HTML before JS loads.
@@ -128,7 +135,7 @@ describe('AddBrandingOptionsForm', () => {
 
       test("the content of the counter should reflect the selection", () => {
 
-        expect(visibleCounter.textContent.trim()).toEqual('Nothing selected');
+        expect(visibleCounter.textContent.trim()).toEqual('No options selected');
 
       });
 
@@ -158,7 +165,7 @@ describe('AddBrandingOptionsForm', () => {
 
         beforeEach(() => {
 
-          clearLink = formControls.querySelector('.js-cancel');
+          clearLink = formControls.querySelector('.js-action');
 
         });
 
