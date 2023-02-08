@@ -1004,6 +1004,23 @@ def insert_content(service_id, template_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit-block", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def edit_service_template_block(service_id, template_id):
+    current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
+    return render_template(
+        "views/templates/edit-block.html",
+        choice=request.args.get("choice"),
+        back_link=url_for(
+            ".view_template",
+            service_id=service_id,
+            template_id=template_id,
+            choices=request.args.getlist("choices"),
+        ),
+    )
+
+
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/insert-pages-upload", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def insert_pages_upload(service_id, template_id):

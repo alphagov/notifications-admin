@@ -51,6 +51,12 @@ def get_template(
                         "edit_subject_link": url_for(
                             ".edit_service_template_subject", service_id=service.id, template_id=template["id"]
                         ),
+                        "edit_block_link": url_for(
+                            ".edit_service_template_block",
+                            service_id=service.id,
+                            template_id=template["id"],
+                            choices=request.args.getlist("choices"),
+                        ),
                         "send_link": url_for(".set_sender", service_id=service.id, template_id=template["id"]),
                         "insert_link": url_for(".insert_content", service_id=service.id, template_id=template["id"]),
                         "choices": request.args.getlist("choices"),
