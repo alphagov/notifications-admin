@@ -37,7 +37,7 @@ def pricing_nav():
                 },
                 {
                     "name": "Trial mode",
-                    "link": "main.trial_mode_new",
+                    "link": "main.trial_mode",
                 },
                 {
                     "name": "How to pay",

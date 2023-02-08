@@ -209,13 +209,6 @@ def who_can_use_notify():
     )
 
 
-@main.route("/trial-mode")
-@main.route("/features/trial-mode")
-@main.route("/using-notify/trial-mode")
-def trial_mode():
-    return redirect(url_for(".trial_mode_new"), 301)
-
-
 @main.route("/using-notify/guidance")
 def guidance_index():
     return render_template(
@@ -380,6 +373,9 @@ def guidance_upload_a_letter():
 @main.route("/using-notify/who-its-for", endpoint="old_who_its_for")
 @main.route("/using-notify/delivery-status", endpoint="old_delivery_status")
 @main.route("/using-notify/guidance/letter-specification", endpoint="old_letter_specification")
+@main.route("/trial-mode", endpoint="old_trial_mode")
+@main.route("/features/trial-mode", endpoint="old_trial_mode")
+@main.route("/using-notify/trial-mode", endpoint="old_trial_mode")
 def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.roadmap",
@@ -398,6 +394,7 @@ def old_page_redirects():
         "main.old_who_its_for": "main.who_its_for",
         "main.old_delivery_status": "main.message_status",
         "main.old_letter_specification": "main.guidance_upload_a_letter",
+        "main.old_trial_mode": "main.trial_mode",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
 

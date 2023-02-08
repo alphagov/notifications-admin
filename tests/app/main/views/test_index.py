@@ -451,7 +451,7 @@ def test_bulk_sending_limits(client_request):
 
 
 def test_trial_mode_sending_limits(client_request):
-    page = client_request.get("main.trial_mode_new")
+    page = client_request.get("main.trial_mode")
 
     assert [normalize_spaces(li.text) for li in page.select_one("main ul").select("li")] == [
         "send messages to yourself and other people in your team",

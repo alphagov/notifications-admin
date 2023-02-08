@@ -40,7 +40,7 @@ def pricing_letters():
 
 
 @main.route("/pricing/trial-mode")
-def trial_mode_new():
+def trial_mode():
     return render_template(
         "views/trial-mode.html",
         navigation_links=pricing_nav(),
