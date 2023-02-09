@@ -19,13 +19,12 @@
       }
     ) }}
 
-  <p class="govuk-body">GOV.UK Notify is free to use unless you:</p>
+  <p class="govuk-body">It’s free to send emails through GOV.UK Notify. There’s also no monthly charge, no setup fee and no procurement cost.</p>
+  <p class="govuk-body">You will only have to pay if you:</p>
   <ul class="govuk-list govuk-list--bullet">
     <li>exceed your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.pricing_text_messages') }}">free text message allowance</a></li>
     <li>send <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.pricing_letters') }}">letters</a></li>
   </ul>
-
-  <p class="govuk-body">You’ll only pay for the additional text messages or letters that you send. There’s no monthly charge, no setup fee and no procurement cost.</p>
 
   <p class="govuk-body">
     {% if not current_user.is_authenticated %}
@@ -36,8 +35,5 @@
   </p>
 
   <p class="govuk-body">When you add a new service it will start in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.trial_mode') }}">trial mode</a>.</p>
-
-  <h2 class="heading-medium">Emails</h2>
-  <p class="govuk-body">It’s free to send emails through Notify.</p>
 
 {% endblock %}
