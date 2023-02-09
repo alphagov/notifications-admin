@@ -1241,7 +1241,6 @@ class TemplateLanguageForm(StripWhitespaceForm):
             ("en", "English only"),
             ("cy", "Welsh only"),
             ("cy-en", "Welsh then English"),
-            ("en-cy", "English then Welsh"),
         ),
         validators=[DataRequired(message="Cannot be empty")],
     )
