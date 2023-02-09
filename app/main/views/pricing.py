@@ -20,7 +20,7 @@ def pricing():
 @main.route("/pricing/text-messages")
 def pricing_text_messages():
     return render_template(
-        "views/pricing/text-messages.html",
+        "views/pricing/text-message-pricing.html",
         sms_rate=CURRENT_SMS_RATE,
         international_sms_rates=sorted(
             [(cc, country["names"], country["billable_units"]) for cc, country in INTERNATIONAL_BILLING_RATES.items()],
@@ -34,7 +34,7 @@ def pricing_text_messages():
 @main.route("/pricing/letters")
 def pricing_letters():
     return render_template(
-        "views/pricing/letters.html",
+        "views/pricing/letter-pricing.html",
         navigation_links=pricing_nav(),
     )
 
