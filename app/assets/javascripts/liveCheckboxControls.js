@@ -7,6 +7,7 @@
 
       this.$liveRegionCounter = this.$form.find('.selection-counter');
 
+      // variants of the noun for checkbox items, used by sentences describing what is selected
       this.thing = {
         singular: this.$form.data('thingSingular') || 'option',
         plural: this.$form.data('thingPlural') || 'options'
@@ -41,13 +42,12 @@
         this.render();
       }
 
-      this.$form.on('change', 'input[type=checkbox]', () => this.checkboxChanged());
+      this.$form.on('change', 'input[type=checkbox]', () => this.onCheckboxChanged());
     };
 
     // Default behaviour - show a 'Select all' link/button if no checkboxes are selected
     this.onNothingSelected = function(state) {
-      let selector = 'button[value=select-all]';
-      let $clear = this.makeButton('Select all', {
+      let $clear = this.makeActionButton('Select all', {
         'onclick': () => {
 
           // uncheck all templates and folders
@@ -65,8 +65,7 @@
 
     // Default behaviour - show a 'Clear' link/button if any checkboxes are selected
     this.onSomethingSelected = function(state) {
-      let selector = 'button[value=clear]';
-      let $clear = this.makeButton('Clear', {
+      let $clear = this.makeActionButton('Clear', {
         'onclick': () => {
 
           // uncheck all templates and folders
@@ -87,22 +86,11 @@
         return `No ${this.thing.plural} selected`;
       },
       'selected': numSelected => {
-        const getString = () => {
-          if (numSelected === 0) {
-            return '';
-          } else if (numSelected === 1) {
-            return `1 ${this.thing.singular}`;
-          } else {
-            return `${numSelected} ${this.thing.plural}`;
-          }
-        };
-
-        const results = [];
-
-        if (numSelected > 0) {
-          results.push(getString());
+        if (numSelected === 1) {
+          return `1 ${this.thing.singular} selected`;
+        } else {
+          return `${numSelected} ${this.thing.plural} selected`;
         }
-        return results.join(', ') + ' selected';
       },
       'update': numSelected => {
         let message = (numSelected > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
@@ -112,7 +100,7 @@
       }
     };
 
-    this.makeButton = function(text, opts) {
+    this.makeActionButton = function(text, opts) {
       let $btn = $('<a href=""></a>')
                     .html(text)
                     .addClass('govuk-link govuk-link--no-visited-state js-action')
@@ -135,17 +123,17 @@
     this.showInitialState = function () {
       // Reset the form to initial state, where nothing is selected
       this.currentState = 'nothing-selected-hint';
-      this.checkboxChanged();
+      this.onCheckboxChanged();
     };
 
-    this.stateChanged = function() {
+    this.stateHasChanged = function() {
       let changed = this.currentState !== this._lastState;
 
       this._lastState = this.currentState;
       return changed;
     };
 
-    this.checkboxChanged = function() {
+    this.onCheckboxChanged = function() {
       let numSelected = this.countSelectedCheckboxes();
 
       if (this.currentState === 'nothing-selected-hint' && numSelected !== 0) {
@@ -156,7 +144,7 @@
         this.currentState = 'nothing-selected-hint';
       }
 
-      if (this.stateChanged()) {
+      if (this.stateHasChanged()) {
         this.render();
       }
 

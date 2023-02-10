@@ -49,7 +49,7 @@ describe('SetAuthTypeForm', () => {
           <div class="page-footer">
             <button class="govuk-button page-footer__button" data-module="govuk-button">Save</button>
           </div>
-          <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite">No team members selected</div>
+          <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite"></div>
         </div>
       </form>`;
 

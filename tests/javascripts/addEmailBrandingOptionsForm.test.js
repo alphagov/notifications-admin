@@ -53,9 +53,7 @@ describe('AddBrandingOptionsForm', () => {
             Add options
           </button>
         </div>
-        <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite">
-          Nothing selected
-        </div>
+        <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite"></div>
       </div>
     </form>
   `;
