@@ -868,7 +868,7 @@ def test_should_check_if_estimated_volumes_provided(
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Before you request to go live"
 
-    assert normalize_spaces(page.select_one(".task-list .task-list-item").text) == (expected_estimated_volumes_item)
+    assert normalize_spaces(page.select_one(".task-list .task-list-item").text) == expected_estimated_volumes_item
 
 
 @pytest.mark.parametrize(
@@ -1579,21 +1579,6 @@ def test_non_gov_users_cant_request_to_go_live(
     )
 
 
-@pytest.mark.parametrize(
-    "volumes, displayed_volumes, formatted_displayed_volumes",
-    (
-        (
-            (("email", None), ("sms", None), ("letter", None)),
-            ", , ",
-            "Emails in next year: \nText messages in next year: \nLetters in next year: \n",
-        ),
-        (
-            (("email", 1234), ("sms", 0), ("letter", 999)),
-            "0, 1234, 999",  # This is a different order to match the spreadsheet
-            "Emails in next year: 1,234\nText messages in next year: 0\nLetters in next year: 999\n",
-        ),
-    ),
-)
 @freeze_time("2012-12-21 13:12:12.12354")
 def test_should_redirect_after_request_to_go_live(
     client_request,
@@ -1608,17 +1593,7 @@ def test_should_redirect_after_request_to_go_live(
     mock_get_users_by_service,
     mock_update_service,
     mock_get_invites_without_manage_permission,
-    volumes,
-    displayed_volumes,
-    formatted_displayed_volumes,
 ):
-    for channel, volume in volumes:
-        mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
-            create=True,
-            new_callable=PropertyMock,
-            return_value=volume,
-        )
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
         "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
@@ -1634,8 +1609,6 @@ def test_should_redirect_after_request_to_go_live(
         "Organisation type: Central government\n"
         "Agreement signed: Can’t tell (domain is user.gov.uk).\n"
         "\n"
-        "{formatted_displayed_volumes}"
-        "\n"
         "Consent to research: Yes\n"
         "Other live services for that user: No\n"
         "\n"
@@ -1644,7 +1617,6 @@ def test_should_redirect_after_request_to_go_live(
         "Requester’s user page: http://localhost/users/{user_id}\n"
     ).format(
         service_id=SERVICE_ONE_ID,
-        formatted_displayed_volumes=formatted_displayed_volumes,
         user_id=active_user_with_permissions["id"],
     )
     mock_create_ticket.assert_called_once_with(
@@ -1712,10 +1684,6 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         "Organisation type: Central government\n"
         "Agreement signed: No (organisation is Org 1, a crown body). {go_live_note}\n"
         "\n"
-        "Emails in next year: 111,111\n"
-        "Text messages in next year: 222,222\n"
-        "Letters in next year: 333,333\n"
-        "\n"
         "Consent to research: Yes\n"
         "Other live services for that user: No\n"
         "\n"
@@ -1781,8 +1749,6 @@ def test_request_to_go_live_displays_mou_signatories(
         "Agreement signed: Yes, for Org 1.\n"
         "Agreement signed by: test@user.gov.uk\n"
         "Agreement signed on behalf of: bigdog@example.gov.uk\n"
-        "\n"
-        "Emails in next year: 111,111\n"
     ) in mock_create_ticket.call_args[1]["message"]
 
 
