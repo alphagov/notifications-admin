@@ -4732,6 +4732,24 @@ class TestSetAuthTypeForUsers:
             _expected_redirect=url_for(".service_set_auth_type", service_id=service_one["id"]),
         )
 
+    def test_redirects_away_if_no_other_users(
+        self,
+        mocker,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mock_get_users_by_service,
+    ):
+        mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[])
+
+        service_one["permissions"] += ["email_auth"]
+        client_request.login(active_user_with_permissions)
+        client_request.get(
+            "main.service_set_auth_type_for_users",
+            service_id=SERVICE_ONE_ID,
+            _expected_redirect=url_for(".service_settings", service_id=service_one["id"]),
+        )
+
     def test_page_loads(
         self,
         client_request,
@@ -4745,6 +4763,8 @@ class TestSetAuthTypeForUsers:
         client_request.get(
             "main.service_set_auth_type_for_users",
             service_id=SERVICE_ONE_ID,
+            _follow_redirects=False,
+            _expected_status=200,
         )
 
     def test_page_shows_other_users_on_service(

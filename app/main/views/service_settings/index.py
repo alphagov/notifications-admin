@@ -831,6 +831,9 @@ def service_set_auth_type_for_users(service_id):
     ]
     all_service_users.extend(current_service.invited_users)
 
+    if not all_service_users:
+        return redirect(url_for(".service_settings", service_id=service_id))
+
     form = SetEmailAuthForUsersForm(
         all_service_users=all_service_users, users=[user.id for user in all_service_users if user.email_auth]
     )
