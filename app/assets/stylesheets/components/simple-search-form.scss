@@ -1,0 +1,21 @@
+.notify-simple-search-form {
+  @include govuk-responsive-padding(6, "bottom");
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.notify-simple-search-form__form-group {
+  flex: 1; // take up any space left by the button
+  margin-bottom: 0; // leave margin-bottom to parent form
+}
+
+.notify-simple-search-form__button {
+  width: 25%;
+  top: -2px; // make box-shadow below line up with textbox
+
+  &:active {
+    top: 0;
+  }
+}

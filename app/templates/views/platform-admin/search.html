@@ -2,6 +2,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "components/error-summary.html" import errorSummary %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block per_page_title %}
   Search
@@ -14,36 +15,54 @@
     Search
   </h1>
 
-  {% call form_wrapper(action=url_for('.find_services_by_name'), class='govuk-grid-row') %}
-    <div class="govuk-grid-column-three-quarters">
-      {{ find_services_form.search(param_extensions={"label": {"text": "Find services by name, partial name, or service ID"} }) }}
-    </div>
-    <div class="govuk-grid-column-one-quarter">
+  <div class="govuk-grid-column-full">
+    {% call form_wrapper(action=url_for('.find_services_by_name'), class='govuk-grid-row notify-simple-search-form') %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      {{ govukButton({"text": "Search", "classes": "search-form__button"}) }}
-    </div>
-  {% endcall %}
-
-  {% call form_wrapper(action=url_for('.find_users_by_email'), class='govuk-grid-row') %}
-    <div class="govuk-grid-column-three-quarters">
-      {{ find_users_form.search(param_extensions={"label": {"text": "Find users by email, or by partial email"} }) }}
-    </div>
-    <div class="govuk-grid-column-one-quarter">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      {{ govukButton({"text": "Search", "classes": "search-form__button"}) }}
-    </div>
-  {% endcall %}
-
-  {% call form_wrapper(action=url_for('.platform_admin_search'), class='govuk-grid-row') %}
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="govuk-grid-column-full">
       {{
-        find_uuid_form.search(
+        find_services_form.search(
           param_extensions={
-            "button": {"html": "Search <div class='govuk-visually-hidden'>by UUID</div>"}
+            "label": {"text": "Find services by name, partial name or service ID"},
+            "formGroup": {"classes": "notify-simple-search-form__form-group"},
+            "classes": "notify-simple-search-form__textbox"
           }
         )
       }}
+      {{ govukButton({
+        "classes": "notify-simple-search-form__button",
+        "html": "Search <div class=\"govuk-visually-hidden\">for services</div>"
+      }) }}
+    {% endcall %}
+
+    {% call form_wrapper(action=url_for('.find_users_by_email'), class='govuk-grid-row notify-simple-search-form') %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{
+        find_users_form.search(
+          param_extensions={
+            "label": {"text": "Find users by email address or partial email address"},
+            "formGroup": {"classes": "notify-simple-search-form__form-group"},
+            "classes": "notify-simple-search-form__textbox"
+          }
+        )
+      }}
+      {{ govukButton({
+        "classes": "notify-simple-search-form__button",
+        "html": "Search <div class='govuk-visually-hidden'>for users</div>"
+      }) }}
+    {% endcall %}
+    {% call form_wrapper(action=url_for('.platform_admin_search'), class='govuk-grid-row notify-simple-search-form') %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{
+        find_uuid_form.search(
+          param_extensions={
+            "formGroup": {"classes": "notify-simple-search-form__form-group"},
+            "classes": "notify-simple-search-form__textbox"
+          }
+        )
+      }}
+      {{ govukButton({
+        "classes": "notify-simple-search-form__button",
+        "html": "Search <div class='govuk-visually-hidden'>by UUID</div>"
+      }) }}
+    {% endcall %}
     </div>
-  {% endcall %}
 {% endblock %}

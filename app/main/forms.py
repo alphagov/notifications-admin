@@ -275,7 +275,7 @@ class GovukEmailField(GovukTextInputFieldMixin, EmailField):
 
 class GovukSearchField(GovukTextInputFieldMixin, SearchField):
     input_type = "search"
-    param_extensions = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
+    param_extensions = {"classes": "govuk-!-width-full"}
 
 
 class GovukDateField(GovukTextInputFieldMixin, DateField):
