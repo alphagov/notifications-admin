@@ -1558,14 +1558,23 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
         elif self.contact_details_type.data == "phone_number":
             # we can't use the existing phone number validation functions here since we want to allow landlines
-            def valid_phone_number(self, num):
+            # and disallow emergency 3-digit numbers
+            def valid_non_emergency_phone_number(self, num):
                 try:
-                    normalise_phone_number(num.data)
-                    return True
+                    normalised_number = normalise_phone_number(num.data)
                 except InvalidPhoneError:
                     raise ValidationError("Must be a valid phone number")
 
-            self.phone_number.validators = [DataRequired(), Length(min=5, max=20), valid_phone_number]
+                if normalised_number in {"999", "112"}:
+                    raise ValidationError("Must not be an emergency number")
+
+                return True
+
+            self.phone_number.validators = [
+                DataRequired(),
+                Length(min=3, max=20),
+                valid_non_emergency_phone_number,
+            ]
 
         return super().validate()
 

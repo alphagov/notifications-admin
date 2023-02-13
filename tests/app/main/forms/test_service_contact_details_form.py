@@ -94,4 +94,31 @@ def test_form_phone_number_validation_fails_with_invalid_phone_number_field(noti
 
         assert not form.validate_on_submit()
         assert len(form.errors) == 1
-        assert form.errors["phone_number"] == ["Must be a valid phone number"]
+        assert "Must be a valid phone number" in form.errors["phone_number"]
+
+
+@pytest.mark.parametrize(
+    "short_number, allowed",
+    (
+        ("119", True),
+        ("999", False),
+        ("112", False),
+        (" 999 ", False),
+        ("(9)99", False),
+        ("9-9-9", False),
+    ),
+)
+def test_form_phone_number_allows_non_emergency_3_digit_numbers(notify_admin, short_number, allowed):
+    data = {"contact_details_type": "phone_number", "phone_number": short_number}
+
+    with notify_admin.test_request_context(method="POST", data=data):
+        form = ServiceContactDetailsForm()
+
+        if allowed:
+            assert form.validate_on_submit()
+            assert len(form.errors) == 0
+            assert form.errors == {}
+        else:
+            assert not form.validate_on_submit()
+            assert len(form.errors) == 1
+            assert form.errors["phone_number"] == ["Must not be an emergency number"]
