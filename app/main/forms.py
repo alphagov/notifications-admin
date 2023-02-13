@@ -2595,3 +2595,17 @@ class SetAuthTypeForm(StripWhitespaceForm):
             (SIGN_IN_METHOD_TEXT_OR_EMAIL, "Email link or text message code"),
         ),
     )
+
+
+class SetEmailAuthForUsersForm(StripWhitespaceForm):
+    def __init__(self, all_service_users=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if all_service_users is not None:
+            self.users.all_service_users = all_service_users
+            self.users.choices = sorted(
+                [(user.id, user.email_address if user.is_invited_user else user.name) for user in all_service_users],
+                key=lambda t: t[1].lower(),
+            )
+
+    users = GovukCheckboxesField("Choose who can sign in using an email link")

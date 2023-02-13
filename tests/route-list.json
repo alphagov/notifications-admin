@@ -266,6 +266,7 @@
     "/services/<uuid:service_id>/service-settings/set-<notification_type>-branding/add-to-branding-pool-step",
     "/services/<uuid:service_id>/service-settings/set-auth-type",
     "/services/<uuid:service_id>/service-settings/set-auth-type/confirm",
+    "/services/<uuid:service_id>/service-settings/set-auth-type/users",
     "/services/<uuid:service_id>/service-settings/set-free-sms-allowance",
     "/services/<uuid:service_id>/service-settings/set-inbound-number",
     "/services/<uuid:service_id>/service-settings/set-international-letters",

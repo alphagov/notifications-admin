@@ -304,6 +304,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "service_receive_text_messages_start",
             "service_receive_text_messages_stop",
             "service_set_auth_type",
+            "service_set_auth_type_for_users",
             "service_confirm_broadcast_account_type",
             "service_set_branding_add_to_branding_pool_step",
             "service_set_broadcast_channel",
