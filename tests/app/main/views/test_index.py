@@ -177,12 +177,13 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("old_roadmap", "roadmap"),
         ("information_risk_management", "security"),
         ("old_terms", "terms_of_use"),
-        ("information_security", "using_notify"),
-        ("old_using_notify", "using_notify"),
+        ("information_security", "guidance_index"),
+        ("old_using_notify", "guidance_index"),
         ("delivery_and_failure", "message_status"),
         ("callbacks", "documentation"),
         ("who_its_for", "who_can_use_notify"),
         ("old_features_terms", "terms_of_use"),
+        ("old_features_using_notify", "guidance_index"),
     ],
 )
 def test_old_static_pages_redirect(client_request, view, expected_view):
@@ -212,10 +213,6 @@ def test_message_status_page_contains_link_to_support(client_request):
 
     temp_fail_details_cell = sms_status_table.select_one("tr:nth-child(4) > td:nth-child(2)")
     assert temp_fail_details_cell.select_one("a")["href"] == url_for("main.support")
-
-
-def test_old_using_notify_page(client_request):
-    client_request.get("main.using_notify", _expected_status=410)
 
 
 def test_old_integration_testing_page(

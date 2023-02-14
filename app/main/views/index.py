@@ -178,11 +178,6 @@ def terms_of_use():
     return render_template("views/terms-of-use.html")
 
 
-@main.route("/features/using-notify")
-def using_notify():
-    return render_template("views/using-notify.html", navigation_links=features_nav()), 410
-
-
 @main.route("/features/get-started")
 def get_started_old():
     return redirect(url_for(".get_started"), 301)
@@ -373,6 +368,7 @@ def guidance_upload_a_letter():
 @main.route("/using-notify/who-its-for", endpoint="old_who_its_for")
 @main.route("/using-notify/delivery-status", endpoint="old_delivery_status")
 @main.route("/using-notify/guidance/letter-specification", endpoint="old_letter_specification")
+@main.route("/features/using-notify", endpoint="old_features_using_notify")
 @main.route("/trial-mode", endpoint="old_trial_mode")
 @main.route("/features/trial-mode", endpoint="old_trial_mode")
 @main.route("/using-notify/trial-mode", endpoint="old_trial_mode")
@@ -380,8 +376,7 @@ def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.roadmap",
         "main.old_terms": "main.terms_of_use",
-        "main.information_security": "main.using_notify",
-        "main.old_using_notify": "main.using_notify",
+        "main.information_security": "main.guidance_index",
         "main.information_risk_management": "main.security",
         "main.old_integration_testing": "main.integration_testing",
         "main.old_schedule_messages": "main.guidance_schedule_messages",
@@ -394,6 +389,8 @@ def old_page_redirects():
         "main.old_who_its_for": "main.who_its_for",
         "main.old_delivery_status": "main.message_status",
         "main.old_letter_specification": "main.guidance_upload_a_letter",
+        "main.old_features_using_notify": "main.guidance_index",
+        "main.old_using_notify": "main.guidance_index",
         "main.old_trial_mode": "main.trial_mode",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
