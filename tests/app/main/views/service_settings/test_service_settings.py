@@ -4857,7 +4857,7 @@ class TestSetAuthTypeForUsers:
         )
 
         assert mock_update_invite.call_args_list == [
-            mocker.call(service_id=SERVICE_ONE_ID, invite_id=USER_ONE_ID, auth_type="email_auth")
+            mocker.call(SERVICE_ONE_ID, USER_ONE_ID, "email_auth")
         ]
 
     @pytest.mark.parametrize(

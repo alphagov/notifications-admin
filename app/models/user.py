@@ -591,6 +591,9 @@ class InvitedUser(BaseUser):
     def is_editable_by(self, other):
         return False
 
+    def update(self, *, auth_type):
+        invite_api_client.update_invite(self.service, self.id, auth_type)
+
 
 class InvitedOrgUser(BaseUser):
 
