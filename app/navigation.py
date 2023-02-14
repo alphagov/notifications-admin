@@ -48,7 +48,7 @@ class HeaderNavigation(Navigation):
             "roadmap",
             "security",
             "terms_of_use",
-            "trial_mode_new",
+            "trial_mode",
             "guidance_index",
         },
         "pricing": {

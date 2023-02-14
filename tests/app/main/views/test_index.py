@@ -108,6 +108,8 @@ def test_hiding_pages_from_search_engines(
         "guidance_upload_a_letter",
         "how_to_pay",
         "pricing",
+        "pricing_letters",
+        "pricing_text_messages",
         "privacy",
         "roadmap",
         "security",
@@ -420,18 +422,18 @@ def test_sms_price(
 
     with freeze_time(current_date):
         home_page = client_request.get("main.index", _test_page_title=False)
-        pricing_page = client_request.get("main.pricing")
+        text_message_pricing_page = client_request.get("main.pricing_text_messages")
 
     assert (
         normalize_spaces(home_page.select(".product-page-section")[5].select(".govuk-grid-column-one-half")[1].text)
         == f"Text messages Up to 40,000 free text messages a year, then {expected_rate} pence per message"
     )
 
-    assert normalize_spaces(pricing_page.select_one("#text-messages + p + p").text) == (
+    assert (
         f"When a service has used its annual allowance, it costs "
         f"{expected_rate} pence (plus VAT) for each text message you "
         f"send."
-    )
+    ) in normalize_spaces(text_message_pricing_page.text)
 
 
 def test_bulk_sending_limits(client_request):
@@ -446,7 +448,7 @@ def test_bulk_sending_limits(client_request):
 
 
 def test_trial_mode_sending_limits(client_request):
-    page = client_request.get("main.trial_mode_new")
+    page = client_request.get("main.trial_mode")
 
     assert [normalize_spaces(li.text) for li in page.select_one("main ul").select("li")] == [
         "send messages to yourself and other people in your team",

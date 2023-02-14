@@ -28,6 +28,7 @@ from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
     TEMPLATE_ONE_ID,
+    USER_ONE_ID,
     create_active_user_no_settings_permission,
     create_active_user_with_permissions,
     create_letter_contact_block,
@@ -36,6 +37,7 @@ from tests.conftest import (
     create_multiple_sms_senders,
     create_platform_admin_user,
     create_reply_to_email_address,
+    create_service_one_user,
     create_sms_sender,
     create_template,
     normalize_spaces,
@@ -868,7 +870,7 @@ def test_should_check_if_estimated_volumes_provided(
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Before you request to go live"
 
-    assert normalize_spaces(page.select_one(".task-list .task-list-item").text) == (expected_estimated_volumes_item)
+    assert normalize_spaces(page.select_one(".task-list .task-list-item").text) == expected_estimated_volumes_item
 
 
 @pytest.mark.parametrize(
@@ -1579,21 +1581,6 @@ def test_non_gov_users_cant_request_to_go_live(
     )
 
 
-@pytest.mark.parametrize(
-    "volumes, displayed_volumes, formatted_displayed_volumes",
-    (
-        (
-            (("email", None), ("sms", None), ("letter", None)),
-            ", , ",
-            "Emails in next year: \nText messages in next year: \nLetters in next year: \n",
-        ),
-        (
-            (("email", 1234), ("sms", 0), ("letter", 999)),
-            "0, 1234, 999",  # This is a different order to match the spreadsheet
-            "Emails in next year: 1,234\nText messages in next year: 0\nLetters in next year: 999\n",
-        ),
-    ),
-)
 @freeze_time("2012-12-21 13:12:12.12354")
 def test_should_redirect_after_request_to_go_live(
     client_request,
@@ -1608,17 +1595,7 @@ def test_should_redirect_after_request_to_go_live(
     mock_get_users_by_service,
     mock_update_service,
     mock_get_invites_without_manage_permission,
-    volumes,
-    displayed_volumes,
-    formatted_displayed_volumes,
 ):
-    for channel, volume in volumes:
-        mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
-            create=True,
-            new_callable=PropertyMock,
-            return_value=volume,
-        )
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
         "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
@@ -1634,8 +1611,6 @@ def test_should_redirect_after_request_to_go_live(
         "Organisation type: Central government\n"
         "Agreement signed: Can’t tell (domain is user.gov.uk).\n"
         "\n"
-        "{formatted_displayed_volumes}"
-        "\n"
         "Consent to research: Yes\n"
         "Other live services for that user: No\n"
         "\n"
@@ -1644,7 +1619,6 @@ def test_should_redirect_after_request_to_go_live(
         "Requester’s user page: http://localhost/users/{user_id}\n"
     ).format(
         service_id=SERVICE_ONE_ID,
-        formatted_displayed_volumes=formatted_displayed_volumes,
         user_id=active_user_with_permissions["id"],
     )
     mock_create_ticket.assert_called_once_with(
@@ -1712,10 +1686,6 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         "Organisation type: Central government\n"
         "Agreement signed: No (organisation is Org 1, a crown body). {go_live_note}\n"
         "\n"
-        "Emails in next year: 111,111\n"
-        "Text messages in next year: 222,222\n"
-        "Letters in next year: 333,333\n"
-        "\n"
         "Consent to research: Yes\n"
         "Other live services for that user: No\n"
         "\n"
@@ -1781,8 +1751,6 @@ def test_request_to_go_live_displays_mou_signatories(
         "Agreement signed: Yes, for Org 1.\n"
         "Agreement signed by: test@user.gov.uk\n"
         "Agreement signed on behalf of: bigdog@example.gov.uk\n"
-        "\n"
-        "Emails in next year: 111,111\n"
     ) in mock_create_ticket.call_args[1]["message"]
 
 
@@ -4599,14 +4567,14 @@ class TestSetAuthType:
         assert normalize_spaces(radio_items[1].select_one("label").text) == "Email link or text message code"
         assert not radio_items[1].select_one("input").has_attr("checked")
 
-    def test_redirects_back_to_service_settings_on_success(self, mocker, client_request, service_one):
+    def tests_redirects_to_set_auth_type_for_users_on_success(self, mocker, client_request, service_one):
         mock_update_service = mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
         mocker.patch("app.models.user.Users.client_method")
         client_request.post(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
             _data={"sign_in_method": SIGN_IN_METHOD_TEXT_OR_EMAIL},
-            _expected_redirect=url_for(".service_settings", service_id=service_one["id"]),
+            _expected_redirect=url_for(".service_set_auth_type_for_users", service_id=service_one["id"]),
         )
         assert mock_update_service.call_count == 1
         mock_update_call = mock_update_service.call_args_list[0]
@@ -4734,6 +4702,213 @@ class TestConfirmDisableEmailAuth:
         )
 
         assert mock_update_user.call_args_list == []
+
+
+class TestSetAuthTypeForUsers:
+    def test_requires_manage_settings_permission(
+        self,
+        client_request,
+        service_one,
+        active_user_view_permissions,
+    ):
+        client_request.login(active_user_view_permissions)
+        client_request.get(
+            "main.service_set_auth_type_for_users",
+            service_id=SERVICE_ONE_ID,
+            _expected_status=403,
+        )
+
+    def test_page_redirects_to_set_auth_type_if_service_cant_email_auth(
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+    ):
+        client_request.login(active_user_with_permissions)
+        client_request.get(
+            "main.service_set_auth_type_for_users",
+            service_id=SERVICE_ONE_ID,
+            _expected_status=302,
+            _expected_redirect=url_for(".service_set_auth_type", service_id=service_one["id"]),
+        )
+
+    def test_page_loads(
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mock_get_users_by_service,
+        mock_get_invites_for_service,
+    ):
+        service_one["permissions"] += ["email_auth"]
+        client_request.login(active_user_with_permissions)
+        client_request.get(
+            "main.service_set_auth_type_for_users",
+            service_id=SERVICE_ONE_ID,
+        )
+
+    def test_page_shows_other_users_on_service(
+        self, mocker, client_request, service_one, active_user_with_permissions, sample_invite
+    ):
+        mocker.patch(
+            "app.models.user.Users.client_method",
+            return_value=[
+                create_service_one_user(
+                    id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
+                ),
+                create_service_one_user(
+                    id="b", name="Zulu", email_address="notify+2@notify.test", auth_type="email_auth"
+                ),
+            ],
+        )
+        mocker.patch(
+            "app.models.user.InvitedUsers.client_method",
+            return_value=[sample_invite],
+        )
+        service_one["permissions"] += ["email_auth"]
+        client_request.login(active_user_with_permissions)
+        page = client_request.get(
+            "main.service_set_auth_type_for_users",
+            service_id=SERVICE_ONE_ID,
+        )
+
+        # Listed alphabetically by name (or email address for invites)
+        labels = page.select("main .govuk-checkboxes label")
+        assert [label.text.strip() for label in labels] == [
+            "Alpha",
+            "invited_user@test.gov.uk",
+            "Zulu",
+        ]
+
+    def test_sets_email_auth_for_users(
+        self, mocker, client_request, service_one, active_user_with_permissions, mock_get_invites_for_service
+    ):
+        mocker.patch(
+            "app.models.user.Users.client_method",
+            return_value=[
+                create_service_one_user(
+                    id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
+                ),
+                create_service_one_user(
+                    id="b", name="Zulu", email_address="notify+2@notify.test", auth_type="email_auth"
+                ),
+            ],
+        )
+        mock_update_user = mocker.patch(
+            "app.notify_client.user_api_client.user_api_client.update_user_attribute", autospec=True
+        )
+        service_one["permissions"] += ["email_auth"]
+        client_request.login(active_user_with_permissions)
+        client_request.post(
+            "main.service_set_auth_type_for_users",
+            service_id=SERVICE_ONE_ID,
+            _data={"users": ["a", "b"]},
+        )
+
+        assert mock_update_user.call_args_list == [mocker.call("a", auth_type="email_auth")]
+
+    def test_sets_sms_auth_for_deselected_users(
+        self, mocker, client_request, service_one, active_user_with_permissions, mock_get_invites_for_service
+    ):
+        mocker.patch(
+            "app.models.user.Users.client_method",
+            return_value=[
+                create_service_one_user(
+                    id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
+                ),
+                create_service_one_user(
+                    id="b", name="Zulu", email_address="notify+2@notify.test", auth_type="email_auth"
+                ),
+            ],
+        )
+        mock_update_user = mocker.patch(
+            "app.notify_client.user_api_client.user_api_client.update_user_attribute", autospec=True
+        )
+        service_one["permissions"] += ["email_auth"]
+        client_request.login(active_user_with_permissions)
+        client_request.post(
+            "main.service_set_auth_type_for_users",
+            service_id=SERVICE_ONE_ID,
+            # If we don't send any data at all, wtforms doesn't override the defaults (ie it won't recognise us
+            # 'unchecking' user b. In reality we will always have a csrf token present, so this should be OK.
+            _data={"csrf": "token"},
+        )
+
+        assert mock_update_user.call_args_list == [mocker.call("b", auth_type="sms_auth")]
+
+    def test_updates_invited_users(
+        self, mocker, client_request, service_one, active_user_with_permissions, sample_invite
+    ):
+        mocker.patch(
+            "app.models.user.Users.client_method",
+            return_value=[],
+        )
+        mocker.patch(
+            "app.models.user.InvitedUsers.client_method",
+            return_value=[sample_invite],
+        )
+        mock_update_invite = mocker.patch("app.invite_api_client.update_invite", autospec=True)
+        service_one["permissions"] += ["email_auth"]
+        client_request.login(active_user_with_permissions)
+        client_request.post(
+            "main.service_set_auth_type_for_users",
+            service_id=SERVICE_ONE_ID,
+            _data={"users": [USER_ONE_ID]},
+        )
+
+        assert mock_update_invite.call_args_list == [
+            mocker.call(service_id=SERVICE_ONE_ID, invite_id=USER_ONE_ID, auth_type="email_auth")
+        ]
+
+    @pytest.mark.parametrize(
+        "form_data, should_fail",
+        (
+            (dict(users=["a"]), False),  # Change user a to email_auth
+            (dict(users=[]), False),  # Change user b to sms_auth
+            (dict(users=["c"]), True),  # Change user c to email_auth
+        ),
+    )
+    def test_user_with_webauthn_auth_not_listed_or_editable(
+        self,
+        mocker,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mock_get_invites_for_service,
+        form_data,
+        should_fail,
+    ):
+        mocker.patch(
+            "app.models.user.Users.client_method",
+            return_value=[
+                create_service_one_user(
+                    id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
+                ),
+                create_service_one_user(
+                    id="b", name="Beta", email_address="notify+2@notify.test", auth_type="email_auth"
+                ),
+                create_service_one_user(
+                    id="c", name="Charlie", email_address="notify+3@notify.test", auth_type="webauthn_auth"
+                ),
+            ],
+        )
+        mock_update_user = mocker.patch(
+            "app.notify_client.user_api_client.user_api_client.update_user_attribute", autospec=True
+        )
+        service_one["permissions"] += ["email_auth"]
+        client_request.login(active_user_with_permissions)
+        page = client_request.post(
+            "main.service_set_auth_type_for_users",
+            service_id=SERVICE_ONE_ID,
+            _data={"csrf": "token", **form_data},
+            _expected_status=200 if should_fail else 302,
+        )
+
+        if should_fail:
+            assert "not a valid choice for this field" in page.text
+            assert mock_update_user.call_args_list == []
+        else:
+            assert mock_update_user.call_args_list != []
 
 
 def test_service_settings_page_loads_when_inbound_number_is_not_set(

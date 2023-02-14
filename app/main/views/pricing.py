@@ -13,6 +13,14 @@ CURRENT_SMS_RATE = "1.72"
 def pricing():
     return render_template(
         "views/pricing/index.html",
+        navigation_links=pricing_nav(),
+    )
+
+
+@main.route("/pricing/text-messages")
+def pricing_text_messages():
+    return render_template(
+        "views/pricing/text-message-pricing.html",
         sms_rate=CURRENT_SMS_RATE,
         international_sms_rates=sorted(
             [(cc, country["names"], country["billable_units"]) for cc, country in INTERNATIONAL_BILLING_RATES.items()],
@@ -20,6 +28,23 @@ def pricing():
         ),
         search_form=SearchByNameForm(),
         navigation_links=pricing_nav(),
+    )
+
+
+@main.route("/pricing/letters")
+def pricing_letters():
+    return render_template(
+        "views/pricing/letter-pricing.html",
+        navigation_links=pricing_nav(),
+    )
+
+
+@main.route("/pricing/trial-mode")
+def trial_mode():
+    return render_template(
+        "views/trial-mode.html",
+        navigation_links=pricing_nav(),
+        email_and_sms_daily_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
     )
 
 

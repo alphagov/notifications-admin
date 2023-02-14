@@ -1,0 +1,49 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set heading = form.users.label.text %}
+
+{% block service_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_set_auth_type', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% call form_wrapper(
+          module='set-auth-type-form',
+          data_kwargs={
+            'thing-singular': 'team member',
+            'thing-plural': 'team members'
+          }) %}
+        {{
+          form.users(
+            param_extensions={
+              'fieldset': {
+                'legend': {'isPageHeading': True, 'classes': 'govuk-fieldset__legend--l'},
+              },
+              'hint': {'text': 'Team members'},
+            }
+          )
+        }}
+
+        <p class="govuk-body">
+        If you need to change someone's sign-in method later, go to the team members page.
+        </p>
+
+        <div class="js-stick-at-bottom-when-scrolling">
+          {{ page_footer('Save') }}
+          <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite"></div>
+        </div>
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

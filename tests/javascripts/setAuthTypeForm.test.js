@@ -2,16 +2,16 @@ const helpers = require('./support/helpers');
 
 beforeAll(() => {
   require('../../app/assets/javascripts/liveCheckboxControls.js');
-  require('../../app/assets/javascripts/addBrandingOptionsForm.js');
+  require('../../app/assets/javascripts/setAuthTypeForm.js');
 });
 
 afterAll(() => {
   require('./support/teardown.js');
 });
 
-describe('AddBrandingOptionsForm', () => {
+describe('SetAuthTypeForm', () => {
 
-  let addBrandingOptionsForm;
+  let setAuthTypeForm;
   let formControls;
   let visibleCounter;
   let hiddenCounter;
@@ -19,48 +19,43 @@ describe('AddBrandingOptionsForm', () => {
   beforeEach(() => {
 
     const htmlFragment = `
-      <form method="post" autocomplete="off" data-notify-module="add-branding-options-form" novalidate="">
-        <div class="brand-pool">
-          <div class="govuk-form-group">
-            <fieldset class="govuk-fieldset" id="branding_field">
-              <legend class="govuk-fieldset__legend govuk-visually-hidden">
-                Branding options
-              </legend>
-              <div class="govuk-checkboxes">
-                <div class="govuk-checkboxes__item"><input class="govuk-checkboxes__input" id="branding_field-0" name="branding_field" type="checkbox" value="7f8d0c7f-fe8f-4723-bdce-8a19012bb24b">
-                  <label class="govuk-label govuk-checkboxes__label" for="branding_field-0">
-                  Branding only
-                  </label>
-                </div>
-              <div class="govuk-checkboxes__item"><input class="govuk-checkboxes__input" id="branding_field-1" name="branding_field" type="checkbox" value="b5e5f5ab-6407-4f35-9b8c-9fb36e2ccd3f">
-                <label class="govuk-label govuk-checkboxes__label" for="branding_field-1">
-                Branding only with colour
-                </label>
+      <form method="post" autocomplete="off" data-notify-module="set-auth-type-form" data-thing-singular="team member" data-thing-plural="team members" novalidate="" class="sticky-scroll-area">
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset" aria-describedby="users-hint" id="users">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+              <h1 class="govuk-fieldset__heading">Choose who can sign in using an email link</h1>
+            </legend>
+            <div id="users-hint" class="govuk-hint">Team members</div>
+            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" id="users-0" name="users" type="checkbox" value="user-a">
+                <label class="govuk-label govuk-checkboxes__label" for="users-0">User A</label>
               </div>
-              <div class="govuk-checkboxes__item"><input class="govuk-checkboxes__input" id="branding_field-2" name="branding_field" type="checkbox" value="23742f8c-0612-4eba-83e6-5bcdd884b0e0">
-                <label class="govuk-label govuk-checkboxes__label" for="branding_field-2">
-                Branding with banner
-                </label>
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" id="users-1" name="users"type="checkbox" value="user-b">
+                <label class="govuk-label govuk-checkboxes__label" for="users-1">User B</label>
+              </div>
+              <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input" id="users-2" name="users"type="checkbox" value="user-c">
+                <label class="govuk-label govuk-checkboxes__label" for="users-2">User C</label>
               </div>
             </div>
           </fieldset>
         </div>
-      </div>
-      <div class="js-stick-at-bottom-when-scrolling">
-        <div class="page-footer">
-          <input type="hidden" name="csrf_token" value="ImYxODZjNDJkODcwMmEwZGZjZTA2OWQ2OTM3YmJhM2IxMWUyM2NlNDYi.YxicPg.8an7lw_jl4Q3pfURcMKAV7Ufps8">
-          <button class="govuk-button page-footer__button" data-module="govuk-button">
-            Add options
-          </button>
+        <p class="govuk-body">
+          If you need to change someone's sign-in method later, go to the team members page.
+        </p>
+        <div class="js-stick-at-bottom-when-scrolling">
+          <div class="page-footer">
+            <button class="govuk-button page-footer__button" data-module="govuk-button">Save</button>
+          </div>
+          <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite"></div>
         </div>
-        <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite"></div>
-      </div>
-    </form>
-  `;
+      </form>`;
 
     document.body.innerHTML = htmlFragment;
 
-    addBrandingOptionsForm = document.querySelector('form[data-notify-module=add-branding-options-form]');
+    setAuthTypeForm = document.querySelector('form[data-notify-module=set-auth-type-form]');
 
   });
 
@@ -70,8 +65,8 @@ describe('AddBrandingOptionsForm', () => {
 
   });
 
-  function getBrandingOptionsCheckboxes () {
-    return addBrandingOptionsForm.querySelectorAll('input[type=checkbox]');
+  function getUserCheckboxes () {
+    return setAuthTypeForm.querySelectorAll('input[type=checkbox]');
   };
 
   function getVisibleCounter () {
@@ -89,7 +84,7 @@ describe('AddBrandingOptionsForm', () => {
       // start module
       window.GOVUK.notifyModules.start();
 
-      formControls = addBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
+      formControls = setAuthTypeForm.querySelector('.js-stick-at-bottom-when-scrolling');
       visibleCounter = getVisibleCounter();
 
     });
@@ -100,9 +95,12 @@ describe('AddBrandingOptionsForm', () => {
 
     });
 
-    test("the 'Select all' link should not exist", () => {
+    test("the 'Select all' link should be showing", () => {
 
-      expect(document.querySelector('.js-action')).toBeNull();
+      var selectAllLink = formControls.querySelector('.js-action');
+
+      expect(selectAllLink).not.toBeNull();
+      expect(selectAllLink.textContent.trim()).toEqual('Select all team members');
 
     });
 
@@ -133,27 +131,27 @@ describe('AddBrandingOptionsForm', () => {
 
       test("the content of the counter should reflect the selection", () => {
 
-        expect(visibleCounter.textContent.trim()).toEqual('No options selected');
+        expect(visibleCounter.textContent.trim()).toEqual('No team members selected');
 
       });
 
     });
 
-    describe("When some branding options are selected", () => {
+    describe("When some team members are selected", () => {
 
-      let BrandingOptionsCheckboxes;
+      let UserCheckboxes;
 
       beforeEach(() => {
 
         // start module
         window.GOVUK.notifyModules.start();
 
-        BrandingOptionsCheckboxes = getBrandingOptionsCheckboxes();
+        UserCheckboxes = getUserCheckboxes();
 
-        formControls = addBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
+        formControls = setAuthTypeForm.querySelector('.js-stick-at-bottom-when-scrolling');
 
-        helpers.triggerEvent(BrandingOptionsCheckboxes[0], 'click');
-        helpers.triggerEvent(BrandingOptionsCheckboxes[2], 'click');
+        helpers.triggerEvent(UserCheckboxes[0], 'click');
+        helpers.triggerEvent(UserCheckboxes[2], 'click');
 
       });
 
@@ -178,7 +176,7 @@ describe('AddBrandingOptionsForm', () => {
 
           helpers.triggerEvent(clearLink, 'click');
 
-          const checkedCheckboxes = Array.from(BrandingOptionsCheckboxes).filter(checkbox => checkbox.checked);
+          const checkedCheckboxes = Array.from(UserCheckboxes).filter(checkbox => checkbox.checked);
 
           expect(checkedCheckboxes.length === 0).toBe(true);
 
@@ -188,7 +186,7 @@ describe('AddBrandingOptionsForm', () => {
 
           helpers.triggerEvent(clearLink, 'click');
 
-          const firstCheckbox = BrandingOptionsCheckboxes[0];
+          const firstCheckbox = UserCheckboxes[0];
 
           expect(document.activeElement).toBe(firstCheckbox);
 
@@ -216,7 +214,7 @@ describe('AddBrandingOptionsForm', () => {
 
         test("the content of the counter should reflect the selection", () => {
 
-          expect(visibleCounterText).toEqual('2 options selected');
+          expect(visibleCounterText).toEqual('2 team members selected');
 
         });
 
