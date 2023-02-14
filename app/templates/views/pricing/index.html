@@ -26,6 +26,12 @@
     <li>send <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.pricing_letters') }}">letters</a></li>
   </ul>
 
+  <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.how_to_pay') }}">how to pay</a>.
+
+  <h2 class="heading-medium">Try Notify for free</h2>  
+
+  <p class="govuk-body">When you add a new service it will start in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.trial_mode') }}">trial mode</a>.</p>
+
   <p class="govuk-body">
     {% if not current_user.is_authenticated %}
       <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> then add as many unique services as you need to.
@@ -33,9 +39,5 @@
       You can add as many unique services as you need to.
     {% endif %}
   </p>
-
-  <p class="govuk-body">When you add a new service it will start in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.trial_mode') }}">trial mode</a>.</p>
-  
-  <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.how_to_pay') }}">how to pay</a>.
 
 {% endblock %}
