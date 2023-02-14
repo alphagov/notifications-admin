@@ -826,10 +826,9 @@ def service_set_auth_type_for_users(service_id):
 
     all_service_users = [
         user
-        for user in current_service.active_users
+        for user in current_service.team_members
         if user.id != current_user.id and user.auth_type != "webauthn_auth"
     ]
-    all_service_users.extend(current_service.invited_users)
 
     form = SetEmailAuthForUsersForm(
         all_service_users=all_service_users, users=[user.id for user in all_service_users if user.email_auth]
