@@ -143,8 +143,6 @@ EXCLUDED_ENDPOINTS = tuple(
             "get_volumes_by_service",
             "get_example_csv",
             "get_notifications_page_partials_as_json",
-            "get_started",
-            "get_started_old",
             "go_to_dashboard_after_tour",
             "guest_list",
             "guidance_bulk_sending",

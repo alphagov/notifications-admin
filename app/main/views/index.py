@@ -178,19 +178,6 @@ def terms_of_use():
     return render_template("views/terms-of-use.html")
 
 
-@main.route("/features/get-started")
-def get_started_old():
-    return redirect(url_for(".get_started"), 301)
-
-
-@main.route("/using-notify/get-started")
-def get_started():
-    return render_template(
-        "views/get-started.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
 @main.route("/features/who-its-for")
 def who_its_for():
     return redirect(url_for(".who_can_use_notify"), 301)
