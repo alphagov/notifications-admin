@@ -15,14 +15,26 @@ def features_nav():
             ],
         },
         {
+            "name": "Pricing",
+            "link": "main.pricing",
+        },
+        {
             "name": "Roadmap",
             "link": "main.roadmap",
+        },
+        {
+            "name": "Using Notify",
+            "link": "main.using_notify",
         },
     ]
 
 
 def pricing_nav():
     return [
+        {
+            "name": "Features",
+            "link": "main.features",
+        },
         {
             "name": "Pricing",
             "link": "main.pricing",
@@ -49,11 +61,23 @@ def pricing_nav():
                 },
             ],
         },
+        {
+            "name": "Using Notify",
+            "link": "main.using_notify",
+        },
     ]
 
 
 def using_notify_nav():
     return [
+        {
+            "name": "Features",
+            "link": "main.features",
+        },
+        {
+            "name": "Pricing",
+            "link": "main.pricing",
+        },
         {
             "name": "Using Notify",
             "link": "main.using_notify",
