@@ -592,7 +592,11 @@ class InvitedUser(BaseUser):
         return False
 
     def update(self, *, auth_type):
-        invite_api_client.update_invite(self.service, self.id, auth_type)
+        invite_api_client.update_invite(
+            service_id=self.service,
+            invite_id=self.id,
+            auth_type=auth_type,
+        )
 
 
 class InvitedOrgUser(BaseUser):
