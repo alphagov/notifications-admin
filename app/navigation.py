@@ -49,7 +49,7 @@ class HeaderNavigation(Navigation):
             "security",
             "terms_of_use",
             "trial_mode",
-            "guidance_index",
+            "using_notify",
         },
         "pricing": {
             "pricing",

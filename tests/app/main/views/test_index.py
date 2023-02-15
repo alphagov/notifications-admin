@@ -97,7 +97,6 @@ def test_hiding_pages_from_search_engines(
         "guidance_delivery_times",
         "guidance_edit_and_format_messages",
         "guidance_email_branding",
-        "guidance_index",
         "guidance_letter_branding",
         "guidance_receive_text_messages",
         "guidance_reply_to_email_address",
@@ -114,6 +113,7 @@ def test_hiding_pages_from_search_engines(
         "roadmap",
         "security",
         "terms_of_use",
+        "using_notify",
         "who_can_use_notify",
     ],
 )
@@ -177,13 +177,13 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("old_roadmap", "roadmap"),
         ("information_risk_management", "security"),
         ("old_terms", "terms_of_use"),
-        ("information_security", "guidance_index"),
-        ("old_using_notify", "guidance_index"),
+        ("information_security", "using_notify"),
+        ("old_using_notify", "using_notify"),
         ("delivery_and_failure", "message_status"),
         ("callbacks", "documentation"),
         ("who_its_for", "who_can_use_notify"),
         ("old_features_terms", "terms_of_use"),
-        ("old_features_using_notify", "guidance_index"),
+        ("old_features_using_notify", "using_notify"),
     ],
 )
 def test_old_static_pages_redirect(client_request, view, expected_view):

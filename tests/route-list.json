@@ -374,6 +374,7 @@
     "/users/<uuid:user_id>",
     "/users/<uuid:user_id>/archive",
     "/users/<uuid:user_id>/change_auth",
+    "/using-notify",
     "/using-notify/delivery-status",
     "/using-notify/get-started",
     "/using-notify/guidance",

@@ -204,8 +204,8 @@ def who_can_use_notify():
     )
 
 
-@main.route("/using-notify/guidance")
-def guidance_index():
+@main.route("/using-notify")
+def using_notify():
     return render_template(
         "views/guidance/index.html",
         navigation_links=using_notify_nav(),
@@ -372,15 +372,16 @@ def guidance_upload_a_letter():
 @main.route("/trial-mode", endpoint="old_trial_mode")
 @main.route("/features/trial-mode", endpoint="old_trial_mode")
 @main.route("/using-notify/trial-mode", endpoint="old_trial_mode")
+@main.route("/using-notify/guidance", endpoint="old_guidance_index")
 def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.roadmap",
         "main.old_terms": "main.terms_of_use",
-        "main.information_security": "main.guidance_index",
+        "main.information_security": "main.using_notify",
         "main.information_risk_management": "main.security",
         "main.old_integration_testing": "main.integration_testing",
         "main.old_schedule_messages": "main.guidance_schedule_messages",
-        "main.old_branding_and_customisation": "main.guidance_index",
+        "main.old_branding_and_customisation": "main.using_notify",
         "main.old_features_sms": "main.features",
         "main.old_features_email": "main.features",
         "main.old_features_letters": "main.features",
@@ -389,9 +390,10 @@ def old_page_redirects():
         "main.old_who_its_for": "main.who_its_for",
         "main.old_delivery_status": "main.message_status",
         "main.old_letter_specification": "main.guidance_upload_a_letter",
-        "main.old_features_using_notify": "main.guidance_index",
-        "main.old_using_notify": "main.guidance_index",
+        "main.old_features_using_notify": "main.using_notify",
+        "main.old_using_notify": "main.using_notify",
         "main.old_trial_mode": "main.trial_mode",
+        "main.old_guidance_index": "main.using_notify",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
 

@@ -55,12 +55,8 @@ def pricing_nav():
 def using_notify_nav():
     return [
         {
-            "name": "Get started",
-            "link": "main.get_started",
-        },
-        {
-            "name": "Guidance",
-            "link": "main.guidance_index",
+            "name": "Using Notify",
+            "link": "main.using_notify",
             "sub_navigation_items": [
                 {
                     "name": "Bulk sending",
