@@ -59,6 +59,10 @@ def using_notify_nav():
             "link": "main.using_notify",
             "sub_navigation_items": [
                 {
+                    "name": "API documentation",
+                    "link": "main.documentation",
+                },
+                {
                     "name": "Bulk sending",
                     "link": "main.guidance_bulk_sending",
                 },
@@ -123,9 +127,5 @@ def using_notify_nav():
                     "link": "main.guidance_upload_a_letter",
                 },
             ],
-        },
-        {
-            "name": "API documentation",
-            "link": "main.documentation",
         },
     ]
