@@ -5,6 +5,10 @@ def features_nav():
             "link": "main.features",
             "sub_navigation_items": [
                 {
+                    "name": "Roadmap",
+                    "link": "main.roadmap",
+                },
+                {
                     "name": "Who can use Notify",
                     "link": "main.who_can_use_notify",
                 },
@@ -12,15 +16,15 @@ def features_nav():
                     "name": "Security",
                     "link": "main.security",
                 },
+                {
+                    "name": "Performance",
+                    "link": "main.performance",
+                },
             ],
         },
         {
             "name": "Pricing",
             "link": "main.pricing",
-        },
-        {
-            "name": "Roadmap",
-            "link": "main.roadmap",
         },
         {
             "name": "Using Notify",
