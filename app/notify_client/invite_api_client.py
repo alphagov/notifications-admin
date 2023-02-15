@@ -25,7 +25,7 @@ class InviteApiClient(NotifyAdminAPIClient):
         resp = self.post(url="/service/{}/invite".format(service_id), data=data)
         return resp["data"]
 
-    def update_invite(self, /, service_id, invite_id, auth_type):
+    def update_invite(self, *, service_id, invite_id, auth_type):
         data = {
             "auth_type": auth_type,
         }

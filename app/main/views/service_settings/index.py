@@ -20,11 +20,9 @@ from app import (
     billing_api_client,
     current_service,
     inbound_number_client,
-    invite_api_client,
     notification_api_client,
     organisations_client,
     service_api_client,
-    user_api_client,
 )
 from app.event_handlers import (
     create_archive_service_event,
@@ -826,10 +824,9 @@ def service_set_auth_type_for_users(service_id):
 
     all_service_users = [
         user
-        for user in current_service.active_users
+        for user in current_service.team_members
         if user.id != current_user.id and user.auth_type != "webauthn_auth"
     ]
-    all_service_users.extend(current_service.invited_users)
 
     if not all_service_users:
         return redirect(url_for(".service_settings", service_id=service_id))
@@ -844,12 +841,7 @@ def service_set_auth_type_for_users(service_id):
             new_auth_type = "email_auth" if should_use_email_auth else "sms_auth"
 
             if user.email_auth != should_use_email_auth:
-                if user.is_invited_user:
-                    invite_api_client.update_invite(
-                        service_id=current_service.id, invite_id=user.id, auth_type=new_auth_type
-                    )
-                else:
-                    user_api_client.update_user_attribute(user.id, auth_type=new_auth_type)
+                user.update(auth_type=new_auth_type)
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
