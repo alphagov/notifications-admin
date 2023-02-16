@@ -57,7 +57,7 @@ class HeaderNavigation(Navigation):
             "billing_details",
         },
         "documentation": {
-            "documentation",
+            "guidance_api_documentation",
             "integration_testing",
         },
         "user-profile": {

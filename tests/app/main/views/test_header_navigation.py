@@ -14,7 +14,7 @@ from tests.conftest import normalize_spaces
                 ("Support", ".support"),
                 ("Features", ".features"),
                 ("Pricing", ".pricing"),
-                ("Documentation", ".documentation"),
+                ("Documentation", ".guidance_api_documentation"),
                 ("Sign in", ".sign_in"),
             ),
         ),
@@ -23,7 +23,7 @@ from tests.conftest import normalize_spaces
             False,
             (
                 ("Support", ".support"),
-                ("Documentation", ".documentation"),
+                ("Documentation", ".guidance_api_documentation"),
                 ("Your profile", ".user_profile"),
             ),
         ),
@@ -32,7 +32,7 @@ from tests.conftest import normalize_spaces
             True,
             (
                 ("Support", ".support"),
-                ("Documentation", ".documentation"),
+                ("Documentation", ".guidance_api_documentation"),
                 ("Platform admin", ".platform_admin_search"),
                 ("Your profile", ".user_profile"),
             ),

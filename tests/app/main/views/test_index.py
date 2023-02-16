@@ -91,8 +91,8 @@ def test_hiding_pages_from_search_engines(
     [
         "billing_details",
         "cookies",
-        "documentation",
         "features",
+        "guidance_api_documentation",
         "guidance_delivery_times",
         "guidance_email_branding",
         "guidance_formatting",
@@ -179,7 +179,7 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("information_security", "using_notify"),
         ("old_using_notify", "using_notify"),
         ("delivery_and_failure", "message_status"),
-        ("callbacks", "documentation"),
+        ("callbacks", "guidance_api_documentation"),
         ("who_its_for", "who_can_use_notify"),
         ("old_features_terms", "terms_of_use"),
         ("old_features_using_notify", "using_notify"),
@@ -226,7 +226,7 @@ def test_old_integration_testing_page(
         "This information has moved. "
         "Refer to the documentation for the client library you are using."
     )
-    assert page.select_one(".govuk-grid-row a")["href"] == url_for("main.documentation")
+    assert page.select_one(".govuk-grid-row a")["href"] == url_for("main.guidance_api_documentation")
 
 
 def test_terms_page_has_correct_content(client_request):
@@ -238,7 +238,7 @@ def test_terms_page_has_correct_content(client_request):
 
 def test_css_is_served_from_correct_path(client_request):
 
-    page = client_request.get("main.documentation")  # easy static page
+    page = client_request.get("main.guidance_api_documentation")  # easy static page
 
     for index, link in enumerate(page.select("link[rel=stylesheet]")):
         assert link["href"].startswith(
@@ -251,7 +251,7 @@ def test_css_is_served_from_correct_path(client_request):
 
 def test_resources_that_use_asset_path_variable_have_correct_path(client_request):
 
-    page = client_request.get("main.documentation")  # easy static page
+    page = client_request.get("main.guidance_api_documentation")  # easy static page
 
     favicon = page.select_one('link[type="image/x-icon"]')
 

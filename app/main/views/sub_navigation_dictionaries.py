@@ -88,7 +88,7 @@ def using_notify_nav():
             "sub_navigation_items": [
                 {
                     "name": "API documentation",
-                    "link": "main.documentation",
+                    "link": "main.guidance_api_documentation",
                 },
                 {
                     "name": "Bulk sending",

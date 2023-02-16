@@ -34,7 +34,7 @@ def api_integration(service_id):
 @main.route("/services/<uuid:service_id>/api/documentation")
 @user_has_permissions("manage_api_keys")
 def api_documentation(service_id):
-    return redirect(url_for(".documentation"), code=301)
+    return redirect(url_for(".guidance_api_documentation"), code=301)
 
 
 @main.route("/services/<uuid:service_id>/api/whitelist", methods=["GET", "POST"], endpoint="old_guest_list")
