@@ -2,19 +2,19 @@ def features_nav():
     return [
         {
             "name": "Features",
-            "link": "main.features",
+            "link": "main.guidance_features",
             "sub_navigation_items": [
                 {
                     "name": "Roadmap",
-                    "link": "main.roadmap",
+                    "link": "main.guidance_roadmap",
                 },
                 {
                     "name": "Who can use Notify",
-                    "link": "main.who_can_use_notify",
+                    "link": "main.guidance_who_can_use_notify",
                 },
                 {
                     "name": "Security",
-                    "link": "main.security",
+                    "link": "main.guidance_security",
                 },
                 {
                     "name": "Performance",
@@ -24,11 +24,11 @@ def features_nav():
         },
         {
             "name": "Pricing",
-            "link": "main.pricing",
+            "link": "main.guidance_pricing",
         },
         {
             "name": "Using Notify",
-            "link": "main.using_notify",
+            "link": "main.guidance_using_notify",
         },
     ]
 
@@ -37,37 +37,38 @@ def pricing_nav():
     return [
         {
             "name": "Features",
-            "link": "main.features",
+            "link": "main.guidance_features",
         },
         {
             "name": "Pricing",
-            "link": "main.pricing",
+            "link": "main.guidance_pricing",
             "sub_navigation_items": [
                 {
                     "name": "Text messages",
-                    "link": "main.pricing_text_messages",
+                    "link": "main.guidance_pricing_text_messages",
+                    "link": "main.guidance_pricing_text_messages",
                 },
                 {
                     "name": "Letters",
-                    "link": "main.pricing_letters",
+                    "link": "main.guidance_pricing_letters",
                 },
                 {
                     "name": "Trial mode",
-                    "link": "main.trial_mode",
+                    "link": "main.guidance_trial_mode",
                 },
                 {
                     "name": "How to pay",
-                    "link": "main.how_to_pay",
+                    "link": "main.guidance_how_to_pay",
                 },
                 {
                     "name": "Billing details",
-                    "link": "main.billing_details",
+                    "link": "main.guidance_billing_details",
                 },
             ],
         },
         {
             "name": "Using Notify",
-            "link": "main.using_notify",
+            "link": "main.guidance_using_notify",
         },
     ]
 
@@ -76,15 +77,15 @@ def using_notify_nav():
     return [
         {
             "name": "Features",
-            "link": "main.features",
+            "link": "main.guidance_features",
         },
         {
             "name": "Pricing",
-            "link": "main.pricing",
+            "link": "main.guidance_pricing",
         },
         {
             "name": "Using Notify",
-            "link": "main.using_notify",
+            "link": "main.guidance_using_notify",
             "sub_navigation_items": [
                 {
                     "name": "API documentation",
@@ -112,7 +113,7 @@ def using_notify_nav():
                 },
                 {
                     "name": "Message status",
-                    "link": "main.message_status",
+                    "link": "main.guidance_message_status",
                 },
                 {
                     "name": "Optional content",

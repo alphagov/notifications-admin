@@ -10,7 +10,7 @@ CURRENT_SMS_RATE = "1.72"
 
 
 @main.route("/pricing")
-def pricing():
+def guidance_pricing():
     return render_template(
         "views/guidance/pricing/index.html",
         navigation_links=pricing_nav(),
@@ -18,7 +18,7 @@ def pricing():
 
 
 @main.route("/pricing/text-messages")
-def pricing_text_messages():
+def guidance_pricing_text_messages():
     return render_template(
         "views/guidance/pricing/text-message-pricing.html",
         sms_rate=CURRENT_SMS_RATE,
@@ -32,7 +32,7 @@ def pricing_text_messages():
 
 
 @main.route("/pricing/letters")
-def pricing_letters():
+def guidance_pricing_letters():
     return render_template(
         "views/guidance/pricing/letter-pricing.html",
         navigation_links=pricing_nav(),
@@ -40,7 +40,7 @@ def pricing_letters():
 
 
 @main.route("/pricing/trial-mode")
-def trial_mode():
+def guidance_trial_mode():
     return render_template(
         "views/guidance/pricing/trial-mode.html",
         navigation_links=pricing_nav(),
@@ -49,7 +49,7 @@ def trial_mode():
 
 
 @main.route("/pricing/how-to-pay")
-def how_to_pay():
+def guidance_how_to_pay():
     return render_template(
         "views/guidance/pricing/how-to-pay.html",
         navigation_links=pricing_nav(),
@@ -57,7 +57,7 @@ def how_to_pay():
 
 
 @main.route("/pricing/billing-details")
-def billing_details():
+def guidance_billing_details():
     if current_user.is_authenticated:
         return render_template(
             "views/guidance/pricing/billing-details.html",

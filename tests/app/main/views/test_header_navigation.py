@@ -12,8 +12,8 @@ from tests.conftest import normalize_spaces
             False,
             (
                 ("Support", ".support"),
-                ("Features", ".features"),
-                ("Pricing", ".pricing"),
+                ("Features", ".guidance_features"),
+                ("Pricing", ".guidance_pricing"),
                 ("Documentation", ".guidance_api_documentation"),
                 ("Sign in", ".sign_in"),
             ),
@@ -50,7 +50,7 @@ def test_header_navigation(
     client_request.login(active_user_with_permissions)
     if not signed_in:
         client_request.logout()
-    page = client_request.get("main.features")
+    page = client_request.get("main.guidance_features")
     assert [
         (normalize_spaces(link.text), link["href"])
         for link in page.select(".govuk-header__navigation-list .govuk-header__navigation-item a")

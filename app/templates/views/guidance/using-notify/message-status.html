@@ -23,9 +23,9 @@
   <div class="govuk-!-margin-bottom-3">
     {{ pill(
       (
-        ("Emails", "email", url_for(".message_status"), 0),
-        ("Text messages", "sms", url_for(".message_status", notification_type="sms"), 0),
-        ("Letters", "letter", url_for(".message_status", notification_type="letter"), 0),
+        ("Emails", "email", url_for(".guidance_message_status"), 0),
+        ("Text messages", "sms", url_for(".guidance_message_status", notification_type="sms"), 0),
+        ("Letters", "letter", url_for(".guidance_message_status", notification_type="letter"), 0),
       ),
       current_value=notification_type,
       show_count=False,

@@ -269,7 +269,7 @@ def format_notification_status_as_url(status, notification_type):
     }:
         return None
 
-    return url_for("main.message_status", notification_type=notification_type)
+    return url_for("main.guidance_message_status", notification_type=notification_type)
 
 
 def nl2br(value):

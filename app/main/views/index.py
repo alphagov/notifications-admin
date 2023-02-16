@@ -58,7 +58,7 @@ def accessibility_statement():
 @main.route("/delivery-and-failure")
 @main.route("/features/messages-status")
 def delivery_and_failure():
-    return redirect(url_for(".message_status"), 301)
+    return redirect(url_for(".guidance_message_status"), 301)
 
 
 @main.route("/design-patterns-content-guidance")
@@ -137,14 +137,6 @@ def letter_template():
     return resp
 
 
-@main.route("/using-notify/api-documentation")
-def guidance_api_documentation():
-    return render_template(
-        "views/guidance/using-notify/api-documentation.html",
-        navigation_links=using_notify_nav(),
-    )
-
-
 @main.route("/integration-testing")
 def integration_testing():
     return render_template("views/integration-testing.html"), 410
@@ -155,36 +147,36 @@ def callbacks():
     return redirect(url_for("main.guidance_api_documentation"), 301)
 
 
-# --- Features page set --- #
-
-
-@main.route("/features")
-def features():
-    return render_template("views/guidance/features/index.html", navigation_links=features_nav())
-
-
-@main.route("/features/roadmap", endpoint="roadmap")
-def roadmap():
-    return render_template("views/guidance/features/roadmap.html", navigation_links=features_nav())
-
-
-@main.route("/features/security", endpoint="security")
-def security():
-    return render_template("views/guidance/features/security.html", navigation_links=features_nav())
-
-
 @main.route("/terms-of-use", endpoint="terms_of_use")
 def terms_of_use():
     return render_template("views/terms-of-use.html")
 
 
+# --- Guidance pages --- #
+
+
+@main.route("/features")
+def guidance_features():
+    return render_template("views/guidance/features/index.html", navigation_links=features_nav())
+
+
+@main.route("/features/roadmap")
+def guidance_roadmap():
+    return render_template("views/guidance/features/roadmap.html", navigation_links=features_nav())
+
+
+@main.route("/features/security")
+def guidance_security():
+    return render_template("views/guidance/features/security.html", navigation_links=features_nav())
+
+
 @main.route("/features/who-its-for")
-def who_its_for():
-    return redirect(url_for(".who_can_use_notify"), 301)
+def guidance_who_its_for():
+    return redirect(url_for(".guidance_who_can_use_notify"), 301)
 
 
 @main.route("/features/who-can-use-notify")
-def who_can_use_notify():
+def guidance_who_can_use_notify():
     return render_template(
         "views/guidance/features/who-can-use-notify.html",
         navigation_links=features_nav(),
@@ -192,9 +184,17 @@ def who_can_use_notify():
 
 
 @main.route("/using-notify")
-def using_notify():
+def guidance_using_notify():
     return render_template(
         "views/guidance/using-notify/index.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/api-documentation")
+def guidance_api_documentation():
+    return render_template(
+        "views/guidance/using-notify/api-documentation.html",
         navigation_links=using_notify_nav(),
     )
 
@@ -214,9 +214,9 @@ def guidance_bulk_sending():
 
 @main.route("/using-notify/message-status")
 @main.route("/using-notify/message-status/<template_type:notification_type>")
-def message_status(notification_type=None):
+def guidance_message_status(notification_type=None):
     if not notification_type:
-        return redirect(url_for(".message_status", notification_type="email"))
+        return redirect(url_for(".guidance_message_status", notification_type="email"))
     return render_template(
         "views/guidance/using-notify/message-status.html",
         navigation_links=using_notify_nav(),
@@ -342,7 +342,7 @@ def guidance_upload_a_letter():
 @main.route("/roadmap", endpoint="old_roadmap")
 @main.route("/terms", endpoint="old_terms")
 @main.route("/information-security", endpoint="information_security")
-@main.route("/using_notify", endpoint="old_using_notify")
+@main.route("/guidance_using_notify", endpoint="old_using_notify")
 @main.route("/using-notify/guidance/schedule-emails-and-text-messages", endpoint="old_schedule_messages")
 @main.route("/using-notify/guidance/branding-and-customisation", endpoint="old_branding_and_customisation")
 @main.route("/information-risk-management", endpoint="information_risk_management")
@@ -379,25 +379,25 @@ def guidance_upload_a_letter():
 @main.route("/performance", endpoint="old_performance")
 def old_page_redirects():
     redirects = {
-        "main.old_roadmap": "main.roadmap",
+        "main.old_roadmap": "main.guidance_roadmap",
         "main.old_terms": "main.terms_of_use",
-        "main.information_security": "main.using_notify",
-        "main.information_risk_management": "main.security",
+        "main.information_security": "main.guidance_using_notify",
+        "main.information_risk_management": "main.guidance_security",
         "main.old_integration_testing": "main.integration_testing",
         "main.old_schedule_messages": "main.guidance_schedule_messages",
-        "main.old_branding_and_customisation": "main.using_notify",
-        "main.old_features_sms": "main.features",
-        "main.old_features_email": "main.features",
-        "main.old_features_letters": "main.features",
+        "main.old_branding_and_customisation": "main.guidance_using_notify",
+        "main.old_features_sms": "main.guidance_features",
+        "main.old_features_email": "main.guidance_features",
+        "main.old_features_letters": "main.guidance_features",
         "main.old_features_terms": "main.terms_of_use",
-        "main.old_who_can_use_notify": "main.who_can_use_notify",
-        "main.old_who_its_for": "main.who_its_for",
-        "main.old_delivery_status": "main.message_status",
+        "main.old_who_can_use_notify": "main.guidance_who_can_use_notify",
+        "main.old_who_its_for": "main.guidance_who_its_for",
+        "main.old_delivery_status": "main.guidance_message_status",
         "main.old_letter_specification": "main.guidance_upload_a_letter",
-        "main.old_features_using_notify": "main.using_notify",
-        "main.old_using_notify": "main.using_notify",
-        "main.old_trial_mode": "main.trial_mode",
-        "main.old_guidance_index": "main.using_notify",
+        "main.old_features_using_notify": "main.guidance_using_notify",
+        "main.old_using_notify": "main.guidance_using_notify",
+        "main.old_trial_mode": "main.guidance_trial_mode",
+        "main.old_guidance_index": "main.guidance_using_notify",
         "main.old_api_documentation": "main.guidance_api_documentation",
         "main.old_bulk_sending": "main.guidance_bulk_sending",
         "main.old_delivery_times": "main.guidance_delivery_times",
@@ -422,7 +422,7 @@ def old_page_redirects():
 @main.route("/using-notify/guidance/message-status")
 @main.route("/using-notify/guidance/message-status/<template_type:notification_type>")
 def old_message_status(notification_type=None):
-    return redirect(url_for("main.message_status", notification_type=notification_type), code=301)
+    return redirect(url_for("main.guidance_message_status", notification_type=notification_type), code=301)
 
 
 @main.route("/docs/notify-pdf-letter-spec-latest.pdf")

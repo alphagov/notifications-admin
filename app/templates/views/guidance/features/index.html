@@ -18,11 +18,11 @@
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_formatting') }}">edit and format content</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_personalisation') }}">add personalisation</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_bulk_sending') }}">send messages in bulk</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.message_status') }}">see when your messages have been delivered</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_message_status') }}">see when your messages have been delivered</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_team_members_and_permissions') }}">collaborate with your team</a></li>
 </ul>
 
-<p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.who_can_use_notify') }}">who can use GOV.UK Notify</a>.</p>
+<p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_who_can_use_notify') }}">who can use GOV.UK Notify</a>.</p>
 
 {% if not current_user.is_authenticated %}
 <div class="govuk-inset-text">
@@ -39,15 +39,15 @@
 
 <h2 class="heading-medium">Send and receive text messages</h2>
 <ul class="govuk-list govuk-list--bullet">
-  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.pricing_text_messages') }}">Send thousands of free text messages</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_pricing_text_messages') }}">Send thousands of free text messages</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_receive_text_messages') }}">Receive text messages</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.pricing_text_messages', _anchor='international-numbers') }}">Send text messages to international numbers</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_pricing_text_messages', _anchor='international-numbers') }}">Send text messages to international numbers</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_text_message_sender') }}">Tell recipients who your messages are from</a></li>
 </ul>
 
 <h2 class="heading-medium">GOV.UK Notify prints and posts your letters for you</h2>
 <ul class="govuk-list govuk-list--bullet">
-  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.pricing_letters') }}">Choose your postage</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_pricing_letters') }}">Choose your postage</a></li>
   <li>Send international letters</li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_letter_branding') }}">Add letter branding</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_upload_a_letter') }}">Upload a letter from a PDF</a></li>
@@ -58,7 +58,7 @@
 <p class="govuk-body">For more information, read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_api_documentation') }}">API documentation</a>.</p>
 
 <h2 class="heading-medium">Keep your data secure</h2>
-<p class="govuk-body">Find out more about <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.security') }}">security on GOV.UK Notify</a>.</p>
+<p class="govuk-body">Find out more about <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">security on GOV.UK Notify</a>.</p>
 
 <h2 class="heading-medium">Performance</h2>
 <p class="govuk-body">GOV.UK Notify commits to:</p>
