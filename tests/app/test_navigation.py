@@ -11,7 +11,7 @@ from app.navigation import (
 )
 from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, normalize_spaces
 
-EXCLUDED_ENDPOINTS = tuple(
+EXCLUDED_ENDPOINTS = set(
     map(
         Navigation.get_endpoint_with_blueprint,
         {
@@ -440,7 +440,7 @@ def flask_app():
     yield app
 
 
-all_endpoints = [rule.endpoint for rule in next(flask_app()).url_map.iter_rules()]
+all_endpoints = set(rule.endpoint for rule in next(flask_app()).url_map.iter_rules())
 
 navigation_instances = (
     MainNavigation(),
@@ -463,11 +463,9 @@ def test_navigation_items_are_properly_defined(navigation_instance):
         ), "{} found more than once in {}.mapping".format(endpoint, type(navigation_instance).__name__)
 
 
-def test_excluded_navigation_items_are_properly_defined():
-    for endpoint in EXCLUDED_ENDPOINTS:
-        assert endpoint in all_endpoints, f"{endpoint} is not a real endpoint (in EXCLUDED_ENDPOINTS)"
-
-        assert EXCLUDED_ENDPOINTS.count(endpoint) == 1, f"{endpoint} found more than once in EXCLUDED_ENDPOINTS"
+def test_excluded_endpoints_are_all_found_in_app():
+    extra_excluded_endpoints = EXCLUDED_ENDPOINTS - all_endpoints
+    assert not extra_excluded_endpoints
 
 
 @pytest.mark.parametrize(
@@ -475,11 +473,12 @@ def test_excluded_navigation_items_are_properly_defined():
 )
 def test_all_endpoints_are_covered(navigation_instance):
     covered_endpoints = (
-        navigation_instance.endpoints_with_navigation + EXCLUDED_ENDPOINTS + ("static", "status.show_status", "metrics")
+        set(navigation_instance.endpoints_with_navigation)
+        | EXCLUDED_ENDPOINTS
+        | {"static", "status.show_status", "metrics"}
     )
-
-    for endpoint in all_endpoints:
-        assert endpoint in covered_endpoints, f"{endpoint} is not listed or excluded"
+    uncovered_endpoints = all_endpoints - covered_endpoints
+    assert not uncovered_endpoints
 
 
 @pytest.mark.parametrize(
