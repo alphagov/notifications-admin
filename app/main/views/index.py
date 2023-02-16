@@ -139,7 +139,7 @@ def letter_template():
 
 @main.route("/integration-testing")
 def integration_testing():
-    return render_template("views/integration-testing.html"), 410
+    return redirect(url_for("main.guidance_api_documentation"), 301)
 
 
 @main.route("/callbacks")

@@ -179,6 +179,7 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("old_using_notify", "guidance_using_notify"),
         ("delivery_and_failure", "guidance_message_status"),
         ("callbacks", "guidance_api_documentation"),
+        ("integration_testing", "guidance_api_documentation"),
         ("guidance_who_its_for", "guidance_who_can_use_notify"),
         ("old_features_terms", "terms_of_use"),
         ("old_features_using_notify", "guidance_using_notify"),
@@ -211,21 +212,6 @@ def test_message_status_page_contains_link_to_support(client_request):
 
     temp_fail_details_cell = sms_status_table.select_one("tr:nth-child(4) > td:nth-child(2)")
     assert temp_fail_details_cell.select_one("a")["href"] == url_for("main.support")
-
-
-def test_old_integration_testing_page(
-    client_request,
-):
-    page = client_request.get(
-        "main.integration_testing",
-        _expected_status=410,
-    )
-    assert normalize_spaces(page.select_one(".govuk-grid-row").text) == (
-        "Integration testing "
-        "This information has moved. "
-        "Refer to the documentation for the client library you are using."
-    )
-    assert page.select_one(".govuk-grid-row a")["href"] == url_for("main.guidance_api_documentation")
 
 
 def test_terms_page_has_correct_content(client_request):
