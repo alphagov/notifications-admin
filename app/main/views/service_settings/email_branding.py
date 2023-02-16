@@ -196,7 +196,7 @@ def email_branding_request(service_id):
 def email_branding_request_government_identity_logo(service_id):
     branding_choice = request.args.get("branding_choice")
     return render_template(
-        "views/service-settings/branding/add-new-branding/email-branding-create-government-identity-logo.html",
+        "views/service-settings/branding/new/email-branding-create-government-identity-logo.html",
         service_id=service_id,
         back_link=url_for(".email_branding_choose_logo", service_id=service_id, branding_choice=branding_choice),
         branding_choice=branding_choice,
@@ -235,7 +235,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/branding/add-new-branding/email-branding-enter-government-identity-logo-text.html",
+        "views/service-settings/branding/new/email-branding-enter-government-identity-logo-text.html",
         form=form,
         back_link=url_for(
             ".email_branding_request_government_identity_logo", service_id=service_id, branding_choice=branding_choice
@@ -283,7 +283,7 @@ def email_branding_choose_logo(service_id):
 
     return (
         render_template(
-            "views/service-settings/branding/add-new-branding/email-branding-choose-logo.html",
+            "views/service-settings/branding/new/email-branding-choose-logo.html",
             form=form,
             branding_options=form,
             branding_choice=branding_choice,
@@ -329,7 +329,7 @@ def email_branding_upload_logo(service_id):
 
     return (
         render_template(
-            "views/service-settings/branding/add-new-branding/email-branding-upload-logo.html",
+            "views/service-settings/branding/new/email-branding-upload-logo.html",
             form=form,
             back_link=back_link,
             abandon_flow_link=abandon_flow_link,
@@ -403,7 +403,7 @@ def email_branding_set_alt_text(service_id):
         return redirect(url_for("main.service_settings", service_id=service_id))
 
     return render_template(
-        "views/service-settings/branding/add-new-branding/email-branding-set-alt-text.html",
+        "views/service-settings/branding/new/email-branding-set-alt-text.html",
         back_link=url_for(
             ".email_branding_upload_logo",
             service_id=service_id,
@@ -470,7 +470,7 @@ def email_branding_choose_banner_type(service_id):
 
     return (
         render_template(
-            "views/service-settings/branding/add-new-branding/email-branding-choose-banner.html",
+            "views/service-settings/branding/new/email-branding-choose-banner.html",
             form=form,
             back_link=url_for(
                 back_view,
@@ -504,7 +504,7 @@ def email_branding_choose_banner_colour(service_id):
     )
     return (
         render_template(
-            "views/service-settings/branding/add-new-branding/email-branding-choose-banner-colour.html",
+            "views/service-settings/branding/new/email-branding-choose-banner-colour.html",
             form=form,
             back_link=url_for(
                 ".email_branding_choose_banner_type",

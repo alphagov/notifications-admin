@@ -195,7 +195,7 @@ def letter_branding_upload_branding(service_id):
         )
 
     return render_template(
-        "views/service-settings/branding/add-new-branding/letter-branding-upload-branding.html",
+        "views/service-settings/branding/new/letter-branding-upload-branding.html",
         form=form,
         branding_choice=request.args.get("branding_choice"),
         back_link=url_for(
@@ -258,7 +258,7 @@ def letter_branding_set_name(service_id):
         return redirect(url_for("main.service_settings", service_id=service_id))
 
     return render_template(
-        "views/service-settings/branding/add-new-branding/letter-branding-set-name.html",
+        "views/service-settings/branding/new/letter-branding-set-name.html",
         back_link=url_for(
             ".letter_branding_upload_branding",
             service_id=service_id,
