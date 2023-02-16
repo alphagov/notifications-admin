@@ -94,8 +94,8 @@ def test_hiding_pages_from_search_engines(
         "documentation",
         "features",
         "guidance_delivery_times",
-        "guidance_edit_and_format_messages",
         "guidance_email_branding",
+        "guidance_formatting",
         "guidance_letter_branding",
         "guidance_receive_text_messages",
         "guidance_reply_to_email_address",
@@ -143,7 +143,7 @@ def test_static_pages(
 def test_guidance_pages_link_to_service_pages_when_signed_in(
     client_request,
 ):
-    request = partial(client_request.get, "main.guidance_edit_and_format_messages")
+    request = partial(client_request.get, "main.guidance_formatting")
     selector = ".govuk-list--number li a"
 
     # Check the page loads when user is signed in

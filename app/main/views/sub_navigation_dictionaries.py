@@ -104,7 +104,7 @@ def using_notify_nav():
                 },
                 {
                     "name": "Formatting",
-                    "link": "main.guidance_edit_and_format_messages",
+                    "link": "main.guidance_formatting",
                 },
                 {
                     "name": "Letter branding",

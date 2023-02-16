@@ -148,7 +148,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "guidance_bulk_sending",
             "guidance_delivery_times",
             "guidance_email_branding",
-            "guidance_edit_and_format_messages",
+            "guidance_formatting",
             "guidance_letter_branding",
             "guidance_optional_content",
             "guidance_personalisation",

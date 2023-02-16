@@ -137,10 +137,10 @@ def letter_template():
     return resp
 
 
-@main.route("/documentation")
+@main.route("/using-notify/api-documentation")
 def documentation():
     return render_template(
-        "views/documentation.html",
+        "views/guidance/using-notify/api-documentation.html",
         navigation_links=using_notify_nav(),
     )
 
@@ -160,17 +160,17 @@ def callbacks():
 
 @main.route("/features")
 def features():
-    return render_template("views/features.html", navigation_links=features_nav())
+    return render_template("views/guidance/features/index.html", navigation_links=features_nav())
 
 
 @main.route("/features/roadmap", endpoint="roadmap")
 def roadmap():
-    return render_template("views/roadmap.html", navigation_links=features_nav())
+    return render_template("views/guidance/features/roadmap.html", navigation_links=features_nav())
 
 
 @main.route("/features/security", endpoint="security")
 def security():
-    return render_template("views/security.html", navigation_links=features_nav())
+    return render_template("views/guidance/features/security.html", navigation_links=features_nav())
 
 
 @main.route("/terms-of-use", endpoint="terms_of_use")
@@ -186,7 +186,7 @@ def who_its_for():
 @main.route("/features/who-can-use-notify")
 def who_can_use_notify():
     return render_template(
-        "views/guidance/who-can-use-notify.html",
+        "views/guidance/features/who-can-use-notify.html",
         navigation_links=features_nav(),
     )
 
@@ -194,15 +194,15 @@ def who_can_use_notify():
 @main.route("/using-notify")
 def using_notify():
     return render_template(
-        "views/guidance/index.html",
+        "views/guidance/using-notify/index.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/bulk-sending")
+@main.route("/using-notify/bulk-sending")
 def guidance_bulk_sending():
     return render_template(
-        "views/guidance/bulk-sending.html",
+        "views/guidance/using-notify/bulk-sending.html",
         max_spreadsheet_rows=RecipientCSV.max_rows,
         rate_limits=[
             message_count(limit, channel)
@@ -212,126 +212,126 @@ def guidance_bulk_sending():
     )
 
 
-@main.route("/using-notify/guidance/message-status")
-@main.route("/using-notify/guidance/message-status/<template_type:notification_type>")
+@main.route("/using-notify/message-status")
+@main.route("/using-notify/message-status/<template_type:notification_type>")
 def message_status(notification_type=None):
     if not notification_type:
         return redirect(url_for(".message_status", notification_type="email"))
     return render_template(
-        "views/guidance/message-status.html",
+        "views/guidance/using-notify/message-status.html",
         navigation_links=using_notify_nav(),
         notification_type=notification_type,
     )
 
 
-@main.route("/using-notify/guidance/delivery-times")
+@main.route("/using-notify/delivery-times")
 def guidance_delivery_times():
     return render_template(
-        "views/guidance/delivery-times.html",
+        "views/guidance/using-notify/delivery-times.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/email-branding")
+@main.route("/using-notify/email-branding")
 def guidance_email_branding():
     return render_template(
-        "views/guidance/email-branding.html",
+        "views/guidance/using-notify/email-branding.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/edit-and-format-messages")
-def guidance_edit_and_format_messages():
+@main.route("/using-notify/formatting")
+def guidance_formatting():
     return render_template(
-        "views/guidance/edit-and-format-messages.html",
+        "views/guidance/using-notify/formatting.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/letter-branding")
+@main.route("/using-notify/letter-branding")
 def guidance_letter_branding():
     return render_template(
-        "views/guidance/letter-branding.html",
+        "views/guidance/using-notify/letter-branding.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/optional-content")
+@main.route("/using-notify/optional-content")
 def guidance_optional_content():
     return render_template(
-        "views/guidance/optional-content.html",
+        "views/guidance/using-notify/optional-content.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/personalisation")
+@main.route("/using-notify/personalisation")
 def guidance_personalisation():
     return render_template(
-        "views/guidance/personalisation.html",
+        "views/guidance/using-notify/personalisation.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/receive-text-messages")
+@main.route("/using-notify/receive-text-messages")
 def guidance_receive_text_messages():
     return render_template(
-        "views/guidance/receive-text-messages.html",
+        "views/guidance/using-notify/receive-text-messages.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/reply-to-email-address")
+@main.route("/using-notify/reply-to-email-address")
 def guidance_reply_to_email_address():
     return render_template(
-        "views/guidance/reply-to-email-address.html",
+        "views/guidance/using-notify/reply-to-email-address.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/schedule-messages")
+@main.route("/using-notify/schedule-messages")
 def guidance_schedule_messages():
     return render_template(
-        "views/guidance/schedule-messages.html",
+        "views/guidance/using-notify/schedule-messages.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/send-files-by-email")
+@main.route("/using-notify/send-files-by-email")
 def guidance_send_files_by_email():
     return render_template(
-        "views/guidance/send-files-by-email.html",
+        "views/guidance/using-notify/send-files-by-email.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/team-members-and-permissions")
+@main.route("/using-notify/team-members-and-permissions")
 def guidance_team_members_and_permissions():
     return render_template(
-        "views/guidance/team-members-permissions.html",
+        "views/guidance/using-notify/team-members-permissions.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/templates")
+@main.route("/using-notify/templates")
 def guidance_templates():
     return render_template(
-        "views/guidance/templates.html",
+        "views/guidance/using-notify/templates.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/text-message-sender")
+@main.route("/using-notify/text-message-sender")
 def guidance_text_message_sender():
     return render_template(
-        "views/guidance/text-message-sender.html",
+        "views/guidance/using-notify/text-message-sender.html",
         navigation_links=using_notify_nav(),
     )
 
 
-@main.route("/using-notify/guidance/upload-a-letter")
+@main.route("/using-notify/upload-a-letter")
 def guidance_upload_a_letter():
     return render_template(
-        "views/guidance/upload-a-letter.html",
+        "views/guidance/using-notify/upload-a-letter.html",
         navigation_links=using_notify_nav(),
     )
 
@@ -360,6 +360,24 @@ def guidance_upload_a_letter():
 @main.route("/features/trial-mode", endpoint="old_trial_mode")
 @main.route("/using-notify/trial-mode", endpoint="old_trial_mode")
 @main.route("/using-notify/guidance", endpoint="old_guidance_index")
+# TODO: redirects for below this point
+@main.route("/documentation", endpoint="old_api_documentation")
+@main.route("/using-notify/guidance/bulk-sending", endpoint="old_bulk_sending")
+@main.route("/using-notify/guidance/delivery-times", endpoint="old_delivery_times")
+@main.route("/using-notify/guidance/email-branding", endpoint="old_email_branding")
+@main.route("/using-notify/guidance/edit-and-format-messages")
+@main.route("/using-notify/guidance/letter-branding")
+@main.route("/using-notify/guidance/optional-content")
+@main.route("/using-notify/guidance/personalisation")
+@main.route("/using-notify/guidance/receive-text-messages")
+@main.route("/using-notify/guidance/reply-to-email-address")
+@main.route("/using-notify/guidance/schedule-messages")
+@main.route("/using-notify/guidance/send-files-by-email")
+@main.route("/using-notify/guidance/team-members-and-permissions")
+@main.route("/using-notify/guidance/templates")
+@main.route("/using-notify/guidance/text-message-sender")
+@main.route("/using-notify/guidance/upload-a-letter")
+@main.route("/performance")
 def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.roadmap",
@@ -383,6 +401,13 @@ def old_page_redirects():
         "main.old_guidance_index": "main.using_notify",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
+
+
+# need to handle this separately to the other redirects due to dynamic notification type
+@main.route("/using-notify/guidance/message-status")
+@main.route("/using-notify/guidance/message-status/<template_type:notification_type>")
+def old_message_status(notification_type=None):
+    return redirect(url_for("main.message_status", notification_type=notification_type), code=301)
 
 
 @main.route("/docs/notify-pdf-letter-spec-latest.pdf")
