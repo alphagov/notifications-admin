@@ -360,23 +360,6 @@ class User(BaseUser, UserMixin):
     def create_webauthn_credential(self, credential):
         user_api_client.create_webauthn_credential_for_user(self.id, credential)
 
-    def serialize(self):
-        dct = {
-            "id": self.id,
-            "name": self.name,
-            "email_address": self.email_address,
-            "mobile_number": self.mobile_number,
-            "password_changed_at": self.password_changed_at,
-            "state": self.state,
-            "failed_login_count": self.failed_login_count,
-            "permissions": [x for x in self._permissions],
-            "organisations": self.organisation_ids,
-            "current_session_id": self.current_session_id,
-        }
-        if hasattr(self, "_password"):
-            dct["password"] = self._password
-        return dct
-
     @classmethod
     def register(
         cls,
@@ -395,9 +378,6 @@ class User(BaseUser, UserMixin):
                 auth_type,
             )
         )
-
-    def set_password(self, pwd):
-        self._password = pwd
 
     def send_verify_email(self):
         user_api_client.send_verify_email(self.id, self.email_address)
@@ -567,23 +547,6 @@ class InvitedUser(BaseUser):
             other.status,
         )
 
-    def serialize(self, permissions_as_string=False):
-        data = {
-            "id": self.id,
-            "service": self.service,
-            "from_user": self._from_user,
-            "email_address": self.email_address,
-            "status": self.status,
-            "created_at": str(self.created_at),
-            "auth_type": self.auth_type,
-            "folder_permissions": self.folder_permissions,
-        }
-        if permissions_as_string:
-            data["permissions"] = ",".join(self.permissions)
-        else:
-            data["permissions"] = sorted(self.permissions)
-        return data
-
     def template_folders_for_service(self, service=None):
         # only used on the manage users page to display the count, so okay to not be fully fledged for now
         return [{"id": x} for x in self.folder_permissions]
@@ -638,17 +601,6 @@ class InvitedOrgUser(BaseUser):
     @classmethod
     def by_id(cls, invited_user_id):
         return cls(org_invite_api_client.get_invited_user(invited_user_id))
-
-    def serialize(self, permissions_as_string=False):
-        data = {
-            "id": self.id,
-            "organisation": self.organisation,
-            "invited_by": self._invited_by,
-            "email_address": self.email_address,
-            "status": self.status,
-            "created_at": str(self.created_at),
-        }
-        return data
 
     @property
     def invited_by(self):

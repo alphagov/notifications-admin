@@ -363,17 +363,17 @@ def test_verified_org_user_redirects_to_dashboard(
     mock_login,
 ):
     client_request.logout()
-    invited_org_user = InvitedOrgUser(sample_org_invite).serialize()
+    invited_org_user = InvitedOrgUser(sample_org_invite)
     with client_request.session_transaction() as session:
         session["expiry_date"] = str(datetime.utcnow() + timedelta(hours=1))
-        session["user_details"] = {"email": invited_org_user["email_address"], "id": invited_org_user["id"]}
-        session["organisation_id"] = invited_org_user["organisation"]
+        session["user_details"] = {"email": invited_org_user.email_address, "id": invited_org_user.id}
+        session["organisation_id"] = invited_org_user.organisation
 
     client_request.post(
         "main.verify",
         _data={"sms_code": "12345"},
         _expected_redirect=url_for(
             "main.organisation_dashboard",
-            org_id=invited_org_user["organisation"],
+            org_id=invited_org_user.organisation,
         ),
     )
