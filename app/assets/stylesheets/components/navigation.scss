@@ -204,11 +204,10 @@
     }
   }
 
-  &__item--active {
-    @include govuk-font(16, $weight: bold);
-
-    a:link, a:visited {
-      color: $govuk-text-colour;
-    }
+  &__item--active>a:link,
+  &__item--active>a:hover,
+  &__item--active>a:visited {
+    color: $govuk-text-colour;
+    font-weight: bold;
   }
 }
