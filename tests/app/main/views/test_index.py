@@ -184,7 +184,7 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("/terms", "main.terms_of_use", {}),
         ("/using-notify/guidance/message-status", "main.guidance_message_status", {}),
         ("/using-notify/guidance/message-status/sms", "main.guidance_message_status", {"notification_type": "sms"}),
-        ("/using-notify/who-its-for", "main.guidance_who_its_for", {}),
+        ("/using-notify/who-its-for", "main.guidance_who_can_use_notify", {}),
     ],
     ids=(lambda arg: arg if isinstance(arg, str) and arg.startswith("/") else ""),
 )

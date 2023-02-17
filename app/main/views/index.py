@@ -59,12 +59,6 @@ def accessibility_statement():
     return render_template("views/accessibility_statement.html")
 
 
-@main.route("/delivery-and-failure")
-@main.route("/features/messages-status")
-def delivery_and_failure():
-    return redirect(url_for(".guidance_message_status"), 301)
-
-
 @main.route("/design-patterns-content-guidance")
 def design_content():
     return redirect("https://www.gov.uk/service-manual/design/sending-emails-and-text-messages", 301)
@@ -141,16 +135,6 @@ def letter_template():
     return resp
 
 
-@main.route("/integration-testing")
-def integration_testing():
-    return redirect(url_for("main.guidance_api_documentation"), 301)
-
-
-@main.route("/callbacks")
-def callbacks():
-    return redirect(url_for("main.guidance_api_documentation"), 301)
-
-
 @main.route("/terms-of-use", endpoint="terms_of_use")
 def terms_of_use():
     return render_template("views/terms-of-use.html")
@@ -172,11 +156,6 @@ def guidance_roadmap():
 @main.route("/features/security")
 def guidance_security():
     return render_template("views/guidance/features/security.html", navigation_links=features_nav())
-
-
-@main.route("/features/who-its-for")
-def guidance_who_its_for():
-    return redirect(url_for(".guidance_who_can_use_notify"), 301)
 
 
 @main.route("/features/who-can-use-notify")
@@ -342,12 +321,6 @@ def guidance_upload_a_letter():
 
 # --- Redirects --- #
 
-# need to handle this separately to the other redirects due to dynamic notification type
-@main.route("/using-notify/guidance/message-status")
-@main.route("/using-notify/guidance/message-status/<template_type:notification_type>")
-def old_message_status(notification_type=None):
-    return redirect(url_for("main.guidance_message_status", notification_type=notification_type), code=301)
-
 
 @main.route("/docs/notify-pdf-letter-spec-latest.pdf")
 def letter_spec():
@@ -359,8 +332,11 @@ def historical_redirects(new_endpoint, **kwargs):
 
 
 REDIRECTS = {
+    "/callbacks": "main.guidance_api_documentation",
+    "/delivery-and-failure": "main.guidance_message_status",
     "/documentation": "main.guidance_api_documentation",
     "/features/email": "main.guidance_features",
+    "/features/get-started": "main.guidance_features",
     "/features/get-started": "main.guidance_features",
     "/features/letters": "main.guidance_features",
     "/features/messages-status": "main.guidance_message_status",
@@ -368,10 +344,12 @@ REDIRECTS = {
     "/features/terms": "main.terms_of_use",
     "/features/trial-mode": "main.guidance_trial_mode",
     "/features/using-notify": "main.guidance_using_notify",
+    "/features/who-its-for": "main.guidance_who_can_use_notify",
     "/guidance_using_notify": "main.guidance_using_notify",
     "/information-risk-management": "main.guidance_security",
     "/information-security": "main.guidance_security",
     "/integration_testing": "main.guidance_api_documentation",
+    "/integration-testing": "main.guidance_api_documentation",
     "/performance": "main.performance",
     "/roadmap": "main.guidance_roadmap",
     "/terms": "main.terms_of_use",
@@ -386,6 +364,8 @@ REDIRECTS = {
     "/using-notify/guidance/email-branding": "main.guidance_email_branding",
     "/using-notify/guidance/letter-branding": "main.guidance_letter_branding",
     "/using-notify/guidance/letter-specification": "main.guidance_upload_a_letter",
+    "/using-notify/guidance/message-status": "main.guidance_message_status",
+    "/using-notify/guidance/message-status/<template_type:notification_type>": "main.guidance_message_status",
     "/using-notify/guidance/optional-content": "main.guidance_optional_content",
     "/using-notify/guidance/personalisation": "main.guidance_personalisation",
     "/using-notify/guidance/receive-text-messages": "main.guidance_receive_text_messages",
@@ -399,7 +379,7 @@ REDIRECTS = {
     "/using-notify/guidance/upload-a-letter": "main.guidance_upload_a_letter",
     "/using-notify/trial-mode": "main.guidance_trial_mode",
     "/using-notify/who-can-use-notify": "main.guidance_who_can_use_notify",
-    "/using-notify/who-its-for": "main.guidance_who_its_for",
+    "/using-notify/who-its-for": "main.guidance_who_can_use_notify",
 }
 
 for old_url, new_endpoint in REDIRECTS.items():

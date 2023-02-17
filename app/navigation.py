@@ -47,7 +47,6 @@ class HeaderNavigation(Navigation):
             "guidance_features",
             "guidance_roadmap",
             "guidance_security",
-            "guidance_who_its_for",
             "guidance_who_can_use_notify",
             "performance",
         },
