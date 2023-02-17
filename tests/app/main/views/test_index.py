@@ -169,30 +169,31 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
 
 
 @pytest.mark.parametrize(
-    "view, expected_view",
+    "old_url, expected_endpoint, expected_endpoint_kwargs",
     [
-        ("information_risk_management", "guidance_security"),
-        ("old_integration_testing", "integration_testing"),
-        ("old_roadmap", "guidance_roadmap"),
-        ("old_terms", "terms_of_use"),
-        ("information_security", "guidance_security"),
-        ("old_using_notify", "guidance_using_notify"),
-        ("delivery_and_failure", "guidance_message_status"),
-        ("callbacks", "guidance_api_documentation"),
-        ("integration_testing", "guidance_api_documentation"),
-        ("guidance_who_its_for", "guidance_who_can_use_notify"),
-        ("old_features_terms", "terms_of_use"),
-        ("old_features_using_notify", "guidance_using_notify"),
+        ("/callbacks", "main.guidance_api_documentation", {}),
+        ("/delivery-and-failure", "main.guidance_message_status", {}),
+        ("/features/terms", "main.terms_of_use", {}),
+        ("/features/using-notify", "main.guidance_using_notify", {}),
+        ("/guidance_using_notify", "main.guidance_using_notify", {}),
+        ("/information-risk-management", "main.guidance_security", {}),
+        ("/information-security", "main.guidance_security", {}),
+        ("/integration_testing", "main.guidance_api_documentation", {}),
+        ("/integration-testing", "main.guidance_api_documentation", {}),
+        ("/roadmap", "main.guidance_roadmap", {}),
+        ("/terms", "main.terms_of_use", {}),
+        ("/using-notify/guidance/message-status", "main.guidance_message_status", {}),
+        ("/using-notify/guidance/message-status/sms", "main.guidance_message_status", {"notification_type": "sms"}),
+        ("/using-notify/who-its-for", "main.guidance_who_its_for", {}),
     ],
+    ids=(lambda arg: arg if isinstance(arg, str) and arg.startswith("/") else ""),
 )
-def test_old_static_pages_redirect(client_request, view, expected_view):
+def test_redirect_blueprint(client_request, old_url, expected_endpoint, expected_endpoint_kwargs):
     client_request.logout()
-    client_request.get(
-        "main.{}".format(view),
+    client_request.get_url(
+        old_url,
         _expected_status=301,
-        _expected_redirect=url_for(
-            "main.{}".format(expected_view),
-        ),
+        _expected_redirect=url_for(expected_endpoint, **expected_endpoint_kwargs),
     )
 
 

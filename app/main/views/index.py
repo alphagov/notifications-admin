@@ -1,4 +1,5 @@
 from flask import (
+    Blueprint,
     abort,
     current_app,
     make_response,
@@ -18,6 +19,9 @@ from app.main.forms import FieldWithNoneOption
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
+
+redirects = Blueprint("redirects", __name__)
+main.register_blueprint(redirects)
 
 
 @main.route("/")
@@ -338,90 +342,6 @@ def guidance_upload_a_letter():
 
 # --- Redirects --- #
 
-
-@main.route("/roadmap", endpoint="old_roadmap")
-@main.route("/terms", endpoint="old_terms")
-@main.route("/information-security", endpoint="information_security")
-@main.route("/guidance_using_notify", endpoint="old_using_notify")
-@main.route("/using-notify/guidance/schedule-emails-and-text-messages", endpoint="old_schedule_messages")
-@main.route("/using-notify/guidance/branding-and-customisation", endpoint="old_branding_and_customisation")
-@main.route("/information-risk-management", endpoint="information_risk_management")
-@main.route("/integration_testing", endpoint="old_integration_testing")
-@main.route("/features/sms", endpoint="old_features_sms")
-@main.route("/features/email", endpoint="old_features_email")
-@main.route("/features/letters", endpoint="old_features_letters")
-@main.route("/features/terms", endpoint="old_features_terms")
-@main.route("/using-notify/who-can-use-notify", endpoint="old_who_can_use_notify")
-@main.route("/using-notify/who-its-for", endpoint="old_who_its_for")
-@main.route("/using-notify/delivery-status", endpoint="old_delivery_status")
-@main.route("/using-notify/guidance/letter-specification", endpoint="old_letter_specification")
-@main.route("/features/using-notify", endpoint="old_features_using_notify")
-@main.route("/trial-mode", endpoint="old_trial_mode")
-@main.route("/features/trial-mode", endpoint="old_trial_mode")
-@main.route("/using-notify/trial-mode", endpoint="old_trial_mode")
-@main.route("/using-notify/guidance", endpoint="old_guidance_index")
-@main.route("/documentation", endpoint="old_api_documentation")
-@main.route("/using-notify/guidance/bulk-sending", endpoint="old_bulk_sending")
-@main.route("/using-notify/guidance/delivery-times", endpoint="old_delivery_times")
-@main.route("/using-notify/guidance/email-branding", endpoint="old_email_branding")
-@main.route("/using-notify/guidance/edit-and-format-messages", endpoint="old_edit_and_format_messages")
-@main.route("/using-notify/guidance/letter-branding", endpoint="old_letter_branding")
-@main.route("/using-notify/guidance/optional-content", endpoint="old_optional_content")
-@main.route("/using-notify/guidance/personalisation", endpoint="old_personalisation")
-@main.route("/using-notify/guidance/receive-text-messages", endpoint="old_receive_text_messages")
-@main.route("/using-notify/guidance/reply-to-email-address", endpoint="old_reply_to_email_address")
-@main.route("/using-notify/guidance/schedule-messages", endpoint="old_schedule_messages")
-@main.route("/using-notify/guidance/send-files-by-email", endpoint="old_send_files_by_email")
-@main.route("/using-notify/guidance/team-members-and-permissions", endpoint="old_team_members_and_permissions")
-@main.route("/using-notify/guidance/templates", endpoint="old_templates")
-@main.route("/using-notify/guidance/text-message-sender", endpoint="old_text_message_sender")
-@main.route("/using-notify/guidance/upload-a-letter", endpoint="old_upload_a_letter")
-@main.route("/performance", endpoint="old_performance")
-@main.route("/using-notify/get-started", endpoint="old_using_notify_get_started")
-@main.route("/features/get-started", endpoint="old_features_get_started")
-def old_page_redirects():
-    redirects = {
-        "main.old_roadmap": "main.guidance_roadmap",
-        "main.old_terms": "main.terms_of_use",
-        "main.information_security": "main.guidance_security",
-        "main.information_risk_management": "main.guidance_security",
-        "main.old_integration_testing": "main.integration_testing",
-        "main.old_schedule_messages": "main.guidance_schedule_messages",
-        "main.old_branding_and_customisation": "main.guidance_using_notify",
-        "main.old_features_sms": "main.guidance_features",
-        "main.old_features_email": "main.guidance_features",
-        "main.old_features_letters": "main.guidance_features",
-        "main.old_features_terms": "main.terms_of_use",
-        "main.old_who_can_use_notify": "main.guidance_who_can_use_notify",
-        "main.old_who_its_for": "main.guidance_who_its_for",
-        "main.old_delivery_status": "main.guidance_message_status",
-        "main.old_letter_specification": "main.guidance_upload_a_letter",
-        "main.old_features_using_notify": "main.guidance_using_notify",
-        "main.old_using_notify": "main.guidance_using_notify",
-        "main.old_trial_mode": "main.guidance_trial_mode",
-        "main.old_guidance_index": "main.guidance_using_notify",
-        "main.old_api_documentation": "main.guidance_api_documentation",
-        "main.old_bulk_sending": "main.guidance_bulk_sending",
-        "main.old_delivery_times": "main.guidance_delivery_times",
-        "main.old_edit_and_format_messages": "main.guidance_formatting",
-        "main.old_email_branding": "main.guidance_email_branding",
-        "main.old_letter_branding": "main.guidance_letter_branding",
-        "main.old_optional_content": "main.guidance_optional_content",
-        "main.old_personalisation": "main.guidance_personalisation",
-        "main.old_receive_text_messages": "main.guidance_receive_text_messages",
-        "main.old_reply_to_email_address": "main.guidance_reply_to_email_address",
-        "main.old_send_files_by_email": "main.guidance_send_files_by_email",
-        "main.old_team_members_and_permissions": "main.guidance_team_members_and_permissions",
-        "main.old_templates": "main.guidance_templates",
-        "main.old_text_message_sender": "main.guidance_text_message_sender",
-        "main.old_upload_a_letter": "main.guidance_upload_a_letter",
-        "main.old_performance": "main.performance",
-        "main.old_using_notify_get_started": "main.guidance_features",
-        "main.old_features_get_started": "main.guidance_features",
-    }
-    return redirect(url_for(redirects[request.endpoint]), code=301)
-
-
 # need to handle this separately to the other redirects due to dynamic notification type
 @main.route("/using-notify/guidance/message-status")
 @main.route("/using-notify/guidance/message-status/<template_type:notification_type>")
@@ -432,3 +352,55 @@ def old_message_status(notification_type=None):
 @main.route("/docs/notify-pdf-letter-spec-latest.pdf")
 def letter_spec():
     return redirect("https://docs.notifications.service.gov.uk" "/documentation/images/notify-pdf-letter-spec-v2.4.pdf")
+
+
+def historical_redirects(new_endpoint, **kwargs):
+    return redirect(url_for(new_endpoint, **kwargs), 301)
+
+
+REDIRECTS = {
+    "/documentation": "main.guidance_api_documentation",
+    "/features/email": "main.guidance_features",
+    "/features/get-started": "main.guidance_features",
+    "/features/letters": "main.guidance_features",
+    "/features/messages-status": "main.guidance_message_status",
+    "/features/sms": "main.guidance_features",
+    "/features/terms": "main.terms_of_use",
+    "/features/trial-mode": "main.guidance_trial_mode",
+    "/features/using-notify": "main.guidance_using_notify",
+    "/guidance_using_notify": "main.guidance_using_notify",
+    "/information-risk-management": "main.guidance_security",
+    "/information-security": "main.guidance_security",
+    "/integration_testing": "main.guidance_api_documentation",
+    "/performance": "main.performance",
+    "/roadmap": "main.guidance_roadmap",
+    "/terms": "main.terms_of_use",
+    "/trial-mode": "main.guidance_trial_mode",
+    "/using-notify/delivery-status": "main.guidance_message_status",
+    "/using-notify/get-started": "main.guidance_features",
+    "/using-notify/guidance": "main.guidance_using_notify",
+    "/using-notify/guidance/branding-and-customisation": "main.guidance_using_notify",
+    "/using-notify/guidance/bulk-sending": "main.guidance_bulk_sending",
+    "/using-notify/guidance/delivery-times": "main.guidance_delivery_times",
+    "/using-notify/guidance/edit-and-format-messages": "main.guidance_formatting",
+    "/using-notify/guidance/email-branding": "main.guidance_email_branding",
+    "/using-notify/guidance/letter-branding": "main.guidance_letter_branding",
+    "/using-notify/guidance/letter-specification": "main.guidance_upload_a_letter",
+    "/using-notify/guidance/optional-content": "main.guidance_optional_content",
+    "/using-notify/guidance/personalisation": "main.guidance_personalisation",
+    "/using-notify/guidance/receive-text-messages": "main.guidance_receive_text_messages",
+    "/using-notify/guidance/reply-to-email-address": "main.guidance_reply_to_email_address",
+    "/using-notify/guidance/schedule-emails-and-text-messages": "main.guidance_schedule_messages",
+    "/using-notify/guidance/schedule-messages": "main.guidance_schedule_messages",
+    "/using-notify/guidance/send-files-by-email": "main.guidance_send_files_by_email",
+    "/using-notify/guidance/team-members-and-permissions": "main.guidance_team_members_and_permissions",
+    "/using-notify/guidance/templates": "main.guidance_templates",
+    "/using-notify/guidance/text-message-sender": "main.guidance_text_message_sender",
+    "/using-notify/guidance/upload-a-letter": "main.guidance_upload_a_letter",
+    "/using-notify/trial-mode": "main.guidance_trial_mode",
+    "/using-notify/who-can-use-notify": "main.guidance_who_can_use_notify",
+    "/using-notify/who-its-for": "main.guidance_who_its_for",
+}
+
+for old_url, new_endpoint in REDIRECTS.items():
+    redirects.add_url_rule(old_url, defaults={"new_endpoint": new_endpoint}, view_func=historical_redirects)
