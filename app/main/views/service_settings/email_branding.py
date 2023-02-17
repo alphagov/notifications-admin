@@ -96,7 +96,7 @@ def email_branding_pool_option(service_id):
     return redirect(url_for("email_branding_option_preview", service_id=service_id), code=301)
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/option-preview", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/confirm-change", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_option_preview(service_id):
     try:
@@ -359,6 +359,18 @@ def _should_set_default_org_email_branding(branding_choice):
 @main.route(
     "/services/<uuid:service_id>/service-settings/email-branding/when-you-use-this-branding", methods=["GET", "POST"]
 )
+@user_has_permissions("manage_service")
+def old_email_branding_set_alt_text(service_id):
+    # TODO: remove this view, it's temporary
+    return redirect(
+        url_for(
+            "main.email_branding_set_alt_text", service_id=service_id, **_email_branding_flow_query_params(request)
+        ),
+        code=301,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-branding/preview", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_set_alt_text(service_id):
     email_branding_data = _email_branding_flow_query_params(request)
