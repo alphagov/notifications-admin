@@ -1,13 +1,15 @@
-{% extends "withoutnav_template.html" %}
+{% extends "content_template.html" %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import field, list_table %}
+
+{% set navigation_label_prefix = 'Features' %}
 
 {% block per_page_title %}
   Performance data
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block content_column_content %}
 
   <div class="govuk-grid-row govuk-!-margin-bottom-8">
     <div class="govuk-grid-column-two-thirds">
