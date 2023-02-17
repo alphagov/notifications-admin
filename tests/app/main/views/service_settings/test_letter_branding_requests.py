@@ -48,7 +48,7 @@ from tests.conftest import (
         ("other", False, [], []),
     ),
 )
-def test_letter_branding_request_page_when_no_branding_is_set(
+def test_letter_branding_options_page_when_no_branding_is_set(
     service_one,
     client_request,
     mock_get_email_branding,
@@ -74,7 +74,7 @@ def test_letter_branding_request_page_when_no_branding_is_set(
         )
         mocker.patch("app.models.branding.LetterBrandingPool.client_method", side_effect=[letter_branding_pool])
 
-    page = client_request.get(".letter_branding_request", service_id=SERVICE_ONE_ID)
+    page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID)
 
     assert mock_get_email_branding.called is False
     assert mock_get_letter_branding_by_id.called is False
@@ -93,14 +93,14 @@ def test_letter_branding_request_page_when_no_branding_is_set(
     ] == expected_options
 
 
-def test_letter_branding_request_page_when_branding_is_set_already(
+def test_letter_branding_options_page_when_branding_is_set_already(
     client_request,
     service_one,
     fake_uuid,
     mock_get_letter_branding_by_id,
 ):
     service_one["letter_branding"] = fake_uuid
-    page = client_request.get(".letter_branding_request", service_id=SERVICE_ONE_ID)
+    page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one("main p").text) == "Your letters currently have HM Government branding."
 
     assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style=fake_uuid)
@@ -119,21 +119,21 @@ def test_letter_branding_request_page_when_branding_is_set_already(
         ),
     ],
 )
-def test_letter_branding_request_page_back_link(
+def test_letter_branding_options_page_back_link(
     client_request,
     from_template,
     back_link_url,
 ):
     if from_template:
-        page = client_request.get(".letter_branding_request", service_id=SERVICE_ONE_ID, from_template=from_template)
+        page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID, from_template=from_template)
     else:
-        page = client_request.get(".letter_branding_request", service_id=SERVICE_ONE_ID)
+        page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID)
 
     back_link = page.select("a.govuk-back-link")
     assert back_link[0].attrs["href"] == back_link_url
 
 
-def test_letter_branding_request_redirects_to_branding_preview_for_a_branding_pool_option(
+def test_letter_branding_options_redirects_to_branding_preview_for_a_branding_pool_option(
     client_request,
     service_one,
     mocker,
@@ -150,19 +150,19 @@ def test_letter_branding_request_redirects_to_branding_preview_for_a_branding_po
     )
 
     client_request.post(
-        ".letter_branding_request",
+        ".letter_branding_options",
         service_id=SERVICE_ONE_ID,
         _data={"options": "1234"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.letter_branding_pool_option",
+            "main.letter_branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="1234",
         ),
     )
 
 
-def test_letter_branding_request_errors_when_no_option_selected(
+def test_letter_branding_options_errors_when_no_option_selected(
     client_request,
     mocker,
     service_one,
@@ -177,12 +177,12 @@ def test_letter_branding_request_errors_when_no_option_selected(
     service_one["letter_branding"] = sample_uuid()
     service_one["organisation"] = organisation_one
 
-    page = client_request.post(".letter_branding_request", service_id=SERVICE_ONE_ID, _data={}, _expected_status=200)
+    page = client_request.post(".letter_branding_options", service_id=SERVICE_ONE_ID, _data={}, _expected_status=200)
     assert page.select_one("h1").text == "Change letter branding"
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select an option"
 
 
-def test_letter_branding_request_does_not_error_when_no_options_available_at_all(
+def test_letter_branding_options_does_not_error_when_no_options_available_at_all(
     client_request,
     mocker,
     service_one,
@@ -200,7 +200,7 @@ def test_letter_branding_request_does_not_error_when_no_options_available_at_all
     service_one["organisation"] = None
 
     client_request.post(
-        ".letter_branding_request",
+        ".letter_branding_options",
         service_id=SERVICE_ONE_ID,
         _data={"options": "something_else"},
         _expected_status=302,
@@ -212,11 +212,11 @@ def test_letter_branding_request_does_not_error_when_no_options_available_at_all
     )
 
 
-def test_letter_branding_request_redirects_to_upload_logo(client_request, mocker):
+def test_letter_branding_options_redirects_to_upload_logo(client_request, mocker):
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
 
     client_request.post(
-        ".letter_branding_request",
+        ".letter_branding_options",
         service_id=SERVICE_ONE_ID,
         _data={"options": "something_else"},
         _expected_redirect=url_for(
@@ -226,7 +226,7 @@ def test_letter_branding_request_redirects_to_upload_logo(client_request, mocker
     mock_create_ticket.assert_not_called()
 
 
-def test_letter_branding_request_redirects_to_nhs_page(
+def test_letter_branding_options_redirects_to_nhs_page(
     client_request,
     service_one,
     organisation_one,
@@ -240,7 +240,7 @@ def test_letter_branding_request_redirects_to_nhs_page(
     )
 
     client_request.post(
-        ".letter_branding_request",
+        ".letter_branding_options",
         service_id=SERVICE_ONE_ID,
         _data={"options": LetterBranding.NHS_ID},
         _expected_redirect=url_for(
@@ -250,14 +250,14 @@ def test_letter_branding_request_redirects_to_nhs_page(
     )
 
 
-def test_GET_letter_branding_something_else_renders_form(
+def test_GET_letter_branding_request_renders_form(
     client_request,
     mock_get_letter_branding_by_id,
 ):
-    page = client_request.get(".letter_branding_something_else", service_id=SERVICE_ONE_ID)
+    page = client_request.get(".letter_branding_request", service_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one("h1").text) == "Describe the branding you want"
-    assert page.select_one("textarea")["name"] == "something_else"
+    assert page.select_one("textarea")["name"] == "branding_request"
     assert normalize_spaces(page.select_one(".page-footer button").text) == "Request new branding"
     assert page.select_one(".govuk-back-link")["href"] == url_for(
         "main.letter_branding_upload_branding",
@@ -273,7 +273,7 @@ def test_GET_letter_branding_something_else_renders_form(
     ],
 )
 @pytest.mark.parametrize("query_params", [{"from_template": "1234-1234-1234"}, {}])
-def test_POST_letter_branding_something_else_creates_zendesk_ticket(
+def test_POST_letter_branding_request_creates_zendesk_ticket(
     client_request,
     service_one,
     mocker,
@@ -287,11 +287,11 @@ def test_POST_letter_branding_something_else_creates_zendesk_ticket(
     service_one["organisation"] = org_id
 
     client_request.post(
-        ".letter_branding_something_else",
+        ".letter_branding_request",
         service_id=SERVICE_ONE_ID,
         **query_params,
         _data={
-            "something_else": "Homer Simpson",
+            "branding_request": "Homer Simpson",
         },
         _expected_redirect=(
             url_for("main.view_template", service_id=SERVICE_ONE_ID, template_id=query_params["from_template"])
@@ -337,13 +337,13 @@ def test_GET_letter_branding_upload_branding_renders_form(
     file_input = form.select_one("input")
     abandon_flow_link = page.select("main a")[-1]
 
-    assert back_button["href"] == url_for("main.letter_branding_request", service_id=SERVICE_ONE_ID)
+    assert back_button["href"] == url_for("main.letter_branding_options", service_id=SERVICE_ONE_ID)
     assert form["method"] == "post"
     assert "Submit" in submit_button.text
     assert file_input["name"] == "branding"
 
     assert abandon_flow_link is not None
-    assert abandon_flow_link["href"] == url_for("main.letter_branding_something_else", service_id=SERVICE_ONE_ID)
+    assert abandon_flow_link["href"] == url_for("main.letter_branding_request", service_id=SERVICE_ONE_ID)
     assert abandon_flow_link.text == "I do not have a file to upload"
 
 
@@ -383,7 +383,7 @@ def test_GET_letter_branding_upload_branding_passes_from_template_through_to_bac
     )
     back_link = page.select("a.govuk-back-link")
     assert back_link[0].attrs["href"] == url_for(
-        "main.letter_branding_request",
+        "main.letter_branding_options",
         service_id=SERVICE_ONE_ID,
         **query_params,
     )
@@ -634,7 +634,7 @@ def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appr
     )
 
 
-def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
+def test_letter_branding_option_preview_page_displays_preview_of_chosen_branding(
     service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
 ):
     organisation_one["organisation_type"] = "central"
@@ -645,12 +645,12 @@ def test_letter_branding_pool_option_page_displays_preview_of_chosen_branding(
         return_value=organisation_one,
     )
 
-    page = client_request.get(".letter_branding_pool_option", service_id=SERVICE_ONE_ID, branding_option="1234")
+    page = client_request.get(".letter_branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="1234")
 
     assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="1234")
 
 
-def test_letter_branding_pool_option_page_redirects_to_branding_request_page_if_branding_option_not_found(
+def test_letter_branding_option_preview_page_redirects_to_branding_options_page_if_branding_option_not_found(
     service_one, organisation_one, client_request, mocker, mock_get_letter_branding_pool
 ):
     organisation_one["organisation_type"] = "central"
@@ -662,15 +662,15 @@ def test_letter_branding_pool_option_page_redirects_to_branding_request_page_if_
     )
 
     client_request.get(
-        ".letter_branding_pool_option",
+        ".letter_branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="some-unknown-branding-id",
         _expected_status=302,
-        _expected_redirect=url_for("main.letter_branding_request", service_id=SERVICE_ONE_ID),
+        _expected_redirect=url_for("main.letter_branding_options", service_id=SERVICE_ONE_ID),
     )
 
 
-def test_letter_branding_pool_option_changes_letter_branding_when_user_confirms(
+def test_letter_branding_option_preview_changes_letter_branding_when_user_confirms(
     mocker,
     service_one,
     organisation_one,
@@ -689,7 +689,7 @@ def test_letter_branding_pool_option_changes_letter_branding_when_user_confirms(
     )
 
     page = client_request.post(
-        ".letter_branding_pool_option",
+        ".letter_branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="1234",
         _follow_redirects=True,

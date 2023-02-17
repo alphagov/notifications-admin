@@ -5221,7 +5221,7 @@ def test_service_settings_links_to_branding_request_page_for_emails(
     assert len(page.select(f'a[href="/services/{SERVICE_ONE_ID}/service-settings/email-branding"]')) == 1
 
 
-def test_service_settings_links_to_branding_request_page_for_letters(
+def test_service_settings_links_to_branding_options_page_for_letters(
     mocker,
     service_one,
     client_request,

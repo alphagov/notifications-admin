@@ -2073,8 +2073,8 @@ class ChooseLetterBrandingForm(ChooseBrandingForm):
         self.options.set_choices(branding.get_letter_choices(service))
 
 
-class SomethingElseBrandingForm(StripWhitespaceForm):
-    something_else = GovukTextareaField(
+class BrandingRequestForm(StripWhitespaceForm):
+    branding_request = GovukTextareaField(
         "Describe the branding you want",
         validators=[DataRequired("Cannot be empty")],
         param_extensions={
