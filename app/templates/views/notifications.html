@@ -32,12 +32,16 @@
 
   {% endif %}
 
+  <div class="govuk-grid-column-full {% if message_type == 'sms' %}extra-tracking{% endif %}">
   {% call form_wrapper(
     action=url_for('.view_notifications', service_id=current_service.id, message_type=message_type),
-    class="govuk-grid-row"
+    class="govuk-grid-row notify-simple-search-form"
   ) %}
-    <div class="govuk-grid-column-three-quarters {% if message_type == 'sms' %}extra-tracking{% endif %}">
-      {{ search_form.to(param_extensions={
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{
+        search_form.to(
+          param_extensions={
+            "formGroup": {"classes": "notify-simple-search-form__form-group"},
             "label": {
               "text": things_you_can_search_by|formatted_list(
                 conjunction='or',
@@ -47,16 +51,15 @@
                 prefix_plural='Search by'
               )
             }
-      }) }}
-    </div>
-    <div class="govuk-grid-column-one-quarter">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          }
+        )
+      }}
       {{ govukButton({
         "text": "Search",
-        "classes": "search-form__button"
+        "classes": "notify-simple-search-form__button",
       }) }}
-    </div>
   {% endcall %}
+    </div>
 
   {% call form_wrapper(id="search-form") %}
     <input type="hidden" name="to" {% if search_form.to.data %}value="{{ search_form.to.data }}"{%  endif %}>

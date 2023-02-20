@@ -52,19 +52,3 @@
   }
 
 }
-
-.search-form__button {
-  @include govuk-media-query($from: desktop) {
-    position: relative;
-    top: 30px;
-    left: -30px;
-    width: 100%;
-    margin-right: -30px;
-    padding-top: 9px;
-    box-sizing: content-box;
-
-    &:active {
-      top: 32px;
-    }
-  }
-}

@@ -15,20 +15,17 @@
 
   {% call form_wrapper(
       action=url_for('.find_users_by_email'),
-      class='govuk-grid-row'
+      class='notify-simple-search-form'
   ) %}
-    <div class="govuk-grid-column-three-quarters">
       {{ form.search(param_extensions={
+            "formGroup": {"classes": "notify-simple-search-form__form-group"},
             "label": {"text": "Find users by email, or by partial email"}
       }) }}
-    </div>
-    <div class="govuk-grid-column-one-quarter">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       {{ govukButton({
         "text": "Search",
-        "classes": "search-form__button"
+        "classes": "notify-simple-search-form__button",
       }) }}
-    </div>
   {% endcall %}
 
   {% call form_wrapper(id='search-form' ) %}

@@ -33,7 +33,7 @@ from tests.conftest import normalize_spaces
             (
                 ("Support", ".support"),
                 ("Documentation", ".documentation"),
-                ("Platform admin", ".platform_admin_splash_page"),
+                ("Platform admin", ".platform_admin_search"),
                 ("Your profile", ".user_profile"),
             ),
         ),

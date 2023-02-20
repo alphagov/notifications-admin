@@ -13,6 +13,7 @@
         <nav class="navigation" aria-label="Platform admin">
           <ul class="govuk-list">
           {% for link_text, url in [
+            ('Search', url_for('main.platform_admin_search')),
             ('Summary', url_for('main.platform_admin')),
             ('Live services', url_for('main.live_services')),
             ('Trial mode services', url_for('main.trial_services')),
@@ -22,8 +23,6 @@
             ('Email branding', url_for('main.email_branding')),
             ('Letter branding', url_for('main.letter_branding')),
             ('Inbound SMS numbers', url_for('main.inbound_sms_admin')),
-            ('Find services by name', url_for('main.find_services_by_name')),
-            ('Find users by email', url_for('main.find_users_by_email')),
             ('Email complaints', url_for('main.platform_admin_list_complaints')),
             ('Returned letters', url_for('main.platform_admin_returned_letters')),
             ('Clear cache', url_for('main.clear_cache')),

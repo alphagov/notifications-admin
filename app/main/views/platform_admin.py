@@ -1,7 +1,9 @@
+import dataclasses
 import itertools
 import re
 from collections import OrderedDict
 from datetime import datetime
+from typing import Optional
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from notifications_python_client.errors import HTTPError
@@ -20,10 +22,14 @@ from app.main import main
 from app.main.forms import (
     AdminClearCacheForm,
     AdminReturnedLettersForm,
+    AdminSearchUsersByEmailForm,
     BillingReportDateFilterForm,
     DateFilterForm,
+    FindByUuidForm,
     RequiredDateFilterForm,
+    SearchByNameForm,
 )
+from app.notify_client.platform_admin_api_client import admin_api_client
 from app.statistics_utils import (
     get_formatted_percentage,
     get_formatted_percentage_two_dp,
@@ -41,11 +47,27 @@ FAILURE_THRESHOLD = 3
 ZERO_FAILURE_THRESHOLD = 0
 
 
-@main.route("/platform-admin")
+@main.route("/platform-admin", methods=["GET", "POST"])
 @user_is_platform_admin
-def platform_admin_splash_page():
+def platform_admin_search():
+    # The services/users form prefixes must match those on the forms on their dedicated views.
+    find_services_form = SearchByNameForm(prefix="services")
+    find_users_form = AdminSearchUsersByEmailForm(prefix="users")
+    find_uuid_form = FindByUuidForm(prefix="uuid")
+
+    # Only the find_uuid_form POSTs to this endpoint - the others all POST to their existing dedicated pages.
+    if find_uuid_form.validate_on_submit():
+        try:
+            redirect_url = get_url_for_notify_record(find_uuid_form.search.data)
+            return redirect(redirect_url)
+        except ValueError as e:
+            find_uuid_form.search.errors.append(str(e))
+
     return render_template(
-        "views/platform-admin/splash-page.html",
+        "views/platform-admin/search.html",
+        find_services_form=find_services_form,
+        find_users_form=find_users_form,
+        find_uuid_form=find_uuid_form,
     )
 
 
@@ -617,6 +639,65 @@ def clear_cache():
         flash(msg, category="default")
 
     return render_template("views/platform-admin/clear-cache.html", form=form)
+
+
+def get_url_for_notify_record(uuid_):
+    @dataclasses.dataclass
+    class _EndpointSpec:
+        endpoint: str
+        param: Optional[str] = None
+        with_service_id: bool = False
+
+        # Extra parameters to pass to `url_for`.
+        extra: dict = dataclasses.field(default_factory=lambda: {})
+
+    result, found = None, False
+    try:
+        result = admin_api_client.find_by_uuid(uuid_)
+        found = True
+    except HTTPError as e:
+        if e.status_code != 404:
+            raise e
+
+    if result and found:
+        url_for_data = {
+            "organisation": _EndpointSpec(".organisation_dashboard", "org_id"),
+            "service": _EndpointSpec(".service_dashboard", "service_id"),
+            "notification": _EndpointSpec(".view_notification", "notification_id", with_service_id=True),
+            "template": _EndpointSpec(".view_template", "template_id", with_service_id=True),
+            "email_branding": _EndpointSpec(".platform_admin_update_email_branding", "branding_id"),
+            "letter_branding": _EndpointSpec(".update_letter_branding", "branding_id"),
+            "user": _EndpointSpec(".user_information", "user_id"),
+            "provider": _EndpointSpec(".view_provider", "provider_id"),
+            "reply_to_email": _EndpointSpec(".service_edit_email_reply_to", "reply_to_email_id", with_service_id=True),
+            "job": _EndpointSpec(".view_job", "job_id", with_service_id=True),
+            "service_contact_list": _EndpointSpec(".contact_list", "contact_list_id", with_service_id=True),
+            "service_data_retention": _EndpointSpec(".edit_data_retention", "data_retention_id", with_service_id=True),
+            "service_sms_sender": _EndpointSpec(".service_edit_sms_sender", "sms_sender_id", with_service_id=True),
+            "inbound_number": _EndpointSpec(".inbound_sms_admin"),
+            "api_key": _EndpointSpec(".api_keys", with_service_id=True),
+            "template_folder": _EndpointSpec(".choose_template", "template_folder_id", with_service_id=True),
+            "service_inbound_api": _EndpointSpec(".received_text_messages_callback", with_service_id=True),
+            "service_callback_api": _EndpointSpec(".delivery_status_callback", with_service_id=True),
+            "complaint": _EndpointSpec(".platform_admin_list_complaints"),
+            "inbound_sms": _EndpointSpec(
+                ".conversation", "notification_id", with_service_id=True, extra={"_anchor": f"n{uuid_}"}
+            ),
+        }
+        if not (spec := url_for_data.get(result["type"])):
+            raise KeyError(f"Don't know how to redirect to {result['type']}")
+
+        url_for_kwargs = {"endpoint": spec.endpoint, **spec.extra}
+
+        if spec.param:
+            url_for_kwargs[spec.param] = uuid_
+
+        if spec.with_service_id:
+            url_for_kwargs["service_id"] = result["context"]["service_id"]
+
+        return url_for(**url_for_kwargs)
+
+    raise ValueError("Could not find a thing with that UUID")
 
 
 def sum_service_usage(service):

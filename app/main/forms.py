@@ -45,6 +45,7 @@ from wtforms import (
 )
 from wtforms.validators import (
     URL,
+    UUID,
     DataRequired,
     InputRequired,
     Length,
@@ -274,7 +275,7 @@ class GovukEmailField(GovukTextInputFieldMixin, EmailField):
 
 class GovukSearchField(GovukTextInputFieldMixin, SearchField):
     input_type = "search"
-    param_extensions = {"classes": "govuk-!-width-full"}  # email addresses don't need to be spellchecked
+    param_extensions = {"classes": "govuk-!-width-full"}
 
 
 class GovukDateField(GovukTextInputFieldMixin, DateField):
@@ -2609,3 +2610,10 @@ class SetEmailAuthForUsersForm(StripWhitespaceForm):
             )
 
     users = GovukCheckboxesField("Choose who can sign in using an email link")
+
+
+class FindByUuidForm(StripWhitespaceForm):
+    search = GovukSearchField(
+        "Find anything by UUID",
+        validators=[DataRequired("Cannot be empty"), UUID("Enter a valid UUID")],
+    )
