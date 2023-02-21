@@ -11,13 +11,13 @@
       <button type="button" class="govuk-button notify-cookie-banner__button notify-cookie-banner__button-reject" data-accept-cookies="false" aria-describedby="notify-cookie-banner__heading">
         No<span class="govuk-visually-hidden">, Notify cannot store analytics cookies on your device</span>
       </button>
-      <a class="govuk-link notify-cookie-banner__link" href="/cookies">How Notify uses cookies</a>
+      <a class="govuk-link notify-cookie-banner__link" href=" {{ url_for("main.cookies") }}">How Notify uses cookies</a>
     </div>
   </div>
 
   <div class="notify-cookie-banner__confirmation govuk-width-container" tabindex="-1">
     <p class="notify-cookie-banner__confirmation-message govuk-body">
-      You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.
+      You can <a class="govuk-link" href=" {{ url_for("main.cookies") }}">change your cookie settings</a> at any time.
     </p>
     <button class="notify-cookie-banner__hide-button govuk-link" data-hide-cookie-banner="true" role="link">Hide<span class="govuk-visually-hidden"> cookies message</span></button>
   </div>

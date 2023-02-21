@@ -302,7 +302,7 @@ def test_upload_csv_shows_trial_mode_error(
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
         "You cannot save this phone number In trial mode you can only send to yourself and members of your team"
     )
-    assert page.select_one(".banner-dangerous a")["href"] == url_for("main.trial_mode")
+    assert page.select_one(".banner-dangerous a")["href"] == url_for("main.guidance_trial_mode")
 
 
 def test_upload_csv_shows_ok_page(

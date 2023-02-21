@@ -89,32 +89,31 @@ def test_hiding_pages_from_search_engines(
 @pytest.mark.parametrize(
     "view",
     [
-        "billing_details",
         "cookies",
-        "documentation",
-        "features",
-        "get_started",
+        "guidance_api_documentation",
+        "guidance_billing_details",
         "guidance_delivery_times",
-        "guidance_edit_and_format_messages",
         "guidance_email_branding",
-        "guidance_index",
+        "guidance_features",
+        "guidance_formatting",
+        "guidance_how_to_pay",
         "guidance_letter_branding",
+        "guidance_pricing_letters",
+        "guidance_pricing_text_messages",
+        "guidance_pricing",
         "guidance_receive_text_messages",
         "guidance_reply_to_email_address",
+        "guidance_roadmap",
         "guidance_schedule_messages",
+        "guidance_security",
         "guidance_send_files_by_email",
         "guidance_templates",
         "guidance_text_message_sender",
         "guidance_upload_a_letter",
-        "how_to_pay",
-        "pricing",
-        "pricing_letters",
-        "pricing_text_messages",
+        "guidance_using_notify",
+        "guidance_who_can_use_notify",
         "privacy",
-        "roadmap",
-        "security",
         "terms_of_use",
-        "who_can_use_notify",
     ],
 )
 def test_static_pages(
@@ -144,7 +143,7 @@ def test_static_pages(
 def test_guidance_pages_link_to_service_pages_when_signed_in(
     client_request,
 ):
-    request = partial(client_request.get, "main.guidance_edit_and_format_messages")
+    request = partial(client_request.get, "main.guidance_formatting")
     selector = ".govuk-list--number li a"
 
     # Check the page loads when user is signed in
@@ -172,18 +171,18 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
 @pytest.mark.parametrize(
     "view, expected_view",
     [
-        ("information_risk_management", "security"),
+        ("information_risk_management", "guidance_security"),
         ("old_integration_testing", "integration_testing"),
-        ("old_roadmap", "roadmap"),
-        ("information_risk_management", "security"),
+        ("old_roadmap", "guidance_roadmap"),
         ("old_terms", "terms_of_use"),
-        ("information_security", "guidance_index"),
-        ("old_using_notify", "guidance_index"),
-        ("delivery_and_failure", "message_status"),
-        ("callbacks", "documentation"),
-        ("who_its_for", "who_can_use_notify"),
+        ("information_security", "guidance_security"),
+        ("old_using_notify", "guidance_using_notify"),
+        ("delivery_and_failure", "guidance_message_status"),
+        ("callbacks", "guidance_api_documentation"),
+        ("integration_testing", "guidance_api_documentation"),
+        ("guidance_who_its_for", "guidance_who_can_use_notify"),
         ("old_features_terms", "terms_of_use"),
-        ("old_features_using_notify", "guidance_index"),
+        ("old_features_using_notify", "guidance_using_notify"),
     ],
 )
 def test_old_static_pages_redirect(client_request, view, expected_view):
@@ -199,35 +198,20 @@ def test_old_static_pages_redirect(client_request, view, expected_view):
 
 def test_message_status_page_redirects_without_notification_type_specified(client_request):
     client_request.get(
-        "main.message_status",
+        "main.guidance_message_status",
         _expected_redirect=url_for(
-            "main.message_status",
+            "main.guidance_message_status",
             notification_type="email",
         ),
     )
 
 
 def test_message_status_page_contains_link_to_support(client_request):
-    page = client_request.get("main.message_status", notification_type="sms")
+    page = client_request.get("main.guidance_message_status", notification_type="sms")
     sms_status_table = page.select_one("tbody")
 
     temp_fail_details_cell = sms_status_table.select_one("tr:nth-child(4) > td:nth-child(2)")
     assert temp_fail_details_cell.select_one("a")["href"] == url_for("main.support")
-
-
-def test_old_integration_testing_page(
-    client_request,
-):
-    page = client_request.get(
-        "main.integration_testing",
-        _expected_status=410,
-    )
-    assert normalize_spaces(page.select_one(".govuk-grid-row").text) == (
-        "Integration testing "
-        "This information has moved. "
-        "Refer to the documentation for the client library you are using."
-    )
-    assert page.select_one(".govuk-grid-row a")["href"] == url_for("main.documentation")
 
 
 def test_terms_page_has_correct_content(client_request):
@@ -239,7 +223,7 @@ def test_terms_page_has_correct_content(client_request):
 
 def test_css_is_served_from_correct_path(client_request):
 
-    page = client_request.get("main.documentation")  # easy static page
+    page = client_request.get("main.guidance_api_documentation")  # easy static page
 
     for index, link in enumerate(page.select("link[rel=stylesheet]")):
         assert link["href"].startswith(
@@ -252,7 +236,7 @@ def test_css_is_served_from_correct_path(client_request):
 
 def test_resources_that_use_asset_path_variable_have_correct_path(client_request):
 
-    page = client_request.get("main.documentation")  # easy static page
+    page = client_request.get("main.guidance_api_documentation")  # easy static page
 
     favicon = page.select_one('link[type="image/x-icon"]')
 
@@ -422,7 +406,7 @@ def test_sms_price(
 
     with freeze_time(current_date):
         home_page = client_request.get("main.index", _test_page_title=False)
-        text_message_pricing_page = client_request.get("main.pricing_text_messages")
+        text_message_pricing_page = client_request.get("main.guidance_pricing_text_messages")
 
     assert (
         normalize_spaces(home_page.select(".product-page-section")[5].select(".govuk-grid-column-one-half")[1].text)
@@ -448,7 +432,7 @@ def test_bulk_sending_limits(client_request):
 
 
 def test_trial_mode_sending_limits(client_request):
-    page = client_request.get("main.trial_mode")
+    page = client_request.get("main.guidance_trial_mode")
 
     assert [normalize_spaces(li.text) for li in page.select_one("main ul").select("li")] == [
         "send messages to yourself and other people in your team",

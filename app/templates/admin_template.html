@@ -55,7 +55,7 @@
           "active": header_navigation.is_selected('support')
         },
         {
-          "href": url_for('main.documentation'),
+          "href": url_for('main.guidance_api_documentation'),
           "text": "Documentation",
           "active": header_navigation.is_selected('documentation')
         },
@@ -78,7 +78,7 @@
           "active": header_navigation.is_selected('support')
         },
         {
-          "href": url_for('main.documentation'),
+          "href": url_for('main.guidance_api_documentation'),
           "text": "Documentation",
           "active": header_navigation.is_selected('documentation')
         },
@@ -97,17 +97,17 @@
         "active": header_navigation.is_selected('support')
       },
       {
-        "href": url_for('main.features'),
+        "href": url_for('main.guidance_features'),
         "text": "Features",
         "active": header_navigation.is_selected('features')
       },
       {
-        "href": url_for('main.pricing'),
+        "href": url_for('main.guidance_pricing'),
         "text": "Pricing",
         "active": header_navigation.is_selected('pricing')
       },
       {
-        "href": url_for('main.documentation'),
+        "href": url_for('main.guidance_api_documentation'),
         "text": "Documentation",
         "active": header_navigation.is_selected('documentation')
       },
@@ -182,19 +182,19 @@
         "width": "one-quarter",
         "items": [
           {
-            "href": url_for("main.features"),
+            "href": url_for("main.guidance_features"),
             "text": "Features"
           },
           {
-            "href": url_for("main.roadmap"),
+            "href": url_for("main.guidance_roadmap"),
             "text": "Roadmap"
           },
           {
-            "href": url_for("main.who_can_use_notify"),
+            "href": url_for("main.guidance_who_can_use_notify"),
             "text": "Who can use Notify",
           },
           {
-            "href": url_for("main.security"),
+            "href": url_for("main.guidance_security"),
             "text": "Security"
           },
           {
@@ -209,15 +209,15 @@
         "width": "one-quarter",
         "items": [
           {
-            "href": url_for("main.pricing"),
+            "href": url_for("main.guidance_pricing"),
             "text": "Pricing"
           },
           {
-            "href": url_for("main.how_to_pay"),
+            "href": url_for("main.guidance_how_to_pay"),
             "text": "How to pay"
           },
           {
-            "href": url_for("main.billing_details"),
+            "href": url_for("main.guidance_billing_details"),
             "text": "Billing details"
           }
         ]
@@ -228,23 +228,19 @@
         "width": "one-quarter",
         "items": [
           {
-            "href": url_for("main.get_started"),
-            "text": "Get started"
-          },
-          {
-            "href": url_for("main.trial_mode"),
+            "href": url_for("main.guidance_trial_mode"),
             "text": "Trial mode"
           },
           {
-            "href": url_for("main.message_status"),
+            "href": url_for("main.guidance_message_status"),
             "text": "Delivery status"
           },
           {
-            "href": url_for("main.guidance_index"),
-            "text": "Guidance"
+            "href": url_for("main.guidance_using_notify"),
+            "text": "Using Notify"
           },
           {
-            "href": url_for("main.documentation"),
+            "href": url_for("main.guidance_api_documentation"),
             "text": "API documentation"
           }
         ]

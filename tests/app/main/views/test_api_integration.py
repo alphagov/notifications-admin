@@ -138,7 +138,7 @@ def test_api_documentation_page_should_redirect(
         service_id=SERVICE_ONE_ID,
         _expected_status=301,
         _expected_redirect=url_for(
-            "main.documentation",
+            "main.guidance_api_documentation",
         ),
     )
 

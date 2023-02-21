@@ -114,7 +114,8 @@ def test_should_render_performance_page(
         start_date=date(2020, 12, 25),
         end_date=date(2021, 1, 1),
     )
-    assert normalize_spaces(page.select_one("main").text) == (
+
+    assert normalize_spaces(page.select_one(".govuk-grid-column-five-eighths").text) == (
         "Performance data "
         ""
         "Messages sent since May 2016 "
