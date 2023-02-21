@@ -381,7 +381,7 @@ def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.guidance_roadmap",
         "main.old_terms": "main.terms_of_use",
-        "main.information_security": "main.guidance_using_notify",
+        "main.information_security": "main.guidance_security",
         "main.information_risk_management": "main.guidance_security",
         "main.old_integration_testing": "main.integration_testing",
         "main.old_schedule_messages": "main.guidance_schedule_messages",
