@@ -1,6 +1,6 @@
 from itertools import chain
 
-from flask import request
+from flask import request, url_for
 
 
 class Navigation:
@@ -127,6 +127,51 @@ class HeaderNavigation(Navigation):
     # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
     def is_selected(self, navigation_item):
         return request.endpoint in self.mapping[navigation_item]
+
+    def visible_header_nav(self):
+        from app import current_user
+
+        nav_items = [
+            {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
+        ]
+
+        if not current_user.is_authenticated:
+            nav_items += [
+                {"href": url_for("main.guidance_features"), "text": "Features", "active": self.is_selected("features")},
+                {"href": url_for("main.guidance_pricing"), "text": "Pricing", "active": self.is_selected("pricing")},
+            ]
+
+        nav_items.append(
+            {
+                "href": url_for("main.guidance_api_documentation"),
+                "text": "Documentation",
+                "active": self.is_selected("documentation"),
+            }
+        )
+
+        if current_user.platform_admin:
+            nav_items.append(
+                {
+                    "href": url_for("main.platform_admin_search"),
+                    "text": "Platform admin",
+                    "active": self.is_selected("platform-admin"),
+                }
+            )
+
+        if current_user.is_authenticated:
+            nav_items.append(
+                {
+                    "href": url_for("main.user_profile"),
+                    "text": "Your profile",
+                    "active": self.is_selected("user-profile"),
+                }
+            )
+        else:
+            nav_items.append(
+                {"href": url_for("main.sign_in"), "text": "Sign in", "active": self.is_selected("sign-in")}
+            )
+
+        return nav_items
 
 
 class MainNavigation(Navigation):

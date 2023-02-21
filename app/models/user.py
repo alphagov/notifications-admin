@@ -630,6 +630,10 @@ class AnonymousUser(AnonymousUserMixin):
     def default_organisation(self):
         return Organisation(None)
 
+    @property
+    def platform_admin(self):
+        return False
+
 
 class Users(ModelList):
 
