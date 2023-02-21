@@ -59,9 +59,8 @@ class HeaderNavigation(Navigation):
             "guidance_how_to_pay",
             "guidance_billing_details",
         },
-        "documentation": {
-            "guidance_api_documentation",
-            "integration_testing",
+        "using-notify": {
+            # todo: add using notify pages to this list
         },
         "user-profile": {
             "user_profile",
@@ -133,21 +132,14 @@ class HeaderNavigation(Navigation):
 
         nav_items = [
             {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
-        ]
-
-        if not current_user.is_authenticated:
-            nav_items += [
-                {"href": url_for("main.guidance_features"), "text": "Features", "active": self.is_selected("features")},
-                {"href": url_for("main.guidance_pricing"), "text": "Pricing", "active": self.is_selected("pricing")},
-            ]
-
-        nav_items.append(
+            {"href": url_for("main.guidance_features"), "text": "Features", "active": self.is_selected("features")},
+            {"href": url_for("main.guidance_pricing"), "text": "Pricing", "active": self.is_selected("pricing")},
             {
-                "href": url_for("main.guidance_api_documentation"),
-                "text": "Documentation",
-                "active": self.is_selected("documentation"),
-            }
-        )
+                "href": url_for("main.guidance_using_notify"),
+                "text": "Using Notify",
+                "active": self.is_selected("using-notify"),
+            },
+        ]
 
         if current_user.platform_admin:
             nav_items.append(
