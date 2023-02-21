@@ -175,7 +175,7 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("old_integration_testing", "integration_testing"),
         ("old_roadmap", "guidance_roadmap"),
         ("old_terms", "terms_of_use"),
-        ("information_security", "guidance_using_notify"),
+        ("information_security", "guidance_security"),
         ("old_using_notify", "guidance_using_notify"),
         ("delivery_and_failure", "guidance_message_status"),
         ("callbacks", "guidance_api_documentation"),
