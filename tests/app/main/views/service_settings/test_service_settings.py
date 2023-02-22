@@ -171,7 +171,6 @@ def mock_get_service_settings_page_common(
                 "Letter branding Not set Change letter branding (admin view)",
                 "Custom data retention Email – 7 days Change data retention",
                 "Email authentication Off Change your settings for Email authentication",
-                "Send international letters Off Change your settings for Send international letters",
                 "Extra letter formatting options Off Change your settings for Extra letter formatting options",
                 "Emergency alerts Off Change your settings for emergency alerts",
             ],

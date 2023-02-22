@@ -81,18 +81,6 @@ def test_service_set_permission_does_not_exist_for_broadcast_permission(
             [],
         ),
         (
-            [],
-            "international_letters",
-            "True",
-            ["international_letters"],
-        ),
-        (
-            ["international_letters"],
-            "international_letters",
-            "False",
-            [],
-        ),
-        (
             ["email"],
             "extra_email_formatting",
             "True",
@@ -160,12 +148,6 @@ def test_service_set_permission(
             ".service_set_inbound_number",
             {},
             "Receive inbound SMS Off Change your settings for Receive inbound SMS",
-        ),
-        (
-            {"permissions": ["letter"]},
-            ".service_set_permission",
-            {"permission": "international_letters"},
-            "Send international letters Off Change your settings for Send international letters",
         ),
         (
             {"permissions": ["email"]},
