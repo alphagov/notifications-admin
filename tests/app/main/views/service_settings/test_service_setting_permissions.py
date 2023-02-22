@@ -92,6 +92,30 @@ def test_service_set_permission_does_not_exist_for_broadcast_permission(
             "False",
             [],
         ),
+        (
+            ["email"],
+            "extra_email_formatting",
+            "True",
+            ["email", "extra_email_formatting"],
+        ),
+        (
+            ["email", "extra_email_formatting"],
+            "extra_email_formatting",
+            "False",
+            ["email"],
+        ),
+        (
+            ["letter"],
+            "extra_letter_formatting",
+            "True",
+            ["letter", "extra_letter_formatting"],
+        ),
+        (
+            ["letter", "extra_letter_formatting"],
+            "extra_letter_formatting",
+            "False",
+            ["letter"],
+        ),
     ],
 )
 def test_service_set_permission(
@@ -142,6 +166,18 @@ def test_service_set_permission(
             ".service_set_permission",
             {"permission": "international_letters"},
             "Send international letters Off Change your settings for Send international letters",
+        ),
+        (
+            {"permissions": ["email"]},
+            ".service_set_permission",
+            {"permission": "extra_email_formatting"},
+            "Extra email formatting options Off Change your settings for Extra email formatting options",
+        ),
+        (
+            {"permissions": ["letter"]},
+            ".service_set_permission",
+            {"permission": "extra_letter_formatting"},
+            "Extra letter formatting options Off Change your settings for Extra letter formatting options",
         ),
     ],
 )
