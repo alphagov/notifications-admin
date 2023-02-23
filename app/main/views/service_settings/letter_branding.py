@@ -79,12 +79,6 @@ def letter_branding_options(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/letter-branding/something-else", methods=["GET", "POST"])
-def letter_branding_something_else(service_id):
-    # TODO: remove this view, it's temporary
-    return redirect(url_for("letter_branding_request", service_id=service_id), code=301)
-
-
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/request", methods=["GET", "POST"])
 def letter_branding_request(service_id):
     form = BrandingRequestForm()
@@ -148,13 +142,6 @@ def letter_branding_nhs(service_id):
     return render_template(
         "views/service-settings/branding/letter-branding-nhs.html", nhs_branding_id=LetterBranding.NHS_ID
     )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/letter-branding/pool", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def letter_branding_pool_option(service_id):
-    # TODO: remove this view, it's temporary
-    return redirect(url_for("letter_branding_option_preview", service_id=service_id), code=301)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/option-preview", methods=["GET", "POST"])

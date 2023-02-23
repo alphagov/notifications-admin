@@ -89,13 +89,6 @@ def email_branding_options(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/pool", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def email_branding_pool_option(service_id):
-    # TODO: remove this view, it's temporary
-    return redirect(url_for("email_branding_option_preview", service_id=service_id), code=301)
-
-
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/confirm-change", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_option_preview(service_id):
@@ -152,12 +145,6 @@ def email_branding_nhs(service_id):
     return render_template(
         "views/service-settings/branding/email-branding-nhs.html", nhs_branding_id=EmailBranding.NHS_ID
     )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=["GET", "POST"])
-def email_branding_something_else(service_id):
-    # TODO: remove this view, it's temporary
-    return redirect(url_for("email_branding_request", service_id=service_id), code=301)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/request", methods=["GET", "POST"])
@@ -353,20 +340,6 @@ def _should_set_default_org_email_branding(branding_choice):
 
     return (
         user_chose_org_name and org_doesnt_have_default_branding and org_not_central and no_other_live_services_in_org
-    )
-
-
-@main.route(
-    "/services/<uuid:service_id>/service-settings/email-branding/when-you-use-this-branding", methods=["GET", "POST"]
-)
-@user_has_permissions("manage_service")
-def old_email_branding_set_alt_text(service_id):
-    # TODO: remove this view, it's temporary
-    return redirect(
-        url_for(
-            "main.email_branding_set_alt_text", service_id=service_id, **_email_branding_flow_query_params(request)
-        ),
-        code=301,
     )
 
 
