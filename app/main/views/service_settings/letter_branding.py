@@ -146,6 +146,13 @@ def letter_branding_nhs(service_id):
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/option-preview", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
+def old_letter_branding_option_preview(service_id):
+    # TODO: remove this view, it's temporary
+    return redirect(url_for("letter_branding_option_preview", service_id=service_id), code=301)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/confirm-change", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
 def letter_branding_option_preview(service_id):
     try:
         chosen_branding = current_service.letter_branding_pool.get_item_by_id(request.args.get("branding_option"))
