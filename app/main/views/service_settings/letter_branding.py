@@ -57,20 +57,20 @@ def letter_branding_options(service_id):
                 )
             )
 
-        if branding_choice in current_service.letter_branding_pool.ids:
+        elif branding_choice in current_service.letter_branding_pool.ids:
             return redirect(
                 url_for(
                     ".letter_branding_option_preview", service_id=current_service.id, branding_option=branding_choice
                 )
             )
-
-        return redirect(
-            url_for(
-                ".letter_branding_upload_branding",
-                service_id=current_service.id,
-                **_letter_branding_flow_query_params(branding_choice=branding_choice),
+        else:
+            return redirect(
+                url_for(
+                    ".letter_branding_upload_branding",
+                    service_id=current_service.id,
+                    **_letter_branding_flow_query_params(branding_choice=branding_choice),
+                )
             )
-        )
 
     return render_template(
         "views/service-settings/branding/letter-branding-options.html",

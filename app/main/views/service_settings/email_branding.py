@@ -59,17 +59,17 @@ def email_branding_options(service_id):
                     service_id=current_service.id,
                 )
             )
-        if branding_choice == "govuk":
+        elif branding_choice == "govuk":
             return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
 
-        if branding_choice in current_service.email_branding_pool.ids:
+        elif branding_choice in current_service.email_branding_pool.ids:
             return redirect(
                 url_for(
                     ".email_branding_option_preview", service_id=current_service.id, branding_option=branding_choice
                 )
             )
 
-        if current_service.organisation_type == "central":
+        elif current_service.organisation_type == "central":
             return redirect(
                 url_for(".email_branding_choose_logo", service_id=current_service.id, branding_choice=branding_choice)
             )
