@@ -3,26 +3,35 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/branding-preview.html" import email_branding_preview %}
 {% from "components/branding-preview.html" import letter_branding_preview %}
 
+{% set page_title = "Check your new branding" %}
+
 {% block service_page_title %}
-  Check your new branding
+{{ page_title }}
 {% endblock %}
 
 {% block backLink %}
   {{ govukBackLink({
-    "href": url_for('.letter_branding_options', service_id=current_service.id)
+    "href": url_for('.{}_branding_options'.format(branding_type),
+    service_id=current_service.id)
   }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('Check your new branding') }}
+  {{ page_header(page_title) }}
 
   <p class="govuk-body">
-    Letters from {{ current_service.name }} will look like this.
+    {{ branding_type|capitalize }}s from {{ current_service.name }} will look like this.
   </p>
-  {{ letter_branding_preview(nhs_branding_id) }}
+
+  {% if branding_type == 'email' %}
+    {{ email_branding_preview(nhs_branding_id) }}
+  {% else %}
+    {{ letter_branding_preview(nhs_branding_id) }}
+  {% endif %}
 
   <h2 class="heading-medium">Before you continue</h2>
 

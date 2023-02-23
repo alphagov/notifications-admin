@@ -140,7 +140,9 @@ def letter_branding_nhs(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/branding/letter-branding-nhs.html", nhs_branding_id=LetterBranding.NHS_ID
+        "views/service-settings/branding/branding-nhs.html",
+        nhs_branding_id=LetterBranding.NHS_ID,
+        branding_type="letter",
     )
 
 
