@@ -58,10 +58,11 @@ def mock_get_service_settings_page_common(
 
 
 @pytest.mark.parametrize(
-    "user, expected_rows",
+    "user, service_permissions, expected_rows",
     [
         (
             create_active_user_with_permissions(),
+            ["sms", "email"],
             [
                 "Label Value Action",
                 "Service name Test Service Change service name",
@@ -82,7 +83,26 @@ def mock_get_service_settings_page_common(
             ],
         ),
         (
+            create_active_user_with_permissions(),
+            ["letter"],
+            [
+                "Label Value Action",
+                "Service name Test Service Change service name",
+                "Sign-in method Text message code Change sign-in method",
+                "Label Value Action",
+                "Send emails Off Change your settings for sending emails",
+                "Label Value Action",
+                "Send text messages Off Change your settings for sending text messages",
+                "Label Value Action",
+                "Send letters On Change your settings for sending letters",
+                "Send international letters Off Change",
+                "Sender addresses Not set Manage sender addresses",
+                "Letter branding Not set Change letter branding",
+            ],
+        ),
+        (
             create_platform_admin_user(),
+            ["sms", "email"],
             [
                 "Label Value Action",
                 "Service name Test Service Change service name",
@@ -116,6 +136,42 @@ def mock_get_service_settings_page_common(
                 "Custom data retention Email – 7 days Change data retention",
                 "Receive inbound SMS Off Change your settings for Receive inbound SMS",
                 "Email authentication Off Change your settings for Email authentication",
+                "Extra email formatting options Off Change your settings for Extra email formatting options",
+                "Emergency alerts Off Change your settings for emergency alerts",
+            ],
+        ),
+        (
+            create_platform_admin_user(),
+            ["letter"],
+            [
+                "Label Value Action",
+                "Service name Test Service Change service name",
+                "Sign-in method Text message code Change sign-in method",
+                "Label Value Action",
+                "Send emails Off Change your settings for sending emails",
+                "Label Value Action",
+                "Send text messages Off Change your settings for sending text messages",
+                "Label Value Action",
+                "Send letters On Change your settings for sending letters",
+                "Send international letters Off Change",
+                "Sender addresses Not set Manage sender addresses",
+                "Letter branding Not set Change letter branding",
+                "Label Value Action",
+                "Live Off Change service status",
+                "Count in list of live services Yes Change if service is counted in list of live services",
+                "Billing details None Change billing details for service",
+                "Notes None Change the notes for the service",
+                "Organisation Test organisation Central government Change organisation for service",
+                "Rate limit 3,000 per minute Change rate limit",
+                "Email limit 1,000 per day Change daily email limit",
+                "SMS limit 1,000 per day Change daily SMS limit",
+                "Letter limit 1,000 per day Change daily letter limit",
+                "Free text message allowance 250,000 per year Change free text message allowance",
+                "Email branding GOV.UK Change email branding (admin view)",
+                "Letter branding Not set Change letter branding (admin view)",
+                "Custom data retention Email – 7 days Change data retention",
+                "Email authentication Off Change your settings for Email authentication",
+                "Extra letter formatting options Off Change your settings for Extra letter formatting options",
                 "Emergency alerts Off Change your settings for emergency alerts",
             ],
         ),
@@ -129,13 +185,14 @@ def test_should_show_overview(
     no_letter_contact_blocks,
     single_sms_sender,
     user,
+    service_permissions,
     expected_rows,
     mock_get_service_settings_page_common,
 ):
     service_one = service_json(
         SERVICE_ONE_ID,
         users=[api_user_active["id"]],
-        permissions=["sms", "email"],
+        permissions=service_permissions,
         organisation_id=ORGANISATION_ID,
         contact_link="contact_us@gov.uk",
     )
