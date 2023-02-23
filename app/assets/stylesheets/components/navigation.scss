@@ -164,6 +164,16 @@
       padding-top: govuk-spacing(1);
     }
 
+    .navigation__item {
+      &:first-child {
+        padding-top: govuk-spacing(1);
+      }
+      a {
+        padding-left: govuk-spacing(3);
+        padding-right: govuk-spacing(1);
+      }
+    }
+
   }
 
 }
