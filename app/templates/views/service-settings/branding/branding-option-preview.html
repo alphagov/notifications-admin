@@ -3,17 +3,18 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/branding-preview.html" import email_branding_preview %}
 {% from "components/branding-preview.html" import letter_branding_preview %}
 
-{% set page_title = "Change letter branding" %}
+{% set page_title = "Change {} branding".format(branding_type) %}
 
 {% block service_page_title %}
-  {{  page_title }}
+{{ page_title }}
 {% endblock %}
 
 {% block backLink %}
   {{ govukBackLink({
-    "href": url_for('.letter_branding_request', service_id=current_service.id)
+    "href": url_for('.{}_branding_options'.format(branding_type), service_id=current_service.id)
   }) }}
 {% endblock %}
 
@@ -22,14 +23,18 @@
   {{ page_header(page_title) }}
 
   <p class="govuk-body">
-    If you confirm, your letters will come with {{ chosen_branding.name }} branding.
+    If you confirm, your {{ branding_type }}s will come with {{ chosen_branding.name }} branding.
   </p>
 
-  {{ letter_branding_preview(chosen_branding.id) }}
+  {% if branding_type == 'email' %}
+    {{ email_branding_preview(chosen_branding.id) }}
+  {% else %}
+    {{ letter_branding_preview(chosen_branding.id) }}
+  {% endif %}
 
 
   {% call form_wrapper() %}
-    {{ page_footer('Change letter branding') }}
+    {{ page_footer('Change {} branding'.format(branding_type)) }}
   {% endcall %}
 
 {% endblock %}

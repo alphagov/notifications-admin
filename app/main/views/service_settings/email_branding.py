@@ -105,8 +105,9 @@ def email_branding_option_preview(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/branding/email-branding-option-preview.html",
+        "views/service-settings/branding/branding-option-preview.html",
         chosen_branding=chosen_branding,
+        branding_type="email",
     )
 
 

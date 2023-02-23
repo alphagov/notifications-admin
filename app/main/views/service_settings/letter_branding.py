@@ -167,8 +167,9 @@ def letter_branding_option_preview(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/branding/letter-branding-pool-option.html",
+        "views/service-settings/branding/branding-option-preview.html",
         chosen_branding=chosen_branding,
+        branding_type="letter",
     )
 
 
