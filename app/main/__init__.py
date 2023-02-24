@@ -46,8 +46,4 @@ from app.main.views import (  # noqa
     webauthn_credentials,
 )
 from app.main.views.organisations import branding, index  # noqa
-from app.main.views.service_settings import (  # noqa
-    email_branding,
-    index,
-    letter_branding,
-)
+from app.main.views.service_settings import branding, index  # noqa

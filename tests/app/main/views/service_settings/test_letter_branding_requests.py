@@ -5,7 +5,7 @@ import pytest
 from flask import g, url_for
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app.main.views.service_settings.letter_branding import (
+from app.main.views.service_settings.branding import (
     _should_set_default_org_letter_branding,
 )
 from app.models.branding import LetterBranding
@@ -455,7 +455,7 @@ def test_POST_letter_branding_upload_branding_redirects_on_success(
     client_request, mock_antivirus_virus_free, fake_uuid, mocker
 ):
     mock_save_temporary = mocker.patch(
-        "app.main.views.service_settings.letter_branding.logo_client.save_temporary_logo",
+        "app.main.views.service_settings.branding.logo_client.save_temporary_logo",
         return_value="temporary.svg",
     )
 
@@ -542,17 +542,17 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     fake_uuid,
     mocker,
 ):
-    mock_flash = mocker.patch("app.main.views.service_settings.letter_branding.flash")
+    mock_flash = mocker.patch("app.main.views.service_settings.branding.flash")
     mock_get_unique_name = mocker.patch(
-        "app.main.views.service_settings.letter_branding.letter_branding_client.get_unique_name_for_letter_branding",
+        "app.main.views.service_settings.branding.letter_branding_client.get_unique_name_for_letter_branding",
         return_value="some unique name",
     )
 
     mock_should_set_default_org_letter_branding = mocker.patch(
-        "app.main.views.service_settings.letter_branding._should_set_default_org_letter_branding", return_value=False
+        "app.main.views.service_settings.branding._should_set_default_org_letter_branding", return_value=False
     )
     mock_save_permanent = mocker.patch(
-        "app.main.views.service_settings.letter_branding.logo_client.save_permanent_logo", return_value="permanent.svg"
+        "app.main.views.service_settings.branding.logo_client.save_permanent_logo", return_value="permanent.svg"
     )
 
     mock_add_to_branding_pool = mocker.patch(
@@ -604,15 +604,13 @@ def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appr
 ):
     service_one["organisation"] = ORGANISATION_ID
     mock_get_unique_name = mocker.patch(
-        "app.main.views.service_settings.letter_branding.letter_branding_client.get_unique_name_for_letter_branding",
+        "app.main.views.service_settings.branding.letter_branding_client.get_unique_name_for_letter_branding",
     )
     mock_add_to_branding_pool = mocker.patch("app.organisations_client.add_brandings_to_letter_branding_pool")
-    mock_save_permanent = mocker.patch(
-        "app.main.views.service_settings.letter_branding.logo_client.save_permanent_logo"
-    )
+    mock_save_permanent = mocker.patch("app.main.views.service_settings.branding.logo_client.save_permanent_logo")
 
     mock_should_set_default_org_letter_branding = mocker.patch(
-        "app.main.views.service_settings.letter_branding._should_set_default_org_letter_branding", return_value=True
+        "app.main.views.service_settings.branding._should_set_default_org_letter_branding", return_value=True
     )
 
     client_request.post(
@@ -756,7 +754,7 @@ def test_letter_branding_nhs_changes_letter_branding_when_user_confirms(
     organisation_one["organisation_type"] = "nhs_central"
     service_one["organisation"] = organisation_one
 
-    mock_flash = mocker.patch("app.main.views.service_settings.email_branding.flash")
+    mock_flash = mocker.patch("app.main.views.service_settings.branding.flash")
     mocker.patch(
         "app.organisations_client.get_organisation",
         return_value=organisation_one,
