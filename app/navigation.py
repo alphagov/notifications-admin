@@ -1,6 +1,6 @@
 from itertools import chain
 
-from flask import request
+from flask import request, url_for
 
 
 class Navigation:
@@ -59,9 +59,25 @@ class HeaderNavigation(Navigation):
             "guidance_how_to_pay",
             "guidance_billing_details",
         },
-        "documentation": {
+        "using-notify": {
+            "guidance_using_notify",
             "guidance_api_documentation",
-            "integration_testing",
+            "guidance_bulk_sending",
+            "guidance_message_status",
+            "guidance_delivery_times",
+            "guidance_email_branding",
+            "guidance_formatting",
+            "guidance_letter_branding",
+            "guidance_optional_content",
+            "guidance_personalisation",
+            "guidance_receive_text_messages",
+            "guidance_reply_to_email_address",
+            "guidance_schedule_messages",
+            "guidance_send_files_by_email",
+            "guidance_team_members_and_permissions",
+            "guidance_templates",
+            "guidance_text_message_sender",
+            "guidance_upload_a_letter",
         },
         "user-profile": {
             "user_profile",
@@ -127,6 +143,44 @@ class HeaderNavigation(Navigation):
     # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
     def is_selected(self, navigation_item):
         return request.endpoint in self.mapping[navigation_item]
+
+    def visible_header_nav(self):
+        from app import current_user
+
+        nav_items = [
+            {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
+            {"href": url_for("main.guidance_features"), "text": "Features", "active": self.is_selected("features")},
+            {"href": url_for("main.guidance_pricing"), "text": "Pricing", "active": self.is_selected("pricing")},
+            {
+                "href": url_for("main.guidance_using_notify"),
+                "text": "Using Notify",
+                "active": self.is_selected("using-notify"),
+            },
+        ]
+
+        if current_user.platform_admin:
+            nav_items.append(
+                {
+                    "href": url_for("main.platform_admin_search"),
+                    "text": "Platform admin",
+                    "active": self.is_selected("platform-admin"),
+                }
+            )
+
+        if current_user.is_authenticated:
+            nav_items.append(
+                {
+                    "href": url_for("main.user_profile"),
+                    "text": "Your profile",
+                    "active": self.is_selected("user-profile"),
+                }
+            )
+        else:
+            nav_items.append(
+                {"href": url_for("main.sign_in"), "text": "Sign in", "active": self.is_selected("sign-in")}
+            )
+
+        return nav_items
 
 
 class MainNavigation(Navigation):
