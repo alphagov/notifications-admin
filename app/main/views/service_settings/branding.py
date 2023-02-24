@@ -2,26 +2,38 @@ from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app import current_service, logo_client, organisations_client
+from app import (
+    current_service,
+    letter_branding_client,
+    logo_client,
+    organisations_client,
+)
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
     BrandingRequestForm,
     ChooseEmailBrandingForm,
+    ChooseLetterBrandingForm,
     EmailBrandingAltTextForm,
     EmailBrandingChooseBanner,
     EmailBrandingChooseBannerColour,
     EmailBrandingChooseLogoForm,
     EmailBrandingLogoUpload,
     GovernmentIdentityLogoForm,
+    LetterBrandingNameForm,
+    LetterBrandingUploadBranding,
 )
-from app.models.branding import AllEmailBranding, EmailBranding
+from app.models.branding import AllEmailBranding, EmailBranding, LetterBranding
 from app.models.organisation import Organisation
 from app.utils import service_belongs_to_org_type
 from app.utils.branding import get_email_choices as get_email_branding_choices
+from app.utils.branding import get_letter_choices as get_letter_branding_choices
+from app.utils.branding import letter_filename_for_db_from_logo_key
 from app.utils.user import user_has_permissions
 
 from .index import THANKS_FOR_BRANDING_REQUEST_MESSAGE
+
+# ================= EMAIL BRANDING ==================
 
 
 def create_email_branding_zendesk_ticket(detail=None):
@@ -55,33 +67,37 @@ def email_branding_options(service_id):
         if branding_choice == EmailBranding.NHS_ID:
             return redirect(
                 url_for(
-                    ".email_branding_nhs",
+                    ".branding_nhs",
                     service_id=current_service.id,
+                    branding_type="email",
                 )
             )
-        if branding_choice == "govuk":
+        elif branding_choice == "govuk":
             return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
 
-        if branding_choice in current_service.email_branding_pool.ids:
+        elif branding_choice in current_service.email_branding_pool.ids:
             return redirect(
                 url_for(
-                    ".email_branding_option_preview", service_id=current_service.id, branding_option=branding_choice
+                    ".branding_option_preview",
+                    service_id=current_service.id,
+                    branding_option=branding_choice,
+                    branding_type="email",
                 )
             )
 
-        if current_service.organisation_type == "central":
+        elif current_service.organisation_type == "central":
             return redirect(
                 url_for(".email_branding_choose_logo", service_id=current_service.id, branding_choice=branding_choice)
             )
-        else:
-            return redirect(
-                url_for(
-                    ".email_branding_choose_banner_type",
-                    service_id=current_service.id,
-                    back_link=".email_branding_options",
-                    branding_choice=branding_choice,
-                )
+
+        return redirect(
+            url_for(
+                ".email_branding_choose_banner_type",
+                service_id=current_service.id,
+                back_link=".email_branding_options",
+                branding_choice=branding_choice,
             )
+        )
 
     return render_template(
         "views/service-settings/branding/email-branding-options.html",
@@ -89,36 +105,11 @@ def email_branding_options(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/pool", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def email_branding_pool_option(service_id):
-    # TODO: remove this view, it's temporary
-    return redirect(url_for("email_branding_option_preview", service_id=service_id), code=301)
-
-
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/confirm-change", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def email_branding_option_preview(service_id):
-    try:
-        chosen_branding = current_service.email_branding_pool.get_item_by_id(request.args.get("branding_option"))
-    except current_service.email_branding_pool.NotFound:
-        flash("No branding found for this id.")
-        return redirect(url_for(".email_branding_options", service_id=current_service.id))
-
-    if request.method == "POST":
-        current_service.update(email_branding=chosen_branding.id)
-
-        flash("You’ve updated your email branding", "default")
-        return redirect(url_for(".service_settings", service_id=current_service.id))
-
-    return render_template(
-        "views/service-settings/branding/email-branding-option-preview.html",
-        chosen_branding=chosen_branding,
-    )
-
-
-def check_email_branding_allowed_for_service(branding):
-    allowed_branding_for_service = dict(get_email_branding_choices(current_service))
+def check_branding_allowed_for_service(branding, branding_type):
+    if branding_type == "email":
+        allowed_branding_for_service = dict(get_email_branding_choices(current_service))
+    else:
+        allowed_branding_for_service = dict(get_letter_branding_choices(current_service))
 
     if branding not in allowed_branding_for_service:
         abort(404)
@@ -127,7 +118,7 @@ def check_email_branding_allowed_for_service(branding):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_govuk(service_id):
-    check_email_branding_allowed_for_service("govuk")
+    check_branding_allowed_for_service("govuk", branding_type="email")
 
     if request.method == "POST":
         current_service.update(email_branding=None)
@@ -136,28 +127,6 @@ def email_branding_govuk(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template("views/service-settings/branding/email-branding-govuk.html")
-
-
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def email_branding_nhs(service_id):
-    check_email_branding_allowed_for_service(EmailBranding.NHS_ID)
-
-    if request.method == "POST":
-        current_service.update(email_branding=EmailBranding.NHS_ID)
-
-        flash("You’ve updated your email branding", "default")
-        return redirect(url_for(".service_settings", service_id=current_service.id))
-
-    return render_template(
-        "views/service-settings/branding/email-branding-nhs.html", nhs_branding_id=EmailBranding.NHS_ID
-    )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/something-else", methods=["GET", "POST"])
-def email_branding_something_else(service_id):
-    # TODO: remove this view, it's temporary
-    return redirect(url_for("email_branding_request", service_id=service_id), code=301)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/request", methods=["GET", "POST"])
@@ -356,20 +325,6 @@ def _should_set_default_org_email_branding(branding_choice):
     )
 
 
-@main.route(
-    "/services/<uuid:service_id>/service-settings/email-branding/when-you-use-this-branding", methods=["GET", "POST"]
-)
-@user_has_permissions("manage_service")
-def old_email_branding_set_alt_text(service_id):
-    # TODO: remove this view, it's temporary
-    return redirect(
-        url_for(
-            "main.email_branding_set_alt_text", service_id=service_id, **_email_branding_flow_query_params(request)
-        ),
-        code=301,
-    )
-
-
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/preview", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_set_alt_text(service_id):
@@ -526,4 +481,258 @@ def email_branding_choose_banner_colour(service_id):
             abandon_flow_link=abandon_flow_link,
         ),
         400 if form.errors else 200,
+    )
+
+
+# ================= BRANDING - SHARED ==================
+
+
+@main.route(
+    "/services/<uuid:service_id>/service-settings/<branding_type>-branding/confirm-change", methods=["GET", "POST"]
+)
+@user_has_permissions("manage_service")
+def branding_option_preview(service_id, branding_type):
+    if branding_type == "email":
+        branding_pool = current_service.email_branding_pool
+    else:
+        branding_pool = current_service.letter_branding_pool
+    try:
+        chosen_branding = branding_pool.get_item_by_id(request.args.get("branding_option"))
+    except branding_pool.NotFound:
+        flash("No branding found for this id.")
+        return redirect(url_for(f".{branding_type}_branding_options", service_id=current_service.id))
+
+    if request.method == "POST":
+        current_service.update(**{f"{branding_type}_branding": chosen_branding.id})
+
+        flash(f"You’ve updated your {branding_type} branding", "default")
+        return redirect(url_for(".service_settings", service_id=current_service.id))
+
+    return render_template(
+        "views/service-settings/branding/branding-option-preview.html",
+        back_link_url=url_for(f".{branding_type}_branding_options", service_id=current_service.id),
+        branding_type=branding_type,
+        chosen_branding=chosen_branding,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/<branding_type>-branding/nhs", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def branding_nhs(service_id, branding_type):
+    branding = EmailBranding.NHS_ID if branding_type == "email" else LetterBranding.NHS_ID
+    check_branding_allowed_for_service(branding, branding_type=branding_type)
+
+    if request.method == "POST":
+        current_service.update(**{f"{branding_type}_branding": branding})
+
+        flash(f"You’ve updated your {branding_type} branding", "default")
+        return redirect(url_for(".service_settings", service_id=current_service.id))
+
+    return render_template(
+        "views/service-settings/branding/branding-nhs.html",
+        back_link_url=url_for(f".{branding_type}_branding_options", service_id=current_service.id),
+        branding_type=branding_type,
+        nhs_branding_id=branding,
+    )
+
+
+# ================= LETTER BRANDING ===================
+
+
+def _letter_branding_flow_query_params(**kwargs):
+    """Return a dictionary containing values for the letter branding flow.
+
+    We've got a variety of query parameters we want to pass around between pages. Any params that are passed in, we
+    should pass through to ensure that back links continue to work the whole way through etc. In addition, we use the
+    branding_choice param (from the letter_branding_options page) later on so need to pass that through.
+
+    To set a new value:
+        _letter_branding_flow_query_params(request, branding_choice='organisation')
+
+    To remove a value:
+        _letter_branding_flow_query_params(request, branding_choice=None)
+    """
+    return {k: kwargs.get(k, request.args.get(k)) for k in ("from_template", "branding_choice", "temp_filename")}
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def letter_branding_options(service_id):
+    form = ChooseLetterBrandingForm(current_service)
+    from_template = request.args.get("from_template")
+
+    if form.validate_on_submit():
+        branding_choice = form.options.data
+
+        if branding_choice == LetterBranding.NHS_ID:
+            return redirect(
+                url_for(
+                    ".branding_nhs",
+                    service_id=current_service.id,
+                    branding_type="letter",
+                )
+            )
+
+        elif branding_choice in current_service.letter_branding_pool.ids:
+            return redirect(
+                url_for(
+                    ".branding_option_preview",
+                    service_id=current_service.id,
+                    branding_option=branding_choice,
+                    branding_type="letter",
+                )
+            )
+        else:
+            return redirect(
+                url_for(
+                    ".letter_branding_upload_branding",
+                    service_id=current_service.id,
+                    **_letter_branding_flow_query_params(branding_choice=branding_choice),
+                )
+            )
+
+    return render_template(
+        "views/service-settings/branding/letter-branding-options.html",
+        form=form,
+        from_template=from_template,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/request", methods=["GET", "POST"])
+def letter_branding_request(service_id):
+    form = BrandingRequestForm()
+    from_template = _letter_branding_flow_query_params()["from_template"]
+
+    if form.validate_on_submit():
+        ticket_message = render_template(
+            "support-tickets/branding-request.txt",
+            current_branding=current_service.letter_branding.name or "no",
+            detail=form.branding_request.data,
+        )
+        ticket = NotifySupportTicket(
+            subject=f"Letter branding request - {current_service.name}",
+            message=ticket_message,
+            ticket_type=NotifySupportTicket.TYPE_QUESTION,
+            user_name=current_user.name,
+            user_email=current_user.email_address,
+            org_id=current_service.organisation_id,
+            org_type=current_service.organisation_type,
+            service_id=current_service.id,
+        )
+        zendesk_client.send_ticket_to_zendesk(ticket)
+        flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
+
+        return redirect(
+            url_for(".view_template", service_id=current_service.id, template_id=from_template)
+            if from_template
+            else url_for(".service_settings", service_id=current_service.id)
+        )
+
+    return render_template(
+        "views/service-settings/branding/branding-request.html",
+        form=form,
+        from_template=from_template,
+        back_link=url_for(
+            ".letter_branding_upload_branding",
+            service_id=current_service.id,
+            **_letter_branding_flow_query_params(),
+        ),
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/option-preview", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def old_letter_branding_option_preview(service_id):
+    # TODO: remove this view, it's temporary
+    return redirect(url_for("branding_option_preview", service_id=service_id, branding_type="letter"), code=301)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/upload-branding", methods=["GET", "POST"])
+def letter_branding_upload_branding(service_id):
+    form = LetterBrandingUploadBranding()
+    if form.validate_on_submit():
+        temporary_logo_key = logo_client.save_temporary_logo(
+            form.branding.data,
+            logo_type="letter",
+        )
+        return redirect(
+            url_for(
+                "main.letter_branding_set_name",
+                service_id=current_service.id,
+                **_letter_branding_flow_query_params(temp_filename=temporary_logo_key),
+            )
+        )
+
+    return render_template(
+        "views/service-settings/branding/new/letter-branding-upload-branding.html",
+        form=form,
+        branding_choice=request.args.get("branding_choice"),
+        back_link=url_for(
+            ".letter_branding_options",
+            service_id=current_service.id,
+            **_letter_branding_flow_query_params(branding_choice=None),
+        ),
+        # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
+        abandon_flow_link=url_for(".letter_branding_request", service_id=current_service.id),
+    )
+
+
+def _should_set_default_org_letter_branding(branding_choice):
+    # 1. the user has chosen ‘[organisation name]’ in the first page of the journey
+    user_chose_org_name = branding_choice == "organisation"
+    # 2. and the organisation doesn’t have default branding already
+    org_doesnt_have_default_branding = current_service.organisation.letter_branding_id is None
+    # 3. and the organisation has no other live services
+    no_other_live_services_in_org = not any(
+        service.id != current_service.id for service in current_service.organisation.live_services
+    )
+
+    return user_chose_org_name and org_doesnt_have_default_branding and no_other_live_services_in_org
+
+
+@main.route("/services/<uuid:service_id>/service-settings/letter-branding/set-name", methods=["GET", "POST"])
+def letter_branding_set_name(service_id):
+    letter_branding_data = _letter_branding_flow_query_params()
+    temporary_logo_key = letter_branding_data["temp_filename"]
+
+    if not temporary_logo_key:
+        return redirect(url_for("main.letter_branding_upload_branding", service_id=service_id, **letter_branding_data))
+
+    form = LetterBrandingNameForm()
+
+    if form.validate_on_submit():
+        name = letter_branding_client.get_unique_name_for_letter_branding(form.name.data)
+
+        permanent_logo_key = logo_client.save_permanent_logo(
+            temporary_logo_key, logo_type="letter", logo_key_extra=name
+        )
+
+        new_letter_branding = LetterBranding.create(
+            name=name, filename=letter_filename_for_db_from_logo_key(permanent_logo_key)
+        )
+
+        # set as service branding
+        current_service.update(letter_branding=new_letter_branding.id)
+
+        # add to org pool
+        organisations_client.add_brandings_to_letter_branding_pool(
+            current_service.organisation.id, [new_letter_branding.id]
+        )
+
+        if _should_set_default_org_letter_branding(letter_branding_data["branding_choice"]):
+            current_service.organisation.update(letter_branding_id=new_letter_branding.id, delete_services_cache=True)
+
+        flash("You’ve changed your letter branding.", "default_with_tick")
+
+        return redirect(url_for("main.service_settings", service_id=service_id))
+
+    return render_template(
+        "views/service-settings/branding/new/letter-branding-set-name.html",
+        back_link=url_for(
+            ".letter_branding_upload_branding",
+            service_id=service_id,
+            **_letter_branding_flow_query_params(temp_filename=None),
+        ),
+        temp_filename=letter_filename_for_db_from_logo_key(temporary_logo_key),
+        form=form,
     )

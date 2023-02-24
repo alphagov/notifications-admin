@@ -309,8 +309,8 @@ def test_email_branding_options_page_shows_preview_if_something_else_is_only_opt
         (
             {"options": EmailBranding.NHS_ID},
             "nhs_local",
-            "main.email_branding_nhs",
-            {},
+            "main.branding_nhs",
+            {"branding_type": "email"},
         ),
     ),
 )
@@ -421,8 +421,9 @@ def test_email_branding_options_page_redirects_nhs_specific_page(
         service_id=SERVICE_ONE_ID,
         _data={"options": EmailBranding.NHS_ID},
         _expected_redirect=url_for(
-            "main.email_branding_nhs",
+            "main.branding_nhs",
             service_id=SERVICE_ONE_ID,
+            branding_type="email",
         ),
     )
 
@@ -450,9 +451,10 @@ def test_email_branding_options_redirects_to_branding_preview_for_a_branding_poo
         _data={"options": "email-branding-1-id"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.email_branding_option_preview",
+            "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="email-branding-1-id",
+            branding_type="email",
         ),
     )
 
@@ -469,7 +471,10 @@ def test_email_branding_option_preview_page_displays_preview_of_chosen_branding(
     )
 
     page = client_request.get(
-        ".email_branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="email-branding-1-id"
+        ".branding_option_preview",
+        service_id=SERVICE_ONE_ID,
+        branding_option="email-branding-1-id",
+        branding_type="email",
     )
 
     assert page.select_one("iframe")["src"] == url_for("main.email_template", branding_style="email-branding-1-id")
@@ -487,9 +492,10 @@ def test_email_branding_option_preview_page_redirects_to_branding_request_page_i
     )
 
     client_request.get(
-        ".email_branding_option_preview",
+        ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="some-unknown-branding-id",
+        branding_type="email",
         _expected_status=302,
         _expected_redirect=url_for("main.email_branding_options", service_id=SERVICE_ONE_ID),
     )
@@ -514,9 +520,10 @@ def test_email_branding_option_preview_changes_email_branding_when_user_confirms
     )
 
     page = client_request.post(
-        ".email_branding_option_preview",
+        ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="email-branding-1-id",
+        branding_type="email",
         _follow_redirects=True,
     )
 
@@ -529,10 +536,10 @@ def test_email_branding_option_preview_changes_email_branding_when_user_confirms
 
 
 @pytest.mark.parametrize(
-    "endpoint, service_org_type, branding_preview_id",
+    "endpoint, service_org_type, branding_preview_id, extra_args",
     [
-        ("main.email_branding_govuk", "central", "__NONE__"),
-        ("main.email_branding_nhs", "nhs_local", EmailBranding.NHS_ID),
+        ("main.email_branding_govuk", "central", "__NONE__", {}),
+        ("main.branding_nhs", "nhs_local", EmailBranding.NHS_ID, {"branding_type": "email"}),
     ],
 )
 def test_email_branding_govuk_and_nhs_pages(
@@ -545,6 +552,7 @@ def test_email_branding_govuk_and_nhs_pages(
     endpoint,
     service_org_type,
     branding_preview_id,
+    extra_args,
 ):
     organisation_one["organisation_type"] = service_org_type
     service_one["email_branding"] = sample_uuid()
@@ -558,6 +566,7 @@ def test_email_branding_govuk_and_nhs_pages(
     page = client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,
+        **extra_args,
     )
     assert page.select_one("h1").text == "Check your new branding"
     assert "Emails from service one will look like this" in normalize_spaces(page.text)
@@ -566,20 +575,18 @@ def test_email_branding_govuk_and_nhs_pages(
 
 
 @pytest.mark.parametrize(
-    "endpoint",
+    "endpoint, extra_args",
     [
-        "main.email_branding_govuk",
-        "main.email_branding_nhs",
+        ("main.email_branding_govuk", {}),
+        ("main.branding_nhs", {"branding_type": "email"}),
     ],
 )
 def test_email_branding_pages_give_404_if_selected_branding_not_allowed(
-    client_request,
-    mock_get_empty_email_branding_pool,
-    endpoint,
+    client_request, mock_get_empty_email_branding_pool, endpoint, extra_args
 ):
     # The only email branding allowed is 'something_else', so trying to visit any of the other
     # endpoints gives a 404 status code.
-    client_request.get(endpoint, service_id=SERVICE_ONE_ID, _expected_status=404)
+    client_request.get(endpoint, service_id=SERVICE_ONE_ID, **extra_args, _expected_status=404)
 
 
 def test_email_branding_govuk_submit(
@@ -633,8 +640,9 @@ def test_email_branding_nhs_submit(
     service_one["organisation_type"] = "nhs_local"
 
     page = client_request.post(
-        ".email_branding_nhs",
+        ".branding_nhs",
         service_id=SERVICE_ONE_ID,
+        branding_type="email",
         _follow_redirects=True,
     )
 
@@ -928,7 +936,7 @@ def test_POST_email_branding_enter_government_identity_logo_text(
         "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
-    mock_flash = mocker.patch("app.main.views.service_settings.email_branding.flash", autospec=True)
+    mock_flash = mocker.patch("app.main.views.service_settings.branding.flash", autospec=True)
 
     client_request.post(
         "main.email_branding_enter_government_identity_logo_text",
@@ -1160,7 +1168,7 @@ def test_GET_email_branding_upload_logo(
 def test_POST_email_branding_upload_logo_success(mocker, client_request, service_one, email_branding_data):
     antivirus_mock = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_save_temporary = mocker.patch(
-        "app.main.views.service_settings.email_branding.logo_client.save_temporary_logo", return_value="my-logo-path"
+        "app.main.views.service_settings.branding.logo_client.save_temporary_logo", return_value="my-logo-path"
     )
 
     mocker.patch.dict(
@@ -1217,7 +1225,7 @@ def test_POST_email_branding_upload_logo_validation_errors(
     if callable(post_data):
         post_data = post_data()
 
-    mock_save_temporary = mocker.patch("app.main.views.service_settings.email_branding.logo_client.save_temporary_logo")
+    mock_save_temporary = mocker.patch("app.main.views.service_settings.branding.logo_client.save_temporary_logo")
 
     with mock.patch.dict("app.main.validators.current_app.config", {"ANTIVIRUS_ENABLED": False}):
         page = client_request.post(
@@ -1242,7 +1250,7 @@ def test_POST_email_branding_upload_logo_validation_errors(
 def test_POST_email_branding_upload_logo_enforces_minimum_logo_height(
     mocker, client_request, service_one, min_logo_height, expect_error
 ):
-    mocker.patch("app.main.views.service_settings.email_branding.logo_client.save_temporary_logo")
+    mocker.patch("app.main.views.service_settings.branding.logo_client.save_temporary_logo")
     mocker.patch("app.utils.image_processing.ImageProcessor")
 
     with mock.patch.dict(
@@ -1265,7 +1273,7 @@ def test_POST_email_branding_upload_logo_enforces_minimum_logo_height(
 
 
 def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(mocker, client_request, service_one):
-    mocker.patch("app.main.views.service_settings.email_branding.logo_client.save_temporary_logo")
+    mocker.patch("app.main.views.service_settings.branding.logo_client.save_temporary_logo")
     mock_image_processor = mocker.patch("app.main.forms.ImageProcessor")
     mock_image_processor().height = ComparablePropertyMock(side_effect=[26, 13])
     mock_image_processor().width = 100
@@ -1392,13 +1400,13 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
     brand_type,
     expected_name,
 ):
-    mock_flash = mocker.patch("app.main.views.service_settings.email_branding.flash")
+    mock_flash = mocker.patch("app.main.views.service_settings.branding.flash")
     mock_save_permanent = mocker.patch(
-        "app.main.views.service_settings.email_branding.logo_client.save_permanent_logo",
+        "app.main.views.service_settings.branding.logo_client.save_permanent_logo",
         return_value="permanent-example.png",
     )
     mock_should_set_default_org_email_branding = mocker.patch(
-        "app.main.views.service_settings.email_branding._should_set_default_org_email_branding", return_value=False
+        "app.main.views.service_settings.branding._should_set_default_org_email_branding", return_value=False
     )
     mock_add_to_branding_pool = mocker.patch(
         "app.organisations_client.add_brandings_to_email_branding_pool", return_value=None
@@ -1455,11 +1463,11 @@ def test_POST_email_branding_set_alt_text_creates_branding_sets_org_default_if_a
 ):
     service_one["organisation"] = ORGANISATION_ID
     mock_save_permanent = mocker.patch(
-        "app.main.views.service_settings.email_branding.logo_client.save_permanent_logo",
+        "app.main.views.service_settings.branding.logo_client.save_permanent_logo",
         return_value="permanent-example.png",
     )
     mock_should_set_default_org_email_branding = mocker.patch(
-        "app.main.views.service_settings.email_branding._should_set_default_org_email_branding", return_value=True
+        "app.main.views.service_settings.branding._should_set_default_org_email_branding", return_value=True
     )
     mock_add_to_branding_pool = mocker.patch(
         "app.organisations_client.add_brandings_to_email_branding_pool", return_value=None

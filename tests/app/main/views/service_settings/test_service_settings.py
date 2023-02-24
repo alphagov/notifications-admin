@@ -11,7 +11,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
 import app
-from app.main.views.service_settings.email_branding import (
+from app.main.views.service_settings.branding import (
     _should_set_default_org_email_branding,
 )
 from app.models.service import Service

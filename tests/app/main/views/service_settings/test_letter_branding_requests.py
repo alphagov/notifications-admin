@@ -5,7 +5,7 @@ import pytest
 from flask import g, url_for
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app.main.views.service_settings.letter_branding import (
+from app.main.views.service_settings.branding import (
     _should_set_default_org_letter_branding,
 )
 from app.models.branding import LetterBranding
@@ -155,9 +155,10 @@ def test_letter_branding_options_redirects_to_branding_preview_for_a_branding_po
         _data={"options": "1234"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.letter_branding_option_preview",
+            "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="1234",
+            branding_type="letter",
         ),
     )
 
@@ -244,8 +245,9 @@ def test_letter_branding_options_redirects_to_nhs_page(
         service_id=SERVICE_ONE_ID,
         _data={"options": LetterBranding.NHS_ID},
         _expected_redirect=url_for(
-            "main.letter_branding_nhs",
+            "main.branding_nhs",
             service_id=SERVICE_ONE_ID,
+            branding_type="letter",
         ),
     )
 
@@ -453,7 +455,7 @@ def test_POST_letter_branding_upload_branding_redirects_on_success(
     client_request, mock_antivirus_virus_free, fake_uuid, mocker
 ):
     mock_save_temporary = mocker.patch(
-        "app.main.views.service_settings.letter_branding.logo_client.save_temporary_logo",
+        "app.main.views.service_settings.branding.logo_client.save_temporary_logo",
         return_value="temporary.svg",
     )
 
@@ -540,17 +542,17 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     fake_uuid,
     mocker,
 ):
-    mock_flash = mocker.patch("app.main.views.service_settings.letter_branding.flash")
+    mock_flash = mocker.patch("app.main.views.service_settings.branding.flash")
     mock_get_unique_name = mocker.patch(
-        "app.main.views.service_settings.letter_branding.letter_branding_client.get_unique_name_for_letter_branding",
+        "app.main.views.service_settings.branding.letter_branding_client.get_unique_name_for_letter_branding",
         return_value="some unique name",
     )
 
     mock_should_set_default_org_letter_branding = mocker.patch(
-        "app.main.views.service_settings.letter_branding._should_set_default_org_letter_branding", return_value=False
+        "app.main.views.service_settings.branding._should_set_default_org_letter_branding", return_value=False
     )
     mock_save_permanent = mocker.patch(
-        "app.main.views.service_settings.letter_branding.logo_client.save_permanent_logo", return_value="permanent.svg"
+        "app.main.views.service_settings.branding.logo_client.save_permanent_logo", return_value="permanent.svg"
     )
 
     mock_add_to_branding_pool = mocker.patch(
@@ -602,15 +604,13 @@ def test_POST_letter_branding_set_name_creates_branding_sets_org_default_if_appr
 ):
     service_one["organisation"] = ORGANISATION_ID
     mock_get_unique_name = mocker.patch(
-        "app.main.views.service_settings.letter_branding.letter_branding_client.get_unique_name_for_letter_branding",
+        "app.main.views.service_settings.branding.letter_branding_client.get_unique_name_for_letter_branding",
     )
     mock_add_to_branding_pool = mocker.patch("app.organisations_client.add_brandings_to_letter_branding_pool")
-    mock_save_permanent = mocker.patch(
-        "app.main.views.service_settings.letter_branding.logo_client.save_permanent_logo"
-    )
+    mock_save_permanent = mocker.patch("app.main.views.service_settings.branding.logo_client.save_permanent_logo")
 
     mock_should_set_default_org_letter_branding = mocker.patch(
-        "app.main.views.service_settings.letter_branding._should_set_default_org_letter_branding", return_value=True
+        "app.main.views.service_settings.branding._should_set_default_org_letter_branding", return_value=True
     )
 
     client_request.post(
@@ -645,7 +645,9 @@ def test_letter_branding_option_preview_page_displays_preview_of_chosen_branding
         return_value=organisation_one,
     )
 
-    page = client_request.get(".letter_branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="1234")
+    page = client_request.get(
+        ".branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="1234", branding_type="letter"
+    )
 
     assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="1234")
 
@@ -662,9 +664,10 @@ def test_letter_branding_option_preview_page_redirects_to_branding_options_page_
     )
 
     client_request.get(
-        ".letter_branding_option_preview",
+        ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="some-unknown-branding-id",
+        branding_type="letter",
         _expected_status=302,
         _expected_redirect=url_for("main.letter_branding_options", service_id=SERVICE_ONE_ID),
     )
@@ -689,9 +692,10 @@ def test_letter_branding_option_preview_changes_letter_branding_when_user_confir
     )
 
     page = client_request.post(
-        ".letter_branding_option_preview",
+        ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="1234",
+        branding_type="letter",
         _follow_redirects=True,
     )
 
@@ -710,7 +714,11 @@ def test_letter_branding_nhs_page_displays_preview(
     service_one["organisation"] = organisation_one
     x = mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
-    page = client_request.get(".letter_branding_nhs", service_id=SERVICE_ONE_ID)
+    page = client_request.get(
+        ".branding_nhs",
+        service_id=SERVICE_ONE_ID,
+        branding_type="letter",
+    )
 
     assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style=LetterBranding.NHS_ID)
     assert x.called
@@ -725,8 +733,9 @@ def test_letter_branding_nhs_page_returns_404_if_service_not_nhs(
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
     client_request.get(
-        ".letter_branding_nhs",
+        ".branding_nhs",
         service_id=SERVICE_ONE_ID,
+        branding_type="letter",
         branding_option="some-unknown-branding-id",
         _expected_status=404,
     )
@@ -745,15 +754,16 @@ def test_letter_branding_nhs_changes_letter_branding_when_user_confirms(
     organisation_one["organisation_type"] = "nhs_central"
     service_one["organisation"] = organisation_one
 
-    mock_flash = mocker.patch("app.main.views.service_settings.letter_branding.flash")
+    mock_flash = mocker.patch("app.main.views.service_settings.branding.flash")
     mocker.patch(
         "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
     client_request.post(
-        ".letter_branding_nhs",
+        ".branding_nhs",
         service_id=SERVICE_ONE_ID,
+        branding_type="letter",
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
     )
 

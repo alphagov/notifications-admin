@@ -4,30 +4,37 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/branding-preview.html" import email_branding_preview %}
+{% from "components/branding-preview.html" import letter_branding_preview %}
+
+{% set page_title = "Change {} branding".format(branding_type) %}
 
 {% block service_page_title %}
-  Change email branding
+{{ page_title }}
 {% endblock %}
 
 {% block backLink %}
   {{ govukBackLink({
-    "href": url_for('.email_branding_options', service_id=current_service.id)
+    "href": back_link_url
   }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change email branding') }}
+  {{ page_header(page_title) }}
 
   <p class="govuk-body">
-    If you confirm, your emails will come with {{ chosen_branding.name }} branding.
+    If you confirm, your {{ branding_type }}s will come with {{ chosen_branding.name }} branding.
   </p>
 
-  {{ email_branding_preview(chosen_branding.id) }}
+  {% if branding_type == 'email' %}
+    {{ email_branding_preview(chosen_branding.id) }}
+  {% else %}
+    {{ letter_branding_preview(chosen_branding.id) }}
+  {% endif %}
 
 
   {% call form_wrapper() %}
-    {{ page_footer('Change email branding') }}
+    {{ page_footer('Change {} branding'.format(branding_type)) }}
   {% endcall %}
 
 {% endblock %}
