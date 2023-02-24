@@ -510,8 +510,9 @@ def branding_option_preview(service_id, branding_type):
 
     return render_template(
         "views/service-settings/branding/branding-option-preview.html",
-        chosen_branding=chosen_branding,
+        back_link_url=url_for(f".{branding_type}_branding_options", service_id=current_service.id),
         branding_type=branding_type,
+        chosen_branding=chosen_branding,
     )
 
 
@@ -529,8 +530,9 @@ def branding_nhs(service_id, branding_type):
 
     return render_template(
         "views/service-settings/branding/branding-nhs.html",
-        nhs_branding_id=branding,
+        back_link_url=url_for(f".{branding_type}_branding_options", service_id=current_service.id),
         branding_type=branding_type,
+        nhs_branding_id=branding,
     )
 
 
