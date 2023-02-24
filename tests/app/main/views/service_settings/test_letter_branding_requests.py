@@ -245,8 +245,9 @@ def test_letter_branding_options_redirects_to_nhs_page(
         service_id=SERVICE_ONE_ID,
         _data={"options": LetterBranding.NHS_ID},
         _expected_redirect=url_for(
-            "main.letter_branding_nhs",
+            "main.branding_nhs",
             service_id=SERVICE_ONE_ID,
+            branding_type="letter",
         ),
     )
 
@@ -715,7 +716,11 @@ def test_letter_branding_nhs_page_displays_preview(
     service_one["organisation"] = organisation_one
     x = mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
-    page = client_request.get(".letter_branding_nhs", service_id=SERVICE_ONE_ID)
+    page = client_request.get(
+        ".branding_nhs",
+        service_id=SERVICE_ONE_ID,
+        branding_type="letter",
+    )
 
     assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style=LetterBranding.NHS_ID)
     assert x.called
@@ -730,8 +735,9 @@ def test_letter_branding_nhs_page_returns_404_if_service_not_nhs(
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
     client_request.get(
-        ".letter_branding_nhs",
+        ".branding_nhs",
         service_id=SERVICE_ONE_ID,
+        branding_type="letter",
         branding_option="some-unknown-branding-id",
         _expected_status=404,
     )
@@ -750,15 +756,16 @@ def test_letter_branding_nhs_changes_letter_branding_when_user_confirms(
     organisation_one["organisation_type"] = "nhs_central"
     service_one["organisation"] = organisation_one
 
-    mock_flash = mocker.patch("app.main.views.service_settings.letter_branding.flash")
+    mock_flash = mocker.patch("app.main.views.service_settings.email_branding.flash")
     mocker.patch(
         "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
 
     client_request.post(
-        ".letter_branding_nhs",
+        ".branding_nhs",
         service_id=SERVICE_ONE_ID,
+        branding_type="letter",
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
     )
 

@@ -15,10 +15,11 @@ from app.main.forms import (
     EmailBrandingLogoUpload,
     GovernmentIdentityLogoForm,
 )
-from app.models.branding import AllEmailBranding, EmailBranding
+from app.models.branding import AllEmailBranding, EmailBranding, LetterBranding
 from app.models.organisation import Organisation
 from app.utils import service_belongs_to_org_type
 from app.utils.branding import get_email_choices as get_email_branding_choices
+from app.utils.branding import get_letter_choices as get_letter_branding_choices
 from app.utils.user import user_has_permissions
 
 from .index import THANKS_FOR_BRANDING_REQUEST_MESSAGE
@@ -55,8 +56,9 @@ def email_branding_options(service_id):
         if branding_choice == EmailBranding.NHS_ID:
             return redirect(
                 url_for(
-                    ".email_branding_nhs",
+                    ".branding_nhs",
                     service_id=current_service.id,
+                    branding_type="email",
                 )
             )
         elif branding_choice == "govuk":
@@ -120,8 +122,11 @@ def branding_option_preview(service_id, branding_type):
     )
 
 
-def check_email_branding_allowed_for_service(branding):
-    allowed_branding_for_service = dict(get_email_branding_choices(current_service))
+def check_branding_allowed_for_service(branding, branding_type):
+    if branding_type == "email":
+        allowed_branding_for_service = dict(get_email_branding_choices(current_service))
+    else:
+        allowed_branding_for_service = dict(get_letter_branding_choices(current_service))
 
     if branding not in allowed_branding_for_service:
         abort(404)
@@ -130,7 +135,7 @@ def check_email_branding_allowed_for_service(branding):
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/govuk", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def email_branding_govuk(service_id):
-    check_email_branding_allowed_for_service("govuk")
+    check_branding_allowed_for_service("govuk", branding_type="email")
 
     if request.method == "POST":
         current_service.update(email_branding=None)
@@ -141,19 +146,22 @@ def email_branding_govuk(service_id):
     return render_template("views/service-settings/branding/email-branding-govuk.html")
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/nhs", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/service-settings/<branding_type>-branding/nhs", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
-def email_branding_nhs(service_id):
-    check_email_branding_allowed_for_service(EmailBranding.NHS_ID)
+def branding_nhs(service_id, branding_type):
+    branding = EmailBranding.NHS_ID if branding_type == "email" else LetterBranding.NHS_ID
+    check_branding_allowed_for_service(branding, branding_type=branding_type)
 
     if request.method == "POST":
-        current_service.update(email_branding=EmailBranding.NHS_ID)
+        current_service.update(**{f"{branding_type}_branding": branding})
 
-        flash("You’ve updated your email branding", "default")
+        flash(f"You’ve updated your {branding_type} branding", "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/branding/branding-nhs.html", nhs_branding_id=EmailBranding.NHS_ID, branding_type="email"
+        "views/service-settings/branding/branding-nhs.html",
+        nhs_branding_id=branding,
+        branding_type=branding_type,
     )
 
 

@@ -309,8 +309,8 @@ def test_email_branding_options_page_shows_preview_if_something_else_is_only_opt
         (
             {"options": EmailBranding.NHS_ID},
             "nhs_local",
-            "main.email_branding_nhs",
-            {},
+            "main.branding_nhs",
+            {"branding_type": "email"},
         ),
     ),
 )
@@ -421,8 +421,9 @@ def test_email_branding_options_page_redirects_nhs_specific_page(
         service_id=SERVICE_ONE_ID,
         _data={"options": EmailBranding.NHS_ID},
         _expected_redirect=url_for(
-            "main.email_branding_nhs",
+            "main.branding_nhs",
             service_id=SERVICE_ONE_ID,
+            branding_type="email",
         ),
     )
 
@@ -535,10 +536,10 @@ def test_email_branding_option_preview_changes_email_branding_when_user_confirms
 
 
 @pytest.mark.parametrize(
-    "endpoint, service_org_type, branding_preview_id",
+    "endpoint, service_org_type, branding_preview_id, extra_args",
     [
-        ("main.email_branding_govuk", "central", "__NONE__"),
-        ("main.email_branding_nhs", "nhs_local", EmailBranding.NHS_ID),
+        ("main.email_branding_govuk", "central", "__NONE__", {}),
+        ("main.branding_nhs", "nhs_local", EmailBranding.NHS_ID, {"branding_type": "email"}),
     ],
 )
 def test_email_branding_govuk_and_nhs_pages(
@@ -551,6 +552,7 @@ def test_email_branding_govuk_and_nhs_pages(
     endpoint,
     service_org_type,
     branding_preview_id,
+    extra_args,
 ):
     organisation_one["organisation_type"] = service_org_type
     service_one["email_branding"] = sample_uuid()
@@ -564,6 +566,7 @@ def test_email_branding_govuk_and_nhs_pages(
     page = client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,
+        **extra_args,
     )
     assert page.select_one("h1").text == "Check your new branding"
     assert "Emails from service one will look like this" in normalize_spaces(page.text)
@@ -572,20 +575,18 @@ def test_email_branding_govuk_and_nhs_pages(
 
 
 @pytest.mark.parametrize(
-    "endpoint",
+    "endpoint, extra_args",
     [
-        "main.email_branding_govuk",
-        "main.email_branding_nhs",
+        ("main.email_branding_govuk", {}),
+        ("main.branding_nhs", {"branding_type": "email"}),
     ],
 )
 def test_email_branding_pages_give_404_if_selected_branding_not_allowed(
-    client_request,
-    mock_get_empty_email_branding_pool,
-    endpoint,
+    client_request, mock_get_empty_email_branding_pool, endpoint, extra_args
 ):
     # The only email branding allowed is 'something_else', so trying to visit any of the other
     # endpoints gives a 404 status code.
-    client_request.get(endpoint, service_id=SERVICE_ONE_ID, _expected_status=404)
+    client_request.get(endpoint, service_id=SERVICE_ONE_ID, **extra_args, _expected_status=404)
 
 
 def test_email_branding_govuk_submit(
@@ -639,8 +640,9 @@ def test_email_branding_nhs_submit(
     service_one["organisation_type"] = "nhs_local"
 
     page = client_request.post(
-        ".email_branding_nhs",
+        ".branding_nhs",
         service_id=SERVICE_ONE_ID,
+        branding_type="email",
         _follow_redirects=True,
     )
 

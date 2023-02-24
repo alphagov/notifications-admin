@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
@@ -17,7 +17,6 @@ from app.main.forms import (
     LetterBrandingUploadBranding,
 )
 from app.models.branding import LetterBranding
-from app.utils.branding import get_letter_choices as get_letter_branding_choices
 from app.utils.branding import letter_filename_for_db_from_logo_key
 from app.utils.user import user_has_permissions
 
@@ -52,8 +51,9 @@ def letter_branding_options(service_id):
         if branding_choice == LetterBranding.NHS_ID:
             return redirect(
                 url_for(
-                    ".letter_branding_nhs",
+                    ".branding_nhs",
                     service_id=current_service.id,
+                    branding_type="letter",
                 )
             )
 
@@ -121,31 +121,6 @@ def letter_branding_request(service_id):
             service_id=current_service.id,
             **_letter_branding_flow_query_params(),
         ),
-    )
-
-
-def check_letter_branding_allowed_for_service(branding):
-    allowed_branding_for_service = dict(get_letter_branding_choices(current_service))
-
-    if branding not in allowed_branding_for_service:
-        abort(404)
-
-
-@main.route("/services/<uuid:service_id>/service-settings/letter-branding/nhs", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def letter_branding_nhs(service_id):
-    check_letter_branding_allowed_for_service(LetterBranding.NHS_ID)
-
-    if request.method == "POST":
-        current_service.update(letter_branding=LetterBranding.NHS_ID)
-
-        flash("You’ve updated your letter branding", "default")
-        return redirect(url_for(".service_settings", service_id=current_service.id))
-
-    return render_template(
-        "views/service-settings/branding/branding-nhs.html",
-        nhs_branding_id=LetterBranding.NHS_ID,
-        branding_type="letter",
     )
 
 
