@@ -11,7 +11,7 @@ from app.navigation import (
 )
 from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, normalize_spaces
 
-EXCLUDED_ENDPOINTS = tuple(
+EXCLUDED_ENDPOINTS = set(
     map(
         Navigation.get_endpoint_with_blueprint,
         {
@@ -44,7 +44,6 @@ EXCLUDED_ENDPOINTS = tuple(
             "broadcast_tour_live",
             "broadcast_tour",
             "broadcast",
-            "callbacks",
             "cancel_broadcast_message",
             "cancel_invited_org_user",
             "cancel_invited_user",
@@ -86,7 +85,6 @@ EXCLUDED_ENDPOINTS = tuple(
             "delete_contact_list",
             "delete_service_template",
             "delete_template_folder",
-            "delivery_and_failure",
             "delivery_status_callback",
             "design_content",
             "download_contact_list",
@@ -170,16 +168,12 @@ EXCLUDED_ENDPOINTS = tuple(
             "guidance_upload_a_letter",
             "guidance_using_notify",
             "guidance_who_can_use_notify",
-            "guidance_who_its_for",
             "history",
             "inbound_sms_admin",
             "inbox_download",
             "inbox_updates",
             "inbox",
             "index",
-            "information_risk_management",
-            "information_security",
-            "integration_testing",
             "invite_org_user",
             "invite_user",
             "letter_branding_nhs",
@@ -196,6 +190,7 @@ EXCLUDED_ENDPOINTS = tuple(
             "link_service_to_organisation",
             "live_services_csv",
             "live_services",
+            "main.redirects.historical_redirects",
             "make_service_live",
             "manage_org_users",
             "manage_template_folder",
@@ -210,46 +205,9 @@ EXCLUDED_ENDPOINTS = tuple(
             "no_cookie.view_letter_template_preview",
             "no_cookie.view_template_version_preview",
             "notifications_sent_by_service",
-            "old_api_documentation",
-            "old_branding_and_customisation",
-            "old_bulk_sending",
-            "old_delivery_status",
-            "old_delivery_times",
-            "old_edit_and_format_messages",
             "old_email_branding_set_alt_text",
-            "old_email_branding",
-            "old_features_email",
-            "old_features_get_started",
-            "old_features_letters",
-            "old_features_sms",
-            "old_features_terms",
-            "old_features_using_notify",
             "old_guest_list",
-            "old_guidance_index",
-            "old_integration_testing",
-            "old_letter_branding",
-            "old_letter_specification",
-            "old_message_status",
-            "old_optional_content",
-            "old_performance",
-            "old_personalisation",
-            "old_receive_text_messages",
-            "old_reply_to_email_address",
-            "old_roadmap",
-            "old_schedule_messages",
-            "old_schedule_messages",
-            "old_send_files_by_email",
             "old_service_dashboard",
-            "old_team_members_and_permissions",
-            "old_templates",
-            "old_terms",
-            "old_text_message_sender",
-            "old_trial_mode",
-            "old_upload_a_letter",
-            "old_using_notify",
-            "old_using_notify_get_started",
-            "old_who_can_use_notify",
-            "old_who_its_for",
             "organisation_billing",
             "organisation_dashboard",
             "organisation_download_agreement",
@@ -440,7 +398,7 @@ def flask_app():
     yield app
 
 
-all_endpoints = [rule.endpoint for rule in next(flask_app()).url_map.iter_rules()]
+all_endpoints = set(rule.endpoint for rule in next(flask_app()).url_map.iter_rules())
 
 navigation_instances = (
     MainNavigation(),
@@ -463,11 +421,9 @@ def test_navigation_items_are_properly_defined(navigation_instance):
         ), "{} found more than once in {}.mapping".format(endpoint, type(navigation_instance).__name__)
 
 
-def test_excluded_navigation_items_are_properly_defined():
-    for endpoint in EXCLUDED_ENDPOINTS:
-        assert endpoint in all_endpoints, f"{endpoint} is not a real endpoint (in EXCLUDED_ENDPOINTS)"
-
-        assert EXCLUDED_ENDPOINTS.count(endpoint) == 1, f"{endpoint} found more than once in EXCLUDED_ENDPOINTS"
+def test_excluded_endpoints_are_all_found_in_app():
+    extra_excluded_endpoints = EXCLUDED_ENDPOINTS - all_endpoints
+    assert not extra_excluded_endpoints
 
 
 @pytest.mark.parametrize(
@@ -475,11 +431,12 @@ def test_excluded_navigation_items_are_properly_defined():
 )
 def test_all_endpoints_are_covered(navigation_instance):
     covered_endpoints = (
-        navigation_instance.endpoints_with_navigation + EXCLUDED_ENDPOINTS + ("static", "status.show_status", "metrics")
+        set(navigation_instance.endpoints_with_navigation)
+        | EXCLUDED_ENDPOINTS
+        | {"static", "status.show_status", "metrics"}
     )
-
-    for endpoint in all_endpoints:
-        assert endpoint in covered_endpoints, f"{endpoint} is not listed or excluded"
+    uncovered_endpoints = all_endpoints - covered_endpoints
+    assert not uncovered_endpoints
 
 
 @pytest.mark.parametrize(

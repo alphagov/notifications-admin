@@ -270,6 +270,14 @@ def init_app(application):
     application.url_map.converters["letter_file_extension"] = LetterFileExtensionConverter
     application.url_map.converters["simple_date"] = SimpleDateTypeConverter
 
+    # you can specify a default arg in a route decorator, that says "when you hit this route, populate the endpoint with
+    # the following kwargs". However, if the `redirect_defaults` flag is set to its default value of true, we also
+    # redirect to the first URL for that endpoint if the args match. So it works in reverse, as in, look at the args and
+    # find the URL that matches - then returns a 308 PERMANENT REDIRECT to that URL. We don't want that, setting it to
+    # false flips the behaviour so we still populate the endpoint args with the default values but don't do any
+    # automatic redirects. We only make use of this in our old historical_redirects endpoint
+    application.url_map.redirect_defaults = False
+
 
 @login_manager.user_loader
 def load_user(user_id):
