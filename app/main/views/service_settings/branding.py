@@ -89,15 +89,15 @@ def email_branding_options(service_id):
             return redirect(
                 url_for(".email_branding_choose_logo", service_id=current_service.id, branding_choice=branding_choice)
             )
-        else:
-            return redirect(
-                url_for(
-                    ".email_branding_choose_banner_type",
-                    service_id=current_service.id,
-                    back_link=".email_branding_options",
-                    branding_choice=branding_choice,
-                )
+
+        return redirect(
+            url_for(
+                ".email_branding_choose_banner_type",
+                service_id=current_service.id,
+                back_link=".email_branding_options",
+                branding_choice=branding_choice,
             )
+        )
 
     return render_template(
         "views/service-settings/branding/email-branding-options.html",
