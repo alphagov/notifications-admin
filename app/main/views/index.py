@@ -377,6 +377,8 @@ def guidance_upload_a_letter():
 @main.route("/using-notify/guidance/text-message-sender", endpoint="old_text_message_sender")
 @main.route("/using-notify/guidance/upload-a-letter", endpoint="old_upload_a_letter")
 @main.route("/performance", endpoint="old_performance")
+@main.route("/using-notify/get-started", endpoint="old_using_notify_get_started")
+@main.route("/features/get-started", endpoint="old_features_get_started")
 def old_page_redirects():
     redirects = {
         "main.old_roadmap": "main.guidance_roadmap",
@@ -414,6 +416,8 @@ def old_page_redirects():
         "main.old_text_message_sender": "main.guidance_text_message_sender",
         "main.old_upload_a_letter": "main.guidance_upload_a_letter",
         "main.old_performance": "main.performance",
+        "main.old_using_notify_get_started": "main.guidance_features",
+        "main.old_features_get_started": "main.guidance_features",
     }
     return redirect(url_for(redirects[request.endpoint]), code=301)
 
