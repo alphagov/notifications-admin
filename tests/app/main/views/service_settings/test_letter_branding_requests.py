@@ -155,9 +155,10 @@ def test_letter_branding_options_redirects_to_branding_preview_for_a_branding_po
         _data={"options": "1234"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.letter_branding_option_preview",
+            "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="1234",
+            branding_type="letter",
         ),
     )
 
@@ -645,7 +646,9 @@ def test_letter_branding_option_preview_page_displays_preview_of_chosen_branding
         return_value=organisation_one,
     )
 
-    page = client_request.get(".letter_branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="1234")
+    page = client_request.get(
+        ".branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="1234", branding_type="letter"
+    )
 
     assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="1234")
 
@@ -662,9 +665,10 @@ def test_letter_branding_option_preview_page_redirects_to_branding_options_page_
     )
 
     client_request.get(
-        ".letter_branding_option_preview",
+        ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="some-unknown-branding-id",
+        branding_type="letter",
         _expected_status=302,
         _expected_redirect=url_for("main.letter_branding_options", service_id=SERVICE_ONE_ID),
     )
@@ -689,9 +693,10 @@ def test_letter_branding_option_preview_changes_letter_branding_when_user_confir
     )
 
     page = client_request.post(
-        ".letter_branding_option_preview",
+        ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="1234",
+        branding_type="letter",
         _follow_redirects=True,
     )
 

@@ -65,7 +65,10 @@ def email_branding_options(service_id):
         elif branding_choice in current_service.email_branding_pool.ids:
             return redirect(
                 url_for(
-                    ".email_branding_option_preview", service_id=current_service.id, branding_option=branding_choice
+                    ".branding_option_preview",
+                    service_id=current_service.id,
+                    branding_option=branding_choice,
+                    branding_type="email",
                 )
             )
 
@@ -89,25 +92,31 @@ def email_branding_options(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-branding/confirm-change", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/<branding_type>-branding/confirm-change", methods=["GET", "POST"]
+)
 @user_has_permissions("manage_service")
-def email_branding_option_preview(service_id):
+def branding_option_preview(service_id, branding_type):
+    if branding_type == "email":
+        branding_pool = current_service.email_branding_pool
+    else:
+        branding_pool = current_service.letter_branding_pool
     try:
-        chosen_branding = current_service.email_branding_pool.get_item_by_id(request.args.get("branding_option"))
-    except current_service.email_branding_pool.NotFound:
+        chosen_branding = branding_pool.get_item_by_id(request.args.get("branding_option"))
+    except branding_pool.NotFound:
         flash("No branding found for this id.")
-        return redirect(url_for(".email_branding_options", service_id=current_service.id))
+        return redirect(url_for(f".{branding_type}_branding_options", service_id=current_service.id))
 
     if request.method == "POST":
-        current_service.update(email_branding=chosen_branding.id)
+        current_service.update(**{f"{branding_type}_branding": chosen_branding.id})
 
-        flash("You’ve updated your email branding", "default")
+        flash(f"You’ve updated your {branding_type} branding", "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
         "views/service-settings/branding/branding-option-preview.html",
         chosen_branding=chosen_branding,
-        branding_type="email",
+        branding_type=branding_type,
     )
 
 

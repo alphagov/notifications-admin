@@ -450,9 +450,10 @@ def test_email_branding_options_redirects_to_branding_preview_for_a_branding_poo
         _data={"options": "email-branding-1-id"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.email_branding_option_preview",
+            "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="email-branding-1-id",
+            branding_type="email",
         ),
     )
 
@@ -469,7 +470,10 @@ def test_email_branding_option_preview_page_displays_preview_of_chosen_branding(
     )
 
     page = client_request.get(
-        ".email_branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="email-branding-1-id"
+        ".branding_option_preview",
+        service_id=SERVICE_ONE_ID,
+        branding_option="email-branding-1-id",
+        branding_type="email",
     )
 
     assert page.select_one("iframe")["src"] == url_for("main.email_template", branding_style="email-branding-1-id")
@@ -487,9 +491,10 @@ def test_email_branding_option_preview_page_redirects_to_branding_request_page_i
     )
 
     client_request.get(
-        ".email_branding_option_preview",
+        ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="some-unknown-branding-id",
+        branding_type="email",
         _expected_status=302,
         _expected_redirect=url_for("main.email_branding_options", service_id=SERVICE_ONE_ID),
     )
@@ -514,9 +519,10 @@ def test_email_branding_option_preview_changes_email_branding_when_user_confirms
     )
 
     page = client_request.post(
-        ".email_branding_option_preview",
+        ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
         branding_option="email-branding-1-id",
+        branding_type="email",
         _follow_redirects=True,
     )
 

@@ -60,7 +60,10 @@ def letter_branding_options(service_id):
         elif branding_choice in current_service.letter_branding_pool.ids:
             return redirect(
                 url_for(
-                    ".letter_branding_option_preview", service_id=current_service.id, branding_option=branding_choice
+                    ".branding_option_preview",
+                    service_id=current_service.id,
+                    branding_option=branding_choice,
+                    branding_type="letter",
                 )
             )
         else:
@@ -150,29 +153,7 @@ def letter_branding_nhs(service_id):
 @user_has_permissions("manage_service")
 def old_letter_branding_option_preview(service_id):
     # TODO: remove this view, it's temporary
-    return redirect(url_for("letter_branding_option_preview", service_id=service_id), code=301)
-
-
-@main.route("/services/<uuid:service_id>/service-settings/letter-branding/confirm-change", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def letter_branding_option_preview(service_id):
-    try:
-        chosen_branding = current_service.letter_branding_pool.get_item_by_id(request.args.get("branding_option"))
-    except current_service.letter_branding_pool.NotFound:
-        flash("No branding found for this id.")
-        return redirect(url_for(".letter_branding_options", service_id=current_service.id))
-
-    if request.method == "POST":
-        current_service.update(letter_branding=chosen_branding.id)
-
-        flash("You’ve updated your letter branding", "default")
-        return redirect(url_for(".service_settings", service_id=current_service.id))
-
-    return render_template(
-        "views/service-settings/branding/branding-option-preview.html",
-        chosen_branding=chosen_branding,
-        branding_type="letter",
-    )
+    return redirect(url_for("branding_option_preview", service_id=service_id, branding_type="letter"), code=301)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/upload-branding", methods=["GET", "POST"])
