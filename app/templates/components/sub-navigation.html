@@ -1,10 +1,10 @@
-{% macro sub_navigation_item(item) %}
-  <li class="sub-navigation__item {% if item['link'] == request.endpoint %} sub-navigation__item--active {% endif %}"
+{% macro sub_navigation_item(item, with_top_border=False) %}
+  <li class="navigation__item {% if with_top_border %} navigation__item--with-separator {% endif %}"
       itemprop="itemListElement"
       itemscope
       itemtype="http://schema.org/ListItem"
   >
-    <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline" href="{{ url_for(item['link']) }}" itemprop="item">
+    <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline {% if item['link'] == request.endpoint %} selected {% endif %}" href="{{ url_for(item['link']) }}" itemprop="item">
       <span itemprop="name">{{item['name']}}</span>
     </a>
     {% if caller %}
@@ -25,15 +25,15 @@
   item_set,
   nav_label_prefix
 ) %}
-  <nav class="sub-navigation" aria-label="{{ nav_label_prefix }}">
+  <nav class="navigation govuk-!-margin-top-7" aria-label="{{ nav_label_prefix }}">
     <ol itemscope itemtype="http://schema.org/ItemList">
       {% for item in item_set %}
         {% if item.sub_navigation_items %}
-          {% call sub_navigation_item(item) %}
+          {% call sub_navigation_item(item, with_top_border=(not loop.first)) %}
             {{ sub_navigation_item_sub_navigation(item) }}
           {% endcall %}
         {% else %}
-          {{ sub_navigation_item(item) }}
+          {{ sub_navigation_item(item, with_top_border=(not loop.first)) }}
         {% endif %}
       {% endfor %}
     </ol>
