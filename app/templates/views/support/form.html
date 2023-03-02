@@ -4,6 +4,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {% block per_page_title %}
   {{ page_title }}
@@ -19,12 +20,12 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         {% if show_status_page_banner %}
-          <div class="govuk-inset-text govuk-!-margin-top-0 govuk-!-margin-bottom-3">
-            <p class="govuk-body">
-              Check our <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">system status</a>
-              page to see if there are any known issues with GOV.UK Notify.
-            </p>
-          </div>
+          {% set insetHtml %}
+          Check our <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">
+            system status</a>
+          page to see if there are any known issues with GOV.UK Notify.
+          {% endset %}
+          {{ govukInsetText({"html": insetHtml, classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-3"}) }}
         {% endif %}
         {% call form_wrapper() %}
             {{ textbox(form.feedback, width='1-1', hint='', rows=10, autosize=True) }}

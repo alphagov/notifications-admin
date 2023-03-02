@@ -1,4 +1,5 @@
 {% extends "content_template.html" %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'About Notify' %}
@@ -25,9 +26,10 @@
 <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_who_can_use_notify') }}">who can use GOV.UK Notify</a>.</p>
 
 {% if not current_user.is_authenticated %}
-<div class="govuk-inset-text">
-    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.</p>
-</div>
+  {% set insetHtml %}
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.
+  {% endset %}
+  {{ govukInsetText({"html": insetHtml}) }}
 {% endif %}
 
 <h2 class="heading-medium">Unlimited free emails</h2>

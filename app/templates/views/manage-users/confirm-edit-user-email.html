@@ -3,6 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {% block per_page_title %}
   Confirm change of email address
@@ -21,9 +22,9 @@
   <div class="govuk-grid-column-full">
   {% call form_wrapper() %}
     <p class="govuk-body">New email address:</p>
-    <div class="govuk-inset-text govuk-!-margin-top-0">
-      <p class="govuk-body">{{ new_email }}</p>
-    </div>
+
+    {{ govukInsetText({"text": new_email, "classes": "govuk-!-margin-top-0"}) }}
+
     <p class="govuk-body">We will send {{ user.name }} an email to tell them about the change.</p>
     {{ page_footer('Confirm') }}
   {% endcall %}
