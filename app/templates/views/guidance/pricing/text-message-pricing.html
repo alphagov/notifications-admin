@@ -3,6 +3,7 @@
 {% from "components/table.html" import mapping_table, row, text_field, field %}
 {% from "components/live-search.html" import live_search %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Pricing information' %}
@@ -23,9 +24,9 @@ Text message pricing
 
   <p class="govuk-body">Each unique service you add has an annual allowance of free text messages.</p>
   <p class="govuk-body">When a service has used its annual allowance, it costs {{ sms_rate }} pence (plus VAT) for each text message you send.</p>
-  <div class="govuk-inset-text">  
-    <p class="govuk-body">On 1 April 2023 the cost of sending a text message will go up to 1.97 pence (plus VAT).</p>
-  </div>
+  {{ govukInsetText({
+    "text": "On 1 April 2023 the cost of sending a text message will go up to 1.97 pence (plus VAT)."
+  }) }}
   <p class="govuk-body">You may use more free messages, or pay more for each message, if you:</p>
   <ul class="govuk-list govuk-list--bullet">
     <li>send <a class="govuk-link govuk-link--no-visited-state" href="#long-text-messages">text messages longer than 160 characters</a></li>
