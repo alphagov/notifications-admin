@@ -4,6 +4,8 @@
 {% from "components/table.html" import field, list_table %}
 
 {% set navigation_label_prefix = 'Features' %}
+{% set content_column_width = 'three-quarters' %}
+{% set bodyClasses = 'performance' %}
 
 {% block per_page_title %}
   Performance data
@@ -21,39 +23,35 @@
     Messages sent since May 2016
   </h2>
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-half">
+  <div class="totals totals--4-column">
+    <div class="totals__all">
       <div class="product-page-big-number">{{ total_notifications|format_billions }}</div>
       total
     </div>
-    <div class="govuk-grid-column-one-half">
-      <div class="govuk-grid-row govuk-!-padding-top-4">
-        <div class="govuk-grid-column-one-third">
-          {{ big_number(
-            email_notifications|format_billions,
-            label=email_notifications|message_count_noun('email'),
-            smallest=True,
-          ) }}
-        </div>
-        <div class="govuk-grid-column-one-third">
-          {{ big_number(
-            sms_notifications|format_billions,
-            label=sms_notifications|message_count_noun('sms'),
-            smallest=True,
-          ) }}
-        </div>
-        <div class="govuk-grid-column-one-third">
-          {{ big_number(
-            letter_notifications|format_billions,
-            label=letter_notifications|message_count_noun('letter'),
-            smallest=True,
-          ) }}
-        </div>
-      </div>
+    <div class="totals__set-type">
+      {{ big_number(
+        email_notifications|format_billions,
+        label=email_notifications|message_count_noun('email'),
+        smallest=True,
+      ) }}
+    </div>
+    <div class="totals__set-type">
+      {{ big_number(
+        sms_notifications|format_billions,
+        label=sms_notifications|message_count_noun('sms'),
+        smallest=True,
+      ) }}
+    </div>
+    <div class="totals__set-type">
+      {{ big_number(
+        letter_notifications|format_billions,
+        label=letter_notifications|message_count_noun('letter'),
+        smallest=True,
+      ) }}
     </div>
   </div>
 
-  <div class="dashboard-table">
+  <div class="dashboard-table dashboard-table--4-column">
     {% call(item, row_number) list_table(
       notifications_by_type|reverse,
       caption='Messages sent since May 2016',
@@ -95,7 +93,7 @@
       ) }}
     </div>
   </div>
-  <div class="dashboard-table">
+  <div class="dashboard-table dashboard-table--2-column">
     {% call(item, row_number) list_table(
       processing_time | reverse,
       caption='Messages sent within 10 seconds',
@@ -120,20 +118,20 @@
   <h2 class="govuk-heading-m" id='organisations-using-notify'>
     Organisations using Notify
   </h2>
-  <div class="govuk-grid-row bottom-gutter">
-    <div class="govuk-grid-column-one-half">
+  <div class="totals totals--2-column bottom-gutter">
+    <div class="totals__all">
       <span class="govuk-visually-hidden">There are</span>
       <div class="product-page-big-number">{{ count_of_live_services_and_organisations.organisations|format_thousands }}</div>
       organisations
     </div>
-    <div class="govuk-grid-column-one-half">
+    <div class="totals__set-type">
       <span class="govuk-visually-hidden">and</span>
       <div class="product-page-big-number">{{ count_of_live_services_and_organisations.services|format_thousands }}</div>
       services
       <span class="govuk-visually-hidden">using Notify.</span>
     </div>
   </div>
-  <div class="dashboard-table">
+  <div class="dashboard-table dashboard-table--2-column">
     {% call(item, row_number) list_table(
       organisations_using_notify,
       caption='Organisations using Notify',

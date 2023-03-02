@@ -14,7 +14,7 @@
       <div class="govuk-grid-column-one-quarter">
         {{ sub_navigation(navigation_links, navigation_label_prefix) }}
       </div>
-      <div class="govuk-grid-column-five-eighths">
+      <div class="govuk-grid-column-{% if content_column_width %}{{ content_column_width }}{% else %}five-eighths{% endif %}">
     {% else %}
       <div class="govuk-grid-column-two-thirds">
     {% endif %}
