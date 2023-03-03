@@ -13,6 +13,8 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                 (
                     "12 December",
                     (
+                        "Test User 2:14pm "
+                        "Renamed this service from ‘After lunch’ to ‘Non-chronological event’ "
                         "Test User 1:13pm "
                         "Renamed this service from ‘Before lunch’ to ‘After lunch’ "
                         "Test User 12:12pm "
@@ -68,6 +70,8 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                 (
                     "12 December",
                     (
+                        "Test User 2:14pm "
+                        "Renamed this service from ‘After lunch’ to ‘Non-chronological event’ "
                         "Test User 1:13pm "
                         "Renamed this service from ‘Before lunch’ to ‘After lunch’ "
                         "Test User 12:12pm "
