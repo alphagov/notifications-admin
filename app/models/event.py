@@ -67,20 +67,6 @@ class ServiceEvent(Event):
     def format_contact_link(self):
         return "Set the contact details for this service to ‘{}’".format(self.value_to)
 
-    def format_email_branding(self):
-        return "Updated this service’s email branding"
-
-    def format_inbound_api(self):
-        return "Updated the callback for received text messages"
-
-    def format_letter_branding(self):
-        if self.value_to is None:
-            return "Removed the logo from this service’s letters"
-        return "Updated the logo on this service’s letters"
-
-    def format_letter_contact_block(self):
-        return "Updated the default letter contact block for this service"
-
     def format_message_limit(self):
         return "{} this service’s daily message limit from {} to {}".format(
             "Reduced" if self.value_from > self.value_to else "Increased",
