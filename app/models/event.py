@@ -151,7 +151,8 @@ class ServiceEvents(ModelList):
 
     @staticmethod
     def splat(events):
-        for index, item in enumerate(sorted(events, key=lambda event: event["updated_at"] or event["created_at"])):
+        sorted_events = sorted(events, key=lambda event: event["updated_at"] or event["created_at"])
+        for index, item in enumerate(sorted_events):
             if index == 0:
                 yield ServiceCreationEvent(item)
             else:
@@ -159,8 +160,8 @@ class ServiceEvents(ModelList):
                     yield ServiceEvent(
                         item,
                         key,
-                        events[index - 1][key],
-                        events[index][key],
+                        sorted_events[index - 1][key],
+                        sorted_events[index][key],
                     )
 
     def __init__(self, service_id):
