@@ -3522,6 +3522,12 @@ def mock_get_service_history(mocker):
                     "created_by_id": uuid4(),
                 },
                 {
+                    "name": "Non-chronological event",
+                    "created_at": "2010-10-10T01:01:01.000000Z",
+                    "updated_at": "2012-12-12T14:14:14.000000Z",
+                    "created_by_id": sample_uuid(),
+                },
+                {
                     "name": "Before lunch",
                     "created_at": "2010-10-10T01:01:01.000000Z",
                     "updated_at": "2012-12-12T12:12:12.000000Z",

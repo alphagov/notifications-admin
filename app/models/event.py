@@ -67,20 +67,6 @@ class ServiceEvent(Event):
     def format_contact_link(self):
         return "Set the contact details for this service to ‘{}’".format(self.value_to)
 
-    def format_email_branding(self):
-        return "Updated this service’s email branding"
-
-    def format_inbound_api(self):
-        return "Updated the callback for received text messages"
-
-    def format_letter_branding(self):
-        if self.value_to is None:
-            return "Removed the logo from this service’s letters"
-        return "Updated the logo on this service’s letters"
-
-    def format_letter_contact_block(self):
-        return "Updated the default letter contact block for this service"
-
     def format_message_limit(self):
         return "{} this service’s daily message limit from {} to {}".format(
             "Reduced" if self.value_from > self.value_to else "Increased",
@@ -165,7 +151,8 @@ class ServiceEvents(ModelList):
 
     @staticmethod
     def splat(events):
-        for index, item in enumerate(sorted(events, key=lambda event: event["updated_at"] or event["created_at"])):
+        sorted_events = sorted(events, key=lambda event: event["updated_at"] or event["created_at"])
+        for index, item in enumerate(sorted_events):
             if index == 0:
                 yield ServiceCreationEvent(item)
             else:
@@ -173,8 +160,8 @@ class ServiceEvents(ModelList):
                     yield ServiceEvent(
                         item,
                         key,
-                        events[index - 1][key],
-                        events[index][key],
+                        sorted_events[index - 1][key],
+                        sorted_events[index][key],
                     )
 
     def __init__(self, service_id):
