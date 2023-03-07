@@ -24,31 +24,31 @@
   </h2>
 
   <div class="totals totals--4-column">
-    <div class="totals__all">
-      <div class="product-page-big-number">{{ total_notifications|format_billions }}</div>
+    <p class="totals__all">
+      <span class="product-page-big-number">{{ total_notifications|format_billions }}</span>
       total
-    </div>
-    <div class="totals__set-type">
+    </p>
+    <p class="totals__set-type">
       {{ big_number(
         email_notifications|format_billions,
         label=email_notifications|message_count_noun('email'),
         smallest=True,
       ) }}
-    </div>
-    <div class="totals__set-type">
+    </p>
+    <p class="totals__set-type">
       {{ big_number(
         sms_notifications|format_billions,
         label=sms_notifications|message_count_noun('sms'),
         smallest=True,
       ) }}
-    </div>
-    <div class="totals__set-type">
+    </p>
+    <p class="totals__set-type">
       {{ big_number(
         letter_notifications|format_billions,
         label=letter_notifications|message_count_noun('letter'),
         smallest=True,
       ) }}
-    </div>
+    </p>
   </div>
 
   <div class="dashboard-table dashboard-table--4-column">
@@ -118,19 +118,19 @@
   <h2 class="govuk-heading-m" id='organisations-using-notify'>
     Organisations using Notify
   </h2>
-  <div class="totals totals--2-column bottom-gutter">
-    <div class="totals__all">
+  <p class="totals totals--2-column bottom-gutter">
+    <span class="totals__all">
       <span class="govuk-visually-hidden">There are</span>
-      <div class="product-page-big-number">{{ count_of_live_services_and_organisations.organisations|format_thousands }}</div>
+      <span class="product-page-big-number">{{ count_of_live_services_and_organisations.organisations|format_thousands }}</span>
       organisations
-    </div>
-    <div class="totals__set-type">
+    </span>
+    <span class="totals__set-type">
       <span class="govuk-visually-hidden">and</span>
-      <div class="product-page-big-number">{{ count_of_live_services_and_organisations.services|format_thousands }}</div>
+      <span class="product-page-big-number">{{ count_of_live_services_and_organisations.services|format_thousands }}</span>
       services
       <span class="govuk-visually-hidden">using Notify.</span>
-    </div>
-  </div>
+    </span>
+  </p>
   <div class="dashboard-table dashboard-table--2-column">
     {% call(item, row_number) list_table(
       organisations_using_notify,
