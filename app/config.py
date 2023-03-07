@@ -59,16 +59,17 @@ class Config:
     SESSION_REFRESH_EACH_REQUEST = False
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
-    CSV_UPLOAD_BUCKET_NAME = "local-notifications-csv-upload"
-    CONTACT_LIST_UPLOAD_BUCKET_NAME = "local-contact-list"
     ACTIVITY_STATS_LIMIT_DAYS = 7
 
     REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT = 45
 
     NOTIFY_ENVIRONMENT = "development"
-    LOGO_UPLOAD_BUCKET_NAME = "public-logos-local"
-    MOU_BUCKET_NAME = "local-mou"
-    TRANSIENT_UPLOADED_LETTERS = "local-transient-uploaded-letters"
+    S3_BUCKET_CSV_UPLOAD = "local-notifications-csv-upload"
+    S3_BUCKET_CONTACT_LIST_UPLOAD = "local-contact-list"
+    S3_BUCKET_LOGO_UPLOAD = "public-logos-local"
+    S3_BUCKET_MOU = "local-mou"
+    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "local-transient-uploaded-letters"
+    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "local-precompiled-originals-backup-letters"
     ROUTE_SECRET_KEY_1 = os.environ.get("ROUTE_SECRET_KEY_1", "")
     ROUTE_SECRET_KEY_2 = os.environ.get("ROUTE_SECRET_KEY_2", "")
     CHECK_PROXY_HEADER = False
@@ -107,13 +108,14 @@ class Development(Config):
     DEBUG = True
     SESSION_COOKIE_SECURE = False
     SESSION_PROTECTION = None
-    CSV_UPLOAD_BUCKET_NAME = "development-notifications-csv-upload"
-    CONTACT_LIST_UPLOAD_BUCKET_NAME = "development-contact-list"
-    LOGO_UPLOAD_BUCKET_NAME = "public-logos-tools"
+    S3_BUCKET_CSV_UPLOAD = "development-notifications-csv-upload"
+    S3_BUCKET_CONTACT_LIST_UPLOAD = "development-contact-list"
+    S3_BUCKET_LOGO_UPLOAD = "public-logos-tools"
+    S3_BUCKET_MOU = "notify.tools-mou"
+    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "development-transient-uploaded-letters"
+    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "development-letters-precompiled-originals-backup"
+
     LOGO_CDN_DOMAIN = "static-logos.notify.tools"
-    MOU_BUCKET_NAME = "notify.tools-mou"
-    TRANSIENT_UPLOADED_LETTERS = "development-transient-uploaded-letters"
-    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "development-letters-precompiled-originals-backup"
 
     ADMIN_CLIENT_SECRET = "dev-notify-secret-key"
     DANGEROUS_SALT = "dev-notify-salt"
@@ -134,13 +136,13 @@ class Test(Development):
     DEBUG = True
     TESTING = True
     WTF_CSRF_ENABLED = False
-    CSV_UPLOAD_BUCKET_NAME = "test-notifications-csv-upload"
-    CONTACT_LIST_UPLOAD_BUCKET_NAME = "test-contact-list"
-    LOGO_UPLOAD_BUCKET_NAME = "public-logos-test"
+    S3_BUCKET_CSV_UPLOAD = "test-notifications-csv-upload"
+    S3_BUCKET_CONTACT_LIST_UPLOAD = "test-contact-list"
+    S3_BUCKET_LOGO_UPLOAD = "public-logos-test"
+    S3_BUCKET_MOU = "test-mou"
+    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "test-transient-uploaded-letters"
+    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "test-letters-precompiled-originals-backup"
     LOGO_CDN_DOMAIN = "static-logos.test.com"
-    MOU_BUCKET_NAME = "test-mou"
-    TRANSIENT_UPLOADED_LETTERS = "test-transient-uploaded-letters"
-    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "test-letters-precompiled-originals-backup"
     NOTIFY_ENVIRONMENT = "test"
     API_HOST_NAME = "http://you-forgot-to-mock-an-api-call-to"
     TEMPLATE_PREVIEW_API_HOST = "http://localhost:9999"
@@ -155,13 +157,13 @@ class Test(Development):
 class Preview(Config):
     HTTP_PROTOCOL = "https"
     HEADER_COLOUR = "#F499BE"  # $baby-pink
-    CSV_UPLOAD_BUCKET_NAME = "preview-notifications-csv-upload"
-    CONTACT_LIST_UPLOAD_BUCKET_NAME = "preview-contact-list"
-    LOGO_UPLOAD_BUCKET_NAME = "public-logos-preview"
+    S3_BUCKET_CSV_UPLOAD = "preview-notifications-csv-upload"
+    S3_BUCKET_CONTACT_LIST_UPLOAD = "preview-contact-list"
+    S3_BUCKET_LOGO_UPLOAD = "public-logos-preview"
+    S3_BUCKET_MOU = "notify.works-mou"
+    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "preview-transient-uploaded-letters"
+    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "preview-letters-precompiled-originals-backup"
     LOGO_CDN_DOMAIN = "static-logos.notify.works"
-    MOU_BUCKET_NAME = "notify.works-mou"
-    TRANSIENT_UPLOADED_LETTERS = "preview-transient-uploaded-letters"
-    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "preview-letters-precompiled-originals-backup"
     NOTIFY_ENVIRONMENT = "preview"
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = "static.notify.works"
@@ -174,13 +176,13 @@ class Preview(Config):
 class Staging(Config):
     HTTP_PROTOCOL = "https"
     HEADER_COLOUR = "#6F72AF"  # $mauve
-    CSV_UPLOAD_BUCKET_NAME = "staging-notifications-csv-upload"
-    CONTACT_LIST_UPLOAD_BUCKET_NAME = "staging-contact-list"
-    LOGO_UPLOAD_BUCKET_NAME = "public-logos-staging"
+    S3_BUCKET_CSV_UPLOAD = "staging-notifications-csv-upload"
+    S3_BUCKET_CONTACT_LIST_UPLOAD = "staging-contact-list"
+    S3_BUCKET_LOGO_UPLOAD = "public-logos-staging"
+    S3_BUCKET_MOU = "staging-notify.works-mou"
+    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "staging-transient-uploaded-letters"
+    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "staging-letters-precompiled-originals-backup"
     LOGO_CDN_DOMAIN = "static-logos.staging-notify.works"
-    MOU_BUCKET_NAME = "staging-notify.works-mou"
-    TRANSIENT_UPLOADED_LETTERS = "staging-transient-uploaded-letters"
-    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "staging-letters-precompiled-originals-backup"
     NOTIFY_ENVIRONMENT = "staging"
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = "static.staging-notify.works"
@@ -190,13 +192,13 @@ class Staging(Config):
 class Production(Config):
     HEADER_COLOUR = "#1d70b8"  # $govuk-blue
     HTTP_PROTOCOL = "https"
-    CSV_UPLOAD_BUCKET_NAME = "live-notifications-csv-upload"
-    CONTACT_LIST_UPLOAD_BUCKET_NAME = "production-contact-list"
-    LOGO_UPLOAD_BUCKET_NAME = "public-logos-production"
+    S3_BUCKET_CSV_UPLOAD = "live-notifications-csv-upload"
+    S3_BUCKET_CONTACT_LIST_UPLOAD = "production-contact-list"
+    S3_BUCKET_LOGO_UPLOAD = "public-logos-production"
+    S3_BUCKET_MOU = "notifications.service.gov.uk-mou"
+    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "production-transient-uploaded-letters"
+    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "production-letters-precompiled-originals-backup"
     LOGO_CDN_DOMAIN = "static-logos.notifications.service.gov.uk"
-    MOU_BUCKET_NAME = "notifications.service.gov.uk-mou"
-    TRANSIENT_UPLOADED_LETTERS = "production-transient-uploaded-letters"
-    PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "production-letters-precompiled-originals-backup"
     NOTIFY_ENVIRONMENT = "production"
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = "static.notifications.service.gov.uk"
@@ -211,8 +213,8 @@ class CloudFoundryConfig(Config):
 class Sandbox(CloudFoundryConfig):
     HTTP_PROTOCOL = "https"
     HEADER_COLOUR = "#F499BE"  # $baby-pink
-    CSV_UPLOAD_BUCKET_NAME = "cf-sandbox-notifications-csv-upload"
-    LOGO_UPLOAD_BUCKET_NAME = "cf-sandbox-notifications-logo-upload"
+    S3_BUCKET_CSV_UPLOAD = "cf-sandbox-notifications-csv-upload"
+    S3_BUCKET_LOGO_UPLOAD = "cf-sandbox-notifications-logo-upload"
     NOTIFY_ENVIRONMENT = "sandbox"
 
 

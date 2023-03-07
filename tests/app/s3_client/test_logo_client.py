@@ -87,7 +87,7 @@ class TestLogoClientSaveTemporaryLogo:
 class TestLogoClientSavePermanentLogo:
     def s3_setup(self, app):
         s3 = boto3.client("s3", region_name=app.config["AWS_REGION"])
-        s3.create_bucket(Bucket=app.config["LOGO_UPLOAD_BUCKET_NAME"])
+        s3.create_bucket(Bucket=app.config["S3_BUCKET_LOGO_UPLOAD"])
 
     @pytest.mark.parametrize(
         "temporary_logo_key, logo_type, logo_key_extra, expected_location",

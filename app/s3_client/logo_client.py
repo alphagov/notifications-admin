@@ -30,7 +30,7 @@ class LogoClient:
 
     def init_app(self, application):
         self.region = application.config["AWS_REGION"]
-        self.bucket_name = application.config["LOGO_UPLOAD_BUCKET_NAME"]
+        self.bucket_name = application.config["S3_BUCKET_LOGO_UPLOAD"]
         self.client = resource("s3")
 
     def _get_object(self, key_):
