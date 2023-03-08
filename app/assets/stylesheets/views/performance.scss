@@ -1,0 +1,118 @@
+// Styles specific to the performance page
+
+$gutter-with-14px-text: 1.696em;
+$gutter-with-16px-text: 1.484em;
+$gutter-with-19px-text: 1.25em;
+
+.totals__all,
+.totals__set-type {
+  margin: 0; // cancel the vertical margins from using <p> tags
+}
+
+// Separate 'grand total' from others in vertical stack of totals
+.totals__all {
+  padding-bottom: 15px;
+}
+
+.totals__all > .product-page-big-number {
+  display: block; // Put label for number on new line
+}
+
+// Make totals block-level by default
+.totals--2-column > .totals__all,
+.totals--2-column > .totals__set-type,
+.totals--4-column > .totals__all,
+.totals--4-column > .totals__set-type {
+  display: block;
+  width: 100%;
+}
+
+// Dashboard tables apply padding to the right of all table headers and cells except the last
+//
+// We reverse this, so the first table header and cell have no padding that could be considered as
+// part of their width
+.performance .dashboard-table .table-field-headings-visible th,
+.performance .table-font-xsmall td {
+  padding-right: 0;
+}
+
+// Set gutters for table headers on
+.performance .dashboard-table .table-field-headings-visible th {
+  padding-left: $gutter-with-16px-text;
+}
+
+// Set gutters for table cells to match table headers
+.performance .table-font-xsmall td {
+  padding-left: $gutter-with-14px-text;
+}
+
+// Cancel padding for gutters on first table headers and cells
+.performance .dashboard-table .table-field-headings-visible th:first-of-type,
+.performance .table-font-xsmall td:first-of-type {
+  padding-left: 0;
+}
+
+.performance .dashboard-table--4-column .table-field-headings-visible th:first-of-type,
+.performance .dashboard-table--4-column .table-font-xsmall td:first-of-type {
+  width: 40%; // 40% is the lowest width the first column works at with the smaller text
+}
+
+.performance .dashboard-table--2-column .table-field-headings-visible th:first-of-type,
+.performance .dashboard-table--2-column .table-font-xsmall td:first-of-type {
+  width: 52.5%;
+}
+
+// Totals use block-level elements so will fill the width and stack by default
+// Make them display as a table on larger screens, to match the data table below
+@include govuk-media-query($from: tablet) {
+  .totals {
+    display: table;
+    width: 100%;
+  }
+
+  .totals > .totals__all,
+  .totals > .totals__set-type {
+    display: table-cell;
+  }
+
+  .totals__all {
+    padding-bottom: 0;
+    padding-left: 0; // Remove padding-left now applied to all totals
+  }
+
+  .totals > .totals__set-type {
+    width: auto; // reset width, set to 100% by default
+  }
+
+  // Give totals and table headers the same gutters
+  .totals__set-type,
+  .performance .dashboard-table .table-field-headings-visible th {
+    padding-left: $gutter-with-19px-text;
+  }
+
+  // Give table cells the same gutters
+  .performance .table-font-xsmall td {
+    padding-left: $gutter-with-16px-text;
+  }
+}
+
+// Handle other screen sizes from tablet up, making totals match tables as much as possible
+.totals--4-column > .totals__all,
+.performance .dashboard-table--4-column .table-field-headings-visible th:first-of-type,
+.performance .dashboard-table--4-column .table-font-xsmall td:first-of-type {
+  // 640-730px has the larger text but less space so needs a smaller first-column width
+  @include govuk-media-query($from: tablet, $until: 730px) {
+    width: 35%;
+  }
+
+  // 900px upwards works with the default of 52.5%
+  @include govuk-media-query($from: 900px) {
+    width: 52.5%;
+  }
+}
+
+.totals--2-column > .totals__all,
+.performance .dashboard-table--2-column .table-field-headings-visible th:first-of-type,
+.performance .dashboard-table--2-column .table-font-xsmall td:first-of-type {
+  width: 52.5%;
+}
