@@ -1137,6 +1137,36 @@ def test_choosing_to_copy_redirects(
     )
 
 
+def test_choosing_letter_creates(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_create_service_template,
+    fake_uuid,
+):
+    service_one["permissions"].append("letter")
+    client_request.post(
+        "main.choose_template",
+        service_id=SERVICE_ONE_ID,
+        _data={"operation": "add-new-template", "add_template_by_template_type": "letter"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_create_service_template.assert_called_once_with(
+        "New letter template",
+        "letter",
+        "Body",
+        SERVICE_ONE_ID,
+        "Main heading",
+        None,
+    )
+
+
 def test_choose_a_template_to_copy(
     client_request,
     mock_get_service_templates,
