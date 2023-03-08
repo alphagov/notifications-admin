@@ -289,12 +289,12 @@ def _add_template_by_type(template_type, template_folder_id):
 
     if template_type == "letter":
         blank_letter = service_api_client.create_service_template(
-            "New letter template",
-            "letter",
-            "Body",
-            current_service.id,
-            "Main heading",
-            template_folder_id,
+            name="New letter template",
+            type_="letter",
+            content="Body",
+            service_id=current_service.id,
+            subject="Main heading",
+            parent_folder_id=template_folder_id,
         )
         return redirect(
             url_for(
