@@ -38,6 +38,10 @@ $iso-paper-ratio: 141.42135624%;
     box-shadow: inset 0 0 0 1px $govuk-border-colour;
   }
 
+  &:nth-of-type(even) {
+    margin-top: -1 * (govuk-spacing(6) + 1px);
+  }
+
   &-postage {
 
     $art-width: 97.83;
