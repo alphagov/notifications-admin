@@ -289,7 +289,7 @@ def _add_template_by_type(template_type, template_folder_id):
 
     if template_type == "letter":
         blank_letter = service_api_client.create_service_template(
-            name="New letter template",
+            name="Untitled letter template",
             type_="letter",
             content="Body",
             service_id=current_service.id,

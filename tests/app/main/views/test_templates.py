@@ -1158,7 +1158,7 @@ def test_choosing_letter_creates(
         ),
     )
     mock_create_service_template.assert_called_once_with(
-        name="New letter template",
+        name="Untitled letter template",
         type_="letter",
         content="Body",
         service_id=SERVICE_ONE_ID,
