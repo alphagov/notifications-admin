@@ -44,6 +44,21 @@
     {% include 'views/templates/_template.html' %}
   </div>
 
+  {% if template.template_type == "letter" and page_count < 10 %}
+    <div class="bottom-gutter-1-2">
+      {{ govukButton({
+      "element": "a",
+      "text": "Attach pages",
+      "href": url_for(
+          '.letter_template_attach_pages',
+          service_id=current_service.id,
+          template_id=template.id
+        ),
+      "classes": "govuk-button--secondary govuk-!-margin-right-3"
+      }) }}
+    </div>
+  {% endif %}
+
   {% if template.template_type != 'broadcast' %}
     <div class="bottom-gutter-1-2">
       {{ copy_to_clipboard(template.id, name="Template ID", thing='template ID') }}

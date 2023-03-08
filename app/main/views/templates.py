@@ -871,3 +871,9 @@ def get_template_sender_form_dict(service_id, template):
 
     context["current_choice"] = template["service_letter_contact"] if template["service_letter_contact"] else ""
     return context
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def letter_template_attach_pages(service_id, template_id):
+    return "TODO"
