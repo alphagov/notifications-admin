@@ -6,7 +6,7 @@
 {% set page_title = "Attach pages" %}
 
 {% block service_page_title %}
-	{{ page_title }}
+    {{ page_title }}
 {% endblock %}
 
 {% block backLink %}
@@ -17,35 +17,35 @@
 
 {% block maincolumn_content %}
 <div class="govuk-grid-row">
-	<div class="govuk-grid-column-five-sixths">
-		{{ page_header(page_title) }}
+    <div class="govuk-grid-column-five-sixths">
+        {{ page_header(page_title) }}
 
-		<p class="govuk-body">Upload a PDF and we’ll print it as part of your letter.</p>
-		<p class="govuk-body">
-			In total, your letter must be 10 pages or less (5 double-sided sheets of paper).
-			You can attach up to 9 pages.
-		</p>
-		<p class="govuk-body">
-			Attached pages will start on the next available page.
-			If you want to start your attachment on a new sheet of paper, add 2 line breaks
-		</p>
-		<p class="govuk-body">
-			Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter
-				specification</a>.
-		</p>
-		<p class="govuk-body">Page size and layout: A4 portrait (210 × 297 mm)</p>
-		<p class="govuk-body">Maximum file size: 2 MB</p>
-		<p class="govuk-body">Your letter must be 10 pages or less (5 double-sided sheets of paper).</p>
+        <p class="govuk-body">Upload a PDF and we’ll print it as part of your letter.</p>
+        <p class="govuk-body">
+            In total, your letter must be 10 pages or less (5 double-sided sheets of paper).
+            You can attach up to 9 pages.
+        </p>
+        <p class="govuk-body">
+            Attached pages will start on the next available page.
+            If you want to start your attachment on a new sheet of paper, add 2 line breaks
+        </p>
+        <p class="govuk-body">
+            Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter
+                specification</a>.
+        </p>
+        <p class="govuk-body">Page size and layout: A4 portrait (210 × 297 mm)</p>
+        <p class="govuk-body">Maximum file size: 2 MB</p>
+        <p class="govuk-body">Your letter must be 10 pages or less (5 double-sided sheets of paper).</p>
 
-		<div class="govuk-body">
-			{{ file_upload(
-			form.file,
-			allowed_file_extensions=['pdf'],
-			action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template_id),
-			button_text='Choose file',
-			show_errors=False
-			)}}
-		</div>
-	</div>
+        <div class="govuk-body">
+            {{ file_upload(
+            form.file,
+            allowed_file_extensions=['pdf'],
+            action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template_id),
+            button_text='Choose file',
+            show_errors=False
+            )}}
+        </div>
+    </div>
 </div>
 {% endblock %}
