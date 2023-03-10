@@ -791,6 +791,7 @@ def test_view_letter_template_has_attach_pages_button_if_template_below_10_pages
     template_page_count,
     template_type,
 ):
+    service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=template_page_count)
     client_request.login(active_user_with_permissions)
     mocker.patch(
@@ -818,6 +819,8 @@ def test_view_letter_template_has_attach_pages_button_if_template_below_10_pages
 
 
 def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mocker):
+    service_one["permissions"] = ["extra_letter_formatting"]
+
     page = client_request.get(
         "main.letter_template_attach_pages",
         service_id=SERVICE_ONE_ID,

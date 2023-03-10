@@ -32,7 +32,11 @@ from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
 from app.template_previews import TemplatePreview, get_page_count_for_letter
-from app.utils import NOTIFICATION_TYPES, should_skip_template_page
+from app.utils import (
+    NOTIFICATION_TYPES,
+    service_has_permission,
+    should_skip_template_page,
+)
 from app.utils.templates import get_template
 from app.utils.user import user_has_permissions
 
@@ -75,6 +79,7 @@ def view_template(service_id, template_id):
         letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
         page_count=page_count,
+        show_attach_pages_button=(True if current_service.has_permission("extra_letter_formatting") else False),
     )
 
 
@@ -876,6 +881,7 @@ def get_template_sender_form_dict(service_id, template):
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
+@service_has_permission("extra_letter_formatting")
 def letter_template_attach_pages(service_id, template_id):
     form = PDFUploadForm()
 
