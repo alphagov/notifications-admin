@@ -817,6 +817,20 @@ def test_view_letter_template_has_attach_pages_button_if_template_below_10_pages
         assert len(buttons) == 0
 
 
+def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mocker):
+    page = client_request.get(
+        "main.letter_template_attach_pages",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert page.select_one("h1").text.strip() == "Attach pages"
+    assert page.select_one("input.file-upload-field")
+    assert page.select_one("input.file-upload-field")["accept"] == ".pdf"
+    assert page.select("form button")
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
+
+
 def test_edit_letter_template_postage_page_displays_correctly(
     client_request,
     service_one,
