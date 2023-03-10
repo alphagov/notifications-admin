@@ -21,6 +21,7 @@ from app.main.forms import (
     EmailTemplateForm,
     LetterTemplateForm,
     LetterTemplatePostageForm,
+    PDFUploadForm,
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
@@ -876,4 +877,8 @@ def get_template_sender_form_dict(service_id, template):
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def letter_template_attach_pages(service_id, template_id):
-    return "TODO"
+    form = PDFUploadForm()
+
+    return render_template(
+        "views/templates/attach-pages.html", form=form, service_id=service_id, template_id=template_id
+    )
