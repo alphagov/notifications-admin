@@ -124,6 +124,7 @@ from app.url_converters import (
     TicketTypeConverter,
 )
 from app.utils import format_provider
+from app.utils.user_id import get_user_id_from_flask_login_session
 
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -225,6 +226,8 @@ def create_app(application):
 def init_app(application):
     application.after_request(useful_headers_after_request)
 
+    # Load user first (as we want user_id to be available for all calls to API, which service+organisation might make.
+    application.before_request(load_user_id_before_request)
     application.before_request(load_service_before_request)
     application.before_request(load_organisation_before_request)
     application.before_request(request_helper.check_proxy_header_before_request)
@@ -337,6 +340,10 @@ def load_organisation_before_request():
                     abort(404)
                 else:
                     raise
+
+
+def load_user_id_before_request():
+    g.user_id = get_user_id_from_flask_login_session()
 
 
 def save_service_or_org_after_request(response):

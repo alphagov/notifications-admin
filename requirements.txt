@@ -124,7 +124,7 @@ newrelic==8.5.0
     # via -r requirements.in
 notifications-python-client==6.4.1
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@62.0.1
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@62.1.0
     # via -r requirements.in
 openpyxl==3.0.10
     # via pyexcel-xlsx
