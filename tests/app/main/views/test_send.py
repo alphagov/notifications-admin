@@ -1962,8 +1962,8 @@ def test_send_one_off_letter_copes_with_placeholder_from_address_block(
         "app.service_api_client.get_service_template",
         return_value={
             "data": template_json(
-                SERVICE_ONE_ID,
-                fake_uuid,
+                service_id=SERVICE_ONE_ID,
+                id_=fake_uuid,
                 name="Awkward letter",
                 type_="letter",
                 subject=f"Hello (({placeholder}))",
@@ -3628,8 +3628,8 @@ def test_check_notification_shows_back_link(mocker, client_request, service_one,
         "app.service_api_client.get_service_template",
         return_value={
             "data": template_json(
-                SERVICE_ONE_ID,
-                fake_uuid,
+                service_id=SERVICE_ONE_ID,
+                id_=fake_uuid,
                 name="Awkward letter",
                 type_="letter",
                 subject="We need to talk about ((thing))",

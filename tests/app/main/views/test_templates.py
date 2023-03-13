@@ -203,29 +203,29 @@ def test_should_show_page_of_broadcast_templates(
         return_value={
             "data": [
                 template_json(
-                    SERVICE_ONE_ID,
-                    fake_uuid,
+                    service_id=SERVICE_ONE_ID,
+                    id_=fake_uuid,
                     type_="broadcast",
                     name="A",
                     content="a" * 40,
                 ),
                 template_json(
-                    SERVICE_ONE_ID,
-                    fake_uuid,
+                    service_id=SERVICE_ONE_ID,
+                    id_=fake_uuid,
                     type_="broadcast",
                     name="B",
                     content="b" * 42,
                 ),
                 template_json(
-                    SERVICE_ONE_ID,
-                    fake_uuid,
+                    service_id=SERVICE_ONE_ID,
+                    id_=fake_uuid,
                     type_="broadcast",
                     name="C",
                     content="c" * 43,
                 ),
                 template_json(
-                    SERVICE_ONE_ID,
-                    fake_uuid,
+                    service_id=SERVICE_ONE_ID,
+                    id_=fake_uuid,
                     type_="broadcast",
                     name="D",
                     # This should be truncated at 40 chars, then have the
@@ -982,7 +982,7 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
 
     mocker.patch(
         "app.service_api_client.get_service_template",
-        return_value={"data": template_json(service_one["id"], fake_uuid, type_="sms", content=msg)},
+        return_value={"data": template_json(service_id=service_one["id"], id_=fake_uuid, type_="sms", content=msg)},
     )
 
     page = client_request.get(
@@ -1407,7 +1407,7 @@ def test_copy_template_loads_template_from_within_subfolder(
     mock_get_non_empty_organisations_and_services_for_user,
     mocker,
 ):
-    template = template_json(SERVICE_TWO_ID, TEMPLATE_ONE_ID, name="foo", folder=PARENT_FOLDER_ID)
+    template = template_json(service_id=SERVICE_TWO_ID, id_=TEMPLATE_ONE_ID, name="foo", folder=PARENT_FOLDER_ID)
 
     mock_get_service_template = mocker.patch(
         "app.service_api_client.get_service_template", return_value={"data": template}
@@ -1957,7 +1957,7 @@ def test_should_show_delete_template_page_with_never_used_block(
 
 
 def test_should_show_delete_template_page_with_escaped_template_name(client_request, mocker, fake_uuid):
-    template = template_json(SERVICE_ONE_ID, fake_uuid, name="<script>evil</script>")
+    template = template_json(service_id=SERVICE_ONE_ID, id_=fake_uuid, name="<script>evil</script>")
 
     mocker.patch("app.template_statistics_client.get_last_used_date_for_template", return_value=None)
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template})
@@ -2209,8 +2209,8 @@ def test_should_not_update_sms_template_with_emoji(
         "app.service_api_client.get_service_template",
         return_value={
             "data": template_json(
-                SERVICE_ONE_ID,
-                fake_uuid,
+                service_id=SERVICE_ONE_ID,
+                id_=fake_uuid,
                 type_=template_type,
             )
         },
