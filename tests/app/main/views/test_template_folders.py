@@ -536,7 +536,7 @@ def test_template_id_is_searchable_for_services_with_api_keys(
     mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
-def test_can_create_email_template_with_parent_folder(client_request, mock_create_service_template):
+def test_can_create_email_template_with_parent_folder(client_request, mock_create_service_template, fake_uuid):
     data = {
         "name": "new name",
         "subject": "Food incoming!",
@@ -554,7 +554,7 @@ def test_can_create_email_template_with_parent_folder(client_request, mock_creat
         _expected_redirect=url_for(
             "main.view_template",
             service_id=SERVICE_ONE_ID,
-            template_id="new%20name",
+            template_id=fake_uuid,
         ),
     )
     mock_create_service_template.assert_called_once_with(

@@ -134,6 +134,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     mock_get_services_with_no_services,
     api_user_active,
     mock_get_all_email_branding,
+    fake_uuid,
     inherited,
     email_address,
     posted,
@@ -156,7 +157,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         _expected_redirect=url_for(
             "main.begin_tour",
             service_id=101,
-            template_id="Example%20text%20message%20template",
+            template_id=fake_uuid,
         ),
     )
     assert mock_get_services_with_no_services.called
