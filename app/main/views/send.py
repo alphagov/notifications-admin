@@ -1080,4 +1080,6 @@ def get_recipient():
     if {"recipient", "placeholders"} - set(session.keys()):
         return None
 
-    return session["recipient"] or InsensitiveDict(session["placeholders"]).get("address line 1")
+    return (
+        session["recipient"] or PostalAddress.from_personalisation(InsensitiveDict(session["placeholders"])).normalised
+    )
