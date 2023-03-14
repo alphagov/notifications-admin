@@ -45,7 +45,7 @@
   </div>
 
   {% if template.template_type == "letter" and page_count < 10 and show_attach_pages_button %}
-    <div class="bottom-gutter-1-2">
+    <div class="govuk-!-margin-bottom-3">
       {{ govukButton({
       "element": "a",
       "text": "Attach pages",
@@ -60,12 +60,12 @@
   {% endif %}
 
   {% if template.template_type != 'broadcast' %}
-    <div class="bottom-gutter-1-2">
+    <div class="govuk-!-margin-bottom-3">
       {{ copy_to_clipboard(template.id, name="Template ID", thing='template ID') }}
     </div>
   {% endif %}
 
-  <div class="bottom-gutter-1-2">
+  <div class="govuk-!-margin-bottom-3">
     {% if template._template.updated_at %}
       <h2 class="heading-small bottom-gutter-2-3 heading-inline">
         Last edited
