@@ -131,7 +131,9 @@ def send_messages(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
+            current_app.logger.info("User %s uploaded %s", current_user.id, form.file.data.filename)
             upload_id = s3upload(service_id, Spreadsheet.from_file_form(form).as_dict, current_app.config["AWS_REGION"])
+            current_app.logger.info("%s persisted in S3 as %s", form.file.data.filename, upload_id)
             file_name_metadata = unicode_truncate(SanitiseASCII.encode(form.file.data.filename), 1600)
             set_metadata_on_csv_upload(service_id, upload_id, original_file_name=file_name_metadata)
             return redirect(
@@ -143,8 +145,10 @@ def send_messages(service_id, template_id):
                 )
             )
         except (UnicodeDecodeError, BadZipFile, XLRDError):
+            current_app.logger.warning("Could not read %s", form.file.data.filename, exc_info=True)
             flash("Could not read {}. Try using a different file format.".format(form.file.data.filename))
-        except (XLDateError):
+        except XLDateError:
+            current_app.logger.warning("Could not parse numbers/dates in %s", form.file.data.filename, exc_info=True)
             flash(
                 (
                     "{} contains numbers or dates that Notify cannot understand. "
