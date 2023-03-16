@@ -1271,6 +1271,9 @@ class LetterAddressForm(StripWhitespaceForm):
         if address.has_too_many_lines:
             raise ValidationError(f"Address must be no more than {PostalAddress.MAX_LINES} lines long")
 
+        if address.has_invalid_country_for_bfpo_address:
+            raise ValidationError("The last line of a BFPO address must not be a country.")
+
         if not address.has_valid_last_line:
             if self.allow_international_letters:
                 raise ValidationError("Last line of the address must be a UK postcode or another country")
