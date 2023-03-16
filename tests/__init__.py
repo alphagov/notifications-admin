@@ -300,6 +300,7 @@ def organisation_json(
 
 
 def template_json(
+    *,
     service_id,
     id_,
     name="sample template",
@@ -345,7 +346,7 @@ def template_json(
 
 
 def template_version_json(service_id, id_, created_by, version=1, created_at=None, **kwargs):
-    template = template_json(service_id, id_, **kwargs)
+    template = template_json(service_id=service_id, id_=id_, **kwargs)
     template["created_by"] = created_by_json(
         created_by["id"],
         created_by["name"],
@@ -506,7 +507,7 @@ def notification_json(
     postage=None,
 ):
     if template is None:
-        template = template_json(service_id, str(generate_uuid()), type_=template_type)
+        template = template_json(service_id=service_id, id_=str(generate_uuid()), type_=template_type)
     if to is None:
         if template_type == "letter":
             to = "1 Example Street"
@@ -579,7 +580,7 @@ def single_notification_json(
     notification_type="sms",
 ):
     if template is None:
-        template = template_json(service_id, str(generate_uuid()))
+        template = template_json(service_id=service_id, id_=str(generate_uuid()))
     if sent_at is None:
         sent_at = str(datetime.utcnow())
     if created_at is None:

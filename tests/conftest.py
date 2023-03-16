@@ -700,7 +700,11 @@ def mock_get_services_with_one_service(mocker, api_user_active):
 def mock_get_service_template(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
-            service_id, template_id, "Two week reminder", "sms", "Template <em>content</em> with & entity"
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="sms",
+            content="Template <em>content</em> with & entity",
         )
         if version:
             template.update({"version": version})
@@ -713,11 +717,11 @@ def mock_get_service_template(mocker):
 def mock_get_deleted_template(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
-            service_id,
-            template_id,
-            "Two week reminder",
-            "sms",
-            "Template <em>content</em> with & entity",
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="sms",
+            content="Template <em>content</em> with & entity",
             archived=True,
         )
         if version:
@@ -749,7 +753,11 @@ def mock_get_template_versions(mocker, api_user_active):
 def mock_get_service_template_with_placeholders(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
-            service_id, template_id, "Two week reminder", "sms", "((name)), Template <em>content</em> with & entity"
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="sms",
+            content="((name)), Template <em>content</em> with & entity",
         )
         return {"data": template}
 
@@ -760,7 +768,10 @@ def mock_get_service_template_with_placeholders(mocker):
 def mock_get_empty_service_template_with_optional_placeholder(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
-            service_id, template_id, name="Optional content", content="((show_placeholder??Some content))"
+            service_id=service_id,
+            id_=template_id,
+            name="Optional content",
+            content="((show_placeholder??Some content))",
         )
         return {"data": template}
 
@@ -770,7 +781,13 @@ def mock_get_empty_service_template_with_optional_placeholder(mocker):
 @pytest.fixture(scope="function")
 def mock_get_service_template_with_multiple_placeholders(mocker):
     def _get(service_id, template_id, version=None):
-        template = template_json(service_id, template_id, "Two week reminder", "sms", "((one)) ((two)) ((three))")
+        template = template_json(
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="sms",
+            content="((one)) ((two)) ((three))",
+        )
         return {"data": template}
 
     return mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
@@ -780,7 +797,11 @@ def mock_get_service_template_with_multiple_placeholders(mocker):
 def mock_get_service_template_with_placeholders_same_as_recipient(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
-            service_id, template_id, "Two week reminder", "sms", "((name)) ((date)) ((PHONENUMBER))"
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="sms",
+            content="((name)) ((date)) ((PHONENUMBER))",
         )
         return {"data": template}
 
@@ -791,12 +812,12 @@ def mock_get_service_template_with_placeholders_same_as_recipient(mocker):
 def mock_get_service_email_template(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
-            service_id,
-            template_id,
-            "Two week reminder",
-            "email",
-            "Your vehicle tax expires on ((date))",
-            "Your ((thing)) is due soon",
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="email",
+            content="Your vehicle tax expires on ((date))",
+            subject="Your ((thing)) is due soon",
             redact_personalisation=False,
         )
         return {"data": template}
@@ -808,11 +829,11 @@ def mock_get_service_email_template(mocker):
 def mock_get_broadcast_template(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
-            service_id,
-            template_id,
-            "Test alert",
-            "broadcast",
-            "This is a test",
+            service_id=service_id,
+            id_=template_id,
+            name="Test alert",
+            type_="broadcast",
+            content="This is a test",
         )
         if version:
             template.update({"version": version})
@@ -825,8 +846,8 @@ def mock_get_broadcast_template(mocker):
 def mock_get_service_email_template_without_placeholders(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
-            service_id,
-            template_id,
+            service_id=service_id,
+            id_=template_id,
             name="Two week reminder",
             type_="email",
             content="Your vehicle tax expires soon",
@@ -842,8 +863,8 @@ def mock_get_service_email_template_without_placeholders(mocker):
 def mock_get_service_letter_template(mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(
-            service_id,
-            template_id,
+            service_id=service_id,
+            id_=template_id,
             name="Two week reminder",
             type_="letter",
             content="Template <em>content</em> with & entity",
@@ -859,8 +880,8 @@ def mock_get_service_letter_template(mocker):
 def mock_get_service_letter_template_with_placeholders(mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(
-            service_id,
-            template_id,
+            service_id=service_id,
+            id_=template_id,
             name="Two week reminder",
             type_="letter",
             content="Hello ((name)) your thing is due on ((date))",
@@ -876,7 +897,7 @@ def mock_get_service_letter_template_with_placeholders(mocker):
 def mock_create_service_template(mocker, fake_uuid):
     def _create(name, type_, content, service_id, subject=None, parent_folder_id=None):
         template = template_json(
-            service_id, fake_uuid, name=name, type_=type_, content=content, folder=parent_folder_id
+            service_id=service_id, id_=fake_uuid, name=name, type_=type_, content=content, folder=parent_folder_id
         )
         return {"data": template}
 
@@ -886,7 +907,9 @@ def mock_create_service_template(mocker, fake_uuid):
 @pytest.fixture(scope="function")
 def mock_update_service_template(mocker):
     def _update(id_, name, type_, content, service, subject=None, postage=None):
-        template = template_json(service, id_, name, type_, content, subject, postage)
+        template = template_json(
+            service_id=service, id_=id_, name=name, type_=type_, content=content, subject=subject, postage=postage
+        )
         return {"data": template}
 
     return mocker.patch("app.service_api_client.update_service_template", side_effect=_update)
@@ -938,11 +961,11 @@ def create_service_templates(service_id, number_of_templates=6):
 
         service_templates.append(
             template_json(
-                service_id,
-                TEMPLATE_ONE_ID if _ == 1 else str(generate_uuid()),
-                "{}_template_{}".format(template_type, template_number),
-                template_type,
-                "{} template {} content".format(template_type, template_number),
+                service_id=service_id,
+                id_=TEMPLATE_ONE_ID if _ == 1 else str(generate_uuid()),
+                name="{}_template_{}".format(template_type, template_number),
+                type_=template_type,
+                content="{} template {} content".format(template_type, template_number),
                 subject="{} template {} subject".format(template_type, template_number)
                 if template_type in ["email", "letter"]
                 else None,
@@ -989,7 +1012,15 @@ def mock_get_service_templates_when_no_templates_exist(mocker):
 def mock_get_service_templates_with_only_one_template(mocker):
     def _get(service_id):
         return {
-            "data": [template_json(service_id, generate_uuid(), "sms_template_one", "sms", "sms template one content")]
+            "data": [
+                template_json(
+                    service_id=service_id,
+                    id_=generate_uuid(),
+                    name="sms_template_one",
+                    type_="sms",
+                    content="sms template one content",
+                )
+            ]
         }
 
     return mocker.patch("app.service_api_client.get_service_templates", side_effect=_get)
@@ -998,7 +1029,13 @@ def mock_get_service_templates_with_only_one_template(mocker):
 @pytest.fixture(scope="function")
 def mock_delete_service_template(mocker):
     def _delete(service_id, template_id):
-        template = template_json(service_id, template_id, "Template to delete", "sms", "content to be deleted")
+        template = template_json(
+            service_id=service_id,
+            id_=template_id,
+            name="Template to delete",
+            type_="sms",
+            content="content to be deleted",
+        )
         return {"data": template}
 
     return mocker.patch("app.service_api_client.delete_service_template", side_effect=_delete)
@@ -1859,7 +1896,7 @@ def mock_get_notifications(
             job = job_json(service_id, api_user_active, job_id=job_id)
         if template_type:
             template = template_json(
-                service_id,
+                service_id=service_id,
                 id_=str(generate_uuid()),
                 type_=template_type[0],
                 redact_personalisation=False,
@@ -1867,7 +1904,7 @@ def mock_get_notifications(
             )
         else:
             template = template_json(
-                service_id,
+                service_id=service_id,
                 id_=str(generate_uuid()),
                 redact_personalisation=False,
             )
@@ -2154,7 +2191,13 @@ def mock_remove_user_from_service(mocker):
 
 @pytest.fixture(scope="function")
 def mock_get_template_statistics(mocker, service_one, fake_uuid):
-    template = template_json(service_one["id"], fake_uuid, "Test template", "sms", "Something very interesting")
+    template = template_json(
+        service_id=service_one["id"],
+        id_=fake_uuid,
+        name="Test template",
+        type_="sms",
+        content="Something very interesting",
+    )
     data = {
         "count": 1,
         "template_name": template["name"],
@@ -2699,8 +2742,8 @@ def mock_get_notification(mocker):
         noti["id"] = notification_id
         noti["created_by"] = {"id": fake_uuid, "name": "Test User", "email_address": "test@user.gov.uk"}
         noti["template"] = template_json(
-            service_id,
-            "5407f4db-51c7-4150-8758-35412d42186a",
+            service_id=service_id,
+            id_="5407f4db-51c7-4150-8758-35412d42186a",
             content="hello ((name))",
             subject="blah",
             redact_personalisation=False,
@@ -3952,8 +3995,8 @@ def create_notification(
         noti["created_by"] = {"id": sample_uuid(), "name": "Test User", "email_address": "test@user.gov.uk"}
     noti["personalisation"] = {"name": "Jo"}
     noti["template"] = template_json(
-        service_id,
-        "5407f4db-51c7-4150-8758-35412d42186a",
+        service_id=service_id,
+        id_="5407f4db-51c7-4150-8758-35412d42186a",
         content="hello ((name))",
         subject="blah",
         redact_personalisation=redact_personalisation,
@@ -3981,7 +4024,7 @@ def create_notifications(
     to=None,
 ):
     template = template_json(
-        service_id,
+        service_id=service_id,
         id_=str(generate_uuid()),
         type_=template_type,
         subject=subject,
