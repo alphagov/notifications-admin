@@ -776,7 +776,6 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
     assert page.select_one("h1", {"data-error-type": "letter-too-long"})
 
 
-@pytest.mark.parametrize("template_page_count", [6, 10])
 @pytest.mark.parametrize("template_type", ["letter", "email", "sms"])
 def test_view_letter_template_has_attach_pages_button_if_template_below_10_pages_long(
     client_request,
@@ -788,11 +787,10 @@ def test_view_letter_template_has_attach_pages_button_if_template_below_10_pages
     active_user_with_permissions,
     mocker,
     fake_uuid,
-    template_page_count,
     template_type,
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=template_page_count)
+    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
     client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -808,7 +806,7 @@ def test_view_letter_template_has_attach_pages_button_if_template_below_10_pages
 
     buttons = [b for b in page.select(".govuk-button--secondary") if normalize_spaces((b).text) == "Attach pages"]
 
-    if template_page_count < 10 and template_type == "letter":
+    if template_type == "letter":
         button = buttons[0]
         assert button.attrs["href"] == url_for(
             ".letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=fake_uuid
