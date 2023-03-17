@@ -32,6 +32,14 @@ class InviteApiClient(NotifyAdminAPIClient):
         resp = self.post(url=f"/service/{service_id}/invite/{invite_id}", data=data)
         return resp["data"]
 
+    def request_invite_for(self, *, user_to_invite_id, service_id, service_managers_ids, reason):
+        data = {
+            "service_managers_ids": service_managers_ids,
+            "reason": reason,
+            "invite_link_host": self.admin_url,
+        }
+        self.post(url=f"/service/{service_id}/invite/request-for/{user_to_invite_id}", data=data)
+
     def get_invites_for_service(self, service_id):
         return self.get(f"/service/{service_id}/invite")["data"]
 
