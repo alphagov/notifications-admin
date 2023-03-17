@@ -3,7 +3,6 @@ from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
-import freezegun
 import pytest
 from bs4 import BeautifulSoup, Doctype
 from flask import session as flask_session
@@ -12,12 +11,6 @@ from flask.testing import FlaskClient
 from flask_login import login_user
 
 from app.models.user import User
-
-# Add itsdangerous to the libraries which freezegun ignores to avoid errors.
-# In tests where we freeze time, the code in the test function will get the frozen time but the
-# fixtures will be using the current time. This causes itsdangerous to raise an exception - when
-# the session is decoded it appears to be created in the future.
-freezegun.configure(extend_ignore_list=["itsdangerous"])
 
 
 class TestClient(FlaskClient):

@@ -164,7 +164,7 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker, 
     mock_send_ticket_to_zendesk.assert_called_once()
 
 
-@freeze_time("2016-12-12 12:00:00.000000")
+@pytest.mark.freeze_time("2016-12-12 12:00:00.000000")
 @pytest.mark.parametrize(
     "data", [{"feedback": "blah"}, {"feedback": "blah", "name": "Ignored", "email_address": "ignored@email.com"}]
 )
