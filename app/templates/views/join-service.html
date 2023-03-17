@@ -1,7 +1,9 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
 
-{% set heading = 'Join {}'.format(service.name) %}
+{% set heading = 'Ask to join {}'.format(service.name) %}
 
 {% block per_page_title %}
   {{ heading }}
@@ -11,16 +13,10 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     {{ page_header(heading) }}
-    <p class="govuk-body">
-      Ask one of these people:
-    </p>
-    <ul class="govuk-list govuk-list--bullet">
-    {% for user in service.active_users %}
-      {% if user.has_permission_for_service(service.id, 'manage_service') %}
-        <li>{{ user.name }} – last logged in {{ user.logged_in_at|format_date_human }}</li>
-      {% endif %}
-    {% endfor %}
-    </ul>
+    {% call form_wrapper() %}
+      {{ form.users }}
+      {{ page_footer('Ask for access') }}
+    {% endcall %}
   </div>
 </div>
 
