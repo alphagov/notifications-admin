@@ -63,4 +63,7 @@ def test_page_lists_team_members_of_service(
         ),
     ]
 
+    assert page.select_one("textarea")["name"] == page.select_one("textarea")["id"] == "reason"
+    assert normalize_spaces(page.select_one("label[for=reason]").text) == "Explain why you need access"
+
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
