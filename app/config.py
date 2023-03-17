@@ -47,8 +47,10 @@ class Config:
     HTTP_PROTOCOL = "http"
     NOTIFY_APP_NAME = "admin"
     NOTIFY_LOG_LEVEL = "DEBUG"
-    PERMANENT_SESSION_LIFETIME = 20 * 60 * 60  # 20 hours
-    SEND_FILE_MAX_AGE_DEFAULT = 365 * 24 * 60 * 60  # 1 year
+
+    # Session config
+    PERMANENT_SESSION_LIFETIME = 20 * 60 * 60  # 20 hours in seconds
+    PLATFORM_ADMIN_INACTIVE_SESSION_TIMEOUT = 30 * 60  # 30 minutes in seconds
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_NAME = "notify_admin_session"
     SESSION_COOKIE_SECURE = True
@@ -57,6 +59,8 @@ class Config:
     # updated unless the session is changed - but it's generally refreshed by `save_service_or_org_after_request`
     # every time anyway, except for specific endpoints (png/pdfs generally) where we've disabled that handler.
     SESSION_REFRESH_EACH_REQUEST = False
+
+    SEND_FILE_MAX_AGE_DEFAULT = 365 * 24 * 60 * 60  # 1 year
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
     ACTIVITY_STATS_LIMIT_DAYS = 7

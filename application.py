@@ -1,5 +1,7 @@
 import os
 
+from flask import Flask
+
 if (environment := os.getenv("NOTIFY_ENVIRONMENT")) in {"development", "preview", "staging"} and os.getenv(
     "NEW_RELIC_ENABLED"
 ) == "1":
@@ -7,8 +9,6 @@ if (environment := os.getenv("NOTIFY_ENVIRONMENT")) in {"development", "preview"
 
     # Expects NEW_RELIC_LICENSE_KEY set in environment as well.
     newrelic.agent.initialize("newrelic.ini", environment=environment, ignore_errors=False)
-
-from flask import Flask
 
 from app import create_app
 
