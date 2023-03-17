@@ -337,6 +337,7 @@
     "/services/<uuid:service_id>/users/invite/<uuid:user_id>",
     "/services/<uuid:service_id>/write-new-broadcast",
     "/services/<uuid:service_to_join_id>/join",
+    "/services/<uuid:service_to_join_id>/join/requested",
     "/sign-in",
     "/sign-out",
     "/static/<path:filename>",

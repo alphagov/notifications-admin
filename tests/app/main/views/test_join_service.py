@@ -1,3 +1,4 @@
+from flask import url_for
 from freezegun import freeze_time
 
 from tests.conftest import (
@@ -67,3 +68,35 @@ def test_page_lists_team_members_of_service(
     assert normalize_spaces(page.select_one("label[for=reason]").text) == "Explain why you need access"
 
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
+
+
+def test_page_redirects_on_post(
+    mocker,
+    client_request,
+):
+    manage_service_user_1 = create_active_user_with_permissions()
+    manage_service_user_2 = create_active_user_with_permissions()
+    manage_service_user_1["logged_in_at"] = "2023-01-02 01:00"
+    manage_service_user_2["logged_in_at"] = "2023-02-03 01:00"
+
+    mocker.patch(
+        "app.models.user.Users.client_method",
+        return_value=[
+            manage_service_user_1,
+            manage_service_user_2,
+        ],
+    )
+
+    client_request.post(
+        "main.join_service",
+        service_to_join_id=SERVICE_ONE_ID,
+        _expected_redirect=url_for(
+            "main.join_service_requested",
+            service_to_join_id=SERVICE_ONE_ID,
+            number_of_users_emailed=1,
+        ),
+        _data={
+            "users": manage_service_user_1["id"],
+            "reason": "Let me in",
+        },
+    )
