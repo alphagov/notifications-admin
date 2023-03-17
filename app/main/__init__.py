@@ -25,6 +25,7 @@ from app.main.views import (  # noqa
     index,
     invites,
     jobs,
+    join_service,
     letter_branding,
     make_service_live,
     manage_users,
