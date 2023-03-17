@@ -116,6 +116,7 @@ from app.notify_client.template_folder_api_client import template_folder_api_cli
 from app.notify_client.template_statistics_api_client import template_statistics_client
 from app.notify_client.upload_api_client import upload_api_client
 from app.notify_client.user_api_client import user_api_client
+from app.notify_session import NotifyAdminSessionInterface
 from app.s3_client.logo_client import logo_client
 from app.url_converters import (
     LetterFileExtensionConverter,
@@ -231,6 +232,8 @@ def init_app(application):
     application.before_request(load_service_before_request)
     application.before_request(load_organisation_before_request)
     application.before_request(request_helper.check_proxy_header_before_request)
+
+    application.session_interface = NotifyAdminSessionInterface()
 
     font_paths = [
         str(item)[len(asset_fingerprinter._filesystem_path) :]
