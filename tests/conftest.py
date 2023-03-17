@@ -4318,3 +4318,11 @@ def logo_client(notify_admin):
     from app import logo_client
 
     yield logo_client
+
+
+@pytest.fixture(scope="function")
+def mock_request_invite_for(mocker):
+    def _request_invite_for(*, user_to_invite_id, service_id, from_user_ids, reason):
+        return
+
+    return mocker.patch("app.invite_api_client.request_invite_for", side_effect=_request_invite_for)

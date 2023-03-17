@@ -73,9 +73,12 @@ def test_page_lists_team_members_of_service(
 def test_page_redirects_on_post(
     mocker,
     client_request,
+    mock_request_invite_for,
+    fake_uuid,
 ):
-    manage_service_user_1 = create_active_user_with_permissions()
-    manage_service_user_2 = create_active_user_with_permissions()
+    current_user = create_active_user_with_permissions(with_unique_id=True)
+    manage_service_user_1 = create_active_user_with_permissions(with_unique_id=True)
+    manage_service_user_2 = create_active_user_with_permissions(with_unique_id=True)
     manage_service_user_1["logged_in_at"] = "2023-01-02 01:00"
     manage_service_user_2["logged_in_at"] = "2023-02-03 01:00"
 
@@ -87,6 +90,7 @@ def test_page_redirects_on_post(
         ],
     )
 
+    client_request.login(current_user)
     client_request.post(
         "main.join_service",
         service_to_join_id=SERVICE_ONE_ID,
@@ -99,4 +103,13 @@ def test_page_redirects_on_post(
             "users": manage_service_user_1["id"],
             "reason": "Let me in",
         },
+    )
+
+    mock_request_invite_for.assert_called_once_with(
+        user_to_invite_id=current_user["id"],
+        from_user_ids=[
+            manage_service_user_1["id"],
+        ],
+        reason="Let me in",
+        service_id=SERVICE_ONE_ID,
     )

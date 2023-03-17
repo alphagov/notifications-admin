@@ -194,6 +194,14 @@ class Service(JSONModel):
             invited_user_id=str(invited_user_id),
         )
 
+    def request_invite_for(self, user_to_invite, *, from_user_ids, reason):
+        invite_api_client.request_invite_for(
+            user_to_invite_id=user_to_invite.id,
+            service_id=self.id,
+            from_user_ids=from_user_ids,
+            reason=reason,
+        )
+
     def get_team_member(self, user_id):
 
         if str(user_id) not in {user.id for user in self.active_users}:
