@@ -24,6 +24,7 @@ from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateAmbiguous, XLDateError, XLDateNegative, XLDateTooLarge
 
 from tests import (
+    sample_uuid,
     template_json,
     validate_route_permission,
     validate_route_permission_with_client,
@@ -335,8 +336,9 @@ def test_upload_files_in_different_formats(
     mock_s3_set_metadata,
     mock_s3_upload,
     fake_uuid,
+    caplog,
 ):
-    with open(filename, "rb") as uploaded:
+    with open(filename, "rb") as uploaded, caplog.at_level("INFO", "app"):
         page = client_request.post(
             "main.send_messages",
             service_id=service_one["id"],
@@ -346,6 +348,9 @@ def test_upload_files_in_different_formats(
             _expected_status=expected_status,
         )
 
+    log_messages = {r.message for r in caplog.records}
+    assert f"User 6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 uploaded {filename}" in log_messages
+
     if acceptable_file:
         assert mock_s3_upload.call_args[0][1]["data"].strip() == (
             "phone number,name,favourite colour,fruit\r\n"
@@ -354,11 +359,15 @@ def test_upload_files_in_different_formats(
             "07512 058 823,Still Not Pete,Crimson,Pear"
         )
         mock_s3_set_metadata.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, original_file_name=filename)
+        assert f"{filename} persisted in S3 as {sample_uuid()}" in [r.message for r in caplog.records]
+        assert f"Could not read {filename}" not in [r.message for r in caplog.records]
     else:
         assert not mock_s3_upload.called
         assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
             "Could not read {}. Try using a different file format.".format(filename)
         )
+        assert f"{filename} persisted in S3 as {sample_uuid()}" not in [r.message for r in caplog.records]
+        assert f"Could not read {filename}" in [r.message for r in caplog.records]
 
 
 def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
