@@ -1,6 +1,7 @@
 {% extends "content_template.html" %}
 
 {% from "components/service-link.html" import service_link %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -17,11 +18,7 @@
 
   <p class="govuk-body">To personalise a message, use double brackets to add a placeholder to your content. For example:</p>
 
-  <div class="govuk-inset-text">
-
-    <p class="govuk-body">Hello ((first name)), your reference is ((reference number)).</p>
-
-  </div>
+  {{ govukInsetText({"text": "Hello ((first name)), your reference is ((reference number))."}) }}
 
   <p class="govuk-body">Each time you send the message, you can:</p>
 
