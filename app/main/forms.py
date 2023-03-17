@@ -2625,11 +2625,24 @@ class JoinServiceForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
 
         self.users.choices = [(user.id, user.name) for user in users]
-        self.users.param_extensions = {
-            "items": [{"hint": {"text": f"Last used Notify {format_date_human(user.logged_in_at)}"}} for user in users]
-        }
+        self.users.param_extensions["items"] = [
+            {"hint": {"text": f"Last used Notify {format_date_human(user.logged_in_at)}"}} for user in users
+        ]
 
     users = GovukCheckboxesField(
         "Who do you want to ask?",
         validators=[DataRequired(message="Select at least 1 person to ask")],
+        param_extensions={
+            "fieldset": {
+                "legend": {
+                    # This removes the `govuk-fieldset__legend--s` class, thereby
+                    # making the form label font regular weight, not bold
+                    "classes": "",
+                },
+            }
+        },
+    )
+    reason = GovukTextareaField(
+        "Explain why you need access",
+        param_extensions={"hint": {"text": "Optional"}},
     )
