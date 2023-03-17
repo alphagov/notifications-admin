@@ -26,7 +26,7 @@ def test_backup_original_letter_to_s3(mocker, notify_admin):
     )
 
     s3_mock.assert_called_once_with(
-        bucket_name=current_app.config["PRECOMPILED_ORIGINALS_BACKUP_LETTERS"],
+        bucket_name=current_app.config["S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS"],
         file_location=f"{str(upload_id)}.pdf",
         filedata="pdf_data",
         region=current_app.config["AWS_REGION"],
@@ -47,7 +47,7 @@ def test_upload_letter_to_s3(mocker):
     )
 
     s3_mock.assert_called_once_with(
-        bucket_name=current_app.config["TRANSIENT_UPLOADED_LETTERS"],
+        bucket_name=current_app.config["S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"],
         file_location="service_id/upload_id.pdf",
         filedata="pdf_data",
         metadata={
@@ -74,7 +74,7 @@ def test_upload_letter_to_s3_with_message_and_invalid_pages(mocker):
     )
 
     s3_mock.assert_called_once_with(
-        bucket_name=current_app.config["TRANSIENT_UPLOADED_LETTERS"],
+        bucket_name=current_app.config["S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"],
         file_location="service_id/upload_id.pdf",
         filedata="pdf_data",
         metadata={
@@ -108,7 +108,7 @@ def test_lettermetadata_unquotes_special_keys():
     [(True, LetterNotFoundError), (False, botocore.exceptions.ClientError)],
 )
 def test_get_letter_s3_object_raises_custom_error(will_raise_custom_error, expected_exception):
-    bucket_name = current_app.config["TRANSIENT_UPLOADED_LETTERS"]
+    bucket_name = current_app.config["S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"]
     s3 = boto3.client("s3", region_name="eu-west-1")
 
     # bucket not existing will trigger some other error

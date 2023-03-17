@@ -22,7 +22,7 @@ def backup_original_letter_to_s3(
     utils_s3upload(
         filedata=data,
         region=current_app.config["AWS_REGION"],
-        bucket_name=current_app.config["PRECOMPILED_ORIGINALS_BACKUP_LETTERS"],
+        bucket_name=current_app.config["S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS"],
         file_location=f"{upload_id}.pdf",
     )
 
@@ -47,7 +47,7 @@ def upload_letter_to_s3(
     utils_s3upload(
         filedata=data,
         region=current_app.config["AWS_REGION"],
-        bucket_name=current_app.config["TRANSIENT_UPLOADED_LETTERS"],
+        bucket_name=current_app.config["S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"],
         file_location=file_location,
         metadata=metadata,
     )
@@ -70,7 +70,7 @@ def get_letter_s3_object(service_id, file_id):
     try:
         file_location = get_transient_letter_file_location(service_id, file_id)
         s3 = resource("s3")
-        return s3.Object(current_app.config["TRANSIENT_UPLOADED_LETTERS"], file_location).get()
+        return s3.Object(current_app.config["S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"], file_location).get()
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchKey":
             raise LetterNotFoundError(f"Letter not found for service {service_id} and file {file_id}")

@@ -47,7 +47,7 @@ class ContactList(JSONModel):
 
     @staticmethod
     def get_bucket_name():
-        return current_app.config["CONTACT_LIST_UPLOAD_BUCKET_NAME"]
+        return current_app.config["S3_BUCKET_CONTACT_LIST_UPLOAD"]
 
     @staticmethod
     def upload(service_id, file_dict):

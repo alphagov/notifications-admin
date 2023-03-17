@@ -11,7 +11,7 @@ FILE_LOCATION_STRUCTURE = "service-{}-notify/{}.csv"
 
 def get_csv_location(service_id, upload_id, bucket=None):
     return (
-        bucket or current_app.config["CSV_UPLOAD_BUCKET_NAME"],
+        bucket or current_app.config["S3_BUCKET_CSV_UPLOAD"],
         FILE_LOCATION_STRUCTURE.format(service_id, upload_id),
     )
 

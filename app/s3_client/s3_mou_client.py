@@ -5,7 +5,7 @@ from app.s3_client import get_s3_object
 
 
 def get_mou(organisation_is_crown):
-    bucket = current_app.config["MOU_BUCKET_NAME"]
+    bucket = current_app.config["S3_BUCKET_MOU"]
     filename = "crown.pdf" if organisation_is_crown else "non-crown.pdf"
     attachment_filename = "GOV.UK Notify data sharing and financial agreement{}.pdf".format(
         "" if organisation_is_crown else " (non-crown)"
