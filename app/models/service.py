@@ -171,15 +171,19 @@ class Service(JSONModel):
     def active_users(self):
         return Users(self.id)
 
+    def active_users_with_permission(self, permission):
+        return tuple(user for user in self.active_users if user.has_permission_for_service(self.id, permission))
+
     @cached_property
     def team_members(self):
         return self.invited_users + self.active_users
 
+    def team_members_with_permission(self, permission):
+        return tuple(user for user in self.team_members if user.has_permission_for_service(self.id, permission))
+
     @cached_property
     def has_team_members(self):
-        return (
-            len([user for user in self.team_members if user.has_permission_for_service(self.id, "manage_service")]) > 1
-        )
+        return len(self.team_members_with_permission("manage_service")) > 1
 
     def cancel_invite(self, invited_user_id):
         if str(invited_user_id) not in {user.id for user in self.invited_users}:

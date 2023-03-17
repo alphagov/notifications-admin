@@ -1,0 +1,28 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% set heading = 'You’ve asked to join ‘{}’'.format(current_service.name) %}
+
+{% block per_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {{ page_header(heading) }}
+      <p class="govuk-body">
+        We’ve emailed {{ request.args.get('number_of_users_emailed') }} of the team members.
+      </p>
+      <p class="govuk-body">
+        If they accept your request you’ll get an email with an invite.
+      </p>
+      <p class="govuk-body">
+        In the mean time you can
+        <a href="{{ url_for('main.add_service') }}" class="govuk-link govuk-link--no-visited-state">try out Notify by creating your own service</a>
+        or
+        <a href="{{ url_for('main.sign_out') }}" class="govuk-link govuk-link--no-visited-state">sign out for now</a>.
+      </p>
+    </div>
+  </div>
+{% endblock %}

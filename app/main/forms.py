@@ -53,6 +53,7 @@ from wtforms.validators import (
 from app import asset_fingerprinter
 from app.formatters import (
     format_auth_type,
+    format_date_human,
     format_thousands,
     guess_name_from_email_address,
     message_count_noun,
@@ -2616,4 +2617,19 @@ class FindByUuidForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Find anything by UUID",
         validators=[DataRequired("Cannot be empty"), UUID("Enter a valid UUID")],
+    )
+
+
+class JoinServiceForm(StripWhitespaceForm):
+    def __init__(self, users, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.users.choices = [(user.id, user.name) for user in users]
+        self.users.param_extensions = {
+            "items": [{"hint": {"text": f"Last used Notify {format_date_human(user.logged_in_at)}"}} for user in users]
+        }
+
+    users = GovukCheckboxesField(
+        "Who do you want to ask?",
+        validators=[DataRequired(message="Select at least 1 person to ask")],
     )

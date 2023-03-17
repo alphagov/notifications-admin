@@ -36,9 +36,31 @@ def test_page_lists_team_members_of_service(
     )
 
     page = client_request.get("main.join_service", service_to_join_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("h1").text) == "Join service one"
-    assert [normalize_spaces(item.text) for item in page.select("main .govuk-list li")] == [
-        "Manage service user 1 – last logged in 2 January",
-        "Manage service user 2 – last logged in today",
+
+    assert normalize_spaces(page.select_one("h1").text) == "Ask to join service one"
+
+    assert [
+        (
+            checkbox["value"],
+            normalize_spaces(label.text),
+            normalize_spaces(hint.text),
+        )
+        for checkbox, label, hint in zip(
+            page.select("input[type=checkbox][name=users]"),
+            page.select(".govuk-label"),
+            page.select(".govuk-hint"),
+        )
+    ] == [
+        (
+            manage_service_user_1["id"],
+            "Manage service user 1",
+            "Last used Notify 2 January",
+        ),
+        (
+            manage_service_user_2["id"],
+            "Manage service user 2",
+            "Last used Notify today",
+        ),
     ]
+
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
