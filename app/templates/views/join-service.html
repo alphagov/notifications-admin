@@ -1,0 +1,27 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% set heading = 'Join {}'.format(current_service.name) %}
+
+{% block per_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block maincolumn_content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ page_header(heading) }}
+    <p class="govuk-body">
+      Ask one of these people:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+    {% for user in current_service.active_users %}
+      {% if user.has_permission_for_service(current_service.id, 'manage_service') %}
+        <li>{{ user.name }}</li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
