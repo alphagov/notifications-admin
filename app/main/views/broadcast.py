@@ -1,7 +1,7 @@
 from flask import abort, flash, jsonify, redirect, render_template, request, url_for
 
 from app import current_service
-from app.main import json_api, main
+from app.main import json_updates, main
 from app.main.forms import (
     BroadcastAreaForm,
     BroadcastAreaFormWithSelectAll,
@@ -83,7 +83,7 @@ def broadcast_dashboard_rejected(service_id):
     )
 
 
-@json_api.route("/services/<uuid:service_id>/broadcast-dashboard.json")
+@json_updates.route("/services/<uuid:service_id>/broadcast-dashboard.json")
 @user_has_permissions()
 @service_has_permission("broadcast")
 def broadcast_dashboard_updates(service_id):

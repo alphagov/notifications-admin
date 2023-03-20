@@ -15,7 +15,7 @@ from app import (
     template_statistics_client,
 )
 from app.formatters import format_date_numeric, format_datetime_numeric
-from app.main import json_api, main
+from app.main import json_updates, main
 from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     DELIVERED_STATUSES,
@@ -51,12 +51,12 @@ def service_dashboard(service_id):
 
     return render_template(
         "views/dashboard/dashboard.html",
-        updates_url=url_for("json_api.service_dashboard_updates", service_id=service_id),
+        updates_url=url_for("json_updates.service_dashboard_updates", service_id=service_id),
         partials=get_dashboard_partials(service_id),
     )
 
 
-@json_api.route("/services/<uuid:service_id>/dashboard.json")
+@json_updates.route("/services/<uuid:service_id>/dashboard.json")
 @user_has_permissions("view_activity")
 def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials(service_id))
@@ -161,11 +161,11 @@ def inbox(service_id):
     return render_template(
         "views/dashboard/inbox.html",
         partials=get_inbox_partials(service_id),
-        updates_url=url_for("json_api.inbox_updates", service_id=service_id, page=request.args.get("page")),
+        updates_url=url_for("json_updates.inbox_updates", service_id=service_id, page=request.args.get("page")),
     )
 
 
-@json_api.route("/services/<uuid:service_id>/inbox.json")
+@json_updates.route("/services/<uuid:service_id>/inbox.json")
 @user_has_permissions("view_activity")
 @service_has_permission("inbound_sms")
 def inbox_updates(service_id):

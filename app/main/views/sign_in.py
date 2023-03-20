@@ -17,6 +17,7 @@ from app.main import main
 from app.main.forms import LoginForm
 from app.models.user import InvitedUser, User
 from app.utils import hide_from_search_engines
+from app.utils.constants import JSON_UPDATES_BLUEPRINT_NAME
 from app.utils.login import is_safe_redirect_url
 
 
@@ -84,7 +85,7 @@ def sign_in():
 
 @login_manager.unauthorized_handler
 def sign_in_again():
-    if request.blueprint == "json_api":
+    if request.blueprint == JSON_UPDATES_BLUEPRINT_NAME:
         return abort(HTTPStatus.UNAUTHORIZED)
 
     return redirect(url_for("main.sign_in", next=request.path))

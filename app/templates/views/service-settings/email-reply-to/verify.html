@@ -21,7 +21,7 @@
   {{ page_header('{} email reply-to address'.format(verb)) }}
   {{ ajax_block(
       partials,
-      url_for('json_api.service_verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace),
+      url_for('json_updates.service_verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace),
       'status',
       finished=finished
     ) }}

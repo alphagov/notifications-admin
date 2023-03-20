@@ -1,9 +1,11 @@
 import typing
 from datetime import datetime, timedelta, timezone
 
-from flask import Flask, Request, Response
+from flask import Flask, Request, Response, request
 from flask.sessions import SecureCookieSession, SecureCookieSessionInterface
 from flask_login import current_user
+
+from app.utils.constants import JSON_UPDATES_BLUEPRINT_NAME
 
 
 class NotifyAdminSessionInterface(SecureCookieSessionInterface):
@@ -50,7 +52,10 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
 
     def save_session(self, app: Flask, session: SecureCookieSession, response: Response) -> None:
         # Catch anyone who is logged-in from before we started tracking session-start times.
-        if "user_id" in session:
+        # Ignore responses from the JSON api endpoints. These power things like the service dashboard or template
+        # usage and are passive views. We don't want the session to be refreshed when someone is inactive on an
+        # auto-refreshing page.
+        if "user_id" in session and request.blueprint != JSON_UPDATES_BLUEPRINT_NAME:
             now = datetime.now(timezone.utc)
             if "session_start" not in session:
                 session["session_start"] = now.isoformat()

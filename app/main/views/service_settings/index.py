@@ -31,7 +31,7 @@ from app.event_handlers import (
 )
 from app.extensions import zendesk_client
 from app.formatters import email_safe
-from app.main import json_api, main
+from app.main import json_updates, main
 from app.main.forms import (
     AdminBillingDetailsForm,
     AdminNotesForm,
@@ -479,7 +479,7 @@ def service_verify_reply_to_address(service_id, notification_id):
     )
 
 
-@json_api.route("/services/<uuid:service_id>/service-settings/email-reply-to/<uuid:notification_id>/verify.json")
+@json_updates.route("/services/<uuid:service_id>/service-settings/email-reply-to/<uuid:notification_id>/verify.json")
 @user_has_permissions("manage_service")
 def service_verify_reply_to_address_updates(service_id, notification_id):
     return jsonify(**get_service_verify_reply_to_address_partials(service_id, notification_id))

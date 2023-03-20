@@ -13,7 +13,8 @@
 
   {{ ajax_block(
     partials,
-    url_for('json_api.broadcast_dashboard_updates', service_id=current_service.id),
+    url_for(
+    'json_updates.broadcast_dashboard_updates', service_id=current_service.id),
     'current_broadcasts'
   ) }}
 

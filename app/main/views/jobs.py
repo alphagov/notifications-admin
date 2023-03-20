@@ -29,7 +29,7 @@ from app import (
     service_api_client,
 )
 from app.formatters import get_time_left, message_count_noun
-from app.main import json_api, main
+from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
 from app.utils import parse_filter_args, set_status_filters
@@ -73,7 +73,7 @@ def view_job(service_id, job_id):
         job=job,
         status=request.args.get("status", ""),
         updates_url=url_for(
-            "json_api.view_job_updates",
+            "json_updates.view_job_updates",
             service_id=service_id,
             job_id=job.id,
             status=request.args.get("status", ""),
@@ -143,7 +143,7 @@ def cancel_letter_job(service_id, job_id):
     return view_job(service_id, job_id)
 
 
-@json_api.route("/services/<uuid:service_id>/jobs/<uuid:job_id>.json")
+@json_updates.route("/services/<uuid:service_id>/jobs/<uuid:job_id>.json")
 @user_has_permissions()
 def view_job_updates(service_id, job_id):
 
@@ -187,8 +187,10 @@ def view_notifications(service_id, message_type=None):
     )
 
 
-@json_api.route("/services/<uuid:service_id>/notifications.json", methods=["GET", "POST"])
-@json_api.route("/services/<uuid:service_id>/notifications/<template_type:message_type>.json", methods=["GET", "POST"])
+@json_updates.route("/services/<uuid:service_id>/notifications.json", methods=["GET", "POST"])
+@json_updates.route(
+    "/services/<uuid:service_id>/notifications/<template_type:message_type>.json", methods=["GET", "POST"]
+)
 @user_has_permissions()
 def get_notifications_page_partials_as_json(service_id, message_type=None):
     return jsonify(_get_notifications_dashboard_partials_data(service_id, message_type))

@@ -503,28 +503,26 @@ def setup_blueprints(application):
 
     main_blueprint is the default for everything.
 
+    json_updates_blueprint is for endpoints that provide (duh) JSON data, eg to power auto-updating pages like the
+    service dashboard or notifications dashboard.
+
     status_blueprint is only for the status page - unauthenticated, unstyled, no cookies, etc.
 
     no_cookie_blueprint is for subresources (things loaded asynchronously) that we might be concerned are setting
     cookies unnecessarily and potentially getting in to strange race conditions and overwriting other cookies, as we've
     seen in the send message flow. Currently, this includes letter template previews, and the iframe from the platform
     admin email branding preview pages.
-
-    This notably doesn't include the *.json ajax endpoints. If we included them in this, the cookies wouldn't be
-    updated, including the expiration date. If you have a dashboard open and in focus it'll refresh the expiration timer
-    every two seconds, and you will never log out, which is behaviour we want to preserve.
     """
-    from app.main import json_api as json_api_blueprint
+    from app.main import json_updates as json_updates_blueprint
     from app.main import main as main_blueprint
     from app.main import no_cookie as no_cookie_blueprint
     from app.status import status as status_blueprint
 
     main_blueprint.before_request(make_session_permanent)
-    json_api_blueprint.before_request(make_session_permanent)
     main_blueprint.after_request(save_service_or_org_after_request)
 
     application.register_blueprint(main_blueprint)
-    application.register_blueprint(json_api_blueprint)
+    application.register_blueprint(json_updates_blueprint)
 
     # no_cookie_blueprint specifically doesn't have `make_session_permanent` or `save_service_or_org_after_request`
     application.register_blueprint(no_cookie_blueprint)

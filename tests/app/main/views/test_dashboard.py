@@ -355,7 +355,7 @@ def test_empty_inbox(
     "endpoint",
     [
         "main.inbox",
-        "json_api.inbox_updates",
+        "json_updates.inbox_updates",
     ],
 )
 def test_inbox_not_accessible_to_service_without_permissions(
@@ -408,7 +408,7 @@ def test_view_inbox_updates(
     )
 
     response = client_request.get_response(
-        "json_api.inbox_updates",
+        "json_updates.inbox_updates",
         service_id=SERVICE_ONE_ID,
     )
 

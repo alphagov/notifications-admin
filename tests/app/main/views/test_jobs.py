@@ -100,7 +100,7 @@ def test_should_show_page_for_one_job(
         "07123456789 template content Delivered 1 January at 11:10am"
     )
     assert page.select_one("div[data-key=notifications]")["data-resource"] == url_for(
-        "json_api.view_job_updates",
+        "json_updates.view_job_updates",
         service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
         status=status_argument,
@@ -656,7 +656,7 @@ def test_should_show_updates_for_one_job_as_json(
     fake_uuid,
 ):
     response = client_request.get_response(
-        "json_api.view_job_updates",
+        "json_updates.view_job_updates",
         service_id=service_one["id"],
         job_id=fake_uuid,
     )
@@ -698,7 +698,7 @@ def test_should_show_updates_for_scheduled_job_as_json(
     )
 
     response = client_request.get_response(
-        "json_api.view_job_updates",
+        "json_updates.view_job_updates",
         service_id=service_one["id"],
         job_id=fake_uuid,
     )
