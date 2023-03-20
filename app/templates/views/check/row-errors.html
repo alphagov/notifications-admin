@@ -73,6 +73,8 @@
                   No content for this message
                 {% elif item.message_too_long %}
                   Message is too long
+                {% elif item.as_postal_address.has_invalid_country_for_bfpo_address %}
+                  The last line of a BFPO address must not be a country.
                 {% elif not item.as_postal_address.has_enough_lines %}
                   Address must be at least {{ letter_min_address_lines }} lines long
                 {% elif item.as_postal_address.has_too_many_lines %}

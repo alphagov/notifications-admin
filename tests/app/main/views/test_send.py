@@ -664,6 +664,48 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     ]
 
 
+def test_upload_csv_file_with_bad_bfpo_postal_address_shows_check_page_with_errors(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_service_letter_template,
+    mock_s3_set_metadata,
+    mock_s3_get_metadata,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+):
+    service_one["permissions"] += ["letter", "international_letters"]
+    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value="""
+            address line 1,address line 2,address line 3,address line 4,
+            Firstname Lastname, BFPO1234, BF1 1AA, USA
+        """,
+    )
+
+    page = client_request.post(
+        "main.send_messages",
+        service_id=service_one["id"],
+        template_id=fake_uuid,
+        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _content_type="multipart/form-data",
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        "There’s a problem with example.csv You need to fix 1 address."
+    )
+    assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
+        "2 The last line of a BFPO address must not be a country.",
+        "Firstname Lastname BFPO1234 BF1 1AA USA",
+    ]
+
+
 def test_upload_csv_file_with_international_letters_permission_shows_appropriate_errors(
     client_request,
     service_one,
@@ -2324,6 +2366,11 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
             "a\n(b\nSW1A 1AA",
             [],
             "Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~",
+        ),
+        (
+            "a\nb\nBFPO 1234\nBFPO\nBF1 1AA\nUSA",
+            [],
+            "The last line of a BFPO address must not be a country.",
         ),
     ],
 )

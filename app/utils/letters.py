@@ -149,6 +149,11 @@ LETTER_VALIDATION_MESSAGES = {
             "following characters: @ ( ) = [ ] ” \\ / , < > ~"
         ),
     },
+    "has-country-for-bfpo-address": {
+        "title": "There’s a problem with the address for this letter",
+        "detail": "The last line of a BFPO address must not be a country.",
+        "summary": "Validation failed because the last line of the BFPO address is a country.",
+    },
     "notify-tag-found-in-content": {
         "title": "There’s a problem with your letter",
         "detail": "Your file includes a letter you’ve downloaded from Notify.<br>You need to edit {invalid_pages}.",
