@@ -50,7 +50,10 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
 
     def save_session(self, app: Flask, session: SecureCookieSession, response: Response) -> None:
         # Catch anyone who is logged-in from before we started tracking session-start times.
-        if "user_id" in session:
+        # Ignore `application/json` responses. These power things like the service dashboard or template
+        # usage and are passive views. We don't want the session to be refreshed when someone is inactive on an
+        # auto-refreshing page.
+        if "user_id" in session and response.content_type != "application/json":
             now = datetime.now(timezone.utc)
             if "session_start" not in session:
                 session["session_start"] = now.isoformat()

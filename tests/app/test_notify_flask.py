@@ -110,3 +110,53 @@ class TestNotifyAdminSessionInterface:
             assert (
                 "Expires=Wed, 01 Jan 2020 02:00:01 GMT" in response.headers["Set-Cookie"]
             ), "A new anonymous session should be created with a permanent lifetime of 1 hour"
+
+    def test_platform_admin_session_not_renewed_by_json_views(
+        self,
+        platform_admin_user,
+        request,
+        service_one,
+        mock_get_service,
+        mock_get_service_templates,
+        mock_get_template_statistics,
+        mock_has_no_jobs,
+        mock_get_annual_usage_for_service,
+        mock_get_free_sms_fragment_limit,
+        mock_get_returned_letter_statistics_with_no_returned_letters,
+    ):
+        # webauthn auth needs some more complex mocking/patching not relevant to the code under test, so let's bypass it
+        platform_admin_user["auth_type"] = "sms_auth"
+        platform_admin_user["can_use_webauthn"] = False
+
+        app = request.getfixturevalue("clean_app")
+        client = request.getfixturevalue("clean_app_client")
+
+        # Set absolute session lifetime to 1 hour
+        app.permanent_session_lifetime = datetime.timedelta(minutes=60)
+        app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60
+
+        # Set platform admin inactive timeout to 30 minutes
+        app.config["PLATFORM_ADMIN_INACTIVE_SESSION_TIMEOUT"] = 30 * 60
+
+        with freezegun.freeze_time("2020-01-01T00:00:00"):
+            client.login(platform_admin_user)
+            response = client.get(url_for("main.service_dashboard", service_id=SERVICE_ONE_ID))
+            assert response.status_code == 200
+            assert session["user_id"] == platform_admin_user["id"]
+            assert "Expires=Wed, 01 Jan 2020 00:30:00 GMT" in response.headers["Set-Cookie"]
+
+        with freezegun.freeze_time("2020-01-01T00:29:00"):
+            response = client.get(url_for("main.service_dashboard_updates", service_id=SERVICE_ONE_ID))
+            assert response.status_code == 200
+            assert session["user_id"] == platform_admin_user["id"]
+            assert (
+                "Expires=Wed, 01 Jan 2020 00:30:00 GMT" in response.headers["Set-Cookie"]
+            ), "The expiry should remain unchanged because we're using a JSON endpoint"
+
+        with freezegun.freeze_time("2020-01-01T00:30:01"):
+            response = client.get(url_for("main.service_dashboard", service_id=SERVICE_ONE_ID))
+            assert response.status_code == 200
+            assert "user_id" not in session, "The session should have expired and the user dropped from the session"
+            assert (
+                "Expires=Wed, 01 Jan 2020 01:30:01 GMT" in response.headers["Set-Cookie"]
+            ), "A new anonymous session should be created with a permanent lifetime of 1 hour"
