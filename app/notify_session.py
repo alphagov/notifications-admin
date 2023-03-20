@@ -7,7 +7,7 @@ from flask_login import current_user
 
 
 class NotifyAdminSessionInterface(SecureCookieSessionInterface):
-    def get_inactive_session_expiry(self, app, session_start: datetime):
+    def _get_inactive_session_expiry(self, app, session_start: datetime):
         """Calculate the inactive expiry timestamp for the session.
 
         For all users, the session lasts at most 20 hours after logging in.
@@ -57,7 +57,7 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
             now = datetime.now(timezone.utc)
             if "session_start" not in session:
                 session["session_start"] = now.isoformat()
-            session["session_expiry"] = self.get_inactive_session_expiry(
+            session["session_expiry"] = self._get_inactive_session_expiry(
                 app, datetime.fromisoformat(session["session_start"])
             ).isoformat()
 
