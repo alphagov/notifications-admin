@@ -181,6 +181,7 @@ EXCLUDED_ENDPOINTS = set(
             "letter_branding",
             "letter_spec",
             "letter_template",
+            "letter_template_attach_pages",
             "link_service_to_organisation",
             "live_services_csv",
             "live_services",

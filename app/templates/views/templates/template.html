@@ -44,13 +44,28 @@
     {% include 'views/templates/_template.html' %}
   </div>
 
+  {% if template.template_type == "letter" and show_attach_pages_button %}
+    <div class="govuk-!-margin-bottom-3">
+      {{ govukButton({
+      "element": "a",
+      "text": "Attach pages",
+      "href": url_for(
+          '.letter_template_attach_pages',
+          service_id=current_service.id,
+          template_id=template.id
+        ),
+      "classes": "govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-2"
+      }) }}
+    </div>
+  {% endif %}
+
   {% if template.template_type != 'broadcast' %}
-    <div class="bottom-gutter-1-2">
+    <div class="govuk-!-margin-bottom-3">
       {{ copy_to_clipboard(template.id, name="Template ID", thing='template ID') }}
     </div>
   {% endif %}
 
-  <div class="bottom-gutter-1-2">
+  <div class="govuk-!-margin-bottom-3">
     {% if template._template.updated_at %}
       <h2 class="heading-small bottom-gutter-2-3 heading-inline">
         Last edited

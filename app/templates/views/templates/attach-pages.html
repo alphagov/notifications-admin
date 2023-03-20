@@ -1,0 +1,43 @@
+{% extends "withnav_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = "Attach pages" %}
+
+{% block service_page_title %}
+    {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+{% if not error %}
+{{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
+{% endif %}
+{% endblock %}
+
+{% block maincolumn_content %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+        {{ page_header(page_title) }}
+
+        <p class="govuk-body">Upload a PDF and we’ll print it as part of your letter.</p>
+        <p class="govuk-body">
+            In total, your letter must be 10 pages or less (5 double-sided sheets of paper).
+        </p>
+        <p class="govuk-body">
+            Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter
+                specification</a>.
+        </p>
+
+        <div class="govuk-body">
+            {{ file_upload(
+            form.file,
+            allowed_file_extensions=['pdf'],
+            action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template_id),
+            button_text='Choose file',
+            show_errors=False
+            )}}
+        </div>
+    </div>
+</div>
+{% endblock %}
