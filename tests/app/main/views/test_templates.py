@@ -832,39 +832,6 @@ def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
 
 
-def test_post_letter_template_attach_pages_shows_error_when_file_is_not_a_pdf(
-    client_request, service_one, fake_uuid, mocker
-):
-    service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-
-    with open("tests/non_spreadsheet_files/actually_a_png.csv", "rb") as file:
-        page = client_request.post(
-            "main.letter_template_attach_pages",
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-            _data={"file": file},
-            _expected_status=400,
-        )
-    assert page.select_one(".banner-dangerous h1").text == "Wrong file type"
-    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
-    assert page.select_one("input[type=file]")["accept"] == ".pdf"
-
-
-def test_post_letter_template_attach_pages_shows_error_when_no_file_uploaded(client_request, service_one, fake_uuid):
-    service_one["permissions"] = ["extra_letter_formatting"]
-
-    page = client_request.post(
-        "main.letter_template_attach_pages",
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        _data={"file": ""},
-        _expected_status=400,
-    )
-    assert page.select_one(".banner-dangerous h1").text == "You need to choose a file to upload"
-    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
-
-
 def test_edit_letter_template_postage_page_displays_correctly(
     client_request,
     service_one,

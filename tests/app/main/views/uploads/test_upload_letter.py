@@ -6,7 +6,7 @@ from requests import RequestException
 
 from app.formatters import normalize_spaces
 from app.s3_client.s3_letter_upload_client import LetterMetadata, LetterNotFoundError
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import SERVICE_ONE_ID, sample_uuid
 
 
 def test_get_upload_letter(client_request):
@@ -229,22 +229,35 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
     )
 
 
-def test_post_upload_letter_shows_error_when_file_is_not_a_pdf(client_request, mocker):
+@pytest.mark.parametrize(
+    "endpoint,kwargs",
+    [
+        ("main.upload_letter", {"service_id": SERVICE_ONE_ID}),
+        ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
+    ],
+)
+def test_post_upload_pdf_views_show_error_when_file_is_not_a_pdf(client_request, service_one, mocker, endpoint, kwargs):
+    service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     with open("tests/non_spreadsheet_files/actually_a_png.csv", "rb") as file:
-        page = client_request.post(
-            "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": file}, _expected_status=400
-        )
+        page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
     assert page.select_one(".banner-dangerous h1").text == "Wrong file type"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
     assert page.select_one("input[type=file]")["accept"] == ".pdf"
 
 
-def test_post_upload_letter_shows_error_when_no_file_uploaded(client_request):
-    page = client_request.post(
-        "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": ""}, _expected_status=400
-    )
+@pytest.mark.parametrize(
+    "endpoint,kwargs",
+    [
+        ("main.upload_letter", {"service_id": SERVICE_ONE_ID}),
+        ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
+    ],
+)
+def test_post_upload_pdf_views_show_error_when_no_file_uploaded(client_request, service_one, endpoint, kwargs):
+    service_one["permissions"] = ["extra_letter_formatting"]
+
+    page = client_request.post(endpoint, **kwargs, _data={"file": ""}, _expected_status=400)
     assert page.select_one(".banner-dangerous h1").text == "You need to choose a file to upload"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
