@@ -7,6 +7,9 @@ const resourceURL = `/services/${serviceNumber}/notifications/email.json?status=
 const updateKey = 'counts';
 
 let responseObj = {};
+let jqueryAJAXReturnXHR = {};
+let documentContentType = 'application/json';
+jqueryAJAXReturnXHR.getResponseHeader = (ct) => documentContentType;
 let jqueryAJAXReturnObj;
 
 beforeAll(() => {
@@ -22,7 +25,7 @@ beforeAll(() => {
     done: callback => {
       // The server takes 1 second to respond
       jest.setSystemTime(Date.now() + 1000);
-      callback(responseObj);
+      callback(responseObj, 'success', jqueryAJAXReturnXHR);
       return jqueryAJAXReturnObj;
     },
     fail: () => {}
@@ -159,6 +162,46 @@ describe('Update content', () => {
 
       })
 
+    });
+
+    describe('Polling should be stopped', () => {
+      beforeEach(() => {
+        // start the module
+        window.GOVUK.notifyModules.start();
+      });
+
+      test("When the response content-type is not application/json", () => {
+        expect($.ajax).toHaveBeenCalledTimes(0);
+
+        jest.advanceTimersByTime(2000);
+        expect($.ajax).toHaveBeenCalledTimes(1);
+
+        documentContentType = 'text/html';
+        jest.advanceTimersByTime(8000);
+        expect($.ajax).toHaveBeenCalledTimes(2);
+
+        jest.advanceTimersByTime(30000);
+        expect($.ajax).toHaveBeenCalledTimes(2);
+      });
+
+      test("When response.stop === 1", () => {
+        expect($.ajax).toHaveBeenCalledTimes(0);
+
+        jest.advanceTimersByTime(2000);
+        expect($.ajax).toHaveBeenCalledTimes(1);
+
+        responseObj.stop = 1;
+        jest.advanceTimersByTime(8000);
+        expect($.ajax).toHaveBeenCalledTimes(2);
+
+        jest.advanceTimersByTime(30000);
+        expect($.ajax).toHaveBeenCalledTimes(2);
+      });
+
+      afterEach(() => {
+        documentContentType = 'application/json';
+        delete responseObj.stop;
+      })
     });
 
   });
