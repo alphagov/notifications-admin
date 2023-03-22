@@ -8,6 +8,7 @@ const updateKey = 'counts';
 
 let responseObj = {};
 let jqueryAJAXReturnObj;
+let ajaxCallbackFilter = 'done';
 
 beforeAll(() => {
 
@@ -20,12 +21,21 @@ beforeAll(() => {
   // set up the object returned from $.ajax so it responds with whatever responseObj is set to
   jqueryAJAXReturnObj = {
     done: callback => {
-      // The server takes 1 second to respond
-      jest.setSystemTime(Date.now() + 1000);
-      callback(responseObj);
+      if (ajaxCallbackFilter === 'done') {
+        // The server takes 1 second to respond
+        jest.setSystemTime(Date.now() + 1000);
+        callback(responseObj);
+      }
       return jqueryAJAXReturnObj;
     },
-    fail: () => {}
+    fail: callback => {
+      if (ajaxCallbackFilter === 'fail') {
+        // The server takes 1 second to respond
+        jest.setSystemTime(Date.now() + 1000);
+        callback(responseObj);
+      }
+      return jqueryAJAXReturnObj;
+    }
   };
 
   $.ajax.mockImplementation(() => jqueryAJAXReturnObj);
@@ -159,6 +169,64 @@ describe('Update content', () => {
 
       })
 
+    });
+
+    describe('With a 401 response status code', () => {
+      let locationMock;
+
+      beforeEach(() => {
+        locationMock = new helpers.LocationMock();
+
+        window.location.reload = jest.fn();
+        // start the module
+        window.GOVUK.notifyModules.start();
+      });
+
+      test("Polling should be stopped", () => {
+        expect($.ajax).toHaveBeenCalledTimes(0);
+
+        jest.advanceTimersByTime(2000);
+        expect($.ajax).toHaveBeenCalledTimes(1);
+
+        // Now expect the request to return a 401 response, trigger an ajax fail. We swap the done/fail handlers so that
+        // .done() does nothing and .fail() triggers the related callback.
+        ajaxCallbackFilter = 'fail';
+        responseObj.status = 401;
+        jest.advanceTimersByTime(8000);
+        expect($.ajax).toHaveBeenCalledTimes(2);
+        expect(window.location.reload).toHaveBeenCalled();
+      });
+
+      afterEach(() => {
+        ajaxCallbackFilter = 'done';
+        delete responseObj.status;
+        locationMock.reset();
+      });
+    });
+
+    describe('With response.stop === 1', () => {
+      beforeEach(() => {
+        // start the module
+        window.GOVUK.notifyModules.start();
+      });
+
+      test("Polling should be stopped", () => {
+        expect($.ajax).toHaveBeenCalledTimes(0);
+
+        jest.advanceTimersByTime(2000);
+        expect($.ajax).toHaveBeenCalledTimes(1);
+
+        responseObj.stop = 1;
+        jest.advanceTimersByTime(8000);
+        expect($.ajax).toHaveBeenCalledTimes(2);
+
+        jest.advanceTimersByTime(30000);
+        expect($.ajax).toHaveBeenCalledTimes(2);
+      });
+
+      afterEach(() => {
+        delete responseObj.stop;
+      });
     });
 
   });

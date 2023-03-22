@@ -2,6 +2,7 @@
   "use strict";
 
   var queues = {};
+  var stopPolling = {};
   var morphdom = global.GOVUK.vendor.morphdom;
   var defaultInterval = 2000;
   var interval = 0;
@@ -77,7 +78,6 @@
   var clearQueue = queue => (queue.length = 0);
 
   var poll = function(renderer, resource, queue, form) {
-
     let startTime = Date.now();
 
     if (document.visibilityState !== "hidden" && queue.push(renderer) === 1) $.ajax(
@@ -90,17 +90,25 @@
       response => {
         flushQueue(queue, response);
         if (response.stop === 1) {
-          poll = function(){};
+          stopPolling[resource] = true;
         }
         interval = calculateBackoff(Date.now() - startTime);
       }
     ).fail(
-      () => poll = function(){}
+      response => {
+        stopPolling[resource] = true;
+        if (response.status === 401) {
+          clearQueue(queue);
+          window.location.reload();
+        }
+      }
     );
 
-    setTimeout(
-      () => poll.apply(window, arguments), interval
-    );
+    if (stopPolling[resource] === false) {
+      setTimeout(
+          () => poll.apply(window, arguments), interval
+      );
+    }
   };
 
   global.GOVUK.NotifyModules.UpdateContent = function() {
@@ -112,6 +120,7 @@
       var resource = $component.data('resource');
       var form = $component.data('form');
       var classesPersister = new ClassesPersister($contents);
+      stopPolling[resource] = false;
 
       // Replace component with contents.
       // The renderer does this anyway when diffing against the first response
