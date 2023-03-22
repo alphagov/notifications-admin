@@ -275,13 +275,19 @@ def test_post_upload_letter_shows_error_when_file_contains_virus(mocker, client_
     mock_s3_backup.assert_not_called()
 
 
-def test_post_choose_upload_file_when_file_is_too_big(mocker, client_request):
+@pytest.mark.parametrize(
+    "endpoint,kwargs",
+    [
+        ("main.upload_letter", {"service_id": SERVICE_ONE_ID}),
+        ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
+    ],
+)
+def test_post_upload_pdf_views_error_when_file_is_too_big(mocker, client_request, service_one, endpoint, kwargs):
+    service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     with open("tests/test_pdf_files/big.pdf", "rb") as file:
-        page = client_request.post(
-            "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": file}, _expected_status=400
-        )
+        page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
     assert page.select_one(".banner-dangerous h1").text == "Your file is too big"
     assert page.select_one(".banner-dangerous p").text == "Files must be smaller than 2MB."
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"

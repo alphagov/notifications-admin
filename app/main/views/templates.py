@@ -37,7 +37,7 @@ from app.utils import (
     service_has_permission,
     should_skip_template_page,
 )
-from app.utils.letters import get_error_from_upload_form
+from app.utils.letters import MAX_FILE_UPLOAD_SIZE, get_error_from_upload_form
 from app.utils.templates import get_template
 from app.utils.user import user_has_permissions
 
@@ -893,13 +893,32 @@ def letter_template_attach_pages(service_id, template_id):
     error = {}
 
     if form.validate_on_submit():
-        pass
+        pdf_file_bytes = form.file.data.read()
+        # original_filename = form.file.data.filename
+
+        if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
+            return _invalid_upload_error(
+                template_id=template_id,
+                error_title="Your file is too big",
+                error_detail="Files must be smaller than 2MB.",
+            )
+
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
 
     return (
-        render_template(
-            "views/templates/attach-pages.html", form=form, service_id=service_id, template_id=template_id, error=error
-        ),
+        render_template("views/templates/attach-pages.html", form=form, template_id=template_id, error=error),
         400 if error else 200,
+    )
+
+
+def _invalid_upload_error(template_id, error_title, error_detail=None):
+    return (
+        render_template(
+            "views/templates/attach-pages.html",
+            error={"title": error_title, "detail": error_detail},
+            form=PDFUploadForm(),
+            template_id=template_id,
+        ),
+        400,
     )
