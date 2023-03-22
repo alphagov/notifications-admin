@@ -191,3 +191,14 @@ def get_letter_validation_error(validation_message, invalid_pages=None, page_cou
             letter_spec_guidance=url_for("main.guidance_upload_a_letter"),
         ),
     }
+
+
+def get_error_from_upload_form(form_errors):
+    error = {}
+    if "PDF" in form_errors:
+        error["title"] = "Wrong file type"
+        error["detail"] = form_errors
+    else:  # No file was uploaded error
+        error["title"] = form_errors
+
+    return error

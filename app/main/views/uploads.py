@@ -47,7 +47,11 @@ from app.s3_client.s3_letter_upload_client import (
 from app.template_previews import TemplatePreview, sanitise_letter
 from app.utils import unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
-from app.utils.letters import get_letter_printing_statement, get_letter_validation_error
+from app.utils.letters import (
+    get_error_from_upload_form,
+    get_letter_printing_statement,
+    get_letter_validation_error,
+)
 from app.utils.pagination import (
     generate_next_dict,
     generate_previous_dict,
@@ -219,7 +223,7 @@ def upload_letter(service_id):
         )
 
     if form.file.errors:
-        error = _get_error_from_upload_form(form.file.errors[0])
+        error = get_error_from_upload_form(form.file.errors[0])
 
     return render_template("views/uploads/choose-file.html", error=error, form=form), 400 if error else 200
 
@@ -231,17 +235,6 @@ def invalid_upload_error(error_title, error_detail=None):
         ),
         400,
     )
-
-
-def _get_error_from_upload_form(form_errors):
-    error = {}
-    if "PDF" in form_errors:
-        error["title"] = "Wrong file type"
-        error["detail"] = form_errors
-    else:  # No file was uploaded error
-        error["title"] = form_errors
-
-    return error
 
 
 @main.route("/services/<uuid:service_id>/preview-letter/<uuid:file_id>")

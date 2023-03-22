@@ -37,6 +37,7 @@ from app.utils import (
     service_has_permission,
     should_skip_template_page,
 )
+from app.utils.letters import get_error_from_upload_form
 from app.utils.templates import get_template
 from app.utils.user import user_has_permissions
 
@@ -889,7 +890,16 @@ def get_template_sender_form_dict(service_id, template):
 @service_has_permission("extra_letter_formatting")
 def letter_template_attach_pages(service_id, template_id):
     form = PDFUploadForm()
+    error = {}
 
-    return render_template(
-        "views/templates/attach-pages.html", form=form, service_id=service_id, template_id=template_id
+    if form.validate_on_submit():
+        pass
+    if form.file.errors:
+        error = get_error_from_upload_form(form.file.errors[0])
+
+    return (
+        render_template(
+            "views/templates/attach-pages.html", form=form, service_id=service_id, template_id=template_id, error=error
+        ),
+        400 if error else 200,
     )
