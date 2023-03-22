@@ -777,7 +777,7 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
 
 
 @pytest.mark.parametrize("template_type", ["letter", "email", "sms"])
-def test_view_letter_template_has_attach_pages_button_if_template_below_10_pages_long(
+def test_view_letter_template_has_attach_pages_button(
     client_request,
     service_one,
     mock_get_service_templates,
