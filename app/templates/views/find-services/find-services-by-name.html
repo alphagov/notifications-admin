@@ -14,6 +14,7 @@
 
 
   {% call form_wrapper(
+      method='get',
       action=url_for('.find_services_by_name'),
       class='notify-simple-search-form'
   ) %}
@@ -21,15 +22,10 @@
             "formGroup": {"classes": "notify-simple-search-form__form-group"},
         "label": {"text": "Find services by name, partial name, or service ID"}
       }) }}
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       {{ govukButton({
         "text": "Search",
         "classes": "notify-simple-search-form__button",
       }) }}
-  {% endcall %}
-
-  {% call form_wrapper(id='search-form' ) %}
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   {% endcall %}
 
   {% if services_found %}

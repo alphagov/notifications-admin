@@ -10,15 +10,17 @@ from app.models.user import User
 from app.utils.user import user_is_platform_admin
 
 
-@main.route("/find-users-by-email", methods=["GET", "POST"])
+@main.route("/find-users-by-email", methods=["GET"])
 @user_is_platform_admin
 def find_users_by_email():
-    # The prefix on this form must match the prefix on the form on the platform_admin_search view as the form on that
-    # page POSTs here.
-    form = AdminSearchUsersByEmailForm(prefix="users")
+    # The prefix on this form must match the prefix on the form on the platform_admin_find view as the form on that page
+    # comes here with pre-populated search terms.
+    form = AdminSearchUsersByEmailForm(request.args, prefix="users", meta={"csrf": False})
+
     users_found = None
-    if form.validate_on_submit():
+    if form.search.data is not None and form.validate():
         users_found = user_api_client.find_users_by_full_or_partial_email(form.search.data)["data"]
+
     return render_template("views/find-users/find-users-by-email.html", form=form, users_found=users_found)
 
 

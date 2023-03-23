@@ -16,8 +16,7 @@
   </h1>
 
   <div class="govuk-grid-column-full">
-    {% call form_wrapper(action=url_for('.find_services_by_name'), class='govuk-grid-row notify-simple-search-form') %}
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% call form_wrapper(method='get', action=url_for('.find_services_by_name'), class='govuk-grid-row notify-simple-search-form') %}
       {{
         find_services_form.search(
           param_extensions={
@@ -33,8 +32,7 @@
       }) }}
     {% endcall %}
 
-    {% call form_wrapper(action=url_for('.find_users_by_email'), class='govuk-grid-row notify-simple-search-form') %}
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% call form_wrapper(method='get', action=url_for('.find_users_by_email'), class='govuk-grid-row notify-simple-search-form') %}
       {{
         find_users_form.search(
           param_extensions={
@@ -49,8 +47,7 @@
         "html": "Search <div class='govuk-visually-hidden'>for users</div>"
       }) }}
     {% endcall %}
-    {% call form_wrapper(action=url_for('.platform_admin_search'), class='govuk-grid-row notify-simple-search-form') %}
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% call form_wrapper(method='get', action=url_for('.platform_admin_search'), class='govuk-grid-row notify-simple-search-form') %}
       {{
         find_uuid_form.search(
           param_extensions={

@@ -1243,8 +1243,8 @@ class TestPlatformAdminFind:
     def test_find_uuid_redirects(self, mocker, client_request, platform_admin_user, api_response, expected_redirect):
         mocker.patch("app.main.views.platform_admin.admin_api_client.find_by_uuid", return_value=api_response)
         client_request.login(platform_admin_user)
-        client_request.post(
+        client_request.get(
             ".platform_admin_search",
-            _data={"uuid-search": "abcdef12-3456-7890-abcd-ef1234567890"},
+            **{"uuid-search": "abcdef12-3456-7890-abcd-ef1234567890"},
             _expected_redirect=expected_redirect,
         )

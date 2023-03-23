@@ -47,16 +47,23 @@ FAILURE_THRESHOLD = 3
 ZERO_FAILURE_THRESHOLD = 0
 
 
-@main.route("/platform-admin", methods=["GET", "POST"])
+# @main.route("/find-services-by-name", methods=["GET"])
+# @main.route("/find-users-by-email", methods=["GET"])
+# @user_is_platform_admin
+# def redirect_old_search_pages():
+#     return redirect(url_for(".platform_admin_search"))
+
+
+@main.route("/platform-admin", methods=["GET"])
 @user_is_platform_admin
 def platform_admin_search():
     # The services/users form prefixes must match those on the forms on their dedicated views.
-    find_services_form = SearchByNameForm(prefix="services")
-    find_users_form = AdminSearchUsersByEmailForm(prefix="users")
-    find_uuid_form = FindByUuidForm(prefix="uuid")
+    find_services_form = SearchByNameForm(request.args, prefix="services", meta={"csrf": False})
+    find_users_form = AdminSearchUsersByEmailForm(request.args, prefix="users", meta={"csrf": False})
+    find_uuid_form = FindByUuidForm(request.args, prefix="uuid", meta={"csrf": False})
 
     # Only the find_uuid_form POSTs to this endpoint - the others all POST to their existing dedicated pages.
-    if find_uuid_form.validate_on_submit():
+    if find_uuid_form.search.data is not None and find_uuid_form.validate():
         try:
             redirect_url = get_url_for_notify_record(find_uuid_form.search.data)
             return redirect(redirect_url)
