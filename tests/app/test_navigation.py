@@ -229,6 +229,7 @@ EXCLUDED_ENDPOINTS = set(
             "public_download_agreement",
             "received_text_messages_callback",
             "redact_template",
+            "redirect_old_search_pages",
             "register_from_invite",
             "register_from_org_invite",
             "register",

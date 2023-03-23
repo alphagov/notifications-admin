@@ -10,10 +10,10 @@ from tests.conftest import normalize_spaces
 
 def test_find_users_by_email_page_loads_correctly(client_request, platform_admin_user):
     client_request.login(platform_admin_user)
-    document = client_request.get("main.find_users_by_email")
-
-    assert document.select_one("h1").text.strip() == "Find users by email"
-    assert len(document.select("input[type=search]")) > 0
+    client_request.get(
+        "main.find_services_by_name",
+        _expected_redirect=url_for("main.platform_admin_search"),
+    )
 
 
 def test_find_users_by_email_displays_users_found(client_request, platform_admin_user, mocker):

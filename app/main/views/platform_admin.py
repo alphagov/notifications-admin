@@ -47,6 +47,13 @@ FAILURE_THRESHOLD = 3
 ZERO_FAILURE_THRESHOLD = 0
 
 
+@main.route("/find-services-by-name", methods=["GET"])
+@main.route("/find-users-by-email", methods=["GET"])
+@user_is_platform_admin
+def redirect_old_search_pages():
+    return redirect(url_for(".platform_admin_search"))
+
+
 @main.route("/platform-admin", methods=["GET", "POST"])
 @user_is_platform_admin
 def platform_admin_search():

@@ -5,10 +5,10 @@ from tests import service_json
 
 def test_find_services_by_name_page_loads_correctly(client_request, platform_admin_user):
     client_request.login(platform_admin_user)
-    document = client_request.get("main.find_services_by_name")
-
-    assert document.select_one("h1").text.strip() == "Find services by name"
-    assert len(document.select("input[type=search]")) > 0
+    client_request.get(
+        "main.find_services_by_name",
+        _expected_redirect=url_for("main.platform_admin_search"),
+    )
 
 
 def test_find_services_by_name_displays_services_found(client_request, platform_admin_user, mocker):
