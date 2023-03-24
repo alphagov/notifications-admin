@@ -1,10 +1,21 @@
 from functools import partial
+from io import BytesIO
 
-from flask import abort, flash, jsonify, redirect, render_template, request, url_for
+from flask import (
+    abort,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
-from notifications_utils.pdf import is_letter_too_long
+from notifications_utils.pdf import is_letter_too_long, pdf_page_count
+from PyPDF2.errors import PdfReadError
 
 from app import (
     current_service,
@@ -901,6 +912,17 @@ def letter_template_attach_pages(service_id, template_id):
                 template_id=template_id,
                 error_title="Your file is too big",
                 error_detail="Files must be smaller than 2MB.",
+            )
+
+        try:
+            # TODO: get page count from the sanitise response once template preview handles malformed files nicely
+            pdf_page_count(BytesIO(pdf_file_bytes))
+        except PdfReadError:
+            current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
+            return _invalid_upload_error(
+                template_id=template_id,
+                error_title="There’s a problem with your file",
+                error_detail="Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
             )
 
     if form.file.errors:
