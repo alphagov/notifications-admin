@@ -71,12 +71,16 @@ def sign_in():
         )
 
     other_device = current_user.logged_in_elsewhere()
-    return render_template(
-        "views/signin.html",
-        form=form,
-        again=bool(redirect_url),
-        other_device=other_device,
-        password_reset_url=password_reset_url,
+    return (
+        render_template(
+            "views/signin.html",
+            form=form,
+            again=bool(redirect_url),
+            other_device=other_device,
+            password_reset_url=password_reset_url,
+        ),
+        200,
+        {"X-Notify-Redirect-URL": request.full_path},
     )
 
 

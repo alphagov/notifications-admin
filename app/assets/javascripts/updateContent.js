@@ -88,7 +88,10 @@
       }
     ).done(
       (response, textStatus, jqXHR) => {
-        if (jqXHR.getResponseHeader('content-type') !== 'application/json') {
+        if (jqXHR.getResponseHeader('X-Notify-Redirect-URL')) {
+          // Check for a Notify-specific header that indicates we should redirect
+          window.location = jqXHR.getResponseHeader('X-Notify-Redirect-URL');
+        } else if (jqXHR.getResponseHeader('content-type') !== 'application/json') {
           // Non-JSON responses are likely to be caused by the user's session being invalidated
           // The request will redirect to the /sign-in page which comes back as a 200, but as text/html.
           stopPolling[resource] = true;
