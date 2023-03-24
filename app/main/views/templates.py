@@ -1,3 +1,4 @@
+import uuid
 from functools import partial
 from io import BytesIO
 
@@ -16,6 +17,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.pdf import is_letter_too_long, pdf_page_count
 from PyPDF2.errors import PdfReadError
+from requests import RequestException
 
 from app import (
     current_service,
@@ -42,13 +44,25 @@ from app.main.forms import (
 from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
-from app.template_previews import TemplatePreview, get_page_count_for_letter
+from app.s3_client.s3_letter_upload_client import (
+    get_transient_letter_file_location,
+    upload_letter_to_s3,
+)
+from app.template_previews import (
+    TemplatePreview,
+    get_page_count_for_letter,
+    sanitise_letter,
+)
 from app.utils import (
     NOTIFICATION_TYPES,
     service_has_permission,
     should_skip_template_page,
 )
-from app.utils.letters import MAX_FILE_UPLOAD_SIZE, get_error_from_upload_form
+from app.utils.letters import (
+    MAX_FILE_UPLOAD_SIZE,
+    get_error_from_upload_form,
+    get_letter_validation_error,
+)
 from app.utils.templates import get_template
 from app.utils.user import user_has_permissions
 
@@ -905,25 +919,62 @@ def letter_template_attach_pages(service_id, template_id):
 
     if form.validate_on_submit():
         pdf_file_bytes = form.file.data.read()
-        # original_filename = form.file.data.filename
+        original_filename = form.file.data.filename
 
         if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
             return _invalid_upload_error(
                 template_id=template_id,
-                error_title="Your file is too big",
-                error_detail="Files must be smaller than 2MB.",
+                error={
+                    "title": "Your file is too big",
+                    "detail": "Files must be smaller than 2MB.",
+                },
             )
 
         try:
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely
-            pdf_page_count(BytesIO(pdf_file_bytes))
+            page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
             current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
             return _invalid_upload_error(
                 template_id=template_id,
-                error_title="There’s a problem with your file",
-                error_detail="Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
+                error={
+                    "title": "There’s a problem with your file",
+                    "detail": "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
+                },
             )
+
+        upload_id = uuid.uuid4()
+        file_location = get_transient_letter_file_location(service_id, upload_id)
+
+        try:
+            response = sanitise_letter(
+                BytesIO(pdf_file_bytes),
+                upload_id=upload_id,
+                allow_international_letters=current_service.has_permission("international_letters"),
+                is_an_attachment=True,
+            )
+            response.raise_for_status()
+        except RequestException as ex:
+            if ex.response is not None and ex.response.status_code == 400:
+                validation_failed_message = response.json().get("message")
+                invalid_pages = response.json().get("invalid_pages")
+
+                status = "invalid"
+                upload_letter_to_s3(
+                    pdf_file_bytes,
+                    file_location=file_location,
+                    status=status,
+                    page_count=page_count,
+                    filename=original_filename,
+                    message=validation_failed_message,
+                    invalid_pages=invalid_pages,
+                )
+                return _invalid_upload_error(
+                    template_id=template_id,
+                    error=get_letter_validation_error(validation_failed_message, invalid_pages, page_count),
+                )
+            else:
+                raise ex
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
@@ -934,11 +985,11 @@ def letter_template_attach_pages(service_id, template_id):
     )
 
 
-def _invalid_upload_error(template_id, error_title, error_detail=None):
+def _invalid_upload_error(template_id, error):
     return (
         render_template(
             "views/templates/attach-pages.html",
-            error={"title": error_title, "detail": error_detail},
+            error=error,
             form=PDFUploadForm(),
             template_id=template_id,
         ),
