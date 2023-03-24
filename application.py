@@ -1,16 +1,10 @@
-import os
+from app.performance import init_performance_monitoring
 
-if (environment := os.getenv("NOTIFY_ENVIRONMENT")) in {"development", "preview", "staging"} and os.getenv(
-    "NEW_RELIC_ENABLED"
-) == "1":
-    import newrelic.agent
+init_performance_monitoring()
 
-    # Expects NEW_RELIC_LICENSE_KEY set in environment as well.
-    newrelic.agent.initialize("newrelic.ini", environment=environment, ignore_errors=False)
+from flask import Flask  # noqa
 
-from flask import Flask
-
-from app import create_app
+from app import create_app  # noqa
 
 application = Flask("app")
 
