@@ -931,7 +931,8 @@ def letter_template_attach_pages(service_id, template_id):
             )
 
         try:
-            # TODO: get page count from the sanitise response once template preview handles malformed files nicely
+            # TODO: get page count from the sanitise response once template preview
+            # handles malformed files nicely - is this done yet?
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
             current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
@@ -975,6 +976,22 @@ def letter_template_attach_pages(service_id, template_id):
                 )
             else:
                 raise ex
+        else:
+
+            # TODO in next PR: upload letter to S3
+
+            flash(
+                "Pages have been successfully attached. You can see them at the bottom of your letter template.",
+                "default_with_tick",
+            )
+
+            return redirect(
+                url_for(
+                    "main.view_template",
+                    service_id=current_service.id,
+                    template_id=template_id,
+                )
+            )
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
