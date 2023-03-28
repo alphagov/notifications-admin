@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block backLink %}
-    {{ govukBackLink({ "href": url_for('.organisation_settings', org_id=current_org.id) }) }}
+    {{ govukBackLink({ "href": url_for('main.organisation_settings', org_id=current_org.id) }) }}
 {%  endblock %}
 
 {% block maincolumn_content %}
@@ -72,7 +72,7 @@
     <div class="js-stick-at-bottom-when-scrolling">
       {{ page_footer(
           button_text='Add branding options',
-          button_url=url_for('.add_organisation_email_branding_options', org_id=current_org.id)
+          button_url=url_for('main.add_organisation_email_branding_options', org_id=current_org.id)
         )
       }}
     </div>

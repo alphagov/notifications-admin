@@ -18,7 +18,7 @@
     {{ govukButton({
       "element": "a",
       "text": "Add data retention",
-      "href": url_for('.add_data_retention', service_id=current_service.id),
+      "href": url_for('main.add_data_retention', service_id=current_service.id),
       "classes": "align-with-heading"
     }) }}
   </div>
@@ -45,7 +45,7 @@
           {% call row() %}
             {{ text_field(item.notification_type | format_notification_type)}}
             {{ text_field(item.days_of_retention|string + ' days') }}
-            {{ edit_field('Change', url_for('.edit_data_retention', service_id=current_service.id, data_retention_id=item.id)) }}
+            {{ edit_field('Change', url_for('main.edit_data_retention', service_id=current_service.id, data_retention_id=item.id)) }}
           {% endcall %}
 
       {% endfor %}

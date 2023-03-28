@@ -10,7 +10,7 @@
 
 {% block backLink %}
   {% if not request.args.get('from_template') %}
-    {{ govukBackLink({ "href": url_for('.service_sms_senders', service_id=current_service.id) }) }}
+    {{ govukBackLink({ "href": url_for('main.service_sms_senders', service_id=current_service.id) }) }}
   {% endif %}
 {% endblock %}
 
@@ -41,7 +41,7 @@
       {% else %}
         {{ page_footer(
           'Save',
-          delete_link=url_for('.service_confirm_delete_sms_sender', service_id=current_service.id, sms_sender_id=sms_sender_id),
+          delete_link=url_for('main.service_confirm_delete_sms_sender', service_id=current_service.id, sms_sender_id=sms_sender_id),
           delete_link_text='Delete'
         ) }}
       {% endif %}

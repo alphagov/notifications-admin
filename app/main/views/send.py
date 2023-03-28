@@ -858,7 +858,7 @@ def get_back_link(service_id, template, step_index, placeholders=None):
             )
         else:
             return url_for(
-                ".view_template",
+                "main.view_template",
                 service_id=service_id,
                 template_id=template.id,
             )
@@ -1040,7 +1040,7 @@ def send_notification(service_id, template_id):
 
     return redirect(
         url_for(
-            ".view_notification",
+            "main.view_notification",
             service_id=service_id,
             notification_id=noti["id"],
             # used to show the final step of the tour (help=3) or not show

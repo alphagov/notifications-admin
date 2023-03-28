@@ -21,7 +21,7 @@
   {% endif %}
   {% for org in organisations|sort %}
     <li class="browse-list-item">
-      <a href="{{ url_for('.organisation_dashboard', org_id=org.id) }}" class="govuk-link govuk-link--no-visited-state">{{ org.name }}</a>
+      <a href="{{ url_for('main.organisation_dashboard', org_id=org.id) }}" class="govuk-link govuk-link--no-visited-state">{{ org.name }}</a>
       <p class="browse-list-hint">
         {{ org.count_of_live_services }}
         live service{% if org.count_of_live_services != 1 %}s{% endif %}
@@ -30,7 +30,7 @@
   {% endfor %}
   {% for service in services|sort %}
     <li class="browse-list-item">
-      <a href="{{ url_for('.service_dashboard', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
+      <a href="{{ url_for('main.service_dashboard', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
     </li>
   {% endfor %}
   {% if show_heading and (services or organisations) %}
@@ -64,7 +64,7 @@
         </div>
         <ul class="govuk-grid-column-three-quarters">
           <li class="browse-list-item">
-            <a href="{{ url_for('.organisations') }}" class="govuk-link govuk-link--no-visited-state">All organisations</a>
+            <a href="{{ url_for('main.organisations') }}" class="govuk-link govuk-link--no-visited-state">All organisations</a>
             <p class="browse-list-hint">
               {{ org_count|format_thousands }} organisations, {{ live_service_count|format_thousands }} live services
             </p>
@@ -111,7 +111,7 @@
       {{ govukButton({
         "element": "a",
         "text": "Add a new service",
-        "href": url_for('.add_service'),
+        "href": url_for('main.add_service'),
         "classes": "govuk-button--secondary"
       }) }}
       {% if current_user.has_access_to_live_and_trial_mode_services %}

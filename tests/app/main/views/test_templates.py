@@ -577,7 +577,7 @@ def test_caseworker_sees_template_page_if_template_is_deleted(
 
     template_id = fake_uuid
     page = client_request.get(
-        ".view_template",
+        "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=template_id,
         _test_page_title=False,
@@ -739,7 +739,7 @@ def test_view_non_letter_template_does_not_display_postage(
     fake_uuid,
 ):
     page = client_request.get(
-        ".view_template",
+        "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _test_page_title=False,
@@ -926,7 +926,7 @@ def test_should_be_able_to_view_a_template_with_links(
     client_request.login(active_user_with_permissions)
 
     page = client_request.get(
-        ".view_template",
+        "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _test_page_title=False,
@@ -963,7 +963,7 @@ def test_view_broadcast_template(
     active_user_create_broadcasts_permission["permissions"][SERVICE_ONE_ID].append("manage_templates")
     client_request.login(active_user_create_broadcasts_permission)
     page = client_request.get(
-        ".view_template",
+        "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _test_page_title=False,
@@ -1002,7 +1002,7 @@ def test_should_show_template_id_on_template_page(
     fake_uuid,
 ):
     page = client_request.get(
-        ".view_template",
+        "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _test_page_title=False,
@@ -1017,7 +1017,7 @@ def test_should_hide_template_id_for_broadcast_templates(
     fake_uuid,
 ):
     page = client_request.get(
-        ".view_template",
+        "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _test_page_title=False,
@@ -1042,7 +1042,7 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
     )
 
     page = client_request.get(
-        ".view_template",
+        "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _test_page_title=False,
@@ -1690,7 +1690,7 @@ def test_should_redirect_when_saving_a_template(
         },
         _expected_status=302,
         _expected_redirect=url_for(
-            ".view_template",
+            "main.view_template",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
         ),
@@ -1724,7 +1724,7 @@ def test_should_not_allow_template_edits_without_correct_permission(
     assert page.select("main p")[0].text.strip() == "Sending text messages has been disabled for your service."
     assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
-        ".view_template",
+        "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
     )
@@ -1930,7 +1930,7 @@ def test_should_redirect_when_saving_a_template_email(
         },
         _expected_status=302,
         _expected_redirect=url_for(
-            ".view_template",
+            "main.view_template",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
         ),
@@ -2077,7 +2077,7 @@ def test_should_show_page_for_a_deleted_template(
 ):
     template_id = fake_uuid
     page = client_request.get(
-        ".view_template",
+        "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=template_id,
         _test_page_title=False,

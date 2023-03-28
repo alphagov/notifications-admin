@@ -14,7 +14,7 @@
       'Are you sure you want to remove {}?'.format(user_to_remove.name),
       type='dangerous',
       delete_button='Yes, remove',
-      action=url_for('.remove_user_from_organisation', org_id=current_org.id, user_id=user_to_remove.id)
+      action=url_for('main.remove_user_from_organisation', org_id=current_org.id, user_id=user_to_remove.id)
     ) }}
   {% endif %}
 
@@ -52,9 +52,9 @@
           </div>
           <div class="govuk-grid-column-one-quarter">
             {% if user.status == 'pending' %}
-              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation<span class="govuk-visually-hidden"> for {{ user.email_address }}</span></a>
+              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation<span class="govuk-visually-hidden"> for {{ user.email_address }}</span></a>
             {% elif user.status != 'cancelled' %}
-              <a class="govuk-link govuk-link--destructive user-list-edit-link" href="{{ url_for('.edit_organisation_user', org_id=current_org.id, user_id=user.id)}}">Remove<span class="govuk-visually-hidden"> {{ user.name }} {{ user.email_address }}</span></a>
+              <a class="govuk-link govuk-link--destructive user-list-edit-link" href="{{ url_for('main.edit_organisation_user', org_id=current_org.id, user_id=user.id)}}">Remove<span class="govuk-visually-hidden"> {{ user.name }} {{ user.email_address }}</span></a>
             {% endif %}
           </div>
         </div>
@@ -66,7 +66,7 @@
     {{ govukButton({
       "element": "a",
       "text": "Invite team member",
-      "href": url_for('.invite_org_user', org_id=current_org.id),
+      "href": url_for('main.invite_org_user', org_id=current_org.id),
       "classes": "govuk-button--secondary"
     }) }}
   </div>

@@ -19,7 +19,7 @@
         {{ text_field(current_org.name) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_name', org_id=current_org.id),
+            url_for('main.edit_organisation_name', org_id=current_org.id),
             suffix='organisation name'
           )
         }}
@@ -29,7 +29,7 @@
         {{ optional_text_field(current_org.organisation_type_label) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_type', org_id=current_org.id),
+            url_for('main.edit_organisation_type', org_id=current_org.id),
             suffix='sector for the organisation'
           )
         }}
@@ -45,7 +45,7 @@
         ) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_crown_status', org_id=current_org.id),
+            url_for('main.edit_organisation_crown_status', org_id=current_org.id),
             suffix='organisation crown status'
           )
         }}
@@ -61,7 +61,7 @@
         ) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_agreement', org_id=current_org.id),
+            url_for('main.edit_organisation_agreement', org_id=current_org.id),
             suffix='data sharing and financial agreement for the organisation'
           )
         }}
@@ -71,7 +71,7 @@
         {{ optional_text_field(current_org.request_to_go_live_notes, default='None') }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_go_live_notes', org_id=current_org.id),
+            url_for('main.edit_organisation_go_live_notes', org_id=current_org.id),
             suffix='go live notes for the organisation'
           )
         }}
@@ -81,7 +81,7 @@
         {{ text_field(current_org.can_approve_own_go_live_requests|format_yes_no) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_can_approve_own_go_live_requests', org_id=current_org.id),
+            url_for('main.edit_organisation_can_approve_own_go_live_requests', org_id=current_org.id),
             suffix='whether this organisation can approve its own go-live requests'
           )
         }}
@@ -92,7 +92,7 @@
         {{ optional_text_field(current_org.billing_details, default="None", wrap=True) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_billing_details', org_id=current_org.id),
+            url_for('main.edit_organisation_billing_details', org_id=current_org.id),
             suffix='billing details for the organisation'
           )
         }}
@@ -103,7 +103,7 @@
         {{ optional_text_field(current_org.notes, default="None", wrap=True) }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_notes', org_id=current_org.id),
+            url_for('main.edit_organisation_notes', org_id=current_org.id),
             suffix='the notes for the organisation'
           )
         }}
@@ -132,7 +132,7 @@
         {% endcall %}
         {{ edit_field(
             'Manage',
-            url_for('.organisation_email_branding', org_id=current_org.id),
+            url_for('main.organisation_email_branding', org_id=current_org.id),
             suffix='email branding options for the organisation'
           )
         }}
@@ -161,7 +161,7 @@
         {% endcall %}
         {{ edit_field(
             'Manage',
-            url_for('.organisation_letter_branding', org_id=current_org.id),
+            url_for('main.organisation_letter_branding', org_id=current_org.id),
             suffix='letter branding options for the organisation'
             )
         }}
@@ -171,7 +171,7 @@
         {{ optional_text_field(current_org.domains or None, default='None') }}
         {{ edit_field(
             'Change',
-            url_for('.edit_organisation_domains', org_id=current_org.id),
+            url_for('main.edit_organisation_domains', org_id=current_org.id),
             suffix='known email domains for the organisation'
           )
         }}
@@ -180,7 +180,7 @@
     {% if current_org.active %}
       <p class="top-gutter-1-2">
         <span class="page-footer-link page-footer-delete-link-without-button">
-          <a class="govuk-link govuk-link--destructive" href="{{ url_for('.archive_organisation', org_id=current_org.id) }}">
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.archive_organisation', org_id=current_org.id) }}">
             Delete this organisation
           </a>
         </span>

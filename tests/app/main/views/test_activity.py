@@ -181,7 +181,7 @@ def test_can_show_notifications(
     )
 
     json_response = client_request.get_response(
-        "main.get_notifications_page_partials_as_json",
+        "json_api.get_notifications_page_partials_as_json",
         service_id=service_one["id"],
         status=status_argument,
         **extra_args

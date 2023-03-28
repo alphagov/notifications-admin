@@ -8,7 +8,7 @@
   <div class="govuk-width-container">
     <div class="navigation-service">
       {% if current_user.platform_admin %}
-        <a href="{{ url_for('.organisations') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-organisation-link">Organisations</a>
+        <a href="{{ url_for('main.organisations') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-organisation-link">Organisations</a>
       {% endif %}
       <div class="navigation-service-name govuk-!-font-weight-bold">
         {{ current_org.name }}

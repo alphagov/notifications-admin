@@ -32,7 +32,7 @@ from app import (
     job_api_client,
     notification_api_client,
 )
-from app.main import main
+from app.main import json_api, main
 from app.notify_client.api_key_api_client import KEY_TYPE_TEST
 from app.template_previews import get_page_count_for_letter
 from app.utils import (
@@ -159,7 +159,7 @@ def view_notification(service_id, notification_id):
         template=template,
         job=job,
         updates_url=url_for(
-            ".view_notification_updates",
+            "json_api.view_notification_updates",
             service_id=service_id,
             notification_id=notification["id"],
             status=request.args.get("status"),
@@ -237,7 +237,7 @@ def get_letter_file_data(service_id, notification_id, filetype, with_metadata=Fa
     return display_file
 
 
-@main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>.json")
+@json_api.route("/services/<uuid:service_id>/notification/<uuid:notification_id>.json")
 @user_has_permissions("view_activity", "send_messages")
 def view_notification_updates(service_id, notification_id):
     return jsonify(

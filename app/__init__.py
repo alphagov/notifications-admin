@@ -511,14 +511,18 @@ def setup_blueprints(application):
     updated, including the expiration date. If you have a dashboard open and in focus it'll refresh the expiration timer
     every two seconds, and you will never log out, which is behaviour we want to preserve.
     """
+    from app.main import json_api as json_api_blueprint
     from app.main import main as main_blueprint
     from app.main import no_cookie as no_cookie_blueprint
     from app.status import status as status_blueprint
 
     main_blueprint.before_request(make_session_permanent)
+    json_api_blueprint.before_request(make_session_permanent)
     main_blueprint.after_request(save_service_or_org_after_request)
 
     application.register_blueprint(main_blueprint)
+    application.register_blueprint(json_api_blueprint)
+
     # no_cookie_blueprint specifically doesn't have `make_session_permanent` or `save_service_or_org_after_request`
     application.register_blueprint(no_cookie_blueprint)
     application.register_blueprint(status_blueprint)

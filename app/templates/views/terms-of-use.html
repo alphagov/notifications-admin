@@ -35,12 +35,12 @@
     <li>
       show how Notify is performing (through our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.performance') }}">performance</a> and <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk/">status</a> pages)
     </li>
-    <li>keep your data <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_security') }}">secure</a></li>
+    <li>keep your data <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">secure</a></li>
     <li>give you one month’s notice by email if we change our terms of use or delivery providers</li>
   </ul>
 
   <h2 class="heading-medium" id="leaving-notify">Leaving Notify</h2>
-  <p class="govuk-body">You can <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('.support')}}">contact us</a> at any time to close your account.</p>
-  <p class="govuk-body">Check our privacy notice to find out <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('.privacy')}}#how-long-we-keep-your-data">how long we keep your personal data</a>.</p>
+  <p class="govuk-body">You can <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact us</a> at any time to close your account.</p>
+  <p class="govuk-body">Check our privacy notice to find out <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.privacy')}}#how-long-we-keep-your-data">how long we keep your personal data</a>.</p>
 
 {% endblock %}

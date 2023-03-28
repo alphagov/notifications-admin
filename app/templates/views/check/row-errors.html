@@ -44,7 +44,7 @@
       {{ file_upload(
         form.file,
         allowed_file_extensions=allowed_file_extensions,
-        action=url_for('.send_messages', service_id=current_service.id, template_id=template.id),
+        action=url_for('main.send_messages', service_id=current_service.id, template_id=template.id),
         button_text='Upload your file again'
       ) }}
     </div>

@@ -44,12 +44,12 @@
         You can make {{ current_service.inbound_number }} the default sender again at any time.
       </p>
       <p class="govuk-body">
-        Add a new <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_sms_senders', service_id=current_service.id) }}">text message sender</a>.
+        Add a new <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">text message sender</a>.
       </p>
 
       <h2 class="heading heading-medium">If you’re sure you want to delete your number</h2>
       <p class="govuk-body">
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.support') }}">Contact the Notify team</a>.
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the Notify team</a>.
       </p>
     </div>
   </div>

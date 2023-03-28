@@ -273,7 +273,7 @@ def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
     assert page.select("main p")[0].text.strip() == "Sending text messages has been disabled for your service."
     assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
-        ".view_template",
+        "main.view_template",
         service_id=service_one["id"],
         template_id=template_id,
     )
@@ -1281,7 +1281,7 @@ def test_send_one_off_does_not_send_without_the_correct_permissions(
     assert page.select("main p")[0].text.strip() == "Sending text messages has been disabled for your service."
     assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
-        ".view_template",
+        "main.view_template",
         service_id=service_one["id"],
         template_id=template_id,
     )
@@ -3868,7 +3868,7 @@ def test_send_notification_redirects_to_view_page(
         template_id=fake_uuid,
         _expected_status=302,
         _expected_redirect=url_for(
-            ".view_notification", service_id=SERVICE_ONE_ID, notification_id=fake_uuid, **extra_redirect_args
+            "main.view_notification", service_id=SERVICE_ONE_ID, notification_id=fake_uuid, **extra_redirect_args
         ),
         **extra_args,
     )

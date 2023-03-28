@@ -25,7 +25,7 @@
             Letter
           </span>
           {% else %}
-          <a class="govuk-link govuk-link--no-visited-state template-statistics-table-template-name" href="{{ url_for('.view_template', service_id=current_service.id, template_id=item.template_id) }}">{{ item.template_name }}</a>
+          <a class="govuk-link govuk-link--no-visited-state template-statistics-table-template-name" href="{{ url_for('main.view_template', service_id=current_service.id, template_id=item.template_id) }}">{{ item.template_name }}</a>
           <span class="template-statistics-table-hint">
             {{ 1|message_count_label(item.template_type, suffix='template')|capitalize }}
           </span>
@@ -35,7 +35,7 @@
         {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
       {% endcall %}
       {{ show_more(
-        url_for('.template_usage', service_id=current_service.id),
+        url_for('main.template_usage', service_id=current_service.id),
         'See templates used by month',
         with_border=False
       ) }}

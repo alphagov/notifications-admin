@@ -31,7 +31,7 @@
       {{ form.is_default }}
       {{ page_footer(
         'Save',
-        delete_link=url_for('.service_confirm_delete_email_reply_to', service_id=current_service.id, reply_to_email_id=reply_to_email_address_id),
+        delete_link=url_for('main.service_confirm_delete_email_reply_to', service_id=current_service.id, reply_to_email_id=reply_to_email_address_id),
         delete_link_text='Delete'
       ) }}
     {% endif %}

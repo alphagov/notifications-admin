@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.user_profile') }) }}
+  {{ govukBackLink({ "href": url_for('main.user_profile') }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -86,7 +86,7 @@
                     {% endif %}
                   </div>
                 {% endcall %}
-                {{ edit_field('Manage', url_for('.user_profile_manage_security_key', key_id=credential.id)) }}
+                {{ edit_field('Manage', url_for('main.user_profile_manage_security_key', key_id=credential.id)) }}
               {% endcall %}
             {% endfor %}
           {% endcall %}

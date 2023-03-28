@@ -14,7 +14,7 @@
 
 
   {% call form_wrapper(
-      action=url_for('.find_users_by_email'),
+      action=url_for('main.find_users_by_email'),
       class='notify-simple-search-form'
   ) %}
       {{ form.search(param_extensions={
@@ -37,7 +37,7 @@
     <ul>
     {% for user in users_found %}
       <li class="browse-list-item">
-        <a href="{{url_for('.user_information', user_id=user.id)}}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ user.email_address }}</a>
+        <a href="{{url_for('main.user_information', user_id=user.id)}}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ user.email_address }}</a>
         <p class="browse-list-hint">{{ user.name }}</p>
       </li>
       <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">

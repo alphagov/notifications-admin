@@ -48,7 +48,7 @@
         {% endcall %}
       {% else %}
         {% call field(align='right', status='error') %}
-          <a class="govuk-link govuk-link--destructive" href='{{ url_for('.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>
+          <a class="govuk-link govuk-link--destructive" href='{{ url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>
             Revoke<span class="govuk-visually-hidden"> {{ item.name }}</span>
           </a>
         {% endcall %}
@@ -60,7 +60,7 @@
     {{ govukButton({
       "element": "a",
       "text": "Create an API key",
-      "href": url_for('.create_api_key', service_id=current_service.id),
+      "href": url_for('main.create_api_key', service_id=current_service.id),
       "classes": "govuk-button--secondary"
     }) }}
   </div>

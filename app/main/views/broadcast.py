@@ -1,7 +1,7 @@
 from flask import abort, flash, jsonify, redirect, render_template, request, url_for
 
 from app import current_service
-from app.main import main
+from app.main import json_api, main
 from app.main.forms import (
     BroadcastAreaForm,
     BroadcastAreaFormWithSelectAll,
@@ -83,7 +83,7 @@ def broadcast_dashboard_rejected(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/broadcast-dashboard.json")
+@json_api.route("/services/<uuid:service_id>/broadcast-dashboard.json")
 @user_has_permissions()
 @service_has_permission("broadcast")
 def broadcast_dashboard_updates(service_id):
@@ -97,7 +97,7 @@ def get_broadcast_dashboard_partials(service_id):
             "views/broadcast/partials/dashboard-table.html",
             broadcasts=broadcast_messages.with_status("pending-approval", "broadcasting"),
             empty_message="You do not have any current alerts",
-            view_broadcast_endpoint=".view_current_broadcast",
+            view_broadcast_endpoint="main.view_current_broadcast",
         ),
     )
 
@@ -181,7 +181,7 @@ def preview_broadcast_areas(service_id, broadcast_message_id):
     )
     if broadcast_message.template_id:
         back_link = url_for(
-            ".view_template",
+            "main.view_template",
             service_id=current_service.id,
             template_id=broadcast_message.template_id,
         )
@@ -363,7 +363,7 @@ def preview_broadcast_message(service_id, broadcast_message_id):
         broadcast_message.request_approval()
         return redirect(
             url_for(
-                ".view_current_broadcast",
+                "main.view_current_broadcast",
                 service_id=current_service.id,
                 broadcast_message_id=broadcast_message.id,
             )
@@ -445,7 +445,7 @@ def approve_broadcast_message(service_id, broadcast_message_id):
     if broadcast_message.status != "pending-approval":
         return redirect(
             url_for(
-                ".view_current_broadcast",
+                "main.view_current_broadcast",
                 service_id=current_service.id,
                 broadcast_message_id=broadcast_message.id,
             )
@@ -475,7 +475,7 @@ def approve_broadcast_message(service_id, broadcast_message_id):
 
     return redirect(
         url_for(
-            ".view_current_broadcast",
+            "main.view_current_broadcast",
             service_id=current_service.id,
             broadcast_message_id=broadcast_message.id,
         )
@@ -495,7 +495,7 @@ def reject_broadcast_message(service_id, broadcast_message_id):
     if broadcast_message.status != "pending-approval":
         return redirect(
             url_for(
-                ".view_current_broadcast",
+                "main.view_current_broadcast",
                 service_id=current_service.id,
                 broadcast_message_id=broadcast_message.id,
             )
@@ -526,7 +526,7 @@ def cancel_broadcast_message(service_id, broadcast_message_id):
     if broadcast_message.status != "broadcasting":
         return redirect(
             url_for(
-                ".view_current_broadcast",
+                "main.view_current_broadcast",
                 service_id=current_service.id,
                 broadcast_message_id=broadcast_message.id,
             )

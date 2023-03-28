@@ -23,13 +23,13 @@
 	    {% call row() %}
 	      {{ text_field('Delivery receipts') }}
 	      {{ optional_text_field(delivery_status_callback, truncate=true) }}
-	      {{ edit_field('Change', url_for('.delivery_status_callback', service_id=current_service.id)) }}
+	      {{ edit_field('Change', url_for('main.delivery_status_callback', service_id=current_service.id)) }}
 	    {% endcall %}
 
 	    {% call row() %}
 	      {{ text_field('Received text messages') }}
           {{ optional_text_field(received_text_messages_callback, truncate=true) }}
-	   	  {{ edit_field('Change', url_for('.received_text_messages_callback', service_id=current_service.id)) }}
+	   	  {{ edit_field('Change', url_for('main.received_text_messages_callback', service_id=current_service.id)) }}
 	    {% endcall %}
 	  {% endcall %}
 	</div>

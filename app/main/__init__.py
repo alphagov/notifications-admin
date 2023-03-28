@@ -1,6 +1,7 @@
 from flask import Blueprint
 
 main = Blueprint("main", __name__)
+json_api = Blueprint("json_api", __name__)
 no_cookie = Blueprint("no_cookie", __name__)
 
 from app.main.views import (  # noqa

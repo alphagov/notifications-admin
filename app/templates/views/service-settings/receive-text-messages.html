@@ -29,10 +29,10 @@
             "classes": "govuk-!-margin-top-0"})
           }}
         <p class="govuk-body">
-          You can see the number of received messages on your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_dashboard', service_id=current_service.id) }}">dashboard</a>.
+          You can see the number of received messages on your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_dashboard', service_id=current_service.id) }}">dashboard</a>.
         </p>
         <p class="govuk-body">
-          You can also download the last {{ current_service.get_days_of_retention('sms') }} days’ worth of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.inbox', service_id=current_service.id) }}">received text messages</a>.
+          You can also download the last {{ current_service.get_days_of_retention('sms') }} days’ worth of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.inbox', service_id=current_service.id) }}">received text messages</a>.
         </p>
         {% if current_service.api_keys %}
           <p class="govuk-body">
@@ -40,10 +40,10 @@
           </p>
         {% endif %}
         <p class="govuk-body">
-          You can still send text messages from a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.service_sms_senders', service_id=current_service.id) }}">sender name</a> if you need to, but people will not be able to reply to those messages.
+          You can still send text messages from a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">sender name</a> if you need to, but people will not be able to reply to those messages.
         </p>
         <p class="govuk-body">
-          <a class="govuk-link govuk-link--destructive" href="{{ url_for('.service_receive_text_messages_stop', service_id=current_service.id) }}">Stop receiving text messages</a>
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.service_receive_text_messages_stop', service_id=current_service.id) }}">Stop receiving text messages</a>
         </p>
 
       {% else %}
@@ -63,7 +63,7 @@
         {{ govukButton({
           "element": "a",
           "text": "Start receiving text messages",
-          "href": url_for('.service_receive_text_messages_start', service_id=current_service.id),
+          "href": url_for('main.service_receive_text_messages_start', service_id=current_service.id),
         }) }}
 
       {% endif %}

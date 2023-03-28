@@ -1,11 +1,11 @@
 <nav class="navigation" aria-label="Organisation">
   <ul>
-    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('dashboard') }}" href="{{ url_for('.organisation_dashboard', org_id=current_org.id) }}">Usage</a></li>
-    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('team-members') }}" href="{{ url_for('.manage_org_users', org_id=current_org.id) }}">Team members</a></li>
+    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('dashboard') }}" href="{{ url_for('main.organisation_dashboard', org_id=current_org.id) }}">Usage</a></li>
+    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('team-members') }}" href="{{ url_for('main.manage_org_users', org_id=current_org.id) }}">Team members</a></li>
     {% if current_user.platform_admin %}
-    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('settings') }}" href="{{ url_for('.organisation_settings', org_id=current_org.id) }}">Settings</a></li>
-    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('trial-services') }}" href="{{ url_for('.organisation_trial_mode_services', org_id=current_org.id) }}">Trial mode services</a></li>
-    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('billing') }}" href="{{ url_for('.organisation_billing', org_id=current_org.id) }}">Billing</a></li>
+    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('settings') }}" href="{{ url_for('main.organisation_settings', org_id=current_org.id) }}">Settings</a></li>
+    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('trial-services') }}" href="{{ url_for('main.organisation_trial_mode_services', org_id=current_org.id) }}">Trial mode services</a></li>
+    <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('billing') }}" href="{{ url_for('main.organisation_billing', org_id=current_org.id) }}">Billing</a></li>
     {% endif %}
   </ul>
 </nav>

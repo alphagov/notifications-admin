@@ -15,14 +15,14 @@
   {{ page_header("Choose where to send this alert") }}
 
   {% for area in broadcast_message.ancestor_areas %}
-    <a class="govuk-heading-m govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_broadcast_sub_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=area.library_id, area_slug=area.id) }}">{{ area.name }}</a>
+    <a class="govuk-heading-m govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_broadcast_sub_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=area.library_id, area_slug=area.id) }}">{{ area.name }}</a>
     {% if loop.last %}
       <div class="keyline-block"></div>
     {% endif %}
   {% endfor %}
 
   {% for library in libraries|sort %}
-    <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=library.id) }}">{{ library.name }}</a>
+    <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, library_slug=library.id) }}">{{ library.name }}</a>
     <p class="file-list-hint-large">{{ library.get_examples() }}</p>
   {% endfor %}
 

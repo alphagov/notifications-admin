@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.send_one_off', service_id=current_service.id, template_id=template.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.send_one_off', service_id=current_service.id, template_id=template.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}

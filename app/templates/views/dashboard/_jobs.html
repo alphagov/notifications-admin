@@ -18,13 +18,13 @@
     {% call row_heading() %}
       <div class="file-list">
         {% if item.upload_type == 'letter_day' %}
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.uploaded_letters', service_id=current_service.id, letter_print_day=item.created_at|format_date_numeric) }}">{{ item.original_file_name }}</a>
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploaded_letters', service_id=current_service.id, letter_print_day=item.created_at|format_date_numeric) }}">{{ item.original_file_name }}</a>
         {% elif item.upload_type == 'letter' %}
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.original_file_name }}</a>
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.original_file_name }}</a>
         {% elif item.upload_type == 'contact_list' %}
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.contact_list', service_id=current_service.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.contact_list', service_id=current_service.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
         {% else %}
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
         {% endif %}
         {% if item.scheduled %}
           <span class="file-list-hint-large">

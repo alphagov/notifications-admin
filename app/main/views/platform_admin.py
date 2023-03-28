@@ -663,8 +663,8 @@ def get_url_for_notify_record(uuid_):
         url_for_data = {
             "organisation": _EndpointSpec(".organisation_dashboard", "org_id"),
             "service": _EndpointSpec(".service_dashboard", "service_id"),
-            "notification": _EndpointSpec(".view_notification", "notification_id", with_service_id=True),
-            "template": _EndpointSpec(".view_template", "template_id", with_service_id=True),
+            "notification": _EndpointSpec("main.view_notification", "notification_id", with_service_id=True),
+            "template": _EndpointSpec("main.view_template", "template_id", with_service_id=True),
             "email_branding": _EndpointSpec(".platform_admin_update_email_branding", "branding_id"),
             "letter_branding": _EndpointSpec(".update_letter_branding", "branding_id"),
             "user": _EndpointSpec(".user_information", "user_id"),

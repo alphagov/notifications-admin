@@ -5,7 +5,7 @@ from notifications_utils.recipients import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
 
 from app import current_service, notification_api_client, service_api_client
-from app.main import main
+from app.main import json_api, main
 from app.main.forms import SearchByNameForm
 from app.models.template_list import UserTemplateList
 from app.utils.user import user_has_permissions
@@ -21,12 +21,12 @@ def conversation(service_id, notification_id):
         "views/conversations/conversation.html",
         user_number=user_number,
         partials=get_conversation_partials(service_id, user_number),
-        updates_url=url_for(".conversation_updates", service_id=service_id, notification_id=notification_id),
+        updates_url=url_for("json_api.conversation_updates", service_id=service_id, notification_id=notification_id),
         notification_id=notification_id,
     )
 
 
-@main.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>.json")
+@json_api.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>.json")
 @user_has_permissions("view_activity")
 def conversation_updates(service_id, notification_id):
 

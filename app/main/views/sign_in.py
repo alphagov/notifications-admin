@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from flask import (
     Markup,
     abort,
@@ -82,4 +84,7 @@ def sign_in():
 
 @login_manager.unauthorized_handler
 def sign_in_again():
+    if request.blueprint == "json_api":
+        return abort(HTTPStatus.UNAUTHORIZED)
+
     return redirect(url_for("main.sign_in", next=request.path))

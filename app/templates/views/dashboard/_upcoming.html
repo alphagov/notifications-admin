@@ -3,7 +3,7 @@
     <h2 class="heading-medium heading-upcoming-jobs">
       In the next few days
     </h2>
-    <a class="govuk-link govuk-link--no-visited-state banner-dashboard" href="{{ url_for('.uploads', service_id=current_service.id) }}">
+    <a class="govuk-link govuk-link--no-visited-state banner-dashboard" href="{{ url_for('main.uploads', service_id=current_service.id) }}">
       <span class="banner-dashboard-count">
         {{ current_service.scheduled_job_stats.count }}
       </span>

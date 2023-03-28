@@ -138,7 +138,7 @@
         {{ file_upload(
           form.file,
           allowed_file_extensions=allowed_file_extensions,
-          action=url_for('.send_messages', service_id=current_service.id, template_id=template.id),
+          action=url_for('main.send_messages', service_id=current_service.id, template_id=template.id),
           button_text='Upload your file again'
         ) }}
       {% endif %}
@@ -169,7 +169,7 @@
               (not errors or recipients.more_rows_than_can_send) and
               displayed_index != preview_row
             ) %}
-              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=displayed_index, original_file_name=original_file_name) }}">{{ displayed_index }}</a>
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=displayed_index, original_file_name=original_file_name) }}">{{ displayed_index }}</a>
             {% else %}
               {{ displayed_index }}
             {% endif %}

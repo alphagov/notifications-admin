@@ -34,7 +34,7 @@
       </div>
     </div>
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.send_messages', service_id=current_service.id, template_id=template.id) }}">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.send_messages', service_id=current_service.id, template_id=template.id) }}">
         Upload a list of {{ 999|recipient_count_label(template.template_type) }}
       </a>
     </p>

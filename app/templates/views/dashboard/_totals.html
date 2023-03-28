@@ -9,8 +9,8 @@
         statistics['email']['failed'],
         statistics['email']['failed_percentage'],
         statistics['email']['show_warning'],
-        failure_link=url_for(".view_notifications", service_id=service_id, message_type='email', status='failed'),
-        link=url_for(".view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed'),
+        failure_link=url_for("main.view_notifications", service_id=service_id, message_type='email', status='failed'),
+        link=url_for("main.view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed'),
         smaller=True,
       ) }}
     </div>
@@ -21,8 +21,8 @@
         statistics['sms']['failed'],
         statistics['sms']['failed_percentage'],
         statistics['sms']['show_warning'],
-        failure_link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='failed'),
-        link=url_for(".view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed'),
+        failure_link=url_for("main.view_notifications", service_id=service_id, message_type='sms', status='failed'),
+        link=url_for("main.view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed'),
         smaller=True,
       ) }}
     </div>
@@ -33,8 +33,8 @@
         statistics['letter']['failed'],
         statistics['letter']['failed_percentage'],
         statistics['letter']['show_warning'],
-        failure_link=url_for(".view_notifications", service_id=service_id, message_type='letter', status='failed'),
-        link=url_for(".view_notifications", service_id=service_id, message_type='letter', status=''),
+        failure_link=url_for("main.view_notifications", service_id=service_id, message_type='letter', status='failed'),
+        link=url_for("main.view_notifications", service_id=service_id, message_type='letter', status=''),
         smaller=True,
       ) }}
     </div>

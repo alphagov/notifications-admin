@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.manage_org_users', org_id=current_org.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.manage_org_users', org_id=current_org.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}

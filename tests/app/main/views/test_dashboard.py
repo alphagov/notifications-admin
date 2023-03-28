@@ -355,7 +355,7 @@ def test_empty_inbox(
     "endpoint",
     [
         "main.inbox",
-        "main.inbox_updates",
+        "json_api.inbox_updates",
     ],
 )
 def test_inbox_not_accessible_to_service_without_permissions(
@@ -408,7 +408,7 @@ def test_view_inbox_updates(
     )
 
     response = client_request.get_response(
-        "main.inbox_updates",
+        "json_api.inbox_updates",
         service_id=SERVICE_ONE_ID,
     )
 
@@ -1456,23 +1456,23 @@ def test_service_dashboard_totals_link_to_view_notifications(
     failed_letter_link = next(filter(lambda a: normalize_spaces(a.text) == "1 failed – 0.1%", failed_links))
 
     assert email_link["href"] == url_for(
-        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="email", status="sending,delivered,failed"
+        "main.view_notifications", service_id=SERVICE_ONE_ID, message_type="email", status="sending,delivered,failed"
     )
     assert sms_link["href"] == url_for(
-        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="sms", status="sending,delivered,failed"
+        "main.view_notifications", service_id=SERVICE_ONE_ID, message_type="sms", status="sending,delivered,failed"
     )
     assert letter_link["href"] == url_for(
-        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="letter", status=""
+        "main.view_notifications", service_id=SERVICE_ONE_ID, message_type="letter", status=""
     )
 
     assert failed_email_link["href"] == url_for(
-        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="email", status="failed"
+        "main.view_notifications", service_id=SERVICE_ONE_ID, message_type="email", status="failed"
     )
     assert failed_sms_link["href"] == url_for(
-        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="sms", status="failed"
+        "main.view_notifications", service_id=SERVICE_ONE_ID, message_type="sms", status="failed"
     )
     assert failed_letter_link["href"] == url_for(
-        ".view_notifications", service_id=SERVICE_ONE_ID, message_type="letter", status="failed"
+        "main.view_notifications", service_id=SERVICE_ONE_ID, message_type="letter", status="failed"
     )
 
 

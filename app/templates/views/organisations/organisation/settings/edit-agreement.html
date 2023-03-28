@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.organisation_settings', org_id=current_org.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.organisation_settings', org_id=current_org.id) }) }}
 {% endblock %}
 
 {% block org_page_title %}
