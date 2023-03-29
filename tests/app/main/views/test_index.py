@@ -396,19 +396,16 @@ def test_font_preload(
         assert element["href"].endswith(".woff2")
 
 
-@pytest.mark.parametrize("current_date, expected_rate", (("2022-05-01", "1.72"),))
 def test_sms_price(
     client_request,
     mock_get_service_and_organisation_counts,
-    current_date,
-    expected_rate,
 ):
     client_request.logout()
 
-    with freeze_time(current_date):
-        home_page = client_request.get("main.index", _test_page_title=False)
-        text_message_pricing_page = client_request.get("main.guidance_pricing_text_messages")
+    home_page = client_request.get("main.index", _test_page_title=False)
+    text_message_pricing_page = client_request.get("main.guidance_pricing_text_messages")
 
+    expected_rate = "1.97"
     assert (
         normalize_spaces(home_page.select(".product-page-section")[5].select(".govuk-grid-column-one-half")[1].text)
         == f"Text messages Up to 40,000 free text messages a year, then {expected_rate} pence per message"
