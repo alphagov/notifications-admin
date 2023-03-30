@@ -2,7 +2,7 @@
   "use strict";
 
   var queues = {};
-  var stopPolling = {};
+  var timeouts = {};
   var morphdom = global.GOVUK.vendor.morphdom;
   var defaultInterval = 2000;
   var interval = 0;
@@ -78,37 +78,40 @@
   var clearQueue = queue => (queue.length = 0);
 
   var poll = function(renderer, resource, queue, form) {
+    let timeout;
     let startTime = Date.now();
 
-    if (document.visibilityState !== "hidden" && queue.push(renderer) === 1) $.ajax(
-      resource,
-      {
-        'method': form ? 'post' : 'get',
-        'data': form ? $('#' + form).serialize() : {}
-      }
-    ).done(
-      response => {
-        flushQueue(queue, response);
-        if (response.stop === 1) {
-          stopPolling[resource] = true;
+    // Only send requests when window/tab is in use and nothing in queue
+    if (document.visibilityState !== "hidden" && queue.push(renderer) === 1) {
+      $.ajax(
+        resource,
+        {
+          'method': form ? 'post' : 'get',
+          'data': form ? $('#' + form).serialize() : {}
         }
-        interval = calculateBackoff(Date.now() - startTime);
-      }
-    ).fail(
-      response => {
-        stopPolling[resource] = true;
-        if (response.status === 401) {
+      ).done(
+        response => {
+          flushQueue(queue, response);
+          if (response.stop === 1) {
+            window.clearTimeout(timeout); // stop polling
+          } else {
+            interval = calculateBackoff(Date.now() - startTime); // keep polling but adjust for response time
+          }
+        }
+      ).fail(
+        response => {
+          window.clearTimeout(timeout); // stop polling
           clearQueue(queue);
-          window.location.reload();
+          if (response.status === 401) {
+            window.location.reload();
+          }
         }
-      }
-    );
-
-    if (stopPolling[resource] === false) {
-      setTimeout(
-          () => poll.apply(window, arguments), interval
       );
     }
+
+    timeout = window.setTimeout(
+      () => poll.apply(window, arguments), interval
+    );
   };
 
   global.GOVUK.NotifyModules.UpdateContent = function() {
@@ -120,7 +123,7 @@
       var resource = $component.data('resource');
       var form = $component.data('form');
       var classesPersister = new ClassesPersister($contents);
-      stopPolling[resource] = false;
+      interval = defaultInterval;
 
       // Replace component with contents.
       // The renderer does this anyway when diffing against the first response
@@ -137,14 +140,14 @@
           .forEach(className => classesPersister.addClassName(className));
       }
 
-      setTimeout(
+      timeouts[resource] = setTimeout(
         () => poll(
           getRenderer($contents, key, classesPersister),
           resource,
           getQueue(resource),
           form
         ),
-        defaultInterval
+        interval
       );
     };
 
