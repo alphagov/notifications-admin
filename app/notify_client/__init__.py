@@ -1,4 +1,4 @@
-from flask import has_request_context, request
+from flask import g, has_request_context, request
 from flask_login import current_user
 from notifications_python_client import __version__
 from notifications_python_client.base import BaseAPIClient
@@ -36,8 +36,13 @@ class NotifyAdminAPIClient(BaseAPIClient):
     def _add_request_id_header(headers):
         if not has_request_context():
             return headers
+
         headers["X-B3-TraceId"] = request.request_id
         headers["X-B3-SpanId"] = request.span_id
+
+        if g.user_id:
+            headers["X-Notify-User-Id"] = g.user_id
+
         return headers
 
 

@@ -25,6 +25,7 @@ def test_generate_headers_sets_request_id_if_in_request_context(notify_admin):
     api_client.init_app(notify_admin)
 
     with notify_admin.test_request_context() as request_context:
+        notify_admin.preprocess_request()
         headers = api_client.generate_headers("api_token")
 
     assert set(headers.keys()) == {
