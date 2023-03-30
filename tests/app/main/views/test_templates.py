@@ -877,8 +877,16 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(mocker, cl
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
+@pytest.mark.parametrize("page_count, expected_pages_content", [(1, "1 page"), (2, "2 pages")])
 def test_post_attach_pages_redirects_to_template_view_when_validation_successful(
-    mocker, client_request, fake_uuid, service_one, mock_get_service_letter_template, mock_get_template_folders
+    mocker,
+    client_request,
+    fake_uuid,
+    service_one,
+    mock_get_service_letter_template,
+    mock_get_template_folders,
+    page_count,
+    expected_pages_content,
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
@@ -891,7 +899,11 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
         ),
     )
 
+    # page count for letter template
     mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+
+    # page count for the attachment
+    mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
     mocker.patch("app.service_api_client.get_letter_contacts", return_value=[])
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
@@ -907,7 +919,7 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
         )
 
     assert normalize_spaces(page.select(".banner-default-with-tick")[0].text) == (
-        "Pages have been successfully attached. You can see them at the bottom of your letter template."
+        f"You have attached {expected_pages_content} to the end of your letter"
     )
 
 

@@ -979,9 +979,10 @@ def letter_template_attach_pages(service_id, template_id):
         else:
 
             # TODO in next PR: upload letter to S3
+            pages_content = "1 page" if page_count == 1 else f"{page_count} pages"
 
             flash(
-                "Pages have been successfully attached. You can see them at the bottom of your letter template.",
+                f"You have attached {pages_content} to the end of your letter",
                 "default_with_tick",
             )
 
