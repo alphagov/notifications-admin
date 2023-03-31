@@ -945,7 +945,6 @@ def letter_template_attach_pages(service_id, template_id):
             )
 
         upload_id = uuid.uuid4()
-        file_location = get_transient_letter_file_location(service_id, upload_id)
 
         try:
             response = sanitise_letter(
@@ -957,6 +956,7 @@ def letter_template_attach_pages(service_id, template_id):
             response.raise_for_status()
         except RequestException as ex:
             if ex.response is not None and ex.response.status_code == 400:
+                file_location = get_transient_letter_file_location(service_id, upload_id)
                 validation_failed_message = response.json().get("message")
                 invalid_pages = response.json().get("invalid_pages")
 
