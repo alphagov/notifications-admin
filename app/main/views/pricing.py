@@ -6,7 +6,7 @@ from app.main import main
 from app.main.forms import SearchByNameForm
 from app.main.views.sub_navigation_dictionaries import pricing_nav
 
-CURRENT_SMS_RATE = "1.72"
+CURRENT_SMS_RATE = "1.97"
 
 
 @main.route("/pricing")
