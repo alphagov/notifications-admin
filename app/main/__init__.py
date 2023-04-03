@@ -1,6 +1,9 @@
 from flask import Blueprint
 
+from app.utils.constants import JSON_UPDATES_BLUEPRINT_NAME
+
 main = Blueprint("main", __name__)
+json_updates = Blueprint(JSON_UPDATES_BLUEPRINT_NAME, __name__)
 no_cookie = Blueprint("no_cookie", __name__)
 
 from app.main.views import (  # noqa

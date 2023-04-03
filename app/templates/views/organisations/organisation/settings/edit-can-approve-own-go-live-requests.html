@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.organisation_settings', org_id=current_org.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.organisation_settings', org_id=current_org.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}

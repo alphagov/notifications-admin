@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import abort, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user, logout_user
@@ -163,6 +163,7 @@ class User(BaseUser, UserMixin):
     def login(self):
         login_user(self)
         session["user_id"] = self.id
+        session["session_start"] = datetime.now(timezone.utc).isoformat()
 
     def send_login_code(self):
         if self.email_auth:

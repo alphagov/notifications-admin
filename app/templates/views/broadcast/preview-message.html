@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.preview_broadcast_areas', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.preview_broadcast_areas', service_id=current_service.id, broadcast_message_id=broadcast_message.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}

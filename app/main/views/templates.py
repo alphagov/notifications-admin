@@ -304,7 +304,7 @@ def _add_template_by_type(template_type, template_folder_id):
         )
         return redirect(
             url_for(
-                ".view_template",
+                "main.view_template",
                 service_id=current_service.id,
                 template_id=blank_letter["data"]["id"],
             )
@@ -427,7 +427,7 @@ def action_blocked(service_id, notification_type, return_to, template_id=None):
     back_link = {
         "add_new_template": partial(url_for, ".choose_template", service_id=current_service.id),
         "templates": partial(url_for, ".choose_template", service_id=current_service.id),
-        "view_template": partial(url_for, ".view_template", service_id=current_service.id, template_id=template_id),
+        "view_template": partial(url_for, "main.view_template", service_id=current_service.id, template_id=template_id),
     }.get(return_to)
 
     return (
@@ -554,7 +554,9 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             else:
                 raise e
         else:
-            return redirect(url_for(".view_template", service_id=service_id, template_id=new_template["data"]["id"]))
+            return redirect(
+                url_for("main.view_template", service_id=service_id, template_id=new_template["data"]["id"])
+            )
 
     return render_template(
         "views/edit-{}-template.html".format(template_type),
@@ -617,7 +619,7 @@ def edit_service_template(service_id, template_id):
             else:
                 raise e
         else:
-            return redirect(url_for(".view_template", service_id=service_id, template_id=template_id))
+            return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
     if template["template_type"] not in current_service.available_template_types:
         return redirect(
@@ -780,7 +782,7 @@ def redact_template(service_id, template_id):
 
     return redirect(
         url_for(
-            ".view_template",
+            "main.view_template",
             service_id=service_id,
             template_id=template_id,
         )
@@ -835,7 +837,7 @@ def set_template_sender(service_id, template_id):
             template_id,
             form.sender.data if form.sender.data else None,
         )
-        return redirect(url_for(".view_template", service_id=service_id, template_id=template_id))
+        return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
     return render_template(
         "views/templates/set-template-sender.html", form=form, template_id=template_id, no_senders=no_senders
@@ -853,7 +855,7 @@ def edit_template_postage(service_id, template_id):
         postage = form.postage.data
         service_api_client.update_service_template_postage(service_id, template_id, postage)
 
-        return redirect(url_for(".view_template", service_id=service_id, template_id=template_id))
+        return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
     return render_template(
         "views/templates/edit-template-postage.html",

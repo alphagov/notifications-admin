@@ -11,7 +11,7 @@
 
 {% block backLink %}
   {% if not request.args.get('from_template') %}
-    {{ govukBackLink({ "href": url_for('.service_letter_contact_details', service_id=current_service.id) }) }}
+    {{ govukBackLink({ "href": url_for('main.service_letter_contact_details', service_id=current_service.id) }) }}
   {% endif %}
 {% endblock %}
 
@@ -39,7 +39,7 @@
 
     {{ page_footer(
       'Save',
-      delete_link=url_for('.service_confirm_delete_letter_contact', service_id=current_service.id, letter_contact_id=letter_contact_id),
+      delete_link=url_for('main.service_confirm_delete_letter_contact', service_id=current_service.id, letter_contact_id=letter_contact_id),
       delete_link_text='Delete'
     ) }}
 

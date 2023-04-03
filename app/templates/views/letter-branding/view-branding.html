@@ -11,7 +11,7 @@
 
 
 {% block backLink %}
-{{ govukBackLink({ "href": url_for('.letter_branding') }) }}
+{{ govukBackLink({ "href": url_for('main.letter_branding') }) }}
 {% endblock %}
 
 {% block platform_admin_content %}
@@ -29,7 +29,7 @@
                     {% for organisation in branding_orgs %}
                         <li class="browse-list-item">
                             <a class="govuk-link govuk-link--no-visited-state browse-list-hint"
-                                href="{{ url_for('.organisation_settings', org_id=organisation.id) }}">
+                                href="{{ url_for('main.organisation_settings', org_id=organisation.id) }}">
                                 {{ organisation.name }}
                             </a>
                         </li>
@@ -46,7 +46,7 @@
             <ul>
                 {% for service in branding_services %}
                 <li class="browse-list-item">
-                    <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href="{{ url_for('.service_settings', service_id=service.id) }}">
+                    <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href="{{ url_for('main.service_settings', service_id=service.id) }}">
                         {{ service.name }}
                     </a>
                 </li>
@@ -63,7 +63,7 @@
             <p class="govuk-body">
                 Created by
                 <a class="govuk-link govuk-link--no-visited-state"
-                   href="{{ url_for('.user_information', user_id=letter_branding.created_by) }}">
+                   href="{{ url_for('main.user_information', user_id=letter_branding.created_by) }}">
                    {{ letter_branding.created_by_user.name }}
                 </a>
               {% if letter_branding.created_at %}on {{ letter_branding.created_at | format_date }}{% endif %}
@@ -78,7 +78,7 @@
         <div class="js-stick-at-bottom-when-scrolling">
             <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter-2-3">
                 <a class="govuk-link govuk-link--no-visited-state"
-                    href="{{ url_for('.update_letter_branding', branding_id=letter_branding.id) }}">
+                    href="{{ url_for('main.update_letter_branding', branding_id=letter_branding.id) }}">
                     Edit this branding</a>
             </span>
         </div>

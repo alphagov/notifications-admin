@@ -58,7 +58,7 @@
       {{ file_upload(
         form.file,
         allowed_file_extensions=allowed_file_extensions,
-        action=url_for('.upload_contact_list', service_id=current_service.id),
+        action=url_for('main.upload_contact_list', service_id=current_service.id),
         button_text='Upload your file again'
       ) }}
     </div>

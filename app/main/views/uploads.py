@@ -123,7 +123,7 @@ def uploaded_letters(service_id, letter_print_day):
         letter_print_day=letter_print_day,
         single_notification_url=partial(
             url_for,
-            ".view_notification",
+            "main.view_notification",
             service_id=current_service.id,
             from_uploaded_letters=letter_print_day,
         ),
@@ -260,7 +260,7 @@ def uploaded_letter_preview(service_id, file_id):
         # notification is always set to the file_id.
         return redirect(
             url_for(
-                ".view_notification",
+                "main.view_notification",
                 service_id=service_id,
                 notification_id=file_id,
             )
@@ -341,7 +341,7 @@ def send_uploaded_letter(service_id, file_id):
         # notification is always set to the file_id.
         return redirect(
             url_for(
-                ".view_notification",
+                "main.view_notification",
                 service_id=service_id,
                 notification_id=file_id,
             )
@@ -367,7 +367,7 @@ def send_uploaded_letter(service_id, file_id):
 
     return redirect(
         url_for(
-            ".view_notification",
+            "main.view_notification",
             service_id=service_id,
             notification_id=file_id,
         )

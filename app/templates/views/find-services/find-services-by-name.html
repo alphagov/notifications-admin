@@ -14,7 +14,7 @@
 
 
   {% call form_wrapper(
-      action=url_for('.find_services_by_name'),
+      action=url_for('main.find_services_by_name'),
       class='notify-simple-search-form'
   ) %}
       {{ form.search(param_extensions={
@@ -37,7 +37,7 @@
     <ul>
     {% for service in services_found %}
       <li class="browse-list-item">
-        <a href="{{url_for('.service_dashboard', service_id=service.id)}}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
+        <a href="{{url_for('main.service_dashboard', service_id=service.id)}}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
       </li>
       <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
     {% endfor %}

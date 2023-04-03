@@ -24,7 +24,7 @@
        {{ govukButton({
         "element": "a",
         "text": "Add a new template",
-        "href": url_for('.choose_template', service_id=current_service.id, initial_state='add-new-template')
+        "href": url_for('main.choose_template', service_id=current_service.id, initial_state='add-new-template')
       }) }}
     {% else %}
       <p class="govuk-body">
@@ -41,16 +41,16 @@
       {% for item in templates_and_folders %}
         <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
           {% for ancestor in item.ancestors %}
-              <a href="{{ url_for('.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+              <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
               {{ ancestor.name }}
             </a> <span class="message-name-separator"></span>
           {% endfor %}
           {% if item.is_folder %}
-            <a href="{{ url_for('.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+            <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
               <span class="live-search-relevant">{{ item.name }}</span>
             </a>
           {% else %}
-            <a class="govuk-link govuk-link--no-visited-state template-list-template" href="{{ url_for('.conversation_reply_with_template', service_id=current_service.id, template_id=item.id, notification_id=notification_id) }}">
+            <a class="govuk-link govuk-link--no-visited-state template-list-template" href="{{ url_for('main.conversation_reply_with_template', service_id=current_service.id, template_id=item.id, notification_id=notification_id) }}">
               <span class="live-search-relevant">{{ item.name }}</span>
             </a>
           {% endif %}

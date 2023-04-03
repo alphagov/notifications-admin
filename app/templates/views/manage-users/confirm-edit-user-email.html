@@ -11,7 +11,7 @@
 
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('.edit_user_email', service_id=service_id, user_id=user.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.edit_user_email', service_id=service_id, user_id=user.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}

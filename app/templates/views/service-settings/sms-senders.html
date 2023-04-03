@@ -38,7 +38,7 @@
           </div>
           <div class="govuk-grid-column-one-quarter">
             {% if current_user.has_permissions('manage_service') %}
-              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">
+              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">
                Change<span class="govuk-visually-hidden"> {{ item.sms_sender }}</span>
               </a>
             {% endif %}
@@ -57,7 +57,7 @@
         {{ govukButton({
           "element": "a",
           "text": "Add text message sender",
-          "href": url_for('.service_add_sms_sender', service_id=current_service.id)
+          "href": url_for('main.service_add_sms_sender', service_id=current_service.id)
         }) }}
       </div>
     </div>

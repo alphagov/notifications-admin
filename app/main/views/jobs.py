@@ -29,7 +29,7 @@ from app import (
     service_api_client,
 )
 from app.formatters import get_time_left, message_count_noun
-from app.main import main
+from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
 from app.utils import parse_filter_args, set_status_filters
@@ -73,7 +73,7 @@ def view_job(service_id, job_id):
         job=job,
         status=request.args.get("status", ""),
         updates_url=url_for(
-            ".view_job_updates",
+            "json_updates.view_job_updates",
             service_id=service_id,
             job_id=job.id,
             status=request.args.get("status", ""),
@@ -143,7 +143,7 @@ def cancel_letter_job(service_id, job_id):
     return view_job(service_id, job_id)
 
 
-@main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>.json")
+@json_updates.route("/services/<uuid:service_id>/jobs/<uuid:job_id>.json")
 @user_has_permissions()
 def view_job_updates(service_id, job_id):
 
@@ -187,8 +187,10 @@ def view_notifications(service_id, message_type=None):
     )
 
 
-@main.route("/services/<uuid:service_id>/notifications.json", methods=["GET", "POST"])
-@main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>.json", methods=["GET", "POST"])
+@json_updates.route("/services/<uuid:service_id>/notifications.json", methods=["GET", "POST"])
+@json_updates.route(
+    "/services/<uuid:service_id>/notifications/<template_type:message_type>.json", methods=["GET", "POST"]
+)
 @user_has_permissions()
 def get_notifications_page_partials_as_json(service_id, message_type=None):
     return jsonify(_get_notifications_dashboard_partials_data(service_id, message_type))
@@ -244,7 +246,7 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
             show_pagination=(not search_term),
             single_notification_url=partial(
                 url_for,
-                ".view_notification",
+                "main.view_notification",
                 service_id=current_service.id,
                 from_statuses=request.args.get("status"),
             ),
@@ -274,7 +276,7 @@ def get_status_filters(service, message_type, statistics):
         (
             label,
             option,
-            url_for(".view_notifications", service_id=service.id, message_type=message_type, status=option),
+            url_for("main.view_notifications", service_id=service.id, message_type=message_type, status=option),
             stats[key],
         )
         for key, label, option in filters
@@ -288,7 +290,7 @@ def _get_job_counts(job):
             label,
             query_param,
             url_for(
-                ".view_job",
+                "main.view_job",
                 service_id=job.service,
                 job_id=job.id,
                 status=query_param,
@@ -357,7 +359,7 @@ def get_job_partials(job):
             notifications=list(add_preview_of_content_to_notifications(notifications["notifications"])),
             more_than_one_page=bool(notifications.get("links", {}).get("next")),
             download_link=url_for(
-                ".view_job_csv", service_id=current_service.id, job_id=job.id, status=request.args.get("status")
+                "main.view_job_csv", service_id=current_service.id, job_id=job.id, status=request.args.get("status")
             ),
             time_left=get_time_left(job.created_at, service_data_retention_days=service_data_retention_days),
             job=job,

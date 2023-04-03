@@ -30,7 +30,7 @@
     {% endif %}
         <li class="area-list-item">
           {{ area.name }}
-          <a class="area-list-item-remove govuk-button" data-module="govuk-button" role="button" href="{{ url_for('.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, area_slug=area.id) }}">
+          <a class="area-list-item-remove govuk-button" data-module="govuk-button" role="button" href="{{ url_for('main.remove_broadcast_area', service_id=current_service.id, broadcast_message_id=broadcast_message.id, area_slug=area.id) }}">
             <svg id="area-list-item-remove__icon" width="11" height="11" viewbox="0 0 10 10" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
               <title id="area__{{ loop.index }}">Remove {{ area.name }}</title>
               <g transform="rotate(45),translate(1, -6)">
@@ -45,7 +45,7 @@
       {{ govukButton({
         "element": "a",
         "text": "Add another area",
-        "href": url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+        "href": url_for('main.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
         "classes": "govuk-button--secondary govuk-!-margin-bottom-5"
       }) }}
     {% endif %}
@@ -54,7 +54,7 @@
       {{ govukButton({
         "element": "a",
         "text": "Add broadcast areas",
-        "href": url_for('.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+        "href": url_for('main.choose_broadcast_library', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
         "classes": "govuk-button--secondary"
       }) }}
     </p>
@@ -65,7 +65,7 @@
     {{ govukButton({
       "element": "a",
       "text": "Preview this alert",
-      "href": url_for('.preview_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
+      "href": url_for('main.preview_broadcast_message', service_id=current_service.id, broadcast_message_id=broadcast_message.id),
       "classes": "govuk-button"
     }) }}
   {% endif %}

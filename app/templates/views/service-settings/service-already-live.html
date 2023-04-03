@@ -22,7 +22,7 @@
 
       {% if prompt_to_switch_service %}
       <p class="govuk-body">
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.choose_account') }}">Switch service</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_account') }}">Switch service</a>
          if you want to make a different service live.
       </p>
       {% endif %}

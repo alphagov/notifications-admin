@@ -17,7 +17,7 @@
       {{ govukButton({
         "element": "a",
         "text": "New alert",
-        "href": url_for('.new_broadcast', service_id=current_service.id),
+        "href": url_for('main.new_broadcast', service_id=current_service.id),
         "classes": "govuk-button--secondary"
       }) }}
     </div>

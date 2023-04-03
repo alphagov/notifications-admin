@@ -623,7 +623,7 @@ def letter_branding_request(service_id):
         flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
 
         return redirect(
-            url_for(".view_template", service_id=current_service.id, template_id=from_template)
+            url_for("main.view_template", service_id=current_service.id, template_id=from_template)
             if from_template
             else url_for(".service_settings", service_id=current_service.id)
         )

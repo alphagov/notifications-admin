@@ -318,7 +318,7 @@ def test_add_service_fails_if_service_name_fails_validation(
     assert error_message in page.select_one(".govuk-error-message").text
 
 
-@freeze_time("2021-01-01")
+@pytest.mark.freeze_time("2021-01-01")
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(
     client_request,
     mock_get_organisation_by_domain,

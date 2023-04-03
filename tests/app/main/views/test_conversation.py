@@ -185,7 +185,7 @@ def test_view_conversation_updates(
     )
 
     response = client_request.get_response(
-        "main.conversation_updates",
+        "json_updates.conversation_updates",
         service_id=SERVICE_ONE_ID,
         notification_id=fake_uuid,
     )

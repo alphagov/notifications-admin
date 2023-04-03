@@ -18,7 +18,7 @@
 
   <p class="govuk-body">Use the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} to check the status of a message.</p>
       <p class="govuk-body">This page describes the statuses you’ll see when you’re signed-in to GOV.UK Notify.</p>
-  <p class="govuk-body">If you’re using the Notify API, read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.guidance_api_documentation') }}">documentation</a> for a list of API statuses.</p>
+  <p class="govuk-body">If you’re using the Notify API, read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">documentation</a> for a list of API statuses.</p>
 
   <div class="govuk-!-margin-bottom-3">
     {{ pill(

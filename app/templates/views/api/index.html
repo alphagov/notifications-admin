@@ -13,10 +13,10 @@
 
   <nav class="govuk-grid-row bottom-gutter-1-2">
     <div class="govuk-grid-column-one-third">
-      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('.api_keys', service_id=current_service.id) }}">API keys</a>
+      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('main.api_keys', service_id=current_service.id) }}">API keys</a>
     </div>
     <div class="govuk-grid-column-one-third">
-      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('.guest_list', service_id=current_service.id) }}">Guest list</a>
+      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('main.guest_list', service_id=current_service.id) }}">Guest list</a>
     </div>
     <div class="govuk-grid-column-one-third">
       <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for(callbacks_link, service_id=current_service.id) }}">Callbacks</a>
@@ -30,7 +30,7 @@
       </h2>
     </div>
     <div class="govuk-grid-column-one-half align-with-heading-copy-right">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.api_integration', service_id=current_service.id) }}">Refresh</a>
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.api_integration', service_id=current_service.id) }}">Refresh</a>
     </div>
   </div>
   <div class="api-notifications">
@@ -74,7 +74,7 @@
             {% endif %}
             {% endfor %}
             {% if notification.status not in ('pending-virus-check', 'virus-scan-failed') %}
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ 1|message_count_label(notification.template.template_type, suffix='') }}</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ 1|message_count_label(notification.template.template_type, suffix='') }}</a>
             {% endif %}
           </dl>
       {% endset %}

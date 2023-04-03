@@ -40,7 +40,7 @@
       ) %}
         {% call row_heading() %}
           <div class="file-list">
-            <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.template_name }}</a>
+            <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.template_name }}</a>
             {% if item.scheduled %}
               <span class="file-list-hint-large">
                 Sending {{

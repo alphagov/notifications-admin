@@ -15,7 +15,7 @@
   <nav>
     {% for brand in letter_brandings %}
       <div class="browse-list-item">
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.platform_admin_view_letter_branding', branding_id=brand.id) }}">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.platform_admin_view_letter_branding', branding_id=brand.id) }}">
           {{ brand.name }}
         </a>
       </div>
@@ -25,7 +25,7 @@
     {{ govukButton({
       "element": "a",
       "text": "New brand",
-      "href": url_for('.create_letter_branding'),
+      "href": url_for('main.create_letter_branding'),
       "classes": "govuk-button--secondary"
     }) }}
   </div>

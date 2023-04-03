@@ -21,7 +21,7 @@
       {{ govukButton({
         "element": "a",
         "text": "Continue",
-        "href": url_for('.service_email_reply_to', service_id=service_id)
+        "href": url_for('main.service_email_reply_to', service_id=service_id)
       }) }}
     </div>
   {% elif verification_status == "failure" %}
@@ -39,9 +39,9 @@
       {% endcall %}
     </div>
     {% if replace %}
-      {% set form_url = url_for('.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
+      {% set form_url = url_for('main.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
     {% else %}
-      {% set form_url = url_for('.service_add_email_reply_to', service_id=service_id) %}
+      {% set form_url = url_for('main.service_add_email_reply_to', service_id=service_id) %}
     {% endif %}
     {% call form_wrapper(
       action = form_url

@@ -7,6 +7,7 @@ const resourceURL = `/services/${serviceNumber}/notifications/email.json?status=
 const updateKey = 'counts';
 
 let responseObj = {};
+let serverResponse;
 let jqueryAJAXReturnObj;
 
 beforeAll(() => {
@@ -17,15 +18,41 @@ beforeAll(() => {
   // mock the bits of jQuery used
   jest.spyOn(window.$, 'ajax');
 
-  // set up the object returned from $.ajax so it responds with whatever responseObj is set to
+  // make the server response global so tests can change it
+  serverResponse = {
+    responseTimeInMilliseconds: 1000,
+    statusCode: 200,
+    complete: () => {
+      responseObj.status = serverResponse.statusCode
+      if (serverResponse.statusCode >= 300) {
+        jqueryAJAXReturnObj.callbacks.fail(responseObj);
+      } else {
+        jqueryAJAXReturnObj.callbacks.done(responseObj);
+      }
+    }
+  };
+
+  // Each request made blocks any further ones for that resource until it completes so force a completion to unblock future tests
+  forceRequestCompletion = () => {
+
+    // Successful requests change the DOM and the interval used by all future requests so use a failing one instead
+    serverResponse.statusCode = 500;
+    serverResponse.complete()
+    serverResponse.statusCode = 200;
+
+  };
+
+  // set up the object returned from $.ajax so it stores callbacks sent for each outcome
   jqueryAJAXReturnObj = {
-    done: callback => {
-      // The server takes 1 second to respond
-      jest.setSystemTime(Date.now() + 1000);
-      callback(responseObj);
+    callbacks: {},
+    done: function (callback) {
+      this.callbacks.done = callback;
       return jqueryAJAXReturnObj;
     },
-    fail: () => {}
+    fail: function (callback) {
+      this.callbacks.fail = callback;
+      return jqueryAJAXReturnObj;
+    }
   };
 
   $.ajax.mockImplementation(() => jqueryAJAXReturnObj);
@@ -72,6 +99,13 @@ describe('Update content', () => {
 
       });
 
+      afterEach(() => {
+
+        // Force last request made to complete, to tidy up for future tests
+        forceRequestCompletion();
+
+      });
+
       test("It should use the GET HTTP method", () => {
 
         jest.advanceTimersByTime(2000);
@@ -88,22 +122,42 @@ describe('Update content', () => {
 
       test("It should request updates with a dynamic interval", () => {
 
-        // First call doesn’t happen in the first 2000ms
+        // Time from start of module: 1999ms
+        // First call doesn’t happen in the first 1999ms
         jest.advanceTimersByTime(1999);
         expect($.ajax).toHaveBeenCalledTimes(0);
 
-        // But it happens after 2000ms by default
+        // Time from start of module: 2000ms
+        // But it happens at 2000ms by default, before the polling interval becomes dynamic
         jest.advanceTimersByTime(1);
         expect($.ajax).toHaveBeenCalledTimes(1);
 
-        // It took the server 1000ms to respond to the first call so we
-        // will back off – the next call shouldn’t happen in the next 6904ms
-        jest.advanceTimersByTime(6904);
-        expect($.ajax).toHaveBeenCalledTimes(1);
+        // Time from start of module: 3000ms
+        // Simulate server responding 1000ms after request is made
+        // This should adjust the polling interval, used next time a request is made
+        jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+        serverResponse.complete();
 
-        // But it should happen after 6905ms
-        jest.advanceTimersByTime(1);
+        // Time from start of module: 4000ms
+        // Second call happens 2000ms after first request is made as still using the default interval
+        jest.advanceTimersByTime(1000);
         expect($.ajax).toHaveBeenCalledTimes(2);
+
+        // Time from start of module: 5000ms
+        // Simulate server responding 1000ms after second request is made
+        jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+        serverResponse.complete();
+
+        // Time from start of module: 10904ms
+        // Third call happens after a 6905ms polling interval, which is based on a response time of 1000ms
+        // so shouldn't have happened by 6904ms
+        jest.advanceTimersByTime(5904);
+        expect($.ajax).toHaveBeenCalledTimes(2);
+
+        // Time from start of module: 10905ms
+        // But it should happen at 6905ms
+        jest.advanceTimersByTime(1);
+        expect($.ajax).toHaveBeenCalledTimes(3);
 
       });
 
@@ -142,6 +196,13 @@ describe('Update content', () => {
 
       });
 
+      afterEach(() => {
+
+        // Force last request made to complete, to tidy up for future tests
+        forceRequestCompletion();
+
+      });
+
       test("requests should use the same HTTP method as the form", () => {
 
         jest.advanceTimersByTime(2000);
@@ -159,6 +220,67 @@ describe('Update content', () => {
 
       })
 
+    });
+
+    test('With a 401 response status code, polling should be stopped', () => {
+
+      const locationMock = new helpers.LocationMock();
+
+      window.location.reload = jest.fn();
+
+      // start the module
+      window.GOVUK.notifyModules.start();
+
+      expect($.ajax).toHaveBeenCalledTimes(0);
+
+      // Time from start of module: 2000ms
+      // First call from polling happens at 2000ms
+      jest.advanceTimersByTime(2000);
+      expect($.ajax).toHaveBeenCalledTimes(1);
+
+      // Time from start of module: 3000ms
+      // Simulate server responding 1000ms after request is made with a 401
+      jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+      serverResponse.statusCode = 401;
+      serverResponse.complete();
+
+      // We expect the 401 to trigger a page reload, to force a redirect to the sign in page
+      expect(window.location.reload).toHaveBeenCalled();
+
+      // Tidy up
+      locationMock.reset();
+      serverResponse.statusCode = 200;
+      forceRequestCompletion();
+
+    });
+
+    test('With response.stop === 1, polling should be stopped', () => {
+      // start the module
+      window.GOVUK.notifyModules.start();
+
+      expect($.ajax).toHaveBeenCalledTimes(0);
+
+      // Time from start of module: 2000ms
+      // First call from polling happens at 2000ms
+      jest.advanceTimersByTime(2000);
+      expect($.ajax).toHaveBeenCalledTimes(1);
+
+      // Time from start of module: 3000ms
+      // Simulate server responding 1000ms after request is made with the stop flag set in its payload
+      jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+      responseObj.stop = 1;
+      serverResponse.complete();
+
+      // Time from start of module: 4000ms
+      // Second call happens 2000ms after request is made as polling is still using the default interval
+      jest.advanceTimersByTime(1000);
+
+      // We expect all future requests to be blocked by the last one having the stop flag set
+      expect($.ajax).toHaveBeenCalledTimes(1);
+
+      // Tidy up
+      delete responseObj.stop;
+      forceRequestCompletion();
     });
 
   });
@@ -219,10 +341,14 @@ describe('Update content', () => {
 
     });
 
-    test("It should replace the original HTML with that of the partial, to match that returned from AJAX responses", () => {
+    afterEach(() => {
 
-      // default the response to match the content inside div[data-notify-module]
-      responseObj[updateKey] = getPartial(partialData);
+      // Force last request made to complete, to tidy up for future tests
+      forceRequestCompletion();
+
+    });
+
+    test("It should replace the original HTML with that of the partial, to match that returned from AJAX responses", () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
@@ -233,11 +359,9 @@ describe('Update content', () => {
 
     test("It should make requests to the URL specified in the data-resource attribute", () => {
 
-      // default the response to match the content inside div[data-notify-module]
-      responseObj[updateKey] = getPartial(partialData);
-
       // start the module
       window.GOVUK.notifyModules.start();
+
       jest.advanceTimersByTime(2000);
 
       expect($.ajax.mock.calls[0][0]).toEqual(resourceURL);
@@ -251,7 +375,13 @@ describe('Update content', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
+
+      // move to the time the first request is fired
       jest.advanceTimersByTime(2000);
+
+      // simulate a 200 response
+      jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+      serverResponse.complete();
 
       // check a sample DOM node is unchanged
       expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("0");
@@ -267,7 +397,13 @@ describe('Update content', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
+
+      // move to the time the first request is fired
       jest.advanceTimersByTime(2000);
+
+      // simulate a 200 response
+      jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+      serverResponse.complete();
 
       // check the right DOM node is updated
       expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("1");
@@ -341,6 +477,13 @@ describe('Update content', () => {
 
     });
 
+    afterEach(() => {
+
+      // Force last request made to complete, to tidy up for future tests
+      forceRequestCompletion();
+
+    });
+
     test("If the response contains no changes, the DOM should stay the same", () => {
 
       document.body.innerHTML = getInitialHTMLString(getPartial(partialData));
@@ -350,7 +493,13 @@ describe('Update content', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
+
+      // move to the time the first request is fired
       jest.advanceTimersByTime(2000);
+
+      // simulate a 200 response
+      jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+      serverResponse.complete();
 
       // check it has the same number of items
       expect(document.querySelectorAll('.file-list').length).toEqual(1);
@@ -377,7 +526,13 @@ describe('Update content', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
+
+      // move to the time the first request is fired
       jest.advanceTimersByTime(2000);
+
+      // simulate a 200 response
+      jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+      serverResponse.complete();
 
       // check the node has been added
       expect(document.querySelectorAll('.file-list').length).toEqual(2);
@@ -409,7 +564,13 @@ describe('Update content', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
+
+      // move to the time the first request is fired
       jest.advanceTimersByTime(2000);
+
+      // simulate a 200 response
+      jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+      serverResponse.complete();
 
       // check the node has been removed
       expect(document.querySelectorAll('.file-list').length).toEqual(1);
@@ -443,7 +604,13 @@ describe('Update content', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
+
+      // move to the time the first request is fired
       jest.advanceTimersByTime(2000);
+
+      // simulate a 200 response
+      jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+      serverResponse.complete();
 
       // check the class is still there
       expect(document.querySelectorAll('.file-list h2')[0].classList.contains('js-child-has-focus')).toBe(true);
@@ -481,7 +648,13 @@ describe('Update content', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
+
+      // move to the time the first request is fired
       jest.advanceTimersByTime(2000);
+
+      // simulate a 200 response
+      jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+      serverResponse.complete();
 
       // re-select in case nodes in partialsInPage have changed
       partialsInPage = document.querySelectorAll('.ajax-block-container');
