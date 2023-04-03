@@ -3,6 +3,7 @@ import pathlib
 from time import monotonic
 
 import jinja2
+import werkzeug
 from flask import (
     current_app,
     flash,
@@ -462,7 +463,10 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
         if "user_id" not in session:
             application.logger.warning("csrf.session_expired: Redirecting user to log in page")
 
-            return application.login_manager.unauthorized()
+            try:
+                return application.login_manager.unauthorized()
+            except werkzeug.exceptions.Unauthorized as e:
+                return handle_no_permissions(e)
 
         application.logger.warning(
             "csrf.invalid_token: Aborting request, user_id: {user_id}", extra={"user_id": session["user_id"]}

@@ -3,6 +3,8 @@ from flask import Response, url_for
 from flask_wtf.csrf import CSRFError
 from notifications_python_client.errors import HTTPError
 
+from tests.conftest import set_config_values
+
 
 def test_bad_url_returns_page_not_found(client_request):
     page = client_request.get_url(
@@ -61,6 +63,21 @@ def test_csrf_redirects_to_sign_in_page_if_not_signed_in(client_request, mocker)
         "/cookies",
         _expected_redirect=url_for("main.sign_in", next="/cookies"),
     )
+
+
+def test_no_session_for_json_endpoint_returns_401(
+    notify_admin,
+    client_request,
+    service_one,
+):
+    with set_config_values(notify_admin, dict(WTF_CSRF_ENABLED=True)):
+        client_request.logout()
+        client_request.post_response(
+            "json_updates.get_notifications_page_partials_as_json",
+            service_id=service_one["id"],
+            message_type="email",
+            _expected_status=401,
+        )
 
 
 def test_405_returns_something_went_wrong_page(client_request, mocker):
