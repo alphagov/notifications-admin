@@ -382,9 +382,9 @@
             {{ edit_field('Change', url_for('main.set_per_day_message_limit', service_id=current_service.id, notification_type='email'), suffix='daily email limit') }}
           {% endcall %}
           {% call row() %}
-            {{ text_field('SMS limit')}}
+            {{ text_field('Text message limit')}}
             {{ text_field('{:,} per day'.format(current_service.sms_message_limit)) }}
-            {{ edit_field('Change', url_for('main.set_per_day_message_limit', service_id=current_service.id, notification_type='sms'), suffix='daily SMS limit') }}
+            {{ edit_field('Change', url_for('main.set_per_day_message_limit', service_id=current_service.id, notification_type='sms'), suffix='daily text message limit') }}
           {% endcall %}
           {% call row() %}
             {{ text_field('Letter limit')}}
