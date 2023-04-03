@@ -10,7 +10,7 @@ from app.models.user import User
 from app.utils.user import user_is_platform_admin
 
 
-@main.route("/find-users-by-email", methods=["GET", "POST"])
+@main.route("/find-users-by-email", methods=["POST"])
 @user_is_platform_admin
 def find_users_by_email():
     # The prefix on this form must match the prefix on the form on the platform_admin_search view as the form on that
