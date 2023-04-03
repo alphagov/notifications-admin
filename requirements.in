@@ -35,4 +35,4 @@ govuk-frontend-jinja==2.3.0
 prometheus-client==0.15.0
 git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
 
-sentry-sdk
+sentry-sdk>=1.0.0,<2.0.0
