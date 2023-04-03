@@ -63,7 +63,4 @@ applications:
 
       NOTIFY_BILLING_DETAILS: '{{ NOTIFY_BILLING_DETAILS | tojson }}'
 
-      NEW_RELIC_APP_NAME: '{{ environment }}.{{ CF_APP }}'
-      NEW_RELIC_LICENSE_KEY: '{{ NEW_RELIC_LICENSE_KEY }}'
-
       SENTRY_DSN: '{{ NOTIFICATIONS_ADMIN_SENTRY_DSN }}'

@@ -119,8 +119,6 @@ markupsafe==2.1.1
     #   wtforms
 mistune==0.8.4
     # via notifications-utils
-newrelic==8.5.0
-    # via -r requirements.in
 notifications-python-client==6.4.1
     # via -r requirements.in
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@62.2.0
