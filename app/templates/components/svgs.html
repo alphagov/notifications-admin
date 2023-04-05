@@ -1,0 +1,31 @@
+{#
+  All SVGs in this file are, essentially, replacements for images.
+
+  We mimic the <img> tag by only setting a role if we have alt text.
+  If there is no alt text, we also need to remove all semantics (aria-hidden) and ensure it cannot be focused (focusable)
+#}
+
+{% macro tick(alt, classes, id="tick") -%}
+  <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 128 128" height="19" width="19"
+    {%- if alt %} aria-labeledby="{{ id }}" role="img"
+    {%- else %} aria-hidden="true" focusable="false"{% endif %}
+    {%- if classes %} class="{{ classes }}"{% endif -%}
+  >
+    {% if alt %}<title id="{{ id }}">{{ alt }}</title>{% endif %}
+    <g fill="currentColor">
+      <path d="m103.5 21 24.4 24.4-81.5 81.5L22 94.5 103.5 21z"/>
+      <path d="M24.4 56 0 80.4 43.6 124 68 99.6 24.4 56z"/>
+    </g>
+  </svg>
+{%- endmacro %}
+
+{% macro cross(alt, classes, id="cross") -%}
+  <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 128 128"
+    {%- if alt %} aria-labeledby="{{ id }}" role="img"
+    {%- else %} aria-hidden="true" focusable="false"{% endif %}
+    {%- if classes %} class="{{ classes }}"{% endif -%}
+  >
+    {% if alt %}<title id="{{ id }}">{{ alt }}</title>{% endif %}
+    <path fill="none" stroke="currentColor" stroke-width="10" d="M38 20 12 46l26 26-26 26 26 26 26-26 26 26 26-26-26-26 26-26-26-26-26 26z"/>
+  </svg>
+{%- endmacro %}

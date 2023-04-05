@@ -430,7 +430,7 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
     if service_has_email_auth:
         service_one["permissions"].append("email_auth")
     page = client_request.get("main.manage_users", service_id=service_one["id"])
-    assert bool(page.select_one(".tick-cross-list-hint")) == displays_auth_type
+    assert bool(page.select_one(".tick-cross__hint")) == displays_auth_type
 
 
 def test_manage_users_page_does_not_link_to_user_profile_page_if_not_platform_admins(
@@ -1638,7 +1638,7 @@ def test_manage_user_page_shows_how_many_folders_user_can_view(
     page = client_request.get("main.manage_users", service_id=service_one["id"])
 
     user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
-    assert user_div.select_one(".tick-cross-list-hint:last-child").text.strip() == expected_message
+    assert user_div.select_one(".tick-cross__hint:last-child").text.strip() == expected_message
 
 
 def test_manage_user_page_doesnt_show_folder_hint_if_service_has_no_folders(
@@ -1655,7 +1655,7 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_has_no_folders(
     page = client_request.get("main.manage_users", service_id=service_one["id"])
 
     user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
-    assert user_div.find(".tick-cross-list-hint:last-child") is None
+    assert user_div.find(".tick-cross__hint:last-child") is None
 
 
 def test_manage_user_page_doesnt_show_folder_hint_if_service_cant_edit_folder_permissions(
@@ -1674,7 +1674,7 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_cant_edit_folder_pe
     page = client_request.get("main.manage_users", service_id=service_one["id"])
 
     user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
-    assert user_div.find(".tick-cross-list-hint:last-child") is None
+    assert user_div.find(".tick-cross__hint:last-child") is None
 
 
 def test_remove_user_from_service(
