@@ -15,8 +15,7 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
-from notifications_utils.pdf import is_letter_too_long, pdf_page_count
-from PyPDF2.errors import PdfReadError
+from notifications_utils.pdf import is_letter_too_long
 from requests import RequestException
 
 from app import (
@@ -930,20 +929,6 @@ def letter_template_attach_pages(service_id, template_id):
                 },
             )
 
-        try:
-            # TODO: get page count from the sanitise response once template preview
-            # handles malformed files nicely - is this done yet?
-            page_count = pdf_page_count(BytesIO(pdf_file_bytes))
-        except PdfReadError:
-            current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
-            return _invalid_upload_error(
-                template_id=template_id,
-                error={
-                    "title": "There’s a problem with your file",
-                    "detail": "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
-                },
-            )
-
         upload_id = uuid.uuid4()
 
         try:
@@ -959,6 +944,17 @@ def letter_template_attach_pages(service_id, template_id):
                 file_location = get_transient_letter_file_location(service_id, upload_id)
                 validation_failed_message = response.json().get("message")
                 invalid_pages = response.json().get("invalid_pages")
+
+                page_count = response.json().get("page_count")
+                if not isinstance(page_count, int):
+                    current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
+                    return _invalid_upload_error(
+                        template_id=template_id,
+                        error={
+                            "title": "There’s a problem with your file",
+                            "detail": "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
+                        },
+                    )
 
                 status = "invalid"
                 upload_letter_to_s3(
@@ -979,6 +975,7 @@ def letter_template_attach_pages(service_id, template_id):
         else:
 
             # TODO in next PR: upload letter to S3
+            page_count = response.json()["page_count"]
             pages_content = "1 page" if page_count == 1 else f"{page_count} pages"
 
             flash(

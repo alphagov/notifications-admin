@@ -841,7 +841,11 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(mocker, cl
 
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
-    mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
+    mock_sanitise_response.json = lambda: {
+        "message": "content-outside-printable-area",
+        "invalid_pages": [1],
+        "page_count": 1,
+    }
     mocker.patch("app.main.views.templates.sanitise_letter", return_value=mock_sanitise_response)
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
@@ -895,15 +899,13 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
         "app.main.views.templates.sanitise_letter",
         return_value=Mock(
             content="The sanitised content",
-            json=lambda: {"file": "VGhlIHNhbml0aXNlZCBjb250ZW50"},
+            json=lambda: {"file": "VGhlIHNhbml0aXNlZCBjb250ZW50", "page_count": page_count},
         ),
     )
 
     # page count for letter template
     mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
 
-    # page count for the attachment
-    mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
     mocker.patch("app.service_api_client.get_letter_contacts", return_value=[])
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:

@@ -18,11 +18,9 @@ from flask import (
     url_for,
 )
 from notifications_utils.insensitive_dict import InsensitiveDict
-from notifications_utils.pdf import pdf_page_count
 from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.sanitise_text import SanitiseASCII
-from PyPDF2.errors import PdfReadError
 from requests import RequestException
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
@@ -156,16 +154,6 @@ def upload_letter(service_id):
         if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
             return _invalid_upload_error("Your file is too big", "Files must be smaller than 2MB.")
 
-        try:
-            # TODO: get page count from the sanitise response once template preview handles malformed files nicely
-            page_count = pdf_page_count(BytesIO(pdf_file_bytes))
-        except PdfReadError:
-            current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
-            return _invalid_upload_error(
-                "There’s a problem with your file",
-                "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
-            )
-
         upload_id = uuid.uuid4()
         file_location = get_transient_letter_file_location(service_id, upload_id)
 
@@ -180,6 +168,13 @@ def upload_letter(service_id):
             if ex.response is not None and ex.response.status_code == 400:
                 validation_failed_message = response.json().get("message")
                 invalid_pages = response.json().get("invalid_pages")
+                page_count = response.json().get("page_count")
+                if not isinstance(page_count, int):
+                    current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
+                    return _invalid_upload_error(
+                        "There’s a problem with your file",
+                        "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
+                    )
 
                 status = "invalid"
                 upload_letter_to_s3(
@@ -203,7 +198,7 @@ def upload_letter(service_id):
                 file_contents,
                 file_location=file_location,
                 status=status,
-                page_count=page_count,
+                page_count=response["page_count"],
                 filename=original_filename,
                 recipient=recipient,
             )
