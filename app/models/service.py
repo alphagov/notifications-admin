@@ -383,19 +383,6 @@ class Service(JSONModel):
         return service_api_client.get_letter_contact(self.id, id)
 
     @property
-    def volumes(self):
-        return sum(
-            filter(
-                None,
-                (
-                    self.volume_email,
-                    self.volume_sms,
-                    self.volume_letter,
-                ),
-            )
-        )
-
-    @property
     def volumes_by_channel(self):
         return {channel: getattr(self, f"volume_{channel}") for channel in ("email", "sms", "letter")}
 
@@ -403,7 +390,7 @@ class Service(JSONModel):
     def go_live_checklist_completed(self):
         return all(
             (
-                bool(self.volumes),
+                any(self.volumes_by_channel.values()),
                 self.has_team_members,
                 self.has_templates,
                 not self.needs_to_add_email_reply_to_address,
