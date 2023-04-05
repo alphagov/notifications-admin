@@ -243,13 +243,7 @@ class Service(JSONModel):
 
     @property
     def has_estimated_usage(self):
-        return self.consent_to_research is not None and any(
-            (
-                self.volume_email,
-                self.volume_sms,
-                self.volume_letter,
-            )
-        )
+        return self.consent_to_research is not None and any(self.volumes_by_channel.values())
 
     def has_templates_of_type(self, template_type):
         return any(template for template in self.all_templates if template["template_type"] == template_type)
