@@ -397,7 +397,7 @@ class Service(JSONModel):
 
     @property
     def volumes_by_channel(self):
-        return ((channel, getattr(self, f"volume_{channel}")) for channel in ("email", "sms", "letter"))
+        return {channel: getattr(self, f"volume_{channel}") for channel in ("email", "sms", "letter")}
 
     @property
     def go_live_checklist_completed(self):
