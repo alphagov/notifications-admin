@@ -1,5 +1,24 @@
 [tool.black]
 line-length = 120
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+line-length = 120
+
+target-version = "py39"
+
+select = [
+    "E",  # pycodestyle
+    "W",  # pycodestyle
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C90",  # mccabe cyclomatic complexity
+]
+ignore = []
+exclude = [
+    "venv*",
+    "__pycache__",
+    "node_modules",
+    "cache",
+    "build",
+]
