@@ -1,5 +1,6 @@
 from notifications_utils.recipients import RecipientCSV
 
+from app.formatters import recipient_count
 from app.models.spreadsheet import Spreadsheet
 from app.utils.templates import get_sample_template
 
@@ -10,21 +11,7 @@ def get_errors_for_csv(recipients, template_type):  # noqa: C901
 
     if any(recipients.rows_with_bad_recipients):
         number_of_bad_recipients = len(list(recipients.rows_with_bad_recipients))
-        if "sms" == template_type:
-            if 1 == number_of_bad_recipients:
-                errors.append("fix 1 phone number")
-            else:
-                errors.append("fix {} phone numbers".format(number_of_bad_recipients))
-        elif "email" == template_type:
-            if 1 == number_of_bad_recipients:
-                errors.append("fix 1 email address")
-            else:
-                errors.append("fix {} email addresses".format(number_of_bad_recipients))
-        elif "letter" == template_type:
-            if 1 == number_of_bad_recipients:
-                errors.append("fix 1 address")
-            else:
-                errors.append("fix {} addresses".format(number_of_bad_recipients))
+        errors.append(f"fix {recipient_count(number_of_bad_recipients, template_type)}")
 
     if any(recipients.rows_with_missing_data):
         number_of_rows_with_missing_data = len(list(recipients.rows_with_missing_data))
