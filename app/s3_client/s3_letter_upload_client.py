@@ -73,7 +73,7 @@ def get_letter_s3_object(service_id, file_id):
         return s3.Object(current_app.config["S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"], file_location).get()
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchKey":
-            raise LetterNotFoundError(f"Letter not found for service {service_id} and file {file_id}")
+            raise LetterNotFoundError(f"Letter not found for service {service_id} and file {file_id}") from e
 
         raise
 
