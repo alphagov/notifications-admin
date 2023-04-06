@@ -18,23 +18,21 @@ def get_errors_for_csv(recipients, template_type):  # noqa: C901
         if 1 == number_of_rows_with_missing_data:
             errors.append("enter missing data in 1 row")
         else:
-            errors.append("enter missing data in {} rows".format(number_of_rows_with_missing_data))
+            errors.append(f"enter missing data in {number_of_rows_with_missing_data} rows")
 
     if any(recipients.rows_with_message_too_long):
         number_of_rows_with_message_too_long = len(list(recipients.rows_with_message_too_long))
         if 1 == number_of_rows_with_message_too_long:
             errors.append("shorten the message in 1 row")
         else:
-            errors.append("shorten the messages in {} rows".format(number_of_rows_with_message_too_long))
+            errors.append(f"shorten the messages in {number_of_rows_with_message_too_long} rows")
 
     if any(recipients.rows_with_empty_message):
         number_of_rows_with_empty_message = len(list(recipients.rows_with_empty_message))
         if 1 == number_of_rows_with_empty_message:
             errors.append("check you have content for the empty message in 1 row")
         else:
-            errors.append(
-                "check you have content for the empty messages in {} rows".format(number_of_rows_with_empty_message)
-            )
+            errors.append(f"check you have content for the empty messages in {number_of_rows_with_empty_message} rows")
 
     return errors
 
