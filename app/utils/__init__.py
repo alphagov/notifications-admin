@@ -127,7 +127,7 @@ def hide_from_search_engines(f):
 # JSON-like means they can contain all types JSON can: all the main primitives
 # plus nested lists or dictionaries.
 # Merge is additive. New values overwrite old and collections are added to.
-def merge_jsonlike(source, destination):
+def merge_jsonlike(source, destination):  # noqa: C901
     def merge_items(source_item, destination_item):
         if isinstance(source_item, dict) and isinstance(destination_item, dict):
             merge_dicts(source_item, destination_item)

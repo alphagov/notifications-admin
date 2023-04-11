@@ -8,7 +8,7 @@ def test_get_count_of_live_services_and_organisations(mocker):
 
     client.get_count_of_live_services_and_organisations()
 
-    mock.assert_called_once_with(url="/_status/live-service-and-organisation-counts")
+    mock.assert_called_once_with("/_status/live-service-and-organisation-counts")
 
 
 def test_sets_value_in_cache(mocker):
@@ -26,7 +26,7 @@ def test_sets_value_in_cache(mocker):
     assert client.get_count_of_live_services_and_organisations() == {"data_from": "api"}
 
     mock_redis_get.assert_called_once_with("live-service-and-organisation-counts")
-    mock_api_get.assert_called_once_with(url="/_status/live-service-and-organisation-counts")
+    mock_api_get.assert_called_once_with("/_status/live-service-and-organisation-counts")
     mock_redis_set.assert_called_once_with("live-service-and-organisation-counts", '{"data_from": "api"}', ex=3600)
 
 

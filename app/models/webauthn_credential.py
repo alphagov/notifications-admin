@@ -41,7 +41,7 @@ class WebAuthnCredential(JSONModel):
                 AttestationObject(response["attestationObject"]),
             )
         except ValueError as e:
-            raise RegistrationError(e)
+            raise RegistrationError(e) from e
 
         if isinstance(auth_data.credential_data.public_key, UnsupportedKey):
             raise RegistrationError("Encryption algorithm not supported")

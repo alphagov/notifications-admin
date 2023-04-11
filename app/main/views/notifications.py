@@ -50,7 +50,7 @@ from app.utils.user import user_has_permissions
 
 @main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>")
 @user_has_permissions("view_activity", "send_messages")
-def view_notification(service_id, notification_id):
+def view_notification(service_id, notification_id):  # noqa: C901
     notification = notification_api_client.get_notification(service_id, str(notification_id))
     notification["template"].update({"reply_to_text": notification["reply_to_text"]})
 

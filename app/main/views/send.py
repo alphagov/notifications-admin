@@ -397,7 +397,7 @@ def send_one_off_letter_address(service_id, template_id):
     methods=["GET", "POST"],
 )
 @user_has_permissions("send_messages", restrict_admin_usage=True)
-def send_one_off_step(service_id, template_id, step_index):
+def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
     if {"recipient", "placeholders"} - set(session.keys()):
         return redirect(
             url_for(

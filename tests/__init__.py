@@ -480,7 +480,7 @@ def job_json(
     return data
 
 
-def notification_json(
+def notification_json(  # noqa: C901
     service_id,
     job=None,
     template=None,

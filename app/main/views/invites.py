@@ -9,7 +9,7 @@ from app.models.user import InvitedOrgUser, InvitedUser, OrganisationUsers, User
 
 
 @main.route("/invitation/<token>")
-def accept_invite(token):
+def accept_invite(token):  # noqa: C901
     invited_user = InvitedUser.from_token(token)
 
     if not current_user.is_anonymous and current_user.email_address.lower() != invited_user.email_address.lower():

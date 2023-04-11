@@ -519,9 +519,9 @@ class InvitedUser(BaseUser):
             return cls(invite_api_client.check_token(token))
         except HTTPError as exception:
             if exception.status_code == 400 and "invitation" in exception.message:
-                raise InviteTokenError(exception.message["invitation"])
+                raise InviteTokenError(exception.message["invitation"]) from exception
             else:
-                raise exception
+                raise
 
     @classmethod
     def from_session(cls):
@@ -613,7 +613,7 @@ class InvitedOrgUser(BaseUser):
             return cls(org_invite_api_client.check_token(token))
         except HTTPError as exception:
             if exception.status_code == 400 and "invitation" in exception.message:
-                raise InviteTokenError(exception.message["invitation"])
+                raise InviteTokenError(exception.message["invitation"]) from exception
             else:
                 raise exception
 

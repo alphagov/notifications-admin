@@ -23,7 +23,7 @@ from app.utils.login import is_safe_redirect_url
 
 @main.route("/sign-in", methods=(["GET", "POST"]))
 @hide_from_search_engines
-def sign_in():
+def sign_in():  # noqa: C901
     redirect_url = request.args.get("next")
     if current_user and current_user.is_authenticated:
         if redirect_url and is_safe_redirect_url(redirect_url):

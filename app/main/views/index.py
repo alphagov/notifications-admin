@@ -337,7 +337,6 @@ REDIRECTS = {
     "/documentation": "main.guidance_api_documentation",
     "/features/email": "main.guidance_features",
     "/features/get-started": "main.guidance_features",
-    "/features/get-started": "main.guidance_features",
     "/features/letters": "main.guidance_features",
     "/features/messages-status": "main.guidance_message_status",
     "/features/sms": "main.guidance_features",

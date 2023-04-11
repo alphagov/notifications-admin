@@ -46,7 +46,6 @@ def pricing_nav():
                 {
                     "name": "Text messages",
                     "link": "main.guidance_pricing_text_messages",
-                    "link": "main.guidance_pricing_text_messages",
                 },
                 {
                     "name": "Letters",

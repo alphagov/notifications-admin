@@ -674,7 +674,8 @@ def test_bat_email_page(
     page_links = page.select("main a")
     form_link = next(
         filter(
-            lambda l: l["href"] == url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no"), page_links
+            lambda link: link["href"] == url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no"),
+            page_links,
         ),
         None,
     )

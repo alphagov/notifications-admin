@@ -9,4 +9,4 @@ def test_no_routes_removed_without_considering_redirects(notify_admin):
     try:
         save_app_routes(acknowledge_removed_routes=False)
     except ValueError as e:
-        raise AssertionError(str(e))
+        raise AssertionError(str(e)) from e

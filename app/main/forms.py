@@ -9,9 +9,8 @@ import pytz
 from flask import Markup, request
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
-from flask_wtf.file import FileAllowed
+from flask_wtf.file import FileAllowed, FileSize
 from flask_wtf.file import FileField as FileField_wtf
-from flask_wtf.file import FileSize
 from notifications_utils.countries.data import Postage
 from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict
@@ -32,9 +31,6 @@ from wtforms import (
     FileField,
     HiddenField,
     PasswordField,
-)
-from wtforms import RadioField as WTFormsRadioField
-from wtforms import (
     SearchField,
     SelectMultipleField,
     StringField,
@@ -43,6 +39,7 @@ from wtforms import (
     ValidationError,
     validators,
 )
+from wtforms import RadioField as WTFormsRadioField
 from wtforms.validators import (
     URL,
     UUID,
@@ -229,7 +226,7 @@ class UKMobileNumber(GovukTextInputFieldMixin, TelField):
         try:
             validate_phone_number(self.data)
         except InvalidPhoneError as e:
-            raise ValidationError(str(e))
+            raise ValidationError(str(e)) from e
 
 
 class InternationalPhoneNumber(UKMobileNumber, GovukTextInputFieldMixin, TelField):
@@ -238,7 +235,7 @@ class InternationalPhoneNumber(UKMobileNumber, GovukTextInputFieldMixin, TelFiel
             if self.data:
                 validate_phone_number(self.data, international=True)
         except InvalidPhoneError as e:
-            raise ValidationError(str(e))
+            raise ValidationError(str(e)) from e
 
 
 def uk_mobile_number(label="Mobile number"):
@@ -477,8 +474,8 @@ class RadioFieldWithRequiredMessage(RadioField):
     def pre_validate(self, form):
         try:
             return super().pre_validate(form)
-        except ValueError:
-            raise ValidationError(self.required_message)
+        except ValueError as e:
+            raise ValidationError(self.required_message) from e
 
 
 class StripWhitespaceForm(Form):
@@ -756,9 +753,9 @@ class OnOffField(GovukRadiosField):
         ]
         super().__init__(
             label,
+            *args,
             choices=choices,
             thing=choices_for_error_message or f"{choices[0][1].lower()} or {choices[1][1].lower()}",
-            *args,
             **kwargs,
         )
 
@@ -1566,8 +1563,8 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
             def valid_non_emergency_phone_number(self, num):
                 try:
                     normalised_number = normalise_phone_number(num.data)
-                except InvalidPhoneError:
-                    raise ValidationError("Must be a valid phone number")
+                except InvalidPhoneError as e:
+                    raise ValidationError("Must be a valid phone number") from e
 
                 if normalised_number in {"999", "112"}:
                     raise ValidationError("Must not be an emergency number")
@@ -1828,10 +1825,10 @@ class EmailBrandingLogoUpload(StripWhitespaceForm):
 
         try:
             image_processor = ImageProcessor(field.data, img_format=self.EXPECTED_LOGO_FORMAT)
-        except WrongImageFormat:
-            raise ValidationError(f"Logo must be a {self.EXPECTED_LOGO_FORMAT.upper()} file")
-        except CorruptImage:
-            raise ValidationError("Notify cannot read this file")
+        except WrongImageFormat as e:
+            raise ValidationError(f"Logo must be a {self.EXPECTED_LOGO_FORMAT.upper()} file") from e
+        except CorruptImage as e:
+            raise ValidationError("Notify cannot read this file") from e
 
         min_height_px = current_app.config["EMAIL_BRANDING_MIN_LOGO_HEIGHT_PX"]
         max_width_px = current_app.config["EMAIL_BRANDING_MAX_LOGO_WIDTH_PX"]
@@ -2487,8 +2484,8 @@ class AcceptAgreementForm(StripWhitespaceForm):
     def validate_version(self, field):
         try:
             float(field.data)
-        except (TypeError, ValueError):
-            raise ValidationError("Must be a number")
+        except (TypeError, ValueError) as e:
+            raise ValidationError("Must be a number") from e
 
 
 class BroadcastAreaForm(StripWhitespaceForm):

@@ -66,8 +66,8 @@ class ValidEmail:
 
         try:
             validate_email_address(field.data)
-        except InvalidEmailError:
-            raise ValidationError(self.message)
+        except InvalidEmailError as e:
+            raise ValidationError(self.message) from e
 
 
 class NoCommasInPlaceHolders:

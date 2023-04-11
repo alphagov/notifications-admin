@@ -60,15 +60,14 @@ generate-version-file: ## Generates the app version file
 
 .PHONY: test
 test: ## Run tests
-	flake8 .
-	isort --check-only ./app ./tests
+	ruff check .
 	black --check .
 	source $(HOME)/.nvm/nvm.sh && npm test
 	py.test -n auto --maxfail=10 tests/
 
 .PHONY: fix-imports
-fix-imports: ## Fix imports using isort
-	isort ./app ./tests
+fix-imports: ## Fix imports using ruff
+	ruff --fix --select=I .
 
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
