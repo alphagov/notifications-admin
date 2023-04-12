@@ -108,7 +108,7 @@
 
     max-width: 25%;
     padding: $padding-top 20px $padding-bottom 0;
-    margin-right: 5px;
+    margin-right: 3px;
     box-sizing: border-box;
     position: relative;
 
@@ -116,9 +116,9 @@
       content: "";
       display: block;
       position: absolute;
-      top: -1px;
+      top: 4px;
       bottom: 1px;
-      right: 2px;
+      right: 5px;
       width: 7px;
       height: 7px;
       margin: auto 0;
