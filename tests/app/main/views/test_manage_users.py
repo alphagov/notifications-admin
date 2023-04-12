@@ -1207,7 +1207,7 @@ def test_invite_user(
         _follow_redirects=True,
     )
     assert page.select_one("h1").string.strip() == "Team members"
-    flash_banner = page.select_one("div.banner-default-with-tick").string.strip()
+    flash_banner = page.select_one("div.banner-default-with-tick").get_text().strip()
     assert flash_banner == f"Invite sent to {email_address}"
 
     expected_permissions = {"manage_api_keys", "manage_service", "manage_templates", "send_messages", "view_activity"}
@@ -1299,7 +1299,7 @@ def test_invite_user_with_email_auth_service(
     )
 
     assert page.select_one("h1").string.strip() == "Team members"
-    flash_banner = page.select_one("div.banner-default-with-tick").string.strip()
+    flash_banner = page.select_one("div.banner-default-with-tick").get_text().strip()
     assert flash_banner == "Invite sent to test@example.gov.uk"
 
     expected_permissions = {"manage_api_keys", "manage_service", "manage_templates", "send_messages", "view_activity"}

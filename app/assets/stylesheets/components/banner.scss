@@ -35,17 +35,17 @@
 
 %banner-with-tick,
 .banner-with-tick {
-  padding: govuk-spacing(3) (govuk-spacing(6) + govuk-spacing(3));
-  background-image: file-url('tick.svg');
-  background-size: 19px;
-  background-repeat: no-repeat;
-  background-position: govuk-spacing(3) govuk-spacing(3);
-
+  padding: govuk-spacing(3) (govuk-spacing(6) + govuk-spacing(3)) govuk-spacing(3) govuk-spacing(3);
 }
 
 .banner-default-with-tick {
   @extend %banner;
   @extend %banner-with-tick;
+}
+
+.banner__icon {
+  float: left;
+  margin-right: govuk-spacing(6) - 19px;
 }
 
 .banner-dangerous {
