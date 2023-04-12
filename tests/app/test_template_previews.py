@@ -175,7 +175,7 @@ def test_from_example_template_makes_request(mocker):
 
 
 @pytest.mark.parametrize("allow_international_letters, query_param_value", [[False, "false"], [True, "true"]])
-def test_sanitise_letter_calls_template_preview_sanitise_endoint_with_file(
+def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file(
     mocker,
     allow_international_letters,
     query_param_value,
@@ -189,6 +189,26 @@ def test_sanitise_letter_calls_template_preview_sanitise_endoint_with_file(
         f"http://localhost:9999/precompiled/sanitise"
         f"?allow_international_letters={query_param_value}"
         f"&upload_id={fake_uuid}"
+    )
+
+    request_mock.assert_called_once_with(
+        expected_url, headers={"Authorization": "Token my-secret-key"}, data="pdf_data"
+    )
+
+
+def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file_for_an_attachment(
+    mocker,
+    fake_uuid,
+):
+    request_mock = mocker.patch("app.template_previews.requests.post")
+
+    sanitise_letter("pdf_data", upload_id=fake_uuid, allow_international_letters=False, is_an_attachment=True)
+
+    expected_url = (
+        f"http://localhost:9999/precompiled/sanitise"
+        f"?allow_international_letters=false"
+        f"&upload_id={fake_uuid}"
+        f"&is_an_attachment=true"
     )
 
     request_mock.assert_called_once_with(

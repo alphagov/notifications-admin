@@ -47,7 +47,12 @@ from app.s3_client.s3_letter_upload_client import (
 from app.template_previews import TemplatePreview, sanitise_letter
 from app.utils import unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
-from app.utils.letters import get_letter_printing_statement, get_letter_validation_error
+from app.utils.letters import (
+    MAX_FILE_UPLOAD_SIZE,
+    get_error_from_upload_form,
+    get_letter_printing_statement,
+    get_letter_validation_error,
+)
 from app.utils.pagination import (
     generate_next_dict,
     generate_previous_dict,
@@ -55,8 +60,6 @@ from app.utils.pagination import (
 )
 from app.utils.templates import get_sample_template, get_template
 from app.utils.user import user_has_permissions
-
-MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
 
 @main.route("/services/<uuid:service_id>/uploads")
@@ -151,14 +154,14 @@ def upload_letter(service_id):
         original_filename = form.file.data.filename
 
         if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
-            return invalid_upload_error("Your file is too big", "Files must be smaller than 2MB.")
+            return _invalid_upload_error("Your file is too big", "Files must be smaller than 2MB.")
 
         try:
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
             current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
-            return invalid_upload_error(
+            return _invalid_upload_error(
                 "There’s a problem with your file",
                 "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
             )
@@ -219,29 +222,18 @@ def upload_letter(service_id):
         )
 
     if form.file.errors:
-        error = _get_error_from_upload_form(form.file.errors[0])
+        error = get_error_from_upload_form(form.file.errors[0])
 
     return render_template("views/uploads/choose-file.html", error=error, form=form), 400 if error else 200
 
 
-def invalid_upload_error(error_title, error_detail=None):
+def _invalid_upload_error(error_title, error_detail=None):
     return (
         render_template(
             "views/uploads/choose-file.html", error={"title": error_title, "detail": error_detail}, form=PDFUploadForm()
         ),
         400,
     )
-
-
-def _get_error_from_upload_form(form_errors):
-    error = {}
-    if "PDF" in form_errors:
-        error["title"] = "Wrong file type"
-        error["detail"] = form_errors
-    else:  # No file was uploaded error
-        error["title"] = form_errors
-
-    return error
 
 
 @main.route("/services/<uuid:service_id>/preview-letter/<uuid:file_id>")

@@ -6,6 +6,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
+from requests import RequestException
 
 from tests import (
     NotifyBeautifulSoup,
@@ -777,7 +778,7 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
 
 
 @pytest.mark.parametrize("template_type", ["letter", "email", "sms"])
-def test_view_letter_template_has_attach_pages_button_if_template_below_10_pages_long(
+def test_view_letter_template_has_attach_pages_button(
     client_request,
     service_one,
     mock_get_service_templates,
@@ -830,6 +831,96 @@ def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid
     assert page.select_one("input.file-upload-field")["accept"] == ".pdf"
     assert page.select("form button")
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
+
+
+def test_post_attach_pages_errors_when_content_outside_printable_area(mocker, client_request, fake_uuid, service_one):
+    service_one["permissions"] = ["extra_letter_formatting"]
+    mocker.patch("uuid.uuid4", return_value=fake_uuid)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mock_s3_upload = mocker.patch("app.main.views.templates.upload_letter_to_s3")
+
+    mock_sanitise_response = Mock()
+    mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
+    mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
+    mocker.patch("app.main.views.templates.sanitise_letter", return_value=mock_sanitise_response)
+
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        file_contents = file.read()
+        file.seek(0)
+
+        page = client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+            _data={"file": file},
+            _expected_status=400,
+        )
+
+        mock_s3_upload.assert_called_once_with(
+            file_contents,
+            file_location="service-{}/{}.pdf".format(SERVICE_ONE_ID, fake_uuid),
+            status="invalid",
+            page_count=1,
+            filename="tests/test_pdf_files/one_page_pdf.pdf",
+            invalid_pages=[1],
+            message="content-outside-printable-area",
+        )
+
+    assert page.select_one(".banner-dangerous h1").text == "Your content is outside the printable area"
+    assert (
+        page.select_one(".banner-dangerous p").text
+        == "You need to edit page 1.Files must meet our letter specification."
+    )
+    assert page.select_one("form").attrs["action"] == url_for(
+        "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
+    )
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+
+
+@pytest.mark.parametrize("page_count, expected_pages_content", [(1, "1 page"), (2, "2 pages")])
+def test_post_attach_pages_redirects_to_template_view_when_validation_successful(
+    mocker,
+    client_request,
+    fake_uuid,
+    service_one,
+    mock_get_service_letter_template,
+    mock_get_template_folders,
+    page_count,
+    expected_pages_content,
+):
+    service_one["permissions"] = ["extra_letter_formatting"]
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
+    mocker.patch(
+        "app.main.views.templates.sanitise_letter",
+        return_value=Mock(
+            content="The sanitised content",
+            json=lambda: {"file": "VGhlIHNhbml0aXNlZCBjb250ZW50"},
+        ),
+    )
+
+    # page count for letter template
+    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+
+    # page count for the attachment
+    mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
+    mocker.patch("app.service_api_client.get_letter_contacts", return_value=[])
+
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        file.read()
+        file.seek(0)
+
+        page = client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+            _data={"file": file},
+            _follow_redirects=True,
+        )
+
+    assert normalize_spaces(page.select(".banner-default-with-tick")[0].text) == (
+        f"You have attached {expected_pages_content} to the end of your letter"
+    )
 
 
 def test_edit_letter_template_postage_page_displays_correctly(
