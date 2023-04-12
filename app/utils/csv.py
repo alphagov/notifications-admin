@@ -5,7 +5,7 @@ from app.models.spreadsheet import Spreadsheet
 from app.utils.templates import get_sample_template
 
 
-def get_errors_for_csv(recipients, template_type):  # noqa: C901
+def get_errors_for_csv(recipients, template_type):
 
     errors = []
 
