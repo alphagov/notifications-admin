@@ -72,6 +72,7 @@
     "/organisations/<uuid:org_id>/settings/edit-agreement",
     "/organisations/<uuid:org_id>/settings/edit-billing-details",
     "/organisations/<uuid:org_id>/settings/edit-can-approve-own-go-live-requests",
+    "/organisations/<uuid:org_id>/settings/edit-can-ask-to-join-a-service",
     "/organisations/<uuid:org_id>/settings/edit-crown-status",
     "/organisations/<uuid:org_id>/settings/edit-go-live-notes",
     "/organisations/<uuid:org_id>/settings/edit-name",

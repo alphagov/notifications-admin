@@ -86,7 +86,16 @@
           )
         }}
       {% endcall %}
-
+      {% call row() %}
+        {{ text_field('Users can ask to join services') }}
+        {{ text_field(current_org.can_ask_to_join_a_service|format_yes_no) }}
+        {{ edit_field(
+            'Change',
+            url_for('main.edit_organisation_can_ask_to_join_a_service', org_id=current_org.id),
+            suffix='whether this users can ask to join services in this organisation'
+          )
+        }}
+      {% endcall %}
       {% call row() %}
         {{ text_field('Billing details')}}
         {{ optional_text_field(current_org.billing_details, default="None", wrap=True) }}
