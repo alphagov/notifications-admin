@@ -462,8 +462,7 @@ def check_contact_list(service_id, upload_id):
             allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
         )
 
-    row_errors = get_errors_for_csv(recipients, template_type)
-    if row_errors:
+    if row_errors := get_errors_for_csv(recipients, template_type):
         return render_template(
             "views/uploads/contact-list/row-errors.html",
             recipients=recipients,
