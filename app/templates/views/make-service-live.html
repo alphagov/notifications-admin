@@ -24,7 +24,7 @@
         They estimate this service will send:
       </p>
       <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
-        {% for channel, volumes in current_service.volumes_by_channel %}
+        {% for channel, volumes in current_service.volumes_by_channel.items() %}
           <li>
             {% if volumes %}
               {{ volumes|message_count(channel) }} per year
