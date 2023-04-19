@@ -190,7 +190,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         data = {"name": name, "content": content}
         if subject:
-            data.update({"subject": subject})
+            data["subject"] = subject
         data = _attach_current_user(data)
         endpoint = f"/service/{service_id}/template/{id_}"
         return self.post(endpoint, data)
