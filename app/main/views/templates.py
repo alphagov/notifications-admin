@@ -630,10 +630,10 @@ def edit_service_template(service_id, template_id):
         try:
             service_api_client.update_service_template(
                 template_id,
-                form.name.data,
-                form.template_content.data,
-                service_id,
-                subject,
+                service_id=service_id,
+                name=form.name.data,
+                content=form.template_content.data,
+                subject=subject,
             )
         except HTTPError as e:
             if e.status_code == 400:
