@@ -977,25 +977,24 @@ def letter_template_attach_pages(service_id, template_id):
                     template_id=template_id,
                     error=get_letter_validation_error(validation_failed_message, invalid_pages, page_count),
                 )
-            else:
-                raise ex
-        else:
 
-            # TODO in next PR: upload letter to S3
-            pages_content = "1 page" if page_count == 1 else f"{page_count} pages"
+            raise
 
-            flash(
-                f"You have attached {pages_content} to the end of your letter",
-                "default_with_tick",
+        # TODO in next PR: upload letter to S3
+        pages_content = "1 page" if page_count == 1 else f"{page_count} pages"
+
+        flash(
+            f"You have attached {pages_content} to the end of your letter",
+            "default_with_tick",
+        )
+
+        return redirect(
+            url_for(
+                "main.view_template",
+                service_id=current_service.id,
+                template_id=template_id,
             )
-
-            return redirect(
-                url_for(
-                    "main.view_template",
-                    service_id=current_service.id,
-                    template_id=template_id,
-                )
-            )
+        )
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
