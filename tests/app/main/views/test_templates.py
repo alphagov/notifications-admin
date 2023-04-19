@@ -1789,7 +1789,6 @@ def test_should_redirect_when_saving_a_template(
     mock_update_service_template.assert_called_with(
         fake_uuid,
         name,
-        "sms",
         content,
         SERVICE_ONE_ID,
         None,
@@ -2029,7 +2028,6 @@ def test_should_redirect_when_saving_a_template_email(
     mock_update_service_template.assert_called_with(
         fake_uuid,
         name,
-        "email",
         content,
         SERVICE_ONE_ID,
         subject,

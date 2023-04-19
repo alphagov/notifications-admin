@@ -410,7 +410,7 @@ def test_deletes_service_cache(
         ),
         (
             "update_service_template",
-            [FAKE_TEMPLATE_ID, "foo", "sms", "bar", SERVICE_ONE_ID],
+            [FAKE_TEMPLATE_ID, "foo", "bar", SERVICE_ONE_ID],
             [
                 "service-{}-templates".format(SERVICE_ONE_ID),
             ],
