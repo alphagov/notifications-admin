@@ -817,7 +817,7 @@ def test_view_letter_template_has_attach_pages_button(
         assert len(buttons) == 0
 
 
-def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mocker):
+def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mocker, mock_get_template_version):
     service_one["permissions"] = ["extra_letter_formatting"]
 
     page = client_request.get(
@@ -833,7 +833,21 @@ def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
 
 
-def test_post_attach_pages_errors_when_content_outside_printable_area(mocker, client_request, fake_uuid, service_one):
+def test_GET_letter_template_attach_pages_404s_if_invalid_template_id(client_request, service_one, fake_uuid, mocker):
+    mocker.patch(
+        "app.notify_client.service_api_client.service_api_client.get_service_template",
+        side_effect=HTTPError(response=Mock(status_code=404)),
+    )
+    service_one["permissions"] = ["extra_letter_formatting"]
+
+    client_request.get(
+        "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=fake_uuid, _expected_status=404
+    )
+
+
+def test_post_attach_pages_errors_when_content_outside_printable_area(
+    mocker, client_request, fake_uuid, service_one, mock_get_template_version
+):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)

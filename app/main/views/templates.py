@@ -916,6 +916,7 @@ def get_template_sender_form_dict(service_id, template):
 @user_has_permissions("manage_templates")
 @service_has_permission("extra_letter_formatting")
 def letter_template_attach_pages(service_id, template_id):
+    _ = current_service.get_template(template_id)
     form = PDFUploadForm()
     error = {}
 
