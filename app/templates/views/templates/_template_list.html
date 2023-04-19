@@ -1,3 +1,5 @@
+{% from "components/svgs.html" import folder %}
+
 {% macro format_item_name(name, separators=True) -%}
   {%- if name is string -%}
     {{- name -}}
@@ -29,11 +31,13 @@
       {% set item_link_content %}
         {% for ancestor in item.ancestors %}
           <a href="{{ url_for('main.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+            {{ folder(classes="template-list-folder__icon") }}
             {{- format_item_name(ancestor.name) -}}
           </a> <span class="message-name-separator"></span>
         {% endfor %}
         {% if item.is_folder %}
           <a href="{{ url_for('main.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+            {{ folder(classes="template-list-folder__icon") }}
             <span class="live-search-relevant">{{- format_item_name(item.name) -}}</span>
           </a>
         {% else %}
