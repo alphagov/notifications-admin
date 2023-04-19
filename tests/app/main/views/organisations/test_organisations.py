@@ -56,7 +56,7 @@ def test_organisation_page_shows_all_organisations(client_request, platform_admi
 def test_view_organisation_shows_the_correct_organisation(client_request, mocker):
     org = {"id": ORGANISATION_ID, "name": "Test 1", "active": True}
     mocker.patch("app.organisations_client.get_organisation", return_value=org)
-    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": {}})
+    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": {}, "updated_at": None})
 
     page = client_request.get(
         ".organisation_dashboard",
@@ -443,7 +443,8 @@ def test_organisation_services_shows_live_services_and_usage(
                     "sms_cost": 42.0,
                     "sms_remainder": None,
                 },
-            ]
+            ],
+            "updated_at": "2020-02-20T20:00:00.000000+00:00",
         },
     )
 
@@ -473,7 +474,9 @@ def test_organisation_services_shows_live_services_and_usage(
     assert normalize_spaces(usage_rows[8].text) == "£0.00 spent on letters"
 
     # Ensure there’s no ‘this org has no services message’
-    assert not page.select(".govuk-hint")
+    hints = page.select(".govuk-hint")
+    assert len(hints) == 1
+    assert hints[0].text == "Last updated today at 8:00pm"
 
 
 @freeze_time("2020-02-20 20:20")
@@ -499,7 +502,8 @@ def test_organisation_services_shows_live_services_and_usage_with_count_of_1(
                     "sms_cost": 0,
                     "sms_remainder": None,
                 },
-            ]
+            ],
+            "updated_at": None,
         },
     )
 
@@ -536,7 +540,9 @@ def test_organisation_services_filters_by_financial_year(
     financial_year,
     expected_selected,
 ):
-    mock = mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": []})
+    mock = mocker.patch(
+        "app.organisations_client.get_services_and_usage", return_value={"services": [], "updated_at": None}
+    )
     page = client_request.get(
         ".organisation_dashboard",
         org_id=ORGANISATION_ID,
@@ -573,7 +579,8 @@ def test_organisation_services_shows_search_bar(
                     "sms_remainder": None,
                 },
             ]
-            * 8
+            * 8,
+            "updated_at": None,
         },
     )
 
@@ -620,7 +627,8 @@ def test_organisation_services_hides_search_bar_for_7_or_fewer_services(
                     "sms_remainder": None,
                 },
             ]
-            * 7
+            * 7,
+            "updated_at": None,
         },
     )
 
@@ -656,7 +664,8 @@ def test_organisation_services_links_to_downloadable_report(
                     "sms_remainder": None,
                 },
             ]
-            * 2
+            * 2,
+            "updated_at": None,
         },
     )
     client_request.login(active_user_with_permissions)
@@ -703,7 +712,8 @@ def test_download_organisation_usage_report(
                     "sms_cost": 3.935,
                     "sms_remainder": 0,
                 },
-            ]
+            ],
+            "updated_at": None,
         },
     )
     client_request.login(active_user_with_permissions)

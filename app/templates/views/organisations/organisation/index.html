@@ -1,4 +1,3 @@
-{% from "components/page-header.html" import page_header %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/pill.html" import pill %}
@@ -10,7 +9,17 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Usage', size='medium') }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+      <h1 class="heading-medium" id="page-header">Usage</h1>
+    </div>
+
+    {% if updated_at %}
+      <div class="govuk-grid-column-one-half">
+        <p class="govuk-hint govuk-!-font-size-16 govuk-!-text-align-right govuk-!-margin-bottom-1 govuk-!-margin-top-7">Last updated {{ updated_at | format_datetime_relative }}</p>
+      </div>
+    {% endif %}
+  </div>
 
   <div class="bottom-gutter">
     {{ pill(years, selected_year, big_number_args={'smallest': True}) }}
