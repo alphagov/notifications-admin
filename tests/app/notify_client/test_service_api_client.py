@@ -511,7 +511,7 @@ def test_client_gets_guest_list(mocker):
 
     assert response == ["a", "b", "c"]
     mock_get.assert_called_once_with(
-        url="/service/foo/guest-list",
+        "/service/foo/guest-list",
     )
 
 
@@ -522,7 +522,7 @@ def test_client_updates_guest_list(mocker):
     client.update_guest_list("foo", data=["a", "b", "c"])
 
     mock_put.assert_called_once_with(
-        url="/service/foo/guest-list",
+        "/service/foo/guest-list",
         data=["a", "b", "c"],
     )
 
