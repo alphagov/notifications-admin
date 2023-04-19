@@ -1,23 +1,27 @@
-<h1 class='banner-title' data-notify-module="track-error" data-error-type="Trial mode: too many recipients" data-error-label="{{ upload_id }}">
-  {% if original_file_name %}
-    Too many recipients
-  {% else %}
-    Daily limit reached
-  {% endif %}
-</h1>
-<p class="govuk-body">
-  You can only send {{ current_service.get_message_limit(template.template_type) | message_count(template.template_type) }} per day
-  {%- if current_service.trial_mode %}
-    in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode')}}">trial mode</a>
-  {%- endif -%}
-  .
-</p>
-{% if original_file_name %}
-  <p class="govuk-body">
-    {% if (current_service.get_message_limit(template.template_type)) != remaining_messages %}
-      You can still send {{ remaining_messages|format_thousands }} {{ remaining_messages|message_count_noun(template.template_type) }} today, but
+{% from "components/banner.html" import banner_wrapper %}
+
+{% call banner_wrapper(type='dangerous') %}
+  <h1 class='banner-title' data-notify-module="track-error" data-error-type="Trial mode: too many recipients" data-error-label="{{ upload_id }}">
+    {% if original_file_name %}
+      Too many recipients
+    {% else %}
+      Daily limit reached
     {% endif %}
-    ‘{{ original_file_name }}’ contains
-    {{ count_of_recipients|recipient_count(template.template_type) }}.
+  </h1>
+  <p class="govuk-body">
+    You can only send {{ current_service.get_message_limit(template.template_type) | message_count(template.template_type) }} per day
+    {%- if current_service.trial_mode %}
+      in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode')}}">trial mode</a>
+    {%- endif -%}
+    .
   </p>
-{% endif %}
+  {% if original_file_name %}
+    <p class="govuk-body">
+      {% if (current_service.get_message_limit(template.template_type)) != remaining_messages %}
+        You can still send {{ remaining_messages|format_thousands }} {{ remaining_messages|message_count_noun(template.template_type) }} today, but
+      {% endif %}
+      ‘{{ original_file_name }}’ contains
+      {{ count_of_recipients|recipient_count(template.template_type) }}.
+    </p>
+  {% endif %}
+{% endcall %}

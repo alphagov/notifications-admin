@@ -1,6 +1,10 @@
-<h1 class='banner-title' data-notify-module="track-error" data-error-type="File previously sent" data-error-label="{{ upload_id }}">
-  These messages have already been sent today
-</h1>
-<p class="govuk-body">
-  If you need to resend them, rename the file and upload it again.
-</p>
+{% from "components/banner.html" import banner_wrapper %}
+
+{% call banner_wrapper(type='dangerous') %}
+  <h1 class='banner-title' data-notify-module="track-error" data-error-type="File previously sent" data-error-label="{{ upload_id }}">
+    These messages have already been sent today
+  </h1>
+  <p class="govuk-body">
+    If you need to resend them, rename the file and upload it again.
+  </p>
+{% endcall %}

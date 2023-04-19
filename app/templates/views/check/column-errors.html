@@ -15,9 +15,10 @@
 {% block maincolumn_content %}
 
   <div class="bottom-gutter-1-2">
-    {% call banner_wrapper(type='dangerous') %}
 
-      {% if recipients.too_many_rows %}
+    {% if recipients.too_many_rows %}
+
+      {% call banner_wrapper(type='dangerous') %}
 
         <h1 class='banner-title' data-notify-module="track-error" data-error-type="Too many rows" data-error-label="{{ upload_id }}">
           Your file has too many rows
@@ -28,7 +29,11 @@
           file has {{ "{:,}".format(recipients|length) }} rows.
         </p>
 
-      {% elif not count_of_recipients %}
+      {% endcall %}
+
+    {% elif not count_of_recipients %}
+
+      {% call banner_wrapper(type='dangerous') %}
 
         <h1 class='banner-title' data-notify-module="track-error" data-error-type="No rows" data-error-label="{{ upload_id }}">
           Your file is missing some rows
@@ -46,7 +51,11 @@
           </p>
         {% endif %}
 
-      {% elif not recipients.has_recipient_columns %}
+      {% endcall %}
+
+    {% elif not recipients.has_recipient_columns %}
+
+      {% call banner_wrapper(type='dangerous') %}
 
         <h1 class='banner-title' data-notify-module="track-error" data-error-type="Missing recipient columns" data-error-label="{{ upload_id }}">
           There’s a problem with your column names
@@ -68,7 +77,11 @@
             ) }}.
           </p>
 
-      {% elif recipients.duplicate_recipient_column_headers %}
+      {% endcall %}
+
+    {% elif recipients.duplicate_recipient_column_headers %}
+
+      {% call banner_wrapper(type='dangerous') %}
 
         <h1 class='banner-title' data-notify-module="track-error" data-error-type="Duplicate recipient columns" data-error-label="{{ upload_id }}">
           There’s a problem with your column names
@@ -86,7 +99,11 @@
           Delete or rename one of these columns and try again.
         </p>
 
-      {% elif recipients.missing_column_headers %}
+      {% endcall %}
+
+    {% elif recipients.missing_column_headers %}
+
+      {% call banner_wrapper(type='dangerous') %}
 
         <h1 class='banner-title' data-notify-module="track-error" data-error-type="Missing placeholder columns" data-error-label="{{ upload_id }}">
           Your column names need to match the double brackets in your template
@@ -99,36 +116,37 @@
             ) }}.
           </p>
 
-      {% elif sent_previously %}
+      {% endcall %}
 
-        {% include "partials/check/sent-previously.html" %}
+    {% elif sent_previously %}
 
-      {% elif not recipients.allowed_to_send_to %}
+      {% include "partials/check/sent-previously.html" %}
 
+    {% elif not recipients.allowed_to_send_to %}
+
+      {% with
+        count_of_recipients=count_of_recipients,
+        template_type_label=recipients.recipient_column_headers[0]
+      %}
+        {% include "partials/check/not-allowed-to-send-to.html" %}
+      {% endwith %}
+
+    {% elif trying_to_send_letters_in_trial_mode %}
+
+      <div class="bottom-gutter">
         {% with
-          count_of_recipients=count_of_recipients,
-          template_type_label=recipients.recipient_column_headers[0]
+          count_of_recipients=count_of_recipients
         %}
-          {% include "partials/check/not-allowed-to-send-to.html" %}
+          {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
         {% endwith %}
+      </div>
 
-      {% elif trying_to_send_letters_in_trial_mode %}
+    {% elif recipients.more_rows_than_can_send %}
 
-        <div class="bottom-gutter">
-          {% with
-            count_of_recipients=count_of_recipients
-          %}
-            {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
-          {% endwith %}
-        </div>
+      {% include "partials/check/too-many-messages.html" %}
 
-      {% elif recipients.more_rows_than_can_send %}
+    {% endif %}
 
-        {% include "partials/check/too-many-messages.html" %}
-
-      {% endif %}
-
-    {% endcall %}
   </div>
 
 

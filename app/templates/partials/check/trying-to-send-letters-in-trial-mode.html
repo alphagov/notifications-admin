@@ -1,8 +1,12 @@
-<h1 class='banner-title' data-notify-module="track-error" data-error-type="Trying to send letters in trial mode" data-error-label="{{ upload_id }}">
-  You cannot send
-  {{ 'this letter' if count_of_recipients == 1 else 'these letters' }}
-</h1>
-<p class="govuk-body">
-  In <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a> you
-  can only preview how your letters will look
-</p>
+{% from "components/banner.html" import banner_wrapper %}
+
+{% call banner_wrapper(type='dangerous') %}
+  <h1 class='banner-title' data-notify-module="track-error" data-error-type="Trying to send letters in trial mode" data-error-label="{{ upload_id }}">
+    You cannot send
+    {{ 'this letter' if count_of_recipients == 1 else 'these letters' }}
+  </h1>
+  <p class="govuk-body">
+    In <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a> you
+    can only preview how your letters will look
+  </p>
+{% endcall %}

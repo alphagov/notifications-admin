@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
@@ -31,13 +30,11 @@
       </div>
     </div>
   {% elif current_service.trial_mode %}
-    {% call banner_wrapper(type='dangerous') %}
-      {% with
-        count_of_recipients=1
-      %}
-        {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
-      {% endwith %}
-    {% endcall %}
+    {% with
+      count_of_recipients=1
+    %}
+      {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
+    {% endwith %}
   {% else %}
       {{ page_header(
         original_filename

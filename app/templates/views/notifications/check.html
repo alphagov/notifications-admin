@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
@@ -16,32 +15,26 @@
   {% if template.template_type == 'letter' and current_service.trial_mode %}
     {% set error = 'trial-mode-letters' %}
     <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        {% with
-          count_of_recipients=1
-        %}
-          {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
-        {% endwith %}
-      {% endcall %}
+      {% with
+        count_of_recipients=1
+      %}
+        {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
+      {% endwith %}
     </div>
   {% elif error == 'not-allowed-to-send-to' %}
     <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        {% with
-          count_of_recipients=1,
-          template_type_label=(
-            'phone number' if template.template_type == 'sms' else 'email address'
-          )
-        %}
-          {% include "partials/check/not-allowed-to-send-to.html" %}
-        {% endwith %}
-      {% endcall %}
+      {% with
+        count_of_recipients=1,
+        template_type_label=(
+          'phone number' if template.template_type == 'sms' else 'email address'
+        )
+      %}
+        {% include "partials/check/not-allowed-to-send-to.html" %}
+      {% endwith %}
     </div>
   {% elif error == 'too-many-messages' %}
     <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        {% include "partials/check/too-many-messages.html" %}
-      {% endcall %}
+      {% include "partials/check/too-many-messages.html" %}
     </div>
   {% elif error == 'message-too-long' %}
     {# the only row_errors we can get when sending one off messages is that the message is too long #}
