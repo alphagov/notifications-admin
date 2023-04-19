@@ -35,6 +35,7 @@
 
     <div class="govuk-grid-row">
       <div class="{% if current_user.has_permissions('manage_templates') %} govuk-grid-column-five-sixths {% else %} govuk-grid-column-full {% endif %}">
+        {# H1 of page #}
         {{ folder_path(
           folders=template_folder_path,
           service=current_service,
