@@ -184,11 +184,15 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete("service-{service_id}-templates")
     @cache.delete_by_pattern("service-{service_id}-template-*")
-    def update_service_template(self, id_, *, name, content, service_id, subject=None):
+    def update_service_template(self, id_, *, service_id, name=None, content=None, subject=None):
         """
         Update a service template.
         """
-        data = {"name": name, "content": content}
+        data = {}
+        if content:
+            data["content"] = content
+        if name:
+            data["name"] = name
         if subject:
             data["subject"] = subject
         data = _attach_current_user(data)

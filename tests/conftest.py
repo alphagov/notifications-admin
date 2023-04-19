@@ -906,7 +906,7 @@ def mock_create_service_template(mocker, fake_uuid):
 
 @pytest.fixture(scope="function")
 def mock_update_service_template(mocker):
-    def _update(id_, *, name, content, service_id, subject=None):
+    def _update(id_, *, service_id, name=None, content=None, subject=None):
         template = template_json(service_id=service_id, id_=id_, name=name, content=content, subject=subject)
         return {"data": template}
 
@@ -933,7 +933,7 @@ def mock_create_service_template_content_too_big(mocker):
 
 @pytest.fixture(scope="function")
 def mock_update_service_template_400_content_too_big(mocker):
-    def _update(id_, *, name, content, service_id, subject=None):
+    def _update(id_, *, service_id, name=None, content=None, subject=None):
         json_mock = Mock(
             return_value={
                 "message": {"content": ["Content has a character count greater than the limit of 459"]},
