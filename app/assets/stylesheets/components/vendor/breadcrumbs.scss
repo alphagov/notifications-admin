@@ -49,25 +49,11 @@
 
     margin: 0;
     padding: 0 (govuk-spacing(6) / 4) 0 (11px + govuk-spacing(6) / 4);
-
-    background-image: file-url('separator.png');
-    background-repeat: no-repeat;
-    background-size: 6px 11px;
-    background-position: left center;
-
     white-space: nowrap;
 
-    @include govuk-device-pixel-ratio(2) {
-      background-image: file-url('separator-2x.png');
-    }
+    position: relative; // to contain chevron
 
-    &,
-    a:link,
-    a:hover,
-    a:active,
-    a:visited {
-      color: $govuk-text-colour;
-    }
+    color: #FFF;
 
     &--active {
       @include govuk-font(16, $weight: bold);
@@ -78,9 +64,31 @@
       }
     }
 
+    // Chevron inserted using a pseudo element, mostly taken from design system's breabcrumbs component
+    &::before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -0.073em; // minus difference in width introduced by rotating
+      width: (7 / 16) * 1em; // get 7px in ems, from a font-size of 16px
+      height: (7 / 16) * 1em; // get 7px in ems, from a font-size of 16px
+      transform: rotate(45deg);
+      border: solid;
+      border-color: currentColor;
+      border-width: 1px 1px 0 0;
+      margin: auto 0;
+    }
+
     &:first-child {
       padding-left: 0;
       background-image: none;
+
+      &::before {
+        content: none;
+        display: none;
+      }
     }
   }
 
