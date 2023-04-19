@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/banner.html" import banner_wrapper %}
 {% from "components/table.html" import list_table, text_field, index_field %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
@@ -22,9 +21,7 @@
   {{ page_header('Preview of {}'.format(template.name)) }}
 
   {% if letter_too_long %}
-    {% call banner_wrapper(type='dangerous') %}
-        {% include "partials/check/letter-too-long.html" %}
-    {% endcall %}
+    {% include "partials/check/letter-too-long.html" %}
   {% endif %}
 
   {{ govukSkipLink({
