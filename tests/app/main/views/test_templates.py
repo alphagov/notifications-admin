@@ -2316,6 +2316,68 @@ def test_should_redirect_to_one_off_if_template_type_is_letter(
     )
 
 
+def test_should_show_page_to_rename_template(
+    client_request,
+    mock_get_service_letter_template,
+    fake_uuid,
+):
+    page = client_request.get(
+        ".rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Rename template"
+    form = page.select_one("form[method=post]")
+    assert "action" not in form
+
+    assert form.select_one("input[name=name]")
+    assert normalize_spaces(form.select_one("label[for=name]").text) == "Template name"
+
+
+def test_should_show_rename_template(
+    client_request,
+    mock_get_service_letter_template,
+    mock_update_service_template,
+    fake_uuid,
+):
+    client_request.post(
+        ".rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": "new name",
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_update_service_template.assert_called_with(
+        template_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        name="new name",
+    )
+
+
+def test_name_required_to_rename_template(
+    client_request,
+    mock_get_service_letter_template,
+    fake_uuid,
+):
+    page = client_request.post(
+        ".rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": "",
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Cannot be empty"
+
+
 @pytest.mark.parametrize(
     "service_id, template_id",
     (

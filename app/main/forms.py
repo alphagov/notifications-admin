@@ -1430,6 +1430,10 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
                 return message
 
 
+class RenameTemplateForm(StripWhitespaceForm):
+    name = GovukTextInputField("Template name", validators=[DataRequired(message="Cannot be empty")])
+
+
 class BaseTemplateForm(StripWhitespaceForm):
     name = GovukTextInputField("Template name", validators=[DataRequired(message="Cannot be empty")])
 

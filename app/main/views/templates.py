@@ -42,6 +42,7 @@ from app.main.forms import (
     LetterTemplateLanguagesForm,
     LetterTemplatePostageForm,
     PDFUploadForm,
+    RenameTemplateForm,
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
@@ -609,6 +610,29 @@ def add_service_template(service_id, template_type, template_folder_id=None):
 def abort_403_if_not_admin_user():
     if not current_user.platform_admin:
         abort(403)
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/rename", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def rename_template(service_id, template_id):
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    form = RenameTemplateForm(obj=template)
+    previous_page = url_for("main.view_template", service_id=current_service.id, template_id=template.id)
+
+    if form.validate_on_submit():
+        service_api_client.update_service_template(
+            service_id=service_id,
+            template_id=template_id,
+            name=form.name.data,
+        )
+        return redirect(previous_page)
+
+    return render_template(
+        "views/rename-template.html",
+        form=form,
+        back_link=previous_page,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
