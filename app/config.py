@@ -74,6 +74,7 @@ class Config:
     S3_BUCKET_MOU = "local-mou"
     S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "local-transient-uploaded-letters"
     S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "local-precompiled-originals-backup-letters"
+    S3_BUCKET_LETTER_ATTACHMENTS = "local-letter-attachments"
     ROUTE_SECRET_KEY_1 = os.environ.get("ROUTE_SECRET_KEY_1", "")
     ROUTE_SECRET_KEY_2 = os.environ.get("ROUTE_SECRET_KEY_2", "")
     CHECK_PROXY_HEADER = False
@@ -118,6 +119,7 @@ class Development(Config):
     S3_BUCKET_MOU = "notify.tools-mou"
     S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "development-transient-uploaded-letters"
     S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "development-letters-precompiled-originals-backup"
+    S3_BUCKET_LETTER_ATTACHMENTS = "development-letter-attachments"
 
     LOGO_CDN_DOMAIN = "static-logos.notify.tools"
 
@@ -146,6 +148,7 @@ class Test(Development):
     S3_BUCKET_MOU = "test-mou"
     S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "test-transient-uploaded-letters"
     S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "test-letters-precompiled-originals-backup"
+    S3_BUCKET_LETTER_ATTACHMENTS = "test-letter-attachments"
     LOGO_CDN_DOMAIN = "static-logos.test.com"
     NOTIFY_ENVIRONMENT = "test"
     API_HOST_NAME = "http://you-forgot-to-mock-an-api-call-to"
@@ -167,6 +170,7 @@ class Preview(Config):
     S3_BUCKET_MOU = "notify.works-mou"
     S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "preview-transient-uploaded-letters"
     S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "preview-letters-precompiled-originals-backup"
+    S3_BUCKET_LETTER_ATTACHMENTS = "preview-letter-attachments"
     LOGO_CDN_DOMAIN = "static-logos.notify.works"
     NOTIFY_ENVIRONMENT = "preview"
     CHECK_PROXY_HEADER = False
@@ -186,6 +190,7 @@ class Staging(Config):
     S3_BUCKET_MOU = "staging-notify.works-mou"
     S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "staging-transient-uploaded-letters"
     S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "staging-letters-precompiled-originals-backup"
+    S3_BUCKET_LETTER_ATTACHMENTS = "staging-letter-attachments"
     LOGO_CDN_DOMAIN = "static-logos.staging-notify.works"
     NOTIFY_ENVIRONMENT = "staging"
     CHECK_PROXY_HEADER = False
@@ -202,6 +207,7 @@ class Production(Config):
     S3_BUCKET_MOU = "notifications.service.gov.uk-mou"
     S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "production-transient-uploaded-letters"
     S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "production-letters-precompiled-originals-backup"
+    S3_BUCKET_LETTER_ATTACHMENTS = "production-letter-attachments"
     LOGO_CDN_DOMAIN = "static-logos.notifications.service.gov.uk"
     NOTIFY_ENVIRONMENT = "production"
     CHECK_PROXY_HEADER = False
