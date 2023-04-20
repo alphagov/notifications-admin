@@ -109,10 +109,10 @@ def test_redirect_from_old_dashboard(
     mocker,
 ):
     mocker.patch("app.user_api_client.get_user", return_value=user)
-    expected_location = "/services/{}".format(SERVICE_ONE_ID)
+    expected_location = f"/services/{SERVICE_ONE_ID}"
 
     client_request.get_url(
-        "/services/{}/dashboard".format(SERVICE_ONE_ID),
+        f"/services/{SERVICE_ONE_ID}/dashboard",
         _expected_redirect=expected_location,
     )
 
@@ -678,7 +678,7 @@ def test_should_not_show_recent_templates_on_dashboard_if_only_one_template_used
     expected_count = stats[0]["count"]
     assert expected_count == 50
     assert normalize_spaces(page.select_one("#total-sms .big-number-smaller").text) == (
-        "{} text messages sent".format(expected_count)
+        f"{expected_count} text messages sent"
     )
 
 
@@ -1550,7 +1550,7 @@ def test_aggregate_status_types(dict_in, expected_failed, expected_requested):
 def test_get_tuples_of_financial_years():
     assert list(
         get_tuples_of_financial_years(
-            lambda year: "http://example.com?year={}".format(year),
+            lambda year: f"http://example.com?year={year}",
             start=2040,
             end=2041,
         )
@@ -1565,7 +1565,7 @@ def test_get_tuples_of_financial_years_defaults_to_2015():
         2015
         in list(
             get_tuples_of_financial_years(
-                lambda year: "http://example.com?year={}".format(year),
+                lambda year: f"http://example.com?year={year}",
                 end=2040,
             )
         )[-1]

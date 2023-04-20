@@ -135,13 +135,11 @@ class BroadcastAreasRepository:
         return sorted(libraries)
 
     def get_areas(self, area_ids):
-        q = """
+        q = f"""
         SELECT id, name, count_of_phones, broadcast_area_library_id
         FROM broadcast_areas
-        WHERE id IN ({})
-        """.format(
-            ",".join("?" * len(area_ids))
-        )
+        WHERE id IN ({','.join('?' * len(area_ids))})
+        """
 
         results = self.query(q, *area_ids)
 

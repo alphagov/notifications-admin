@@ -33,7 +33,7 @@ def get_template(
         return EmailPreviewTemplate(
             template,
             from_name=service.name,
-            from_address="{}@notifications.service.gov.uk".format(service.email_from),
+            from_address=f"{service.email_from}@notifications.service.gov.uk",
             show_recipient=show_recipient,
             redact_missing_personalisation=redact_missing_personalisation,
             reply_to=email_reply_to,

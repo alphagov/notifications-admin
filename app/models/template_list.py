@@ -334,12 +334,12 @@ class TemplateListFolder(TemplateListItem):
         if self.number_of_templates == 1:
             yield "1 template"
         elif self.number_of_templates > 1:
-            yield "{} templates".format(self.number_of_templates)
+            yield f"{self.number_of_templates} templates"
 
         if self.number_of_folders == 1:
             yield "1 folder"
         elif self.number_of_folders > 1:
-            yield "{} folders".format(self.number_of_folders)
+            yield f"{self.number_of_folders} folders"
 
     @property
     def hint(self):

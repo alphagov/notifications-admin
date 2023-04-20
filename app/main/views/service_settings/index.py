@@ -374,13 +374,13 @@ def archive_service(service_id):
         create_archive_service_event(service_id=service_id, archived_by_id=current_user.id)
 
         flash(
-            "‘{}’ was deleted".format(current_service.name),
+            f"‘{current_service.name}’ was deleted",
             "default_with_tick",
         )
         return redirect(url_for(".choose_account"))
     else:
         flash(
-            "Are you sure you want to delete ‘{}’? There’s no way to undo this.".format(current_service.name),
+            f"Are you sure you want to delete ‘{current_service.name}’? There’s no way to undo this.",
             "delete",
         )
         return service_settings(service_id)
@@ -637,7 +637,7 @@ def service_set_sms_prefix(service_id):
 
     form = SMSPrefixForm(enabled=current_service.prefix_sms)
 
-    form.enabled.label.text = "Start all text messages with ‘{}:’".format(current_service.name)
+    form.enabled.label.text = f"Start all text messages with ‘{current_service.name}:’"
 
     if form.validate_on_submit():
         current_service.update(prefix_sms=form.enabled.data)
@@ -753,7 +753,7 @@ def service_set_channel(service_id, channel):
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
-        "views/service-settings/set-{}.html".format(channel),
+        f"views/service-settings/set-{channel}.html",
         form=form,
         sms_rate=CURRENT_SMS_RATE,
     )

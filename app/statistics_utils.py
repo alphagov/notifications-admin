@@ -31,7 +31,7 @@ def add_rates_to(delivery_statistics):
             delivery_statistics["sms_failed"], delivery_statistics["sms_requested"]
         ),
         week_end_datetime=parser.parse(delivery_statistics.get("week_end", str(datetime.utcnow()))),
-        **delivery_statistics
+        **delivery_statistics,
     )
 
 
@@ -39,14 +39,14 @@ def get_formatted_percentage(x, tot):
     """
     Return a percentage to one decimal place (respecting )
     """
-    return "{0:.1f}".format((float(x) / tot * 100)) if tot else "0"
+    return f"{float(x) / tot * 100:.1f}" if tot else "0"
 
 
 def get_formatted_percentage_two_dp(x, tot):
     """
     Return a percentage to two decimal places
     """
-    return "{0:.2f}".format((float(x) / tot * 100)) if tot else "0"
+    return f"{float(x) / tot * 100:.2f}" if tot else "0"
 
 
 def statistics_by_state(statistics):

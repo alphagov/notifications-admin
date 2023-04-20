@@ -946,7 +946,7 @@ def test_get_billing_report_calls_api_and_download_data(client_request, platform
 
     assert response.content_type == "text/csv; charset=utf-8"
     assert response.headers["Content-Disposition"] == (
-        'attachment; filename="Billing Report from {} to {}.csv"'.format("2019-01-01", "2019-03-31")
+        'attachment; filename="Billing Report from 2019-01-01 to 2019-03-31.csv"'
     )
 
     assert response.get_data(as_text=True) == (
@@ -997,7 +997,7 @@ def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
 
     assert response.content_type == "text/csv; charset=utf-8"
     assert response.headers["Content-Disposition"] == (
-        'attachment; filename="{} to {} notification status per service report.csv"'.format(start_date, end_date)
+        f'attachment; filename="{start_date} to {end_date} notification status per service report.csv"'
     )
     assert response.get_data(as_text=True) == (
         "date_created,service_id,service_name,notification_type,count_sending,count_delivered,"
@@ -1045,7 +1045,7 @@ def test_get_volumes_by_service_report_calls_api_and_download_data(client_reques
 
     assert response.content_type == "text/csv; charset=utf-8"
     assert response.headers["Content-Disposition"] == (
-        'attachment; filename="Volumes by service report from {} to {}.csv"'.format("2019-01-01", "2019-03-31")
+        'attachment; filename="Volumes by service report from 2019-01-01 to 2019-03-31.csv"'
     )
 
     assert response.get_data(as_text=True) == (
@@ -1099,7 +1099,7 @@ def test_get_daily_volumes_report_calls_api_and_download_data(client_request, pl
 
     assert response.content_type == "text/csv; charset=utf-8"
     assert response.headers["Content-Disposition"] == (
-        'attachment; filename="Daily volumes report from {} to {}.csv"'.format("2019-01-01", "2019-03-31")
+        'attachment; filename="Daily volumes report from 2019-01-01 to 2019-03-31.csv"'
     )
 
     assert response.get_data(as_text=True) == (
@@ -1144,7 +1144,7 @@ def test_get_daily_sms_provider_volumes_report_calls_api_and_download_data(clien
 
     assert response.content_type == "text/csv; charset=utf-8"
     assert response.headers["Content-Disposition"] == (
-        'attachment; filename="Daily SMS provider volumes report from {} to {}.csv"'.format("2019-01-01", "2019-03-31")
+        'attachment; filename="Daily SMS provider volumes report from 2019-01-01 to 2019-03-31.csv"'
     )
 
     assert response.get_data(as_text=True) == (

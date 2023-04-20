@@ -88,7 +88,7 @@ def test_letter_branding_options_page_when_no_branding_is_set(
     assert button_text == "Continue"
 
     assert [
-        (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
+        (radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip())
         for radio in page.select("input[type=radio]")
     ] == expected_options
 
@@ -111,11 +111,11 @@ def test_letter_branding_options_page_when_branding_is_set_already(
     [
         (
             None,
-            "/services/{}/service-settings".format(SERVICE_ONE_ID),
+            f"/services/{SERVICE_ONE_ID}/service-settings",
         ),
         (
             TEMPLATE_ONE_ID,
-            "/services/{}/templates/{}".format(SERVICE_ONE_ID, TEMPLATE_ONE_ID),
+            f"/services/{SERVICE_ONE_ID}/templates/{TEMPLATE_ONE_ID}",
         ),
     ],
 )

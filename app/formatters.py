@@ -29,33 +29,27 @@ def convert_to_boolean(value):
 
 
 def format_datetime(date):
-    return "{} at {}".format(format_date(date), format_time(date))
+    return f"{format_date(date)} at {format_time(date)}"
 
 
 def format_datetime_24h(date):
-    return "{} at {}".format(
-        format_date(date),
-        format_time_24h(date),
-    )
+    return f"{format_date(date)} at {format_time_24h(date)}"
 
 
 def format_datetime_normal(date):
-    return "{} at {}".format(format_date_normal(date), format_time(date))
+    return f"{format_date_normal(date)} at {format_time(date)}"
 
 
 def format_datetime_short(date):
-    return "{} at {}".format(format_date_short(date), format_time(date))
+    return f"{format_date_short(date)} at {format_time(date)}"
 
 
 def format_datetime_relative(date):
-    return "{} at {}".format(get_human_day(date), format_time(date))
+    return f"{get_human_day(date)} at {format_time(date)}"
 
 
 def format_datetime_numeric(date):
-    return "{} {}".format(
-        format_date_numeric(date),
-        format_time_24h(date),
-    )
+    return f"{format_date_numeric(date)} {format_time_24h(date)}"
 
 
 def format_date_numeric(date):
@@ -84,10 +78,7 @@ def get_human_day(time, date_prefix=""):
             _format_datetime_short(date),
             date.strftime("%Y"),
         ).strip()
-    return "{} {}".format(
-        date_prefix,
-        _format_datetime_short(date),
-    ).strip()
+    return f"{date_prefix} {_format_datetime_short(date)}".strip()
 
 
 def format_time(date):
@@ -118,10 +109,7 @@ def format_date_human(date):
 
 
 def format_datetime_human(date, date_prefix=""):
-    return "{} at {}".format(
-        get_human_day(date, date_prefix="on"),
-        format_time(date),
-    )
+    return f"{get_human_day(date, date_prefix='on')} at {format_time(date)}"
 
 
 def format_day_of_week(date):
@@ -135,7 +123,7 @@ def _format_datetime_short(datetime):
 def naturaltime_without_indefinite_article(date):
     return re.sub(
         "an? (.*) ago",
-        lambda match: "1 {} ago".format(match.group(1)),
+        lambda match: f"1 {match.group(1)} ago",
         humanize.naturaltime(date),
     )
 
@@ -215,7 +203,7 @@ def format_notification_status(status, template_type):
 
 
 def format_notification_status_as_time(status, created, updated):
-    return dict.fromkeys({"created", "pending", "sending"}, " since {}".format(created)).get(status, updated)
+    return dict.fromkeys({"created", "pending", "sending"}, f" since {created}").get(status, updated)
 
 
 def format_notification_status_as_field_status(status, notification_type):
@@ -307,7 +295,7 @@ def linkable_name(value):
 
 def format_thousands(value):
     if isinstance(value, Number):
-        return "{:,.0f}".format(value)
+        return f"{value:,.0f}"
     if value is None:
         return ""
     return value

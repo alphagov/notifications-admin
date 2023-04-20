@@ -35,7 +35,7 @@ class UserApiClient(NotifyAdminAPIClient):
 
     @cache.set("user-{user_id}")
     def _get_user(self, user_id):
-        return self.get("/user/{}".format(user_id))
+        return self.get(f"/user/{user_id}")
 
     def get_user_by_email(self, email_address):
         user_data = self.post("/user/email", data={"email": email_address})
@@ -54,33 +54,33 @@ class UserApiClient(NotifyAdminAPIClient):
         data = dict(kwargs)
         disallowed_attributes = set(data.keys()) - ALLOWED_ATTRIBUTES
         if disallowed_attributes:
-            raise TypeError("Not allowed to update user attributes: {}".format(", ".join(disallowed_attributes)))
+            raise TypeError(f"Not allowed to update user attributes: {', '.join(disallowed_attributes)}")
 
-        url = "/user/{}".format(user_id)
+        url = f"/user/{user_id}"
         user_data = self.post(url, data=data)
         return user_data["data"]
 
     @cache.delete("user-{user_id}")
     def archive_user(self, user_id):
-        return self.post("/user/{}/archive".format(user_id), data=None)
+        return self.post(f"/user/{user_id}/archive", data=None)
 
     @cache.delete("user-{user_id}")
     def reset_failed_login_count(self, user_id):
-        url = "/user/{}/reset-failed-login-count".format(user_id)
+        url = f"/user/{user_id}/reset-failed-login-count"
         user_data = self.post(url, data={})
         return user_data["data"]
 
     @cache.delete("user-{user_id}")
     def update_password(self, user_id, password):
         data = {"_password": password}
-        url = "/user/{}/update-password".format(user_id)
+        url = f"/user/{user_id}/update-password"
         user_data = self.post(url, data=data)
         return user_data["data"]
 
     @cache.delete("user-{user_id}")
     def verify_password(self, user_id, password):
         try:
-            url = "/user/{}/verify/password".format(user_id)
+            url = f"/user/{user_id}/verify/password"
             data = {"password": password}
             self.post(url, data=data)
             return True
@@ -94,7 +94,7 @@ class UserApiClient(NotifyAdminAPIClient):
             data["next"] = next_string
         if code_type == "email":
             data["email_auth_link_host"] = self.admin_url
-        endpoint = "/user/{0}/{1}-code".format(user_id, code_type)
+        endpoint = f"/user/{user_id}/{code_type}-code"
         self.post(endpoint, data=data)
 
     def send_verify_email(self, user_id, to):
@@ -102,18 +102,18 @@ class UserApiClient(NotifyAdminAPIClient):
             "to": to,
             "admin_base_url": self.admin_url,
         }
-        endpoint = "/user/{0}/email-verification".format(user_id)
+        endpoint = f"/user/{user_id}/email-verification"
         self.post(endpoint, data=data)
 
     def send_already_registered_email(self, user_id, to):
         data = {"email": to}
-        endpoint = "/user/{0}/email-already-registered".format(user_id)
+        endpoint = f"/user/{user_id}/email-already-registered"
         self.post(endpoint, data=data)
 
     @cache.delete("user-{user_id}")
     def check_verify_code(self, user_id, code, code_type):
         data = {"code_type": code_type, "code": code}
-        endpoint = "/user/{}/verify/code".format(user_id)
+        endpoint = f"/user/{user_id}/verify/code"
         try:
             self.post(endpoint, data=data)
             return True, ""
@@ -135,11 +135,11 @@ class UserApiClient(NotifyAdminAPIClient):
             raise e
 
     def get_users_for_service(self, service_id):
-        endpoint = "/service/{}/users".format(service_id)
+        endpoint = f"/service/{service_id}/users"
         return self.get(endpoint)["data"]
 
     def get_users_for_organisation(self, org_id):
-        endpoint = "/organisations/{}/users".format(org_id)
+        endpoint = f"/organisations/{org_id}/users"
         return self.get(endpoint)["data"]
 
     @cache.delete("service-{service_id}")
@@ -147,7 +147,7 @@ class UserApiClient(NotifyAdminAPIClient):
     @cache.delete("user-{user_id}")
     def add_user_to_service(self, service_id, user_id, permissions, folder_permissions):
         # permissions passed in are the combined UI permissions, not DB permissions
-        endpoint = "/service/{}/users/{}".format(service_id, user_id)
+        endpoint = f"/service/{service_id}/users/{user_id}"
         data = {
             "permissions": [{"permission": x} for x in translate_permissions_from_ui_to_db(permissions)],
             "folder_permissions": folder_permissions,
@@ -157,7 +157,7 @@ class UserApiClient(NotifyAdminAPIClient):
 
     @cache.delete("user-{user_id}")
     def add_user_to_organisation(self, org_id, user_id):
-        resp = self.post("/organisations/{}/users/{}".format(org_id, user_id), data={})
+        resp = self.post(f"/organisations/{org_id}/users/{user_id}", data={})
         return resp["data"]
 
     @cache.delete("service-{service_id}-template-folders")
@@ -171,7 +171,7 @@ class UserApiClient(NotifyAdminAPIClient):
         if folder_permissions is not None:
             data["folder_permissions"] = folder_permissions
 
-        endpoint = "/user/{}/service/{}/permission".format(user_id, service_id)
+        endpoint = f"/user/{user_id}/service/{service_id}/permission"
         self.post(endpoint, data=data)
 
     def send_reset_password_url(self, email_address, next_string=None):
@@ -192,15 +192,15 @@ class UserApiClient(NotifyAdminAPIClient):
 
     @cache.delete("user-{user_id}")
     def activate_user(self, user_id):
-        return self.post("/user/{}/activate".format(user_id), data=None)
+        return self.post(f"/user/{user_id}/activate", data=None)
 
     def send_change_email_verification(self, user_id, new_email):
-        endpoint = "/user/{}/change-email-verification".format(user_id)
+        endpoint = f"/user/{user_id}/change-email-verification"
         data = {"email": new_email}
         self.post(endpoint, data)
 
     def get_organisations_and_services_for_user(self, user_id):
-        endpoint = "/user/{}/organisations-and-services".format(user_id)
+        endpoint = f"/user/{user_id}/organisations-and-services"
         return self.get(endpoint)
 
     def get_webauthn_credentials_for_user(self, user_id):

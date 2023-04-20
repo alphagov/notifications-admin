@@ -10,7 +10,7 @@ from app.models.service import Service
 
 class TemplateTypeConverter(BaseConverter):
 
-    regex = "(?:{})".format("|".join(Service.TEMPLATE_TYPES))
+    regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)})"
 
 
 class TicketTypeConverter(BaseConverter):

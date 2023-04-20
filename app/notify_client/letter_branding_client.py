@@ -4,7 +4,7 @@ from app.notify_client import NotifyAdminAPIClient, cache
 class LetterBrandingClient(NotifyAdminAPIClient):
     @cache.set("letter_branding-{branding_id}")
     def get_letter_branding(self, branding_id):
-        return self.get(url="/letter-branding/{}".format(branding_id))
+        return self.get(url=f"/letter-branding/{branding_id}")
 
     @cache.set("letter_branding")
     def get_all_letter_branding(self):

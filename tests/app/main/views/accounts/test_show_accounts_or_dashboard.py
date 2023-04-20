@@ -7,8 +7,8 @@ from tests import user_json
 def user_with_orgs_and_services(num_orgs, num_services, platform_admin=False):
     return user_json(
         name="leo",
-        organisations=["org{}".format(i) for i in range(1, num_orgs + 1)],
-        services=["service{}".format(i) for i in range(1, num_services + 1)],
+        organisations=[f"org{i}" for i in range(1, num_orgs + 1)],
+        services=[f"service{i}" for i in range(1, num_services + 1)],
         platform_admin=platform_admin,
     )
 

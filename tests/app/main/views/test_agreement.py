@@ -177,7 +177,7 @@ def test_download_service_agreement(
     if expected_file_served:
         assert response.get_data() == b"foo"
         assert response.headers["Content-Type"] == "application/pdf"
-        assert response.headers["Content-Disposition"] == ('attachment; filename="{}"'.format(expected_file_served))
+        assert response.headers["Content-Disposition"] == f'attachment; filename="{expected_file_served}"'
         mock_get_s3_object.assert_called_once_with("test-mou", expected_file_fetched)
     else:
         assert not expected_file_fetched

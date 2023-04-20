@@ -23,7 +23,7 @@ ZENDESK_API_KEY = os.environ.get("ZENDESK_API_KEY")
 
 def get_tickets():
     ZENDESK_TICKET_URL = "https://govuk.zendesk.com/api/v2/search.json?query={}"
-    query_params = "type:ticket group:{}".format(NOTIFY_GROUP_ID)
+    query_params = f"type:ticket group:{NOTIFY_GROUP_ID}"
     query_params = urllib.parse.quote(query_params)
 
     next_page = ZENDESK_TICKET_URL.format(query_params)
@@ -43,7 +43,7 @@ def get_tickets():
             response = requests.get(
                 next_page,
                 headers={"Content-type": "application/json"},
-                auth=("{}/token".format(NOTIFY_ZENDESK_EMAIL), ZENDESK_API_KEY),
+                auth=(f"{NOTIFY_ZENDESK_EMAIL}/token", ZENDESK_API_KEY),
             )
             data = response.json()
             print(data)
@@ -69,7 +69,7 @@ def get_tickets():
 
 def get_tickets_without_service_id():
     ZENDESK_TICKET_URL = "https://govuk.zendesk.com/api/v2/search.json?query={}"
-    query_params = "type:ticket group:{}".format(NOTIFY_GROUP_ID)
+    query_params = f"type:ticket group:{NOTIFY_GROUP_ID}"
     query_params = urllib.parse.quote(query_params)
 
     next_page = ZENDESK_TICKET_URL.format(query_params)
@@ -87,7 +87,7 @@ def get_tickets_without_service_id():
             response = requests.get(
                 next_page,
                 headers={"Content-type": "application/json"},
-                auth=("{}/token".format(NOTIFY_ZENDESK_EMAIL), ZENDESK_API_KEY),
+                auth=(f"{NOTIFY_ZENDESK_EMAIL}/token", ZENDESK_API_KEY),
             )
             data = response.json()
             print(data)
@@ -112,7 +112,7 @@ def get_tickets_without_service_id():
 
 def get_tickets_with_description():
     ZENDESK_TICKET_URL = "https://govuk.zendesk.com/api/v2/search.json?query={}"
-    query_params = "type:ticket group:{}, created>2019-07-01".format(NOTIFY_GROUP_ID)
+    query_params = f"type:ticket group:{NOTIFY_GROUP_ID}, created>2019-07-01"
     query_params = urllib.parse.quote(query_params)
 
     next_page = ZENDESK_TICKET_URL.format(query_params)
@@ -131,7 +131,7 @@ def get_tickets_with_description():
             response = requests.get(
                 next_page,
                 headers={"Content-type": "application/json"},
-                auth=("{}/token".format(NOTIFY_ZENDESK_EMAIL), ZENDESK_API_KEY),
+                auth=(f"{NOTIFY_ZENDESK_EMAIL}/token", ZENDESK_API_KEY),
             )
             data = response.json()
             print(data)

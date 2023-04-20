@@ -115,7 +115,7 @@ def get_human_day(time, prefix_today_with="T"):
     #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
     time = (time - timedelta(hours=1)).strftime("%A")
     if time == datetime.utcnow().strftime("%A"):
-        return "{}oday".format(prefix_today_with)
+        return f"{prefix_today_with}oday"
     if time == (datetime.utcnow() + timedelta(days=1)).strftime("%A"):
         return "Tomorrow"
     return time
@@ -1002,7 +1002,7 @@ class RenameOrganisationForm(StripWhitespaceForm):
 class AddGPOrganisationForm(StripWhitespaceForm):
     def __init__(self, *args, service_name="unknown", **kwargs):
         super().__init__(*args, **kwargs)
-        self.same_as_service_name.label.text = "Is your GP practice called ‘{}’?".format(service_name)
+        self.same_as_service_name.label.text = f"Is your GP practice called ‘{service_name}’?"
         self.service_name = service_name
 
     def get_organisation_name(self):
@@ -1622,7 +1622,7 @@ class ServiceLetterContactBlockForm(StripWhitespaceForm):
     def validate_letter_contact_block(self, field):
         line_count = field.data.strip().count("\n")
         if line_count >= 10:
-            raise ValidationError("Contains {} lines, maximum is 10".format(line_count + 1))
+            raise ValidationError(f"Contains {line_count + 1} lines, maximum is 10")
 
 
 class OnOffSettingForm(StripWhitespaceForm):

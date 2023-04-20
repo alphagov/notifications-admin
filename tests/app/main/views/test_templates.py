@@ -872,7 +872,7 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
 
         mock_s3_upload.assert_called_once_with(
             file_contents,
-            file_location="service-{}/{}.pdf".format(SERVICE_ONE_ID, fake_uuid),
+            file_location=f"service-{SERVICE_ONE_ID}/{fake_uuid}.pdf",
             status="invalid",
             page_count=1,
             filename="tests/test_pdf_files/one_page_pdf.pdf",

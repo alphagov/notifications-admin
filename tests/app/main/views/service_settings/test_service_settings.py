@@ -814,7 +814,7 @@ def test_show_switch_service_to_count_as_live_page(
         service_id=SERVICE_ONE_ID,
     )
     assert page.select_one("[checked]")["value"] == selected
-    assert page.select_one("label[for={}]".format(page.select_one("[checked]")["id"])).text.strip() == labelled
+    assert page.select_one(f"label[for={page.select_one('[checked]')['id']}]").text.strip() == labelled
 
 
 @pytest.mark.parametrize(
@@ -911,7 +911,7 @@ def test_should_check_if_estimated_volumes_provided(
 
     for volume, channel in zip(volumes, ("sms", "email", "letter")):
         mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
+            f"app.models.service.Service.volume_{channel}",
             create=True,
             new_callable=PropertyMock,
             return_value=volume,
@@ -968,7 +968,7 @@ def test_should_check_for_reply_to_on_go_live(
 
     for channel, volume in (("email", volume_email), ("sms", 0), ("letter", 1)):
         mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
+            f"app.models.service.Service.volume_{channel}",
             create=True,
             new_callable=PropertyMock,
             return_value=volume,
@@ -1093,7 +1093,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
 
     for channel in ("email", "sms", "letter"):
         mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
+            f"app.models.service.Service.volume_{channel}",
             create=True,
             new_callable=PropertyMock,
             return_value=0,
@@ -1259,7 +1259,7 @@ def test_should_check_for_sms_sender_on_go_live(
 
     for channel, volume in (("email", 0), ("sms", estimated_sms_volume)):
         mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
+            f"app.models.service.Service.volume_{channel}",
             create=True,
             new_callable=PropertyMock,
             return_value=volume,
@@ -1316,7 +1316,7 @@ def test_should_check_for_mou_on_request_to_go_live(
     )
     for channel in {"email", "sms", "letter"}:
         mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
+            f"app.models.service.Service.volume_{channel}",
             create=True,
             new_callable=PropertyMock,
             return_value=None,
@@ -1364,7 +1364,7 @@ def test_gp_without_organisation_is_shown_agreement_step(
     )
     for channel in {"email", "sms", "letter"}:
         mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
+            f"app.models.service.Service.volume_{channel}",
             create=True,
             new_callable=PropertyMock,
             return_value=None,
@@ -1452,7 +1452,7 @@ def test_should_show_estimate_volumes(
 ):
     for channel, volume in volumes:
         mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
+            f"app.models.service.Service.volume_{channel}",
             create=True,
             new_callable=PropertyMock,
             return_value=volume,
@@ -1485,9 +1485,9 @@ def test_should_show_estimate_volumes(
             displayed_volumes[2],
         ),
     ):
-        assert normalize_spaces(page.select_one("label[for=volume_{}]".format(channel)).text) == label
-        assert normalize_spaces(page.select_one("#volume_{}-hint".format(channel)).text) == hint
-        assert page.select_one("#volume_{}".format(channel)).get("value") == value
+        assert normalize_spaces(page.select_one(f"label[for=volume_{channel}]").text) == label
+        assert normalize_spaces(page.select_one(f"#volume_{channel}-hint").text) == hint
+        assert page.select_one(f"#volume_{channel}").get("value") == value
 
     assert len(page.select("input[type=radio]")) == 2
 
@@ -1826,7 +1826,7 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
 ):
     for channel in {"email", "sms", "letter"}:
         mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
+            f"app.models.service.Service.volume_{channel}",
             create=True,
             new_callable=PropertyMock,
             return_value=1,
@@ -2013,9 +2013,7 @@ def test_ready_to_go_live(
         "shouldnt_use_govuk_as_sms_sender",
         "sms_sender_is_govuk",
     }:
-        mocker.patch("app.models.service.Service.{}".format(prop), new_callable=PropertyMock).return_value = locals()[
-            prop
-        ]
+        mocker.patch(f"app.models.service.Service.{prop}", new_callable=PropertyMock).return_value = locals()[prop]
 
     for channel, volume in (
         ("sms", volume_sms),
@@ -2023,7 +2021,7 @@ def test_ready_to_go_live(
         ("letter", volume_letter),
     ):
         mocker.patch(
-            "app.models.service.Service.volume_{}".format(channel),
+            f"app.models.service.Service.volume_{channel}",
             create=True,
             new_callable=PropertyMock,
             return_value=volume,
@@ -2418,7 +2416,7 @@ def test_add_reply_to_email_address_sends_test_notification(
             service_id=SERVICE_ONE_ID,
             notification_id="123",
         )
-        + "?is_default={}".format(api_default_args),
+        + f"?is_default={api_default_args}",
     )
     mock_verify.assert_called_once_with(SERVICE_ONE_ID, "test@example.com")
 
@@ -2487,9 +2485,9 @@ def test_service_verify_reply_to_address(
         "main.service_verify_reply_to_address",
         service_id=SERVICE_ONE_ID,
         notification_id=notification["id"],
-        _optional_args="?is_default={}{}".format(is_default, replace),
+        _optional_args=f"?is_default={is_default}{replace}",
     )
-    assert page.select_one("h1").text == "{} email reply-to address".format(expected_header)
+    assert page.select_one("h1").text == f"{expected_header} email reply-to address"
     back_link = page.select_one(".govuk-back-link")
     assert back_link.text.strip() == "Back"
     if replace:
@@ -2535,7 +2533,7 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_se
         "main.service_verify_reply_to_address",
         service_id=SERVICE_ONE_ID,
         notification_id=notification["id"],
-        _optional_args="?is_default={}".format(False),
+        _optional_args=f"?is_default={False}",
     )
     expected_banner = page.select_one("div.banner-dangerous")
     assert "There’s a problem with your reply-to address" in expected_banner.text.strip()
@@ -4354,7 +4352,7 @@ def test_archive_service_after_confirm(
         _follow_redirects=True,
     )
 
-    mock_api.assert_called_once_with("/service/{}/archive".format(SERVICE_ONE_ID), data=None)
+    mock_api.assert_called_once_with(f"/service/{SERVICE_ONE_ID}/archive", data=None)
     mock_event.assert_called_once_with(service_id=SERVICE_ONE_ID, archived_by_id=user["id"])
 
     assert normalize_spaces(page.select_one("h1").text) == "Choose service"
@@ -5210,7 +5208,7 @@ def test_select_organisation(
 
     assert len(page.select(".govuk-radios__item")) == 3
     for i in range(0, 3):
-        assert normalize_spaces(page.select(".govuk-radios__item label")[i].text) == "Org {}".format(i + 1)
+        assert normalize_spaces(page.select(".govuk-radios__item label")[i].text) == f"Org {i + 1}"
 
 
 def test_select_organisation_shows_message_if_no_orgs(

@@ -215,7 +215,7 @@ class User(BaseUser, UserMixin):
     def has_permissions(self, *permissions, restrict_admin_usage=False, allow_org_user=False):
         unknown_permissions = set(permissions) - all_ui_permissions
         if unknown_permissions:
-            raise TypeError("{} are not valid permissions".format(list(unknown_permissions)))
+            raise TypeError(f"{list(unknown_permissions)} are not valid permissions")
 
         # Service id is always set on the request for service specific views.
         service_id = _get_service_id_from_view_args()

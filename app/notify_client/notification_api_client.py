@@ -39,11 +39,11 @@ class NotificationApiClient(NotifyAdminAPIClient):
         kwargs = {"data": params} if to else {"params": params}
 
         if job_id:
-            return method(url="/service/{}/job/{}/notifications".format(service_id, job_id), **kwargs)
+            return method(url=f"/service/{service_id}/job/{job_id}/notifications", **kwargs)
         else:
             if limit_days is not None:
                 params["limit_days"] = limit_days
-            return method(url="/service/{}/notifications".format(service_id), **kwargs)
+            return method(url=f"/service/{service_id}/notifications", **kwargs)
 
     def send_notification(self, service_id, *, template_id, recipient, personalisation, sender_id):
         data = {
@@ -54,15 +54,15 @@ class NotificationApiClient(NotifyAdminAPIClient):
         if sender_id:
             data["sender_id"] = sender_id
         data = _attach_current_user(data)
-        return self.post(url="/service/{}/send-notification".format(service_id), data=data)
+        return self.post(url=f"/service/{service_id}/send-notification", data=data)
 
     def send_precompiled_letter(self, service_id, filename, file_id, postage, recipient_address):
         data = {"filename": filename, "file_id": file_id, "postage": postage, "recipient_address": recipient_address}
         data = _attach_current_user(data)
-        return self.post(url="/service/{}/send-pdf-letter".format(service_id), data=data)
+        return self.post(url=f"/service/{service_id}/send-pdf-letter", data=data)
 
     def get_notification(self, service_id, notification_id):
-        return self.get(url="/service/{}/notifications/{}".format(service_id, notification_id))
+        return self.get(url=f"/service/{service_id}/notifications/{notification_id}")
 
     def get_api_notifications_for_service(self, service_id):
         ret = self.get_notifications_for_service(
@@ -90,7 +90,7 @@ class NotificationApiClient(NotifyAdminAPIClient):
         return self.get(url=get_url)
 
     def update_notification_to_cancelled(self, service_id, notification_id):
-        return self.post(url="/service/{}/notifications/{}/cancel".format(service_id, notification_id), data={})
+        return self.post(url=f"/service/{service_id}/notifications/{notification_id}/cancel", data={})
 
     def get_notification_status_by_service(self, start_date, end_date):
         return self.get(
@@ -102,7 +102,7 @@ class NotificationApiClient(NotifyAdminAPIClient):
         )
 
     def get_notification_count_for_job_id(self, *, service_id, job_id):
-        return self.get(url="/service/{}/job/{}/notification_count".format(service_id, job_id))["count"]
+        return self.get(url=f"/service/{service_id}/job/{job_id}/notification_count")["count"]
 
 
 notification_api_client = NotificationApiClient()

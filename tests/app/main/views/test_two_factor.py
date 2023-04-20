@@ -75,7 +75,7 @@ def test_should_login_user_and_should_redirect_to_next_url(
 
     client_request.post(
         "main.two_factor_sms",
-        next="/services/{}".format(SERVICE_ONE_ID),
+        next=f"/services/{SERVICE_ONE_ID}",
         _data={"sms_code": "12345"},
         _expected_redirect=url_for(
             "main.service_dashboard",

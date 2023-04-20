@@ -74,7 +74,7 @@ def test_post_upload_letter_redirects_for_valid_file(
 
     mock_s3_upload.assert_called_once_with(
         b"The sanitised content",
-        file_location="service-{}/{}.pdf".format(SERVICE_ONE_ID, fake_uuid),
+        file_location=f"service-{SERVICE_ONE_ID}/{fake_uuid}.pdf",
         status="valid",
         page_count=1,
         filename="tests/test_pdf_files/one_page_pdf.pdf",
@@ -364,7 +364,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
 
         mock_s3_upload.assert_called_once_with(
             file_contents,
-            file_location="service-{}/{}.pdf".format(SERVICE_ONE_ID, fake_uuid),
+            file_location=f"service-{SERVICE_ONE_ID}/{fake_uuid}.pdf",
             status="invalid",
             page_count=1,
             filename="tests/test_pdf_files/one_page_pdf.pdf",

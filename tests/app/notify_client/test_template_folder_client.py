@@ -12,7 +12,7 @@ def test_create_template_folder_calls_correct_api_endpoint(mocker, parent_id):
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
 
     some_service_id = uuid.uuid4()
-    expected_url = "/service/{}/template-folder".format(some_service_id)
+    expected_url = f"/service/{some_service_id}/template-folder"
     data = {"name": "foo", "parent_id": parent_id}
 
     client = TemplateFolderAPIClient()
@@ -22,7 +22,7 @@ def test_create_template_folder_calls_correct_api_endpoint(mocker, parent_id):
     client.create_template_folder(some_service_id, name="foo", parent_id=parent_id)
 
     mock_post.assert_called_once_with(expected_url, data)
-    mock_redis_delete.assert_called_once_with("service-{}-template-folders".format(some_service_id))
+    mock_redis_delete.assert_called_once_with(f"service-{some_service_id}-template-folders")
 
 
 def test_get_template_folders_calls_correct_api_endpoint(mocker):
@@ -33,8 +33,8 @@ def test_get_template_folders_calls_correct_api_endpoint(mocker):
     )
 
     some_service_id = uuid.uuid4()
-    expected_url = "/service/{}/template-folder".format(some_service_id)
-    redis_key = "service-{}-template-folders".format(some_service_id)
+    expected_url = f"/service/{some_service_id}/template-folder"
+    redis_key = f"service-{some_service_id}-template-folders"
 
     client = TemplateFolderAPIClient()
 
@@ -63,7 +63,7 @@ def test_move_templates_and_folders(mocker):
     )
 
     mock_api_post.assert_called_once_with(
-        "/service/{}/template-folder/{}/contents".format(some_service_id, some_folder_id),
+        f"/service/{some_service_id}/template-folder/{some_folder_id}/contents",
         {
             "folders": ["1", "2", "3"],
             "templates": ["a", "b", "c"],
@@ -75,8 +75,8 @@ def test_move_templates_and_folders(mocker):
             f"service-{some_service_id}-template-b-version-None",
             f"service-{some_service_id}-template-c-version-None",
         ),
-        call("service-{}-templates".format(some_service_id)),
-        call("service-{}-template-folders".format(some_service_id)),
+        call(f"service-{some_service_id}-templates"),
+        call(f"service-{some_service_id}-template-folders"),
     ]
 
 
@@ -94,7 +94,7 @@ def test_move_templates_and_folders_to_root(mocker):
     )
 
     mock_api_post.assert_called_once_with(
-        "/service/{}/template-folder/contents".format(some_service_id),
+        f"/service/{some_service_id}/template-folder/contents",
         {
             "folders": ["1", "2", "3"],
             "templates": ["a", "b", "c"],
@@ -107,7 +107,7 @@ def test_update_template_folder_calls_correct_api_endpoint(mocker):
 
     some_service_id = uuid.uuid4()
     template_folder_id = uuid.uuid4()
-    expected_url = "/service/{}/template-folder/{}".format(some_service_id, template_folder_id)
+    expected_url = f"/service/{some_service_id}/template-folder/{template_folder_id}"
     data = {"name": "foo", "users_with_permission": ["some_id"]}
 
     client = TemplateFolderAPIClient()
@@ -117,7 +117,7 @@ def test_update_template_folder_calls_correct_api_endpoint(mocker):
     client.update_template_folder(some_service_id, template_folder_id, name="foo", users_with_permission=["some_id"])
 
     mock_post.assert_called_once_with(expected_url, data)
-    mock_redis_delete.assert_called_once_with("service-{}-template-folders".format(some_service_id))
+    mock_redis_delete.assert_called_once_with(f"service-{some_service_id}-template-folders")
 
 
 def test_delete_template_folder_calls_correct_api_endpoint(mocker):
@@ -125,7 +125,7 @@ def test_delete_template_folder_calls_correct_api_endpoint(mocker):
 
     some_service_id = uuid.uuid4()
     template_folder_id = uuid.uuid4()
-    expected_url = "/service/{}/template-folder/{}".format(some_service_id, template_folder_id)
+    expected_url = f"/service/{some_service_id}/template-folder/{template_folder_id}"
 
     client = TemplateFolderAPIClient()
 
@@ -134,4 +134,4 @@ def test_delete_template_folder_calls_correct_api_endpoint(mocker):
     client.delete_template_folder(some_service_id, template_folder_id)
 
     mock_delete.assert_called_once_with(expected_url, {})
-    mock_redis_delete.assert_called_once_with("service-{}-template-folders".format(some_service_id))
+    mock_redis_delete.assert_called_once_with(f"service-{some_service_id}-template-folders")

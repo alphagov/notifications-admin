@@ -7,7 +7,7 @@ from app.notify_client.billing_api_client import BillingAPIClient
 
 def test_get_free_sms_fragment_limit_for_year_correct_endpoint(mocker, api_user_active):
     service_id = uuid.uuid4()
-    expected_url = "/service/{}/billing/free-sms-fragment-limit".format(service_id)
+    expected_url = f"/service/{service_id}/billing/free-sms-fragment-limit"
     client = BillingAPIClient()
 
     mock_get = mocker.patch("app.notify_client.billing_api_client.BillingAPIClient.get")
@@ -24,9 +24,7 @@ def test_post_free_sms_fragment_limit_for_current_year_endpoint(mocker, api_user
 
     client.create_or_update_free_sms_fragment_limit(service_id=service_id, free_sms_fragment_limit=1111)
 
-    mock_post.assert_called_once_with(
-        url="/service/{}/billing/free-sms-fragment-limit".format(service_id), data=sms_limit_data
-    )
+    mock_post.assert_called_once_with(url=f"/service/{service_id}/billing/free-sms-fragment-limit", data=sms_limit_data)
 
 
 def test_post_free_sms_fragment_limit_for_year_endpoint(mocker, api_user_active):
@@ -36,9 +34,7 @@ def test_post_free_sms_fragment_limit_for_year_endpoint(mocker, api_user_active)
     client = BillingAPIClient()
 
     client.create_or_update_free_sms_fragment_limit(service_id=service_id, free_sms_fragment_limit=1111, year=2017)
-    mock_post.assert_called_once_with(
-        url="/service/{}/billing/free-sms-fragment-limit".format(service_id), data=sms_limit_data
-    )
+    mock_post.assert_called_once_with(url=f"/service/{service_id}/billing/free-sms-fragment-limit", data=sms_limit_data)
 
 
 @pytest.mark.parametrize(

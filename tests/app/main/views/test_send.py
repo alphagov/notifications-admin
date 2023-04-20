@@ -364,7 +364,7 @@ def test_upload_files_in_different_formats(
     else:
         assert not mock_s3_upload.called
         assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-            "Could not read {}. Try using a different file format.".format(filename)
+            f"Could not read {filename}. Try using a different file format."
         )
         assert f"{filename} persisted in S3 as {sample_uuid()}" not in [r.message for r in caplog.records]
         assert f"Could not read {filename}" in [r.message for r in caplog.records]
@@ -2463,9 +2463,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
 
     mocker.patch(
         "app.main.views.send.s3download",
-        return_value="\n".join(
-            ["phone number"] + ["07700 9007{0:02d}".format(final_two) for final_two in range(0, 53)]
-        ),
+        return_value="\n".join(["phone number"] + [f"07700 9007{final_two:02d}" for final_two in range(0, 53)]),
     )
     mock_get_notification_count = mocker.patch("app.service_api_client.get_notification_count", return_value=0)
     page = client_request.post(

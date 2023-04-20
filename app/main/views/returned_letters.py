@@ -65,6 +65,6 @@ def returned_letters_report(service_id, reported_at):
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": 'inline; filename="{} returned letters.csv"'.format(reported_at),
+            "Content-Disposition": f'inline; filename="{reported_at} returned letters.csv"',
         },
     )

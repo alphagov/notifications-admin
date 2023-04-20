@@ -245,7 +245,7 @@ def get_name_of_decorator_from_ast_node(node):
         return get_name_of_decorator_from_ast_node(node.func)
     if isinstance(node, ast.Attribute):
         return node.value.id
-    return "{}.{}".format(node.func.value.id, node.func.attr)
+    return f"{node.func.value.id}.{node.func.attr}"
 
 
 def get_decorators_for_function(function):
@@ -269,11 +269,11 @@ def get_routes_and_decorators(argument_name=None):
                 if "main.route" in decorators and (
                     not argument_name or argument_name in inspect.signature(function).parameters.keys()
                 ):
-                    yield "{}.{}".format(module_name, function_name), decorators
+                    yield f"{module_name}.{function_name}", decorators
 
 
 def format_decorators(decorators, indent=8):
-    return "\n".join("{}@{}".format(" " * indent, decorator) for decorator in decorators)
+    return "\n".join(f"{' ' * indent}@{decorator}" for decorator in decorators)
 
 
 def test_code_to_extract_decorators_works_with_known_examples():

@@ -23,5 +23,5 @@ def generate_previous_next_dict(view, service_id, page, title, url_args):
     return {
         "url": url_for(view, service_id=service_id, page=page, **url_args),
         "title": title,
-        "label": "page {}".format(page),
+        "label": f"page {page}",
     }

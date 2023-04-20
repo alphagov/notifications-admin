@@ -115,7 +115,7 @@ class LogoClient:
         # TaggingDirective='REPLACE' here will strip all tags from the S3 object - ie removes the 'delete-after-7-days'
         # tag, so this new version won't get cleaned up by our lifecycle policy.
         self._get_object(permanent_logo_key).copy_from(
-            CopySource="{}/{}".format(self.bucket_name, temporary_logo_key), TaggingDirective="REPLACE"
+            CopySource=f"{self.bucket_name}/{temporary_logo_key}", TaggingDirective="REPLACE"
         )
 
         return permanent_logo_key
