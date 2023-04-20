@@ -1,3 +1,4 @@
+import base64
 import uuid
 from functools import partial
 from io import BytesIO
@@ -45,7 +46,9 @@ from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
 from app.s3_client.s3_letter_upload_client import (
+    backup_original_letter_to_s3,
     get_transient_letter_file_location,
+    upload_letter_attachment_to_s3,
     upload_letter_to_s3,
 )
 from app.template_previews import (
@@ -947,6 +950,7 @@ def letter_template_attach_pages(service_id, template_id):
             )
 
         upload_id = uuid.uuid4()
+        file_location = get_transient_letter_file_location(service_id, upload_id)
 
         try:
             response = sanitise_letter(
@@ -958,7 +962,6 @@ def letter_template_attach_pages(service_id, template_id):
             response.raise_for_status()
         except RequestException as ex:
             if ex.response is not None and ex.response.status_code == 400:
-                file_location = get_transient_letter_file_location(service_id, upload_id)
                 validation_failed_message = response.json().get("message")
                 invalid_pages = response.json().get("invalid_pages")
 
@@ -979,9 +982,26 @@ def letter_template_attach_pages(service_id, template_id):
 
             raise
 
-        # TODO in next PR: upload letter to S3
         template_page_count = get_page_count_for_letter(template)
         if attachment_page_count + template_page_count <= 10:
+
+            response_json = response.json()
+            page_count = response_json["page_count"]
+            file_contents = base64.b64decode(response_json["file"].encode())
+
+            upload_letter_attachment_to_s3(
+                file_contents,
+                file_location=file_location,
+                page_count=page_count,
+                original_filename=original_filename,
+            )
+
+            # we've changed fonts and cmyk, so retain original in case we need to investigate errors
+            backup_original_letter_to_s3(
+                file_contents,
+                upload_id=upload_id,
+            )
+
             pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
             flash(f"You have attached {pages_content} to the end of your letter", "default_with_tick")
 

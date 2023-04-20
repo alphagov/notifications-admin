@@ -935,25 +935,25 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
-    mocker.patch(
+    mock_sanitise = mocker.patch(
         "app.main.views.templates.sanitise_letter",
         return_value=Mock(
             content="The sanitised content",
-            json=lambda: {"file": "VGhlIHNhbml0aXNlZCBjb250ZW50"},
+            json=lambda: {"file": "VGhlIHNhbml0aXNlZCBjb250ZW50", "page_count": page_count},
         ),
     )
 
-    # page count for letter template
+    # page count for letter template on redirect page
     mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
 
     # page count for the attachment
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
     mocker.patch("app.service_api_client.get_letter_contacts", return_value=[])
 
-    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
-        file.read()
-        file.seek(0)
+    mock_upload = mocker.patch("app.main.views.templates.upload_letter_attachment_to_s3")
+    mock_backup = mocker.patch("app.main.views.templates.backup_original_letter_to_s3")
 
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         page = client_request.post(
             "main.letter_template_attach_pages",
             service_id=SERVICE_ONE_ID,
@@ -965,6 +965,14 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     assert normalize_spaces(page.select(".banner-default-with-tick")[0].text) == (
         f"You have attached {expected_pages_content} to the end of your letter"
     )
+    upload_id = mock_sanitise.call_args[1]["upload_id"]
+    mock_upload.assert_called_once_with(
+        b"The sanitised content",
+        file_location=f"service-{SERVICE_ONE_ID}/{upload_id}.pdf",
+        page_count=page_count,
+        original_filename="tests/test_pdf_files/one_page_pdf.pdf",
+    )
+    mock_backup.assert_called_once_with(b"The sanitised content", upload_id=upload_id)
 
 
 def test_edit_letter_template_postage_page_displays_correctly(
