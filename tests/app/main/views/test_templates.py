@@ -912,7 +912,8 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
         )
 
     assert page.select_one(".banner-dangerous h1").text == (
-        "Letters must be 10 pages or less (5 double-sided sheets of paper). Your letter is 19 pages long."
+        "Letters must be 10 pages or less (5 double-sided sheets of paper). "
+        "In total, your letter template and the file you attached are 19 pages long."
     )
     assert page.select_one("form").attrs["action"] == url_for(
         "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=sample_uuid()

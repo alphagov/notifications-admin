@@ -13,7 +13,6 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
-from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
 from notifications_utils.pdf import is_letter_too_long, pdf_page_count
@@ -996,11 +995,9 @@ def letter_template_attach_pages(service_id, template_id):
             )
 
         form.file.errors.append(
-            Markup(
-                get_letter_validation_error("letter-too-long", page_count=template_page_count + attachment_page_count)[
-                    "detail"
-                ]
-            )
+            "Letters must be 10 pages or less (5 double-sided sheets of paper). "
+            "In total, your letter template and the file you attached are "
+            f"{template_page_count + attachment_page_count} pages long."
         )
 
     if form.file.errors:
