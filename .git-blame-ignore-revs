@@ -2,3 +2,6 @@
 8a9ee35a0a4d9e1f8a8547af382ff4db630ddd5f
 508d2d2568fa116ab65a5de56284c6bb6c4e46a5
 13422afdfbe9ae9c52100b49d069be4fcdcd3182
+
+# Ignore bulk reformatting to f-strings from flynt
+fa3c94d74db7f03f33837595633ff04b405d1abe
