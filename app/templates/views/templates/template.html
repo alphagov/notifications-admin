@@ -44,7 +44,7 @@
     {% include 'views/templates/_template.html' %}
   </div>
 
-  {% if template.template_type == "letter" and show_attach_pages_button %}
+  {% if show_attach_pages_button %}
     <div class="govuk-!-margin-bottom-3">
       {{ govukButton({
       "element": "a",
