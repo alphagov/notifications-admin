@@ -11,9 +11,7 @@
 {% endblock %}
 
 {% block backLink %}
-{% if not error %}
-{{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
-{% endif %}
+    {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
