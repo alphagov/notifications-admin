@@ -18,12 +18,14 @@
 
 {% block maincolumn_content %}
     {% if error %}
-        {% call banner_wrapper(type='dangerous') %}
-            <h1 class="banner-title">{{ error.title }}</h1>
-            {% if error.detail %}
-                <p class="govuk-body">{{ error.detail | safe }}</p>
-            {% endif %}
-        {% endcall %}
+        <div class="govuk-!-margin-bottom-4">
+            {% call banner_wrapper(type='dangerous') %}
+                <h1 class="banner-title">{{ error.title }}</h1>
+                {% if error.detail %}
+                    <p class="govuk-body">{{ error.detail | safe }}</p>
+                {% endif %}
+            {% endcall %}
+        </div>
     {% else %}
         {{ page_header(page_title) }}
     {% endif %}
