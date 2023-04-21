@@ -953,11 +953,14 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     mock_upload = mocker.patch("app.main.views.templates.upload_letter_attachment_to_s3")
     mock_backup = mocker.patch("app.main.views.templates.backup_original_letter_to_s3")
 
+    mock_save_to_db = mocker.patch("app.letter_attachment_client.create_letter_attachment")
+
+    template_id = sample_uuid()
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         page = client_request.post(
             "main.letter_template_attach_pages",
             service_id=SERVICE_ONE_ID,
-            template_id=sample_uuid(),
+            template_id=template_id,
             _data={"file": file},
             _follow_redirects=True,
         )
@@ -973,6 +976,12 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
         original_filename="tests/test_pdf_files/one_page_pdf.pdf",
     )
     mock_backup.assert_called_once_with(b"The sanitised content", upload_id=upload_id)
+    mock_save_to_db.assert_called_once_with(
+        upload_id=upload_id,
+        template_id=template_id,
+        page_count=page_count,
+        original_filename="tests/test_pdf_files/one_page_pdf.pdf",
+    )
 
 
 def test_edit_letter_template_postage_page_displays_correctly(

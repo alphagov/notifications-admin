@@ -100,6 +100,7 @@ from app.notify_client.events_api_client import events_api_client
 from app.notify_client.inbound_number_client import inbound_number_client
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.job_api_client import job_api_client
+from app.notify_client.letter_attachment_client import letter_attachment_client
 from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.letter_jobs_client import letter_jobs_client
 from app.notify_client.notification_api_client import notification_api_client
@@ -180,6 +181,7 @@ def create_app(application):
         inbound_number_client,
         invite_api_client,
         job_api_client,
+        letter_attachment_client,
         letter_branding_client,
         letter_jobs_client,
         notification_api_client,

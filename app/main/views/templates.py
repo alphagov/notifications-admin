@@ -23,6 +23,7 @@ from requests import RequestException
 from app import (
     current_service,
     format_delta,
+    letter_attachment_client,
     nl2br,
     service_api_client,
     template_folder_api_client,
@@ -1000,6 +1001,13 @@ def letter_template_attach_pages(service_id, template_id):
             backup_original_letter_to_s3(
                 file_contents,
                 upload_id=upload_id,
+            )
+
+            letter_attachment_client.create_letter_attachment(
+                upload_id=upload_id,
+                original_filename=original_filename,
+                page_count=page_count,
+                template_id=template_id,
             )
 
             pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
