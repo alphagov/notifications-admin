@@ -41,7 +41,7 @@ def simplify_geometry(feature):
     elif feature["type"] == "MultiPolygon":
         return [polygon for polygon, *_holes in feature["coordinates"]]
     else:
-        raise Exception("Unknown type: {}".format(feature["type"]))
+        raise Exception(f"Unknown type: {feature['type']}")
 
 
 def clean_up_invalid_polygons(polygons, indent="    "):

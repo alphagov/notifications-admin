@@ -25,7 +25,7 @@ def test_invite_org_user(
 
     mock_invite_org_user.assert_called_once_with(
         sample_org_invite["invited_by"],
-        "{}".format(ORGANISATION_ID),
+        f"{ORGANISATION_ID}",
         "test@example.gov.uk",
     )
 

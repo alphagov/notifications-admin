@@ -30,7 +30,7 @@ class TemplatePreview:
                 "?page={}".format(page) if page else "",
             ),
             json=data,
-            headers={"Authorization": "Token {}".format(current_app.config["TEMPLATE_PREVIEW_API_KEY"])},
+            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
@@ -43,7 +43,7 @@ class TemplatePreview:
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"], "?hide_notify=true" if page == "1" else ""
             ),
             data=base64.b64encode(pdf_page).decode("utf-8"),
-            headers={"Authorization": "Token {}".format(current_app.config["TEMPLATE_PREVIEW_API_KEY"])},
+            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
@@ -56,7 +56,7 @@ class TemplatePreview:
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"], "?page_number={}".format(page)
             ),
             data=pdf_page,
-            headers={"Authorization": "Token {}".format(current_app.config["TEMPLATE_PREVIEW_API_KEY"])},
+            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
@@ -69,9 +69,9 @@ class TemplatePreview:
             "filename": filename,
         }
         resp = requests.post(
-            "{}/preview.png".format(current_app.config["TEMPLATE_PREVIEW_API_HOST"]),
+            f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.png",
             json=data,
-            headers={"Authorization": "Token {}".format(current_app.config["TEMPLATE_PREVIEW_API_KEY"])},
+            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
@@ -107,5 +107,5 @@ def sanitise_letter(pdf_file, *, upload_id, allow_international_letters, is_an_a
     return requests.post(
         url,
         data=pdf_file,
-        headers={"Authorization": "Token {}".format(current_app.config["TEMPLATE_PREVIEW_API_KEY"])},
+        headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
     )

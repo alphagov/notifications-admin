@@ -146,7 +146,7 @@ def send_messages(service_id, template_id):
             )
         except (UnicodeDecodeError, BadZipFile, XLRDError):
             current_app.logger.warning("Could not read %s", form.file.data.filename, exc_info=True)
-            flash("Could not read {}. Try using a different file format.".format(form.file.data.filename))
+            flash(f"Could not read {form.file.data.filename}. Try using a different file format.")
         except XLDateError:
             current_app.logger.warning("Could not parse numbers/dates in %s", form.file.data.filename, exc_info=True)
             flash(
@@ -184,7 +184,7 @@ def get_example_csv(service_id, template_id):
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": 'inline; filename="{}.csv"'.format(template.name),
+            "Content-Disposition": f'inline; filename="{template.name}.csv"',
         },
     )
 
@@ -845,7 +845,7 @@ def all_placeholders_in_session(placeholders):
 
 def get_send_test_page_title(template_type, entering_recipient, name=None):
     if entering_recipient:
-        return "Send ‘{}’".format(name)
+        return f"Send ‘{name}’"
     return "Personalise this message"
 
 
@@ -893,7 +893,7 @@ def get_skip_link(step_index, template):
         and current_user.has_permissions("manage_templates", "manage_service")
     ):
         return (
-            "Use my {}".format(first_column_headings[template.template_type][0]),
+            f"Use my {first_column_headings[template.template_type][0]}",
             url_for(".send_one_off_to_myself", service_id=current_service.id, template_id=template.id),
         )
 
@@ -1026,9 +1026,7 @@ def send_notification(service_id, template_id):
             sender_id=session.get("sender_id", None),
         )
     except HTTPError as exception:
-        current_app.logger.info(
-            'Service {} could not send notification: "{}"'.format(current_service.id, exception.message)
-        )
+        current_app.logger.info(f'Service {current_service.id} could not send notification: "{exception.message}"')
         return render_template(
             "views/notifications/check.html",
             **_check_notification(service_id, template_id, exception),

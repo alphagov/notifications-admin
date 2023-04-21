@@ -588,7 +588,7 @@ def test_get_manage_folder_page(
     assert page.select_one("input[name=name]")["value"] == "folder_two"
     delete_link = page.select_one("a.govuk-link--destructive")
     assert normalize_spaces(delete_link.text) == "Delete this folder"
-    expected_delete_url = "/services/{}/templates/folders/{}/delete".format(service_one["id"], folder_id)
+    expected_delete_url = f"/services/{service_one['id']}/templates/folders/{folder_id}/delete"
     assert expected_delete_url in delete_link["href"]
 
 
@@ -1025,7 +1025,7 @@ def test_should_show_checkboxes_for_selecting_templates(
     assert len(checkboxes) == 4
 
     assert checkboxes[0]["value"] == TEMPLATE_ONE_ID
-    assert checkboxes[0]["id"] == "templates-or-folder-{}".format(TEMPLATE_ONE_ID)
+    assert checkboxes[0]["id"] == f"templates-or-folder-{TEMPLATE_ONE_ID}"
 
     for index in (1, 2, 3):
         assert checkboxes[index]["value"] != TEMPLATE_ONE_ID
@@ -1386,7 +1386,7 @@ def test_no_action_if_user_fills_in_ambiguous_fields(
     assert mock_move_to_template_folder.called is False
     assert mock_create_template_folder.called is False
 
-    assert page.select_one("button[value={}]".format(data["operation"]))
+    assert page.select_one(f"button[value={data['operation']}]")
 
     assert [
         "email",

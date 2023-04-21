@@ -414,7 +414,7 @@ def test_navigation_items_are_properly_defined(navigation_instance):
         )
         assert (
             navigation_instance.endpoints_with_navigation.count(endpoint) == 1
-        ), "{} found more than once in {}.mapping".format(endpoint, type(navigation_instance).__name__)
+        ), f"{endpoint} found more than once in {type(navigation_instance).__name__}.mapping"
 
 
 def test_excluded_endpoints_are_all_found_in_app():
@@ -515,13 +515,13 @@ def test_navigation_urls(
 ):
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
     assert [a["href"] for a in page.select(".navigation a")] == [
-        "/services/{}".format(SERVICE_ONE_ID),
-        "/services/{}/templates".format(SERVICE_ONE_ID),
-        "/services/{}/uploads".format(SERVICE_ONE_ID),
-        "/services/{}/users".format(SERVICE_ONE_ID),
-        "/services/{}/usage".format(SERVICE_ONE_ID),
-        "/services/{}/service-settings".format(SERVICE_ONE_ID),
-        "/services/{}/api".format(SERVICE_ONE_ID),
+        f"/services/{SERVICE_ONE_ID}",
+        f"/services/{SERVICE_ONE_ID}/templates",
+        f"/services/{SERVICE_ONE_ID}/uploads",
+        f"/services/{SERVICE_ONE_ID}/users",
+        f"/services/{SERVICE_ONE_ID}/usage",
+        f"/services/{SERVICE_ONE_ID}/service-settings",
+        f"/services/{SERVICE_ONE_ID}/api",
     ]
 
 
@@ -538,11 +538,11 @@ def test_navigation_for_services_with_broadcast_permission(
 
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
     assert [a["href"] for a in page.select(".navigation a")] == [
-        "/services/{}/current-alerts".format(SERVICE_ONE_ID),
-        "/services/{}/past-alerts".format(SERVICE_ONE_ID),
-        "/services/{}/rejected-alerts".format(SERVICE_ONE_ID),
-        "/services/{}/templates".format(SERVICE_ONE_ID),
-        "/services/{}/users".format(SERVICE_ONE_ID),
+        f"/services/{SERVICE_ONE_ID}/current-alerts",
+        f"/services/{SERVICE_ONE_ID}/past-alerts",
+        f"/services/{SERVICE_ONE_ID}/rejected-alerts",
+        f"/services/{SERVICE_ONE_ID}/templates",
+        f"/services/{SERVICE_ONE_ID}/users",
     ]
 
 
@@ -559,13 +559,13 @@ def test_navigation_for_services_with_broadcast_permission_platform_admin(
     client_request.login(platform_admin_user)
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
     assert [a["href"] for a in page.select(".navigation a")] == [
-        "/services/{}/current-alerts".format(SERVICE_ONE_ID),
-        "/services/{}/past-alerts".format(SERVICE_ONE_ID),
-        "/services/{}/rejected-alerts".format(SERVICE_ONE_ID),
-        "/services/{}/templates".format(SERVICE_ONE_ID),
-        "/services/{}/users".format(SERVICE_ONE_ID),
-        "/services/{}/service-settings".format(SERVICE_ONE_ID),
-        "/services/{}/api/keys".format(SERVICE_ONE_ID),
+        f"/services/{SERVICE_ONE_ID}/current-alerts",
+        f"/services/{SERVICE_ONE_ID}/past-alerts",
+        f"/services/{SERVICE_ONE_ID}/rejected-alerts",
+        f"/services/{SERVICE_ONE_ID}/templates",
+        f"/services/{SERVICE_ONE_ID}/users",
+        f"/services/{SERVICE_ONE_ID}/service-settings",
+        f"/services/{SERVICE_ONE_ID}/api/keys",
     ]
 
 

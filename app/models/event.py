@@ -37,7 +37,7 @@ class ServiceCreationEvent(Event):
     relevant = True
 
     def __str__(self):
-        return "Created this service and called it ‘{}’".format(self.item["name"])
+        return f"Created this service and called it ‘{self.item['name']}’"
 
 
 class ServiceEvent(Event):
@@ -50,7 +50,7 @@ class ServiceEvent(Event):
 
     @property
     def _formatter(self):
-        return getattr(self, "format_{}".format(self.key), None)
+        return getattr(self, f"format_{self.key}", None)
 
     def format_restricted(self):
         if self.value_to is False:
@@ -65,7 +65,7 @@ class ServiceEvent(Event):
             return "Unsuspended this service"
 
     def format_contact_link(self):
-        return "Set the contact details for this service to ‘{}’".format(self.value_to)
+        return f"Set the contact details for this service to ‘{self.value_to}’"
 
     def format_message_limit(self):
         return "{} this service’s daily message limit from {} to {}".format(
@@ -96,7 +96,7 @@ class ServiceEvent(Event):
         )
 
     def format_name(self):
-        return "Renamed this service from ‘{}’ to ‘{}’".format(self.value_from, self.value_to)
+        return f"Renamed this service from ‘{self.value_from}’ to ‘{self.value_to}’"
 
     def format_permissions(self):
         added = list(sorted(set(self.value_to) - set(self.value_from)))
@@ -107,9 +107,9 @@ class ServiceEvent(Event):
                 formatted_list(added),
             )
         if added:
-            return "Added {} to this service’s permissions".format(formatted_list(added))
+            return f"Added {formatted_list(added)} to this service’s permissions"
         if removed:
-            return "Removed {} from this service’s permissions".format(formatted_list(removed))
+            return f"Removed {formatted_list(removed)} from this service’s permissions"
 
     def format_prefix_sms(self):
         if self.value_to is True:
@@ -130,9 +130,9 @@ class APIKeyEvent(Event):
 
     def __str__(self):
         if self.item["updated_at"]:
-            return "Revoked the ‘{}’ API key".format(self.item["name"])
+            return f"Revoked the ‘{self.item['name']}’ API key"
         else:
-            return "Created an API key called ‘{}’".format(self.item["name"])
+            return f"Created an API key called ‘{self.item['name']}’"
 
 
 class APIKeyEvents(ModelList):

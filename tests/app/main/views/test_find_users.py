@@ -289,7 +289,7 @@ def test_archive_user_posts_to_user_client(
         ),
     )
 
-    mock_user_client.assert_called_once_with("/user/{}/archive".format(api_user_active["id"]), data=None)
+    mock_user_client.assert_called_once_with(f"/user/{api_user_active['id']}/archive", data=None)
 
     assert mock_events.called
 

@@ -85,7 +85,7 @@ def test_email_branding_options_page_when_no_branding_is_set(
     button_text = normalize_spaces(page.select_one(".page-footer button").text)
 
     assert [
-        (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
+        (radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip())
         for radio in page.select("input[type=radio]")
     ] == [(EmailBranding.NHS_ID, "NHS"), ("something_else", "Something else")]
 
@@ -153,7 +153,7 @@ def test_email_branding_options_page_shows_branding_pool_options_if_branding_poo
     page = client_request.get(".email_branding_options", service_id=SERVICE_ONE_ID)
 
     assert [
-        (radio["value"], page.select_one("label[for={}]".format(radio["id"])).text.strip())
+        (radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip())
         for radio in page.select("input[type=radio]")
     ] == expected_options
 

@@ -121,7 +121,7 @@ def test_static_pages(
     mock_get_organisation_by_domain,
     view,
 ):
-    request = partial(client_request.get, "main.{}".format(view))
+    request = partial(client_request.get, f"main.{view}")
 
     # Check the page loads when user is signed in
     page = request()

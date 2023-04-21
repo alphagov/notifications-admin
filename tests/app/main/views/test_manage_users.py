@@ -1724,7 +1724,7 @@ def test_edit_user_email_page(
     page = client_request.get("main.edit_user_email", service_id=service_one["id"], user_id=sample_uuid())
 
     assert page.select_one("h1").text == "Change team member’s email address"
-    assert page.select("p[id=user_name]")[0].text == "This will change the email address for {}.".format(user["name"])
+    assert page.select("p[id=user_name]")[0].text == f"This will change the email address for {user['name']}."
     assert page.select("input[type=email]")[0].attrs["value"] == user["email_address"]
     assert normalize_spaces(page.select("form button")[0].text) == "Save"
 
@@ -1759,7 +1759,7 @@ def test_edit_user_email_redirects_to_confirmation(
         ),
     )
     with client_request.session_transaction() as session:
-        assert session["team_member_email_change-{}".format(active_user_with_permissions["id"])] == "test@user.gov.uk"
+        assert session[f"team_member_email_change-{active_user_with_permissions['id']}"] == "test@user.gov.uk"
 
 
 def test_edit_user_email_without_changing_goes_back_to_team_members(
@@ -1850,7 +1850,7 @@ def test_edit_user_email_cannot_change_a_gov_email_address_to_a_non_gov_email_ad
     )
     assert "Enter a public sector email address" in page.select_one(".govuk-error-message").text
     with client_request.session_transaction() as session:
-        assert "team_member_email_change-{}".format(active_user_with_permissions["id"]) not in session
+        assert f"team_member_email_change-{active_user_with_permissions['id']}" not in session
 
 
 def test_confirm_edit_user_email_page(
@@ -1861,7 +1861,7 @@ def test_confirm_edit_user_email_page(
 ):
     new_email = "new_email@gov.uk"
     with client_request.session_transaction() as session:
-        session["team_member_email_change-{}".format(active_user_with_permissions["id"])] = new_email
+        session[f"team_member_email_change-{active_user_with_permissions['id']}"] = new_email
 
     page = client_request.get(
         "main.confirm_edit_user_email",
@@ -1873,7 +1873,7 @@ def test_confirm_edit_user_email_page(
     for text in [
         "New email address:",
         new_email,
-        "We will send {} an email to tell them about the change.".format(active_user_with_permissions["name"]),
+        f"We will send {active_user_with_permissions['name']} an email to tell them about the change.",
     ]:
         assert text in page.text
     assert "Confirm" in page.text
@@ -1924,7 +1924,7 @@ def test_confirm_edit_user_email_changes_user_email(
 
     new_email = "new_email@gov.uk"
     with client_request.session_transaction() as session:
-        session["team_member_email_change-{}".format(api_user_active["id"])] = new_email
+        session[f"team_member_email_change-{api_user_active['id']}"] = new_email
 
     client_request.post(
         "main.confirm_edit_user_email",
@@ -2077,7 +2077,7 @@ def test_confirm_edit_user_mobile_number_page(
     for text in [
         "New mobile number:",
         new_number,
-        "We will send {} a text message to tell them about the change.".format(active_user_with_permissions["name"]),
+        f"We will send {active_user_with_permissions['name']} a text message to tell them about the change.",
     ]:
         assert text in page.text
     assert "Confirm" in page.text

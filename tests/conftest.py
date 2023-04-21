@@ -650,7 +650,7 @@ def mock_update_service(mocker):
 @pytest.fixture(scope="function")
 def mock_update_service_raise_httperror_duplicate_name(mocker):
     def _update(service_id, **kwargs):
-        json_mock = Mock(return_value={"message": {"name": ["Duplicate service name '{}'".format(kwargs.get("name"))]}})
+        json_mock = Mock(return_value={"message": {"name": [f"Duplicate service name '{kwargs.get('name')}'"]}})
         resp_mock = Mock(status_code=400, json=json_mock)
         http_error = HTTPError(response=resp_mock, message="Default message")
         raise http_error
@@ -961,10 +961,10 @@ def create_service_templates(service_id, number_of_templates=6):
             template_json(
                 service_id=service_id,
                 id_=TEMPLATE_ONE_ID if _ == 1 else str(generate_uuid()),
-                name="{}_template_{}".format(template_type, template_number),
+                name=f"{template_type}_template_{template_number}",
                 type_=template_type,
-                content="{} template {} content".format(template_type, template_number),
-                subject="{} template {} subject".format(template_type, template_number)
+                content=f"{template_type} template {template_number} content",
+                subject=f"{template_type} template {template_number} subject"
                 if template_type in ["email", "letter"]
                 else None,
             )
@@ -1577,8 +1577,8 @@ def mock_get_jobs(mocker, api_user_active, fake_uuid):
         return {
             "data": [job for job in jobs if job["job_status"] in statuses],
             "links": {
-                "prev": "services/{}/jobs?page={}".format(service_id, page - 1),
-                "next": "services/{}/jobs?page={}".format(service_id, page + 1),
+                "prev": f"services/{service_id}/jobs?page={page - 1}",
+                "next": f"services/{service_id}/jobs?page={page + 1}",
             },
         }
 
@@ -1635,8 +1635,8 @@ def mock_get_uploads(mocker, api_user_active):
         return {
             "data": uploads,
             "links": {
-                "prev": "services/{}/uploads?page={}".format(service_id, page - 1),
-                "next": "services/{}/uploads?page={}".format(service_id, page + 1),
+                "prev": f"services/{service_id}/uploads?page={page - 1}",
+                "next": f"services/{service_id}/uploads?page={page + 1}",
             },
         }
 
@@ -1737,8 +1737,8 @@ def mock_get_uploaded_letters(mocker):
             "notifications": uploads,
             "total": 1234,
             "links": {
-                "prev": "services/{}/uploads?page={}".format(service_id, page - 1),
-                "next": "services/{}/uploads?page={}".format(service_id, page + 1),
+                "prev": f"services/{service_id}/uploads?page={page - 1}",
+                "next": f"services/{service_id}/uploads?page={page + 1}",
             },
         }
 
@@ -2134,7 +2134,7 @@ def mock_get_invites_for_service(mocker, service_one, sample_invite):
         data = []
         for i in range(0, 5):
             invite = copy.copy(sample_invite)
-            invite["email_address"] = "user_{}@testnotify.gov.uk".format(i)
+            invite["email_address"] = f"user_{i}@testnotify.gov.uk"
             data.append(invite)
         return data
 
@@ -2434,10 +2434,10 @@ def create_email_brandings(number_of_brandings, non_standard_values=None, shuffl
     brandings = [
         {
             "id": str(idx),
-            "name": "org {}".format(idx),
-            "text": "org {}".format(idx),
+            "name": f"org {idx}",
+            "text": f"org {idx}",
             "colour": None,
-            "logo": "logo{}.png".format(idx),
+            "logo": f"logo{idx}.png",
             "brand_type": "org",
         }
         for idx in range(1, number_of_brandings + 1)
@@ -3356,7 +3356,7 @@ def mock_get_invites_for_organisation(mocker, sample_org_invite):
         data = []
         for i in range(0, 5):
             invite = copy.copy(sample_org_invite)
-            invite["email_address"] = "user_{}@testnotify.gov.uk".format(i)
+            invite["email_address"] = f"user_{i}@testnotify.gov.uk"
             data.append(invite)
         return data
 
@@ -3429,7 +3429,7 @@ def mock_get_non_empty_organisations_and_services_for_user(mocker, organisation_
     def _make_services(name, trial_mode=False):
         return [
             {
-                "name": "{} {}".format(name, i),
+                "name": f"{name} {i}",
                 "id": SERVICE_TWO_ID,
                 "restricted": trial_mode,
                 "organisation": None,
@@ -3471,7 +3471,7 @@ def mock_get_just_services_for_user(mocker, organisation_one, api_user_active):
     def _make_services(name, trial_mode=False):
         return [
             {
-                "name": "{} {}".format(name, i + 1),
+                "name": f"{name} {i + 1}",
                 "id": id,
                 "restricted": trial_mode,
                 "organisation": None,

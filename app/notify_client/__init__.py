@@ -26,9 +26,9 @@ class NotifyAdminAPIClient(BaseAPIClient):
     def generate_headers(self, api_token):
         headers = {
             "Content-type": "application/json",
-            "Authorization": "Bearer {}".format(api_token),
+            "Authorization": f"Bearer {api_token}",
             "X-Custom-Forwarder": self.route_secret,
-            "User-agent": "NOTIFY-API-PYTHON-CLIENT/{}".format(__version__),
+            "User-agent": f"NOTIFY-API-PYTHON-CLIENT/{__version__}",
         }
         return self._add_request_id_header(headers)
 

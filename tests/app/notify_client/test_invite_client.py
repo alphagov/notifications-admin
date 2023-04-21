@@ -34,7 +34,7 @@ def test_client_creates_invite(
     invite_api_client.create_invite("12345", "67890", "test@example.com", {"send_messages"}, "sms_auth", [fake_uuid])
 
     mock_post.assert_called_once_with(
-        url="/service/{}/invite".format("67890"),
+        url="/service/67890/invite",
         data={
             "auth_type": "sms_auth",
             "email_address": "test@example.com",
@@ -79,7 +79,7 @@ def test_client_returns_invite(mocker, sample_invite):
 
     expected_data = {"data": [sample_invite]}
 
-    expected_url = "/service/{}/invite".format(service_id)
+    expected_url = f"/service/{service_id}/invite"
 
     mock_get = mocker.patch("app.notify_client.invite_api_client.InviteApiClient.get", return_value=expected_data)
 

@@ -89,7 +89,7 @@ def invite_user(service_id, user_id=None):
             form.folder_permissions.data,
         )
 
-        flash("Invite sent to {}".format(invited_user.email_address), "default_with_tick")
+        flash(f"Invite sent to {invited_user.email_address}", "default_with_tick")
         return redirect(url_for(".manage_users", service_id=service_id))
 
     return render_template(
@@ -156,7 +156,7 @@ def remove_user_from_service(service_id, user_id):
 def edit_user_email(service_id, user_id):
     user = current_service.get_team_member(user_id)
     user_email = user.email_address
-    session_key = "team_member_email_change-{}".format(user_id)
+    session_key = f"team_member_email_change-{user_id}"
 
     if is_gov_user(user_email):
         form = ChangeEmailForm(User.already_registered, email_address=user_email)
@@ -178,7 +178,7 @@ def edit_user_email(service_id, user_id):
 @user_has_permissions("manage_service")
 def confirm_edit_user_email(service_id, user_id):
     user = current_service.get_team_member(user_id)
-    session_key = "team_member_email_change-{}".format(user_id)
+    session_key = f"team_member_email_change-{user_id}"
     if session_key in session:
         new_email = session[session_key]
     else:

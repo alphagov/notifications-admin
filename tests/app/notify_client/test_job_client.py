@@ -15,7 +15,7 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
 
     expected_data = {"id": job_id, "created_by": "1"}
 
-    expected_url = "/service/{}/job".format(service_id)
+    expected_url = f"/service/{service_id}/job"
 
     client = JobApiClient()
     mock_post = mocker.patch(
@@ -26,7 +26,7 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
     client.create_job(service_id, job_id)
     mock_post.assert_called_once_with(url=expected_url, data=expected_data)
     mock_redis_set.assert_called_once_with(
-        "has_jobs-{}".format(service_id),
+        f"has_jobs-{service_id}",
         b"true",
         ex=604800,
     )
@@ -62,7 +62,7 @@ def test_client_gets_job_by_service_and_job(mocker):
     service_id = "service_id"
     job_id = "job_id"
 
-    expected_url = "/service/{}/job/{}".format(service_id, job_id)
+    expected_url = f"/service/{service_id}/job/{job_id}"
 
     client = JobApiClient()
     mock_get = mocker.patch("app.notify_client.job_api_client.JobApiClient.get")
@@ -122,7 +122,7 @@ def test_client_parses_job_stats(mocker):
         }
     }
 
-    expected_url = "/service/{}/job/{}".format(service_id, job_id)
+    expected_url = f"/service/{service_id}/job/{job_id}"
 
     mock_get = mocker.patch("app.notify_client.job_api_client.JobApiClient.get", return_value=expected_data)
 
@@ -159,7 +159,7 @@ def test_client_parses_empty_job_stats(mocker):
         }
     }
 
-    expected_url = "/service/{}/job/{}".format(service_id, job_id)
+    expected_url = f"/service/{service_id}/job/{job_id}"
 
     mock_get = mocker.patch("app.notify_client.job_api_client.JobApiClient.get", return_value=expected_data)
 
@@ -235,7 +235,7 @@ def test_client_parses_job_stats_for_service(mocker):
         ]
     }
 
-    expected_url = "/service/{}/job".format(service_id)
+    expected_url = f"/service/{service_id}/job"
 
     mock_get = mocker.patch("app.notify_client.job_api_client.JobApiClient.get", return_value=expected_data)
 
@@ -299,7 +299,7 @@ def test_client_parses_empty_job_stats_for_service(mocker):
         ]
     }
 
-    expected_url = "/service/{}/job".format(service_id)
+    expected_url = f"/service/{service_id}/job"
 
     mock_get = mocker.patch("app.notify_client.job_api_client.JobApiClient.get", return_value=expected_data)
 
@@ -323,7 +323,7 @@ def test_cancel_job(mocker):
 
     JobApiClient().cancel_job("service_id", "job_id")
 
-    mock_post.assert_called_once_with(url="/service/{}/job/{}/cancel".format("service_id", "job_id"), data={})
+    mock_post.assert_called_once_with(url="/service/service_id/job/job_id/cancel", data={})
 
 
 @pytest.mark.parametrize(
@@ -350,9 +350,9 @@ def test_has_jobs_sets_cache(
 
     JobApiClient().has_jobs(fake_uuid)
 
-    mock_get.assert_called_once_with(url="/service/{}/job".format(fake_uuid), params={"page": 1})
+    mock_get.assert_called_once_with(url=f"/service/{fake_uuid}/job", params={"page": 1})
     mock_redis_set.assert_called_once_with(
-        "has_jobs-{}".format(fake_uuid),
+        f"has_jobs-{fake_uuid}",
         expected_cache_value,
         ex=604800,
     )
@@ -379,4 +379,4 @@ def test_has_jobs_returns_from_cache(
 
     assert JobApiClient().has_jobs(fake_uuid) is return_value
     assert not mock_get.called
-    mock_redis_get.assert_called_once_with("has_jobs-{}".format(fake_uuid))
+    mock_redis_get.assert_called_once_with(f"has_jobs-{fake_uuid}")

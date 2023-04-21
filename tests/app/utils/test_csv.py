@@ -31,9 +31,9 @@ def _get_notifications_csv(
         links = {}
         if with_links:
             links = {
-                "prev": "/service/{}/notifications?page=0".format(service_id),
-                "next": "/service/{}/notifications?page=1".format(service_id),
-                "last": "/service/{}/notifications?page=2".format(service_id),
+                "prev": f"/service/{service_id}/notifications?page=0",
+                "next": f"/service/{service_id}/notifications?page=1",
+                "last": f"/service/{service_id}/notifications?page=2",
             }
 
         data = {

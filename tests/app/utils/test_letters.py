@@ -83,7 +83,7 @@ def test_get_letter_printing_statement_when_letter_prints_tomorrow(created_at, c
 def test_get_letter_printing_statement_for_letter_that_has_been_sent(created_at, print_day):
     statement = get_letter_printing_statement("delivered", created_at)
 
-    assert statement == "Printed {} at 5:30pm".format(print_day)
+    assert statement == f"Printed {print_day} at 5:30pm"
 
 
 def test_get_letter_validation_error_for_unknown_error():

@@ -405,7 +405,7 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     def _error_response(error_code, error_page_template=None):
         if error_page_template is None:
             error_page_template = error_code
-        resp = make_response(render_template("error/{0}.html".format(error_page_template)), error_code)
+        resp = make_response(render_template(f"error/{error_page_template}.html"), error_code)
         return useful_headers_after_request(resp)
 
     @application.errorhandler(HTTPError)
@@ -458,7 +458,7 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
 
     @application.errorhandler(CSRFError)
     def handle_csrf(reason):
-        application.logger.warning("csrf.error_message: {}".format(reason))
+        application.logger.warning(f"csrf.error_message: {reason}")
 
         if "user_id" not in session:
             application.logger.warning("csrf.session_expired: Redirecting user to log in page")

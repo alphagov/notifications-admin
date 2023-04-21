@@ -21,7 +21,7 @@ class JobApiClient(NotifyAdminAPIClient):
 
     def get_job(self, service_id, job_id):
         params = {}
-        job = self.get(url="/service/{}/job/{}".format(service_id, job_id), params=params)
+        job = self.get(url=f"/service/{service_id}/job/{job_id}", params=params)
 
         return job
 
@@ -34,13 +34,13 @@ class JobApiClient(NotifyAdminAPIClient):
         if contact_list_id is not None:
             params["contact_list_id"] = contact_list_id
 
-        return self.get(url="/service/{}/job".format(service_id), params=params)
+        return self.get(url=f"/service/{service_id}/job", params=params)
 
     def get_uploads(self, service_id, limit_days=None, page=1):
         params = {"page": page}
         if limit_days is not None:
             params["limit_days"] = limit_days
-        return self.get(url="/service/{}/upload".format(service_id), params=params)
+        return self.get(url=f"/service/{service_id}/upload", params=params)
 
     def has_sent_previously(self, service_id, template_id, template_version, original_file_name):
         return (template_id, template_version, original_file_name) in (
@@ -93,10 +93,10 @@ class JobApiClient(NotifyAdminAPIClient):
             data.update({"contact_list_id": contact_list_id})
 
         data = _attach_current_user(data)
-        job = self.post(url="/service/{}/job".format(service_id), data=data)
+        job = self.post(url=f"/service/{service_id}/job", data=data)
 
         redis_client.set(
-            "has_jobs-{}".format(service_id),
+            f"has_jobs-{service_id}",
             b"true",
             ex=int(cache.DEFAULT_TTL),
         )
@@ -105,11 +105,11 @@ class JobApiClient(NotifyAdminAPIClient):
 
     @cache.delete("has_jobs-{service_id}")
     def cancel_job(self, service_id, job_id):
-        return self.post(url="/service/{}/job/{}/cancel".format(service_id, job_id), data={})
+        return self.post(url=f"/service/{service_id}/job/{job_id}/cancel", data={})
 
     @cache.delete("has_jobs-{service_id}")
     def cancel_letter_job(self, service_id, job_id):
-        return self.post(url="/service/{}/job/{}/cancel-letter-job".format(service_id, job_id), data={})
+        return self.post(url=f"/service/{service_id}/job/{job_id}/cancel-letter-job", data={})
 
 
 job_api_client = JobApiClient()

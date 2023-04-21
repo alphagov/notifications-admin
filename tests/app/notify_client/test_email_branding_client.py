@@ -15,10 +15,10 @@ def test_get_email_branding(mocker, fake_uuid):
         "app.extensions.RedisClient.set",
     )
     EmailBrandingClient().get_email_branding(fake_uuid)
-    mock_get.assert_called_once_with(url="/email-branding/{}".format(fake_uuid))
-    mock_redis_get.assert_called_once_with("email_branding-{}".format(fake_uuid))
+    mock_get.assert_called_once_with(url=f"/email-branding/{fake_uuid}")
+    mock_redis_get.assert_called_once_with(f"email_branding-{fake_uuid}")
     mock_redis_set.assert_called_once_with(
-        "email_branding-{}".format(fake_uuid),
+        f"email_branding-{fake_uuid}",
         '{"foo": "bar"}',
         ex=604800,
     )
@@ -98,9 +98,9 @@ def test_update_email_branding(mocker, fake_uuid):
         updated_by_id=org_data["updated_by"],
     )
 
-    mock_post.assert_called_once_with(url="/email-branding/{}".format(fake_uuid), data=org_data)
+    mock_post.assert_called_once_with(url=f"/email-branding/{fake_uuid}", data=org_data)
     assert mock_redis_delete.call_args_list == [
-        call("email_branding-{}".format(fake_uuid)),
+        call(f"email_branding-{fake_uuid}"),
         call("email_branding"),
     ]
     assert mock_redis_delete_by_pattern.call_args_list == [call("organisation-*-email-branding-pool")]

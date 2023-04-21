@@ -29,7 +29,7 @@ class Navigation:
 
     @staticmethod
     def get_endpoint_with_blueprint(endpoint):
-        return endpoint if "." in endpoint else "main.{}".format(endpoint)
+        return endpoint if "." in endpoint else f"main.{endpoint}"
 
 
 class HeaderNavigation(Navigation):

@@ -176,7 +176,7 @@ def download_organisation_usage_report(org_id):
 
     org_usage_data = [list(unit_column_names.values()) + list(monetary_column_names.values())] + [
         [service[attribute] for attribute in unit_column_names.keys()]
-        + ["{:,.2f}".format(service[attribute]) for attribute in monetary_column_names.keys()]
+        + [f"{service[attribute]:,.2f}" for attribute in monetary_column_names.keys()]
         for service in services_usage
     ]
 
@@ -224,7 +224,7 @@ def invite_org_user(org_id):
         email_address = form.email_address.data
         invited_org_user = InvitedOrgUser.create(current_user.id, org_id, email_address)
 
-        flash("Invite sent to {}".format(invited_org_user.email_address), "default_with_tick")
+        flash(f"Invite sent to {invited_org_user.email_address}", "default_with_tick")
         return redirect(url_for(".manage_org_users", org_id=org_id))
 
     return render_template("views/organisations/organisation/users/invite-org-user.html", form=form)

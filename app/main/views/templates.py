@@ -417,7 +417,7 @@ def copy_template(service_id, template_id):
         )
 
     return render_template(
-        "views/edit-{}-template.html".format(template["template_type"]),
+        f"views/edit-{template['template_type']}-template.html",
         form=form,
         template=template,
         heading_action="Add",
@@ -431,13 +431,13 @@ def _get_template_copy_name(template, existing_templates):
     template_names = [existing["name"] for existing in existing_templates]
 
     for index in reversed(range(1, 10)):
-        if "{} (copy {})".format(template["name"], index) in template_names:
-            return "{} (copy {})".format(template["name"], index + 1)
+        if f"{template['name']} (copy {index})" in template_names:
+            return f"{template['name']} (copy {index + 1})"
 
-    if "{} (copy)".format(template["name"]) in template_names:
-        return "{} (copy 2)".format(template["name"])
+    if f"{template['name']} (copy)" in template_names:
+        return f"{template['name']} (copy 2)"
 
-    return "{} (copy)".format(template["name"])
+    return f"{template['name']} (copy)"
 
 
 @main.route(("/services/<uuid:service_id>/templates/action-blocked/" "<template_type:notification_type>/<return_to>"))
@@ -533,7 +533,7 @@ def delete_template_folder(service_id, template_folder_id):
             else:
                 abort(500, e)
     else:
-        flash("Are you sure you want to delete the ‘{}’ folder?".format(template_folder["name"]), "delete")
+        flash(f"Are you sure you want to delete the ‘{template_folder['name']}’ folder?", "delete")
         return manage_template_folder(service_id, template_folder_id)
 
 
@@ -585,7 +585,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             )
 
     return render_template(
-        "views/edit-{}-template.html".format(template_type),
+        f"views/edit-{template_type}-template.html",
         form=form,
         template_type=template_type,
         template_folder_id=template_folder_id,
@@ -658,7 +658,7 @@ def edit_service_template(service_id, template_id):
         )
     else:
         return render_template(
-            "views/edit-{}-template.html".format(template["template_type"]),
+            f"views/edit-{template['template_type']}-template.html",
             form=form,
             template=template,
             heading_action="Edit",
@@ -747,7 +747,7 @@ def delete_service_template(service_id, template_id):
         message = (
             "This template has never been used."
             if not last_used_notification
-            else "This template was last used {}.".format(format_delta(last_used_notification))
+            else f"This template was last used {format_delta(last_used_notification)}."
         )
 
     except HTTPError as e:
@@ -756,7 +756,7 @@ def delete_service_template(service_id, template_id):
         else:
             raise e
 
-    flash(["Are you sure you want to delete ‘{}’?".format(template["name"]), message, template["name"]], "delete")
+    flash([f"Are you sure you want to delete ‘{template['name']}’?", message, template["name"]], "delete")
     return render_template(
         "views/templates/template.html",
         template=get_template(
@@ -937,7 +937,7 @@ def letter_template_attach_pages(service_id, template_id):
             # handles malformed files nicely - is this done yet?
             attachment_page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
-            current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
+            current_app.logger.info(f"Invalid PDF uploaded for service_id: {service_id}")
             return _invalid_upload_error(
                 template_id=template_id,
                 error={

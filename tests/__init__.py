@@ -522,9 +522,9 @@ def notification_json(  # noqa: C901
 
     if with_links:
         links = {
-            "prev": "/service/{}/notifications?page=0".format(service_id),
-            "next": "/service/{}/notifications?page=1".format(service_id),
-            "last": "/service/{}/notifications?page=2".format(service_id),
+            "prev": f"/service/{service_id}/notifications?page=0",
+            "next": f"/service/{service_id}/notifications?page=1",
+            "last": f"/service/{service_id}/notifications?page=2",
         }
 
     job_payload = None
@@ -634,9 +634,9 @@ def validate_route_permission(
             elif method == "POST":
                 resp = client.post(route)
             else:
-                pytest.fail("Invalid method call {}".format(method))
+                pytest.fail(f"Invalid method call {method}")
             if resp.status_code != response_code:
-                pytest.fail("Invalid permissions set for endpoint {}".format(route))
+                pytest.fail(f"Invalid permissions set for endpoint {route}")
     return resp
 
 
@@ -658,9 +658,9 @@ def validate_route_permission_with_client(mocker, client, method, response_code,
     elif method == "POST":
         resp = client.post_response_from_url(route, _expected_status=response_code)
     else:
-        pytest.fail("Invalid method call {}".format(method))
+        pytest.fail(f"Invalid method call {method}")
     if resp.status_code != response_code:
-        pytest.fail("Invalid permissions set for endpoint {}".format(route))
+        pytest.fail(f"Invalid permissions set for endpoint {route}")
     return resp
 
 

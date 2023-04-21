@@ -19,7 +19,7 @@ class ContactListApiClient(NotifyAdminAPIClient):
         }
 
         data = _attach_current_user(data)
-        job = self.post(url="/service/{}/contact-list".format(service_id), data=data)
+        job = self.post(url=f"/service/{service_id}/contact-list", data=data)
 
         return job
 

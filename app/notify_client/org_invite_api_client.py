@@ -14,11 +14,11 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
             "invite_link_host": self.admin_url,
         }
         data = _attach_current_user(data)
-        resp = self.post(url="/organisation/{}/invite".format(org_id), data=data)
+        resp = self.post(url=f"/organisation/{org_id}/invite", data=data)
         return resp["data"]
 
     def get_invites_for_organisation(self, org_id):
-        endpoint = "/organisation/{}/invite".format(org_id)
+        endpoint = f"/organisation/{org_id}/invite"
         resp = self.get(endpoint)
         return resp["data"]
 
@@ -29,17 +29,17 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
         return self.get(f"/invite/organisation/{invited_user_id}")["data"]
 
     def check_token(self, token):
-        resp = self.get(url="/invite/organisation/check/{}".format(token))
+        resp = self.get(url=f"/invite/organisation/check/{token}")
         return resp["data"]
 
     def cancel_invited_user(self, org_id, invited_user_id):
         data = {"status": "cancelled"}
         data = _attach_current_user(data)
-        self.post(url="/organisation/{0}/invite/{1}".format(org_id, invited_user_id), data=data)
+        self.post(url=f"/organisation/{org_id}/invite/{invited_user_id}", data=data)
 
     def accept_invite(self, org_id, invited_user_id):
         data = {"status": "accepted"}
-        self.post(url="/organisation/{0}/invite/{1}".format(org_id, invited_user_id), data=data)
+        self.post(url=f"/organisation/{org_id}/invite/{invited_user_id}", data=data)
 
 
 org_invite_api_client = OrgInviteApiClient()

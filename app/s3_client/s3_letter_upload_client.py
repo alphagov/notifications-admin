@@ -12,7 +12,7 @@ class LetterNotFoundError(Exception):
 
 
 def get_transient_letter_file_location(service_id, upload_id):
-    return "service-{}/{}.pdf".format(service_id, upload_id)
+    return f"service-{service_id}/{upload_id}.pdf"
 
 
 def backup_original_letter_to_s3(

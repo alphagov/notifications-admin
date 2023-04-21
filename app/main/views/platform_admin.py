@@ -105,7 +105,7 @@ def is_over_threshold(number, total, threshold):
 
 def get_status_box_data(stats, key, label, threshold=FAILURE_THRESHOLD):
     return {
-        "number": "{:,}".format(stats["failures"][key]),
+        "number": f"{stats['failures'][key]:,}",
         "label": label,
         "failing": is_over_threshold(stats["failures"][key], stats["total"], threshold),
         "percentage": get_formatted_percentage(stats["failures"][key], stats["total"]),
@@ -200,7 +200,7 @@ def platform_admin_services():
         include_from_test_key=include_from_test_key,
         form=form,
         services=list(format_stats_by_service(services)),
-        page_title="{} services".format("Trial mode" if request.endpoint == "main.trial_services" else "Live"),
+        page_title=f"{'Trial mode' if request.endpoint == 'main.trial_services' else 'Live'} services",
         global_stats=create_global_stats(services),
     )
 
@@ -515,7 +515,7 @@ def get_daily_sms_provider_volumes():
 def platform_admin_list_complaints():
     page = get_page_from_request()
     if page is None:
-        abort(404, "Invalid page argument ({}).".format(request.args.get("page")))
+        abort(404, f"Invalid page argument ({request.args.get('page')}).")
 
     response = complaint_api_client.get_all_complaints(page=page)
 
@@ -552,11 +552,11 @@ def platform_admin_returned_letters():
                 error_references = [
                     re.match("references (.*) does not match", e["message"]).group(1) for e in error.message
                 ]
-                form.references.errors.append("Invalid references: {}".format(", ".join(error_references)))
+                form.references.errors.append(f"Invalid references: {', '.join(error_references)}")
             else:
                 raise error
         else:
-            flash("Submitted {} letter references".format(len(references)), "default")
+            flash(f"Submitted {len(references)} letter references", "default")
             return redirect(url_for(".platform_admin_returned_letters"))
     return render_template(
         "views/platform-admin/returned-letters.html",

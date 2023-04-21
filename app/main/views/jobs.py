@@ -134,7 +134,7 @@ def cancel_letter_job(service_id, job_id):
             flash(e.message, "dangerous")
             return redirect(url_for("main.view_job", service_id=service_id, job_id=job_id))
         flash(
-            "Cancelled {} letters from {}".format(format_thousands(number_of_letters), job.original_file_name),
+            f"Cancelled {format_thousands(number_of_letters)} letters from {job.original_file_name}",
             "default_with_tick",
         )
         return redirect(url_for("main.service_dashboard", service_id=service_id))
@@ -199,7 +199,7 @@ def get_notifications_page_partials_as_json(service_id, message_type=None):
 def _get_notifications_dashboard_partials_data(service_id, message_type):
     page = get_page_from_request()
     if page is None:
-        abort(404, "Invalid page argument ({}).".format(request.args.get("page")))
+        abort(404, f"Invalid page argument ({request.args.get('page')}).")
     filter_args = parse_filter_args(request.args)
     filter_args["status"] = set_status_filters(filter_args)
     service_data_retention_days = None

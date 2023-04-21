@@ -361,7 +361,7 @@ def yyyy_mm_to_datetime(string):
 def aggregate_status_types(counts_dict):
     return get_dashboard_totals(
         {
-            "{}_counts".format(message_type): {
+            f"{message_type}_counts": {
                 "failed": sum(stats.get(status, 0) for status in FAILURE_STATUSES),
                 "requested": sum(stats.get(status, 0) for status in REQUESTED_STATUSES),
             }
@@ -459,7 +459,7 @@ def get_tuples_of_financial_years(
             "financial year",
             year,
             partial_url(year=year),
-            "{} to {}".format(year, year + 1),
+            f"{year} to {year + 1}",
         )
         for year in reversed(range(start, end + 1))
     )

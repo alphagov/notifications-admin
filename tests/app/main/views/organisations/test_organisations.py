@@ -1293,11 +1293,11 @@ def test_view_organisation_settings(
     for index, option in enumerate(expected_options):
         option_values = {
             "value": radios[index]["value"],
-            "label": normalize_spaces(page.select_one("label[for={}]".format(radios[index]["id"])).text),
+            "label": normalize_spaces(page.select_one(f"label[for={radios[index]['id']}]").text),
         }
         if "hint" in option:
             option_values["hint"] = normalize_spaces(
-                page.select_one("label[for={}] + .govuk-hint".format(radios[index]["id"])).text
+                page.select_one(f"label[for={radios[index]['id']}] + .govuk-hint").text
             )
         assert option_values == option
 

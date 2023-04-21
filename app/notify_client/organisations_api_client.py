@@ -16,7 +16,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
         return list(chain.from_iterable(organisation["domains"] for organisation in self.get_organisations()))
 
     def get_organisation(self, org_id):
-        return self.get(url="/organisations/{}".format(org_id))
+        return self.get(url=f"/organisations/{org_id}")
 
     @cache.set("organisation-{org_id}-name")
     def get_organisation_name(self, org_id):
@@ -25,7 +25,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
     def get_organisation_by_domain(self, domain):
         try:
             return self.get(
-                url="/organisations/by-domain?domain={}".format(domain),
+                url=f"/organisations/by-domain?domain={domain}",
             )
         except HTTPError as error:
             if error.status_code == 404:
@@ -47,7 +47,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
     @cache.delete("domains")
     @cache.delete("organisations")
     def update_organisation(self, org_id, cached_service_ids=None, **kwargs):
-        api_response = self.post(url="/organisations/{}".format(org_id), data=kwargs)
+        api_response = self.post(url=f"/organisations/{org_id}", data=kwargs)
 
         if cached_service_ids:
             redis_client.delete(*map("service-{}".format, cached_service_ids))
@@ -84,10 +84,10 @@ class OrganisationsClient(NotifyAdminAPIClient):
     @cache.delete("organisations")
     def update_service_organisation(self, service_id, org_id):
         data = {"service_id": service_id}
-        return self.post(url="/organisations/{}/service".format(org_id), data=data)
+        return self.post(url=f"/organisations/{org_id}/service", data=data)
 
     def get_organisation_services(self, org_id):
-        return self.get(url="/organisations/{}/services".format(org_id))
+        return self.get(url=f"/organisations/{org_id}/services")
 
     @cache.delete("user-{user_id}")
     def remove_user_from_organisation(self, org_id, user_id):

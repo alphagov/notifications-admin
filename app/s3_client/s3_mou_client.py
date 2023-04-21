@@ -18,5 +18,5 @@ def get_mou(organisation_is_crown):
             "as_attachment": True,
         }
     except botocore.exceptions.ClientError as exception:
-        current_app.logger.error("Unable to download s3 file {}/{}".format(bucket, filename))
+        current_app.logger.error(f"Unable to download s3 file {bucket}/{filename}")
         raise exception

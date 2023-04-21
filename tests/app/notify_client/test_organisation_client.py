@@ -189,7 +189,7 @@ def test_update_organisation_when_not_updating_org_type(
 
     organisations_client.update_organisation(fake_uuid, **post_data)
 
-    mock_post.assert_called_with(url="/organisations/{}".format(fake_uuid), data=post_data)
+    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data=post_data)
     assert mock_redis_delete.call_args_list == expected_cache_delete_calls
 
 
@@ -203,7 +203,7 @@ def test_update_organisation_when_updating_org_type_and_org_has_services(mocker,
         organisation_type="central",
     )
 
-    mock_post.assert_called_with(url="/organisations/{}".format(fake_uuid), data={"organisation_type": "central"})
+    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"organisation_type": "central"})
     assert mock_redis_delete.call_args_list == [
         call("service-a", "service-b", "service-c"),
         call("organisations"),
@@ -221,7 +221,7 @@ def test_update_organisation_when_updating_org_type_but_org_has_no_services(mock
         organisation_type="central",
     )
 
-    mock_post.assert_called_with(url="/organisations/{}".format(fake_uuid), data={"organisation_type": "central"})
+    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"organisation_type": "central"})
     assert mock_redis_delete.call_args_list == [
         call("organisations"),
         call("domains"),
@@ -271,9 +271,9 @@ def test_update_service_organisation_deletes_cache(mocker, fake_uuid):
     assert sorted(mock_redis_delete.call_args_list) == [
         call("live-service-and-organisation-counts"),
         call("organisations"),
-        call("service-{}".format(fake_uuid)),
+        call(f"service-{fake_uuid}"),
     ]
-    mock_post.assert_called_with(url="/organisations/{}/service".format(fake_uuid), data=ANY)
+    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}/service", data=ANY)
 
 
 def test_remove_user_from_organisation_deletes_user_cache(mocker):

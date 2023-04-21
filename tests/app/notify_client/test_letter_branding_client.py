@@ -12,10 +12,10 @@ def test_get_letter_branding(mocker, fake_uuid):
 
     LetterBrandingClient().get_letter_branding(fake_uuid)
 
-    mock_get.assert_called_once_with(url="/letter-branding/{}".format(fake_uuid))
-    mock_redis_get.assert_called_once_with("letter_branding-{}".format(fake_uuid))
+    mock_get.assert_called_once_with(url=f"/letter-branding/{fake_uuid}")
+    mock_redis_get.assert_called_once_with(f"letter_branding-{fake_uuid}")
     mock_redis_set.assert_called_once_with(
-        "letter_branding-{}".format(fake_uuid),
+        f"letter_branding-{fake_uuid}",
         '{"foo": "bar"}',
         ex=604800,
     )
