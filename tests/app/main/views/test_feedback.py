@@ -302,7 +302,11 @@ def test_urgency(
     is_in_business_hours,
     is_out_of_hours_emergency,
 ):
-    mocker.patch("app.main.views.feedback.in_business_hours", return_value=is_in_business_hours)
+    mocker.patch(
+        "app.main.views.feedback.in_business_hours",
+        return_value=is_in_business_hours,
+        autospec=True,
+    )
 
     mock_ticket = mocker.patch("app.main.views.feedback.NotifySupportTicket")
     mocker.patch(
@@ -383,7 +387,11 @@ def test_redirects_to_triage(
         new_callable=PropertyMock,
         return_value=[{}, {}] if has_live_services else [],
     )
-    mocker.patch("app.main.views.feedback.in_business_hours", return_value=is_in_business_hours)
+    mocker.patch(
+        "app.main.views.feedback.in_business_hours",
+        return_value=is_in_business_hours,
+        autospec=True,
+    )
     if not logged_in:
         client_request.logout()
 
@@ -418,7 +426,11 @@ def test_doesnt_lose_message_if_post_across_closing(
 ):
 
     mocker.patch("app.models.user.User.live_services", return_value=True)
-    mocker.patch("app.main.views.feedback.in_business_hours", return_value=False)
+    mocker.patch(
+        "app.main.views.feedback.in_business_hours",
+        return_value=False,
+        autospec=True,
+    )
 
     page = client_request.post(
         "main.feedback",
@@ -580,7 +592,11 @@ def test_should_be_shown_the_bat_email(
     expected_redirect_when_logged_in,
 ):
 
-    mocker.patch("app.main.views.feedback.in_business_hours", return_value=is_in_business_hours)
+    mocker.patch(
+        "app.main.views.feedback.in_business_hours",
+        return_value=is_in_business_hours,
+        autospec=True,
+    )
 
     feedback_page = url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe=severe)
 
@@ -638,7 +654,11 @@ def test_should_be_shown_the_bat_email_for_general_questions(
     expected_redirect_when_logged_in,
 ):
 
-    mocker.patch("app.main.views.feedback.in_business_hours", return_value=False)
+    mocker.patch(
+        "app.main.views.feedback.in_business_hours",
+        return_value=False,
+        autospec=True,
+    )
 
     feedback_page = url_for("main.feedback", ticket_type=GENERAL_TICKET_TYPE, severe=severe)
 
@@ -735,7 +755,11 @@ def test_thanks(
     out_of_hours,
     message,
 ):
-    mocker.patch("app.main.views.feedback.in_business_hours", return_value=(not out_of_hours))
+    mocker.patch(
+        "app.main.views.feedback.in_business_hours",
+        return_value=(not out_of_hours),
+        autospec=True,
+    )
     page = client_request.get(
         "main.thanks",
         out_of_hours_emergency=out_of_hours_emergency,

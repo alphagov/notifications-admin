@@ -73,7 +73,11 @@ def test_letter_notifications_should_have_link_to_view_letter(
     link_text,
 ):
     notifications = create_notifications(template_type=template_type)
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch(
+        "app.notification_api_client.get_notifications_for_service",
+        return_value=notifications,
+        autospec=True,
+    )
     page = client_request.get(
         "main.api_integration",
         service_id=SERVICE_ONE_ID,
@@ -87,7 +91,11 @@ def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_st
     client_request, fake_uuid, mock_has_permissions, mocker, status
 ):
     notifications = create_notifications(status=status)
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch(
+        "app.notification_api_client.get_notifications_for_service",
+        return_value=notifications,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.api_integration",
@@ -108,7 +116,11 @@ def test_letter_notifications_should_show_client_reference(
     client_request, fake_uuid, mock_has_permissions, mocker, client_reference, shows_ref
 ):
     notifications = create_notifications(client_reference=client_reference)
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch(
+        "app.notification_api_client.get_notifications_for_service",
+        return_value=notifications,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.api_integration",
@@ -228,7 +240,11 @@ def test_should_show_create_api_key_page(
     if can_send_letters:
         service_one["permissions"].append("letter")
 
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     page = client_request.get("main.create_api_key", service_id=SERVICE_ONE_ID)
 
@@ -251,7 +267,11 @@ def test_should_create_api_key_with_type_normal(
     fake_uuid,
     mocker,
 ):
-    post = mocker.patch("app.notify_client.api_key_api_client.ApiKeyApiClient.post", return_value={"data": fake_uuid})
+    post = mocker.patch(
+        "app.notify_client.api_key_api_client.ApiKeyApiClient.post",
+        return_value={"data": fake_uuid},
+        # should use autospec=True here but doesnt work for some reason
+    )
 
     page = client_request.post(
         "main.create_api_key",
@@ -813,8 +833,16 @@ def test_callbacks_page_works_when_no_apis_set(
     service_one["inbound_api"] = inbound_api
     service_one["service_callback_api"] = service_callback_api
 
-    mocker.patch("app.service_api_client.get_service_callback_api", return_value=delivery_url)
-    mocker.patch("app.service_api_client.get_service_inbound_api", return_value=inbound_url)
+    mocker.patch(
+        "app.service_api_client.get_service_callback_api",
+        return_value=delivery_url,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.service_api_client.get_service_inbound_api",
+        return_value=inbound_url,
+        autospec=True,
+    )
 
     page = client_request.get("main.api_callbacks", service_id=service_one["id"], _follow_redirects=True)
     expected_rows = [

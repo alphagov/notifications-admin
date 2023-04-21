@@ -108,7 +108,11 @@ def test_redirect_from_old_dashboard(
     user,
     mocker,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=user,
+        autospec=True,
+    )
     expected_location = "/services/{}".format(SERVICE_ONE_ID)
 
     client_request.get_url(
@@ -913,7 +917,11 @@ def test_correct_font_size_for_big_numbers(
 
     service_one["permissions"] = permissions
 
-    mocker.patch("app.main.views.dashboard.get_dashboard_totals", return_value=totals)
+    mocker.patch(
+        "app.main.views.dashboard.get_dashboard_totals",
+        return_value=totals,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.service_dashboard",
@@ -1160,11 +1168,31 @@ def test_future_usage_page(
 def _test_dashboard_menu(client_request, mocker, usr, service, permissions):
     usr["permissions"][str(service["id"])] = permissions
     usr["services"] = [service["id"]]
-    mocker.patch("app.user_api_client.check_verify_code", return_value=(True, ""))
-    mocker.patch("app.service_api_client.get_services", return_value={"data": [service]})
-    mocker.patch("app.user_api_client.get_user", return_value=usr)
-    mocker.patch("app.user_api_client.get_user_by_email", return_value=usr)
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service})
+    mocker.patch(
+        "app.user_api_client.check_verify_code",
+        return_value=(True, ""),
+        autospec=True,
+    )
+    mocker.patch(
+        "app.service_api_client.get_services",
+        return_value={"data": [service]},
+        autospec=True,
+    )
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=usr,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.user_api_client.get_user_by_email",
+        return_value=usr,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service},
+        autospec=True,
+    )
     client_request.login(usr)
     return client_request.get("main.service_dashboard", service_id=service["id"])
 
@@ -1601,7 +1629,11 @@ def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
     service_one_json = service_json(
         SERVICE_ONE_ID, users=[active_caseworking_user["id"]], restricted=False, organisation_id=ORGANISATION_ID
     )
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one_json})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one_json},
+        autospec=True,
+    )
 
     client_request.login(active_caseworking_user, service=service_one_json)
     page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID, _follow_redirects=True)
@@ -1626,7 +1658,11 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
         SERVICE_ONE_ID, users=[active_user_with_permissions["id"]], restricted=False, organisation_id=ORGANISATION_ID
     )
 
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one_json})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one_json},
+        autospec=True,
+    )
     mocker.patch(
         "app.organisations_client.get_organisation",
         return_value=organisation_json(
@@ -1658,7 +1694,11 @@ def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but
         SERVICE_ONE_ID, users=[active_user_with_permissions["id"]], organisation_id=ORGANISATION_ID
     )
 
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one_json})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one_json},
+        autospec=True,
+    )
     mocker.patch("app.models.service.Organisation")
 
     page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
@@ -1679,7 +1719,11 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
 ):
     service_one_json = service_json(SERVICE_ONE_ID, users=[platform_admin_user["id"]], organisation_id=ORGANISATION_ID)
 
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one_json})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one_json},
+        autospec=True,
+    )
     mocker.patch(
         "app.organisations_client.get_organisation",
         return_value=organisation_json(

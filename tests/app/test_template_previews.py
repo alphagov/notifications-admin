@@ -71,7 +71,11 @@ def test_from_database_object_makes_request(
     load_service_before_request()
 
     resp = Mock(content="a", status_code="b", headers={"content-type": "image/png"})
-    request_mock = mocker.patch("app.template_previews.requests.post", return_value=resp)
+    request_mock = mocker.patch(
+        "app.template_previews.requests.post",
+        return_value=resp,
+        autospec=True,
+    )
     mocker.patch("app.template_previews.current_service", letter_branding=letter_branding)
     template = mock_get_service_letter_template("123", "456")["data"]
 
@@ -100,7 +104,11 @@ def test_from_database_object_makes_request(
     ],
 )
 def test_from_valid_pdf_file_makes_request(mocker, page_number, expected_url):
-    mocker.patch("app.template_previews.extract_page_from_pdf", return_value=b"pdf page")
+    mocker.patch(
+        "app.template_previews.extract_page_from_pdf",
+        return_value=b"pdf page",
+        autospec=True,
+    )
     request_mock = mocker.patch(
         "app.template_previews.requests.post",
         return_value=Mock(content="a", status_code="b", headers={"content-type": "image/png"}),
@@ -117,7 +125,11 @@ def test_from_valid_pdf_file_makes_request(mocker, page_number, expected_url):
 
 
 def test_from_invalid_pdf_file_makes_request(mocker):
-    mocker.patch("app.template_previews.extract_page_from_pdf", return_value=b"pdf page")
+    mocker.patch(
+        "app.template_previews.extract_page_from_pdf",
+        return_value=b"pdf page",
+        autospec=True,
+    )
     request_mock = mocker.patch(
         "app.template_previews.requests.post",
         return_value=Mock(content="a", status_code="b", headers={"content-type": "image/png"}),

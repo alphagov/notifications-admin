@@ -171,7 +171,11 @@ def test_view_providers_shows_all_providers(
     mocker,
     stub_providers,
 ):
-    mocker.patch("app.provider_client.get_all_providers", return_value=stub_providers)
+    mocker.patch(
+        "app.provider_client.get_all_providers",
+        return_value=stub_providers,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.get("main.view_providers")
@@ -268,7 +272,11 @@ def test_add_monthly_traffic():
 
 
 def test_view_provider_shows_version_history(client_request, platform_admin_user, mocker, stub_provider_history):
-    mocker.patch("app.provider_client.get_provider_versions", return_value=stub_provider_history)
+    mocker.patch(
+        "app.provider_client.get_provider_versions",
+        return_value=stub_provider_history,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.get("main.view_provider", provider_id=stub_provider_history["data"][0]["id"])
@@ -301,7 +309,11 @@ def test_view_provider_shows_version_history(client_request, platform_admin_user
 
 
 def test_edit_sms_provider_provider_ratio(client_request, platform_admin_user, mocker, stub_providers, sms_provider_1):
-    mocker.patch("app.provider_client.get_all_providers", return_value=stub_providers)
+    mocker.patch(
+        "app.provider_client.get_all_providers",
+        return_value=stub_providers,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -365,7 +377,11 @@ def test_edit_sms_provider_ratio_submit(
     expected_calls,
     stub_providers,
 ):
-    mocker.patch("app.provider_client.get_all_providers", return_value=stub_providers)
+    mocker.patch(
+        "app.provider_client.get_all_providers",
+        return_value=stub_providers,
+        autospec=True,
+    )
     mock_update_provider = mocker.patch("app.provider_client.update_provider")
 
     client_request.login(platform_admin_user)
@@ -396,7 +412,11 @@ def test_edit_sms_provider_submit_invalid_percentages(
     expected_error,
     stub_providers,
 ):
-    mocker.patch("app.provider_client.get_all_providers", return_value=stub_providers)
+    mocker.patch(
+        "app.provider_client.get_all_providers",
+        return_value=stub_providers,
+        autospec=True,
+    )
     mock_update_provider = mocker.patch("app.provider_client.update_provider")
 
     client_request.login(platform_admin_user)

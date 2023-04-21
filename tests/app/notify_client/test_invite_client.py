@@ -60,6 +60,7 @@ def test_client_update_invite(
     mock_post = mocker.patch(
         "app.invite_api_client.post",
         return_value={"data": sample_invite},
+        autospec=True,
     )
 
     invite_api_client.update_invite(service_id="67890", invite_id="12345", auth_type="email_auth")

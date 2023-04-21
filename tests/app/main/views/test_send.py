@@ -148,12 +148,24 @@ def test_sender_session_is_present_after_selected(
     client_request, service_one, fake_uuid, template_type, sender_data, mocker
 ):
     template_data = create_template(template_type=template_type)
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template_data},
+        autospec=True,
+    )
 
     if template_type == "email":
-        mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=sender_data)
+        mocker.patch(
+            "app.service_api_client.get_reply_to_email_addresses",
+            return_value=sender_data,
+            autospec=True,
+        )
     else:
-        mocker.patch("app.service_api_client.get_sms_senders", return_value=sender_data)
+        mocker.patch(
+            "app.service_api_client.get_sms_senders",
+            return_value=sender_data,
+            autospec=True,
+        )
 
     client_request.post(
         ".set_sender",
@@ -300,7 +312,11 @@ def test_example_spreadsheet_for_letters(
     fake_uuid,
 ):
     service_one["permissions"] += ["letter"]
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
 
     page = client_request.get(".send_messages", service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
@@ -448,7 +464,11 @@ def test_shows_error_if_parsing_exception(
     def _raise_exception_or_partial_exception(file_content, filename):
         raise exception()
 
-    mocker.patch("app.main.views.send.Spreadsheet.from_file", side_effect=_raise_exception_or_partial_exception)
+    mocker.patch(
+        "app.main.views.send.Spreadsheet.from_file",
+        side_effect=_raise_exception_or_partial_exception,
+        autospec=True,
+    )
 
     page = client_request.post(
         "main.send_messages",
@@ -624,7 +644,11 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     fake_uuid,
 ):
     service_one["permissions"] += ["letter"]
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=9,
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -679,7 +703,11 @@ def test_upload_csv_file_with_bad_bfpo_postal_address_shows_check_page_with_erro
     fake_uuid,
 ):
     service_one["permissions"] += ["letter", "international_letters"]
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=9,
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -721,7 +749,11 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
     fake_uuid,
 ):
     service_one["permissions"] += ["letter", "international_letters"]
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=9,
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -776,7 +808,11 @@ def test_upload_csv_file_with_international_letters_permission_shows_correct_pos
     expected_postage,
 ):
     service_one["permissions"] += ["letter", "international_letters"]
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=9,
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -890,7 +926,11 @@ def test_upload_csv_file_with_missing_columns_shows_error(
     expected_error,
 ):
 
-    mocker.patch("app.main.views.send.s3download", return_value=file_contents)
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value=file_contents,
+        autospec=True,
+    )
 
     page = client_request.post(
         "main.send_messages",
@@ -1241,7 +1281,11 @@ def test_send_one_off_step_redirects_to_start_if_session_not_setup(
     template_type,
 ):
     template_data = create_template(template_type=template_type, content="Hi ((name))")
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template_data},
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         assert "recipient" not in session
@@ -1303,10 +1347,22 @@ def test_send_one_off_has_correct_page_title(
     mocker,
     user,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=user,
+        autospec=True,
+    )
     template_data = create_template(template_type="sms", name="Two week reminder", content="Hi there ((name))")
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template_data},
+        autospec=True,
+    )
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=9,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.send_one_off",
@@ -1397,8 +1453,16 @@ def test_send_one_off_has_skip_link(
     user,
 ):
     template_data = create_template(template_id=fake_uuid, template_type=template_type)
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template_data},
+        # should use autospec=True here but doesn’t work for some reason
+    )
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=9,
+        autospec=True,
+    )
 
     client_request.login(user)
     page = client_request.get(
@@ -1440,8 +1504,16 @@ def test_send_one_off_has_sticky_header_for_email(
     expected_sticky,
 ):
     template_data = create_template(template_type=template_type, content="((body))")
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template_data},
+        autospec=True,
+    )
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=9,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.send_one_off_step",
@@ -1461,8 +1533,16 @@ def test_send_one_off_has_sticky_header_for_letter_on_non_address_placeholders(
     mock_get_live_service,
 ):
     template_data = create_template(template_type="letter", content="((body))")
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template_data},
+        autospec=True,
+    )
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=9,
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         session["recipient"] = ""
@@ -1708,7 +1788,11 @@ def test_send_one_off_redirects_to_start_if_you_skip_steps(
     mocker,
     user,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=user,
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         session["placeholders"] = {"address_line_1": "foo"}
@@ -1746,7 +1830,11 @@ def test_send_one_off_redirects_to_start_if_index_out_of_bounds_and_some_placeho
     mocker,
     user,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=user,
+        autospec=True,
+    )
     with client_request.session_transaction() as session:
         session["placeholders"] = {"name": "foo"}
 
@@ -1778,9 +1866,17 @@ def test_send_one_off_sms_message_redirects(
     fake_uuid,
     user,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=user,
+        autospec=True,
+    )
     template = {"data": {"template_type": "sms", "folder": None}}
-    mocker.patch("app.service_api_client.get_service_template", return_value=template)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value=template,
+        autospec=True,
+    )
 
     client_request.get(
         "main.send_one_off",
@@ -1815,7 +1911,11 @@ def test_send_one_off_email_to_self_without_placeholders_redirects_to_check_page
     fake_uuid,
     user,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=user,
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         session["recipient"] = "foo@bar.com"
@@ -1910,7 +2010,11 @@ def test_send_one_off_letter_redirects_to_right_url(
     mock_get_service_statistics,
     mocker,
 ):
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=9)
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=9,
+        autospec=True,
+    )
     with client_request.session_transaction() as session:
         session["recipient"] = ""
         session["placeholders"] = {
@@ -2157,9 +2261,21 @@ def test_send_test_works_as_letter_preview(
     mocker,
 ):
     service_one["permissions"] = ["letter"]
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=1)
-    mocked_preview = mocker.patch("app.main.views.send.TemplatePreview.from_utils_template", return_value="foo")
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
+    mocked_preview = mocker.patch(
+        "app.main.views.send.TemplatePreview.from_utils_template",
+        return_value="foo",
+        autospec=True,
+    )
 
     service_id = service_one["id"]
     template_id = fake_uuid
@@ -2189,7 +2305,11 @@ def test_send_one_off_clears_session(
     fake_uuid,
 ):
     template = {"data": {"template_type": "sms", "folder": None}}
-    mocker.patch("app.service_api_client.get_service_template", return_value=template)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value=template,
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         session["recipient"] = "07700900001"
@@ -2409,7 +2529,11 @@ def test_send_one_off_letter_address_goes_to_next_placeholder(client_request, mo
 
     template_data = create_template(template_type="letter", content="((foo))")
 
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template_data},
+        autospec=True,
+    )
 
     client_request.post(
         "main.send_one_off_letter_address",
@@ -2467,7 +2591,11 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
             ["phone number"] + ["07700 9007{0:02d}".format(final_two) for final_two in range(0, 53)]
         ),
     )
-    mock_get_notification_count = mocker.patch("app.service_api_client.get_notification_count", return_value=0)
+    mock_get_notification_count = mocker.patch(
+        "app.service_api_client.get_notification_count",
+        return_value=0,
+        autospec=True,
+    )
     page = client_request.post(
         "main.send_messages",
         service_id=service_one["id"],
@@ -2527,9 +2655,17 @@ def test_upload_csvfile_with_international_validates(
 ):
     if international_sms_permission:
         service_one["permissions"] += ("sms", "international_sms")
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
-    mocker.patch("app.main.views.send.s3download", return_value="")
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value="",
+        autospec=True,
+    )
     mock_recipients = mocker.patch(
         "app.main.views.send.RecipientCSV",
         return_value=RecipientCSV("", template=SMSPreviewTemplate({"content": "foo", "template_type": "sms"})),
@@ -2605,9 +2741,17 @@ def test_letter_can_only_be_sent_now(
     mock_get_jobs,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.send.s3download", return_value="addressline1, addressline2, postcode\na,b,sw1 1aa")
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value="addressline1, addressline2, postcode\na,b,sw1 1aa",
+        autospec=True,
+    )
     mocker.patch("app.main.views.send.set_metadata_on_csv_upload")
-    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.check_messages",
@@ -2632,7 +2776,11 @@ def test_send_button_is_correctly_labelled(
     fake_uuid,
     mock_s3_get_metadata,
 ):
-    mocker.patch("app.main.views.send.s3download", return_value="\n".join(["phone_number"] + (["07900900123"] * 1000)))
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value="\n".join(["phone_number"] + (["07900900123"] * 1000)),
+        autospec=True,
+    )
     mocker.patch("app.main.views.send.set_metadata_on_csv_upload")
 
     page = client_request.get(
@@ -2752,8 +2900,16 @@ def test_should_show_preview_letter_message(
     expected_page,
 ):
     service_one["permissions"] = ["letter"]
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
-    mock_page_count = mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
+    mock_page_count = mocker.patch(
+        "app.main.views.send.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
 
     mocker.patch(
         "app.main.views.send.s3download",
@@ -2765,7 +2921,11 @@ def test_should_show_preview_letter_message(
         "app.main.views.send.get_csv_metadata",
         return_value={"original_file_name": f"example.{filetype}"},
     )
-    mocked_preview = mocker.patch("app.main.views.send.TemplatePreview.from_utils_template", return_value="foo")
+    mocked_preview = mocker.patch(
+        "app.main.views.send.TemplatePreview.from_utils_template",
+        return_value="foo",
+        autospec=True,
+    )
 
     service_id = service_one["id"]
     template_id = fake_uuid
@@ -2935,7 +3095,11 @@ def test_check_messages_back_link(
 ):
     content = "Hi there ((name))" if has_placeholders else "Hi there"
     template_data = create_template(template_id=fake_uuid, template_type=template_type, content=content)
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template_data},
+        autospec=True,
+    )
 
     mocker.patch(
         "app.main.views.send.get_page_count_for_letter",
@@ -2993,7 +3157,11 @@ def test_check_messages_shows_too_many_messages_errors(
         "app.main.views.send.s3download",
         return_value=",\n".join(["phone number"] + ([mock_get_users_by_service(None)[0]["mobile_number"]] * 1234)),
     )
-    mocker.patch("app.extensions.redis_client.get", return_value=num_requested)
+    mocker.patch(
+        "app.extensions.redis_client.get",
+        return_value=num_requested,
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {fake_uuid: {"template_id": fake_uuid, "notification_count": 1, "valid": True}}
@@ -3024,7 +3192,11 @@ def test_check_messages_shows_trial_mode_error(
     fake_uuid,
     mocker,
 ):
-    mocker.patch("app.main.views.send.s3download", return_value=("phone number,\n07900900321"))  # Not in team
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value=("phone number,\n07900900321"),
+        autospec=True,
+    )  # Not in team
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {
@@ -3080,7 +3252,11 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     expected_error_message,
 ):
     service_one["restricted"] = restricted
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     mocker.patch(
         "app.main.views.send.s3download",
@@ -3249,7 +3425,11 @@ def test_warns_if_file_sent_already(
     mocker,
     uploaded_file_name,
 ):
-    mocker.patch("app.main.views.send.s3download", return_value=("phone number,\n07900900321"))
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value=("phone number,\n07900900321"),
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.send.get_csv_metadata",
         return_value={"original_file_name": uploaded_file_name},
@@ -3331,8 +3511,16 @@ def test_check_messages_adds_sender_id_in_session_to_metadata(
     mock_s3_set_metadata,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.send.s3download", return_value=("phone number,\n07900900321"))
-    mocker.patch("app.main.views.send.get_sms_sender_from_session", return_value="Fake Sender")
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value=("phone number,\n07900900321"),
+        autospec=True,
+    )
+    mocker.patch(
+        "app.main.views.send.get_sms_sender_from_session",
+        return_value="Fake Sender",
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {fake_uuid: {"template_id": fake_uuid}}
@@ -3479,7 +3667,11 @@ def test_one_off_letters_have_download_link(
     service_one,
 ):
     service_one["restricted"] = restricted
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     mocker.patch(
         "app.main.views.send.get_page_count_for_letter",

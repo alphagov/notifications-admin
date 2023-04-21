@@ -11,7 +11,11 @@ from tests.conftest import (
 
 @pytest.fixture
 def mock_email_validated_recently(mocker):
-    return mocker.patch("app.main.views.two_factor.email_needs_revalidating", return_value=False)
+    return mocker.patch(
+        "app.main.views.two_factor.email_needs_revalidating",
+        return_value=False,
+        autospec=True,
+    )
 
 
 @pytest.mark.parametrize("request_url", ["two_factor_email_sent", "revalidate_email_sent"])
@@ -46,7 +50,11 @@ def test_should_render_two_factor_page(client_request, api_user_active, mock_get
     # reassign the session after it is lost mid register process
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active,
+        autospec=True,
+    )
     page = client_request.get("main.two_factor_sms", next=redirect_url)
 
     assert page.select_one("main p").text.strip() == "We’ve sent you a text message with a security code."
@@ -95,8 +103,16 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
 ):
     client_request.logout()
 
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
-    mocker.patch("app.main.views.two_factor.email_needs_revalidating", return_value=True)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.main.views.two_factor.email_needs_revalidating",
+        return_value=True,
+        autospec=True,
+    )
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
     client_request.post(
@@ -169,7 +185,11 @@ def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(
 
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active,
+        autospec=True,
+    )
 
     page = client_request.post(
         "main.two_factor_sms",
@@ -274,7 +294,11 @@ def test_two_factor_webauthn_should_have_auth_signin_button(
     mocker,
 ):
     client_request.logout()
-    mock_get_user = mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
+    mock_get_user = mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=platform_admin_user,
+        autospec=True,
+    )
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": platform_admin_user["id"], "email": platform_admin_user["email_address"]}
 
@@ -295,7 +319,11 @@ def test_two_factor_webauthn_should_reject_non_webauthn_auth_users(
 ):
     client_request.logout()
     platform_admin_user["auth_type"] = "sms_auth"
-    mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=platform_admin_user,
+        autospec=True,
+    )
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": platform_admin_user["id"], "email": platform_admin_user["email_address"]}
 
@@ -315,8 +343,16 @@ def test_two_factor_sms_should_activate_pending_user(
     mock_email_validated_recently,
 ):
     client_request.logout()
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_pending)
-    mocker.patch("app.service_api_client.get_services", return_value={"data": []})
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_pending,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.service_api_client.get_services",
+        return_value={"data": []},
+        autospec=True,
+    )
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": api_user_pending["id"], "email_address": api_user_pending["email_address"]}
     client_request.post("main.two_factor_sms", _data={"sms_code": "12345"})
@@ -365,7 +401,11 @@ def test_valid_two_factor_email_link_logs_in_user(
     mocker,
     mock_create_event,
 ):
-    mocker.patch("app.user_api_client.check_verify_code", return_value=(True, ""))
+    mocker.patch(
+        "app.user_api_client.check_verify_code",
+        return_value=(True, ""),
+        autospec=True,
+    )
 
     client_request.post_url(
         url_for_endpoint_with_token("main.two_factor_email", token=valid_token),
@@ -424,7 +464,11 @@ def test_two_factor_email_link_is_already_used(
     client_request, valid_token, mocker, mock_send_verify_code, redirect_url
 ):
     client_request.logout()
-    mocker.patch("app.user_api_client.check_verify_code", return_value=(False, "Code has expired"))
+    mocker.patch(
+        "app.user_api_client.check_verify_code",
+        return_value=(False, "Code has expired"),
+        # should use autospec=True here but doesn’t work for some reason
+    )
 
     page = client_request.post_url(
         url_for_endpoint_with_token("main.two_factor_email", token=valid_token, next=redirect_url),
@@ -439,7 +483,11 @@ def test_two_factor_email_link_is_already_used(
 
 def test_two_factor_email_link_when_user_is_locked_out(client_request, valid_token, mocker, mock_send_verify_code):
     client_request.logout()
-    mocker.patch("app.user_api_client.check_verify_code", return_value=(False, "Code not found"))
+    mocker.patch(
+        "app.user_api_client.check_verify_code",
+        return_value=(False, "Code not found"),
+        # should use autospec=True here but doesn’t work for some reason
+    )
 
     page = client_request.post_url(
         url_for_endpoint_with_token("main.two_factor_email", token=valid_token),

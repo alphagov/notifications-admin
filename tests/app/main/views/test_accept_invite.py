@@ -22,12 +22,20 @@ def mock_no_users_for_service(mocker):
 
 @pytest.fixture(scope="function")
 def mock_get_existing_user_by_email(mocker, api_user_active):
-    return mocker.patch("app.user_api_client.get_user_by_email", return_value=api_user_active)
+    return mocker.patch(
+        "app.user_api_client.get_user_by_email",
+        return_value=api_user_active,
+        autospec=True,
+    )
 
 
 @pytest.fixture(scope="function")
 def mock_check_invite_token(mocker, sample_invite):
-    return mocker.patch("app.invite_api_client.check_token", return_value=sample_invite)
+    return mocker.patch(
+        "app.invite_api_client.check_token",
+        return_value=sample_invite,
+        autospec=True,
+    )
 
 
 @freeze_time("2021-12-12 12:12:12")
@@ -132,7 +140,11 @@ def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
     sample_invite["permissions"] = ""
     expected_permissions = set()
     expected_folder_permissions = []
-    mocker.patch("app.invite_api_client.accept_invite", return_value=sample_invite)
+    mocker.patch(
+        "app.invite_api_client.accept_invite",
+        return_value=sample_invite,
+        autospec=True,
+    )
 
     client_request.get(
         "main.accept_invite",
@@ -542,7 +554,11 @@ def test_signed_in_existing_user_cannot_use_anothers_invite(
     mock_accept_invite,
     mock_get_service,
 ):
-    mocker.patch("app.user_api_client.get_users_for_service", return_value=[api_user_active])
+    mocker.patch(
+        "app.user_api_client.get_users_for_service",
+        return_value=[api_user_active],
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.accept_invite",
@@ -766,7 +782,11 @@ def test_platform_admin_user_accepts_and_preserves_auth(
     sample_invite["auth_type"] = "email_auth"
     service_one["permissions"].append("email_auth")
 
-    mocker.patch("app.user_api_client.get_user_by_email", return_value=platform_admin_user)
+    mocker.patch(
+        "app.user_api_client.get_user_by_email",
+        return_value=platform_admin_user,
+        autospec=True,
+    )
     mock_update_user_attribute = mocker.patch(
         "app.user_api_client.update_user_attribute",
         return_value=platform_admin_user,
@@ -842,7 +862,11 @@ def test_existing_email_auth_user_without_phone_cannot_set_sms_auth(
     api_user_active["mobile_number"] = None
     sample_invite["auth_type"] = "sms_auth"
 
-    mocker.patch("app.user_api_client.get_user_by_email", return_value=api_user_active)
+    mocker.patch(
+        "app.user_api_client.get_user_by_email",
+        return_value=api_user_active,
+        autospec=True,
+    )
 
     client_request.get(
         "main.accept_invite",

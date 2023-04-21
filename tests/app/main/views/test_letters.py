@@ -41,7 +41,11 @@ def test_letters_lets_in_without_permission(
     service_one,
 ):
     service_one["permissions"] = ["letter"]
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     client_request.login(api_user_active)
     client_request.get_url(url(service_id=service_one["id"]))

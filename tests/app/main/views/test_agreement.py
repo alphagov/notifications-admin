@@ -87,7 +87,11 @@ def test_show_agreement_page(
     expected_other_links,
 ):
     org = organisation_json(crown=crown, agreement_signed=agreement_signed)
-    mocker.patch("app.organisations_client.get_organisation", return_value=org)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=org,
+        # should use autospec=True here but doesn’t work for some reason
+    )
 
     page = client_request.get("main.service_agreement", service_id=SERVICE_ONE_ID)
 
@@ -166,7 +170,11 @@ def test_download_service_agreement(
     mocker.patch(
         "app.models.organisation.organisations_client.get_organisation", return_value=organisation_json(crown=crown)
     )
-    mock_get_s3_object = mocker.patch("app.s3_client.s3_mou_client.get_s3_object", return_value=MockS3Object(b"foo"))
+    mock_get_s3_object = mocker.patch(
+        "app.s3_client.s3_mou_client.get_s3_object",
+        return_value=MockS3Object(b"foo"),
+        autospec=True,
+    )
 
     response = client_request.get_response(
         "main.service_download_agreement",
@@ -512,7 +520,11 @@ def test_show_public_agreement_page(
     variant,
     expected_status,
 ):
-    mocker.patch("app.s3_client.s3_mou_client.get_s3_object", return_value=MockS3Object())
+    mocker.patch(
+        "app.s3_client.s3_mou_client.get_s3_object",
+        return_value=MockS3Object(),
+        autospec=True,
+    )
     client_request.logout()
     client_request.get_response(
         endpoint,

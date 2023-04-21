@@ -153,7 +153,11 @@ def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
 ):
     client_request.logout()
     user = mock_get_user_by_email_request_password_reset.return_value
-    mock_get_user = mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mock_get_user = mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active,
+        autospec=True,
+    )
     user["auth_type"] = "email_auth"
     data = json.dumps({"email": user["email_address"], "created_at": str(datetime.utcnow())})
     token = generate_token(data, notify_admin.config["SECRET_KEY"], notify_admin.config["DANGEROUS_SALT"])

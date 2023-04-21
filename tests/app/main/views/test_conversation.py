@@ -85,7 +85,11 @@ def test_view_conversation(
         personalisation={"name": "Jo"},
         redact_personalisation=outbound_redacted,
     )
-    mock = mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mock = mocker.patch(
+        "app.notification_api_client.get_notifications_for_service",
+        return_value=notifications,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.conversation",
@@ -290,7 +294,11 @@ def test_conversation_reply_shows_templates(
             _template("letter", "letter_template_one"),
         ]
     }
-    mocker.patch("app.service_api_client.get_service_templates", return_value=all_templates)
+    mocker.patch(
+        "app.service_api_client.get_service_templates",
+        return_value=all_templates,
+        autospec=True,
+    )
     mock_get_template_folders.return_value = [
         {"name": "Parent 1 - invisible", "id": INV_PARENT_FOLDER_ID, "parent_id": None, "users_with_permission": []},
         {

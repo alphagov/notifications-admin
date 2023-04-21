@@ -574,7 +574,11 @@ def test_caseworker_sees_template_page_if_template_is_deleted(
     active_caseworking_user,
 ):
 
-    mocker.patch("app.user_api_client.get_user", return_value=active_caseworking_user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=active_caseworking_user,
+        autospec=True,
+    )
 
     template_id = fake_uuid
     page = client_request.get(
@@ -638,7 +642,11 @@ def test_user_with_only_send_and_view_sees_letter_page(
     fake_uuid,
     permissions,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.templates.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
     active_user_with_permissions["permissions"][SERVICE_ONE_ID] = permissions
     client_request.login(active_user_with_permissions)
     page = client_request.get(
@@ -680,7 +688,11 @@ def test_letter_with_default_branding_has_add_logo_button(
     expected_link,
     expected_link_text,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.templates.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
     service_one["permissions"] += ["letter"]
     service_one["letter_branding"] = letter_branding
 
@@ -716,7 +728,11 @@ def test_view_letter_template_displays_postage(
     template_postage,
     expected_result,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.templates.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
     client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -759,7 +775,11 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
     mocker,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=11)
+    mocker.patch(
+        "app.main.views.templates.get_page_count_for_letter",
+        return_value=11,
+        autospec=True,
+    )
     client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -791,7 +811,11 @@ def test_view_letter_template_has_attach_pages_button(
     template_type,
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.templates.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
     client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -835,14 +859,26 @@ def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid
 
 def test_post_attach_pages_errors_when_content_outside_printable_area(mocker, client_request, fake_uuid, service_one):
     service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "uuid.uuid4",
+        return_value=fake_uuid,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     mock_s3_upload = mocker.patch("app.main.views.templates.upload_letter_to_s3")
 
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
-    mocker.patch("app.main.views.templates.sanitise_letter", return_value=mock_sanitise_response)
+    mocker.patch(
+        "app.main.views.templates.sanitise_letter",
+        return_value=mock_sanitise_response,
+        autospec=True,
+    )
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         file_contents = file.read()
@@ -889,7 +925,11 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     expected_pages_content,
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
 
     mocker.patch(
         "app.main.views.templates.sanitise_letter",
@@ -900,11 +940,23 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     )
 
     # page count for letter template
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.templates.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
 
     # page count for the attachment
-    mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
-    mocker.patch("app.service_api_client.get_letter_contacts", return_value=[])
+    mocker.patch(
+        "app.main.views.templates.pdf_page_count",
+        return_value=page_count,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.service_api_client.get_letter_contacts",
+        return_value=[],
+        autospec=True,
+    )
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         file.read()
@@ -1173,8 +1225,16 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
     contact_block_data,
     expected_partial_url,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
-    mocker.patch("app.service_api_client.get_letter_contacts", return_value=contact_block_data)
+    mocker.patch(
+        "app.main.views.templates.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.service_api_client.get_letter_contacts",
+        return_value=contact_block_data,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.view_template",
@@ -1214,7 +1274,11 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
 def test_should_show_preview_letter_templates(
     view, extra_view_args, filetype, client_request, mock_get_service_email_template, service_one, fake_uuid, mocker
 ):
-    mocked_preview = mocker.patch("app.main.views.templates.TemplatePreview.from_database_object", return_value="foo")
+    mocked_preview = mocker.patch(
+        "app.main.views.templates.TemplatePreview.from_database_object",
+        return_value="foo",
+        autospec=True,
+    )
 
     service_id, template_id = service_one["id"], fake_uuid
 
@@ -1249,7 +1313,11 @@ def test_letter_branding_preview_image(
     original_filename,
     new_filename,
 ):
-    mocked_preview = mocker.patch("app.main.views.templates.TemplatePreview.from_example_template", return_value="foo")
+    mocked_preview = mocker.patch(
+        "app.main.views.templates.TemplatePreview.from_example_template",
+        return_value="foo",
+        autospec=True,
+    )
     resp = client_request.get_response(
         "no_cookie.letter_branding_preview_image",
         filename=original_filename,
@@ -1857,7 +1925,11 @@ def test_should_show_interstitial_when_making_breaking_change(
     email_template = create_template(
         template_id=fake_uuid, template_type="email", subject="Your ((thing)) is due soon", content=old_content
     )
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": email_template},
+        autospec=True,
+    )
 
     data = {
         "id": fake_uuid,
@@ -2039,7 +2111,11 @@ def test_should_redirect_when_saving_a_template_email(
 def test_should_show_delete_template_page_with_time_block(
     client_request, mock_get_service_template, mock_get_template_folders, mocker, fake_uuid
 ):
-    mocker.patch("app.template_statistics_client.get_last_used_date_for_template", return_value="2012-01-01 12:00:00")
+    mocker.patch(
+        "app.template_statistics_client.get_last_used_date_for_template",
+        return_value="2012-01-01 12:00:00",
+        autospec=True,
+    )
 
     with freeze_time("2012-01-01 12:10:00"):
         page = client_request.get(
@@ -2061,7 +2137,11 @@ def test_should_show_delete_template_page_with_time_block(
 def test_should_show_delete_template_page_with_time_block_for_empty_notification(
     client_request, mock_get_service_template, mock_get_template_folders, mocker, fake_uuid
 ):
-    mocker.patch("app.template_statistics_client.get_last_used_date_for_template", return_value=None)
+    mocker.patch(
+        "app.template_statistics_client.get_last_used_date_for_template",
+        return_value=None,
+        autospec=True,
+    )
 
     with freeze_time("2012-01-01 11:00:00"):
         page = client_request.get(
@@ -2106,8 +2186,16 @@ def test_should_show_delete_template_page_with_never_used_block(
 def test_should_show_delete_template_page_with_escaped_template_name(client_request, mocker, fake_uuid):
     template = template_json(service_id=SERVICE_ONE_ID, id_=fake_uuid, name="<script>evil</script>")
 
-    mocker.patch("app.template_statistics_client.get_last_used_date_for_template", return_value=None)
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template})
+    mocker.patch(
+        "app.template_statistics_client.get_last_used_date_for_template",
+        return_value=None,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template},
+        autospec=True,
+    )
 
     page = client_request.get(
         ".delete_service_template", service_id=SERVICE_ONE_ID, template_id=fake_uuid, _test_page_title=False
@@ -2197,7 +2285,11 @@ def test_route_permissions(
     mock_get_template_folders,
     fake_uuid,
 ):
-    mocker.patch("app.template_statistics_client.get_last_used_date_for_template", return_value="2012-01-01 12:00:00")
+    mocker.patch(
+        "app.template_statistics_client.get_last_used_date_for_template",
+        return_value="2012-01-01 12:00:00",
+        autospec=True,
+    )
     validate_route_permission(
         mocker,
         notify_admin,
@@ -2467,7 +2559,11 @@ def test_should_show_hint_once_template_redacted(
     fake_uuid,
 ):
     template = create_template(template_type="email", content="hi ((name))", redact_personalisation=True)
-    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template})
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template},
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.view_template",
@@ -2488,7 +2584,11 @@ def test_should_not_show_redaction_stuff_for_letters(
     single_letter_contact_block,
 ):
 
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.templates.get_page_count_for_letter",
+        return_value=1,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.view_template",
@@ -2557,7 +2657,11 @@ def test_add_sender_link_only_appears_on_services_with_no_senders(
     contact_block_data,
     mock_get_service_letter_template,
 ):
-    mocker.patch("app.service_api_client.get_letter_contacts", return_value=contact_block_data)
+    mocker.patch(
+        "app.service_api_client.get_letter_contacts",
+        return_value=contact_block_data,
+        autospec=True,
+    )
     page = client_request.get(
         "main.set_template_sender",
         service_id=SERVICE_ONE_ID,
@@ -2578,7 +2682,11 @@ def test_set_template_sender_escapes_letter_contact_block_names(
     mock_get_service_letter_template,
 ):
     letter_contact_block = create_letter_contact_block(contact_block="foo\n\n<script>\n\nbar")
-    mocker.patch("app.service_api_client.get_letter_contacts", return_value=[letter_contact_block])
+    mocker.patch(
+        "app.service_api_client.get_letter_contacts",
+        return_value=[letter_contact_block],
+        autospec=True,
+    )
     page = client_request.get(
         "main.set_template_sender",
         service_id=SERVICE_ONE_ID,

@@ -35,8 +35,16 @@ def test_post_upload_letter_redirects_for_valid_file(
     extra_permissions,
     expected_allow_international,
 ):
-    mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    antivirus_mock = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "uuid.uuid4",
+        return_value=fake_uuid,
+        autospec=True,
+    )
+    antivirus_mock = mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     mock_sanitise = mocker.patch(
         "app.main.views.uploads.sanitise_letter",
         return_value=Mock(
@@ -119,8 +127,16 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
         "content": "my letter",
     }
 
-    mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "uuid.uuid4",
+        return_value=fake_uuid,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.uploads.sanitise_letter",
         return_value=Mock(
@@ -130,7 +146,11 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
     )
     mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
-    mocker.patch("app.main.views.uploads.pdf_page_count", return_value=3)
+    mocker.patch(
+        "app.main.views.uploads.pdf_page_count",
+        return_value=3,
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
         return_value=LetterMetadata(
@@ -142,7 +162,11 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
             }
         ),
     )
-    mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template", return_value=letter_template)
+    mocker.patch(
+        "app.main.views.uploads.service_api_client.get_precompiled_template",
+        return_value=letter_template,
+        autospec=True,
+    )
 
     service_one["restricted"] = False
     client_request.login(active_user_with_permissions, service=service_one)
@@ -185,7 +209,11 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
         "content": "my letter",
     }
 
-    mocker.patch("uuid.uuid4", return_value=fake_uuid)
+    mocker.patch(
+        "uuid.uuid4",
+        return_value=fake_uuid,
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.uploads.sanitise_letter",
         return_value=Mock(
@@ -195,7 +223,11 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
     )
     mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
-    mocker.patch("app.main.views.uploads.pdf_page_count", return_value=3)
+    mocker.patch(
+        "app.main.views.uploads.pdf_page_count",
+        return_value=3,
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
         return_value=LetterMetadata(
@@ -207,8 +239,16 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
             }
         ),
     )
-    mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template", return_value=letter_template)
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.main.views.uploads.service_api_client.get_precompiled_template",
+        return_value=letter_template,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
 
     service_one["restricted"] = False
     client_request.login(active_user_with_permissions, service=service_one)
@@ -238,7 +278,11 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
 )
 def test_uploading_a_pdf_shows_error_when_file_is_not_a_pdf(client_request, service_one, mocker, endpoint, kwargs):
     service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
 
     with open("tests/non_spreadsheet_files/actually_a_png.csv", "rb") as file:
         page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
@@ -271,7 +315,11 @@ def test_uploading_a_pdf_shows_error_when_no_file_uploaded(client_request, servi
 )
 def test_uploading_a_pdf_shows_error_when_file_contains_virus(mocker, client_request, service_one, endpoint, kwargs):
     service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=False)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=False,
+        autospec=True,
+    )
     mock_s3_backup = mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
@@ -290,7 +338,11 @@ def test_uploading_a_pdf_shows_error_when_file_contains_virus(mocker, client_req
 )
 def test_uploading_a_pdf_errors_when_file_is_too_big(mocker, client_request, service_one, endpoint, kwargs):
     service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
 
     with open("tests/test_pdf_files/big.pdf", "rb") as file:
         page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
@@ -308,7 +360,11 @@ def test_uploading_a_pdf_errors_when_file_is_too_big(mocker, client_request, ser
 )
 def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request, service_one, endpoint, kwargs):
     service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
 
     with open("tests/test_pdf_files/no_eof_marker.pdf", "rb") as file:
         page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
@@ -321,15 +377,27 @@ def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request, 
 
 
 def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid):
-    mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "uuid.uuid4",
+        return_value=fake_uuid,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     mock_s3_upload = mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mock_s3_backup = mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
 
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
-    mocker.patch("app.main.views.uploads.sanitise_letter", return_value=mock_sanitise_response)
+    mocker.patch(
+        "app.main.views.uploads.sanitise_letter",
+        return_value=mock_sanitise_response,
+        autospec=True,
+    )
     mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template")
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
@@ -377,14 +445,30 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
         "content": "my letter",
     }
 
-    mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "uuid.uuid4",
+        return_value=fake_uuid,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "template preview error", "recipient_address": "The Queen"}
-    mocker.patch("app.main.views.uploads.sanitise_letter", return_value=mock_sanitise_response)
-    mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template", return_value=letter_template)
+    mocker.patch(
+        "app.main.views.uploads.sanitise_letter",
+        return_value=mock_sanitise_response,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.main.views.uploads.service_api_client.get_precompiled_template",
+        return_value=letter_template,
+        autospec=True,
+    )
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
         return_value=LetterMetadata(
@@ -423,8 +507,16 @@ def test_post_upload_letter_does_not_upload_to_s3_if_template_preview_raises_unk
     client_request,
     fake_uuid,
 ):
-    mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "uuid.uuid4",
+        return_value=fake_uuid,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     mock_s3 = mocker.patch("app.main.views.uploads.upload_letter_to_s3")
 
     mocker.patch("app.main.views.uploads.sanitise_letter", side_effect=RequestException())
@@ -587,7 +679,11 @@ def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outsi
     metadata,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.uploads.get_letter_pdf_and_metadata", return_value=("pdf_file", metadata))
+    mocker.patch(
+        "app.main.views.uploads.get_letter_pdf_and_metadata",
+        return_value=("pdf_file", metadata),
+        autospec=True,
+    )
     template_preview_mock = mocker.patch(
         "app.main.views.uploads.TemplatePreview.from_valid_pdf_file", return_value=make_response("page.html", 200)
     )
@@ -664,9 +760,17 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(
         }
     )
 
-    mocker.patch("app.main.views.uploads.get_letter_pdf_and_metadata", return_value=("file", metadata))
+    mocker.patch(
+        "app.main.views.uploads.get_letter_pdf_and_metadata",
+        return_value=("file", metadata),
+        autospec=True,
+    )
     mock_send = mocker.patch("app.main.views.uploads.notification_api_client.send_precompiled_letter")
-    mocker.patch("app.main.views.uploads.get_letter_metadata", return_value=metadata)
+    mocker.patch(
+        "app.main.views.uploads.get_letter_metadata",
+        return_value=metadata,
+        autospec=True,
+    )
 
     service_one["permissions"] = ["letter", "upload_letters"]
 
@@ -727,7 +831,11 @@ def test_send_uploaded_letter_when_service_does_not_have_correct_permissions(
     permissions,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.uploads.get_letter_pdf_and_metadata", return_value=("file", {"status": "valid"}))
+    mocker.patch(
+        "app.main.views.uploads.get_letter_pdf_and_metadata",
+        return_value=("file", {"status": "valid"}),
+        autospec=True,
+    )
     mock_send = mocker.patch("app.main.views.uploads.notification_api_client.send_precompiled_letter")
 
     service_one["permissions"] = permissions

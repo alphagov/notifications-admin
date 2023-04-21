@@ -208,14 +208,22 @@ def test_change_your_mobile_number_page_doesnt_show_delete_link_if_user_has_no_m
     client_request, api_user_active_email_auth, mocker
 ):
     user = create_user(id=fake_uuid, auth_type="email_auth", mobile_number=None)
-    mocker.patch("app.user_api_client.get_user", return_value=user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=user,
+        autospec=True,
+    )
     page = client_request.get(("main.user_profile_mobile_number"))
     assert "Change your mobile number" in page.text
     assert "Delete your number" not in page.text
 
 
 def test_confirm_delete_mobile_number(client_request, api_user_active_email_auth, mocker):
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_active_email_auth)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active_email_auth,
+        autospec=True,
+    )
 
     page = client_request.get(
         ".user_profile_confirm_delete_mobile_number",
@@ -329,7 +337,11 @@ def test_should_redirect_after_mobile_number_confirm(
 
     # first time (login decorator) return normally, second time (after 2FA return with new session id)
     client_request.login(user_before)
-    mocker.patch("app.user_api_client.get_user", return_value=user_after)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=user_after,
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         session["new-mob-password-confirmed"] = True

@@ -22,7 +22,11 @@ def test_should_redirect_to_password_reset_sent_for_valid_email(
 ):
     client_request.logout()
     sample_user = user_json(email_address=email_address)
-    mocker.patch("app.user_api_client.send_reset_password_url", return_value=None)
+    mocker.patch(
+        "app.user_api_client.send_reset_password_url",
+        return_value=None,
+        autospec=True,
+    )
     page = client_request.post(
         ".forgot_password",
         _data={"email_address": sample_user["email_address"]},
@@ -39,7 +43,11 @@ def test_forgot_password_sends_next_link_with_reset_password_email_request(
 ):
     client_request.logout()
     sample_user = user_json(email_address="test@user.gov.uk")
-    mocker.patch("app.user_api_client.send_reset_password_url", return_value=None)
+    mocker.patch(
+        "app.user_api_client.send_reset_password_url",
+        return_value=None,
+        autospec=True,
+    )
     client_request.post_url(
         url_for(".forgot_password") + f"?next=/services/{SERVICE_ONE_ID}/templates",
         _data={"email_address": sample_user["email_address"]},

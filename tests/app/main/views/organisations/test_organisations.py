@@ -55,8 +55,16 @@ def test_organisation_page_shows_all_organisations(client_request, platform_admi
 
 def test_view_organisation_shows_the_correct_organisation(client_request, mocker):
     org = {"id": ORGANISATION_ID, "name": "Test 1", "active": True}
-    mocker.patch("app.organisations_client.get_organisation", return_value=org)
-    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": {}})
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=org,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.organisations_client.get_services_and_usage",
+        return_value={"services": {}},
+        autospec=True,
+    )
 
     page = client_request.get(
         ".organisation_dashboard",
@@ -188,7 +196,11 @@ def test_create_new_organisation_fails_with_duplicate_name(
         http_error = HTTPError(response=resp_mock, message="Default message")
         raise http_error
 
-    mocker.patch("app.organisations_client.create_organisation", side_effect=_create)
+    mocker.patch(
+        "app.organisations_client.create_organisation",
+        side_effect=_create,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -222,7 +234,11 @@ def test_gps_can_create_own_organisations(
     organisation,
     expected_status,
 ):
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        # should use autospec=True here but doesn’t work for some reason
+    )
     service_one["organisation_type"] = organisation_type
 
     page = client_request.get(
@@ -256,7 +272,11 @@ def test_nhs_local_can_create_own_organisations(
     organisation,
     expected_status,
 ):
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        # should use autospec=True here but doesn’t work for some reason
+    )
     mocker.patch(
         "app.models.organisation.AllOrganisations.client_method",
         return_value=[
@@ -536,7 +556,11 @@ def test_organisation_services_filters_by_financial_year(
     financial_year,
     expected_selected,
 ):
-    mock = mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": []})
+    mock = mocker.patch(
+        "app.organisations_client.get_services_and_usage",
+        return_value={"services": []},
+        autospec=True,
+    )
     page = client_request.get(
         ".organisation_dashboard",
         org_id=ORGANISATION_ID,
@@ -991,7 +1015,11 @@ def test_organisation_settings_table_shows_letter_branding_pool_with_brand_as_de
     mocker,
 ):
     organisation_one["letter_branding_id"] = "5678"
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        # should use autospec=True here but doesn’t work for some reason
+    )
 
     mocker.patch(
         "app.models.branding.letter_branding_client.get_letter_branding",
@@ -1102,7 +1130,11 @@ def test_organisation_settings_does_not_show_delete_link_for_archived_organisati
     mocker,
 ):
     organisation_one["active"] = False
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
@@ -1127,7 +1159,11 @@ def test_archive_organisation_prompts_user(
     mock_get_letter_branding_pool,
     mocker,
 ):
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     delete_page = client_request.get(
@@ -1148,7 +1184,11 @@ def test_archive_organisation_gives_403_for_inactive_orgs(
     method,
 ):
     organisation_one["active"] = False
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
 
@@ -1378,7 +1418,11 @@ def test_update_organisation_settings(
     expected_persisted,
     user,
 ):
-    mocker.patch("app.organisations_client.get_organisation_services", return_value=[])
+    mocker.patch(
+        "app.organisations_client.get_organisation_services",
+        return_value=[],
+        autospec=True,
+    )
     client_request.login(user)
 
     client_request.post(
@@ -2082,10 +2126,18 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_perso
     organisation_one["agreement_signed_on_behalf_of_name"] = signed_by_name
     organisation_one["agreement_signed_at"] = "Thu, 20 Feb 2020 00:00:00 GMT"
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active,
+        autospec=True,
+    )
     page = client_request.get(
         ".organisation_billing",
         org_id=ORGANISATION_ID,
@@ -2106,7 +2158,11 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_an_unknown_pe
     mocker,
 ):
     organisation_one["agreement_signed"] = True
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -2137,7 +2193,11 @@ def test_organisation_billing_page_when_the_agreement_is_not_signed(
     expected_content,
 ):
     organisation_one["agreement_signed"] = agreement_signed
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -2184,7 +2244,11 @@ def test_download_organisation_agreement(
     mocker.patch(
         "app.models.organisation.organisations_client.get_organisation", return_value=organisation_json(crown=crown)
     )
-    mock_get_s3_object = mocker.patch("app.s3_client.s3_mou_client.get_s3_object", return_value=MockS3Object(b"foo"))
+    mock_get_s3_object = mocker.patch(
+        "app.s3_client.s3_mou_client.get_s3_object",
+        return_value=MockS3Object(b"foo"),
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     response = client_request.get_response(

@@ -13,7 +13,11 @@ def test_find_services_by_name_page_loads_correctly(client_request, platform_adm
 
 def test_find_services_by_name_displays_services_found(client_request, platform_admin_user, mocker):
     client_request.login(platform_admin_user)
-    get_services = mocker.patch("app.service_api_client.find_services_by_name", return_value={"data": [service_json()]})
+    get_services = mocker.patch(
+        "app.service_api_client.find_services_by_name",
+        return_value={"data": [service_json()]},
+        autospec=True,
+    )
     document = client_request.post(
         "main.find_services_by_name", _data={"services-search": "Test Service"}, _expected_status=200
     )
@@ -40,7 +44,11 @@ def test_find_services_by_name_displays_multiple_services(client_request, platfo
 
 def test_find_services_by_name_displays_message_if_no_services_found(client_request, platform_admin_user, mocker):
     client_request.login(platform_admin_user)
-    mocker.patch("app.service_api_client.find_services_by_name", return_value={"data": []})
+    mocker.patch(
+        "app.service_api_client.find_services_by_name",
+        return_value={"data": []},
+        autospec=True,
+    )
     document = client_request.post(
         "main.find_services_by_name", _data={"services-search": "Nabuchodonosorian Empire"}, _expected_status=200
     )

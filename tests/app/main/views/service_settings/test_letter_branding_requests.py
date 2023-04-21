@@ -234,7 +234,11 @@ def test_letter_branding_options_redirects_to_nhs_page(
     mocker,
 ):
     service_one["organisation"] = organisation_one["id"]
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
     mocker.patch(
         "app.models.branding.LetterBrandingPool.client_method",
         return_value=[{"name": "NHS", "id": LetterBranding.NHS_ID}],
@@ -353,7 +357,11 @@ def test_GET_letter_branding_upload_branding_renders_form_with_prompt_if_user_cl
     client_request, service_one, organisation_one, mocker
 ):
     service_one["organisation"] = organisation_one["id"]
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="organisation"
@@ -365,7 +373,11 @@ def test_GET_letter_branding_upload_branding_renders_form_without_prompt_if_user
     client_request, service_one, organisation_one, mocker
 ):
     service_one["organisation"] = organisation_one["id"]
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.letter_branding_upload_branding", service_id=SERVICE_ONE_ID, branding_choice="something_else"
@@ -712,7 +724,11 @@ def test_letter_branding_nhs_page_displays_preview(
 ):
     organisation_one["organisation_type"] = "nhs_central"
     service_one["organisation"] = organisation_one
-    x = mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    x = mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     page = client_request.get(
         ".branding_nhs",
@@ -730,7 +746,11 @@ def test_letter_branding_nhs_page_returns_404_if_service_not_nhs(
 ):
     organisation_one["organisation_type"] = "central"
     service_one["organisation"] = organisation_one
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     client_request.get(
         ".branding_nhs",
@@ -785,7 +805,11 @@ def test_should_set_default_org_letter_branding_fails_if_branding_choice_is_not_
         return_value=[service, service_json(id_="5678", restricted=True)],
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        autospec=True,
+    )
     g.current_service = Service(service)
 
     assert _should_set_default_org_letter_branding(branding_choice) is False
@@ -799,7 +823,11 @@ def test_should_set_default_org_letter_branding_fails_if_org_already_has_a_defau
         return_value=[service, service_json(id_="5678", restricted=True)],
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        autospec=True,
+    )
     g.current_service = Service(service)
 
     assert _should_set_default_org_letter_branding("organisation") is False
@@ -813,7 +841,11 @@ def test_should_set_default_org_letter_branding_fails_if_other_live_services_in_
         return_value=[service, service_json(id_="5678", restricted=False)],
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        autospec=True,
+    )
     g.current_service = Service(service)
 
     assert _should_set_default_org_letter_branding("organisation") is False
@@ -832,7 +864,11 @@ def test_should_set_default_org_letter_branding_succeeds_if_all_conditions_are_m
         return_value=[service, service_json(id_="5678", restricted=True)],
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        autospec=True,
+    )
     g.current_service = Service(service)
 
     assert _should_set_default_org_letter_branding("organisation") is True

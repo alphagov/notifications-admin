@@ -442,7 +442,11 @@ def test_should_show_complaints_with_next_previous(
         "links": {"last": "/complaint?page=3", "next": "/complaint?page=3", "prev": "/complaint?page=1"},
     }
 
-    mocker.patch("app.complaint_api_client.get_all_complaints", return_value=api_response)
+    mocker.patch(
+        "app.complaint_api_client.get_all_complaints",
+        return_value=api_response,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -466,7 +470,11 @@ def test_platform_admin_list_complaints_returns_404_with_invalid_page(
     mocker,
 ):
 
-    mocker.patch("app.complaint_api_client.get_all_complaints", return_value={"complaints": [], "links": {}})
+    mocker.patch(
+        "app.complaint_api_client.get_all_complaints",
+        return_value={"complaints": [], "links": {}},
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     client_request.get(
@@ -612,7 +620,11 @@ def test_platform_admin_displays_stats_in_right_boxes_and_with_correct_styling(
         "app.main.views.platform_admin.platform_stats_api_client.get_aggregate_platform_stats",
         return_value=platform_stats,
     )
-    mocker.patch("app.main.views.platform_admin.complaint_api_client.get_complaint_count", return_value=15)
+    mocker.patch(
+        "app.main.views.platform_admin.complaint_api_client.get_complaint_count",
+        return_value=15,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.get("main.platform_admin")
@@ -905,7 +917,11 @@ def test_get_notifications_sent_by_service_validates_form(
 def test_get_billing_report_when_no_results_for_date(client_request, platform_admin_user, mocker):
     client_request.login(platform_admin_user)
 
-    mocker.patch("app.main.views.platform_admin.billing_api_client.get_data_for_billing_report", return_value=[])
+    mocker.patch(
+        "app.main.views.platform_admin.billing_api_client.get_data_for_billing_report",
+        return_value=[],
+        autospec=True,
+    )
 
     page = client_request.post(
         "main.get_billing_report", _expected_status=200, _data={"start_date": "2019-01-01", "end_date": "2019-03-31"}
@@ -1241,7 +1257,11 @@ class TestPlatformAdminFind:
         ),
     )
     def test_find_uuid_redirects(self, mocker, client_request, platform_admin_user, api_response, expected_redirect):
-        mocker.patch("app.main.views.platform_admin.admin_api_client.find_by_uuid", return_value=api_response)
+        mocker.patch(
+            "app.main.views.platform_admin.admin_api_client.find_by_uuid",
+            return_value=api_response,
+            autospec=True,
+        )
         client_request.login(platform_admin_user)
         client_request.post(
             ".platform_admin_search",

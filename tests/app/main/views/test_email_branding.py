@@ -330,8 +330,16 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
     mocker,
     platform_admin_user,
 ):
-    mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo", return_value="temp_filename")
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.main.views.email_branding.logo_client.save_temporary_logo",
+        return_value="temp_filename",
+        autospec=True,
+    )
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     data = {
         "file": (BytesIO("".encode("utf-8")), "test.png"),
         "colour": "",
@@ -364,8 +372,16 @@ def test_create_email_branding_calls_antivirus_scan(
     scan_result,
     expected_status_code,
 ):
-    mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo", return_value="temp_filename")
-    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=scan_result)
+    mocker.patch(
+        "app.main.views.email_branding.logo_client.save_temporary_logo",
+        return_value="temp_filename",
+        autospec=True,
+    )
+    mock_antivirus = mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=scan_result,
+        autospec=True,
+    )
     data = {
         "file": (BytesIO("".encode("utf-8")), "test.png"),
         "colour": "",
@@ -411,7 +427,11 @@ def test_create_new_email_branding_when_branding_saved(
         "brand_type": "org_banner",
     }
 
-    mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo", return_value="email/test.png")
+    mocker.patch(
+        "app.main.views.email_branding.logo_client.save_permanent_logo",
+        return_value="email/test.png",
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     client_request.post(
@@ -506,7 +526,11 @@ def test_update_existing_branding(
         "updated_by_id": fake_uuid,
     }
 
-    mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo", return_value="email/test.png")
+    mocker.patch(
+        "app.main.views.email_branding.logo_client.save_permanent_logo",
+        return_value="email/test.png",
+        autospec=True,
+    )
     mock_create_update_email_branding_event = mocker.patch(
         "app.main.views.email_branding.create_update_email_branding_event"
     )
@@ -756,8 +780,16 @@ def test_temp_logo_is_shown_after_uploading_logo(
     mocker,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo", return_value="email/test.png")
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.main.views.email_branding.logo_client.save_temporary_logo",
+        return_value="email/test.png",
+        autospec=True,
+    )
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.post(

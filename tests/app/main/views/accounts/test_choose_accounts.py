@@ -69,7 +69,11 @@ SAMPLE_DATA = {
 
 @pytest.fixture
 def mock_get_orgs_and_services(mocker):
-    return mocker.patch("app.user_api_client.get_organisations_and_services_for_user", return_value=SAMPLE_DATA)
+    return mocker.patch(
+        "app.user_api_client.get_organisations_and_services_for_user",
+        return_value=SAMPLE_DATA,
+        autospec=True,
+    )
 
 
 def test_choose_account_should_show_choose_accounts_page(

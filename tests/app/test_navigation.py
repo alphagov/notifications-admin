@@ -500,7 +500,11 @@ def test_a_page_should_nave_selected_org_navigation_item(
     selected_nav_item,
     mocker,
 ):
-    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": {}})
+    mocker.patch(
+        "app.organisations_client.get_services_and_usage",
+        return_value={"services": {}},
+        autospec=True,
+    )
     page = client_request.get(endpoint, org_id=ORGANISATION_ID)
     selected_nav_items = page.select(".navigation a.selected")
     assert len(selected_nav_items) == 1

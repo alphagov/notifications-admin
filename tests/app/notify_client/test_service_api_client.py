@@ -148,7 +148,11 @@ def test_client_returns_count_of_service_templates(
     expected_count,
 ):
 
-    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": template_data})
+    mocker.patch(
+        "app.service_api_client.get_service_templates",
+        return_value={"data": template_data},
+        autospec=True,
+    )
 
     assert service_api_client.count_service_templates(SERVICE_ONE_ID, **extra_args) == expected_count
 
@@ -480,7 +484,11 @@ def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_te
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
     mock_redis_delete_by_pattern = mocker.patch("app.extensions.RedisClient.delete_by_pattern")
 
-    mocker.patch("notifications_python_client.base.BaseAPIClient.request", return_value={"data": ""})
+    mocker.patch(
+        "notifications_python_client.base.BaseAPIClient.request",
+        return_value={"data": ""},
+        autospec=True,
+    )
 
     service_api_client.archive_service(SERVICE_ONE_ID, ["my-user-id1", "my-user-id2"])
 
@@ -491,7 +499,11 @@ def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_te
 def test_deletes_cached_users_when_changing_broadcast_service_settings(mocker):
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
 
-    mocker.patch("notifications_python_client.base.BaseAPIClient.request", return_value={"data": ""})
+    mocker.patch(
+        "notifications_python_client.base.BaseAPIClient.request",
+        return_value={"data": ""},
+        autospec=True,
+    )
 
     service_api_client.set_service_broadcast_settings(
         SERVICE_ONE_ID, "live", "severe", "all", ["my-user-id1", "my-user-id2"]

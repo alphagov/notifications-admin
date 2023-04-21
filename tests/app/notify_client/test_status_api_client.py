@@ -2,7 +2,11 @@ from app.notify_client.status_api_client import StatusApiClient
 
 
 def test_get_count_of_live_services_and_organisations(mocker):
-    mocker.patch("app.extensions.RedisClient.get", return_value=None)
+    mocker.patch(
+        "app.extensions.RedisClient.get",
+        return_value=None,
+        autospec=True,
+    )
     client = StatusApiClient()
     mock = mocker.patch.object(client, "get", return_value={})
 

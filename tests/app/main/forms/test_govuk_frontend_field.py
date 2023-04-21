@@ -23,7 +23,11 @@ def test_govuk_frontend_widget_mixin_separates_params_properly(client_request):
 
 
 def test_govuk_frontend_widget_mixin_calls_render(client_request, mocker):
-    mock_render = mocker.patch("app.utils.govuk_frontend_field.render_govuk_frontend_macro", return_value="my html")
+    mock_render = mocker.patch(
+        "app.utils.govuk_frontend_field.render_govuk_frontend_macro",
+        return_value="my html",
+        autospec=True,
+    )
 
     class MyField(GovukFrontendWidgetMixin, StringField):
         govuk_frontend_component_name = "component"
@@ -40,7 +44,11 @@ def test_govuk_frontend_widget_mixin_calls_render(client_request, mocker):
 
 
 def test_govuk_frontend_widget_mixin_takes_instance_params_over_class_params(client_request, mocker):
-    mock_render = mocker.patch("app.utils.govuk_frontend_field.render_govuk_frontend_macro", return_value="my html")
+    mock_render = mocker.patch(
+        "app.utils.govuk_frontend_field.render_govuk_frontend_macro",
+        return_value="my html",
+        autospec=True,
+    )
 
     class MyField(GovukFrontendWidgetMixin, StringField):
         govuk_frontend_component_name = "component"
@@ -55,7 +63,11 @@ def test_govuk_frontend_widget_mixin_takes_instance_params_over_class_params(cli
 
 
 def test_govuk_frontend_widget_mixin_takes_render_params_over_class_params(client_request, mocker):
-    mock_render = mocker.patch("app.utils.govuk_frontend_field.render_govuk_frontend_macro", return_value="my html")
+    mock_render = mocker.patch(
+        "app.utils.govuk_frontend_field.render_govuk_frontend_macro",
+        return_value="my html",
+        autospec=True,
+    )
 
     class MyField(GovukFrontendWidgetMixin, StringField):
         govuk_frontend_component_name = "component"

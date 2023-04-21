@@ -108,7 +108,11 @@ def test_client_converts_admin_permissions_to_db_permissions_on_edit(notify_admi
 
 
 def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(notify_admin, mocker):
-    mock_post = mocker.patch("app.notify_client.user_api_client.UserApiClient.post", return_value={"data": {}})
+    mock_post = mocker.patch(
+        "app.notify_client.user_api_client.UserApiClient.post",
+        return_value={"data": {}},
+        autospec=True,
+    )
 
     user_api_client.add_user_to_service(
         "service_id", "user_id", permissions={"send_messages", "view_activity"}, folder_permissions=[]

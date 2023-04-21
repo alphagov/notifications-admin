@@ -38,7 +38,11 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(
     fake_uuid,
 ):
     api_user_active["current_session_id"] = str(uuid.UUID(int=1))
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active,
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         session["user_details"] = {"email_address": api_user_active["email_address"], "id": api_user_active["id"]}
@@ -68,7 +72,11 @@ def test_should_activate_user_after_verify(
     mock_activate_user,
 ):
     client_request.logout()
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_pending)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_pending,
+        autospec=True,
+    )
     with client_request.session_transaction() as session:
         session["user_details"] = {"email_address": api_user_pending["email_address"], "id": api_user_pending["id"]}
     client_request.post("main.verify", _data={"sms_code": "12345"})
@@ -105,7 +113,11 @@ def test_verify_email_redirects_to_verify_if_token_valid(
     mock_check_verify_code,
 ):
     token_data = {"user_id": api_user_pending["id"], "secret_code": "UNUSED"}
-    mocker.patch("app.main.views.verify.check_token", return_value=json.dumps(token_data))
+    mocker.patch(
+        "app.main.views.verify.check_token",
+        return_value=json.dumps(token_data),
+        autospec=True,
+    )
 
     client_request.get(
         "main.verify_email",
@@ -130,9 +142,17 @@ def test_verify_email_doesnt_verify_sms_if_user_on_email_auth(
 ):
     pending_user_with_email_auth = create_user(auth_type="email_auth", state="pending", id=fake_uuid)
 
-    mocker.patch("app.user_api_client.get_user", return_value=pending_user_with_email_auth)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=pending_user_with_email_auth,
+        autospec=True,
+    )
     token_data = {"user_id": pending_user_with_email_auth["id"], "secret_code": "UNUSED"}
-    mocker.patch("app.main.views.verify.check_token", return_value=json.dumps(token_data))
+    mocker.patch(
+        "app.main.views.verify.check_token",
+        return_value=json.dumps(token_data),
+        autospec=True,
+    )
 
     client_request.get(
         "main.verify_email",
@@ -175,7 +195,11 @@ def test_verify_email_redirects_to_sign_in_if_user_active(
 ):
     client_request.logout()
     token_data = {"user_id": api_user_active["id"], "secret_code": 12345}
-    mocker.patch("app.main.views.verify.check_token", return_value=json.dumps(token_data))
+    mocker.patch(
+        "app.main.views.verify.check_token",
+        return_value=json.dumps(token_data),
+        autospec=True,
+    )
 
     page = client_request.get("main.verify_email", token="notreal", _follow_redirects=True)
 

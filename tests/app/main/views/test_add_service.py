@@ -330,7 +330,11 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
         http_error = HTTPError(response=resp_mock, message="Default message")
         raise http_error
 
-    mocker.patch("app.service_api_client.create_service", side_effect=_create)
+    mocker.patch(
+        "app.service_api_client.create_service",
+        side_effect=_create,
+        autospec=True,
+    )
 
     page = client_request.post(
         "main.add_service",

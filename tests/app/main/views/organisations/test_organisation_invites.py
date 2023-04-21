@@ -62,7 +62,11 @@ def test_cancel_invited_org_user_cancels_user_invitations(
     mocker,
 ):
     mock_cancel = mocker.patch("app.org_invite_api_client.cancel_invited_user")
-    mocker.patch("app.org_invite_api_client.get_invited_user_for_org", return_value=sample_org_invite)
+    mocker.patch(
+        "app.org_invite_api_client.get_invited_user_for_org",
+        return_value=sample_org_invite,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.cancel_invited_org_user",
@@ -93,7 +97,11 @@ def test_cancelled_invite_opened_by_user(
     mocker, client_request, api_user_active, mock_check_org_cancelled_invite_token, mock_get_organisation, fake_uuid
 ):
     client_request.logout()
-    mock_get_user = mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mock_get_user = mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.accept_org_invite",

@@ -346,7 +346,11 @@ def test_get_letter_choices_shows_nhs_branding_for_nhs_services(
         new_callable=PropertyMock,
         return_value="org-branding-id",
     )
-    mocker.patch("app.letter_branding_client.get_letter_branding", return_value={"name": branding_name})
+    mocker.patch(
+        "app.letter_branding_client.get_letter_branding",
+        return_value={"name": branding_name},
+        autospec=True,
+    )
 
     options = get_letter_choices(service)
     assert list(options) == expected_options

@@ -55,7 +55,11 @@ def test_find_users_by_email_displays_multiple_users(client_request, platform_ad
 
 def test_find_users_by_email_displays_message_if_no_users_found(client_request, platform_admin_user, mocker):
     client_request.login(platform_admin_user)
-    mocker.patch("app.user_api_client.find_users_by_full_or_partial_email", return_value={"data": []}, autospec=True)
+    mocker.patch(
+        "app.user_api_client.find_users_by_full_or_partial_email",
+        return_value={"data": []},
+        autospec=True,
+    )
     document = client_request.post(
         "main.find_users_by_email", _data={"users-search": "twilight.sparkle"}, _expected_status=200
     )

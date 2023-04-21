@@ -181,7 +181,11 @@ def test_should_show_change_details_link(
     other_user["email_address"] = "zzzzzzz@example.gov.uk"
     other_user["state"] = state
 
-    mocker.patch("app.user_api_client.get_user", return_value=current_user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=current_user,
+        autospec=True,
+    )
     mocker.patch(
         "app.models.user.Users.client_method",
         return_value=[
@@ -218,7 +222,11 @@ def test_should_show_live_search_if_more_than_7_users(
     active_user_view_permissions,
     number_of_users,
 ):
-    mocker.patch("app.user_api_client.get_user", return_value=active_user_with_permissions)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=active_user_with_permissions,
+        autospec=True,
+    )
     mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[])
     mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions] * number_of_users)
 
@@ -518,7 +526,11 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
     active_user_with_permissions["mobile_number"] = mobile_number
 
     service_one["permissions"].append("email_auth")
-    mocker.patch("app.user_api_client.get_user", return_value=active_user_with_permissions)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=active_user_with_permissions,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.edit_user_permissions",
@@ -815,7 +827,11 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
     platform_admin_user,
 ):
     service_one["permissions"] = ["edit_folder_permissions"]
-    mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=platform_admin_user,
+        autospec=True,
+    )
     mock_get_template_folders.return_value = [
         {"id": "folder-id-1", "name": "folder_one", "parent_id": None, "users_with_permission": []},
         {"id": "folder-id-2", "name": "folder_one", "parent_id": None, "users_with_permission": []},
@@ -1190,7 +1206,11 @@ def test_invite_user(
     assert is_gov_user(email_address) == gov_user
     mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
     mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
-    mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
+    mocker.patch(
+        "app.invite_api_client.create_invite",
+        return_value=sample_invite,
+        autospec=True,
+    )
     page = client_request.post(
         "main.invite_user",
         service_id=SERVICE_ONE_ID,
@@ -1235,7 +1255,11 @@ def test_invite_user_when_email_address_is_prefilled(
         "app.models.user.user_api_client.get_user",
         return_value=active_user_with_permission_to_other_service,
     )
-    mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
+    mocker.patch(
+        "app.invite_api_client.create_invite",
+        return_value=sample_invite,
+        autospec=True,
+    )
     client_request.post(
         "main.invite_user",
         service_id=SERVICE_ONE_ID,
@@ -1278,7 +1302,11 @@ def test_invite_user_with_email_auth_service(
     assert is_gov_user(email_address) is gov_user
     mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
     mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
-    mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
+    mocker.patch(
+        "app.invite_api_client.create_invite",
+        return_value=sample_invite,
+        autospec=True,
+    )
 
     page = client_request.post(
         "main.invite_user",
@@ -1351,7 +1379,11 @@ def test_invite_user_to_broadcast_service(
     service_one["permissions"] = ["broadcast"]
     mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
     mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
-    mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
+    mocker.patch(
+        "app.invite_api_client.create_invite",
+        return_value=sample_invite,
+        autospec=True,
+    )
     post_data["email_address"] = "broadcast@example.gov.uk"
     client_request.post(
         "main.invite_user",
@@ -1380,7 +1412,11 @@ def test_invite_non_govt_user_to_broadcast_service_fails_validation(
     service_one["permissions"] = ["broadcast"]
     mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
     mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
-    mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
+    mocker.patch(
+        "app.invite_api_client.create_invite",
+        return_value=sample_invite,
+        autospec=True,
+    )
     post_data = {
         "permissions_field": [
             "send_messages",
@@ -1404,7 +1440,11 @@ def test_cancel_invited_user_cancels_user_invitations(
     mocker,
 ):
     mock_cancel = mocker.patch("app.invite_api_client.cancel_invited_user")
-    mocker.patch("app.invite_api_client.get_invited_user_for_service", return_value=sample_invite)
+    mocker.patch(
+        "app.invite_api_client.get_invited_user_for_service",
+        return_value=sample_invite,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.cancel_invited_user",
@@ -1719,7 +1759,11 @@ def test_edit_user_email_page(
     client_request, active_user_with_permissions, service_one, mock_get_users_by_service, mocker
 ):
     user = active_user_with_permissions
-    mocker.patch("app.user_api_client.get_user", return_value=user)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=user,
+        autospec=True,
+    )
 
     page = client_request.get("main.edit_user_email", service_id=service_one["id"], user_id=sample_uuid())
 

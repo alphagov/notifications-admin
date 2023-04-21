@@ -221,7 +221,11 @@ def test_email_branding_options_does_not_show_nhs_branding_twice(
     organisation_one["organisation_type"] = "nhs_central"
     service_one["organisation"] = organisation_one
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     nhs_branding = create_email_branding(EmailBranding.NHS_ID, {"colour": None, "name": "NHS", "text": None})[
         "email_branding"
@@ -863,7 +867,11 @@ def test_GET_email_branding_enter_government_identity_logo_text_protects_against
 ):
     organisation_one["name"] = "<script>evil</script>"
     service_one["organisation"] = organisation_one["id"]
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     page = client_request.get("main.email_branding_enter_government_identity_logo_text", service_id=service_one["id"])
 
@@ -1166,7 +1174,11 @@ def test_GET_email_branding_upload_logo(
     ),
 )
 def test_POST_email_branding_upload_logo_success(mocker, client_request, service_one, email_branding_data):
-    antivirus_mock = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    antivirus_mock = mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     mock_save_temporary = mocker.patch(
         "app.main.views.service_settings.branding.logo_client.save_temporary_logo", return_value="my-logo-path"
     )
@@ -1525,7 +1537,11 @@ def test_email_branding_choose_banner_type_page(
 ):
     organisation_one["organisation_type"] = org_type
     service_one["organisation"] = organisation_one
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     page = client_request.get("main.email_branding_choose_banner_type", service_id=SERVICE_ONE_ID, **url_params)
 

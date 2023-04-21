@@ -6,7 +6,11 @@ from app.notify_client.performance_dashboard_api_client import (
 
 
 def test_get_aggregate_platform_stats(mocker):
-    mocker.patch("app.extensions.RedisClient.get", return_value=None)
+    mocker.patch(
+        "app.extensions.RedisClient.get",
+        return_value=None,
+        autospec=True,
+    )
     client = PerformanceDashboardAPIClient()
     mock = mocker.patch.object(client, "get", return_value={})
 

@@ -42,7 +42,11 @@ def test_sign_in_explains_session_timeout(client_request):
 
 def test_sign_in_explains_other_browser(client_request, api_user_active, mocker):
     api_user_active["current_session_id"] = str(uuid.UUID(int=1))
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active,
+        autospec=True,
+    )
 
     with client_request.session_transaction() as session:
         session["current_session_id"] = str(uuid.UUID(int=2))
@@ -78,7 +82,11 @@ def test_redirect_to_sign_in_if_logged_in_from_other_browser(
     client_request, api_user_active, mocker, db_sess_id, cookie_sess_id
 ):
     api_user_active["current_session_id"] = db_sess_id
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active,
+        autospec=True,
+    )
     with client_request.session_transaction() as session:
         session["current_session_id"] = str(cookie_sess_id)
 
@@ -165,8 +173,16 @@ def test_process_email_auth_sign_in_return_2fa_template(
     client_request, api_user_active_email_auth, mock_send_verify_code, mock_verify_password, mocker, redirect_url
 ):
     client_request.logout()
-    mocker.patch("app.user_api_client.get_user", return_value=api_user_active_email_auth)
-    mocker.patch("app.user_api_client.get_user_by_email", return_value=api_user_active_email_auth)
+    mocker.patch(
+        "app.user_api_client.get_user",
+        return_value=api_user_active_email_auth,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.user_api_client.get_user_by_email",
+        return_value=api_user_active_email_auth,
+        autospec=True,
+    )
 
     client_request.post(
         "main.sign_in",
@@ -194,7 +210,11 @@ def test_process_webauthn_auth_sign_in_redirects_to_webauthn_with_next_redirect(
 ):
     client_request.logout()
     api_user_active["auth_type"] = "webauthn_auth"
-    mock_get_user_by_email = mocker.patch("app.user_api_client.get_user_by_email", return_value=api_user_active)
+    mock_get_user_by_email = mocker.patch(
+        "app.user_api_client.get_user_by_email",
+        return_value=api_user_active,
+        autospec=True,
+    )
 
     client_request.post(
         "main.sign_in",

@@ -196,7 +196,11 @@ def test_should_show_overview(
         organisation_id=ORGANISATION_ID,
         contact_link="contact_us@gov.uk",
     )
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     client_request.login(user, service_one)
     page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
@@ -226,7 +230,11 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
         organisation_id=ORGANISATION_ID,
         contact_link="contact_us@gov.uk",
     )
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     client_request.login(create_platform_admin_user(), service_one)
     page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
@@ -288,7 +296,11 @@ def test_platform_admin_sees_correct_description_of_broadcast_service_setting(
         broadcast_channel=broadcast_channel,
         allowed_broadcast_provider=allowed_broadcast_provider,
     )
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     client_request.login(create_platform_admin_user(), service_one)
     page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
@@ -308,7 +320,11 @@ def test_no_go_live_link_for_service_without_organisation(
     platform_admin_user,
     mock_get_service_settings_page_common,
 ):
-    mocker.patch("app.organisations_client.get_organisation", return_value=None)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=None,
+        autospec=True,
+    )
     client_request.login(platform_admin_user)
     page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
 
@@ -332,7 +348,11 @@ def test_organisation_name_links_to_org_dashboard(
     mocker,
 ):
     service_one = service_json(SERVICE_ONE_ID, permissions=["sms", "email"], organisation_id=ORGANISATION_ID)
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user, service_one)
     response = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
@@ -364,7 +384,11 @@ def test_send_files_by_email_row_on_settings_page(
         SERVICE_ONE_ID, permissions=["sms", "email"], organisation_id=ORGANISATION_ID, contact_link=service_contact_link
     )
 
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user, service_one)
     response = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
@@ -1859,7 +1883,11 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
     expected_call_args,
 ):
     organisation_one["can_approve_own_go_live_requests"] = can_approve_own_go_live_requests
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        # should use autospec=True here but doesn’t work for some reason
+    )
     mocker.patch("app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True)
 
     client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID)
@@ -2001,7 +2029,9 @@ def test_ready_to_go_live(
     agreement_signed,
 ):
     mocker.patch(
-        "app.organisations_client.get_organisation", return_value=organisation_json(agreement_signed=agreement_signed)
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(agreement_signed=agreement_signed),
+        autospec=True,
     )
 
     for prop in {
@@ -2403,7 +2433,11 @@ def test_incorrect_sms_sender_input_with_multiple_errors_only_shows_the_first(
 def test_add_reply_to_email_address_sends_test_notification(
     mocker, client_request, reply_to_addresses, data, api_default_args
 ):
-    mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=reply_to_addresses)
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_addresses",
+        return_value=reply_to_addresses,
+        autospec=True,
+    )
     data["email_address"] = "test@example.com"
     mock_verify = mocker.patch(
         "app.service_api_client.verify_reply_to_email_address", return_value={"data": {"id": "123"}}
@@ -2479,10 +2513,18 @@ def test_service_verify_reply_to_address(
         "notification_type": "email",
         "created_at": "2018-06-01T11:10:52.499230+00:00",
     }
-    mocker.patch("app.notification_api_client.get_notification", return_value=notification)
+    mocker.patch(
+        "app.notification_api_client.get_notification",
+        return_value=notification,
+        autospec=True,
+    )
     mock_add_reply_to_email_address = mocker.patch("app.service_api_client.add_reply_to_email_address")
     mock_update_reply_to_email_address = mocker.patch("app.service_api_client.update_reply_to_email_address")
-    mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=[])
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_addresses",
+        return_value=[],
+        autospec=True,
+    )
     page = client_request.get(
         "main.service_verify_reply_to_address",
         service_id=SERVICE_ONE_ID,
@@ -2528,8 +2570,16 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_se
         "notification_type": "email",
         "created_at": "2018-06-01T11:10:12.499230+00:00",
     }
-    mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=[])
-    mocker.patch("app.notification_api_client.get_notification", return_value=notification)
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_addresses",
+        return_value=[],
+        autospec=True,
+    )
+    mocker.patch(
+        "app.notification_api_client.get_notification",
+        return_value=notification,
+        autospec=True,
+    )
     mock_add_reply_to_email_address = mocker.patch("app.service_api_client.add_reply_to_email_address")
     page = client_request.get(
         "main.service_verify_reply_to_address",
@@ -2553,7 +2603,11 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_se
 def test_add_letter_contact(
     letter_contact_blocks, data, api_default_args, mocker, client_request, mock_add_letter_contact
 ):
-    mocker.patch("app.service_api_client.get_letter_contacts", return_value=letter_contact_blocks)
+    mocker.patch(
+        "app.service_api_client.get_letter_contacts",
+        return_value=letter_contact_blocks,
+        autospec=True,
+    )
 
     data["letter_contact_block"] = "1 Example Street"
     client_request.post("main.service_add_letter_contact", service_id=SERVICE_ONE_ID, _data=data)
@@ -2618,7 +2672,11 @@ def test_add_letter_contact_when_coming_from_template(
     ],
 )
 def test_add_sms_sender(sms_senders, data, api_default_args, mocker, client_request, mock_add_sms_sender):
-    mocker.patch("app.service_api_client.get_sms_senders", return_value=sms_senders)
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=sms_senders,
+        autospec=True,
+    )
     data["sms_sender"] = "Example"
     client_request.post("main.service_add_sms_sender", service_id=SERVICE_ONE_ID, _data=data)
 
@@ -2633,7 +2691,11 @@ def test_add_sms_sender(sms_senders, data, api_default_args, mocker, client_requ
     ],
 )
 def test_default_box_doesnt_show_on_first_email_sender(reply_to_addresses, mocker, checkbox_present, client_request):
-    mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=reply_to_addresses)
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_addresses",
+        return_value=reply_to_addresses,
+        autospec=True,
+    )
 
     page = client_request.get("main.service_add_email_reply_to", service_id=SERVICE_ONE_ID)
 
@@ -2644,7 +2706,11 @@ def test_default_box_doesnt_show_on_first_email_sender(reply_to_addresses, mocke
     "contact_blocks, checkbox_present", [([], False), (create_multiple_letter_contact_blocks(), True)]
 )
 def test_default_box_doesnt_show_on_first_letter_sender(contact_blocks, mocker, checkbox_present, client_request):
-    mocker.patch("app.service_api_client.get_letter_contacts", return_value=contact_blocks)
+    mocker.patch(
+        "app.service_api_client.get_letter_contacts",
+        return_value=contact_blocks,
+        autospec=True,
+    )
 
     page = client_request.get("main.service_add_letter_contact", service_id=SERVICE_ONE_ID)
 
@@ -2671,7 +2737,11 @@ def test_edit_reply_to_email_address_sends_verification_notification_if_address_
     mock_verify = mocker.patch(
         "app.service_api_client.verify_reply_to_email_address", return_value={"data": {"id": "123"}}
     )
-    mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_address",
+        return_value=reply_to_address,
+        autospec=True,
+    )
     data["email_address"] = "test@example.gov.uk"
     client_request.post(
         "main.service_edit_email_reply_to", service_id=SERVICE_ONE_ID, reply_to_email_id=fake_uuid, _data=data
@@ -2718,7 +2788,11 @@ def test_service_edit_email_reply_to_updates_email_address_without_verification_
 def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
     reply_to_address, data, api_default_args, mocker, fake_uuid, client_request, mock_update_reply_to_email_address
 ):
-    mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_address",
+        return_value=reply_to_address,
+        autospec=True,
+    )
     mock_verify = mocker.patch("app.service_api_client.verify_reply_to_email_address")
     data["email_address"] = "test@example.com"
     client_request.post(
@@ -2742,8 +2816,16 @@ def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_
     mocker, fake_uuid, client_request, mock_update_reply_to_email_address, url
 ):
     reply_to_email_address = create_reply_to_email_address()
-    mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=[reply_to_email_address])
-    mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_email_address)
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_addresses",
+        return_value=[reply_to_email_address],
+        autospec=True,
+    )
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_address",
+        return_value=reply_to_email_address,
+        autospec=True,
+    )
     error_message = "Your service already uses ‘reply_to@example.com’ as an email reply-to address."
     mocker.patch(
         "app.service_api_client.verify_reply_to_email_address",
@@ -2785,7 +2867,11 @@ def test_shows_delete_link_for_get_request_for_edit_email_reply_to_address(
     fake_uuid,
     client_request,
 ):
-    mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_address",
+        return_value=reply_to_address,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.service_edit_email_reply_to",
@@ -2831,7 +2917,11 @@ def test_shows_delete_link_for_error_on_post_request_for_edit_email_reply_to_add
     fake_uuid,
     client_request,
 ):
-    mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_address",
+        return_value=reply_to_address,
+        autospec=True,
+    )
 
     data = {"email_address": "not a valid email address"}
     if default_checkbox_checked:
@@ -2912,7 +3002,11 @@ def test_delete_reply_to_email_address(
 def test_edit_letter_contact_block(
     letter_contact_block, data, api_default_args, mocker, fake_uuid, client_request, mock_update_letter_contact
 ):
-    mocker.patch("app.service_api_client.get_letter_contact", return_value=letter_contact_block)
+    mocker.patch(
+        "app.service_api_client.get_letter_contact",
+        return_value=letter_contact_block,
+        autospec=True,
+    )
     data["letter_contact_block"] = "1 Example Street"
     client_request.post(
         "main.service_edit_letter_contact", service_id=SERVICE_ONE_ID, letter_contact_id=fake_uuid, _data=data
@@ -2976,7 +3070,11 @@ def test_delete_letter_contact_block(
     ],
 )
 def test_edit_sms_sender(sms_sender, data, api_default_args, mocker, fake_uuid, client_request, mock_update_sms_sender):
-    mocker.patch("app.service_api_client.get_sms_sender", return_value=sms_sender)
+    mocker.patch(
+        "app.service_api_client.get_sms_sender",
+        return_value=sms_sender,
+        autospec=True,
+    )
 
     client_request.post("main.service_edit_sms_sender", service_id=SERVICE_ONE_ID, sms_sender_id=fake_uuid, _data=data)
 
@@ -3064,7 +3162,11 @@ def test_default_box_shows_on_non_default_sender_details_while_editing(
 
 def test_sender_details_are_escaped(client_request, mocker, fake_uuid):
     letter_contact_block = create_letter_contact_block(contact_block="foo\n\n<br>\n\nbar")
-    mocker.patch("app.service_api_client.get_letter_contacts", return_value=[letter_contact_block])
+    mocker.patch(
+        "app.service_api_client.get_letter_contacts",
+        return_value=[letter_contact_block],
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.service_letter_contact_details",
@@ -3099,7 +3201,11 @@ def test_shows_delete_link_for_sms_sender(
     client_request,
 ):
 
-    mocker.patch("app.service_api_client.get_sms_sender", return_value=sms_sender)
+    mocker.patch(
+        "app.service_api_client.get_sms_sender",
+        return_value=sms_sender,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.service_edit_sms_sender",
@@ -3154,7 +3260,11 @@ def test_confirm_delete_sms_sender(
 def test_inbound_sms_sender_is_not_deleteable(
     client_request, service_one, fake_uuid, sms_sender, expected_link_text, mocker
 ):
-    mocker.patch("app.service_api_client.get_sms_sender", return_value=sms_sender)
+    mocker.patch(
+        "app.service_api_client.get_sms_sender",
+        return_value=sms_sender,
+        autospec=True,
+    )
 
     page = client_request.get(
         ".service_edit_sms_sender",
@@ -3200,7 +3310,11 @@ def test_delete_sms_sender(
     ],
 )
 def test_inbound_sms_sender_is_not_editable(client_request, service_one, fake_uuid, sms_sender, hide_textbox, mocker):
-    mocker.patch("app.service_api_client.get_sms_sender", return_value=sms_sender)
+    mocker.patch(
+        "app.service_api_client.get_sms_sender",
+        return_value=sms_sender,
+        autospec=True,
+    )
 
     page = client_request.get(
         ".service_edit_sms_sender",
@@ -3430,6 +3544,7 @@ def test_should_show_branding_styles(
             "Org 1",
             email_branding_id=current_branding,
         ),
+        autospec=True,
     )
 
     client_request.login(platform_admin_user)
@@ -3575,10 +3690,16 @@ def test_should_set_branding_for_service_with_organisation(
     email_branding_name = "branding1"
 
     mocker.patch(
-        "app.email_branding_client.get_email_branding", return_value={"email_branding": {"name": email_branding_name}}
+        "app.email_branding_client.get_email_branding",
+        return_value={"email_branding": {"name": email_branding_name}},
+        autospec=True,
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        # should use autospec=True here but doesn’t work for some reason
+    )
 
     client_request.login(platform_admin_user)
     client_request.post(
@@ -3639,7 +3760,11 @@ def test_get_service_set_email_branding_add_to_branding_pool_step(
     mocker.patch(
         "app.email_branding_client.get_email_branding", return_value={"email_branding": {"name": email_branding_name}}
     )
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.service_set_branding_add_to_branding_pool_step",
@@ -3660,8 +3785,16 @@ def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_
     mocker.patch(
         "app.email_branding_client.get_email_branding", return_value={"email_branding": {"name": email_branding_name}}
     )
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
-    mocker.patch("app.main.forms.AdminSetBrandingAddToBrandingPoolStepForm", return_value=None)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.main.forms.AdminSetBrandingAddToBrandingPoolStepForm",
+        return_value=None,
+        autospec=True,
+    )
     client_request.get(
         "main.service_set_branding_add_to_branding_pool_step",
         _expected_status=403,
@@ -3694,7 +3827,11 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
     mocker.patch(
         "app.email_branding_client.get_email_branding", return_value={"email_branding": {"name": email_branding_name}}
     )
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
     mock_add_to_branding_pool = mocker.patch(
         "app.organisations_client.add_brandings_to_email_branding_pool", return_value=None
     )
@@ -3737,7 +3874,11 @@ def test_get_service_set_letter_branding_add_to_branding_pool_step(
         "app.letter_branding_client.get_letter_branding",
         return_value={"name": letter_branding_name},
     )
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.service_set_branding_add_to_branding_pool_step",
@@ -3755,8 +3896,16 @@ def test_get_service_set_letter_branding_add_to_branding_pool_step_protects_agai
     service_one["organisation"] = organisation_one
     service_one["name"] = "<script>evil</script>"
     client_request.login(platform_admin_user)
-    mocker.patch("app.letter_branding_client.get_letter_branding", return_value={"name": "branding 1"})
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.letter_branding_client.get_letter_branding",
+        return_value={"name": "branding 1"},
+        autospec=True,
+    )
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.service_set_branding_add_to_branding_pool_step",
@@ -3781,8 +3930,16 @@ def test_service_set_letter_branding_add_to_branding_pool_step_is_platform_admin
         "app.letter_branding_client.get_letter_branding",
         return_value={"name": letter_branding_name},
     )
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
-    mocker.patch("app.main.forms.AdminSetBrandingAddToBrandingPoolStepForm", return_value=None)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
+    mocker.patch(
+        "app.main.forms.AdminSetBrandingAddToBrandingPoolStepForm",
+        return_value=None,
+        autospec=True,
+    )
     client_request.get(
         "main.service_set_branding_add_to_branding_pool_step",
         _expected_status=403,
@@ -3816,7 +3973,11 @@ def test_service_set_letter_branding_add_to_branding_pool_step_choices_yes_or_no
         "app.letter_branding_client.get_letter_branding",
         return_value={"name": letter_branding_name},
     )
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
     mock_add_to_branding_pool = mocker.patch(
         "app.organisations_client.add_brandings_to_letter_branding_pool", return_value=None
     )
@@ -4193,7 +4354,11 @@ def test_switch_service_channels_on_and_off(
     posted_value,
     expected_updated_permissions,
 ):
-    mocked_fn = mocker.patch("app.service_api_client.update_service", return_value=service_one)
+    mocked_fn = mocker.patch(
+        "app.service_api_client.update_service",
+        return_value=service_one,
+        autospec=True,
+    )
     service_one["permissions"] = initial_permissions
 
     page = client_request.get(
@@ -4303,7 +4468,11 @@ def test_switch_service_enable_international_sms_and_letters(
     post_value,
     permission_expected_in_api_call,
 ):
-    mocked_fn = mocker.patch("app.service_api_client.update_service", return_value=service_one)
+    mocked_fn = mocker.patch(
+        "app.service_api_client.update_service",
+        return_value=service_one,
+        autospec=True,
+    )
     client_request.post(
         f"main.service_set_{permission}",
         service_id=service_one["id"],
@@ -5216,7 +5385,11 @@ def test_select_organisation(
 def test_select_organisation_shows_message_if_no_orgs(
     client_request, platform_admin_user, service_one, mock_get_organisation, mocker
 ):
-    mocker.patch("app.organisations_client.get_organisations", return_value=[])
+    mocker.patch(
+        "app.organisations_client.get_organisations",
+        return_value=[],
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -5599,7 +5772,11 @@ def test_service_set_broadcast_channel_has_radio_selected_for_broadcast_service(
         broadcast_channel=broadcast_channel,
         allowed_broadcast_provider=allowed_broadcast_provider,
     )
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user, service_one)
     page = client_request.get(
@@ -5708,7 +5885,11 @@ def test_service_set_broadcast_network_has_radio_selected(
         broadcast_channel=broadcast_channel,
         allowed_broadcast_provider=allowed_broadcast_provider,
     )
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_one},
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.service_set_broadcast_network",
@@ -5994,7 +6175,11 @@ def test_should_set_default_org_email_branding_fails_if_branding_choice_is_not_o
         return_value=[service, service_json(id_="5678", restricted=True)],
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        autospec=True,
+    )
     g.current_service = Service(service)
 
     assert _should_set_default_org_email_branding(branding_choice) is False
@@ -6008,7 +6193,11 @@ def test_should_set_default_org_email_branding_fails_if_org_already_has_a_defaul
         return_value=[service, service_json(id_="5678", restricted=True)],
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        autospec=True,
+    )
     g.current_service = Service(service)
 
     assert _should_set_default_org_email_branding("organisation") is False
@@ -6022,7 +6211,11 @@ def test_should_set_default_org_email_branding_fails_if_org_is_central(client_re
         return_value=[service, service_json(id_="5678", restricted=True)],
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        autospec=True,
+    )
     g.current_service = Service(service)
 
     assert _should_set_default_org_email_branding("organisation") is False
@@ -6036,7 +6229,11 @@ def test_should_set_default_org_email_branding_fails_if_other_live_services_in_o
         return_value=[service, service_json(id_="5678", restricted=False)],
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        autospec=True,
+    )
     g.current_service = Service(service)
 
     assert _should_set_default_org_email_branding("organisation") is False
@@ -6055,7 +6252,11 @@ def test_should_set_default_org_email_branding_succeeds_if_all_conditions_are_me
         return_value=[service, service_json(id_="5678", restricted=True)],
     )
 
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation,
+        autospec=True,
+    )
     g.current_service = Service(service)
 
     assert _should_set_default_org_email_branding("organisation") is True

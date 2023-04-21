@@ -8,7 +8,11 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 def test_returned_letter_summary(client_request, mocker):
     summary_data = [{"returned_letter_count": 1234, "reported_at": "2019-12-24"}]
-    mock = mocker.patch("app.service_api_client.get_returned_letter_summary", return_value=summary_data)
+    mock = mocker.patch(
+        "app.service_api_client.get_returned_letter_summary",
+        return_value=summary_data,
+        autospec=True,
+    )
 
     page = client_request.get("main.returned_letter_summary", service_id=SERVICE_ONE_ID)
 
@@ -25,7 +29,11 @@ def test_returned_letter_summary(client_request, mocker):
 
 def test_returned_letter_summary_with_one_letter(client_request, mocker):
     summary_data = [{"returned_letter_count": 1, "reported_at": "2019-12-24"}]
-    mock = mocker.patch("app.service_api_client.get_returned_letter_summary", return_value=summary_data)
+    mock = mocker.patch(
+        "app.service_api_client.get_returned_letter_summary",
+        return_value=summary_data,
+        autospec=True,
+    )
 
     page = client_request.get("main.returned_letter_summary", service_id=SERVICE_ONE_ID)
 
@@ -58,7 +66,11 @@ def test_returned_letters_page(client_request, mocker):
             ("XYZ999", None, None, None),
         )
     ]
-    mocker.patch("app.service_api_client.get_returned_letters", return_value=data)
+    mocker.patch(
+        "app.service_api_client.get_returned_letters",
+        return_value=data,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.returned_letters",
@@ -104,7 +116,11 @@ def test_returned_letters_page_with_many_letters(
             "uploaded_letter_file_name": None,
         }
     ] * number_of_letters
-    mocker.patch("app.service_api_client.get_returned_letters", return_value=data)
+    mocker.patch(
+        "app.service_api_client.get_returned_letters",
+        return_value=data,
+        autospec=True,
+    )
 
     page = client_request.get(
         "main.returned_letters",
@@ -138,7 +154,11 @@ def test_returned_letters_reports(client_request, mocker):
             "uploaded_letter_file_name": "test_letter.pdf",
         }
     ]
-    mock = mocker.patch("app.service_api_client.get_returned_letters", return_value=data)
+    mock = mocker.patch(
+        "app.service_api_client.get_returned_letters",
+        return_value=data,
+        autospec=True,
+    )
 
     response = client_request.get_response(
         "main.returned_letters_report", service_id=SERVICE_ONE_ID, reported_at="2019-12-24"

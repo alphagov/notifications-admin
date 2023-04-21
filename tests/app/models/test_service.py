@@ -10,7 +10,11 @@ def test_organisation_type_when_services_organisation_has_no_org_type(mocker, se
     service = Service(service_one)
     service._dict["organisation_id"] = ORGANISATION_ID
     org = organisation_json(organisation_type=None)
-    mocker.patch("app.organisations_client.get_organisation", return_value=org)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=org,
+        autospec=True,
+    )
 
     assert not org["organisation_type"]
     assert service.organisation_type == "central"
@@ -21,7 +25,11 @@ def test_organisation_type_when_service_and_its_org_both_have_an_org_type(mocker
     service = Service(service_one)
     service._dict["organisation"] = ORGANISATION_ID
     org = organisation_json(organisation_type="local")
-    mocker.patch("app.organisations_client.get_organisation", return_value=org)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=org,
+        autospec=True,
+    )
 
     assert service.organisation_type == "local"
 
@@ -102,6 +110,10 @@ def test_has_templates_of_type_includes_folders(
         return_value={"data": [create_template(folder="something", template_type="sms")]},
     )
 
-    mocker.patch("app.template_folder_api_client.get_template_folders", return_value=[create_folder(id="something")])
+    mocker.patch(
+        "app.template_folder_api_client.get_template_folders",
+        return_value=[create_folder(id="something")],
+        autospec=True,
+    )
 
     assert Service(service_one).has_templates_of_type("sms")

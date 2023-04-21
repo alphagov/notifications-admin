@@ -209,7 +209,11 @@ def test_update_letter_branding_with_new_valid_file_shows_page_with_file_preview
     mock_save_temporary = mocker.patch(
         "app.main.views.letter_branding.logo_client.save_temporary_logo", return_value="temporary.svg"
     )
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -232,7 +236,11 @@ def test_update_letter_branding_when_uploading_invalid_file(
     fake_uuid,
     mocker,
 ):
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -417,7 +425,11 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
     mock_save_temporary = mocker.patch(
         "app.main.views.letter_branding.logo_client.save_temporary_logo", return_value="temporary.svg"
     )
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
     page = client_request.post(
@@ -452,7 +464,11 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
 def test_create_letter_branding_calls_antivirus_scan(
     mocker, client_request, platform_admin_user, fake_uuid, scan_result, expected_status_code
 ):
-    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=scan_result)
+    mock_antivirus = mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=scan_result,
+        autospec=True,
+    )
     mock_save_temporary = mocker.patch(
         "app.main.views.letter_branding.logo_client.save_temporary_logo", return_value="temporary.svg"
     )
@@ -507,7 +523,11 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_ele
     svg_contents,
     expected_error,
 ):
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     mock_save_temporary = mocker.patch("app.main.views.letter_branding.logo_client.save_temporary_logo")
 
     client_request.login(platform_admin_user)
@@ -530,7 +550,11 @@ def test_create_letter_branding_when_uploading_invalid_file(
     platform_admin_user,
     mocker,
 ):
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+        autospec=True,
+    )
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".create_letter_branding",

@@ -81,7 +81,11 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     mock_get_service = mocker.patch(
         "app.notify_client.service_api_client.service_api_client.get_service", return_value={"data": service}
     )
-    mocker.patch("app.template_folder_api_client.get_template_folders", return_value=[create_folder(id=sample_uuid())])
+    mocker.patch(
+        "app.template_folder_api_client.get_template_folders",
+        return_value=[create_folder(id=sample_uuid())],
+        autospec=True,
+    )
 
     client_request.login(
         api_user_active,
@@ -158,7 +162,11 @@ def test_service_navigation_for_org_user(
         id_=SERVICE_ONE_ID,
         organisation_id=ORGANISATION_ID,
     )
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service},
+        autospec=True,
+    )
     client_request.login(api_user_active, service=service)
 
     page = client_request.get(
@@ -223,7 +231,11 @@ def test_service_user_without_manage_service_permission_can_see_usage_page_when_
         id_=SERVICE_ONE_ID,
         organisation_id=ORGANISATION_ID,
     )
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service})
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service},
+        autospec=True,
+    )
     client_request.login(active_caseworking_user, service=service)
     page = client_request.get(
         "main.choose_template",

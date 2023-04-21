@@ -124,7 +124,11 @@ def test_get_api_notifications_changes_letter_statuses(mocker, letter_status, ex
     notis = notification_json(service_id=service_id, rows=0)
     notis["notifications"] = [sms_notification, email_notification, letter_notification]
 
-    mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get", return_value=notis)
+    mocker.patch(
+        "app.notify_client.notification_api_client.NotificationApiClient.get",
+        return_value=notis,
+        autospec=True,
+    )
 
     ret = NotificationApiClient().get_api_notifications_for_service(service_id)
 

@@ -86,7 +86,11 @@ def test_get_upload_hub_with_no_uploads(
     extra_permissions,
     expected_empty_message,
 ):
-    mocker.patch("app.job_api_client.get_jobs", return_value={"data": []})
+    mocker.patch(
+        "app.job_api_client.get_jobs",
+        return_value={"data": []},
+        autospec=True,
+    )
     service_one["permissions"] += extra_permissions
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(" ".join(paragraph.text for paragraph in page.select("main p"))) == expected_empty_message
@@ -101,7 +105,11 @@ def test_get_upload_hub_page(
     mock_get_uploads,
     mock_get_no_contact_lists,
 ):
-    mocker.patch("app.job_api_client.get_jobs", return_value={"data": []})
+    mocker.patch(
+        "app.job_api_client.get_jobs",
+        return_value={"data": []},
+        autospec=True,
+    )
     service_one["permissions"] += ["letter", "upload_letters"]
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Uploads"

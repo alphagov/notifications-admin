@@ -167,7 +167,11 @@ def test_post_organisation_email_branding_page_with_remove_param(
             email_branding_id=None,
         ),
     )
-    remove_mock = mocker.patch("app.organisations_client.remove_email_branding_from_pool", return_value=None)
+    remove_mock = mocker.patch(
+        "app.organisations_client.remove_email_branding_from_pool",
+        return_value=None,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
 
@@ -198,7 +202,11 @@ def test_remove_org_email_branding_from_pool_invalid_brand_id(
             email_branding_id=None,
         ),
     )
-    remove_mock = mocker.patch("app.organisations_client.remove_email_branding_from_pool", return_value=None)
+    remove_mock = mocker.patch(
+        "app.organisations_client.remove_email_branding_from_pool",
+        return_value=None,
+        autospec=True,
+    )
 
     client_request.login(platform_admin_user)
 
@@ -595,7 +603,11 @@ def test_organisation_letter_branding_page_shows_remove_links(
     mocker,
 ):
     organisation_one["letter_branding_id"] = "9abc"
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     mocker.patch(
         "app.models.branding.letter_branding_client.get_letter_branding",
@@ -696,7 +708,11 @@ def test_organisation_letter_branding_page_shows_confirmation_when_making_none_d
     mocker,
 ):
     organisation_one["letter_branding_id"] = "9abc"
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+        autospec=True,
+    )
 
     mocker.patch(
         "app.models.branding.letter_branding_client.get_letter_branding",
