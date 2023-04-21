@@ -916,6 +916,7 @@ def get_template_sender_form_dict(service_id, template):
 @user_has_permissions("manage_templates")
 @service_has_permission("extra_letter_formatting")
 def letter_template_attach_pages(service_id, template_id):
+    template = current_service.get_template(template_id)
     form = PDFUploadForm()
     error = {}
 
@@ -935,7 +936,7 @@ def letter_template_attach_pages(service_id, template_id):
         try:
             # TODO: get page count from the sanitise response once template preview
             # handles malformed files nicely - is this done yet?
-            page_count = pdf_page_count(BytesIO(pdf_file_bytes))
+            attachment_page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
             current_app.logger.info("Invalid PDF uploaded for service_id: {}".format(service_id))
             return _invalid_upload_error(
@@ -967,26 +968,23 @@ def letter_template_attach_pages(service_id, template_id):
                     pdf_file_bytes,
                     file_location=file_location,
                     status=status,
-                    page_count=page_count,
+                    page_count=attachment_page_count,
                     filename=original_filename,
                     message=validation_failed_message,
                     invalid_pages=invalid_pages,
                 )
                 return _invalid_upload_error(
                     template_id=template_id,
-                    error=get_letter_validation_error(validation_failed_message, invalid_pages, page_count),
+                    error=get_letter_validation_error(validation_failed_message, invalid_pages, attachment_page_count),
                 )
-            else:
-                raise ex
-        else:
 
-            # TODO in next PR: upload letter to S3
-            pages_content = "1 page" if page_count == 1 else f"{page_count} pages"
+            raise
 
-            flash(
-                f"You have attached {pages_content} to the end of your letter",
-                "default_with_tick",
-            )
+        # TODO in next PR: upload letter to S3
+        template_page_count = get_page_count_for_letter(template)
+        if attachment_page_count + template_page_count <= 10:
+            pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
+            flash(f"You have attached {pages_content} to the end of your letter", "default_with_tick")
 
             return redirect(
                 url_for(
@@ -995,6 +993,12 @@ def letter_template_attach_pages(service_id, template_id):
                     template_id=template_id,
                 )
             )
+
+        form.file.errors.append(
+            "Letters must be 10 pages or less (5 double-sided sheets of paper). "
+            "In total, your letter template and the file you attached are "
+            f"{template_page_count + attachment_page_count} pages long."
+        )
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])

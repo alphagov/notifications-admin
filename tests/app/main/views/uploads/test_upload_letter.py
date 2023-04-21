@@ -236,7 +236,9 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
         ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
     ],
 )
-def test_uploading_a_pdf_shows_error_when_file_is_not_a_pdf(client_request, service_one, mocker, endpoint, kwargs):
+def test_uploading_a_pdf_shows_error_when_file_is_not_a_pdf(
+    client_request, service_one, mocker, endpoint, kwargs, mock_get_template_version
+):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
@@ -254,7 +256,9 @@ def test_uploading_a_pdf_shows_error_when_file_is_not_a_pdf(client_request, serv
         ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
     ],
 )
-def test_uploading_a_pdf_shows_error_when_no_file_uploaded(client_request, service_one, endpoint, kwargs):
+def test_uploading_a_pdf_shows_error_when_no_file_uploaded(
+    client_request, service_one, endpoint, kwargs, mock_get_template_version
+):
     service_one["permissions"] = ["extra_letter_formatting"]
 
     page = client_request.post(endpoint, **kwargs, _data={"file": ""}, _expected_status=400)
@@ -269,7 +273,9 @@ def test_uploading_a_pdf_shows_error_when_no_file_uploaded(client_request, servi
         ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
     ],
 )
-def test_uploading_a_pdf_shows_error_when_file_contains_virus(mocker, client_request, service_one, endpoint, kwargs):
+def test_uploading_a_pdf_shows_error_when_file_contains_virus(
+    mocker, client_request, service_one, endpoint, kwargs, mock_get_template_version
+):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=False)
     mock_s3_backup = mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
@@ -288,7 +294,9 @@ def test_uploading_a_pdf_shows_error_when_file_contains_virus(mocker, client_req
         ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
     ],
 )
-def test_uploading_a_pdf_errors_when_file_is_too_big(mocker, client_request, service_one, endpoint, kwargs):
+def test_uploading_a_pdf_errors_when_file_is_too_big(
+    mocker, client_request, service_one, endpoint, kwargs, mock_get_template_version
+):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
@@ -306,7 +314,9 @@ def test_uploading_a_pdf_errors_when_file_is_too_big(mocker, client_request, ser
         ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
     ],
 )
-def test_post_choose_upload_file_when_file_is_malformed(mocker, client_request, service_one, endpoint, kwargs):
+def test_post_choose_upload_file_when_file_is_malformed(
+    mocker, client_request, service_one, endpoint, kwargs, mock_get_template_version
+):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
