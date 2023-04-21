@@ -1,5 +1,11 @@
 .template-container {
   position: relative;
+
+  &--with-attach-pages-button {
+    .letter {
+      margin-bottom: 0;
+    }
+  }
 }
 
 %edit-template-link,

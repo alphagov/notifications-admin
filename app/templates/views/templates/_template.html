@@ -62,7 +62,7 @@
     </div>
   {% endif %}
 </div>
-<div class="govuk-grid-column-full template-container">
+<div class="govuk-grid-column-full template-container {% if show_attach_pages_button %}template-container--with-attach-pages-button{% endif %}">
   {% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %}
     {% if not current_service.letter_branding_id %}
       <a href="{{ url_for(".letter_branding_options", service_id=current_service.id, from_template=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-branding">Add logo</a>
