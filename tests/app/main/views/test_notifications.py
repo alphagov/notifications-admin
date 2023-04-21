@@ -993,11 +993,6 @@ def test_should_show_image_of_precompiled_letter_notification(
         return_value=notification,
         autospec=True,
     )
-    mock_pdf_page_count = mocker.patch(
-        "app.main.views.notifications.pdf_page_count",
-        return_value=1,
-        # should use autospec=True here but doesn’t work for some reason
-    )
 
     mocker.patch(
         "app.main.views.notifications.notification_api_client.get_notification_letter_preview",
@@ -1013,7 +1008,6 @@ def test_should_show_image_of_precompiled_letter_notification(
     )
 
     assert response.get_data(as_text=True) == "foo"
-    assert mock_pdf_page_count.called_once()
 
 
 @freeze_time("2016-01-01 15:00")
