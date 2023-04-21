@@ -184,7 +184,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete("service-{service_id}-templates")
     @cache.delete_by_pattern("service-{service_id}-template-*")
-    def update_service_template(self, id_, *, service_id, name=None, content=None, subject=None):
+    def update_service_template(self, *, service_id, template_id, name=None, content=None, subject=None):
         """
         Update a service template.
         """
@@ -196,7 +196,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         if subject:
             data["subject"] = subject
         data = _attach_current_user(data)
-        endpoint = f"/service/{service_id}/template/{id_}"
+        endpoint = f"/service/{service_id}/template/{template_id}"
         return self.post(endpoint, data)
 
     @cache.delete("service-{service_id}-templates")

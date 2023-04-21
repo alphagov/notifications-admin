@@ -1787,10 +1787,10 @@ def test_should_redirect_when_saving_a_template(
         ),
     )
     mock_update_service_template.assert_called_with(
-        fake_uuid,
+        template_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
         name=name,
         content=content,
-        service_id=SERVICE_ONE_ID,
         subject=None,
     )
 
@@ -2026,10 +2026,10 @@ def test_should_redirect_when_saving_a_template_email(
         ),
     )
     mock_update_service_template.assert_called_with(
-        fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
         name=name,
         content=content,
-        service_id=SERVICE_ONE_ID,
         subject=subject,
     )
 

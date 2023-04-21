@@ -629,8 +629,8 @@ def edit_service_template(service_id, template_id):
             )
         try:
             service_api_client.update_service_template(
-                template_id,
                 service_id=service_id,
+                template_id=template_id,
                 name=form.name.data,
                 content=form.template_content.data,
                 subject=subject,
