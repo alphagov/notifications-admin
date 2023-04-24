@@ -11,16 +11,6 @@
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Edit and format messages</h1>
-
-  <p class="govuk-body">This page explains how to:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li><a class="govuk-link govuk-link--no-visited-state" href="#formatting">format your content</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="#links">add links</a></li>
-  </ul>
-
-  <h2 class="heading-medium" id="formatting">Format your content</h2>
-
   <p class="govuk-body">You can see a list of formatting instructions on the edit template page:</p>
 
   <ol class="govuk-list govuk-list--number">
@@ -39,19 +29,7 @@
   <p class="govuk-body">Letter templates can include headings and bullets.</p>
 
   <p class="govuk-body">Notify does not allow bold, italics, subheadings, underlined text or different fonts. This is because they can make it harder for users to read what you’ve written.</p>
-
-  <h2 class="heading-medium" id="links">Add links</h2>
-
-  <p class="govuk-body">When composing an email or text message, write URLs in full and Notify will convert them into links for you.</p>
-
-  <p class="govuk-body">You cannot convert text into a link. Research shows that people like to check a URL looks genuine before clicking the link in an email. This is hard to do if the URL is hidden behind clickable link text.</p>
-
-  <p class="govuk-body">We do not recommend using a third-party link shortening service because:</p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>your users cannot see where the link will take them</li>
-    <li>your link might stop working if there’s a service outage</li>
-    <li>you can no longer control where the redirect goes</li>
-  </ul>
+  
+  <p class="govuk-body">Find <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('NEED TO ADD LINK TO NEW LINKS AND URLS PAGE') }}"> more information on links and URls in messages</a>.</p>
 
 {% endblock %}
