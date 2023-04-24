@@ -985,33 +985,12 @@ def letter_template_attach_pages(service_id, template_id):
 
         template_page_count = get_page_count_for_letter(template)
         if attachment_page_count + template_page_count <= 10:
-
-            response_json = response.json()
-            page_count = response_json["page_count"]
-            file_contents = base64.b64decode(response_json["file"].encode())
-
-            upload_letter_attachment_to_s3(
-                file_contents,
-                file_location=file_location,
-                page_count=page_count,
-                original_filename=original_filename,
-            )
-
-            # we've changed fonts and cmyk, so retain original in case we need to investigate errors
-            backup_original_letter_to_s3(
-                file_contents,
-                upload_id=upload_id,
-            )
-
-            letter_attachment_client.create_letter_attachment(
-                upload_id=upload_id,
-                original_filename=original_filename,
-                page_count=page_count,
+            _save_letter_attachment(
                 template_id=template_id,
+                upload_id=upload_id,
+                original_filename=original_filename,
+                sanitise_response=response,
             )
-
-            pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
-            flash(f"You have attached {pages_content} to the end of your letter", "default_with_tick")
 
             return redirect(
                 url_for(
@@ -1034,6 +1013,37 @@ def letter_template_attach_pages(service_id, template_id):
         render_template("views/templates/attach-pages.html", form=form, template_id=template_id, error=error),
         400 if error else 200,
     )
+
+
+def _save_letter_attachment(*, template_id, upload_id, original_filename, sanitise_response):
+    response_json = sanitise_response.json()
+    attachment_page_count = response_json["page_count"]
+    file_contents = base64.b64decode(response_json["file"].encode())
+
+    file_location = get_transient_letter_file_location(current_service.id, upload_id)
+
+    upload_letter_attachment_to_s3(
+        file_contents,
+        file_location=file_location,
+        page_count=attachment_page_count,
+        original_filename=original_filename,
+    )
+
+    # we've changed fonts and cmyk, so retain original in case we need to investigate errors
+    backup_original_letter_to_s3(
+        file_contents,
+        upload_id=upload_id,
+    )
+
+    letter_attachment_client.create_letter_attachment(
+        upload_id=upload_id,
+        original_filename=original_filename,
+        page_count=attachment_page_count,
+        template_id=template_id,
+    )
+
+    pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
+    flash(f"You have attached {pages_content} to the end of your letter", "default_with_tick")
 
 
 def _invalid_upload_error(template_id, error):
