@@ -71,12 +71,7 @@ a {
 
         display: block;
 
-        &:first-child {
-          display: block;
-        }
-
         &.template-list-folder:first-of-type {
-          background-position: 0 2px;
           padding-left: 0;
           text-indent: 35px;
 
@@ -90,9 +85,6 @@ a {
 
       .template-list-template,
       .template-list-folder {
-
-        position: relative; /* contain absolutely positioned ::before pseudo element*/
-        display: block; /* fill horizontal space to allow hint/meta below to float */
 
         &::before {
           content: '';
@@ -134,6 +126,15 @@ a {
 
       }
 
+      // adjust for position being relative to a block-level element
+      .template-list-folder__icon {
+        top: 2px;
+
+        @include govuk-media-query($from: tablet) {
+          top: 3px;
+        }
+      }
+
     }
 
     &-label {
@@ -162,29 +163,29 @@ a {
     @include govuk-media-query($from: tablet) {
       line-height: 1.25;
     }
+    position: relative; /* contain absolutely positioned icon and ::before element */
   }
 
   &-folder {
 
     display: inline;
     padding-left: 35px;
-    background-image: file-url('folder-blue-bold.svg');
-    background-repeat: no-repeat;
-    background-size: auto 20px;
-    background-position: 0px 4px;
 
     @include govuk-media-query($from: tablet) {
       padding-left: 40px;
     }
 
-    &:hover {
-      background-image: file-url('folder-blue-bold-hover.svg');
-    }
+    &__icon {
 
-    &:focus,
-    &:active {
-      background-image: file-url('folder-black-bold.svg');
-    }
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      @include govuk-media-query($from: tablet) {
+        top: 3px;
+      }
+
+     }
 
   }
 
@@ -242,16 +243,13 @@ a {
 
     display: inline;
     vertical-align: top;
-    background-repeat: no-repeat;
-    background-size: auto 20px;
-    background-position: 0px 4px;
+    position: relative;
     min-height: 30px;
 
   }
 
   &-folder {
     padding: 0 0 0 40px;
-    background-image: file-url('folder-black-bold.svg');
   }
 
   &-folder-truncated {
@@ -259,6 +257,11 @@ a {
     padding: 0 0 0 30px;
     white-space: nowrap;
     overflow: hidden;
+    top: -2px; // adjust for effect of inline-block on content-height
+
+    @include govuk-media-query($from: tablet) {
+      top: auto;
+    }
   }
 
   &-folder-root-truncated {
@@ -276,20 +279,13 @@ a {
     &.folder-heading-folder {
 
       display: inline;
-      background-image: file-url('folder-blue-bold.svg');
-      background-position: 0px 4px;
       overflow: hidden;
       text-overflow: ellipsis;
-
-      &:hover {
-        background-image: file-url('folder-blue-bold-hover.svg');
-      }
 
     }
 
     &.folder-heading-folder-truncated {
       display: inline-block;
-      background-position: 0px 2px;
     }
 
     &:hover {
@@ -300,6 +296,16 @@ a {
 
   &-separator {
     @include separator;
+  }
+
+  &-folder__icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    @include govuk-media-query($from: tablet) {
+      top: 3px;
+    }
   }
 
   &-manage-link {

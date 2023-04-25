@@ -3,6 +3,15 @@ $govuk-touch-target-size: 44px;
 $govuk-checkboxes-size: 40px;
 
 .selection-summary {
+  position: relative;
+
+  .selection-summary__icon {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 39px;
+    height: 30px;
+  }
 
   .selection-summary__text {
     @include govuk-font(19, $tabular: true);
@@ -16,10 +25,6 @@ $govuk-checkboxes-size: 40px;
 
   .selection-summary__text--folders {
     padding: 10px 15px 5px 51px;
-    background-image: file-url('folder-black.svg');
-    background-repeat: no-repeat;
-    background-size: 39px auto;
-    background-position: 0px 4px;
   }
 
 }

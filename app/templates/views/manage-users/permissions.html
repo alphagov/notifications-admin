@@ -1,4 +1,5 @@
 {% from "components/radios.html" import radios %}
+{% from "components/svgs.html" import folder %}
 
 {# this may be called from invite page (where no user exists) #}
 {% if user is not defined %}
@@ -8,7 +9,13 @@
 {{ form.permissions_field }}
 
 {% if form.folder_permissions.all_template_folders %}
-  {{ form.folder_permissions }}
+  {# reset selection summary here to use 'folder' macro #}
+  {% set selection_summary %}
+    <div class="selection-summary" role="region" aria-live="polite">{{ folder(classes="selection-summary__icon", border_width=2) }}</div>
+  {% endset %}
+  {{ form.folder_permissions(param_extensions={
+       "hint": {"html": selection_summary }
+  }) }}
 {% elif user.platform_admin %}
   <p class="bottom-gutter">
     Platform admin users can access all template folders.

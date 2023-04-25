@@ -48,7 +48,7 @@
               {% endif %}
               </span>
             </h2>
-            <ul class="tick-cross-list-permissions">
+            <ul class="tick-cross__list">
               {% for permission, label in permissions %}
                 {{ tick_cross(
                   user.has_permission_for_service(current_service.id, permission),
@@ -58,7 +58,7 @@
             </ul>
             {# only show if the service has folders #}
             {% if current_service.all_template_folders %}
-              <p class="govuk-body tick-cross-list-hint">
+              <p class="govuk-body tick-cross__hint">
                 {% set folder_count = user.template_folders_for_service(current_service) | length %}
 
                 {% if folder_count == 0 %}
@@ -71,7 +71,7 @@
               </p>
             {% endif %}
             {% if current_service.has_permission('email_auth') %}
-              <p class="govuk-body tick-cross-list-hint">
+              <p class="govuk-body tick-cross__hint">
                 Signs in with
                 {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}
               </p>

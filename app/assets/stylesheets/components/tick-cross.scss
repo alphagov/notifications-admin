@@ -1,46 +1,43 @@
-%tick-cross {
+.tick-cross__list {
   @include govuk-font(19);
-  display: inline-block;
-  background-size: 19px 19px;
-  background-repeat: no-repeat;
-  background-position: 0 6px;
-  padding: 6px 0 5px 25px;
+  list-style: none;
+  margin-top: 5px;
 }
 
-.tick-cross {
+.tick-cross__list-item {
+  margin-right: 0.5em;
+  padding: 6px 0 5px;
+}
 
-  &-tick {
-    @extend %tick-cross;
-    background-image: file-url('tick.svg');
+.tick-cross__cross {
+  color: $govuk-secondary-text-colour; // text colour also changes for crossed items
+}
+
+// set colour for the SVG icon to inherit via `currentColor`
+.tick-cross__cross > .tick-cross__icon {
+  color: #6F777B;
+}
+
+// set colour for the SVG icon to inherit via `currentColor`
+.tick-cross__tick > .tick-cross__icon {
+  color: #00703C;
+}
+
+.tick-cross__icon {
+  float: left;
+  height: 19px;
+  width: 19px;
+  padding-right: 6px;
+  position: relative;
+  top: -3px; // offset vertical position relative to 16px font
+
+  @include govuk-media-query($from: tablet) {
+    position: static;
   }
+}
 
-  &-cross {
-    @extend %tick-cross;
-    color: $govuk-secondary-text-colour;
-    background-image: file-url('cross-grey.svg');
-  }
-
-  &-list {
-
-    position: relative;
-
-    &-permissions {
-
-      margin-top: 5px;
-
-      li {
-        display: block;
-        margin-right: 0.5em;
-      }
-
-    }
-
-    &-hint {
-      color: #6F777B;
-      padding-top: 5px;
-      margin: 0;
-    }
-
-  }
-
+.tick-cross__hint {
+  color: #6F777B;
+  padding-top: 5px;
+  margin: 0;
 }
