@@ -9,23 +9,20 @@ from app.main.views.send import (
     get_placeholder_form_instance,
     get_recipient_and_placeholders_from_session,
 )
-from app.utils.templates import get_template
 from app.utils.user import user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/tour/<uuid:template_id>")
 @user_has_permissions("send_messages")
 def begin_tour(service_id, template_id):
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-
-    if db_template["template_type"] != "sms" or not current_user.mobile_number:
-        abort(404)
-
-    template = get_template(
-        db_template,
-        current_service,
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
         show_recipient=True,
     )
+
+    if template.template_type != "sms" or not current_user.mobile_number:
+        abort(404)
 
     template.values = {"phone_number": current_user.mobile_number}
 
@@ -45,19 +42,17 @@ def begin_tour(service_id, template_id):
 )
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def tour_step(service_id, template_id, step_index):
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
+        show_recipient=True,
+    )
 
-    if db_template["template_type"] != "sms" or step_index == 0:
+    if template.template_type != "sms" or step_index == 0:
         abort(404)
 
     if "placeholders" not in session:
         return redirect(url_for(".begin_tour", service_id=current_service.id, template_id=template_id))
-
-    template = get_template(
-        db_template,
-        current_service,
-        show_recipient=True,
-    )
 
     placeholders = fields_to_fill_in(template, prefill_current_user=True)
     try:
@@ -86,7 +81,7 @@ def tour_step(service_id, template_id, step_index):
 
     back_link = _get_tour_step_back_link(service_id, template_id, step_index)
 
-    template.values = get_recipient_and_placeholders_from_session(db_template["template_type"])
+    template.values = get_recipient_and_placeholders_from_session(template.template_type)
     template.values[current_placeholder] = None
 
     return render_template(
@@ -109,11 +104,9 @@ def _get_tour_step_back_link(service_id, template_id, step_index):
 @main.route("/services/<uuid:service_id>/tour/<uuid:template_id>/check", methods=["GET"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def check_tour_notification(service_id, template_id):
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-
-    template = get_template(
-        db_template,
-        current_service,
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
         show_recipient=True,
     )
 

@@ -90,34 +90,32 @@ class LetterAttachmentFormError(Exception):
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>")
 @user_has_permissions(allow_org_user=True)
 def view_template(service_id, template_id):
-    template = current_service.get_template(template_id)
-    template_folder = current_service.get_template_folder(template["folder"])
+    template = current_service.get_template(
+        template_id,
+        letter_preview_url=url_for(
+            "no_cookie.view_letter_template_preview",
+            service_id=service_id,
+            template_id=template_id,
+            filetype="png",
+        ),
+        show_recipient=True,
+    )
+    template_folder = current_service.get_template_folder(template.get_raw("folder"))
 
     user_has_template_permission = current_user.has_template_folder_permission(template_folder, service=current_service)
     if should_skip_template_page(template):
         return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
-    page_count = get_page_count_for_letter(template)
+    template.page_count = get_page_count_for_letter(template._template)
+
     return render_template(
         "views/templates/template.html",
-        template=get_template(
-            template,
-            current_service,
-            letter_preview_url=url_for(
-                "no_cookie.view_letter_template_preview",
-                service_id=service_id,
-                template_id=template_id,
-                filetype="png",
-            ),
-            show_recipient=True,
-            page_count=page_count,
-        ),
-        template_postage=template["postage"],
+        template=template,
         user_has_template_permission=user_has_template_permission,
-        letter_too_long=is_letter_too_long(page_count),
+        letter_too_long=is_letter_too_long(template.page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
-        page_count=page_count,
-        show_manage_attachment_button="letter_attachment" in template and template["letter_attachment"] is not None,
+        page_count=template.page_count,
+        show_manage_attachment_button=template.get_raw("letter_attachment") is not None,
     )
 
 
@@ -255,9 +253,9 @@ def view_letter_template_preview(service_id, template_id, filetype):
     if filetype not in ("pdf", "png"):
         abort(404)
 
-    db_template = current_service.get_template(template_id)
+    template = current_service.get_template(template_id)
 
-    return TemplatePreview.from_database_object(db_template, filetype, page=request.args.get("page"))
+    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get("page"))
 
 
 @no_cookie.route("/templates/letter-preview-image/<filename>")
@@ -288,18 +286,16 @@ def letter_branding_preview_image(filename):
 
 
 def _view_template_version(service_id, template_id, version):
-    return dict(
-        template=get_template(
-            current_service.get_template(template_id, version=version),
-            current_service,
-            letter_preview_url=url_for(
-                "no_cookie.view_template_version_preview",
-                service_id=service_id,
-                template_id=template_id,
-                version=version,
-                filetype="png",
-            ),
-        )
+    return current_service.get_template(
+        template_id,
+        version=version,
+        letter_preview_url=url_for(
+            "no_cookie.view_template_version_preview",
+            service_id=service_id,
+            template_id=template_id,
+            version=version,
+            filetype="png",
+        ),
     )
 
 
@@ -308,15 +304,15 @@ def _view_template_version(service_id, template_id, version):
 def view_template_version(service_id, template_id, version):
     return render_template(
         "views/templates/template_history.html",
-        **_view_template_version(service_id=service_id, template_id=template_id, version=version),
+        template=_view_template_version(service_id=service_id, template_id=template_id, version=version),
     )
 
 
 @no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<filetype>")
 @user_has_permissions(allow_org_user=True)
 def view_template_version_preview(service_id, template_id, version, filetype):
-    db_template = current_service.get_template(template_id, version=version)
-    return TemplatePreview.from_database_object(db_template, filetype)
+    template = current_service.get_template(template_id, version=version)
+    return TemplatePreview.from_utils_template(template, filetype)
 
 
 def _add_template_by_type(template_type, template_folder_id):
@@ -406,7 +402,7 @@ def copy_template(service_id, template_id):
         abort(403)
 
     if request.method == "POST":
-        return add_service_template(service_id, template["template_type"])
+        return add_service_template(service_id, template.template_type)
 
     template["template_content"] = template["content"]
     template["name"] = _get_template_copy_name(template, current_service.all_templates)
@@ -614,19 +610,19 @@ def abort_403_if_not_admin_user():
 def edit_service_template(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
-    if template["template_type"] not in current_service.available_template_types:
+    if template.template_type not in current_service.available_template_types:
         return redirect(
             url_for(
                 ".action_blocked",
                 service_id=service_id,
-                notification_type=template["template_type"],
+                notification_type=template.template_type,
                 return_to="view_template",
-                template_id=template_id,
+                template_id=template.id,
             )
         )
 
-    template["template_content"] = template["content"]
-    form = form_objects[template["template_type"]](**template)
+    template._template["template_content"] = template.content
+    form = form_objects[template.template_type](**template._template)
     if form.validate_on_submit():
         subject = form.subject.data if hasattr(form, "subject") else None
 
@@ -634,15 +630,14 @@ def edit_service_template(service_id, template_id):
             "name": form.name.data,
             "content": form.template_content.data,
             "subject": subject,
-            "template_type": template["template_type"],
-            "id": template["id"],
-            "reply_to_text": template["reply_to_text"],
+            "template_type": template.template_type,
+            "id": template.id,
+            "reply_to_text": template.get_raw("reply_to_text"),
             "postage": None,
         }
 
         new_template = get_template(new_template_data, current_service)
-
-        template_change = get_template(template, current_service).compare_to(new_template)
+        template_change = template.compare_to(new_template)
 
         if template_change.placeholders_added and not request.form.get("confirm") and current_service.api_keys:
             return render_template(
@@ -671,11 +666,11 @@ def edit_service_template(service_id, template_id):
             return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
     return render_template(
-        f"views/edit-{template['template_type']}-template.html",
+        f"views/edit-{template.template_type}-template.html",
         form=form,
         template=template,
         heading_action="Edit",
-        back_link=url_for("main.view_template", service_id=current_service.id, template_id=template["id"]),
+        back_link=url_for("main.view_template", service_id=current_service.id, template_id=template.id),
     )
 
 
@@ -743,7 +738,17 @@ def _get_content_count_error_and_message_for_template(template):
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/delete", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def delete_service_template(service_id, template_id):
-    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
+        letter_preview_url=url_for(
+            "no_cookie.view_letter_template_preview",
+            service_id=service_id,
+            template_id=template_id,
+            filetype="png",
+        ),
+        show_recipient=True,
+    )
 
     if request.method == "POST":
         service_api_client.delete_service_template(service_id, template_id)
@@ -751,12 +756,12 @@ def delete_service_template(service_id, template_id):
             url_for(
                 ".choose_template",
                 service_id=service_id,
-                template_folder_id=template["folder"],
+                template_folder_id=template.get_raw("folder"),
             )
         )
 
     try:
-        last_used_notification = template_statistics_client.get_last_used_date_for_template(service_id, template["id"])
+        last_used_notification = template_statistics_client.get_last_used_date_for_template(service_id, template.id)
         message = (
             "This template has never been used."
             if not last_used_notification
@@ -769,20 +774,10 @@ def delete_service_template(service_id, template_id):
         else:
             raise e
 
-    flash([f"Are you sure you want to delete ‘{template['name']}’?", message, template["name"]], "delete")
+    flash([f"Are you sure you want to delete ‘{template.name}’?", message, template.name], "delete")
     return render_template(
         "views/templates/template.html",
-        template=get_template(
-            template,
-            current_service,
-            letter_preview_url=url_for(
-                "no_cookie.view_letter_template_preview",
-                service_id=service_id,
-                template_id=template["id"],
-                filetype="png",
-            ),
-            show_recipient=True,
-        ),
+        template=template,
         user_has_template_permission=True,
     )
 
@@ -790,21 +785,21 @@ def delete_service_template(service_id, template_id):
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/redact", methods=["GET"])
 @user_has_permissions("manage_templates")
 def confirm_redact_template(service_id, template_id):
-    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
+        letter_preview_url=url_for(
+            "no_cookie.view_letter_template_preview",
+            service_id=service_id,
+            template_id=template_id,
+            filetype="png",
+        ),
+        show_recipient=True,
+    )
 
     return render_template(
         "views/templates/template.html",
-        template=get_template(
-            template,
-            current_service,
-            letter_preview_url=url_for(
-                "no_cookie.view_letter_template_preview",
-                service_id=service_id,
-                template_id=template_id,
-                filetype="png",
-            ),
-            show_recipient=True,
-        ),
+        template=template,
         user_has_template_permission=True,
         show_redaction_message=True,
     )
@@ -886,9 +881,9 @@ def set_template_sender(service_id, template_id):
 @user_has_permissions("manage_templates")
 def edit_template_postage(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-    if template["template_type"] != "letter":
+    if template.template_type != "letter":
         abort(404)
-    form = LetterTemplatePostageForm(**template)
+    form = LetterTemplatePostageForm(**template._template)
     if form.validate_on_submit():
         postage = form.postage.data
         service_api_client.update_service_template_postage(service_id, template_id, postage)
@@ -900,7 +895,7 @@ def edit_template_postage(service_id, template_id):
         form=form,
         service_id=service_id,
         template_id=template_id,
-        template_postage=template["postage"],
+        template_postage=template.get_raw("postage"),
     )
 
 
@@ -909,10 +904,10 @@ def get_template_sender_form_dict(service_id, template):
         "email": {"field_name": "email_address"},
         "letter": {"field_name": "contact_block"},
         "sms": {"field_name": "sms_sender"},
-    }[template["template_type"]]
+    }[template.template_type]
 
     sender_format = context["field_name"]
-    service_senders = get_sender_details(service_id, template["template_type"])
+    service_senders = get_sender_details(service_id, template.template_type)
     context["default_sender"] = next((x["id"] for x in service_senders if x["is_default"]), "Not set")
     if not service_senders:
         context["no_senders"] = True
@@ -920,7 +915,7 @@ def get_template_sender_form_dict(service_id, template):
     context["value_and_label"] = [(sender["id"], nl2br(sender[sender_format])) for sender in service_senders]
     context["value_and_label"].insert(0, ("", "Blank"))  # Add blank option to start of list
 
-    context["current_choice"] = template["service_letter_contact"] if template["service_letter_contact"] else ""
+    context["current_choice"] = template.get_raw("service_letter_contact") or ""
     return context
 
 
@@ -940,7 +935,7 @@ def letter_template_attach_pages(service_id, template_id):
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
 
-    if template.get("letter_attachment") is None:
+    if template.get_raw("letter_attachment") is None:
 
         return (
             render_template(
@@ -958,7 +953,7 @@ def letter_template_attach_pages(service_id, template_id):
         template_id=template_id,
         service_id=service_id,
         error=error,
-        attachment_filename=template["letter_attachment"]["original_filename"],
+        attachment_filename=template.get_raw("letter_attachment")["original_filename"],
     )
 
 
@@ -971,12 +966,12 @@ def letter_template_edit_pages(template_id, service_id):
 
     error = {}
 
-    if template.get("letter_attachment") is None:
+    if template.get_raw("letter_attachment") is None:
         abort(404)
 
     if request.method == "POST":
         letter_attachment_client.archive_letter_attachment(
-            letter_attachment_id=template["letter_attachment"]["id"],
+            letter_attachment_id=template.get_raw("letter_attachment")["id"],
             service_id=service_id,
             user_id=current_user.id,
         )
@@ -989,7 +984,8 @@ def letter_template_edit_pages(template_id, service_id):
         )
 
     flash(
-        f"Are you sure you want to remove the " f"‘{template['letter_attachment']['original_filename']}’ attachment?",
+        f"Are you sure you want to remove the "
+        f"‘{template.get_raw('letter_attachment')['original_filename']}’ attachment?",
         "remove",
     )
 
@@ -999,12 +995,11 @@ def letter_template_edit_pages(template_id, service_id):
         template_id=template_id,
         service_id=service_id,
         error=error,
-        attachment_filename=template["letter_attachment"]["original_filename"],
+        attachment_filename=template.get_raw("letter_attachment")["original_filename"],
     )
 
 
 def _process_letter_attachment_form(service_id, template, form):
-    template_id = template["id"]
     pdf_file_bytes = form.file.data.read()
     original_filename = form.file.data.filename
 
@@ -1062,15 +1057,15 @@ def _process_letter_attachment_form(service_id, template, form):
 
     try:
         # Archive letter attachment if there is already one
-        if template.get("letter_attachment") is not None:
+        if template.get_raw("letter_attachment") is not None:
             letter_attachment_client.archive_letter_attachment(
-                letter_attachment_id=template["letter_attachment"]["id"],
+                letter_attachment_id=template.get_raw("letter_attachment")["id"],
                 service_id=service_id,
                 user_id=current_user.id,
             )
         _save_letter_attachment(
             service_id=service_id,
-            template_id=template_id,
+            template_id=template.id,
             upload_id=upload_id,
             original_filename=original_filename,
             sanitise_response=response,
@@ -1082,7 +1077,7 @@ def _process_letter_attachment_form(service_id, template, form):
         url_for(
             "main.view_template",
             service_id=current_service.id,
-            template_id=template_id,
+            template_id=template.id,
         )
     )
 

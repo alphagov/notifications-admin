@@ -1778,7 +1778,7 @@ def test_send_one_off_sms_message_redirects(
     user,
 ):
     mocker.patch("app.user_api_client.get_user", return_value=user)
-    template = {"data": {"template_type": "sms", "folder": None}}
+    template = {"data": {"template_type": "sms", "folder": None, "content": "foo"}}
     mocker.patch("app.service_api_client.get_service_template", return_value=template)
 
     client_request.get(
@@ -2187,7 +2187,7 @@ def test_send_one_off_clears_session(
     service_one,
     fake_uuid,
 ):
-    template = {"data": {"template_type": "sms", "folder": None}}
+    template = {"data": {"template_type": "sms", "folder": None, "content": "foo"}}
     mocker.patch("app.service_api_client.get_service_template", return_value=template)
 
     with client_request.session_transaction() as session:

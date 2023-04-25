@@ -92,41 +92,34 @@ def get_example_letter_address(key):
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/csv", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def send_messages(service_id, template_id):
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-
-    email_reply_to = None
-    sms_sender = None
-
-    if db_template["template_type"] == "email":
-        email_reply_to = get_email_reply_to_address_from_session()
-    elif db_template["template_type"] == "sms":
-        sms_sender = get_sms_sender_from_session()
-
-    if db_template["template_type"] not in current_service.available_template_types:
-        return redirect(
-            url_for(
-                ".action_blocked",
-                service_id=service_id,
-                notification_type=db_template["template_type"],
-                return_to="view_template",
-                template_id=template_id,
-            )
-        )
-
-    template = get_template(
-        db_template,
-        current_service,
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
         show_recipient=True,
         letter_preview_url=url_for(
             "no_cookie.view_letter_template_preview",
             service_id=service_id,
             template_id=template_id,
             filetype="png",
-            page_count=get_page_count_for_letter(db_template),
         ),
-        email_reply_to=email_reply_to,
-        sms_sender=sms_sender,
     )
+
+    if template.template_type == "email":
+        template.reply_to = get_email_reply_to_address_from_session()
+    elif template.template_type == "sms":
+        template.sender = get_sms_sender_from_session()
+        template.show_sender = bool(template.sender)
+
+    if template.template_type not in current_service.available_template_types:
+        return redirect(
+            url_for(
+                ".action_blocked",
+                service_id=service_id,
+                notification_type=template.template_type,
+                return_to="view_template",
+                template_id=template_id,
+            )
+        )
 
     form = CsvUploadForm()
     if form.validate_on_submit():
@@ -200,10 +193,10 @@ def set_sender(service_id, template_id):
 
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
-    if template["template_type"] == "letter":
+    if template.template_type == "letter":
         return redirect_to_one_off
 
-    sender_details = get_sender_details(service_id, template["template_type"])
+    sender_details = get_sender_details(service_id, template.template_type)
 
     if len(sender_details) == 1:
         session["sender_id"] = sender_details[0]["id"]
@@ -211,7 +204,7 @@ def set_sender(service_id, template_id):
     if len(sender_details) <= 1:
         return redirect_to_one_off
 
-    sender_context = get_sender_context(sender_details, template["template_type"])
+    sender_context = get_sender_context(sender_details, template.template_type)
 
     form = SetSenderForm(
         sender=sender_context["default_id"],
@@ -294,17 +287,17 @@ def send_one_off(service_id, template_id):
     session["recipient"] = None
     session["placeholders"] = {}
 
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-    if db_template["template_type"] == "letter":
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    if template.template_type == "letter":
         session["sender_id"] = None
         return redirect(url_for(".send_one_off_letter_address", service_id=service_id, template_id=template_id))
 
-    if db_template["template_type"] not in current_service.available_template_types:
+    if template.template_type not in current_service.available_template_types:
         return redirect(
             url_for(
                 ".action_blocked",
                 service_id=service_id,
-                notification_type=db_template["template_type"],
+                notification_type=template.template_type,
                 return_to="view_template",
                 template_id=template_id,
             )
@@ -337,13 +330,9 @@ def send_one_off_letter_address(service_id, template_id):
         # if someone has come here via a bookmark or back button they might have some stuff still in their session
         return redirect(url_for(".send_one_off", service_id=service_id, template_id=template_id))
 
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-
-    session_placeholders = get_normalised_placeholders_from_session()
-
-    template = get_template(
-        db_template,
-        current_service,
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
         show_recipient=True,
         letter_preview_url=url_for(
             "no_cookie.send_test_preview",
@@ -351,10 +340,11 @@ def send_one_off_letter_address(service_id, template_id):
             template_id=template_id,
             filetype="png",
         ),
-        page_count=get_page_count_for_letter(db_template, session_placeholders),
-        email_reply_to=None,
-        sms_sender=None,
     )
+
+    session_placeholders = get_normalised_placeholders_from_session()
+
+    template.page_count = get_page_count_for_letter(template._template, session_placeholders)
 
     current_session_address = PostalAddress.from_personalisation(session_placeholders)
 
@@ -410,20 +400,9 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
             )
         )
 
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-
-    email_reply_to = None
-    sms_sender = None
-    if db_template["template_type"] == "email":
-        email_reply_to = get_email_reply_to_address_from_session()
-    elif db_template["template_type"] == "sms":
-        sms_sender = get_sms_sender_from_session()
-
-    template_values = get_recipient_and_placeholders_from_session(db_template["template_type"])
-
-    template = get_template(
-        db_template,
-        current_service,
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
         show_recipient=True,
         letter_preview_url=url_for(
             "no_cookie.send_test_preview",
@@ -431,10 +410,17 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
             template_id=template_id,
             filetype="png",
         ),
-        page_count=get_page_count_for_letter(db_template, values=template_values),
-        email_reply_to=email_reply_to,
-        sms_sender=sms_sender,
     )
+
+    if template.template_type == "email":
+        template.reply_to = get_email_reply_to_address_from_session()
+    elif template.template_type == "sms":
+        template.sender = get_sms_sender_from_session()
+        template.show_sender = bool(template.sender)
+
+    template_values = get_recipient_and_placeholders_from_session(template.template_type)
+
+    template.page_count = get_page_count_for_letter(template._template, values=template_values)
 
     placeholders = fields_to_fill_in(template)
 
@@ -477,7 +463,6 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
         template_type=template.template_type,
         allow_international_phone_numbers=current_service.has_permission("international_sms"),
     )
-
     if form.validate_on_submit():
         # if it's the first input (phone/email), we store against `recipient` as well, for easier extraction.
         # Only if it's not a letter.
@@ -526,11 +511,9 @@ def send_test_preview(service_id, template_id, filetype):
     if filetype not in ("pdf", "png"):
         abort(404)
 
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-
-    template = get_template(
-        db_template,
-        current_service,
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
         letter_preview_url=url_for(
             "no_cookie.send_test_preview",
             service_id=service_id,
@@ -547,11 +530,7 @@ def send_test_preview(service_id, template_id, filetype):
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>" "/from-contact-list")
 @user_has_permissions("send_messages")
 def choose_from_contact_list(service_id, template_id):
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-    template = get_template(
-        db_template,
-        current_service,
-    )
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     return render_template(
         "views/send-contact-list.html",
         contact_lists=ContactListsAlphabetical(
@@ -598,23 +577,9 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
 
     contents = s3download(service_id, upload_id)
 
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-
-    notification_count = service_api_client.get_notification_count(
-        service_id, notification_type=db_template["template_type"]
-    )
-    remaining_messages = current_service.get_message_limit(db_template["template_type"]) - notification_count
-
-    email_reply_to = None
-    sms_sender = None
-    if db_template["template_type"] == "email":
-        email_reply_to = get_email_reply_to_address_from_session()
-    elif db_template["template_type"] == "sms":
-        sms_sender = get_sms_sender_from_session()
-
-    template = get_template(
-        db_template,
-        current_service,
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
         show_recipient=True,
         letter_preview_url=url_for(
             "no_cookie.check_messages_preview",
@@ -624,13 +589,22 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
             filetype="png",
             row_index=preview_row,
         ),
-        email_reply_to=email_reply_to,
-        sms_sender=sms_sender,
-        # In this case, we don't provide template values when calculating the page count
-        # because we don't know them at this point. It means that later on we will need to
-        # recalculate the page count once we have the values
-        page_count=get_page_count_for_letter(db_template),
     )
+
+    notification_count = service_api_client.get_notification_count(service_id, notification_type=template.template_type)
+    remaining_messages = current_service.get_message_limit(template.template_type) - notification_count
+
+    if template.template_type == "email":
+        template.reply_to = get_email_reply_to_address_from_session()
+    elif template.template_type == "sms":
+        template.sender = get_sms_sender_from_session()
+        template.show_sender = bool(template.sender)
+
+    # In this case, we don't provide template values when calculating the page count
+    # because we don't know them at this point. It means that later on we will need to
+    # recalculate the page count once we have the values
+    template.page_count = get_page_count_for_letter(template._template)
+
     recipients = RecipientCSV(
         contents,
         template=template,
@@ -662,8 +636,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
     elif preview_row > 2:
         abort(404)
 
-    page_count = get_page_count_for_letter(db_template, template.values)
-    template.page_count = page_count
+    template.page_count = get_page_count_for_letter(template._template, template.values)
     original_file_name = get_csv_metadata(service_id, upload_id).get("original_file_name", "")
 
     return dict(
@@ -688,13 +661,13 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         first_recipient_column=recipients.recipient_column_headers[0],
         preview_row=preview_row,
         sent_previously=job_api_client.has_sent_previously(
-            service_id, template.id, db_template["version"], original_file_name
+            service_id, template.id, template.get_raw("version"), original_file_name
         ),
-        letter_too_long=is_letter_too_long(page_count),
+        letter_too_long=is_letter_too_long(template.page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
         letter_min_address_lines=PostalAddress.MIN_LINES,
         letter_max_address_lines=PostalAddress.MAX_LINES,
-        page_count=page_count,
+        page_count=template.page_count,
     )
 
 
@@ -852,7 +825,7 @@ def get_send_test_page_title(template_type, entering_recipient, name=None):
 
 def get_back_link(service_id, template, step_index, placeholders=None):
     if step_index == 0:
-        if should_skip_template_page(template._template):
+        if should_skip_template_page(template):
             return url_for(
                 ".choose_template",
                 service_id=service_id,
@@ -902,17 +875,13 @@ def get_skip_link(step_index, template):
 @main.route("/services/<uuid:service_id>/template/<uuid:template_id>/one-off/send-to-myself", methods=["GET"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def send_one_off_to_myself(service_id, template_id):
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-
-    if db_template["template_type"] not in ("sms", "email"):
-        abort(404)
-
     # We aren't concerned with creating the exact template (for example adding recipient and sender names)
     # we just want to create enough to use `fields_to_fill_in`
-    template = get_template(
-        db_template,
-        current_service,
-    )
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
+    if template.template_type not in ("sms", "email"):
+        abort(404)
+
     fields_to_fill_in(template, prefill_current_user=True)
 
     return redirect(
@@ -935,39 +904,36 @@ def check_notification(service_id, template_id):
 
 
 def _check_notification(service_id, template_id, exception=None):
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
-    email_reply_to = None
-    sms_sender = None
-    if db_template["template_type"] == "email":
-        email_reply_to = get_email_reply_to_address_from_session()
-    elif db_template["template_type"] == "sms":
-        sms_sender = get_sms_sender_from_session()
-    template = get_template(
-        db_template,
-        current_service,
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
         show_recipient=True,
-        email_reply_to=email_reply_to,
-        sms_sender=sms_sender,
         letter_preview_url=url_for(
             "no_cookie.check_notification_preview",
             service_id=service_id,
             template_id=template_id,
             filetype="png",
         ),
-        page_count=get_page_count_for_letter(db_template),
     )
+    if template.template_type == "email":
+        template.reply_to = get_email_reply_to_address_from_session()
+    elif template.template_type == "sms":
+        template.sender = get_sms_sender_from_session()
+        template.show_sender = bool(template.sender)
+
+    template.page_count = get_page_count_for_letter(template._template)
 
     placeholders = fields_to_fill_in(template)
 
     back_link = get_back_link(service_id, template, len(placeholders), placeholders)
 
-    if (not session.get("recipient") and db_template["template_type"] != "letter") or not all_placeholders_in_session(
+    if (not session.get("recipient") and template.template_type != "letter") or not all_placeholders_in_session(
         template.placeholders
     ):
         raise PermanentRedirect(back_link)
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
-    page_count = get_page_count_for_letter(db_template, template.values)
+    page_count = get_page_count_for_letter(template._template, template.values)
     template.page_count = page_count
     return dict(
         template=template,
@@ -1016,12 +982,12 @@ def send_notification(service_id, template_id):
             )
         )
 
-    db_template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+    current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     try:
         noti = notification_api_client.send_notification(
             service_id,
-            template_id=db_template["id"],
+            template_id=template_id,
             recipient=recipient,
             personalisation=session["placeholders"],
             sender_id=session.get("sender_id", None),
