@@ -756,7 +756,7 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
     else:
         abort(404)
 
-    template = _check_messages(service_id, template_id, upload_id, row_index, letters_as_pdf=True)["template"]
+    template = _check_messages(service_id, template_id, upload_id, row_index)["template"]
     return TemplatePreview.from_utils_template(template, filetype, page=page)
 
 
