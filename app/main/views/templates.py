@@ -2,6 +2,7 @@ import base64
 import uuid
 from functools import partial
 from io import BytesIO
+from typing import Dict
 
 from flask import (
     abort,
@@ -76,6 +77,15 @@ form_objects = {
     "letter": LetterTemplateForm,
     "broadcast": BroadcastTemplateForm,
 }
+
+
+class LetterAttachmentFormError(Exception):
+    def __init__(self, *, title: str = None, detail: str) -> None:
+        self.title = title or "There is a problem"
+        self.detail = detail
+
+    def as_error_dict(self) -> Dict[str, int]:
+        return {"title": self.title, "detail": self.detail}
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>")
@@ -926,7 +936,10 @@ def letter_template_attach_pages(service_id, template_id):
     error = {}
 
     if form.validate_on_submit():
-        return _process_letter_attachment_form(service_id, template, form)
+        try:
+            return _process_letter_attachment_form(service_id, template, form)
+        except LetterAttachmentFormError as e:
+            error = e.as_error_dict()
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
@@ -943,12 +956,9 @@ def _process_letter_attachment_form(service_id, template, form):
     original_filename = form.file.data.filename
 
     if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
-        return _invalid_upload_error(
-            template_id=template_id,
-            error={
-                "title": "Your file is too big",
-                "detail": "Files must be smaller than 2MB.",
-            },
+        raise LetterAttachmentFormError(
+            title="Your file is too big",
+            detail="Files must be smaller than 2MB.",
         )
 
     try:
@@ -957,13 +967,10 @@ def _process_letter_attachment_form(service_id, template, form):
         attachment_page_count = pdf_page_count(BytesIO(pdf_file_bytes))
     except PdfReadError:
         current_app.logger.info(f"Invalid PDF uploaded for service_id: {service_id}")
-        return _invalid_upload_error(
-            template_id=template_id,
-            error={
-                "title": "There’s a problem with your file",
-                "detail": "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
-            },
-        )
+        raise LetterAttachmentFormError(
+            title="There’s a problem with your file",
+            detail="Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
+        ) from None
 
     upload_id = uuid.uuid4()
     file_location = get_transient_letter_file_location(service_id, upload_id)
@@ -991,44 +998,43 @@ def _process_letter_attachment_form(service_id, template, form):
                 message=validation_failed_message,
                 invalid_pages=invalid_pages,
             )
-            return _invalid_upload_error(
-                template_id=template_id,
-                error=get_letter_validation_error(validation_failed_message, invalid_pages, attachment_page_count),
-            )
+            error_dict = get_letter_validation_error(validation_failed_message, invalid_pages, attachment_page_count)
+            raise LetterAttachmentFormError(title=error_dict["title"], detail=error_dict["detail"]) from None
 
         raise
 
     template_page_count = get_page_count_for_letter(template)
-    if attachment_page_count + template_page_count <= 10:
-        try:
-            _save_letter_attachment(
-                service_id=service_id,
-                template_id=template_id,
-                upload_id=upload_id,
-                original_filename=original_filename,
-                sanitise_response=response,
+    if attachment_page_count + template_page_count > 10:
+        raise LetterAttachmentFormError(
+            detail=(
+                "Letters must be 10 pages or less (5 double-sided sheets of paper). "
+                "In total, your letter template and the file you attached are "
+                f"{template_page_count + attachment_page_count} pages long."
             )
-            return redirect(
-                url_for(
-                    "main.view_template",
-                    service_id=current_service.id,
-                    template_id=template_id,
-                )
-            )
-        except HTTPError as e:
-            if e.status_code == 400 and e.message == "template-already-has-attachment":
-                # TODO: decide on content. this might depend on what the management page looks like (as we might
-                # want to redirect to the existing  to show the user the attachment that has already been added)
-                form.file.errors.append("This template already has an attachment.")
-            else:
-                raise
-
-    else:
-        form.file.errors.append(
-            "Letters must be 10 pages or less (5 double-sided sheets of paper). "
-            "In total, your letter template and the file you attached are "
-            f"{template_page_count + attachment_page_count} pages long."
         )
+
+    try:
+        _save_letter_attachment(
+            service_id=service_id,
+            template_id=template_id,
+            upload_id=upload_id,
+            original_filename=original_filename,
+            sanitise_response=response,
+        )
+    except HTTPError as e:
+        if e.status_code == 400 and e.message == "template-already-has-attachment":
+            # TODO: decide on content. this might depend on what the management page looks like (as we might
+            # want to redirect to the existing  to show the user the attachment that has already been added)
+            raise LetterAttachmentFormError(detail="This template already has an attachment.") from None
+        raise
+
+    return redirect(
+        url_for(
+            "main.view_template",
+            service_id=current_service.id,
+            template_id=template_id,
+        )
+    )
 
 
 def _save_letter_attachment(*, service_id, template_id, upload_id, original_filename, sanitise_response):
@@ -1061,15 +1067,3 @@ def _save_letter_attachment(*, service_id, template_id, upload_id, original_file
 
     pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
     flash(f"You have attached {pages_content} to the end of your letter", "default_with_tick")
-
-
-def _invalid_upload_error(template_id, error):
-    return (
-        render_template(
-            "views/templates/attach-pages.html",
-            error=error,
-            form=PDFUploadForm(),
-            template_id=template_id,
-        ),
-        400,
-    )
