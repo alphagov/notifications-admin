@@ -44,18 +44,20 @@
     {% include 'views/templates/_template.html' %}
   </div>
 
-  {% if template.template_type == "letter" and show_attach_pages_button %}
-    <div class="govuk-!-margin-bottom-3">
-      {{ govukButton({
-      "element": "a",
-      "text": "Attach pages",
-      "href": url_for(
-          '.letter_template_attach_pages',
-          service_id=current_service.id,
-          template_id=template.id
-        ),
-      "classes": "govuk-button--secondary govuk-!-margin-right-3 govuk-!-margin-bottom-2"
-      }) }}
+  {% if show_attach_pages_button %}
+    <div class="govuk-!-margin-bottom-2">
+      <div class="js-stick-at-bottom-when-scrolling">
+        {{ govukButton({
+        "element": "a",
+        "text": "Attach pages",
+        "href": url_for(
+            '.letter_template_attach_pages',
+            service_id=current_service.id,
+            template_id=template.id
+          ),
+        "classes": "govuk-button--secondary"
+        }) }}
+      </div>
     </div>
   {% endif %}
 

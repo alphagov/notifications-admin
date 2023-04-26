@@ -806,15 +806,17 @@ def test_view_letter_template_has_attach_pages_button(
     )
 
     buttons = [b for b in page.select(".govuk-button--secondary") if normalize_spaces((b).text) == "Attach pages"]
+    template_container = page.select(".template-container.template-container--with-attach-pages-button")
 
     if template_type == "letter":
         button = buttons[0]
         assert button.attrs["href"] == url_for(
             ".letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=fake_uuid
         )
-
+        assert template_container
     else:
         assert len(buttons) == 0
+        assert not template_container
 
 
 def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mocker, mock_get_template_version):

@@ -11,43 +11,39 @@
 {% endblock %}
 
 {% block backLink %}
-{% if not error %}
-{{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
-{% endif %}
+    {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-five-sixths">
-        {% if error %}
+    {% if error %}
+        <div class="govuk-!-margin-bottom-4">
             {% call banner_wrapper(type='dangerous') %}
                 <h1 class="banner-title">{{ error.title }}</h1>
                 {% if error.detail %}
                     <p class="govuk-body">{{ error.detail | safe }}</p>
                 {% endif %}
             {% endcall %}
-        {% else %}
-            {{ page_header(page_title) }}
-        {% endif %}
-
-        <p class="govuk-body">Upload a PDF and we’ll print it as part of your letter.</p>
-        <p class="govuk-body">
-            In total, your letter must be 10 pages or less (5 double-sided sheets of paper).
-        </p>
-        <p class="govuk-body">
-            Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter
-                specification</a>.
-        </p>
-
-        <div class="govuk-body">
-            {{ file_upload(
-            form.file,
-            allowed_file_extensions=['pdf'],
-            action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template_id),
-            button_text='Upload your file again' if error else 'Choose file',
-            show_errors=False
-            )}}
         </div>
+    {% else %}
+        {{ page_header(page_title) }}
+    {% endif %}
+
+    <p class="govuk-body">Upload a PDF and we’ll print it as part of your letter.</p>
+    <p class="govuk-body">
+        In total, your letter must be 10 pages or less (5 double-sided sheets of paper).
+    </p>
+    <p class="govuk-body">
+        Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter
+            specification</a>.
+    </p>
+
+    <div class="govuk-body">
+        {{ file_upload(
+        form.file,
+        allowed_file_extensions=['pdf'],
+        action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template_id),
+        button_text='Upload your file again' if error else 'Choose file',
+        show_errors=False
+        )}}
     </div>
-</div>
 {% endblock %}
