@@ -537,11 +537,13 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     client_request,
     service_one,
     mock_create_letter_branding,
+    mock_get_organisation,
     active_user_with_permissions,
     mock_update_service,
     fake_uuid,
     mocker,
 ):
+    service_one["organisation"] = ORGANISATION_ID
     mock_flash = mocker.patch("app.main.views.service_settings.branding.flash")
     mock_get_unique_name = mocker.patch(
         "app.main.views.service_settings.branding.letter_branding_client.get_unique_name_for_letter_branding",
@@ -582,6 +584,56 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
         "You’ve changed your letter branding.",
         "default_with_tick",
     )
+    assert mock_save_permanent.call_args_list == [
+        mocker.call(
+            "temporary.svg",
+            logo_type="letter",
+            logo_key_extra="some unique name",
+        )
+    ]
+
+
+def test_POST_letter_branding_set_name_creates_branding_and_redirects_if_service_has_no_org(
+    client_request,
+    service_one,
+    mock_create_letter_branding,
+    mock_get_organisation,
+    active_user_with_permissions,
+    mock_update_service,
+    fake_uuid,
+    mocker,
+):
+    mock_get_unique_name = mocker.patch(
+        "app.main.views.service_settings.branding.letter_branding_client.get_unique_name_for_letter_branding",
+        return_value="some unique name",
+    )
+    mock_set_default_org_letter_branding = mocker.patch(
+        "app.main.views.service_settings.branding._should_set_default_org_letter_branding"
+    )
+    mock_save_permanent = mocker.patch(
+        "app.main.views.service_settings.branding.logo_client.save_permanent_logo", return_value="permanent.svg"
+    )
+    mock_add_to_branding_pool = mocker.patch("app.organisations_client.add_brandings_to_letter_branding_pool")
+
+    client_request.post(
+        "main.letter_branding_set_name",
+        service_id=SERVICE_ONE_ID,
+        temp_filename="temporary.svg",
+        branding_choice="something else",
+        _data={"name": "some name"},
+        _expected_status=302,
+        _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
+    )
+
+    mock_get_unique_name.assert_called_once_with("some name")
+    mock_create_letter_branding.assert_called_once_with(
+        filename="permanent",
+        name="some unique name",
+        created_by_id=fake_uuid,
+    )
+    assert not mock_add_to_branding_pool.called
+    assert not mock_set_default_org_letter_branding.called
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, letter_branding=fake_uuid)
     assert mock_save_permanent.call_args_list == [
         mocker.call(
             "temporary.svg",
