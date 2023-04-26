@@ -1358,7 +1358,7 @@ class CsvUploadForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Please pick a file"),
             CsvFileValidator(),
-            FileSize(max_size=10e6, message="File must be smaller than 10Mb"),  # 10Mb
+            FileSize(max_size=10 * 1024 * 1024, message="File must be smaller than 10MB"),
         ],
     )
 
@@ -1798,7 +1798,7 @@ class LetterBrandingUploadBranding(StripWhitespaceForm):
         validators=[
             FileAllowed(["svg"], "Branding must be an SVG file"),
             DataRequired(message="You need to upload a file to submit"),
-            FileSize(max_size=(2 * 1024 * 1024), message="File must be smaller than 2MB"),
+            FileSize(max_size=2 * 1024 * 1024, message="File must be smaller than 2MB"),
             NoEmbeddedImagesInSVG(),
             NoTextInSVG(),
         ],
@@ -1816,7 +1816,7 @@ class EmailBrandingLogoUpload(StripWhitespaceForm):
         "Upload a logo",
         validators=[
             DataRequired(message="You need to upload a file to submit"),
-            FileSize(max_size=(2 * 1024 * 1024), message="File must be smaller than 2MB"),
+            FileSize(max_size=2 * 1024 * 1024, message="File must be smaller than 2MB"),
         ],
     )
 
@@ -1854,6 +1854,7 @@ class PDFUploadForm(StripWhitespaceForm):
         validators=[
             FileAllowed(["pdf"], "Save your letter as a PDF and try again."),
             DataRequired(message="You need to choose a file to upload"),
+            FileSize(max_size=2 * 1024 * 1024, message="File must be smaller than 2MB"),
         ],
     )
 

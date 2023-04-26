@@ -12,8 +12,6 @@ from notifications_utils.timezones import (
     utc_string_to_aware_gmt_datetime,
 )
 
-MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
-
 
 def printing_today_or_tomorrow(created_at):
     print_cutoff = convert_bst_to_utc(convert_utc_to_bst(datetime.utcnow()).replace(hour=17, minute=30)).replace(

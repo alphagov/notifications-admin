@@ -64,7 +64,6 @@ from app.utils import (
     should_skip_template_page,
 )
 from app.utils.letters import (
-    MAX_FILE_UPLOAD_SIZE,
     get_error_from_upload_form,
     get_letter_validation_error,
 )
@@ -954,12 +953,6 @@ def _process_letter_attachment_form(service_id, template, form):
     template_id = template["id"]
     pdf_file_bytes = form.file.data.read()
     original_filename = form.file.data.filename
-
-    if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
-        raise LetterAttachmentFormError(
-            title="Your file is too big",
-            detail="Files must be smaller than 2MB.",
-        )
 
     try:
         # TODO: get page count from the sanitise response once template preview

@@ -48,7 +48,6 @@ from app.template_previews import TemplatePreview, sanitise_letter
 from app.utils import unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.letters import (
-    MAX_FILE_UPLOAD_SIZE,
     get_error_from_upload_form,
     get_letter_printing_statement,
     get_letter_validation_error,
@@ -152,9 +151,6 @@ def upload_letter(service_id):
     if form.validate_on_submit():
         pdf_file_bytes = form.file.data.read()
         original_filename = form.file.data.filename
-
-        if len(pdf_file_bytes) > MAX_FILE_UPLOAD_SIZE:
-            return _invalid_upload_error("Your file is too big", "Files must be smaller than 2MB.")
 
         try:
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely

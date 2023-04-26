@@ -302,8 +302,8 @@ def test_uploading_a_pdf_errors_when_file_is_too_big(
 
     with open("tests/test_pdf_files/big.pdf", "rb") as file:
         page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
-    assert page.select_one(".banner-dangerous h1").text == "Your file is too big"
-    assert page.select_one(".banner-dangerous p").text == "Files must be smaller than 2MB."
+    assert page.select_one(".banner-dangerous h1").text == "There is a problem"
+    assert page.select_one(".banner-dangerous p").text == "File must be smaller than 2MB."
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
