@@ -17,6 +17,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
     LetterImageTemplate,
+    LetterPreviewTemplate,
     SMSPreviewTemplate,
 )
 from xlrd.biffh import XLRDError
@@ -2784,7 +2785,7 @@ def test_should_show_preview_letter_message(
     assert response.get_data(as_text=True) == "foo"
     mocked_preview.assert_called_once()
     assert mocked_preview.call_args[0][0].id == template_id
-    assert type(mocked_preview.call_args[0][0]) == LetterImageTemplate
+    assert type(mocked_preview.call_args[0][0]) == LetterPreviewTemplate
     assert mocked_preview.call_args[0][1] == filetype
     assert mocked_preview.call_args[0][0].values == expected_values
     assert mocked_preview.call_args[1] == {"page": expected_page}
