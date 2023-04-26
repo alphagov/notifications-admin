@@ -1,13 +1,16 @@
 import json
+import uuid
 from functools import partial
 from unittest.mock import ANY, Mock
 
 import pytest
-from flask import url_for
+from flask import g, url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from requests import RequestException
 
+from app.main.views.templates import _save_letter_attachment
+from app.models.service import Service
 from tests import (
     NotifyBeautifulSoup,
     sample_uuid,
@@ -923,6 +926,46 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
+def test_post_attach_pages_errors_when_attachment_already_exists_for_template(
+    mocker, client_request, fake_uuid, service_one, mock_get_template_version
+):
+    service_one["permissions"] = ["extra_letter_formatting"]
+    mocker.patch("uuid.uuid4", return_value=fake_uuid)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch("app.main.views.templates.upload_letter_to_s3")
+
+    mocker.patch("app.main.views.templates.sanitise_letter")
+    mocker.patch("app.main.views.templates.pdf_page_count", return_value=2)
+    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.templates._save_letter_attachment",
+        side_effect=HTTPError(
+            response=Mock(
+                status_code=400,
+                json=lambda: {
+                    "result": "error",
+                    "message": "template-already-has-attachment",
+                },
+            ),
+        ),
+    )
+
+    with open("tests/test_pdf_files/multi_page_pdf.pdf", "rb") as file:
+        page = client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+            _data={"file": file},
+            _expected_status=400,
+        )
+
+    assert page.select_one(".banner-dangerous h1").text == "This template already has an attachment."
+    assert page.select_one("form").attrs["action"] == url_for(
+        "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
+    )
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+
+
 @pytest.mark.parametrize("page_count, expected_pages_content", [(1, "1 page"), (2, "2 pages")])
 def test_post_attach_pages_redirects_to_template_view_when_validation_successful(
     mocker,
@@ -937,36 +980,76 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
-    mocker.patch(
-        "app.main.views.templates.sanitise_letter",
-        return_value=Mock(
-            content="The sanitised content",
-            json=lambda: {"file": "VGhlIHNhbml0aXNlZCBjb250ZW50"},
-        ),
-    )
+    mock_sanitise = mocker.patch("app.main.views.templates.sanitise_letter")
 
-    # page count for letter template
+    # page count for letter template on redirect page
     mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
 
     # page count for the attachment
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
-    mocker.patch("app.service_api_client.get_letter_contacts", return_value=[])
 
+    mock_save = mocker.patch("app.main.views.templates._save_letter_attachment")
+
+    template_id = sample_uuid()
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
-        file.read()
-        file.seek(0)
-
-        page = client_request.post(
+        client_request.post(
             "main.letter_template_attach_pages",
             service_id=SERVICE_ONE_ID,
-            template_id=sample_uuid(),
+            template_id=template_id,
             _data={"file": file},
-            _follow_redirects=True,
+            _expected_redirect=url_for("main.view_template", service_id=SERVICE_ONE_ID, template_id=template_id),
         )
 
-    assert normalize_spaces(page.select(".banner-default-with-tick")[0].text) == (
-        f"You have attached {expected_pages_content} to the end of your letter"
+    upload_id = mock_sanitise.call_args[1]["upload_id"]
+
+    mock_save.assert_called_once_with(
+        template_id=template_id,
+        upload_id=upload_id,
+        original_filename="tests/test_pdf_files/one_page_pdf.pdf",
+        sanitise_response=mock_sanitise.return_value,
     )
+
+
+def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, service_one, mocker):
+    upload_id = uuid.uuid4()
+    template_id = uuid.uuid4()
+
+    attachment_page_count = 3
+
+    mock_sanitise_response = Mock(
+        content="The sanitised content",
+        json=Mock(return_value={"file": "VGhlIHNhbml0aXNlZCBjb250ZW50", "page_count": attachment_page_count}),
+    )
+
+    mock_upload = mocker.patch("app.main.views.templates.upload_letter_attachment_to_s3")
+    mock_backup = mocker.patch("app.main.views.templates.backup_original_letter_to_s3")
+    mock_save_to_db = mocker.patch("app.letter_attachment_client.create_letter_attachment")
+    mock_flash = mocker.patch("app.main.views.templates.flash")
+
+    g.current_service = Service(service_one)
+
+    _save_letter_attachment(
+        template_id=template_id,
+        upload_id=upload_id,
+        original_filename="foo.pdf",
+        sanitise_response=mock_sanitise_response,
+    )
+
+    mock_upload.assert_called_once_with(
+        b"The sanitised content",
+        file_location=f"service-{SERVICE_ONE_ID}/{upload_id}.pdf",
+        page_count=attachment_page_count,
+        original_filename="foo.pdf",
+    )
+    mock_backup.assert_called_once_with(b"The sanitised content", upload_id=upload_id)
+    mock_save_to_db.assert_called_once_with(
+        upload_id=upload_id,
+        template_id=template_id,
+        page_count=attachment_page_count,
+        original_filename="foo.pdf",
+    )
+
+    mock_flash.assert_called_once_with("You have attached 3 pages to the end of your letter", "default_with_tick")
 
 
 def test_edit_letter_template_postage_page_displays_correctly(

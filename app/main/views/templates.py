@@ -1,3 +1,4 @@
+import base64
 import uuid
 from functools import partial
 from io import BytesIO
@@ -22,6 +23,7 @@ from requests import RequestException
 from app import (
     current_service,
     format_delta,
+    letter_attachment_client,
     nl2br,
     service_api_client,
     template_folder_api_client,
@@ -45,7 +47,9 @@ from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
 from app.s3_client.s3_letter_upload_client import (
+    backup_original_letter_to_s3,
     get_transient_letter_file_location,
+    upload_letter_attachment_to_s3,
     upload_letter_to_s3,
 )
 from app.template_previews import (
@@ -947,6 +951,7 @@ def letter_template_attach_pages(service_id, template_id):
             )
 
         upload_id = uuid.uuid4()
+        file_location = get_transient_letter_file_location(service_id, upload_id)
 
         try:
             response = sanitise_letter(
@@ -958,7 +963,6 @@ def letter_template_attach_pages(service_id, template_id):
             response.raise_for_status()
         except RequestException as ex:
             if ex.response is not None and ex.response.status_code == 400:
-                file_location = get_transient_letter_file_location(service_id, upload_id)
                 validation_failed_message = response.json().get("message")
                 invalid_pages = response.json().get("invalid_pages")
 
@@ -979,25 +983,36 @@ def letter_template_attach_pages(service_id, template_id):
 
             raise
 
-        # TODO in next PR: upload letter to S3
         template_page_count = get_page_count_for_letter(template)
         if attachment_page_count + template_page_count <= 10:
-            pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
-            flash(f"You have attached {pages_content} to the end of your letter", "default_with_tick")
-
-            return redirect(
-                url_for(
-                    "main.view_template",
-                    service_id=current_service.id,
+            try:
+                _save_letter_attachment(
                     template_id=template_id,
+                    upload_id=upload_id,
+                    original_filename=original_filename,
+                    sanitise_response=response,
                 )
-            )
+                return redirect(
+                    url_for(
+                        "main.view_template",
+                        service_id=current_service.id,
+                        template_id=template_id,
+                    )
+                )
+            except HTTPError as e:
+                if e.status_code == 400 and e.message == "template-already-has-attachment":
+                    # TODO: decide on content. this might depend on what the management page looks like (as we might
+                    # want to redirect to the existing  to show the user the attachment that has already been added)
+                    form.file.errors.append("This template already has an attachment.")
+                else:
+                    raise
 
-        form.file.errors.append(
-            "Letters must be 10 pages or less (5 double-sided sheets of paper). "
-            "In total, your letter template and the file you attached are "
-            f"{template_page_count + attachment_page_count} pages long."
-        )
+        else:
+            form.file.errors.append(
+                "Letters must be 10 pages or less (5 double-sided sheets of paper). "
+                "In total, your letter template and the file you attached are "
+                f"{template_page_count + attachment_page_count} pages long."
+            )
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
@@ -1006,6 +1021,37 @@ def letter_template_attach_pages(service_id, template_id):
         render_template("views/templates/attach-pages.html", form=form, template_id=template_id, error=error),
         400 if error else 200,
     )
+
+
+def _save_letter_attachment(*, template_id, upload_id, original_filename, sanitise_response):
+    response_json = sanitise_response.json()
+    attachment_page_count = response_json["page_count"]
+    file_contents = base64.b64decode(response_json["file"].encode())
+
+    file_location = get_transient_letter_file_location(current_service.id, upload_id)
+
+    upload_letter_attachment_to_s3(
+        file_contents,
+        file_location=file_location,
+        page_count=attachment_page_count,
+        original_filename=original_filename,
+    )
+
+    # we've changed fonts and cmyk, so retain original in case we need to investigate errors
+    backup_original_letter_to_s3(
+        file_contents,
+        upload_id=upload_id,
+    )
+
+    letter_attachment_client.create_letter_attachment(
+        upload_id=upload_id,
+        original_filename=original_filename,
+        page_count=attachment_page_count,
+        template_id=template_id,
+    )
+
+    pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
+    flash(f"You have attached {pages_content} to the end of your letter", "default_with_tick")
 
 
 def _invalid_upload_error(template_id, error):

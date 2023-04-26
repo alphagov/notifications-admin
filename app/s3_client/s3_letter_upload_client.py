@@ -87,3 +87,19 @@ def get_letter_pdf_and_metadata(service_id, file_id):
 def get_letter_metadata(service_id, file_id):
     s3_object = get_letter_s3_object(service_id, file_id)
     return LetterMetadata(s3_object["Metadata"])
+
+
+def upload_letter_attachment_to_s3(data, *, file_location, page_count, original_filename):
+    # Use of urllib.parse.quote encodes metadata into ascii, which is required by s3.
+    # Making sure data for displaying to users is decoded is taken care of by LetterMetadata
+    metadata = {
+        "page_count": str(page_count),
+        "filename": urllib.parse.quote(original_filename),
+    }
+    utils_s3upload(
+        filedata=data,
+        region=current_app.config["AWS_REGION"],
+        bucket_name=current_app.config["S3_BUCKET_LETTER_ATTACHMENTS"],
+        file_location=file_location,
+        metadata=metadata,
+    )
