@@ -1391,6 +1391,7 @@ def test_POST_email_branding_set_alt_text_shows_error(client_request, service_on
 def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redirects(
     client_request,
     service_one,
+    mock_get_organisation,
     mock_create_email_branding,
     mock_get_email_branding_name_for_alt_text,
     active_user_with_permissions,
@@ -1400,6 +1401,7 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
     brand_type,
     expected_name,
 ):
+    service_one["organisation"] = ORGANISATION_ID
     mock_flash = mocker.patch("app.main.views.service_settings.branding.flash")
     mock_save_permanent = mocker.patch(
         "app.main.views.service_settings.branding.logo_client.save_permanent_logo",
@@ -1439,6 +1441,58 @@ def test_POST_email_branding_set_alt_text_creates_branding_adds_to_pool_and_redi
         "default_with_tick",
     )
     mock_should_set_default_org_email_branding.assert_called_once_with(None)
+    assert mock_save_permanent.call_args_list == [
+        mocker.call(
+            "example.png",
+            logo_type="email",
+            logo_key_extra="some alt text",
+        )
+    ]
+
+
+def test_POST_email_branding_set_alt_text_creates_branding_and_redirects_if_service_has_no_org(
+    client_request,
+    service_one,
+    mock_create_email_branding,
+    mock_get_email_branding_name_for_alt_text,
+    active_user_with_permissions,
+    mock_update_service,
+    fake_uuid,
+    mocker,
+):
+    mock_save_permanent = mocker.patch(
+        "app.main.views.service_settings.branding.logo_client.save_permanent_logo",
+        return_value="permanent-example.png",
+    )
+    mock_set_default_org_email_branding = mocker.patch(
+        "app.main.views.service_settings.branding._should_set_default_org_email_branding"
+    )
+    mock_add_to_branding_pool = mocker.patch("app.organisations_client.add_brandings_to_email_branding_pool")
+
+    client_request.post(
+        "main.email_branding_set_alt_text",
+        service_id=service_one["id"],
+        brand_type="org",
+        logo="example.png",
+        _data={"alt_text": "some alt text"},
+        _expected_status=302,
+        _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
+    )
+    mock_create_email_branding.assert_called_once_with(
+        logo="permanent-example.png",
+        name="some alt text",
+        alt_text="some alt text",
+        text=None,
+        colour=None,
+        brand_type="org",
+        created_by_id=active_user_with_permissions["id"],
+    )
+    assert not mock_add_to_branding_pool.called
+    assert not mock_set_default_org_email_branding.called
+    mock_update_service.assert_called_once_with(
+        service_one["id"],
+        email_branding=fake_uuid,
+    )
     assert mock_save_permanent.call_args_list == [
         mocker.call(
             "example.png",

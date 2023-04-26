@@ -355,13 +355,14 @@ def email_branding_set_alt_text(service_id):
         # set as service branding
         current_service.update(email_branding=new_email_branding.id)
 
-        # add to org pool
-        organisations_client.add_brandings_to_email_branding_pool(
-            current_service.organisation.id, [new_email_branding.id]
-        )
+        if current_service.organisation:
+            # add to org pool
+            organisations_client.add_brandings_to_email_branding_pool(
+                current_service.organisation.id, [new_email_branding.id]
+            )
 
-        if _should_set_default_org_email_branding(branding_choice):
-            current_service.organisation.update(email_branding_id=new_email_branding.id, delete_services_cache=True)
+            if _should_set_default_org_email_branding(branding_choice):
+                current_service.organisation.update(email_branding_id=new_email_branding.id, delete_services_cache=True)
 
         flash(
             "You’ve changed your email branding. Send yourself an email to make sure it looks OK.", "default_with_tick"
@@ -714,13 +715,17 @@ def letter_branding_set_name(service_id):
         # set as service branding
         current_service.update(letter_branding=new_letter_branding.id)
 
-        # add to org pool
-        organisations_client.add_brandings_to_letter_branding_pool(
-            current_service.organisation.id, [new_letter_branding.id]
-        )
+        if current_service.organisation:
+            # add to org pool
+            organisations_client.add_brandings_to_letter_branding_pool(
+                current_service.organisation.id, [new_letter_branding.id]
+            )
 
-        if _should_set_default_org_letter_branding(letter_branding_data["branding_choice"]):
-            current_service.organisation.update(letter_branding_id=new_letter_branding.id, delete_services_cache=True)
+            if _should_set_default_org_letter_branding(letter_branding_data["branding_choice"]):
+                current_service.organisation.update(
+                    letter_branding_id=new_letter_branding.id,
+                    delete_services_cache=True,
+                )
 
         flash("You’ve changed your letter branding.", "default_with_tick")
 
