@@ -985,26 +985,34 @@ def letter_template_attach_pages(service_id, template_id):
 
         template_page_count = get_page_count_for_letter(template)
         if attachment_page_count + template_page_count <= 10:
-            _save_letter_attachment(
-                template_id=template_id,
-                upload_id=upload_id,
-                original_filename=original_filename,
-                sanitise_response=response,
-            )
-
-            return redirect(
-                url_for(
-                    "main.view_template",
-                    service_id=current_service.id,
+            try:
+                _save_letter_attachment(
                     template_id=template_id,
+                    upload_id=upload_id,
+                    original_filename=original_filename,
+                    sanitise_response=response,
                 )
-            )
+                return redirect(
+                    url_for(
+                        "main.view_template",
+                        service_id=current_service.id,
+                        template_id=template_id,
+                    )
+                )
+            except HTTPError as e:
+                if e.status_code == 400 and e.message == "template-already-has-attachment":
+                    # TODO: decide on content. this might depend on what the management page looks like (as we might
+                    # want to redirect to the existing  to show the user the attachment that has already been added)
+                    form.file.errors.append("This template already has an attachment.")
+                else:
+                    raise
 
-        form.file.errors.append(
-            "Letters must be 10 pages or less (5 double-sided sheets of paper). "
-            "In total, your letter template and the file you attached are "
-            f"{template_page_count + attachment_page_count} pages long."
-        )
+        else:
+            form.file.errors.append(
+                "Letters must be 10 pages or less (5 double-sided sheets of paper). "
+                "In total, your letter template and the file you attached are "
+                f"{template_page_count + attachment_page_count} pages long."
+            )
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])

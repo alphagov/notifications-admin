@@ -924,6 +924,46 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
+def test_post_attach_pages_errors_when_attachment_already_exists_for_template(
+    mocker, client_request, fake_uuid, service_one, mock_get_template_version
+):
+    service_one["permissions"] = ["extra_letter_formatting"]
+    mocker.patch("uuid.uuid4", return_value=fake_uuid)
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch("app.main.views.templates.upload_letter_to_s3")
+
+    mocker.patch("app.main.views.templates.sanitise_letter")
+    mocker.patch("app.main.views.templates.pdf_page_count", return_value=2)
+    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch(
+        "app.main.views.templates._save_letter_attachment",
+        side_effect=HTTPError(
+            response=Mock(
+                status_code=400,
+                json=lambda: {
+                    "result": "error",
+                    "message": "template-already-has-attachment",
+                },
+            ),
+        ),
+    )
+
+    with open("tests/test_pdf_files/multi_page_pdf.pdf", "rb") as file:
+        page = client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+            _data={"file": file},
+            _expected_status=400,
+        )
+
+    assert page.select_one(".banner-dangerous h1").text == "This template already has an attachment."
+    assert page.select_one("form").attrs["action"] == url_for(
+        "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
+    )
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+
+
 @pytest.mark.parametrize("page_count, expected_pages_content", [(1, "1 page"), (2, "2 pages")])
 def test_post_attach_pages_redirects_to_template_view_when_validation_successful(
     mocker,
