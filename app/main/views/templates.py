@@ -281,7 +281,7 @@ def letter_branding_preview_image(filename):
     return TemplatePreview.from_example_template(template, filename)
 
 
-def _view_template_version(service_id, template_id, version):
+def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
     return dict(
         template=get_template(
             current_service.get_template(template_id, version=version),
@@ -292,7 +292,9 @@ def _view_template_version(service_id, template_id, version):
                 template_id=template_id,
                 version=version,
                 filetype="png",
-            ),
+            )
+            if not letters_as_pdf
+            else None,
         )
     )
 
