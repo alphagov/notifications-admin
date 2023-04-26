@@ -402,6 +402,7 @@
     "/using-notify/guidance/text-message-sender",
     "/using-notify/guidance/upload-a-letter",
     "/using-notify/letter-branding",
+    "/using-notify/links-and-URLs",
     "/using-notify/message-status",
     "/using-notify/message-status/<template_type:notification_type>",
     "/using-notify/optional-content",
