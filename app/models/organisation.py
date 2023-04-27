@@ -66,6 +66,7 @@ class Organisation(JSONModel):
         "purchase_order_number",
         "notes",
         "can_approve_own_go_live_requests",
+        "permissions",
     }
 
     __sort_attribute__ = "name"
@@ -122,6 +123,7 @@ class Organisation(JSONModel):
             self.email_branding_id = None
             self.letter_branding_id = None
             self.can_approve_own_go_live_requests = False
+            self.permissions = []
 
     @property
     def organisation_type_label(self):
@@ -163,6 +165,10 @@ class Organisation(JSONModel):
     @property
     def trial_services(self):
         return [s for s in self.services if not s.active or s.trial_mode]
+
+    @property
+    def can_ask_to_join_a_service(self):
+        return "can_ask_to_join_a_service" in self.permissions
 
     @cached_property
     def invited_users(self):

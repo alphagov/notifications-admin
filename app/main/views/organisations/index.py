@@ -442,6 +442,33 @@ def edit_organisation_can_approve_own_go_live_requests(org_id):
     )
 
 
+@main.route("/organisations/<uuid:org_id>/settings/edit-can-ask-to-join-a-service", methods=["GET", "POST"])
+@user_is_platform_admin
+def edit_organisation_can_ask_to_join_a_service(org_id):
+
+    form = YesNoSettingForm(
+        name="Can people ask to join services in this organisation?",
+        enabled=current_organisation.can_ask_to_join_a_service,
+    )
+    permissions = current_organisation.permissions
+
+    if form.enabled.data:
+        if "can_ask_to_join_a_service" not in permissions:
+            permissions.extend(["can_ask_to_join_a_service"])
+    else:
+        while "can_ask_to_join_a_service" in permissions:
+            permissions.remove("can_ask_to_join_a_service")
+
+    if form.validate_on_submit():
+        current_organisation.update(permissions=permissions)
+        return redirect(url_for(".organisation_settings", org_id=org_id))
+
+    return render_template(
+        "views/organisations/organisation/settings/edit-can-ask-to-join-a-service.html",
+        form=form,
+    )
+
+
 @main.route("/organisations/<uuid:org_id>/settings/notes", methods=["GET", "POST"])
 @user_is_platform_admin
 def edit_organisation_notes(org_id):
