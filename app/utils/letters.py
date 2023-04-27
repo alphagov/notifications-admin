@@ -197,8 +197,9 @@ def get_error_from_upload_form(form_errors):
     error = {}
     if "PDF" in form_errors:
         error["title"] = "Wrong file type"
-        error["detail"] = form_errors
-    else:  # No file was uploaded error
-        error["title"] = form_errors
+    else:
+        error["title"] = "There is a problem"
+
+    error["detail"] = form_errors
 
     return error
