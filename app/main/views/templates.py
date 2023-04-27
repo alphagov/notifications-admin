@@ -989,6 +989,7 @@ def letter_template_attach_pages(service_id, template_id):
         if attachment_page_count + template_page_count <= 10:
             try:
                 _save_letter_attachment(
+                    service_id=service_id,
                     template_id=template_id,
                     upload_id=upload_id,
                     original_filename=original_filename,
@@ -1025,7 +1026,7 @@ def letter_template_attach_pages(service_id, template_id):
     )
 
 
-def _save_letter_attachment(*, template_id, upload_id, original_filename, sanitise_response):
+def _save_letter_attachment(*, service_id, template_id, upload_id, original_filename, sanitise_response):
     response_json = sanitise_response.json()
     attachment_page_count = response_json["page_count"]
     file_contents = base64.b64decode(response_json["file"].encode())
@@ -1050,6 +1051,7 @@ def _save_letter_attachment(*, template_id, upload_id, original_filename, saniti
         original_filename=original_filename,
         page_count=attachment_page_count,
         template_id=template_id,
+        service_id=service_id,
     )
 
     pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
