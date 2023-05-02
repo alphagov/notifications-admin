@@ -54,7 +54,7 @@ eventlet==0.33.1
     # via gunicorn
 fido2==1.1.0
     # via -r requirements.in
-flask==2.2.2
+flask==2.2.5
     # via
     #   -r requirements.in
     #   flask-login
@@ -86,7 +86,7 @@ humanize==4.4.0
     # via -r requirements.in
 idna==3.3
     # via requests
-importlib-metadata==6.3.0
+importlib-metadata==6.6.0
     # via flask
 itsdangerous==2.1.2
     # via
