@@ -23,6 +23,7 @@ class TemplatePreview:
             "values": values,
             "filename": current_service.letter_branding.filename,
         }
+
         resp = requests.post(
             "{}/preview.{}{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"],

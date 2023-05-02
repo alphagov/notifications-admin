@@ -39,6 +39,7 @@ from app.models.contact_list import ContactList
 from app.s3_client.s3_letter_upload_client import (
     LetterNotFoundError,
     backup_original_letter_to_s3,
+    get_attachment_pdf_and_metadata,
     get_letter_metadata,
     get_letter_pdf_and_metadata,
     get_transient_letter_file_location,
@@ -307,7 +308,12 @@ def view_letter_upload_as_preview(service_id, file_id):
     except ValueError:
         abort(400)
 
-    pdf_file, metadata = get_letter_pdf_and_metadata(service_id, file_id)
+    is_an_attachment = request.args.get("is_an_attachment", False)
+
+    if is_an_attachment:
+        pdf_file, metadata = get_attachment_pdf_and_metadata(service_id, file_id)
+    else:
+        pdf_file, metadata = get_letter_pdf_and_metadata(service_id, file_id)
     invalid_pages = json.loads(metadata.get("invalid_pages", "[]"))
 
     if metadata.get("message") == "content-outside-printable-area" and page in invalid_pages:

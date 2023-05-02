@@ -28,6 +28,8 @@ def get_template(
     redact_missing_personalisation=False,
     email_reply_to=None,
     sms_sender=None,
+    attachment_page_count=0,
+    attachment_preview_url=None,
 ):
     if "email" == template["template_type"]:
         return EmailPreviewTemplate(
@@ -56,6 +58,8 @@ def get_template(
                 page_count=int(page_count),
                 contact_block=template["reply_to_text"],
                 postage=template["postage"],
+                attachment_page_count=attachment_page_count,
+                attachment_image_url=attachment_preview_url,
             )
         else:
             return LetterPreviewTemplate(

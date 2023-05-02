@@ -822,6 +822,10 @@ def test_view_letter_template_has_attach_pages_button(
         assert not template_container
 
 
+def test_view_letter_template_shows_attachment_preview():
+    pass
+
+
 def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mocker, mock_get_template_version):
     service_one["permissions"] = ["extra_letter_formatting"]
 

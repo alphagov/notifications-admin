@@ -88,6 +88,9 @@ def view_template(service_id, template_id):
     if should_skip_template_page(template):
         return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
+    attachment_page_count, attachment_preview_url = _get_letter_attachment_page_count_and_url(
+        service_id, template["letter_attachment"]
+    )
     page_count = get_page_count_for_letter(template)
 
     return render_template(
@@ -103,6 +106,8 @@ def view_template(service_id, template_id):
             ),
             show_recipient=True,
             page_count=page_count,
+            attachment_page_count=attachment_page_count,
+            attachment_preview_url=attachment_preview_url,
         ),
         template_postage=template["postage"],
         user_has_template_permission=user_has_template_permission,
@@ -1066,3 +1071,17 @@ def _invalid_upload_error(template_id, error):
         ),
         400,
     )
+
+
+def _get_letter_attachment_page_count_and_url(service_id, attachment_id):
+    if attachment_id:
+        attachment_page_count = letter_attachment_client.get_letter_attachment(attachment_id)["page_count"]
+        attachment_preview_url = url_for(
+            ".view_letter_upload_as_preview",
+            service_id=service_id,
+            file_id=attachment_id,
+            is_an_attachment=True,
+        )
+    else:
+        attachment_page_count, attachment_preview_url = 0, None
+    return attachment_page_count, attachment_preview_url
