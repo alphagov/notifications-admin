@@ -474,9 +474,9 @@ def test_organisation_services_shows_live_services_and_usage(
     assert normalize_spaces(usage_rows[8].text) == "£0.00 spent on letters"
 
     # Ensure there’s no ‘this org has no services message’
-    hints = page.select(".govuk-hint")
-    assert len(hints) == 1
-    assert hints[0].text == "Last updated today at 8:00pm"
+    heading_aside = page.select(".heading-aside")
+    assert len(heading_aside) == 1
+    assert heading_aside[0].text == "Last updated today at 8:00pm"
 
 
 @freeze_time("2020-02-20 20:20")

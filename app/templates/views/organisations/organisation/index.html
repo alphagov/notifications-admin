@@ -9,15 +9,10 @@
 
 {% block maincolumn_content %}
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-half">
-      <h1 class="heading-medium" id="page-header">Usage</h1>
-    </div>
-
+  <div class="heading-with-aside heading-with-aside--heading-medium">
+    <h1 class="heading-medium" id="page-header">Usage</h1>
     {% if updated_at %}
-      <div class="govuk-grid-column-one-half">
-        <p class="govuk-hint govuk-!-font-size-16 govuk-!-text-align-right govuk-!-margin-bottom-1 govuk-!-margin-top-7">Last updated {{ updated_at | format_datetime_relative }}</p>
-      </div>
+      <p class="heading-aside">Last updated {{ updated_at | format_datetime_relative }}</p>
     {% endif %}
   </div>
 
