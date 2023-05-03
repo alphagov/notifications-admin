@@ -1003,6 +1003,7 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     upload_id = mock_sanitise.call_args[1]["upload_id"]
 
     mock_save.assert_called_once_with(
+        service_id=service_one["id"],
         template_id=template_id,
         upload_id=upload_id,
         original_filename="tests/test_pdf_files/one_page_pdf.pdf",
@@ -1029,6 +1030,7 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
     g.current_service = Service(service_one)
 
     _save_letter_attachment(
+        service_id=service_one["id"],
         template_id=template_id,
         upload_id=upload_id,
         original_filename="foo.pdf",
@@ -1045,6 +1047,7 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
     mock_save_to_db.assert_called_once_with(
         upload_id=upload_id,
         template_id=template_id,
+        service_id=service_one["id"],
         page_count=attachment_page_count,
         original_filename="foo.pdf",
     )
