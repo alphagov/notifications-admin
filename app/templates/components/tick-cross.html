@@ -1,17 +1,17 @@
-{% from 'components/svgs.html' import tick, cross %}
+{% import 'components/svgs.html' as svgs %}
 
 {% macro tick_cross(yes, label, truthy_hint='Can', falsey_hint='Cannot') %}
   {% if yes %}
     <li class="tick-cross__list-item tick-cross__tick">
       <span class="tick-cross__icon">
-        {{ tick() }}
+        {{ svgs.tick() }}
       </span>
       <span class="govuk-visually-hidden">{{ truthy_hint }}&nbsp;</span>{{ label}}
     </li>
     {% else %}
     <li class="tick-cross__list-item tick-cross__cross">
       <span class="tick-cross__icon">
-        {{ cross() }}
+        {{ svgs.cross() }}
       </span>
       <span class="govuk-visually-hidden">{{ falsey_hint }}&nbsp;</span>{{ label}}
     </li>

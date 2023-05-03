@@ -1,6 +1,6 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
-{% from "components/svgs.html" import tick %}
+{% import "components/svgs.html" as svgs %}
 
 {% macro banner(body, type=None, with_tick=False, delete_button=None, subhead=None, context=None, action=None, id=None, thing=None) %}
   <div
@@ -14,7 +14,7 @@
     {% endif %}
   >
     {% if with_tick %}
-      {{ tick(classes="banner__icon") }}
+      {{ svgs.tick(classes="banner__icon") }}
     {% endif %}
     {% if subhead -%}
       <h1 class="banner-title">{{ subhead }}</h1>
