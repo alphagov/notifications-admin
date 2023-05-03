@@ -12,8 +12,6 @@ from notifications_utils.timezones import (
     utc_string_to_aware_gmt_datetime,
 )
 
-MAX_FILE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
-
 
 def printing_today_or_tomorrow(created_at):
     print_cutoff = convert_bst_to_utc(convert_utc_to_bst(datetime.utcnow()).replace(hour=17, minute=30)).replace(
@@ -199,8 +197,9 @@ def get_error_from_upload_form(form_errors):
     error = {}
     if "PDF" in form_errors:
         error["title"] = "Wrong file type"
-        error["detail"] = form_errors
-    else:  # No file was uploaded error
-        error["title"] = form_errors
+    else:
+        error["title"] = "There is a problem"
+
+    error["detail"] = form_errors
 
     return error

@@ -262,7 +262,7 @@ def test_uploading_a_pdf_shows_error_when_no_file_uploaded(
     service_one["permissions"] = ["extra_letter_formatting"]
 
     page = client_request.post(endpoint, **kwargs, _data={"file": ""}, _expected_status=400)
-    assert page.select_one(".banner-dangerous h1").text == "You need to choose a file to upload"
+    assert page.select_one(".banner-dangerous p").text == "You need to choose a file to upload"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
@@ -282,7 +282,8 @@ def test_uploading_a_pdf_shows_error_when_file_contains_virus(
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
-    assert page.select_one(".banner-dangerous h1").text == "Your file contains a virus"
+    assert page.select_one(".banner-dangerous h1").text == "There is a problem"
+    assert page.select_one(".banner-dangerous p").text == "Your file contains a virus"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
     mock_s3_backup.assert_not_called()
 
@@ -302,8 +303,8 @@ def test_uploading_a_pdf_errors_when_file_is_too_big(
 
     with open("tests/test_pdf_files/big.pdf", "rb") as file:
         page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
-    assert page.select_one(".banner-dangerous h1").text == "Your file is too big"
-    assert page.select_one(".banner-dangerous p").text == "Files must be smaller than 2MB."
+    assert page.select_one(".banner-dangerous h1").text == "There is a problem"
+    assert page.select_one(".banner-dangerous p").text == "File must be smaller than 2MB"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 

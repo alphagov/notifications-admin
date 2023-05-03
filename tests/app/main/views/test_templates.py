@@ -916,7 +916,8 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
             _expected_status=400,
         )
 
-    assert page.select_one(".banner-dangerous h1").text == (
+    assert page.select_one(".banner-dangerous h1").text == "There is a problem"
+    assert page.select_one(".banner-dangerous p").text == (
         "Letters must be 10 pages or less (5 double-sided sheets of paper). "
         "In total, your letter template and the file you attached are 19 pages long."
     )
@@ -959,7 +960,7 @@ def test_post_attach_pages_errors_when_attachment_already_exists_for_template(
             _expected_status=400,
         )
 
-    assert page.select_one(".banner-dangerous h1").text == "This template already has an attachment."
+    assert page.select_one(".banner-dangerous p").text == "This template already has an attachment."
     assert page.select_one("form").attrs["action"] == url_for(
         "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
     )
