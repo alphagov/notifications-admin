@@ -1,29 +1,28 @@
-<div class="govuk-grid-column-full">
-  {% if template._template.archived %}
-    <p class="hint">
-      This template was deleted {{ template._template.updated_at|format_datetime_relative }}.
-    </p>
-  {% else %}
-    <div class="bottom-gutter-2-3">
-      <div class="govuk-grid-row">
-        {% if current_user.has_permissions('create_broadcasts') %}
-          <div class="govuk-grid-column-one-half">
-            <a href="{{ url_for(".broadcast", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
-              Get ready to send
-            </a>
-          </div>
-        {% endif %}
-        {% if current_user.has_permissions('manage_templates') %}
-          <div class="govuk-grid-column-one-half">
-            <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
-              Edit<span class="govuk-visually-hidden"> this template</span>
-            </a>
-          </div>
-        {% endif %}
-      </div>
+{% if template._template.archived %}
+  <p class="hint">
+    This template was deleted {{ template._template.updated_at|format_datetime_relative }}.
+  </p>
+{% else %}
+  <div class="bottom-gutter-2-3">
+    <div class="govuk-grid-row">
+      {% if current_user.has_permissions('create_broadcasts') %}
+        <div class="govuk-grid-column-one-half">
+          <a href="{{ url_for(".broadcast", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
+            Get ready to send
+          </a>
+        </div>
+      {% endif %}
+      {% if current_user.has_permissions('manage_templates') %}
+        <div class="govuk-grid-column-one-half">
+          <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
+            Edit<span class="govuk-visually-hidden"> this template</span>
+          </a>
+        </div>
+      {% endif %}
     </div>
-  {% endif %}
-</div>
-<div class="govuk-grid-column-full template-container">
+  </div>
+{% endif %}
+
+<div class="template-container">
   {{ template|string }}
 </div>

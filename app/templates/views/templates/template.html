@@ -40,17 +40,15 @@
     </div>
   {% endif %}
 
-  <div class="govuk-grid-row">
-    {% if template.template_type == "email" %}
-      {% include 'views/templates/_email_template.html' %}
-    {% elif template.template_type == "sms" %}
-      {% include 'views/templates/_sms_template.html' %}
-    {% elif template.template_type == "letter" %}
-      {% include 'views/templates/_letter_template.html' %}
-    {% elif template.template_type == "broadcast" %}
-      {% include 'views/templates/_broadcast_template.html' %}
-    {% endif %}
-  </div>
+  {% if template.template_type == "email" %}
+    {% include 'views/templates/_email_template.html' %}
+  {% elif template.template_type == "sms" %}
+    {% include 'views/templates/_sms_template.html' %}
+  {% elif template.template_type == "letter" %}
+    {% include 'views/templates/_letter_template.html' %}
+  {% elif template.template_type == "broadcast" %}
+    {% include 'views/templates/_broadcast_template.html' %}
+  {% endif %}
 
   {% if template.template_type != 'broadcast' %}
     <div class="govuk-!-margin-bottom-3">
