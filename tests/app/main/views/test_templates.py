@@ -1056,6 +1056,67 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
     mock_flash.assert_called_once_with("You have attached 3 pages to the end of your letter", "default_with_tick")
 
 
+def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
+    mock_get_service_letter_template_with_attachment, client_request, service_one
+):
+    service_one["permissions"] = ["extra_letter_formatting"]
+    page = client_request.get(
+        "main.letter_template_attach_pages",
+        service_id=SERVICE_ONE_ID,
+        template_id=sample_uuid(),
+        _expected_status=200,
+    )
+    assert page.select_one("#filename").text.strip() == "original file.pdf"
+
+
+def test_post_delete_letter_attachment_calls_archive_letter_attachment(
+    mock_get_service_letter_template_with_attachment,
+    client_request,
+    service_one,
+    mocker,
+    active_user_with_permissions,
+):
+    service_one["permissions"] = ["extra_letter_formatting"]
+    mock_archive_attachment = mocker.patch("app.letter_attachment_client.archive_letter_attachment")
+    client_request.post(
+        "main.letter_template_remove_pages",
+        service_id=SERVICE_ONE_ID,
+        template_id=sample_uuid(),
+        _expected_status=302,
+        expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+        ),
+    )
+
+    mock_archive_attachment.assert_called_once_with(
+        letter_attachment_id=sample_uuid(),
+        user_id=active_user_with_permissions["id"],
+        service_id=service_one["id"],
+    )
+
+
+def test_get_delete_letter_attachment_shows_confirmation(
+    mock_get_service_letter_template_with_attachment,
+    client_request,
+    service_one,
+    mocker,
+    active_user_with_permissions,
+):
+    mock_flash = mocker.patch("app.main.views.templates.flash")
+    service_one["permissions"] = ["extra_letter_formatting"]
+    mocker.patch("app.letter_attachment_client.archive_letter_attachment")
+    page = client_request.get(
+        "main.letter_template_remove_pages",
+        service_id=SERVICE_ONE_ID,
+        template_id=sample_uuid(),
+        _expected_status=200,
+    )
+    mock_flash.assert_called_once_with("Are you sure you want to remove the ‘original file.pdf’ attachment?", "remove")
+    assert page.select_one("#filename").text.strip() == "original file.pdf"
+
+
 def test_edit_letter_template_postage_page_displays_correctly(
     client_request,
     service_one,

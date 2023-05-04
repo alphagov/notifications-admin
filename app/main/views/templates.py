@@ -98,7 +98,6 @@ def view_template(service_id, template_id):
         return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
     page_count = get_page_count_for_letter(template)
-
     return render_template(
         "views/templates/template.html",
         template=get_template(
@@ -118,6 +117,7 @@ def view_template(service_id, template_id):
         letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
         page_count=page_count,
+        show_manage_attachment_button="letter_attachment" in template and template["letter_attachment"] is not None,
     )
 
 
@@ -930,7 +930,6 @@ def letter_template_attach_pages(service_id, template_id):
     template = current_service.get_template(template_id)
     form = PDFUploadForm()
     error = {}
-
     if form.validate_on_submit():
         try:
             return _process_letter_attachment_form(service_id, template, form)
@@ -940,9 +939,63 @@ def letter_template_attach_pages(service_id, template_id):
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
 
-    return (
-        render_template("views/templates/attach-pages.html", form=form, template_id=template_id, error=error),
-        400 if error else 200,
+    if template.get("letter_attachment") is None:
+
+        return (
+            render_template(
+                "views/templates/attach-pages.html",
+                form=form,
+                template_id=template_id,
+                error=error,
+            ),
+            400 if error else 200,
+        )
+
+    return render_template(
+        "views/templates/manage-attachment.html",
+        form=form,
+        template_id=template_id,
+        service_id=service_id,
+        error=error,
+        attachment_filename=template["letter_attachment"]["original_filename"],
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages/delete", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+@service_has_permission("extra_letter_formatting")
+def letter_template_remove_pages(template_id, service_id):
+    template = current_service.get_template(template_id)
+    error = {}
+
+    if template.get("letter_attachment") is None:
+        abort(404)
+
+    if request.method == "POST":
+        letter_attachment_client.archive_letter_attachment(
+            letter_attachment_id=template["letter_attachment"]["id"],
+            service_id=service_id,
+            user_id=current_user.id,
+        )
+        return redirect(
+            url_for(
+                ".view_template",
+                service_id=service_id,
+                template_id=template_id,
+            )
+        )
+
+    flash(
+        f"Are you sure you want to remove the " f"‘{template['letter_attachment']['original_filename']}’ attachment?",
+        "remove",
+    )
+
+    return render_template(
+        "views/templates/manage-attachment.html",
+        template_id=template_id,
+        service_id=service_id,
+        error=error,
+        attachment_filename=template["letter_attachment"]["original_filename"],
     )
 
 

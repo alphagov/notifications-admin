@@ -19,5 +19,13 @@ class LetterAttachmentClient(NotifyAdminAPIClient):
         }
         return self.post(url="/letter-attachment", data=data)
 
+    @cache.delete("service-{service_id}-templates")
+    @cache.delete_by_pattern("service-{service_id}-template-*")
+    def archive_letter_attachment(self, *, letter_attachment_id, user_id, service_id):
+        data = {
+            "archived_by": str(user_id),
+        }
+        return self.post(url=f"/letter-attachment/{letter_attachment_id}/archive", data=data)
+
 
 letter_attachment_client = LetterAttachmentClient()
