@@ -10,7 +10,7 @@
     {% if current_user.has_permissions('manage_templates') %}
       <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
         <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
-          Edit
+          Edit<span class="govuk-visually-hidden"> this template</span>
         </a>
       </div>
     {% endif %}

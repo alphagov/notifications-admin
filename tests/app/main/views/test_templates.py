@@ -1121,7 +1121,7 @@ def test_edit_letter_templates_postage_updates_postage(
         (
             ["manage_templates"],
             [
-                (".edit_service_template", "Edit"),
+                (".edit_service_template", "Edit this template"),
             ],
             None,
         ),
@@ -1129,7 +1129,7 @@ def test_edit_letter_templates_postage_updates_postage(
             ["send_messages", "manage_templates"],
             [
                 (".set_sender", "Get ready to send a message using this template"),
-                (".edit_service_template", "Edit"),
+                (".edit_service_template", "Edit this template"),
             ],
             None,
         ),
