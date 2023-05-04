@@ -1,6 +1,6 @@
 {% from "components/folder-path.html" import copy_folder_path %}
 {% from "components/live-search.html" import live_search %}
-{% from "components/svgs.html" import folder %}
+{% import "components/svgs.html" as svgs %}
 
 {% extends "withnav_template.html" %}
 {% set page_title = "Copy an existing template" %}
@@ -35,18 +35,18 @@
               {% else %}
                 <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service.id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
               {% endif %}
-                {{ folder(classes="template-list-folder__icon") }}
+                {{ svgs.folder(classes="template-list-folder__icon") }}
                 {{ ancestor.name }}
               </a> <span class="message-name-separator"></span>
             {% endfor %}
             {% if item.is_service %}
               <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service.id, from_service=item.service_id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-                {{ folder(classes="template-list-folder__icon") }}
+                {{ svgs.folder(classes="template-list-folder__icon") }}
                 <span class="live-search-relevant">{{ item.name }}</span>
               </a>
             {% elif item.is_folder %}
               <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service.id, from_service=item.service_id, from_folder=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-                {{ folder(classes="template-list-folder__icon") }}
+                {{ svgs.folder(classes="template-list-folder__icon") }}
                 <span class="live-search-relevant">{{ item.name }}</span>
               </a>
             {% else %}

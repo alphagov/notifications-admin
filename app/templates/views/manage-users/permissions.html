@@ -1,5 +1,5 @@
 {% from "components/radios.html" import radios %}
-{% from "components/svgs.html" import folder %}
+{% import "components/svgs.html" as svgs %}
 
 {# this may be called from invite page (where no user exists) #}
 {% if user is not defined %}
@@ -11,7 +11,7 @@
 {% if form.folder_permissions.all_template_folders %}
   {# reset selection summary here to use 'folder' macro #}
   {% set selection_summary %}
-    <div class="selection-summary" role="region" aria-live="polite">{{ folder(classes="selection-summary__icon", border_width=2) }}</div>
+    <div class="selection-summary" role="region" aria-live="polite">{{ svgs.folder(classes="selection-summary__icon", border_width=2) }}</div>
   {% endset %}
   {{ form.folder_permissions(param_extensions={
        "hint": {"html": selection_summary }

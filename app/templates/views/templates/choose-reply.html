@@ -1,7 +1,7 @@
 {% from "components/live-search.html" import live_search %}
 {% from "components/folder-path.html" import folder_path %}
-{% from "components/svgs.html" import folder %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% import "components/svgs.html" as svgs %}
 
 {% extends "withnav_template.html" %}
 
@@ -43,13 +43,13 @@
         <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
           {% for ancestor in item.ancestors %}
               <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-              {{ folder(classes="template-list-folder__icon") }}
+              {{ svgs.folder(classes="template-list-folder__icon") }}
               {{ ancestor.name }}
             </a> <span class="message-name-separator"></span>
           {% endfor %}
           {% if item.is_folder %}
             <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-              {{ folder(classes="template-list-folder__icon") }}
+              {{ svgs.folder(classes="template-list-folder__icon") }}
               <span class="live-search-relevant">{{ item.name }}</span>
             </a>
           {% else %}
