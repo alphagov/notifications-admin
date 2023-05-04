@@ -41,7 +41,15 @@
   {% endif %}
 
   <div class="govuk-grid-row">
-    {% include 'views/templates/_template.html' %}
+    {% if template.template_type == "email" %}
+      {% include 'views/templates/_email_template.html' %}
+    {% elif template.template_type == "sms" %}
+      {% include 'views/templates/_sms_template.html' %}
+    {% elif template.template_type == "letter" %}
+      {% include 'views/templates/_letter_template.html' %}
+    {% elif template.template_type == "broadcast" %}
+      {% include 'views/templates/_broadcast_template.html' %}
+    {% endif %}
   </div>
 
   {% if show_attach_pages_button %}
