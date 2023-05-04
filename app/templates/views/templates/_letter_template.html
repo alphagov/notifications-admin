@@ -77,3 +77,20 @@
   {% endif %}
   {{ template|string }}
 </div>
+
+{% if show_attach_pages_button %}
+  <div class="govuk-!-margin-bottom-2">
+    <div class="js-stick-at-bottom-when-scrolling">
+      {{ govukButton({
+      "element": "a",
+      "text": "Attach pages",
+      "href": url_for(
+          '.letter_template_attach_pages',
+          service_id=current_service.id,
+          template_id=template.id
+        ),
+      "classes": "govuk-button--secondary"
+      }) }}
+    </div>
+  </div>
+{% endif %}
