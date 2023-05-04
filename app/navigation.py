@@ -67,6 +67,7 @@ class HeaderNavigation(Navigation):
             "guidance_email_branding",
             "guidance_formatting",
             "guidance_letter_branding",
+            "guidance_links_and_URLs",
             "guidance_optional_content",
             "guidance_personalisation",
             "guidance_receive_text_messages",

@@ -1,0 +1,66 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Links and URLs
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Links and URLs</h1>
+
+  <p class="govuk-body">When composing a message, write URLs in full and Notify will convert them into links for you. For example:</p>
+
+  {{ govukInsetText({"html": "Apply now at <a class=\"govuk-link govuk-link--no-visited-state\" href=\"https://www.gov.uk\">https://www.gov.uk</a>"}) }}
+
+  <p class="govuk-body">URLs should be easy to read.</p>
+
+  <p class="govuk-body">If you have a long, complex web address, you may want to set up a short URL. Find out <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.gov.uk/guidance/contact-the-government-digital-service/request-a-thing#short-url">how to set up a short URL if you have a GOV.UK domain</a>.
+  </p>
+
+  <p class="govuk-body">We do not recommend using a third-party link shortening service because:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>your users cannot see where the link will take them</li>
+    <li>your link might stop working if there’s a service outage</li>
+    <li>you can no longer control where the redirect goes</li>
+  </ul>
+
+  <h2 class="heading-medium" id="link-text-in-emails">Link text in emails</h2>
+
+  <p class="govuk-body">When writing an email, you can convert text into a link instead of writing the full web address.</p>
+
+  <p class="govuk-body">Link text may be useful if you have:</p>
+  <ul class="govuk-list govuk-list--bullet">
+  <li>long, complex URLs</li>
+  <li>unsubscribe links</li>
+  <li>emails that contain more than 2 links</li>
+  </ul>
+
+  <p class="govuk-body">If the recipient is not expecting to receive an email from you, we recommend using the URL instead of link text.</p>
+
+  <p class="govuk-body">Link text should tell the recipient what action they need to take and where the link goes.</p>
+
+  <p class="govuk-body">Never use ‘click here’, ‘click link’, ‘this link’ or ‘more’, as these do not make sense when read out of context.</p>
+
+  <h3 class="heading-small">How to format link text</h3>
+  <p class="govuk-body">GOV.UK Notify uses Markdown to format link text.</p>
+  <p class="govuk-body">To convert text into a link, use square brackets [] around the link text and round brackets () around the URL. Make sure there are no spaces between the brackets or the link will not work. For example:</p>
+
+  {{ govukInsetText({"text": "[Apply now](https://www.gov.uk/example)"}) }}
+
+  <p class="govuk-body">To see formatting instructions while you’re editing a template:</p>
+   <ol class="govuk-list govuk-list--number">
+    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
+    <li>Add a new template or choose an existing template and select <b class="govuk-!-font-weight-bold">Edit</b>.</li>
+    <li>Scroll down to see a guide to the available Markdown.</li>
+  </ol>
+
+
+{% endblock %}

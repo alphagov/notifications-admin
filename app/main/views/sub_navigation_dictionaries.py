@@ -111,6 +111,10 @@ def using_notify_nav():
                     "link": "main.guidance_letter_branding",
                 },
                 {
+                    "name": "Links and URLs",
+                    "link": "main.guidance_links_and_URLs",
+                },
+                {
                     "name": "Message status",
                     "link": "main.guidance_message_status",
                 },

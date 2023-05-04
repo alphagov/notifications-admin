@@ -239,6 +239,14 @@ def guidance_letter_branding():
     )
 
 
+@main.route("/using-notify/links-and-URLs")
+def guidance_links_and_URLs():
+    return render_template(
+        "views/guidance/using-notify/links-and-URLs.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/optional-content")
 def guidance_optional_content():
     return render_template(
