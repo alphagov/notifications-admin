@@ -17,7 +17,7 @@
 {% endif %}
 
 <div class="template-container {% if current_service.has_permission("extra_letter_formatting") %}template-container--with-attach-pages-button{% endif %}">
-  {% if current_user.has_permissions('manage_templates') %}
+  {% if current_user.has_permissions('manage_templates') and not template._template.archived %}
     {% if not current_service.letter_branding_id %}
       <a href="{{ url_for(".letter_branding_options", service_id=current_service.id, from_template=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-branding">Add logo</a>
     {% endif %}
@@ -32,7 +32,7 @@
   {{ template|string }}
 </div>
 
-{% if current_service.has_permission("extra_letter_formatting") %}
+{% if current_service.has_permission("extra_letter_formatting") and not template._template.archived %}
   <div class="govuk-!-margin-bottom-2">
     <div class="js-stick-at-bottom-when-scrolling">
       {{ govukButton({
