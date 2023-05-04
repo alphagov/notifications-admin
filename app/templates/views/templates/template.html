@@ -40,10 +40,8 @@
     </div>
   {% endif %}
 
-  {% if template.template_type == "email" %}
-    {% include 'views/templates/_email_template.html' %}
-  {% elif template.template_type == "sms" %}
-    {% include 'views/templates/_sms_template.html' %}
+  {% if template.template_type == "email" or template.template_type == "sms" %}
+    {% include 'views/templates/_email_or_sms_template.html' %}
   {% elif template.template_type == "letter" %}
     {% include 'views/templates/_letter_template.html' %}
   {% elif template.template_type == "broadcast" %}
