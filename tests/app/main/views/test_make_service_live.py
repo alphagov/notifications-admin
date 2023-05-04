@@ -235,7 +235,7 @@ def test_post_make_service_live_page_has_flash_message_after_redirect(
     expected_banner_class,
     expected_flash_message,
 ):
-    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": []})
+    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": [], "updated_at": None})
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
 

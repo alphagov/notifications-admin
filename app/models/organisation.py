@@ -1,4 +1,6 @@
+import datetime
 from collections import OrderedDict
+from typing import Optional
 
 from flask import abort
 from werkzeug.utils import cached_property
@@ -225,8 +227,12 @@ class Organisation(JSONModel):
     def associate_service(self, service_id):
         organisations_client.update_service_organisation(service_id, self.id)
 
-    def services_and_usage(self, financial_year):
-        return organisations_client.get_services_and_usage(self.id, financial_year)
+    def services_and_usage(self, financial_year) -> tuple[dict, Optional[datetime.date]]:
+        response = organisations_client.get_services_and_usage(self.id, financial_year)
+        updated_at = response.get("updated_at")
+        if updated_at:
+            updated_at = datetime.datetime.fromisoformat(updated_at)
+        return response["services"], updated_at
 
 
 class Organisations(SerialisedModelCollection):

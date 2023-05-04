@@ -16,7 +16,8 @@
 .column-main {
 
   .heading-large,
-  > .heading-medium {
+  > .heading-medium,
+  > .heading-with-aside--heading-medium {
     margin: govuk-spacing(3) 0 govuk-spacing(4) 0;
     word-wrap: break-word;
 
@@ -54,8 +55,42 @@ td {
   vertical-align: top;
 }
 
-.heading-medium {
+.heading-medium,
+.heading-with-aside--heading-medium {
   margin-top: govuk-spacing(6);
+}
+
+// TODO: refactor all this when GOVUK Elements typography is removed
+// Allow headings to have related content that sits alongside
+.heading-with-aside {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+// TODO: refactor all this when GOVUK Elements typography is removed
+// Transfer vertical spacing from heading onto container
+.heading-with-aside--heading-medium {
+  margin-bottom: govuk-spacing(6);
+
+  @include govuk-media-query($from: tablet) {
+    > .heading-medium {
+      margin: 0 govuk-spacing(6) 0 0;
+    }
+  }
+}
+
+// TODO: refactor all this when GOVUK Elements typography is removed
+.heading-aside {
+  @include govuk-font(16);
+  color: $govuk-secondary-text-colour;
+  margin: 0;
+  width: 100%; // force wrapping
+
+  @include govuk-media-query($from: tablet) {
+    width: auto;
+  }
 }
 
 .form-label {

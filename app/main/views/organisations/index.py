@@ -136,7 +136,7 @@ def add_organisation_from_nhs_local_service(service_id):
 @user_has_permissions()
 def organisation_dashboard(org_id):
     year, current_financial_year = requested_and_current_financial_year(request)
-    services = current_organisation.services_and_usage(financial_year=year)["services"]
+    services, updated_at = current_organisation.services_and_usage(financial_year=year)
     return render_template(
         "views/organisations/organisation/index.html",
         services=services,
@@ -146,6 +146,7 @@ def organisation_dashboard(org_id):
             end=current_financial_year,
         ),
         selected_year=year,
+        updated_at=updated_at,
         search_form=SearchByNameForm() if len(services) > 7 else None,
         **{
             f"total_{key}": sum(service[key] for service in services)
@@ -159,7 +160,7 @@ def organisation_dashboard(org_id):
 @user_has_permissions()
 def download_organisation_usage_report(org_id):
     selected_year = request.args.get("selected_year")
-    services_usage = current_organisation.services_and_usage(financial_year=selected_year)["services"]
+    services_usage, _ = current_organisation.services_and_usage(financial_year=selected_year)
 
     unit_column_names = OrderedDict(
         [

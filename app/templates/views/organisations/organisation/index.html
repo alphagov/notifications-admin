@@ -1,4 +1,3 @@
-{% from "components/page-header.html" import page_header %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/pill.html" import pill %}
@@ -10,7 +9,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Usage', size='medium') }}
+  <div class="heading-with-aside heading-with-aside--heading-medium">
+    <h1 class="heading-medium" id="page-header">Usage</h1>
+    {% if updated_at %}
+      <p class="heading-aside">Last updated {{ updated_at | format_datetime_relative }}</p>
+    {% endif %}
+  </div>
 
   <div class="bottom-gutter">
     {{ pill(years, selected_year, big_number_args={'smallest': True}) }}
