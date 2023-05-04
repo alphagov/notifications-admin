@@ -118,9 +118,6 @@ def view_template(service_id, template_id):
         letter_too_long=is_letter_too_long(page_count),
         letter_max_pages=LETTER_MAX_PAGE_COUNT,
         page_count=page_count,
-        show_attach_pages_button=(
-            template["template_type"] == "letter" and current_service.has_permission("extra_letter_formatting")
-        ),
     )
 
 
