@@ -1,14 +1,4 @@
-{% if template._template.archived %}
-  <p class="hint">
-    This template was deleted {{ template._template.updated_at|format_datetime_relative }}.
-  </p>
-{% elif not current_user.has_permissions('send_messages', 'manage_api_keys', 'manage_templates', 'manage_service') or not user_has_template_permission %}
-  <p class="top-gutter-1-3 bottom-gutter">
-    If you need to send this
-    {{ 1|message_count_label(template.template_type, suffix='') }}
-    or edit this template, contact your manager.
-  </p>
-{% else %}
+{% if not template._template.archived %}
   <div class="govuk-grid-row">
     {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
       <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">

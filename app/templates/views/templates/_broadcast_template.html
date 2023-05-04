@@ -1,8 +1,4 @@
-{% if template._template.archived %}
-  <p class="hint">
-    This template was deleted {{ template._template.updated_at|format_datetime_relative }}.
-  </p>
-{% else %}
+{% if not template._template.archived %}
   <div class="govuk-grid-row">
     {% if current_user.has_permissions('create_broadcasts') %}
       <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
