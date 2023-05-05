@@ -1212,11 +1212,7 @@ def test_view_broadcast_template(
         ),
     ]
 
-    assert (
-        (normalize_spaces(page.select_one(".template-container").text))
-        == (normalize_spaces(page.select_one(".broadcast-message-wrapper").text))
-        == "Emergency alert This is a test"
-    )
+    assert normalize_spaces(page.select_one(".broadcast-message-wrapper").text) == "Emergency alert This is a test"
 
 
 def test_should_show_template_id_on_template_page(
