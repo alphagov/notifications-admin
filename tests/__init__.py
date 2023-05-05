@@ -330,6 +330,7 @@ def template_json(
         "is_precompiled_letter": is_precompiled_letter,
         "folder": folder,
         "postage": postage,
+        "letter_attachment": None,
     }
     if content is None:
         template["content"] = "template content"

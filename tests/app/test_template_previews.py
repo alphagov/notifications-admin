@@ -1,4 +1,5 @@
 import base64
+from copy import deepcopy
 from functools import partial
 from unittest.mock import Mock
 
@@ -90,6 +91,40 @@ def test_from_database_object_makes_request(
     headers = {"Authorization": "Token my-secret-key"}
 
     request_mock.assert_called_once_with(expected_url, json=data, headers=headers)
+
+
+def test_from_database_object_includes_url_for_template_with_attachment(
+    mocker,
+    client_request,
+    mock_get_service_letter_template,
+):
+    # This test is calling `current_service` outside a Flask endpoint, so we need to make sure
+    # `service` is in the `_request_ctx_stack` to avoid an error
+    load_service_before_request()
+
+    resp = Mock(content="a", status_code="b", headers={"content-type": "image/png"})
+    request_mock = mocker.patch("app.template_previews.requests.post", return_value=resp)
+    mocker.patch("app.template_previews.current_service", letter_branding=LetterBranding.from_id(None))
+    template = mock_get_service_letter_template("123", "456")["data"]
+    template["letter_attachment"] = {"id": "123456"}
+    s3_mock = mocker.patch("app.template_previews.get_letter_attachment_url", return_value="fake_url")
+
+    TemplatePreview.from_database_object(template=template, filetype="png", page=1)
+
+    expected_data = {
+        "letter_contact_block": None,
+        "template": deepcopy(template),
+        "values": None,
+        "filename": None,
+    }
+    expected_data["template"]["letter_attachment"]["s3_url"] = "fake_url"
+
+    headers = {"Authorization": "Token my-secret-key"}
+
+    request_mock.assert_called_once_with(
+        "http://localhost:9999/preview.png?page=1", json=expected_data, headers=headers
+    )
+    s3_mock.assert_called_once_with("123", "123456")
 
 
 @pytest.mark.parametrize(

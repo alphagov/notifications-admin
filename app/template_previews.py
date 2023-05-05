@@ -6,6 +6,7 @@ from flask import current_app, json
 from notifications_utils.pdf import extract_page_from_pdf
 
 from app import current_service
+from app.s3_client.s3_letter_upload_client import get_letter_attachment_url
 
 
 class TemplatePreview:
@@ -23,6 +24,11 @@ class TemplatePreview:
             "values": values,
             "filename": current_service.letter_branding.filename,
         }
+        if template["letter_attachment"]:
+            data["template"]["letter_attachment"]["s3_url"] = get_letter_attachment_url(
+                template["service"], template["letter_attachment"]["id"]
+            )
+
         resp = requests.post(
             "{}/preview.{}{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"],

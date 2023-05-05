@@ -89,6 +89,16 @@ def get_letter_metadata(service_id, file_id):
     return LetterMetadata(s3_object["Metadata"])
 
 
+def get_letter_attachment_url(service_id, attachment_id):
+    file_location = get_transient_letter_file_location(service_id, attachment_id)
+    s3 = resource("s3")
+    return s3.meta.client.generate_presigned_url(
+        ClientMethod="get_object",
+        Params={"Bucket": current_app.config["S3_BUCKET_LETTER_ATTACHMENTS"], "Key": file_location},
+        ExpiresIn=3600,
+    )
+
+
 def upload_letter_attachment_to_s3(data, *, file_location, page_count, original_filename):
     # Use of urllib.parse.quote encodes metadata into ascii, which is required by s3.
     # Making sure data for displaying to users is decoded is taken care of by LetterMetadata
