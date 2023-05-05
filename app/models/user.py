@@ -249,10 +249,10 @@ class User(BaseUser, UserMixin):
         return allow_org_user and self.belongs_to_organisation(current_service.organisation_id)
 
     def permissions_for_service(self, service_id):
-        return self._permissions.get(service_id, set())
+        return self.permissions.get(service_id, set())
 
     def has_permission_for_service(self, service_id, permission):
-        return permission in self._permissions.get(service_id, [])
+        return permission in self.permissions_for_service(service_id)
 
     def has_template_folder_permission(self, template_folder, *, service):
         # These users can see all folders
