@@ -49,6 +49,12 @@
   left: 51px; // Aligns to left of logo area
 }
 
+.edit-template-link-get-ready-to-send {
+  @extend %edit-template-link;
+  top: 232px; // covers MDI barcode and aligns to bottom of contact block
+  left: 51px; // Aligns to left of logo area
+}
+
 .template-content-count {
   @include govuk-font(19, $tabular: true);
   color: $govuk-secondary-text-colour;
