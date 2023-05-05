@@ -1,25 +1,23 @@
 {% from "components/banner.html" import banner_wrapper %}
 
-{% if not template._template.archived %}
-  {% if letter_too_long %}
-    <div class="govuk-!-margin-bottom-6">
-      {% call banner_wrapper(type='dangerous') %}
-          {% include "partials/check/letter-too-long.html" %}
-      {% endcall %}
+{% if letter_too_long %}
+  <div class="govuk-!-margin-bottom-6">
+    {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/letter-too-long.html" %}
+    {% endcall %}
+  </div>
+{% elif current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
+      <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
+        Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
+      </a>
     </div>
-  {% elif current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-        <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
-          Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
-        </a>
-      </div>
-    </div>
-  {% endif %}
+  </div>
 {% endif %}
 
 <div class="template-container {% if current_service.has_permission("extra_letter_formatting") %}template-container--with-attach-pages-button{% endif %}">
-  {% if current_user.has_permissions('manage_templates') and not template._template.archived %}
+  {% if current_user.has_permissions('manage_templates') %}
     {% if not current_service.letter_branding_id %}
       <a href="{{ url_for(".letter_branding_options", service_id=current_service.id, from_template=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-branding">Add logo</a>
     {% endif %}
@@ -34,7 +32,7 @@
   {{ template|string }}
 </div>
 
-{% if current_service.has_permission("extra_letter_formatting") and not template._template.archived %}
+{% if current_service.has_permission("extra_letter_formatting") %}
   <div class="govuk-!-margin-bottom-2">
     <div class="js-stick-at-bottom-when-scrolling">
       {{ govukButton({

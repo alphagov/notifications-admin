@@ -54,7 +54,9 @@
     {% endif %}
   {% endif %}
 
-  {% if template.template_type == "email" or template.template_type == "sms" %}
+  {% if template._template.archived %}
+    {{ template|string }}
+  {% elif template.template_type == "email" or template.template_type == "sms" %}
     {% include 'views/templates/_email_or_sms_template.html' %}
   {% elif template.template_type == "letter" %}
     {% include 'views/templates/_letter_template.html' %}
