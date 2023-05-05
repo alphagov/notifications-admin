@@ -694,9 +694,9 @@ def test_letter_with_default_branding_has_add_logo_button(
         _test_page_title=False,
     )
 
-    first_edit_link = page.select_one(".template-container a")
-    assert first_edit_link["href"] == expected_link(service_id=SERVICE_ONE_ID)
-    assert first_edit_link.text == expected_link_text
+    edit_links = page.select(".template-container a")
+    assert edit_links[1]["href"] == expected_link(service_id=SERVICE_ONE_ID)
+    assert edit_links[1].text == expected_link_text
 
 
 @pytest.mark.parametrize(
