@@ -1121,7 +1121,7 @@ def test_edit_letter_templates_postage_updates_postage(
         (
             ["manage_templates"],
             [
-                (".edit_service_template", "Edit"),
+                (".edit_service_template", "Edit this template"),
             ],
             None,
         ),
@@ -1129,7 +1129,7 @@ def test_edit_letter_templates_postage_updates_postage(
             ["send_messages", "manage_templates"],
             [
                 (".set_sender", "Get ready to send a message using this template"),
-                (".edit_service_template", "Edit"),
+                (".edit_service_template", "Edit this template"),
             ],
             None,
         ),
@@ -1212,11 +1212,7 @@ def test_view_broadcast_template(
         ),
     ]
 
-    assert (
-        (normalize_spaces(page.select_one(".template-container").text))
-        == (normalize_spaces(page.select_one(".broadcast-message-wrapper").text))
-        == "Emergency alert This is a test"
-    )
+    assert normalize_spaces(page.select_one(".broadcast-message-wrapper").text) == "Emergency alert This is a test"
 
 
 def test_should_show_template_id_on_template_page(

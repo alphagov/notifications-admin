@@ -21,32 +21,32 @@
 
 .edit-template-link-letter-contact {
   @extend %edit-template-link;
-  right: -25px;
+  right: -40px;
   top: 232px; // align to bottom of contact block
 }
 
 .edit-template-link-letter-address {
   @extend %edit-template-link;
   top: 14.65%; // align bottom edge to bottom of address
-  left: -5px;
+  left: -20px;
 }
 
 .edit-template-link-letter-body {
   @extend %edit-template-link;
   top: 400px; // aligns to top of subject
-  left: -5px;
+  left: -20px;
 }
 
 .edit-template-link-letter-postage {
   @extend %edit-template-link;
   top: 51px; // aligns bottom edge to bottom of postmark
-  right: 145px; // Aligns right edge to midpoint of postmark and fold
+  right: 130px; // Aligns right edge to midpoint of postmark and fold
 }
 
 .edit-template-link-letter-branding {
   @extend %edit-template-link;
   top: 51px; // aligns with ‘change postage’ link
-  left: 66px; // Aligns to left of logo area
+  left: 51px; // Aligns to left of logo area
 }
 
 .template-content-count {

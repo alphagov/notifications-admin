@@ -1,0 +1,50 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+{% if letter_too_long %}
+  <div class="govuk-!-margin-bottom-6">
+    {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/letter-too-long.html" %}
+    {% endcall %}
+  </div>
+{% elif current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
+      <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
+        Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
+      </a>
+    </div>
+  </div>
+{% endif %}
+
+<div class="template-container {% if current_service.has_permission("extra_letter_formatting") %}template-container--with-attach-pages-button{% endif %}">
+  {% if current_user.has_permissions('manage_templates') %}
+    {% if not current_service.letter_branding_id %}
+      <a href="{{ url_for(".letter_branding_options", service_id=current_service.id, from_template=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-branding">Add logo</a>
+    {% endif %}
+    <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-postage">Change<span class="govuk-visually-hidden"> postage</span></a>
+    <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> letter template</span></a>
+    {% if current_service.count_letter_contact_details %}
+      <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-contact">Edit<span class="govuk-visually-hidden"> letter contact block</span></a>
+    {% else %}
+      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-link govuk-link--inverse edit-template-link-letter-contact">Edit<span class="govuk-visually-hidden"> letter contact block</span></a>
+    {% endif %}
+  {% endif %}
+  {{ template|string }}
+</div>
+
+{% if current_service.has_permission("extra_letter_formatting") %}
+  <div class="govuk-!-margin-bottom-2">
+    <div class="js-stick-at-bottom-when-scrolling">
+      {{ govukButton({
+      "element": "a",
+      "text": "Attach pages",
+      "href": url_for(
+          '.letter_template_attach_pages',
+          service_id=current_service.id,
+          template_id=template.id
+        ),
+      "classes": "govuk-button--secondary"
+      }) }}
+    </div>
+  </div>
+{% endif %}
