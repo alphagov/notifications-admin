@@ -11,7 +11,7 @@
 <div class="template-container {% if current_service.has_permission("extra_letter_formatting") %}template-container--with-attach-pages-button{% endif %}">
   {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not letter_too_long %}
     <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item edit-template-link-get-ready-to-send">
-      Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
+      Get ready to send<span class="govuk-visually-hidden"> a letter using this template</span>
     </a>
   {% endif %}
   {% if current_user.has_permissions('manage_templates') %}

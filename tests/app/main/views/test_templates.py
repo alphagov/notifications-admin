@@ -1176,6 +1176,68 @@ def test_should_be_able_to_view_a_template_with_links(
     assert normalize_spaces(page.select_one("main p").text) == (permissions_warning_to_be_shown or "To: phone number")
 
 
+def test_should_be_able_to_view_a_letter_template_with_links(
+    mocker,
+    client_request,
+    mock_get_service_letter_template,
+    mock_get_template_folders,
+    active_user_with_permissions,
+    single_letter_contact_block,
+    fake_uuid,
+):
+    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+
+    page = client_request.get(
+        "main.view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert [(link["href"], normalize_spaces(link.text)) for link in page.select("a[class*=edit-template-link]")] == [
+        (
+            url_for(
+                "main.set_sender",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            "Get ready to send a letter using this template",
+        ),
+        (
+            url_for(
+                "main.letter_branding_options",
+                service_id=SERVICE_ONE_ID,
+                from_template=fake_uuid,
+            ),
+            "Add logo",
+        ),
+        (
+            url_for(
+                "main.edit_template_postage",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            "Change postage",
+        ),
+        (
+            url_for(
+                "main.edit_service_template",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            "Edit letter template",
+        ),
+        (
+            url_for(
+                "main.set_template_sender",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            "Edit letter contact block",
+        ),
+    ]
+
+
 def test_view_broadcast_template(
     client_request,
     service_one,
