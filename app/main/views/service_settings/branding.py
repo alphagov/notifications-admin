@@ -1,6 +1,6 @@
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
+from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
 from app import (
     current_service,
@@ -46,6 +46,7 @@ def create_email_branding_zendesk_ticket(detail=None):
         subject=f"Email branding request - {current_service.name}",
         message=ticket_message,
         ticket_type=NotifySupportTicket.TYPE_QUESTION,
+        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name=current_user.name,
         user_email=current_user.email_address,
         org_id=current_service.organisation_id,
@@ -193,6 +194,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
             subject=f"Email branding request - {current_service.name}",
             message=ticket_message,
             ticket_type=NotifySupportTicket.TYPE_TASK,
+            notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
             user_name=current_user.name,
             user_email=current_user.email_address,
             org_id=current_service.organisation_id,
@@ -614,6 +616,7 @@ def letter_branding_request(service_id):
             subject=f"Letter branding request - {current_service.name}",
             message=ticket_message,
             ticket_type=NotifySupportTicket.TYPE_QUESTION,
+            notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
             user_name=current_user.name,
             user_email=current_user.email_address,
             org_id=current_service.organisation_id,

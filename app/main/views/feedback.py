@@ -114,6 +114,7 @@ def feedback(ticket_type):
             subject="Notify feedback",
             message=feedback_msg,
             ticket_type=get_zendesk_ticket_type(ticket_type),
+            notify_ticket_type=None,  # don't set technical/non-technical, we'll do this as part of triage on support
             p1=out_of_hours_emergency,
             user_name=user_name,
             user_email=user_email,
