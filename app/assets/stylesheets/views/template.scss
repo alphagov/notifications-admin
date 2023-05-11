@@ -2,8 +2,8 @@
   position: relative;
 
   &--with-attach-pages-button {
-    .letter {
-      margin-bottom: 0;
+    .page--last {
+      margin-bottom: govuk-spacing(4);
     }
   }
 }
