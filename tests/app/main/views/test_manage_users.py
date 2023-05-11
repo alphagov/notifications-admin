@@ -491,16 +491,14 @@ def test_manage_users_page_does_not_links_to_user_profile_page_if_user_only_invi
             None,
             """
             Text message code
-            Not available because this team member has not added a
-            phone number to their profile
-        """,
+            """,
         ),
         (
             False,
             "07700 900762",
             """
             Text message code
-        """,
+            """,
         ),
     ],
 )

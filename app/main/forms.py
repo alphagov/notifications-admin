@@ -842,14 +842,31 @@ class AuthTypeForm(StripWhitespaceForm):
 
 
 class BasePermissionsForm(StripWhitespaceForm):
-    def __init__(self, all_template_folders=None, *args, **kwargs):
+    def __init__(self, all_template_folders=None, disable_sms_auth=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.folder_permissions.choices = []
+        self.disable_sms_auth = disable_sms_auth
         if all_template_folders is not None:
             self.folder_permissions.all_template_folders = all_template_folders
             self.folder_permissions.choices = [
                 (item["id"], item["name"]) for item in ([{"name": "Templates", "id": None}] + all_template_folders)
             ]
+
+        # In a scenario where there is no mobile number for the user
+        # the option to select sms_auth is disabled
+        if self.disable_sms_auth:
+            self.login_authentication.param_extensions = {
+                "items": [
+                    {
+                        "hint": {
+                            "text": "Not available because this team member has not added a "
+                            "phone number to their profile"
+                        },
+                        "disabled": True,
+                    },
+                    {"checked": True},
+                ]
+            }
 
     folder_permissions = GovukCollapsibleNestedCheckboxesField("Folders this team member can see", field_label="folder")
 
@@ -892,6 +909,7 @@ class BasePermissionsForm(StripWhitespaceForm):
             all_template_folders=all_template_folders,
             permissions_field=user.permissions_for_service(service.id) & all_ui_permissions,
             login_authentication=user.auth_type,
+            disable_sms_auth=False if user.mobile_number else True,
         )
 
         # If a user logs in with a security key, we generally don't want a service admin to be able to change this.
