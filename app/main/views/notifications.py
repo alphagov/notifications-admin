@@ -8,6 +8,7 @@ from datetime import datetime
 from dateutil import parser
 from flask import (
     Response,
+    abort,
     flash,
     jsonify,
     redirect,
@@ -38,6 +39,7 @@ from app.template_previews import get_page_count_for_letter
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
+    NOTIFICATION_TYPES,
     get_help_argument,
     parse_filter_args,
     set_status_filters,
@@ -275,7 +277,13 @@ def download_notifications_csv(service_id):
     filter_args = parse_filter_args(request.args)
     filter_args["status"] = set_status_filters(filter_args)
 
-    service_data_retention_days = current_service.get_days_of_retention(filter_args.get("message_type")[0])
+    if (
+        "message_type" not in filter_args
+        or (message_type := filter_args.get("message_type")[0]) not in NOTIFICATION_TYPES
+    ):
+        abort(404)
+
+    service_data_retention_days = current_service.get_days_of_retention(message_type)
     return Response(
         stream_with_context(
             generate_notifications_csv(
@@ -285,7 +293,7 @@ def download_notifications_csv(service_id):
                 page=request.args.get("page", 1),
                 page_size=10000,
                 format_for_csv=True,
-                template_type=filter_args.get("message_type"),
+                template_type=message_type,
                 limit_days=service_data_retention_days,
             )
         ),
@@ -293,7 +301,7 @@ def download_notifications_csv(service_id):
         headers={
             "Content-Disposition": 'inline; filename="{} - {} - {} report.csv"'.format(
                 format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
-                filter_args["message_type"][0],
+                message_type,
                 current_service.name,
             )
         },
