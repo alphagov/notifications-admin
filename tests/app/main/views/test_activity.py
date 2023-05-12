@@ -284,6 +284,28 @@ def test_download_not_available_to_users_without_dashboard(
     )
 
 
+@pytest.mark.parametrize(
+    "message_type, expected_status",
+    (
+        (None, 404),
+        ("blah", 404),
+    ),
+)
+def test_download_not_available_to_users_if_invalid_message_type(
+    client_request,
+    message_type,
+    expected_status,
+    mock_get_service_data_retention,
+    mock_get_notifications,
+):
+    client_request.get(
+        "main.download_notifications_csv",
+        service_id=SERVICE_ONE_ID,
+        message_type=message_type,
+        _expected_status=expected_status,
+    )
+
+
 def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
     mocker,
     client_request,
