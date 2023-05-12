@@ -16,16 +16,16 @@
 
     {{ page_header('Change postage') }}
     {% call form_wrapper() %}
+      {{ form.postage(param_extensions={
+        "fieldset": {
+            "legend": {
+                "classes": "",
+            },
+        }
+      }) }}
+      {{ page_footer('Save') }}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-five-sixths">
-          {{ form.postage(param_extensions={
-            "fieldset": {
-                "legend": {
-                    "classes": "",
-                },
-            }
-          }) }}
-          {{ page_footer('Save') }}
           <h2 class="heading-medium">
             Delivery times
           </h2>
