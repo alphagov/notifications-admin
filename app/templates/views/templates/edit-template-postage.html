@@ -15,7 +15,7 @@
 {% block maincolumn_content %}
 
   {{ page_header('Change postage') }}
-  {% call form_wrapper() %}
+  {% call form_wrapper(class="govuk-!-margin-bottom-7") %}
     {{ form.postage(param_extensions={
       "fieldset": {
           "legend": {
@@ -28,7 +28,7 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      <h2 class="heading-medium">
+      <h2 class="govuk-heading-m">
         Delivery times
       </h2>
       <p class="govuk-body">
