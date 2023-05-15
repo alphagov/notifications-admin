@@ -338,11 +338,12 @@ def test_archive_user_does_not_create_event_if_user_client_raises_unexpected_exc
     mocker,
     mock_events,
 ):
-    with pytest.raises(Exception):
+    mocker.patch("app.main.views.find_users.user_api_client.archive_user", side_effect=ValueError())
+    with pytest.raises(ValueError):
         client_request.login(platform_admin_user)
         client_request.post(
             "main.archive_user",
-            user_id=api_user_active.id,
+            user_id=api_user_active["id"],
         )
 
     assert not mock_events.called

@@ -13,7 +13,7 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
+from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
@@ -183,6 +183,7 @@ def submit_request_to_go_live(service_id):
         subject=f"Request to go live - {current_service.name}",
         message=ticket_message,
         ticket_type=NotifySupportTicket.TYPE_QUESTION,
+        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name=current_user.name,
         user_email=current_user.email_address,
         requester_sees_message_content=False,

@@ -6,7 +6,7 @@ from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import url_for
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
+from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
 from app.models.branding import EmailBranding
 from tests import sample_uuid
@@ -769,6 +769,7 @@ def test_email_branding_request_submit(
         ),
         subject="Email branding request - service one",
         ticket_type="question",
+        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name="Test User",
         user_email="test@user.gov.uk",
         org_id=None,

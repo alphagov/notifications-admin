@@ -8,7 +8,7 @@ import pytest
 from flask import g, url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
+from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
 import app
 from app.main.views.service_settings.branding import (
@@ -1683,6 +1683,7 @@ def test_should_redirect_after_request_to_go_live(
         subject="Request to go live - service one",
         message=expected_message,
         ticket_type="question",
+        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name=active_user_with_permissions["name"],
         user_email=active_user_with_permissions["email_address"],
         requester_sees_message_content=False,
@@ -1760,6 +1761,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         subject="Request to go live - service one",
         message=expected_message,
         ticket_type="question",
+        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name=active_user_with_permissions["name"],
         user_email=active_user_with_permissions["email_address"],
         requester_sees_message_content=False,
