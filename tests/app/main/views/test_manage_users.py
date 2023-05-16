@@ -491,6 +491,7 @@ def test_manage_users_page_does_not_links_to_user_profile_page_if_user_only_invi
             None,
             """
             Text message code
+            Not available because this team member has not added a phone number to their profile
             """,
         ),
         (
@@ -526,7 +527,7 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
 
     sms_auth_radio_button = page.select_one('input[value="sms_auth"]')
     assert sms_auth_radio_button.has_attr("disabled") == sms_option_disabled
-    assert normalize_spaces(page.select_one("label[for=login_authentication-0]").text) == normalize_spaces(
+    assert normalize_spaces(page.select_one("label[for=login_authentication-0]").parent.text) == normalize_spaces(
         expected_label
     )
 
