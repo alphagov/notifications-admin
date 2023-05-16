@@ -1,6 +1,7 @@
 import dataclasses
 import itertools
 import re
+import uuid
 from collections import OrderedDict
 from datetime import datetime
 from typing import Optional
@@ -16,18 +17,17 @@ from app import (
     notification_api_client,
     platform_stats_api_client,
     service_api_client,
+    user_api_client,
 )
 from app.extensions import redis_client
 from app.main import main
 from app.main.forms import (
     AdminClearCacheForm,
     AdminReturnedLettersForm,
-    AdminSearchUsersByEmailForm,
     BillingReportDateFilterForm,
     DateFilterForm,
-    FindByUuidForm,
+    PlatformAdminSearch,
     RequiredDateFilterForm,
-    SearchByNameForm,
 )
 from app.notify_client.platform_admin_api_client import admin_api_client
 from app.statistics_utils import (
@@ -57,24 +57,25 @@ def redirect_old_search_pages():
 @main.route("/platform-admin", methods=["GET", "POST"])
 @user_is_platform_admin
 def platform_admin_search():
-    # The services/users form prefixes must match those on the forms on their dedicated views.
-    find_services_form = SearchByNameForm(prefix="services")
-    find_users_form = AdminSearchUsersByEmailForm(prefix="users")
-    find_uuid_form = FindByUuidForm(prefix="uuid")
+    users, services = [], []
+    search_form = PlatformAdminSearch()
 
-    # Only the find_uuid_form POSTs to this endpoint - the others all POST to their existing dedicated pages.
-    if find_uuid_form.validate_on_submit():
-        try:
-            redirect_url = get_url_for_notify_record(find_uuid_form.search.data)
-            return redirect(redirect_url)
-        except ValueError as e:
-            find_uuid_form.search.errors.append(str(e))
+    if search_form.validate_on_submit():
+        users, services, redirect_to_something_url = [
+            user_api_client.find_users_by_full_or_partial_email(search_form.search.data)["data"],
+            service_api_client.find_services_by_name(search_form.search.data)["data"],
+            get_url_for_notify_record(search_form.search.data),
+        ]
+
+        if redirect_to_something_url:
+            return redirect(redirect_to_something_url)
 
     return render_template(
         "views/platform-admin/search.html",
-        find_services_form=find_services_form,
-        find_users_form=find_users_form,
-        find_uuid_form=find_uuid_form,
+        search_form=search_form,
+        show_results=search_form.is_submitted() and search_form.search.data,
+        users=users,
+        services=services,
     )
 
 
@@ -658,6 +659,11 @@ def get_url_for_notify_record(uuid_):
         # Extra parameters to pass to `url_for`.
         extra: dict = dataclasses.field(default_factory=lambda: {})
 
+    try:
+        uuid.UUID(uuid_)
+    except ValueError:
+        return None
+
     result, found = None, False
     try:
         result = admin_api_client.find_by_uuid(uuid_)
@@ -704,7 +710,7 @@ def get_url_for_notify_record(uuid_):
 
         return url_for(**url_for_kwargs)
 
-    raise ValueError("Could not find a thing with that UUID")
+    return None
 
 
 def sum_service_usage(service):

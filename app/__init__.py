@@ -607,3 +607,4 @@ def init_jinja(application):
     )
 
     application.jinja_env.filters["format_provider"] = format_provider
+    application.jinja_env.add_extension("jinja2.ext.do")
