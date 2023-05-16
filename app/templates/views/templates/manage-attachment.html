@@ -2,9 +2,9 @@
 {% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "components/file-upload.html" import file_upload %}
+
 
 {% set page_title = "Manage attached pages" %}
 
@@ -31,11 +31,15 @@
     {% endif %}
 
     <h3 class="govuk-heading-m govuk-!-font-weight-bold" id="filename">{{attachment_filename}}</h3>
-
-
-    {% call form_wrapper(class="govuk-!-margin-bottom-6") %}
-        {{govukButton({"text": "Choose different file"})}}
-    {% endcall %}
+    <div class="govuk-body">
+    {{ file_upload(
+        form.file,
+        allowed_file_extensions=['pdf'],
+        action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template_id),
+        button_text='Upload your file again' if error else 'Choose different file',
+        show_errors=False
+    )}}
+    </div>
     <div class="template-container">
         <div class="letter page--odd">
         </div>
@@ -43,7 +47,7 @@
     <div class="govuk-!-margin-bottom-2">
       <div class="js-stick-at-bottom-when-scrolling">
         {{ page_footer(
-            delete_link=url_for('main.letter_template_remove_pages', template_id=template_id, service_id=service_id),
+            delete_link=url_for('main.letter_template_edit_pages', template_id=template_id, service_id=service_id),
             delete_link_text='Remove attachment'
         ) }}
       </div>

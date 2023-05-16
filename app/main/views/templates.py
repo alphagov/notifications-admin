@@ -961,11 +961,13 @@ def letter_template_attach_pages(service_id, template_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages/delete", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages/edit", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 @service_has_permission("extra_letter_formatting")
-def letter_template_remove_pages(template_id, service_id):
+def letter_template_edit_pages(template_id, service_id):
     template = current_service.get_template(template_id)
+    form = PDFUploadForm()
+
     error = {}
 
     if template.get("letter_attachment") is None:
@@ -992,6 +994,7 @@ def letter_template_remove_pages(template_id, service_id):
 
     return render_template(
         "views/templates/manage-attachment.html",
+        form=form,
         template_id=template_id,
         service_id=service_id,
         error=error,
@@ -1057,6 +1060,13 @@ def _process_letter_attachment_form(service_id, template, form):
         )
 
     try:
+        # Archive letter attachment if there is already one
+        if template.get("letter_attachment") is not None:
+            letter_attachment_client.archive_letter_attachment(
+                letter_attachment_id=template["letter_attachment"]["id"],
+                service_id=service_id,
+                user_id=current_user.id,
+            )
         _save_letter_attachment(
             service_id=service_id,
             template_id=template_id,
@@ -1065,11 +1075,7 @@ def _process_letter_attachment_form(service_id, template, form):
             sanitise_response=response,
         )
     except HTTPError as e:
-        if e.status_code == 400 and e.message == "template-already-has-attachment":
-            # TODO: decide on content. this might depend on what the management page looks like (as we might
-            # want to redirect to the existing  to show the user the attachment that has already been added)
-            raise LetterAttachmentFormError(detail="This template already has an attachment.") from None
-        raise
+        raise e
 
     return redirect(
         url_for(

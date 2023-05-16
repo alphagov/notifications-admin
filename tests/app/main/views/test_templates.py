@@ -927,46 +927,6 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
-def test_post_attach_pages_errors_when_attachment_already_exists_for_template(
-    mocker, client_request, fake_uuid, service_one, mock_get_template_version
-):
-    service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-    mocker.patch("app.main.views.templates.upload_letter_to_s3")
-
-    mocker.patch("app.main.views.templates.sanitise_letter")
-    mocker.patch("app.main.views.templates.pdf_page_count", return_value=2)
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
-    mocker.patch(
-        "app.main.views.templates._save_letter_attachment",
-        side_effect=HTTPError(
-            response=Mock(
-                status_code=400,
-                json=lambda: {
-                    "result": "error",
-                    "message": "template-already-has-attachment",
-                },
-            ),
-        ),
-    )
-
-    with open("tests/test_pdf_files/multi_page_pdf.pdf", "rb") as file:
-        page = client_request.post(
-            "main.letter_template_attach_pages",
-            service_id=SERVICE_ONE_ID,
-            template_id=sample_uuid(),
-            _data={"file": file},
-            _expected_status=400,
-        )
-
-    assert page.select_one(".banner-dangerous p").text == "This template already has an attachment."
-    assert page.select_one("form").attrs["action"] == url_for(
-        "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
-    )
-    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
-
-
 @pytest.mark.parametrize("page_count, expected_pages_content", [(1, "1 page"), (2, "2 pages")])
 def test_post_attach_pages_redirects_to_template_view_when_validation_successful(
     mocker,
@@ -1009,6 +969,57 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
         upload_id=upload_id,
         original_filename="tests/test_pdf_files/one_page_pdf.pdf",
         sanitise_response=mock_sanitise.return_value,
+    )
+
+
+def test_post_attach_pages_archives_existing_attachment_when_it_exists(
+    mocker,
+    client_request,
+    fake_uuid,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_letter_template_with_attachment,
+    mock_get_template_folders,
+):
+    service_one["permissions"] = ["extra_letter_formatting"]
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
+    mock_sanitise = mocker.patch("app.main.views.templates.sanitise_letter")
+
+    # page count for letter template on redirect page
+    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+
+    # page count for the attachment
+    mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
+
+    mock_save = mocker.patch("app.main.views.templates._save_letter_attachment")
+
+    mock_archive_attachment = mocker.patch("app.letter_attachment_client.archive_letter_attachment")
+
+    template_id = sample_uuid()
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=template_id,
+            _data={"file": file},
+            _expected_redirect=url_for("main.view_template", service_id=SERVICE_ONE_ID, template_id=template_id),
+        )
+
+    upload_id = mock_sanitise.call_args[1]["upload_id"]
+
+    mock_save.assert_called_once_with(
+        service_id=service_one["id"],
+        template_id=template_id,
+        upload_id=upload_id,
+        original_filename="tests/test_pdf_files/one_page_pdf.pdf",
+        sanitise_response=mock_sanitise.return_value,
+    )
+
+    mock_archive_attachment.assert_called_once_with(
+        letter_attachment_id=sample_uuid(),
+        user_id=active_user_with_permissions["id"],
+        service_id=SERVICE_ONE_ID,
     )
 
 
@@ -1079,7 +1090,7 @@ def test_post_delete_letter_attachment_calls_archive_letter_attachment(
     service_one["permissions"] = ["extra_letter_formatting"]
     mock_archive_attachment = mocker.patch("app.letter_attachment_client.archive_letter_attachment")
     client_request.post(
-        "main.letter_template_remove_pages",
+        "main.letter_template_edit_pages",
         service_id=SERVICE_ONE_ID,
         template_id=sample_uuid(),
         _expected_status=302,
@@ -1108,7 +1119,7 @@ def test_get_delete_letter_attachment_shows_confirmation(
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.letter_attachment_client.archive_letter_attachment")
     page = client_request.get(
-        "main.letter_template_remove_pages",
+        "main.letter_template_edit_pages",
         service_id=SERVICE_ONE_ID,
         template_id=sample_uuid(),
         _expected_status=200,
