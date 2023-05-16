@@ -14,17 +14,37 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Change postage') }}
-    {% call form_wrapper() %}
-      <div class="govuk-grid-row">
-        <div class="govuk-grid-column-five-sixths">
-          {{ form.postage }}
-          {{ page_footer('Save') }}
-        </div>
-        <div class="govuk-grid-column-three-quarters">
-          {% include "partials/templates/guidance-postage.html" %}
-        </div>
-      </div>
-    {% endcall %}
+  {{ page_header('Change postage') }}
+  {% call form_wrapper(class="govuk-!-margin-bottom-7") %}
+    {{ form.postage(param_extensions={
+      "fieldset": {
+          "legend": {
+              "classes": "",
+          },
+      }
+    }) }}
+    {{ page_footer('Save') }}
+  {% endcall %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <h2 class="govuk-heading-m">
+        Delivery times
+      </h2>
+      <p class="govuk-body">
+        Letters sent before 5:30pm are dispatched the next working day (Monday to Friday).
+      </p>
+      <p class="govuk-body">
+        First class letters are delivered one day after they’re dispatched. Second class letters are delivered 2 days after they’re dispatched.
+      </p>
+      <p class="govuk-body">
+        Royal Mail delivers from Monday to Saturday, excluding bank holidays.
+      </p>
+      <p class="govuk-body">
+        See a list of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">postage prices</a>.
+      </p>
+    </div>
+  </div>
+
 
 {% endblock %}
