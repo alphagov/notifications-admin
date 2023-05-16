@@ -1,0 +1,53 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% set page_title = "Manage attached pages" %}
+
+{% block service_page_title %}
+    {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+    {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+    {% if error %}
+        <div class="govuk-!-margin-bottom-4">
+            {% call banner_wrapper(type='dangerous') %}
+                <h1 class="banner-title">{{ error.title }}</h1>
+                {% if error.detail %}
+                    <p class="govuk-body">{{ error.detail | safe }}</p>
+                {% endif %}
+            {% endcall %}
+        </div>
+    {% else %}
+        {{ page_header(page_title) }}
+    {% endif %}
+
+    <h3 class="govuk-heading-m govuk-!-font-weight-bold" id="filename">{{attachment_filename}}</h3>
+
+
+    {% call form_wrapper(class="govuk-!-margin-bottom-6") %}
+        {{govukButton({"text": "Choose different file"})}}
+    {% endcall %}
+    <div class="template-container">
+        <div class="letter page--odd">
+        </div>
+    </div>
+    <div class="govuk-!-margin-bottom-2">
+      <div class="js-stick-at-bottom-when-scrolling">
+        {{ page_footer(
+            delete_link=url_for('main.letter_template_remove_pages', template_id=template_id, service_id=service_id),
+            delete_link_text='Remove attachment'
+        ) }}
+      </div>
+    </div>
+
+
+{% endblock %}

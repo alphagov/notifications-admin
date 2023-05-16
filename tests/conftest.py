@@ -877,6 +877,27 @@ def mock_get_service_letter_template(mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_get_service_letter_template_with_attachment(mocker):
+    def _get(service_id, template_id, version=None, postage="second"):
+        template = template_json(
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="letter",
+            content="Template <em>content</em> with & entity",
+            subject="Subject",
+            postage=postage,
+            letter_attachment={
+                "id": sample_uuid(),
+                "original_filename": "original file.pdf",
+            },
+        )
+        return {"data": template}
+
+    return mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
 def mock_get_service_letter_template_with_placeholders(mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(

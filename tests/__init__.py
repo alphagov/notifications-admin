@@ -313,6 +313,7 @@ def template_json(
     is_precompiled_letter=False,
     postage=None,
     folder=None,
+    letter_attachment=None,
 ):
     template = {
         "id": id_,
@@ -330,6 +331,7 @@ def template_json(
         "is_precompiled_letter": is_precompiled_letter,
         "folder": folder,
         "postage": postage,
+        "letter_attachment": letter_attachment,
     }
     if content is None:
         template["content"] = "template content"
