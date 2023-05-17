@@ -10,49 +10,68 @@
 
 %edit-template-link,
 .edit-template-link {
-
-  @include govuk-font(19);
   position: absolute;
-  background-color: $govuk-link-colour; // text colour is set in the HTML by the govuk-link--inverse class
-  padding: 10px govuk-spacing(3);
   z-index: 10000;
-
 }
 
 .edit-template-link-letter-contact {
   @extend %edit-template-link;
   right: -40px;
   top: 232px; // align to bottom of contact block
+  &:active {
+    margin-top: -2px;
+    top: 232px;
+  }
 }
 
 .edit-template-link-letter-address {
   @extend %edit-template-link;
   top: 14.65%; // align bottom edge to bottom of address
   left: -20px;
+  &:active {
+    margin-top: -2px;
+    top: 14.65%;
+  }
 }
 
 .edit-template-link-letter-body {
   @extend %edit-template-link;
   top: 400px; // aligns to top of subject
   left: -20px;
+  &:active {
+    margin-top: -2px;
+    top: 400px;
+  }
 }
 
 .edit-template-link-letter-postage {
   @extend %edit-template-link;
   top: 51px; // aligns bottom edge to bottom of postmark
   right: 130px; // Aligns right edge to midpoint of postmark and fold
+  &:active {
+    margin-top: -2px;
+    top: 51px;
+  }
 }
 
 .edit-template-link-letter-branding {
   @extend %edit-template-link;
   top: 51px; // aligns with ‘change postage’ link
   left: 51px; // Aligns to left of logo area
+  &:active {
+    margin-top: -2px;
+    top: 51px;
+  }
 }
 
 .edit-template-link-get-ready-to-send {
   @extend %edit-template-link;
   top: 232px; // covers MDI barcode and aligns to bottom of contact block
   left: 51px; // Aligns to left of logo area
+  &:active {
+    margin-top: -2px;
+    top: 232px;
+  }
 }
 
 .template-content-count {
