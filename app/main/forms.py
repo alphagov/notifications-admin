@@ -2613,16 +2613,8 @@ class FindByUuidForm(StripWhitespaceForm):
     )
 
 
-class PlatformAdminSearch(StripWhitespaceForm):
+class PlatformAdminSearchForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Search",
-        param_extensions={
-            "hint": {
-                "text": (
-                    "Search for users, services, and organisations by name or partial name, "
-                    "or find any other Notify object by UUID."
-                )
-            }
-        },
         validators=[DataRequired()],
     )

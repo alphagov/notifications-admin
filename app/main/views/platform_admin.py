@@ -27,7 +27,7 @@ from app.main.forms import (
     AdminReturnedLettersForm,
     BillingReportDateFilterForm,
     DateFilterForm,
-    PlatformAdminSearch,
+    PlatformAdminSearchForm,
     RequiredDateFilterForm,
 )
 from app.notify_client.platform_admin_api_client import admin_api_client
@@ -59,7 +59,7 @@ def redirect_old_search_pages():
 @user_is_platform_admin
 def platform_admin_search():
     users, services, organisations = [], [], []
-    search_form = PlatformAdminSearch()
+    search_form = PlatformAdminSearchForm()
 
     if search_form.validate_on_submit():
         users, services, organisations, redirect_to_something_url = [

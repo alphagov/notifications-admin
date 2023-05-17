@@ -20,17 +20,20 @@
             param_extensions={
               "label": {
                   "isPageHeading": True,
-                  "classes": "heading-medium",
+                  "classes": "govuk-label--m govuk-!-margin-top-3",
                   "id": "page-header",
               },
               "formGroup": {"classes": "notify-simple-search-form__form-group"},
-              "classes": "notify-simple-search-form__textbox"
+              "classes": "notify-simple-search-form__textbox",
+              "hint": {
+                "text": "Search for users, services, and organisations by name or partial name, or find any other Notify object by UUID."
+              },
             }
           )
         }}
         {{ govukButton({
           "classes": "notify-simple-search-form__button",
-          "html": "Search <div class=\"govuk-visually-hidden\">for services</div>"
+          "html": "Search <span class=\"govuk-visually-hidden\">for services</span>"
         }) }}
       {% endcall %}
     </div>
@@ -40,19 +43,16 @@
       {% if users %}
         {% set users_html %}
           <h2 class="govuk-heading-m">Users</h2>
-          <nav class="browse-list">
+          <div class="browse-list browse-list--tabbed">
             <ul>
             {% for user in users %}
               <li class="browse-list-item">
                 <a href="{{url_for('main.user_information', user_id=user.id)}}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ user.email_address }}</a>
                 <p class="browse-list-hint">{{ user.name }}</p>
               </li>
-              {% if not loop.last %}
-                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-              {% endif %}
             {% endfor %}
             </ul>
-          </nav>
+          </div>
         {% endset %}
 
         {% do items.append({
@@ -66,18 +66,15 @@
       {% if services %}
         {% set services_html %}
           <h2 class="govuk-heading-m">Services</h2>
-          <nav class="browse-list">
+          <div class="browse-list browse-list--tabbed">
             <ul>
             {% for service in services %}
               <li class="browse-list-item">
                 <a href="{{url_for('main.service_dashboard', service_id=service.id)}}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
               </li>
-              {% if not loop.last %}
-                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-              {% endif %}
             {% endfor %}
             </ul>
-          </nav>
+          </div>
         {% endset %}
 
         {% do items.append({
@@ -91,18 +88,15 @@
       {% if organisations %}
         {% set organisations_html %}
           <h2 class="govuk-heading-m">Organisations</h2>
-          <nav class="browse-list">
+          <div class="browse-list browse-list--tabbed">
             <ul>
             {% for organisation in organisations %}
               <li class="browse-list-item">
                 <a href="{{url_for('main.organisation_dashboard', org_id=organisation.id)}}" class="govuk-link govuk-link--no-visited-state">{{ organisation.name }}</a>
               </li>
-              {% if not loop.last %}
-                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-              {% endif %}
             {% endfor %}
             </ul>
-          </nav>
+          </div>
         {% endset %}
 
         {% do items.append({
