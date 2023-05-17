@@ -8,7 +8,7 @@
 // For example, `export { Frontend }` will assign `Frontend` to `window.Frontend`
 
 // GOVUK Frontend modules
-import { Header, Details, Button, Radios, ErrorSummary, SkipLink } from 'govuk-frontend';
+import { Header, Details, Button, Radios, ErrorSummary, SkipLink, Tabs } from 'govuk-frontend';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -58,6 +58,11 @@ function initAll (options) {
   var $skipLinks = scope.querySelectorAll('[data-module="govuk-skip-link"]')
   nodeListForEach($skipLinks, function ($skipLink) {
     new SkipLink($skipLink).init()
+  })
+
+  var $tabs = scope.querySelectorAll('[data-module="govuk-tabs"]')
+  nodeListForEach($tabs, function ($tabs) {
+    new Tabs($tabs).init()
   })
 
   // There will only every be one error-summary per page

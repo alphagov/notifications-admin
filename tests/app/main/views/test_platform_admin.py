@@ -1159,7 +1159,7 @@ def test_get_daily_sms_provider_volumes_report_calls_api_and_download_data(clien
     )
 
 
-class TestPlatformAdminFind:
+class TestPlatformAdminSearch:
     def test_page_requires_platform_admin(self, client_request):
         client_request.get(".platform_admin_search", _expected_status=403)
 
@@ -1167,20 +1167,122 @@ class TestPlatformAdminFind:
         client_request.login(platform_admin_user)
         client_request.get(".platform_admin_search")
 
-    def test_page_has_find_services_form(self, client_request, platform_admin_user):
+    def test_can_search_for_user(self, mocker, client_request, platform_admin_user, active_caseworking_user):
+        mocker.patch(
+            "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
+            return_value={"data": [active_caseworking_user]},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.service_api_client.find_services_by_name",
+            return_value={"data": []},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": []},
+        )
+        mocker.patch("app.main.views.platform_admin.get_url_for_notify_record", return_value=None)
         client_request.login(platform_admin_user)
-        page = client_request.get(".platform_admin_search")
-        assert any(form["action"] == url_for(".find_services_by_name") for form in page.select("form"))
 
-    def test_page_has_find_users_form(self, client_request, platform_admin_user):
-        client_request.login(platform_admin_user)
-        page = client_request.get(".platform_admin_search")
-        assert any(form["action"] == url_for(".find_users_by_email") for form in page.select("form"))
+        response = client_request.post(".platform_admin_search", _data={"search": "caseworker"}, _expected_status=200)
 
-    def test_page_has_find_uuid_form(self, client_request, platform_admin_user):
+        assert normalize_spaces(response.select(".govuk-tabs ul")[0]) == "Users (1)"
+
+        found_user_links = response.select(".govuk-tabs ul")[1].select("a")
+        assert found_user_links[0].text == "caseworker@example.gov.uk"
+        assert found_user_links[0].get("href") == "/users/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6"
+
+    def test_can_search_for_services(self, mocker, client_request, platform_admin_user, service_one, service_two):
+        mocker.patch(
+            "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
+            return_value={"data": []},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.service_api_client.find_services_by_name",
+            return_value={"data": [service_one, service_two]},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": []},
+        )
+        mocker.patch("app.main.views.platform_admin.get_url_for_notify_record", return_value=None)
         client_request.login(platform_admin_user)
-        page = client_request.get(".platform_admin_search")
-        assert any(form["action"] == url_for(".platform_admin_search") for form in page.select("form"))
+
+        response = client_request.post(".platform_admin_search", _data={"search": "service"}, _expected_status=200)
+
+        assert normalize_spaces(response.select(".govuk-tabs ul")[0]) == "Services (2)"
+
+        found_service_links = response.select(".govuk-tabs ul")[1].select("a")
+        assert found_service_links[0].text == "service one"
+        assert found_service_links[0].get("href") == "/services/596364a0-858e-42c8-9062-a8fe822260eb"
+        assert found_service_links[1].text == "service two"
+        assert found_service_links[1].get("href") == "/services/147ad62a-2951-4fa1-9ca0-093cd1a52c52"
+
+    def test_can_search_for_organisations(self, mocker, client_request, platform_admin_user, organisation_one):
+        mocker.patch(
+            "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
+            return_value={"data": []},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.service_api_client.find_services_by_name",
+            return_value={"data": []},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": [organisation_one]},
+        )
+        mocker.patch("app.main.views.platform_admin.get_url_for_notify_record", return_value=None)
+        client_request.login(platform_admin_user)
+
+        response = client_request.post(".platform_admin_search", _data={"search": "service"}, _expected_status=200)
+
+        assert normalize_spaces(response.select(".govuk-tabs ul")[0]) == "Organisations (1)"
+
+        found_service_links = response.select(".govuk-tabs ul")[1].select("a")
+        assert found_service_links[0].text == "organisation one"
+        assert found_service_links[0].get("href") == "/organisations/c011fa40-4cbe-4524-b415-dde2f421bd9c"
+
+    def test_shows_results_from_all_categories(
+        self,
+        mocker,
+        client_request,
+        platform_admin_user,
+        active_caseworking_user,
+        service_one,
+        service_two,
+        organisation_one,
+    ):
+        mocker.patch(
+            "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
+            return_value={"data": [active_caseworking_user]},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.service_api_client.find_services_by_name",
+            return_value={"data": [service_one, service_two]},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": [organisation_one]},
+        )
+        mocker.patch("app.main.views.platform_admin.get_url_for_notify_record", return_value=None)
+        client_request.login(platform_admin_user)
+
+        response = client_request.post(".platform_admin_search", _data={"search": "blah"}, _expected_status=200)
+
+        assert normalize_spaces(response.select(".govuk-tabs ul")[0]) == "Users (1) Services (2) Organisations (1)"
+
+        found_user_links = response.select(".govuk-tabs ul")[1].select("a")
+        assert found_user_links[0].text == "caseworker@example.gov.uk"
+        assert found_user_links[0].get("href") == "/users/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6"
+
+        found_service_links = response.select(".govuk-tabs ul")[2].select("a")
+        assert found_service_links[0].text == "service one"
+        assert found_service_links[0].get("href") == "/services/596364a0-858e-42c8-9062-a8fe822260eb"
+        assert found_service_links[1].text == "service two"
+        assert found_service_links[1].get("href") == "/services/147ad62a-2951-4fa1-9ca0-093cd1a52c52"
+
+        found_organisation_links = response.select(".govuk-tabs ul")[3].select("a")
+        assert found_organisation_links[0].text == "organisation one"
+        assert found_organisation_links[0].get("href") == "/organisations/c011fa40-4cbe-4524-b415-dde2f421bd9c"
 
     @pytest.mark.parametrize(
         "api_response, expected_redirect",
@@ -1241,10 +1343,21 @@ class TestPlatformAdminFind:
         ),
     )
     def test_find_uuid_redirects(self, mocker, client_request, platform_admin_user, api_response, expected_redirect):
+        mocker.patch(
+            "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
+            return_value={"data": []},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.service_api_client.find_services_by_name", return_value={"data": []}
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": []},
+        )
         mocker.patch("app.main.views.platform_admin.admin_api_client.find_by_uuid", return_value=api_response)
         client_request.login(platform_admin_user)
         client_request.post(
             ".platform_admin_search",
-            _data={"uuid-search": "abcdef12-3456-7890-abcd-ef1234567890"},
+            _data={"search": "abcdef12-3456-7890-abcd-ef1234567890"},
             _expected_redirect=expected_redirect,
         )

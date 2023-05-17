@@ -1932,13 +1932,6 @@ class SearchByNameForm(StripWhitespaceForm):
     )
 
 
-class AdminSearchUsersByEmailForm(StripWhitespaceForm):
-    search = GovukSearchField(
-        "Search by name or email address",
-        validators=[DataRequired("You need to enter full or partial email address to search by.")],
-    )
-
-
 class SearchUsersForm(StripWhitespaceForm):
     search = GovukSearchField("Search by name or email address")
 
@@ -2635,4 +2628,11 @@ class FindByUuidForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Find anything by UUID",
         validators=[DataRequired("Cannot be empty"), UUID("Enter a valid UUID")],
+    )
+
+
+class PlatformAdminSearchForm(StripWhitespaceForm):
+    search = GovukSearchField(
+        "Search",
+        validators=[DataRequired()],
     )

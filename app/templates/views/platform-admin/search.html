@@ -1,68 +1,121 @@
 {% extends "views/platform-admin/_base_template.html" %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/tabs/macro.html" import govukTabs %}
 {% from "components/error-summary.html" import errorSummary %}
-{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block per_page_title %}
   Search
 {% endblock %}
 
 {% block platform_admin_content %}
-  {{ errorSummary(find_uuid_form) }}
+  {{ errorSummary(search_form) }}
 
-  <h1 class="heading-medium">
-    Search
-  </h1>
-
-  <div class="govuk-grid-column-full">
-    {% call form_wrapper(action=url_for('main.find_services_by_name'), class='govuk-grid-row notify-simple-search-form') %}
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      {{
-        find_services_form.search(
-          param_extensions={
-            "label": {"text": "Find services by name, partial name or service ID"},
-            "formGroup": {"classes": "notify-simple-search-form__form-group"},
-            "classes": "notify-simple-search-form__textbox"
-          }
-        )
-      }}
-      {{ govukButton({
-        "classes": "notify-simple-search-form__button",
-        "html": "Search <div class=\"govuk-visually-hidden\">for services</div>"
-      }) }}
-    {% endcall %}
-
-    {% call form_wrapper(action=url_for('main.find_users_by_email'), class='govuk-grid-row notify-simple-search-form') %}
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      {{
-        find_users_form.search(
-          param_extensions={
-            "label": {"text": "Find users by email address or partial email address"},
-            "formGroup": {"classes": "notify-simple-search-form__form-group"},
-            "classes": "notify-simple-search-form__textbox"
-          }
-        )
-      }}
-      {{ govukButton({
-        "classes": "notify-simple-search-form__button",
-        "html": "Search <div class='govuk-visually-hidden'>for users</div>"
-      }) }}
-    {% endcall %}
-    {% call form_wrapper(action=url_for('main.platform_admin_search'), class='govuk-grid-row notify-simple-search-form') %}
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      {{
-        find_uuid_form.search(
-          param_extensions={
-            "formGroup": {"classes": "notify-simple-search-form__form-group"},
-            "classes": "notify-simple-search-form__textbox"
-          }
-        )
-      }}
-      {{ govukButton({
-        "classes": "notify-simple-search-form__button",
-        "html": "Search <div class='govuk-visually-hidden'>by UUID</div>"
-      }) }}
-    {% endcall %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% call form_wrapper(class='notify-simple-search-form', action=url_for('main.platform_admin_search')) %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {{
+          search_form.search(
+            param_extensions={
+              "label": {
+                  "isPageHeading": True,
+                  "classes": "govuk-label--m govuk-!-margin-top-3",
+                  "id": "page-header",
+              },
+              "formGroup": {"classes": "notify-simple-search-form__form-group"},
+              "classes": "notify-simple-search-form__textbox",
+              "hint": {
+                "text": "Search for users, services, and organisations by name or partial name, or find any other Notify object by UUID."
+              },
+            }
+          )
+        }}
+        {{ govukButton({
+          "classes": "notify-simple-search-form__button",
+          "html": "Search <span class=\"govuk-visually-hidden\">for services</span>"
+        }) }}
+      {% endcall %}
     </div>
+
+    {% if show_results %}
+      {% set items = [] %}
+      {% if users %}
+        {% set users_html %}
+          <h2 class="govuk-heading-m">Users</h2>
+          <div class="browse-list browse-list--tabbed">
+            <ul>
+            {% for user in users %}
+              <li class="browse-list-item">
+                <a href="{{url_for('main.user_information', user_id=user.id)}}" class="govuk-link govuk-link--no-visited-state browse-list-link">{{ user.email_address }}</a>
+                <p class="browse-list-hint">{{ user.name }}</p>
+              </li>
+            {% endfor %}
+            </ul>
+          </div>
+        {% endset %}
+
+        {% do items.append({
+            "label": "Users (" + (users | count | string) + ")",
+            "id": "search-users",
+            "panel": {"html": users_html},
+          })
+        %}
+      {% endif %}
+
+      {% if services %}
+        {% set services_html %}
+          <h2 class="govuk-heading-m">Services</h2>
+          <div class="browse-list browse-list--tabbed">
+            <ul>
+            {% for service in services %}
+              <li class="browse-list-item">
+                <a href="{{url_for('main.service_dashboard', service_id=service.id)}}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
+              </li>
+            {% endfor %}
+            </ul>
+          </div>
+        {% endset %}
+
+        {% do items.append({
+            "label": "Services (" + (services | count | string) + ")",
+            "id": "search-services",
+            "panel": {"html": services_html},
+          })
+        %}
+      {% endif %}
+
+      {% if organisations %}
+        {% set organisations_html %}
+          <h2 class="govuk-heading-m">Organisations</h2>
+          <div class="browse-list browse-list--tabbed">
+            <ul>
+            {% for organisation in organisations %}
+              <li class="browse-list-item">
+                <a href="{{url_for('main.organisation_dashboard', org_id=organisation.id)}}" class="govuk-link govuk-link--no-visited-state">{{ organisation.name }}</a>
+              </li>
+            {% endfor %}
+            </ul>
+          </div>
+        {% endset %}
+
+        {% do items.append({
+            "label": "Organisations (" + (organisations | count | string) + ")",
+            "id": "search-organisations",
+            "panel": {"html": organisations_html},
+          })
+        %}
+      {% endif %}
+
+      <div class="govuk-grid-column-full">
+        {% if items %}
+          {{ govukTabs({"items": items}) }}
+        {% else %}
+          <p class="govuk-body">
+            No results found.
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}
