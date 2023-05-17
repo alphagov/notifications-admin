@@ -88,6 +88,31 @@
         %}
       {% endif %}
 
+      {% if organisations %}
+        {% set organisations_html %}
+          <h2 class="govuk-heading-m">Organisations</h2>
+          <nav class="browse-list">
+            <ul>
+            {% for organisation in organisations %}
+              <li class="browse-list-item">
+                <a href="{{url_for('main.organisation_dashboard', org_id=organisation.id)}}" class="govuk-link govuk-link--no-visited-state">{{ organisation.name }}</a>
+              </li>
+              {% if not loop.last %}
+                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+              {% endif %}
+            {% endfor %}
+            </ul>
+          </nav>
+        {% endset %}
+
+        {% do items.append({
+            "label": "Organisations (" + (organisations | count | string) + ")",
+            "id": "search-organisations",
+            "panel": {"html": organisations_html},
+          })
+        %}
+      {% endif %}
+
       <div class="govuk-grid-column-full">
         {% if items %}
           {{ govukTabs({"items": items}) }}

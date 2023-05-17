@@ -15,6 +15,7 @@ from app import (
     format_date_numeric,
     letter_jobs_client,
     notification_api_client,
+    organisations_client,
     platform_stats_api_client,
     service_api_client,
     user_api_client,
@@ -57,13 +58,14 @@ def redirect_old_search_pages():
 @main.route("/platform-admin", methods=["GET", "POST"])
 @user_is_platform_admin
 def platform_admin_search():
-    users, services = [], []
+    users, services, organisations = [], [], []
     search_form = PlatformAdminSearch()
 
     if search_form.validate_on_submit():
-        users, services, redirect_to_something_url = [
+        users, services, organisations, redirect_to_something_url = [
             user_api_client.find_users_by_full_or_partial_email(search_form.search.data)["data"],
             service_api_client.find_services_by_name(search_form.search.data)["data"],
+            organisations_client.search(search_form.search.data)["data"],
             get_url_for_notify_record(search_form.search.data),
         ]
 
@@ -76,6 +78,7 @@ def platform_admin_search():
         show_results=search_form.is_submitted() and search_form.search.data,
         users=users,
         services=services,
+        organisations=organisations,
     )
 
 

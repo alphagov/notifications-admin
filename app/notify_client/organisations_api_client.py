@@ -32,6 +32,9 @@ class OrganisationsClient(NotifyAdminAPIClient):
                 return None
             raise error
 
+    def search(self, name):
+        return self.get(f"/organisations/search?name={name}")
+
     @cache.delete("organisations")
     def create_organisation(self, name, crown, organisation_type, agreement_signed):
         return self.post(

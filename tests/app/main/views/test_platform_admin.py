@@ -1176,6 +1176,10 @@ class TestPlatformAdminSearch:
             "app.main.views.platform_admin.service_api_client.find_services_by_name",
             return_value={"data": []},
         )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": []},
+        )
         mocker.patch("app.main.views.platform_admin.get_url_for_notify_record", return_value=None)
         client_request.login(platform_admin_user)
 
@@ -1196,6 +1200,10 @@ class TestPlatformAdminSearch:
             "app.main.views.platform_admin.service_api_client.find_services_by_name",
             return_value={"data": [service_one, service_two]},
         )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": []},
+        )
         mocker.patch("app.main.views.platform_admin.get_url_for_notify_record", return_value=None)
         client_request.login(platform_admin_user)
 
@@ -1209,8 +1217,39 @@ class TestPlatformAdminSearch:
         assert found_service_links[1].text == "service two"
         assert found_service_links[1].get("href") == "/services/147ad62a-2951-4fa1-9ca0-093cd1a52c52"
 
+    def test_can_search_for_organisations(self, mocker, client_request, platform_admin_user, organisation_one):
+        mocker.patch(
+            "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
+            return_value={"data": []},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.service_api_client.find_services_by_name",
+            return_value={"data": []},
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": [organisation_one]},
+        )
+        mocker.patch("app.main.views.platform_admin.get_url_for_notify_record", return_value=None)
+        client_request.login(platform_admin_user)
+
+        response = client_request.post(".platform_admin_search", _data={"search": "service"}, _expected_status=200)
+
+        assert normalize_spaces(response.select(".govuk-tabs ul")[0]) == "Organisations (1)"
+
+        found_service_links = response.select(".govuk-tabs ul")[1].select("a")
+        assert found_service_links[0].text == "organisation one"
+        assert found_service_links[0].get("href") == "/organisations/c011fa40-4cbe-4524-b415-dde2f421bd9c"
+
     def test_shows_results_from_all_categories(
-        self, mocker, client_request, platform_admin_user, active_caseworking_user, service_one, service_two
+        self,
+        mocker,
+        client_request,
+        platform_admin_user,
+        active_caseworking_user,
+        service_one,
+        service_two,
+        organisation_one,
     ):
         mocker.patch(
             "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
@@ -1220,12 +1259,16 @@ class TestPlatformAdminSearch:
             "app.main.views.platform_admin.service_api_client.find_services_by_name",
             return_value={"data": [service_one, service_two]},
         )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": [organisation_one]},
+        )
         mocker.patch("app.main.views.platform_admin.get_url_for_notify_record", return_value=None)
         client_request.login(platform_admin_user)
 
-        response = client_request.post(".platform_admin_search", _data={"search": "service"}, _expected_status=200)
+        response = client_request.post(".platform_admin_search", _data={"search": "blah"}, _expected_status=200)
 
-        assert normalize_spaces(response.select(".govuk-tabs ul")[0]) == "Users (1) Services (2)"
+        assert normalize_spaces(response.select(".govuk-tabs ul")[0]) == "Users (1) Services (2) Organisations (1)"
 
         found_user_links = response.select(".govuk-tabs ul")[1].select("a")
         assert found_user_links[0].text == "caseworker@example.gov.uk"
@@ -1236,6 +1279,10 @@ class TestPlatformAdminSearch:
         assert found_service_links[0].get("href") == "/services/596364a0-858e-42c8-9062-a8fe822260eb"
         assert found_service_links[1].text == "service two"
         assert found_service_links[1].get("href") == "/services/147ad62a-2951-4fa1-9ca0-093cd1a52c52"
+
+        found_organisation_links = response.select(".govuk-tabs ul")[3].select("a")
+        assert found_organisation_links[0].text == "organisation one"
+        assert found_organisation_links[0].get("href") == "/organisations/c011fa40-4cbe-4524-b415-dde2f421bd9c"
 
     @pytest.mark.parametrize(
         "api_response, expected_redirect",
@@ -1302,6 +1349,10 @@ class TestPlatformAdminSearch:
         )
         mocker.patch(
             "app.main.views.platform_admin.service_api_client.find_services_by_name", return_value={"data": []}
+        )
+        mocker.patch(
+            "app.main.views.platform_admin.organisations_client.search",
+            return_value={"data": []},
         )
         mocker.patch("app.main.views.platform_admin.admin_api_client.find_by_uuid", return_value=api_response)
         client_request.login(platform_admin_user)
