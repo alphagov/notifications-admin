@@ -77,7 +77,7 @@
           "template-list-item-hidden-by-default" if item.ancestors else "template-list-item-without-ancestors"),
         "after": item_link_content ~ item_meta
       } %}
-      {% set _ = checkboxes_data.append(checkbox_config) %}
+      {% do checkboxes_data.append(checkbox_config) %}
 
       {% if not current_user.has_permissions('manage_templates') %}
         <div class="template-list-item {%- if item.ancestors %} template-list-item-hidden-by-default {%- else %} template-list-item-without-ancestors{%- endif %}">
