@@ -100,7 +100,6 @@ class HeaderNavigation(Navigation):
             "create_letter_branding",
             "edit_sms_provider_ratio",
             "email_branding",
-            "find_services_by_name",
             "letter_branding",
             "live_services",
             "live_services_csv",
