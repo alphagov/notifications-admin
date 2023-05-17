@@ -1914,13 +1914,6 @@ class SearchByNameForm(StripWhitespaceForm):
     )
 
 
-class AdminSearchUsersByEmailForm(StripWhitespaceForm):
-    search = GovukSearchField(
-        "Search by name or email address",
-        validators=[DataRequired("You need to enter full or partial email address to search by.")],
-    )
-
-
 class SearchUsersForm(StripWhitespaceForm):
     search = GovukSearchField("Search by name or email address")
 

@@ -127,7 +127,6 @@ EXCLUDED_ENDPOINTS = set(
             "estimate_usage",
             "feedback",
             "find_services_by_name",
-            "find_users_by_email",
             "forgot_password",
             "get_billing_report",
             "get_daily_sms_provider_volumes",

@@ -5,21 +5,9 @@ from notifications_python_client.errors import HTTPError
 from app import user_api_client
 from app.event_handlers import create_archive_user_event
 from app.main import main
-from app.main.forms import AdminSearchUsersByEmailForm, AuthTypeForm
+from app.main.forms import AuthTypeForm
 from app.models.user import User
 from app.utils.user import user_is_platform_admin
-
-
-@main.route("/find-users-by-email", methods=["POST"])
-@user_is_platform_admin
-def find_users_by_email():
-    # The prefix on this form must match the prefix on the form on the platform_admin_search view as the form on that
-    # page POSTs here.
-    form = AdminSearchUsersByEmailForm(prefix="users")
-    users_found = None
-    if form.validate_on_submit():
-        users_found = user_api_client.find_users_by_full_or_partial_email(form.search.data)["data"]
-    return render_template("views/find-users/find-users-by-email.html", form=form, users_found=users_found)
 
 
 @main.route("/users/<uuid:user_id>", methods=["GET"])
