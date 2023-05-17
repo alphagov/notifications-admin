@@ -19,8 +19,8 @@
   }
 
   &--tabbed > ul > .browse-list-item:not(:last-of-type) {
-    @include govuk-responsive-padding(6, "bottom");
-    @include govuk-responsive-margin(6, "bottom");
+    @include govuk-responsive-padding(5, "bottom");
+    @include govuk-responsive-margin(5, "bottom");
 
     border-bottom: solid 1px $govuk-border-colour;
   }
