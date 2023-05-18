@@ -99,7 +99,7 @@
       // if the name is distinct from the thing:
       // - it will be used in the rendering
       // - the value won't be identified by a heading so needs its own label
-      if (name !== stateOptions.thing) {
+      if (name.toLowerCase() !== stateOptions.thing.toLowerCase()) {
         stateOptions.name = name;
         stateOptions.valueLabel = true;
       }
