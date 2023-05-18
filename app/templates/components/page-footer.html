@@ -18,20 +18,20 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
       {% set button_data = {"text": button_text, "classes": "page-footer__button"} %}
-      {% if destructive %}{% set _ = button_data.update({"classes": "govuk-button--warning page-footer__button"}) %}{% endif %}
-      {% if centered_button %}{% set _ = button_data.update({"classes": "page-footer__button--centred"}) %}{% endif %}
+      {% if destructive %}{% do button_data.update({"classes": "govuk-button--warning page-footer__button"}) %}{% endif %}
+      {% if centered_button %}{% do button_data.update({"classes": "page-footer__button--centred"}) %}{% endif %}
       {% if button_url %}
-        {% set _ = button_data.update({
+        {% do button_data.update({
           "classes": "govuk-button--secondary",
           "href": button_url }) %}
       {% endif %}
-      {% if button_name %}{% set _ = button_data.update({"name": button_name}) %}{% endif %}
-      {% if button_value %}{% set _ = button_data.update({"value": button_value}) %}{% endif %}
+      {% if button_name %}{% do button_data.update({"name": button_name}) %}{% endif %}
+      {% if button_value %}{% do button_data.update({"value": button_value}) %}{% endif %}
       {% if button_text_hidden_suffix %}
         {% set html %}
           {{ button_text }}<span class="govuk-visually-hidden"> {{button_text_hidden_suffix}}</span>
         {% endset %}
-        {% set _ = button_data.update({
+        {% do button_data.update({
           "text": "",
           "html": html
         }) %}

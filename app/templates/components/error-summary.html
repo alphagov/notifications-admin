@@ -5,10 +5,10 @@
     {% set errors = [] %}
     {% for field_name, error_list in form.errors.items() %}
       {% if field_name %}
-        {% set _ = errors.append({"href": "#" + form[field_name].id, "text": error_list[0]}) %}
+        {% do errors.append({"href": "#" + form[field_name].id, "text": error_list[0]}) %}
       {% else %}
         {# field_name is None for form level errors #}
-        {% set _ = errors.append({"text": error_list[0]}) %}
+        {% do errors.append({"text": error_list[0]}) %}
       {% endif %}
     {% endfor %}
 
