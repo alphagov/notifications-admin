@@ -154,7 +154,7 @@ describe('copy to clipboard', () => {
 
           expect(component.querySelector('.copy-to-clipboard__value').textContent).toBe('00000000-0000-0000-0000-000000000000');
 
-        });        
+        });
 
       });
 
@@ -261,7 +261,7 @@ describe('copy to clipboard', () => {
 
           expect(liveRegionHiddenText.length).toEqual(2);
           expect(liveRegionHiddenText[0].textContent).toEqual('Some Thing ');
-          expect(liveRegionHiddenText[1].textContent).toEqual(', press button to show in page');
+          expect(liveRegionHiddenText[1].textContent).toEqual(', use button to show in page');
 
         });
 
