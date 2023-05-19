@@ -95,7 +95,7 @@ def get_letter_attachment_url(service_id, attachment_id):
     return s3.meta.client.generate_presigned_url(
         ClientMethod="get_object",
         Params={"Bucket": current_app.config["S3_BUCKET_LETTER_ATTACHMENTS"], "Key": file_location},
-        ExpiresIn=3600,
+        ExpiresIn=30,
     )
 
 

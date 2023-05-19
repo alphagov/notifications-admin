@@ -117,7 +117,7 @@ def test_from_database_object_includes_url_for_template_with_attachment(
         "values": None,
         "filename": None,
     }
-    expected_data["template"]["letter_attachment"]["s3_url"] = "fake_url"
+    expected_data["template"]["letter_attachment"]["url"] = "fake_url"
 
     headers = {"Authorization": "Token my-secret-key"}
 

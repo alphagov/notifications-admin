@@ -25,7 +25,7 @@ class TemplatePreview:
             "filename": current_service.letter_branding.filename,
         }
         if template["letter_attachment"]:
-            data["template"]["letter_attachment"]["s3_url"] = get_letter_attachment_url(
+            data["template"]["letter_attachment"]["url"] = get_letter_attachment_url(
                 template["service"], template["letter_attachment"]["id"]
             )
 
