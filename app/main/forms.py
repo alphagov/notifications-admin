@@ -1022,6 +1022,12 @@ class AddGPOrganisationForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.same_as_service_name.label.text = f"Is your GP practice called ‘{service_name}’?"
         self.service_name = service_name
+        self.same_as_service_name.param_extensions = {
+            "items": [
+                {},
+                {"conditional": {"html": self.name}},
+            ]
+        }
 
     def get_organisation_name(self):
         if self.same_as_service_name.data:
@@ -1030,10 +1036,10 @@ class AddGPOrganisationForm(StripWhitespaceForm):
 
     same_as_service_name = OnOffField(
         "Is your GP practice called the same name as your service?",
-        choices=(
+        choices=[
             (True, "Yes"),
             (False, "No"),
-        ),
+        ],
     )
 
     name = GovukTextInputField(

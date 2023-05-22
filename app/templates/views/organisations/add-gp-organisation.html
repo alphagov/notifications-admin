@@ -17,14 +17,8 @@
 {% block maincolumn_content %}
   {{ page_header('Accept our data sharing and financial agreement') }}
   {% call form_wrapper() %}
-    {% call select_wrapper(form.same_as_service_name) %}
-      {% for option in form.same_as_service_name %}
-        {{ radio(option, data_target='custom-organisation-name' if option.data == False else '') }}
-      {% endfor %}
-    {% endcall %}
-    {% call conditional_radio_panel('custom-organisation-name') %}
-      {{ form.name }}
-    {% endcall %}
-    {{ page_footer('Continue') }}
+      {{ form.same_as_service_name }}
+      {{ page_footer('Continue') }}
   {% endcall %}
+
 {% endblock %}
