@@ -1,10 +1,10 @@
 {% extends "withnav_template.html" %}
-{% from "components/radios.html" import radio, conditional_radio_panel %}
-{% from "components/select-input.html" import select_wrapper %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/fieldset/macro.html" import govukFieldset %}
+
 
 {% block per_page_title %}
   Accept our data sharing and financial agreement
@@ -21,22 +21,28 @@
 
     {{ page_header('Accept our data sharing and financial agreement') }}
 
-    {% call form_wrapper(class='top-gutter') %}
+    {%  set contentHtml%}
+        {% call govukFieldset(
+            {legend: {text: "What is your address?",
+                      classes: "govuk-fieldset__legend--l",
+                      isPageHeading: true
+                      }
+            }) %}
+                {{ form.on_behalf_of_name }}
+                {{ form.on_behalf_of_email }}
+       {% endcall %}
+    {% endset -%}
 
-      {% call select_wrapper(form.who) %}
-        {% for option in form.who %}
-          {{ radio(option, data_target='on-behalf-of' if option.data == 'someone-else' else None) }}
-        {% endfor %}
-      {% endcall %}
-      {% call conditional_radio_panel('on-behalf-of') %}
-        {{ form.on_behalf_of_name(param_extensions={"classes": "govuk-!-width-full"}) }}
-        {{ form.on_behalf_of_email(param_extensions={"classes": "govuk-!-width-full"}) }}
-      {% endcall %}
-      {{ form.version(
+    {% call form_wrapper(class='top-gutter') %}
+        {{ form.who(param_extensions={
+          "items": [{}, {"conditional": {"html": contentHtml}
+          }]})
+        }}
+        {{ form.version(
         param_extensions={
           "hint": {"text": "The version number is on the front page, for example ‘3.6’"},
-          "classes": "govuk-!-width-one-third"}
-      ) }}
+          "classes": "govuk-!-width-one-third"})
+       }}
 
       {{ page_footer('Continue') }}
 

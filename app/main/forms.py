@@ -2474,9 +2474,9 @@ class AcceptAgreementForm(StripWhitespaceForm):
 
     version = GovukTextInputField("Which version of the agreement do you want to accept?")
 
-    who = RadioField(
+    who = GovukRadiosField(
         "Who are you accepting the agreement for?",
-        choices=(
+        choices=[
             (
                 "me",
                 "Yourself",
@@ -2485,7 +2485,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
                 "someone-else",
                 "Someone else",
             ),
-        ),
+        ],
     )
 
     on_behalf_of_name = GovukTextInputField("What’s their name?")
