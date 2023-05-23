@@ -2073,6 +2073,13 @@ def test_should_not_allow_template_edits_without_correct_permission(
 
 
 @pytest.mark.parametrize(
+    "template_type",
+    (
+        "email",
+        "letter",
+    ),
+)
+@pytest.mark.parametrize(
     "old_content, new_content, expected_paragraphs",
     [
         (
@@ -2104,9 +2111,10 @@ def test_should_show_interstitial_when_making_breaking_change(
     new_content,
     old_content,
     expected_paragraphs,
+    template_type,
 ):
     email_template = create_template(
-        template_id=fake_uuid, template_type="email", subject="Your ((thing)) is due soon", content=old_content
+        template_id=fake_uuid, template_type=template_type, subject="Your ((thing)) is due soon", content=old_content
     )
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
 

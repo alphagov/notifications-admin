@@ -627,10 +627,14 @@ def edit_service_template(service_id, template_id):
             "template_type": template["template_type"],
             "id": template["id"],
             "reply_to_text": template["reply_to_text"],
+            "postage": None,
         }
 
-        new_template = get_template(new_template_data, current_service)
-        template_change = get_template(template, current_service).compare_to(new_template)
+        new_template = get_template(new_template_data, current_service, letter_preview_url="https://www.example.com")
+
+        template_change = get_template(
+            template, current_service, letter_preview_url="https://www.example.com"
+        ).compare_to(new_template)
 
         if template_change.placeholders_added and not request.form.get("confirm") and current_service.api_keys:
             return render_template(
