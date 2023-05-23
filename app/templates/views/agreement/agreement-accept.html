@@ -22,12 +22,8 @@
     {{ page_header('Accept our data sharing and financial agreement') }}
 
     {%  set contentHtml%}
-        {% call govukFieldset(
-            {legend: {text: "What is your address?",
-                      classes: "govuk-fieldset__legend--l",
-                      isPageHeading: true
-                      }
-            }) %}
+            {% call govukFieldset(
+            {legend: {classes: "govuk-fieldset__legend--l"}}) %}
                 {{ form.on_behalf_of_name }}
                 {{ form.on_behalf_of_email }}
        {% endcall %}
