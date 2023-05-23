@@ -581,7 +581,7 @@ def send_from_contact_list(service_id, template_id, contact_list_id):
     )
 
 
-def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
+def _check_messages(service_id, template_id, upload_id, preview_row):
 
     try:
         # The happy path is that the job doesn’t already exist, so the
@@ -624,9 +624,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             upload_id=upload_id,
             filetype="png",
             row_index=preview_row,
-        )
-        if not letters_as_pdf
-        else None,
+        ),
         email_reply_to=email_reply_to,
         sms_sender=sms_sender,
         # In this case, we don't provide template values when calculating the page count
@@ -760,7 +758,7 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
     else:
         abort(404)
 
-    template = _check_messages(service_id, template_id, upload_id, row_index, letters_as_pdf=True)["template"]
+    template = _check_messages(service_id, template_id, upload_id, row_index)["template"]
     return TemplatePreview.from_utils_template(template, filetype, page=page)
 
 

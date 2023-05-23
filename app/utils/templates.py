@@ -1,9 +1,7 @@
-from flask import current_app
 from notifications_utils.template import (
     BroadcastPreviewTemplate,
     EmailPreviewTemplate,
     LetterImageTemplate,
-    LetterPreviewTemplate,
     SMSPreviewTemplate,
 )
 
@@ -49,21 +47,13 @@ def get_template(
             redact_missing_personalisation=redact_missing_personalisation,
         )
     if "letter" == template["template_type"]:
-        if letter_preview_url:
-            return LetterImageTemplate(
-                template,
-                image_url=letter_preview_url,
-                page_count=int(page_count),
-                contact_block=template["reply_to_text"],
-                postage=template["postage"],
-            )
-        else:
-            return LetterPreviewTemplate(
-                template,
-                contact_block=template["reply_to_text"],
-                admin_base_url=current_app.config["ADMIN_BASE_URL"],
-                redact_missing_personalisation=redact_missing_personalisation,
-            )
+        return LetterImageTemplate(
+            template,
+            image_url=letter_preview_url,
+            page_count=int(page_count),
+            contact_block=template["reply_to_text"],
+            postage=template["postage"],
+        )
     if "broadcast" == template["template_type"]:
         return BroadcastPreviewTemplate(
             template,
