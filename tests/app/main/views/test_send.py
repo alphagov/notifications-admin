@@ -17,7 +17,6 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import (
     LetterImageTemplate,
-    LetterPreviewTemplate,
     SMSPreviewTemplate,
 )
 from xlrd.biffh import XLRDError
@@ -2446,6 +2445,43 @@ def test_download_example_csv(
     assert "text/csv" in response.headers["Content-Type"]
 
 
+def test_download_example_csv_for_letter_template(
+    client_request,
+    mocker,
+    api_user_active,
+    mock_login,
+    mock_get_service,
+    mock_get_service_template_with_placeholders_same_as_recipient,
+    mock_has_permissions,
+    fake_uuid,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": template_json(
+                service_id=SERVICE_ONE_ID,
+                id_=fake_uuid,
+                name="Two week reminder",
+                subject="Hello ((address line 1))",
+                type_="letter",
+                content="((name)) ((date))",
+            )
+        },
+    )
+    response = client_request.get_response(
+        "main.get_example_csv",
+        service_id=fake_uuid,
+        template_id=fake_uuid,
+        follow_redirects=True,
+    )
+    assert response.get_data(as_text=True) == (
+        "address line 1,address line 2,address line 3,address line 4,address line 5,address line 6,address line 7,"
+        "name,date\r\n"
+        "A. Name,123 Example Street,XM4 5HQ,,,,,example,example\r\n"
+    )
+    assert "text/csv" in response.headers["Content-Type"]
+
+
 def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     client_request,
     mock_get_service_template,
@@ -2785,7 +2821,7 @@ def test_should_show_preview_letter_message(
     assert response.get_data(as_text=True) == "foo"
     mocked_preview.assert_called_once()
     assert mocked_preview.call_args[0][0].id == template_id
-    assert type(mocked_preview.call_args[0][0]) == LetterPreviewTemplate
+    assert type(mocked_preview.call_args[0][0]) == LetterImageTemplate
     assert mocked_preview.call_args[0][1] == filetype
     assert mocked_preview.call_args[0][0].values == expected_values
     assert mocked_preview.call_args[1] == {"page": expected_page}

@@ -176,7 +176,11 @@ def send_messages(service_id, template_id):
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>.csv", methods=["GET"])
 @user_has_permissions("send_messages", "manage_templates")
 def get_example_csv(service_id, template_id):
-    template = get_template(service_api_client.get_service_template(service_id, template_id)["data"], current_service)
+    template = get_template(
+        service_api_client.get_service_template(service_id, template_id)["data"],
+        current_service,
+        letter_preview_url="https://www.example.com",
+    )
     return (
         Spreadsheet.from_rows(
             [get_spreadsheet_column_headings_from_template(template), get_example_csv_rows(template)]
@@ -577,7 +581,7 @@ def send_from_contact_list(service_id, template_id, contact_list_id):
     )
 
 
-def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_pdf=False):
+def _check_messages(service_id, template_id, upload_id, preview_row):
 
     try:
         # The happy path is that the job doesn’t already exist, so the
@@ -620,9 +624,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, letters_as_
             upload_id=upload_id,
             filetype="png",
             row_index=preview_row,
-        )
-        if not letters_as_pdf
-        else None,
+        ),
         email_reply_to=email_reply_to,
         sms_sender=sms_sender,
         # In this case, we don't provide template values when calculating the page count
@@ -756,7 +758,7 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
     else:
         abort(404)
 
-    template = _check_messages(service_id, template_id, upload_id, row_index, letters_as_pdf=True)["template"]
+    template = _check_messages(service_id, template_id, upload_id, row_index)["template"]
     return TemplatePreview.from_utils_template(template, filetype, page=page)
 
 

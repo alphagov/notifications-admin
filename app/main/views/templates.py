@@ -287,7 +287,7 @@ def letter_branding_preview_image(filename):
     return TemplatePreview.from_example_template(template, filename)
 
 
-def _view_template_version(service_id, template_id, version, letters_as_pdf=False):
+def _view_template_version(service_id, template_id, version):
     return dict(
         template=get_template(
             current_service.get_template(template_id, version=version),
@@ -298,9 +298,7 @@ def _view_template_version(service_id, template_id, version, letters_as_pdf=Fals
                 template_id=template_id,
                 version=version,
                 filetype="png",
-            )
-            if not letters_as_pdf
-            else None,
+            ),
         )
     )
 
@@ -627,10 +625,14 @@ def edit_service_template(service_id, template_id):
             "template_type": template["template_type"],
             "id": template["id"],
             "reply_to_text": template["reply_to_text"],
+            "postage": None,
         }
 
-        new_template = get_template(new_template_data, current_service)
-        template_change = get_template(template, current_service).compare_to(new_template)
+        new_template = get_template(new_template_data, current_service, letter_preview_url="https://www.example.com")
+
+        template_change = get_template(
+            template, current_service, letter_preview_url="https://www.example.com"
+        ).compare_to(new_template)
 
         if template_change.placeholders_added and not request.form.get("confirm") and current_service.api_keys:
             return render_template(
