@@ -731,7 +731,10 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
             "name": self.name,
             "fieldset": {
                 "attributes": {"id": self.name},
-                "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
+                "legend": {
+                    "text": self.label.text,
+                    "classes": "govuk-fieldset__legend--s, govuk-!-font-weight-regular",
+                },
             },
             "errorMessage": self.get_error_message(),
             "items": items,
