@@ -881,6 +881,7 @@ class BasePermissionsForm(StripWhitespaceForm):
         ],
         thing="how this team member should sign in",
         validators=[DataRequired()],
+        param_extensions={"fieldset": {"legend": {"classes": "govuk-fieldset__legend--s"}}},
     )
 
     permissions_field = GovukCheckboxesField(
