@@ -731,7 +731,10 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
             "name": self.name,
             "fieldset": {
                 "attributes": {"id": self.name},
-                "legend": {"text": self.label.text, "classes": "govuk-fieldset__legend--s"},
+                "legend": {
+                    "text": self.label.text,
+                    "classes": "govuk-fieldset__legend--s, govuk-!-font-weight-regular",
+                },
             },
             "errorMessage": self.get_error_message(),
             "items": items,
@@ -878,6 +881,7 @@ class BasePermissionsForm(StripWhitespaceForm):
         ],
         thing="how this team member should sign in",
         validators=[DataRequired()],
+        param_extensions={"fieldset": {"legend": {"classes": "govuk-fieldset__legend--s"}}},
     )
 
     permissions_field = GovukCheckboxesField(
@@ -1022,6 +1026,12 @@ class AddGPOrganisationForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.same_as_service_name.label.text = f"Is your GP practice called ‘{service_name}’?"
         self.service_name = service_name
+        self.same_as_service_name.param_extensions = {
+            "items": [
+                {},
+                {"conditional": {"html": self.name}},
+            ]
+        }
 
     def get_organisation_name(self):
         if self.same_as_service_name.data:
@@ -1030,10 +1040,10 @@ class AddGPOrganisationForm(StripWhitespaceForm):
 
     same_as_service_name = OnOffField(
         "Is your GP practice called the same name as your service?",
-        choices=(
+        choices=[
             (True, "Yes"),
             (False, "No"),
-        ),
+        ],
     )
 
     name = GovukTextInputField(
@@ -2461,9 +2471,9 @@ class AcceptAgreementForm(StripWhitespaceForm):
 
     version = GovukTextInputField("Which version of the agreement do you want to accept?")
 
-    who = RadioField(
+    who = GovukRadiosField(
         "Who are you accepting the agreement for?",
-        choices=(
+        choices=[
             (
                 "me",
                 "Yourself",
@@ -2472,7 +2482,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
                 "someone-else",
                 "Someone else",
             ),
-        ),
+        ],
     )
 
     on_behalf_of_name = GovukTextInputField("What’s their name?")
