@@ -613,6 +613,18 @@ def abort_403_if_not_admin_user():
 @user_has_permissions("manage_templates")
 def edit_service_template(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
+    if template["template_type"] not in current_service.available_template_types:
+        return redirect(
+            url_for(
+                ".action_blocked",
+                service_id=service_id,
+                notification_type=template["template_type"],
+                return_to="view_template",
+                template_id=template_id,
+            )
+        )
+
     template["template_content"] = template["content"]
     form = form_objects[template["template_type"]](**template)
     if form.validate_on_submit():
@@ -660,16 +672,6 @@ def edit_service_template(service_id, template_id):
         else:
             return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
-    if template["template_type"] not in current_service.available_template_types:
-        return redirect(
-            url_for(
-                ".action_blocked",
-                service_id=service_id,
-                notification_type=template["template_type"],
-                return_to="view_template",
-                template_id=template_id,
-            )
-        )
     return render_template(
         f"views/edit-{template['template_type']}-template.html",
         form=form,

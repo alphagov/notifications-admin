@@ -2114,6 +2114,7 @@ def test_should_not_allow_template_edits_without_correct_permission(
 )
 def test_should_show_interstitial_when_making_breaking_change(
     client_request,
+    service_one,
     mock_update_service_template,
     mock_get_user_by_email,
     mock_get_api_keys,
@@ -2124,6 +2125,8 @@ def test_should_show_interstitial_when_making_breaking_change(
     expected_paragraphs,
     template_type,
 ):
+    service_one["permissions"] += [template_type]
+
     email_template = create_template(
         template_id=fake_uuid, template_type=template_type, subject="Your ((thing)) is due soon", content=old_content
     )
