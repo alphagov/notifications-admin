@@ -670,14 +670,13 @@ def edit_service_template(service_id, template_id):
                 template_id=template_id,
             )
         )
-    else:
-        return render_template(
-            f"views/edit-{template['template_type']}-template.html",
-            form=form,
-            template=template,
-            heading_action="Edit",
-            back_link=url_for("main.view_template", service_id=current_service.id, template_id=template["id"]),
-        )
+    return render_template(
+        f"views/edit-{template['template_type']}-template.html",
+        form=form,
+        template=template,
+        heading_action="Edit",
+        back_link=url_for("main.view_template", service_id=current_service.id, template_id=template["id"]),
+    )
 
 
 @main.route(
