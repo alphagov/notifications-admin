@@ -179,7 +179,6 @@ def get_example_csv(service_id, template_id):
     template = get_template(
         service_api_client.get_service_template(service_id, template_id)["data"],
         current_service,
-        letter_preview_url="https://www.example.com",
     )
     return (
         Spreadsheet.from_rows(
