@@ -367,6 +367,59 @@ def get_billing_report():
     return render_template("views/platform-admin/get-billing-report.html", form=form)
 
 
+@main.route("/platform-admin/reports/dvla-billing", methods=["GET", "POST"])
+def get_dvla_billing_report():
+    form = BillingReportDateFilterForm()
+
+    if form.validate_on_submit():
+        start_date = form.start_date.data
+        end_date = form.end_date.data
+        headers = [
+            "despatch date",
+            "postage",
+            "DVLA cost threshold",
+            "sheets",
+            "rate (£)",
+            "letters",
+            "cost (£)",
+        ]
+        try:
+            result = billing_api_client.get_data_for_dvla_billing_report(start_date, end_date)
+        except HTTPError as e:
+            message = "Date must be in a single financial year."
+            if e.status_code == 400 and e.message == message:
+                flash(message)
+                return render_template("views/platform-admin/get-dvla-billing-report.html", form=form)
+            else:
+                raise e
+        rows = [
+            [
+                r["date"],
+                r["postage"],
+                r["cost_threshold"],
+                r["sheets"],
+                r["rate"],
+                r["letters"],
+                r["cost"],
+            ]
+            for r in result
+        ]
+        if rows:
+            return (
+                Spreadsheet.from_rows([headers] + rows).as_csv_data,
+                200,
+                {
+                    "Content-Type": "text/csv; charset=utf-8",
+                    "Content-Disposition": 'attachment; filename="DVLA Billing Report from {} to {}.csv"'.format(
+                        start_date, end_date
+                    ),
+                },
+            )
+        else:
+            flash("No results for dates")
+    return render_template("views/platform-admin/get-dvla-billing-report.html", form=form)
+
+
 @main.route("/platform-admin/reports/volumes-by-service", methods=["GET", "POST"])
 @user_is_platform_admin
 def get_volumes_by_service():
