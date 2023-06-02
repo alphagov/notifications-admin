@@ -15,6 +15,7 @@ from tests import (
     NotifyBeautifulSoup,
     sample_uuid,
     template_json,
+    template_version_json,
     validate_route_permission,
 )
 from tests.app.main.views.test_template_folders import (
@@ -641,7 +642,7 @@ def test_user_with_only_send_and_view_sees_letter_page(
     fake_uuid,
     permissions,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
     active_user_with_permissions["permissions"][SERVICE_ONE_ID] = permissions
     client_request.login(active_user_with_permissions)
     page = client_request.get(
@@ -683,7 +684,7 @@ def test_letter_with_default_branding_has_add_logo_button(
     expected_link,
     expected_link_text,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
     service_one["permissions"] += ["letter"]
     service_one["letter_branding"] = letter_branding
 
@@ -719,7 +720,7 @@ def test_view_letter_template_displays_postage(
     template_postage,
     expected_result,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
     client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -762,7 +763,7 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
     mocker,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=11)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=11)
     client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -794,7 +795,7 @@ def test_view_letter_template_has_attach_pages_button(
     template_type,
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
     client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -897,15 +898,24 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
 
 
 def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
-    mocker, client_request, fake_uuid, service_one, mock_get_template_version
+    mocker,
+    client_request,
+    api_user_active,
+    fake_uuid,
+    service_one,
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mocker.patch("app.main.views.templates.upload_letter_to_s3")
-
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": template_version_json(SERVICE_ONE_ID, fake_uuid, api_user_active, version=1, type_="letter")
+        },
+    )
     mocker.patch("app.main.views.templates.sanitise_letter")
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=9)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
 
     with open("tests/test_pdf_files/multi_page_pdf.pdf", "rb") as file:
         page = client_request.post(
@@ -944,7 +954,7 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     mock_sanitise = mocker.patch("app.main.views.templates.sanitise_letter")
 
     # page count for letter template on redirect page
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     # page count for the attachment
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
@@ -987,7 +997,7 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
     mock_sanitise = mocker.patch("app.main.views.templates.sanitise_letter")
 
     # page count for letter template on redirect page
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     # page count for the attachment
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
@@ -1257,7 +1267,7 @@ def test_should_be_able_to_view_a_letter_template_with_links(
     single_letter_contact_block,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(
         "main.view_template",
@@ -1436,7 +1446,7 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
     contact_block_data,
     expected_partial_url,
 ):
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
     mocker.patch("app.service_api_client.get_letter_contacts", return_value=contact_block_data)
 
     page = client_request.get(
@@ -2760,7 +2770,7 @@ def test_should_not_show_redaction_stuff_for_letters(
     single_letter_contact_block,
 ):
 
-    mocker.patch("app.main.views.templates.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(
         "main.view_template",

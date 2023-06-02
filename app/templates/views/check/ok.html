@@ -21,7 +21,7 @@
 
   {{ page_header('Preview of {}'.format(template.name)) }}
 
-  {% if letter_too_long %}
+  {% if template.too_many_pages %}
     {% call banner_wrapper(type='dangerous') %}
         {% include "partials/check/letter-too-long.html" %}
     {% endcall %}
@@ -47,7 +47,7 @@
           }
         }) }}
       {% endif %}
-      {% if (template.template_type != 'letter' or not request.args.from_test) and not letter_too_long %}
+      {% if (template.template_type != 'letter' or not request.args.from_test) and not template.too_many_pages %}
         {% set button_text %}
           Send {{ count_of_recipients|message_count(template.template_type) }}
         {% endset %}

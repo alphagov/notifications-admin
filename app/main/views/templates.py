@@ -16,8 +16,8 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
-from notifications_utils.pdf import is_letter_too_long, pdf_page_count
+from notifications_utils import SMS_CHAR_COUNT_LIMIT
+from notifications_utils.pdf import pdf_page_count
 from PyPDF2.errors import PdfReadError
 from requests import RequestException
 
@@ -55,7 +55,6 @@ from app.s3_client.s3_letter_upload_client import (
 )
 from app.template_previews import (
     TemplatePreview,
-    get_page_count_for_letter,
     sanitise_letter,
 )
 from app.utils import (
@@ -106,15 +105,10 @@ def view_template(service_id, template_id):
     if should_skip_template_page(template):
         return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
-    template.page_count = get_page_count_for_letter(template._template)
-
     return render_template(
         "views/templates/template.html",
         template=template,
         user_has_template_permission=user_has_template_permission,
-        letter_too_long=is_letter_too_long(template.page_count),
-        letter_max_pages=LETTER_MAX_PAGE_COUNT,
-        page_count=template.page_count,
         show_manage_attachment_button=template.get_raw("letter_attachment") is not None,
     )
 
@@ -1045,13 +1039,13 @@ def _process_letter_attachment_form(service_id, template, form):
 
         raise
 
-    template_page_count = get_page_count_for_letter(template)
-    if attachment_page_count + template_page_count > 10:
+    if attachment_page_count + template.page_count > template.max_page_count:
         raise LetterAttachmentFormError(
             detail=(
-                "Letters must be 10 pages or less (5 double-sided sheets of paper). "
+                f"Letters must be {template.max_page_count} pages or less "
+                f"({template.max_sheet_count} double-sided sheets of paper). "
                 "In total, your letter template and the file you attached are "
-                f"{template_page_count + attachment_page_count} pages long."
+                f"{template.page_count + attachment_page_count} pages long."
             )
         )
 

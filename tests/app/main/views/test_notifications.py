@@ -249,10 +249,7 @@ def test_notification_page_shows_page_for_letter_notification(
 
     notification = create_notification(notification_status="created", template_type="letter", postage="second")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-
-    mock_page_count = mocker.patch(
-        "app.main.views.notifications.get_page_count_for_letter", return_value=count_of_pages
-    )
+    mock_page_count = mocker.patch("app.template_previews.get_page_count_for_letter", return_value=count_of_pages)
 
     page = client_request.get(
         "main.view_notification",
@@ -280,7 +277,7 @@ def test_notification_page_shows_page_for_letter_notification(
 
     assert len(mock_page_count.call_args_list) == 1
     assert mock_page_count.call_args_list[0][0][0]["name"] == "sample template"
-    assert mock_page_count.call_args_list[0][1]["values"] == {"name": "Jo"}
+    assert mock_page_count.call_args_list[0][0][1] == {"name": "Jo"}
 
 
 @freeze_time("2020-01-01 00:00")
@@ -295,7 +292,7 @@ def test_notification_page_shows_uploaded_letter(
     )
     mocker.patch("app.main.views.notifications.pdf_page_count", return_value=1)
     mocker.patch(
-        "app.main.views.notifications.get_page_count_for_letter",
+        "app.template_previews.get_page_count_for_letter",
         return_value=1,
     )
 
@@ -354,9 +351,8 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
         )
 
     mocker.patch("app.main.views.notifications.pdf_page_count", return_value=1)
-
     mocker.patch(
-        "app.main.views.notifications.get_page_count_for_letter",
+        "app.template_previews.get_page_count_for_letter",
         return_value=1,
     )
 
@@ -399,7 +395,7 @@ def test_notification_page_shows_validation_failed_precompiled_letter(
     }
     mocker.patch("app.main.views.notifications.get_letter_file_data", return_value=("some letter content", metadata))
     mocker.patch(
-        "app.main.views.notifications.get_page_count_for_letter",
+        "app.template_previews.get_page_count_for_letter",
         return_value=1,
     )
 
@@ -449,7 +445,7 @@ def test_notification_page_shows_cancelled_or_failed_letter(
     notification = create_notification(template_type="letter", notification_status=notification_status)
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
     mocker.patch(
-        "app.main.views.notifications.get_page_count_for_letter",
+        "app.template_previews.get_page_count_for_letter",
         return_value=1,
     )
 
@@ -497,7 +493,7 @@ def test_notification_page_shows_cancel_link_for_letter_which_can_be_cancelled(
     notification = create_notification(template_type="letter", notification_status="created")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
 
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(
         "main.view_notification",
@@ -516,8 +512,7 @@ def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_
 ):
     notification = create_notification(template_type="letter")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(
         "main.view_notification",
@@ -567,7 +562,7 @@ def test_notification_page_shows_page_for_other_postage_classes(
         postage=postage,
     )
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=3)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=3)
 
     page = client_request.get(
         "main.view_notification",
@@ -644,7 +639,7 @@ def test_should_show_image_of_templated_letter_notification_that_failed_validati
 ):
     notification = create_notification(notification_status="validation-failed", template_type="letter")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=11)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=11)
 
     page = client_request.get(
         "main.view_notification",
@@ -743,7 +738,7 @@ def test_notification_page_has_link_to_send_another_for_sms(
     service_one["permissions"] = service_permissions
     notification = create_notification(template_type=template_type)
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(
         "main.view_notification",
@@ -787,7 +782,7 @@ def test_notification_page_has_link_to_download_letter(
 ):
     notification = create_notification(template_type=template_type)
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(
         "main.view_notification",
@@ -824,7 +819,7 @@ def test_notification_page_has_expected_template_link_for_letter(
 
     notification = create_notification(template_type="letter", is_precompiled_letter=is_precompiled_letter)
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(
         "main.view_notification",
@@ -873,7 +868,7 @@ def test_show_cancel_letter_confirmation(
 ):
     notification = create_notification(template_type="letter", notification_status="created")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(
         "main.cancel_letter",
@@ -894,7 +889,7 @@ def test_cancelling_a_letter_calls_the_api(
 ):
     notification = create_notification(template_type="letter", notification_status="created")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
     cancel_endpoint = mocker.patch(
         "app.main.views.notifications.notification_api_client.update_notification_to_cancelled"
     )
@@ -922,7 +917,7 @@ def test_cancelling_a_letter_calls_the_api(
 def test_cancel_letter_catches_errors_from_API(client_request, mocker, fake_uuid, error_message):
     notification = create_notification(template_type="letter", notification_status="created")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocker.patch("app.main.views.notifications.get_page_count_for_letter", return_value=1)
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
     mocker.patch(
         "app.main.views.notifications.notification_api_client.update_notification_to_cancelled",
         side_effect=HTTPError(response=Mock(status_code=400, json=Mock(return_value={"message": error_message}))),

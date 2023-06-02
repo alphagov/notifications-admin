@@ -14,9 +14,8 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils import LETTER_MAX_PAGE_COUNT, SMS_CHAR_COUNT_LIMIT
+from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.insensitive_dict import InsensitiveDict
-from notifications_utils.pdf import is_letter_too_long
 from notifications_utils.postal_address import PostalAddress, address_lines_1_to_7_keys
 from notifications_utils.recipients import RecipientCSV, first_column_headings
 from notifications_utils.sanitise_text import SanitiseASCII
@@ -46,7 +45,7 @@ from app.s3_client.s3_csv_client import (
     s3upload,
     set_metadata_on_csv_upload,
 )
-from app.template_previews import TemplatePreview, get_page_count_for_letter
+from app.template_previews import TemplatePreview
 from app.utils import PermanentRedirect, should_skip_template_page, unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.templates import get_template
@@ -344,8 +343,6 @@ def send_one_off_letter_address(service_id, template_id):
 
     session_placeholders = get_normalised_placeholders_from_session()
 
-    template.page_count = get_page_count_for_letter(template._template, session_placeholders)
-
     current_session_address = PostalAddress.from_personalisation(session_placeholders)
 
     form = LetterAddressForm(
@@ -419,8 +416,6 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
         template.show_sender = bool(template.sender)
 
     template_values = get_recipient_and_placeholders_from_session(template.template_type)
-
-    template.page_count = get_page_count_for_letter(template._template, values=template_values)
 
     placeholders = fields_to_fill_in(template)
 
@@ -600,11 +595,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         template.sender = get_sms_sender_from_session()
         template.show_sender = bool(template.sender)
 
-    # In this case, we don't provide template values when calculating the page count
-    # because we don't know them at this point. It means that later on we will need to
-    # recalculate the page count once we have the values
-    template.page_count = get_page_count_for_letter(template._template)
-
     recipients = RecipientCSV(
         contents,
         template=template,
@@ -636,7 +626,6 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
     elif preview_row > 2:
         abort(404)
 
-    template.page_count = get_page_count_for_letter(template._template, template.values)
     original_file_name = get_csv_metadata(service_id, upload_id).get("original_file_name", "")
 
     return dict(
@@ -663,11 +652,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         sent_previously=job_api_client.has_sent_previously(
             service_id, template.id, template.get_raw("version"), original_file_name
         ),
-        letter_too_long=is_letter_too_long(template.page_count),
-        letter_max_pages=LETTER_MAX_PAGE_COUNT,
         letter_min_address_lines=PostalAddress.MIN_LINES,
         letter_max_address_lines=PostalAddress.MAX_LINES,
-        page_count=template.page_count,
     )
 
 
@@ -921,8 +907,6 @@ def _check_notification(service_id, template_id, exception=None):
         template.sender = get_sms_sender_from_session()
         template.show_sender = bool(template.sender)
 
-    template.page_count = get_page_count_for_letter(template._template)
-
     placeholders = fields_to_fill_in(template)
 
     back_link = get_back_link(service_id, template, len(placeholders), placeholders)
@@ -933,14 +917,10 @@ def _check_notification(service_id, template_id, exception=None):
         raise PermanentRedirect(back_link)
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
-    page_count = get_page_count_for_letter(template._template, template.values)
-    template.page_count = page_count
+
     return dict(
         template=template,
         back_link=back_link,
-        letter_too_long=is_letter_too_long(page_count),
-        letter_max_pages=LETTER_MAX_PAGE_COUNT,
-        page_count=page_count,
         **(get_template_error_dict(exception) if exception else {}),
     )
 

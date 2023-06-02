@@ -1,9 +1,51 @@
 from notifications_utils.template import (
     BroadcastPreviewTemplate,
     EmailPreviewTemplate,
-    LetterImageTemplate,
     SMSPreviewTemplate,
 )
+from notifications_utils.template import LetterImageTemplate as UtilsLetterImageTemplate
+
+
+class PrecompiledLetterImageTemplate(UtilsLetterImageTemplate):
+    pass
+
+
+class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
+    def __init__(
+        self,
+        template,
+        values=None,
+        image_url=None,
+        contact_block=None,
+        postage=None,
+    ):
+        super().__init__(
+            template,
+            values=values,
+            image_url=image_url,
+            page_count=1,
+            contact_block=contact_block,
+            postage=postage,
+        )
+        self._page_count = None
+
+    @property
+    def page_count(self):
+        from app.template_previews import get_page_count_for_letter
+
+        if self._page_count is None:
+            self._page_count = get_page_count_for_letter(self._template, self.values)
+        return self._page_count
+
+    @property
+    def values(self):
+        return super().values
+
+    @values.setter
+    def values(self, value):
+        # If the personalisation changes then we might need to recalculate the page count
+        self._page_count = None
+        super(UtilsLetterImageTemplate, type(self)).values.fset(self, value)
 
 
 def get_sample_template(template_type):
@@ -12,8 +54,8 @@ def get_sample_template(template_type):
     if template_type == "sms":
         return SMSPreviewTemplate({"content": "any", "template_type": "sms"})
     if template_type == "letter":
-        return LetterImageTemplate(
-            {"content": "any", "subject": "", "template_type": "letter"}, postage="second", page_count=1
+        return TemplatedLetterImageTemplate(
+            {"content": "any", "subject": "", "template_type": "letter"}, postage="second"
         )
 
 
@@ -22,7 +64,7 @@ def get_template(
     service,
     show_recipient=False,
     letter_preview_url=None,
-    page_count=1,
+    page_count=None,
     redact_missing_personalisation=False,
     email_reply_to=None,
     sms_sender=None,
@@ -47,10 +89,16 @@ def get_template(
             redact_missing_personalisation=redact_missing_personalisation,
         )
     if "letter" == template["template_type"]:
-        return LetterImageTemplate(
+        if template.get("is_precompiled_letter"):
+            return PrecompiledLetterImageTemplate(
+                template,
+                image_url=letter_preview_url,
+                postage=template["postage"],
+                page_count=page_count,
+            )
+        return TemplatedLetterImageTemplate(
             template,
             image_url=letter_preview_url,
-            page_count=int(page_count),
             contact_block=template["reply_to_text"],
             postage=template["postage"],
         )
