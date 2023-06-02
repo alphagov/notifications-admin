@@ -3966,6 +3966,42 @@ def test_send_notification_shows_error_if_400(
     assert not page.select_one("input[type=submit]")
 
 
+def test_send_notification_shows_error_if_400_for_letters(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+    mock_get_service_letter_template,
+):
+    service_one["restricted"] = False
+
+    class MockHTTPError(HTTPError):
+        message = SERVICE_DAILY_LIMIT_MSG
+
+    mocker.patch(
+        "app.notification_api_client.send_notification",
+        side_effect=MockHTTPError(),
+    )
+
+    mocker.patch("app.main.views.send.get_page_count_for_letter", return_value=1)
+
+    with client_request.session_transaction() as session:
+        session["recipient"] = "Firstname Lastname"
+        session["placeholders"] = {
+            "address line 1": "Firstname Lastname",
+            "address line 2": "123 Example Street",
+            "address line 3": "SW1A 1AA",
+        }
+
+    page = client_request.post(
+        "main.send_notification", service_id=SERVICE_ONE_ID, template_id=fake_uuid, _expected_status=200
+    )
+
+    assert normalize_spaces(page.select_one(".banner-dangerous h1").text) == "Daily limit reached"
+    assert normalize_spaces(page.select_one(".banner-dangerous p").text) == "You can only send 1,000 letters per day."
+    assert not page.select_one("input[type=submit]")
+
+
 def test_send_notification_shows_email_error_in_trial_mode(
     client_request,
     fake_uuid,
