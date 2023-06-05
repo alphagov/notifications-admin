@@ -773,7 +773,8 @@ def test_user_access_denied_to_template_actions_without_folder_permission(
 ):
 
     mock = mocker.patch(
-        "app.models.service.Service.get_template_with_user_permission_or_403", side_effect=lambda *args: abort(403)
+        "app.models.service.Service.get_template_with_user_permission_or_403",
+        side_effect=lambda *args, **kwargs: abort(403),
     )
 
     template_id = str(uuid.uuid4())
@@ -784,8 +785,11 @@ def test_user_access_denied_to_template_actions_without_folder_permission(
         _expected_status=403,
         _test_page_title=False,
     )
-
-    mock.assert_called_once_with(template_id, User(active_user_with_permissions))
+    assert len(mock.call_args_list) == 1
+    assert mock.call_args[0][0] == template_id
+    assert mock.call_args[0][1] == User(active_user_with_permissions)
+    # In some cases `get_template_with_user_permission_or_403` will also be called with
+    # `letter_preview_url` so we can’t assert on the complete `call_args` here
 
 
 def test_rename_folder(client_request, active_user_with_permissions, service_one, mock_get_template_folders, mocker):

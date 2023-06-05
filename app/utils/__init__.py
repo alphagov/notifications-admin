@@ -89,12 +89,12 @@ def unicode_truncate(s, length):
     return encoded.decode("utf-8", "ignore")
 
 
-def should_skip_template_page(db_template):
+def should_skip_template_page(template):
     return (
         current_user.has_permissions("send_messages")
         and not current_user.has_permissions("manage_templates", "manage_api_keys")
-        and db_template["template_type"] != "letter"
-        and not db_template["archived"]
+        and template.template_type != "letter"
+        and not template.get_raw("archived")
     )
 
 

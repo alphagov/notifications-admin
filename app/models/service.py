@@ -18,6 +18,7 @@ from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.utils import get_default_sms_sender
 from app.utils.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
+from app.utils.templates import get_template
 
 
 class Service(JSONModel):
@@ -208,8 +209,9 @@ class Service(JSONModel):
     def all_template_ids(self):
         return {template["id"] for template in self.all_templates}
 
-    def get_template(self, template_id, version=None):
-        return service_api_client.get_service_template(self.id, template_id, version)["data"]
+    def get_template(self, template_id, version=None, **kwargs):
+        template = service_api_client.get_service_template(self.id, template_id, version)["data"]
+        return get_template(template, service=self, **kwargs)
 
     def get_template_folder_with_user_permission_or_403(self, folder_id, user):
         template_folder = self.get_template_folder(folder_id)
@@ -219,10 +221,10 @@ class Service(JSONModel):
 
         return template_folder
 
-    def get_template_with_user_permission_or_403(self, template_id, user):
-        template = self.get_template(template_id)
+    def get_template_with_user_permission_or_403(self, template_id, user, **kwargs):
+        template = self.get_template(template_id, **kwargs)
 
-        self.get_template_folder_with_user_permission_or_403(template["folder"], user)
+        self.get_template_folder_with_user_permission_or_403(template.get_raw("folder"), user)
 
         return template
 
