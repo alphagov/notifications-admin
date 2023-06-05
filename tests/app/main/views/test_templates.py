@@ -1863,6 +1863,34 @@ def test_cant_copy_template_from_non_member_service(
     assert mock_get_service_email_template.call_args_list == []
 
 
+def test_post_copy_template(
+    mocker,
+    client_request,
+    mock_get_service_email_template,
+    mock_get_organisations_and_services_for_user,
+    mock_create_service_template,
+):
+    client_request.post(
+        "main.copy_template",
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        _data={
+            "name": "template (copy)",
+            "subject": "some email",
+            "template_content": "this is a copy of that other template",
+            "template_type": "sms",
+            "service": SERVICE_ONE_ID,
+        },
+        _expected_status=302,
+    )
+    assert mock_create_service_template.call_args_list == [
+        mocker.call(
+            "template (copy)", "email", "this is a copy of that other template", SERVICE_ONE_ID, "some email", None
+        )
+    ]
+
+
 @pytest.mark.parametrize(
     "template_type, expected_page_heading",
     [

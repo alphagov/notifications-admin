@@ -402,7 +402,7 @@ def copy_template(service_id, template_id):
         abort(403)
 
     if request.method == "POST":
-        return add_service_template(service_id, template.template_type)
+        return add_service_template(service_id, template["template_type"])
 
     template["template_content"] = template["content"]
     template["name"] = _get_template_copy_name(template, current_service.all_templates)
