@@ -7,7 +7,13 @@ from notifications_utils.template import LetterImageTemplate as UtilsLetterImage
 
 
 class PrecompiledLetterImageTemplate(UtilsLetterImageTemplate):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Override pre compiled letter template postage to None as it has not
+        # yet been picked even though the pre compiled letter template has its
+        # postage set as second class as the DB currently requires a non null
+        # value of postage for letter templates
+        self.postage = None
 
 
 class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
@@ -17,7 +23,6 @@ class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
         values=None,
         image_url=None,
         contact_block=None,
-        postage=None,
     ):
         super().__init__(
             template,
@@ -25,7 +30,6 @@ class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
             image_url=image_url,
             page_count=1,
             contact_block=contact_block,
-            postage=postage,
         )
         self._page_count = None
 
@@ -91,14 +95,12 @@ def get_template(
             return PrecompiledLetterImageTemplate(
                 template,
                 image_url=letter_preview_url,
-                postage=template["postage"],
                 page_count=page_count,
             )
         return TemplatedLetterImageTemplate(
             template,
             image_url=letter_preview_url,
             contact_block=template["reply_to_text"],
-            postage=template["postage"],
         )
     if "broadcast" == template["template_type"]:
         return BroadcastPreviewTemplate(

@@ -266,10 +266,6 @@ def uploaded_letter_preview(service_id, file_id):
 
     error_message = get_letter_validation_error(error_shortcode, invalid_pages, page_count)
     template_dict = service_api_client.get_precompiled_template(service_id)
-    # Override pre compiled letter template postage to none as it has not yet been picked even though
-    # the pre compiled letter template has its postage set as second class as the DB currently requires
-    # a non null value of postage for letter templates
-    template_dict["postage"] = None
 
     form = LetterUploadPostageForm(postage_zone=postal_address.postage)
 
