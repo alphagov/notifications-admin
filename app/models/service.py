@@ -228,6 +228,14 @@ class Service(JSONModel):
 
         return template
 
+    def get_precompiled_letter_template(self, *, letter_preview_url, page_count):
+        return get_template(
+            service_api_client.get_precompiled_template(self.id),
+            self,
+            letter_preview_url=letter_preview_url,
+            page_count=page_count,
+        )
+
     @property
     def available_template_types(self):
         return list(filter(self.has_permission, self.TEMPLATE_TYPES))

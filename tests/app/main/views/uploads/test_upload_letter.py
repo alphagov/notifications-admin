@@ -57,7 +57,7 @@ def test_post_upload_letter_redirects_for_valid_file(
             }
         ),
     )
-    mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template")
+    mocker.patch("app.models.service.service_api_client.get_precompiled_template")
 
     service_one["restricted"] = False
     service_one["permissions"] += extra_permissions
@@ -143,7 +143,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
             }
         ),
     )
-    mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template", return_value=letter_template)
+    mocker.patch("app.models.service.service_api_client.get_precompiled_template", return_value=letter_template)
 
     service_one["restricted"] = False
     client_request.login(active_user_with_permissions, service=service_one)
@@ -209,7 +209,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
             }
         ),
     )
-    mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template", return_value=letter_template)
+    mocker.patch("app.models.service.service_api_client.get_precompiled_template", return_value=letter_template)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     service_one["restricted"] = False
@@ -343,7 +343,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
     mocker.patch("app.main.views.uploads.sanitise_letter", return_value=mock_sanitise_response)
-    mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template")
+    mocker.patch("app.models.service.service_api_client.get_precompiled_template")
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
         return_value=LetterMetadata(
@@ -398,7 +398,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "template preview error", "recipient_address": "The Queen"}
     mocker.patch("app.main.views.uploads.sanitise_letter", return_value=mock_sanitise_response)
-    mocker.patch("app.main.views.uploads.service_api_client.get_precompiled_template", return_value=letter_template)
+    mocker.patch("app.models.service.service_api_client.get_precompiled_template", return_value=letter_template)
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
         return_value=LetterMetadata(
@@ -459,7 +459,7 @@ def test_uploaded_letter_preview(
     client_request,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.uploads.service_api_client")
+    mocker.patch("app.models.service.service_api_client.get_precompiled_template")
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
         return_value=LetterMetadata(
@@ -493,7 +493,7 @@ def test_uploaded_letter_preview_does_not_show_send_button_if_service_in_trial_m
     client_request,
     fake_uuid,
 ):
-    mocker.patch("app.main.views.uploads.service_api_client")
+    mocker.patch("app.models.service.service_api_client.get_precompiled_template")
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
         return_value=LetterMetadata(
