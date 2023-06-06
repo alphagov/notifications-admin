@@ -627,7 +627,6 @@ def edit_service_template(service_id, template_id):
             "template_type": template.template_type,
             "id": template.id,
             "reply_to_text": template.get_raw("reply_to_text"),
-            "postage": None,
         }
 
         new_template = get_template(new_template_data, current_service)
@@ -889,7 +888,6 @@ def edit_template_postage(service_id, template_id):
         form=form,
         service_id=service_id,
         template_id=template_id,
-        template_postage=template.get_raw("postage"),
     )
 
 
