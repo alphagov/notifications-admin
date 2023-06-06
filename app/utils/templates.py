@@ -28,10 +28,8 @@ class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
             template,
             values=values,
             image_url=image_url,
-            page_count=1,
             contact_block=contact_block,
         )
-        self._page_count = None
 
     @property
     def page_count(self):
