@@ -6,6 +6,7 @@ from flask import url_for
 from notifications_utils.formatters import unescaped_formatted_list
 from notifications_utils.letter_timings import letter_can_be_cancelled
 from notifications_utils.postal_address import PostalAddress
+from notifications_utils.template import BaseLetterTemplate
 from notifications_utils.timezones import (
     convert_bst_to_utc,
     convert_utc_to_bst,
@@ -81,12 +82,14 @@ LETTER_VALIDATION_MESSAGES = {
     "letter-too-long": {
         "title": "Your letter is too long",
         "detail": (
-            "Letters must be 10 pages or less (5 double-sided sheets of paper). <br>"
+            f"Letters must be {BaseLetterTemplate.max_page_count} pages or less "
+            f"({BaseLetterTemplate.max_sheet_count} double-sided sheets of paper). <br>"
             "Your letter is {page_count} pages long."
         ),
         "summary": (
             "Validation failed because this letter is {page_count} pages long.<br>"
-            "Letters must be 10 pages or less (5 double-sided sheets of paper)."
+            f"Letters must be {BaseLetterTemplate.max_page_count} pages or less "
+            f"({BaseLetterTemplate.max_sheet_count} double-sided sheets of paper)."
         ),
     },
     "no-encoded-string": {"title": "Sanitise failed - No encoded string"},

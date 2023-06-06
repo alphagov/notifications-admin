@@ -117,6 +117,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
         "postage": "second",
         "subject": "hi",
         "content": "my letter",
+        "is_precompiled_letter": True,
     }
 
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
@@ -183,6 +184,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
         "postage": "second",
         "subject": "hi",
         "content": "my letter",
+        "is_precompiled_letter": True,
     }
 
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
@@ -386,6 +388,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
         "postage": "first",
         "subject": "hi",
         "content": "my letter",
+        "is_precompiled_letter": True,
     }
 
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
