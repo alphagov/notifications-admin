@@ -239,6 +239,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         endpoint = f"/service/{service_id}/template/{template_id}/versions"
         return self.get(endpoint)
 
+    @cache.set("service-{service_id}-template-precompiled")
     def get_precompiled_template(self, service_id):
         """
         Returns the precompiled template for a service, creating it if it doesn't already exist
