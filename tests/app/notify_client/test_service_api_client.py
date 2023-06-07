@@ -94,11 +94,18 @@ def test_client_creates_service_with_correct_data(
 
 
 def test_get_precompiled_template(mocker):
+    mock_redis_set = mocker.patch("app.extensions.RedisClient.set")
+
     client = ServiceAPIClient()
-    mock_get = mocker.patch.object(client, "get")
+    mock_get = mocker.patch.object(client, "get", return_value={"data": "foo"})
 
     client.get_precompiled_template(SERVICE_ONE_ID)
     mock_get.assert_called_once_with(f"/service/{SERVICE_ONE_ID}/template/precompiled")
+    mock_redis_set.assert_called_once_with(
+        f"service-{SERVICE_ONE_ID}-template-precompiled",
+        '{"data": "foo"}',
+        ex=604800,
+    )
 
 
 @pytest.mark.parametrize(
