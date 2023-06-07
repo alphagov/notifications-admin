@@ -1091,7 +1091,7 @@ def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
         template_id=sample_uuid(),
         _expected_status=200,
     )
-    assert page.select_one("#filename").text.strip() == "original file.pdf"
+    assert page.select_one("h1").text.strip() == "original file.pdf"
 
 
 def test_post_delete_letter_attachment_calls_archive_letter_attachment(
@@ -1139,7 +1139,7 @@ def test_get_delete_letter_attachment_shows_confirmation(
         _expected_status=200,
     )
     mock_flash.assert_called_once_with("Are you sure you want to remove the ‘original file.pdf’ attachment?", "remove")
-    assert page.select_one("#filename").text.strip() == "original file.pdf"
+    assert page.select_one("h1").text.strip() == "original file.pdf"
 
 
 def test_edit_letter_template_postage_page_displays_correctly(

@@ -6,7 +6,7 @@
 {% from "components/file-upload.html" import file_upload %}
 
 
-{% set page_title = "Manage attached pages" %}
+{% set page_title = template.attachment.original_filename %}
 
 {% block service_page_title %}
     {{ page_title }}
@@ -30,7 +30,6 @@
         {{ page_header(page_title) }}
     {% endif %}
 
-    <h3 class="govuk-heading-m govuk-!-font-weight-bold" id="filename">{{template.attachment.original_filename}}</h3>
     <div class="govuk-body">
     {{ file_upload(
         form.file,
