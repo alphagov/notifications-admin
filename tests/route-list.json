@@ -97,6 +97,7 @@
     "/platform-admin/reports",
     "/platform-admin/reports/daily-sms-provider-volumes-report",
     "/platform-admin/reports/daily-volumes-report",
+    "/platform-admin/reports/dvla-billing",
     "/platform-admin/reports/live-services.csv",
     "/platform-admin/reports/notifications-sent-by-service",
     "/platform-admin/reports/usage-for-all-services",

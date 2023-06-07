@@ -970,6 +970,77 @@ def test_get_billing_report_calls_api_and_download_data(client_request, platform
     )
 
 
+class TestGetDvlaBillingReport:
+    def test_when_no_results_for_date(self, client_request, platform_admin_user, mocker):
+        client_request.login(platform_admin_user)
+
+        mocker.patch(
+            "app.main.views.platform_admin.billing_api_client.get_data_for_dvla_billing_report", return_value=[]
+        )
+
+        page = client_request.post(
+            "main.get_dvla_billing_report",
+            _expected_status=200,
+            _data={"start_date": "2023-06-01", "end_date": "2023-06-01"},
+        )
+
+        error = page.select_one(".banner-dangerous")
+        assert normalize_spaces(error.text) == "No results for dates"
+
+    def test_calls_api_and_downloads_data(self, client_request, platform_admin_user, mocker):
+        mocker.patch(
+            "app.main.views.platform_admin.billing_api_client.get_data_for_dvla_billing_report",
+            return_value=[
+                {
+                    "date": "2023-06-01",
+                    "postage": "first",
+                    "cost_threshold": "sorted",
+                    "sheets": 1,
+                    "rate": 1.0,
+                    "letters": 10,
+                    "cost": 10.0,
+                },
+                {
+                    "date": "2023-06-01",
+                    "postage": "second",
+                    "cost_threshold": "sorted",
+                    "sheets": 1,
+                    "rate": 0.5,
+                    "letters": 50,
+                    "cost": 25.0,
+                },
+                {
+                    "date": "2023-06-01",
+                    "postage": "second",
+                    "cost_threshold": "unsorted",
+                    "sheets": 3,
+                    "rate": 0.75,
+                    "letters": 5,
+                    "cost": 3.75,
+                },
+            ],
+        )
+
+        client_request.login(platform_admin_user)
+        response = client_request.post_response(
+            "main.get_dvla_billing_report",
+            _data={"start_date": "2023-06-01", "end_date": "2023-06-01"},
+            _expected_status=200,
+        )
+
+        assert response.content_type == "text/csv; charset=utf-8"
+        assert response.headers["Content-Disposition"] == (
+            'attachment; filename="DVLA Billing Report from 2023-06-01 to 2023-06-01.csv"'
+        )
+
+        assert response.get_data(as_text=True) == (
+            "despatch date,postage,DVLA cost threshold,sheets,rate (£),letters,cost (£)\r\n"
+            "2023-06-01,first,sorted,1,1.0,10,10.0\r\n"
+            "2023-06-01,second,sorted,1,0.5,50,25.0\r\n"
+            "2023-06-01,second,unsorted,3,0.75,5,3.75\r\n"
+        )
+
+
 def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
     mocker,
     client_request,
