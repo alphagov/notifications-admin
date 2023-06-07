@@ -122,6 +122,10 @@ def render_govuk_frontend_macro(component, params):
             "path": "govuk_frontend_jinja_overrides/templates/components/radios-with-images/macro.html",
             "macro": "govukRadiosWithImages",
         },
+        "nested-radios": {
+            "path": "govuk_frontend_jinja_overrides/templates/components/nested-radios/macro.html",
+            "macro": "govukNestedRadios",
+        },
         "text-input": {"path": "govuk_frontend_jinja/components/input/macro.html", "macro": "govukInput"},
         "textarea": {"path": "govuk_frontend_jinja/components/textarea/macro.html", "macro": "govukTextarea"},
         "checkbox": {
