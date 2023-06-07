@@ -1097,6 +1097,3 @@ def _save_letter_attachment(*, service_id, template_id, upload_id, original_file
         template_id=template_id,
         service_id=service_id,
     )
-
-    pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
-    flash(f"You have attached {pages_content} to the end of your letter", "default_with_tick")

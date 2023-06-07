@@ -1061,7 +1061,6 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
     mock_upload = mocker.patch("app.main.views.templates.upload_letter_attachment_to_s3")
     mock_backup = mocker.patch("app.main.views.templates.backup_original_letter_to_s3")
     mock_save_to_db = mocker.patch("app.letter_attachment_client.create_letter_attachment")
-    mock_flash = mocker.patch("app.main.views.templates.flash")
 
     g.current_service = Service(service_one)
 
@@ -1087,8 +1086,6 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
         page_count=attachment_page_count,
         original_filename="foo.pdf",
     )
-
-    mock_flash.assert_called_once_with("You have attached 3 pages to the end of your letter", "default_with_tick")
 
 
 def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
