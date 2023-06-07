@@ -17,20 +17,6 @@ class PrecompiledLetterImageTemplate(UtilsLetterImageTemplate):
 
 
 class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
-    def __init__(
-        self,
-        template,
-        values=None,
-        image_url=None,
-        contact_block=None,
-    ):
-        super().__init__(
-            template,
-            values=values,
-            image_url=image_url,
-            contact_block=contact_block,
-        )
-
     @property
     def page_count(self):
         from app.template_previews import get_page_count_for_letter
