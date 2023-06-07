@@ -838,7 +838,7 @@ def test_GET_letter_template_attach_pages(
     assert page.select_one("input.file-upload-field")
     assert page.select_one("input.file-upload-field")["accept"] == ".pdf"
     assert page.select("form button")
-    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose a file"
 
     mock_get_service_letter_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, None)
 
