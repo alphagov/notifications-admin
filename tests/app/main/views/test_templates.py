@@ -823,7 +823,9 @@ def test_view_letter_template_has_attach_pages_button(
         assert not template_container
 
 
-def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mocker, mock_get_template_version):
+def test_GET_letter_template_attach_pages(
+    client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
+):
     service_one["permissions"] = ["extra_letter_formatting"]
 
     page = client_request.get(
@@ -837,6 +839,8 @@ def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid
     assert page.select_one("input.file-upload-field")["accept"] == ".pdf"
     assert page.select("form button")
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
+
+    mock_get_service_letter_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
 def test_GET_letter_template_attach_pages_404s_if_invalid_template_id(client_request, service_one, fake_uuid, mocker):
@@ -852,7 +856,7 @@ def test_GET_letter_template_attach_pages_404s_if_invalid_template_id(client_req
 
 
 def test_post_attach_pages_errors_when_content_outside_printable_area(
-    mocker, client_request, fake_uuid, service_one, mock_get_template_version
+    mocker, client_request, fake_uuid, service_one, mock_get_service_letter_template
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("uuid.uuid4", return_value=fake_uuid)

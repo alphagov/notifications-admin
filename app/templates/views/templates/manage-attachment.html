@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block backLink %}
-    {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
+    {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -30,12 +30,12 @@
         {{ page_header(page_title) }}
     {% endif %}
 
-    <h3 class="govuk-heading-m govuk-!-font-weight-bold" id="filename">{{attachment_filename}}</h3>
+    <h3 class="govuk-heading-m govuk-!-font-weight-bold" id="filename">{{template.attachment.original_filename}}</h3>
     <div class="govuk-body">
     {{ file_upload(
         form.file,
         allowed_file_extensions=['pdf'],
-        action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template_id),
+        action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id),
         button_text='Upload your file again' if error else 'Choose different file',
         show_errors=False
     )}}
@@ -47,7 +47,7 @@
     <div class="govuk-!-margin-bottom-2">
       <div class="js-stick-at-bottom-when-scrolling">
         {{ page_footer(
-            delete_link=url_for('main.letter_template_edit_pages', template_id=template_id, service_id=service_id),
+            delete_link=url_for('main.letter_template_edit_pages', template_id=template.id, service_id=service_id),
             delete_link_text='Remove attachment'
         ) }}
       </div>
