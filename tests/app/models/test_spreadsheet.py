@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from pathlib import Path
 
 import pytest
@@ -15,7 +14,7 @@ def test_can_create_spreadsheet_from_large_excel_file():
 def test_can_create_spreadsheet_from_dict():
     assert (
         Spreadsheet.from_dict(
-            OrderedDict(
+            dict(
                 foo="bar",
                 name="Jane",
             )

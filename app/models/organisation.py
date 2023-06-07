@@ -1,5 +1,4 @@
 import datetime
-from collections import OrderedDict
 from typing import Optional
 
 from flask import abort
@@ -32,18 +31,16 @@ class Organisation(JSONModel):
         TYPE_NHS_GP,
     )
 
-    TYPE_LABELS = OrderedDict(
-        [
-            (TYPE_CENTRAL, "Central government"),
-            (TYPE_LOCAL, "Local government"),
-            (TYPE_NHS_CENTRAL, "NHS – central government agency or public body"),
-            (TYPE_NHS_LOCAL, "NHS Trust or Clinical Commissioning Group"),
-            (TYPE_NHS_GP, "GP practice"),
-            (TYPE_EMERGENCY_SERVICE, "Emergency service"),
-            (TYPE_SCHOOL_OR_COLLEGE, "School or college"),
-            (TYPE_OTHER, "Other"),
-        ]
-    )
+    TYPE_LABELS = {
+        TYPE_CENTRAL: "Central government",
+        TYPE_LOCAL: "Local government",
+        TYPE_NHS_CENTRAL: "NHS – central government agency or public body",
+        TYPE_NHS_LOCAL: "NHS Trust or Clinical Commissioning Group",
+        TYPE_NHS_GP: "GP practice",
+        TYPE_EMERGENCY_SERVICE: "Emergency service",
+        TYPE_SCHOOL_OR_COLLEGE: "School or college",
+        TYPE_OTHER: "Other",
+    }
 
     ALLOWED_PROPERTIES = {
         "id",
