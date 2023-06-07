@@ -1,4 +1,3 @@
-{% from "components/radios.html" import radios, radios_nested %}
 {% from "components/page-footer.html" import page_footer %}
 
 <div id="sticky_template_forms">
@@ -7,8 +6,8 @@
   {% if templates_and_folders_form.move_to.choices and template_list.templates_to_show %}
     <div id="move_to_folder_radios" class="sticky-template-form" role="region" aria-label="Choose the folder to move selected items to">
       <div class="js-will-stick-at-bottom-when-scrolling">
-      {{ radios_nested(templates_and_folders_form.move_to, move_to_children, option_hints=option_hints) }}
-      </div>
+      {{ templates_and_folders_form.move_to}}
+    </div>
       <div class="js-will-stick-at-bottom-when-scrolling">
       {{ page_footer('Move', button_name='operation', button_value='move-to-existing-folder', button_text_hidden_suffix=' selection to folder') }}
       </div>
@@ -28,7 +27,7 @@
   </div>
   <div id="add_new_template_form" class="sticky-template-form" role="region" aria-label="Choose template type" {% if single_notification_channel %}data-channel="{{single_notification_channel}}" data-service="{{current_service.id}}"{% endif %}>
     <div class="js-will-stick-at-bottom-when-scrolling">
-    {{ radios(templates_and_folders_form.add_template_by_template_type) }}
+     {{templates_and_folders_form.add_template_by_template_type}}
     </div>
     <div class="js-will-stick-at-bottom-when-scrolling">
     {{ page_footer('Continue', button_name='operation', button_value='add-new-template') }}
