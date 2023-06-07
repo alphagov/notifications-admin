@@ -2395,14 +2395,13 @@ class TemplateAndFoldersSelectionForm(Form):
     )
     add_new_folder_name = GovukTextInputField("Folder name", validators=[required_for_ops("add-new-folder")])
     move_to_new_folder_name = GovukTextInputField("Folder name", validators=[required_for_ops("move-to-new-folder")])
-
-    add_template_by_template_type = RadioFieldWithRequiredMessage(
+    add_template_by_template_type = GovukRadiosField(
         "New template",
         validators=[
             required_for_ops("add-new-template"),
             Optional(),
         ],
-        required_message="Select the type of template you want to add",
+        param_extensions={"errorMessage": {"text": "Select the type of template you want to add"}},
     )
 
 
