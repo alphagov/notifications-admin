@@ -255,7 +255,7 @@ def uploaded_letter_preview(service_id, file_id):
         )
 
     original_filename = metadata.get("filename")
-    page_count = metadata.get("page_count")
+    page_count = int(metadata.get("page_count"))
     status = metadata.get("status")
     error_shortcode = metadata.get("message")
     invalid_pages = metadata.get("invalid_pages")

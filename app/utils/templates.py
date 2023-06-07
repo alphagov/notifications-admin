@@ -54,9 +54,7 @@ def get_sample_template(template_type):
     if template_type == "sms":
         return SMSPreviewTemplate({"content": "any", "template_type": "sms"})
     if template_type == "letter":
-        return TemplatedLetterImageTemplate(
-            {"content": "any", "subject": "", "template_type": "letter"}, postage="second"
-        )
+        return TemplatedLetterImageTemplate({"content": "any", "subject": "", "template_type": "letter"})
 
 
 def get_template(
