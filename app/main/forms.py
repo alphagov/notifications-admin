@@ -2345,6 +2345,7 @@ class TemplateAndFoldersSelectionForm(Form):
         template_list,
         available_template_types,
         allow_adding_copy_of_template,
+        option_hints,
         *args,
         **kwargs,
     ):
@@ -2359,6 +2360,9 @@ class TemplateAndFoldersSelectionForm(Form):
         self.is_move_op = self.is_add_folder_op = self.is_add_template_op = False
 
         self.move_to.all_template_folders = all_template_folders
+
+        self.move_to.option_hints = option_hints
+
         self.move_to.choices = [
             (item["id"], item["name"]) for item in ([self.ALL_TEMPLATES_FOLDER] + all_template_folders)
         ]
@@ -2414,12 +2418,14 @@ class TemplateAndFoldersSelectionForm(Form):
         choices=[],  # added to keep order of arguments, added properly in __init__
         param_extensions={"fieldset": {"legend": {"classes": "govuk-visually-hidden"}}},
     )
+
     # if no default set, it is set to None, which process_data transforms to '__NONE__'
     # this means '__NONE__' (self.ALL_TEMPLATES option) is selected when no form data has been submitted
     # set default to empty string so process_data method doesn't perform any transformation
-    move_to = NestedRadioField(
+    move_to = GovukNestedRadiosField(
         "Choose a folder", default="", validators=[required_for_ops("move-to-existing-folder"), Optional()]
     )
+
     add_new_folder_name = GovukTextInputField("Folder name", validators=[required_for_ops("add-new-folder")])
     move_to_new_folder_name = GovukTextInputField("Folder name", validators=[required_for_ops("move-to-new-folder")])
     add_template_by_template_type = GovukRadiosField(
