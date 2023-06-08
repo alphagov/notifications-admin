@@ -59,7 +59,7 @@ def test_organisation_name_goes_into_cache(mocker, service_one):
     mock_redis_set.assert_called_once_with(
         f"organisation-{ORGANISATION_ID}-name",
         '"Test Organisation"',
-        ex=604800,
+        ex=2_419_200,
     )
 
 

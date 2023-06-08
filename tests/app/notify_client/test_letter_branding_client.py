@@ -17,7 +17,7 @@ def test_get_letter_branding(mocker, fake_uuid):
     mock_redis_set.assert_called_once_with(
         f"letter_branding-{fake_uuid}",
         '{"foo": "bar"}',
-        ex=604800,
+        ex=2_419_200,
     )
 
 
@@ -33,7 +33,7 @@ def test_get_all_letter_branding(mocker):
     mock_redis_set.assert_called_once_with(
         "letter_branding",
         "[1, 2, 3]",
-        ex=604800,
+        ex=2_419_200,
     )
 
 

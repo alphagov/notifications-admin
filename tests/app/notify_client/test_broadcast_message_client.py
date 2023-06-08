@@ -46,7 +46,7 @@ def test_get_broadcast_message(mocker):
     mock_redis_set.assert_called_once_with(
         "service-12345-broadcast-message-67890",
         '{"abc": "def"}',
-        ex=604_800,
+        ex=2_419_200,
     )
 
 

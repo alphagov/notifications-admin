@@ -42,9 +42,9 @@ from app import organisations_client
                 call(
                     "organisations",
                     '[{"domains": ["x", "y", "z"]}]',
-                    ex=604800,
+                    ex=2_419_200,
                 ),
-                call("domains", '["x", "y", "z"]', ex=604800),
+                call("domains", '["x", "y", "z"]', ex=2_419_200),
             ],
             "from api",
         ),
@@ -74,7 +74,7 @@ from app import organisations_client
                 call(
                     "organisations",
                     '[{"domains": ["x", "y", "z"]}]',
-                    ex=604800,
+                    ex=2_419_200,
                 ),
             ],
             "from api",
@@ -335,7 +335,7 @@ def test_get_letter_branding_pool(mocker):
     organisations_client.get_letter_branding_pool(org_id)
 
     mock_redis_set.assert_called_once_with(
-        f"organisation-{org_id}-letter-branding-pool", '{"filename": "gov.svg"}', ex=604800
+        f"organisation-{org_id}-letter-branding-pool", '{"filename": "gov.svg"}', ex=2_419_200
     )
     mock_get.assert_called_with(url=f"/organisations/{org_id}/letter-branding-pool")
 

@@ -145,7 +145,7 @@ def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(n
             [call(f"user-{user_id}")],
             None,
             [call(f"/user/{user_id}")],
-            [call(f"user-{user_id}", '{"data": "from api"}', ex=604800)],
+            [call(f"user-{user_id}", '{"data": "from api"}', ex=2_419_200)],
             "from api",
         ),
     ],

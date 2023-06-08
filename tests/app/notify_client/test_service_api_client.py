@@ -104,7 +104,7 @@ def test_get_precompiled_template(mocker):
     mock_redis_set.assert_called_once_with(
         f"service-{SERVICE_ONE_ID}-template-precompiled",
         '{"data": "foo"}',
-        ex=604800,
+        ex=2_419_200,
     )
 
 
@@ -190,7 +190,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     f"service-{SERVICE_ONE_ID}",
                     '{"data_from": "api"}',
-                    ex=604800,
+                    ex=2_419_200,
                 )
             ],
             {"data_from": "api"},
@@ -216,7 +216,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}-version-None",
                     '{"data_from": "api"}',
-                    ex=604800,
+                    ex=2_419_200,
                 ),
             ],
             {"data_from": "api"},
@@ -242,7 +242,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}-version-1",
                     '{"data_from": "api"}',
-                    ex=604800,
+                    ex=2_419_200,
                 ),
             ],
             {"data_from": "api"},
@@ -266,7 +266,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     f"service-{SERVICE_ONE_ID}-templates",
                     '{"data_from": "api"}',
-                    ex=604800,
+                    ex=2_419_200,
                 )
             ],
             {"data_from": "api"},
@@ -292,7 +292,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}-versions",
                     '{"data_from": "api"}',
-                    ex=604800,
+                    ex=2_419_200,
                 ),
             ],
             {"data_from": "api"},
@@ -307,7 +307,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     f"service-{SERVICE_ONE_ID}-returned-letters-summary",
                     '{"data_from": "api"}',
-                    ex=604800,
+                    ex=2_419_200,
                 )
             ],
             {"data_from": "api"},
@@ -322,7 +322,7 @@ def test_client_returns_count_of_service_templates(
                 call(
                     f"service-{SERVICE_ONE_ID}-returned-letters-statistics",
                     '{"data_from": "api"}',
-                    ex=604800,
+                    ex=2_419_200,
                 )
             ],
             {"data_from": "api"},
