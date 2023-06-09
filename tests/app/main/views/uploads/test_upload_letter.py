@@ -232,6 +232,29 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
 
 
 @pytest.mark.parametrize(
+    "endpoint",
+    (
+        "main.letter_template_attach_pages",
+        "main.letter_template_edit_pages",
+    ),
+)
+def test_letter_attachment_pages_404_for_non_letter_template(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_template,
+    endpoint,
+):
+    service_one["permissions"] = ["extra_letter_formatting"]
+    client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=404,
+    )
+
+
+@pytest.mark.parametrize(
     "endpoint,kwargs",
     [
         ("main.upload_letter", {"service_id": SERVICE_ONE_ID}),

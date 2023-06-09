@@ -915,6 +915,10 @@ def get_template_sender_form_dict(service_id, template):
 @service_has_permission("extra_letter_formatting")
 def letter_template_attach_pages(service_id, template_id):
     template = current_service.get_template(template_id)
+
+    if template.template_type != "letter":
+        abort(404)
+
     form = PDFUploadForm()
     error = {}
     if form.validate_on_submit():
@@ -951,6 +955,10 @@ def letter_template_attach_pages(service_id, template_id):
 @service_has_permission("extra_letter_formatting")
 def letter_template_edit_pages(template_id, service_id):
     template = current_service.get_template(template_id)
+
+    if template.template_type != "letter":
+        abort(404)
+
     form = PDFUploadForm()
 
     error = {}
