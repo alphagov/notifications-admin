@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from datetime import datetime
 from functools import partial
 
@@ -162,18 +161,17 @@ def download_organisation_usage_report(org_id):
     selected_year = request.args.get("selected_year")
     services_usage, _ = current_organisation.services_and_usage(financial_year=selected_year)
 
-    unit_column_names = OrderedDict(
-        [
-            ("service_id", "Service ID"),
-            ("service_name", "Service Name"),
-            ("emails_sent", "Emails sent"),
-            ("sms_remainder", "Free text message allowance remaining"),
-        ]
-    )
+    unit_column_names = {
+        "service_id": "Service ID",
+        "service_name": "Service Name",
+        "emails_sent": "Emails sent",
+        "sms_remainder": "Free text message allowance remaining",
+    }
 
-    monetary_column_names = OrderedDict(
-        [("sms_cost", "Spent on text messages (£)"), ("letter_cost", "Spent on letters (£)")]
-    )
+    monetary_column_names = {
+        "sms_cost": "Spent on text messages (£)",
+        "letter_cost": "Spent on letters (£)",
+    }
 
     org_usage_data = [list(unit_column_names.values()) + list(monetary_column_names.values())] + [
         [service[attribute] for attribute in unit_column_names.keys()]
@@ -382,7 +380,7 @@ def edit_organisation_domains(org_id):
         try:
             organisations_client.update_organisation(
                 org_id,
-                domains=list(OrderedDict.fromkeys(domain.lower() for domain in filter(None, form.domains.data))),
+                domains=list(dict.fromkeys(domain.lower() for domain in form.domains.data if domain)),
             )
         except HTTPError as e:
             error_message = "Domain already exists"

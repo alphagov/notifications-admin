@@ -1,5 +1,4 @@
 import uuid
-from collections import OrderedDict
 from unittest.mock import call
 
 import pytest
@@ -418,14 +417,12 @@ def test_should_update_guestlist(
     client_request,
     mock_update_guest_list,
 ):
-    data = OrderedDict(
-        [
-            ("email_addresses-1", "test@example.com"),
-            ("email_addresses-3", "test@example.com"),
-            ("phone_numbers-0", "07900900000"),
-            ("phone_numbers-2", "+1800-555-555"),
-        ]
-    )
+    data = {
+        "email_addresses-1": "test@example.com",
+        "email_addresses-3": "test@example.com",
+        "phone_numbers-0": "07900900000",
+        "phone_numbers-2": "+1800-555-555",
+    }
 
     client_request.post(
         "main.guest_list",
@@ -450,7 +447,7 @@ def test_should_validate_guestlist_items(
     page = client_request.post(
         "main.guest_list",
         service_id=SERVICE_ONE_ID,
-        _data=OrderedDict([("email_addresses-1", "abc"), ("phone_numbers-0", "123")]),
+        _data={"email_addresses-1": "abc", "phone_numbers-0": "123"},
         _expected_status=200,
     )
 

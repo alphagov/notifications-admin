@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from datetime import datetime
 
 from flask import (
@@ -79,14 +78,12 @@ from app.utils.user import (
     user_is_platform_admin,
 )
 
-PLATFORM_ADMIN_SERVICE_PERMISSIONS = OrderedDict(
-    [
-        ("inbound_sms", {"title": "Receive inbound SMS", "requires": "sms", "endpoint": ".service_set_inbound_number"}),
-        ("email_auth", {"title": "Email authentication"}),
-        ("extra_email_formatting", {"title": "Extra email formatting options", "requires": "email"}),
-        ("extra_letter_formatting", {"title": "Extra letter formatting options", "requires": "letter"}),
-    ]
-)
+PLATFORM_ADMIN_SERVICE_PERMISSIONS = {
+    "inbound_sms": {"title": "Receive inbound SMS", "requires": "sms", "endpoint": ".service_set_inbound_number"},
+    "email_auth": {"title": "Email authentication"},
+    "extra_email_formatting": {"title": "Extra email formatting options", "requires": "email"},
+    "extra_letter_formatting": {"title": "Extra letter formatting options", "requires": "letter"},
+}
 
 THANKS_FOR_BRANDING_REQUEST_MESSAGE = "Thanks for your branding request. We’ll get back to you within one working day."
 
