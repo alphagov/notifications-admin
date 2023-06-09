@@ -28,7 +28,7 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
     mock_redis_set.assert_called_once_with(
         f"has_jobs-{service_id}",
         b"true",
-        ex=604800,
+        ex=2_419_200,
     )
 
 
@@ -354,7 +354,7 @@ def test_has_jobs_sets_cache(
     mock_redis_set.assert_called_once_with(
         f"has_jobs-{fake_uuid}",
         expected_cache_value,
-        ex=604800,
+        ex=2_419_200,
     )
 
 

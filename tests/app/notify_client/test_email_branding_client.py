@@ -20,7 +20,7 @@ def test_get_email_branding(mocker, fake_uuid):
     mock_redis_set.assert_called_once_with(
         f"email_branding-{fake_uuid}",
         '{"foo": "bar"}',
-        ex=604800,
+        ex=2_419_200,
     )
 
 
@@ -41,7 +41,7 @@ def test_get_all_email_branding(mocker):
     mock_redis_set.assert_called_once_with(
         "email_branding",
         "[1, 2, 3]",
-        ex=604800,
+        ex=2_419_200,
     )
 
 

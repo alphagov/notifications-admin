@@ -7,28 +7,16 @@ from notifications_utils.template import LetterImageTemplate as UtilsLetterImage
 
 
 class PrecompiledLetterImageTemplate(UtilsLetterImageTemplate):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Override pre compiled letter template postage to None as it has not
+        # yet been picked even though the pre compiled letter template has its
+        # postage set as second class as the DB currently requires a non null
+        # value of postage for letter templates
+        self.postage = None
 
 
 class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
-    def __init__(
-        self,
-        template,
-        values=None,
-        image_url=None,
-        contact_block=None,
-        postage=None,
-    ):
-        super().__init__(
-            template,
-            values=values,
-            image_url=image_url,
-            page_count=1,
-            contact_block=contact_block,
-            postage=postage,
-        )
-        self._page_count = None
-
     @property
     def page_count(self):
         from app.template_previews import get_page_count_for_letter
@@ -54,9 +42,7 @@ def get_sample_template(template_type):
     if template_type == "sms":
         return SMSPreviewTemplate({"content": "any", "template_type": "sms"})
     if template_type == "letter":
-        return TemplatedLetterImageTemplate(
-            {"content": "any", "subject": "", "template_type": "letter"}, postage="second"
-        )
+        return TemplatedLetterImageTemplate({"content": "any", "subject": "", "template_type": "letter"})
 
 
 def get_template(
@@ -93,14 +79,12 @@ def get_template(
             return PrecompiledLetterImageTemplate(
                 template,
                 image_url=letter_preview_url,
-                postage=template["postage"],
                 page_count=page_count,
             )
         return TemplatedLetterImageTemplate(
             template,
             image_url=letter_preview_url,
             contact_block=template["reply_to_text"],
-            postage=template["postage"],
         )
     if "broadcast" == template["template_type"]:
         return BroadcastPreviewTemplate(

@@ -73,11 +73,6 @@ def view_notification(service_id, notification_id):  # noqa: C901
                 "views/notifications/invalid_precompiled_letter.html", created_at=notification["created_at"]
             )
 
-    if notification.get("postage"):
-        if notification["status"] == "validation-failed":
-            notification["template"]["postage"] = None
-        else:
-            notification["template"]["postage"] = notification["postage"]
     template = get_template(
         notification["template"],
         current_service,
@@ -94,6 +89,7 @@ def view_notification(service_id, notification_id):  # noqa: C901
         email_reply_to=notification["reply_to_text"],
     )
     template.values = personalisation
+    template.postage = None if notification["status"] == "validation-failed" else notification.get("postage")
 
     if template.template_type == "letter" and template.too_many_pages:
         # We check page count here to show the right error message for a letter that is too long.
@@ -174,7 +170,6 @@ def view_notification(service_id, notification_id):  # noqa: C901
         help=get_help_argument(),
         estimated_letter_delivery_date=estimated_letter_delivery_date,
         notification_id=notification["id"],
-        postage=notification["postage"],
         can_receive_inbound=(current_service.has_permission("inbound_sms")),
         is_precompiled_letter=notification["template"]["is_precompiled_letter"],
         letter_print_day=letter_print_day,

@@ -44,7 +44,7 @@ def test_get_template_folders_calls_correct_api_endpoint(mocker):
 
     mock_redis_get.assert_called_once_with(redis_key)
     mock_api_get.assert_called_once_with(expected_url)
-    mock_redis_set.assert_called_once_with(redis_key, '{"a": "b"}', ex=604800)
+    mock_redis_set.assert_called_once_with(redis_key, '{"a": "b"}', ex=2_419_200)
 
 
 def test_move_templates_and_folders(mocker):

@@ -30,7 +30,6 @@ from xlrd.xldate import XLDateError
 from app import (
     current_service,
     notification_api_client,
-    service_api_client,
     upload_api_client,
 )
 from app.main import main
@@ -57,7 +56,7 @@ from app.utils.pagination import (
     generate_previous_dict,
     get_page_from_request,
 )
-from app.utils.templates import get_sample_template, get_template
+from app.utils.templates import get_sample_template
 from app.utils.user import user_has_permissions
 
 
@@ -255,7 +254,7 @@ def uploaded_letter_preview(service_id, file_id):
         )
 
     original_filename = metadata.get("filename")
-    page_count = metadata.get("page_count")
+    page_count = int(metadata.get("page_count"))
     status = metadata.get("status")
     error_shortcode = metadata.get("message")
     invalid_pages = metadata.get("invalid_pages")
@@ -265,17 +264,10 @@ def uploaded_letter_preview(service_id, file_id):
         invalid_pages = json.loads(invalid_pages)
 
     error_message = get_letter_validation_error(error_shortcode, invalid_pages, page_count)
-    template_dict = service_api_client.get_precompiled_template(service_id)
-    # Override pre compiled letter template postage to none as it has not yet been picked even though
-    # the pre compiled letter template has its postage set as second class as the DB currently requires
-    # a non null value of postage for letter templates
-    template_dict["postage"] = None
 
     form = LetterUploadPostageForm(postage_zone=postal_address.postage)
 
-    template = get_template(
-        template_dict,
-        service_id,
+    template = current_service.get_precompiled_letter_template(
         letter_preview_url=url_for(".view_letter_upload_as_preview", service_id=service_id, file_id=file_id),
         page_count=page_count,
     )
