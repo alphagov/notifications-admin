@@ -132,7 +132,6 @@ def test_notification_status_page_respects_redaction(
     template_redaction_setting,
     expected_content,
 ):
-
     _mock_get_notification = mocker.patch(
         "app.notification_api_client.get_notification",
         return_value=create_notification(redact_personalisation=template_redaction_setting),
@@ -221,7 +220,6 @@ def test_notification_page_doesnt_link_to_template_in_tour(
     time_of_viewing_page,
     expected_message,
 ):
-
     with freeze_time("2012-01-01 01:01"):
         notification = create_notification()
         mocker.patch("app.notification_api_client.get_notification", return_value=notification)
@@ -244,7 +242,6 @@ def test_notification_page_shows_page_for_letter_notification(
     mocker,
     fake_uuid,
 ):
-
     count_of_pages = 3
 
     notification = create_notification(notification_status="created", template_type="letter", postage="second")
@@ -343,7 +340,6 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
     expected_p2,
     expected_postage,
 ):
-
     if is_precompiled_letter:
         mocker.patch(
             "app.main.views.notifications.get_letter_file_data",
@@ -595,11 +591,9 @@ def test_should_show_image_of_letter_notification(
 
     notification = create_notification(template_type="letter")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-
-    mocker.patch(
-        "app.main.views.notifications.notification_api_client.get_notification_letter_preview",
-        return_value={"content": base64.b64encode(b"foo").decode("utf-8")},
-    )
+    mocked_preview = mocker.patch("app.main.views.templates.TemplatePreview.from_database_object", return_value="foo")
+    # only called for precompiled letters
+    mock_api = mocker.patch("app.main.views.notifications.notification_api_client.get_notification_letter_preview")
 
     response = client_request.get_response(
         "main.view_letter_notification_as_preview",
@@ -610,9 +604,19 @@ def test_should_show_image_of_letter_notification(
 
     assert response.get_data(as_text=True) == "foo"
 
+    assert mock_api.called is False
+    mocked_preview.assert_called_once_with(
+        notification["template"],
+        filetype,
+        notification["personalisation"],
+        page=None,
+    )
+
 
 def test_should_show_image_of_letter_notification_that_failed_validation(client_request, fake_uuid, mocker):
-    notification = create_notification(template_type="letter", notification_status="validation-failed")
+    notification = create_notification(
+        template_type="letter", notification_status="validation-failed", is_precompiled_letter=True
+    )
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
 
     metadata = {"message": "content-outside-printable-area", "invalid_pages": "[1]", "page_count": "1"}
@@ -660,7 +664,7 @@ def test_should_show_preview_error_image_letter_notification_on_preview_error(
     fake_uuid,
     mocker,
 ):
-    notification = create_notification(template_type="letter")
+    notification = create_notification(template_type="letter", is_precompiled_letter=True)
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
 
     mocker.patch(
@@ -734,7 +738,6 @@ def test_notification_page_has_link_to_send_another_for_sms(
     template_type,
     link_expected,
 ):
-
     service_one["permissions"] = service_permissions
     notification = create_notification(template_type=template_type)
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
@@ -808,7 +811,6 @@ def test_notification_page_has_link_to_download_letter(
 def test_notification_page_has_expected_template_link_for_letter(
     client_request, mocker, fake_uuid, service_one, is_precompiled_letter, has_template_link
 ):
-
     if is_precompiled_letter:
         mocker.patch(
             "app.main.views.notifications.get_letter_file_data",

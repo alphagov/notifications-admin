@@ -92,6 +92,14 @@ def test_from_database_object_makes_request(
     request_mock.assert_called_once_with(expected_url, json=data, headers=headers)
 
 
+def test_from_notification_has_correct_args():
+    raise AssertionError()
+
+
+def test_from_notification_rejects_precompiled_templates():
+    raise AssertionError()
+
+
 @pytest.mark.parametrize(
     "page_number, expected_url",
     [
