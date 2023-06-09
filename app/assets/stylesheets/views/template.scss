@@ -83,3 +83,20 @@
     margin: 0;
   }
 }
+
+#first-page-of-attachment {
+  position: absolute;
+  left: 0;
+
+  .page--odd & {
+    // Odd pages have a gutter between them and the previous
+    // page. We need to account for this so that the page number
+    // of the previous page is at the same position in the viewport
+    top: -1 * (govuk-spacing(9) + govuk-spacing(6));
+  }
+
+  .page--even & {
+    top: -1 * govuk-spacing(9);
+  }
+
+}

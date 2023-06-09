@@ -972,7 +972,12 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
             service_id=SERVICE_ONE_ID,
             template_id=template_id,
             _data={"file": file},
-            _expected_redirect=url_for("main.view_template", service_id=SERVICE_ONE_ID, template_id=template_id),
+            _expected_redirect=url_for(
+                "main.view_template",
+                service_id=SERVICE_ONE_ID,
+                template_id=template_id,
+                _anchor="first-page-of-attachment",
+            ),
         )
 
     upload_id = mock_sanitise.call_args[1]["upload_id"]
@@ -1017,7 +1022,12 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
             service_id=SERVICE_ONE_ID,
             template_id=template_id,
             _data={"file": file},
-            _expected_redirect=url_for("main.view_template", service_id=SERVICE_ONE_ID, template_id=template_id),
+            _expected_redirect=url_for(
+                "main.view_template",
+                service_id=SERVICE_ONE_ID,
+                template_id=template_id,
+                _anchor="first-page-of-attachment",
+            ),
         )
 
     upload_id = mock_sanitise.call_args[1]["upload_id"]
