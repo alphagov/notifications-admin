@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block backLink %}
-    {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
+    {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -41,8 +41,8 @@
         {{ file_upload(
         form.file,
         allowed_file_extensions=['pdf'],
-        action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template_id),
-        button_text='Upload your file again' if error else 'Choose file',
+        action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id),
+        button_text='Upload your file again' if error else 'Choose a file',
         show_errors=False
         )}}
     </div>

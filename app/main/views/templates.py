@@ -109,7 +109,6 @@ def view_template(service_id, template_id):
         "views/templates/template.html",
         template=template,
         user_has_template_permission=user_has_template_permission,
-        show_manage_attachment_button=template.get_raw("letter_attachment") is not None,
     )
 
 
@@ -916,6 +915,10 @@ def get_template_sender_form_dict(service_id, template):
 @service_has_permission("extra_letter_formatting")
 def letter_template_attach_pages(service_id, template_id):
     template = current_service.get_template(template_id)
+
+    if template.template_type != "letter":
+        abort(404)
+
     form = PDFUploadForm()
     error = {}
     if form.validate_on_submit():
@@ -927,13 +930,12 @@ def letter_template_attach_pages(service_id, template_id):
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
 
-    if template.get_raw("letter_attachment") is None:
-
+    if not template.attachment:
         return (
             render_template(
                 "views/templates/attach-pages.html",
                 form=form,
-                template_id=template_id,
+                template=template,
                 error=error,
             ),
             400 if error else 200,
@@ -942,10 +944,9 @@ def letter_template_attach_pages(service_id, template_id):
     return render_template(
         "views/templates/manage-attachment.html",
         form=form,
-        template_id=template_id,
+        template=template,
         service_id=service_id,
         error=error,
-        attachment_filename=template.get_raw("letter_attachment")["original_filename"],
     )
 
 
@@ -954,16 +955,20 @@ def letter_template_attach_pages(service_id, template_id):
 @service_has_permission("extra_letter_formatting")
 def letter_template_edit_pages(template_id, service_id):
     template = current_service.get_template(template_id)
+
+    if template.template_type != "letter":
+        abort(404)
+
     form = PDFUploadForm()
 
     error = {}
 
-    if template.get_raw("letter_attachment") is None:
+    if not template.attachment:
         abort(404)
 
     if request.method == "POST":
         letter_attachment_client.archive_letter_attachment(
-            letter_attachment_id=template.get_raw("letter_attachment")["id"],
+            letter_attachment_id=template.attachment.id,
             service_id=service_id,
             user_id=current_user.id,
         )
@@ -976,18 +981,16 @@ def letter_template_edit_pages(template_id, service_id):
         )
 
     flash(
-        f"Are you sure you want to remove the "
-        f"‘{template.get_raw('letter_attachment')['original_filename']}’ attachment?",
+        f"Are you sure you want to remove the " f"‘{template.attachment.original_filename}’ attachment?",
         "remove",
     )
 
     return render_template(
         "views/templates/manage-attachment.html",
         form=form,
-        template_id=template_id,
+        template=template,
         service_id=service_id,
         error=error,
-        attachment_filename=template.get_raw("letter_attachment")["original_filename"],
     )
 
 
@@ -1049,9 +1052,9 @@ def _process_letter_attachment_form(service_id, template, form):
 
     try:
         # Archive letter attachment if there is already one
-        if template.get_raw("letter_attachment") is not None:
+        if template.attachment:
             letter_attachment_client.archive_letter_attachment(
-                letter_attachment_id=template.get_raw("letter_attachment")["id"],
+                letter_attachment_id=template.attachment.id,
                 service_id=service_id,
                 user_id=current_user.id,
             )
@@ -1070,6 +1073,7 @@ def _process_letter_attachment_form(service_id, template, form):
             "main.view_template",
             service_id=current_service.id,
             template_id=template.id,
+            _anchor="first-page-of-attachment",
         )
     )
 
@@ -1101,6 +1105,3 @@ def _save_letter_attachment(*, service_id, template_id, upload_id, original_file
         template_id=template_id,
         service_id=service_id,
     )
-
-    pages_content = "1 page" if attachment_page_count == 1 else f"{attachment_page_count} pages"
-    flash(f"You have attached {pages_content} to the end of your letter", "default_with_tick")

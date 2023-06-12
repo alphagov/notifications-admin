@@ -5,6 +5,8 @@ from notifications_utils.template import (
 )
 from notifications_utils.template import LetterImageTemplate as UtilsLetterImageTemplate
 
+from app.models import JSONModel
+
 
 class PrecompiledLetterImageTemplate(UtilsLetterImageTemplate):
     def __init__(self, *args, **kwargs):
@@ -34,6 +36,20 @@ class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
         # If the personalisation changes then we might need to recalculate the page count
         self._page_count = None
         super(UtilsLetterImageTemplate, type(self)).values.fset(self, value)
+
+    @property
+    def attachment(self):
+        if attachment := self.get_raw("letter_attachment"):
+            return LetterAttachment(attachment)
+
+
+class LetterAttachment(JSONModel):
+    ALLOWED_PROPERTIES = {
+        "id",
+        "original_filename",
+        "page_count",
+    }
+    __sort_attribute__ = "original_filename"
 
 
 def get_sample_template(template_type):

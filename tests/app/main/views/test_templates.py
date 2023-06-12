@@ -823,7 +823,9 @@ def test_view_letter_template_has_attach_pages_button(
         assert not template_container
 
 
-def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mocker, mock_get_template_version):
+def test_GET_letter_template_attach_pages(
+    client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
+):
     service_one["permissions"] = ["extra_letter_formatting"]
 
     page = client_request.get(
@@ -836,7 +838,9 @@ def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid
     assert page.select_one("input.file-upload-field")
     assert page.select_one("input.file-upload-field")["accept"] == ".pdf"
     assert page.select("form button")
-    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose a file"
+
+    mock_get_service_letter_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
 def test_GET_letter_template_attach_pages_404s_if_invalid_template_id(client_request, service_one, fake_uuid, mocker):
@@ -852,7 +856,7 @@ def test_GET_letter_template_attach_pages_404s_if_invalid_template_id(client_req
 
 
 def test_post_attach_pages_errors_when_content_outside_printable_area(
-    mocker, client_request, fake_uuid, service_one, mock_get_template_version
+    mocker, client_request, fake_uuid, service_one, mock_get_service_letter_template
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
@@ -968,7 +972,12 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
             service_id=SERVICE_ONE_ID,
             template_id=template_id,
             _data={"file": file},
-            _expected_redirect=url_for("main.view_template", service_id=SERVICE_ONE_ID, template_id=template_id),
+            _expected_redirect=url_for(
+                "main.view_template",
+                service_id=SERVICE_ONE_ID,
+                template_id=template_id,
+                _anchor="first-page-of-attachment",
+            ),
         )
 
     upload_id = mock_sanitise.call_args[1]["upload_id"]
@@ -1013,7 +1022,12 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
             service_id=SERVICE_ONE_ID,
             template_id=template_id,
             _data={"file": file},
-            _expected_redirect=url_for("main.view_template", service_id=SERVICE_ONE_ID, template_id=template_id),
+            _expected_redirect=url_for(
+                "main.view_template",
+                service_id=SERVICE_ONE_ID,
+                template_id=template_id,
+                _anchor="first-page-of-attachment",
+            ),
         )
 
     upload_id = mock_sanitise.call_args[1]["upload_id"]
@@ -1047,7 +1061,6 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
     mock_upload = mocker.patch("app.main.views.templates.upload_letter_attachment_to_s3")
     mock_backup = mocker.patch("app.main.views.templates.backup_original_letter_to_s3")
     mock_save_to_db = mocker.patch("app.letter_attachment_client.create_letter_attachment")
-    mock_flash = mocker.patch("app.main.views.templates.flash")
 
     g.current_service = Service(service_one)
 
@@ -1074,8 +1087,6 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
         original_filename="foo.pdf",
     )
 
-    mock_flash.assert_called_once_with("You have attached 3 pages to the end of your letter", "default_with_tick")
-
 
 def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
     mock_get_service_letter_template_with_attachment, client_request, service_one
@@ -1087,7 +1098,7 @@ def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
         template_id=sample_uuid(),
         _expected_status=200,
     )
-    assert page.select_one("#filename").text.strip() == "original file.pdf"
+    assert page.select_one("h1").text.strip() == "original file.pdf"
 
 
 def test_post_delete_letter_attachment_calls_archive_letter_attachment(
@@ -1135,7 +1146,7 @@ def test_get_delete_letter_attachment_shows_confirmation(
         _expected_status=200,
     )
     mock_flash.assert_called_once_with("Are you sure you want to remove the ‘original file.pdf’ attachment?", "remove")
-    assert page.select_one("#filename").text.strip() == "original file.pdf"
+    assert page.select_one("h1").text.strip() == "original file.pdf"
 
 
 def test_edit_letter_template_postage_page_displays_correctly(

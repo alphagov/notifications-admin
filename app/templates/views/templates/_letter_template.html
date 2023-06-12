@@ -34,7 +34,7 @@
     <div class="js-stick-at-bottom-when-scrolling">
       {{ govukButton({
       "element": "a",
-      "text": "Manage attachment" if show_manage_attachment_button else "Attach pages",
+      "text": "Manage attachment" if template.attachment else "Attach pages",
       "href": url_for(
           '.letter_template_attach_pages',
           service_id=current_service.id,
