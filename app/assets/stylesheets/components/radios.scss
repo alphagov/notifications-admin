@@ -1,3 +1,9 @@
+$govuk-touch-target-size: 44px;
+$govuk-radios-size: 40px;
+$border-thickness: 4px;
+$govuk-small-radios-size: 24px;
+$border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
+
 .radio-select {
 
   min-height: 39px;
@@ -56,13 +62,7 @@
   margin-bottom: 10px;
 
   .multiple-choice {
-
-    $circle-diameter: 39px;
-    $border-thickness: 4px;
-    $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
-    $govuk-border-colour: $govuk-border-colour;
-
-    float: none;
+    //float: none;
     position: relative;
 
     &:before {
@@ -98,16 +98,29 @@
         // hint so that it extends all the way down to the next radio
         content: "";
         position: absolute;
-        top: $circle-diameter + 5px;
+        top: $govuk-radios-size;
         left: $border-indent;
         width: $border-thickness;
-        height: 25px;
+        height: $govuk-small-radios-size;
         background: $govuk-border-colour;
       }
     }
 
   }
 
+}
+
+.govuk-form-group--nested-radio{
+  $border-thickness: $govuk-touch-target-size - $govuk-radios-size;
+  $border-indent: $govuk-touch-target-size / 2;
+
+  position: relative;
+
+  // To equalise the spacing between the line and the top/bottom of
+  // the radio
+  margin-top: govuk-spacing(1) + ($border-thickness / 2);
+  margin-bottom: govuk-spacing(1) * -1;
+  padding-left: govuk-spacing(2) + 2;
 }
 
 .inline {

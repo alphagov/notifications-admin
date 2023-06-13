@@ -439,7 +439,7 @@ class NestedFieldMixin:
         params = {
             "name": name,
             "fieldset": {"legend": {"text": label, "classes": "govuk-visually-hidden"}},
-            "formGroup": {"classes": "govuk-form-group--nested"},
+            "formGroup": {"classes": "govuk-form-group--nested-radios"},
             "asList": True,
             "items": [],
         }
@@ -802,7 +802,7 @@ class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
         params = {
             "name": name,
             "fieldset": {"legend": {"text": label, "classes": "govuk-visually-hidden"}},
-            "formGroup": {"classes": "govuk-form-group--nested"},
+            "formGroup": {"classes": "govuk-form-group--nested-radio"},
             "asList": True,
             "items": [],
         }
