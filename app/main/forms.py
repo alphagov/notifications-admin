@@ -2,6 +2,7 @@ import math
 import weakref
 from contextlib import suppress
 from datetime import datetime, timedelta
+from functools import partial
 from itertools import chain
 from numbers import Number
 
@@ -93,6 +94,8 @@ from app.utils.user import distinct_email_addresses
 from app.utils.user_permissions import (
     all_ui_permissions,
     broadcast_permission_options,
+    organisation_user_permission_names,
+    organisation_user_permission_options,
     permission_options,
 )
 
@@ -819,11 +822,11 @@ class GovukRadiosWithImagesField(GovukRadiosField):
 
 
 # guard against data entries that aren't a known permission
-def filter_by_permissions(valuelist):
+def filter_by_permissions(valuelist, permissions):
     if valuelist is None:
         return None
     else:
-        return [entry for entry in valuelist if any(entry in option for option in permission_options)]
+        return [entry for entry in valuelist if any(entry in option for option in permissions)]
 
 
 # guard against data entries that aren't a known broadcast permission
@@ -886,7 +889,7 @@ class BasePermissionsForm(StripWhitespaceForm):
 
     permissions_field = GovukCheckboxesField(
         "Permissions",
-        filters=[filter_by_permissions],
+        filters=[partial(filter_by_permissions, permissions=permission_options)],
         choices=[(value, label) for value, label in permission_options],
         param_extensions={"hint": {"text": "All team members can see sent messages."}},
     )
@@ -938,6 +941,37 @@ class BroadcastPermissionsForm(BasePermissionsForm):
     @property
     def permissions(self):
         return {"view_activity"} | super().permissions
+
+
+class OrganisationUserPermissionsForm(StripWhitespaceForm):
+    permissions_field = GovukCheckboxesField(
+        "Permissions",
+        filters=[partial(filter_by_permissions, permissions=organisation_user_permission_options)],
+        choices=[(value, label) for value, label in organisation_user_permission_options],
+        param_extensions={
+            "hint": {
+                "html": (
+                    '<p class="govuk-hint">All team members can:</p>'
+                    '<ul class="govuk-list govuk-list--bullet govuk-hint">'
+                    "<li>see usage, templates, and team members</li>"
+                    "<li>invite other team members</li>"
+                    "</ul>"
+                )
+            }
+        },
+    )
+
+    @property
+    def permissions(self):
+        return set(self.permissions_field.data)
+
+    @classmethod
+    def from_user_and_organisation(cls, user, organisation):
+        form = cls(
+            permissions_field=user.permissions_for_organisation(organisation.id) & organisation_user_permission_names,
+        )
+
+        return form
 
 
 class BaseInviteUserForm:

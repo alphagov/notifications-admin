@@ -174,6 +174,10 @@ class UserApiClient(NotifyAdminAPIClient):
         endpoint = f"/user/{user_id}/service/{service_id}/permission"
         self.post(endpoint, data=data)
 
+    @cache.delete("user-{user_id}")
+    def set_organisation_permissions(self, user_id, organisation_id, permissions):
+        self.post(f"/user/{user_id}/organisation/{organisation_id}/permissions", data={"permissions": permissions})
+
     def send_reset_password_url(self, email_address, next_string=None):
         endpoint = "/user/reset-password"
         data = {

@@ -1,0 +1,46 @@
+{% extends "org_template.html" %}
+
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/banner.html" import banner %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block org_page_title %}
+  {{ user.name or user.email_localpart }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.manage_org_users', org_id=current_organisation.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% if delete %}
+    {{ banner(
+      'Are you sure you want to remove {}?'.format(user.name),
+      type='dangerous',
+      delete_button='Yes, remove',
+      action=url_for('main.remove_user_from_organisation', org_id=current_organisation.id, user_id=user.id)
+    ) }}
+  {% endif %}
+
+  {{ page_header(user.name or user.email_localpart) }}
+
+  <p class="govuk-body">
+    {{ user.email_address }}&emsp;
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_organisation_user', org_id=current_organisation.id, user_id=user.id)}}">
+    </a>
+  </p>
+  {% call form_wrapper() %}
+
+    {% include 'views/organisations/organisation/users/permissions.html' %}
+
+    {{ page_footer(
+      'Save',
+      delete_link=url_for('main.edit_organisation_user', org_id=current_organisation.id, user_id=user.id, delete='yes'),
+      delete_link_text='Remove this team member'
+    ) }}
+
+  {% endcall %}
+
+{% endblock %}

@@ -1,6 +1,6 @@
 {% extends "org_template.html" %}
-{% from "components/banner.html" import banner %}
 {% from "components/live-search.html" import live_search %}
+{% from "components/tick-cross.html" import tick_cross %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block org_page_title %}
@@ -8,16 +8,6 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-
-  {% if user_to_remove %}
-    {{ banner(
-      'Are you sure you want to remove {}?'.format(user_to_remove.name),
-      type='dangerous',
-      delete_button='Yes, remove',
-      action=url_for('main.remove_user_from_organisation', org_id=current_org.id, user_id=user_to_remove.id)
-    ) }}
-  {% endif %}
-
   <h1 class="heading-medium">
     Team members
   </h1>
@@ -49,12 +39,25 @@
                 {% endif %}
               </span>
             </h2>
+
+            {# Remove this guard condition when invited users can get permissions from the API #}
+            {% if user.is_invited_user == false %}
+            <ul class="tick-cross__list">
+              {% for permission, label in permissions %}
+                {{ tick_cross(
+                  user.has_permission_for_organisation(current_org.id, permission),
+                  label
+                ) }}
+              {% endfor %}
+            </ul>
+            {% endif %}
+
           </div>
           <div class="govuk-grid-column-one-quarter">
             {% if user.status == 'pending' %}
               <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation<span class="govuk-visually-hidden"> for {{ user.email_address }}</span></a>
-            {% elif user.status != 'cancelled' %}
-              <a class="govuk-link govuk-link--destructive user-list-edit-link" href="{{ url_for('main.edit_organisation_user', org_id=current_org.id, user_id=user.id)}}">Remove<span class="govuk-visually-hidden"> {{ user.name }} {{ user.email_address }}</span></a>
+            {% elif user.is_editable_by(current_user) %}
+              <a class="user-list-edit-link govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_organisation_user', org_id=current_org.id, user_id=user.id)}}">Change details<span class="govuk-visually-hidden"> for {{ user.name }} {{ user.email_address }}</span></a>
             {% endif %}
           </div>
         </div>

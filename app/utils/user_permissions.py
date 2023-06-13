@@ -27,6 +27,9 @@ broadcast_permission_options = (
     ("approve_broadcasts", "Approve alerts"),
 )
 
+organisation_user_permission_names = {"can_make_services_live"}
+organisation_user_permission_options = (("can_make_services_live", "Make new services live"),)
+
 
 def translate_permissions_from_db_to_ui(db_permissions):
     """

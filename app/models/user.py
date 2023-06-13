@@ -8,6 +8,7 @@ from werkzeug.utils import cached_property
 
 from app.event_handlers import (
     create_add_user_to_service_event,
+    create_set_organisation_user_permissions_event,
     create_set_user_permissions_event,
 )
 from app.models import JSONModel, ModelList
@@ -37,7 +38,7 @@ class BaseUser(JSONModel):
 
     @property
     def is_invited_user(self):
-        return self.__class__ is InvitedUser
+        return self.__class__ in {InvitedUser, InvitedOrgUser}
 
 
 class User(BaseUser, UserMixin):
@@ -63,6 +64,7 @@ class User(BaseUser, UserMixin):
     def __init__(self, _dict):
         super().__init__(_dict)
         self.permissions = _dict.get("permissions", {})
+        self.organisation_permissions = _dict.get("organisation_permissions", {})
         self._platform_admin = _dict["platform_admin"]
 
     @classmethod
@@ -117,6 +119,16 @@ class User(BaseUser, UserMixin):
             for service, permissions in permissions_by_service.items()
         }
 
+    @property
+    def organisation_permissions(self):
+        return self._organisation_permissions
+
+    @organisation_permissions.setter
+    def organisation_permissions(self, permissions_by_organisation):
+        self._organisation_permissions = {
+            organisation: set(permissions) for organisation, permissions in permissions_by_organisation.items()
+        }
+
     def update(self, **kwargs):
         response = user_api_client.update_user_attribute(self.id, **kwargs)
         self.__init__(response)
@@ -147,6 +159,20 @@ class User(BaseUser, UserMixin):
             service_id=service_id,
             original_ui_permissions=self.permissions_for_service(service_id),
             new_ui_permissions=permissions,
+            set_by_id=set_by_id,
+        )
+
+    def set_organisation_permissions(self, organisation_id, permissions: list[str], set_by_id):
+        user_api_client.set_organisation_permissions(
+            self.id,
+            organisation_id=organisation_id,
+            permissions=[{"permission": p} for p in permissions],
+        )
+        create_set_organisation_user_permissions_event(
+            user_id=self.id,
+            organisation_id=organisation_id,
+            original_permissions=self.permissions_for_organisation(organisation_id),
+            new_permissions=permissions,
             set_by_id=set_by_id,
         )
 
@@ -251,8 +277,14 @@ class User(BaseUser, UserMixin):
     def permissions_for_service(self, service_id):
         return self.permissions.get(service_id, set())
 
+    def permissions_for_organisation(self, organisation_id):
+        return self.organisation_permissions.get(organisation_id, set())
+
     def has_permission_for_service(self, service_id, permission):
         return permission in self.permissions_for_service(service_id)
+
+    def has_permission_for_organisation(self, service_id, permission):
+        return permission in self.permissions_for_organisation(service_id)
 
     def has_template_folder_permission(self, template_folder, *, service):
         # These users can see all folders
@@ -538,6 +570,11 @@ class InvitedUser(BaseUser):
             return False
         return self.service == service_id and permission in self.permissions
 
+    def has_permission_for_organisation(self, organisation_id, permission):
+        if self.status == "cancelled":
+            return False
+        return self.organisation == organisation_id and permission in self.organisation_permissions
+
     def __eq__(self, other):
         return (self.id, self.service, self._from_user, self.email_address, self.auth_type, self.status) == (
             other.id,
@@ -619,6 +656,9 @@ class InvitedOrgUser(BaseUser):
 
     def accept_invite(self):
         org_invite_api_client.accept_invite(self.organisation, self.id)
+
+    def is_editable_by(self, other):
+        return False
 
 
 class AnonymousUser(AnonymousUserMixin):

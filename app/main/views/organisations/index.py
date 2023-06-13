@@ -25,6 +25,7 @@ from app.main.forms import (
     OrganisationAgreementSignedForm,
     OrganisationCrownStatusForm,
     OrganisationOrganisationTypeForm,
+    OrganisationUserPermissionsForm,
     RenameOrganisationForm,
     SearchByNameForm,
     SearchUsersForm,
@@ -35,10 +36,11 @@ from app.main.views.dashboard import (
     requested_and_current_financial_year,
 )
 from app.models.organisation import AllOrganisations, Organisation
-from app.models.user import InvitedOrgUser, User
+from app.models.user import InvitedOrgUser
 from app.s3_client.s3_mou_client import get_mou
 from app.utils.csv import Spreadsheet
 from app.utils.user import user_has_permissions, user_is_platform_admin
+from app.utils.user_permissions import organisation_user_permission_options
 
 
 @main.route("/organisations", methods=["GET"])
@@ -212,6 +214,7 @@ def manage_org_users(org_id):
         users=current_organisation.team_members,
         show_search_box=(len(current_organisation.team_members) > 7),
         form=SearchUsersForm(),
+        permissions=organisation_user_permission_options,
     )
 
 
@@ -229,19 +232,29 @@ def invite_org_user(org_id):
     return render_template("views/organisations/organisation/users/invite-org-user.html", form=form)
 
 
-@main.route("/organisations/<uuid:org_id>/users/<uuid:user_id>", methods=["GET"])
+@main.route("/organisations/<uuid:org_id>/users/<uuid:user_id>", methods=["GET", "POST"])
 @user_has_permissions()
 def edit_organisation_user(org_id, user_id):
-    # The only action that can be done to an org user is to remove them from the org.
-    # This endpoint is used to get the ID of the user to delete without passing it as a
-    # query string, but it uses the template for all org team members in order to avoid
-    # having a page containing a single link.
+    user = current_organisation.get_team_member(user_id)
+    if not user.is_editable_by(current_user):
+        abort(403)
+
+    form = OrganisationUserPermissionsForm.from_user_and_organisation(user, current_organisation)
+
+    if form.validate_on_submit():
+        user.set_organisation_permissions(
+            org_id,
+            permissions=list(form.permissions),
+            set_by_id=current_user.id,
+        )
+        return redirect(url_for(".manage_org_users", org_id=org_id))
+
     return render_template(
-        "views/organisations/organisation/users/index.html",
-        users=current_organisation.team_members,
-        show_search_box=(len(current_organisation.team_members) > 7),
-        form=SearchUsersForm(),
-        user_to_remove=User.from_id(user_id),
+        "views/organisations/organisation/users/edit-org-user-permissions.html",
+        current_organisation=current_organisation,
+        user=user,
+        form=form,
+        delete=request.args.get("delete"),
     )
 
 
