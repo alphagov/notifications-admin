@@ -1050,23 +1050,20 @@ def _process_letter_attachment_form(service_id, template, form):
             )
         )
 
-    try:
-        # Archive letter attachment if there is already one
-        if template.attachment:
-            letter_attachment_client.archive_letter_attachment(
-                letter_attachment_id=template.attachment.id,
-                service_id=service_id,
-                user_id=current_user.id,
-            )
-        _save_letter_attachment(
+    # Archive letter attachment if there is already one
+    if template.attachment:
+        letter_attachment_client.archive_letter_attachment(
+            letter_attachment_id=template.attachment.id,
             service_id=service_id,
-            template_id=template.id,
-            upload_id=upload_id,
-            original_filename=original_filename,
-            sanitise_response=response,
+            user_id=current_user.id,
         )
-    except HTTPError as e:
-        raise e
+    _save_letter_attachment(
+        service_id=service_id,
+        template_id=template.id,
+        upload_id=upload_id,
+        original_filename=original_filename,
+        sanitise_response=response,
+    )
 
     return redirect(
         url_for(
