@@ -65,7 +65,7 @@ make run-flask
 
 Then visit [localhost:6012](http://localhost:6012).
 
-Any Python code changes you make should be picked up automatically in development. If you're developing JavaScript code, run `npm run watch` to achieve the same.
+Any Python code changes you make should be picked up automatically in development. If you're developing JavaScript or CSS code, run `make watch-frontend` to achieve the same.
 
 ## To test the application
 
