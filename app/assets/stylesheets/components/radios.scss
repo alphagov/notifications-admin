@@ -115,3 +115,16 @@
     margin-right: 15px;
   }
 }
+
+.govuk-radios__input:disabled + .govuk-radios__label,
+.govuk-radios__input:disabled ~ .govuk-hint {
+  opacity: 1;
+  color: $govuk-secondary-text-colour;
+}
+
+.govuk-radios__input:disabled + .govuk-radios__label {
+  &:before {
+    border-color: $govuk-secondary-text-colour;
+    background-color: govuk-colour("light-grey");
+  }
+}
