@@ -322,6 +322,7 @@ def test_POST_letter_branding_request_creates_zendesk_ticket(
     assert zendesk_ticket.org_id == org_id
     assert zendesk_ticket.org_type == "central"
     assert zendesk_ticket.service_id == SERVICE_ONE_ID
+    assert zendesk_ticket.ticket_categories == ["notify_email_letter_branding"]
 
 
 def test_GET_letter_branding_upload_branding_renders_form(

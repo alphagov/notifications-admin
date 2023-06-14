@@ -1690,6 +1690,7 @@ def test_should_redirect_after_request_to_go_live(
         org_id=None,
         org_type="central",
         service_id=SERVICE_ONE_ID,
+        ticket_categories=["notify_go_live_request"],
     )
     mock_send_ticket_to_zendesk.assert_called_once()
 
@@ -1768,6 +1769,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         org_id=ORGANISATION_ID,
         org_type="central",
         service_id=SERVICE_ONE_ID,
+        ticket_categories=["notify_go_live_request"],
     )
     mock_send_ticket_to_zendesk.assert_called_once()
 

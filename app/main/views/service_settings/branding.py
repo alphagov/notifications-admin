@@ -52,6 +52,7 @@ def create_email_branding_zendesk_ticket(detail=None):
         org_id=current_service.organisation_id,
         org_type=current_service.organisation_type,
         service_id=current_service.id,
+        ticket_categories=["notify_email_letter_branding"],
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 
@@ -200,6 +201,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
             org_id=current_service.organisation_id,
             org_type=current_service.organisation_type,
             service_id=current_service.id,
+            ticket_categories=["notify_email_letter_branding"],
         )
         zendesk_client.send_ticket_to_zendesk(ticket)
         flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
@@ -622,6 +624,7 @@ def letter_branding_request(service_id):
             org_id=current_service.organisation_id,
             org_type=current_service.organisation_type,
             service_id=current_service.id,
+            ticket_categories=["notify_email_letter_branding"],
         )
         zendesk_client.send_ticket_to_zendesk(ticket)
         flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
