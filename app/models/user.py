@@ -464,6 +464,7 @@ class User(BaseUser, UserMixin):
             or (
                 self.belongs_to_organisation(service.organisation_id)
                 and service.organisation.can_approve_own_go_live_requests
+                and self.has_permission_for_organisation(service.organisation_id, "can_make_services_live")
             )
         ) and service.has_active_go_live_request
 

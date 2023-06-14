@@ -3834,6 +3834,7 @@ def create_user(**overrides):
         "state": "active",
         "failed_login_count": 0,
         "permissions": {},
+        "organisation_permissions": {},
         "platform_admin": False,
         "auth_type": "sms_auth",
         "password_changed_at": str(datetime.utcnow()),

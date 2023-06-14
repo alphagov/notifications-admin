@@ -16,7 +16,11 @@ from tests.conftest import (
     (
         (
             # A user who is a member of the organisation
-            create_user(id=sample_uuid(), organisations=[ORGANISATION_ID]),
+            create_user(
+                id=sample_uuid(),
+                organisations=[ORGANISATION_ID],
+                organisation_permissions={ORGANISATION_ID: ["can_make_services_live"]},
+            ),
             True,
             True,
             200,
@@ -37,14 +41,29 @@ from tests.conftest import (
         ),
         (
             # If the organisation can’t approve its own go live requests then the user is blocked
-            create_user(id=sample_uuid(), organisations=[ORGANISATION_ID]),
+            create_user(
+                id=sample_uuid(),
+                organisations=[ORGANISATION_ID],
+                organisation_permissions={ORGANISATION_ID: ["can_make_services_live"]},
+            ),
             False,
             True,
             403,
         ),
         (
             # If the service doesn’t have an active go live request then the user is blocked
-            create_user(id=sample_uuid(), organisations=[ORGANISATION_ID]),
+            create_user(
+                id=sample_uuid(),
+                organisations=[ORGANISATION_ID],
+                organisation_permissions={ORGANISATION_ID: ["can_make_services_live"]},
+            ),
+            True,
+            False,
+            403,
+        ),
+        (
+            # If the user doesn't have the "can make services live" permission then the user is blocked
+            create_user(id=sample_uuid(), organisations=[ORGANISATION_ID], organisation_permissions={}),
             True,
             False,
             403,
