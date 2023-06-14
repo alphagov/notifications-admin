@@ -156,8 +156,10 @@ class UserApiClient(NotifyAdminAPIClient):
         self.post(endpoint, data=data)
 
     @cache.delete("user-{user_id}")
-    def add_user_to_organisation(self, org_id, user_id):
-        resp = self.post(f"/organisations/{org_id}/users/{user_id}", data={})
+    def add_user_to_organisation(self, org_id, user_id, permissions: list[str]):
+        resp = self.post(
+            f"/organisations/{org_id}/users/{user_id}", data={"permissions": [{"permission": p} for p in permissions]}
+        )
         return resp["data"]
 
     @cache.delete("service-{service_id}-template-folders")

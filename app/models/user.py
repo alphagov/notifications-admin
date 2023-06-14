@@ -445,11 +445,8 @@ class User(BaseUser, UserMixin):
             else:
                 raise exception
 
-    def add_to_organisation(self, organisation_id):
-        user_api_client.add_user_to_organisation(
-            organisation_id,
-            self.id,
-        )
+    def add_to_organisation(self, organisation_id, permissions: list[str]):
+        user_api_client.add_user_to_organisation(organisation_id, self.id, permissions=permissions)
 
     def complete_webauthn_login_attempt(self, is_successful=True, webauthn_credential_id=None):
         return user_api_client.complete_webauthn_login_attempt(self.id, is_successful, webauthn_credential_id)
@@ -624,8 +621,8 @@ class InvitedOrgUser(BaseUser):
         )
 
     @classmethod
-    def create(cls, invite_from_id, org_id, email_address):
-        return cls(org_invite_api_client.create_invite(invite_from_id, org_id, email_address))
+    def create(cls, invite_from_id, org_id, email_address, permissions):
+        return cls(org_invite_api_client.create_invite(invite_from_id, org_id, email_address, permissions))
 
     @classmethod
     def from_session(cls):

@@ -7,11 +7,12 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
 
         self.admin_url = app.config["ADMIN_BASE_URL"]
 
-    def create_invite(self, invite_from_id, org_id, email_address):
+    def create_invite(self, invite_from_id, org_id, email_address, permissions: list[str]):
         data = {
             "email_address": email_address,
             "invited_by": invite_from_id,
             "invite_link_host": self.admin_url,
+            "permissions": permissions,
         }
         data = _attach_current_user(data)
         resp = self.post(url=f"/organisation/{org_id}/invite", data=data)

@@ -82,7 +82,9 @@ def activate_user(user_id):
 
     invited_org_user = InvitedOrgUser.from_session()
     if invited_org_user:
-        user_api_client.add_user_to_organisation(invited_org_user.organisation, user_id)
+        user_api_client.add_user_to_organisation(
+            invited_org_user.organisation, user_id, permissions=["can_make_services_live"]
+        )
 
     if organisation_id:
         return redirect(url_for("main.organisation_dashboard", org_id=organisation_id))

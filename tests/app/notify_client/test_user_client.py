@@ -196,7 +196,7 @@ def test_returns_value_from_cache(
             {"is_successful": True, "webauthn_credential_id": "123"},
         ),
         (user_api_client, "add_user_to_service", [SERVICE_ONE_ID, user_id, [], []], {}),
-        (user_api_client, "add_user_to_organisation", [sample_uuid(), user_id], {}),
+        (user_api_client, "add_user_to_organisation", [sample_uuid(), user_id, ["can_make_services_live"]], {}),
         (user_api_client, "set_user_permissions", [user_id, SERVICE_ONE_ID, []], {}),
         (user_api_client, "activate_user", [user_id], {}),
         (user_api_client, "archive_user", [user_id], {}),

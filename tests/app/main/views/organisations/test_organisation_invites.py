@@ -187,6 +187,7 @@ def test_existing_user_invite_not_a_member_of_organisation(
     mock_add_user_to_organisation.assert_called_once_with(
         ORGANISATION_ID,
         api_user_active["id"],
+        permissions=["can_make_services_live"],
     )
     mock_update_user_attribute.assert_called_once_with(
         mock_get_user_by_email.side_effect(None)["id"],

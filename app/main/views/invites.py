@@ -122,7 +122,9 @@ def accept_org_invite(token):
         existing_user.update_email_access_validated_at()
         invited_org_user.accept_invite()
         if existing_user not in organisation_users:
-            existing_user.add_to_organisation(organisation_id=invited_org_user.organisation)
+            existing_user.add_to_organisation(
+                organisation_id=invited_org_user.organisation, permissions=["can_make_services_live"]
+            )
         return redirect(url_for("main.organisation_dashboard", org_id=invited_org_user.organisation))
     else:
         return redirect(url_for("main.register_from_org_invite"))
