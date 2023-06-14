@@ -9,26 +9,28 @@
 {% endblock %}
 
 {% block backLink %}
-  {% if not error %}
-    {{ govukBackLink({ "href": url_for('main.uploads', service_id=current_service.id) }) }}
-  {% endif %}
+  {{ govukBackLink({ "href": url_for('main.uploads', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-five-sixths">
-    {% if error %}
+  {% if error %}
+    <div class="govuk-!-margin-bottom-4">
       {% call banner_wrapper(type='dangerous') %}
         <h1 class="banner-title">{{ error.title }}</h1>
         {% if error.detail %}
           <p class="govuk-body">{{ error.detail | safe }}</p>
         {% endif %}
       {% endcall %}
-    {% else %}
-      {{ page_header('Upload a letter') }}
-    <p class="govuk-body">Upload a single letter as a PDF and we’ll print, pack and post it for you.</p>
-    <p class="govuk-body">You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
-    {% endif %}
+    </div>
+  {% else %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        {{ page_header('Upload a letter') }}
+        <p class="govuk-body">Upload a single letter as a PDF and we’ll print, pack and post it for you.</p>
+        <p class="govuk-body">You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
+      </div>
+    </div>
+  {% endif %}
 
   <div class="govuk-body">
     {{ file_upload(
@@ -40,7 +42,5 @@
     )}}
   </div>
 
-    <p class="govuk-body">Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter specification</a>.</p>
-  </div>
-</div>
+  <p class="govuk-body">Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter specification</a>.</p>
 {% endblock %}
