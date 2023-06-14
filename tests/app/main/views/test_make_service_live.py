@@ -2,6 +2,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
@@ -19,7 +20,7 @@ from tests.conftest import (
             create_user(
                 id=sample_uuid(),
                 organisations=[ORGANISATION_ID],
-                organisation_permissions={ORGANISATION_ID: ["can_make_services_live"]},
+                organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
             ),
             True,
             True,
@@ -44,7 +45,7 @@ from tests.conftest import (
             create_user(
                 id=sample_uuid(),
                 organisations=[ORGANISATION_ID],
-                organisation_permissions={ORGANISATION_ID: ["can_make_services_live"]},
+                organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
             ),
             False,
             True,
@@ -55,7 +56,7 @@ from tests.conftest import (
             create_user(
                 id=sample_uuid(),
                 organisations=[ORGANISATION_ID],
-                organisation_permissions={ORGANISATION_ID: ["can_make_services_live"]},
+                organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
             ),
             True,
             False,

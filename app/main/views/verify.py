@@ -5,6 +5,7 @@ from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import check_token
 
 from app import user_api_client
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.main import main
 from app.main.forms import TwoFactorForm
 from app.models.service import Service
@@ -83,7 +84,7 @@ def activate_user(user_id):
     invited_org_user = InvitedOrgUser.from_session()
     if invited_org_user:
         user_api_client.add_user_to_organisation(
-            invited_org_user.organisation, user_id, permissions=["can_make_services_live"]
+            invited_org_user.organisation, user_id, permissions=[PERMISSION_CAN_MAKE_SERVICES_LIVE]
         )
 
     if organisation_id:

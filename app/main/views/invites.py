@@ -2,6 +2,7 @@ from flask import abort, flash, redirect, render_template, session, url_for
 from flask_login import current_user
 from markupsafe import Markup
 
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.main import main
 from app.models.organisation import Organisation
 from app.models.service import Service
@@ -123,7 +124,7 @@ def accept_org_invite(token):
         invited_org_user.accept_invite()
         if existing_user not in organisation_users:
             existing_user.add_to_organisation(
-                organisation_id=invited_org_user.organisation, permissions=["can_make_services_live"]
+                organisation_id=invited_org_user.organisation, permissions=[PERMISSION_CAN_MAKE_SERVICES_LIVE]
             )
         return redirect(url_for("main.organisation_dashboard", org_id=invited_org_user.organisation))
     else:

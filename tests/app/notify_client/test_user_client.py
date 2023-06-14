@@ -5,6 +5,7 @@ import pytest
 from notifications_python_client.errors import HTTPError
 
 from app import invite_api_client, service_api_client, user_api_client
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.models.webauthn_credential import WebAuthnCredential
 from tests import sample_uuid
 from tests.conftest import SERVICE_ONE_ID
@@ -196,7 +197,12 @@ def test_returns_value_from_cache(
             {"is_successful": True, "webauthn_credential_id": "123"},
         ),
         (user_api_client, "add_user_to_service", [SERVICE_ONE_ID, user_id, [], []], {}),
-        (user_api_client, "add_user_to_organisation", [sample_uuid(), user_id, ["can_make_services_live"]], {}),
+        (
+            user_api_client,
+            "add_user_to_organisation",
+            [sample_uuid(), user_id, [PERMISSION_CAN_MAKE_SERVICES_LIVE]],
+            {},
+        ),
         (user_api_client, "set_user_permissions", [user_id, SERVICE_ONE_ID, []], {}),
         (user_api_client, "activate_user", [user_id], {}),
         (user_api_client, "archive_user", [user_id], {}),

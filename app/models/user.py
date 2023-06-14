@@ -6,6 +6,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.event_handlers import (
     create_add_user_to_service_event,
     create_set_organisation_user_permissions_event,
@@ -464,7 +465,7 @@ class User(BaseUser, UserMixin):
             or (
                 self.belongs_to_organisation(service.organisation_id)
                 and service.organisation.can_approve_own_go_live_requests
-                and self.has_permission_for_organisation(service.organisation_id, "can_make_services_live")
+                and self.has_permission_for_organisation(service.organisation_id, PERMISSION_CAN_MAKE_SERVICES_LIVE)
             )
         ) and service.has_active_go_live_request
 

@@ -5,6 +5,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.models.user import InvitedOrgUser
 from tests.conftest import ORGANISATION_ID, create_active_user_with_permissions, normalize_spaces
 
@@ -27,7 +28,7 @@ def test_invite_org_user(
         sample_org_invite["invited_by"],
         f"{ORGANISATION_ID}",
         "test@example.gov.uk",
-        ["can_make_services_live"],
+        [PERMISSION_CAN_MAKE_SERVICES_LIVE],
     )
 
 
@@ -187,7 +188,7 @@ def test_existing_user_invite_not_a_member_of_organisation(
     mock_add_user_to_organisation.assert_called_once_with(
         ORGANISATION_ID,
         api_user_active["id"],
-        permissions=["can_make_services_live"],
+        permissions=[PERMISSION_CAN_MAKE_SERVICES_LIVE],
     )
     mock_update_user_attribute.assert_called_once_with(
         mock_get_user_by_email.side_effect(None)["id"],
@@ -452,7 +453,7 @@ class TestEditOrganisationUser:
             user_id=_other_user["id"],
             _data={
                 "permissions_field": [
-                    "can_make_services_live",
+                    PERMISSION_CAN_MAKE_SERVICES_LIVE,
                 ],
             },
             _expected_redirect="",
@@ -462,7 +463,7 @@ class TestEditOrganisationUser:
             mocker.call(
                 _other_user["id"],
                 organisation_id=ORGANISATION_ID,
-                permissions=[{"permission": "can_make_services_live"}],
+                permissions=[{"permission": PERMISSION_CAN_MAKE_SERVICES_LIVE}],
             )
         ]
         assert mock_event.call_args_list == [
@@ -470,7 +471,7 @@ class TestEditOrganisationUser:
                 user_id=_other_user["id"],
                 organisation_id=ORGANISATION_ID,
                 original_permissions=set(),
-                new_permissions=["can_make_services_live"],
+                new_permissions=[PERMISSION_CAN_MAKE_SERVICES_LIVE],
                 set_by_id=platform_admin_user["id"],
             )
         ]
