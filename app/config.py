@@ -109,6 +109,7 @@ class Config:
 
 
 class Development(Config):
+    SERVER_NAME = os.getenv("SERVER_NAME")
     NOTIFY_LOG_PATH = "application.log"
     DEBUG = True
     SESSION_COOKIE_SECURE = False
