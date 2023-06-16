@@ -47,6 +47,35 @@ def test_get_page_count_for_letter_caches(
     assert len(mock_get_page_count.call_args_list) == 1
 
 
+def test_get_page_count_for_letter_returns_cached_value(
+    client_request,
+    service_one,
+    api_user_active,
+    mocker,
+    fake_uuid,
+):
+    client_request.login(api_user_active, service_one)
+
+    mock_redis_get = mocker.patch(
+        "app.extensions.RedisClient.get",
+        return_value="5",
+    )
+
+    template = TemplatedLetterImageTemplate(
+        template_json(
+            service_id=SERVICE_ONE_ID,
+            id_=fake_uuid,
+            type_="letter",
+        )
+    )
+
+    for _ in range(3):
+        assert template.page_count == 5
+
+    # Redis only gets called once because the instance also caches the value
+    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-page-count")
+
+
 def test_get_page_count_for_letter_does_not_cache_for_personalised_letters(
     client_request,
     service_one,

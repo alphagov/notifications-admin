@@ -35,7 +35,8 @@ class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
         cache_key = f"service-{self._template['service']}-template-{self.id}-page-count"
 
         if cached_value := redis_client.get(cache_key):
-            return cached_value
+            self._page_count = int(cached_value)
+            return self._page_count
 
         self._page_count = get_page_count_for_letter(self._template)
 
