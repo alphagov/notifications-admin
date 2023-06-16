@@ -412,9 +412,7 @@ def test_deletes_service_cache(
             "create_service_template",
             ["name", "type_", "content", SERVICE_ONE_ID],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
             [],
         ),
         (
@@ -426,67 +424,43 @@ def test_deletes_service_cache(
                 "service_id": SERVICE_ONE_ID,
                 "template_id": FAKE_TEMPLATE_ID,
             },
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
-            [
-                f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "redact_service_template",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
-            [
-                f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "update_service_template_sender",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, "foo"],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
-            [
-                f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "update_service_template_postage",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, "first"],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
-            [
-                f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "delete_service_template",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
-            [
-                f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "archive_service",
             [SERVICE_ONE_ID, []],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}",
-            ],
-            [
-                f"service-{SERVICE_ONE_ID}-template*",
-            ],
+            [f"service-{SERVICE_ONE_ID}"],
+            [f"service-{SERVICE_ONE_ID}-template*"],
         ),
     ],
 )
