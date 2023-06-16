@@ -5,7 +5,9 @@ from notifications_utils.template import (
 )
 from notifications_utils.template import LetterImageTemplate as UtilsLetterImageTemplate
 
+from app.extensions import redis_client
 from app.models import JSONModel
+from app.notify_client import cache
 
 
 class PrecompiledLetterImageTemplate(UtilsLetterImageTemplate):
@@ -26,7 +28,18 @@ class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
         if self._page_count:
             return self._page_count
 
-        self._page_count = get_page_count_for_letter(self._template, self.values)
+        if self.values:
+            self._page_count = get_page_count_for_letter(self._template, self.values)
+            return self._page_count
+
+        cache_key = f"service-{self._template['service']}-template-{self.id}-page-count"
+
+        if cached_value := redis_client.get(cache_key):
+            return cached_value
+
+        self._page_count = get_page_count_for_letter(self._template)
+
+        redis_client.set(cache_key, self._page_count, ex=cache.DEFAULT_TTL)
 
         return self._page_count
 
