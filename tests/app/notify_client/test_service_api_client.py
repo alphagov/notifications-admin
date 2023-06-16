@@ -25,7 +25,7 @@ def test_client_posts_archived_true_when_deleting_template(mocker):
 
     client.delete_service_template(SERVICE_ONE_ID, FAKE_TEMPLATE_ID)
     mock_post.assert_called_once_with(expected_url, data=expected_data)
-    assert call(f"service-{SERVICE_ONE_ID}-template-*") in mock_redis_delete_by_pattern.call_args_list
+    assert call(f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*") in mock_redis_delete_by_pattern.call_args_list
 
 
 def test_client_gets_service(mocker):
@@ -406,15 +406,14 @@ def test_deletes_service_cache(
 
 
 @pytest.mark.parametrize(
-    "method, extra_args, extra_kwargs, expected_cache_deletes",
+    "method, extra_args, extra_kwargs, expected_cache_deletes, expected_cache_deletes_by_pattern",
     [
         (
             "create_service_template",
             ["name", "type_", "content", SERVICE_ONE_ID],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [],
         ),
         (
             "update_service_template",
@@ -425,50 +424,43 @@ def test_deletes_service_cache(
                 "service_id": SERVICE_ONE_ID,
                 "template_id": FAKE_TEMPLATE_ID,
             },
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "redact_service_template",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "update_service_template_sender",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, "foo"],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "update_service_template_postage",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, "first"],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "delete_service_template",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-            ],
+            [f"service-{SERVICE_ONE_ID}-templates"],
+            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
             "archive_service",
             [SERVICE_ONE_ID, []],
             {},
-            [
-                f"service-{SERVICE_ONE_ID}-templates",
-                f"service-{SERVICE_ONE_ID}",
-            ],
+            [f"service-{SERVICE_ONE_ID}"],
+            [f"service-{SERVICE_ONE_ID}-template*"],
         ),
     ],
 )
@@ -480,6 +472,7 @@ def test_deletes_caches_when_modifying_templates(
     extra_args,
     extra_kwargs,
     expected_cache_deletes,
+    expected_cache_deletes_by_pattern,
 ):
     mocker.patch("app.notify_client.current_user", id="1")
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
@@ -490,10 +483,8 @@ def test_deletes_caches_when_modifying_templates(
 
     assert mock_redis_delete.call_args_list == [call(x) for x in expected_cache_deletes]
     assert len(mock_request.call_args_list) == 1
-    if method != "create_service_template":
-        # no deletes for template cach on create_service_template
-        assert len(mock_redis_delete_by_pattern.call_args_list) == 1
-        assert mock_redis_delete_by_pattern.call_args_list[0] == call(f"service-{SERVICE_ONE_ID}-template-*")
+
+    assert mock_redis_delete_by_pattern.call_args_list == [call(x) for x in expected_cache_deletes_by_pattern]
 
 
 def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_templates):
@@ -505,7 +496,7 @@ def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_te
     service_api_client.archive_service(SERVICE_ONE_ID, ["my-user-id1", "my-user-id2"])
 
     assert call("user-my-user-id1", "user-my-user-id2") in mock_redis_delete.call_args_list
-    assert call(f"service-{SERVICE_ONE_ID}-template-*") in mock_redis_delete_by_pattern.call_args_list
+    assert call(f"service-{SERVICE_ONE_ID}-template*") in mock_redis_delete_by_pattern.call_args_list
 
 
 def test_deletes_cached_users_when_changing_broadcast_service_settings(mocker):

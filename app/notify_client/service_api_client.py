@@ -145,8 +145,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.update_service(service_id, **properties)
 
     @cache.delete("service-{service_id}")
-    @cache.delete("service-{service_id}-templates")
-    @cache.delete_by_pattern("service-{service_id}-template-*")
+    @cache.delete_by_pattern("service-{service_id}-template*")
     def archive_service(self, service_id, cached_service_user_ids):
         if cached_service_user_ids:
             redis_client.delete(*map("user-{}".format, cached_service_user_ids))
@@ -183,7 +182,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(endpoint, data)
 
     @cache.delete("service-{service_id}-templates")
-    @cache.delete_by_pattern("service-{service_id}-template-*")
+    @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
     def update_service_template(self, *, service_id, template_id, name=None, content=None, subject=None):
         """
         Update a service template.
@@ -200,7 +199,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(endpoint, data)
 
     @cache.delete("service-{service_id}-templates")
-    @cache.delete_by_pattern("service-{service_id}-template-*")
+    @cache.delete_by_pattern("service-{service_id}-template-{id_}*")
     def redact_service_template(self, service_id, id_):
         return self.post(
             f"/service/{service_id}/template/{id_}",
@@ -208,7 +207,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         )
 
     @cache.delete("service-{service_id}-templates")
-    @cache.delete_by_pattern("service-{service_id}-template-*")
+    @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
     def update_service_template_sender(self, service_id, template_id, reply_to):
         data = {
             "reply_to": reply_to,
@@ -217,7 +216,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(f"/service/{service_id}/template/{template_id}", data)
 
     @cache.delete("service-{service_id}-templates")
-    @cache.delete_by_pattern("service-{service_id}-template-*")
+    @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
     def update_service_template_postage(self, service_id, template_id, postage):
         return self.post(f"/service/{service_id}/template/{template_id}", _attach_current_user({"postage": postage}))
 
@@ -265,7 +264,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         )
 
     @cache.delete("service-{service_id}-templates")
-    @cache.delete_by_pattern("service-{service_id}-template-*")
+    @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
     def delete_service_template(self, service_id, template_id):
         """
         Set a service template's archived flag to True
