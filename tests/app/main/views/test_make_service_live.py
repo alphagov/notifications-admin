@@ -96,6 +96,27 @@ def test_get_make_service_live_page(
         ]
 
 
+def test_get_make_service_live_page_without_org(
+    client_request,
+    service_one,
+    organisation_one,
+):
+    user = create_user(id=sample_uuid(), platform_admin=True)
+
+    service_one["has_active_go_live_request"] = True
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.make_service_live",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one("a#link-org")) == "link an organisation"
+
+
 @pytest.mark.parametrize(
     "method",
     ("get", "post"),

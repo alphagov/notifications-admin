@@ -38,4 +38,5 @@ def make_service_live(service_id):
         "views/make-service-live.html",
         form=form,
         title="Make service live",
+        organisation=current_service.organisation_id,
     )
