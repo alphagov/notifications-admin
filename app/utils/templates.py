@@ -23,8 +23,11 @@ class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
     def page_count(self):
         from app.template_previews import get_page_count_for_letter
 
-        if self._page_count is None:
-            self._page_count = get_page_count_for_letter(self._template, self.values)
+        if self._page_count:
+            return self._page_count
+
+        self._page_count = get_page_count_for_letter(self._template, self.values)
+
         return self._page_count
 
     @property
