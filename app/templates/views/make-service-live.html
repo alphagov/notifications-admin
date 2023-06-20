@@ -34,7 +34,7 @@
           </li>
         {% endfor %}
       </ul>
-
+      {% if organisation %}
       {% call form_wrapper() %}
         {{ form.enabled(param_extensions={
           "items": [
@@ -44,6 +44,9 @@
         }) }}
         {{ page_footer('Confirm') }}
       {% endcall %}
+      {% else %}
+      The service needs to <a id="link-org" href="{{url_for('main.link_service_to_organisation', service_id=current_service.id)}}" class="govuk-link govuk-link--no-visited-state">link an organisation</a> first before it can be made live.
+      {% endif %}
 
     </div>
   </div>
