@@ -3,6 +3,7 @@ from functools import partial
 from unittest.mock import Mock
 
 import pytest
+import werkzeug
 from notifications_utils.template import LetterPreviewTemplate
 
 from app import load_service_before_request
@@ -12,6 +13,7 @@ from app.template_previews import (
     get_page_count_for_letter,
     sanitise_letter,
 )
+from tests.conftest import create_notification
 
 
 @pytest.mark.parametrize(
@@ -70,16 +72,16 @@ def test_from_database_object_makes_request(
     # `service` is in the `_request_ctx_stack` to avoid an error
     load_service_before_request()
 
-    resp = Mock(content="a", status_code="b", headers={"content-type": "image/png"})
-    request_mock = mocker.patch("app.template_previews.requests.post", return_value=resp)
+    request_mock_returns = Mock(content="a", status_code="b", headers={"content-type": "image/png"})
+    request_mock = mocker.patch("app.template_previews.requests.post", return_value=request_mock_returns)
     mocker.patch("app.template_previews.current_service", letter_branding=letter_branding)
     template = mock_get_service_letter_template("123", "456")["data"]
 
-    ret = partial_call(template=template)
+    response = partial_call(template=template)
 
-    assert ret[0] == "a"
-    assert ret[1] == "b"
-    assert list(ret[2]) == [("content-type", "image/png")]
+    assert response[0] == "a"
+    assert response[1] == "b"
+    assert list(response[2]) == [("content-type", "image/png")]
 
     data = {
         "letter_contact_block": None,
@@ -92,6 +94,50 @@ def test_from_database_object_makes_request(
     request_mock.assert_called_once_with(expected_url, json=data, headers=headers)
 
 
+def test_from_notification_has_correct_args(mocker, client_request):
+    # This test is calling `current_service` outside a Flask endpoint, so we need to make sure
+    # `service` is in the `_request_ctx_stack` to avoid an error
+    load_service_before_request()
+
+    request_mock_returns = Mock(content="a", status_code="b", headers={"content-type": "image/png"})
+    request_mock = mocker.patch("app.template_previews.requests.post", return_value=request_mock_returns)
+    mocker.patch("app.template_previews.current_service", letter_branding=LetterBranding({"filename": "hm-government"}))
+
+    notification = create_notification(
+        service_id="abcd",
+        template_type="letter",
+        template_name="sample template",
+        is_precompiled_letter=False,
+    )
+    response = TemplatePreview.from_notification(notification, "png")
+
+    assert response[0] == "a"
+    assert response[1] == "b"
+    assert list(response[2]) == [("content-type", "image/png")]
+
+    data = {
+        "letter_contact_block": None,
+        "template": notification["template"],
+        "values": {"name": "Jo"},
+        "filename": "hm-government",
+    }
+    headers = {"Authorization": "Token my-secret-key"}
+
+    request_mock.assert_called_once_with("http://localhost:9999/preview.png", json=data, headers=headers)
+
+
+def test_from_notification_rejects_precompiled_templates(mocker):
+    notification = create_notification(
+        service_id="abcd",
+        template_type="letter",
+        template_name="sample template",
+        is_precompiled_letter=True,
+    )
+
+    with pytest.raises(werkzeug.exceptions.BadRequest):
+        TemplatePreview.from_notification(notification, "png")
+
+
 @pytest.mark.parametrize(
     "page_number, expected_url",
     [
@@ -99,7 +145,7 @@ def test_from_database_object_makes_request(
         ("2", "http://localhost:9999/precompiled-preview.png"),
     ],
 )
-def test_from_valid_pdf_file_makes_request(mocker, page_number, expected_url):
+def test_from_valid_pdf_file_makes_request(mocker, client_request, page_number, expected_url):
     mocker.patch("app.template_previews.extract_page_from_pdf", return_value=b"pdf page")
     request_mock = mocker.patch(
         "app.template_previews.requests.post",
@@ -116,7 +162,7 @@ def test_from_valid_pdf_file_makes_request(mocker, page_number, expected_url):
     )
 
 
-def test_from_invalid_pdf_file_makes_request(mocker):
+def test_from_invalid_pdf_file_makes_request(mocker, client_request):
     mocker.patch("app.template_previews.extract_page_from_pdf", return_value=b"pdf page")
     request_mock = mocker.patch(
         "app.template_previews.requests.post",
@@ -160,7 +206,7 @@ def test_page_count_unpacks_from_json_response(
     mock_template_preview.assert_called_once_with(*expected_template_preview_args)
 
 
-def test_from_example_template_makes_request(mocker):
+def test_from_example_template_makes_request(mocker, client_request):
     request_mock = mocker.patch("app.template_previews.requests.post")
     template = {}
     filename = "geo"
@@ -177,6 +223,7 @@ def test_from_example_template_makes_request(mocker):
 @pytest.mark.parametrize("allow_international_letters, query_param_value", [[False, "false"], [True, "true"]])
 def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file(
     mocker,
+    client_request,
     allow_international_letters,
     query_param_value,
     fake_uuid,
@@ -198,6 +245,7 @@ def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file(
 
 def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file_for_an_attachment(
     mocker,
+    client_request,
     fake_uuid,
 ):
     request_mock = mocker.patch("app.template_previews.requests.post")

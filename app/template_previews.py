@@ -2,7 +2,7 @@ import base64
 from io import BytesIO
 
 import requests
-from flask import current_app, json
+from flask import abort, current_app, json
 from notifications_utils.pdf import extract_page_from_pdf
 
 from app import current_service
@@ -84,9 +84,20 @@ class TemplatePreview:
             page=page,
         )
 
+    @classmethod
+    def from_notification(cls, notification: dict, filetype: str, page=None):
+        if notification["template"]["is_precompiled_letter"]:
+            abort(400)
+
+        return cls.from_database_object(
+            notification["template"],
+            filetype,
+            notification["personalisation"],
+            page=page,
+        )
+
 
 def get_page_count_for_letter(template, values=None):
-
     if template["template_type"] != "letter":
         return None
 
