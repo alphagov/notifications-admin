@@ -134,7 +134,7 @@ class Development(Config):
 
     ASSET_PATH = "/static/"
 
-    REDIS_URL = "redis://localhost:6379/0"
+    REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
     REDIS_ENABLED = os.environ.get("REDIS_ENABLED") == "1"
     NOTIFY_RUNTIME_PLATFORM = "local"
 
