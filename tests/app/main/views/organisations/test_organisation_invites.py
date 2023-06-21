@@ -5,8 +5,9 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.models.user import InvitedOrgUser
-from tests.conftest import ORGANISATION_ID, normalize_spaces
+from tests.conftest import ORGANISATION_ID, create_active_user_with_permissions, normalize_spaces
 
 
 def test_invite_org_user(
@@ -27,6 +28,7 @@ def test_invite_org_user(
         sample_org_invite["invited_by"],
         f"{ORGANISATION_ID}",
         "test@example.gov.uk",
+        [PERMISSION_CAN_MAKE_SERVICES_LIVE],
     )
 
 
@@ -186,6 +188,7 @@ def test_existing_user_invite_not_a_member_of_organisation(
     mock_add_user_to_organisation.assert_called_once_with(
         ORGANISATION_ID,
         api_user_active["id"],
+        permissions=[PERMISSION_CAN_MAKE_SERVICES_LIVE],
     )
     mock_update_user_attribute.assert_called_once_with(
         mock_get_user_by_email.side_effect(None)["id"],
@@ -377,3 +380,98 @@ def test_verified_org_user_redirects_to_dashboard(
             org_id=invited_org_user.organisation,
         ),
     )
+
+
+class TestEditOrganisationUser:
+    @pytest.fixture
+    def _other_user(self):
+        return create_active_user_with_permissions(with_unique_id=True)
+
+    @pytest.fixture
+    def _get_user_fn(self, platform_admin_user, _other_user):
+        def _get_user(user_id):
+            if user_id == platform_admin_user["id"]:
+                return platform_admin_user
+            elif user_id == _other_user["id"]:
+                return _other_user
+
+            raise ValueError("unknown user id for mock")
+
+        return _get_user
+
+    def test_edit_organisation_user_shows_the_delete_confirmation_banner(
+        self,
+        client_request,
+        mock_get_organisation,
+        mock_get_invites_for_organisation,
+        platform_admin_user,
+        _other_user,
+        _get_user_fn,
+        mocker,
+    ):
+        mocker.patch("app.models.user.OrganisationUsers.client_method", return_value=[_other_user])
+        client_request.login(platform_admin_user)
+
+        # Override the `get_user` mock from `login` because we need to be able to get multiple users
+        mocker.patch("app.user_api_client.get_user", side_effect=_get_user_fn)
+
+        page = client_request.get(
+            "main.edit_organisation_user", org_id=ORGANISATION_ID, user_id=_other_user["id"], delete="yes"
+        )
+
+        assert normalize_spaces(page.select_one("h1").text) == "Test User"
+
+        banner = page.select_one(".banner-dangerous")
+        assert "Are you sure you want to remove Test User?" in normalize_spaces(banner.contents[0])
+        assert banner.form.attrs["action"] == url_for(
+            "main.remove_user_from_organisation", org_id=ORGANISATION_ID, user_id=_other_user["id"]
+        )
+
+    def test_set_permissions(
+        self,
+        client_request,
+        mock_get_organisation,
+        mock_get_invites_for_organisation,
+        platform_admin_user,
+        _other_user,
+        _get_user_fn,
+        mocker,
+    ):
+        mocker.patch("app.models.user.OrganisationUsers.client_method", return_value=[_other_user])
+        mock_set_org_permissions = mocker.patch(
+            "app.notify_client.user_api_client.UserApiClient.set_organisation_permissions"
+        )
+        mock_event = mocker.patch("app.models.user.create_set_organisation_user_permissions_event")
+        client_request.login(platform_admin_user)
+
+        # Override the `get_user` mock from `login` because we need to be able to get multiple users
+        mocker.patch("app.user_api_client.get_user", side_effect=_get_user_fn)
+
+        client_request.post(
+            "main.edit_organisation_user",
+            org_id=ORGANISATION_ID,
+            user_id=_other_user["id"],
+            _data={
+                "permissions_field": [
+                    PERMISSION_CAN_MAKE_SERVICES_LIVE,
+                ],
+            },
+            _expected_redirect="",
+        )
+
+        assert mock_set_org_permissions.call_args_list == [
+            mocker.call(
+                _other_user["id"],
+                organisation_id=ORGANISATION_ID,
+                permissions=[{"permission": PERMISSION_CAN_MAKE_SERVICES_LIVE}],
+            )
+        ]
+        assert mock_event.call_args_list == [
+            mocker.call(
+                user_id=_other_user["id"],
+                organisation_id=ORGANISATION_ID,
+                original_permissions=set(),
+                new_permissions=[PERMISSION_CAN_MAKE_SERVICES_LIVE],
+                set_by_id=platform_admin_user["id"],
+            )
+        ]

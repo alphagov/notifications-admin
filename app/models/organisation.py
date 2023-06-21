@@ -185,6 +185,14 @@ class Organisation(JSONModel):
     def team_members(self):
         return self.invited_users + self.active_users
 
+    def get_team_member(self, user_id):
+        from app import User
+
+        if str(user_id) not in {user.id for user in self.active_users}:
+            abort(404)
+
+        return User.from_id(user_id)
+
     @cached_property
     def email_branding(self):
         return EmailBranding.from_id(self.email_branding_id)

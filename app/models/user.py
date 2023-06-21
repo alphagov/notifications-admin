@@ -6,8 +6,10 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.event_handlers import (
     create_add_user_to_service_event,
+    create_set_organisation_user_permissions_event,
     create_set_user_permissions_event,
 )
 from app.models import JSONModel, ModelList
@@ -37,7 +39,7 @@ class BaseUser(JSONModel):
 
     @property
     def is_invited_user(self):
-        return self.__class__ is InvitedUser
+        return self.__class__ in {InvitedUser, InvitedOrgUser}
 
 
 class User(BaseUser, UserMixin):
@@ -63,6 +65,7 @@ class User(BaseUser, UserMixin):
     def __init__(self, _dict):
         super().__init__(_dict)
         self.permissions = _dict.get("permissions", {})
+        self.organisation_permissions = _dict.get("organisation_permissions", {})
         self._platform_admin = _dict["platform_admin"]
 
     @classmethod
@@ -117,6 +120,16 @@ class User(BaseUser, UserMixin):
             for service, permissions in permissions_by_service.items()
         }
 
+    @property
+    def organisation_permissions(self):
+        return self._organisation_permissions
+
+    @organisation_permissions.setter
+    def organisation_permissions(self, permissions_by_organisation):
+        self._organisation_permissions = {
+            organisation: set(permissions) for organisation, permissions in permissions_by_organisation.items()
+        }
+
     def update(self, **kwargs):
         response = user_api_client.update_user_attribute(self.id, **kwargs)
         self.__init__(response)
@@ -147,6 +160,20 @@ class User(BaseUser, UserMixin):
             service_id=service_id,
             original_ui_permissions=self.permissions_for_service(service_id),
             new_ui_permissions=permissions,
+            set_by_id=set_by_id,
+        )
+
+    def set_organisation_permissions(self, organisation_id, permissions: list[str], set_by_id):
+        user_api_client.set_organisation_permissions(
+            self.id,
+            organisation_id=organisation_id,
+            permissions=[{"permission": p} for p in permissions],
+        )
+        create_set_organisation_user_permissions_event(
+            user_id=self.id,
+            organisation_id=organisation_id,
+            original_permissions=self.permissions_for_organisation(organisation_id),
+            new_permissions=permissions,
             set_by_id=set_by_id,
         )
 
@@ -251,8 +278,14 @@ class User(BaseUser, UserMixin):
     def permissions_for_service(self, service_id):
         return self.permissions.get(service_id, set())
 
+    def permissions_for_organisation(self, organisation_id):
+        return self.organisation_permissions.get(organisation_id, set())
+
     def has_permission_for_service(self, service_id, permission):
         return permission in self.permissions_for_service(service_id)
+
+    def has_permission_for_organisation(self, organisation_id, permission):
+        return permission in self.permissions_for_organisation(organisation_id)
 
     def has_template_folder_permission(self, template_folder, *, service):
         # These users can see all folders
@@ -413,11 +446,8 @@ class User(BaseUser, UserMixin):
             else:
                 raise exception
 
-    def add_to_organisation(self, organisation_id):
-        user_api_client.add_user_to_organisation(
-            organisation_id,
-            self.id,
-        )
+    def add_to_organisation(self, organisation_id, permissions: list[str]):
+        user_api_client.add_user_to_organisation(organisation_id, self.id, permissions=permissions)
 
     def complete_webauthn_login_attempt(self, is_successful=True, webauthn_credential_id=None):
         return user_api_client.complete_webauthn_login_attempt(self.id, is_successful, webauthn_credential_id)
@@ -435,6 +465,7 @@ class User(BaseUser, UserMixin):
             or (
                 self.belongs_to_organisation(service.organisation_id)
                 and service.organisation.can_approve_own_go_live_requests
+                and self.has_permission_for_organisation(service.organisation_id, PERMISSION_CAN_MAKE_SERVICES_LIVE)
             )
         ) and service.has_active_go_live_request
 
@@ -538,6 +569,11 @@ class InvitedUser(BaseUser):
             return False
         return self.service == service_id and permission in self.permissions
 
+    def has_permission_for_organisation(self, organisation_id, permission):
+        if self.status == "cancelled":
+            return False
+        return self.organisation == organisation_id and permission in self.organisation_permissions
+
     def __eq__(self, other):
         return (self.id, self.service, self._from_user, self.email_address, self.auth_type, self.status) == (
             other.id,
@@ -587,8 +623,8 @@ class InvitedOrgUser(BaseUser):
         )
 
     @classmethod
-    def create(cls, invite_from_id, org_id, email_address):
-        return cls(org_invite_api_client.create_invite(invite_from_id, org_id, email_address))
+    def create(cls, invite_from_id, org_id, email_address, permissions):
+        return cls(org_invite_api_client.create_invite(invite_from_id, org_id, email_address, permissions))
 
     @classmethod
     def from_session(cls):
@@ -619,6 +655,9 @@ class InvitedOrgUser(BaseUser):
 
     def accept_invite(self):
         org_invite_api_client.accept_invite(self.organisation, self.id)
+
+    def is_editable_by(self, other):
+        return False
 
 
 class AnonymousUser(AnonymousUserMixin):

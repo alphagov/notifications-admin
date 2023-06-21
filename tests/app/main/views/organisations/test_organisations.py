@@ -790,8 +790,14 @@ def test_manage_org_users_shows_correct_link_next_to_each_user(
         normalize_spaces(users[0].text)
         == "invited_user@test.gov.uk (invited) Cancel invitation for invited_user@test.gov.uk"
     )
-    assert normalize_spaces(users[1].text) == "Test User 1 test@gov.uk Remove Test User 1 test@gov.uk"
-    assert normalize_spaces(users[2].text) == "Test User 2 testt@gov.uk Remove Test User 2 testt@gov.uk"
+    assert (
+        normalize_spaces(users[1].text)
+        == "Test User 1 test@gov.uk Cannot Make new services live Change details for Test User 1 test@gov.uk"
+    )
+    assert (
+        normalize_spaces(users[2].text)
+        == "Test User 2 testt@gov.uk Cannot Make new services live Change details for Test User 2 testt@gov.uk"
+    )
 
     assert users[0].a["href"] == url_for(
         ".cancel_invited_org_user", org_id=ORGANISATION_ID, invited_user_id="73616d70-6c65-4f6f-b267-5f696e766974"
@@ -863,26 +869,6 @@ def test_manage_org_users_should_show_live_search_if_more_than_7_users(
         "govuk-!-width-full",
     ]
     assert normalize_spaces(page.select_one("label[for=search]").text) == "Search by name or email address"
-
-
-def test_edit_organisation_user_shows_the_delete_confirmation_banner(
-    client_request,
-    mock_get_organisation,
-    mock_get_invites_for_organisation,
-    mock_get_users_for_organisation,
-    active_user_with_permissions,
-):
-    page = client_request.get(
-        ".edit_organisation_user", org_id=ORGANISATION_ID, user_id=active_user_with_permissions["id"]
-    )
-
-    assert normalize_spaces(page.select_one("h1").text) == "Team members"
-
-    banner = page.select_one(".banner-dangerous")
-    assert "Are you sure you want to remove Test User?" in normalize_spaces(banner.contents[0])
-    assert banner.form.attrs["action"] == url_for(
-        "main.remove_user_from_organisation", org_id=ORGANISATION_ID, user_id=active_user_with_permissions["id"]
-    )
 
 
 def test_remove_user_from_organisation_makes_api_request_to_remove_user(

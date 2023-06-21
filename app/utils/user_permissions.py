@@ -1,5 +1,7 @@
 from itertools import chain
 
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
+
 permission_mappings = {
     "send_messages": ["send_texts", "send_emails", "send_letters"],
     "manage_templates": ["manage_templates"],
@@ -26,6 +28,9 @@ broadcast_permission_options = (
     ("create_broadcasts", "Create new alerts"),
     ("approve_broadcasts", "Approve alerts"),
 )
+
+organisation_user_permission_names = {PERMISSION_CAN_MAKE_SERVICES_LIVE}
+organisation_user_permission_options = ((PERMISSION_CAN_MAKE_SERVICES_LIVE, "Make new services live"),)
 
 
 def translate_permissions_from_db_to_ui(db_permissions):

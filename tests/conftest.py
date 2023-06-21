@@ -3423,7 +3423,7 @@ def mock_accept_org_invite(mocker, sample_org_invite):
 
 @pytest.fixture(scope="function")
 def mock_add_user_to_organisation(mocker, organisation_one, api_user_active):
-    def _add_user(organisation_id, user_id):
+    def _add_user(organisation_id, user_id, permissions):
         return api_user_active
 
     return mocker.patch("app.user_api_client.add_user_to_organisation", side_effect=_add_user)
@@ -3834,6 +3834,7 @@ def create_user(**overrides):
         "state": "active",
         "failed_login_count": 0,
         "permissions": {},
+        "organisation_permissions": {},
         "platform_admin": False,
         "auth_type": "sms_auth",
         "password_changed_at": str(datetime.utcnow()),
