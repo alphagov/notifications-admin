@@ -44,10 +44,12 @@
             {% if user.is_invited_user == false %}
             <ul class="tick-cross__list">
               {% for permission, label in permissions %}
-                {{ tick_cross(
-                  user.has_permission_for_organisation(current_org.id, permission),
-                  label
-                ) }}
+                {% if current_org.can_use_org_user_permission(permission) %}
+                  {{ tick_cross(
+                    user.has_permission_for_organisation(current_org.id, permission),
+                    label
+                  ) }}
+                {% endif %}
               {% endfor %}
             </ul>
             {% endif %}

@@ -768,12 +768,27 @@ def test_organisation_trial_mode_services_doesnt_work_if_not_platform_admin(
     client_request.get(".organisation_trial_mode_services", org_id=ORGANISATION_ID, _expected_status=403)
 
 
+@pytest.mark.parametrize("can_approve_own_go_live_requests", (True, False))
 def test_manage_org_users_shows_correct_link_next_to_each_user(
     client_request,
-    mock_get_organisation,
+    mocker,
     mock_get_users_for_organisation,
     mock_get_invited_users_for_organisation,
+    can_approve_own_go_live_requests,
 ):
+    def _get_organisation(org_id):
+        return organisation_json(
+            org_id,
+            {
+                "o1": "Org 1",
+                "o2": "Org 2",
+                "o3": "Org 3",
+            }.get(org_id, "Test organisation"),
+            can_approve_own_go_live_requests=can_approve_own_go_live_requests,
+        )
+
+    mocker.patch("app.organisations_client.get_organisation", side_effect=_get_organisation)
+
     page = client_request.get(
         ".manage_org_users",
         org_id=ORGANISATION_ID,
@@ -790,14 +805,19 @@ def test_manage_org_users_shows_correct_link_next_to_each_user(
         normalize_spaces(users[0].text)
         == "invited_user@test.gov.uk (invited) Cancel invitation for invited_user@test.gov.uk"
     )
-    assert (
-        normalize_spaces(users[1].text)
-        == "Test User 1 test@gov.uk Cannot Make new services live Change details for Test User 1 test@gov.uk"
-    )
-    assert (
-        normalize_spaces(users[2].text)
-        == "Test User 2 testt@gov.uk Cannot Make new services live Change details for Test User 2 testt@gov.uk"
-    )
+
+    if can_approve_own_go_live_requests:
+        assert (
+            normalize_spaces(users[1].text)
+            == "Test User 1 test@gov.uk Cannot Make new services live Change details for Test User 1 test@gov.uk"
+        )
+        assert (
+            normalize_spaces(users[2].text)
+            == "Test User 2 testt@gov.uk Cannot Make new services live Change details for Test User 2 testt@gov.uk"
+        )
+    else:
+        assert normalize_spaces(users[1].text) == "Test User 1 test@gov.uk Change details for Test User 1 test@gov.uk"
+        assert normalize_spaces(users[2].text) == "Test User 2 testt@gov.uk Change details for Test User 2 testt@gov.uk"
 
     assert users[0].a["href"] == url_for(
         ".cancel_invited_org_user", org_id=ORGANISATION_ID, invited_user_id="73616d70-6c65-4f6f-b267-5f696e766974"
