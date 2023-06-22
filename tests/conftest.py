@@ -3369,8 +3369,9 @@ def sample_org_invite(mocker, organisation_one):
     organisation = organisation_one["id"]
     created_at = str(datetime.utcnow())
     status = "pending"
+    permissions = ["can_make_services_live"]
 
-    return org_invite_json(id_, invited_by, organisation, email_address, created_at, status)
+    return org_invite_json(id_, invited_by, organisation, email_address, created_at, status, permissions)
 
 
 @pytest.fixture(scope="function")

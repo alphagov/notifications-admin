@@ -607,6 +607,7 @@ class InvitedOrgUser(BaseUser):
         "email_address",
         "status",
         "created_at",
+        "permissions",
     }
 
     def __init__(self, _dict):
@@ -658,6 +659,11 @@ class InvitedOrgUser(BaseUser):
 
     def is_editable_by(self, other):
         return False
+
+    def has_permission_for_organisation(self, organisation_id, permission):
+        if self.status == "cancelled":
+            return False
+        return self.organisation == organisation_id and permission in self.permissions
 
 
 class AnonymousUser(AnonymousUserMixin):
