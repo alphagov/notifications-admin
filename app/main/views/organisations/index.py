@@ -40,7 +40,7 @@ from app.models.user import InvitedOrgUser
 from app.s3_client.s3_mou_client import get_mou
 from app.utils.csv import Spreadsheet
 from app.utils.user import user_has_permissions, user_is_platform_admin
-from app.utils.user_permissions import organisation_user_permission_names, organisation_user_permission_options
+from app.utils.user_permissions import organisation_user_permission_options
 
 
 @main.route("/organisations", methods=["GET"])
@@ -222,10 +222,13 @@ def manage_org_users(org_id):
 @user_has_permissions()
 def invite_org_user(org_id):
     form = InviteOrgUserForm(inviter_email_address=current_user.email_address)
+
     if form.validate_on_submit():
-        email_address = form.email_address.data
         invited_org_user = InvitedOrgUser.create(
-            current_user.id, org_id, email_address, list(organisation_user_permission_names)
+            invite_from_id=current_user.id,
+            org_id=org_id,
+            email_address=form.email_address.data,
+            permissions=form.permissions_field.data,
         )
 
         flash(f"Invite sent to {invited_org_user.email_address}", "default_with_tick")

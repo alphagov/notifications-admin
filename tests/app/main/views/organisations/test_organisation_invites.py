@@ -11,26 +11,54 @@ from tests import organisation_json
 from tests.conftest import ORGANISATION_ID, create_active_user_with_permissions, normalize_spaces
 
 
+@pytest.mark.parametrize(
+    "can_approve_own_go_live_requests, extra_form_data, expected_status",
+    (
+        (False, {}, 302),
+        (False, {"permissions_field": ["can_make_services_live"]}, 200),
+        (True, {}, 302),
+        (True, {"permissions_field": ["can_make_services_live"]}, 302),
+    ),
+)
 def test_invite_org_user(
-    client_request,
-    mocker,
-    mock_get_organisation,
-    sample_org_invite,
+    client_request, mocker, sample_org_invite, can_approve_own_go_live_requests, extra_form_data, expected_status
 ):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(
+            ORGANISATION_ID,
+            "Test organisation",
+            can_approve_own_go_live_requests=can_approve_own_go_live_requests,
+        ),
+    )
 
     mock_invite_org_user = mocker.patch(
         "app.org_invite_api_client.create_invite",
         return_value=sample_org_invite,
     )
 
-    client_request.post(".invite_org_user", org_id=ORGANISATION_ID, _data={"email_address": "test@example.gov.uk"})
-
-    mock_invite_org_user.assert_called_once_with(
-        sample_org_invite["invited_by"],
-        f"{ORGANISATION_ID}",
-        "test@example.gov.uk",
-        [PERMISSION_CAN_MAKE_SERVICES_LIVE],
+    page = client_request.post(
+        ".invite_org_user",
+        org_id=ORGANISATION_ID,
+        _data={"email_address": "test@example.gov.uk", **extra_form_data},
+        _expected_status=expected_status,
     )
+
+    # The page has been re-rendered with an error because the form submission is invalid
+    if expected_status == 200:
+        assert "'can_make_services_live' is not a valid choice for" in page.text
+        assert mock_invite_org_user.call_args_list == []
+
+    # The user has been redirected because the form submission was good
+    else:
+        assert mock_invite_org_user.call_args_list == [
+            mocker.call(
+                sample_org_invite["invited_by"],
+                f"{ORGANISATION_ID}",
+                "test@example.gov.uk",
+                extra_form_data.get("permissions_field", []),
+            )
+        ]
 
 
 def test_invite_org_user_errors_when_same_email_as_inviter(
