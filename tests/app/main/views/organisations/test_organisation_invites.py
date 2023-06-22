@@ -7,6 +7,7 @@ from freezegun import freeze_time
 
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.models.user import InvitedOrgUser
+from tests import organisation_json
 from tests.conftest import ORGANISATION_ID, create_active_user_with_permissions, normalize_spaces
 
 
@@ -399,6 +400,20 @@ class TestEditOrganisationUser:
 
         return _get_user
 
+    def _mock_get_organistion_can_approve_go_live(self, mocker):
+        def _get_organisation(org_id):
+            return organisation_json(
+                org_id,
+                {
+                    "o1": "Org 1",
+                    "o2": "Org 2",
+                    "o3": "Org 3",
+                }.get(org_id, "Test organisation"),
+                can_approve_own_go_live_requests=True,
+            )
+
+        return mocker.patch("app.organisations_client.get_organisation", side_effect=_get_organisation)
+
     def test_edit_organisation_user_shows_the_delete_confirmation_banner(
         self,
         client_request,
@@ -430,13 +445,13 @@ class TestEditOrganisationUser:
     def test_set_permissions(
         self,
         client_request,
-        mock_get_organisation,
         mock_get_invites_for_organisation,
         platform_admin_user,
         _other_user,
         _get_user_fn,
         mocker,
     ):
+        self._mock_get_organistion_can_approve_go_live(mocker)
         mocker.patch("app.models.user.OrganisationUsers.client_method", return_value=[_other_user])
         mock_set_org_permissions = mocker.patch(
             "app.notify_client.user_api_client.UserApiClient.set_organisation_permissions"
@@ -475,3 +490,35 @@ class TestEditOrganisationUser:
                 set_by_id=platform_admin_user["id"],
             )
         ]
+
+    def test_cannot_set_org_user_permissions_filtered_out_by_org_perms(
+        self,
+        client_request,
+        mock_get_organisation,
+        mock_get_invites_for_organisation,
+        platform_admin_user,
+        _other_user,
+        _get_user_fn,
+        mocker,
+    ):
+        mocker.patch("app.models.user.OrganisationUsers.client_method", return_value=[_other_user])
+        mocker.patch("app.notify_client.user_api_client.UserApiClient.set_organisation_permissions")
+        mocker.patch("app.models.user.create_set_organisation_user_permissions_event")
+        client_request.login(platform_admin_user)
+
+        # Override the `get_user` mock from `login` because we need to be able to get multiple users
+        mocker.patch("app.user_api_client.get_user", side_effect=_get_user_fn)
+
+        page = client_request.post(
+            "main.edit_organisation_user",
+            org_id=ORGANISATION_ID,
+            user_id=_other_user["id"],
+            _data={
+                "permissions_field": [
+                    PERMISSION_CAN_MAKE_SERVICES_LIVE,
+                ],
+            },
+            _expected_status=200,
+        )
+
+        assert "Error: 'can_make_services_live' is not a valid choice for this field." in page.text

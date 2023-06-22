@@ -4,6 +4,7 @@ from typing import Optional
 from flask import abort
 from werkzeug.utils import cached_property
 
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.models import JSONModel, ModelList, SerialisedModelCollection
 from app.models.branding import (
     EmailBranding,
@@ -238,6 +239,17 @@ class Organisation(JSONModel):
         if updated_at:
             updated_at = datetime.datetime.fromisoformat(updated_at)
         return response["services"], updated_at
+
+    def can_use_org_user_permission(self, permission: str):
+        """Validate whether an organisation can see/access/edit a given org permission
+
+        This is used currently because the 'approve own go live requests' is behind an org-level feature flag.
+        Once that feature flag is removed we might be able to remove this method altogether as it's possibly not
+        something that needs to live forever."""
+        if permission == PERMISSION_CAN_MAKE_SERVICES_LIVE:
+            return self.can_approve_own_go_live_requests
+
+        return True
 
 
 class Organisations(SerialisedModelCollection):

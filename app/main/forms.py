@@ -51,7 +51,7 @@ from wtforms.validators import (
     Regexp,
 )
 
-from app import asset_fingerprinter
+from app import asset_fingerprinter, current_organisation
 from app.formatters import (
     format_auth_type,
     format_thousands,
@@ -970,6 +970,13 @@ class OrganisationUserPermissionsForm(StripWhitespaceForm):
         form = cls(
             permissions_field=user.permissions_for_organisation(organisation.id) & organisation_user_permission_names,
         )
+
+        # Remove any permissions that an org doesn't have access to
+        form.permissions_field.choices = [
+            (value, label)
+            for value, label in form.permissions_field.choices
+            if current_organisation.can_use_org_user_permission(value)
+        ]
 
         return form
 
