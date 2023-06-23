@@ -613,6 +613,7 @@ class InvitedOrgUser(BaseUser):
     def __init__(self, _dict):
         super().__init__(_dict)
         self._invited_by = _dict["invited_by"]
+        self.permissions = _dict["permissions"]
 
     def __eq__(self, other):
         return (self.id, self.organisation, self._invited_by, self.email_address, self.status) == (
@@ -659,6 +660,17 @@ class InvitedOrgUser(BaseUser):
 
     def is_editable_by(self, other):
         return False
+
+    @property
+    def permissions(self):
+        return self._permissions
+
+    @permissions.setter
+    def permissions(self, permissions):
+        if isinstance(permissions, list):
+            self._permissions = permissions
+        else:
+            self._permissions = [p for p in permissions.split(",") if p]
 
     def has_permission_for_organisation(self, organisation_id, permission):
         if self.status == "cancelled":
