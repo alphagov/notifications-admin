@@ -228,7 +228,7 @@ def invite_org_user(org_id):
             invite_from_id=current_user.id,
             org_id=org_id,
             email_address=form.email_address.data,
-            permissions=form.permissions_field.data,
+            permissions=list(form.permissions),
         )
 
         flash(f"Invite sent to {invited_org_user.email_address}", "default_with_tick")

@@ -529,7 +529,7 @@ class InvitedUser(BaseUser):
         if isinstance(permissions, list):
             self._permissions = permissions
         else:
-            self._permissions = permissions.split(",")
+            self._permissions = [p for p in permissions.split(",") if p]
         self._permissions = translate_permissions_from_db_to_ui(self.permissions)
 
     @property
