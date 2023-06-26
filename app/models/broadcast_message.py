@@ -30,7 +30,6 @@ class BroadcastMessage(JSONModel):
         "service_id",
         "template_id",
         "content",
-        "service_id",
         "created_by",
         "personalisation",
         "starts_at",

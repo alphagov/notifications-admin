@@ -405,7 +405,6 @@ class OrgNavigation(Navigation):
             "edit_organisation_can_approve_own_go_live_requests",
             "edit_organisation_crown_status",
             "edit_organisation_domains",
-            "edit_organisation_domains",
             "edit_organisation_go_live_notes",
             "edit_organisation_name",
             "edit_organisation_notes",
