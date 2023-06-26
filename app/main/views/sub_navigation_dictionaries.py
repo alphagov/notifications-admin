@@ -103,7 +103,7 @@ def using_notify_nav():
                     "link": "main.guidance_email_branding",
                 },
                 {
-                    "name": "Formatting",
+                    "name": "Formatting emails and letters",
                     "link": "main.guidance_formatting",
                 },
                 {
