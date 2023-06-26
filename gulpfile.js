@@ -9,6 +9,7 @@ const { src, pipe, dest, series, parallel, watch } = require('gulp');
 const rollupPluginNodeResolve = require('rollup-plugin-node-resolve');
 const streamqueue = require('streamqueue');
 const stylish = require('jshint-stylish');
+const del = require('del');
 
 const plugins = {};
 plugins.addSrc = require('gulp-add-src');
@@ -182,15 +183,15 @@ const images = () => {
 
 const watchFiles = {
   javascripts: (cb) => {
-    watch([paths.src + 'javascripts/**/*'], javascripts);
+    watch([paths.src + 'javascripts/**/*'], series(clean.javascripts, javascripts));
     cb();
   },
   sass: (cb) => {
-    watch([paths.src + 'stylesheets/**/*'], sass);
+    watch([paths.src + 'stylesheets/**/*'], series(clean.sass, sass));
     cb();
   },
   images: (cb) => {
-    watch([paths.src + 'images/**/*'], images);
+    watch([paths.src + 'images/**/*'], series(clean.images, images));
     cb();
   },
   self: (cb) => {
@@ -224,8 +225,28 @@ const lint = {
   }
 };
 
+const clean = {
+  everything: async function cleanEverything(cb) {
+    await del([`${paths.dist}/*`]);
+    cb();
+  },
+  javascripts: async function cleanJavascripts(cb) {
+    await del([`${paths.dist}/javascripts/*`]);
+    cb();
+  },
+  sass: async function cleanSass(cb) {
+    await del([`${paths.dist}/stylesheets/*`]);
+    cb();
+  },
+  images: async function cleanImages(cb) {
+    await del([`${paths.dist}/images/*`]);
+    cb();
+  }
+}
+
 // Default: compile everything
 const defaultTask = series(
+  clean.everything,
   parallel(
     copy.govuk_frontend.fonts,
     copy.leaflet.js,
