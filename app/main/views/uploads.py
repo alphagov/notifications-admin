@@ -155,7 +155,7 @@ def upload_letter(service_id):
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
-            current_app.logger.info(f"Invalid PDF uploaded for service_id: {service_id}")
+            current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
             return _invalid_upload_error(
                 "There’s a problem with your file",
                 "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",

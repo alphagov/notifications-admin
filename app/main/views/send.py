@@ -973,7 +973,7 @@ def send_notification(service_id, template_id):
             sender_id=session.get("sender_id", None),
         )
     except HTTPError as exception:
-        current_app.logger.info(f'Service {current_service.id} could not send notification: "{exception.message}"')
+        current_app.logger.info('Service %s could not send notification: "%s"', current_service.id, exception.message)
         return render_template(
             "views/notifications/check.html",
             **_check_notification(service_id, template_id, exception),
