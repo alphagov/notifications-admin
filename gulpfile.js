@@ -224,19 +224,14 @@ const lint = {
   }
 };
 
-
 // Default: compile everything
-const defaultTask = parallel(
+const defaultTask = series(
   parallel(
     copy.govuk_frontend.fonts,
-    images,
-    copy.leaflet.js
-  ),
-  series(
+    copy.leaflet.js,
     copy.error_pages,
-    series(
-      javascripts
-    ),
+    images,
+    javascripts,
     sass
   )
 );
@@ -253,7 +248,7 @@ const watchForChanges = parallel(
 
 exports.default = defaultTask;
 
-exports.lint = series(lint.sass, lint.js);
+exports.lint = parallel(lint.sass, lint.js);
 
 // Optional: recompile on changes
 exports.watch = series(defaultTask, watchForChanges);
