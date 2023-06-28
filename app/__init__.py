@@ -473,7 +473,9 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
                 return handle_no_permissions(e)
 
         application.logger.warning(
-            "csrf.invalid_token: Aborting request, user_id: {user_id}", extra={"user_id": session["user_id"]}
+            "csrf.invalid_token: Aborting request, user_id: %s",
+            session["user_id"],
+            extra={"user_id": session["user_id"]},
         )
 
         return _error_response(400, error_page_template=500)
