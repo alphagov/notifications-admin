@@ -666,11 +666,8 @@ class InvitedOrgUser(BaseUser):
         return self._permissions
 
     @permissions.setter
-    def permissions(self, permissions):
-        if isinstance(permissions, list):
-            self._permissions = permissions
-        else:
-            self._permissions = [p for p in permissions.split(",") if p]
+    def permissions(self, permissions: list[str]):
+        self._permissions = permissions
 
     def has_permission_for_organisation(self, organisation_id, permission):
         if self.status == "cancelled":
