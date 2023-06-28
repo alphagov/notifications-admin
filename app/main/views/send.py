@@ -123,9 +123,15 @@ def send_messages(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
-            current_app.logger.info("User %s uploaded %s", current_user.id, form.file.data.filename)
+            current_app.logger.info(
+                "User %(user_id)s uploaded %(filename)s",
+                dict(user_id=current_user.id, filename=form.file.data.filename),
+            )
             upload_id = s3upload(service_id, Spreadsheet.from_file_form(form).as_dict, current_app.config["AWS_REGION"])
-            current_app.logger.info("%s persisted in S3 as %s", form.file.data.filename, upload_id)
+            current_app.logger.info(
+                "%(filename)s persisted in S3 as %(upload_id)s",
+                dict(filename=form.file.data.filename, upload_id=upload_id),
+            )
             file_name_metadata = unicode_truncate(SanitiseASCII.encode(form.file.data.filename), 1600)
             set_metadata_on_csv_upload(service_id, upload_id, original_file_name=file_name_metadata)
             return redirect(
@@ -973,7 +979,10 @@ def send_notification(service_id, template_id):
             sender_id=session.get("sender_id", None),
         )
     except HTTPError as exception:
-        current_app.logger.info(f'Service {current_service.id} could not send notification: "{exception.message}"')
+        current_app.logger.info(
+            'Service %(service_id)s could not send notification: "%(message)s"',
+            dict(service_id=current_service.id, message=exception.message),
+        )
         return render_template(
             "views/notifications/check.html",
             **_check_notification(service_id, template_id, exception),

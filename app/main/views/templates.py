@@ -1003,7 +1003,7 @@ def _process_letter_attachment_form(service_id, template, form):
         # handles malformed files nicely - is this done yet?
         attachment_page_count = pdf_page_count(BytesIO(pdf_file_bytes))
     except PdfReadError:
-        current_app.logger.info(f"Invalid PDF uploaded for service_id: {service_id}")
+        current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
         raise LetterAttachmentFormError(
             title="There’s a problem with your file",
             detail="Notify cannot read this PDF.<br>Save a new copy of your file and try again.",

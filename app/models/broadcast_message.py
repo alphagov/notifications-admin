@@ -30,7 +30,6 @@ class BroadcastMessage(JSONModel):
         "service_id",
         "template_id",
         "content",
-        "service_id",
         "created_by",
         "personalisation",
         "starts_at",
@@ -107,10 +106,12 @@ class BroadcastMessage(JSONModel):
                 # we should just treat the whole thing as a custom broadcast,
                 # which isn't great as our code doesn't support editing its
                 # areas, but we don't expect this to happen often
-                current_app.logger.warn(
-                    f"BroadcastMessage has {len(self.area_ids)} area IDs "
-                    f"but {len(library_areas)} found in the library. Treating "
-                    f"{self.id} as a custom broadcast."
+                current_app.logger.warning(
+                    (
+                        "BroadcastMessage has %(area_ids)s area IDs but %(library_areas)s found in the library. "
+                        "Treating %(id)s as a custom broadcast."
+                    ),
+                    dict(area_ids=len(self.area_ids), library_areas=len(library_areas), id=self.id),
                 )
 
         polygons = self._dict["areas"].get("simple_polygons", [])

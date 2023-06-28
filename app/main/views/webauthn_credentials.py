@@ -46,7 +46,7 @@ def webauthn_complete_register():
             cbor.decode(request.get_data()),
         )
     except RegistrationError as e:
-        current_app.logger.info(f"User {current_user.id} could not register a new webauthn token - {e}")
+        current_app.logger.info("User %s could not register a new webauthn token - %s", current_user.id, e)
         abort(400)
 
     current_user.create_webauthn_credential(credential)
@@ -139,7 +139,7 @@ def _verify_webauthn_authentication(user):
         # couldn't be authenticated, something went wrong along the way, probably:
         # * The browser didn't implement the webauthn standard correctly, and let something through it shouldn't have
         # * The key itself is in some way corrupted, or of lower security standard
-        current_app.logger.info(f"User {user.id} could not sign in using their webauthn token - {exc}")
+        current_app.logger.info("User %s could not sign in using their webauthn token - %s", user.id, exc)
         user.complete_webauthn_login_attempt(is_successful=False)
         abort(403)
 

@@ -413,9 +413,12 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     @application.errorhandler(HTTPError)
     def render_http_error(error):
         application.logger.warning(
-            "API {} failed with status {} message {}".format(
-                error.response.url if error.response else "unknown", error.status_code, error.message
-            )
+            "API %(api)s failed with status %(status)s message %(message)s",
+            dict(
+                api=error.response.url if error.response else "unknown",
+                status=error.status_code,
+                message=error.message,
+            ),
         )
         error_code = error.status_code
         if error_code not in [401, 404, 403, 410]:
@@ -423,9 +426,12 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             # it might be a 400, which we should handle as if it's an internal server error. If the API might
             # legitimately return a 400, we should handle that within the view or the client that calls it.
             application.logger.exception(
-                "API {} failed with status {} message {}".format(
-                    error.response.url if error.response else "unknown", error.status_code, error.message
-                )
+                "API %(api)s failed with status %(status)s message %(message)s",
+                dict(
+                    api=error.response.url if error.response else "unknown",
+                    status=error.status_code,
+                    message=error.message,
+                ),
             )
             error_code = 500
         return _error_response(error_code)
@@ -460,7 +466,7 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
 
     @application.errorhandler(CSRFError)
     def handle_csrf(reason):
-        application.logger.warning(f"csrf.error_message: {reason}")
+        application.logger.warning("csrf.error_message: %s", reason)
 
         if "user_id" not in session:
             application.logger.warning("csrf.session_expired: Redirecting user to log in page")
@@ -471,7 +477,9 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
                 return handle_no_permissions(e)
 
         application.logger.warning(
-            "csrf.invalid_token: Aborting request, user_id: {user_id}", extra={"user_id": session["user_id"]}
+            "csrf.invalid_token: Aborting request, user_id: %(user_id)s",
+            dict(user_id=session["user_id"]),
+            extra={"user_id": session["user_id"]},  # include as a distinct field in the log output
         )
 
         return _error_response(400, error_page_template=500)

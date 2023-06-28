@@ -155,7 +155,7 @@ def upload_letter(service_id):
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
-            current_app.logger.info(f"Invalid PDF uploaded for service_id: {service_id}")
+            current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
             return _invalid_upload_error(
                 "There’s a problem with your file",
                 "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
@@ -238,8 +238,8 @@ def uploaded_letter_preview(service_id, file_id):
 
     try:
         metadata = get_letter_metadata(service_id, file_id)
-    except LetterNotFoundError as e:
-        current_app.logger.warning(e)
+    except LetterNotFoundError:
+        current_app.logger.warning("Uploaded letter preview failed", exc_info=True)
 
         # If the file is missing it's likely because this is a duplicate
         # request, the notification already exists and the file has been
@@ -312,8 +312,8 @@ def send_uploaded_letter(service_id, file_id):
 
     try:
         metadata = get_letter_metadata(service_id, file_id)
-    except LetterNotFoundError as e:
-        current_app.logger.warning(e)
+    except LetterNotFoundError:
+        current_app.logger.warning("Get letter metadata failed", exc_info=True)
 
         # If the file is missing it's likely because this is a duplicate
         # request, the notification already exists and the file has been
