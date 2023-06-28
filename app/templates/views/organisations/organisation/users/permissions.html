@@ -5,4 +5,6 @@
   {% set user = {'platform_admin': False, 'webauthn_auth': False, 'mobile_number': 'truthy so we give auth option'} %}
 {% endif %}
 
-{{ form.permissions_field }}
+{{ form.permissions_field(param_extensions={
+  "fieldset": false
+}) }}
