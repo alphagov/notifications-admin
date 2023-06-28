@@ -529,7 +529,7 @@ class InvitedUser(BaseUser):
         if isinstance(permissions, list):
             self._permissions = permissions
         else:
-            self._permissions = permissions.split(",")
+            self._permissions = [p for p in permissions.split(",") if p]
         self._permissions = translate_permissions_from_db_to_ui(self.permissions)
 
     @property
@@ -607,11 +607,13 @@ class InvitedOrgUser(BaseUser):
         "email_address",
         "status",
         "created_at",
+        "permissions",
     }
 
     def __init__(self, _dict):
         super().__init__(_dict)
         self._invited_by = _dict["invited_by"]
+        self.permissions = _dict["permissions"]
 
     def __eq__(self, other):
         return (self.id, self.organisation, self._invited_by, self.email_address, self.status) == (
@@ -658,6 +660,19 @@ class InvitedOrgUser(BaseUser):
 
     def is_editable_by(self, other):
         return False
+
+    @property
+    def permissions(self):
+        return self._permissions
+
+    @permissions.setter
+    def permissions(self, permissions: list[str]):
+        self._permissions = permissions
+
+    def has_permission_for_organisation(self, organisation_id, permission):
+        if self.status == "cancelled":
+            return False
+        return self.organisation == organisation_id and permission in self.permissions
 
 
 class AnonymousUser(AnonymousUserMixin):

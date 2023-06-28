@@ -961,23 +961,28 @@ class OrganisationUserPermissionsForm(StripWhitespaceForm):
         },
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._restrict_permission_choices()
+
+    def _restrict_permission_choices(self):
+        # Remove any permissions that an org doesn't have access to
+        self.permissions_field.choices = [
+            (value, label)
+            for value, label in self.permissions_field.choices
+            if current_organisation.can_use_org_user_permission(value)
+        ]
+
     @property
     def permissions(self):
         return set(self.permissions_field.data)
 
     @classmethod
-    def from_user_and_organisation(cls, user, organisation):
+    def from_user_and_organisation(cls, user, organisation, **kwargs):
         form = cls(
             permissions_field=user.permissions_for_organisation(organisation.id) & organisation_user_permission_names,
+            **kwargs,
         )
-
-        # Remove any permissions that an org doesn't have access to
-        form.permissions_field.choices = [
-            (value, label)
-            for value, label in form.permissions_field.choices
-            if current_organisation.can_use_org_user_permission(value)
-        ]
-
         return form
 
 
@@ -1007,7 +1012,7 @@ class BroadcastInviteUserForm(BaseInviteUserForm, BroadcastPermissionsForm):
             raise ValidationError("You cannot send an invitation to yourself")
 
 
-class InviteOrgUserForm(BaseInviteUserForm, StripWhitespaceForm):
+class InviteOrgUserForm(BaseInviteUserForm, OrganisationUserPermissionsForm):
     pass
 
 

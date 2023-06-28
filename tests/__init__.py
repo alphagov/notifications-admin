@@ -378,7 +378,7 @@ def invite_json(
     }
 
 
-def org_invite_json(id_, invited_by, org_id, email_address, created_at, status):
+def org_invite_json(*, id_, invited_by, org_id, email_address, created_at, status, permissions):
     return {
         "id": id_,
         "invited_by": invited_by,
@@ -386,6 +386,7 @@ def org_invite_json(id_, invited_by, org_id, email_address, created_at, status):
         "email_address": email_address,
         "status": status,
         "created_at": created_at,
+        "permissions": permissions,
     }
 
 
