@@ -9,6 +9,7 @@ const { src, pipe, dest, series, parallel, watch } = require('gulp');
 const rollupPluginNodeResolve = require('rollup-plugin-node-resolve');
 const streamqueue = require('streamqueue');
 const stylish = require('jshint-stylish');
+const del = require('del');
 
 const plugins = {};
 plugins.addSrc = require('gulp-add-src');
@@ -182,15 +183,15 @@ const images = () => {
 
 const watchFiles = {
   javascripts: (cb) => {
-    watch([paths.src + 'javascripts/**/*'], javascripts);
+    watch([paths.src + 'javascripts/**/*'], series(clean.javascripts, javascripts));
     cb();
   },
   sass: (cb) => {
-    watch([paths.src + 'stylesheets/**/*'], sass);
+    watch([paths.src + 'stylesheets/**/*'], series(clean.sass, sass));
     cb();
   },
   images: (cb) => {
-    watch([paths.src + 'images/**/*'], images);
+    watch([paths.src + 'images/**/*'], series(clean.images, images));
     cb();
   },
   self: (cb) => {
@@ -224,19 +225,34 @@ const lint = {
   }
 };
 
+const clean = {
+  everything: async function cleanEverything(cb) {
+    await del([`${paths.dist}/*`]);
+    cb();
+  },
+  javascripts: async function cleanJavascripts(cb) {
+    await del([`${paths.dist}/javascripts/*`]);
+    cb();
+  },
+  sass: async function cleanSass(cb) {
+    await del([`${paths.dist}/stylesheets/*`]);
+    cb();
+  },
+  images: async function cleanImages(cb) {
+    await del([`${paths.dist}/images/*`]);
+    cb();
+  }
+}
 
 // Default: compile everything
-const defaultTask = parallel(
+const defaultTask = series(
+  clean.everything,
   parallel(
     copy.govuk_frontend.fonts,
-    images,
-    copy.leaflet.js
-  ),
-  series(
+    copy.leaflet.js,
     copy.error_pages,
-    series(
-      javascripts
-    ),
+    images,
+    javascripts,
     sass
   )
 );
@@ -253,7 +269,7 @@ const watchForChanges = parallel(
 
 exports.default = defaultTask;
 
-exports.lint = series(lint.sass, lint.js);
+exports.lint = parallel(lint.sass, lint.js);
 
 // Optional: recompile on changes
 exports.watch = series(defaultTask, watchForChanges);
