@@ -948,17 +948,6 @@ class OrganisationUserPermissionsForm(StripWhitespaceForm):
         "Permissions",
         filters=[partial(filter_by_permissions, permissions=organisation_user_permission_options)],
         choices=[(value, label) for value, label in organisation_user_permission_options],
-        param_extensions={
-            "hint": {
-                "html": (
-                    '<p class="govuk-hint">All team members can:</p>'
-                    '<ul class="govuk-list govuk-list--bullet govuk-hint">'
-                    "<li>see usage, templates, and team members</li>"
-                    "<li>invite other team members</li>"
-                    "</ul>"
-                )
-            }
-        },
     )
 
     def __init__(self, *args, **kwargs):
