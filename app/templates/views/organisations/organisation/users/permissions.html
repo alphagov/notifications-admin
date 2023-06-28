@@ -1,10 +1,3 @@
-{% import "components/svgs.html" as svgs %}
-
-{# this may be called from invite page (where no user exists) #}
-{% if user is not defined %}
-  {% set user = {'platform_admin': False, 'webauthn_auth': False, 'mobile_number': 'truthy so we give auth option'} %}
-{% endif %}
-
 {{ form.permissions_field(param_extensions={
   "fieldset": false
 }) }}
