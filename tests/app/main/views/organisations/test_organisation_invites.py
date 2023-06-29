@@ -12,6 +12,37 @@ from tests.conftest import ORGANISATION_ID, create_active_user_with_permissions,
 
 
 @pytest.mark.parametrize(
+    "can_approve_own_go_live_requests, expected_radios",
+    (
+        (False, []),
+        (True, [("can_make_services_live", "This team member can make new services live")]),
+    ),
+)
+def test_invite_org_user_page(client_request, mocker, can_approve_own_go_live_requests, expected_radios):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(
+            ORGANISATION_ID,
+            "Test organisation",
+            can_approve_own_go_live_requests=can_approve_own_go_live_requests,
+        ),
+    )
+
+    page = client_request.get(
+        ".invite_org_user",
+        org_id=ORGANISATION_ID,
+    )
+
+    assert [
+        (
+            checkbox.select_one("input")["value"],
+            normalize_spaces(checkbox.select_one("label").text),
+        )
+        for checkbox in page.select(".govuk-checkboxes__item")
+    ] == expected_radios
+
+
+@pytest.mark.parametrize(
     "can_approve_own_go_live_requests, extra_form_data, expected_status",
     (
         (False, {}, 302),

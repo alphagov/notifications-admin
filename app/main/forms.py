@@ -947,18 +947,9 @@ class OrganisationUserPermissionsForm(StripWhitespaceForm):
     permissions_field = GovukCheckboxesField(
         "Permissions",
         filters=[partial(filter_by_permissions, permissions=organisation_user_permission_options)],
-        choices=[(value, label) for value, label in organisation_user_permission_options],
-        param_extensions={
-            "hint": {
-                "html": (
-                    '<p class="govuk-hint">All team members can:</p>'
-                    '<ul class="govuk-list govuk-list--bullet govuk-hint">'
-                    "<li>see usage, templates, and team members</li>"
-                    "<li>invite other team members</li>"
-                    "</ul>"
-                )
-            }
-        },
+        choices=[
+            (value, f"This team member can {label.lower()}") for value, label in organisation_user_permission_options
+        ],
     )
 
     def __init__(self, *args, **kwargs):

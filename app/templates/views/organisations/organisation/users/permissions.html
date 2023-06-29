@@ -1,8 +1,9 @@
-{% import "components/svgs.html" as svgs %}
+{{ form.permissions_field(param_extensions={
+  "fieldset": false
+}) }}
 
-{# this may be called from invite page (where no user exists) #}
-{% if user is not defined %}
-  {% set user = {'platform_admin': False, 'webauthn_auth': False, 'mobile_number': 'truthy so we give auth option'} %}
-{% endif %}
-
-{{ form.permissions_field }}
+<p class="govuk-body govuk-!-margin-bottom-2">All team members can:</p>
+<ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+  <li>see usage, templates, and team members</li>
+  <li>invite other team members</li>
+</ul>

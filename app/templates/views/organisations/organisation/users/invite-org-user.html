@@ -29,7 +29,7 @@
       error_message_with_html=True
     ) }}
 
-    {{ form.permissions_field }}
+    {% include 'views/organisations/organisation/users/permissions.html' %}
 
     {{ page_footer('Send invitation email') }}
   {% endcall %}
