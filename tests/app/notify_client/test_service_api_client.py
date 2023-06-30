@@ -576,7 +576,6 @@ def test_client_updates_service_with_allowed_attributes(
 
     allowed_attributes = [
         "active",
-        "consent_to_research",
         "contact_link",
         "count_as_live",
         "email_branding",

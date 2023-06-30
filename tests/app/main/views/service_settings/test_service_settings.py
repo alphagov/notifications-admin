@@ -886,13 +886,11 @@ def test_should_redirect_after_service_name_change(
 
 
 @pytest.mark.parametrize(
-    "volumes, consent_to_research, expected_estimated_volumes_item",
+    "volumes, expected_estimated_volumes_item",
     [
-        ((0, 0, 0), None, "Tell us how many messages you expect to send Not completed"),
-        ((1, 0, 0), None, "Tell us how many messages you expect to send Not completed"),
-        ((1, 0, 0), False, "Tell us how many messages you expect to send Completed"),
-        ((1, 0, 0), True, "Tell us how many messages you expect to send Completed"),
-        ((9, 99, 999), True, "Tell us how many messages you expect to send Completed"),
+        ((0, 0, 0), "Tell us how many messages you expect to send Not completed"),
+        ((1, 0, 0), "Tell us how many messages you expect to send Completed"),
+        ((9, 99, 999), "Tell us how many messages you expect to send Completed"),
     ],
 )
 def test_should_check_if_estimated_volumes_provided(
@@ -905,7 +903,6 @@ def test_should_check_if_estimated_volumes_provided(
     mock_get_organisation,
     mock_get_invites_for_service,
     volumes,
-    consent_to_research,
     expected_estimated_volumes_item,
 ):
 
@@ -916,13 +913,6 @@ def test_should_check_if_estimated_volumes_provided(
             new_callable=PropertyMock,
             return_value=volume,
         )
-
-    mocker.patch(
-        "app.models.service.Service.consent_to_research",
-        create=True,
-        new_callable=PropertyMock,
-        return_value=consent_to_research,
-    )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Before you request to go live"
@@ -1422,14 +1412,6 @@ def test_non_gov_user_is_told_they_cant_go_live(
 
 
 @pytest.mark.parametrize(
-    "consent_to_research, displayed_consent",
-    (
-        (None, None),
-        (True, "yes"),
-        (False, "no"),
-    ),
-)
-@pytest.mark.parametrize(
     "volumes, displayed_volumes",
     (
         (
@@ -1447,8 +1429,6 @@ def test_should_show_estimate_volumes(
     client_request,
     volumes,
     displayed_volumes,
-    consent_to_research,
-    displayed_consent,
 ):
     for channel, volume in volumes:
         mocker.patch(
@@ -1457,12 +1437,6 @@ def test_should_show_estimate_volumes(
             new_callable=PropertyMock,
             return_value=volume,
         )
-    mocker.patch(
-        "app.models.service.Service.consent_to_research",
-        create=True,
-        new_callable=PropertyMock,
-        return_value=consent_to_research,
-    )
     page = client_request.get("main.estimate_usage", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Tell us how many messages you expect to send"
     for channel, label, hint, value in (
@@ -1489,27 +1463,10 @@ def test_should_show_estimate_volumes(
         assert normalize_spaces(page.select_one(f"#volume_{channel}-hint").text) == hint
         assert page.select_one(f"#volume_{channel}").get("value") == value
 
-    assert len(page.select("input[type=radio]")) == 2
 
-    if displayed_consent is None:
-        assert len(page.select("input[checked]")) == 0
-    else:
-        assert len(page.select("input[checked]")) == 1
-        assert page.select_one("input[checked]")["value"] == displayed_consent
-
-
-@pytest.mark.parametrize(
-    "consent_to_research, expected_persisted_consent_to_research",
-    (
-        ("yes", True),
-        ("no", False),
-    ),
-)
 def test_should_show_persist_estimated_volumes(
     client_request,
     mock_update_service,
-    consent_to_research,
-    expected_persisted_consent_to_research,
 ):
     client_request.post(
         "main.estimate_usage",
@@ -1518,7 +1475,6 @@ def test_should_show_persist_estimated_volumes(
             "volume_email": "1,234,567",
             "volume_sms": "",
             "volume_letter": "098",
-            "consent_to_research": consent_to_research,
         },
         _expected_status=302,
         _expected_redirect=url_for(
@@ -1531,49 +1487,27 @@ def test_should_show_persist_estimated_volumes(
         volume_email=1234567,
         volume_sms=0,
         volume_letter=98,
-        consent_to_research=expected_persisted_consent_to_research,
     )
 
 
-@pytest.mark.parametrize(
-    "data, error_selector, expected_error_message",
-    (
-        (
-            {
-                "volume_email": "1234",
-                "volume_sms": "2000000001",
-                "volume_letter": "9876",
-                "consent_to_research": "yes",
-            },
-            "#volume_sms-error",
-            "Number of text messages must be 2,000,000,000 or less",
-        ),
-        (
-            {
-                "volume_email": "1 234",
-                "volume_sms": "0",
-                "volume_letter": "9876",
-                "consent_to_research": "",
-            },
-            '[data-error-label="consent_to_research"]',
-            "Select yes or no",
-        ),
-    ),
-)
 def test_should_error_if_bad_estimations_given(
     client_request,
     mock_update_service,
-    data,
-    error_selector,
-    expected_error_message,
 ):
     page = client_request.post(
         "main.estimate_usage",
         service_id=SERVICE_ONE_ID,
-        _data=data,
+        _data={
+            "volume_email": "1234",
+            "volume_sms": "2000000001",
+            "volume_letter": "9876",
+        },
         _expected_status=200,
     )
-    assert expected_error_message in page.select_one(error_selector).text
+    assert (
+        normalize_spaces(page.select_one("#volume_sms-error").text)
+        == "Error: Number of text messages must be 2,000,000,000 or less"
+    )
     assert mock_update_service.called is False
 
 
@@ -1588,7 +1522,6 @@ def test_should_error_if_all_volumes_zero(
             "volume_email": "",
             "volume_sms": "0",
             "volume_letter": "0,00 0",
-            "consent_to_research": "yes",
         },
         _expected_status=200,
     )
@@ -1612,7 +1545,6 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             "volume_email": "1234",
             "volume_sms": "",
             "volume_letter": "aaaaaaaaaaaaa",
-            "consent_to_research": "yes",
         },
         _expected_status=200,
     )
@@ -1668,7 +1600,6 @@ def test_should_redirect_after_request_to_go_live(
         "Organisation type: Central government\n"
         "Agreement signed: Can’t tell (domain is user.gov.uk).\n"
         "\n"
-        "Consent to research: Yes\n"
         "Other live services for that user: No\n"
         "\n"
         "---\n"
@@ -1744,7 +1675,6 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         "Organisation type: Central government\n"
         "Agreement signed: No (organisation is Org 1, a crown body). {go_live_note}\n"
         "\n"
-        "Consent to research: Yes\n"
         "Other live services for that user: No\n"
         "\n"
         "---\n"
