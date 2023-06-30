@@ -890,6 +890,7 @@ def mock_get_service_letter_template_with_attachment(mocker):
             letter_attachment={
                 "id": sample_uuid(),
                 "original_filename": "original file.pdf",
+                "page_count": 1,
             },
         )
         return {"data": template}

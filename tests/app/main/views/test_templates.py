@@ -1099,6 +1099,8 @@ def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
         _expected_status=200,
     )
     assert page.select_one("h1").text.strip() == "original file.pdf"
+    assert len(page.select(".letter")) == 1
+    assert page.select_one(".letter img")["src"] == f"/services/{SERVICE_ONE_ID}/attachment/{sample_uuid()}.png?page=1"
 
 
 def test_post_delete_letter_attachment_calls_archive_letter_attachment(
@@ -1511,6 +1513,25 @@ def test_should_show_preview_letter_templates(
     assert mocked_preview.call_args[0][0]["id"] == template_id
     assert mocked_preview.call_args[0][0]["service"] == service_id
     assert mocked_preview.call_args[0][1] == filetype
+
+
+def test_should_show_preview_letter_attachment(
+    client_request, mock_get_service_email_template, service_one, fake_uuid, mocker
+):
+    mocked_preview = mocker.patch(
+        "app.main.views.templates.LetterAttachmentPreview.from_attachment_data", return_value="foo"
+    )
+
+    service_id, attachment_id = service_one["id"], fake_uuid
+
+    response = client_request.get_response(
+        "no_cookie.view_letter_attachment_preview",
+        service_id=service_id,
+        attachment_id=attachment_id,
+    )
+
+    assert response.get_data(as_text=True) == "foo"
+    assert mocked_preview.call_args[0][0] == attachment_id
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(

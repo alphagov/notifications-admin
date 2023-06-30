@@ -40,8 +40,13 @@
     )}}
     </div>
     <div class="template-container">
-        <div class="letter page--odd">
-        </div>
+
+        {% for page_number in page_numbers %}
+          <div class="letter page--{{ loop.cycle('odd', 'even') }}{% if loop.first %} page--first{% endif %}{% if loop.last %} page--last{% endif %}">
+            <img src="{{ letter_attachment_image_url }}?page={{ page_number }}" alt="" loading="{{ 'eager' if (page_number==1) else 'lazy' }}">
+          </div>
+        {% endfor %}
+
     </div>
     <div class="govuk-!-margin-bottom-2">
       <div class="js-stick-at-bottom-when-scrolling">
