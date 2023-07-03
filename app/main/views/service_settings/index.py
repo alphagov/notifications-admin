@@ -187,6 +187,7 @@ def submit_request_to_go_live(service_id):
         org_id=current_service.organisation_id,
         org_type=current_service.organisation_type,
         service_id=current_service.id,
+        ticket_categories=["notify_go_live_request"],
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 
