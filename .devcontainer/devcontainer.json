@@ -1,0 +1,20 @@
+{
+  "customizations": {
+    "codespaces": {
+      "repositories": {
+        "alphagov/notifications-admin": {
+          "permissions": {
+            "contents": "write",
+            "pull_requests": "write"
+          }
+        },
+        "alphagov/notifications-api": {
+          "permissions": {
+            "contents": "read"
+          }
+        }
+      }
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/prepare-codespace.sh"
+}

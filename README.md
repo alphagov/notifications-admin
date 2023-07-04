@@ -87,3 +87,20 @@ To run a specific JavaScript test, you'll need to copy the full command from `pa
 - [Working with static assets](docs/static-assets.md)
 - [JavaScript documentation](https://github.com/alphagov/notifications-manuals/wiki/JavaScript-Documentation)
 - [Updating dependencies](https://github.com/alphagov/notifications-manuals/wiki/Dependencies)
+
+## Codespaces for content designers
+
+Create a fine-grained personal access token: https://github.com/settings/tokens?type=beta. Name it 'notifications-admin codespaces', give it an expiration of 90 days and set the resource owner to the 'alphagov' organisation. Choose 'only select repositories' and then search for and add the following:
+
+* notifications-local
+* notifications-api
+* notifications-admin
+* notifications-template-preview
+* document-download-api
+* document-download-frontend
+
+Set the following repository permissions:
+* Contents: read and write
+* Pull request: read and write
+
+Generate the token and then copy the secret. Go to your codespace settings: https://github.com/settings/codespaces. Add a codespace secret called GH_TOKEN and paste the value you copied into the value field. Set repository access for the secret to 'notifications-admin'.
