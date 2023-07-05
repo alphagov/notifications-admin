@@ -82,6 +82,7 @@ class HeaderNavigation(Navigation):
         "user-profile": {
             "user_profile",
             "user_profile_confirm_delete_mobile_number",
+            "user_profile_consent_to_user_research",
             "user_profile_email",
             "user_profile_email_authenticate",
             "user_profile_email_confirm",

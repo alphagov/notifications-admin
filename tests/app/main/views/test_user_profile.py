@@ -31,6 +31,20 @@ def test_should_show_overview_page(
     assert "govuk-!-font-weight-bold" in sign_out_link["class"]
 
 
+def test_overview_page_change_links_for_regular_user(client_request):
+    page = client_request.get("main.user_profile")
+
+    assert page.select_one(f'a[href="{url_for("main.user_profile_name")}"]')
+    assert page.select_one(f'a[href="{url_for("main.user_profile_email")}"]')
+    assert page.select_one(f'a[href="{url_for("main.user_profile_mobile_number")}"]')
+    assert page.select_one(f'a[href="{url_for("main.user_profile_password")}"]')
+    assert page.select_one(f'a[href="{url_for("main.user_profile_consent_to_user_research")}"]')
+
+    # only platform admins see this
+    assert not page.select_one(f'a[href="{url_for("main.user_profile_security_keys")}"]')
+    assert not page.select_one(f'a[href="{url_for("main.user_profile_disable_platform_admin_view")}"]')
+
+
 def test_overview_page_shows_disable_for_platform_admin(client_request, platform_admin_user, mocker):
     mocker.patch("app.models.webauthn_credential.WebAuthnCredentials.client_method")
     client_request.login(platform_admin_user)

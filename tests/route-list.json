@@ -358,6 +358,7 @@
     "/two-factor-sms",
     "/two-factor-webauthn",
     "/user-profile",
+    "/user-profile/consent-to-user-research",
     "/user-profile/disable-platform-admin-view",
     "/user-profile/email",
     "/user-profile/email/authenticate",

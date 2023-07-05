@@ -345,6 +345,7 @@ EXCLUDED_ENDPOINTS = set(
             "user_information",
             "user_profile_confirm_delete_mobile_number",
             "user_profile_confirm_delete_security_key",
+            "user_profile_consent_to_user_research",
             "user_profile_delete_security_key",
             "user_profile_disable_platform_admin_view",
             "user_profile_email_authenticate",

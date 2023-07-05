@@ -208,6 +208,12 @@ def user_profile_password():
     return render_template("views/user-profile/change-password.html", form=form)
 
 
+@main.route("/user-profile/consent-to-user-research", methods=["GET", "POST"])
+@user_is_logged_in
+def user_profile_consent_to_user_research():
+    return "Consent to user research page"
+
+
 @main.route("/user-profile/disable-platform-admin-view", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_disable_platform_admin_view():
