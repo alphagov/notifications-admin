@@ -76,10 +76,10 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 }
 
 .govuk-form-group--nested-radio .govuk-fieldset .govuk-radios .govuk-radios__item > .govuk-radios__hint {
-   // This is intended to take 5px away from the space below a radio item
-   // The enlogated selector name is to help the specificity score in order to override the margin-bottom
-   // value from govuk-hint.
-   margin-bottom: govuk-spacing(1) * -1;
+  // This is intended to take 5px away from the space below a radio item
+  // The enlogated selector name is to help the specificity score in order to override the margin-bottom
+  // value from govuk-hint.
+  margin-bottom: govuk-spacing(1) * -1;
 }
 
 .govuk-form-group--nested-radio .govuk-radios__item:before{
