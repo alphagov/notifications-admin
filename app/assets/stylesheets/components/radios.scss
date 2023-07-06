@@ -1,6 +1,5 @@
 $govuk-touch-target-size: 44px;
 $govuk-radios-size: 40px;
-$govuk-small-radios-size: 24px;
 $border-thickness: 4px;
 $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 
@@ -104,7 +103,7 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
         top: $govuk-radios-size;
         left: $border-indent;
         width: $border-thickness;
-        height: $govuk-small-radios-size;
+        height: $govuk-radios-size;
         background: $govuk-border-colour;
       }
     }
@@ -122,17 +121,21 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   // To equalise the spacing between the line and the top/bottom of
   // the radio
   margin-top: govuk-spacing(1) + ($border-thickness / 2) + 2;
-  margin-bottom: govuk-spacing(1) * -1 * 2;
-  padding-left: 12px;
-
+  margin-bottom: govuk-spacing(1) * 2;
+  padding-left: govuk-spacing(2) + 2;
 }
 
+.govuk-form-group--nested-radio .govuk-radios__item > .govuk-form-group{
+  // To equalise the spacing between the line and the top/bottom of
+  // the radio
+  margin-top: govuk-spacing(2);
+}
 
-.govuk-form-group--nested-radio .govuk-radios__label:before {
-
-  box-shadow: 0 govuk-spacing(1) 0 0 govuk-colour("white");
-  background: govuk-colour("white");
-
+.govuk-form-group--nested-radio .govuk-fieldset .govuk-radios .govuk-radios__item > .govuk-radios__hint {
+   // This is intended to take 5px away from the space below a radio item
+   // The enlogated selector name is to help the specificity score in order to override the margin-bottom
+   // value from govuk-hint.
+   margin-bottom: govuk-spacing(1) * -1;
 }
 
 .govuk-form-group--nested-radio .govuk-radios__item:before{
@@ -145,11 +148,12 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   background: $govuk-border-colour;
 }
 
-[class="govuk-radios__hint"]{
-  padding-left: 0;
+.govuk-form-group--nested-radio .govuk-radios__label:before {
+  box-shadow: 0 govuk-spacing(1) 0 0 govuk-colour("white");
+  background: govuk-colour("white");
 }
 
-.nested-radios__hint:after {
+.govuk-form-group--nested-radio .govuk-radios__hint:after {
   // Adds an little extra segment of line alongside the ‘current folder’
   // hint so that it extends all the way down to the next radio
   content: "";
@@ -159,7 +163,6 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   width: $border-thickness;
   background: $govuk-border-colour;
 }
-
 
 .inline {
   .multiple-choice {
