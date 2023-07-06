@@ -65,6 +65,33 @@ const copy = {
 
 
 
+const jsModules = () => {
+  const pipeline = src([
+    paths.src + 'javascripts/esm/new_all.mjs'
+  ])
+  .pipe(plugins.rollup(
+    {
+      plugins: [
+        // determine module entry points from either 'module' or 'main' fields in package.json
+        rollupPluginNodeResolve({
+          mainFields: ['module', 'main']
+        })
+      ]
+    },
+    {
+      format: 'iife',
+      name: 'GOVUK',
+      file: 'testBundle.js'
+    }
+  ))
+  .pipe(dest(paths.dist + 'javascripts/'));
+
+  return pipeline;
+}
+
+
+
+
 const javascripts = () => {
   // JS from third-party sources
   // We assume none of it will need to pass through Babel
@@ -253,6 +280,7 @@ const defaultTask = series(
     copy.error_pages,
     images,
     javascripts,
+    jsModules,
     sass
   )
 );
