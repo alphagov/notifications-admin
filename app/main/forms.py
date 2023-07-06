@@ -799,14 +799,13 @@ class GovukRadiosFieldWithNoneOption(FieldWithNoneOption, GovukRadiosField):
 
 class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
     govuk_frontend_component_name = "nested-radios"
+    param_extensions = {"formGroup": {"classes": "govuk-form-group--nested-radio"}}
 
     # TODO: blurb to explain this
     def render_children(self, name, label, options):
         params = {
             "name": name,
-            "fieldset": {"legend": {"text": label, "classes": "govuk-visually-hidden"}},
-            "formGroup": {"classes": "govuk-form-group--nested-radio"},
-            "asList": True,
+            "fieldset": {"legend": {"text": label, "classes": "govuk-visually-hidden "}},
             "items": [],
         }
         for option in options:

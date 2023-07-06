@@ -127,15 +127,15 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 
 }
 
-[class="govuk-radios__item"]{
-  [type=radio]+label::before {
-    // To overlap the grey inset line
-    background: govuk-colour("white");
-  }
+
+.govuk-form-group--nested-radio .govuk-radios__label:before {
+
+  box-shadow: 0 govuk-spacing(1) 0 0 govuk-colour("white");
+  background: govuk-colour("white");
 
 }
 
-[class="govuk-radios__item"]:before{
+.govuk-form-group--nested-radio .govuk-radios__item:before{
   content: "";
   position: absolute;
   bottom: 0;
