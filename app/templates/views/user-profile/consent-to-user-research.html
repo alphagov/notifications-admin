@@ -1,0 +1,38 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = "Consent to user research" %}
+
+{% block per_page_title %}
+{{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+{{ govukBackLink({ "href": url_for("main.user_profile") }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+        {% call form_wrapper(class="govuk-!-margin-top-3") %}
+        {{ form.enabled(param_extensions={
+        "fieldset": {
+        "legend": {
+        "isPageHeading": True,
+        "classes": "govuk-fieldset__legend--l"
+        }
+        },
+        "hint": {
+        "text": "Tell us if you want to be contacted to take part in user research in order to improve GOV.UK Notify."
+        }
+        }) }}
+        {{ page_footer("Save") }}
+        {% endcall %}
+    </div>
+</div>
+
+{% endblock %}

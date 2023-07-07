@@ -211,7 +211,16 @@ def user_profile_password():
 @main.route("/user-profile/consent-to-user-research", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_consent_to_user_research():
-    return "Consent to user research page"
+    form = YesNoSettingForm(
+        name="Consent to user research",
+        enabled=current_user.consent_to_research,
+    )
+
+    if form.validate_on_submit():
+        current_user.update(consent_to_research=form.enabled.data)
+        return redirect(url_for(".user_profile"))
+
+    return render_template("views/user-profile/consent-to-user-research.html", form=form)
 
 
 @main.route("/user-profile/disable-platform-admin-view", methods=["GET", "POST"])
