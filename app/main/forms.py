@@ -442,7 +442,7 @@ class NestedFieldMixin:
         params = {
             "name": name,
             "fieldset": {"legend": {"text": label, "classes": "govuk-visually-hidden"}},
-            "formGroup": {"classes": "govuk-form-group--nested-radios"},
+            "formGroup": {"classes": "govuk-form-group--nested"},
             "asList": True,
             "items": [],
         }
