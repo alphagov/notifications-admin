@@ -722,7 +722,7 @@ def test_delete_security_key_handles_last_credential_error(
         (False, None, ""),
     ],
 )
-def test_consent_to_user_research_page(
+def test_get_consent_to_user_research(
     client_request, active_user_with_permissions, consent_to_research, is_yes_checked, is_no_checked
 ):
     active_user_with_permissions["consent_to_research"] = consent_to_research
@@ -735,3 +735,19 @@ def test_consent_to_user_research_page(
     assert radios[0].attrs.get("checked", None) == is_yes_checked
     assert radios[1].attrs["value"] == "False"
     assert radios[1].attrs.get("checked", None) == is_no_checked
+
+
+def test_post_consent_to_research(client_request, mocker, active_user_with_permissions):
+    active_user_with_permissions["consent_to_research"] = True
+    client_request.login(active_user_with_permissions)
+
+    mock_update_consent = mocker.patch("app.user_api_client.update_user_attribute")
+
+    client_request.post(
+        ".user_profile_consent_to_user_research",
+        _data={"enabled": False},
+        _expected_status=302,
+        _expected_redirect=url_for("main.user_profile"),
+    ),
+
+    mock_update_consent.assert_called_once_with(active_user_with_permissions["id"], consent_to_research=False)

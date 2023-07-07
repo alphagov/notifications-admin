@@ -220,6 +220,10 @@ def user_profile_consent_to_user_research():
         current_user.update(consent_to_research=form.enabled.data)
         return redirect(url_for(".user_profile"))
 
+    if form.validate_on_submit():
+        current_user.update(consent_to_research=form.enabled.data)
+        return redirect(url_for(".user_profile"))
+
     return render_template("views/user-profile/consent-to-user-research.html", form=form)
 
 
