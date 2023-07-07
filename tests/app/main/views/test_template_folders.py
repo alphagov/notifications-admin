@@ -1273,7 +1273,7 @@ def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
     assert normalize_spaces(move_form_labels[0].text) == "Templates"
     assert normalize_spaces(move_form_labels[1].text) == "parent_folder"
     assert normalize_spaces(move_form_labels[2].text) == "child_folder"
-    assert normalize_spaces(page.select("div#move_to_folder_radios div .govuk-radios__hint")) == "current folder"
+    assert normalize_spaces(page.select("div#move_to_folder_radios div .govuk-radios__hint")) == ""
 
 
 def test_should_be_able_to_move_a_sub_item(

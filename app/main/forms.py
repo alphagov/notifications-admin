@@ -2484,20 +2484,37 @@ class ServiceBroadcastNetworkForm(StripWhitespaceForm):
     def __init__(self, broadcast_channel, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.broadcast_channel = broadcast_channel
+        self.all_networks.param_extensions = {
+            "fieldset": {
+                "legend": {
+                    "text": "Choose a mobile network",
+                    "isPageHeading": True,
+                    "classes": "govuk-fieldset__legend--l",
+                }
+            },
+            "items": [
+                {},
+                {"conditional": {"html": self.network}},
+            ],
+            "errorMessage": {"text": "Select a mobile network"},
+        }
 
     all_networks = OnOffField(
         "Choose a mobile network",
-        choices=((True, "All networks"), (False, "A single network")),
+        choices=[
+            (True, "All networks"),
+            (False, "A single network"),
+        ],
     )
     network = OptionalGovukRadiosField(
         "Choose a mobile network",
         thing="a mobile network",
-        choices=(
+        choices=[
             ("ee", "EE"),
             ("o2", "O2"),
             ("vodafone", "Vodafone"),
             ("three", "Three"),
-        ),
+        ],
     )
 
     @property
