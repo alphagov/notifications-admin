@@ -28,6 +28,11 @@
   &-alternate-link {
     display: inline-block;
     line-height: govuk-spacing(7);
+    padding-left: govuk-spacing(1);
+
+    a {
+      padding-left: govuk-spacing(1) / 2;
+    }
   }
 
 }
