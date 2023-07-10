@@ -1085,6 +1085,8 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
         service_id=SERVICE_ONE_ID,
         template_id=sample_uuid(),
     )
+    # Should not have a ‘Remove attachment’ link
+    assert not page.select(".js-stick-at-bottom-when-scrolling .govuk-link--destructive")
 
 
 def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, service_one, mocker):
@@ -1143,6 +1145,14 @@ def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
     assert page.select_one(".letter img")["src"] == f"/services/{SERVICE_ONE_ID}/attachment/{sample_uuid()}.png?page=1"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose a different file"
     assert not page.select_one(".file-upload-alternate-link")
+
+    remove_attachment_link = page.select_one(".js-stick-at-bottom-when-scrolling .govuk-link--destructive")
+    assert normalize_spaces(remove_attachment_link.text) == "Remove attachment"
+    assert remove_attachment_link["href"] == url_for(
+        "main.letter_template_edit_pages",
+        service_id=SERVICE_ONE_ID,
+        template_id=sample_uuid(),
+    )
 
 
 def test_post_delete_letter_attachment_calls_archive_letter_attachment(

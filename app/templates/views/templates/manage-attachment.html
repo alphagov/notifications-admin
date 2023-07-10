@@ -50,6 +50,7 @@
         {% endfor %}
 
     </div>
+    {% if not error %}
     <div class="govuk-!-margin-bottom-2">
       <div class="js-stick-at-bottom-when-scrolling">
         {{ page_footer(
@@ -58,6 +59,7 @@
         ) }}
       </div>
     </div>
+    {% endif %}
 
 
 {% endblock %}
