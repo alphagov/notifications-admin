@@ -36,7 +36,9 @@
         allowed_file_extensions=['pdf'],
         action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id),
         button_text='Upload your file again' if error else 'Choose a different file',
-        show_errors=False
+        show_errors=False,
+        alternate_link=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id) if error else None,
+        alternate_link_text='cancel'
     )}}
     </div>
     <div class="template-container">

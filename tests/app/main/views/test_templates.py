@@ -1047,6 +1047,46 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
     )
 
 
+def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_errors(
+    mocker,
+    client_request,
+    fake_uuid,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_letter_template_with_attachment,
+    mock_get_template_folders,
+):
+    service_one["permissions"] = ["extra_letter_formatting"]
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
+    mock_sanitise_response = Mock()
+    mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
+    mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
+    mocker.patch("app.main.views.templates.sanitise_letter", return_value=mock_sanitise_response)
+
+    mocker.patch("app.main.views.templates.upload_letter_to_s3")
+    mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
+
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        page = client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+            _data={"file": file},
+            _expected_status=200,
+        )
+
+    assert page.select_one(".banner-dangerous h1").text == "Your content is outside the printable area"
+
+    cancel_link = page.select_one(".file-upload-alternate-link a.govuk-link")
+    assert normalize_spaces(cancel_link.text) == "cancel"
+    assert cancel_link["href"] == url_for(
+        "main.letter_template_attach_pages",
+        service_id=SERVICE_ONE_ID,
+        template_id=sample_uuid(),
+    )
+
+
 def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, service_one, mocker):
     upload_id = uuid.uuid4()
     template_id = uuid.uuid4()
@@ -1101,6 +1141,8 @@ def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
     assert page.select_one("h1").text.strip() == "original file.pdf"
     assert len(page.select(".letter")) == 1
     assert page.select_one(".letter img")["src"] == f"/services/{SERVICE_ONE_ID}/attachment/{sample_uuid()}.png?page=1"
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose a different file"
+    assert not page.select_one(".file-upload-alternate-link")
 
 
 def test_post_delete_letter_attachment_calls_archive_letter_attachment(
