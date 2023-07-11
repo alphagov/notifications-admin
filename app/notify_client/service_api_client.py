@@ -79,7 +79,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "billing_contact_email_addresses",
             "billing_contact_names",
             "billing_reference",
-            "consent_to_research",
             "contact_link",
             "created_by",
             "count_as_live",

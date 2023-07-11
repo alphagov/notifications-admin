@@ -30,7 +30,6 @@ class Service(JSONModel):
         "billing_contact_names",
         "billing_reference",
         "broadcast_channel",
-        "consent_to_research",
         "contact_link",
         "count_as_live",
         "email_from",
@@ -253,7 +252,7 @@ class Service(JSONModel):
 
     @property
     def has_estimated_usage(self):
-        return self.consent_to_research is not None and any(self.volumes_by_channel.values())
+        return any(self.volumes_by_channel.values())
 
     def has_templates_of_type(self, template_type):
         return any(template for template in self.all_templates if template["template_type"] == template_type)

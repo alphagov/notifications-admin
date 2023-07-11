@@ -1542,15 +1542,6 @@ class EstimateUsageForm(StripWhitespaceForm):
         "How many letters do you expect to send in the next year?",
         things="number of letters",
     )
-    consent_to_research = GovukRadiosField(
-        "Can we contact you when we’re doing user research?",
-        choices=[
-            ("yes", "Yes"),
-            ("no", "No"),
-        ],
-        thing="yes or no",
-        param_extensions={"hint": {"text": "You do not have to take part and you can unsubscribe at any time"}},
-    )
 
     at_least_one_volume_filled = True
 
