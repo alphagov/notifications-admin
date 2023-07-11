@@ -38,7 +38,7 @@ def test_overview_page_change_links_for_regular_user(client_request):
     assert page.select_one(f'a[href="{url_for("main.user_profile_email")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_mobile_number")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_password")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_consent_to_user_research")}"]')
+    assert page.select_one(f'a[href="{url_for("main.user_profile_take_part_in_user_research")}"]')
 
     # only platform admins see this
     assert not page.select_one(f'a[href="{url_for("main.user_profile_security_keys")}"]')
@@ -716,19 +716,19 @@ def test_delete_security_key_handles_last_credential_error(
 
 
 @pytest.mark.parametrize(
-    "consent_to_research, is_yes_checked, is_no_checked",
+    "take_part_in_research, is_yes_checked, is_no_checked",
     [
         (True, "", None),
         (False, None, ""),
     ],
 )
-def test_get_consent_to_user_research(
-    client_request, active_user_with_permissions, consent_to_research, is_yes_checked, is_no_checked
+def test_get_user_profile_take_part_in_user_research(
+    client_request, active_user_with_permissions, take_part_in_research, is_yes_checked, is_no_checked
 ):
-    active_user_with_permissions["consent_to_research"] = consent_to_research
+    active_user_with_permissions["take_part_in_research"] = take_part_in_research
     client_request.login(active_user_with_permissions)
-    page = client_request.get(("main.user_profile_consent_to_user_research"))
-    assert "Consent to user research" in page.text
+    page = client_request.get(("main.user_profile_take_part_in_user_research"))
+    assert "Take part in user research" in page.text
     radios = page.select("input.govuk-radios__input")
     assert len(radios) == 2
     assert radios[0].attrs["value"] == "True"
@@ -737,17 +737,17 @@ def test_get_consent_to_user_research(
     assert radios[1].attrs.get("checked", None) == is_no_checked
 
 
-def test_post_consent_to_research(client_request, mocker, active_user_with_permissions):
-    active_user_with_permissions["consent_to_research"] = True
+def test_post_user_profile_take_part_in_user_research(client_request, mocker, active_user_with_permissions):
+    active_user_with_permissions["take_part_in_research"] = True
     client_request.login(active_user_with_permissions)
 
     mock_update_consent = mocker.patch("app.user_api_client.update_user_attribute")
 
     client_request.post(
-        ".user_profile_consent_to_user_research",
+        ".user_profile_take_part_in_user_research",
         _data={"enabled": False},
         _expected_status=302,
         _expected_redirect=url_for("main.user_profile"),
     ),
 
-    mock_update_consent.assert_called_once_with(active_user_with_permissions["id"], consent_to_research=False)
+    mock_update_consent.assert_called_once_with(active_user_with_permissions["id"], take_part_in_research=False)

@@ -208,23 +208,23 @@ def user_profile_password():
     return render_template("views/user-profile/change-password.html", form=form)
 
 
-@main.route("/user-profile/consent-to-user-research", methods=["GET", "POST"])
+@main.route("/user-profile/take-part-in-user-research", methods=["GET", "POST"])
 @user_is_logged_in
-def user_profile_consent_to_user_research():
+def user_profile_take_part_in_user_research():
     form = YesNoSettingForm(
-        name="Consent to user research",
-        enabled=current_user.consent_to_research,
+        name="Take part in user research",
+        enabled=current_user.take_part_in_research,
     )
 
     if form.validate_on_submit():
-        current_user.update(consent_to_research=form.enabled.data)
+        current_user.update(take_part_in_research=form.enabled.data)
         return redirect(url_for(".user_profile"))
 
     if form.validate_on_submit():
-        current_user.update(consent_to_research=form.enabled.data)
+        current_user.update(take_part_in_research=form.enabled.data)
         return redirect(url_for(".user_profile"))
 
-    return render_template("views/user-profile/consent-to-user-research.html", form=form)
+    return render_template("views/user-profile/take-part-in-user-research.html", form=form)
 
 
 @main.route("/user-profile/disable-platform-admin-view", methods=["GET", "POST"])

@@ -60,7 +60,7 @@ class User(BaseUser, UserMixin):
         "password_changed_at",
         "permissions",
         "state",
-        "consent_to_research",
+        "take_part_in_research",
     }
 
     def __init__(self, _dict):
