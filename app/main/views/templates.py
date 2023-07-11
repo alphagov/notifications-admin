@@ -54,6 +54,7 @@ from app.s3_client.s3_letter_upload_client import (
     upload_letter_to_s3,
 )
 from app.template_previews import (
+    LetterAttachmentPreview,
     TemplatePreview,
     sanitise_letter,
 )
@@ -946,8 +947,20 @@ def letter_template_attach_pages(service_id, template_id):
         form=form,
         template=template,
         service_id=service_id,
+        letter_attachment_image_url=url_for(
+            "no_cookie.view_letter_attachment_preview",
+            service_id=service_id,
+            attachment_id=template.attachment.id,
+        ),
+        page_numbers=list(range(1, template.attachment.page_count + 1)),
         error=error,
     )
+
+
+@no_cookie.route("/services/<uuid:service_id>/attachment/<uuid:attachment_id>.png")
+@user_has_permissions(allow_org_user=True)
+def view_letter_attachment_preview(service_id, attachment_id):
+    return LetterAttachmentPreview.from_attachment_data(attachment_id, page=request.args.get("page"))
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages/edit", methods=["GET", "POST"])
@@ -990,6 +1003,12 @@ def letter_template_edit_pages(template_id, service_id):
         form=form,
         template=template,
         service_id=service_id,
+        letter_attachment_image_url=url_for(
+            "no_cookie.view_letter_attachment_preview",
+            service_id=service_id,
+            attachment_id=template.attachment.id,
+        ),
+        page_numbers=list(range(1, template.attachment.page_count + 1)),
         error=error,
     )
 

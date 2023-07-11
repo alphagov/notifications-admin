@@ -149,6 +149,7 @@
     "/services/<uuid:service_id>/api/keys/create",
     "/services/<uuid:service_id>/api/keys/revoke/<uuid:key_id>",
     "/services/<uuid:service_id>/api/whitelist",
+    "/services/<uuid:service_id>/attachment/<uuid:attachment_id>.png",
     "/services/<uuid:service_id>/broadcast-dashboard.json",
     "/services/<uuid:service_id>/broadcast-tour/<int:step_index>",
     "/services/<uuid:service_id>/broadcast-tour/live/<int:step_index>",
