@@ -11,6 +11,7 @@ ALLOWED_ATTRIBUTES = {
     "updated_by",
     "current_session_id",
     "email_access_validated_at",
+    "take_part_in_research",
 }
 
 

@@ -372,6 +372,7 @@
     "/user-profile/security-keys",
     "/user-profile/security-keys/<uuid:key_id>/delete",
     "/user-profile/security-keys/<uuid:key_id>/manage",
+    "/user-profile/take-part-in-user-research",
     "/users/<uuid:user_id>",
     "/users/<uuid:user_id>/archive",
     "/users/<uuid:user_id>/change_auth",

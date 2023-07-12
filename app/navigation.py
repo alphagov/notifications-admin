@@ -82,6 +82,7 @@ class HeaderNavigation(Navigation):
         "user-profile": {
             "user_profile",
             "user_profile_confirm_delete_mobile_number",
+            "user_profile_disable_platform_admin_view",
             "user_profile_email",
             "user_profile_email_authenticate",
             "user_profile_email_confirm",
@@ -91,7 +92,7 @@ class HeaderNavigation(Navigation):
             "user_profile_mobile_number_delete",
             "user_profile_name",
             "user_profile_password",
-            "user_profile_disable_platform_admin_view",
+            "user_profile_take_part_in_user_research",
         },
         "platform-admin": {
             "archive_user",
