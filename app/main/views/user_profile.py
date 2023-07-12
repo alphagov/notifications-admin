@@ -220,10 +220,6 @@ def user_profile_take_part_in_user_research():
         current_user.update(take_part_in_research=form.enabled.data)
         return redirect(url_for(".user_profile"))
 
-    if form.validate_on_submit():
-        current_user.update(take_part_in_research=form.enabled.data)
-        return redirect(url_for(".user_profile"))
-
     return render_template("views/user-profile/take-part-in-user-research.html", form=form)
 
 
