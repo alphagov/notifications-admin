@@ -17,20 +17,22 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-
         {% call form_wrapper(class="govuk-!-margin-top-3") %}
-        {{ form.enabled(param_extensions={
-        "fieldset": {
-        "legend": {
-        "isPageHeading": True,
-        "classes": "govuk-fieldset__legend--l"
-        }
-        },
-        "hint": {
-        "text": "Tell us if you want to be contacted to take part in user research to improve GOV.UK Notify."
-        }
-        }) }}
-        {{ page_footer("Save") }}
+          {{
+            form.enabled(param_extensions={
+              "fieldset": {
+                "legend": {
+                  "isPageHeading": True,
+                  "classes": "govuk-fieldset__legend--l"
+                }
+              },
+              "hint": {
+                "text": "Tell us if you want to be contacted to take part in user research to improve GOV.UK Notify."
+              }
+            })
+          }}
+
+          {{ page_footer("Save") }}
         {% endcall %}
     </div>
 </div>
