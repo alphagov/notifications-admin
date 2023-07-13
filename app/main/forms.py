@@ -79,7 +79,7 @@ from app.main.validators import (
 )
 from app.models.branding import (
     GOVERNMENT_IDENTITY_SYSTEM_COLOURS,
-    GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA,
+    get_government_identity_system_crests_or_insignia,
 )
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
@@ -2606,13 +2606,15 @@ def markup_for_coloured_stripe(colour):
 
 
 class GovernmentIdentityCoatOfArmsOrInsignia(StripWhitespaceForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.coat_of_arms_or_insignia.choices = [
+            (name, markup_for_crest_or_insignia(f"{name}.png") + name)
+            for name in sorted(get_government_identity_system_crests_or_insignia())
+        ]
 
     coat_of_arms_or_insignia = GovukRadiosField(
         "Coat of arms or insignia",
-        choices=[
-            (name, markup_for_crest_or_insignia(f"{name}.png") + name)
-            for name in sorted(GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA)
-        ],
         thing="a coat of arms or insignia",
     )
 

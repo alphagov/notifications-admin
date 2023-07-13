@@ -267,8 +267,10 @@ GOVERNMENT_IDENTITY_SYSTEM_COLOURS = {
     "Wales Office": "#a33038",
 }
 
-INSIGNIA_ASSETS_PATH = Path(asset_fingerprinter._filesystem_path) / "images/branding/insignia/"
 
-GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA = tuple(
-    item.stem for item in INSIGNIA_ASSETS_PATH.resolve().iterdir() if item.is_file()
-)
+def get_insignia_asset_path():
+    return Path(asset_fingerprinter._filesystem_path) / "images/branding/insignia/"
+
+
+def get_government_identity_system_crests_or_insignia():
+    return tuple(item.stem for item in get_insignia_asset_path().resolve().iterdir() if item.is_file())

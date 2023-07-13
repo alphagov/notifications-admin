@@ -6,7 +6,7 @@ import pytest
 from flask import url_for
 from notifications_python_client.errors import HTTPError
 
-from app.models.branding import INSIGNIA_ASSETS_PATH
+from app.models.branding import get_insignia_asset_path
 from tests.conftest import create_email_branding, normalize_spaces
 
 
@@ -979,4 +979,4 @@ def test_post_create_email_branding_government_identity_form_colour(mocker, clie
 
     assert mock_save_temporary.call_args_list == [mocker.call(mocker.ANY, logo_type="email")]
     logo_bytes_io = mock_save_temporary.call_args_list[0][0][0]
-    assert logo_bytes_io.read() == (INSIGNIA_ASSETS_PATH / "HM Government.png").resolve().read_bytes()
+    assert logo_bytes_io.read() == (get_insignia_asset_path() / "HM Government.png").resolve().read_bytes()

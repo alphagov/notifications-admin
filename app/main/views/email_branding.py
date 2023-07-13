@@ -15,10 +15,10 @@ from app.main.forms import (
     SearchByNameForm,
 )
 from app.models.branding import (
-    GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA,
-    INSIGNIA_ASSETS_PATH,
     AllEmailBranding,
     EmailBranding,
+    get_government_identity_system_crests_or_insignia,
+    get_insignia_asset_path,
 )
 from app.s3_client.logo_client import logo_client
 from app.utils.user import user_is_platform_admin
@@ -160,14 +160,14 @@ def create_email_branding_government_identity_logo():
 def create_email_branding_government_identity_colour():
 
     filename = request.args.get("filename")
-    if filename not in GOVERNMENT_IDENTITY_SYSTEM_CRESTS_OR_INSIGNIA:
+    if filename not in get_government_identity_system_crests_or_insignia():
         abort(400)
 
     filename = f"{filename}.png"
     form = GovernmentIdentityColour(crest_or_insignia_image_filename=filename)
 
     if form.validate_on_submit():
-        image_file_path = INSIGNIA_ASSETS_PATH / filename
+        image_file_path = get_insignia_asset_path() / filename
         logo_data = FileStorage(
             BytesIO(image_file_path.resolve().read_bytes()), filename=filename, content_type="image/png"
         )
