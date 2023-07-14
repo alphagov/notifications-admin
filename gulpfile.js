@@ -149,11 +149,7 @@ const javascripts = () => {
 
 
 const sass = () => {
-  return src([
-      paths.src + '/stylesheets/main*.scss',
-      paths.src + '/stylesheets/map.scss',
-      paths.src + '/stylesheets/print.scss'
-    ])
+  return src(paths.src + '/stylesheets/*.scss')
     .pipe(plugins.prettyerror())
     .pipe(plugins.sass.sync({
       includePaths: [
