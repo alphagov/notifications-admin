@@ -1,3 +1,8 @@
+$govuk-touch-target-size: 44px;
+$govuk-radios-size: 40px;
+$border-thickness: 4px;
+$border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
+
 .radio-select {
 
   min-height: 39px;
@@ -51,63 +56,65 @@
 
 }
 
-.radios-nested {
+.govuk-form-group--nested-radio{
+  $border-thickness: $govuk-touch-target-size - $govuk-radios-size;
+  $border-indent: $govuk-touch-target-size / 2;
 
-  margin-bottom: 10px;
+  position: relative;
 
-  .multiple-choice {
+  // To equalise the spacing between the line and the top/bottom of
+  // the radio
+  margin-top: govuk-spacing(1) + ($border-thickness / 2) + 2;
 
-    $circle-diameter: 39px;
-    $border-thickness: 4px;
-    $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
-    $govuk-border-colour: $govuk-border-colour;
-
-    float: none;
-    position: relative;
-
-    &:before {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: $border-indent;
-      width: $border-thickness;
-      height: 100%;
-      background: $govuk-border-colour;
-    }
-
-    label {
-      float: none;
-    }
-
-    [type=radio]+label::before {
-      // To overlap the grey inset line
-      background: govuk-colour("white");
-    }
-
-    ul {
-      // To equalise the spacing between the line and the top/bottom of
-      // the radio
-      margin-top: 5px;
-      margin-bottom: -5px;
-      padding-left: 12px;
-    }
-
-    .block-label-hint {
-      &:after {
-        // Adds an little extra segment of line alongside the ‘current folder’
-        // hint so that it extends all the way down to the next radio
-        content: "";
-        position: absolute;
-        top: $circle-diameter + 5px;
-        left: $border-indent;
-        width: $border-thickness;
-        height: 25px;
-        background: $govuk-border-colour;
-      }
-    }
-
+  // transparent borders become visible in high contrast modes so set to match background
+  @media (-ms-high-contrast: active), (forced-colors: active) {
+    background: canvasText;
   }
+}
 
+.govuk-form-group--nested-radio .govuk-radios__item > .govuk-form-group{
+  // To equalise the spacing between the line and the top/bottom of
+  // the radio
+  margin-top: govuk-spacing(2);
+}
+
+
+.govuk-form-group--nested-radio .govuk-radios__item{
+  padding-left: govuk-spacing(8);
+}
+
+.govuk-form-group--nested-radio .govuk-radios__item:before{
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: $border-indent;
+  width: $border-thickness;
+  height: 100%;
+  background: $govuk-border-colour;
+}
+
+.govuk-form-group--nested-radio .govuk-radios__label{
+  padding-left: govuk-spacing(0);
+}
+
+.govuk-form-group--nested-radio .govuk-radios__label:before {
+  box-shadow: 0 govuk-spacing(1) 0 0 govuk-colour("white");
+  background: govuk-colour("white");
+}
+
+.govuk-form-group--nested-radio .govuk-radios__hint{
+  padding-left: govuk-spacing(0) ;
+}
+
+.govuk-form-group--nested-radio .govuk-radios__hint:after {
+  // Adds an little extra segment of line alongside the ‘current folder’
+  // hint so that it extends all the way down to the next radio
+  content: "";
+  position: absolute;
+  top: $govuk-radios-size;
+  left: $border-indent;
+  width: $border-thickness;
+  background: $govuk-border-colour;
 }
 
 .inline {

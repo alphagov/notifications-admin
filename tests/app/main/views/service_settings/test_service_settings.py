@@ -5713,6 +5713,7 @@ def test_service_set_broadcast_network_makes_you_choose(
         _data=data,
         _expected_status=200,
     )
+
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select a mobile network"
 
 

@@ -133,15 +133,15 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
     )
 
     all_template_folders = UserTemplateList(service=current_service, user=current_user).all_template_folders
-
+    option_hints = {template_folder_id: "current folder"}
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
         all_template_folders=all_template_folders,
         template_list=template_list,
         template_type=template_type,
         available_template_types=current_service.available_template_types,
         allow_adding_copy_of_template=(current_service.all_templates or len(current_user.service_ids) > 1),
+        option_hints=option_hints,
     )
-    option_hints = {template_folder_id: "current folder"}
 
     single_notification_channel = None
     notification_channels = list(set(current_service.permissions).intersection(NOTIFICATION_TYPES))

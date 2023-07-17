@@ -62,14 +62,6 @@ $govuk-checkboxes-size: 40px;
       background: govuk-colour("white");
     }
 
-    ul {
-      // To equalise the spacing between the line and the top/bottom of
-      // the radio
-      margin-top: 5px;
-      margin-bottom: -5px;
-      padding-left: 12px;
-    }
-
   }
 
 }
@@ -97,7 +89,6 @@ $govuk-checkboxes-size: 40px;
     background: $govuk-border-colour;
   }
 }
-
 .selection-content {
   margin-bottom: govuk-spacing(4);
 

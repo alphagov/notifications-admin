@@ -12,9 +12,9 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
       nodes
         .filter(node => node.type === 'folder')
         .forEach(node => {
-          result += `<li class="multiple-choice">
+          result += `<li class="govuk-radios__item">
                       <input id="node-${count}" name="move_to" type="radio" value="node-${count}">
-                      <label class="block-label" for="node-${count}">
+                      <label class="govuk-radios__label" for="node-${count}">
                         ${node.label}
                       </label>
                       ${node.children ? foldersCheckboxesHTML(node.children) : ''}
@@ -38,7 +38,7 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
                       <legend class="form-label">
                         Choose a folder
                       </legend>
-                      <div class="radios-nested">
+                      <div class="govuk-radios">
                         ${foldersCheckboxesHTML(hierarchy)}
                       </div>
                     </fieldset>
@@ -86,27 +86,27 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
                       <legend class="form-label">
                         New template
                       </legend>
-                      <div class="multiple-choice">
+                      <div class="govuk-radios__item">
                         <input id="add_template_by_template_type-0" name="add_template_by_template_type" type="radio" value="email">
-                        <label class="block-label" for="add_template_by_template_type-0">
+                        <label class="govuk-radios__label" for="add_template_by_template_type-0">
                           Email
                         </label>
                       </div>
-                      <div class="multiple-choice">
+                      <div class="govuk-radios__item">
                         <input id="add_template_by_template_type-1" name="add_template_by_template_type" type="radio" value="sms">
-                        <label class="block-label" for="add_template_by_template_type-1">
+                        <label class="govuk-radios__label" for="add_template_by_template_type-1">
                           Text message
                         </label>
                       </div>
-                      <div class="multiple-choice">
+                      <div class="govuk-radios__item">
                         <input id="add_template_by_template_type-2" name="add_template_by_template_type" type="radio" value="letter">
-                        <label class="block-label" for="add_template_by_template_type-2">
+                        <label class="govuk-radios__label" for="add_template_by_template_type-2">
                           Letter
                         </label>
                       </div>
-                      <div class="multiple-choice">
+                      <div class="govuk-radios__item">
                         <input id="add_template_by_template_type-3" name="add_template_by_template_type" type="radio" value="copy-existing">
-                        <label class="block-label" for="add_template_by_template_type-3">
+                        <label class="govuk-radios__label" for="add_template_by_template_type-3">
                           Copy an existing template
                         </label>
                       </div>

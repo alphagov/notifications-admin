@@ -1244,13 +1244,12 @@ def test_move_folder_form_shows_current_folder_hint_when_in_a_folder(
     )
 
     assert page.select(f'input[name=move_to][value="{PARENT_FOLDER_ID}"]')
-
     move_form_labels = page.select("div#move_to_folder_radios label")
-
     assert len(move_form_labels) == 3
     assert normalize_spaces(move_form_labels[0].text) == "Templates"
-    assert normalize_spaces(move_form_labels[1].text) == "parent_folder current folder"
+    assert normalize_spaces(move_form_labels[1].text) == "parent_folder"
     assert normalize_spaces(move_form_labels[2].text) == "child_folder"
+    assert normalize_spaces(page.select("div#move_to_folder_radios div .govuk-radios__hint")) == "current folder"
 
 
 def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
@@ -1274,6 +1273,7 @@ def test_move_folder_form_does_not_show_current_folder_hint_at_the_top_level(
     assert normalize_spaces(move_form_labels[0].text) == "Templates"
     assert normalize_spaces(move_form_labels[1].text) == "parent_folder"
     assert normalize_spaces(move_form_labels[2].text) == "child_folder"
+    assert normalize_spaces(page.select("div#move_to_folder_radios div .govuk-radios__hint")) == ""
 
 
 def test_should_be_able_to_move_a_sub_item(
@@ -1493,7 +1493,7 @@ def test_radio_button_with_no_value_shows_custom_error_message(
     assert mock_move_to_template_folder.called is False
     assert mock_create_template_folder.called is False
 
-    assert page.select_one("span.error-message").text.strip() == "Select the type of template you want to add"
+    assert page.select_one(".govuk-error-message").text.strip() == "Error: Select the type of template you want to add"
 
 
 @pytest.mark.parametrize(
