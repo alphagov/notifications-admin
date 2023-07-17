@@ -65,7 +65,6 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   // To equalise the spacing between the line and the top/bottom of
   // the radio
   margin-top: govuk-spacing(1) + ($border-thickness / 2) + 2;
-  padding-left: govuk-spacing(2) + 2;
 
   // transparent borders become visible in high contrast modes so set to match background
   @media (-ms-high-contrast: active), (forced-colors: active) {
@@ -79,12 +78,6 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   margin-top: govuk-spacing(2);
 }
 
-.govuk-form-group--nested-radio .govuk-fieldset .govuk-radios .govuk-radios__item > .govuk-radios__hint {
-  // This is intended to take 5px away from the space below a radio item
-  // The enlogated selector name is to help the specificity score in order to override the margin-bottom
-  // value from govuk-hint.
-  margin-bottom: govuk-spacing(-1);
-}
 
 .govuk-form-group--nested-radio .govuk-radios__item{
   padding-left: govuk-spacing(8);
