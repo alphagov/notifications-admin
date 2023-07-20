@@ -204,6 +204,7 @@
     "/services/<uuid:service_id>/notifications/<template_type:message_type>",
     "/services/<uuid:service_id>/notifications/<template_type:message_type>.json",
     "/services/<uuid:service_id>/past-alerts",
+    "/services/<uuid:service_id>/preview-invalid-attachment-image/<uuid:file_id>",
     "/services/<uuid:service_id>/preview-letter-image/<uuid:file_id>",
     "/services/<uuid:service_id>/preview-letter/<uuid:file_id>",
     "/services/<uuid:service_id>/previous-alerts/<uuid:broadcast_message_id>",

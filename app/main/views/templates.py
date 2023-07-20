@@ -1,4 +1,5 @@
 import base64
+import json
 import uuid
 from functools import partial
 from io import BytesIO
@@ -49,6 +50,7 @@ from app.models.service import Service
 from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
 from app.s3_client.s3_letter_upload_client import (
     backup_original_letter_to_s3,
+    get_attachment_pdf_and_metadata,
     get_transient_letter_file_location,
     upload_letter_attachment_to_s3,
     upload_letter_to_s3,
@@ -79,12 +81,13 @@ form_objects = {
 
 
 class LetterAttachmentFormError(Exception):
-    def __init__(self, *, title: str = None, detail: str) -> None:
+    def __init__(self, *, title: str = None, detail: str, attachment_page_count: int = 0) -> None:
         self.title = title or "There is a problem"
         self.detail = detail
+        self.attachment_page_count = attachment_page_count
 
     def as_error_dict(self) -> Dict[str, int]:
-        return {"title": self.title, "detail": self.detail}
+        return {"title": self.title, "detail": self.detail, "attachment_page_count": self.attachment_page_count}
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>")
@@ -310,7 +313,6 @@ def view_template_version_preview(service_id, template_id, version, filetype):
 
 
 def _add_template_by_type(template_type, template_folder_id):
-
     if template_type == "copy-existing":
         return redirect(
             url_for(
@@ -358,7 +360,6 @@ def choose_template_to_copy(
     from_service=None,
     from_folder=None,
 ):
-
     if from_service:
 
         current_user.belongs_to_service_or_403(from_service)
@@ -427,7 +428,6 @@ def copy_template(service_id, template_id):
 
 
 def _get_template_copy_name(template, existing_templates):
-
     template_names = [existing["name"] for existing in existing_templates]
 
     for index in reversed(range(1, 10)):
@@ -449,7 +449,6 @@ def _get_template_copy_name(template, existing_templates):
 )
 @user_has_permissions("manage_templates")
 def action_blocked(service_id, notification_type, return_to, template_id=None):
-
     back_link = {
         "add_new_template": partial(url_for, ".choose_template", service_id=current_service.id),
         "templates": partial(url_for, ".choose_template", service_id=current_service.id),
@@ -547,7 +546,6 @@ def delete_template_folder(service_id, template_folder_id):
 )
 @user_has_permissions("manage_templates")
 def add_service_template(service_id, template_type, template_folder_id=None):
-
     if template_type not in current_service.available_template_types:
         return redirect(
             url_for(
@@ -698,7 +696,6 @@ def count_content_length(service_id, template_type):
 
 
 def _get_content_count_error_and_message_for_template(template):
-
     if template.template_type == "sms":
         if template.is_message_too_long():
             return True, (
@@ -801,7 +798,6 @@ def confirm_redact_template(service_id, template_id):
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/redact", methods=["POST"])
 @user_has_permissions("manage_templates")
 def redact_template(service_id, template_id):
-
     service_api_client.redact_service_template(service_id, template_id)
 
     flash("Personalised content will be hidden for messages sent with this template", "default_with_tick")
@@ -922,11 +918,22 @@ def letter_template_attach_pages(service_id, template_id):
 
     form = PDFUploadForm()
     error = {}
+    letter_attachment_image_url = None
+    attachment_page_count = 0
     if form.validate_on_submit():
+        upload_id = uuid.uuid4()
         try:
-            return _process_letter_attachment_form(service_id, template, form)
+            return _process_letter_attachment_form(service_id, template, form, upload_id)
         except LetterAttachmentFormError as e:
             error = e.as_error_dict()
+            attachment_page_count = error.get("attachment_page_count", 0)
+            letter_attachment_image_url = (
+                url_for(
+                    "no_cookie.view_invalid_letter_attachment_as_preview",
+                    service_id=service_id,
+                    file_id=upload_id,
+                ),
+            )
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
@@ -938,6 +945,8 @@ def letter_template_attach_pages(service_id, template_id):
                 form=form,
                 template=template,
                 error=error,
+                letter_attachment_image_url=letter_attachment_image_url,
+                page_numbers=[*range(1, attachment_page_count + 1)],
             ),
             400 if error else 200,
         )
@@ -1013,7 +1022,7 @@ def letter_template_edit_pages(template_id, service_id):
     )
 
 
-def _process_letter_attachment_form(service_id, template, form):
+def _process_letter_attachment_form(service_id, template, form, upload_id):
     pdf_file_bytes = form.file.data.read()
     original_filename = form.file.data.filename
 
@@ -1028,7 +1037,6 @@ def _process_letter_attachment_form(service_id, template, form):
             detail="Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
         ) from None
 
-    upload_id = uuid.uuid4()
     file_location = get_transient_letter_file_location(service_id, upload_id)
 
     try:
@@ -1055,7 +1063,9 @@ def _process_letter_attachment_form(service_id, template, form):
                 invalid_pages=invalid_pages,
             )
             error_dict = get_letter_validation_error(validation_failed_message, invalid_pages, attachment_page_count)
-            raise LetterAttachmentFormError(title=error_dict["title"], detail=error_dict["detail"]) from None
+            raise LetterAttachmentFormError(
+                title=error_dict["title"], detail=error_dict["detail"], attachment_page_count=attachment_page_count
+            ) from None
 
         raise
 
@@ -1121,3 +1131,21 @@ def _save_letter_attachment(*, service_id, template_id, upload_id, original_file
         template_id=template_id,
         service_id=service_id,
     )
+
+
+@no_cookie.route("/services/<uuid:service_id>/preview-invalid-attachment-image/<uuid:file_id>")
+@user_has_permissions("manage_templates")
+def view_invalid_letter_attachment_as_preview(service_id, file_id):
+    try:
+        page = int(request.args.get("page"))
+    except ValueError:
+        abort(400)
+
+    pdf_file, metadata = get_attachment_pdf_and_metadata(service_id, file_id)
+
+    invalid_pages = json.loads(metadata.get("invalid_pages", "[]"))
+
+    if metadata.get("message") == "content-outside-printable-area" and page in invalid_pages:
+        return TemplatePreview.from_invalid_pdf_file(pdf_file, page)
+    else:
+        return TemplatePreview.from_valid_pdf_file(pdf_file, page)

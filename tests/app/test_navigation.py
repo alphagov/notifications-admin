@@ -203,6 +203,7 @@ EXCLUDED_ENDPOINTS = set(
             "no_cookie.check_notification_preview",
             "no_cookie.letter_branding_preview_image",
             "no_cookie.send_test_preview",
+            "no_cookie.view_invalid_letter_attachment_as_preview",
             "no_cookie.view_letter_attachment_preview",
             "no_cookie.view_letter_template_preview",
             "no_cookie.view_template_version_preview",

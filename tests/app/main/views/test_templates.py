@@ -861,6 +861,9 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    # page count for the attachment
+    mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
+
     mock_s3_upload = mocker.patch("app.main.views.templates.upload_letter_to_s3")
 
     mock_sanitise_response = Mock()
@@ -899,6 +902,12 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
         "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
     )
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+
+    letter_images = page.select("main img")
+    assert len(letter_images) == 1
+    assert letter_images[0]["src"] == url_for(
+        "no_cookie.view_invalid_letter_attachment_as_preview", service_id=SERVICE_ONE_ID, file_id=fake_uuid, page=1
+    )
 
 
 def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(

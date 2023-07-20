@@ -66,11 +66,20 @@ class LetterMetadata:
         return value
 
 
-def get_letter_s3_object(service_id, file_id):
+class LetterAttachmentMetadata:
+    def __init__(self, metadata):
+        self._metadata = metadata
+
+    def get(self, key, default=None):
+        value = self._metadata.get(key, default)
+        return value
+
+
+def get_letter_s3_object(service_id, file_id, bucket_name="S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"):
     try:
         file_location = get_transient_letter_file_location(service_id, file_id)
         s3 = resource("s3")
-        return s3.Object(current_app.config["S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"], file_location).get()
+        return s3.Object(current_app.config[bucket_name], file_location).get()
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchKey":
             raise LetterNotFoundError(f"Letter not found for service {service_id} and file {file_id}") from e
@@ -87,6 +96,12 @@ def get_letter_pdf_and_metadata(service_id, file_id):
 def get_letter_metadata(service_id, file_id):
     s3_object = get_letter_s3_object(service_id, file_id)
     return LetterMetadata(s3_object["Metadata"])
+
+
+def get_attachment_pdf_and_metadata(service_id, file_id):
+    s3_object = get_letter_s3_object(service_id, file_id, bucket_name="S3_BUCKET_TRANSIENT_UPLOADED_LETTERS")
+    pdf = s3_object["Body"].read()
+    return pdf, LetterAttachmentMetadata(s3_object["Metadata"])
 
 
 def upload_letter_attachment_to_s3(data, *, file_location, page_count, original_filename):
