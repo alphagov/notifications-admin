@@ -4,7 +4,7 @@ from functools import partial
 from unittest.mock import ANY, Mock
 
 import pytest
-from flask import g, url_for
+from flask import g, make_response, url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from requests import RequestException
@@ -3270,3 +3270,53 @@ def test_content_count_json_endpoint_for_unsupported_template_types(
         content="foo",
         _expected_status=404,
     )
+
+
+@pytest.mark.parametrize(
+    "invalid_pages, page_requested, overlay_expected",
+    (
+        ("[1, 2]", 1, True),
+        ("[1, 2]", 2, True),
+        ("[1, 2]", 3, False),
+        ("[]", 1, False),
+    ),
+)
+def test_letter_attachment_preview_image_shows_overlay_when_content_outside_printable_area_on_a_page(
+    mocker,
+    client_request,
+    mock_get_service,
+    fake_uuid,
+    invalid_pages,
+    page_requested,
+    overlay_expected,
+):
+    mocker.patch(
+        "app.main.views.templates.get_attachment_pdf_and_metadata",
+        return_value=(
+            "pdf_file",
+            {
+                "message": "content-outside-printable-area",
+                "invalid_pages": invalid_pages,
+            },
+        ),
+    )
+    template_preview_mock_valid = mocker.patch(
+        "app.main.views.templates.TemplatePreview.from_valid_pdf_file", return_value=make_response("page.html", 200)
+    )
+    template_preview_mock_invalid = mocker.patch(
+        "app.main.views.templates.TemplatePreview.from_invalid_pdf_file", return_value=make_response("page.html", 200)
+    )
+
+    client_request.get_response(
+        "no_cookie.view_invalid_letter_attachment_as_preview",
+        file_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        page=page_requested,
+    )
+
+    if overlay_expected:
+        template_preview_mock_invalid.assert_called_once_with("pdf_file", page_requested)
+        assert template_preview_mock_valid.called is False
+    else:
+        template_preview_mock_valid.assert_called_once_with("pdf_file", page_requested)
+        assert template_preview_mock_invalid.called is False
