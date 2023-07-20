@@ -919,7 +919,7 @@ def letter_template_attach_pages(service_id, template_id):
     form = PDFUploadForm()
     error = {}
     letter_attachment_image_url = None
-    attachment_page_count = 0
+    attachment_page_count = None
     if form.validate_on_submit():
         upload_id = uuid.uuid4()
         try:
@@ -933,12 +933,13 @@ def letter_template_attach_pages(service_id, template_id):
                     service_id=service_id,
                     file_id=upload_id,
                 ),
-            )
+            )[0]
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
 
     if not template.attachment:
+        attachment_page_count = attachment_page_count or 0
         return (
             render_template(
                 "views/templates/attach-pages.html",
@@ -951,17 +952,21 @@ def letter_template_attach_pages(service_id, template_id):
             400 if error else 200,
         )
 
+    letter_attachment_image_url = letter_attachment_image_url or url_for(
+        "no_cookie.view_letter_attachment_preview",
+        service_id=service_id,
+        attachment_id=template.attachment.id,
+    )
+
+    attachment_page_count = attachment_page_count or template.attachment.page_count
+
     return render_template(
         "views/templates/manage-attachment.html",
         form=form,
         template=template,
         service_id=service_id,
-        letter_attachment_image_url=url_for(
-            "no_cookie.view_letter_attachment_preview",
-            service_id=service_id,
-            attachment_id=template.attachment.id,
-        ),
-        page_numbers=list(range(1, template.attachment.page_count + 1)),
+        letter_attachment_image_url=letter_attachment_image_url,
+        page_numbers=list(range(1, attachment_page_count + 1)),
         error=error,
     )
 

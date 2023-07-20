@@ -1067,6 +1067,7 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch("uuid.uuid4", return_value=fake_uuid)
 
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
@@ -1096,6 +1097,13 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
     )
     # Should not have a ‘Remove attachment’ link
     assert not page.select(".js-stick-at-bottom-when-scrolling .govuk-link--destructive")
+
+    # should show preview of invalid attachment
+    letter_images = page.select("main img")
+    assert len(letter_images) == 1
+    assert letter_images[0]["src"] == url_for(
+        "no_cookie.view_invalid_letter_attachment_as_preview", service_id=SERVICE_ONE_ID, file_id=fake_uuid, page=1
+    )
 
 
 def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, service_one, mocker):
