@@ -34,15 +34,15 @@
   <svg xmlns="http://www.w3.org/2000/svg" width="26" height="20" viewBox="0 0 26 20"
     {%- if alt %} aria-labeledby="{{ id }}" role="img"
     {%- else %} aria-hidden="true" focusable="false"{% endif %}
-    {%- if classes %} class="{{ classes }}"{% endif -%}
+    class="svg-folder-icon{%- if classes %} {{ classes }}{% endif -%}"
   >
     <style><![CDATA[
-      path {
+      .svg-folder-icon > path {
         fill: #dee0e2;
       }
 
       @media (forced-colors: active) {
-        path {
+        .svg-folder-icon > path {
           fill: none;
         }
       }
