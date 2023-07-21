@@ -173,7 +173,7 @@ def test_from_invalid_pdf_file_makes_request(mocker, client_request):
 
     assert response == ("a", "b", {"content-type": "image/png"}.items())
     request_mock.assert_called_once_with(
-        "http://localhost:9999/precompiled/overlay.png?page_number=1",
+        "http://localhost:9999/precompiled/overlay.png?page_number=1&is_an_attachment=False",
         data=b"pdf page",
         headers={"Authorization": "Token my-secret-key"},
     )

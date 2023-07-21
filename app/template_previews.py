@@ -68,12 +68,13 @@ class TemplatePreview(AuthPreview):
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
     @classmethod
-    def from_invalid_pdf_file(cls, pdf_file, page):
+    def from_invalid_pdf_file(cls, pdf_file, page, is_an_attachment=False):
         pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)
 
         resp = requests.post(
             "{}/precompiled/overlay.png{}".format(
-                current_app.config["TEMPLATE_PREVIEW_API_HOST"], "?page_number={}".format(page)
+                current_app.config["TEMPLATE_PREVIEW_API_HOST"],
+                f"?page_number={page}&is_an_attachment={is_an_attachment}",
             ),
             data=pdf_page,
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},

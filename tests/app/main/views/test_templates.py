@@ -3281,7 +3281,7 @@ def test_content_count_json_endpoint_for_unsupported_template_types(
         ("[]", 1, False),
     ),
 )
-def test_letter_attachment_preview_image_shows_overlay_when_content_outside_printable_area_on_a_page(
+def test_letter_attachment_preview_image_shows_overlay_when_content_outside_printable_area(
     mocker,
     client_request,
     mock_get_service,
@@ -3315,7 +3315,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
     )
 
     if overlay_expected:
-        template_preview_mock_invalid.assert_called_once_with("pdf_file", page_requested)
+        template_preview_mock_invalid.assert_called_once_with("pdf_file", page_requested, is_an_attachment=True)
         assert template_preview_mock_valid.called is False
     else:
         template_preview_mock_valid.assert_called_once_with("pdf_file", page_requested)
