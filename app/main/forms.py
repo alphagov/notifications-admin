@@ -469,18 +469,6 @@ class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
     pass
 
 
-class RadioFieldWithRequiredMessage(RadioField):
-    def __init__(self, *args, required_message="Not a valid choice", **kwargs):
-        self.required_message = required_message
-        super().__init__(*args, **kwargs)
-
-    def pre_validate(self, form):
-        try:
-            return super().pre_validate(form)
-        except ValueError as e:
-            raise ValidationError(self.required_message) from e
-
-
 class StripWhitespaceForm(Form):
     class Meta:
         def bind_field(self, form, unbound_field, options):
@@ -845,6 +833,18 @@ class GovukRadiosWithImagesField(GovukRadiosField):
             "checked": option.checked,
             "image": self.image_data[option.data],
         }
+
+
+class GovukRadiosFieldWithRequiredMessage(GovukRadiosField):
+    def __init__(self, *args, required_message="Not a valid choice", **kwargs):
+        self.required_message = required_message
+        super().__init__(*args, **kwargs)
+
+    def pre_validate(self, form):
+        try:
+            return super().pre_validate(form)
+        except ValueError as e:
+            raise ValidationError(self.required_message) from e
 
 
 # guard against data entries that aren't a known permission
@@ -2409,13 +2409,13 @@ class TemplateAndFoldersSelectionForm(Form):
 
     add_new_folder_name = GovukTextInputField("Folder name", validators=[required_for_ops("add-new-folder")])
     move_to_new_folder_name = GovukTextInputField("Folder name", validators=[required_for_ops("move-to-new-folder")])
-    add_template_by_template_type = GovukRadiosField(
+    add_template_by_template_type = GovukRadiosFieldWithRequiredMessage(
         "New template",
         validators=[
             required_for_ops("add-new-template"),
             Optional(),
         ],
-        param_extensions={"errorMessage": {"text": "Select the type of template you want to add"}},
+        required_message="Select the type of template you want to add",
     )
 
 
