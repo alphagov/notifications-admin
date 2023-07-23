@@ -17,7 +17,7 @@ def check_render_template_forms(calls: list[mock.call]):
         context = call.args[2]
 
         # Specific exclusions to this check that a developer is manually overriding due to explicit handling.
-        if template.name in {"views/uploads/preview.html"}:
+        if template.name in {"views/uploads/preview.html", "views/letter-branding/manage-letter-branding.html"}:
             continue
 
         for key, value in context.items():

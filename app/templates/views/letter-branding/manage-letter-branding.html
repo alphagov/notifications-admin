@@ -5,6 +5,10 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
+{% block errorPrefix %}
+  {% if file_upload_form.errors or letter_branding_details_form.errors %}Error: {% endif %}
+{% endblock %}
+
 {% block per_page_title %}
   {{ '{} letter branding'.format('Update' if is_update else 'Add')}}
 {% endblock %}
