@@ -185,7 +185,7 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         template_nav_items=get_template_nav_items(template_folder_id),
         template_type=template_type,
         _search_form=SearchTemplatesForm(current_service.api_keys),
-        templates_and_folders_form=templates_and_folders_form,
+        form=templates_and_folders_form,
         move_to_children=templates_and_folders_form.move_to.children(),
         user_has_template_folder_permission=user_has_template_folder_permission,
         single_notification_channel=single_notification_channel,

@@ -90,7 +90,7 @@
     {% endfor %}
 
     {% if current_user.has_permissions('manage_templates') %}
-      {{ templates_and_folders_form.templates_and_folders(param_extensions={
+      {{ form.templates_and_folders(param_extensions={
         "items": checkboxes_data,
         "formGroup": {"classes": "govuk-!-margin-bottom-0"}
       }) }}

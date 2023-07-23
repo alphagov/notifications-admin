@@ -62,7 +62,7 @@
       {% call form_wrapper(
           class='sticky-scroll-area',
           module='template-folder-form',
-          data_kwargs={'prev-state': templates_and_folders_form.op or None}
+          data_kwargs={'prev-state': form.op or None}
       ) %}
         {% include 'views/templates/_template_list.html' %}
         {% include 'views/templates/_move_to.html' %}
