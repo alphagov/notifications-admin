@@ -258,7 +258,6 @@ def email_branding_choose_logo(service_id):
         render_template(
             "views/service-settings/branding/new/email-branding-choose-logo.html",
             form=form,
-            branding_options=form,
             branding_choice=branding_choice,
         ),
         400 if form.errors else 200,
