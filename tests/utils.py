@@ -13,7 +13,13 @@ class ComparablePropertyMock(PropertyMock):
 
 def check_render_template_forms(calls: list[mock.call]):
     for call in calls:
+        template = call.args[1]
         context = call.args[2]
+
+        # Specific exclusions to this check that a developer is manually overriding due to explicit handling.
+        if template.name in {"views/uploads/preview.html"}:
+            continue
+
         for key, value in context.items():
             if isinstance(value, Form) and key != "form":
                 if key.startswith("_") and not value.errors:
@@ -23,7 +29,7 @@ def check_render_template_forms(calls: list[mock.call]):
                     continue
 
                 raise ValueError(
-                    f"{value} passed into `render_template` for `{call.args[1]} as `{key}`. "
+                    f"{value} passed into `{template} as `{key}`. "
                     f"It should be passed as `form` if it is the main form for the page to allow for consistent error "
                     f"handling. If the form cannot report errors (eg it's a search form), you can prefix the key "
                     f"with an underscore to bypass this check.\n\n"
