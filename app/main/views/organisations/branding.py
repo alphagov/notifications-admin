@@ -204,7 +204,7 @@ def add_organisation_email_branding_options(org_id):
     return render_template(
         "views/organisations/organisation/settings/add-email-branding-options.html",
         form=form,
-        search_form=SearchByNameForm(),
+        _search_form=SearchByNameForm(),
     )
 
 
@@ -366,5 +366,5 @@ def add_organisation_letter_branding_options(org_id):
     return render_template(
         "views/organisations/organisation/settings/add-letter-branding-options.html",
         form=form,
-        search_form=SearchByNameForm(),
+        _search_form=SearchByNameForm(),
     )

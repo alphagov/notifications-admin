@@ -172,7 +172,7 @@ Text message pricing
   <h2 class="heading-medium" id="international-numbers">Sending text messages to international numbers</h2>
   <p class="govuk-body">It might cost more to send text messages to international numbers than UK ones, depending on the country.</p>
   {% set smsIntRates %}
-    {{ live_search(target_selector='#international-pricing .table-row', show=True, form=search_form, label='Search by country name or code') }}
+    {{ live_search(target_selector='#international-pricing .table-row', show=True, form=_search_form, label='Search by country name or code') }}
 
     <div id="international-pricing" class="bottom-gutter-3-2">
       {% call mapping_table(

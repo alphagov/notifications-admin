@@ -22,7 +22,7 @@ def letter_branding():
     return render_template(
         "views/letter-branding/select-letter-branding.html",
         letter_brandings=AllLetterBranding(),
-        search_form=SearchByNameForm(),
+        _search_form=SearchByNameForm(),
     )
 
 

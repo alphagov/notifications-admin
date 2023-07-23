@@ -39,7 +39,7 @@
   ) %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       {{
-        search_form.to(
+        _search_form.to(
           param_extensions={
             "formGroup": {"classes": "notify-simple-search-form__form-group"},
             "label": {
@@ -62,7 +62,7 @@
     </div>
 
   {% call form_wrapper(id="search-form") %}
-    <input type="hidden" name="to" {% if search_form.to.data %}value="{{ search_form.to.data }}"{%  endif %}>
+    <input type="hidden" name="to" {% if _search_form.to.data %}value="{{ _search_form.to.data }}"{%  endif %}>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   {% endcall %}
 

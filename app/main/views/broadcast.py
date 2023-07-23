@@ -228,7 +228,7 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
     if library.is_group:
         return render_template(
             "views/broadcast/areas-with-sub-areas.html",
-            search_form=SearchByNameForm(),
+            _search_form=SearchByNameForm(),
             show_search_form=(len(library) > 7),
             library=library,
             page_title=f"Choose a {library.name_singular.lower()}",
@@ -248,7 +248,7 @@ def choose_broadcast_area(service_id, broadcast_message_id, library_slug):
     return render_template(
         "views/broadcast/areas.html",
         form=form,
-        search_form=SearchByNameForm(),
+        _search_form=SearchByNameForm(),
         show_search_form=(len(form.areas.choices) > 7),
         page_title=f"Choose {library.name[0].lower()}{library.name[1:]}",
         broadcast_message=broadcast_message,
@@ -310,7 +310,7 @@ def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, ar
         return render_template(
             "views/broadcast/counties.html",
             form=form,
-            search_form=SearchByNameForm(),
+            _search_form=SearchByNameForm(),
             show_search_form=(len(area.sub_areas) > 7),
             library_slug=library_slug,
             page_title=f"Choose an area of {area.name}",
@@ -322,7 +322,7 @@ def choose_broadcast_sub_area(service_id, broadcast_message_id, library_slug, ar
     return render_template(
         "views/broadcast/sub-areas.html",
         form=form,
-        search_form=SearchByNameForm(),
+        _search_form=SearchByNameForm(),
         show_search_form=(len(form.areas.choices) > 7),
         library_slug=library_slug,
         page_title=f"Choose an area of {area.name}",

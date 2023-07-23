@@ -73,7 +73,7 @@ def platform_admin_search():
 
     return render_template(
         "views/platform-admin/search.html",
-        search_form=search_form,
+        form=search_form,
         show_results=search_form.is_submitted() and search_form.search.data,
         users=users,
         services=services,

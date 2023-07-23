@@ -23,7 +23,7 @@
     <div class="form-group govuk-!-margin-bottom-4">
       {{ form.select_all }}
     </div>
-    {{ live_search(target_selector='.file-list-item', show=show_search_form, form=search_form, label='Or by district') }}
+    {{ live_search(target_selector='.file-list-item', show=show_search_form, form=_search_form, label='Or by district') }}
 
     <div class="govuk-!-margin-bottom-6">
     {% for area in county.sub_areas|sort %}

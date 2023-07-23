@@ -28,7 +28,7 @@ from app.utils.user import user_is_platform_admin
 @user_is_platform_admin
 def email_branding():
     return render_template(
-        "views/email-branding/select-branding.html", email_brandings=AllEmailBranding(), search_form=SearchByNameForm()
+        "views/email-branding/select-branding.html", email_brandings=AllEmailBranding(), _search_form=SearchByNameForm()
     )
 
 

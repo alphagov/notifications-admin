@@ -56,7 +56,7 @@
       </div>
     {% endif %}
 
-    {{ live_search(target_selector='#template-list .template-list-item', show=show_search_box, form=search_form) }}
+    {{ live_search(target_selector='#template-list .template-list-item', show=show_search_box, form=_search_form) }}
 
     {% if current_user.has_permissions('manage_templates') and user_has_template_folder_permission %}
       {% call form_wrapper(
