@@ -66,15 +66,6 @@ class LetterMetadata:
         return value
 
 
-class LetterAttachmentMetadata:
-    def __init__(self, metadata):
-        self._metadata = metadata
-
-    def get(self, key, default=None):
-        value = self._metadata.get(key, default)
-        return value
-
-
 def get_letter_s3_object(service_id, file_id, bucket_name="S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"):
     try:
         file_location = get_transient_letter_file_location(service_id, file_id)
@@ -101,7 +92,7 @@ def get_letter_metadata(service_id, file_id):
 def get_attachment_pdf_and_metadata(service_id, file_id):
     s3_object = get_letter_s3_object(service_id, file_id, bucket_name="S3_BUCKET_TRANSIENT_UPLOADED_LETTERS")
     pdf = s3_object["Body"].read()
-    return pdf, LetterAttachmentMetadata(s3_object["Metadata"])
+    return pdf, s3_object["Metadata"]
 
 
 def upload_letter_attachment_to_s3(data, *, file_location, page_count, original_filename):
