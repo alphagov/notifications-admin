@@ -927,13 +927,11 @@ def letter_template_attach_pages(service_id, template_id):
         except LetterAttachmentFormError as e:
             error = e.as_error_dict()
             attachment_page_count = error.get("attachment_page_count", 0)
-            letter_attachment_image_url = (
-                url_for(
-                    "no_cookie.view_invalid_letter_attachment_as_preview",
-                    service_id=service_id,
-                    file_id=upload_id,
-                ),
-            )[0]
+            letter_attachment_image_url = url_for(
+                "no_cookie.view_invalid_letter_attachment_as_preview",
+                service_id=service_id,
+                file_id=upload_id,
+            )
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
