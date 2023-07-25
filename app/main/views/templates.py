@@ -18,7 +18,7 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.pdf import pdf_page_count
-from PyPDF2.errors import PdfReadError
+from pypdf.errors import PdfReadError
 from requests import RequestException
 
 from app import (

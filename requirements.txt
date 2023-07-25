@@ -123,7 +123,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==8.0.1
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@65.3.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@66.0.0
     # via -r requirements.in
 openpyxl==3.0.10
     # via pyexcel-xlsx
@@ -160,7 +160,7 @@ pyexcel-xlsx==0.6.0
     # via -r requirements.in
 pyjwt==2.4.0
     # via notifications-python-client
-pypdf2==2.10.3
+pypdf==3.13.0
     # via notifications-utils
 pyproj==3.4.1
     # via notifications-utils
@@ -212,7 +212,7 @@ statsd==3.3.0
 texttable==1.6.4
     # via pyexcel
 typing-extensions==4.6.0
-    # via pypdf2
+    # via pypdf
 urllib3==1.26.15
     # via
     #   botocore
