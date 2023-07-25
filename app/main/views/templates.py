@@ -919,7 +919,7 @@ def letter_template_attach_pages(service_id, template_id):
     form = PDFUploadForm()
     error = {}
     letter_attachment_image_url = None
-    attachment_page_count = None
+    attachment_page_count = 0
     if form.validate_on_submit():
         upload_id = uuid.uuid4()
         try:
@@ -937,7 +937,6 @@ def letter_template_attach_pages(service_id, template_id):
         error = get_error_from_upload_form(form.file.errors[0])
 
     if not template.attachment:
-        attachment_page_count = attachment_page_count or 0
         return (
             render_template(
                 "views/templates/attach-pages.html",
