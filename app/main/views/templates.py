@@ -944,7 +944,7 @@ def letter_template_attach_pages(service_id, template_id):
                 template=template,
                 error=error,
                 letter_attachment_image_url=letter_attachment_image_url,
-                page_numbers=[*range(1, attachment_page_count + 1)],
+                page_numbers=_get_page_numbers(attachment_page_count),
             ),
             400 if error else 200,
         )
@@ -963,7 +963,7 @@ def letter_template_attach_pages(service_id, template_id):
         template=template,
         service_id=service_id,
         letter_attachment_image_url=letter_attachment_image_url,
-        page_numbers=list(range(1, attachment_page_count + 1)),
+        page_numbers=_get_page_numbers(attachment_page_count),
         error=error,
     )
 
@@ -1019,7 +1019,7 @@ def letter_template_edit_pages(template_id, service_id):
             service_id=service_id,
             attachment_id=template.attachment.id,
         ),
-        page_numbers=list(range(1, template.attachment.page_count + 1)),
+        page_numbers=_get_page_numbers(template.attachment.page_count),
         error=error,
     )
 
@@ -1151,3 +1151,7 @@ def view_invalid_letter_attachment_as_preview(service_id, file_id):
         return TemplatePreview.from_invalid_pdf_file(pdf_file, page, is_an_attachment=True)
     else:
         return TemplatePreview.from_valid_pdf_file(pdf_file, page)
+
+
+def _get_page_numbers(page_count):
+    return [*range(1, page_count + 1)]
