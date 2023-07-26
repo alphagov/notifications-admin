@@ -4,7 +4,7 @@ from functools import partial
 from unittest.mock import ANY, Mock
 
 import pytest
-from flask import g, url_for
+from flask import g, make_response, url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from requests import RequestException
@@ -861,6 +861,9 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    # page count for the attachment
+    mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
+
     mock_s3_upload = mocker.patch("app.main.views.templates.upload_letter_to_s3")
 
     mock_sanitise_response = Mock()
@@ -899,6 +902,12 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
         "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
     )
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+
+    letter_images = page.select("main img")
+    assert len(letter_images) == 1
+    assert letter_images[0]["src"] == url_for(
+        "no_cookie.view_invalid_letter_attachment_as_preview", service_id=SERVICE_ONE_ID, file_id=fake_uuid, page=1
+    )
 
 
 def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
@@ -1058,6 +1067,7 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
 ):
     service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mocker.patch("uuid.uuid4", return_value=fake_uuid)
 
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
@@ -1087,6 +1097,13 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
     )
     # Should not have a ‘Remove attachment’ link
     assert not page.select(".js-stick-at-bottom-when-scrolling .govuk-link--destructive")
+
+    # should show preview of invalid attachment
+    letter_images = page.select("main img")
+    assert len(letter_images) == 1
+    assert letter_images[0]["src"] == url_for(
+        "no_cookie.view_invalid_letter_attachment_as_preview", service_id=SERVICE_ONE_ID, file_id=fake_uuid, page=1
+    )
 
 
 def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, service_one, mocker):
@@ -3253,3 +3270,53 @@ def test_content_count_json_endpoint_for_unsupported_template_types(
         content="foo",
         _expected_status=404,
     )
+
+
+@pytest.mark.parametrize(
+    "invalid_pages, page_requested, overlay_expected",
+    (
+        ("[1, 2]", 1, True),
+        ("[1, 2]", 2, True),
+        ("[1, 2]", 3, False),
+        ("[]", 1, False),
+    ),
+)
+def test_letter_attachment_preview_image_shows_overlay_when_content_outside_printable_area(
+    mocker,
+    client_request,
+    mock_get_service,
+    fake_uuid,
+    invalid_pages,
+    page_requested,
+    overlay_expected,
+):
+    mocker.patch(
+        "app.main.views.templates.get_attachment_pdf_and_metadata",
+        return_value=(
+            "pdf_file",
+            {
+                "message": "content-outside-printable-area",
+                "invalid_pages": invalid_pages,
+            },
+        ),
+    )
+    template_preview_mock_valid = mocker.patch(
+        "app.main.views.templates.TemplatePreview.from_valid_pdf_file", return_value=make_response("page.html", 200)
+    )
+    template_preview_mock_invalid = mocker.patch(
+        "app.main.views.templates.TemplatePreview.from_invalid_pdf_file", return_value=make_response("page.html", 200)
+    )
+
+    client_request.get_response(
+        "no_cookie.view_invalid_letter_attachment_as_preview",
+        file_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        page=page_requested,
+    )
+
+    if overlay_expected:
+        template_preview_mock_invalid.assert_called_once_with("pdf_file", page_requested, is_an_attachment=True)
+        assert template_preview_mock_valid.called is False
+    else:
+        template_preview_mock_valid.assert_called_once_with("pdf_file", page_requested)
+        assert template_preview_mock_invalid.called is False
