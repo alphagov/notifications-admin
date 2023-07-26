@@ -8,7 +8,7 @@
   </div>
 {% endif %}
 
-<div class="template-container {% if current_service.has_permission("extra_letter_formatting") %}template-container--with-attach-pages-button{% endif %}">
+<div class="template-container template-container--with-attach-pages-button">
   {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not template.too_many_pages %}
     <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-get-ready-to-send">
       Get ready to send<span class="govuk-visually-hidden"> a letter using this template</span>
@@ -29,19 +29,17 @@
   {{ template|string }}
 </div>
 
-{% if current_service.has_permission("extra_letter_formatting") %}
-  <div class="govuk-!-margin-bottom-2">
-    <div class="js-stick-at-bottom-when-scrolling">
-      {{ govukButton({
-      "element": "a",
-      "text": "Manage attachment" if template.attachment else "Attach pages",
-      "href": url_for(
-          '.letter_template_attach_pages',
-          service_id=current_service.id,
-          template_id=template.id
-        ),
-      "classes": "govuk-button--secondary edit-template-link-attachment"
-      }) }}
-    </div>
+<div class="govuk-!-margin-bottom-2">
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ govukButton({
+    "element": "a",
+    "text": "Manage attachment" if template.attachment else "Attach pages",
+    "href": url_for(
+        '.letter_template_attach_pages',
+        service_id=current_service.id,
+        template_id=template.id
+      ),
+    "classes": "govuk-button--secondary edit-template-link-attachment"
+    }) }}
   </div>
-{% endif %}
+</div>

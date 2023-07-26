@@ -781,53 +781,9 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
     assert page.select_one("h1", {"data-error-type": "letter-too-long"})
 
 
-@pytest.mark.parametrize("template_type", ["letter", "email", "sms"])
-def test_view_letter_template_has_attach_pages_button(
-    client_request,
-    service_one,
-    mock_get_service_templates,
-    mock_get_template_folders,
-    single_letter_contact_block,
-    mock_has_jobs,
-    active_user_with_permissions,
-    mocker,
-    fake_uuid,
-    template_type,
-):
-    service_one["permissions"] = ["extra_letter_formatting"]
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
-    client_request.login(active_user_with_permissions)
-    mocker.patch(
-        "app.service_api_client.get_service_template",
-        return_value={"data": create_template(template_id=fake_uuid, template_type=template_type)},
-    )
-
-    page = client_request.get(
-        "main.view_template",
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        _test_page_title=False,
-    )
-
-    buttons = [b for b in page.select(".govuk-button--secondary") if normalize_spaces((b).text) == "Attach pages"]
-    template_container = page.select(".template-container.template-container--with-attach-pages-button")
-
-    if template_type == "letter":
-        button = buttons[0]
-        assert button.attrs["href"] == url_for(
-            ".letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=fake_uuid
-        )
-        assert template_container
-    else:
-        assert len(buttons) == 0
-        assert not template_container
-
-
 def test_GET_letter_template_attach_pages(
     client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
 ):
-    service_one["permissions"] = ["extra_letter_formatting"]
-
     page = client_request.get(
         "main.letter_template_attach_pages",
         service_id=SERVICE_ONE_ID,
@@ -848,8 +804,6 @@ def test_GET_letter_template_attach_pages_404s_if_invalid_template_id(client_req
         "app.notify_client.service_api_client.service_api_client.get_service_template",
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
-    service_one["permissions"] = ["extra_letter_formatting"]
-
     client_request.get(
         "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=fake_uuid, _expected_status=404
     )
@@ -858,7 +812,6 @@ def test_GET_letter_template_attach_pages_404s_if_invalid_template_id(client_req
 def test_post_attach_pages_errors_when_content_outside_printable_area(
     mocker, client_request, fake_uuid, service_one, mock_get_service_letter_template
 ):
-    service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     # page count for the attachment
@@ -917,7 +870,6 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
     fake_uuid,
     service_one,
 ):
-    service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mocker.patch("app.main.views.templates.upload_letter_to_s3")
@@ -961,7 +913,6 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     page_count,
     expected_pages_content,
 ):
-    service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     mock_sanitise = mocker.patch("app.main.views.templates.sanitise_letter")
@@ -1009,7 +960,6 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
     mock_get_service_letter_template_with_attachment,
     mock_get_template_folders,
 ):
-    service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     mock_sanitise = mocker.patch("app.main.views.templates.sanitise_letter")
@@ -1065,7 +1015,6 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
     mock_get_service_letter_template_with_attachment,
     mock_get_template_folders,
 ):
-    service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
 
@@ -1150,7 +1099,6 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
 def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
     mock_get_service_letter_template_with_attachment, client_request, service_one
 ):
-    service_one["permissions"] = ["extra_letter_formatting"]
     page = client_request.get(
         "main.letter_template_attach_pages",
         service_id=SERVICE_ONE_ID,
@@ -1179,7 +1127,6 @@ def test_post_delete_letter_attachment_calls_archive_letter_attachment(
     mocker,
     active_user_with_permissions,
 ):
-    service_one["permissions"] = ["extra_letter_formatting"]
     mock_archive_attachment = mocker.patch("app.letter_attachment_client.archive_letter_attachment")
     client_request.post(
         "main.letter_template_edit_pages",
@@ -1208,7 +1155,6 @@ def test_get_delete_letter_attachment_shows_confirmation(
     active_user_with_permissions,
 ):
     mock_flash = mocker.patch("app.main.views.templates.flash")
-    service_one["permissions"] = ["extra_letter_formatting"]
     mocker.patch("app.letter_attachment_client.archive_letter_attachment")
     page = client_request.get(
         "main.letter_template_edit_pages",
@@ -1398,6 +1344,14 @@ def test_should_be_able_to_view_a_letter_template_with_links(
                 template_id=fake_uuid,
             ),
             "Edit letter contact block",
+        ),
+        (
+            url_for(
+                "main.letter_template_attach_pages",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            "Attach pages",
         ),
     ]
 

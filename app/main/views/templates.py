@@ -62,7 +62,6 @@ from app.template_previews import (
 )
 from app.utils import (
     NOTIFICATION_TYPES,
-    service_has_permission,
     should_skip_template_page,
 )
 from app.utils.letters import (
@@ -909,7 +908,6 @@ def get_template_sender_form_dict(service_id, template):
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-@service_has_permission("extra_letter_formatting")
 def letter_template_attach_pages(service_id, template_id):
     template = current_service.get_template(template_id)
 
@@ -976,7 +974,6 @@ def view_letter_attachment_preview(service_id, attachment_id):
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages/edit", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-@service_has_permission("extra_letter_formatting")
 def letter_template_edit_pages(template_id, service_id):
     template = current_service.get_template(template_id)
 
