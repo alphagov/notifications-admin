@@ -49,7 +49,7 @@ def organisations():
     return render_template(
         "views/organisations/index.html",
         organisations=AllOrganisations(),
-        search_form=SearchByNameForm(),
+        _search_form=SearchByNameForm(),
     )
 
 
@@ -129,7 +129,7 @@ def add_organisation_from_nhs_local_service(service_id):
     return render_template(
         "views/organisations/add-nhs-local-organisation.html",
         form=form,
-        search_form=search_form,
+        _search_form=search_form,
     )
 
 
@@ -148,7 +148,7 @@ def organisation_dashboard(org_id):
         ),
         selected_year=year,
         updated_at=updated_at,
-        search_form=SearchByNameForm() if len(services) > 7 else None,
+        _search_form=SearchByNameForm() if len(services) > 7 else None,
         **{
             f"total_{key}": sum(service[key] for service in services)
             for key in ("emails_sent", "sms_cost", "letter_cost")
@@ -202,7 +202,7 @@ def download_organisation_usage_report(org_id):
 def organisation_trial_mode_services(org_id):
     return render_template(
         "views/organisations/organisation/trial-mode-services.html",
-        search_form=SearchByNameForm(),
+        _search_form=SearchByNameForm(),
     )
 
 

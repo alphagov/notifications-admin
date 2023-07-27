@@ -3,10 +3,10 @@
 <div id="sticky_template_forms">
   <button name="operation" value="unknown" hidden></button>
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-  {% if templates_and_folders_form.move_to.choices and template_list.templates_to_show %}
+  {% if form.move_to.choices and template_list.templates_to_show %}
     <div id="move_to_folder_radios" class="sticky-template-form" role="region" aria-label="Choose the folder to move selected items to">
       <div class="js-will-stick-at-bottom-when-scrolling">
-      {{ templates_and_folders_form.move_to}}
+      {{ form.move_to}}
     </div>
       <div class="js-will-stick-at-bottom-when-scrolling">
       {{ page_footer('Move', button_name='operation', button_value='move-to-existing-folder', button_text_hidden_suffix=' selection to folder') }}
@@ -14,20 +14,20 @@
     </div>
     <div id="move_to_new_folder_form" class="sticky-template-form" role="region" aria-label="Enter name of the new folder to move selected items to">
       <div class="js-will-stick-at-bottom-when-scrolling">
-        {{ templates_and_folders_form.move_to_new_folder_name(param_extensions={"classes": "govuk-!-width-full"}) }}
+        {{ form.move_to_new_folder_name(param_extensions={"classes": "govuk-!-width-full"}) }}
         {{ page_footer('Add to new folder', button_name='operation', button_value='move-to-new-folder') }}
       </div>
     </div>
   {% endif %}
   <div id="add_new_folder_form" class="sticky-template-form" role="region" aria-label="Enter name of the new folder">
     <div class="js-will-stick-at-bottom-when-scrolling">
-      {{ templates_and_folders_form.add_new_folder_name(param_extensions={"classes": "govuk-!-width-full"}) }}
+      {{ form.add_new_folder_name(param_extensions={"classes": "govuk-!-width-full"}) }}
       {{ page_footer('Add new folder', button_name='operation', button_value='add-new-folder') }}
     </div>
   </div>
   <div id="add_new_template_form" class="sticky-template-form" role="region" aria-label="Choose template type" {% if single_notification_channel %}data-channel="{{single_notification_channel}}" data-service="{{current_service.id}}"{% endif %}>
     <div class="js-will-stick-at-bottom-when-scrolling">
-     {{templates_and_folders_form.add_template_by_template_type}}
+     {{form.add_template_by_template_type}}
     </div>
     <div class="js-will-stick-at-bottom-when-scrolling">
     {{ page_footer('Continue', button_name='operation', button_value='add-new-template') }}

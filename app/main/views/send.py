@@ -645,7 +645,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         upload_id=upload_id,
         form=CsvUploadForm(),
         remaining_messages=remaining_messages,
-        choose_time_form=choose_time_form,
+        _choose_time_form=choose_time_form,
         back_link=back_link,
         trying_to_send_letters_in_trial_mode=all(
             (

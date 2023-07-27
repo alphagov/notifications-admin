@@ -26,7 +26,7 @@ def guidance_pricing_text_messages():
             [(cc, country["names"], country["billable_units"]) for cc, country in INTERNATIONAL_BILLING_RATES.items()],
             key=lambda x: x[0],
         ),
-        search_form=SearchByNameForm(),
+        _search_form=SearchByNameForm(),
         navigation_links=pricing_nav(),
     )
 

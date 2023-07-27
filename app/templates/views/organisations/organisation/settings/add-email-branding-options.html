@@ -15,7 +15,7 @@
 
 {% block maincolumn_content %}
   {{ page_header("Add email branding options") }}
-  {{ live_search(target_selector='.govuk-checkboxes__item', show=True, form=search_form, autofocus=True) }}
+  {{ live_search(target_selector='.govuk-checkboxes__item', show=True, form=_search_form, autofocus=True) }}
 
   {% call form_wrapper(module='add-branding-options-form') %}
     <div class="brand-pool">

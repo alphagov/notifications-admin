@@ -11,7 +11,7 @@
 {% block platform_admin_content %}
 
   <h1 class="heading-medium">{{ page_title }}</h1>
-  {{ live_search(target_selector='.browse-list-item', show=True, form=search_form, autofocus=True) }}
+  {{ live_search(target_selector='.browse-list-item', show=True, form=_search_form, autofocus=True) }}
   <nav>
     {% for brand in letter_brandings %}
       <div class="browse-list-item">

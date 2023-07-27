@@ -55,18 +55,18 @@
     </div>
   </div>
 
-  {% if search_form %}
+  {% if _search_form %}
     <div class="govuk-!-margin-bottom-5">
       {{ live_search(
         target_selector='.organisation-service',
         show=True,
-        form=search_form,
+        form=_search_form,
         label='Search by service'
       ) }}
     </div>
   {% endif %}
 
-  <h2 class="heading-small {% if search_form %}govuk-visually-hidden{% endif %}">By service</h2>
+  <h2 class="heading-small {% if _search_form %}govuk-visually-hidden{% endif %}">By service</h2>
 
   {% for service in services %}
     <div class="keyline-block govuk-!-margin-top-2 organisation-service">

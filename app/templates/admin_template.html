@@ -33,7 +33,8 @@
 {% endblock %}
 
 {% block pageTitle %}
-   {% block per_page_title %}{% endblock %} – GOV.UK Notify
+  {% block errorPrefix %}{% if form and form.errors %}Error: {% endif %}{% endblock %}
+  {% block per_page_title %}{% endblock %} – GOV.UK Notify
 {% endblock %}
 
 {% block bodyStart %}

@@ -36,7 +36,7 @@
 
   {% else %}
 
-    {{ live_search(target_selector='#template-list .template-list-item', show=True, form=search_form) }}
+    {{ live_search(target_selector='#template-list .template-list-item', show=True, form=_search_form) }}
 
     <div id="template-list">
       {% for item in templates_and_folders %}

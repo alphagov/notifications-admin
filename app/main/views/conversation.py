@@ -49,7 +49,7 @@ def conversation_reply(
             service=current_service, template_folder_id=from_folder, user=current_user, template_type="sms"
         ),
         template_folder_path=current_service.get_template_folder_path(from_folder),
-        search_form=SearchByNameForm(),
+        _search_form=SearchByNameForm(),
         notification_id=notification_id,
         template_type="sms",
     )

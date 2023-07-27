@@ -4,6 +4,7 @@ import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 from functools import partial
+from unittest import mock
 from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
 
@@ -35,6 +36,7 @@ from . import (
     template_version_json,
     user_json,
 )
+from .utils import check_render_template_forms
 
 html5parser = html5lib.HTMLParser()
 
@@ -2871,10 +2873,15 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             _test_for_elements_without_class=True,
             **endpoint_kwargs,
         ):
-            resp = _logged_in_client.get(
-                url,
-                follow_redirects=_follow_redirects,
-            )
+            from flask.templating import _render
+
+            with mock.patch("flask.templating._render", wraps=_render) as mock_render:
+                resp = _logged_in_client.get(
+                    url,
+                    follow_redirects=_follow_redirects,
+                )
+
+                check_render_template_forms(mock_render.call_args_list)
 
             if _expected_redirect and _expected_status == 200:
                 _expected_status = 302
@@ -2959,7 +2966,13 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
             post_kwargs = {}
             if _content_type:
                 post_kwargs.update(content_type=_content_type)
-            resp = _logged_in_client.post(url, data=_data, follow_redirects=_follow_redirects, **post_kwargs)
+
+            from flask.templating import _render
+
+            with mock.patch("flask.templating._render", wraps=_render) as mock_render:
+                resp = _logged_in_client.post(url, data=_data, follow_redirects=_follow_redirects, **post_kwargs)
+                check_render_template_forms(mock_render.call_args_list)
+
             assert resp.status_code == _expected_status
             if _expected_redirect:
                 assert_url_expected(resp.location, _expected_redirect)

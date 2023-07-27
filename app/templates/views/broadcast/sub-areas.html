@@ -24,7 +24,7 @@
       {{ form.select_all }}
     </div>
 
-    {{ live_search(target_selector='#sub-areas .govuk-checkboxes__item', show=show_search_form, form=search_form, label='Or by electoral ward') }}
+    {{ live_search(target_selector='#sub-areas .govuk-checkboxes__item', show=show_search_form, form=_search_form, label='Or by electoral ward') }}
 
     <div id="sub-areas">
       {{ form.areas }}
