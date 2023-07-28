@@ -488,6 +488,7 @@ def email_branding_choose_banner_colour(service_id):
                 **_email_branding_flow_query_params(request),
             ),
             abandon_flow_link=abandon_flow_link,
+            error_summary_enabled=True,
         ),
         400 if form.errors else 200,
     )
