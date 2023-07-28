@@ -5229,7 +5229,6 @@ def test_show_service_data_retention(
     service_one,
     mock_get_service_data_retention,
 ):
-
     mock_get_service_data_retention.return_value[0]["days_of_retention"] = 5
 
     client_request.login(platform_admin_user)
@@ -5241,6 +5240,11 @@ def test_show_service_data_retention(
     rows = page.select("tbody tr")
     assert len(rows) == 1
     assert normalize_spaces(rows[0].text) == "Email 5 days Change"
+
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.service_settings",
+        service_id=SERVICE_ONE_ID,
+    )
 
 
 def test_view_add_service_data_retention(
@@ -5255,6 +5259,11 @@ def test_view_add_service_data_retention(
     )
     assert normalize_spaces(page.select_one("input")["value"]) == "email"
     assert page.select_one("input", attrs={"name": "days_of_retention"})
+
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.data_retention",
+        service_id=SERVICE_ONE_ID,
+    )
 
 
 def test_add_service_data_retention(
