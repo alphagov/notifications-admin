@@ -3975,37 +3975,63 @@ def test_should_set_per_minute_rate_limit(
 
 
 @pytest.mark.parametrize(
-    "endpoint, extra_args, form_data, expected_error_message",
+    "endpoint, extra_args, form_data, expected_error_message, patches",
     (
         (
             "main.set_per_minute_rate_limit",
             {},
             {"rate_limit": ""},
             "Error: Cannot be empty",
+            {},
+        ),
+        (
+            "main.set_per_minute_rate_limit",
+            {},
+            {"rate_limit": "-1"},
+            "Error: Number must be at least 0.",
+            {},
         ),
         (
             "main.set_per_minute_rate_limit",
             {},
             {"rate_limit": "foo"},
             "Error: Number of messages must be a whole number",
+            {},
         ),
         (
             "main.set_per_day_message_limit",
             {"notification_type": "sms"},
             {"message_limit": ""},
             "Error: Cannot be empty",
+            {},
+        ),
+        (
+            "main.set_per_day_message_limit",
+            {"notification_type": "email"},
+            {"message_limit": "-1"},
+            "Error: Number must be at least 0.",
+            {},
         ),
         (
             "main.set_per_day_message_limit",
             {"notification_type": "email"},
             {"message_limit": "foo"},
             "Error: Number of emails must be a whole number",
+            {},
         ),
         (
             "main.set_per_day_message_limit",
             {"notification_type": "letter"},
             {"message_limit": "12.34"},
             "Error: Number of letters must be a whole number",
+            {},
+        ),
+        (
+            "main.set_free_sms_allowance",
+            {},
+            {"free_sms_allowance": "-1"},
+            "Error: Number must be at least 0.",
+            {"app.billing_api_client.get_free_sms_fragment_limit_for_year": 0},
         ),
     ),
 )
@@ -4016,7 +4042,12 @@ def test_should_show_error_for_invalid_message_limits(
     extra_args,
     form_data,
     expected_error_message,
+    mocker,
+    patches,
 ):
+    for patch, patch_retval in patches.items():
+        mocker.patch(patch, return_value=patch_retval)
+
     client_request.login(platform_admin_user)
     page = client_request.post(
         endpoint,

@@ -47,8 +47,10 @@ from wtforms.validators import (
     DataRequired,
     InputRequired,
     Length,
+    NumberRange,
     Optional,
     Regexp,
+    StopValidation,
 )
 
 from app import asset_fingerprinter, current_organisation
@@ -329,7 +331,7 @@ class GovukIntegerField(GovukTextInputField):
         if self.data:
 
             if not isinstance(self.data, int):
-                raise ValidationError(f"{sentence_case(self.things)} must be a whole number")
+                raise StopValidation(f"{sentence_case(self.things)} must be a whole number")
 
             if self.data > self.POSTGRES_MAX_INT:
                 raise ValidationError(
@@ -1222,7 +1224,7 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
         "Numbers of text message fragments per year",
         things="text message fragments",
-        validators=[InputRequired(message="Cannot be empty")],
+        validators=[InputRequired(message="Cannot be empty"), NumberRange(min=0)],
     )
 
 
@@ -1230,7 +1232,7 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
     message_limit = GovukIntegerField(
         "",
         things="number of messages",
-        validators=[DataRequired(message="Cannot be empty")],
+        validators=[DataRequired(message="Cannot be empty"), NumberRange(min=0)],
     )
 
     def __init__(self, notification_type, *args, **kwargs):
@@ -1251,7 +1253,7 @@ class AdminServiceRateLimitForm(StripWhitespaceForm):
     rate_limit = GovukIntegerField(
         "Number of messages the service can send in a rolling 60 second window",
         things="number of messages",
-        validators=[DataRequired(message="Cannot be empty")],
+        validators=[DataRequired(message="Cannot be empty"), NumberRange(min=0)],
     )
 
 
