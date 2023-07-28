@@ -213,6 +213,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
         back_link=url_for(
             ".email_branding_request_government_identity_logo", service_id=service_id, branding_choice=branding_choice
         ),
+        error_summary_enabled=True,
     )
 
 
