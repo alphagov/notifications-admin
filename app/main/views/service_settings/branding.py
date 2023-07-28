@@ -686,6 +686,7 @@ def letter_branding_upload_branding(service_id):
         ),
         # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
         abandon_flow_link=url_for(".letter_branding_request", service_id=current_service.id),
+        error_summary_enabled=True,
     )
 
 
