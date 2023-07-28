@@ -1155,6 +1155,7 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
         back_link=url_for(".service_set_branding", service_id=current_service.id, notification_type=notification_type),
         form=form,
         branding_name=branding_name,
+        error_summary_enabled=True,
     )
 
 
