@@ -307,6 +307,7 @@ def email_branding_upload_logo(service_id):
             form=form,
             back_link=back_link,
             abandon_flow_link=abandon_flow_link,
+            error_summary_enabled=True,
         ),
         400 if form.errors else 200,
     )
