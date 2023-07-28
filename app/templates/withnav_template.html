@@ -1,4 +1,5 @@
 {% from "service_navigation.html" import service_navigation %}
+{% from "components/error-summary.html" import errorSummary %}
 
 {% extends "admin_template.html" %}
 
@@ -30,6 +31,11 @@
         <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content" role="main">
         {% block content %}
           {% include 'flash_messages.html' %}
+          {% block errorSummary %}
+            {% if error_summary_enabled %}
+              {% if form and form.errors %}{{ errorSummary(form) }}{% endif %}
+            {% endif %}
+          {% endblock %}
           {% block maincolumn_content %}{% endblock %}
         {% endblock %}
         </main>
