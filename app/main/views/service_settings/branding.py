@@ -452,6 +452,7 @@ def email_branding_choose_banner_type(service_id):
                 service_id=current_service.id,
                 **_email_branding_flow_query_params(request),
             ),
+            error_summary_enabled=True,
         ),
         400 if form.errors else 200,
     )
