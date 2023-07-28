@@ -1224,7 +1224,10 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
         "Numbers of text message fragments per year",
         things="text message fragments",
-        validators=[InputRequired(message="Cannot be empty"), NumberRange(min=0)],
+        validators=[
+            InputRequired(message="Cannot be empty"),
+            NumberRange(min=0, message="Number must be greater than or equal to 0"),
+        ],
     )
 
 
@@ -1232,7 +1235,10 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
     message_limit = GovukIntegerField(
         "",
         things="number of messages",
-        validators=[DataRequired(message="Cannot be empty"), NumberRange(min=0)],
+        validators=[
+            DataRequired(message="Cannot be empty"),
+            NumberRange(min=0, message="Number must be greater than or equal to 0"),
+        ],
     )
 
     def __init__(self, notification_type, *args, **kwargs):
@@ -1253,7 +1259,10 @@ class AdminServiceRateLimitForm(StripWhitespaceForm):
     rate_limit = GovukIntegerField(
         "Number of messages the service can send in a rolling 60 second window",
         things="number of messages",
-        validators=[DataRequired(message="Cannot be empty"), NumberRange(min=0)],
+        validators=[
+            DataRequired(message="Cannot be empty"),
+            NumberRange(min=0, message="Number must be greater than or equal to 0"),
+        ],
     )
 
 

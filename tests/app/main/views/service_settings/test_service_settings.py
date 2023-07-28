@@ -3988,7 +3988,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_minute_rate_limit",
             {},
             {"rate_limit": "-1"},
-            "Error: Number must be at least 0.",
+            "Error: Number must be greater than or equal to 0",
             {},
         ),
         (
@@ -4009,7 +4009,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_day_message_limit",
             {"notification_type": "email"},
             {"message_limit": "-1"},
-            "Error: Number must be at least 0.",
+            "Error: Number must be greater than or equal to 0",
             {},
         ),
         (
@@ -4030,7 +4030,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_free_sms_allowance",
             {},
             {"free_sms_allowance": "-1"},
-            "Error: Number must be at least 0.",
+            "Error: Number must be greater than or equal to 0",
             {"app.billing_api_client.get_free_sms_fragment_limit_for_year": 0},
         ),
     ),
