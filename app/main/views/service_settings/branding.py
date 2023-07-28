@@ -260,6 +260,7 @@ def email_branding_choose_logo(service_id):
             "views/service-settings/branding/new/email-branding-choose-logo.html",
             form=form,
             branding_choice=branding_choice,
+            error_summary_enabled=True,
         ),
         400 if form.errors else 200,
     )

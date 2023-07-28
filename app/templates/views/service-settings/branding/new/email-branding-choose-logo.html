@@ -2,7 +2,6 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "components/error-summary.html" import errorSummary %}
 
 {% set page_title = form.branding_options.label.text %}
 
@@ -25,8 +24,6 @@
 {%- endset %}
 
 {% block maincolumn_content %}
-  {{ errorSummary(form) }}
-
   {% call form_wrapper() %}
     {% if prompt_text %}
       {% set param_extensions = {
