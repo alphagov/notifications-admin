@@ -752,4 +752,5 @@ def letter_branding_set_name(service_id):
         ),
         temp_filename=letter_filename_for_db_from_logo_key(temporary_logo_key),
         form=form,
+        error_summary_enabled=True,
     )
