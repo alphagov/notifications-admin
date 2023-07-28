@@ -385,6 +385,7 @@ def email_branding_set_alt_text(service_id):
         ),
         email_preview_data=email_branding_data,
         form=form,
+        error_summary_enabled=True,
     )
 
 
