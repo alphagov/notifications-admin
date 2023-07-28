@@ -1014,7 +1014,6 @@ def service_delete_sms_sender(service_id, sms_sender_id):
 @main.route("/services/<uuid:service_id>/service-settings/set-free-sms-allowance", methods=["GET", "POST"])
 @user_is_platform_admin
 def set_free_sms_allowance(service_id):
-
     form = AdminServiceSMSAllowanceForm(free_sms_allowance=current_service.free_sms_fragment_limit)
 
     if form.validate_on_submit():
