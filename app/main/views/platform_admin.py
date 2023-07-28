@@ -78,6 +78,7 @@ def platform_admin_search():
         users=users,
         services=services,
         organisations=organisations,
+        error_summary_enabled=True,
     )
 
 
