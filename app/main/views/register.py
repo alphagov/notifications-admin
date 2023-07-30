@@ -48,7 +48,12 @@ def register_from_invite():
             # so just activate them straight away
             return activate_user(session["user_details"]["id"])
 
-    return render_template("views/register-from-invite.html", invited_user=invited_user, form=form)
+    return render_template(
+        "views/register-from-invite.html",
+        invited_user=invited_user,
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/register-from-org-invite", methods=["GET", "POST"])
