@@ -83,7 +83,12 @@ def two_factor_sms():
         else:
             return log_in_user(user_id)
 
-    return render_template("views/two-factor-sms.html", form=form, redirect_url=redirect_url)
+    return render_template(
+        "views/two-factor-sms.html",
+        form=form,
+        redirect_url=redirect_url,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/two-factor-webauthn", methods=["GET"])
