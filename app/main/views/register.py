@@ -72,7 +72,12 @@ def register_from_org_invite():
         invited_org_user.accept_invite()
 
         return redirect(url_for("main.verify"))
-    return render_template("views/register-from-org-invite.html", invited_org_user=invited_org_user, form=form)
+    return render_template(
+        "views/register-from-org-invite.html",
+        invited_org_user=invited_org_user,
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 def _do_registration(form, send_sms=True, send_email=True, organisation_id=None):
