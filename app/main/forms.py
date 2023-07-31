@@ -476,7 +476,40 @@ class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
     pass
 
 
-class StripWhitespaceForm(Form):
+class OrderableFieldsForm(Form):
+    """Can be used to force fields to be iterated in a specific order.
+
+    WTForms will iterate over fields on a form in the order that they are instantiated at runtime (this is generally
+    top-down as you read through the file). This order is sometimes different from the order that fields are displayed
+    on the page. With simple forms this is easy - we can just reorder the fields in the class declaration. However,
+    we have a number of forms that have inheritance chains, which makes reordering more difficult.
+
+    Where we are using forms with inheritance and display fields in a different order than they're created for the form,
+    we can use `custom_field_order` to rejig the fields. In particular this may be important to get error messages
+    displaying in error summaries to match the order of forms visually on the page.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if hasattr(self, "custom_field_order"):
+            from flask import current_app
+
+            custom_field_order = self.custom_field_order
+            if current_app.config["WTF_CSRF_ENABLED"]:
+                custom_field_order = ("csrf_token",) + custom_field_order
+
+            unlisted_fields = set(self._fields).symmetric_difference(set(custom_field_order))
+            if unlisted_fields:
+                raise RuntimeError(
+                    "When setting `OrderableFieldsForm.custom_field_order`, all fields must be listed exhaustively. "
+                    f"The following fields are missing: {unlisted_fields}."
+                )
+
+            self._fields = {fieldname: self._fields[fieldname] for fieldname in custom_field_order}
+
+
+class StripWhitespaceForm(OrderableFieldsForm):
     class Meta:
         def bind_field(self, form, unbound_field, options):
             # FieldList simply doesn't support filters.
@@ -1040,7 +1073,12 @@ class BaseInviteUserForm:
 
 
 class InviteUserForm(BaseInviteUserForm, PermissionsForm):
-    pass
+    custom_field_order: tuple = (
+        "email_address",
+        "permissions_field",
+        "folder_permissions",
+        "login_authentication",
+    )
 
 
 class BroadcastInviteUserForm(BaseInviteUserForm, BroadcastPermissionsForm):
@@ -1610,7 +1648,7 @@ class EstimateUsageForm(StripWhitespaceForm):
         return super().validate(*args, **kwargs)
 
 
-class AdminProviderRatioForm(Form):
+class AdminProviderRatioForm(OrderableFieldsForm):
     def __init__(self, providers):
         self._providers = providers
 
@@ -1663,7 +1701,6 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
     phone_number = GovukTextInputField("Phone number")
 
     def validate(self):
-
         if self.contact_details_type.data == "url":
             self.url.validators = [DataRequired(), URL(message="Must be a valid URL")]
 
@@ -2230,7 +2267,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
     )
 
 
-class EmailBrandingChooseBanner(Form):
+class EmailBrandingChooseBanner(OrderableFieldsForm):
     BANNER_CHOICES_DATA = {
         "org_banner": {
             "label": "Yes",
@@ -2329,7 +2366,7 @@ def required_for_ops(*operations):
     return validate
 
 
-class TemplateAndFoldersSelectionForm(Form):
+class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
     """
     This form expects the form data to include an operation, based on which submit button is clicked.
     If enter is pressed, unknown will be sent by a hidden submit button at the top of the form.
