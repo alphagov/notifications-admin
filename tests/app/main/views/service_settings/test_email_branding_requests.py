@@ -1679,7 +1679,7 @@ def test_email_branding_choose_banner_type_shows_error_summary_on_invalid_data(c
 
     error_summary = page.select_one(".govuk-error-summary")
     assert normalize_spaces(error_summary.text) == "There is a problem Select an option"
-    assert error_summary.select_one("a").get("href") == "#banner"
+    assert error_summary.select_one("a").get("href") == "#banner-0"
 
     assert "Error: Select an option" in page.select_one("#banner").text
 
