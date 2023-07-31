@@ -616,6 +616,7 @@ def platform_admin_returned_letters():
     return render_template(
         "views/platform-admin/returned-letters.html",
         form=form,
+        error_summary_enabled=True,
     )
 
 
