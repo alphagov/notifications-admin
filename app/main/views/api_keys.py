@@ -100,7 +100,7 @@ def create_api_key(service_id):
             service_id=service_id,
             key_name=email_safe(form.key_name.data, whitespace="_"),
         )
-    return render_template("views/api/keys/create.html", form=form)
+    return render_template("views/api/keys/create.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/api/keys/revoke/<uuid:key_id>", methods=["GET", "POST"])

@@ -1531,13 +1531,13 @@ class CreateKeyForm(StripWhitespaceForm):
         self.existing_key_names = [key["name"].lower() for key in existing_keys if not key["expiry_date"]]
         super().__init__(*args, **kwargs)
 
+    key_name = GovukTextInputField(
+        "Name for this key", validators=[DataRequired(message="You need to give the key a name")]
+    )
+
     key_type = GovukRadiosField(
         "Type of key",
         thing="the type of key",
-    )
-
-    key_name = GovukTextInputField(
-        "Name for this key", validators=[DataRequired(message="You need to give the key a name")]
     )
 
     def validate_key_name(self, key_name):
