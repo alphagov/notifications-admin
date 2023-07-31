@@ -296,7 +296,11 @@ def notifications_sent_by_service():
             },
         )
 
-    return render_template("views/platform-admin/notifications_by_service.html", form=form)
+    return render_template(
+        "views/platform-admin/notifications_by_service.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/reports/usage-for-all-services", methods=["GET", "POST"])
