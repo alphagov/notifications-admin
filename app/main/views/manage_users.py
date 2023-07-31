@@ -97,6 +97,7 @@ def invite_user(service_id, user_id=None):
         form=form,
         mobile_number=True,
         user_to_invite=user_to_invite,
+        error_summary_enabled=True,
     )
 
 
