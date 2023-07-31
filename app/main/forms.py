@@ -251,11 +251,11 @@ def international_phone_number(label="Mobile number"):
     return InternationalPhoneNumber(label, validators=[DataRequired(message="Cannot be empty")])
 
 
-def password(label="Password"):
+def make_password_field(label="Password", no_input_error="Enter a password"):
     return GovukPasswordField(
         label,
         validators=[
-            DataRequired(message="Cannot be empty"),
+            DataRequired(message=no_input_error),
             Length(8, 255, message="Must be at least 8 characters"),
             CommonlyUsedPassword(message="Choose a password that’s harder to guess"),
         ],
@@ -522,7 +522,7 @@ class RegisterUserForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
     email_address = email_address()
     mobile_number = international_phone_number()
-    password = password()
+    password = make_password_field()
     # always register as sms type
     auth_type = HiddenField("auth_type", default="sms_auth")
 
@@ -556,7 +556,7 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
 
     mobile_number = InternationalPhoneNumber("Mobile number", validators=[DataRequired(message="Cannot be empty")])
-    password = password()
+    password = make_password_field()
     organisation = HiddenField("organisation")
     email_address = HiddenField("email_address")
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
@@ -1454,7 +1454,7 @@ class ForgotPasswordForm(StripWhitespaceForm):
 
 
 class NewPasswordForm(StripWhitespaceForm):
-    new_password = password()
+    new_password = make_password_field()
 
 
 class ChangePasswordForm(StripWhitespaceForm):
@@ -1462,8 +1462,8 @@ class ChangePasswordForm(StripWhitespaceForm):
         self.validate_password_func = validate_password_func
         super(ChangePasswordForm, self).__init__(*args, **kwargs)
 
-    old_password = password("Current password")
-    new_password = password("New password")
+    old_password = make_password_field("Current password", no_input_error="Enter your current password")
+    new_password = make_password_field("New password", no_input_error="Enter your new password")
 
     def validate_old_password(self, field):
         if not self.validate_password_func(field.data):
