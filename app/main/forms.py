@@ -620,6 +620,14 @@ class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
     def get_items_from_options(self, field):
         return [self.get_item_from_option(option) for option in field]
 
+    @property
+    def error_summary_id(self):
+        items = self.get_items_from_options(self)
+        if len(items) > 0:
+            return items[0]["id"]
+
+        return self.id
+
     def prepare_params(self, **kwargs):
         # returns either a list or a hierarchy of lists
         # depending on how get_items_from_options is implemented
@@ -714,6 +722,14 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
 
     def get_items_from_options(self, field):
         return [self.get_item_from_option(option) for option in field]
+
+    @property
+    def error_summary_id(self):
+        items = self.get_items_from_options(self)
+        if len(items) > 0:
+            return items[0]["id"]
+
+        return self.id
 
     def prepare_params(self, **kwargs):
         # returns either a list or a hierarchy of lists
