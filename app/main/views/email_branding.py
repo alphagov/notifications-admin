@@ -193,6 +193,7 @@ def create_email_branding_government_identity_colour():
     return render_template(
         "views/email-branding/government-identity-options-colour.html",
         form=form,
+        error_summary_enabled=True,
     )
 
 
