@@ -213,6 +213,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
         back_link=url_for(
             ".email_branding_request_government_identity_logo", service_id=service_id, branding_choice=branding_choice
         ),
+        error_summary_enabled=True,
     )
 
 
@@ -259,6 +260,7 @@ def email_branding_choose_logo(service_id):
             "views/service-settings/branding/new/email-branding-choose-logo.html",
             form=form,
             branding_choice=branding_choice,
+            error_summary_enabled=True,
         ),
         400 if form.errors else 200,
     )
@@ -305,6 +307,7 @@ def email_branding_upload_logo(service_id):
             form=form,
             back_link=back_link,
             abandon_flow_link=abandon_flow_link,
+            error_summary_enabled=True,
         ),
         400 if form.errors else 200,
     )
@@ -382,6 +385,7 @@ def email_branding_set_alt_text(service_id):
         ),
         email_preview_data=email_branding_data,
         form=form,
+        error_summary_enabled=True,
     )
 
 
@@ -448,6 +452,7 @@ def email_branding_choose_banner_type(service_id):
                 service_id=current_service.id,
                 **_email_branding_flow_query_params(request),
             ),
+            error_summary_enabled=True,
         ),
         400 if form.errors else 200,
     )
@@ -483,6 +488,7 @@ def email_branding_choose_banner_colour(service_id):
                 **_email_branding_flow_query_params(request),
             ),
             abandon_flow_link=abandon_flow_link,
+            error_summary_enabled=True,
         ),
         400 if form.errors else 200,
     )
@@ -680,6 +686,7 @@ def letter_branding_upload_branding(service_id):
         ),
         # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
         abandon_flow_link=url_for(".letter_branding_request", service_id=current_service.id),
+        error_summary_enabled=True,
     )
 
 
@@ -745,4 +752,5 @@ def letter_branding_set_name(service_id):
         ),
         temp_filename=letter_filename_for_db_from_logo_key(temporary_logo_key),
         form=form,
+        error_summary_enabled=True,
     )

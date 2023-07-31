@@ -3,7 +3,6 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/branding-preview.html" import custom_email_branding_preview %}
-{% from "components/error-summary.html" import errorSummary %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
@@ -15,10 +14,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-
   {{ page_header('Preview your email branding') }}
-
-  {{ errorSummary(form) }}
 
   <p class="govuk-body">
     This is a preview of what emails from {{ current_service.name }} will look like.

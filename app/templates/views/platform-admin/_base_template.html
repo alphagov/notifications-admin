@@ -1,5 +1,7 @@
 {% extends "withoutnav_template.html" %}
 
+{% from "components/error-summary.html" import errorSummary %}
+
 {% block main %}
 <div class="govuk-width-container {{ mainClasses }}">
     <div class="navigation-service">
@@ -41,6 +43,11 @@
         <main class="govuk-main-wrapper column-main govuk-!-padding-top-0 govuk-!-padding-bottom-0" id="main-content" role="main">
           {% block content %}
             {% include 'flash_messages.html' %}
+            {% block errorSummary %}
+              {% if error_summary_enabled %}
+                {% if form and form.errors %}{{ errorSummary(form) }}{% endif %}
+              {% endif %}
+            {% endblock %}
             {% block platform_admin_content %}{% endblock %}
           {% endblock %}
         </main>

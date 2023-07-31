@@ -234,7 +234,11 @@ def invite_org_user(org_id):
         flash(f"Invite sent to {invited_org_user.email_address}", "default_with_tick")
         return redirect(url_for(".manage_org_users", org_id=org_id))
 
-    return render_template("views/organisations/organisation/users/invite-org-user.html", form=form)
+    return render_template(
+        "views/organisations/organisation/users/invite-org-user.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/organisations/<uuid:org_id>/users/<uuid:user_id>", methods=["GET", "POST"])

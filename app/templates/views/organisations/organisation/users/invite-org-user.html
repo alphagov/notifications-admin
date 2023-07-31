@@ -4,7 +4,6 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "components/error-summary.html" import errorSummary %}
 
 {% block org_page_title %}
   Invite a team member
@@ -15,9 +14,6 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-
-  {{ errorSummary(form) }}
-
   {{ page_header("Invite a team member") }}
 
   {% call form_wrapper() %}

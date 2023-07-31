@@ -3,22 +3,17 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
-{% from "components/error-summary.html" import errorSummary %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
   {{ '{} email branding'.format('Update' if email_branding else 'Add')}}
 {% endblock %}
 
-
 {% block backLink %}
   {{ govukBackLink({ "href": back_link }) }}
 {% endblock %}
 
 {% block platform_admin_content %}
-
-  {{ errorSummary(form) }}
-
   {{ page_header('{} email branding'.format('Update' if email_branding else 'Add')) }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
