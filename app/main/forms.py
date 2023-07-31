@@ -74,6 +74,7 @@ from app.main.validators import (
     NoEmbeddedImagesInSVG,
     NoPlaceholders,
     NoTextInSVG,
+    NotifyDataRequired,
     OnlySMSCharacters,
     StringsNotAllowed,
     ValidEmail,
@@ -160,7 +161,7 @@ class RadioField(WTFormsRadioField):
             raise ValidationError(f"Select {self.thing}")
 
 
-def email_address(label="Email address", gov_user=True, required=True):
+def make_email_address_field(label="Email address", gov_user=True, required=True, thing=None):
 
     validators = [
         ValidEmail(),
@@ -170,7 +171,11 @@ def email_address(label="Email address", gov_user=True, required=True):
         validators.append(ValidGovEmail())
 
     if required:
-        validators.append(DataRequired(message="Cannot be empty"))
+        if thing:
+            validators.append(NotifyDataRequired(thing=thing))
+        else:
+            # FIXME: being deprecated; prefer to pass in `thing`.
+            validators.append(DataRequired(message="Cannot be empty"))
 
     return GovukEmailField(label, validators)
 
@@ -520,7 +525,7 @@ class LoginForm(StripWhitespaceForm):
 
 class RegisterUserForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
-    email_address = email_address()
+    email_address = make_email_address_field()
     mobile_number = international_phone_number()
     password = make_password_field()
     # always register as sms type
@@ -927,7 +932,6 @@ class BasePermissionsForm(StripWhitespaceForm):
             ("email_auth", "Email link"),
         ],
         thing="how this team member should sign in",
-        validators=[DataRequired()],
         param_extensions={"fieldset": {"legend": {"classes": "govuk-fieldset__legend--s"}}},
     )
 
@@ -1022,7 +1026,7 @@ class OrganisationUserPermissionsForm(StripWhitespaceForm):
 
 
 class BaseInviteUserForm:
-    email_address = email_address(gov_user=False)
+    email_address = make_email_address_field(gov_user=False)
 
     def __init__(self, inviter_email_address, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1040,7 +1044,7 @@ class InviteUserForm(BaseInviteUserForm, PermissionsForm):
 
 
 class BroadcastInviteUserForm(BaseInviteUserForm, BroadcastPermissionsForm):
-    email_address = email_address(gov_user=True)
+    email_address = make_email_address_field(gov_user=True)
 
     def validate_email_address(self, field):
         if not distinct_email_addresses(field.data, self.inviter_email_address):
@@ -1450,7 +1454,7 @@ class LetterUploadPostageForm(StripWhitespaceForm):
 
 
 class ForgotPasswordForm(StripWhitespaceForm):
-    email_address = email_address(gov_user=False)
+    email_address = make_email_address_field(gov_user=False)
 
 
 class NewPasswordForm(StripWhitespaceForm):
@@ -1490,7 +1494,7 @@ class ChangeEmailForm(StripWhitespaceForm):
         self.validate_email_func = validate_email_func
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
 
-    email_address = email_address()
+    email_address = make_email_address_field()
 
     def validate_email_address(self, field):
         # The validate_email_func can be used to call API to check if the email address is already in
@@ -1505,7 +1509,7 @@ class ChangeEmailForm(StripWhitespaceForm):
 
 
 class ChangeNonGovEmailForm(ChangeEmailForm):
-    email_address = email_address(gov_user=False)
+    email_address = make_email_address_field(gov_user=False)
 
 
 class ChangeMobileNumberForm(StripWhitespaceForm):
@@ -1567,7 +1571,7 @@ class SupportRedirect(StripWhitespaceForm):
 
 class FeedbackOrProblem(StripWhitespaceForm):
     name = GovukTextInputField("Name (optional)")
-    email_address = email_address(label="Email address", gov_user=False, required=True)
+    email_address = make_email_address_field(label="Email address", gov_user=False, required=True)
     feedback = TextAreaField("Your message", validators=[DataRequired(message="Cannot be empty")])
 
 
@@ -1690,7 +1694,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
-    email_address = email_address(label="Reply-to email address", gov_user=False)
+    email_address = make_email_address_field(label="Reply-to email address", gov_user=False)
     is_default = GovukCheckboxField("Make this email address the default")
 
 
@@ -2094,7 +2098,7 @@ def get_placeholder_form_instance(
     allow_international_phone_numbers=False,
 ):
     if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template_type == "email":
-        field = email_address(label=placeholder_name, gov_user=False)
+        field = make_email_address_field(label=placeholder_name, gov_user=False)
     elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template_type == "sms":
         if allow_international_phone_numbers:
             field = international_phone_number(label=placeholder_name)
@@ -2590,7 +2594,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
 
     on_behalf_of_name = GovukTextInputField("What’s their name?")
 
-    on_behalf_of_email = email_address(
+    on_behalf_of_email = make_email_address_field(
         "What’s their email address?",
         required=False,
         gov_user=False,
