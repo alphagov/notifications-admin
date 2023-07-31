@@ -679,7 +679,11 @@ def clear_cache():
 
         flash(msg, category="default")
 
-    return render_template("views/platform-admin/clear-cache.html", form=form)
+    return render_template(
+        "views/platform-admin/clear-cache.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 def get_url_for_notify_record(uuid_):
