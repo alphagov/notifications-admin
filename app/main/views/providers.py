@@ -59,7 +59,12 @@ def edit_sms_provider_ratio():
             provider_client.update_provider(provider["id"], field.data)
         return redirect(url_for(".view_providers"))
 
-    return render_template("views/providers/edit-sms-provider-ratio.html", form=form, providers=providers)
+    return render_template(
+        "views/providers/edit-sms-provider-ratio.html",
+        form=form,
+        providers=providers,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/provider/<uuid:provider_id>")
