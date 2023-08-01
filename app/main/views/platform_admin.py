@@ -366,7 +366,11 @@ def get_billing_report():
             )
         else:
             flash("No results for dates")
-    return render_template("views/platform-admin/get-billing-report.html", form=form)
+    return render_template(
+        "views/platform-admin/get-billing-report.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/reports/dvla-billing", methods=["GET", "POST"])
