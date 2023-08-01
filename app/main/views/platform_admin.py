@@ -529,7 +529,11 @@ def get_daily_volumes():
             )
         else:
             flash("No results for dates")
-    return render_template("views/platform-admin/daily-volumes-report.html", form=form)
+    return render_template(
+        "views/platform-admin/daily-volumes-report.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/reports/daily-sms-provider-volumes-report", methods=["GET", "POST"])
