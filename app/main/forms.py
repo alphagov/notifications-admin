@@ -570,6 +570,15 @@ class RegisterUserForm(StripWhitespaceForm):
 
 
 class RegisterUserFromInviteForm(RegisterUserForm):
+    custom_field_order = (
+        "name",
+        "mobile_number",
+        "password",
+        "service",
+        "email_address",
+        "auth_type",
+    )
+
     def __init__(self, invited_user):
         super().__init__(
             service=invited_user.service,
