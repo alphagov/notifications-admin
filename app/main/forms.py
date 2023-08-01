@@ -74,6 +74,7 @@ from app.main.validators import (
     NoEmbeddedImagesInSVG,
     NoPlaceholders,
     NoTextInSVG,
+    NotifyDataRequired,
     OnlySMSCharacters,
     StringsNotAllowed,
     ValidEmail,
@@ -160,7 +161,7 @@ class RadioField(WTFormsRadioField):
             raise ValidationError(f"Select {self.thing}")
 
 
-def email_address(label="Email address", gov_user=True, required=True):
+def make_email_address_field(label="Email address", gov_user=True, required=True, thing=None):
 
     validators = [
         ValidEmail(),
@@ -170,7 +171,11 @@ def email_address(label="Email address", gov_user=True, required=True):
         validators.append(ValidGovEmail())
 
     if required:
-        validators.append(DataRequired(message="Cannot be empty"))
+        if thing:
+            validators.append(NotifyDataRequired(thing=thing))
+        else:
+            # FIXME: being deprecated; prefer to pass in `thing`.
+            validators.append(DataRequired(message="Cannot be empty"))
 
     return GovukEmailField(label, validators)
 
@@ -251,11 +256,11 @@ def international_phone_number(label="Mobile number"):
     return InternationalPhoneNumber(label, validators=[DataRequired(message="Cannot be empty")])
 
 
-def password(label="Password"):
+def make_password_field(label="Password", thing="a password"):
     return GovukPasswordField(
         label,
         validators=[
-            DataRequired(message="Cannot be empty"),
+            NotifyDataRequired(thing=thing),
             Length(8, 255, message="Must be at least 8 characters"),
             CommonlyUsedPassword(message="Choose a password that’s harder to guess"),
         ],
@@ -471,7 +476,40 @@ class HiddenFieldWithNoneOption(FieldWithNoneOption, HiddenField):
     pass
 
 
-class StripWhitespaceForm(Form):
+class OrderableFieldsForm(Form):
+    """Can be used to force fields to be iterated in a specific order.
+
+    WTForms will iterate over fields on a form in the order that they are instantiated at runtime (this is generally
+    top-down as you read through the file). This order is sometimes different from the order that fields are displayed
+    on the page. With simple forms this is easy - we can just reorder the fields in the class declaration. However,
+    we have a number of forms that have inheritance chains, which makes reordering more difficult.
+
+    Where we are using forms with inheritance and display fields in a different order than they're created for the form,
+    we can use `custom_field_order` to rejig the fields. In particular this may be important to get error messages
+    displaying in error summaries to match the order of forms visually on the page.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if hasattr(self, "custom_field_order"):
+            from flask import current_app
+
+            custom_field_order = self.custom_field_order
+            if current_app.config["WTF_CSRF_ENABLED"]:
+                custom_field_order = ("csrf_token",) + custom_field_order
+
+            unlisted_fields = set(self._fields).symmetric_difference(set(custom_field_order))
+            if unlisted_fields:
+                raise RuntimeError(
+                    "When setting `OrderableFieldsForm.custom_field_order`, all fields must be listed exhaustively. "
+                    f"The following fields are missing: {unlisted_fields}."
+                )
+
+            self._fields = {fieldname: self._fields[fieldname] for fieldname in custom_field_order}
+
+
+class StripWhitespaceForm(OrderableFieldsForm):
     class Meta:
         def bind_field(self, form, unbound_field, options):
             # FieldList simply doesn't support filters.
@@ -520,9 +558,9 @@ class LoginForm(StripWhitespaceForm):
 
 class RegisterUserForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
-    email_address = email_address()
+    email_address = make_email_address_field()
     mobile_number = international_phone_number()
-    password = password()
+    password = make_password_field()
     # always register as sms type
     auth_type = HiddenField("auth_type", default="sms_auth")
 
@@ -556,7 +594,7 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
 
     mobile_number = InternationalPhoneNumber("Mobile number", validators=[DataRequired(message="Cannot be empty")])
-    password = password()
+    password = make_password_field()
     organisation = HiddenField("organisation")
     email_address = HiddenField("email_address")
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
@@ -926,8 +964,7 @@ class BasePermissionsForm(StripWhitespaceForm):
             ("sms_auth", "Text message code"),
             ("email_auth", "Email link"),
         ],
-        thing="how this team member should sign in",
-        validators=[DataRequired()],
+        thing="a sign-in method",
         param_extensions={"fieldset": {"legend": {"classes": "govuk-fieldset__legend--s"}}},
     )
 
@@ -1022,7 +1059,7 @@ class OrganisationUserPermissionsForm(StripWhitespaceForm):
 
 
 class BaseInviteUserForm:
-    email_address = email_address(gov_user=False)
+    email_address = make_email_address_field(gov_user=False, thing="an email address")
 
     def __init__(self, inviter_email_address, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1036,11 +1073,16 @@ class BaseInviteUserForm:
 
 
 class InviteUserForm(BaseInviteUserForm, PermissionsForm):
-    pass
+    custom_field_order: tuple = (
+        "email_address",
+        "permissions_field",
+        "folder_permissions",
+        "login_authentication",
+    )
 
 
 class BroadcastInviteUserForm(BaseInviteUserForm, BroadcastPermissionsForm):
-    email_address = email_address(gov_user=True)
+    email_address = make_email_address_field(gov_user=True)
 
     def validate_email_address(self, field):
         if not distinct_email_addresses(field.data, self.inviter_email_address):
@@ -1450,11 +1492,12 @@ class LetterUploadPostageForm(StripWhitespaceForm):
 
 
 class ForgotPasswordForm(StripWhitespaceForm):
-    email_address = email_address(gov_user=False)
+    email_address = make_email_address_field(gov_user=False, thing="your email address")
 
 
 class NewPasswordForm(StripWhitespaceForm):
-    new_password = password()
+
+    new_password = make_password_field(thing="a new password")
 
 
 class ChangePasswordForm(StripWhitespaceForm):
@@ -1462,8 +1505,8 @@ class ChangePasswordForm(StripWhitespaceForm):
         self.validate_password_func = validate_password_func
         super(ChangePasswordForm, self).__init__(*args, **kwargs)
 
-    old_password = password("Current password")
-    new_password = password("New password")
+    old_password = make_password_field("Current password", thing="your current password")
+    new_password = make_password_field("New password", thing="your new password")
 
     def validate_old_password(self, field):
         if not self.validate_password_func(field.data):
@@ -1490,7 +1533,7 @@ class ChangeEmailForm(StripWhitespaceForm):
         self.validate_email_func = validate_email_func
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
 
-    email_address = email_address()
+    email_address = make_email_address_field()
 
     def validate_email_address(self, field):
         # The validate_email_func can be used to call API to check if the email address is already in
@@ -1505,7 +1548,7 @@ class ChangeEmailForm(StripWhitespaceForm):
 
 
 class ChangeNonGovEmailForm(ChangeEmailForm):
-    email_address = email_address(gov_user=False)
+    email_address = make_email_address_field(gov_user=False)
 
 
 class ChangeMobileNumberForm(StripWhitespaceForm):
@@ -1531,13 +1574,13 @@ class CreateKeyForm(StripWhitespaceForm):
         self.existing_key_names = [key["name"].lower() for key in existing_keys if not key["expiry_date"]]
         super().__init__(*args, **kwargs)
 
-    key_type = GovukRadiosField(
-        "Type of key",
-        thing="the type of key",
+    key_name = GovukTextInputField(
+        "Name for this key", validators=[NotifyDataRequired(thing="a name for this API key")]
     )
 
-    key_name = GovukTextInputField(
-        "Name for this key", validators=[DataRequired(message="You need to give the key a name")]
+    key_type = GovukRadiosField(
+        "Type of key",
+        thing="a type of API key",
     )
 
     def validate_key_name(self, key_name):
@@ -1567,7 +1610,7 @@ class SupportRedirect(StripWhitespaceForm):
 
 class FeedbackOrProblem(StripWhitespaceForm):
     name = GovukTextInputField("Name (optional)")
-    email_address = email_address(label="Email address", gov_user=False, required=True)
+    email_address = make_email_address_field(label="Email address", gov_user=False, required=True)
     feedback = TextAreaField("Your message", validators=[DataRequired(message="Cannot be empty")])
 
 
@@ -1606,7 +1649,7 @@ class EstimateUsageForm(StripWhitespaceForm):
         return super().validate(*args, **kwargs)
 
 
-class AdminProviderRatioForm(Form):
+class AdminProviderRatioForm(OrderableFieldsForm):
     def __init__(self, providers):
         self._providers = providers
 
@@ -1659,7 +1702,6 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
     phone_number = GovukTextInputField("Phone number")
 
     def validate(self):
-
         if self.contact_details_type.data == "url":
             self.url.validators = [DataRequired(), URL(message="Must be a valid URL")]
 
@@ -1690,7 +1732,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
-    email_address = email_address(label="Reply-to email address", gov_user=False)
+    email_address = make_email_address_field(label="Reply-to email address", gov_user=False)
     is_default = GovukCheckboxField("Make this email address the default")
 
 
@@ -2094,7 +2136,7 @@ def get_placeholder_form_instance(
     allow_international_phone_numbers=False,
 ):
     if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template_type == "email":
-        field = email_address(label=placeholder_name, gov_user=False)
+        field = make_email_address_field(label=placeholder_name, gov_user=False)
     elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template_type == "sms":
         if allow_international_phone_numbers:
             field = international_phone_number(label=placeholder_name)
@@ -2226,7 +2268,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
     )
 
 
-class EmailBrandingChooseBanner(Form):
+class EmailBrandingChooseBanner(OrderableFieldsForm):
     BANNER_CHOICES_DATA = {
         "org_banner": {
             "label": "Yes",
@@ -2325,7 +2367,7 @@ def required_for_ops(*operations):
     return validate
 
 
-class TemplateAndFoldersSelectionForm(Form):
+class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
     """
     This form expects the form data to include an operation, based on which submit button is clicked.
     If enter is pressed, unknown will be sent by a hidden submit button at the top of the form.
@@ -2590,7 +2632,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
 
     on_behalf_of_name = GovukTextInputField("What’s their name?")
 
-    on_behalf_of_email = email_address(
+    on_behalf_of_email = make_email_address_field(
         "What’s their email address?",
         required=False,
         gov_user=False,

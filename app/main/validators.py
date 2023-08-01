@@ -9,7 +9,7 @@ from notifications_utils.sanitise_text import SanitiseSMS
 from notifications_utils.template import BroadcastMessageTemplate
 from orderedset import OrderedSet
 from wtforms import ValidationError
-from wtforms.validators import StopValidation
+from wtforms.validators import DataRequired, StopValidation
 
 from app import antivirus_client
 from app.main._commonly_used_passwords import commonly_used_passwords
@@ -231,3 +231,8 @@ class FileIsVirusFree:
                         raise StopValidation("Your file contains a virus")
                 finally:
                     field.data.seek(0)
+
+
+class NotifyDataRequired(DataRequired):
+    def __init__(self, thing):
+        super().__init__(message=f"Enter {thing}")

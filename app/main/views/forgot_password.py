@@ -19,4 +19,4 @@ def forgot_password():
                 raise e
         return render_template("views/password-reset-sent.html")
 
-    return render_template("views/forgot-password.html", form=form)
+    return render_template("views/forgot-password.html", form=form, error_summary_enabled=True)
