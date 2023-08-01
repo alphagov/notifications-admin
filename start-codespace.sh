@@ -5,4 +5,11 @@ if [[ "${CODESPACES}" != "true" ]]; then
   exit 1
 fi
 
-(cd ../notifications-local; make up)
+make generate-version-file
+(cd ../notifications-api; make generate-version-file)
+(cd ../notifications-template-preview; make generate-version-file)
+(cd ../notifications-antivirus; make generate-version-file)
+(cd ../document-download-api; make generate-version-file)
+(cd ../document-download-frontend; make generate-version-file)
+
+(cd ../notifications-local; ./generate-env-files.sh; docker-compose build; make up)
