@@ -560,7 +560,7 @@ class LoginForm(StripWhitespaceForm):
 
 
 class RegisterUserForm(StripWhitespaceForm):
-    name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
+    name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
     email_address = make_email_address_field()
     mobile_number = international_phone_number()
     password = make_password_field()
