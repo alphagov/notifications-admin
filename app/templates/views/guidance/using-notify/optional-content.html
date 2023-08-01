@@ -1,5 +1,4 @@
 {% extends "content_template.html" %}
-{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -18,12 +17,12 @@
 
   <ul class="govuk-list govuk-list--bullet">
     <li>put it inside double brackets</li>
-    <li>give it a unique placeholder name, followed by ‘??’</li>
+    <li>give it a unique placeholder name, followed by 2 question marks</li>
   </ul>
 
   <p class="govuk-body">Your optional content should look like this:</p>
 
-  {{ govukInsetText({"text": "((under18??Please get your application signed by a parent or guardian.))"}) }}
+  <pre class="formatting-example">((under18??Please get your application signed by a parent or guardian.))</code></pre>
 
   <p class="govuk-body">For each person you send the message to, specify ‘yes’ or ‘no’ to show or hide the optional content.</p>
 

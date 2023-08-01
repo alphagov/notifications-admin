@@ -1,12 +1,8 @@
-{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
-
 <h2 class="heading-medium">
   Personalisation
 </h2>
-<p class="bottom-gutter-1-3">
-  Use double brackets to personalise your message:
+<p class="govuk-body">
+  To personalise a message, use double brackets to add a placeholder to your content. For example:
 </p>
-{{ govukInsetText({
-  "text": "Hello ((first name)), your reference is ((ref number))",
-  "classes": "govuk-!-margin-top-0"})
-}}
+<pre class="formatting-example govuk-!-margin-top-0"><code class="lang-md">Hello ((first name)), your reference is ((ref number))
+</code></pre>

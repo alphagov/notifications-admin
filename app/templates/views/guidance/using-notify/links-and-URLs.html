@@ -1,7 +1,6 @@
 {% extends "content_template.html" %}
 
 {% from "components/service-link.html" import service_link %}
-{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -14,9 +13,9 @@
 
   <h1 class="heading-large">Links and URLs</h1>
 
-  <p class="govuk-body">When composing a message, write URLs in full and Notify will convert them into links for you. For example:</p>
+  <p class="govuk-body">When composing a message, write URLs in full. For example:</p>
 
-  {{ govukInsetText({"html": "Apply now at <a class=\"govuk-link govuk-link--no-visited-state\" href=\"https://www.gov.uk\">https://www.gov.uk</a>"}) }}
+  <pre class="formatting-example"><code class="lang-md">Apply now at https://www.gov.uk/example</code></pre>
 
   <p class="govuk-body">URLs should be easy to read.</p>
 
@@ -51,9 +50,9 @@
 
   <h3 class="heading-small">How to format link text</h3>
   <p class="govuk-body">GOV.UK Notify uses Markdown to format link text.</p>
-  <p class="govuk-body">To convert text into a link, use square brackets [] around the link text and round brackets () around the URL. Make sure there are no spaces between the brackets or the link will not work. For example:</p>
+  <p class="govuk-body">To convert text into a link, use square brackets around the link text and round brackets around the URL. Make sure there are no spaces between the brackets or the link will not work. For example:</p>
 
-  {{ govukInsetText({"text": "[Apply now](https://www.gov.uk/example)"}) }}
+  <pre class="formatting-example"><code class="lang-md">[Apply now](https://www.gov.uk/example)</code></pre>
 
   <p class="govuk-body">To see formatting instructions while you’re editing a template:</p>
    <ol class="govuk-list govuk-list--number">

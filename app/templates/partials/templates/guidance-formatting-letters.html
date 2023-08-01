@@ -1,30 +1,38 @@
-{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
-
 <h2 class="heading-medium">Formatting</h2>
+<h3 class="heading-small">Headings</h3>
 <p class="govuk-body">
-  To put a heading in your template, use a hash:
+  Use one hashtag followed by a space for a heading, for example:
 </p>
-{{ govukInsetText({
-  "text": "# This is a heading",
-  "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
-}}
+<pre class="formatting-example"><code class="lang-md"># This is a heading</code></pre>
+<h3 class="heading-small">Bullet points</h3>
 <p class="govuk-body">
-  To make bullet points, use asterisks:
+  Copy this example to add bullet points:
 </p>
-{{ govukInsetText({
-  "html": "* point 1<br/>
-            * point 2<br/>
-            * point 3<br/>",
-  "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
-}}
+<pre class="formatting-example"><code class="lang-md">Introduce bullet points with a lead-in line ending in a colon:
+
+* leave one empty line space after the lead-in line
+* use an asterisk or a dash followed by a space to add an item
+* start each item with a lowercase letter, do not end with a full stop
+* leave one empty line space after the last item
+</code></pre>
+<p class="govuk-body">To create sub-items, add an indent of 2 spaces before the asterisk or dash.</p>
+<h3 class="heading-small">Numbered steps</h3>
+<p class="bottom-gutter-1-3">
+  Copy this example to add a numbered list:
+</p>
+<pre class="formatting-example"><code class="lang-md">1. Leave one empty line space before starting your list.
+2. Enter a number followed by a full stop and a space to add an item.
+3. Start each item with a capital letter and end it with a full stop.
+4. Leave one empty line space after the last item.
+</code></pre>
+<p class="govuk-body">To create sub-items, add an indent of 2 spaces before the number.</p>
+<h3 class="heading-small">Page breaks</h3>
 <p class="govuk-body">
-  To insert a page break, use three asterisks:
+  To insert a page break, use 3 asterisks. For example:
 </p>
-{{ govukInsetText({
-  "html": "Content on page 1<br/>
-            <br/>
-            ***<br/>
-            <br/>
-            Content on page 2<br/>",
-  "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
-}}
+<pre class="formatting-example"><code class="lang-md">Content on page 1
+
+***
+
+Content on page 2
+</code></pre>

@@ -1,41 +1,49 @@
-{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
-
 <h2 class="heading-medium">Formatting</h2>
+<h3 class="heading-small">Headings and subheadings</h3>
 <p class="bottom-gutter-1-3">
-  To put a heading in your template, use a hash:
+  Use one hashtag followed by a space for a heading, for example:
 </p>
-<div class="govuk-!-margin-bottom-6">
-  {{ govukInsetText({"text": "# This is a heading", "classes": "govuk-!-margin-top-0"})}}
-</div>
+<pre class="formatting-example"><code class="lang-md"># This is a heading
+</code></pre>
 <p class="bottom-gutter-1-3">
-  To put a subheading in your template, use 2 hashes:
+  To add a subheading, use 2 hashtags:
 </p>
-<div class="govuk-!-margin-bottom-6">
-  {{ govukInsetText({"text": "## This is a subheading", "classes": "govuk-!-margin-top-0"})}}
-</div>
+<pre class="formatting-example"><code class="lang-md">## This is a subheading
+</code></pre>
+<h3 class="heading-small">Bullet points</h3>
 <p class="bottom-gutter-1-3">
-  To make bullet points, use asterisks:
+  Copy this example to add bullet points:
 </p>
-<div class="govuk-!-margin-bottom-6">
-  {{ govukInsetText({
-    "html": "* point 1<br/>
-             * point 2<br/>
-             * point 3<br/>",
-    "classes": "govuk-!-margin-top-0"})
-  }}
-</div>
+<pre class="formatting-example"><code class="lang-md">Introduce bullet points with a lead-in line ending in a colon:
+
+* leave one empty line space after the lead-in line
+* use an asterisk or a dash followed by a space to add an item
+* start each item with a lowercase letter, do not end with a full stop
+* leave one empty line space after the last item
+</code></pre>
+<p class="govuk-body">To create sub-items, add an indent of 2 spaces before the asterisk or dash.</p>
+<h3 class="heading-small">Numbered steps</h3>
 <p class="bottom-gutter-1-3">
-  To add inset text, use a caret:
+  Copy this example to add numbered steps:
 </p>
-<div class="govuk-!-margin-bottom-6">
-  {{ govukInsetText({"text": "^ You must tell us if your circumstances change", "classes": "govuk-!-margin-top-0"})}}
-</div>
-<p class="bottom-gutter-1-3">
-  To add a horizontal line, use three dashes:
+<pre class="formatting-example"><code class="lang-md">1. Leave one empty line space before starting your list.
+2. Enter a number followed by a full stop and a space to add an item.
+3. Start each item with a capital letter and end it with a full stop.
+4. Leave one empty line space after the last item.
+</code></pre>
+<p class="govuk-body">To create sub-items, add an indent of 2 spaces before the number.</p>
+<h3 class="heading-small">Inset text</h3>
+<p class="govuk-body">
+  To add inset text, use a caret. For example:
 </p>
-{{ govukInsetText({
-  "html": '<p class="govuk-body">First paragraph</p>
-            <p class="govuk-body" style="letter-spacing: 1px;">---</p>
-            <p class="govuk-body">Second paragraph</p>',
-  "classes": "govuk-!-margin-top-0"})
-}}
+<pre class="formatting-example"><code class="lang-md">^ You must tell us if your circumstances change.
+</code></pre>
+<h3 class="heading-small">Horizontal lines</h3>
+<p class="govuk-body">
+  To add a horizontal line between 2 paragraphs, use 3 dashes. Leave one empty line space after the first paragraph. For example:
+</p>
+<pre class="formatting-example"><code class="lang-md">First paragraph
+
+---
+Second paragraph
+</code></pre>
