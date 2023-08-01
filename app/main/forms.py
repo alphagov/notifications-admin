@@ -249,10 +249,12 @@ class InternationalPhoneNumber(UKMobileNumber, GovukTextInputFieldMixin, TelFiel
 
 
 def uk_mobile_number(label="Mobile number"):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     return UKMobileNumber(label, validators=[DataRequired(message="Cannot be empty")])
 
 
 def international_phone_number(label="Mobile number"):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     return InternationalPhoneNumber(label, validators=[DataRequired(message="Cannot be empty")])
 
 
@@ -295,6 +297,7 @@ class SMSCode(GovukTextInputField):
     input_type = "tel"
     param_extensions = {"attributes": {"pattern": "[0-9]*"}}
     validators = [
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         DataRequired(message="Cannot be empty"),
         Regexp(regex=r"^\d+$", message="Numbers only"),
         Length(min=5, message="Not enough numbers"),
@@ -550,13 +553,16 @@ class VirusScannedFileField(FileField_wtf, RequiredValidatorsMixin):
 
 
 class LoginForm(StripWhitespaceForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     email_address = GovukEmailField(
         "Email address", validators=[Length(min=5, max=255), DataRequired(message="Cannot be empty"), ValidEmail()]
     )
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     password = GovukPasswordField("Password", validators=[DataRequired(message="Enter your password")])
 
 
 class RegisterUserForm(StripWhitespaceForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
     email_address = make_email_address_field()
     mobile_number = international_phone_number()
@@ -577,6 +583,7 @@ class RegisterUserFromInviteForm(RegisterUserForm):
     mobile_number = InternationalPhoneNumber("Mobile number", validators=[])
     service = HiddenField("service")
     email_address = HiddenField("email_address")
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
 
     def validate_mobile_number(self, field):
@@ -591,12 +598,15 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
             email_address=invited_org_user.email_address,
         )
 
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
 
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     mobile_number = InternationalPhoneNumber("Mobile number", validators=[DataRequired(message="Cannot be empty")])
     password = make_password_field()
     organisation = HiddenField("organisation")
     email_address = HiddenField("email_address")
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
 
 
@@ -1126,6 +1136,7 @@ class RenameServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Service name",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
             Length(max=255, message="Service name must be 255 characters or fewer"),
@@ -1137,6 +1148,7 @@ class RenameOrganisationForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Organisation name",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
             Length(max=255, message="Organisation name must be 255 characters or fewer"),
@@ -1252,6 +1264,7 @@ class CreateServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Service name",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
             Length(max=255, message="Service name must be 255 characters or fewer"),
@@ -1294,6 +1307,7 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
         "",
         things="number of messages",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Cannot be empty"),
             NumberRange(min=0, message="Number must be greater than or equal to 0"),
         ],
@@ -1318,6 +1332,7 @@ class AdminServiceRateLimitForm(StripWhitespaceForm):
         "Number of messages the service can send in a rolling 60 second window",
         things="number of messages",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Cannot be empty"),
             NumberRange(min=0, message="Number must be greater than or equal to 0"),
         ],
@@ -1358,6 +1373,7 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
         self.confirm.label.text = self.generate_label(channel, max_phones)
 
         if service_is_live:
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             self.confirm.validators += (DataRequired("You need to confirm that you understand"),)
 
     confirm = GovukCheckboxField("Confirm")
@@ -1389,8 +1405,10 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
 
 
 class BaseTemplateForm(StripWhitespaceForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     name = GovukTextInputField("Template name", validators=[DataRequired(message="Cannot be empty")])
 
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     template_content = TextAreaField(
         "Message", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
     )
@@ -1413,6 +1431,7 @@ class LetterAddressForm(StripWhitespaceForm):
         self.allow_international_letters = allow_international_letters
         super().__init__(*args, **kwargs)
 
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     address = PostalAddressField("Address", validators=[DataRequired(message="Cannot be empty")])
 
     def validate_address(self, field):
@@ -1445,12 +1464,15 @@ class LetterAddressForm(StripWhitespaceForm):
 
 
 class EmailTemplateForm(BaseTemplateForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     subject = TextAreaField("Subject", validators=[DataRequired(message="Cannot be empty")])
 
 
 class LetterTemplateForm(EmailTemplateForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     subject = TextAreaField("Main heading", validators=[DataRequired(message="Cannot be empty")])
 
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     template_content = TextAreaField(
         "Body", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
     )
@@ -1464,6 +1486,7 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
             ("second", "Second class"),
         ],
         thing="first class or second class",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired()],
     )
 
@@ -1487,6 +1510,7 @@ class LetterUploadPostageForm(StripWhitespaceForm):
             ("second", "Second class post"),
         ],
         default="second",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired()],
     )
 
@@ -1517,6 +1541,7 @@ class CsvUploadForm(StripWhitespaceForm):
     file = FileField(
         "Add recipients",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Please pick a file"),
             CsvFileValidator(),
             FileSize(max_size=10 * 1024 * 1024, message="File must be smaller than 10MB"),
@@ -1525,6 +1550,7 @@ class CsvUploadForm(StripWhitespaceForm):
 
 
 class ChangeNameForm(StripWhitespaceForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     new_name = GovukTextInputField("Your name", validators=[DataRequired()])
 
 
@@ -1611,6 +1637,7 @@ class SupportRedirect(StripWhitespaceForm):
 class FeedbackOrProblem(StripWhitespaceForm):
     name = GovukTextInputField("Name (optional)")
     email_address = make_email_address_field(label="Email address", gov_user=False, required=True)
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     feedback = TextAreaField("Your message", validators=[DataRequired(message="Cannot be empty")])
 
 
@@ -1703,9 +1730,11 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
     def validate(self):
         if self.contact_details_type.data == "url":
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             self.url.validators = [DataRequired(), URL(message="Must be a valid URL")]
 
         elif self.contact_details_type.data == "email_address":
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             self.email_address.validators = [DataRequired(), Length(min=5, max=255), ValidEmail()]
 
         elif self.contact_details_type.data == "phone_number":
@@ -1722,6 +1751,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
                 return True
 
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             self.phone_number.validators = [
                 DataRequired(),
                 Length(min=3, max=20),
@@ -1740,6 +1770,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
     sms_sender = GovukTextInputField(
         "Text message sender",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Cannot be empty"),
             Length(max=11, message="Enter 11 characters or fewer"),
             Length(min=3, message="Enter 3 characters or more"),
@@ -1767,6 +1798,7 @@ class AdminBillingDetailsForm(StripWhitespaceForm):
 
 
 class ServiceLetterContactBlockForm(StripWhitespaceForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     letter_contact_block = TextAreaField(validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()])
     is_default = GovukCheckboxField("Set as your default address")
 
@@ -1882,6 +1914,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
 class AdminChangeOrganisationDefaultEmailBrandingForm(StripWhitespaceForm):
     email_branding_id = HiddenField(
         "Email branding id",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired()],
     )
 
@@ -1889,6 +1922,7 @@ class AdminChangeOrganisationDefaultEmailBrandingForm(StripWhitespaceForm):
 class AdminChangeOrganisationDefaultLetterBrandingForm(StripWhitespaceForm):
     letter_branding_id = HiddenField(
         "Letter branding id",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired()],
     )
 
@@ -1896,6 +1930,7 @@ class AdminChangeOrganisationDefaultLetterBrandingForm(StripWhitespaceForm):
 class AddEmailBrandingOptionsForm(StripWhitespaceForm):
     branding_field = GovukCheckboxesField(
         "Branding options",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired(message="Select at least 1 email branding option")],
         param_extensions={"fieldset": {"legend": {"classes": "govuk-visually-hidden"}}},
     )
@@ -1904,6 +1939,7 @@ class AddEmailBrandingOptionsForm(StripWhitespaceForm):
 class AddLetterBrandingOptionsForm(StripWhitespaceForm):
     branding_field = GovukCheckboxesField(
         "Branding options",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired(message="Select at least 1 letter branding option")],
         param_extensions={"fieldset": {"legend": {"classes": "govuk-visually-hidden"}}},
     )
@@ -1926,6 +1962,7 @@ class AdminSetBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
 
 
 class AdminEditLetterBrandingForm(StripWhitespaceForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     name = GovukTextInputField("Name of brand", validators=[DataRequired()])
 
 
@@ -1934,6 +1971,7 @@ class AdminEditLetterBrandingSVGUploadForm(StripWhitespaceForm):
         "Upload an SVG logo",
         validators=[
             FileAllowed(["svg"], "SVG Images only!"),
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="You need to upload a file to submit"),
             NoEmbeddedImagesInSVG(),
             NoTextInSVG(),
@@ -1948,6 +1986,7 @@ class LetterBrandingUploadBranding(StripWhitespaceForm):
         "Upload letter branding",
         validators=[
             FileAllowed(["svg"], "Branding must be an SVG file"),
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="You need to upload a file to submit"),
             FileSize(max_size=2 * 1024 * 1024, message="File must be smaller than 2MB"),
             NoEmbeddedImagesInSVG(),
@@ -1957,6 +1996,7 @@ class LetterBrandingUploadBranding(StripWhitespaceForm):
 
 
 class LetterBrandingNameForm(StripWhitespaceForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     name = GovukTextInputField("Branding name", validators=[DataRequired(message="Cannot be empty")])
 
 
@@ -1966,6 +2006,7 @@ class EmailBrandingLogoUpload(StripWhitespaceForm):
     logo = VirusScannedFileField(
         "Upload a logo",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="You need to upload a file to submit"),
             FileSize(max_size=2 * 1024 * 1024, message="File must be smaller than 2MB"),
         ],
@@ -2004,6 +2045,7 @@ class PDFUploadForm(StripWhitespaceForm):
         "Upload a letter in PDF format",
         validators=[
             FileAllowed(["pdf"], "Save your letter as a PDF and try again."),
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="You need to choose a file to upload"),
             FileSize(max_size=2 * 1024 * 1024, message="File must be smaller than 2MB"),
         ],
@@ -2061,6 +2103,7 @@ class BillingReportDateFilterForm(StripWhitespaceForm):
 class SearchByNameForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Search by name",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired("You need to enter full or partial name to search by.")],
     )
 
@@ -2112,12 +2155,14 @@ class CallbackForm(StripWhitespaceForm):
     url = GovukTextInputField(
         "URL",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Cannot be empty"),
             Regexp(regex="^https.*", message="Must be a valid https URL"),
         ],
     )
     bearer_token = GovukPasswordField(
         "Bearer token",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired(message="Cannot be empty"), Length(min=10, message="Must be at least 10 characters")],
     )
 
@@ -2143,6 +2188,7 @@ def get_placeholder_form_instance(
         else:
             field = uk_mobile_number(label=placeholder_name)
     else:
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         field = GovukTextInputField(placeholder_name, validators=[DataRequired(message="Cannot be empty")])
 
     PlaceholderForm.placeholder_value = field
@@ -2173,6 +2219,7 @@ class AdminSetOrganisationForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
         self.organisations.choices = kwargs["choices"]
 
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     organisations = GovukRadiosField("Select an organisation", validators=[DataRequired()])
 
 
@@ -2222,6 +2269,7 @@ class ChooseLetterBrandingForm(ChooseBrandingForm):
 class BrandingRequestForm(StripWhitespaceForm):
     branding_request = GovukTextareaField(
         "Describe the branding you want",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired("Cannot be empty")],
         param_extensions={
             "label": {
@@ -2236,6 +2284,7 @@ class BrandingRequestForm(StripWhitespaceForm):
 class GovernmentIdentityLogoForm(StripWhitespaceForm):
     logo_text = GovukTextInputField(
         "Enter the text that will appear in your logo",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired("Cannot be empty")],
     )
 
@@ -2296,10 +2345,12 @@ class EmailBrandingChooseBanner(OrderableFieldsForm):
 
 
 class EmailBrandingChooseBannerColour(StripWhitespaceForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     hex_colour = HexColourCodeField("Choose a background colour", validators=[DataRequired()])
 
 
 class EmailBrandingAltTextForm(StripWhitespaceForm):
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     alt_text = GovukTextInputField("Alt text", validators=[DataRequired(message="Cannot be empty")])
 
     def validate_alt_text(self, field):
@@ -2336,6 +2387,7 @@ class AdminReturnedLettersForm(StripWhitespaceForm):
     references = TextAreaField(
         "Letter references",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Cannot be empty"),
         ],
     )
@@ -2351,6 +2403,7 @@ class TemplateFolderForm(StripWhitespaceForm):
     users_with_permission = GovukCollapsibleCheckboxesField(
         "Team members who can see this folder", field_label="team member"
     )
+    # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
     name = GovukTextInputField("Folder name", validators=[DataRequired(message="Cannot be empty")])
 
 
@@ -2592,6 +2645,7 @@ class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
             for broadcast_channel in ["test", "operator", "severe", "government"]
             for provider in ["all", "ee", "o2", "three", "vodafone"]
         ],
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired()],
     )
 
@@ -2692,6 +2746,7 @@ class ChangeSecurityKeyNameForm(StripWhitespaceForm):
     security_key_name = GovukTextInputField(
         "Name of key",
         validators=[
+            # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
             Length(max=255, message="Name of key must be 255 characters or fewer"),
@@ -2784,6 +2839,7 @@ class SetEmailAuthForUsersForm(StripWhitespaceForm):
 class FindByUuidForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Find anything by UUID",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired("Cannot be empty"), UUID("Enter a valid UUID")],
     )
 
@@ -2791,5 +2847,6 @@ class FindByUuidForm(StripWhitespaceForm):
 class PlatformAdminSearchForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Search",
+        # FIXME: `DataRequired` being phased out; use NotifyDataRequired(thing='x') for standardised error messages.
         validators=[DataRequired()],
     )
