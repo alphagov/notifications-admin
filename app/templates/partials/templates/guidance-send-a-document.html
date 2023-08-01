@@ -1,14 +1,10 @@
-{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
-
 <h2 class="heading-medium">
   Send a document by email
 </h2>
 <p class="govuk-body">
   Use double brackets to add a placeholder field to your template. This will contain a secure link to download the document.
 </p>
-{{ govukInsetText({
-  "text": "Download your document at: ((link_to_file))",
-  "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
-}}
+<pre class="formatting-example"><code class="lang-md">Download your document at: ((link_to_file))
+</code></pre>
 
 Next, use the API to upload your document. Follow the instructions to send a document by email in the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API documentation</a>.

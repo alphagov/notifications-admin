@@ -1,27 +1,9 @@
 {% extends "content_template.html" %}
 
 {% from "components/service-link.html" import service_link %}
-{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
-
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
-{% set bullets_instructions -%}
-  <p class="govuk-body">Introduce bullet points with a lead-in line ending in a colon:</p>
-  <p class="govuk-body"></p>
-  <p class="govuk-body">* leave one empty line space after the lead-in line<br>
-      * use * (asterisk) or - (dash) followed by a space to add an item<br>
-      * start each item with a lowercase letter, do not end with a full stop<br>
-      * leave one empty line space after the last item<br>
-  </p>
-{%- endset %}
-{% set numbered_list_instructions -%}
-  <p class="govuk-body">1. Leave one empty line space before starting your list.<br>
-      2. Enter a number followed by a full stop and a space to add an item.<br>
-      3. Start each item with a capital letter and end it with a full stop.<br>
-      4. Leave one empty line space after the last item.<br>
-  </p>
-{%- endset %}
 
 {% block per_page_title %}
   Formatting emails and letters
@@ -64,11 +46,15 @@
 
 <p class="govuk-body">Use bullet points to help words or phrases stand out in your emails and letters.</p>
 
-  <p class="govuk-body">Copy this example to add bullet points:</p>
+<p class="govuk-body">Copy this example to add bullet points:</p>
 
-{{ govukInsetText({"html": bullets_instructions,
-  "classes": "govuk-!-margin-top-0"})
-}}
+<pre class="formatting-example"><code class="lang-md">Introduce bullet points with a lead-in line ending in a colon:
+
+* leave one empty line space after the lead-in line
+* use an asterisk or a dash followed by a space to add an item
+* start each item with a lowercase letter, do not end with a full stop
+* leave one empty line space after the last item
+</code></pre>
 
 <p class="govuk-body">To create sub-items, add an indent of 2 spaces before the asterisk or dash.</p>
 <p class="govuk-body">There’s more <a class="govuk-link govuk-link--no-visited-state"
@@ -81,11 +67,13 @@
 <p class="govuk-body">Write all headings and subheadings in sentence case.</p>
 <p class="govuk-body">Use one hashtag followed by a space for a heading in emails and letters, for example:</p>
 
-{{ govukInsetText({"html": "# This is a heading"}) }}
+<pre class="formatting-example"><code class="lang-md"># This is a heading
+</code></pre>
 
 <p class="govuk-body">Use 2 hashtags followed by a space for a subheading in emails, for example:</p>
 
-{{ govukInsetText({"html": "## This is a subheading"}) }}
+<pre class="formatting-example"><code class="lang-md">## This is a subheading
+</code></pre>
 
 <p class="govuk-body">There’s more <a class="govuk-link govuk-link--no-visited-state"
     href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#headings">guidance about headings on GOV.UK</a>.</p>
@@ -94,13 +82,11 @@
 <p class="govuk-body">Use a horizontal line to create separate sections in an email template.</p>
 <p class="govuk-body">To add a horizontal line between 2 paragraphs, use 3 dashes. Leave one empty line space after the first paragraph. For example:</p>
 
-{{ govukInsetText({
-  "html": '<p class="govuk-body">First paragraph</p>
-            <p class="govuk-body"></p>
-            <p class="govuk-body" style="letter-spacing: 1px;">---</p>
-            <p class="govuk-body">Second paragraph</p>',
-  "classes": "govuk-!-margin-top-0"})
-}}
+<pre class="formatting-example"><code class="lang-md">First paragraph
+
+---
+Second paragraph
+</code></pre>
 
 <h3 class="heading-small" id="inset-text">Inset text</h3>
 <p class="govuk-body">Use inset text to differentiate a block of text from the content that surrounds it, for example:</p>
@@ -110,22 +96,25 @@
     <li>examples</li>
     <li>additional information</li>
   </ul>
-<p class="govuk-body">To add inset text, use a ^ (caret). For example:</p>
+<p class="govuk-body">To add inset text, use a caret. For example:</p>
 
-{{ govukInsetText({"html": "^ You must tell us if your circumstances change."}) }}
+<pre class="formatting-example"><code class="lang-md">^ You must tell us if your circumstances change.
+</code></pre>
 
-<p class="govuk-body">Use inset text very sparingly - it’s less effective if it’s overused.</p>
+<p class="govuk-body">Use inset text very sparingly – it’s less effective if it’s overused.</p>
 <p class="govuk-body">There’s more <a class="govuk-link govuk-link--no-visited-state"
     href="https://design-system.service.gov.uk/components/inset-text/">guidance about inset text in the GOV.UK Design System</a>.</p>
 
 <h3 class="heading-small" id="numbered-steps">Numbered steps</h3>
 <p class="govuk-body">Use numbered steps instead of bullet points to guide a user through a process, or when the order of the items in a list is relevant.</p>
-<p class="govuk-body">You do not need a lead-in line for numbered lists.</p>
-<p class="govuk-body">Copy this example to add a numbered list:</p>
+<p class="govuk-body">You do not need a lead-in line for a numbered list.</p>
+<p class="govuk-body">Copy this example to add numbered steps:</p>
 
-{{ govukInsetText({"html": numbered_list_instructions,
-  "classes": "govuk-!-margin-top-0"})
-}}
+<pre class="formatting-example"><code class="lang-md">1. Leave one empty line space before starting your list.
+2. Enter a number followed by a full stop and a space to add an item.
+3. Start each item with a capital letter and end it with a full stop.
+4. Leave one empty line space after the last item.
+</code></pre>
 
 <p class="govuk-body">To create sub-items, add an indent of 2 spaces before the number.</p>
 <p class="govuk-body">There’s more <a class="govuk-link govuk-link--no-visited-state"
@@ -133,13 +122,12 @@
 
 <h3 class="heading-small" id="page-breaks">Page breaks</h3>
 <p class="govuk-body">To insert a page break in a letter template, use 3 asterisks. For example:</p>
-{{ govukInsetText({
-  "html": "Content on page 1<br/>
-            <br/>
-            ***<br/>
-            <br/>
-            Content on page 2<br/>",
-  "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"})
-}}
+
+<pre class="formatting-example"><code class="lang-md">Content on page 1
+
+***
+
+Content on page 2
+</code></pre>
 
 {% endblock %}
