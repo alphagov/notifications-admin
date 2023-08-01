@@ -7,7 +7,7 @@
       {% if field_name %}
         {% do errors.append(
           {
-            "href": "#" + form[field_name].error_summary_id if form[field_name].error_summary_id != undefined else form[field_name].id,
+            "href": "#" + (form[field_name].error_summary_id if form[field_name].error_summary_id != undefined else form[field_name].id),
             "text": error_list[0]
           }
         ) %}

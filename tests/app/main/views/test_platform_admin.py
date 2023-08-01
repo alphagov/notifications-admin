@@ -1436,3 +1436,10 @@ class TestPlatformAdminSearch:
             _data={"search": "abcdef12-3456-7890-abcd-ef1234567890"},
             _expected_redirect=expected_redirect,
         )
+
+    def test_error_summary(self, mocker, client_request, platform_admin_user):
+        client_request.login(platform_admin_user)
+
+        page = client_request.post(".platform_admin_search", _data={"search": ""}, _expected_status=200)
+
+        assert page.select_one(".govuk-error-summary a")["href"] == "#search"
