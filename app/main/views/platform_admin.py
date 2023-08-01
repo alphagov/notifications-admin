@@ -478,7 +478,11 @@ def get_volumes_by_service():
             )
         else:
             flash("No results for dates")
-    return render_template("views/platform-admin/volumes-by-service-report.html", form=form)
+    return render_template(
+        "views/platform-admin/volumes-by-service-report.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/reports/daily-volumes-report", methods=["GET", "POST"])
