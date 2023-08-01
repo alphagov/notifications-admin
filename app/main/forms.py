@@ -256,11 +256,11 @@ def international_phone_number(label="Mobile number"):
     return InternationalPhoneNumber(label, validators=[DataRequired(message="Cannot be empty")])
 
 
-def make_password_field(label="Password", no_input_error="Enter a password"):
+def make_password_field(label="Password", thing="a password"):
     return GovukPasswordField(
         label,
         validators=[
-            DataRequired(message=no_input_error),
+            NotifyDataRequired(thing=thing),
             Length(8, 255, message="Must be at least 8 characters"),
             CommonlyUsedPassword(message="Choose a password that’s harder to guess"),
         ],
@@ -964,7 +964,7 @@ class BasePermissionsForm(StripWhitespaceForm):
             ("sms_auth", "Text message code"),
             ("email_auth", "Email link"),
         ],
-        thing="how this team member should sign in",
+        thing="a sign-in method",
         param_extensions={"fieldset": {"legend": {"classes": "govuk-fieldset__legend--s"}}},
     )
 
@@ -1059,7 +1059,7 @@ class OrganisationUserPermissionsForm(StripWhitespaceForm):
 
 
 class BaseInviteUserForm:
-    email_address = make_email_address_field(gov_user=False)
+    email_address = make_email_address_field(gov_user=False, thing="an email address")
 
     def __init__(self, inviter_email_address, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1492,11 +1492,12 @@ class LetterUploadPostageForm(StripWhitespaceForm):
 
 
 class ForgotPasswordForm(StripWhitespaceForm):
-    email_address = make_email_address_field(gov_user=False)
+    email_address = make_email_address_field(gov_user=False, thing="your email address")
 
 
 class NewPasswordForm(StripWhitespaceForm):
-    new_password = make_password_field()
+
+    new_password = make_password_field(thing="a new password")
 
 
 class ChangePasswordForm(StripWhitespaceForm):
@@ -1504,8 +1505,8 @@ class ChangePasswordForm(StripWhitespaceForm):
         self.validate_password_func = validate_password_func
         super(ChangePasswordForm, self).__init__(*args, **kwargs)
 
-    old_password = make_password_field("Current password", no_input_error="Enter your current password")
-    new_password = make_password_field("New password", no_input_error="Enter your new password")
+    old_password = make_password_field("Current password", thing="your current password")
+    new_password = make_password_field("New password", thing="your new password")
 
     def validate_old_password(self, field):
         if not self.validate_password_func(field.data):
@@ -1574,12 +1575,12 @@ class CreateKeyForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
 
     key_name = GovukTextInputField(
-        "Name for this key", validators=[DataRequired(message="You need to give the key a name")]
+        "Name for this key", validators=[NotifyDataRequired(thing="a name for this API key")]
     )
 
     key_type = GovukRadiosField(
         "Type of key",
-        thing="the type of key",
+        thing="a type of API key",
     )
 
     def validate_key_name(self, key_name):
