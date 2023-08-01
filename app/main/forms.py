@@ -252,8 +252,14 @@ def uk_mobile_number(label="Mobile number"):
     return UKMobileNumber(label, validators=[DataRequired(message="Cannot be empty")])
 
 
-def international_phone_number(label="Mobile number"):
-    return InternationalPhoneNumber(label, validators=[DataRequired(message="Cannot be empty")])
+def international_phone_number(label="Mobile number", thing=None):
+    validators = []
+    if thing:
+        validators.append(NotifyDataRequired(thing=thing))
+    else:
+        # FIXME: being deprecated; prefer to pass in `thing`.
+        validators.append(DataRequired(message="Cannot be empty"))
+    return InternationalPhoneNumber(label, validators=validators)
 
 
 def make_password_field(label="Password", thing="a password"):
@@ -295,7 +301,7 @@ class SMSCode(GovukTextInputField):
     input_type = "tel"
     param_extensions = {"attributes": {"pattern": "[0-9]*"}}
     validators = [
-        DataRequired(message="Cannot be empty"),
+        NotifyDataRequired(thing="your text message code"),
         Regexp(regex=r"^\d+$", message="Numbers only"),
         Length(min=5, message="Not enough numbers"),
         Length(max=5, message="Too many numbers"),
@@ -572,14 +578,14 @@ class RegisterUserFromInviteForm(RegisterUserForm):
             name=guess_name_from_email_address(invited_user.email_address),
         )
 
-    mobile_number = InternationalPhoneNumber("Mobile number", validators=[])
+    mobile_number = InternationalPhoneNumber("Mobile number")
     service = HiddenField("service")
     email_address = HiddenField("email_address")
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
 
     def validate_mobile_number(self, field):
         if self.auth_type.data == "sms_auth" and not field.data:
-            raise ValidationError("Cannot be empty")
+            raise ValidationError("Enter your mobile number")
 
 
 class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
