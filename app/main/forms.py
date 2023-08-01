@@ -550,10 +550,8 @@ class VirusScannedFileField(FileField_wtf, RequiredValidatorsMixin):
 
 
 class LoginForm(StripWhitespaceForm):
-    email_address = GovukEmailField(
-        "Email address", validators=[Length(min=5, max=255), DataRequired(message="Cannot be empty"), ValidEmail()]
-    )
-    password = GovukPasswordField("Password", validators=[DataRequired(message="Enter your password")])
+    email_address = make_email_address_field(thing="your email address")
+    password = GovukPasswordField("Password", validators=[NotifyDataRequired(thing="your password")])
 
 
 class RegisterUserForm(StripWhitespaceForm):
