@@ -42,7 +42,7 @@ def test_form_is_valid_returns_no_errors(
         ),
         (
             {},
-            "Cannot be empty",
+            "Enter your text message code",
         ),
         (
             {"sms_code": "12E45"},

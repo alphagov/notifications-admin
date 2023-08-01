@@ -253,13 +253,12 @@ def uk_mobile_number(label="Mobile number"):
 
 
 def international_phone_number(label="Mobile number", thing=None):
-    validators = []
+    validators_list = []
     if thing:
-        validators.append(NotifyDataRequired(thing=thing))
+        validators_list.append(NotifyDataRequired(thing=thing))
     else:
-        # FIXME: being deprecated; prefer to pass in `thing`.
-        validators.append(DataRequired(message="Cannot be empty"))
-    return InternationalPhoneNumber(label, validators=validators)
+        validators_list.append(DataRequired(message="Cannot be empty"))
+    return InternationalPhoneNumber(label, validators=validators_list)
 
 
 def make_password_field(label="Password", thing="a password"):
@@ -604,9 +603,11 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
             email_address=invited_org_user.email_address,
         )
 
-    name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
+    name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
 
-    mobile_number = InternationalPhoneNumber("Mobile number", validators=[DataRequired(message="Cannot be empty")])
+    mobile_number = InternationalPhoneNumber(
+        "Mobile number", validators=[NotifyDataRequired(thing="your mobile number")]
+    )
     password = make_password_field()
     organisation = HiddenField("organisation")
     email_address = HiddenField("email_address")
