@@ -6,7 +6,7 @@ if [[ "${CODESPACES}" != "true" ]]; then
 fi
 
 if [[ ! -f "../notifications-api/create-codespace-user.sh" ]]; then
-  echo -n "Enter an email address for your Notify user login: "
+  echo -n "Enter your email address for your Notify user login: "
   read USER_EMAIL_ADDRESS
   echo -n "Enter a password for your Notify user login: "
   read USER_PASSWORD
@@ -30,4 +30,4 @@ nvm install; nvm use; npm install; npm run build
 (cd ../document-download-api; make generate-version-file)
 (cd ../document-download-frontend; make generate-version-file; nvm install; nvm use; npm install; npm run build)
 
-(cd ../notifications-local; ./generate-env-files.sh; docker-compose build; docker-compose run --entrypoint bash notify-api -c "cat create-codespace-user.py | flask shell"; make up)
+(cd ../notifications-local; git checkout SW-codespace-support; ./generate-env-files.sh; docker-compose build; docker-compose run --entrypoint bash notify-api -c "cat create-codespace-user.py | flask shell"; make up)
