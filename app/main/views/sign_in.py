@@ -80,6 +80,7 @@ def sign_in():  # noqa: C901
         again=bool(redirect_url),
         other_device=other_device,
         password_reset_url=password_reset_url,
+        error_summary_enabled=True,
     )
 
 

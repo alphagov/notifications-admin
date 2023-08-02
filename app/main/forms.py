@@ -252,8 +252,13 @@ def uk_mobile_number(label="Mobile number"):
     return UKMobileNumber(label, validators=[DataRequired(message="Cannot be empty")])
 
 
-def international_phone_number(label="Mobile number"):
-    return InternationalPhoneNumber(label, validators=[DataRequired(message="Cannot be empty")])
+def international_phone_number(label="Mobile number", thing=None):
+    validators_list = []
+    if thing:
+        validators_list.append(NotifyDataRequired(thing=thing))
+    else:
+        validators_list.append(DataRequired(message="Cannot be empty"))
+    return InternationalPhoneNumber(label, validators=validators_list)
 
 
 def make_password_field(label="Password", thing="a password"):
@@ -295,7 +300,7 @@ class SMSCode(GovukTextInputField):
     input_type = "tel"
     param_extensions = {"attributes": {"pattern": "[0-9]*"}}
     validators = [
-        DataRequired(message="Cannot be empty"),
+        NotifyDataRequired(thing="your text message code"),
         Regexp(regex=r"^\d+$", message="Numbers only"),
         Length(min=5, message="Not enough numbers"),
         Length(max=5, message="Too many numbers"),
@@ -550,14 +555,12 @@ class VirusScannedFileField(FileField_wtf, RequiredValidatorsMixin):
 
 
 class LoginForm(StripWhitespaceForm):
-    email_address = GovukEmailField(
-        "Email address", validators=[Length(min=5, max=255), DataRequired(message="Cannot be empty"), ValidEmail()]
-    )
-    password = GovukPasswordField("Password", validators=[DataRequired(message="Enter your password")])
+    email_address = make_email_address_field(thing="your email address")
+    password = GovukPasswordField("Password", validators=[NotifyDataRequired(thing="your password")])
 
 
 class RegisterUserForm(StripWhitespaceForm):
-    name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
+    name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
     email_address = make_email_address_field()
     mobile_number = international_phone_number()
     password = make_password_field()
@@ -566,6 +569,15 @@ class RegisterUserForm(StripWhitespaceForm):
 
 
 class RegisterUserFromInviteForm(RegisterUserForm):
+    custom_field_order = (
+        "name",
+        "mobile_number",
+        "password",
+        "service",
+        "email_address",
+        "auth_type",
+    )
+
     def __init__(self, invited_user):
         super().__init__(
             service=invited_user.service,
@@ -574,14 +586,14 @@ class RegisterUserFromInviteForm(RegisterUserForm):
             name=guess_name_from_email_address(invited_user.email_address),
         )
 
-    mobile_number = InternationalPhoneNumber("Mobile number", validators=[])
+    mobile_number = InternationalPhoneNumber("Mobile number")
     service = HiddenField("service")
     email_address = HiddenField("email_address")
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
 
     def validate_mobile_number(self, field):
         if self.auth_type.data == "sms_auth" and not field.data:
-            raise ValidationError("Cannot be empty")
+            raise ValidationError("Enter your mobile number")
 
 
 class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
@@ -591,9 +603,11 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
             email_address=invited_org_user.email_address,
         )
 
-    name = GovukTextInputField("Full name", validators=[DataRequired(message="Cannot be empty")])
+    name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
 
-    mobile_number = InternationalPhoneNumber("Mobile number", validators=[DataRequired(message="Cannot be empty")])
+    mobile_number = InternationalPhoneNumber(
+        "Mobile number", validators=[NotifyDataRequired(thing="your mobile number")]
+    )
     password = make_password_field()
     organisation = HiddenField("organisation")
     email_address = HiddenField("email_address")
