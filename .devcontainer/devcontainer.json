@@ -16,5 +16,9 @@
       }
     }
   },
-  "postCreateCommand": "bash .devcontainer/prepare-codespace.sh"
+  "postCreateCommand": "bash .devcontainer/prepare-codespace.sh",
+  "forwardPorts": ["6012"],
+  "settings": {
+    "remote.autoForwardPorts": false
+  }
 }
