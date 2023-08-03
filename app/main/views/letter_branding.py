@@ -166,4 +166,5 @@ def create_letter_branding(logo=None):
         letter_branding_details_form=letter_branding_details_form,
         cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
         logo=temporary_logo_key,
+        error_summary_enabled=True,
     )

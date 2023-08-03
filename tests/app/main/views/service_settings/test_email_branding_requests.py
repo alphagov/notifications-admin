@@ -1758,4 +1758,4 @@ def test_POST_email_branding_choose_banner_colour_invalid_hex_code(client_reques
         _expected_status=400,
     )
 
-    assert "Must be a valid hex colour code" in page.text
+    assert "Enter a hex colour code in the correct format" in page.text

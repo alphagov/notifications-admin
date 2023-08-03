@@ -371,7 +371,7 @@ class GovukIntegerField(GovukTextInputField):
 
 class HexColourCodeField(GovukTextInputField, RequiredValidatorsMixin):
     required_validators = [
-        Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"),
+        Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Enter a hex colour code in the correct format"),
     ]
     param_extensions = {
         "prefix": {
@@ -1873,7 +1873,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
     def validate_name(self, name):
         op = request.form.get("operation")
         if op == "email-branding-details" and not self.name.data:
-            raise ValidationError("This field is required")
+            raise ValidationError("Enter a name for the branding")
 
     def validate(self):
         rv = super().validate()
@@ -1940,7 +1940,12 @@ class AdminSetBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
 
 
 class AdminEditLetterBrandingForm(StripWhitespaceForm):
-    name = GovukTextInputField("Name of brand", validators=[DataRequired()])
+    name = GovukTextInputField("Name of brand")
+
+    def validate_name(self, name):
+        op = request.form.get("operation")
+        if op == "branding-details" and not self.name.data:
+            raise ValidationError("Enter a name for the branding")
 
 
 class AdminEditLetterBrandingSVGUploadForm(StripWhitespaceForm):
