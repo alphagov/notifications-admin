@@ -2522,13 +2522,11 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
 
 
 class AdminClearCacheForm(StripWhitespaceForm):
-    model_type = GovukCheckboxesField(
-        "What do you want to clear today",
-    )
+    model_type = GovukCheckboxesField("What do you want to clear today")
 
     def validate_model_type(self, field):
         if not field.data:
-            raise ValidationError("Select at least one option")
+            raise ValidationError("Select at least 1 type of cache")
 
 
 class AdminOrganisationGoLiveNotesForm(StripWhitespaceForm):
