@@ -174,7 +174,7 @@ def make_columns(global_stats, complaints_number):
 @main.route("/platform-admin/trial-services", endpoint="trial_services")
 @user_is_platform_admin
 def platform_admin_services():
-    form = DateFilterForm(request.args)
+    form = DateFilterForm(request.args, meta={"csrf": False})
     if all(
         (
             request.args.get("include_from_test_key") is None,
@@ -193,9 +193,10 @@ def platform_admin_services():
         "include_from_test_key": include_from_test_key,
     }
 
-    if form.start_date.data:
-        api_args["start_date"] = form.start_date.data
-        api_args["end_date"] = form.end_date.data or datetime.utcnow().date()
+    if form.validate():
+        if form.start_date.data:
+            api_args["start_date"] = form.start_date.data
+            api_args["end_date"] = form.end_date.data or datetime.utcnow().date()
 
     services = filter_and_sort_services(
         service_api_client.get_services(api_args)["data"],
@@ -209,6 +210,7 @@ def platform_admin_services():
         services=list(format_stats_by_service(services)),
         page_title=f"{'Trial mode' if request.endpoint == 'main.trial_services' else 'Live'} services",
         global_stats=create_global_stats(services),
+        error_summary_enabled=True,
     )
 
 

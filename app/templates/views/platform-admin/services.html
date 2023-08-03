@@ -74,7 +74,8 @@
 
   {{ govukDetails({
     "summaryText": "Apply filters",
-    "html": details_content
+    "html": details_content,
+    "open": form.errors | convert_to_boolean
   }) }}
 
   {% include "views/platform-admin/_global_stats.html" %}
