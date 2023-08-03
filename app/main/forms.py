@@ -2810,5 +2810,5 @@ class FindByUuidForm(StripWhitespaceForm):
 class PlatformAdminSearchForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Search",
-        validators=[DataRequired()],
+        validators=[NotifyDataRequired(thing="a search term")],
     )
