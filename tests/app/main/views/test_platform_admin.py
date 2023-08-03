@@ -900,8 +900,10 @@ def test_get_notifications_sent_by_service_validates_form(
     errors = page.select(".govuk-error-message")
     assert len(errors) == 2
 
-    for error in errors:
-        assert "Not a valid date value" in error.text
+    assert [error.text.strip() for error in errors] == [
+        "Error: Enter a start date in the correct format",
+        "Error: Enter an end date in the correct format",
+    ]
 
     assert mock_get_stats_from_api.called is False
 

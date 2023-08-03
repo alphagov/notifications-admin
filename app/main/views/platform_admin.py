@@ -98,7 +98,10 @@ def platform_admin():
     number_of_complaints = complaint_api_client.get_complaint_count(api_args)
 
     return render_template(
-        "views/platform-admin/index.html", form=form, global_stats=make_columns(platform_stats, number_of_complaints)
+        "views/platform-admin/index.html",
+        form=form,
+        global_stats=make_columns(platform_stats, number_of_complaints),
+        error_summary_enabled=True,
     )
 
 

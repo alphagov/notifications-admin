@@ -290,7 +290,21 @@ class GovukSearchField(GovukTextInputFieldMixin, SearchField):
     param_extensions = {"classes": "govuk-!-width-full"}
 
 
-class GovukDateField(GovukTextInputFieldMixin, DateField):
+class NotifyDateField(DateField):
+    """A thin wrapper around WTForm's DateField providing our own error message."""
+
+    def __init__(self, label=None, validators=None, format="%Y-%m-%d", thing="a date", **kwargs):
+        super().__init__(label, validators, format, **kwargs)
+        self.thing = thing
+
+    def process_formdata(self, valuelist):
+        try:
+            super().process_formdata(valuelist)
+        except ValueError as e:
+            raise ValueError(f"Enter {self.thing} in the correct format") from e
+
+
+class GovukDateField(GovukTextInputFieldMixin, NotifyDateField):
     pass
 
 
@@ -2062,19 +2076,19 @@ class GuestList(StripWhitespaceForm):
 
 
 class DateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("Start Date", [validators.optional()])
-    end_date = GovukDateField("End Date", [validators.optional()])
+    start_date = GovukDateField("Start Date", [validators.optional()], thing="a start date")
+    end_date = GovukDateField("End Date", [validators.optional()], thing="an end date")
     include_from_test_key = GovukCheckboxField("Include test keys")
 
 
 class RequiredDateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("Start Date")
-    end_date = GovukDateField("End Date")
+    start_date = GovukDateField("Start Date", thing="a start date")
+    end_date = GovukDateField("End Date", thing="an end date")
 
 
 class BillingReportDateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("First day covered by report")
-    end_date = GovukDateField("Last day covered by report")
+    start_date = GovukDateField("First day covered by report", thing="a start date")
+    end_date = GovukDateField("Last day covered by report", thing="an end date")
 
 
 class SearchByNameForm(StripWhitespaceForm):
