@@ -2369,7 +2369,7 @@ class AdminReturnedLettersForm(StripWhitespaceForm):
     references = TextAreaField(
         "Letter references",
         validators=[
-            DataRequired(message="Cannot be empty"),
+            NotifyDataRequired(thing="the returned letter references"),
         ],
     )
 

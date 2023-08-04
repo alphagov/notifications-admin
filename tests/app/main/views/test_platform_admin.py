@@ -687,7 +687,7 @@ def test_platform_admin_submit_empty_returned_letters(
 
     assert not mock_client.called
 
-    assert "Cannot be empty" in page.text
+    assert "Enter the returned letter references" in page.text
 
 
 def test_clear_cache_shows_form(
