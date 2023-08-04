@@ -2526,7 +2526,7 @@ class AdminClearCacheForm(StripWhitespaceForm):
 
     def validate_model_type(self, field):
         if not field.data:
-            raise ValidationError("Select at least 1 type of cache")
+            raise ValidationError("Select at least one type of cache")
 
 
 class AdminOrganisationGoLiveNotesForm(StripWhitespaceForm):

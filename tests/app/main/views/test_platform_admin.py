@@ -786,7 +786,7 @@ def test_clear_cache_requires_option(
 
     page = client_request.post("main.clear_cache", _data={}, _expected_status=200)
 
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select at least 1 type of cache"
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select at least one type of cache"
     assert not redis.delete_by_pattern.called
 
 
