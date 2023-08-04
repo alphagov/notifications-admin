@@ -32,10 +32,23 @@
     <p class="govuk-body">
         In total, your letter must be 10 pages or less (5 double-sided sheets of paper).
     </p>
-    <p class="govuk-body">
-        Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter
-            specification</a>.
-    </p>
+
+{% set letter_spec %}
+    <p class="govuk-body">Page size and layout: A4 portrait (210 × 297 mm)</p>
+    <p class="govuk-body">Maximum file size: 2 MB</p>
+    <p class="govuk-body">The content of your letter must appear inside the printable area:</p>
+
+    <p class="govuk-body">Left margin 15mm</p>
+    <p class="govuk-body">Right margin 15mm</p>
+    <p class="govuk-body">Top margin 5mm</p>
+    <p class="govuk-body">Bottom margin 5mm</p>
+  {% endset %}
+
+  {{ govukDetails({
+    "summaryText": "Your PDF must meet our letter specification",
+    "html": letter_spec
+  }) }}
+
 
     <div class="govuk-body">
         {{ file_upload(
