@@ -4,6 +4,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 
 {% set page_title = template.attachment.original_filename %}
@@ -29,6 +30,22 @@
     {% else %}
         {{ page_header(page_title) }}
     {% endif %}
+
+    {% set attachment_spec %}
+        <p class="govuk-body">Page size and layout: A4 portrait (210 × 297 mm)</p>
+        <p class="govuk-body">Maximum file size: 2 MB</p>
+        <p class="govuk-body">The content of your letter must appear inside the printable area:</p>
+
+        <p class="govuk-body">Left margin 15mm</p>
+        <p class="govuk-body">Right margin 15mm</p>
+        <p class="govuk-body">Top margin 5mm</p>
+        <p class="govuk-body">Bottom margin 5mm</p>
+    {% endset %}
+
+    {{ govukDetails({
+        "summaryText": "Your PDF must meet our attachment specification",
+        "html": attachment_spec
+    }) }}
 
     <div class="govuk-!-padding-top-1 govuk-!-margin-bottom-6">
     {{ file_upload(
