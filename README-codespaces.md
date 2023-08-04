@@ -19,7 +19,7 @@ Configure codespace secrets here: https://github.com/settings/codespaces
 
 Add a secret `GH_TOKEN` with the personal access token you generated previously. Make it available to the `notifications-admin` repository.
 
-Ask a developer for an AWS access key pair and insert new codespace secrets called `GH_AWS_ACCESS_KEY_ID` and `GH_AWS_SECRET_ACCESS_KEY`. Make them both available to the `notifications-admin` repository.
+Ask a developer for an AWS access key pair and insert new codespace secrets called `GH_NOTIFY_AWS_ACCESS_KEY_ID` and `GH_NOTIFY_AWS_SECRET_ACCESS_KEY`. Make them both available to the `notifications-admin` repository.
 
 # Running
 
