@@ -30,4 +30,4 @@ nvm install; nvm use; npm install; npm run build
 (cd ../document-download-api; git checkout main; git pull; make generate-version-file)
 (cd ../document-download-frontend; git checkout main; git pull; make generate-version-file; nvm install; nvm use; npm install; npm run build)
 
-(cd ../notifications-local; git checkout SW-codespace-support; git pull; ./generate-env-files.sh; docker-compose build; docker-compose run --entrypoint bash notify-api -c "cat create-codespace-user.py | flask shell"; make up)
+(cd ../notifications-local; git checkout SW-codespace-support; git pull; ./generate-env-files.sh; docker-compose build; docker-compose run notify-api-db-migration; docker-compose run --entrypoint bash notify-api -c "cat create-codespace-user.py | flask shell"; make up)
