@@ -10,10 +10,12 @@ if [[ ! -f "../notifications-api/create-codespace-user.sh" ]]; then
   read USER_EMAIL_ADDRESS
   echo -n "Enter a password for your Notify user login: "
   read USER_PASSWORD
+  echo -n "Enter your mobile number (07 format, no spaces, no typos, be careful): "
+  read USER_MOBILE_NUMBER
 
   cat <<EOF | envsubst > ../notifications-api/create-codespace-user.py
 from app.models import *
-user = User(name='${USER_EMAIL_ADDRESS}', email_address='${USER_EMAIL_ADDRESS}', state='active', auth_type='email_auth', password='${USER_PASSWORD}', platform_admin=True)
+user = User(name='${USER_EMAIL_ADDRESS}', email_address='${USER_EMAIL_ADDRESS}', mobile_number='${USER_MOBILE_NUMBER}', state='active', auth_type='email_auth', password='${USER_PASSWORD}', platform_admin=True)
 db.session.add(user)
 db.session.commit()
 EOF
