@@ -29,7 +29,7 @@ Launch a codespace via GitHub:
 * Click the green 'Code' button, switch to the 'Codespaces' tab, and press the 'three dots menu'. Select 'New with options...'
 * Change the machine type from '2 core' to '4 core', then click 'Create codespace'.
 * Wait for the browser tab to load and a terminal to appear at the bottom. After a few seconds the display should show a command running. Wait for 'postCreateCommand' to report as complete.
-* Type './start-codespace.sh' into the terminal, enter your email address and password at the prompt, and then wait for Notify to build and launch.
+* Type './start-notify-in-codespace.sh' into the terminal, enter your email address and password at the prompt, and then wait for Notify to build and launch.
 * Once Notify has started running (takes ~15 minutes the first time), click the 'Ports' tab, hover over the 'Local address' row, and click the 'globe'/'www' icon to launch a new browser window with Notify.
 
 # Issues

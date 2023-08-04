@@ -24,10 +24,10 @@ source ${NVM_DIR}/nvm.sh
 
 make generate-version-file
 nvm install; nvm use; npm install; npm run build
-(cd ../notifications-api; make generate-version-file)
-(cd ../notifications-template-preview; make generate-version-file)
-(cd ../notifications-antivirus; make generate-version-file)
-(cd ../document-download-api; make generate-version-file)
-(cd ../document-download-frontend; make generate-version-file; nvm install; nvm use; npm install; npm run build)
+(cd ../notifications-api; git checkout main; git pull; make generate-version-file)
+(cd ../notifications-template-preview; git checkout main; git pull; make generate-version-file)
+(cd ../notifications-antivirus; git checkout main; git pull; make generate-version-file)
+(cd ../document-download-api; git checkout main; git pull; make generate-version-file)
+(cd ../document-download-frontend; git checkout main; git pull; make generate-version-file; nvm install; nvm use; npm install; npm run build)
 
-(cd ../notifications-local; git checkout SW-codespace-support; ./generate-env-files.sh; docker-compose build; docker-compose run --entrypoint bash notify-api -c "cat create-codespace-user.py | flask shell"; make up)
+(cd ../notifications-local; git checkout SW-codespace-support; git pull; ./generate-env-files.sh; docker-compose build; docker-compose run --entrypoint bash notify-api -c "cat create-codespace-user.py | flask shell"; make up)
