@@ -583,7 +583,11 @@ def get_daily_sms_provider_volumes():
             )
         else:
             flash("No results for dates")
-    return render_template("views/platform-admin/daily-sms-provider-volumes-report.html", form=form)
+    return render_template(
+        "views/platform-admin/daily-sms-provider-volumes-report.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/complaints")
