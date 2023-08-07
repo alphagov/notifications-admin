@@ -1709,7 +1709,7 @@ class AdminProviderRatioForm(OrderableFieldsForm):
             return True
 
         for provider in self._providers:
-            getattr(self, provider["identifier"]).errors += ["Must add up to 100%"]
+            getattr(self, provider["identifier"]).errors += ["The total must add up to 100%"]
 
         return False
 
