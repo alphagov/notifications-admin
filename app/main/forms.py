@@ -2087,8 +2087,8 @@ class RequiredDateFilterForm(StripWhitespaceForm):
 
 
 class BillingReportDateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("First day covered by report", thing="a start date")
-    end_date = GovukDateField("Last day covered by report", thing="an end date")
+    start_date = GovukDateField("Start Date", thing="a start date")
+    end_date = GovukDateField("End Date", thing="an end date")
 
 
 class SearchByNameForm(StripWhitespaceForm):
