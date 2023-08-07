@@ -161,7 +161,7 @@ class RadioField(WTFormsRadioField):
             raise ValidationError(f"Select {self.thing}")
 
 
-def make_email_address_field(label="Email address", gov_user=True, required=True, thing=None):
+def make_email_address_field(label="Email address", *, gov_user: bool, required=True, thing=None):
 
     validators = [
         ValidEmail(),
@@ -561,7 +561,7 @@ class LoginForm(StripWhitespaceForm):
 
 class RegisterUserForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
-    email_address = make_email_address_field()
+    email_address = make_email_address_field(gov_user=True)
     mobile_number = international_phone_number()
     password = make_password_field()
     # always register as sms type
@@ -1547,7 +1547,7 @@ class ChangeEmailForm(StripWhitespaceForm):
         self.validate_email_func = validate_email_func
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
 
-    email_address = make_email_address_field()
+    email_address = make_email_address_field(gov_user=True)
 
     def validate_email_address(self, field):
         # The validate_email_func can be used to call API to check if the email address is already in
