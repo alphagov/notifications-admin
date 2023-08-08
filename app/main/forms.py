@@ -2076,19 +2076,19 @@ class GuestList(StripWhitespaceForm):
 
 
 class DateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("Start Date", [validators.optional()], thing="a start date")
-    end_date = GovukDateField("End Date", [validators.optional()], thing="an end date")
+    start_date = GovukDateField("Start date", [validators.optional()], thing="a start date")
+    end_date = GovukDateField("End date", [validators.optional()], thing="an end date")
     include_from_test_key = GovukCheckboxField("Include test keys")
 
 
 class RequiredDateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("Start Date", thing="a start date")
-    end_date = GovukDateField("End Date", thing="an end date")
+    start_date = GovukDateField("Start date", thing="a start date")
+    end_date = GovukDateField("End date", thing="an end date")
 
 
 class BillingReportDateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("Start Date", thing="a start date")
-    end_date = GovukDateField("End Date", thing="an end date")
+    start_date = GovukDateField("Start date", thing="a start date")
+    end_date = GovukDateField("End date", thing="an end date")
 
 
 class SearchByNameForm(StripWhitespaceForm):
