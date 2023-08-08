@@ -321,7 +321,7 @@ def test_create_email_branding_requires_a_name_when_submitting_logo_details(
         _expected_status=400,
     )
 
-    assert page.select_one(".govuk-error-message").text.strip() == "Error: This field is required"
+    assert page.select_one(".govuk-error-message").text.strip() == "Error: Enter a name for the branding"
     assert mock_create_email_branding.called is False
 
 
@@ -458,10 +458,7 @@ def test_create_email_branding_shows_error_with_neither_alt_text_and_text(
     client_request.login(platform_admin_user)
     response = client_request.post("main.platform_admin_create_email_branding", _data=data, _expected_status=400)
     assert response.select_one("#text-error") is None
-    assert (
-        normalize_spaces(response.select_one("#alt_text-error").text)
-        == "Error: Cannot be empty if you do not have logo text"
-    )
+    assert normalize_spaces(response.select_one("#alt_text-error").text) == "Error: Enter alt text for your logo"
     assert not mock_create_email_branding.called
 
 
@@ -484,7 +481,8 @@ def test_create_email_branding_shows_error_with_both_alt_text_and_text(
     response = client_request.post("main.platform_admin_create_email_branding", _data=data, _expected_status=400)
     assert response.select_one("#text-error") is None
     assert (
-        normalize_spaces(response.select_one("#alt_text-error").text) == "Error: Must be empty if you enter logo text"
+        normalize_spaces(response.select_one("#alt_text-error").text)
+        == "Error: Alt text must be empty if you have already entered logo text"
     )
     assert not mock_create_email_branding.called
 
@@ -625,10 +623,7 @@ def test_update_email_branding_shows_error_with_neither_alt_text_and_text(
         "main.platform_admin_update_email_branding", branding_id=fake_uuid, _data=data, _expected_status=400
     )
     assert response.select_one("#text-error") is None
-    assert (
-        normalize_spaces(response.select_one("#alt_text-error").text)
-        == "Error: Cannot be empty if you do not have logo text"
-    )
+    assert normalize_spaces(response.select_one("#alt_text-error").text) == "Error: Enter alt text for your logo"
     assert not mock_update_email_branding.called
 
 
@@ -653,7 +648,8 @@ def test_update_email_branding_shows_error_with_both_alt_text_and_text(
     )
     assert response.select_one("#text-error") is None
     assert (
-        normalize_spaces(response.select_one("#alt_text-error").text) == "Error: Must be empty if you enter logo text"
+        normalize_spaces(response.select_one("#alt_text-error").text)
+        == "Error: Alt text must be empty if you have already entered logo text"
     )
     assert not mock_update_email_branding.called
 

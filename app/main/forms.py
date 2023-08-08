@@ -290,7 +290,21 @@ class GovukSearchField(GovukTextInputFieldMixin, SearchField):
     param_extensions = {"classes": "govuk-!-width-full"}
 
 
-class GovukDateField(GovukTextInputFieldMixin, DateField):
+class NotifyDateField(DateField):
+    """A thin wrapper around WTForm's DateField providing our own error message."""
+
+    def __init__(self, label=None, validators=None, format="%Y-%m-%d", thing="a date", **kwargs):
+        super().__init__(label, validators, format, **kwargs)
+        self.thing = thing
+
+    def process_formdata(self, valuelist):
+        try:
+            super().process_formdata(valuelist)
+        except ValueError as e:
+            raise ValueError(f"Enter {self.thing} in the correct format") from e
+
+
+class GovukDateField(GovukTextInputFieldMixin, NotifyDateField):
     pass
 
 
@@ -371,7 +385,7 @@ class GovukIntegerField(GovukTextInputField):
 
 class HexColourCodeField(GovukTextInputField, RequiredValidatorsMixin):
     required_validators = [
-        Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Must be a valid hex colour code"),
+        Regexp(regex="^$|^#?(?:[0-9a-fA-F]{3}){1,2}$", message="Enter a hex colour code in the correct format"),
     ]
     param_extensions = {
         "prefix": {
@@ -1695,7 +1709,7 @@ class AdminProviderRatioForm(OrderableFieldsForm):
             return True
 
         for provider in self._providers:
-            getattr(self, provider["identifier"]).errors += ["Must add up to 100%"]
+            getattr(self, provider["identifier"]).errors += ["The total must add up to 100%"]
 
         return False
 
@@ -1873,7 +1887,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
     def validate_name(self, name):
         op = request.form.get("operation")
         if op == "email-branding-details" and not self.name.data:
-            raise ValidationError("This field is required")
+            raise ValidationError("Enter a name for the branding")
 
     def validate(self):
         rv = super().validate()
@@ -1883,11 +1897,11 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
             # we only want to validate alt_text/text if we're editing the fields, not the file
 
             if self.alt_text.data and self.text.data:
-                self.alt_text.errors.append("Must be empty if you enter logo text")
+                self.alt_text.errors.append("Alt text must be empty if you have already entered logo text")
                 return False
 
             if not (self.alt_text.data or self.text.data):
-                self.alt_text.errors.append("Cannot be empty if you do not have logo text")
+                self.alt_text.errors.append("Enter alt text for your logo")
                 return False
 
         return rv
@@ -1940,7 +1954,12 @@ class AdminSetBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
 
 
 class AdminEditLetterBrandingForm(StripWhitespaceForm):
-    name = GovukTextInputField("Name of brand", validators=[DataRequired()])
+    name = GovukTextInputField("Name of brand")
+
+    def validate_name(self, name):
+        op = request.form.get("operation")
+        if op == "branding-details" and not self.name.data:
+            raise ValidationError("Enter a name for the branding")
 
 
 class AdminEditLetterBrandingSVGUploadForm(StripWhitespaceForm):
@@ -2057,19 +2076,19 @@ class GuestList(StripWhitespaceForm):
 
 
 class DateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("Start Date", [validators.optional()])
-    end_date = GovukDateField("End Date", [validators.optional()])
+    start_date = GovukDateField("Start date", [validators.optional()], thing="a start date")
+    end_date = GovukDateField("End date", [validators.optional()], thing="an end date")
     include_from_test_key = GovukCheckboxField("Include test keys")
 
 
 class RequiredDateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("Start Date")
-    end_date = GovukDateField("End Date")
+    start_date = GovukDateField("Start date", thing="a start date")
+    end_date = GovukDateField("End date", thing="an end date")
 
 
 class BillingReportDateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("First day covered by report")
-    end_date = GovukDateField("Last day covered by report")
+    start_date = GovukDateField("Start date", thing="a start date")
+    end_date = GovukDateField("End date", thing="an end date")
 
 
 class SearchByNameForm(StripWhitespaceForm):
@@ -2350,7 +2369,7 @@ class AdminReturnedLettersForm(StripWhitespaceForm):
     references = TextAreaField(
         "Letter references",
         validators=[
-            DataRequired(message="Cannot be empty"),
+            NotifyDataRequired(thing="the returned letter references"),
         ],
     )
 
@@ -2503,13 +2522,11 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
 
 
 class AdminClearCacheForm(StripWhitespaceForm):
-    model_type = GovukCheckboxesField(
-        "What do you want to clear today",
-    )
+    model_type = GovukCheckboxesField("What do you want to clear today")
 
     def validate_model_type(self, field):
         if not field.data:
-            raise ValidationError("Select at least one option")
+            raise ValidationError("Select at least one type of cache")
 
 
 class AdminOrganisationGoLiveNotesForm(StripWhitespaceForm):
@@ -2805,5 +2822,5 @@ class FindByUuidForm(StripWhitespaceForm):
 class PlatformAdminSearchForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Search",
-        validators=[DataRequired()],
+        validators=[NotifyDataRequired(thing="a search term")],
     )

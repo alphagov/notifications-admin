@@ -299,7 +299,7 @@ def test_update_letter_branding_shows_form_errors_on_name_fields(
 
     assert page.select_one("h1").text == "Update letter branding"
     assert len(error_messages) == 1
-    assert "This field is required." in error_messages[0].text.strip()
+    assert "Error: Enter a name for the branding" in error_messages[0].text.strip()
 
 
 def test_update_letter_branding_shows_database_errors_on_name_field(
@@ -614,7 +614,7 @@ def test_create_letter_branding_shows_form_errors_on_name_field(
 
     assert page.select_one("h1").text == "Add letter branding"
     assert len(error_messages) == 1
-    assert "This field is required." in error_messages[0].text.strip()
+    assert "Error: Enter a name for the branding" in error_messages[0].text.strip()
 
 
 def test_create_letter_branding_shows_database_errors_on_name_fields(

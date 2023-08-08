@@ -9,6 +9,16 @@
   {% if file_upload_form.errors or letter_branding_details_form.errors %}Error: {% endif %}
 {% endblock %}
 
+{% block errorSummary %}
+  {% if error_summary_enabled %}
+    {% if file_upload_form and file_upload_form.errors %}
+      {{ errorSummary(file_upload_form) }}
+    {% elif letter_branding_details_form and letter_branding_details_form.errors %}
+      {{ errorSummary(letter_branding_details_form) }}
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
 {% block per_page_title %}
   {{ '{} letter branding'.format('Update' if is_update else 'Add')}}
 {% endblock %}

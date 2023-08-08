@@ -687,7 +687,7 @@ def test_platform_admin_submit_empty_returned_letters(
 
     assert not mock_client.called
 
-    assert "Cannot be empty" in page.text
+    assert "Enter the returned letter references" in page.text
 
 
 def test_clear_cache_shows_form(
@@ -786,7 +786,7 @@ def test_clear_cache_requires_option(
 
     page = client_request.post("main.clear_cache", _data={}, _expected_status=200)
 
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select at least one option"
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select at least one type of cache"
     assert not redis.delete_by_pattern.called
 
 
@@ -900,8 +900,10 @@ def test_get_notifications_sent_by_service_validates_form(
     errors = page.select(".govuk-error-message")
     assert len(errors) == 2
 
-    for error in errors:
-        assert "Not a valid date value" in error.text
+    assert [error.text.strip() for error in errors] == [
+        "Error: Enter a start date in the correct format",
+        "Error: Enter an end date in the correct format",
+    ]
 
     assert mock_get_stats_from_api.called is False
 

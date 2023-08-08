@@ -98,7 +98,10 @@ def platform_admin():
     number_of_complaints = complaint_api_client.get_complaint_count(api_args)
 
     return render_template(
-        "views/platform-admin/index.html", form=form, global_stats=make_columns(platform_stats, number_of_complaints)
+        "views/platform-admin/index.html",
+        form=form,
+        global_stats=make_columns(platform_stats, number_of_complaints),
+        error_summary_enabled=True,
     )
 
 
@@ -171,7 +174,7 @@ def make_columns(global_stats, complaints_number):
 @main.route("/platform-admin/trial-services", endpoint="trial_services")
 @user_is_platform_admin
 def platform_admin_services():
-    form = DateFilterForm(request.args)
+    form = DateFilterForm(request.args, meta={"csrf": False})
     if all(
         (
             request.args.get("include_from_test_key") is None,
@@ -190,9 +193,10 @@ def platform_admin_services():
         "include_from_test_key": include_from_test_key,
     }
 
-    if form.start_date.data:
-        api_args["start_date"] = form.start_date.data
-        api_args["end_date"] = form.end_date.data or datetime.utcnow().date()
+    if form.validate():
+        if form.start_date.data:
+            api_args["start_date"] = form.start_date.data
+            api_args["end_date"] = form.end_date.data or datetime.utcnow().date()
 
     services = filter_and_sort_services(
         service_api_client.get_services(api_args)["data"],
@@ -206,6 +210,7 @@ def platform_admin_services():
         services=list(format_stats_by_service(services)),
         page_title=f"{'Trial mode' if request.endpoint == 'main.trial_services' else 'Live'} services",
         global_stats=create_global_stats(services),
+        error_summary_enabled=True,
     )
 
 
@@ -296,7 +301,11 @@ def notifications_sent_by_service():
             },
         )
 
-    return render_template("views/platform-admin/notifications_by_service.html", form=form)
+    return render_template(
+        "views/platform-admin/notifications_by_service.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/reports/usage-for-all-services", methods=["GET", "POST"])
@@ -362,7 +371,11 @@ def get_billing_report():
             )
         else:
             flash("No results for dates")
-    return render_template("views/platform-admin/get-billing-report.html", form=form)
+    return render_template(
+        "views/platform-admin/get-billing-report.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/reports/dvla-billing", methods=["GET", "POST"])
@@ -470,7 +483,11 @@ def get_volumes_by_service():
             )
         else:
             flash("No results for dates")
-    return render_template("views/platform-admin/volumes-by-service-report.html", form=form)
+    return render_template(
+        "views/platform-admin/volumes-by-service-report.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/reports/daily-volumes-report", methods=["GET", "POST"])
@@ -517,7 +534,11 @@ def get_daily_volumes():
             )
         else:
             flash("No results for dates")
-    return render_template("views/platform-admin/daily-volumes-report.html", form=form)
+    return render_template(
+        "views/platform-admin/daily-volumes-report.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/reports/daily-sms-provider-volumes-report", methods=["GET", "POST"])
@@ -562,7 +583,11 @@ def get_daily_sms_provider_volumes():
             )
         else:
             flash("No results for dates")
-    return render_template("views/platform-admin/daily-sms-provider-volumes-report.html", form=form)
+    return render_template(
+        "views/platform-admin/daily-sms-provider-volumes-report.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/platform-admin/complaints")
@@ -616,6 +641,7 @@ def platform_admin_returned_letters():
     return render_template(
         "views/platform-admin/returned-letters.html",
         form=form,
+        error_summary_enabled=True,
     )
 
 
@@ -679,7 +705,11 @@ def clear_cache():
 
         flash(msg, category="default")
 
-    return render_template("views/platform-admin/clear-cache.html", form=form)
+    return render_template(
+        "views/platform-admin/clear-cache.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 def get_url_for_notify_record(uuid_):
