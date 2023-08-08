@@ -182,6 +182,14 @@ def guidance_api_documentation():
     )
 
 
+@main.route("/using-notify/attach-pages")
+def guidance_attach_pages():
+    return render_template(
+        "views/guidance/using-notify/attach-pages.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/bulk-sending")
 def guidance_bulk_sending():
     return render_template(

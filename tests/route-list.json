@@ -379,6 +379,7 @@
     "/users/<uuid:user_id>/change_auth",
     "/using-notify",
     "/using-notify/api-documentation",
+    "/using-notify/attach-pages",
     "/using-notify/bulk-sending",
     "/using-notify/delivery-status",
     "/using-notify/delivery-times",

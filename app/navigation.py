@@ -61,6 +61,7 @@ class HeaderNavigation(Navigation):
         "using-notify": {
             "guidance_using_notify",
             "guidance_api_documentation",
+            "guidance_attach_pages",
             "guidance_bulk_sending",
             "guidance_message_status",
             "guidance_delivery_times",
