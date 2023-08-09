@@ -381,7 +381,7 @@ def useful_headers_after_request(response):
             "font-src 'self' {asset_domain} data:;"
             "img-src 'self' {asset_domain} *.tile.openstreetmap.org *.google-analytics.com"
             " *.notifications.service.gov.uk {logo_domain} data:;"
-            "frame-src 'self' www.youtube-nocookie.com;".format(
+            "frame-src 'self';".format(
                 asset_domain=current_app.config["ASSET_DOMAIN"],
                 logo_domain=current_app.config["LOGO_CDN_DOMAIN"],
             )
