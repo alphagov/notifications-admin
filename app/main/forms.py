@@ -252,13 +252,8 @@ def uk_mobile_number(label="Mobile number"):
     return UKMobileNumber(label, validators=[DataRequired(message="Cannot be empty")])
 
 
-def international_phone_number(label="Mobile number", thing=None):
-    validators_list = []
-    if thing:
-        validators_list.append(NotifyDataRequired(thing=thing))
-    else:
-        validators_list.append(DataRequired(message="Cannot be empty"))
-    return InternationalPhoneNumber(label, validators=validators_list)
+def international_phone_number(label="Mobile number"):
+    return InternationalPhoneNumber(label, validators=[NotifyDataRequired(thing="a mobile number")])
 
 
 def make_password_field(label="Password", thing="a password"):

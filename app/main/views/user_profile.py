@@ -53,7 +53,11 @@ def user_profile_name():
         current_user.update(name=form.new_name.data)
         return redirect(url_for(".user_profile"))
 
-    return render_template("views/user-profile/change.html", thing="name", form_field=form.new_name)
+    return render_template(
+        "views/user-profile/change.html",
+        thing="name",
+        form=form,
+    )
 
 
 @main.route("/user-profile/email", methods=["GET", "POST"])
@@ -66,7 +70,11 @@ def user_profile_email():
     if form.validate_on_submit():
         session[NEW_EMAIL] = form.email_address.data
         return redirect(url_for(".user_profile_email_authenticate"))
-    return render_template("views/user-profile/change.html", thing="email address", form_field=form.email_address)
+    return render_template(
+        "views/user-profile/change.html",
+        thing="email address",
+        form=form,
+    )
 
 
 @main.route("/user-profile/email/authenticate", methods=["GET", "POST"])
@@ -126,7 +134,11 @@ def user_profile_mobile_number():
         flash("Are you sure you want to delete your mobile number from Notify?", "delete")
 
     return render_template(
-        "views/user-profile/change.html", thing="mobile number", form_field=form.mobile_number, user_auth=user.auth_type
+        "views/user-profile/change.html",
+        thing="mobile number",
+        form=form,
+        user_auth=user.auth_type,
+        error_summary_enabled=True,
     )
 
 

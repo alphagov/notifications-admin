@@ -19,7 +19,13 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper() %}
-        {{ form_field(error_message_with_html=True) }}
+          {%  if thing == "email address" %}
+              {{ form.email_address }}
+          {%  elif thing == "name" %}
+              {{ form.new_name }}
+          {%  elif thing == "mobile number" %}
+              {{ form.mobile_number }}
+           {%  endif %}
         {% if current_user.auth_type == 'email_auth' and (current_user.mobile_number and thing == "mobile number") %}
           {{ page_footer(
             'Save',
