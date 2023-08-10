@@ -91,6 +91,10 @@ def using_notify_nav():
                     "link": "main.guidance_api_documentation",
                 },
                 {
+                    "name": "Attach pages",
+                    "link": "main.guidance_attach_pages",
+                },
+                {
                     "name": "Bulk sending",
                     "link": "main.guidance_bulk_sending",
                 },
