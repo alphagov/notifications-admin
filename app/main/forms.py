@@ -1355,11 +1355,12 @@ class ConfirmPasswordForm(StripWhitespaceForm):
         self.validate_password_func = validate_password_func
         super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
 
-    password = GovukPasswordField("Enter password")
+    password = GovukPasswordField("Enter your password", validators=[NotifyDataRequired(thing="your password")])
 
     def validate_password(self, field):
+        print(self.validate_password_func)
         if not self.validate_password_func(field.data):
-            raise ValidationError("Invalid password")
+            raise ValidationError("Incorrect password")
 
 
 class NewBroadcastForm(StripWhitespaceForm):

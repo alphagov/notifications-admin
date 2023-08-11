@@ -99,6 +99,7 @@ def user_profile_email_authenticate():
         thing="email address",
         form=form,
         back_link=url_for(".user_profile_email"),
+        error_summary_enabled=True,
     )
 
 
