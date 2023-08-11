@@ -1537,7 +1537,7 @@ class ChangePasswordForm(StripWhitespaceForm):
 
     def validate_old_password(self, field):
         if not self.validate_password_func(field.data):
-            raise ValidationError("Invalid password")
+            raise ValidationError("Incorrect password")
 
 
 class CsvUploadForm(StripWhitespaceForm):

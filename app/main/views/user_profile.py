@@ -219,7 +219,11 @@ def user_profile_password():
         user_api_client.update_password(current_user.id, password=form.new_password.data)
         return redirect(url_for(".user_profile"))
 
-    return render_template("views/user-profile/change-password.html", form=form)
+    return render_template(
+        "views/user-profile/change-password.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/user-profile/take-part-in-user-research", methods=["GET", "POST"])
