@@ -1358,7 +1358,6 @@ class ConfirmPasswordForm(StripWhitespaceForm):
     password = GovukPasswordField("Enter your password", validators=[NotifyDataRequired(thing="your password")])
 
     def validate_password(self, field):
-        print(self.validate_password_func)
         if not self.validate_password_func(field.data):
             raise ValidationError("Incorrect password")
 
@@ -1560,8 +1559,7 @@ class ChangeEmailForm(StripWhitespaceForm):
         self.validate_email_func = validate_email_func
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
 
-    email_address = make_email_address_field(thing="Enter an email address")
-    email_address = make_email_address_field(gov_user=True)
+    email_address = make_email_address_field(thing="an email address", gov_user=True)
 
     def validate_email_address(self, field):
         # The validate_email_func can be used to call API to check if the email address is already in
@@ -2735,7 +2733,7 @@ class ChangeSecurityKeyNameForm(StripWhitespaceForm):
     security_key_name = GovukTextInputField(
         "Name of key",
         validators=[
-            DataRequired(message="Cannot be empty"),
+            DataRequired(message="Enter a name for this key"),
             MustContainAlphanumericCharacters(),
             Length(max=255, message="Name of key must be 255 characters or fewer"),
         ],

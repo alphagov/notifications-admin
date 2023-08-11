@@ -304,7 +304,12 @@ def user_profile_manage_security_key(key_id):
     if request.endpoint == "main.user_profile_confirm_delete_security_key":
         flash("Are you sure you want to delete this security key?", "delete")
 
-    return render_template("views/user-profile/manage-security-key.html", security_key=security_key, form=form)
+    return render_template(
+        "views/user-profile/manage-security-key.html",
+        security_key=security_key,
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=["POST"])
