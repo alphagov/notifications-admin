@@ -74,6 +74,7 @@ def user_profile_email():
         "views/user-profile/change.html",
         thing="email address",
         form=form,
+        error_summary_enabled=True,
     )
 
 

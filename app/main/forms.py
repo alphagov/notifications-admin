@@ -1559,6 +1559,7 @@ class ChangeEmailForm(StripWhitespaceForm):
         self.validate_email_func = validate_email_func
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
 
+    email_address = make_email_address_field(thing="Enter an email address")
     email_address = make_email_address_field(gov_user=True)
 
     def validate_email_address(self, field):
