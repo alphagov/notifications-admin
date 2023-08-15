@@ -75,7 +75,7 @@ FROM production as test
 ARG NODE_VERSION=16.14.0
 
 USER root
-RUN chown -R notify:notify /opt/venv
+
 RUN echo "Install OS dependencies for test build" && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -90,6 +90,9 @@ ENV HOME=/home/vcap
 ENV NVM_DIR /home/vcap/.nvm
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/v$NODE_VERSION/bin:$PATH
+
+# Copying to overwrite is faster than RUN chown notify:notify ...
+COPY --from=python_build --chown=notify:notify /opt/venv /opt/venv
 
 COPY .nvmrc .nvmrc
 RUN echo "Installing nvm and NodeJS v${NODE_VERSION}" && \
