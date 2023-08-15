@@ -1828,7 +1828,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             1,
             0,
             0,
-            "Yes",
+            True,
             True,
         ),
         (  # Needs to set reply to address
@@ -1842,7 +1842,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             1,
             0,
             1,
-            "No",
+            False,
             True,
         ),
         (  # Just sending SMS
@@ -1856,7 +1856,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             0,
             1,
             0,
-            "Yes",
+            True,
             True,
         ),
         (  # Needs to change SMS sender
@@ -1870,7 +1870,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             0,
             1,
             0,
-            "No",
+            False,
             True,
         ),
         (  # Needs team members
@@ -1884,7 +1884,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             1,
             0,
             0,
-            "No",
+            False,
             True,
         ),
         (  # Needs templates
@@ -1898,7 +1898,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             0,
             1,
             0,
-            "No",
+            False,
             True,
         ),
         (  # Not done anything yet
@@ -1912,7 +1912,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             None,
             None,
             None,
-            "No",
+            False,
             False,
         ),
     ),
@@ -1961,9 +1961,7 @@ def test_ready_to_go_live(
             return_value=volume,
         )
 
-    assert (
-        app.models.service.Service({"id": SERVICE_ONE_ID}).go_live_checklist_completed_as_yes_no == expected_readyness
-    )
+    assert app.models.service.Service({"id": SERVICE_ONE_ID}).go_live_checklist_completed is expected_readyness
 
 
 @pytest.mark.parametrize(
