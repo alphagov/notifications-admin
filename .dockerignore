@@ -2,3 +2,4 @@ venv
 .git
 .env
 .envrc
+node_modules
