@@ -30,6 +30,10 @@ bootstrap: generate-version-file ## Set up everything to run the app
 	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci --no-audit
 	. environment.sh; source $(HOME)/.nvm/nvm.sh && npm run build
 
+.PHONY: bootstrap-with-docker
+bootstrap-with-docker: generate-version-file ## Build the image to run the app in Docker
+	docker build -f docker/Dockerfile --target test -t notifications-admin .
+
 .PHONY: watch-frontend
 watch-frontend:  ## Build frontend and watch for changes
 	. environment.sh; npm run watch
