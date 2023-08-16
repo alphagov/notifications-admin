@@ -34,6 +34,13 @@ def get_errors_for_csv(recipients, template_type):
         else:
             errors.append(f"check you have content for the empty messages in {number_of_rows_with_empty_message} rows")
 
+    if any(recipients.rows_with_bad_qr_codes):
+        number_of_rows_with_bad_qr_codes = len(list(recipients.rows_with_bad_qr_codes))
+        if 1 == number_of_rows_with_bad_qr_codes:
+            errors.append("QRCODE VALIDATION ERROR MESSAGE HERE FOR 1 ROW")
+        else:
+            errors.append(f"QRCODE VALIDATION ERROR MESSAGE HERE FOR {number_of_rows_with_bad_qr_codes} ROWS")
+
     return errors
 
 
