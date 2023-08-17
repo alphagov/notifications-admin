@@ -1483,6 +1483,12 @@ class LetterTemplateForm(EmailTemplateForm):
         "Body", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
     )
 
+    welsh_subject = TextAreaField("Welsh Main heading", validators=[DataRequired(message="Cannot be empty")])
+
+    welsh_template_content = TextAreaField(
+        "Welsh Body", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
+    )
+
 
 class LetterTemplatePostageForm(StripWhitespaceForm):
     postage = GovukRadiosField(

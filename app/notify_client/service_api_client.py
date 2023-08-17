@@ -182,7 +182,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete("service-{service_id}-templates")
     @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
-    def update_service_template(self, *, service_id, template_id, name=None, content=None, subject=None):
+    def update_service_template(
+        self, *, service_id, template_id, name=None, content=None, subject=None, welsh_content=None, welsh_subject=None
+    ):
         """
         Update a service template.
         """
@@ -193,6 +195,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             data["name"] = name
         if subject:
             data["subject"] = subject
+        if welsh_content:
+            data["welsh_content"] = welsh_content
+        if welsh_subject:
+            data["welsh_subject"] = welsh_subject
         data = _attach_current_user(data)
         endpoint = f"/service/{service_id}/template/{template_id}"
         return self.post(endpoint, data)
