@@ -57,6 +57,7 @@ def user_profile_name():
         "views/user-profile/change.html",
         thing="name",
         form=form,
+        error_summary_enabled=True,
     )
 
 

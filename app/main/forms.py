@@ -1551,7 +1551,7 @@ class CsvUploadForm(StripWhitespaceForm):
 
 
 class ChangeNameForm(StripWhitespaceForm):
-    new_name = GovukTextInputField("Your name", validators=[DataRequired()])
+    new_name = GovukTextInputField("Your name", validators=[NotifyDataRequired(thing="your name")])
 
 
 class ChangeEmailForm(StripWhitespaceForm):
