@@ -402,10 +402,6 @@ class Service(JSONModel):
         )
 
     @property
-    def go_live_checklist_completed_as_yes_no(self):
-        return "Yes" if self.go_live_checklist_completed else "No"
-
-    @property
     def go_live_user(self):
         return User.from_id(self._dict["go_live_user"])
 
