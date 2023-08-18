@@ -36,6 +36,8 @@
     <input type="hidden" name="name" value="{{ new_template.name }}" />
     <input type="hidden" name="subject" value="{{ new_template._subject or '' }}" />
     <input type="hidden" name="template_content" value="{{ new_template.content }}" />
+    <input type="hidden" name="welsh_subject" value="{{ new_template._welsh_subject or '' }}" />
+    <input type="hidden" name="welsh_template_content" value="{{ new_template.welsh_content }}" />
     <input type="hidden" name="template_id" value="{{ new_template.id }}" />
 
     <input type="hidden" name="confirm" value="true" />
