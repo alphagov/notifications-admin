@@ -2340,6 +2340,17 @@ class EmailBrandingAltTextForm(StripWhitespaceForm):
             raise ValidationError("Do not include the word ‘logo’ in your alt text")
 
 
+class SetServiceDataRetentionForm(StripWhitespaceForm):
+    days_of_retention = GovukIntegerField(
+        label="Data retention",
+        things="data retention",
+        validators=[
+            NotifyDataRequired(thing="a data retention"),
+            validators.NumberRange(min=3, max=90, message="Must be between 3 and 90"),
+        ],
+    )
+
+
 class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
     notification_type = GovukRadiosField(
         "What notification type?",

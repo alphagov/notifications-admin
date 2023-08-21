@@ -448,6 +448,21 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_service_data_retention(self, service_id):
         return self.get(f"/service/{service_id}/data-retention")
 
+    @cache.delete("service-{service_id}-data-retention")
+    def set_service_data_retention(self, service_id, days_of_retention):
+        current_retention = self.get_service_data_retention(service_id)
+
+        for notification_type in ["email", "sms", "letter"]:
+            retention = next(
+                filter(lambda retention: retention["notification_type"] == notification_type, current_retention), None
+            )
+            if retention:
+                self.update_service_data_retention(service_id, retention["id"], days_of_retention=days_of_retention)
+            else:
+                self.create_service_data_retention(
+                    service_id, notification_type=notification_type, days_of_retention=days_of_retention
+                )
+
     @cache.set("service-{service_id}-returned-letters-statistics")
     def get_returned_letter_statistics(self, service_id):
         return self.get(f"service/{service_id}/returned-letter-statistics")

@@ -287,6 +287,7 @@
     "/services/<uuid:service_id>/service-settings/sms-sender/add",
     "/services/<uuid:service_id>/service-settings/switch-count-as-live",
     "/services/<uuid:service_id>/service-settings/switch-live",
+    "/services/<uuid:service_id>/set-data-retention",
     "/services/<uuid:service_id>/start-job/<uuid:upload_id>",
     "/services/<uuid:service_id>/template-activity",
     "/services/<uuid:service_id>/template-usage",

@@ -1,0 +1,28 @@
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Set data retention
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {% call form_wrapper(class="govuk-!-margin-top-3") %}
+    {{ form.days_of_retention(
+      param_extensions={
+        "label": {
+          "isPageHeading": True,
+          "classes": "govuk-label--l",
+        },
+      }
+    ) }}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+{% endblock %}

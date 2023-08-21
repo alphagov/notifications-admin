@@ -60,6 +60,7 @@ from app.main.forms import (
     ServiceSwitchChannelForm,
     SetAuthTypeForm,
     SetEmailAuthForUsersForm,
+    SetServiceDataRetentionForm,
     SMSPrefixForm,
     YesNoSettingForm,
 )
@@ -125,6 +126,19 @@ def service_name_change(service_id):
         form=form,
         organisation_type=current_service.organisation_type,
     )
+
+
+@main.route("/services/<uuid:service_id>/set-data-retention", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_data_retention(service_id):
+    form = SetServiceDataRetentionForm()
+    if form.validate_on_submit():
+        service_api_client.set_service_data_retention(
+            service_id=service_id, days_of_retention=form.days_of_retention.data
+        )
+        flash(f"WIP: Your service's data retention has been set to {form.days_of_retention.data} days", "default")
+        return redirect(url_for(".service_settings", service_id=service_id))
+    return render_template("views/service-settings/service-data-retention.html", form=form)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/request-to-go-live/estimate-usage", methods=["GET", "POST"])
