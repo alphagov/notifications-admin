@@ -477,10 +477,9 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
         session["placeholders"][current_placeholder] = form.placeholder_value.data
 
         template.values[current_placeholder] = form.placeholder_value.data
-        if template.template_type == "letter" and (error := template.has_qr_code_with_too_much_data()):
+        if template.template_type == "letter" and template.has_qr_code_with_too_much_data():
             form.placeholder_value.errors.append(
-                f"WIP: Cannot create a usable QR code. Link cannot be longer than 504 characters. "
-                f"The following link is {error.num_bytes} characters: {error.data}"
+                "Cannot create a usable QR code - the text you entered makes the link too long"
             )
 
         else:

@@ -1967,7 +1967,7 @@ def test_send_one_off_letter_qr_code_placeholder_too_big(
         _expected_status=200,
     )
 
-    assert "WIP: Cannot create a usable QR code. Link cannot be longer than 504 characters." in page.text
+    assert "Cannot create a usable QR code - the text you entered makes the link too long" in page.text
 
 
 def test_send_one_off_populates_field_from_session(

@@ -246,8 +246,8 @@ MockRecipients = namedtuple(
         ({}, {}, {3, 12}, [], [], "sms", ["shorten the messages in 2 rows"]),
         ({}, {}, {}, {2}, [], "sms", ["check you have content for the empty message in 1 row"]),
         ({}, {}, {}, {2, 4, 8}, [], "sms", ["check you have content for the empty messages in 3 rows"]),
-        ([], [], [], [], {2}, "letter", ["QRCODE VALIDATION ERROR MESSAGE HERE FOR 1 ROW"]),
-        ([], [], [], [], {2, 4}, "letter", ["QRCODE VALIDATION ERROR MESSAGE HERE FOR 2 ROWS"]),
+        ([], [], [], [], {2}, "letter", ["enter fewer characters for the QR code links in 1 row"]),
+        ([], [], [], [], {2, 4}, "letter", ["enter fewer characters for the QR code links in 2 rows"]),
     ],
 )
 def test_get_errors_for_csv(
