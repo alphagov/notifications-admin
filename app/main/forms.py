@@ -1551,7 +1551,10 @@ class CsvUploadForm(StripWhitespaceForm):
 
 
 class ChangeNameForm(StripWhitespaceForm):
-    new_name = GovukTextInputField("Your name", validators=[NotifyDataRequired(thing="your name")])
+    new_name = GovukTextInputField(
+        "Change your name",
+        validators=[NotifyDataRequired(thing="your name")],
+    )
 
 
 class ChangeEmailForm(StripWhitespaceForm):
@@ -1559,7 +1562,11 @@ class ChangeEmailForm(StripWhitespaceForm):
         self.validate_email_func = validate_email_func
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
 
-    email_address = make_email_address_field(thing="an email address", gov_user=True)
+    email_address = make_email_address_field(
+        label="Change your email address",
+        thing="an email address",
+        gov_user=True,
+    )
 
     def validate_email_address(self, field):
         # The validate_email_func can be used to call API to check if the email address is already in
@@ -1578,7 +1585,9 @@ class ChangeNonGovEmailForm(ChangeEmailForm):
 
 
 class ChangeMobileNumberForm(StripWhitespaceForm):
-    mobile_number = international_phone_number()
+    mobile_number = international_phone_number(
+        label="Change your mobile number",
+    )
 
 
 class ChooseTimeForm(StripWhitespaceForm):
