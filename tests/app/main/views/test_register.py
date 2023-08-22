@@ -111,7 +111,7 @@ def test_process_register_returns_200_when_mobile_number_is_invalid(
         _expected_status=200,
     )
 
-    assert "Must not contain letters or symbols" in page.text
+    assert "Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -" in page.text
 
 
 def test_should_return_200_when_email_is_not_gov_uk(
