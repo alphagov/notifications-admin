@@ -12,6 +12,7 @@ from wtforms import ValidationError
 from wtforms.validators import DataRequired, StopValidation
 
 from app import antivirus_client
+from app.formatters import sentence_case
 from app.main._commonly_used_passwords import commonly_used_passwords
 from app.models.spreadsheet import Spreadsheet
 from app.utils.user import is_gov_user
@@ -181,8 +182,13 @@ class MustContainAlphanumericCharacters:
 
     regex = re.compile(r".*[a-zA-Z0-9].*[a-zA-Z0-9].*")
 
-    def __init__(self, message="Must include at least two alphanumeric characters"):
-        self.message = message
+    def __init__(self, *, thing=None, message="Must include at least two alphanumeric characters"):
+        if thing:
+            self.message = f"{sentence_case(thing)} must include at least 2 letters or numbers"
+        else:
+            # DEPRECATED - prefer to pass in `thing` instead. When all instances are using `thing,` retire `message`
+            # altogether.
+            self.message = message
 
     def __call__(self, form, field):
         if field.data and not re.match(self.regex, field.data):

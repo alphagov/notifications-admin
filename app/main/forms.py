@@ -2743,7 +2743,7 @@ class ChangeSecurityKeyNameForm(StripWhitespaceForm):
         "Name of key",
         validators=[
             DataRequired(message="Enter a name for this key"),
-            MustContainAlphanumericCharacters(),
+            MustContainAlphanumericCharacters(thing="the name of the key"),
             Length(max=255, message="Name of key must be 255 characters or fewer"),
         ],
     )
