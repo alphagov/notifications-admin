@@ -261,14 +261,18 @@ def international_phone_number(label="Mobile number"):
     return InternationalPhoneNumber(label, validators=[NotifyDataRequired(thing="a mobile number")])
 
 
-def make_password_field(label="Password", thing="a password"):
+def make_password_field(label="Password", thing="a password", validate_length=True):
+    validators = [
+        NotifyDataRequired(thing=thing),
+        CommonlyUsedPassword(message="Choose a password that’s harder to guess"),
+    ]
+
+    if validate_length:
+        validators.insert(1, Length(min=8, max=255, thing=thing))
+
     return GovukPasswordField(
         label,
-        validators=[
-            NotifyDataRequired(thing=thing),
-            Length(min=8, max=255, message="Must be at least 8 characters"),
-            CommonlyUsedPassword(message="Choose a password that’s harder to guess"),
-        ],
+        validators=validators,
     )
 
 
@@ -579,7 +583,7 @@ class RegisterUserForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
     email_address = make_email_address_field(gov_user=True)
     mobile_number = international_phone_number()
-    password = make_password_field()
+    password = make_password_field(thing="your password")
     # always register as sms type
     auth_type = HiddenField("auth_type", default="sms_auth")
 
@@ -624,7 +628,7 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     mobile_number = InternationalPhoneNumber(
         "Mobile number", validators=[NotifyDataRequired(thing="your mobile number")]
     )
-    password = make_password_field()
+    password = make_password_field(thing="your password")
     organisation = HiddenField("organisation")
     email_address = HiddenField("email_address")
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
@@ -1527,7 +1531,7 @@ class ForgotPasswordForm(StripWhitespaceForm):
 
 class NewPasswordForm(StripWhitespaceForm):
 
-    new_password = make_password_field(thing="a new password")
+    new_password = make_password_field(thing="your new password")
 
 
 class ChangePasswordForm(StripWhitespaceForm):
@@ -1535,7 +1539,7 @@ class ChangePasswordForm(StripWhitespaceForm):
         self.validate_password_func = validate_password_func
         super(ChangePasswordForm, self).__init__(*args, **kwargs)
 
-    old_password = make_password_field("Current password", thing="your current password")
+    old_password = make_password_field("Current password", thing="your current password", validate_length=False)
     new_password = make_password_field("New password", thing="your new password")
 
     def validate_old_password(self, field):
