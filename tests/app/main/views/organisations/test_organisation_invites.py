@@ -289,7 +289,7 @@ def test_registration_from_org_invite_404s_if_user_not_in_session(
     [
         [
             {"name": "Bad Mobile", "mobile_number": "not good", "password": "validPassword!"},
-            "Must not contain letters or symbols",
+            "Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -",
         ],
         [
             {"name": "Bad Password", "mobile_number": "+44123412345", "password": "password"},

@@ -70,7 +70,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 1 phone number.",
             "Row in file 1 phone number",
-            "2 Must not contain letters or symbols test@example.com",
+            "2 Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + - test@example.com",
         ),
         (
             """
@@ -131,7 +131,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 1 phone number.",
             "Row in file 1 phone number",
-            "2 Not enough digits +447700900",
+            "2 Mobile number is too short +447700900",
         ),
         (
             """
