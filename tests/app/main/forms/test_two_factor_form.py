@@ -34,11 +34,11 @@ def test_form_is_valid_returns_no_errors(
     (
         (
             {"sms_code": "1234"},
-            "Not enough numbers",
+            "Security code must be 5 digits long",
         ),
         (
             {"sms_code": "123456"},
-            "Too many numbers",
+            "Security code must be 5 digits long",
         ),
         (
             {},

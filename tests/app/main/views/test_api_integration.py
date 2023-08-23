@@ -475,7 +475,7 @@ def test_should_validate_guestlist_items(
     [
         ("https://example.com", "", "Cannot be empty"),
         ("http://not_https.com", "1234567890", "Must be a valid https URL"),
-        ("https://test.com", "123456789", "Must be at least 10 characters"),
+        ("https://test.com", "123456789", "The bearer token must be at least 10 characters long"),
     ],
 )
 def test_callback_forms_validation(

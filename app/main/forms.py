@@ -46,7 +46,6 @@ from wtforms.validators import (
     UUID,
     DataRequired,
     InputRequired,
-    Length,
     NumberRange,
     Optional,
     Regexp,
@@ -68,6 +67,7 @@ from app.main.validators import (
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
     FileIsVirusFree,
+    Length,
     LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
@@ -261,7 +261,7 @@ def make_password_field(label="Password", thing="a password"):
         label,
         validators=[
             NotifyDataRequired(thing=thing),
-            Length(8, 255, message="Must be at least 8 characters"),
+            Length(min=8, max=255, message="Must be at least 8 characters"),
             CommonlyUsedPassword(message="Choose a password that’s harder to guess"),
         ],
     )
@@ -311,8 +311,7 @@ class SMSCode(GovukTextInputField):
     validators = [
         NotifyDataRequired(thing="your text message code"),
         Regexp(regex=r"^\d+$", message="Numbers only"),
-        Length(min=5, message="Not enough numbers"),
-        Length(max=5, message="Too many numbers"),
+        Length(min=5, max=5, thing="security code", unit="digits"),
     ]
 
     def process_formdata(self, valuelist):
@@ -1154,7 +1153,7 @@ class RenameServiceForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
-            Length(max=255, message="Service name must be 255 characters or fewer"),
+            Length(max=255, thing="service name"),
         ],
     )
 
@@ -1165,7 +1164,7 @@ class RenameOrganisationForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
-            Length(max=255, message="Organisation name must be 255 characters or fewer"),
+            Length(max=255, thing="organisation name"),
         ],
     )
 
@@ -1280,7 +1279,7 @@ class CreateServiceForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
-            Length(max=255, message="Service name must be 255 characters or fewer"),
+            Length(max=255, thing="service name"),
         ],
     )
     organisation_type = OrganisationTypeField("Who runs this service?")
@@ -1741,7 +1740,11 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
             self.url.validators = [DataRequired(), URL(message="Must be a valid URL")]
 
         elif self.contact_details_type.data == "email_address":
-            self.email_address.validators = [DataRequired(), Length(min=5, max=255), ValidEmail()]
+            self.email_address.validators = [
+                DataRequired(),
+                Length(min=5, max=255, thing="email address"),
+                ValidEmail(),
+            ]
 
         elif self.contact_details_type.data == "phone_number":
             # we can't use the existing phone number validation functions here since we want to allow landlines
@@ -1759,7 +1762,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
             self.phone_number.validators = [
                 DataRequired(),
-                Length(min=3, max=20),
+                Length(min=3, max=20, thing="phone number"),
                 valid_non_emergency_phone_number,
             ]
 
@@ -1776,8 +1779,8 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
         "Text message sender",
         validators=[
             DataRequired(message="Cannot be empty"),
-            Length(max=11, message="Enter 11 characters or fewer"),
-            Length(min=3, message="Enter 3 characters or more"),
+            Length(min=3, thing="text message sender"),
+            Length(max=11, thing="text message sender"),
             LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly(),
             DoesNotStartWithDoubleZero(),
         ],
@@ -2158,7 +2161,7 @@ class CallbackForm(StripWhitespaceForm):
     )
     bearer_token = GovukPasswordField(
         "Bearer token",
-        validators=[DataRequired(message="Cannot be empty"), Length(min=10, message="Must be at least 10 characters")],
+        validators=[DataRequired(message="Cannot be empty"), Length(min=10, thing="the bearer token")],
     )
 
     def validate(self):
@@ -2744,7 +2747,7 @@ class ChangeSecurityKeyNameForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Enter a name for this key"),
             MustContainAlphanumericCharacters(thing="the name of the key"),
-            Length(max=255, message="Name of key must be 255 characters or fewer"),
+            Length(max=255, thing="the name of the key"),
         ],
     )
 

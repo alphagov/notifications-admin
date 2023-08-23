@@ -10,6 +10,7 @@ from notifications_utils.template import BroadcastMessageTemplate
 from orderedset import OrderedSet
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, StopValidation
+from wtforms.validators import Length as WTFormsLength
 
 from app import antivirus_client
 from app.formatters import sentence_case
@@ -242,3 +243,24 @@ class FileIsVirusFree:
 class NotifyDataRequired(DataRequired):
     def __init__(self, thing):
         super().__init__(message=f"Enter {thing}")
+
+
+class Length(WTFormsLength):
+    def __init__(self, min=-1, max=-1, message=None, thing=None, unit="characters"):
+        super().__init__(min=min, max=max, message=message)
+        self.thing = thing
+        self.unit = unit
+
+        if not self.message:
+            if not self.thing:
+                raise RuntimeError("Must provide `thing` (preferred) unless `message` is explicitly set.")
+
+            if min >= 0 and max >= 0:
+                if min == max:
+                    self.message = f"{sentence_case(thing)} must be {min} {unit} long"
+                else:
+                    self.message = f"{sentence_case(thing)} must be between {min} and {max} {unit} long"
+            elif min >= 0:
+                self.message = f"{sentence_case(thing)} must be at least {min} {unit} long"
+            else:
+                self.message = f"{sentence_case(thing)} cannot be longer than {max} {unit}"
