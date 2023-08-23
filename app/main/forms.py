@@ -1839,7 +1839,7 @@ class OnOffSettingForm(StripWhitespaceForm):
 
 class YesNoSettingForm(OnOffSettingForm):
     def __init__(self, name, *args, **kwargs):
-        super().__init__(name, *args, truthy="Yes", falsey="No", **kwargs)
+        super().__init__(name, *args, truthy="Yes", falsey="No", choices_for_error_message="yes or no", **kwargs)
 
 
 class ServiceSwitchChannelForm(OnOffSettingForm):
