@@ -13,16 +13,28 @@
 
 {% block maincolumn_content %}
   <h1 class="govuk-heading-l">Data retention period</h1>
-  <p class="govuk-body">Choose the number of days you want Notify to keep:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>the content of the emails, text messages and letters you send</li>
-    <li>recipient email addresses, mobile numbers and addresses</li>
-  </ul>
-  <p class="govuk-body">The default period is 7 days.</p>
+  {% if high_volume_service %}
+    <p class="govuk-body">You need to ask the Notify team to change the number of days we can store:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>the content of the emails, text messages and letters you send</li>
+      <li>recipient email addresses, mobile numbers and addresses</li>
+    </ul>
+    <p class="govuk-body">This is because we expect your service to send over 1 million emails, text messages or letters this year.</p>
+    <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the Notify team</a>.
+    </p>
 
-  {% call form_wrapper(class='top-gutter') %}
-    {{ form.days_of_retention }}
-    {{ page_footer('Continue') }}
-  {% endcall %}
+  {% else %}
+    <p class="govuk-body">Choose the number of days you want Notify to keep:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>the content of the emails, text messages and letters you send</li>
+      <li>recipient email addresses, mobile numbers and addresses</li>
+    </ul>
+    <p class="govuk-body">The default period is 7 days.</p>
 
+    {% call form_wrapper(class='top-gutter') %}
+      {{ form.days_of_retention }}
+      {{ page_footer('Continue') }}
+    {% endcall %}
+  {% endif %}
 {% endblock %}
