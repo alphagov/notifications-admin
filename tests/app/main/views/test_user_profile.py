@@ -136,7 +136,8 @@ def test_should_redirect_after_email_change(
             'Enter a public sector email address or <a class="govuk-link govuk-link--no-visited-state" '
             'href="/features/who-can-use-notify">find out who can use Notify</a>',
         ),
-        ("not_valid", "Enter a valid email address"),  # 2 errors with email address, only first error shown
+        # 2 errors with email address, only first error shown
+        ("not_valid", "Enter an email address in the correct format, like name@example.gov.uk"),
     ],
 )
 def test_should_show_errors_if_new_email_address_does_not_validate(

@@ -162,10 +162,15 @@ class RadioField(WTFormsRadioField):
 
 
 def make_email_address_field(label="Email address", *, gov_user: bool, required=True, thing=None):
-
-    validators = [
-        ValidEmail(),
-    ]
+    if thing:
+        validators = [
+            ValidEmail(message=f"Enter {thing} in the correct format, like name@example.gov.uk"),
+        ]
+    else:
+        # FIXME: being deprecated; remove this when all form fields have been transferred across to `thing`.
+        validators = [
+            ValidEmail(),
+        ]
 
     if gov_user:
         validators.append(ValidGovEmail())
