@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Set data retention
+  Data retention period
 {% endblock %}
 
 {% block backLink %}
@@ -12,16 +12,16 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+  <h1 class="govuk-heading-l">Data retention period</h1>
+  <p class="govuk-body">Choose the number of days you want Notify to keep:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>the content of the emails, text messages and letters you send</li>
+    <li>recipient email addresses, mobile numbers and addresses</li>
+  </ul>
+  <p class="govuk-body">The default period is 7 days.</p>
 
-  {% call form_wrapper(class="govuk-!-margin-top-3") %}
-    {{ form.days_of_retention(
-      param_extensions={
-        "label": {
-          "isPageHeading": True,
-          "classes": "govuk-label--l",
-        },
-      }
-    ) }}
+  {% call form_wrapper(class='top-gutter') %}
+    {{ form.days_of_retention }}
     {{ page_footer('Continue') }}
   {% endcall %}
 

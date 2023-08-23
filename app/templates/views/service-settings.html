@@ -50,7 +50,7 @@
         {# TODO: Remove platform admin restriction when we want to release this #}
         {% if not current_service.has_permission('broadcast') and current_user.platform_admin %}
           {% call row() %}
-            {{ text_field('Data retention') }}
+            {{ text_field('Data retention period') }}
             {% call field() %}
                 <ul>
                   {% for channel in ['email', 'sms', 'letter'] %}

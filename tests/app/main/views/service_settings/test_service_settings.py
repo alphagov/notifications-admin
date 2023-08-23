@@ -107,7 +107,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
-                "Data retention Email – 7 days Text message – 7 days Letter – 7 days Change data retention",
+                "Data retention period Email – 7 days Text message – 7 days Letter – 7 days Change data retention",
                 "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
@@ -148,7 +148,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
-                "Data retention Email – 7 days Text message – 7 days Letter – 7 days Change data retention",
+                "Data retention period Email – 7 days Text message – 7 days Letter – 7 days Change data retention",
                 "Label Value Action",
                 "Send emails Off Change your settings for sending emails",
                 "Label Value Action",
@@ -1508,7 +1508,7 @@ def test_should_error_if_bad_estimations_given(
     )
     assert (
         normalize_spaces(page.select_one("#volume_sms-error").text)
-        == "Error: Number of text messages must be 2,000,000,000 or less"
+        == "Error: The number of text messages must be 2,000,000,000 or less"
     )
     assert mock_update_service.called is False
 
@@ -1554,7 +1554,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
     assert page.select("input[type=text]")[1].get("value") is None
     assert page.select("input[type=text]")[2]["value"] == "aaaaaaaaaaaaa"
     assert normalize_spaces(page.select_one("#volume_letter-error").text) == (
-        "Error: Number of letters must be a whole number"
+        "Error: Enter the number of letters in digits"
     )
     assert mock_update_service.called is False
 
@@ -3995,7 +3995,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_minute_rate_limit",
             {},
             {"rate_limit": "foo"},
-            "Error: Number of messages must be a whole number",
+            "Error: Enter the number of messages in digits",
             {},
         ),
         (
@@ -4016,14 +4016,14 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_day_message_limit",
             {"notification_type": "email"},
             {"message_limit": "foo"},
-            "Error: Number of emails must be a whole number",
+            "Error: Enter the number of emails in digits",
             {},
         ),
         (
             "main.set_per_day_message_limit",
             {"notification_type": "letter"},
             {"message_limit": "12.34"},
-            "Error: Number of letters must be a whole number",
+            "Error: The number of letters must be a whole number",
             {},
         ),
         (
