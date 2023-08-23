@@ -58,11 +58,10 @@ class ValidGovEmail:
 
 
 class ValidEmail:
-
-    message = "Enter a valid email address"
+    def __init__(self, message="Enter a valid email address"):
+        self.message = message
 
     def __call__(self, form, field):
-
         if not field.data:
             return
 
