@@ -239,7 +239,7 @@ def user_profile_take_part_in_user_research():
         current_user.update(take_part_in_research=form.enabled.data)
         return redirect(url_for(".user_profile"))
 
-    return render_template("views/user-profile/take-part-in-user-research.html", form=form)
+    return render_template("views/user-profile/take-part-in-user-research.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/user-profile/disable-platform-admin-view", methods=["GET", "POST"])
@@ -259,7 +259,7 @@ def user_profile_disable_platform_admin_view():
         session["disable_platform_admin_view"] = not form.enabled.data
         return redirect(url_for(".user_profile"))
 
-    return render_template("views/user-profile/disable-platform-admin-view.html", form=form)
+    return render_template("views/user-profile/disable-platform-admin-view.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/user-profile/security-keys", methods=["GET"])
