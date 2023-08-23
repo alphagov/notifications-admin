@@ -131,7 +131,9 @@ def service_name_change(service_id):
 @main.route("/services/<uuid:service_id>/set-data-retention", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_data_retention(service_id):
-    form = SetServiceDataRetentionForm()
+    days_of_retention = current_service.get_consistent_data_retention_period()
+    form_kwargs = dict(days_of_retention=days_of_retention) if days_of_retention else dict()
+    form = SetServiceDataRetentionForm(**form_kwargs)
     if form.validate_on_submit():
         service_api_client.set_service_data_retention(
             service_id=service_id, days_of_retention=form.days_of_retention.data

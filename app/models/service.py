@@ -1,3 +1,5 @@
+from typing import Optional
+
 from flask import abort, current_app
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
@@ -424,6 +426,14 @@ class Service(JSONModel):
         return next((dr for dr in self.data_retention if dr["notification_type"] == notification_type), {}).get(
             "days_of_retention", current_app.config["ACTIVITY_STATS_LIMIT_DAYS"]
         )
+
+    def get_consistent_data_retention_period(self) -> Optional[int]:
+        """If the service's data retention periods are all the same, returns that period. Otherwise returns None."""
+        return (
+            self.get_days_of_retention("email")
+            == self.get_days_of_retention("sms")
+            == self.get_days_of_retention("letter")
+        ) and self.get_days_of_retention("email")
 
     @property
     def email_branding_id(self):
