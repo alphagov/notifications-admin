@@ -73,7 +73,7 @@ from app.models.branding import (
 )
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
-from app.utils.services import service_has_or_is_expected_to_send_over_x_notifications
+from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
 from app.utils.user import (
     user_has_permissions,
     user_is_gov_user,
@@ -132,7 +132,7 @@ def service_name_change(service_id):
 @main.route("/services/<uuid:service_id>/set-data-retention", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_data_retention(service_id):
-    high_volume_service = service_has_or_is_expected_to_send_over_x_notifications(
+    high_volume_service = service_has_or_is_expected_to_send_x_or_more_notifications(
         current_service, num_notifications=1_000_000
     )
     days_of_retention = current_service.get_consistent_data_retention_period()
