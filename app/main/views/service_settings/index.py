@@ -142,7 +142,7 @@ def service_data_retention(service_id):
         service_api_client.set_service_data_retention(
             service_id=service_id, days_of_retention=form.days_of_retention.data
         )
-        flash(f"WIP: Your service's data retention has been set to {form.days_of_retention.data} days", "default")
+        flash(f"You’ve changed the data retention period to {form.days_of_retention.data} days", "default")
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
