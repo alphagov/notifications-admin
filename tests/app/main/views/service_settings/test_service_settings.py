@@ -107,7 +107,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
-                "Data retention period Email – 7 days Text message – 7 days Letter – 7 days Change data retention",
+                "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
@@ -148,7 +148,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
-                "Data retention period Email – 7 days Text message – 7 days Letter – 7 days Change data retention",
+                "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails Off Change your settings for sending emails",
                 "Label Value Action",
@@ -209,6 +209,48 @@ def test_should_show_overview(
     for index, row in enumerate(expected_rows):
         assert row == " ".join(rows[index].text.split())
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
+
+
+def test_shows_individual_data_retentions_if_different(
+    client_request,
+    mocker,
+    api_user_active,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+):
+    user = create_platform_admin_user()
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        users=[api_user_active["id"]],
+        permissions=[],
+        organisation_id=ORGANISATION_ID,
+        contact_link="contact_us@gov.uk",
+    )
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service_data_retention",
+        return_value=[
+            {
+                "id": str(sample_uuid()),
+                "service_id": str(sample_uuid()),
+                "service_name": "service name",
+                "notification_type": "email",
+                "days_of_retention": 3,
+                "created_at": datetime.now(),
+                "updated_at": None,
+            }
+        ],
+    )
+
+    client_request.login(user, service_one)
+    page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
+
+    assert (
+        "Data retention period Email – 3 days Text message – 7 days Letter – 7 days Change data retention"
+        in normalize_spaces(page.text)
+    )
 
 
 def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
