@@ -149,6 +149,7 @@ def service_data_retention(service_id):
         "views/service-settings/service-data-retention.html",
         form=form,
         high_volume_service=high_volume_service,
+        error_summary_enabled=True,
     )
 
 
