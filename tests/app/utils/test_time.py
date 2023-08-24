@@ -1,7 +1,7 @@
 import pytest
 from freezegun import freeze_time
 
-from app.utils.time import get_current_financial_year, is_less_than_days_ago
+from app.utils.time import get_current_financial_year, is_less_than_days_ago, percentage_through_current_financial_year
 
 
 @pytest.mark.parametrize(
@@ -29,3 +29,18 @@ def test_is_less_than_days_ago(date_from_db, expected_result):
 def test_get_financial_year(datetime_string, financial_year):
     with freeze_time(datetime_string):
         assert get_current_financial_year() == financial_year
+
+
+@pytest.mark.parametrize(
+    "datetime_string, expected_percent",
+    (
+        ("2023-04-01T00:00:00+00:00", 0),
+        ("2023-04-05T00:00:00+00:00", 1),
+        ("2023-10-01T00:00:00+00:00", 50),
+        ("2024-03-01T00:00:00+00:00", 91),
+        ("2024-03-31T11:59:59+00:00", 100),
+    ),
+)
+def test_percentage_through_current_financial_year(datetime_string, expected_percent):
+    with freeze_time(datetime_string):
+        assert percentage_through_current_financial_year() == expected_percent
