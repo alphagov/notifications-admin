@@ -13,6 +13,17 @@
 
 {% block maincolumn_content %}
   <h1 class="govuk-heading-l">Data retention period</h1>
+  {% if single_retention_period %}
+    <p class="govuk-body">Your current data retention period is {{ single_retention_period }} days.</p>
+  {% else %}
+    <p class="govuk-body">Your current data retention period is:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ current_service.get_days_of_retention('email') }} days for {{ 2|message_count_noun("email") }}</li>
+      <li>{{ current_service.get_days_of_retention('sms') }} days for {{ 2|message_count_noun("sms") }}</li>
+      <li>{{ current_service.get_days_of_retention('letter') }} days for {{ 2|message_count_noun("letter") }}</li>
+    </ul>
+  {% endif %}
+
   {% if high_volume_service %}
     <p class="govuk-body">
       <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the team</a>

@@ -135,8 +135,8 @@ def service_data_retention(service_id):
     high_volume_service = service_has_or_is_expected_to_send_x_or_more_notifications(
         current_service, num_notifications=1_000_000
     )
-    days_of_retention = current_service.get_consistent_data_retention_period()
-    form_kwargs = dict(days_of_retention=days_of_retention) if days_of_retention else dict()
+    single_retention_period = current_service.get_consistent_data_retention_period()
+    form_kwargs = dict(days_of_retention=single_retention_period) if single_retention_period else dict()
     form = SetServiceDataRetentionForm(**form_kwargs)
     if not high_volume_service and form.validate_on_submit():
         service_api_client.set_service_data_retention(
@@ -149,6 +149,7 @@ def service_data_retention(service_id):
         "views/service-settings/service-data-retention.html",
         form=form,
         high_volume_service=high_volume_service,
+        single_retention_period=single_retention_period,
         error_summary_enabled=True,
     )
 
