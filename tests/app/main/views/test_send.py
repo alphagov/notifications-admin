@@ -1934,6 +1934,45 @@ def test_send_one_off_letter_redirects_to_right_url(
     )
 
 
+def test_send_one_off_letter_qr_code_placeholder_too_big(
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+    mock_get_service_letter_template_with_qr_placeholder,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mocker,
+):
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    with client_request.session_transaction() as session:
+        session["recipient"] = ""
+        session["placeholders"] = {
+            "address line 1": "foo",
+            "address line 2": "bar",
+            "address line 3": "",
+            "address line 4": "",
+            "address line 5": "",
+            "address line 6": "",
+            "address line 7": "SW1 1AA",
+        }
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        "main.send_one_off_step",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=7,
+        _data={"placeholder_value": "content which makes the QR code too big " * 25},
+        _expected_status=200,
+    )
+
+    assert (
+        normalize_spaces(page.select_one(".govuk-error-message").text)
+        == "Error: Cannot create a usable QR code - the text you entered makes the link too long"
+    )
+
+
 def test_send_one_off_populates_field_from_session(
     client_request,
     mocker,

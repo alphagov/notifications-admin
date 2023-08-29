@@ -2312,6 +2312,34 @@ def test_should_not_create_too_big_template(
     assert "Content has a character count greater than the limit of 459" in page.text
 
 
+def test_should_not_create_letter_template_with_too_big_qr_code(
+    client_request,
+    mock_get_service_template,
+    mock_create_service_template_qr_code_too_big,
+    fake_uuid,
+    service_one,
+):
+    service_one["permissions"].append("letter")
+
+    page = client_request.post(
+        ".add_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_type="letter",
+        _data={
+            "name": "new name",
+            "subject": "subject",
+            "template_content": "qr: " + ("content" * 100),
+            "template_type": "letter",
+            "service": SERVICE_ONE_ID,
+        },
+        _expected_status=200,
+    )
+    assert (
+        normalize_spaces(page.select_one(".error-message").text)
+        == "Cannot create a usable QR code - the link you entered is too long"
+    )
+
+
 def test_should_not_update_too_big_template(
     client_request,
     mock_get_service_template,
@@ -2332,6 +2360,34 @@ def test_should_not_update_too_big_template(
         _expected_status=200,
     )
     assert "Content has a character count greater than the limit of 459" in page.text
+
+
+def test_should_not_edit_letter_template_with_too_big_qr_code(
+    client_request,
+    mock_get_service_template,
+    mock_update_service_template_400_qr_code_too_big,
+    fake_uuid,
+    service_one,
+):
+    service_one["permissions"].append("letter")
+
+    page = client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": "new name",
+            "subject": "subject",
+            "template_content": "qr: " + ("content" * 100),
+            "template_type": "letter",
+            "service": SERVICE_ONE_ID,
+        },
+        _expected_status=200,
+    )
+    assert (
+        normalize_spaces(page.select_one(".error-message").text)
+        == "Cannot create a usable QR code - the link you entered is too long"
+    )
 
 
 @pytest.mark.parametrize(

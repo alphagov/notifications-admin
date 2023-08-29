@@ -464,6 +464,9 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
         template_type=template.template_type,
         allow_international_phone_numbers=current_service.has_permission("international_sms"),
     )
+
+    template.values = template_values
+
     if form.validate_on_submit():
         # if it's the first input (phone/email), we store against `recipient` as well, for easier extraction.
         # Only if it's not a letter.
@@ -473,21 +476,26 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
 
         session["placeholders"][current_placeholder] = form.placeholder_value.data
 
-        if all_placeholders_in_session(placeholders):
-            return get_notification_check_endpoint(service_id, template)
-
-        return redirect(
-            url_for(
-                request.endpoint,
-                service_id=service_id,
-                template_id=template_id,
-                step_index=step_index + 1,
+        template.values[current_placeholder] = form.placeholder_value.data
+        if template.template_type == "letter" and template.has_qr_code_with_too_much_data():
+            form.placeholder_value.errors.append(
+                "Cannot create a usable QR code - the text you entered makes the link too long"
             )
-        )
+
+        else:
+            if all_placeholders_in_session(placeholders):
+                return get_notification_check_endpoint(service_id, template)
+
+            return redirect(
+                url_for(
+                    request.endpoint,
+                    service_id=service_id,
+                    template_id=template_id,
+                    step_index=step_index + 1,
+                )
+            )
 
     back_link = get_back_link(service_id, template, step_index, placeholders)
-
-    template.values = template_values
     template.values[current_placeholder] = None
 
     return render_template(

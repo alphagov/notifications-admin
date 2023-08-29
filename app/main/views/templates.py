@@ -31,6 +31,7 @@ from app import (
     template_folder_api_client,
     template_statistics_client,
 )
+from app.constants import QR_CODE_TOO_LONG
 from app.formatters import character_count, message_count
 from app.main import main, no_cookie
 from app.main.forms import (
@@ -574,6 +575,12 @@ def add_service_template(service_id, template_type, template_folder_id=None):
                 and any(["character count greater than" in x for x in e.message["content"]])
             ):
                 form.template_content.errors.extend(e.message["content"])
+            elif (
+                e.status_code == 400
+                and "content" in e.message
+                and any(x == QR_CODE_TOO_LONG for x in e.message["content"])
+            ):
+                form.template_content.errors.append("Cannot create a usable QR code - the link you entered is too long")
             else:
                 raise e
         else:
@@ -648,6 +655,10 @@ def edit_service_template(service_id, template_id):
             if e.status_code == 400:
                 if "content" in e.message and any(["character count greater than" in x for x in e.message["content"]]):
                     form.template_content.errors.extend(e.message["content"])
+                elif "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
+                    form.template_content.errors.append(
+                        "Cannot create a usable QR code - the link you entered is too long"
+                    )
                 else:
                     raise e
             else:

@@ -34,6 +34,13 @@ def get_errors_for_csv(recipients, template_type):
         else:
             errors.append(f"check you have content for the empty messages in {number_of_rows_with_empty_message} rows")
 
+    if any(recipients.rows_with_bad_qr_codes):
+        number_of_rows_with_bad_qr_codes = len(list(recipients.rows_with_bad_qr_codes))
+        if 1 == number_of_rows_with_bad_qr_codes:
+            errors.append("enter fewer characters for the QR code links in 1 row")
+        else:
+            errors.append(f"enter fewer characters for the QR code links in {number_of_rows_with_bad_qr_codes} rows")
+
     return errors
 
 
