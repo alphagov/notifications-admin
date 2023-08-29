@@ -1967,7 +1967,10 @@ def test_send_one_off_letter_qr_code_placeholder_too_big(
         _expected_status=200,
     )
 
-    assert "Cannot create a usable QR code - the text you entered makes the link too long" in page.text
+    assert (
+        normalize_spaces(page.select_one(".govuk-error-message").text)
+        == "Error: Cannot create a usable QR code - the text you entered makes the link too long"
+    )
 
 
 def test_send_one_off_populates_field_from_session(

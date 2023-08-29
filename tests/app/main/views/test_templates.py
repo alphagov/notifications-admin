@@ -2334,7 +2334,10 @@ def test_should_not_create_letter_template_with_too_big_qr_code(
         },
         _expected_status=200,
     )
-    assert "Cannot create a usable QR code - the link you entered is too long" in page.text
+    assert (
+        normalize_spaces(page.select_one(".error-message").text)
+        == "Cannot create a usable QR code - the link you entered is too long"
+    )
 
 
 def test_should_not_update_too_big_template(
@@ -2381,7 +2384,10 @@ def test_should_not_edit_letter_template_with_too_big_qr_code(
         },
         _expected_status=200,
     )
-    assert "Cannot create a usable QR code - the link you entered is too long" in page.text
+    assert (
+        normalize_spaces(page.select_one(".error-message").text)
+        == "Cannot create a usable QR code - the link you entered is too long"
+    )
 
 
 @pytest.mark.parametrize(
