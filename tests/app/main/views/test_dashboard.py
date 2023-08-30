@@ -1034,7 +1034,7 @@ def test_usage_page_no_sms_spend(
         (
             [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 1_000_000}],
             ".big-number-smallest",
-            8,
+            9,
         ),
         (
             [{"notification_type": "email", "notifications_sent": 999_999_999}],
@@ -1044,7 +1044,7 @@ def test_usage_page_no_sms_spend(
         (
             [{"notification_type": "email", "notifications_sent": 1_000_000_000}],
             ".big-number-smallest",
-            7,
+            8,
         ),
         (
             [{"notification_type": "letter", "notifications_sent": 1, "cost": 999_999}],
@@ -1054,7 +1054,7 @@ def test_usage_page_no_sms_spend(
         (
             [{"notification_type": "letter", "notifications_sent": 1, "cost": 1_000_000}],
             ".big-number-smallest",
-            7,
+            8,
         ),
     ),
 )
