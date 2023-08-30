@@ -429,11 +429,12 @@ class Service(JSONModel):
 
     def get_consistent_data_retention_period(self) -> Optional[int]:
         """If the service's data retention periods are all the same, returns that period. Otherwise returns None."""
-        return (
+        consistent_data_retention = (
             self.get_days_of_retention("email")
             == self.get_days_of_retention("sms")
             == self.get_days_of_retention("letter")
-        ) and self.get_days_of_retention("email")
+        )
+        return self.get_days_of_retention("email") if consistent_data_retention else None
 
     @property
     def email_branding_id(self):

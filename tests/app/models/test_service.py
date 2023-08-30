@@ -105,3 +105,28 @@ def test_has_templates_of_type_includes_folders(
     mocker.patch("app.template_folder_api_client.get_template_folders", return_value=[create_folder(id="something")])
 
     assert Service(service_one).has_templates_of_type("sms")
+
+
+@pytest.mark.parametrize(
+    "retentions, expected_value",
+    (
+        ({}, 7),
+        ({"email": 1, "sms": 1, "letter": 1}, 1),
+        ({"email": 1, "sms": 2, "letter": 3}, None),
+        ({"email": 1}, None),
+        ({"email": 7}, 7),
+    ),
+)
+def test_get_consistent_data_retention_period(
+    mocker,
+    service_one,
+    mock_get_template_folders,
+    retentions,
+    expected_value,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_data_retention",
+        return_value=[{"notification_type": k, "days_of_retention": v} for k, v in retentions.items()],
+    )
+
+    assert Service(service_one).get_consistent_data_retention_period() == expected_value
