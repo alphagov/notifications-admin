@@ -130,7 +130,7 @@ def service_name_change(service_id):
 
 
 @main.route("/services/<uuid:service_id>/set-data-retention", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
+@user_is_platform_admin
 def service_data_retention(service_id):
     high_volume_service = service_has_or_is_expected_to_send_x_or_more_notifications(
         current_service, num_notifications=1_000_000

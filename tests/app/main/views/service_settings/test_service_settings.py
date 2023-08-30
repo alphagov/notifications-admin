@@ -1468,7 +1468,7 @@ class TestServiceDataRetention:
         ),
     )
     def test_shown_guidance_if_declared_over_1mil_notifications_per_year(
-        self, client_request, mocker, notification_volumes, show_guidance
+        self, client_request, platform_admin_user, mocker, notification_volumes, show_guidance
     ):
         for channel, volume in notification_volumes.items():
             mocker.patch(
@@ -1480,6 +1480,7 @@ class TestServiceDataRetention:
         mocker.patch("app.service_api_client.get_service_data_retention", return_value=[])
         mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
 
+        client_request.login(platform_admin_user)
         page = client_request.get("main.service_data_retention", service_id=SERVICE_ONE_ID)
         assert (
             (
@@ -1501,7 +1502,7 @@ class TestServiceDataRetention:
         ),
     )
     def test_shown_guidance_if_sent_over_1mil_notifications_last_year(
-        self, client_request, mocker, notification_volumes, show_guidance
+        self, client_request, platform_admin_user, mocker, notification_volumes, show_guidance
     ):
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
@@ -1529,6 +1530,7 @@ class TestServiceDataRetention:
             ],
         )
 
+        client_request.login(platform_admin_user)
         page = client_request.get("main.service_data_retention", service_id=SERVICE_ONE_ID)
         assert (
             (
@@ -1551,7 +1553,7 @@ class TestServiceDataRetention:
         ),
     )
     def test_shown_guidance_if_predicted_to_send_over_1mil_notifications_this_year(
-        self, client_request, mocker, notification_volumes, show_guidance
+        self, client_request, platform_admin_user, mocker, notification_volumes, show_guidance
     ):
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
@@ -1580,6 +1582,7 @@ class TestServiceDataRetention:
         )
         mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
 
+        client_request.login(platform_admin_user)
         page = client_request.get("main.service_data_retention", service_id=SERVICE_ONE_ID)
         assert (
             (
@@ -1601,7 +1604,7 @@ class TestServiceDataRetention:
         ),
     )
     def test_input_prefilled_if_all_existing_retention_periods_are_the_same(
-        self, client_request, mocker, service_retentions, expected_retention
+        self, client_request, platform_admin_user, mocker, service_retentions, expected_retention
     ):
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
@@ -1628,6 +1631,7 @@ class TestServiceDataRetention:
         mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
         mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
 
+        client_request.login(platform_admin_user)
         page = client_request.get("main.service_data_retention", service_id=SERVICE_ONE_ID)
         assert page.select_one("input[name=days_of_retention]").get("value") == expected_retention
 
@@ -1639,7 +1643,7 @@ class TestServiceDataRetention:
             ("1", "Error: The number of days must be between 3 and 90"),
         ),
     )
-    def test_post_input_validation(self, client_request, mocker, value, expected_error):
+    def test_post_input_validation(self, client_request, platform_admin_user, mocker, value, expected_error):
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
                 f"app.models.service.Service.volume_{channel}",
@@ -1654,6 +1658,7 @@ class TestServiceDataRetention:
         mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
         mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
 
+        client_request.login(platform_admin_user)
         page = client_request.post(
             "main.service_data_retention",
             service_id=SERVICE_ONE_ID,
@@ -1662,7 +1667,7 @@ class TestServiceDataRetention:
         )
         assert expected_error in page.text
 
-    def test_post_updates_volumes_for_all_channels(self, client_request, mocker):
+    def test_post_updates_volumes_for_all_channels(self, client_request, platform_admin_user, mocker):
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
                 f"app.models.service.Service.volume_{channel}",
@@ -1679,6 +1684,7 @@ class TestServiceDataRetention:
         mock_set = mocker.patch("app.service_api_client.set_service_data_retention")
         mock_flash = mocker.patch("app.main.views.service_settings.index.flash")
 
+        client_request.login(platform_admin_user)
         client_request.post(
             "main.service_data_retention",
             service_id=SERVICE_ONE_ID,
