@@ -1,7 +1,7 @@
 {% from "components/big-number.html" import big_number %}
 
-{% set is_high_volume = sms_cost >= 1_000_000 or letter_cost >= 1_000_000 %}
-{% set big_number_kwargs = {"smaller": not is_high_volume, "smallest": is_high_volume} %}
+{% set is_big_spender = sms_cost >= 1_000_000 or letter_cost >= 1_000_000 %}
+{% set big_number_kwargs = {"smaller": not is_big_spender, "smallest": is_big_spender} %}
 
 <div class='govuk-grid-row ajax-block-container'>
   <div class='govuk-grid-column-one-third'>
