@@ -1,0 +1,53 @@
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Data retention period
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class="govuk-heading-l">Data retention period</h1>
+  {% if single_retention_period %}
+    <p class="govuk-body">Your current data retention period is {{ single_retention_period }} days.</p>
+  {% else %}
+    <p class="govuk-body">Your current data retention period is:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ current_service.get_days_of_retention('email') }} days for {{ 2|message_count_noun("email") }}</li>
+      <li>{{ current_service.get_days_of_retention('sms') }} days for {{ 2|message_count_noun("sms") }}</li>
+      <li>{{ current_service.get_days_of_retention('letter') }} days for {{ 2|message_count_noun("letter") }}</li>
+    </ul>
+  {% endif %}
+
+  {% if high_volume_service %}
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the team</a>
+      to change the number of days Notify stores:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>the content of the emails, text messages and letters you send</li>
+      <li>recipient email addresses, mobile numbers and addresses</li>
+    </ul>
+    <p class="govuk-body">You cannot change the data retention period yourself. This is because your service is likely to send over 1 million messages this year.</p>
+    <p class="govuk-body">
+      For security, Notify does not store large amounts of personal data for long periods of time.
+    </p>
+
+  {% else %}
+    <p class="govuk-body">Choose the number of days you want Notify to keep:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>the content of the emails, text messages and letters you send</li>
+      <li>recipient email addresses, mobile numbers and addresses</li>
+    </ul>
+
+    {% call form_wrapper(class='top-gutter') %}
+      {{ form.days_of_retention }}
+      {{ page_footer('Continue') }}
+    {% endcall %}
+  {% endif %}
+{% endblock %}

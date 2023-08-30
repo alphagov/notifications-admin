@@ -107,6 +107,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
+                "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
@@ -147,6 +148,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
+                "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails Off Change your settings for sending emails",
                 "Label Value Action",
@@ -207,6 +209,48 @@ def test_should_show_overview(
     for index, row in enumerate(expected_rows):
         assert row == " ".join(rows[index].text.split())
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
+
+
+def test_shows_individual_data_retentions_if_different(
+    client_request,
+    mocker,
+    api_user_active,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+):
+    user = create_platform_admin_user()
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        users=[api_user_active["id"]],
+        permissions=[],
+        organisation_id=ORGANISATION_ID,
+        contact_link="contact_us@gov.uk",
+    )
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service_data_retention",
+        return_value=[
+            {
+                "id": str(sample_uuid()),
+                "service_id": str(sample_uuid()),
+                "service_name": "service name",
+                "notification_type": "email",
+                "days_of_retention": 3,
+                "created_at": datetime.now(),
+                "updated_at": None,
+            }
+        ],
+    )
+
+    client_request.login(user, service_one)
+    page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
+
+    assert (
+        "Data retention period Email – 3 days Text message – 7 days Letter – 7 days Change data retention"
+        in normalize_spaces(page.text)
+    )
 
 
 def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
@@ -1411,6 +1455,247 @@ def test_non_gov_user_is_told_they_cant_go_live(
     assert len(page.select("main button")) == 0
 
 
+class TestServiceDataRetention:
+    @pytest.mark.parametrize(
+        "notification_volumes, show_guidance",
+        (
+            ({"email": 1_000_000, "sms": 0, "letter": 0}, True),
+            ({"email": 0, "sms": 1_000_000, "letter": 0}, True),
+            ({"email": 0, "sms": 0, "letter": 1_000_000}, True),
+            ({"email": 0, "sms": 500_000, "letter": 500_000}, True),
+            ({"email": 350_000, "sms": 350_000, "letter": 350_000}, True),
+            ({"email": 999_999, "sms": 0, "letter": 0}, False),
+        ),
+    )
+    def test_shown_guidance_if_declared_over_1mil_notifications_per_year(
+        self, client_request, platform_admin_user, mocker, notification_volumes, show_guidance
+    ):
+        for channel, volume in notification_volumes.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch("app.service_api_client.get_service_data_retention", return_value=[])
+        mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
+
+        client_request.login(platform_admin_user)
+        page = client_request.get("main.service_data_retention", service_id=SERVICE_ONE_ID)
+        assert (
+            (
+                "You cannot change the data retention period yourself. "
+                "This is because your service is likely to send over 1 million messages this year."
+            )
+            in page.text
+        ) is show_guidance
+
+    @pytest.mark.parametrize(
+        "notification_volumes, show_guidance",
+        (
+            ({"email": 1_000_000, "sms": 0, "letter": 0}, True),
+            ({"email": 0, "sms": 1_000_000, "letter": 0}, True),
+            ({"email": 0, "sms": 0, "letter": 1_000_000}, True),
+            ({"email": 0, "sms": 500_000, "letter": 500_000}, True),
+            ({"email": 350_000, "sms": 350_000, "letter": 350_000}, True),
+            ({"email": 999_999, "sms": 0, "letter": 0}, False),
+        ),
+    )
+    def test_shown_guidance_if_sent_over_1mil_notifications_last_year(
+        self, client_request, platform_admin_user, mocker, notification_volumes, show_guidance
+    ):
+        for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch("app.service_api_client.get_service_data_retention", return_value=[])
+        mocker.patch(
+            "app.billing_api_client.get_annual_usage_for_service",
+            side_effect=[
+                [
+                    {
+                        "notification_type": channel,
+                        "chargeable_units": volume,
+                        "notifications_sent": volume,
+                        "charged_units": 0,
+                        "rate": 0.0165,
+                        "cost": 0,
+                    }
+                    for channel, volume in notification_volumes.items()
+                ],
+                [],
+            ],
+        )
+
+        client_request.login(platform_admin_user)
+        page = client_request.get("main.service_data_retention", service_id=SERVICE_ONE_ID)
+        assert (
+            (
+                "You cannot change the data retention period yourself. "
+                "This is because your service is likely to send over 1 million messages this year."
+            )
+            in page.text
+        ) is show_guidance
+
+    @pytest.mark.parametrize(
+        "notification_volumes, show_guidance",
+        (
+            ({"email": 500_000, "sms": 0, "letter": 0}, True),
+            ({"email": 0, "sms": 500_000, "letter": 0}, True),
+            ({"email": 0, "sms": 0, "letter": 500_000}, True),
+            ({"email": 0, "sms": 250_000, "letter": 250_000}, True),
+            ({"email": 166_000, "sms": 166_000, "letter": 166_000}, True),
+            ({"email": 250_000, "sms": 0, "letter": 0}, True),
+            ({"email": 249_999, "sms": 0, "letter": 0}, False),
+        ),
+    )
+    def test_shown_guidance_if_predicted_to_send_over_1mil_notifications_this_year(
+        self, client_request, platform_admin_user, mocker, notification_volumes, show_guidance
+    ):
+        for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch("app.service_api_client.get_service_data_retention", return_value=[])
+        mocker.patch(
+            "app.billing_api_client.get_annual_usage_for_service",
+            side_effect=[
+                [],
+                [
+                    {
+                        "notification_type": channel,
+                        "chargeable_units": volume,
+                        "notifications_sent": volume,
+                        "charged_units": 0,
+                        "rate": 0.0165,
+                        "cost": 0,
+                    }
+                    for channel, volume in notification_volumes.items()
+                ],
+            ],
+        )
+        mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
+
+        client_request.login(platform_admin_user)
+        page = client_request.get("main.service_data_retention", service_id=SERVICE_ONE_ID)
+        assert (
+            (
+                "You cannot change the data retention period yourself. "
+                "This is because your service is likely to send over 1 million messages this year."
+            )
+            in page.text
+        ) is show_guidance
+
+    @pytest.mark.parametrize(
+        "service_retentions, expected_retention",
+        (
+            ({}, "7"),
+            ({"email": 3}, None),
+            ({"sms": 3}, None),
+            ({"letter": 3}, None),
+            ({"email": 3, "sms": 3, "letter": 3}, "3"),
+            ({"email": 3, "sms": 5, "letter": 7}, None),
+        ),
+    )
+    def test_input_prefilled_if_all_existing_retention_periods_are_the_same(
+        self, client_request, platform_admin_user, mocker, service_retentions, expected_retention
+    ):
+        for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch(
+            "app.service_api_client.get_service_data_retention",
+            return_value=[
+                {
+                    "id": str(sample_uuid()),
+                    "service_id": str(sample_uuid()),
+                    "service_name": "service name",
+                    "notification_type": channel,
+                    "days_of_retention": retention,
+                    "created_at": datetime.now(),
+                    "updated_at": None,
+                }
+                for channel, retention in service_retentions.items()
+            ],
+        )
+        mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
+        mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
+
+        client_request.login(platform_admin_user)
+        page = client_request.get("main.service_data_retention", service_id=SERVICE_ONE_ID)
+        assert page.select_one("input[name=days_of_retention]").get("value") == expected_retention
+
+    @pytest.mark.parametrize(
+        "value, expected_error",
+        (
+            ("", "Error: Enter a number of days"),
+            ("a", "Error: Enter the number of days in digits"),
+            ("1", "Error: The number of days must be between 3 and 90"),
+        ),
+    )
+    def test_post_input_validation(self, client_request, platform_admin_user, mocker, value, expected_error):
+        for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch(
+            "app.service_api_client.get_service_data_retention",
+            return_value=[],
+        )
+        mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
+        mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
+
+        client_request.login(platform_admin_user)
+        page = client_request.post(
+            "main.service_data_retention",
+            service_id=SERVICE_ONE_ID,
+            _data={"days_of_retention": value},
+            _expected_status=200,
+        )
+        assert expected_error in page.text
+
+    def test_post_updates_volumes_for_all_channels(self, client_request, platform_admin_user, mocker):
+        for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch(
+            "app.service_api_client.get_service_data_retention",
+            return_value=[],
+        )
+        mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
+        mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
+        mock_set = mocker.patch("app.service_api_client.set_service_data_retention")
+        mock_flash = mocker.patch("app.main.views.service_settings.index.flash")
+
+        client_request.login(platform_admin_user)
+        client_request.post(
+            "main.service_data_retention",
+            service_id=SERVICE_ONE_ID,
+            _data={"days_of_retention": "3"},
+        )
+        assert mock_set.call_args_list == [mocker.call(service_id=SERVICE_ONE_ID, days_of_retention=3)]
+        assert mock_flash.call_args_list == [
+            mocker.call("You’ve changed the data retention period to 3 days", "default")
+        ]
+
+
 @pytest.mark.parametrize(
     "volumes, displayed_volumes",
     (
@@ -1506,7 +1791,7 @@ def test_should_error_if_bad_estimations_given(
     )
     assert (
         normalize_spaces(page.select_one("#volume_sms-error").text)
-        == "Error: Number of text messages must be 2,000,000,000 or less"
+        == "Error: The number of text messages must be 2,000,000,000 or less"
     )
     assert mock_update_service.called is False
 
@@ -1552,7 +1837,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
     assert page.select("input[type=text]")[1].get("value") is None
     assert page.select("input[type=text]")[2]["value"] == "aaaaaaaaaaaaa"
     assert normalize_spaces(page.select_one("#volume_letter-error").text) == (
-        "Error: Number of letters must be a whole number"
+        "Error: Enter the number of letters in digits"
     )
     assert mock_update_service.called is False
 
@@ -3993,7 +4278,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_minute_rate_limit",
             {},
             {"rate_limit": "foo"},
-            "Error: Number of messages must be a whole number",
+            "Error: Enter the number of messages in digits",
             {},
         ),
         (
@@ -4014,14 +4299,14 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_day_message_limit",
             {"notification_type": "email"},
             {"message_limit": "foo"},
-            "Error: Number of emails must be a whole number",
+            "Error: Enter the number of emails in digits",
             {},
         ),
         (
             "main.set_per_day_message_limit",
             {"notification_type": "letter"},
             {"message_limit": "12.34"},
-            "Error: Number of letters must be a whole number",
+            "Error: The number of letters must be a whole number",
             {},
         ),
         (

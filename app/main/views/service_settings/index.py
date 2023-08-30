@@ -60,6 +60,7 @@ from app.main.forms import (
     ServiceSwitchChannelForm,
     SetAuthTypeForm,
     SetEmailAuthForUsersForm,
+    SetServiceDataRetentionForm,
     SMSPrefixForm,
     YesNoSettingForm,
 )
@@ -72,6 +73,7 @@ from app.models.branding import (
 )
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
+from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
 from app.utils.user import (
     user_has_permissions,
     user_is_gov_user,
@@ -124,6 +126,31 @@ def service_name_change(service_id):
         "views/service-settings/name.html",
         form=form,
         organisation_type=current_service.organisation_type,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/set-data-retention", methods=["GET", "POST"])
+@user_is_platform_admin
+def service_data_retention(service_id):
+    high_volume_service = service_has_or_is_expected_to_send_x_or_more_notifications(
+        current_service, num_notifications=1_000_000
+    )
+    single_retention_period = current_service.get_consistent_data_retention_period()
+    form_kwargs = dict(days_of_retention=single_retention_period) if single_retention_period else dict()
+    form = SetServiceDataRetentionForm(**form_kwargs)
+    if not high_volume_service and form.validate_on_submit():
+        service_api_client.set_service_data_retention(
+            service_id=service_id, days_of_retention=form.days_of_retention.data
+        )
+        flash(f"You’ve changed the data retention period to {form.days_of_retention.data} days", "default")
+        return redirect(url_for(".service_settings", service_id=service_id))
+
+    return render_template(
+        "views/service-settings/service-data-retention.html",
+        form=form,
+        high_volume_service=high_volume_service,
+        single_retention_period=single_retention_period,
+        error_summary_enabled=True,
     )
 
 

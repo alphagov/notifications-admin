@@ -46,6 +46,31 @@
             )
           }}
         {% endcall %}
+
+        {# TODO: Remove platform admin restriction when we want to release this #}
+        {% if not current_service.has_permission('broadcast') and current_user.platform_admin %}
+          {% call row() %}
+            {{ text_field('Data retention period') }}
+            {% if current_service.get_consistent_data_retention_period() %}
+              {{ text_field(current_service.get_consistent_data_retention_period()|string + ' days') }}
+            {% else %}
+              {% call field() %}
+                  <ul>
+                    {% for channel in ['email', 'sms', 'letter'] %}
+                    <li>{{ channel|format_notification_type }} – {{ current_service.get_days_of_retention(channel) }} days</li>
+                    {% endfor %}
+                  </ul>
+              {% endcall %}
+            {% endif %}
+            {{ edit_field(
+              'Change',
+              url_for('main.service_data_retention', service_id=current_service.id),
+              permissions=['manage_service'],
+              suffix='data retention'
+              )
+            }}
+          {% endcall %}
+        {% endif %}
       {% endcall %}
 
       {% if not current_service.has_permission('broadcast') %}
