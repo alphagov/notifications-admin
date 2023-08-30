@@ -9,6 +9,9 @@
   Usage
 {% endblock %}
 
+{% set is_high_volume = emails_sent >= 1_000_000_000 or sms_cost >= 1_000_000 or letter_cost >= 1_000_000 %}
+{% set big_number_kwargs = {"smaller": not is_high_volume, "smallest": is_high_volume} %}
+
 {% block maincolumn_content %}
 
     {{ page_header('Usage', size='medium') }}
@@ -21,24 +24,24 @@
         <div class='govuk-grid-column-one-third'>
           <h2 class='heading-small'>Emails</h2>
           <div class="keyline-block">
-            {{ big_number(emails_sent, 'sent', smaller=True) }}
+            {{ big_number(emails_sent, 'sent', **big_number_kwargs) }}
             {{ big_number("Unlimited", 'free allowance', smaller=True) }}
           </div>
         </div>
         <div class='govuk-grid-column-one-third'>
           <h2 class='heading-small'>Text messages</h2>
           <div class="keyline-block">
-            {{ big_number(sms_sent, 'sent', smaller=True) }}
-            {{ big_number(sms_free_allowance, 'free allowance', smaller=True) }}
+            {{ big_number(sms_sent, 'sent', **big_number_kwargs) }}
+            {{ big_number(sms_free_allowance, 'free allowance', **big_number_kwargs) }}
             {% if sms_free_allowance > 0 %}
-              {{ big_number(sms_allowance_remaining, 'free allowance remaining', smaller=True) }}
+              {{ big_number(sms_allowance_remaining, 'free allowance remaining', **big_number_kwargs) }}
             {% endif %}
             {% for row in sms_breakdown %}
               {% if row.charged_units > 0 %}
                 {{ big_number(
                   row.charged_units,
                   'at {:.2f} pence per message'.format(row.rate * 100),
-                  smaller=True
+                  **big_number_kwargs
                 ) }}
               {% endif %}
             {% endfor %}
@@ -47,7 +50,7 @@
         <div class='govuk-grid-column-one-third'>
           <h2 class='heading-small'>Letters</h2>
           <div class="keyline-block">
-            {{ big_number(letter_sent, 'sent', smaller=True) }}
+            {{ big_number(letter_sent, 'sent', **big_number_kwargs) }}
           </div>
         </div>
       </div>
@@ -64,7 +67,7 @@
               sms_cost,
               'spent',
               currency="£",
-              smaller=True
+              **big_number_kwargs
             ) }}
           </div>
         </div>
@@ -74,7 +77,7 @@
                 letter_cost,
                 'spent',
                 currency="£",
-                smaller=True
+                **big_number_kwargs
               ) }}
           </div>
         </div>

@@ -1,9 +1,12 @@
 {% from "components/big-number.html" import big_number %}
 
+{% set is_high_volume = sms_cost >= 1_000_000 or letter_cost >= 1_000_000 %}
+{% set big_number_kwargs = {"smaller": not is_high_volume, "smallest": is_high_volume} %}
+
 <div class='govuk-grid-row ajax-block-container'>
   <div class='govuk-grid-column-one-third'>
     <div class="keyline-block">
-      {{ big_number("Unlimited", 'free email allowance', smaller=True) }}
+      {{ big_number("Unlimited", 'free email allowance', **big_number_kwargs) }}
     </div>
   </div>
   <div class='govuk-grid-column-one-third'>
@@ -13,10 +16,10 @@
           sms_cost,
           'spent on text messages',
           currency="£",
-          smaller=True
+          **big_number_kwargs
         ) }}
       {% else %}
-        {{ big_number(sms_allowance_remaining, 'free text messages left', smaller=True) }}
+        {{ big_number(sms_allowance_remaining, 'free text messages left', **big_number_kwargs) }}
       {% endif %}
     </div>
   </div>
@@ -26,7 +29,7 @@
         letter_cost,
         'spent on letters',
         currency="£",
-        smaller=True
+        **big_number_kwargs
       ) }}
     </div>
   </div>
