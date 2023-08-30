@@ -79,11 +79,14 @@ USER root
 RUN echo "Install OS dependencies for test build" && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-			make \
+      sudo \
+      make \
       curl \
-			git && \
+      git && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
+RUN usermod -aG sudo notify
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER notify
 
 ENV HOME=/home/vcap
