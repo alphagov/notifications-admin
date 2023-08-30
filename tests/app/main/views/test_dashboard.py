@@ -1023,6 +1023,65 @@ def test_usage_page_no_sms_spend(
     assert "pence per message" not in sms_column
 
 
+@pytest.mark.parametrize(
+    "annual_usage, expected_css_class, expected_item_count",
+    (
+        (
+            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 999_999}],
+            ".big-number-smaller",
+            9,
+        ),
+        (
+            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 1_000_000}],
+            ".big-number-smallest",
+            8,
+        ),
+        (
+            [{"notification_type": "email", "notifications_sent": 999_999_999}],
+            ".big-number-smaller",
+            8,
+        ),
+        (
+            [{"notification_type": "email", "notifications_sent": 1_000_000_000}],
+            ".big-number-smallest",
+            7,
+        ),
+        (
+            [{"notification_type": "letter", "notifications_sent": 1, "cost": 999_999}],
+            ".big-number-smaller",
+            8,
+        ),
+        (
+            [{"notification_type": "letter", "notifications_sent": 1, "cost": 1_000_000}],
+            ".big-number-smallest",
+            7,
+        ),
+    ),
+)
+@freeze_time("2012-03-31 12:12:12")
+def test_usage_page_font_size(
+    mocker,
+    client_request,
+    mock_get_monthly_usage_for_service,
+    mock_get_free_sms_fragment_limit,
+    annual_usage,
+    expected_css_class,
+    expected_item_count,
+):
+    mocker.patch(
+        "app.billing_api_client.get_annual_usage_for_service",
+        return_value=annual_usage,
+    )
+
+    page = client_request.get(
+        "main.usage",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    totals = page.select(f"#pill-selected-item > .govuk-grid-row {expected_css_class}")
+    assert len(totals) == expected_item_count
+
+
 @freeze_time("2012-03-31 12:12:12")
 def test_usage_page_monthly_breakdown(
     client_request,
@@ -1763,3 +1822,55 @@ def test_service_dashboard_shows_free_allowance(
     usage_text = normalize_spaces(page.select_one("[data-key=usage]").text)
     assert "spent on text messages" not in usage_text
     assert "249,000 free text messages left" in usage_text
+
+
+@pytest.mark.parametrize(
+    "annual_usage, expected_css_class",
+    (
+        (
+            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 999_999}],
+            ".big-number-smaller",
+        ),
+        (
+            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 1_000_000}],
+            ".big-number-smallest",
+        ),
+        (
+            [{"notification_type": "email", "notifications_sent": 999_999_999}],
+            ".big-number-smaller",
+        ),
+        (
+            [{"notification_type": "email", "notifications_sent": 1_000_000_000}],
+            ".big-number-smaller",  # Count of emails not shown on dashboard so doesn’t affect font size
+        ),
+        (
+            [{"notification_type": "letter", "notifications_sent": 1, "cost": 999_999}],
+            ".big-number-smaller",
+        ),
+        (
+            [{"notification_type": "letter", "notifications_sent": 1, "cost": 1_000_000}],
+            ".big-number-smallest",
+        ),
+    ),
+)
+def test_service_dashboard_shows_usage_in_correct_font_size(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_statistics,
+    mock_has_no_jobs,
+    mock_get_free_sms_fragment_limit,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+    annual_usage,
+    expected_css_class,
+):
+    mocker.patch(
+        "app.billing_api_client.get_annual_usage_for_service",
+        return_value=annual_usage,
+    )
+
+    page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
+
+    usage_columns = page.select(f"[data-key=usage] {expected_css_class}")
+    assert len(usage_columns) == 3

@@ -7,6 +7,9 @@
   Usage
 {% endblock %}
 
+{% set is_high_volume = total_emails_sent >= 1_000_000_000 or total_sms_cost >= 1_000_000 or total_letter_cost >= 1_000_000 %}
+{% set big_number_kwargs = {"smaller": not is_high_volume, "smallest": is_high_volume} %}
+
 {% block maincolumn_content %}
 
   <div class="heading-with-aside heading-with-aside--heading-medium">
@@ -27,7 +30,7 @@
         {{ big_number(
           total_emails_sent,
           label='sent',
-          smaller=True
+          **big_number_kwargs
         ) }}
       </div>
     </div>
@@ -38,7 +41,7 @@
           total_sms_cost,
           'spent',
           currency="£",
-          smaller=True
+          **big_number_kwargs
         ) }}
       </div>
     </div>
@@ -49,7 +52,7 @@
           total_letter_cost,
           'spent',
           currency="£",
-          smaller=True
+          **big_number_kwargs
         ) }}
       </div>
     </div>
