@@ -13,6 +13,7 @@
 
 {% block maincolumn_content %}
   <h1 class="govuk-heading-l">Data retention period</h1>
+
   {% if single_retention_period %}
     <p class="govuk-body">Your current data retention period is {{ single_retention_period }} days.</p>
   {% else %}
@@ -24,7 +25,19 @@
     </ul>
   {% endif %}
 
-  {% if high_volume_service %}
+  {% if current_service.trial_mode %}
+    <p class="govuk-body">
+      You cannot change your data retention period while your service is in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a>.
+    </p>
+    <p class="govuk-body">Once your service is live, you can choose the number of days you want Notify to keep:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>the content of the emails, text messages and letters you send</li>
+      <li>recipient email addresses, mobile numbers and addresses</li>
+    </ul>
+
+    <p class="govuk-body">The number of days must be between 3 and 90.</p>
+
+  {% elif high_volume_service %}
     <p class="govuk-body">
       <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the team</a>
       to change the number of days Notify stores:

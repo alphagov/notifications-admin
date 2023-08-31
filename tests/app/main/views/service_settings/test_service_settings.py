@@ -1468,8 +1468,9 @@ class TestServiceDataRetention:
         ),
     )
     def test_shown_guidance_if_declared_over_1mil_notifications_per_year(
-        self, client_request, platform_admin_user, mocker, notification_volumes, show_guidance
+        self, client_request, platform_admin_user, mocker, service_one, notification_volumes, show_guidance
     ):
+        service_one["restricted"] = False
         for channel, volume in notification_volumes.items():
             mocker.patch(
                 f"app.models.service.Service.volume_{channel}",
@@ -1502,8 +1503,9 @@ class TestServiceDataRetention:
         ),
     )
     def test_shown_guidance_if_sent_over_1mil_notifications_last_year(
-        self, client_request, platform_admin_user, mocker, notification_volumes, show_guidance
+        self, client_request, platform_admin_user, mocker, service_one, notification_volumes, show_guidance
     ):
+        service_one["restricted"] = False
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
                 f"app.models.service.Service.volume_{channel}",
@@ -1553,8 +1555,9 @@ class TestServiceDataRetention:
         ),
     )
     def test_shown_guidance_if_predicted_to_send_over_1mil_notifications_this_year(
-        self, client_request, platform_admin_user, mocker, notification_volumes, show_guidance
+        self, client_request, platform_admin_user, mocker, service_one, notification_volumes, show_guidance
     ):
+        service_one["restricted"] = False
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
                 f"app.models.service.Service.volume_{channel}",
@@ -1592,6 +1595,55 @@ class TestServiceDataRetention:
             in page.text
         ) is show_guidance
 
+    def test_shown_guidance_if_service_is_in_trial_mode(self, client_request, platform_admin_user, mocker, service_one):
+        service_one["restricted"] = True
+        for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch("app.service_api_client.get_service_data_retention", return_value=[])
+        mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
+        mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
+
+        client_request.login(platform_admin_user)
+        page = client_request.get("main.service_data_retention", service_id=SERVICE_ONE_ID)
+        assert (
+            normalize_spaces("You cannot change your data retention period while your service is in trial mode.")
+            in page.text
+        )
+
+    def test_post_from_trial_mode_service_does_not_change_retention(
+        self, client_request, platform_admin_user, mocker, service_one
+    ):
+        service_one["restricted"] = True
+        for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch("app.service_api_client.get_service_data_retention", return_value=[])
+        mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
+        mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
+        mock_set = mocker.patch("app.service_api_client.set_service_data_retention")
+
+        client_request.login(platform_admin_user)
+        page = client_request.post(
+            "main.service_data_retention",
+            service_id=SERVICE_ONE_ID,
+            _data={"days_of_retention": 10},
+            _expected_status=200,
+        )
+        assert mock_set.call_args_list == []
+        assert (
+            normalize_spaces("You cannot change your data retention period while your service is in trial mode.")
+            in page.text
+        )
+
     @pytest.mark.parametrize(
         "service_retentions, expected_retention",
         (
@@ -1604,8 +1656,9 @@ class TestServiceDataRetention:
         ),
     )
     def test_input_prefilled_if_all_existing_retention_periods_are_the_same(
-        self, client_request, platform_admin_user, mocker, service_retentions, expected_retention
+        self, client_request, platform_admin_user, mocker, service_one, service_retentions, expected_retention
     ):
+        service_one["restricted"] = False
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
                 f"app.models.service.Service.volume_{channel}",
@@ -1643,7 +1696,10 @@ class TestServiceDataRetention:
             ("1", "Error: The number of days must be between 3 and 90"),
         ),
     )
-    def test_post_input_validation(self, client_request, platform_admin_user, mocker, value, expected_error):
+    def test_post_input_validation(
+        self, client_request, platform_admin_user, mocker, value, expected_error, service_one
+    ):
+        service_one["restricted"] = False
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
                 f"app.models.service.Service.volume_{channel}",
@@ -1667,7 +1723,8 @@ class TestServiceDataRetention:
         )
         assert expected_error in page.text
 
-    def test_post_updates_volumes_for_all_channels(self, client_request, platform_admin_user, mocker):
+    def test_post_updates_volumes_for_all_channels(self, client_request, platform_admin_user, mocker, service_one):
+        service_one["restricted"] = False
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
             mocker.patch(
                 f"app.models.service.Service.volume_{channel}",
