@@ -139,17 +139,34 @@
         });
       };
 
-      this.expandOrCollapseSection = function (state) {
+      this.toggleFormSubmit = function () {
+        const $formSubmitButton = this.$component.closest('form').find('.govuk-button:not([type=button])').eq(0);
+
+        if ($formSubmitButton.attr('hidden') === undefined) {
+          $formSubmitButton
+            .hide() // needed to stop the `display` property overriding `hidden`
+            .attr('hidden', '');
+        } else {
+          $formSubmitButton
+            .show() // needed to stop the `display` property overriding `hidden`
+            .removeAttr('hidden', '');
+        }
+      };
+
+      this.toggleExpandingSection = function () {
         const expander = this.$component.find('.radio-select__expander').get(0);
         const expandee = this.$component.find('.radio-select__expandee').get(0);
+        const isExpanded = expander.getAttribute('aria-expanded') === 'true';
 
-        if (state === 'expand') {
-          expander.setAttribute('aria-expanded', 'true');
-          expandee.removeAttribute('hidden');
-        } else {
+        if (isExpanded) {
           expander.setAttribute('aria-expanded', 'false');
           expandee.setAttribute('hidden', '');
+        } else {
+          expander.setAttribute('aria-expanded', 'true');
+          expandee.removeAttribute('hidden');
         }
+
+        this.toggleFormSubmit();
       };
 
       this.updateSelection = function () {
@@ -166,7 +183,7 @@
 
         // reset state of expanding section for selecting a day + time
         this.showDaysView();
-        this.expandOrCollapseSection('collapse');
+        this.toggleExpandingSection();
         this.updateSelection();
         this.$component.find('.radio-select__selected-day-and-time').focus();
       };
@@ -198,12 +215,9 @@
       };
 
       this.onExpanderClick = function (event) {
-        const isExpanded = event.target.getAttribute('aria-expanded') === 'true';
         event.preventDefault();
 
-        this.expandOrCollapseSection(
-          isExpanded ? 'collapse' : 'expand'
-        );
+        this.toggleExpandingSection();
       };
 
       // uncheck any radios for other days already checked
