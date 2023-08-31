@@ -17,7 +17,7 @@
     <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper() %}
           {%  if thing == "email address" %}
-              {{ form.email_address(param_extensions={"label": {"isPageHeading": True, "classes": "govuk-label--l"}}) }}
+              {{ form.email_address(param_extensions={"label": {"isPageHeading": True, "classes": "govuk-label--l"}}, error_message_with_html=True) }}
           {%  elif thing == "name" %}
               {{ form.new_name(param_extensions={"label": {"isPageHeading": True, "classes": "govuk-label--l"}}) }}
           {%  elif thing == "mobile number" %}
