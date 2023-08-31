@@ -1491,6 +1491,34 @@ class TestServiceDataRetention:
             in page.text
         ) is show_guidance
 
+    def test_post_from_service_that_declared_over_1mil_notifications_per_year_does_not_change_retention(
+        self, client_request, platform_admin_user, mocker, service_one
+    ):
+        service_one["restricted"] = False
+        for channel, volume in {"email": 1_000_000, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch("app.service_api_client.get_service_data_retention", return_value=[])
+        mocker.patch("app.billing_api_client.get_annual_usage_for_service", return_value=[])
+        mock_set = mocker.patch("app.service_api_client.set_service_data_retention")
+
+        client_request.login(platform_admin_user)
+        page = client_request.post(
+            "main.service_data_retention",
+            service_id=SERVICE_ONE_ID,
+            _data={"days_of_retention": 10},
+            _expected_status=200,
+        )
+        assert mock_set.call_args_list == []
+        assert (
+            "You cannot change the data retention period yourself. "
+            "This is because your service is likely to send over 1 million messages this year."
+        ) in page.text
+
     @pytest.mark.parametrize(
         "notification_volumes, show_guidance",
         (
@@ -1541,6 +1569,50 @@ class TestServiceDataRetention:
             )
             in page.text
         ) is show_guidance
+
+    def test_post_from_service_that_sent_over_1mil_notifications_last_year_does_not_change_retention(
+        self, client_request, platform_admin_user, mocker, service_one
+    ):
+        service_one["restricted"] = False
+        for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch("app.service_api_client.get_service_data_retention", return_value=[])
+        mocker.patch(
+            "app.billing_api_client.get_annual_usage_for_service",
+            side_effect=[
+                [
+                    {
+                        "notification_type": "email",
+                        "chargeable_units": 1000000,
+                        "notifications_sent": 1000000,
+                        "charged_units": 0,
+                        "rate": 0.0165,
+                        "cost": 0,
+                    },
+                ],
+                [],
+            ],
+        )
+        mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
+        mock_set = mocker.patch("app.service_api_client.set_service_data_retention")
+
+        client_request.login(platform_admin_user)
+        page = client_request.post(
+            "main.service_data_retention",
+            service_id=SERVICE_ONE_ID,
+            _data={"days_of_retention": 10},
+            _expected_status=200,
+        )
+        assert mock_set.call_args_list == []
+        assert (
+            "You cannot change the data retention period yourself. "
+            "This is because your service is likely to send over 1 million messages this year."
+        ) in page.text
 
     @pytest.mark.parametrize(
         "notification_volumes, show_guidance",
@@ -1594,6 +1666,50 @@ class TestServiceDataRetention:
             )
             in page.text
         ) is show_guidance
+
+    def test_post_from_service_sending_over_1mil_notifications_does_not_change_retention(
+        self, client_request, platform_admin_user, mocker, service_one
+    ):
+        service_one["restricted"] = False
+        for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
+            mocker.patch(
+                f"app.models.service.Service.volume_{channel}",
+                create=True,
+                new_callable=PropertyMock,
+                return_value=volume,
+            )
+        mocker.patch("app.service_api_client.get_service_data_retention", return_value=[])
+        mocker.patch(
+            "app.billing_api_client.get_annual_usage_for_service",
+            side_effect=[
+                [],
+                [
+                    {
+                        "notification_type": "email",
+                        "chargeable_units": 1000000,
+                        "notifications_sent": 1000000,
+                        "charged_units": 0,
+                        "rate": 0.0165,
+                        "cost": 0,
+                    },
+                ],
+            ],
+        )
+        mocker.patch("app.utils.services.percentage_through_current_financial_year", return_value=25)
+        mock_set = mocker.patch("app.service_api_client.set_service_data_retention")
+
+        client_request.login(platform_admin_user)
+        page = client_request.post(
+            "main.service_data_retention",
+            service_id=SERVICE_ONE_ID,
+            _data={"days_of_retention": 10},
+            _expected_status=200,
+        )
+        assert mock_set.call_args_list == []
+        assert (
+            "You cannot change the data retention period yourself. "
+            "This is because your service is likely to send over 1 million messages this year."
+        ) in page.text
 
     def test_shown_guidance_if_service_is_in_trial_mode(self, client_request, platform_admin_user, mocker, service_one):
         service_one["restricted"] = True
