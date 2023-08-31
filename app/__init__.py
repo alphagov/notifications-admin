@@ -273,7 +273,7 @@ def init_app(application):
             "font_paths": font_paths,
         }
 
-    application.url_map.converters["uuid"].to_python = lambda self, value: value
+    application.url_map.converters["uuid"].to_python = lambda self, value: value.lower()
     application.url_map.converters["template_type"] = TemplateTypeConverter
     application.url_map.converters["ticket_type"] = TicketTypeConverter
     application.url_map.converters["letter_file_extension"] = LetterFileExtensionConverter
