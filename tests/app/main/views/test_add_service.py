@@ -301,7 +301,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     [
         ("", "Cannot be empty"),
         (".", "Must include at least two alphanumeric characters"),
-        ("a" * 256, "Service name must be 255 characters or fewer"),
+        ("a" * 256, "Service name cannot be longer than 255 characters"),
     ],
 )
 def test_add_service_fails_if_service_name_fails_validation(

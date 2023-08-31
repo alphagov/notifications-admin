@@ -482,7 +482,7 @@ def test_cannot_register_with_sms_auth_and_missing_mobile_number(
     )
 
     err = page.select_one(".govuk-error-message")
-    assert err.text.strip() == "Error: Cannot be empty"
+    assert err.text.strip() == "Error: Enter a mobile number"
     assert err.attrs["data-error-label"] == "mobile_number"
 
 

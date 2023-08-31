@@ -151,7 +151,7 @@ def test_create_new_organisation_validates(
     [
         ("", "Cannot be empty"),
         ("a", "at least two alphanumeric characters"),
-        ("a" * 256, "Organisation name must be 255 characters or fewer"),
+        ("a" * 256, "Organisation name cannot be longer than 255 characters"),
     ],
 )
 def test_create_new_organisation_fails_with_incorrect_input(
@@ -1773,7 +1773,7 @@ def test_update_organisation_name(
     [
         ("", "Cannot be empty"),
         ("a", "at least two alphanumeric characters"),
-        ("a" * 256, "Organisation name must be 255 characters or fewer"),
+        ("a" * 256, "Organisation name cannot be longer than 255 characters"),
     ],
 )
 def test_update_organisation_with_incorrect_input(

@@ -10,8 +10,10 @@ from notifications_utils.template import BroadcastMessageTemplate
 from orderedset import OrderedSet
 from wtforms import ValidationError
 from wtforms.validators import DataRequired, StopValidation
+from wtforms.validators import Length as WTFormsLength
 
 from app import antivirus_client
+from app.formatters import sentence_case
 from app.main._commonly_used_passwords import commonly_used_passwords
 from app.models.spreadsheet import Spreadsheet
 from app.utils.user import is_gov_user
@@ -56,11 +58,10 @@ class ValidGovEmail:
 
 
 class ValidEmail:
-
-    message = "Enter a valid email address"
+    def __init__(self, message="Enter a valid email address"):
+        self.message = message
 
     def __call__(self, form, field):
-
         if not field.data:
             return
 
@@ -181,8 +182,13 @@ class MustContainAlphanumericCharacters:
 
     regex = re.compile(r".*[a-zA-Z0-9].*[a-zA-Z0-9].*")
 
-    def __init__(self, message="Must include at least two alphanumeric characters"):
-        self.message = message
+    def __init__(self, *, thing=None, message="Must include at least two alphanumeric characters"):
+        if thing:
+            self.message = f"{sentence_case(thing)} must include at least 2 letters or numbers"
+        else:
+            # DEPRECATED - prefer to pass in `thing` instead. When all instances are using `thing,` retire `message`
+            # altogether.
+            self.message = message
 
     def __call__(self, form, field):
         if field.data and not re.match(self.regex, field.data):
@@ -236,3 +242,24 @@ class FileIsVirusFree:
 class NotifyDataRequired(DataRequired):
     def __init__(self, thing):
         super().__init__(message=f"Enter {thing}")
+
+
+class Length(WTFormsLength):
+    def __init__(self, min=-1, max=-1, message=None, thing=None, unit="characters"):
+        super().__init__(min=min, max=max, message=message)
+        self.thing = thing
+        self.unit = unit
+
+        if not self.message:
+            if not self.thing:
+                raise RuntimeError("Must provide `thing` (preferred) unless `message` is explicitly set.")
+
+            if min >= 0 and max >= 0:
+                if min == max:
+                    self.message = f"{sentence_case(thing)} must be {min} {unit} long"
+                else:
+                    self.message = f"{sentence_case(thing)} must be between {min} and {max} {unit} long"
+            elif min >= 0:
+                self.message = f"{sentence_case(thing)} must be at least {min} {unit} long"
+            else:
+                self.message = f"{sentence_case(thing)} cannot be longer than {max} {unit}"

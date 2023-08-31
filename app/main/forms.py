@@ -46,7 +46,6 @@ from wtforms.validators import (
     UUID,
     DataRequired,
     InputRequired,
-    Length,
     NumberRange,
     Optional,
     Regexp,
@@ -68,6 +67,7 @@ from app.main.validators import (
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
     FileIsVirusFree,
+    Length,
     LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
@@ -162,10 +162,15 @@ class RadioField(WTFormsRadioField):
 
 
 def make_email_address_field(label="Email address", *, gov_user: bool, required=True, thing=None):
-
-    validators = [
-        ValidEmail(),
-    ]
+    if thing:
+        validators = [
+            ValidEmail(message=f"Enter {thing} in the correct format, like name@example.gov.uk"),
+        ]
+    else:
+        # FIXME: being deprecated; remove this when all form fields have been transferred across to `thing`.
+        validators = [
+            ValidEmail(),
+        ]
 
     if gov_user:
         validators.append(ValidGovEmail())
@@ -252,23 +257,22 @@ def uk_mobile_number(label="Mobile number"):
     return UKMobileNumber(label, validators=[DataRequired(message="Cannot be empty")])
 
 
-def international_phone_number(label="Mobile number", thing=None):
-    validators_list = []
-    if thing:
-        validators_list.append(NotifyDataRequired(thing=thing))
-    else:
-        validators_list.append(DataRequired(message="Cannot be empty"))
-    return InternationalPhoneNumber(label, validators=validators_list)
+def international_phone_number(label="Mobile number"):
+    return InternationalPhoneNumber(label, validators=[NotifyDataRequired(thing="a mobile number")])
 
 
-def make_password_field(label="Password", thing="a password"):
+def make_password_field(label="Password", thing="a password", validate_length=True):
+    validators = [
+        NotifyDataRequired(thing=thing),
+        CommonlyUsedPassword(message="Choose a password that’s harder to guess"),
+    ]
+
+    if validate_length:
+        validators.insert(1, Length(min=8, max=255, thing=thing))
+
     return GovukPasswordField(
         label,
-        validators=[
-            NotifyDataRequired(thing=thing),
-            Length(8, 255, message="Must be at least 8 characters"),
-            CommonlyUsedPassword(message="Choose a password that’s harder to guess"),
-        ],
+        validators=validators,
     )
 
 
@@ -316,8 +320,7 @@ class SMSCode(GovukTextInputField):
     validators = [
         NotifyDataRequired(thing="your text message code"),
         Regexp(regex=r"^\d+$", message="Numbers only"),
-        Length(min=5, message="Not enough numbers"),
-        Length(max=5, message="Too many numbers"),
+        Length(min=5, max=5, thing="security code", unit="digits"),
     ]
 
     def process_formdata(self, valuelist):
@@ -580,7 +583,7 @@ class RegisterUserForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
     email_address = make_email_address_field(gov_user=True)
     mobile_number = international_phone_number()
-    password = make_password_field()
+    password = make_password_field(thing="your password")
     # always register as sms type
     auth_type = HiddenField("auth_type", default="sms_auth")
 
@@ -625,7 +628,7 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     mobile_number = InternationalPhoneNumber(
         "Mobile number", validators=[NotifyDataRequired(thing="your mobile number")]
     )
-    password = make_password_field()
+    password = make_password_field(thing="your password")
     organisation = HiddenField("organisation")
     email_address = HiddenField("email_address")
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
@@ -1159,7 +1162,7 @@ class RenameServiceForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
-            Length(max=255, message="Service name must be 255 characters or fewer"),
+            Length(max=255, thing="service name"),
         ],
     )
 
@@ -1170,7 +1173,7 @@ class RenameOrganisationForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
-            Length(max=255, message="Organisation name must be 255 characters or fewer"),
+            Length(max=255, thing="organisation name"),
         ],
     )
 
@@ -1285,7 +1288,7 @@ class CreateServiceForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="Cannot be empty"),
             MustContainAlphanumericCharacters(),
-            Length(max=255, message="Service name must be 255 characters or fewer"),
+            Length(max=255, thing="service name"),
         ],
     )
     organisation_type = OrganisationTypeField("Who runs this service?")
@@ -1360,11 +1363,11 @@ class ConfirmPasswordForm(StripWhitespaceForm):
         self.validate_password_func = validate_password_func
         super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
 
-    password = GovukPasswordField("Enter password")
+    password = GovukPasswordField("Enter your password", validators=[NotifyDataRequired(thing="your password")])
 
     def validate_password(self, field):
         if not self.validate_password_func(field.data):
-            raise ValidationError("Invalid password")
+            raise ValidationError("Incorrect password")
 
 
 class NewBroadcastForm(StripWhitespaceForm):
@@ -1528,7 +1531,7 @@ class ForgotPasswordForm(StripWhitespaceForm):
 
 class NewPasswordForm(StripWhitespaceForm):
 
-    new_password = make_password_field(thing="a new password")
+    new_password = make_password_field(thing="your new password")
 
 
 class ChangePasswordForm(StripWhitespaceForm):
@@ -1536,12 +1539,12 @@ class ChangePasswordForm(StripWhitespaceForm):
         self.validate_password_func = validate_password_func
         super(ChangePasswordForm, self).__init__(*args, **kwargs)
 
-    old_password = make_password_field("Current password", thing="your current password")
+    old_password = make_password_field("Current password", thing="your current password", validate_length=False)
     new_password = make_password_field("New password", thing="your new password")
 
     def validate_old_password(self, field):
         if not self.validate_password_func(field.data):
-            raise ValidationError("Invalid password")
+            raise ValidationError("Incorrect password")
 
 
 class CsvUploadForm(StripWhitespaceForm):
@@ -1556,7 +1559,10 @@ class CsvUploadForm(StripWhitespaceForm):
 
 
 class ChangeNameForm(StripWhitespaceForm):
-    new_name = GovukTextInputField("Your name", validators=[DataRequired()])
+    new_name = GovukTextInputField(
+        "Change your name",
+        validators=[NotifyDataRequired(thing="your name")],
+    )
 
 
 class ChangeEmailForm(StripWhitespaceForm):
@@ -1564,7 +1570,11 @@ class ChangeEmailForm(StripWhitespaceForm):
         self.validate_email_func = validate_email_func
         super(ChangeEmailForm, self).__init__(*args, **kwargs)
 
-    email_address = make_email_address_field(gov_user=True)
+    email_address = make_email_address_field(
+        label="Change your email address",
+        thing="an email address",
+        gov_user=True,
+    )
 
     def validate_email_address(self, field):
         # The validate_email_func can be used to call API to check if the email address is already in
@@ -1575,7 +1585,7 @@ class ChangeEmailForm(StripWhitespaceForm):
 
         is_valid = self.validate_email_func(field.data)
         if is_valid:
-            raise ValidationError("The email address is already in use")
+            raise ValidationError("This email address is already in use")
 
 
 class ChangeNonGovEmailForm(ChangeEmailForm):
@@ -1583,7 +1593,9 @@ class ChangeNonGovEmailForm(ChangeEmailForm):
 
 
 class ChangeMobileNumberForm(StripWhitespaceForm):
-    mobile_number = international_phone_number()
+    mobile_number = international_phone_number(
+        label="Change your mobile number",
+    )
 
 
 class ChooseTimeForm(StripWhitespaceForm):
@@ -1737,7 +1749,11 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
             self.url.validators = [DataRequired(), URL(message="Must be a valid URL")]
 
         elif self.contact_details_type.data == "email_address":
-            self.email_address.validators = [DataRequired(), Length(min=5, max=255), ValidEmail()]
+            self.email_address.validators = [
+                DataRequired(),
+                Length(min=5, max=255, thing="email address"),
+                ValidEmail(),
+            ]
 
         elif self.contact_details_type.data == "phone_number":
             # we can't use the existing phone number validation functions here since we want to allow landlines
@@ -1755,7 +1771,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
             self.phone_number.validators = [
                 DataRequired(),
-                Length(min=3, max=20),
+                Length(min=3, max=20, thing="phone number"),
                 valid_non_emergency_phone_number,
             ]
 
@@ -1772,8 +1788,8 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
         "Text message sender",
         validators=[
             DataRequired(message="Cannot be empty"),
-            Length(max=11, message="Enter 11 characters or fewer"),
-            Length(min=3, message="Enter 3 characters or more"),
+            Length(min=3, thing="text message sender"),
+            Length(max=11, thing="text message sender"),
             LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly(),
             DoesNotStartWithDoubleZero(),
         ],
@@ -1823,7 +1839,7 @@ class OnOffSettingForm(StripWhitespaceForm):
 
 class YesNoSettingForm(OnOffSettingForm):
     def __init__(self, name, *args, **kwargs):
-        super().__init__(name, *args, truthy="Yes", falsey="No", **kwargs)
+        super().__init__(name, *args, truthy="Yes", falsey="No", choices_for_error_message="yes or no", **kwargs)
 
 
 class ServiceSwitchChannelForm(OnOffSettingForm):
@@ -2154,7 +2170,7 @@ class CallbackForm(StripWhitespaceForm):
     )
     bearer_token = GovukPasswordField(
         "Bearer token",
-        validators=[DataRequired(message="Cannot be empty"), Length(min=10, message="Must be at least 10 characters")],
+        validators=[DataRequired(message="Cannot be empty"), Length(min=10, thing="the bearer token")],
     )
 
     def validate(self):
@@ -2738,9 +2754,9 @@ class ChangeSecurityKeyNameForm(StripWhitespaceForm):
     security_key_name = GovukTextInputField(
         "Name of key",
         validators=[
-            DataRequired(message="Cannot be empty"),
-            MustContainAlphanumericCharacters(),
-            Length(max=255, message="Name of key must be 255 characters or fewer"),
+            DataRequired(message="Enter a name for this key"),
+            MustContainAlphanumericCharacters(thing="the name of the key"),
+            Length(max=255, thing="the name of the key"),
         ],
     )
 

@@ -636,7 +636,7 @@ def test_should_show_service_name_with_no_prefixing(
     [
         ("", "Cannot be empty"),
         (".", "Must include at least two alphanumeric characters"),
-        ("a" * 256, "Service name must be 255 characters or fewer"),
+        ("a" * 256, "Service name cannot be longer than 255 characters"),
     ],
 )
 def test_service_name_change_fails_if_new_name_fails_validation(
@@ -2558,7 +2558,7 @@ def test_incorrect_letter_contact_block_input(
         ("elevenchars", None),
         ("11 chars", None),
         ("", "Cannot be empty"),
-        ("abcdefghijkhgkg", "Enter 11 characters or fewer"),
+        ("abcdefghijkhgkg", "Text message sender cannot be longer than 11 characters"),
         (r" ¯\_(ツ)_/¯ ", "Use letters and numbers only"),
         ("blood.co.uk", None),
         ("00123", "Cannot start with 00"),
@@ -2603,7 +2603,7 @@ def test_incorrect_sms_sender_input_with_multiple_errors_only_shows_the_first(
     error_message = page.select_one(".govuk-error-message")
     count_of_api_calls = len(mock_add_sms_sender.call_args_list)
 
-    assert normalize_spaces(error_message.text) == "Error: Enter 3 characters or more"
+    assert normalize_spaces(error_message.text) == "Error: Text message sender must be at least 3 characters long"
     assert count_of_api_calls == 0
 
 
