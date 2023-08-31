@@ -49,7 +49,9 @@ class ValidGovEmail:
 
         message = """
             Enter a public sector email address or
-            <a class="govuk-link govuk-link--no-visited-state" href="{}">find out who can use Notify</a>
+            <a class="govuk-link govuk-link--no-visited-state notify-link--error" href="{}">
+            find out who can use Notify
+            </a>
         """.format(
             url_for("main.guidance_who_can_use_notify")
         )

@@ -4,6 +4,7 @@
 // Based on the error colour in:
 // https://github.com/alphagov/govuk-frontend/blob/v4.2.0/src/govuk/settings/_colours-applied.scss
 // with :hover and :active variants based on those for links
+$notify-error-link-colour: $govuk-error-colour;
 $govuk-destructive-link-colour: $govuk-error-colour;
 $govuk-destructive-link-hover-colour: #990a00;
 $govuk-destructive-link-active-colour: $govuk-text-colour;
@@ -57,6 +58,14 @@ $govuk-destructive-link-active-colour: $govuk-text-colour;
 
 .govuk-link--destructive {
   @include govuk-link-style-destructive-no-visited-state;
+}
+
+.notify-link--error {
+  color: $notify-error-link-colour;
+
+  &:visited, &:link, &:hover {
+    color: $notify-error-link-colour;
+  }
 }
 
 // GOVUK Frontend's grid-column classes are built from the $govuk-grid-widths map
