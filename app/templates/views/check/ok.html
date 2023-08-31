@@ -40,6 +40,7 @@
       {% if _choose_time_form and template.template_type != 'letter' %}
         {{ _choose_time_form.scheduled_for(param_extensions={
           'formGroup': {'classes': 'bottom-gutter-2-3'},
+          'classes': 'radio-select',
           'attributes': {
             'data-notify-module': 'radio-select',
             'data-days': _choose_time_form.scheduled_for.days|join(','),

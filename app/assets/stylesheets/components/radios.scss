@@ -5,11 +5,17 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 
 .radio-select {
   min-height: 39px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .radio-select__selection-and-button {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
+  padding: 3px 3px 4px;
+  border: solid 3px $govuk-input-border-colour;
+  @include govuk-responsive-margin(6, "bottom");
 }
 
 .radio-select__selected-day-and-time {
@@ -23,7 +29,8 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 }
 
 .radio-select__selected-day-and-time {
-  @include govuk-responsive-margin(3, "right");
+  margin: 3px;
+  border: none;
 }
 
 .radio-select__expander::before {
@@ -52,7 +59,6 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 .radio-select__times {
   display: flex;
   flex-direction: column;
-  @include govuk-responsive-margin(6, "bottom");
 }
 
 .radio-select__days:focus-visible,
