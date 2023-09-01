@@ -842,16 +842,18 @@ def test_GET_letter_template_change_language(
     mock_get_service_letter_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
-def test_letter_template_change_language_updates_language(
+def test_POST_letter_template_change_language_updates_language(
     client_request,
     service_one,
     mocker,
     fake_uuid,
+    active_user_with_permissions,
     mock_get_service_letter_template,
 ):
-    mock_template_change_language = mocker.patch(
-        "app.main.views.templates.service_api_client.update_service_template_language"
-    )
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
 
     client_request.post(
         "main.letter_template_change_language",
@@ -864,7 +866,7 @@ def test_letter_template_change_language_updates_language(
             template_id=fake_uuid,
         ),
     )
-    mock_template_change_language.assert_called_with(SERVICE_ONE_ID, fake_uuid, "welsh_then_english")
+    mock_template_change_language.assert_called_with(SERVICE_ONE_ID, fake_uuid, languages="welsh_then_english")
 
 
 def test_GET_letter_template_attach_pages(

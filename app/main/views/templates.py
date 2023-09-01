@@ -1178,6 +1178,12 @@ def letter_template_change_language(template_id, service_id):
 
     form = LetterTemplateLanguagesForm(**template._template)
 
+    if form.validate_on_submit():
+        languages = form.languages.data
+        service_api_client.update_service_template(service_id, template_id, languages=languages)
+
+        return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
+
     return render_template(
         "views/templates/change-language.html",
         form=form,
