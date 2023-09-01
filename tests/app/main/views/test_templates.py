@@ -781,6 +781,35 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
     assert page.select_one("h1", {"data-error-type": "letter-too-long"})
 
 
+def test_view_letter_template_displays_change_language_button(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    single_letter_contact_block,
+    mock_has_jobs,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
+    client_request.login(active_user_with_permissions)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": create_template(template_type="letter")},
+    )
+
+    page = client_request.get(
+        "main.view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one(".change_language").text) == "Change Language"
+
+
 def test_GET_letter_template_attach_pages(
     client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
 ):
