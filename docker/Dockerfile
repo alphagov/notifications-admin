@@ -92,7 +92,7 @@ USER notify
 ENV HOME=/home/vcap
 ENV NVM_DIR /home/vcap/.nvm
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
-ENV PATH $NVM_DIR/v$NODE_VERSION/bin:$PATH
+ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 # Copying to overwrite is faster than RUN chown notify:notify ...
 COPY --from=python_build --chown=notify:notify /opt/venv /opt/venv
