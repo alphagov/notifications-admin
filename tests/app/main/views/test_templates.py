@@ -2115,35 +2115,51 @@ def test_should_redirect_to_one_off_if_template_type_is_letter(
     )
 
 
+@pytest.mark.parametrize(
+    "service_id, template_id",
+    (
+        (
+            SERVICE_ONE_ID,
+            sample_uuid(),
+        ),
+        (
+            SERVICE_ONE_ID.upper(),
+            sample_uuid().upper(),
+        ),
+    ),
+)
 def test_should_redirect_when_saving_a_template(
     client_request,
     mock_get_service_template,
     mock_get_api_keys,
     mock_update_service_template,
-    fake_uuid,
+    service_id,
+    template_id,
 ):
     name = "new name"
     content = "template <em>content</em> with & entity"
     client_request.post(
         ".edit_service_template",
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
+        service_id=service_id,
+        template_id=template_id,
         _data={
-            "id": fake_uuid,
+            "id": template_id,
             "name": name,
             "template_content": content,
             "template_type": "sms",
-            "service": SERVICE_ONE_ID,
+            "service": service_id,
         },
         _expected_status=302,
         _expected_redirect=url_for(
             "main.view_template",
+            # UUIDs are always lowercase here
             service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
+            template_id=sample_uuid(),
         ),
     )
     mock_update_service_template.assert_called_with(
-        template_id=fake_uuid,
+        # UUIDs are always lowercase here
+        template_id=sample_uuid(),
         service_id=SERVICE_ONE_ID,
         name=name,
         content=content,
