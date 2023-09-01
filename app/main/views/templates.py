@@ -887,7 +887,7 @@ def edit_template_postage(service_id, template_id):
     form = LetterTemplatePostageForm(**template._template)
     if form.validate_on_submit():
         postage = form.postage.data
-        service_api_client.update_service_template_postage(service_id, template_id, postage)
+        service_api_client.update_service_template(service_id, template_id, postage=postage)
 
         return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 

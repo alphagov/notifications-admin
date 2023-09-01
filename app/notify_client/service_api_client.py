@@ -9,6 +9,7 @@ ALLOWED_TEMPLATE_ATTRIBUTES = {
     "content",
     "languages",
     "name",
+    "postage",
     "subject",
 }
 
@@ -217,11 +218,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         }
         data = _attach_current_user(data)
         return self.post(f"/service/{service_id}/template/{template_id}", data)
-
-    @cache.delete("service-{service_id}-templates")
-    @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
-    def update_service_template_postage(self, service_id, template_id, postage):
-        return self.post(f"/service/{service_id}/template/{template_id}", _attach_current_user({"postage": postage}))
 
     @cache.set("service-{service_id}-template-{template_id}-version-{version}")
     def get_service_template(self, service_id, template_id, version=None):

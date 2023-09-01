@@ -1294,9 +1294,7 @@ def test_edit_letter_templates_postage_updates_postage(
     fake_uuid,
     mock_get_service_letter_template,
 ):
-    mock_update_template_postage = mocker.patch(
-        "app.main.views.templates.service_api_client.update_service_template_postage"
-    )
+    mock_update_template_postage = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
 
     client_request.post(
         "main.edit_template_postage",
@@ -1304,7 +1302,7 @@ def test_edit_letter_templates_postage_updates_postage(
         template_id=fake_uuid,
         _data={"postage": "first"},
     )
-    mock_update_template_postage.assert_called_with(SERVICE_ONE_ID, fake_uuid, "first")
+    mock_update_template_postage.assert_called_with(SERVICE_ONE_ID, fake_uuid, postage="first")
 
 
 @pytest.mark.parametrize(
