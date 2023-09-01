@@ -842,7 +842,7 @@ def test_GET_letter_template_change_language(
     mock_get_service_letter_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
-def test_POST_letter_template_change_language_updates_language(
+def test_letter_template_change_language_to_welsh_then_english_populates_default_welsh_content_and_subject(
     client_request,
     service_one,
     mocker,
@@ -866,7 +866,13 @@ def test_POST_letter_template_change_language_updates_language(
             template_id=fake_uuid,
         ),
     )
-    mock_template_change_language.assert_called_with(SERVICE_ONE_ID, fake_uuid, languages="welsh_then_english")
+    mock_template_change_language.assert_called_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        languages="welsh_then_english",
+        welsh_subject="Templed llythyr di-deitl",
+        welsh_content="Cynnwys templed",
+    )
 
 
 def test_letter_template_change_language_404s_if_template_is_not_a_letter(
