@@ -807,7 +807,38 @@ def test_view_letter_template_displays_change_language_button(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one(".change-language").text) == "Change language"
+    change_language_button = page.select_one(".change-language")
+
+    assert normalize_spaces(change_language_button.text) == "Change language"
+
+    assert change_language_button["href"] == url_for(
+        "main.letter_template_change_language", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
+    )
+
+
+def test_GET_letter_template_change_language(
+    client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
+):
+    page = client_request.get(
+        "main.letter_template_change_language",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert page.select_one("h1").text.strip() == "Change language"
+
+    assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
+        "English",
+        "Welsh, then English",
+    ]
+    assert [radio["value"] for radio in page.select(".govuk-radios__item input")] == [
+        "english",
+        "welsh_then_english",
+    ]
+
+    assert page.select("form button")
+
+    mock_get_service_letter_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
 def test_GET_letter_template_attach_pages(
