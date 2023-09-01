@@ -228,6 +228,7 @@ class MainNavigation(Navigation):
             "edit_service_template",
             "edit_template_postage",
             "letter_template_attach_pages",
+            "letter_template_change_language",
             "manage_template_folder",
             "send_messages",
             "send_one_off",

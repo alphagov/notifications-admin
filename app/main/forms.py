@@ -1502,6 +1502,17 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
     )
 
 
+class LetterTemplateLanguagesForm(StripWhitespaceForm):
+    languages = GovukRadiosField(
+        "This will change the language used for the date and page numbers of your letter template.",
+        choices=[
+            ("english", "English only"),
+            ("welsh_then_english", "Welsh followed by English"),
+        ],
+        validators=[DataRequired()],
+    )
+
+
 class LetterUploadPostageForm(StripWhitespaceForm):
     def __init__(self, *args, postage_zone, **kwargs):
         super().__init__(*args, **kwargs)

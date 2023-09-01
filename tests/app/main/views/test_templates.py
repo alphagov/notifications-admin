@@ -795,30 +795,31 @@ def test_view_letter_template_displays_change_language_button(
     service_one["permissions"].append("extra_letter_formatting")
     mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
     client_request.login(active_user_with_permissions)
+    template_id = fake_uuid
     mocker.patch(
         "app.service_api_client.get_service_template",
-        return_value={"data": create_template(template_type="letter")},
+        return_value={"data": create_template(template_type="letter", template_id=template_id)},
     )
-
     page = client_request.get(
         "main.view_template",
         service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
+        template_id=template_id,
         _test_page_title=False,
     )
 
     change_language_button = page.select_one(".change-language")
 
     assert normalize_spaces(change_language_button.text) == "Change language"
-
     assert change_language_button["href"] == url_for(
-        "main.letter_template_change_language", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
+        "main.letter_template_change_language", service_id=SERVICE_ONE_ID, template_id=template_id
     )
 
 
 def test_GET_letter_template_change_language(
-    client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
+    client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template, active_user_with_permissions
 ):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
     page = client_request.get(
         "main.letter_template_change_language",
         service_id=SERVICE_ONE_ID,
@@ -828,8 +829,8 @@ def test_GET_letter_template_change_language(
     assert page.select_one("h1").text.strip() == "Change language"
 
     assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
-        "English",
-        "Welsh, then English",
+        "English only",
+        "Welsh followed by English",
     ]
     assert [radio["value"] for radio in page.select(".govuk-radios__item input")] == [
         "english",

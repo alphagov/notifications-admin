@@ -38,6 +38,7 @@ from app.main.forms import (
     BroadcastTemplateForm,
     EmailTemplateForm,
     LetterTemplateForm,
+    LetterTemplateLanguagesForm,
     LetterTemplatePostageForm,
     PDFUploadForm,
     SearchTemplatesForm,
@@ -63,6 +64,7 @@ from app.template_previews import (
 )
 from app.utils import (
     NOTIFICATION_TYPES,
+    service_has_permission,
     should_skip_template_page,
 )
 from app.utils.letters import (
@@ -1163,3 +1165,21 @@ def view_invalid_letter_attachment_as_preview(service_id, file_id):
 
 def _get_page_numbers(page_count):
     return [*range(1, page_count + 1)]
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/change-language", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+@service_has_permission("extra_letter_formatting")
+def letter_template_change_language(template_id, service_id):
+    template = current_service.get_template(template_id)
+
+    if template.template_type != "letter":
+        abort(404)
+
+    form = LetterTemplateLanguagesForm(**template._template)
+
+    return render_template(
+        "views/templates/change-language.html",
+        form=form,
+        template=template,
+    )
