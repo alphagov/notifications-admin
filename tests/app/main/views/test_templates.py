@@ -842,6 +842,31 @@ def test_GET_letter_template_change_language(
     mock_get_service_letter_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
+def test_letter_template_change_language_updates_language(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    mock_get_service_letter_template,
+):
+    mock_template_change_language = mocker.patch(
+        "app.main.views.templates.service_api_client.update_service_template_language"
+    )
+
+    client_request.post(
+        "main.letter_template_change_language",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"languages": "welsh_then_english"},
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_template_change_language.assert_called_with(SERVICE_ONE_ID, fake_uuid, "welsh_then_english")
+
+
 def test_GET_letter_template_attach_pages(
     client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
 ):
