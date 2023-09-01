@@ -869,6 +869,23 @@ def test_POST_letter_template_change_language_updates_language(
     mock_template_change_language.assert_called_with(SERVICE_ONE_ID, fake_uuid, languages="welsh_then_english")
 
 
+def test_letter_template_change_language_404s_if_template_is_not_a_letter(
+    client_request,
+    service_one,
+    mock_get_service_template,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        "main.letter_template_change_language", service_id=SERVICE_ONE_ID, template_id=fake_uuid, _expected_status=404
+    )
+
+    assert page.select_one("h1").text.strip() != "Change language"
+
+
 def test_GET_letter_template_attach_pages(
     client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
 ):
