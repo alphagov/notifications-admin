@@ -807,7 +807,7 @@ def test_view_letter_template_displays_change_language_button(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one(".change_language").text) == "Change Language"
+    assert normalize_spaces(page.select_one(".change-language").text) == "Change language"
 
 
 def test_GET_letter_template_attach_pages(
