@@ -5,13 +5,7 @@ from notifications_utils.clients.redis import daily_limit_cache_key
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
-ALLOWED_TEMPLATE_ATTRIBUTES = {
-    "content",
-    "languages",
-    "name",
-    "postage",
-    "subject",
-}
+ALLOWED_TEMPLATE_ATTRIBUTES = {"content", "languages", "name", "postage", "subject", "welsh_subject", "welsh_content"}
 
 
 class ServiceAPIClient(NotifyAdminAPIClient):

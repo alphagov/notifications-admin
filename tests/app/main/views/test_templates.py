@@ -870,8 +870,8 @@ def test_letter_template_change_language_to_welsh_then_english_populates_default
         SERVICE_ONE_ID,
         fake_uuid,
         languages="welsh_then_english",
-        welsh_subject="Templed llythyr di-deitl",
-        welsh_content="Cynnwys templed",
+        welsh_subject="Welsh subject line goes here",
+        welsh_content="Welsh content goes here",
     )
 
 

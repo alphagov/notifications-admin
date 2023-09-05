@@ -1180,7 +1180,14 @@ def letter_template_change_language(template_id, service_id):
 
     if form.validate_on_submit():
         languages = form.languages.data
-        service_api_client.update_service_template(service_id, template_id, languages=languages)
+        welsh_subject = ""
+        welsh_content = ""
+        if languages == "welsh_then_english":
+            welsh_subject = "Welsh subject line goes here"
+            welsh_content = "Welsh content goes here"
+        service_api_client.update_service_template(
+            service_id, template_id, languages=languages, welsh_subject=welsh_subject, welsh_content=welsh_content
+        )
 
         return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
