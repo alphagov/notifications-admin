@@ -71,7 +71,7 @@ def test_client_creates_service_with_correct_data(
         1,
         True,
         fake_uuid,
-        "test@example.com",
+        "some.test.name",
     )
     mock_post.assert_called_once_with(
         "/service",
@@ -88,7 +88,8 @@ def test_client_creates_service_with_correct_data(
             letter_message_limit=1,
             restricted=True,
             user_id=fake_uuid,
-            email_from="test@example.com",
+            email_from="some.test.name",
+            normalised_service_name="some.test.name",
         ),
     )
 
@@ -154,7 +155,6 @@ def test_client_returns_count_of_service_templates(
     extra_args,
     expected_count,
 ):
-
     mocker.patch("app.service_api_client.get_service_templates", return_value={"data": template_data})
 
     assert service_api_client.count_service_templates(SERVICE_ONE_ID, **extra_args) == expected_count
@@ -339,7 +339,6 @@ def test_returns_value_from_cache(
     expected_api_calls,
     expected_cache_set_calls,
 ):
-
     mock_redis_get = mocker.patch(
         "app.extensions.RedisClient.get",
         return_value=cache_value,
@@ -579,7 +578,7 @@ def test_client_updates_service_with_allowed_attributes(
         "contact_link",
         "count_as_live",
         "email_branding",
-        "email_from",
+        "normalised_service_name",
         "free_sms_fragment_limit",
         "go_live_at",
         "go_live_user",
@@ -613,6 +612,10 @@ def test_client_updates_service_with_allowed_attributes(
         ({"name": "Service name error"}, "This service name is already in use"),
         (
             {"email_from": "email_from disallowed characters"},
+            "Service name must not include characters from a non-Latin alphabet",
+        ),
+        (
+            {"normalised_service_name": "normalised service name has disallowed characters"},
             "Service name must not include characters from a non-Latin alphabet",
         ),
         ({"other": "blah"}, None),

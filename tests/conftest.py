@@ -604,14 +604,14 @@ def mock_create_service(mocker):
         letter_message_limit,
         restricted,
         user_id,
-        email_from,
+        normalised_service_name,
     ):
         service = service_json(
             101,
             service_name,
             [user_id],
             restricted=restricted,
-            email_from=email_from,
+            normalised_service_name=normalised_service_name,
             email_message_limit=email_message_limit,
             sms_message_limit=sms_message_limit,
             letter_message_limit=letter_message_limit,
@@ -638,7 +638,7 @@ def mock_update_service(mocker):
                     "email_message_limit",
                     "letter_message_limit",
                     "restricted",
-                    "email_from",
+                    "normalised_service_name",
                     "sms_sender",
                     "permissions",
                 ]

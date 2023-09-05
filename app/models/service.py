@@ -24,7 +24,6 @@ from app.utils.templates import get_template
 
 
 class Service(JSONModel):
-
     ALLOWED_PROPERTIES = {
         "active",
         "allowed_broadcast_provider",
@@ -44,6 +43,7 @@ class Service(JSONModel):
         "letter_message_limit",
         "rate_limit",
         "name",
+        "normalised_service_name",
         "notes",
         "prefix_sms",
         "purchase_order_number",
@@ -111,7 +111,6 @@ class Service(JSONModel):
         )
 
     def force_permission(self, permission, on=False):
-
         permissions, permission = set(self.permissions), {permission}
 
         return self.update_permissions(
@@ -193,7 +192,6 @@ class Service(JSONModel):
         )
 
     def get_team_member(self, user_id):
-
         if str(user_id) not in {user.id for user in self.active_users}:
             abort(404)
 
@@ -201,7 +199,6 @@ class Service(JSONModel):
 
     @cached_property
     def all_templates(self):
-
         templates = service_api_client.get_service_templates(self.id)["data"]
 
         return [template for template in templates if template["template_type"] in self.available_template_types]
@@ -517,7 +514,6 @@ class Service(JSONModel):
         return self._get_by_id(self.all_template_folders, folder_id)
 
     def get_template_folder_path(self, template_folder_id):
-
         folder = self.get_template_folder(template_folder_id)
 
         if folder["id"] is None:
@@ -535,7 +531,6 @@ class Service(JSONModel):
         return len(self.all_templates + self.all_template_folders)
 
     def move_to_folder(self, ids_to_move, move_to):
-
         ids_to_move = set(ids_to_move)
 
         template_folder_api_client.move_to_folder(

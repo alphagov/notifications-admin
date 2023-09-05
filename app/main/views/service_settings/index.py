@@ -105,11 +105,12 @@ def service_name_change(service_id):
     form = RenameServiceForm(name=current_service.name)
 
     if form.validate_on_submit():
-
         try:
+            normalised_service_name = email_safe(form.name.data)
             current_service.update(
                 name=form.name.data,
-                email_from=email_safe(form.name.data),
+                email_from=normalised_service_name,
+                normalised_service_name=normalised_service_name,
             )
         except HTTPError as http_error:
             if http_error.status_code == 400:
@@ -157,7 +158,6 @@ def service_data_retention(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/request-to-go-live/estimate-usage", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def estimate_usage(service_id):
-
     form = EstimateUsageForm(
         volume_email=current_service.volume_email,
         volume_sms=current_service.volume_sms,
@@ -243,7 +243,6 @@ def service_switch_live(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/switch-count-as-live", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_switch_count_as_live(service_id):
-
     form = YesNoSettingForm(
         name="Count in list of live services",
         enabled=current_service.count_as_live,
@@ -655,7 +654,6 @@ def service_set_inbound_number(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/sms-prefix", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_sms_prefix(service_id):
-
     form = SMSPrefixForm(enabled=current_service.prefix_sms)
 
     form.enabled.label.text = f"Start all text messages with ‘{current_service.name}:’"
@@ -757,7 +755,6 @@ def service_set_letters(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/set-<channel>", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_channel(service_id, channel):
-
     if channel not in {"email", "sms", "letter"}:
         abort(404)
 
@@ -1079,7 +1076,6 @@ def set_per_day_message_limit(service_id, notification_type):
 @main.route("/services/<uuid:service_id>/service-settings/set-rate-limit", methods=["GET", "POST"])
 @user_is_platform_admin
 def set_per_minute_rate_limit(service_id):
-
     form = AdminServiceRateLimitForm(rate_limit=current_service.rate_limit)
 
     if form.validate_on_submit():
@@ -1236,7 +1232,6 @@ def service_preview_branding(service_id, notification_type):
 @main.route("/services/<uuid:service_id>/service-settings/link-service-to-organisation", methods=["GET", "POST"])
 @user_is_platform_admin
 def link_service_to_organisation(service_id):
-
     all_organisations = organisations_client.get_organisations()
 
     form = AdminSetOrganisationForm(
@@ -1299,7 +1294,6 @@ def edit_service_notes(service_id):
     form = AdminNotesForm(notes=current_service.notes)
 
     if form.validate_on_submit():
-
         if form.notes.data == current_service.notes:
             return redirect(url_for(".service_settings", service_id=service_id))
 
