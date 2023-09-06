@@ -13,6 +13,7 @@ errorlog = "/home/vcap/logs/gunicorn_error.log"
 bind = f"0.0.0.0:{os.getenv('PORT')}"
 disable_redirect_access_to_syslog = True
 gunicorn.SERVER_SOFTWARE = "None"
+keepalive = 90
 
 
 def worker_abort(worker):
