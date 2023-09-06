@@ -12,32 +12,50 @@
   <h1 class="heading-large">Using Notify</h1>
 
   <p class="govuk-body">This information is for teams using GOV.UK Notify to send emails, text messages and letters.</p>
+  <p class="govuk-body">If you need to integrate with the GOV.UK Notify API, read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API documentation</a>.</p>
 
-  <h2 class="heading-medium">Help and guidance</h2>
+  <h2 class="heading-medium">Send and receive messages</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API documentation</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">Attach pages to a letter template</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_templates') }}">Templates</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">Bulk sending</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_delivery_times') }}">Delivery times</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_email_branding') }}">Email branding</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_formatting') }}">Formatting emails and letters</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_letter_branding') }}">Letter branding</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_links_and_URLs') }}">Links and URLs</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_message_status') }}">Message status</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_optional_content') }}">Optional content</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_personalisation') }}">Personalisation</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_receive_text_messages') }}">Receive text messages</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_reply_to_email_address') }}">Reply-to email address</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_schedule_messages') }}">Schedule emails and text messages</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_send_files_by_email') }}">Send files by email</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_team_members_and_permissions') }}">Team members and permissions</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_templates') }}">Templates</a></li>
+     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_schedule_messages') }}">Schedule emails and text messages</a></li>
+  </ul>
+
+   <h2 class="heading-medium">Formatting</h2>
+
+   <ul class="govuk-list govuk-list--bullet">
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_formatting') }}">Formatting emails and letters</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_links_and_URLs') }}">Links and URLs</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_optional_content') }}">Optional content</a></li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_personalisation') }}">Personalisation</a></li>
+   </ul>
+
+  <h2 class="heading-medium">Branding</h2>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_email_branding') }}">Email branding</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_text_message_sender') }}">Text message sender</a></li>
+     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_letter_branding') }}">Letter branding</a></li>
+  </ul>
+
+  <h2 class="heading-medium">Uploads and attachments</h2>
+
+  <ul class="govuk-list govuk-list--bullet">
+     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_send_files_by_email') }}">Send files by email</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">Attach pages to a letter template</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">Upload a letter</a></li>
   </ul>
 
-  <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact us</a> if you cannot find what you’re looking for.</p>
+ <h2 class="heading-medium">Settings and permissions</h2>
+
+ <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_team_members_and_permissions') }}">Team members and permissions</a></li>
+  </ul>
 
 
   <h2 class="heading-medium">More information</h2>
