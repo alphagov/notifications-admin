@@ -5,7 +5,15 @@ from notifications_utils.clients.redis import daily_limit_cache_key
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
-ALLOWED_TEMPLATE_ATTRIBUTES = {"content", "languages", "name", "postage", "subject", "welsh_subject", "welsh_content"}
+ALLOWED_TEMPLATE_ATTRIBUTES = {
+    "content",
+    "letter_languages",
+    "name",
+    "postage",
+    "subject",
+    "letter_welsh_subject",
+    "letter_welsh_content",
+}
 
 
 class ServiceAPIClient(NotifyAdminAPIClient):
@@ -188,11 +196,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         Update a service template.
         """
-        data = dict(kwargs)
-        disallowed_attributes = set(data.keys()) - ALLOWED_TEMPLATE_ATTRIBUTES
+        disallowed_attributes = set(kwargs.keys()) - ALLOWED_TEMPLATE_ATTRIBUTES
         if disallowed_attributes:
             raise TypeError(f"Not allowed to update template attributes: {', '.join(disallowed_attributes)}")
-        data = _attach_current_user(data)
+        data = _attach_current_user(kwargs)
         endpoint = f"/service/{service_id}/template/{template_id}"
         return self.post(endpoint, data)
 

@@ -869,9 +869,9 @@ def test_letter_template_change_language_to_welsh_then_english_populates_default
     mock_template_change_language.assert_called_with(
         SERVICE_ONE_ID,
         fake_uuid,
-        languages="welsh_then_english",
-        welsh_subject="Welsh subject line goes here",
-        welsh_content="Welsh content goes here",
+        letter_languages="welsh_then_english",
+        letter_welsh_subject="Welsh subject line goes here",
+        letter_welsh_content="Welsh content goes here",
     )
 
 

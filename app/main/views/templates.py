@@ -629,11 +629,13 @@ def edit_service_template(service_id, template_id):
         new_template_data = {
             "name": form.name.data,
             "content": form.template_content.data,
-            "subject": subject,
             "template_type": template.template_type,
             "id": template.id,
             "reply_to_text": template.get_raw("reply_to_text"),
         }
+
+        if subject:
+            new_template_data["subject"] = subject
 
         new_template = get_template(new_template_data, current_service)
         template_change = template.compare_to(new_template)
@@ -1186,7 +1188,11 @@ def letter_template_change_language(template_id, service_id):
             welsh_subject = "Welsh subject line goes here"
             welsh_content = "Welsh content goes here"
         service_api_client.update_service_template(
-            service_id, template_id, languages=languages, welsh_subject=welsh_subject, welsh_content=welsh_content
+            service_id,
+            template_id,
+            letter_languages=languages,
+            letter_welsh_subject=welsh_subject,
+            letter_welsh_content=welsh_content,
         )
 
         return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
