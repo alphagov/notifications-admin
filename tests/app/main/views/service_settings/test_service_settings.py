@@ -2712,8 +2712,11 @@ def test_incorrect_reply_to_email_address_input(
 @pytest.mark.parametrize(
     "contact_block_input, expected_error",
     [
-        ("", "Cannot be empty"),
-        ("1 \n 2 \n 3 \n 4 \n 5 \n 6 \n 7 \n 8 \n 9 \n 0 \n a", "Contains 11 lines, maximum is 10"),
+        ("", "Enter a sender address"),
+        (
+            "1 \n 2 \n 3 \n 4 \n 5 \n 6 \n 7 \n 8 \n 9 \n 0 \n a",
+            "This address is 11 lines long - the most you can have is 10 lines",
+        ),
     ],
 )
 def test_incorrect_letter_contact_block_input(
@@ -2754,7 +2757,6 @@ def test_incorrect_sms_sender_input(
         _data={"sms_sender": sms_sender_input},
         _expected_status=(200 if expected_error else 302),
     )
-
     error_message = page.select_one(".govuk-error-message")
     count_of_api_calls = len(mock_add_sms_sender.call_args_list)
 
@@ -2762,6 +2764,7 @@ def test_incorrect_sms_sender_input(
         assert not error_message
         assert count_of_api_calls == 1
     else:
+
         assert expected_error in error_message.text
         assert count_of_api_calls == 0
 

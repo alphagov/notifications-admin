@@ -1823,13 +1823,15 @@ class AdminBillingDetailsForm(StripWhitespaceForm):
 
 
 class ServiceLetterContactBlockForm(StripWhitespaceForm):
-    letter_contact_block = TextAreaField(validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()])
+    letter_contact_block = TextAreaField(
+        validators=[NotifyDataRequired(thing="a sender address"), NoCommasInPlaceHolders()]
+    )
     is_default = GovukCheckboxField("Set as your default address")
 
     def validate_letter_contact_block(self, field):
         line_count = field.data.strip().count("\n")
         if line_count >= 10:
-            raise ValidationError(f"Contains {line_count + 1} lines, maximum is 10")
+            raise ValidationError(f"This address is {line_count + 1} lines long - the most you can have is 10 lines")
 
 
 class OnOffSettingForm(StripWhitespaceForm):

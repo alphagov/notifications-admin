@@ -915,6 +915,7 @@ def service_add_letter_contact(service_id):
             if from_template
             else url_for(".service_letter_contact_details", service_id=current_service.id)
         ),
+        error_summary_enabled=True,
     )
 
 
