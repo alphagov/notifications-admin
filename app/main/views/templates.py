@@ -1182,11 +1182,15 @@ def letter_template_change_language(template_id, service_id):
 
     if form.validate_on_submit():
         languages = form.languages.data
-        welsh_subject = ""
-        welsh_content = ""
         if languages == "welsh_then_english":
             welsh_subject = "Welsh subject line goes here"
             welsh_content = "Welsh content goes here"
+        elif languages == "english":
+            welsh_subject = None
+            welsh_content = None
+        else:
+            # no other radio options
+            abort(404)
         service_api_client.update_service_template(
             service_id,
             template_id,

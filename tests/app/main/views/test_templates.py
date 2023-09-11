@@ -859,13 +859,20 @@ def test_GET_letter_template_change_language_404s_if_template_is_not_a_letter(
     assert page.select_one("h1").text.strip() != "Change language"
 
 
-def test_POST_letter_template_change_language_to_welsh_then_english_populates_default_welsh_content_and_subject(
+@pytest.mark.parametrize(
+    "languages, expected_welsh_subject, expected_welsh_content",
+    [("welsh_then_english", "Welsh subject line goes here", "Welsh content goes here"), ("english", None, None)],
+)
+def test_POST_letter_template_change_language_also_changes_welsh_subject_and_content(
     client_request,
     service_one,
     mocker,
     fake_uuid,
     active_user_with_permissions,
     mock_get_service_letter_template,
+    languages,
+    expected_welsh_subject,
+    expected_welsh_content,
 ):
     service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
@@ -876,7 +883,7 @@ def test_POST_letter_template_change_language_to_welsh_then_english_populates_de
         "main.letter_template_change_language",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _data={"languages": "welsh_then_english"},
+        _data={"languages": languages},
         _expected_redirect=url_for(
             "main.view_template",
             service_id=SERVICE_ONE_ID,
@@ -886,9 +893,9 @@ def test_POST_letter_template_change_language_to_welsh_then_english_populates_de
     mock_template_change_language.assert_called_with(
         SERVICE_ONE_ID,
         fake_uuid,
-        letter_languages="welsh_then_english",
-        letter_welsh_subject="Welsh subject line goes here",
-        letter_welsh_content="Welsh content goes here",
+        letter_languages=languages,
+        letter_welsh_subject=expected_welsh_subject,
+        letter_welsh_content=expected_welsh_content,
     )
 
 
