@@ -990,7 +990,12 @@ def service_add_sms_sender(service_id):
             is_default=first_sms_sender if first_sms_sender else form.is_default.data,
         )
         return redirect(url_for(".service_sms_senders", service_id=service_id))
-    return render_template("views/service-settings/sms-sender/add.html", form=form, first_sms_sender=first_sms_sender)
+    return render_template(
+        "views/service-settings/sms-sender/add.html",
+        form=form,
+        first_sms_sender=first_sms_sender,
+        error_summary_enabled=True,
+    )
 
 
 @main.route(

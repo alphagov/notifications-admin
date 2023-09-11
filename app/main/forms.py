@@ -1796,7 +1796,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
     sms_sender = GovukTextInputField(
         "Text message sender",
         validators=[
-            DataRequired(message="Cannot be empty"),
+            NotifyDataRequired(thing="a text message sender"),
             Length(min=3, thing="text message sender"),
             Length(max=11, thing="text message sender"),
             LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly(),

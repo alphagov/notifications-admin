@@ -161,7 +161,7 @@ class LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly:
 
     regex = re.compile(r"^[a-zA-Z0-9\s\._']+$")
 
-    def __init__(self, message="Use letters and numbers only"):
+    def __init__(self, message="Text message sender can only include letters and numbers"):
         self.message = message
 
     def __call__(self, form, field):
@@ -170,7 +170,7 @@ class LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly:
 
 
 class DoesNotStartWithDoubleZero:
-    def __init__(self, message="Cannot start with 00"):
+    def __init__(self, message="Text message sender cannot start with 00"):
         self.message = message
 
     def __call__(self, form, field):
