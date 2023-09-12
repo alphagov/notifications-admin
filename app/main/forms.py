@@ -2690,7 +2690,10 @@ class AcceptAgreementForm(StripWhitespaceForm):
             on_behalf_of_email=org.agreement_signed_on_behalf_of_email_address,
         )
 
-    version = GovukTextInputField("Which version of the agreement do you want to accept?")
+    version = GovukTextInputField(
+        "Which version of the agreement do you want to accept?",
+        validators=[NotifyDataRequired(thing="a version number")],
+    )
 
     who = GovukRadiosField(
         "Who are you accepting the agreement for?",
@@ -2715,9 +2718,16 @@ class AcceptAgreementForm(StripWhitespaceForm):
     )
 
     def __validate_if_nominating(self, field):
+
+        error_messages = {
+            "on_behalf_of_name": "Enter the name of the person accepting the agreement",
+            "on_behalf_of_email": "Enter the email address of the person accepting the agreement",
+        }
+
         if self.who.data == "someone-else":
             if not field.data:
-                raise ValidationError("Cannot be empty")
+                error_message = error_messages[field.name]
+                raise ValidationError(error_message)
         else:
             field.data = ""
 
@@ -2728,7 +2738,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
         try:
             float(field.data)
         except (TypeError, ValueError) as e:
-            raise ValidationError("Must be a number") from e
+            raise ValidationError("Enter a version number in digits, like 3.1") from e
 
 
 class BroadcastAreaForm(StripWhitespaceForm):
