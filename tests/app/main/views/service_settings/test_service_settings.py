@@ -2692,8 +2692,8 @@ def test_no_senders_message_shows(client_request, sender_list_page, endpoint_to_
 @pytest.mark.parametrize(
     "reply_to_input, expected_error",
     [
-        ("", "Cannot be empty"),
-        ("testtest", "Enter a valid email address"),
+        ("", "Enter an email address"),
+        ("testtest", "Enter an email address in the correct format, like name@example.gov.uk"),
     ],
 )
 def test_incorrect_reply_to_email_address_input(
@@ -3232,7 +3232,7 @@ def test_shows_delete_link_for_error_on_post_request_for_edit_email_reply_to_add
 ):
     mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
 
-    data = {"email_address": "not a valid email address"}
+    data = {"email_address": "Enter an email address"}
     if default_checkbox_checked:
         data["is_default"] = "y"
 
@@ -3249,8 +3249,11 @@ def test_shows_delete_link_for_error_on_post_request_for_edit_email_reply_to_add
         ".service_email_reply_to",
         service_id=SERVICE_ONE_ID,
     )
-    assert page.select_one(".govuk-error-message").text.strip() == "Error: Enter a valid email address"
-    assert page.select_one("input#email_address").get("value") == "not a valid email address"
+    assert (
+        page.select_one(".govuk-error-message").text.strip()
+        == "Error: Enter an email address in the correct format, like name@example.gov.uk"
+    )
+    assert page.select_one("input#email_address").get("value") == "Enter an email address"
 
     if default_choice_and_delete_link_expected:
         link = page.select_one(".page-footer a")
@@ -4973,9 +4976,9 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
 @pytest.mark.parametrize(
     "contact_details_type, invalid_value, error",
     [
-        ("url", "invalid.com/", "Must be a valid URL"),
-        ("email_address", "me@co", "Enter a valid email address"),
-        ("phone_number", "abcde", "Must be a valid phone number"),
+        ("url", "invalid.com/", "Enter a URL in the correct"),
+        ("email_address", "me@co", "Enter an email address in the correct format, like name@example.gov.uk"),
+        ("phone_number", "abcde", "Enter a phone number in the correct format"),
     ],
 )
 def test_send_files_by_email_contact_details_does_not_update_invalid_contact_details(

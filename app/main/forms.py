@@ -1755,11 +1755,14 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
     def validate(self):
         if self.contact_details_type.data == "url":
-            self.url.validators = [DataRequired(), URL(message="Must be a valid URL")]
+            self.url.validators = [
+                NotifyDataRequired(thing="a URL in the correct format"),
+                URL(message="Enter a URL in the correct format"),
+            ]
 
         elif self.contact_details_type.data == "email_address":
             self.email_address.validators = [
-                DataRequired(),
+                NotifyDataRequired(thing="an email address"),
                 Length(min=5, max=255, thing="email address"),
                 ValidEmail(),
             ]
@@ -1771,15 +1774,15 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
                 try:
                     normalised_number = normalise_phone_number(num.data)
                 except InvalidPhoneError as e:
-                    raise ValidationError("Must be a valid phone number") from e
+                    raise ValidationError("Enter a phone number in the correct format") from e
 
                 if normalised_number in {"999", "112"}:
-                    raise ValidationError("Must not be an emergency number")
+                    raise ValidationError("Phone number cannot be an emergency number")
 
                 return True
 
             self.phone_number.validators = [
-                DataRequired(),
+                NotifyDataRequired(thing="a phone number"),
                 Length(min=3, max=20, thing="phone number"),
                 valid_non_emergency_phone_number,
             ]
@@ -1788,7 +1791,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
-    email_address = make_email_address_field(label="Reply-to email address", gov_user=False)
+    email_address = make_email_address_field(label="Reply-to email address", thing="an email address", gov_user=False)
     is_default = GovukCheckboxField("Make this email address the default")
 
 

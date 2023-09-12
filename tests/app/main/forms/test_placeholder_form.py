@@ -20,8 +20,20 @@ def test_form_class_not_mutated(notify_admin):
     "service_can_send_international_sms, placeholder_name, template_type, value, expected_error",
     [
         (False, "email address", "email", "", "Cannot be empty"),
-        (False, "email address", "email", "12345", "Enter a valid email address"),
-        (False, "email address", "email", "“bad”@email-address.com", "Enter a valid email address"),
+        (
+            False,
+            "email address",
+            "email",
+            "12345",
+            "Enter an email address in the correct format, like name@example.gov.uk",
+        ),
+        (
+            False,
+            "email address",
+            "email",
+            "“bad”@email-address.com",
+            "Enter an email address in the correct format, like name@example.gov.uk",
+        ),
         (False, "email address", "email", "test@example.com", None),
         (False, "email address", "email", "test@example.gov.uk", None),
         (False, "phone number", "sms", "", "Cannot be empty"),

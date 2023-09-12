@@ -58,7 +58,7 @@ class ValidGovEmail:
 
 
 class ValidEmail:
-    def __init__(self, message="Enter a valid email address"):
+    def __init__(self, message="Enter an email address in the correct format, like name@example.gov.uk"):
         self.message = message
 
     def __call__(self, form, field):

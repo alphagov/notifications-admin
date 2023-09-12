@@ -427,7 +427,10 @@ def send_files_by_email_contact_details(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/send-files-by-email.html", form=form, contact_details=contact_details
+        "views/service-settings/send-files-by-email.html",
+        form=form,
+        contact_details=contact_details,
+        error_summary_enabled=True,
     )
 
 

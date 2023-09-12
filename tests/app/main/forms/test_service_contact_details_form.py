@@ -13,18 +13,18 @@ def test_form_fails_validation_with_no_radio_buttons_selected(notify_admin):
 
 
 @pytest.mark.parametrize(
-    "selected_radio_button, selected_text_box, text_box_data",
+    "selected_radio_button, selected_text_box, text_box_data, error_message",
     [
-        ("email_address", "url", "http://www.example.com"),
-        ("phone_number", "url", "http://www.example.com"),
-        ("url", "email_address", "user@example.com"),
-        ("phone_number", "email_address", "user@example.com"),
-        ("url", "phone_number", "0207 123 4567"),
-        ("email_address", "phone_number", "0207 123 4567"),
+        ("email_address", "url", "http://www.example.com", "Enter an email address"),
+        ("phone_number", "url", "http://www.example.com", "Enter a phone number"),
+        ("url", "email_address", "user@example.com", "Enter a URL in the correct format"),
+        ("phone_number", "email_address", "user@example.com", "Enter a phone number"),
+        ("url", "phone_number", "0207 123 4567", "Enter a URL in the correct format"),
+        ("email_address", "phone_number", "0207 123 4567", "Enter an email address"),
     ],
 )
 def test_form_fails_validation_when_radio_button_selected_and_text_box_filled_in_do_not_match(
-    notify_admin, selected_radio_button, selected_text_box, text_box_data
+    notify_admin, selected_radio_button, selected_text_box, text_box_data, error_message
 ):
     data = {"contact_details_type": selected_radio_button, selected_text_box: text_box_data}
 
@@ -33,7 +33,7 @@ def test_form_fails_validation_when_radio_button_selected_and_text_box_filled_in
 
         assert not form.validate_on_submit()
         assert len(form.errors) == 1
-        assert form.errors[selected_radio_button] == ["This field is required."]
+        assert form.errors[selected_radio_button] == [error_message]
 
 
 @pytest.mark.parametrize(
@@ -94,7 +94,7 @@ def test_form_phone_number_validation_fails_with_invalid_phone_number_field(noti
 
         assert not form.validate_on_submit()
         assert len(form.errors) == 1
-        assert "Must be a valid phone number" in form.errors["phone_number"]
+        assert "Enter a phone number in the correct format" in form.errors["phone_number"]
 
 
 @pytest.mark.parametrize(
@@ -121,4 +121,4 @@ def test_form_phone_number_allows_non_emergency_3_digit_numbers(notify_admin, sh
         else:
             assert not form.validate_on_submit()
             assert len(form.errors) == 1
-            assert form.errors["phone_number"] == ["Must not be an emergency number"]
+            assert form.errors["phone_number"] == ["Phone number cannot be an emergency number"]
