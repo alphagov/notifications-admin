@@ -67,6 +67,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
+                "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
@@ -89,6 +90,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
+                "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails Off Change your settings for sending emails",
                 "Label Value Action",
@@ -425,6 +427,7 @@ def test_send_files_by_email_row_on_settings_page(
             [
                 "Service name service one Change service name",
                 "Sign-in method Text message code Change sign-in method",
+                "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
@@ -445,6 +448,7 @@ def test_send_files_by_email_row_on_settings_page(
             [
                 "Service name service one Change service name",
                 "Sign-in method Email link or text message code Change sign-in method",
+                "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
@@ -465,6 +469,7 @@ def test_send_files_by_email_row_on_settings_page(
             [
                 "Service name service one Change service name",
                 "Sign-in method Text message code Change sign-in method",
+                "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails Off Change your settings for sending emails",
                 "Label Value Action",
@@ -532,7 +537,7 @@ def test_letter_contact_block_shows_none_if_not_set(
         service_id=SERVICE_ONE_ID,
     )
 
-    div = page.select("tr")[10].select("td")[1].div
+    div = page.select("tr")[11].select("td")[1].div
     assert div.text.strip() == "Not set"
     assert "default" in div.attrs["class"][0]
 
@@ -552,7 +557,7 @@ def test_escapes_letter_contact_block(
         service_id=SERVICE_ONE_ID,
     )
 
-    div = str(page.select("tr")[10].select("td")[1].div)
+    div = str(page.select("tr")[11].select("td")[1].div)
     assert "foo<br/>bar" in div
     assert "<script>" not in div
 
@@ -5412,6 +5417,7 @@ def test_service_settings_page_loads_when_inbound_number_is_not_set(
     single_reply_to_email_address,
     single_sms_sender,
     mock_no_inbound_number_for_service,
+    mock_get_service_data_retention,
 ):
     client_request.get(
         "main.service_settings",
@@ -5688,6 +5694,7 @@ def test_service_settings_links_to_branding_request_page_for_emails(
     client_request,
     no_reply_to_email_addresses,
     single_sms_sender,
+    mock_get_service_data_retention,
 ):
     # expect to have a "NHS" option as well as the
     # fallback one, so ask user to choose
@@ -5704,6 +5711,7 @@ def test_service_settings_links_to_branding_options_page_for_letters(
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
+    mock_get_service_data_retention,
 ):
     service_one["permissions"].append("letter")
     page = client_request.get(".service_settings", service_id=SERVICE_ONE_ID)

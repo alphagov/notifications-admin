@@ -735,6 +735,7 @@ def test_letter_branding_option_preview_changes_letter_branding_when_user_confir
     single_sms_sender,
     mock_get_letter_branding_pool,
     mock_update_service,
+    mock_get_service_data_retention,
 ):
     organisation_one["organisation_type"] = "central"
     service_one["organisation"] = organisation_one
