@@ -60,8 +60,8 @@
         return {
           'value': radio.value,
           'label': radio.nextElementSibling.textContent.trim()
-        }
-      };
+        };
+      }
 
       const timesByDay = {};
 
@@ -73,7 +73,7 @@
         return {
           'value': dayValue,
           'label': day
-        }
+        };
       });
 
       const componentName = this.$component.find('input[type=radio]').attr('name');
@@ -208,7 +208,7 @@
       // selected for other days
       this.onTimeSelection = function (event) {
         this.$component.find('.radio-select__time:checked').each((idx, radio) => {
-          if (radio !== event.target) { radio.checked = false}
+          if (radio !== event.target) { radio.checked = false; }
         });
       };
 
