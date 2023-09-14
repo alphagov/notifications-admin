@@ -1086,10 +1086,7 @@ def set_per_day_message_limit(service_id, notification_type):
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
-    return render_template(
-        "views/service-settings/set-message-limit.html",
-        form=form,
-    )
+    return render_template("views/service-settings/set-message-limit.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-rate-limit", methods=["GET", "POST"])

@@ -1322,14 +1322,7 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
 
 
 class AdminServiceMessageLimitForm(StripWhitespaceForm):
-    message_limit = GovukIntegerField(
-        "",
-        things="the number of messages",
-        validators=[
-            DataRequired(message="Cannot be empty"),
-            NumberRange(min=0, message="Number must be greater than or equal to 0"),
-        ],
-    )
+    message_limit = GovukIntegerField("", things="the number of messages", validators=[])
 
     def __init__(self, notification_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1343,6 +1336,11 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
                 )
             }
         }
+        self.type_of_message = {"email": "emails", "sms": "text messages", "letter": "letters"}
+        self.message_limit.validators = [
+            InputRequired(message=f"Enter a number of {self.type_of_message[notification_type]}"),
+            NumberRange(min=0, message="Number must be greater than or equal to 0"),
+        ]
 
 
 class AdminServiceRateLimitForm(StripWhitespaceForm):

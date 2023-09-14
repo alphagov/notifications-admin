@@ -4465,7 +4465,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_day_message_limit",
             {"notification_type": "sms"},
             {"message_limit": ""},
-            "Error: Cannot be empty",
+            "Error: Enter a number of text messages",
             {},
         ),
         (
