@@ -385,7 +385,7 @@ def test_edit_sms_provider_ratio_submit(
     [
         ({"sms_provider_1": 90, "sms_provider_2": 20}, "The total must add up to 100%"),
         ({"sms_provider_1": 101, "sms_provider_2": 20}, "Must be between 0 and 100"),
-        ({"sms_provider_1": 99.9, "sms_provider_2": 0.1}, "Enter percentage in digits"),
+        ({"sms_provider_1": 99.9, "sms_provider_2": 0.1}, "Enter a percentage in digits"),
     ],
 )
 def test_edit_sms_provider_submit_invalid_percentages(

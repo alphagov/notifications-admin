@@ -503,11 +503,11 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     @classmethod
     def parse_edit_service_http_error(cls, http_error):
         """Inspect the HTTPError from a create_service/update_service call and return a human-friendly error message"""
-        if http_error.message.get("normalised_service_name"):
-            return "Service name must not include characters from a non-Latin alphabet"
+        if http_error.message.get("email_from"):
+            return "Service name cannot include characters from a non-Latin alphabet"
 
         elif http_error.message.get("name"):
-            return "This service name is already in use"
+            return "This service name is already in use - enter a unique name"
 
         return None
 

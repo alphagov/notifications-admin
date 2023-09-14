@@ -639,8 +639,8 @@ def test_should_show_service_name_with_no_prefixing(
 @pytest.mark.parametrize(
     "name, error_message",
     [
-        ("", "Cannot be empty"),
-        (".", "Must include at least two alphanumeric characters"),
+        ("", "Error: Enter a service name"),
+        (".", "Service name must include at least 2 letters or numbers"),
         ("a" * 256, "Service name cannot be longer than 255 characters"),
     ],
 )
@@ -4976,7 +4976,7 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
 @pytest.mark.parametrize(
     "contact_details_type, invalid_value, error",
     [
-        ("url", "invalid.com/", "Enter a URL in the correct"),
+        ("url", "invalid.com/", "Enter a URL in the correct format"),
         ("email_address", "me@co", "Enter an email address in the correct format, like name@example.gov.uk"),
         ("phone_number", "abcde", "Enter a phone number in the correct format"),
     ],

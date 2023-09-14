@@ -126,6 +126,7 @@ def service_name_change(service_id):
         "views/service-settings/name.html",
         form=form,
         organisation_type=current_service.organisation_type,
+        error_summary_enabled=True,
     )
 
 
@@ -1064,10 +1065,7 @@ def set_free_sms_allowance(service_id):
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
-    return render_template(
-        "views/service-settings/set-free-sms-allowance.html",
-        form=form,
-    )
+    return render_template("views/service-settings/set-free-sms-allowance.html", form=form, error_summary_enabled=True)
 
 
 @main.route(

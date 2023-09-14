@@ -1158,8 +1158,8 @@ class RenameServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Service name",
         validators=[
-            DataRequired(message="Cannot be empty"),
-            MustContainAlphanumericCharacters(),
+            NotifyDataRequired(thing="a service name"),
+            MustContainAlphanumericCharacters(thing="Service name"),
             Length(max=255, thing="service name"),
         ],
     )
@@ -1313,9 +1313,9 @@ class AdminNewOrganisationForm(
 class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
         "Numbers of text message fragments per year",
-        things="text message fragments",
+        things="the number of text message fragments",
         validators=[
-            InputRequired(message="Cannot be empty"),
+            InputRequired(message="Enter a number of text messages"),
             NumberRange(min=0, message="Number must be greater than or equal to 0"),
         ],
     )
@@ -1709,7 +1709,7 @@ class AdminProviderRatioForm(OrderableFieldsForm):
                 provider["identifier"],
                 GovukIntegerField(
                     f"{provider['display_name']} (%)",
-                    things="percentage",
+                    things="a percentage",
                     validators=[validators.NumberRange(min=0, max=100, message="Must be between 0 and 100")],
                     param_extensions={
                         "classes": "govuk-input--width-3",
