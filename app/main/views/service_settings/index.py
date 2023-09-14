@@ -1102,10 +1102,7 @@ def set_per_minute_rate_limit(service_id):
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
-    return render_template(
-        "views/service-settings/set-rate-limit.html",
-        form=form,
-    )
+    return render_template("views/service-settings/set-rate-limit.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-<notification_type>-branding", methods=["GET", "POST"])

@@ -359,7 +359,7 @@ class GovukIntegerField(GovukTextInputField):
                 raise StopValidation(f"Enter {self.things} in digits")
 
             if not isinstance(self.data, int):
-                raise StopValidation(f"{sentence_case(self.things)} must be a whole number")
+                raise StopValidation(f"Enter {self.things} in digits")
 
             if self.data > self.POSTGRES_MAX_INT:
                 raise ValidationError(
@@ -1350,7 +1350,7 @@ class AdminServiceRateLimitForm(StripWhitespaceForm):
         "Number of messages the service can send in a rolling 60 second window",
         things="the number of messages",
         validators=[
-            DataRequired(message="Cannot be empty"),
+            NotifyDataRequired(thing="a number of messages"),
             NumberRange(min=0, message="Number must be greater than or equal to 0"),
         ],
     )

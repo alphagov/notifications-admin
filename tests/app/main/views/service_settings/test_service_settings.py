@@ -4444,7 +4444,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_minute_rate_limit",
             {},
             {"rate_limit": ""},
-            "Error: Cannot be empty",
+            "Error: Enter a number of messages",
             {},
         ),
         (
@@ -4486,7 +4486,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_day_message_limit",
             {"notification_type": "letter"},
             {"message_limit": "12.34"},
-            "Error: The number of letters must be a whole number",
+            "Error: Enter the number of letters in digits",
             {},
         ),
         (
