@@ -10,8 +10,7 @@ from app.models.service import Service
 from app.utils.user import user_is_gov_user, user_is_logged_in
 
 
-def _create_service(service_name, organisation_type, email_from, form):
-
+def _create_service(service_name, organisation_type, normalised_service_name, form):
     try:
         service_id = service_api_client.create_service(
             service_name=service_name,
@@ -21,7 +20,7 @@ def _create_service(service_name, organisation_type, email_from, form):
             letter_message_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
             restricted=True,
             user_id=session["user_id"],
-            email_from=email_from,
+            normalised_service_name=normalised_service_name,
         )
         session["service_id"] = service_id
 
@@ -59,19 +58,18 @@ def add_service():
         form = CreateServiceForm(organisation_type=default_organisation_type)
 
     if form.validate_on_submit():
-        email_from = email_safe(form.name.data)
+        normalised_service_name = email_safe(form.name.data)
         service_name = form.name.data
 
         service_id, error = _create_service(
             service_name,
             default_organisation_type or form.organisation_type.data,
-            email_from,
+            normalised_service_name,
             form,
         )
         if error:
             return _render_add_service_page(form, default_organisation_type)
         if len(service_api_client.get_active_services({"user_id": session["user_id"]}).get("data", [])) > 1:
-
             # if user has email auth, it makes sense that people they invite to their new service can have it too
             if current_user.email_auth:
                 new_service = Service.from_id(service_id)
