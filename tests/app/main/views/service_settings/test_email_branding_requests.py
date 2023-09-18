@@ -510,6 +510,7 @@ def test_email_branding_option_preview_changes_email_branding_when_user_confirms
     single_sms_sender,
     mock_get_email_branding_pool,
     mock_update_service,
+    mock_get_service_data_retention,
 ):
     organisation_one["organisation_type"] = "central"
     service_one["organisation"] = organisation_one
@@ -599,6 +600,7 @@ def test_email_branding_govuk_submit(
     mock_get_email_branding,
     single_sms_sender,
     mock_update_service,
+    mock_get_service_data_retention,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -635,6 +637,7 @@ def test_email_branding_nhs_submit(
     mock_get_email_branding,
     single_sms_sender,
     mock_update_service,
+    mock_get_service_data_retention,
 ):
     service_one["email_branding"] = sample_uuid()
     service_one["organisation_type"] = "nhs_local"
@@ -736,6 +739,7 @@ def test_email_branding_request_submit(
     mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     single_sms_sender,
+    mock_get_service_data_retention,
 ):
     service_one["email_branding"] = sample_uuid()
     service_one["organisation_type"] = "nhs_local"
