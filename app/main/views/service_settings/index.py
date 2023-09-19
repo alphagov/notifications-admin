@@ -450,34 +450,43 @@ def service_add_email_reply_to(service_id):
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
     is_default = first_email_address if first_email_address else form.is_default.data
+
     if form.validate_on_submit():
         if current_user.platform_admin:
-            service_api_client.add_reply_to_email_address(
-                service_id, email_address=form.email_address.data, is_default=is_default
-            )
-            return redirect(url_for(".service_email_reply_to", service_id=service_id))
+            try:
+                service_api_client.add_reply_to_email_address(
+                    service_id, email_address=form.email_address.data, is_default=is_default
+                )
+
+            except HTTPError as e:
+                handle_reply_to_email_address_http_error(e, form)
+
+            else:
+                return redirect(url_for(".service_email_reply_to", service_id=service_id))
+
         else:
             try:
                 notification_id = service_api_client.verify_reply_to_email_address(service_id, form.email_address.data)[
                     "data"
                 ]["id"]
             except HTTPError as e:
-                if e.status_code == 409:
-                    flash(e.message, "error")
-                    return redirect(url_for(".service_email_reply_to", service_id=service_id))
-                else:
-                    raise e
-            return redirect(
-                url_for(
-                    ".service_verify_reply_to_address",
-                    service_id=service_id,
-                    notification_id=notification_id,
-                    is_default=is_default,
+                handle_reply_to_email_address_http_error(e, form)
+
+            else:
+                return redirect(
+                    url_for(
+                        ".service_verify_reply_to_address",
+                        service_id=service_id,
+                        notification_id=notification_id,
+                        is_default=is_default,
+                    )
                 )
-            )
 
     return render_template(
-        "views/service-settings/email-reply-to/add.html", form=form, first_email_address=first_email_address
+        "views/service-settings/email-reply-to/add.html",
+        form=form,
+        first_email_address=first_email_address,
+        error_summary_enabled=True,
     )
 
 
@@ -570,7 +579,7 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
 def service_edit_email_reply_to(service_id, reply_to_email_id):
     form = ServiceReplyToEmailForm()
     reply_to_email_address = current_service.get_email_reply_to_address(reply_to_email_id)
-
+    print(reply_to_email_address)
     if request.method == "GET":
         form.email_address.data = reply_to_email_address["email_address"]
         form.is_default.data = reply_to_email_address["is_default"]
@@ -587,9 +596,11 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
             )
             return redirect(url_for(".service_email_reply_to", service_id=service_id))
         try:
+
             notification_id = service_api_client.verify_reply_to_email_address(service_id, form.email_address.data)[
                 "data"
             ]["id"]
+
         except HTTPError as e:
             if e.status_code == 409:
                 flash(e.message, "error")
@@ -1344,3 +1355,12 @@ def check_contact_details_type(contact_details):
         return "email_address"
     else:
         return "phone_number"
+
+
+def handle_reply_to_email_address_http_error(raised_exception, form):
+    if raised_exception.status_code == 409:
+        error_message = raised_exception.message
+        form.email_address.errors.append(error_message)
+
+    else:
+        raise raised_exception

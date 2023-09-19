@@ -3125,19 +3125,19 @@ def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_chan
 
 
 @pytest.mark.parametrize(
-    "url",
+    "url, header_text",
     [
-        "main.service_edit_email_reply_to",
-        "main.service_add_email_reply_to",
+        ("main.service_edit_email_reply_to", "Reply-to email addresses"),
+        ("main.service_add_email_reply_to", "Add reply-to email address"),
     ],
 )
 def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
-    mocker, fake_uuid, client_request, mock_update_reply_to_email_address, url
+    mocker, fake_uuid, client_request, mock_update_reply_to_email_address, url, header_text
 ):
     reply_to_email_address = create_reply_to_email_address()
     mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=[reply_to_email_address])
     mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_email_address)
-    error_message = "Your service already uses ‘reply_to@example.com’ as an email reply-to address."
+    error_message = "‘reply_to@example.com’ is already a reply-to email address for this service."
     mocker.patch(
         "app.service_api_client.verify_reply_to_email_address",
         side_effect=[
@@ -3152,8 +3152,12 @@ def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_
         url, service_id=SERVICE_ONE_ID, reply_to_email_id=fake_uuid, _data=data, _follow_redirects=True
     )
 
-    assert page.select_one("h1").text == "Reply-to email addresses"
-    assert error_message in page.select_one("div.banner-dangerous").text
+    assert page.select_one("h1").text == header_text
+
+    if url == "main.service_edit_email_reply_to":
+        assert error_message in page.select_one("div.banner-dangerous").text
+    else:
+        assert error_message in page.select_one(".govuk-error-message").text
 
     assert mock_update_reply_to_email_address.called is False
 
