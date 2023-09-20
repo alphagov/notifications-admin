@@ -52,10 +52,6 @@ def pricing_nav():
                     "link": "main.guidance_pricing_letters",
                 },
                 {
-                    "name": "Trial mode",
-                    "link": "main.guidance_trial_mode",
-                },
-                {
                     "name": "How to pay",
                     "link": "main.guidance_how_to_pay",
                 },
@@ -157,6 +153,10 @@ def using_notify_nav():
                 {
                     "name": "Text message sender",
                     "link": "main.guidance_text_message_sender",
+                },
+                {
+                    "name": "Trial mode",
+                    "link": "main.guidance_trial_mode",
                 },
                 {
                     "name": "Upload a letter",
