@@ -3,6 +3,7 @@
   "use strict";
 
   var Modules = global.GOVUK.NotifyModules;
+  var ENTER_CODE = 13;
 
   // Object holding all the states for the component's HTML
   function getInitialHTML (params) {
@@ -126,17 +127,20 @@
         });
       };
 
-      this.toggleFormSubmit = function () {
-        const $formSubmitButton = this.$component.closest('form').find('.govuk-button:not([type=button])').eq(0);
+      this.cancelFiredEvent = evt => evt.preventDefault();
 
-        if ($formSubmitButton.attr('hidden') === undefined) {
-          $formSubmitButton
-            .hide() // needed to stop the `display` property overriding `hidden`
-            .attr('hidden', '');
+      this.toggleFormSubmit = function () {
+        const $form = this.$component.closest('form');
+        const formSubmitButton = $form.find('.govuk-button:not([type=button])').get(0);
+
+        if (!formSubmitButton.hasAttribute('hidden')) {
+          formSubmitButton.style.display = 'none';
+          formSubmitButton.setAttribute('hidden', '');
+          $form.on('submit', this.cancelFiredEvent);
         } else {
-          $formSubmitButton
-            .show() // needed to stop the `display` property overriding `hidden`
-            .removeAttr('hidden', '');
+          formSubmitButton.removeAttribute('style');
+          formSubmitButton.removeAttribute('hidden');
+          $form.off('submit', this.cancelFiredEvent);
         }
       };
 
@@ -212,6 +216,22 @@
         });
       };
 
+      this.onKeyupOnTime = function (event) {
+        // block uses of enter key to stop form submitting before selection is confirmed
+        if (event.which === ENTER_CODE) {
+          event.preventDefault();
+        }
+      };
+
+      this.onKeyupOnSelectedDayAndTime = function (event) {
+        const isExpanded = (this.$component.find('.radio-select__expander').attr('aria-expanded') === 'true');
+
+        // block uses of enter key to stop form submitting when day + time selection is expanded
+        if (isExpanded && (event.which === ENTER_CODE)) {
+          event.preventDefault();
+        }
+      };
+
       this.selectedDay = days[0];
       this.selectedTime = timesByDay[this.selectedDay.value][0];
 
@@ -231,6 +251,8 @@
         .on('click', '.radio-select__day', this.onDayClick.bind(this))
         .on('click', '.radio-select__return-to-days', this.onReturnToDaysClick.bind(this))
         .on('click', '.radio-select__confirm__button', this.onConfirmClick.bind(this))
+        .on('keyup', '.radio-select__time', this.onKeyupOnTime.bind(this))
+        .on('keyup', '.radio-select__selected-day-and-time', this.onKeyupOnSelectedDayAndTime.bind(this))
         .on('change', '.radio-select__time', this.onTimeSelection.bind(this));
 
     };
