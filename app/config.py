@@ -197,7 +197,6 @@ class Staging(Config):
     CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = "static.staging-notify.works"
     ASSET_PATH = "https://static.staging-notify.works/"
-    REDIS_ENABLED = False
 
 
 class Production(Config):
