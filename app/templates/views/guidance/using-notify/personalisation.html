@@ -19,7 +19,7 @@
 
   <pre class="formatting-example"><code class="lang-md">Hello ((first name)), your reference is ((reference number)).</code></pre>
 
-  <p class="govuk-body">Each time you send the message, you can:</p>
+  <p class="govuk-body">Each time you send the message, you can either:</p>
 
   <ul class="govuk-list govuk-list--bullet">
     <li>fill in the placeholders yourself</li>
@@ -27,6 +27,13 @@
   </ul>
 
   <p class="govuk-body">If you upload a list of personal details, the column names in your spreadsheet need to match the placeholders in the template.</p>
+
+  <p class="govuk-body">You can use personalisation to add:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_optional_content') }}">optional content</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_qr_codes') }}">a QR code to a letter template</a></li>
+  </ul>
 
   <h2 class="heading-medium" id="hide-personalised-content">Hide personalised content after sending</h2>
 
