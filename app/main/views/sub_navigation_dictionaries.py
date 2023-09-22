@@ -127,6 +127,10 @@ def using_notify_nav():
                     "link": "main.guidance_personalisation",
                 },
                 {
+                    "name": "QR codes",
+                    "link": "main.guidance_qr_codes",
+                },                
+                {
                     "name": "Receive text messages",
                     "link": "main.guidance_receive_text_messages",
                 },
