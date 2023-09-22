@@ -271,7 +271,7 @@ def guidance_personalisation():
     )
 
 @main.route("/using-notify/qr-codes")
-def guidance_personalisation():
+def guidance_qr_codes():
     return render_template(
         "views/guidance/using-notify/qr-codes.html",
         navigation_links=using_notify_nav(),
