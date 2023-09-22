@@ -165,7 +165,7 @@
         this.$component.find('.radio-select__selected-value').val(this.selectedTime.value);
       };
 
-      this.onConfirmClick = function (event) {
+      this.selectDayAndTime = function () {
         this.selectedTime = _getTimeFromRadio(
           this.$component.find('.radio-select__times:not([hidden]) .radio-select__time:checked').get(0)
         );
@@ -177,6 +177,10 @@
         this.toggleExpandingSection();
         this.updateSelection();
         this.$component.find('.radio-select__selected-day-and-time').focus();
+      };
+
+      this.onConfirmClick = function (event) {
+        this.selectDayAndTime();
       };
 
       this.onReturnToDaysClick = function (event) {
@@ -220,6 +224,7 @@
         // block uses of enter key to stop form submitting before selection is confirmed
         if (event.which === ENTER_CODE) {
           event.preventDefault();
+          this.selectDayAndTime();
         }
       };
 
@@ -229,6 +234,7 @@
         // block uses of enter key to stop form submitting when day + time selection is expanded
         if (isExpanded && (event.which === ENTER_CODE)) {
           event.preventDefault();
+          this.toggleExpandingSection();
         }
       };
 

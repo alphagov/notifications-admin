@@ -198,6 +198,24 @@ describe('RadioSelect', () => {
 
     });
 
+    test("If you press the enter key on the selected day and time field, it should submit", () => {
+
+      const expanderButton = document.querySelector('.radio-select__expander');
+      const selectedDayAndTimeField = document.querySelector('.radio-select__selected-day-and-time');
+      const enterKeyupEvent = getEnterKeyupEvent();
+
+      // JSDOM doesn't seem to implement forms being submitted by a press of the enter key on a field, like browsers.
+      // Because of that, we instead test that enter key events are prevented at the field level instead.
+      // This is testing an implementation detail so 🤮 but unsure how else to do it
+      jest.spyOn(enterKeyupEvent, 'preventDefault');
+      selectedDayAndTimeField.focus();
+
+      selectedDayAndTimeField.dispatchEvent(enterKeyupEvent);
+      expect(enterKeyupEvent.preventDefault).not.toHaveBeenCalled();
+      expect(expanderButton.getAttribute('aria-expanded')).toEqual('false');
+
+    });
+
   });
 
   describe("When you click the button to expand the section for choosing a time", () => {
@@ -440,119 +458,121 @@ describe('RadioSelect', () => {
 
   });
 
-  // JSDOM doesn't seem to implement forms being submitted by a press of the enter key on a field, like browsers.
-  // Because of that, we instead test that enter key events are prevented at the field level instead.
-  // This is testing an implementation detail so 🤮 but unsure how else to do it
-  describe("If you press the enter key to submit the form", () => {
-
-    test("on the selected day and time field, when the section for selecting a time is collapsed, it should submit", () => {
-
-      const selectedDayAndTimeField = document.querySelector('.radio-select__selected-day-and-time');
-      const enterKeyupEvent = getEnterKeyupEvent();
-
-      jest.spyOn(enterKeyupEvent, 'preventDefault');
-      selectedDayAndTimeField.focus();
-
-      selectedDayAndTimeField.dispatchEvent(enterKeyupEvent);
-      expect(enterKeyupEvent.preventDefault).not.toHaveBeenCalled();
-
-    });
-
-    describe("when the section for selecting a time is expanded", () => {
-
-      let expanderButton;
-      let expandingSection;
-      let enterKeyupEvent;
-
-      beforeEach(() => {
-
-        expanderButton = document.querySelector('.radio-select__expander');
-        expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
-
-        helpers.triggerEvent(expanderButton, 'click');
-
-      });
-
-      // JSDOM doesn't seem to implement forms being submitted by a press of the enter key on a field, like browsers.
-      // Because of that, we instead test that enter key events are prevented at the field level instead.
-      // This is testing an implementation detail so 🤮 but unsure how else to do it
-      test("and the selected day and time field is focused, it should not submit", () => {
-
-        const selectedDayAndTimeField = document.querySelector('.radio-select__selected-day-and-time')
-
-        enterKeyupEvent = getEnterKeyupEvent();
-        jest.spyOn(enterKeyupEvent, 'preventDefault');
-
-        selectedDayAndTimeField.focus();
-        selectedDayAndTimeField.dispatchEvent(enterKeyupEvent);
-
-        expect(enterKeyupEvent.preventDefault).toHaveBeenCalled();
-
-      });
-
-      // JSDOM doesn't seem to implement forms being submitted by a press of the enter key on a field, like browsers.
-      // Because of that, we instead test that enter key events are prevented at the field level instead.
-      // This is testing an implementation detail so 🤮 but unsure how else to do it
-      test("and a radio for a time is focused, it should not submit", () => {
-
-        buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
-        radioFor3amTomorrow = expandingSection.querySelectorAll('.radio-select__times input[name=times-for-tomorrow]')[2];
-
-        enterKeyupEvent = getEnterKeyupEvent();
-        jest.spyOn(enterKeyupEvent, 'preventDefault');
-
-        helpers.triggerEvent(buttonForTomorrow, 'click');
-        radioFor3amTomorrow.focus();
-
-        radioFor3amTomorrow.dispatchEvent(enterKeyupEvent);
-
-        expect(enterKeyupEvent.preventDefault).toHaveBeenCalled();
-
-      });
-
-    });
-
-  });
-
-  describe("When you click the a 'Back to days' link", () => {
+  describe("When the section for selecting a time is expanded", () => {
 
     let expanderButton;
     let expandingSection;
-    let daysView;
-    let timesView;
     let buttonForTomorrow;
-    let backLink;
+    let radioFor3amTomorrow;
+    let enterKeyupEvent;
 
     beforeEach(() => {
 
       expanderButton = document.querySelector('.radio-select__expander');
       expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
-      daysView = expandingSection.querySelector('.radio-select__days').parentElement;
-      timesView = expandingSection.querySelector('.radio-select__times').parentElement;
-      buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
-      backLink = expandingSection.querySelector('.govuk-back-link');
 
       helpers.triggerEvent(expanderButton, 'click');
+
+      buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
+      radioFor3amTomorrow = expandingSection.querySelectorAll('.radio-select__times input[name=times-for-tomorrow]')[2];
+
       helpers.triggerEvent(buttonForTomorrow, 'click');
-      helpers.triggerEvent(backLink, 'click');
 
     });
 
-    test("the times view should be hidden", () => {
+    // JSDOM doesn't seem to implement forms being submitted by a press of the enter key on a field, like browsers.
+    // Because of that, we instead test that enter key events are prevented at the field level instead.
+    // This is testing an implementation detail so 🤮 but unsure how else to do it
+    test("if the enter key is pressed when the selected day and time field is focused, the form should not submit", () => {
 
-      expect(timesView.hasAttribute('hidden')).toBe(true);
+      const selectedDayAndTimeField = document.querySelector('.radio-select__selected-day-and-time')
+
+      enterKeyupEvent = getEnterKeyupEvent();
+      jest.spyOn(enterKeyupEvent, 'preventDefault');
+
+      selectedDayAndTimeField.focus();
+      selectedDayAndTimeField.dispatchEvent(enterKeyupEvent);
+
+      expect(enterKeyupEvent.preventDefault).toHaveBeenCalled();
 
     });
 
-    test("the days view should show", () => {
+    describe("if the enter key is pressed when a radio for a time is checked and focused", () => {
 
-      expect(daysView.hasAttribute('hidden')).toBe(false);
+      beforeEach(() => {
+
+        // JSDOM doesn't seem to implement forms being submitted by a press of the enter key on a field, like browsers.
+        // Because of that, we instead test that enter key events are prevented at the field level instead.
+        // This is testing an implementation detail so 🤮 but unsure how else to do it
+        enterKeyupEvent = getEnterKeyupEvent();
+        jest.spyOn(enterKeyupEvent, 'preventDefault');
+
+        radioFor3amTomorrow.focus();
+        radioFor3amTomorrow.setAttribute('checked', 'checked');
+        radioFor3amTomorrow.dispatchEvent(enterKeyupEvent);
+
+      });
+
+      test("the time chosen should show in the field and its value be updated in the form data", () => {
+
+        const timeLabel = expandingSection.querySelector(`label[for=${radioFor3amTomorrow.id}]`).textContent.trim();
+        const timeValue = radioFor3amTomorrow.value;
+        const formData = new FormData(radioFor3amTomorrow.form);
+
+        expect(document.querySelector('.radio-select__selected-day-and-time').value).toEqual(timeLabel);
+        expect(formData.get('scheduled_for')).toEqual(timeValue);
+
+      });
+
+      test("the part of the field showing the time should be focused", () => {
+
+        expect(document.activeElement).toBe(document.querySelector('.radio-select__selected-day-and-time'));
+
+      });
 
     });
 
-    test("the button for the day you clicked before should be focused", () => {
+    describe("When you click the a 'Back to days' link", () => {
 
-      expect(document.activeElement).toBe(buttonForTomorrow);
+      let expanderButton;
+      let expandingSection;
+      let daysView;
+      let timesView;
+      let buttonForTomorrow;
+      let backLink;
+
+      beforeEach(() => {
+
+        expanderButton = document.querySelector('.radio-select__expander');
+        expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
+        daysView = expandingSection.querySelector('.radio-select__days').parentElement;
+        timesView = expandingSection.querySelector('.radio-select__times').parentElement;
+        buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
+        backLink = expandingSection.querySelector('.govuk-back-link');
+
+        helpers.triggerEvent(expanderButton, 'click');
+        helpers.triggerEvent(buttonForTomorrow, 'click');
+        helpers.triggerEvent(backLink, 'click');
+
+      });
+
+      test("the times view should be hidden", () => {
+
+        expect(timesView.hasAttribute('hidden')).toBe(true);
+
+      });
+
+      test("the days view should show", () => {
+
+        expect(daysView.hasAttribute('hidden')).toBe(false);
+
+      });
+
+      test("the button for the day you clicked before should be focused", () => {
+
+        expect(document.activeElement).toBe(buttonForTomorrow);
+
+      });
 
     });
 
