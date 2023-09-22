@@ -270,6 +270,14 @@ def guidance_personalisation():
         navigation_links=using_notify_nav(),
     )
 
+@main.route("/using-notify/qr-codes")
+def guidance_personalisation():
+    return render_template(
+        "views/guidance/using-notify/qr-codes.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 
 @main.route("/using-notify/receive-text-messages")
 def guidance_receive_text_messages():
