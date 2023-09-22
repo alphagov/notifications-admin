@@ -27,7 +27,7 @@ def verify():
         session.pop("user_details", None)
         return activate_user(user_id)
 
-    return render_template("views/two-factor-sms.html", form=form)
+    return render_template("views/two-factor-sms.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/verify-email/<token>")
