@@ -42,10 +42,8 @@ from wtforms import (
 )
 from wtforms import RadioField as WTFormsRadioField
 from wtforms.validators import (
-    URL,
     UUID,
     DataRequired,
-    InputRequired,
     NumberRange,
     Optional,
     Regexp,
@@ -76,6 +74,8 @@ from app.main.validators import (
     NoPlaceholders,
     NoTextInSVG,
     NotifyDataRequired,
+    NotifyInputRequired,
+    NotifyUrlValidator,
     OnlySMSCharacters,
     StringsNotAllowed,
     ValidEmail,
@@ -354,9 +354,6 @@ class GovukIntegerField(GovukTextInputField):
     def pre_validate(self, form):
 
         if self.data:
-
-            if isinstance(self.data, str):
-                raise StopValidation(f"Enter {self.things} in digits")
 
             if not isinstance(self.data, int):
                 raise StopValidation(f"Enter {self.things} in digits")
@@ -1159,7 +1156,7 @@ class RenameServiceForm(StripWhitespaceForm):
         "Service name",
         validators=[
             NotifyDataRequired(thing="a service name"),
-            MustContainAlphanumericCharacters(thing="Service name"),
+            MustContainAlphanumericCharacters(thing="service name"),
             Length(max=255, thing="service name"),
         ],
     )
@@ -1315,7 +1312,7 @@ class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
         "Numbers of text message fragments per year",
         things="the number of text message fragments",
         validators=[
-            InputRequired(message="Enter a number of text messages"),
+            NotifyInputRequired(thing="a number of text messages"),
             NumberRange(min=0, message="Number must be greater than or equal to 0"),
         ],
     )
@@ -1336,9 +1333,8 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
                 )
             }
         }
-        self.type_of_message = {"email": "emails", "sms": "text messages", "letter": "letters"}
         self.message_limit.validators = [
-            InputRequired(message=f"Enter a number of {self.type_of_message[notification_type]}"),
+            NotifyInputRequired(thing=f"a number of {message_count_noun(2, notification_type)}"),
             NumberRange(min=0, message="Number must be greater than or equal to 0"),
         ]
 
@@ -1755,7 +1751,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
         if self.contact_details_type.data == "url":
             self.url.validators = [
                 NotifyDataRequired(thing="a URL in the correct format"),
-                URL(message="Enter a URL in the correct format"),
+                NotifyUrlValidator(),
             ]
 
         elif self.contact_details_type.data == "email_address":

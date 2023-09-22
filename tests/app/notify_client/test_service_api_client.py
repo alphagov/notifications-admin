@@ -604,7 +604,7 @@ def test_client_updates_service_with_allowed_attributes(
         ({"name": "Service name error"}, "This service name is already in use - enter a unique name"),
         (
             {"normalised_service_name": "normalised service name has disallowed characters"},
-            "Service name must not include characters from a non-Latin alphabet",
+            "Service name cannot include characters from a non-Latin alphabet",
         ),
         ({"other": "blah"}, None),
     ),

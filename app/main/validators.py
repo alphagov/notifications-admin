@@ -9,7 +9,7 @@ from notifications_utils.sanitise_text import SanitiseSMS
 from notifications_utils.template import BroadcastMessageTemplate
 from orderedset import OrderedSet
 from wtforms import ValidationError
-from wtforms.validators import DataRequired, StopValidation
+from wtforms.validators import URL, DataRequired, InputRequired, StopValidation
 from wtforms.validators import Length as WTFormsLength
 
 from app import antivirus_client
@@ -241,6 +241,16 @@ class FileIsVirusFree:
 
 class NotifyDataRequired(DataRequired):
     def __init__(self, thing):
+        super().__init__(message=f"Enter {thing}")
+
+
+class NotifyInputRequired(InputRequired):
+    def __init__(self, thing):
+        super().__init__(message=f"Enter {thing}")
+
+
+class NotifyUrlValidator(URL):
+    def __init__(self, thing="a URL in the correct format"):
         super().__init__(message=f"Enter {thing}")
 
 
