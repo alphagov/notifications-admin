@@ -1,0 +1,49 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  QR codes
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Add QR codes to a letter templates</h1>
+
+  <p class="govuk-body">Add a QR code to your letter to let recipients visit your website without having to type in the URL.</p>
+
+  <p class="govuk-body">To personalise a message, use double brackets to add a placeholder to your content. For example:</p>
+
+  <pre class="formatting-example"><code class="lang-md">Hello ((first name)), your reference is ((reference number)).</code></pre>
+
+  <p class="govuk-body">Each time you send the message, you can:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>fill in the placeholders yourself</li>
+    <li>upload a list of personal details and let Notify do it for you</li>
+  </ul>
+
+  <p class="govuk-body">If you upload a list of personal details, the column names in your spreadsheet need to match the placeholders in the template.</p>
+
+  <h2 class="heading-medium" id="hide-personalised-content">Hide personalised content after sending</h2>
+
+  <p class="govuk-body">Some placeholders include sensitive information like security codes or password reset links. To protect your users, you can choose to hide the content of these placeholders after sending.</p>
+
+  <p class="govuk-body">Only the recipient will be able to see the sensitive information you’ve sent them. You and your team will see a redacted version of the message.</p>
+
+  <p class="govuk-body">To hide personalised content after sending:</p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
+    <li>Add a new template or choose an existing template.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">Hide personalisation after sending</b>.</li>
+  </ol>
+
+  <p class="govuk-body">You cannot undo this change.</p>
+
+  <p class="govuk-body">Read more about <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">Notify’s security features</a>.</p>
+
+{% endblock %}
