@@ -1181,22 +1181,23 @@ def letter_template_change_language(template_id, service_id):
     form = LetterTemplateLanguagesForm(languages=template._template.get("letter_languages"))
     if form.validate_on_submit():
         languages = form.languages.data
-        if languages == "welsh_then_english":
-            welsh_subject = "Welsh subject line goes here"
-            welsh_content = "Welsh content goes here"
-        elif languages == "english":
-            welsh_subject = None
-            welsh_content = None
-        else:
-            # no other radio options
-            abort(404)
-        service_api_client.update_service_template(
-            service_id,
-            template_id,
-            letter_languages=languages,
-            letter_welsh_subject=welsh_subject,
-            letter_welsh_content=welsh_content,
-        )
+        if languages != current_language:
+            if languages == "welsh_then_english":
+                welsh_subject = "Welsh subject line goes here"
+                welsh_content = "Welsh content goes here"
+            elif languages == "english":
+                welsh_subject = None
+                welsh_content = None
+            else:
+                abort(500, f"Unknown/unhandled form option: {languages}")
+
+            service_api_client.update_service_template(
+                service_id,
+                template_id,
+                letter_languages=languages,
+                letter_welsh_subject=welsh_subject,
+                letter_welsh_content=welsh_content,
+            )
 
         return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
