@@ -71,7 +71,7 @@ from app.utils.letters import (
     get_error_from_upload_form,
     get_letter_validation_error,
 )
-from app.utils.templates import get_template
+from app.utils.templates import TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
 form_objects = {
@@ -1175,11 +1175,10 @@ def _get_page_numbers(page_count):
 def letter_template_change_language(template_id, service_id):
     template = current_service.get_template(template_id)
 
-    if template.template_type != "letter":
+    if template.template_type != "letter" or not isinstance(template, TemplatedLetterImageTemplate):
         abort(404)
 
-    form = LetterTemplateLanguagesForm(**template._template)
-
+    form = LetterTemplateLanguagesForm(languages=template._template.get("letter_languages"))
     if form.validate_on_submit():
         languages = form.languages.data
         if languages == "welsh_then_english":
