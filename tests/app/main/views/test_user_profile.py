@@ -185,6 +185,15 @@ def test_should_show_authenticate_after_email_change(
     assert "Confirm" in page.text
 
 
+def test_should_redirect_from_authenticate_if_new_email_not_in_session(
+    client_request,
+):
+    client_request.get(
+        "main.user_profile_email_authenticate",
+        _expected_redirect=url_for("main.user_profile_email"),
+    )
+
+
 def test_should_render_change_email_continue_after_authenticate_email(
     client_request,
     mock_verify_password,

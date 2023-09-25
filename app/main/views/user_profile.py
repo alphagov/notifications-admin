@@ -89,7 +89,7 @@ def user_profile_email_authenticate():
     form = ConfirmPasswordForm(_check_password)
 
     if NEW_EMAIL not in session:
-        return redirect("main.user_profile_email")
+        return redirect(url_for("main.user_profile_email"))
 
     if form.validate_on_submit():
         user_api_client.send_change_email_verification(current_user.id, session[NEW_EMAIL])
