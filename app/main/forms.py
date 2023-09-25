@@ -1509,7 +1509,7 @@ class LetterTemplateLanguagesForm(StripWhitespaceForm):
             ("english", "English only"),
             ("welsh_then_english", "Welsh followed by English"),
         ],
-        validators=[DataRequired()],
+        validators=[InputRequired()],
     )
 
 
