@@ -179,6 +179,7 @@ def user_profile_mobile_number_authenticate():
         thing="mobile number",
         form=form,
         back_link=url_for(".user_profile_mobile_number_confirm"),
+        error_summary_enabled=True,
     )
 
 

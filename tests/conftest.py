@@ -2980,6 +2980,16 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
                             f"\n"
                             f'(you probably want to add class="{hint}")'
                         )
+
+                assert not page.select(
+                    r"main.govuk-\!-padding-top-0 h1.govuk-heading-l"
+                ), "Use heading-large or set error_summary_enabled=True"
+
+                if page.select("h1.heading-large"):
+                    assert (
+                        "govuk-!-padding-top-0" in page.select_one("main")["class"]
+                    ), "Use govuk-heading-l or set error_summary_enabled=False"
+
             return page
 
         @staticmethod
