@@ -53,6 +53,7 @@ from wtforms.validators import (
 )
 
 from app import asset_fingerprinter, current_organisation
+from app.constants import LetterLanguageOptions
 from app.formatters import (
     format_auth_type,
     format_thousands,
@@ -1506,8 +1507,8 @@ class LetterTemplateLanguagesForm(StripWhitespaceForm):
     languages = GovukRadiosField(
         "This will change the language used for the date and page numbers of your letter template.",
         choices=[
-            ("english", "English only"),
-            ("welsh_then_english", "Welsh followed by English"),
+            (LetterLanguageOptions.english.value, "English only"),
+            (LetterLanguageOptions.welsh_then_english.value, "Welsh followed by English"),
         ],
         validators=[InputRequired()],
     )

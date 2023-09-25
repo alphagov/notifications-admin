@@ -31,7 +31,7 @@ from app import (
     template_folder_api_client,
     template_statistics_client,
 )
-from app.constants import QR_CODE_TOO_LONG
+from app.constants import QR_CODE_TOO_LONG, LetterLanguageOptions
 from app.formatters import character_count, message_count
 from app.main import main, no_cookie
 from app.main.forms import (
@@ -1180,15 +1180,46 @@ def letter_template_change_language(template_id, service_id):
 
     current_language = template._template.get("letter_languages")
     form = LetterTemplateLanguagesForm(data=dict(languages=current_language))
-    if form.validate_on_submit():
+    if "confirm" in request.args:
+        if "languages" not in request.args:
+            return redirect(url_for(".change_letter_template_language", service_id=service_id, template_id=template_id))
+
+        if request.method == "POST":
+            service_api_client.update_service_template(
+                service_id,
+                template_id,
+                letter_languages=LetterLanguageOptions.english.value,
+                letter_welsh_subject=None,
+                letter_welsh_content=None,
+            )
+            return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
+
+        form.languages.data = request.args["languages"]
+        return render_template(
+            "views/templates/change-language.html",
+            form=form,
+            template=template,
+            error_summary_enabled=True,
+            confirmation_banner=True,
+            languages=request.args["languages"],
+        )
+
+    elif form.validate_on_submit():
         languages = form.languages.data
         if languages != current_language:
-            if languages == "welsh_then_english":
+            if languages == LetterLanguageOptions.welsh_then_english:
                 welsh_subject = "Welsh subject line goes here"
                 welsh_content = "Welsh content goes here"
-            elif languages == "english":
-                welsh_subject = None
-                welsh_content = None
+            elif languages == LetterLanguageOptions.english:
+                return redirect(
+                    url_for(
+                        ".letter_template_change_language",
+                        service_id=service_id,
+                        template_id=template_id,
+                        confirm="",
+                        languages=languages,
+                    )
+                )
             else:
                 abort(500, f"Unknown/unhandled form option: {languages}")
 

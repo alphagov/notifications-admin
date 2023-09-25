@@ -859,20 +859,13 @@ def test_GET_letter_template_change_language_404s_if_template_is_not_a_letter(
     assert page.select_one("h1").text.strip() != "Change language"
 
 
-@pytest.mark.parametrize(
-    "languages, expected_welsh_subject, expected_welsh_content",
-    [("welsh_then_english", "Welsh subject line goes here", "Welsh content goes here"), ("english", None, None)],
-)
-def test_POST_letter_template_change_language_also_changes_welsh_subject_and_content(
+def test_POST_letter_template_change_to_welsh_and_english_sets_subject_and_content(
     client_request,
     service_one,
     mocker,
     fake_uuid,
     active_user_with_permissions,
     mock_get_service_letter_template,
-    languages,
-    expected_welsh_subject,
-    expected_welsh_content,
 ):
     service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
@@ -883,7 +876,7 @@ def test_POST_letter_template_change_language_also_changes_welsh_subject_and_con
         "main.letter_template_change_language",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _data={"languages": languages},
+        _data={"languages": "welsh_then_english"},
         _expected_redirect=url_for(
             "main.view_template",
             service_id=SERVICE_ONE_ID,
@@ -893,9 +886,58 @@ def test_POST_letter_template_change_language_also_changes_welsh_subject_and_con
     mock_template_change_language.assert_called_with(
         SERVICE_ONE_ID,
         fake_uuid,
-        letter_languages=languages,
-        letter_welsh_subject=expected_welsh_subject,
-        letter_welsh_content=expected_welsh_content,
+        letter_languages="welsh_then_english",
+        letter_welsh_subject="Welsh subject line goes here",
+        letter_welsh_content="Welsh content goes here",
+    )
+
+
+def test_POST_letter_template_change_to_english_confirmation_banner_flow(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    mock_get_service_letter_template,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+
+    page = client_request.post(
+        "main.letter_template_change_language",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"languages": "english"},
+        _follow_redirects=True,
+    )
+    assert mock_template_change_language.call_args_list == []
+    expected_url = f"/services/{service_one['id']}/templates/{fake_uuid}/change-language?confirm=yes&languages=english"
+    form = page.select_one("form[method=post]")
+    assert form["action"] == expected_url
+    assert form.select_one("button")
+
+    client_request.post_url(
+        url_for(
+            "main.letter_template_change_language",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            confirm="yes",
+            languages="english",
+        ),
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_template_change_language.assert_called_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        letter_languages="english",
+        letter_welsh_subject=None,
+        letter_welsh_content=None,
     )
 
 
