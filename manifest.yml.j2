@@ -29,6 +29,8 @@ applications:
     health-check-http-endpoint: '/_status?simple=true'
     health-check-invocation-timeout: 10
 
+    stack: cflinuxfs4
+
     services:
       - logit-ssl-syslog-drain
       - notify-splunk
