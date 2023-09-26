@@ -102,8 +102,7 @@ def email_branding_options(service_id):
         )
 
     return render_template(
-        "views/service-settings/branding/email-branding-options.html",
-        form=form,
+        "views/service-settings/branding/email-branding-options.html", form=form, error_summary_enabled=True
     )
 
 
