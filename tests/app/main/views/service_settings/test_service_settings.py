@@ -3129,11 +3129,11 @@ def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_chan
 @pytest.mark.parametrize(
     "url, header_text",
     [
-        ("main.service_edit_email_reply_to", "Reply-to email addresses"),
+        ("main.service_edit_email_reply_to", "Change reply-to email address"),
         ("main.service_add_email_reply_to", "Add reply-to email address"),
     ],
 )
-def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
+def test_add_and_edit_reply_to_email_address(
     mocker, fake_uuid, client_request, mock_update_reply_to_email_address, url, header_text
 ):
     reply_to_email_address = create_reply_to_email_address()
@@ -3155,12 +3155,7 @@ def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_
     )
 
     assert page.select_one("h1").text == header_text
-
-    if url == "main.service_edit_email_reply_to":
-        assert error_message in page.select_one("div.banner-dangerous").text
-    else:
-        assert error_message in page.select_one(".govuk-error-message").text
-
+    assert error_message in page.select_one(".govuk-error-message").text
     assert mock_update_reply_to_email_address.called is False
 
 

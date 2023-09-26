@@ -582,7 +582,6 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
 def service_edit_email_reply_to(service_id, reply_to_email_id):
     form = ServiceReplyToEmailForm()
     reply_to_email_address = current_service.get_email_reply_to_address(reply_to_email_id)
-    print(reply_to_email_address)
     if request.method == "GET":
         form.email_address.data = reply_to_email_address["email_address"]
         form.is_default.data = reply_to_email_address["is_default"]
@@ -605,20 +604,18 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
             ]["id"]
 
         except HTTPError as e:
-            if e.status_code == 409:
-                flash(e.message, "error")
-                return redirect(url_for(".service_email_reply_to", service_id=service_id))
-            else:
-                raise e
-        return redirect(
-            url_for(
-                ".service_verify_reply_to_address",
-                service_id=service_id,
-                notification_id=notification_id,
-                is_default=True if reply_to_email_address["is_default"] else form.is_default.data,
-                replace=reply_to_email_id,
+            handle_reply_to_email_address_http_error(e, form)
+
+        else:
+            return redirect(
+                url_for(
+                    ".service_verify_reply_to_address",
+                    service_id=service_id,
+                    notification_id=notification_id,
+                    is_default=True if reply_to_email_address["is_default"] else form.is_default.data,
+                    replace=reply_to_email_id,
+                )
             )
-        )
 
     if request.endpoint == "main.service_confirm_delete_email_reply_to":
         flash("Are you sure you want to delete this reply-to email address?", "delete")
@@ -627,6 +624,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         form=form,
         reply_to_email_address_id=reply_to_email_id,
         show_choice_of_default_checkbox=show_choice_of_default_checkbox,
+        error_summary_enabled=True,
     )
 
 
