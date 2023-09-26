@@ -1037,6 +1037,7 @@ def service_edit_sms_sender(service_id, sms_sender_id):
         sms_sender=sms_sender,
         inbound_number=is_inbound_number,
         sms_sender_id=sms_sender_id,
+        error_summary_enabled=True,
     )
 
 
