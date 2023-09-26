@@ -948,7 +948,10 @@ def service_edit_letter_contact(service_id, letter_contact_id):
     if request.endpoint == "main.service_confirm_delete_letter_contact":
         flash("Are you sure you want to delete this contact block?", "delete")
     return render_template(
-        "views/service-settings/letter-contact/edit.html", form=form, letter_contact_id=letter_contact_block["id"]
+        "views/service-settings/letter-contact/edit.html",
+        form=form,
+        letter_contact_id=letter_contact_block["id"],
+        error_summary_enabled=True,
     )
 
 
