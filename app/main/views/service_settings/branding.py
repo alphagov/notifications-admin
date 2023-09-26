@@ -604,6 +604,7 @@ def letter_branding_options(service_id):
         "views/service-settings/branding/letter-branding-options.html",
         form=form,
         from_template=from_template,
+        error_summary_enabled=True,
     )
 
 
@@ -648,6 +649,7 @@ def letter_branding_request(service_id):
             service_id=current_service.id,
             **_letter_branding_flow_query_params(),
         ),
+        error_summary_enabled=True,
     )
 
 
