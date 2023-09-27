@@ -100,19 +100,6 @@
 
       }.bind(this));
 
-      this.focusContainer = function ($container) {
-        const onBlurContainer = evt => {
-          $container
-            .removeAttr('tabindex')
-            .off('blur', onBlurContainer);
-        };
-
-        $container
-          .attr('tabindex', 0)
-          .focus()
-          .on('blur', onBlurContainer);
-      };
-
       this.showDaysView = function () {
         const viewPanes = this.$component.find('.radio-select__expandee .radio-select__view');
 
@@ -192,9 +179,7 @@
         event.preventDefault();
 
         this.showDaysView();
-        this.focusContainer(
-          this.$component.find('.radio-select__days').eq(0)
-        );
+        this.$component.find(`.radio-select__days button[name=${this.selectedDay}]`).focus();
       };
 
       this.onDayClick = function (event) {
@@ -207,9 +192,7 @@
 
         scrollTop = $(window).scrollTop(); // store current scroll position
 
-        this.focusContainer(
-          this.$component.find(`#radio-select__times-for-${this.selectedDay}`).eq(0)
-        );
+        this.$component.find(`#radio-select__times-for-${this.selectedDay}`).parent().focus();
 
         $(window).scrollTop(scrollTop); // reset window to previous scroll position
       };
