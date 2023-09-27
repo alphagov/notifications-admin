@@ -892,7 +892,7 @@ def test_POST_letter_template_change_to_welsh_and_english_sets_subject_and_conte
     )
 
 
-def test_POST_letter_template_change_to_english_confirmation_banner_flow(
+def test_POST_letter_template_change_to_english_redirects_to_confirmation_page(
     client_request,
     service_one,
     mocker,
@@ -905,7 +905,7 @@ def test_POST_letter_template_change_to_english_confirmation_banner_flow(
 
     mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
 
-    page = client_request.post(
+    client_request.post(
         "main.letter_template_change_language",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
@@ -913,19 +913,49 @@ def test_POST_letter_template_change_to_english_confirmation_banner_flow(
         _follow_redirects=True,
     )
     assert mock_template_change_language.call_args_list == []
-    expected_url = f"/services/{service_one['id']}/templates/{fake_uuid}/change-language?confirm=yes&languages=english"
-    form = page.select_one("form[method=post]")
-    assert form["action"] == expected_url
-    assert form.select_one("button")
 
-    client_request.post_url(
-        url_for(
-            "main.letter_template_change_language",
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-            confirm="yes",
-            languages="english",
-        ),
+
+def test_GET_letter_template_confirm_remove_welsh(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    mock_get_service_letter_template,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+
+    page = client_request.get(
+        "main.letter_template_confirm_remove_welsh",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    form = page.select_one("form[method=post]")
+    assert form.select_one("button")
+    assert mock_template_change_language.call_args_list == []
+
+
+def test_POST_letter_template_confirm_remove_welsh(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    mock_get_service_letter_template,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+
+    client_request.post(
+        "main.letter_template_confirm_remove_welsh",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"confirm": "true"},
         _expected_redirect=url_for(
             "main.view_template",
             service_id=SERVICE_ONE_ID,
@@ -941,9 +971,7 @@ def test_POST_letter_template_change_to_english_confirmation_banner_flow(
     )
 
 
-def test_GET_letter_template_attach_pages(
-    client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
-):
+def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mock_get_service_letter_template):
     page = client_request.get(
         "main.letter_template_attach_pages",
         service_id=SERVICE_ONE_ID,

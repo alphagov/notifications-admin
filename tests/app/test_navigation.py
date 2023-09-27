@@ -189,6 +189,7 @@ EXCLUDED_ENDPOINTS = set(
             "letter_template",
             "letter_template_attach_pages",
             "letter_template_change_language",
+            "letter_template_confirm_remove_welsh",
             "letter_template_edit_pages",
             "link_service_to_organisation",
             "live_services_csv",

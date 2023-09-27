@@ -301,6 +301,7 @@
     "/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages/edit",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/change-language",
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/change-language/confirm",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/delete",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/edit",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/edit-postage",
