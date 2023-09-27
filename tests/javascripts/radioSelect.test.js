@@ -32,8 +32,8 @@ describe('RadioSelect', () => {
            };
   };
 
-  function getEnterKeyupEvent () {
-    return new window.KeyboardEvent('keyup', {
+  function getEnterKeyEvent (eventType) {
+    return new $.Event(eventType, {
       which: 13,
       charCode: 13,
       keyCode: 13,
@@ -200,17 +200,16 @@ describe('RadioSelect', () => {
 
       const expanderButton = document.querySelector('.radio-select__expander');
       const selectedDayAndTimeField = document.querySelector('.radio-select__selected-day-and-time');
-      const enterKeyupEvent = getEnterKeyupEvent();
+      const enterKeydownEvent = getEnterKeyEvent('keydown');
+      const enterKeyupEvent = getEnterKeyEvent('keyup');
+      const submitEvent = new $.Event('submit');
 
-      // JSDOM doesn't seem to implement forms being submitted by a press of the enter key on a field, like browsers.
-      // Because of that, we instead test that enter key events are prevented at the field level instead.
-      // This is testing an implementation detail so 🤮 but unsure how else to do it
-      jest.spyOn(enterKeyupEvent, 'preventDefault');
+      jest.spyOn(submitEvent, 'preventDefault');
       selectedDayAndTimeField.focus();
 
-      selectedDayAndTimeField.dispatchEvent(enterKeyupEvent);
-      expect(enterKeyupEvent.preventDefault).not.toHaveBeenCalled();
-      expect(expanderButton.getAttribute('aria-expanded')).toEqual('false');
+      $(selectedDayAndTimeField).trigger(enterKeydownEvent);
+      $(selectedDayAndTimeField).trigger(enterKeyupEvent);
+      expect(submitEvent.preventDefault).not.toHaveBeenCalled();
 
     });
 
@@ -260,10 +259,16 @@ describe('RadioSelect', () => {
 
     });
 
-    test("it should hide the submit button", () => {
+    test("it should hide the submit button and prevent the form being submitted", () => {
 
-      // it should hide the submit button
       expect(expanderButton.form.querySelector('button:not([type=button])').hasAttribute('hidden')).toBe(true);
+
+      const submitEvent = new $.Event('submit');
+
+      jest.spyOn(submitEvent, 'preventDefault');
+      $(expanderButton.form).trigger(submitEvent);
+
+      expect(submitEvent.preventDefault).toHaveBeenCalled();
 
     });
 
@@ -291,9 +296,16 @@ describe('RadioSelect', () => {
 
     });
 
-    test("it should show the submit button again", () => {
+    test("it should show the submit button again and allow the form to be submitted again", () => {
 
       expect(expanderButton.form.querySelector('button:not([type=button])').hasAttribute('hidden')).toBe(false);
+
+      const submitEvent = new $.Event('submit');
+
+      jest.spyOn(submitEvent, 'preventDefault');
+      $(expanderButton.form).trigger(submitEvent);
+
+      expect(submitEvent.preventDefault).not.toHaveBeenCalled();
 
     });
 
@@ -474,6 +486,7 @@ describe('RadioSelect', () => {
     let expandingSection;
     let buttonForTomorrow;
     let radioFor3amTomorrow;
+    let enterKeydownEvent;
     let enterKeyupEvent;
 
     beforeEach(() => {
@@ -490,36 +503,17 @@ describe('RadioSelect', () => {
 
     });
 
-    // JSDOM doesn't seem to implement forms being submitted by a press of the enter key on a field, like browsers.
-    // Because of that, we instead test that enter key events are prevented at the field level instead.
-    // This is testing an implementation detail so 🤮 but unsure how else to do it
-    test("if the enter key is pressed when the selected day and time field is focused, the form should not submit", () => {
-
-      const selectedDayAndTimeField = document.querySelector('.radio-select__selected-day-and-time')
-
-      enterKeyupEvent = getEnterKeyupEvent();
-      jest.spyOn(enterKeyupEvent, 'preventDefault');
-
-      selectedDayAndTimeField.focus();
-      selectedDayAndTimeField.dispatchEvent(enterKeyupEvent);
-
-      expect(enterKeyupEvent.preventDefault).toHaveBeenCalled();
-
-    });
-
-    describe("if the enter key is pressed when a radio for a time is checked and focused", () => {
+    describe("if the enter key is pressed on a selected radio", () => {
 
       beforeEach(() => {
 
-        // JSDOM doesn't seem to implement forms being submitted by a press of the enter key on a field, like browsers.
-        // Because of that, we instead test that enter key events are prevented at the field level instead.
-        // This is testing an implementation detail so 🤮 but unsure how else to do it
-        enterKeyupEvent = getEnterKeyupEvent();
-        jest.spyOn(enterKeyupEvent, 'preventDefault');
+        enterKeydownEvent = getEnterKeyEvent('keydown');
+        enterKeyupEvent = getEnterKeyEvent('keyup');
 
         radioFor3amTomorrow.focus();
         radioFor3amTomorrow.setAttribute('checked', 'checked');
-        radioFor3amTomorrow.dispatchEvent(enterKeyupEvent);
+        $(radioFor3amTomorrow).trigger(enterKeydownEvent);
+        $(radioFor3amTomorrow).trigger(enterKeyupEvent);
 
       });
 
