@@ -29,9 +29,9 @@
             <div class="radio-select__view" hidden>
               <a href="" class="govuk-link govuk-back-link radio-select__return-to-days js-header">Back to days</a>
               ${params.days.map((day, idx) => `
-                <fieldset class="govuk-fieldset radio-select__times" aria-describedby="radio-select__times-description" id="radio-select__times-for-${day.value}" hidden>
+                <fieldset class="govuk-fieldset radio-select__times" id="radio-select__times-for-${day.value}" aria-describedby="radio-select__times-help" hidden>
                   <legend class="govuk-visually-hidden">Time to send these messages</legend>
-                  <p class="govuk-visually-hidden" id="radio-select__times-description">Choose a time and press confirm or cancel</p>
+                  <p class="govuk-visually-hidden radio-select__times-help govuk-body" id="radio-select__times-help">Choose a time and confirm</p>
                   ${params.times[day.value].map((time, idx) => `
                     <div class="govuk-radios__item">
                       <input class="govuk-radios__input radio-select__time" type="radio" value="${time.value}" id="${time.id}" name="${time.name}"${time.checked ? ' checked' : ''} />
@@ -117,6 +117,16 @@
         GOVUK.stickAtBottomWhenScrolling.recalculate();
       };
 
+      this.focusSelectedTimeOrFirst = function () {
+        let time = this.$component.find(`.radio-select__expandee input[name=times-for-${this.selectedDay}]:checked`);
+
+        if (time.length === 0) {
+          time = this.$component.find(`.radio-select__expandee input[name=times-for-${this.selectedDay}]`);
+        }
+
+        time.eq(0).focus();
+      };
+
       this.showTimesForDay = function (day) {
         this.$component.find('.radio-select__expandee .radio-select__times').each((idx, timesGroup) => {
           if (timesGroup.id === `radio-select__times-for-${day}`) {
@@ -166,11 +176,13 @@
       };
 
       this.selectDayAndTime = function () {
-        this.selectedTime = _getTimeFromRadio(
-          this.$component.find('.radio-select__times:not([hidden]) .radio-select__time:checked').get(0)
-        );
+        const selectedRadio = this.$component.find('.radio-select__times:not([hidden]) .radio-select__time:checked');
 
-        if (this.selectedTime.length === 0) { return; }
+        if (selectedRadio.length === 0) { return; }
+
+        this.selectedTime = _getTimeFromRadio(
+          selectedRadio.get(0)
+        );
 
         // reset state of expanding section for selecting a day + time
         this.showDaysView();
@@ -191,18 +203,12 @@
       };
 
       this.onDayClick = function (event) {
-        let scrollTop;
-
         this.selectedDay = event.target.value.trim();
 
         this.showTimesForDay(this.selectedDay);
         this.showTimesView();
 
-        scrollTop = $(window).scrollTop(); // store current scroll position
-
-        this.$component.find(`#radio-select__times-for-${this.selectedDay}`).parent().focus();
-
-        $(window).scrollTop(scrollTop); // reset window to previous scroll position
+        this.focusSelectedTimeOrFirst();
       };
 
       this.onExpanderClick = function (event) {
@@ -220,22 +226,37 @@
         });
       };
 
-      this.onKeyupOnTime = function (event) {
-        // block uses of enter key to stop form submitting before selection is confirmed
-        if (event.which === ENTER_CODE) {
-          event.preventDefault();
+      this.keyCache = null;
+
+      // runs on keydown and keyup to track a complete keypress
+      this.onEnterKeyUpAndDown = function (event) {
+
+        let isExpanded;
+        let targetIsSelectedDayAndTimeField;
+
+        if (event.which !== ENTER_CODE) {
+          return;
+        }
+        if (event.type === 'keydown') {
+          this.keyCache = event.target;
+          return;
+        }
+
+        if (event.target !== this.keyCache) {
+          return;
+        }
+
+        // event.type is 'keyup', key is enter and was the key that fired the last 'keydown' event
+        targetIsSelectedDayAndTimeField = event.target.classList.contains('radio-select__selected-day-and-time');
+        isExpanded = this.$component.find('.radio-select__expander').attr('aria-expanded') === 'true';
+
+        if (targetIsSelectedDayAndTimeField) {
+          if (isExpanded) { this.toggleExpandingSection(); }
+        } else { // target element is the radio for a time
           this.selectDayAndTime();
         }
-      };
 
-      this.onKeyupOnSelectedDayAndTime = function (event) {
-        const isExpanded = (this.$component.find('.radio-select__expander').attr('aria-expanded') === 'true');
-
-        // block uses of enter key to stop form submitting when day + time selection is expanded
-        if (isExpanded && (event.which === ENTER_CODE)) {
-          event.preventDefault();
-          this.toggleExpandingSection();
-        }
+        this.keyCache = null;
       };
 
       this.selectedDay = days[0];
@@ -257,8 +278,8 @@
         .on('click', '.radio-select__day', this.onDayClick.bind(this))
         .on('click', '.radio-select__return-to-days', this.onReturnToDaysClick.bind(this))
         .on('click', '.radio-select__confirm__button', this.onConfirmClick.bind(this))
-        .on('keyup', '.radio-select__time', this.onKeyupOnTime.bind(this))
-        .on('keyup', '.radio-select__selected-day-and-time', this.onKeyupOnSelectedDayAndTime.bind(this))
+        .on('keydown keyup', '.radio-select__time', this.onEnterKeyUpAndDown.bind(this))
+        .on('keydown keyup', '.radio-select__selected-day-and-time', this.onEnterKeyUpAndDown.bind(this))
         .on('change', '.radio-select__time', this.onTimeSelection.bind(this));
 
     };

@@ -55,16 +55,14 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   @include govuk-responsive-margin(3, "top");
 }
 
+.radio-select__expandee > .radio-select__view:nth-of-type(2) {
+  margin: 5px 3px 3px;
+}
+
 .radio-select__days,
 .radio-select__times {
   display: flex;
   flex-direction: column;
-}
-
-.radio-select__days:focus-visible,
-.radio-select__times:focus-visible {
-  outline: 3px solid $govuk-focus-colour;
-  outline-offset: 2px;
 }
 
 .radio-select__times[hidden] {

@@ -138,9 +138,7 @@ describe('RadioSelect', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-
     window.GOVUK.stickAtBottomWhenScrolling.recalculate.mockClear();
-    window.scrollTo.mockClear();
   });
 
   describe("when the page has loaded", () => {
@@ -319,11 +317,12 @@ describe('RadioSelect', () => {
       buttonForTomorrow = daysView.querySelectorAll('button[type=button]')[1];
 
       helpers.triggerEvent(expanderButton, 'click');
-      helpers.triggerEvent(buttonForTomorrow, 'click');
 
     });
 
     test("the days view should be hidden", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
 
       expect(daysView.hasAttribute('hidden')).toBe(true);
 
@@ -331,31 +330,38 @@ describe('RadioSelect', () => {
 
     test("the times view and the times for that day should show", () => {
 
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
       expect(timesView.hasAttribute('hidden')).toBe(false);
 
-    });
-
-    test("the times view should be focused", () => {
-
-      expect(document.activeElement).toBe(timesView);
+      // There should be a radio for each hour of the day still remaining and tomorrow should have them all.
+      expect(timesView.querySelectorAll('input[name=times-for-tomorrow]').length).toEqual(24);
 
     });
 
-    test("it should stop the browser scrolling the page when the times view is focused", () => {
-      // Different browsers scroll to show the currently focused element in different ways, so it isn't out of the viewport.
-      // The times view is often too tall for the viewport so the browser may often scroll to try and accommodate.
-      // In our case, this is more confusing that helpful and retaining the current scroll position is better, to match
-      // that of the days view we came from.
-      // We do that by caching the scroll position before we switch views and reset to that afterwards, all quickly enough
-      // to not be noticable
-      //
-      // Note: we have mocked window.scrollTo so the page will not actually scroll here.
+    test("if no times are selected yet for that day, the first radio should be focused", () => {
 
-      expect(window.scrollTo).toHaveBeenCalled();
-      expect(window.scrollTo.mock.lastCall[1]).toEqual(scrollPosition); // window.scrollTo gets called with x,y params
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      expect(document.activeElement).toBe(timesView.querySelector('#radio-select__times-for-tomorrow .govuk-radios__item:nth-of-type(1) input[type=radio]'));
+
+    });
+
+    test("if a time is already selected for that day, its radio should be focused", () => {
+
+      const radioFor2amTomorrow = timesView.querySelector('#radio-select__times-for-tomorrow .govuk-radios__item:nth-of-type(2) input');
+
+      radioFor2amTomorrow.setAttribute('checked', 'checked');
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      expect(document.activeElement).toBe(timesView.querySelector('#radio-select__times-for-tomorrow .govuk-radios__item:nth-of-type(2) input'));
+
     });
 
     test("there should be a link to return to the days view", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
 
       const backLink = expandingSection.querySelector('.radio-select__times').parentElement.querySelector('.govuk-back-link');
 
@@ -383,6 +389,8 @@ describe('RadioSelect', () => {
 
     test("the 'confirm' button container should be made sticky", () => {
 
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
       const container = expandingSection.querySelector('.radio-select__confirm');
 
       expect(container.classList.contains('js-stick-at-bottom-when-scrolling')).toBe(true);
@@ -391,6 +399,8 @@ describe('RadioSelect', () => {
     });
 
     test("if you select a time but don't confirm it and collapse the section, neither the field or form data should be updated", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
 
       expandingSection.querySelectorAll('.radio-select__times input[name=times-for-tomorrow]')[2].checked = true;
 
