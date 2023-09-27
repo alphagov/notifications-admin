@@ -3,7 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% set title = 'Remove Welsh pages' %}
+{% set title = 'Are you sure you want to change the language to English only?' %}
 {% block service_page_title %}
   {{ title }}
 {% endblock %}
@@ -15,13 +15,11 @@
 {% block maincolumn_content %}
   {{ page_header(title) }}
 
-  <p class="govuk-body">Are you sure you want to change the language to English only?</p>
-
-  <p class="govuk-body">This will delete the Welsh pages of your letter template.</p>
+  <p class="govuk-body">This will remove the Welsh pages of your letter template.</p>
 
   {% call form_wrapper() %}
     <input type="hidden" name="confirm" value="true" />
-    {{ page_footer('Remove Welsh pages') }}
+    {{ page_footer('Yes, change the language') }}
   {% endcall %}
 
 {% endblock %}
