@@ -54,6 +54,9 @@ applications:
       {% if REDIS_URL is defined %}
       REDIS_URL: '{{ REDIS_URL }}'
       {% endif %}
+      {% if REDIS_ENABLED is defined %}
+      REDIS_ENABLED: '{{ REDIS_ENABLED }}'
+      {% endif %}
 
       AWS_ACCESS_KEY_ID: '{{ AWS_ACCESS_KEY_ID }}'
       AWS_SECRET_ACCESS_KEY: '{{ AWS_SECRET_ACCESS_KEY }}'
