@@ -13,9 +13,9 @@
         <input type="text" class="radio-select__selected-day-and-time" id="radio-select__selected-day-and-time" readonly value="${params.selectedTime.label}">
         <input type="hidden" class="radio-select__selected-value" value="${params.selectedTime.value}" name="${params.componentName}">
         <div class="radio-select__expander-and-expandee">
-          <button type='button' class='govuk-button govuk-button--secondary radio-select__expander' aria-expanded="false" >Choose another time</button>
-          <div class="radio-select__expandee" hidden>
-            <div class="radio-select__column">
+          <button type="button" class="govuk-button govuk-button--secondary radio-select__expander" aria-expanded="false" aria-controls="${params.componentName}-expanding-section">Choose another time</button>
+          <div class="radio-select__expandee" id="${params.componentName}-expanding-section" hidden>
+            <div class="radio-select__view">
               <fieldset class="govuk-fieldset radio-select__days">
                 <legend class="govuk-visually-hidden">Day to send these messages</legend>
                 ${params.days.map((day, idx) => `
@@ -25,7 +25,7 @@
                 ).join('')}
               </fieldset>
             </div>
-            <div class="radio-select__column" hidden>
+            <div class="radio-select__view" hidden>
               <a href="" class="govuk-link govuk-back-link radio-select__return-to-days js-header">Back to days</a>
               ${params.days.map((day, idx) => `
                 <fieldset class="govuk-fieldset radio-select__times" aria-describedby="radio-select__times-description" id="radio-select__times-for-${day.value}" hidden>
@@ -114,14 +114,14 @@
       };
 
       this.showDaysView = function () {
-        const viewPanes = this.$component.find('.radio-select__expandee .radio-select__column');
+        const viewPanes = this.$component.find('.radio-select__expandee .radio-select__view');
 
         viewPanes.get(0).removeAttribute('hidden');
         viewPanes.get(1).setAttribute('hidden', '');
       };
 
       this.showTimesView = function () {
-        const viewPanes = this.$component.find('.radio-select__expandee .radio-select__column');
+        const viewPanes = this.$component.find('.radio-select__expandee .radio-select__view');
 
         viewPanes.get(0).setAttribute('hidden', '');
         viewPanes.get(1).removeAttribute('hidden');

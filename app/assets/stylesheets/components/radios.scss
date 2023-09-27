@@ -51,7 +51,7 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   transform:translateY(1px) rotate(225deg) scale(1);
 }
 
-.radio-select__expandee > .radio-select__column {
+.radio-select__expandee > .radio-select__view {
   @include govuk-responsive-margin(3, "top");
 }
 
