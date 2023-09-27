@@ -410,7 +410,7 @@ describe('RadioSelect', () => {
 
     });
 
-    test("if you select a time but don't confirm it and collapse the section, neither the field or form data should be updated", () => {
+    test("if you select a time but don't confirm it and collapse the section, neither the selected time and day field or form data should be updated", () => {
 
       helpers.triggerEvent(buttonForTomorrow, 'click');
 
@@ -461,7 +461,7 @@ describe('RadioSelect', () => {
 
     });
 
-    test("the time chosen should show in the field and its value be updated in the form data", () => {
+    test("the time chosen should show in the selected day and time field and its value be updated in the form data", () => {
 
       const timeLabel = expandingSection.querySelector(`label[for=${radioFor3amTomorrow.id}]`).textContent.trim();
       const timeValue = radioFor3amTomorrow.value;
@@ -472,7 +472,7 @@ describe('RadioSelect', () => {
 
     });
 
-    test("the part of the field showing the time should be focused", () => {
+    test("the field showing the selected day and time should be focused", () => {
 
       expect(document.activeElement).toBe(document.querySelector('.radio-select__selected-day-and-time'));
 
@@ -517,7 +517,7 @@ describe('RadioSelect', () => {
 
       });
 
-      test("the time chosen should show in the field and its value be updated in the form data", () => {
+      test("the time chosen should show in the field showing the selected day and time and its value be updated in the form data", () => {
 
         const timeLabel = expandingSection.querySelector(`label[for=${radioFor3amTomorrow.id}]`).textContent.trim();
         const timeValue = radioFor3amTomorrow.value;
@@ -528,7 +528,7 @@ describe('RadioSelect', () => {
 
       });
 
-      test("the part of the field showing the time should be focused", () => {
+      test("the field showing the selected day and time should be focused", () => {
 
         expect(document.activeElement).toBe(document.querySelector('.radio-select__selected-day-and-time'));
 
