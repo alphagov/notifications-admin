@@ -1,5 +1,6 @@
 import base64
 import json
+import math
 import uuid
 from functools import partial
 from io import BytesIO
@@ -71,6 +72,7 @@ from app.utils.letters import (
     get_error_from_upload_form,
     get_letter_validation_error,
 )
+from app.utils.pagination import generate_optional_previous_and_next_dicts, get_page_from_request
 from app.utils.templates import TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
@@ -831,8 +833,32 @@ def redact_template(service_id, template_id):
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/versions")
 @user_has_permissions(allow_org_user=True)
 def view_template_versions(service_id, template_id):
+    page = get_page_from_request() or 1
+    page_size = 25
+
+    template_data = service_api_client.get_service_template_versions(service_id, template_id)["data"]
+    num_pages = math.ceil(len(template_data) / page_size)
+
+    if page > num_pages:
+        return redirect(
+            url_for(".view_template_versions", service_id=service_id, template_id=template_id, page=num_pages)
+        )
+
+    start_offset = (page - 1) * page_size
+    end_offset = start_offset + page_size
+    templates = template_data[start_offset:end_offset]
+
+    previous_page, next_page = generate_optional_previous_and_next_dicts(
+        ".view_template_versions",
+        service_id=service_id,
+        page=page,
+        num_pages=num_pages,
+        url_args=dict(template_id=template_id),
+    )
+
     return render_template(
         "views/templates/choose_history.html",
+        template_id=template_id,
         versions=[
             get_template(
                 template,
@@ -845,8 +871,10 @@ def view_template_versions(service_id, template_id):
                     filetype="png",
                 ),
             )
-            for template in service_api_client.get_service_template_versions(service_id, template_id)["data"]
+            for template in templates
         ],
+        previous_page=previous_page,
+        next_page=next_page,
     )
 
 
