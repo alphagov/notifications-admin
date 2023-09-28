@@ -1,16 +1,27 @@
 const helpers = require('./support/helpers');
 
+let consoleErrorSpy;
+
 beforeAll(() => {
+
   require('../../app/assets/javascripts/radioSelect.js');
 
   // The sticky JS should be called whenever the times are shown so stub it out as a mock
   window.GOVUK.stickAtBottomWhenScrolling = {
     recalculate: jest.fn(() => {})
   };
+
+  // spy on console.error to track JSDOM errors
+  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
 });
 
 afterAll(() => {
+
+  consoleErrorSpy.mockRestore();
+
   require('./support/teardown.js');
+
 });
 
 describe('RadioSelect', () => {
@@ -48,6 +59,10 @@ describe('RadioSelect', () => {
     screenMock.setWindow({
       scrollTop: scrollPosition
     });
+
+    // reset all tracking of calls to console.error
+    consoleErrorSpy.mockClear();
+
 
     const options = () => {
       let result = '';
@@ -196,20 +211,23 @@ describe('RadioSelect', () => {
 
     });
 
-    test("If you press the enter key on the selected day and time field, it should submit", () => {
+    test("You should be able to submit the form again", () => {
 
-      const expanderButton = document.querySelector('.radio-select__expander');
-      const selectedDayAndTimeField = document.querySelector('.radio-select__selected-day-and-time');
-      const enterKeydownEvent = getEnterKeyEvent('keydown');
-      const enterKeyupEvent = getEnterKeyEvent('keyup');
+      const form = document.querySelector('.radio-select__selected-day-and-time').form;
+
       const submitEvent = new $.Event('submit');
 
-      jest.spyOn(submitEvent, 'preventDefault');
-      selectedDayAndTimeField.focus();
+      $(form).trigger(submitEvent);
 
-      $(selectedDayAndTimeField).trigger(enterKeydownEvent);
-      $(selectedDayAndTimeField).trigger(enterKeyupEvent);
-      expect(submitEvent.preventDefault).not.toHaveBeenCalled();
+      // JSDOM doesn't implement form submissions
+      // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
+      //
+      // If a form submission is fired, this instead outputs a 'not implemented' error from the requestSubmit method.
+      //
+      // That means we can assume any errors of that type would be the same as a form submission in
+      // browsers.
+      expect(consoleErrorSpy.mock.calls.length).toEqual(1);
+      expect(consoleErrorSpy.mock.calls[0][0].message).toEqual('Not implemented: HTMLFormElement.prototype.submit');
 
     });
 
@@ -302,10 +320,17 @@ describe('RadioSelect', () => {
 
       const submitEvent = new $.Event('submit');
 
-      jest.spyOn(submitEvent, 'preventDefault');
       $(expanderButton.form).trigger(submitEvent);
 
-      expect(submitEvent.preventDefault).not.toHaveBeenCalled();
+      // JSDOM doesn't implement form submissions
+      // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
+      //
+      // If a form submission is fired, this instead outputs a 'not implemented' error from the requestSubmit method.
+      //
+      // That means we can assume any errors of that type would be the same as a form submission in
+      // browsers.
+      expect(consoleErrorSpy.mock.calls.length).toEqual(1);
+      expect(consoleErrorSpy.mock.calls[0][0].message).toEqual('Not implemented: HTMLFormElement.prototype.submit');
 
     });
 
