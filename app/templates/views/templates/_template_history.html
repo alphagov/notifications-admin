@@ -1,5 +1,11 @@
 <div class="govuk-grid-column-full">
-  <h2 class="message-name">{{ template.name }}</h2>
+  {% if version_heading %}
+  <h2 class="message-name">
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.view_template_version', service_id=current_service.id, template_id=template.id, version=template._template.version) }}">
+      Version {{ template._template.version }}: {{ template.name }}
+    </a>
+  </h2>
+  {% endif %}
   <p class="hint">
     {% if template.get_raw('version', 1) > 1 %}
       Edit made {% if template.get_raw('updated_at', None) %}{{ template.get_raw('updated_at')|format_datetime_normal }}{% endif %}
