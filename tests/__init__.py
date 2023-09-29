@@ -203,7 +203,6 @@ def service_json(
         "rate_limit": rate_limit,
         "active": active,
         "restricted": restricted,
-        "email_from": normalised_service_name,
         "normalised_service_name": normalised_service_name,
         "reply_to_email_address": reply_to_email_address,
         "sms_sender": sms_sender,

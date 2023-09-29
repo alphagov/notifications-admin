@@ -88,7 +88,6 @@ def test_client_creates_service_with_correct_data(
             letter_message_limit=1,
             restricted=True,
             user_id=fake_uuid,
-            email_from="some.test.name",
             normalised_service_name="some.test.name",
         ),
     )
@@ -578,7 +577,6 @@ def test_client_updates_service_with_allowed_attributes(
         "contact_link",
         "count_as_live",
         "email_branding",
-        "email_from",
         "normalised_service_name",
         "free_sms_fragment_limit",
         "go_live_at",
@@ -611,10 +609,6 @@ def test_client_updates_service_with_allowed_attributes(
     "err_data, expected_message",
     (
         ({"name": "Service name error"}, "This service name is already in use"),
-        (
-            {"email_from": "email_from disallowed characters"},
-            "Service name must not include characters from a non-Latin alphabet",
-        ),
         (
             {"normalised_service_name": "normalised service name has disallowed characters"},
             "Service name must not include characters from a non-Latin alphabet",
