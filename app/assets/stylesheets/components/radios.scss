@@ -15,7 +15,7 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   display: flex;
   flex-direction: column;
   padding: 3px 3px 4px;
-  border: solid 3px $govuk-input-border-colour;
+  border: solid 2px $govuk-input-border-colour;
 }
 
 .radio-select__selected-day-and-time {
