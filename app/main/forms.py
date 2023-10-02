@@ -129,7 +129,7 @@ def get_human_day(time):
 
 
 def get_furthest_possible_scheduled_time():
-    return (datetime.utcnow() + timedelta(days=4)).replace(hour=0)
+    return (datetime.utcnow() + timedelta(days=7)).replace(hour=0)
 
 
 def get_next_hours_until(until):
