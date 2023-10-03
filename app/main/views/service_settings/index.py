@@ -109,7 +109,6 @@ def service_name_change(service_id):
             normalised_service_name = email_safe(form.name.data)
             current_service.update(
                 name=form.name.data,
-                email_from=normalised_service_name,
                 normalised_service_name=normalised_service_name,
             )
         except HTTPError as http_error:

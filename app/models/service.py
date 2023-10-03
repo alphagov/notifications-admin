@@ -33,7 +33,6 @@ class Service(JSONModel):
         "broadcast_channel",
         "contact_link",
         "count_as_live",
-        "email_from",
         "go_live_at",
         "has_active_go_live_request",
         "id",

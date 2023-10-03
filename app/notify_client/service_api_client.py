@@ -31,7 +31,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "letter_message_limit": letter_message_limit,
             "user_id": user_id,
             "restricted": restricted,
-            "email_from": normalised_service_name,
             "normalised_service_name": normalised_service_name,
         }
         data = _attach_current_user(data)
@@ -84,7 +83,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "created_by",
             "count_as_live",
             "email_branding",
-            "email_from",
             "normalised_service_name",
             "free_sms_fragment_limit",
             "go_live_at",
@@ -504,7 +502,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     @classmethod
     def parse_edit_service_http_error(cls, http_error):
         """Inspect the HTTPError from a create_service/update_service call and return a human-friendly error message"""
-        if http_error.message.get("email_from") or http_error.message.get("normalised_service_name"):
+        if http_error.message.get("normalised_service_name"):
             return "Service name must not include characters from a non-Latin alphabet"
 
         elif http_error.message.get("name"):
