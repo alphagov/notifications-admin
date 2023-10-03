@@ -41,7 +41,7 @@
               </fieldset>`
               ).join('')}
               <div class="radio-select__confirm js-stick-at-bottom-when-scrolling">
-                <button type="button" class="govuk-button radio-select__confirm__button">Confirm time</button>
+                <button type="button" class="govuk-button govuk-button--secondary radio-select__confirm__button">Confirm time</button>
               </div>
             </div>
           </div>
