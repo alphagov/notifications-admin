@@ -15,12 +15,16 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   display: block;
   width: 100%;
   box-sizing: border-box;
-  padding-top: 5px;
-  padding: 5px;
+  padding: 6px 5px 6px;
   border: solid 2px $govuk-input-border-colour;
   text-align: center;
   position: relative;
   z-index: 100;
+}
+
+.radio-select__selected-day-and-time:focus {
+  padding: 5px 5px 5px;
+  border-width: 3px;
 }
 
 .radio-select__expander {
