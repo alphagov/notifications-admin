@@ -11,6 +11,12 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   @include govuk-responsive-margin(6, "bottom");
 }
 
+// make focus ring appear above button
+.radio-select__selected-day-and-time:focus {
+  position: relative;
+  z-index: 1;
+}
+
 .radio-select__selected-day-and-time {
   display: block;
   width: 100%;
@@ -18,8 +24,6 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   padding: 6px 5px 6px;
   border: solid 2px $govuk-input-border-colour;
   text-align: center;
-  position: relative;
-  z-index: 100;
 }
 
 .radio-select__selected-day-and-time:focus {
