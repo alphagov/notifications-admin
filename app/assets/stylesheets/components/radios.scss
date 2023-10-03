@@ -5,18 +5,16 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 
 .radio-select {
   min-height: 39px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
 }
 
 .radio-select__selection-and-button {
   @include govuk-responsive-margin(6, "bottom");
-  display: flex;
-  flex-direction: column;
 }
 
 .radio-select__selected-day-and-time {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   padding-top: 5px;
   padding: 5px;
   border: solid 2px $govuk-input-border-colour;
@@ -25,15 +23,12 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   z-index: 100;
 }
 
-.radio-select__expander-and-expandee {
-  display: flex;
-  flex-direction: column;
-}
-
 .radio-select__expander {
   border-top-color: rgba(255, 255, 255, 0.2);
   border-left-color: rgba(0, 0, 0, 0.02);
   border-right-color: rgba(0, 0, 0, 0.02);
+  display: block;
+  width: 100%;
 }
 
 .radio-select__expander::before {
@@ -89,6 +84,10 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 
 .radio-select__confirm.js-stick-at-bottom-when-scrolling {
   margin-top: 0;
+}
+
+.radio-select__confirm__button {
+  width: 100%;
 }
 
 .govuk-form-group--nested-radio{
