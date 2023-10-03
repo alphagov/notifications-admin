@@ -39,7 +39,7 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   content:"";
   display:inline-block;
   height:8px;
-  margin:0 10px 0 2px;
+  margin: 0 10px 0 -18px; // negative left margin means the element effectively occupies 0 width
   vertical-align:middle;
   width:8px;
   position: static; // override GOV.UK Frontend styling from the Button component
