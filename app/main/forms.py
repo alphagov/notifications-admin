@@ -1604,7 +1604,7 @@ class ChooseTimeForm(StripWhitespaceForm):
         self.scheduled_for.days = get_next_days_until(get_furthest_possible_scheduled_time())
 
     scheduled_for = GovukRadiosField(
-        "When should Notify send these messages?",
+        "When to send these messages",
         default="",
     )
 
