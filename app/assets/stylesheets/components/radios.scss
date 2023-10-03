@@ -30,6 +30,12 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   flex-direction: column;
 }
 
+.radio-select__expander {
+  border-top-color: rgba(255, 255, 255, 0.2);
+  border-left-color: rgba(0, 0, 0, 0.02);
+  border-right-color: rgba(0, 0, 0, 0.02);
+}
+
 .radio-select__expander::before {
   transform:translateY(-35%) rotate(45deg) scale(1);
   border-color: black;
