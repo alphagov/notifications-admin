@@ -64,6 +64,10 @@
   }
 }
 
+.change-language {
+  float: right;
+}
+
 .edit-template-link-get-ready-to-send {
   @extend %edit-template-link;
   top: 232px; // covers MDI barcode and aligns to bottom of contact block

@@ -5,6 +5,16 @@ from notifications_utils.clients.redis import daily_limit_cache_key
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
+ALLOWED_TEMPLATE_ATTRIBUTES = {
+    "content",
+    "letter_languages",
+    "name",
+    "postage",
+    "subject",
+    "letter_welsh_subject",
+    "letter_welsh_content",
+}
+
 
 class ServiceAPIClient(NotifyAdminAPIClient):
     @cache.delete("user-{user_id}")
@@ -182,18 +192,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.delete("service-{service_id}-templates")
     @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
-    def update_service_template(self, *, service_id, template_id, name=None, content=None, subject=None):
+    def update_service_template(self, service_id, template_id, **kwargs):
         """
         Update a service template.
         """
-        data = {}
-        if content:
-            data["content"] = content
-        if name:
-            data["name"] = name
-        if subject:
-            data["subject"] = subject
-        data = _attach_current_user(data)
+        disallowed_attributes = set(kwargs.keys()) - ALLOWED_TEMPLATE_ATTRIBUTES
+        if disallowed_attributes:
+            raise TypeError(f"Not allowed to update template attributes: {', '.join(disallowed_attributes)}")
+        data = _attach_current_user(kwargs)
         endpoint = f"/service/{service_id}/template/{template_id}"
         return self.post(endpoint, data)
 
@@ -213,11 +219,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         }
         data = _attach_current_user(data)
         return self.post(f"/service/{service_id}/template/{template_id}", data)
-
-    @cache.delete("service-{service_id}-templates")
-    @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
-    def update_service_template_postage(self, service_id, template_id, postage):
-        return self.post(f"/service/{service_id}/template/{template_id}", _attach_current_user({"postage": postage}))
 
     @cache.set("service-{service_id}-template-{template_id}-version-{version}")
     def get_service_template(self, service_id, template_id, version=None):

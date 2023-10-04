@@ -440,13 +440,6 @@ def test_deletes_service_cache(
             [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
         ),
         (
-            "update_service_template_postage",
-            [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, "first"],
-            {},
-            [f"service-{SERVICE_ONE_ID}-templates"],
-            [f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"],
-        ),
-        (
             "delete_service_template",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             {},

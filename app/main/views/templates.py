@@ -31,13 +31,14 @@ from app import (
     template_folder_api_client,
     template_statistics_client,
 )
-from app.constants import QR_CODE_TOO_LONG
+from app.constants import QR_CODE_TOO_LONG, LetterLanguageOptions
 from app.formatters import character_count, message_count
 from app.main import main, no_cookie
 from app.main.forms import (
     BroadcastTemplateForm,
     EmailTemplateForm,
     LetterTemplateForm,
+    LetterTemplateLanguagesForm,
     LetterTemplatePostageForm,
     PDFUploadForm,
     SearchTemplatesForm,
@@ -63,13 +64,14 @@ from app.template_previews import (
 )
 from app.utils import (
     NOTIFICATION_TYPES,
+    service_has_permission,
     should_skip_template_page,
 )
 from app.utils.letters import (
     get_error_from_upload_form,
     get_letter_validation_error,
 )
-from app.utils.templates import get_template
+from app.utils.templates import TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
 form_objects = {
@@ -627,11 +629,13 @@ def edit_service_template(service_id, template_id):
         new_template_data = {
             "name": form.name.data,
             "content": form.template_content.data,
-            "subject": subject,
             "template_type": template.template_type,
             "id": template.id,
             "reply_to_text": template.get_raw("reply_to_text"),
         }
+
+        if subject:
+            new_template_data["subject"] = subject
 
         new_template = get_template(new_template_data, current_service)
         template_change = template.compare_to(new_template)
@@ -885,7 +889,7 @@ def edit_template_postage(service_id, template_id):
     form = LetterTemplatePostageForm(**template._template)
     if form.validate_on_submit():
         postage = form.postage.data
-        service_api_client.update_service_template_postage(service_id, template_id, postage)
+        service_api_client.update_service_template(service_id, template_id, postage=postage)
 
         return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
@@ -1163,3 +1167,75 @@ def view_invalid_letter_attachment_as_preview(service_id, file_id):
 
 def _get_page_numbers(page_count):
     return [*range(1, page_count + 1)]
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/change-language", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+@service_has_permission("extra_letter_formatting")
+def letter_template_change_language(template_id, service_id):
+    template = current_service.get_template(template_id)
+
+    if template.template_type != "letter" or not isinstance(template, TemplatedLetterImageTemplate):
+        abort(404)
+
+    current_languages = template._template.get("letter_languages")
+    form = LetterTemplateLanguagesForm(data=dict(languages=current_languages))
+    if form.validate_on_submit():
+        languages = form.languages.data
+        if languages != current_languages:
+            if languages == LetterLanguageOptions.welsh_then_english:
+                welsh_subject = "Welsh subject line goes here"
+                welsh_content = "Welsh content goes here"
+            elif languages == LetterLanguageOptions.english:
+                return redirect(
+                    url_for(
+                        ".letter_template_confirm_remove_welsh",
+                        service_id=service_id,
+                        template_id=template_id,
+                    )
+                )
+            else:
+                abort(500, f"Unknown/unhandled form option: {languages}")
+
+            service_api_client.update_service_template(
+                service_id,
+                template_id,
+                letter_languages=languages,
+                letter_welsh_subject=welsh_subject,
+                letter_welsh_content=welsh_content,
+            )
+
+        return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
+
+    return render_template(
+        "views/templates/change-language.html",
+        form=form,
+        template=template,
+        error_summary_enabled=True,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/change-language/confirm", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+@service_has_permission("extra_letter_formatting")
+def letter_template_confirm_remove_welsh(template_id, service_id):
+    template = current_service.get_template(template_id)
+
+    if template.template_type != "letter" or not isinstance(template, TemplatedLetterImageTemplate):
+        abort(404)
+
+    if request.method == "POST" and request.form.get("confirm"):
+        service_api_client.update_service_template(
+            service_id,
+            template_id,
+            letter_languages=LetterLanguageOptions.english.value,
+            letter_welsh_subject=None,
+            letter_welsh_content=None,
+        )
+        return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
+
+    return render_template(
+        "views/templates/remove-welsh-language-from-letter.html",
+        template=template,
+        error_summary_enabled=True,
+    )

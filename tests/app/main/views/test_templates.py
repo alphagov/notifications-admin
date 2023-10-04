@@ -781,9 +781,201 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
     assert page.select_one("h1", {"data-error-type": "letter-too-long"})
 
 
-def test_GET_letter_template_attach_pages(
-    client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template
+def test_view_letter_template_displays_change_language_button(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    single_letter_contact_block,
+    mock_has_jobs,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
 ):
+    service_one["permissions"].append("extra_letter_formatting")
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
+    client_request.login(active_user_with_permissions)
+    template_id = fake_uuid
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": create_template(template_type="letter", template_id=template_id)},
+    )
+    page = client_request.get(
+        "main.view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=template_id,
+        _test_page_title=False,
+    )
+
+    change_language_button = page.select_one(".change-language")
+
+    assert normalize_spaces(change_language_button.text) == "Change language"
+    assert change_language_button["href"] == url_for(
+        "main.letter_template_change_language", service_id=SERVICE_ONE_ID, template_id=template_id
+    )
+
+
+def test_GET_letter_template_change_language(
+    client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template, active_user_with_permissions
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        "main.letter_template_change_language",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert page.select_one("h1").text.strip() == "Change language"
+
+    assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
+        "English only",
+        "Welsh followed by English",
+    ]
+    assert [radio["value"] for radio in page.select(".govuk-radios__item input")] == [
+        "english",
+        "welsh_then_english",
+    ]
+
+    assert page.select("form button")
+
+    mock_get_service_letter_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, None)
+
+    assert (
+        page.select_one("a[class='govuk-back-link']").get("href") == f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}"
+    )
+
+
+def test_GET_letter_template_change_language_404s_if_template_is_not_a_letter(
+    client_request,
+    service_one,
+    mock_get_service_template,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        "main.letter_template_change_language", service_id=SERVICE_ONE_ID, template_id=fake_uuid, _expected_status=404
+    )
+
+    assert page.select_one("h1").text.strip() != "Change language"
+
+
+def test_POST_letter_template_change_to_welsh_and_english_sets_subject_and_content(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    mock_get_service_letter_template,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+
+    client_request.post(
+        "main.letter_template_change_language",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"languages": "welsh_then_english"},
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_template_change_language.assert_called_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        letter_languages="welsh_then_english",
+        letter_welsh_subject="Welsh subject line goes here",
+        letter_welsh_content="Welsh content goes here",
+    )
+
+
+def test_POST_letter_template_change_to_english_redirects_to_confirmation_page(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    mock_get_service_letter_template,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+
+    client_request.post(
+        "main.letter_template_change_language",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"languages": "english"},
+        _follow_redirects=True,
+    )
+    assert mock_template_change_language.call_args_list == []
+
+
+def test_GET_letter_template_confirm_remove_welsh(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    mock_get_service_letter_template,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+
+    page = client_request.get(
+        "main.letter_template_confirm_remove_welsh",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    form = page.select_one("form[method=post]")
+    assert form.select_one("button")
+    assert mock_template_change_language.call_args_list == []
+
+
+def test_POST_letter_template_confirm_remove_welsh(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    mock_get_service_letter_template,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+
+    client_request.post(
+        "main.letter_template_confirm_remove_welsh",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"confirm": "true"},
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_template_change_language.assert_called_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        letter_languages="english",
+        letter_welsh_subject=None,
+        letter_welsh_content=None,
+    )
+
+
+def test_GET_letter_template_attach_pages(client_request, service_one, fake_uuid, mock_get_service_letter_template):
     page = client_request.get(
         "main.letter_template_attach_pages",
         service_id=SERVICE_ONE_ID,
@@ -1206,9 +1398,7 @@ def test_edit_letter_templates_postage_updates_postage(
     fake_uuid,
     mock_get_service_letter_template,
 ):
-    mock_update_template_postage = mocker.patch(
-        "app.main.views.templates.service_api_client.update_service_template_postage"
-    )
+    mock_update_template_postage = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
 
     client_request.post(
         "main.edit_template_postage",
@@ -1216,7 +1406,7 @@ def test_edit_letter_templates_postage_updates_postage(
         template_id=fake_uuid,
         _data={"postage": "first"},
     )
-    mock_update_template_postage.assert_called_with(SERVICE_ONE_ID, fake_uuid, "first")
+    mock_update_template_postage.assert_called_with(SERVICE_ONE_ID, fake_uuid, postage="first")
 
 
 @pytest.mark.parametrize(

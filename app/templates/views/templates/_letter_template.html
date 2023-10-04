@@ -41,5 +41,18 @@
       ),
     "classes": "govuk-button--secondary edit-template-link-attachment"
     }) }}
+
+    {% if 'extra_letter_formatting' in current_service.permissions %}
+      {{ govukButton({
+      "element": "a",
+      "text": "Change language",
+      "href": url_for(
+      '.letter_template_change_language',
+      service_id=current_service.id,
+      template_id=template.id
+      ),
+      "classes": "govuk-button--secondary change-language"
+      }) }}
+    {% endif %}
   </div>
 </div>
