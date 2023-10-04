@@ -11,8 +11,7 @@ from tests.conftest import (
     sample_uuid,
 )
 
-
-@pytest.mark.parametrize(
+pytest_user_auth_combinations = (
     "user, organisation_can_approve_own_go_live_requests, service_has_active_go_live_request, expected_status",
     (
         (
@@ -71,6 +70,9 @@ from tests.conftest import (
         ),
     ),
 )
+
+
+@pytest.mark.parametrize(*pytest_user_auth_combinations)
 def test_get_make_service_live_page(
     mocker,
     client_request,
