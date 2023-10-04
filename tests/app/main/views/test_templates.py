@@ -2353,7 +2353,6 @@ def test_should_redirect_when_saving_a_template(
         service_id=SERVICE_ONE_ID,
         name=name,
         content=content,
-        subject=None,
     )
 
 
