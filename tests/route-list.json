@@ -416,6 +416,7 @@
     "/using-notify/message-status/<template_type:notification_type>",
     "/using-notify/optional-content",
     "/using-notify/personalisation",
+    "/using-notify/qr-codes",
     "/using-notify/receive-text-messages",
     "/using-notify/reply-to-email-address",
     "/using-notify/schedule-messages",
