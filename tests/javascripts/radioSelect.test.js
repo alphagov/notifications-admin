@@ -403,7 +403,7 @@ describe('RadioSelect', () => {
       const backLink = expandingSection.querySelector('.radio-select__times').parentElement.querySelector('.govuk-back-link');
 
       expect(backLink).not.toBeNull();
-      expect(backLink.textContent.trim()).toEqual('Back to days');
+      expect(backLink.textContent.trim()).toEqual('Change the day');
 
     });
 

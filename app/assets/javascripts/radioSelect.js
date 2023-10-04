@@ -27,7 +27,7 @@
               </fieldset>
             </div>
             <div class="radio-select__view" hidden>
-              <a href="" class="govuk-link govuk-back-link radio-select__return-to-days js-header">Back to days</a>
+              <a href="" class="govuk-link govuk-back-link radio-select__return-to-days js-header">Change the day</a>
               ${params.days.map((day, idx) => `
                 <fieldset class="govuk-fieldset radio-select__times" id="radio-select__times-for-${day.value}" aria-describedby="radio-select__times-help" hidden>
                   <legend class="govuk-visually-hidden">Time to send these messages</legend>
