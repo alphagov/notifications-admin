@@ -626,18 +626,23 @@ def edit_service_template(service_id, template_id):
     if form.validate_on_submit():
         subject = form.subject.data if hasattr(form, "subject") else None
 
+        current_template_data = {
+            "id": template.id,
+            "reply_to_text": template.get_raw("reply_to_text"),
+            "template_type": template.template_type,
+        }
         new_template_data = {
             "name": form.name.data,
             "content": form.template_content.data,
-            "template_type": template.template_type,
-            "id": template.id,
-            "reply_to_text": template.get_raw("reply_to_text"),
         }
 
         if subject:
             new_template_data["subject"] = subject
 
-        new_template = get_template(new_template_data, current_service)
+        new_template = get_template(
+            current_template_data | new_template_data,
+            current_service,
+        )
         template_change = template.compare_to(new_template)
 
         if template_change.placeholders_added and not request.form.get("confirm") and current_service.api_keys:
@@ -651,9 +656,7 @@ def edit_service_template(service_id, template_id):
             service_api_client.update_service_template(
                 service_id=service_id,
                 template_id=template_id,
-                name=form.name.data,
-                content=form.template_content.data,
-                subject=subject,
+                **new_template_data,
             )
         except HTTPError as e:
             if e.status_code == 400:
