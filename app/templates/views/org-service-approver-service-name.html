@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+
+{% set title = "Service name" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      <p class="govuk-body">
+        Check the service name is easy to understand. The service name must be unique and tell people what your messages are about. For example:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        {% if organisation.organisation_type == 'local' %}
+          <li>School admissions - {{ organisation.name }}</li>
+          <li>Electoral services - {{ organisation.name }}</li>
+          <li>Blue Badge - {{ organisation.name }}</li>
+        {% else %}
+          <li>Register to vote</li>
+          <li>Renew your Passport</li>
+          <li>Check your state pension</li>
+        {% endif %}
+      </ul>
+
+      <p class="govuk-body">
+        The service name is: {{ current_service.name }}
+      </p>
+
+    {% call form_wrapper() %}
+      {{ form.enabled }}
+      {{ page_footer('Continue') }}
+    {% endcall %}
+
+    </div>
+  </div>
+
+{% endblock %}

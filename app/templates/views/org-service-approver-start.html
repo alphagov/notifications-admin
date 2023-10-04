@@ -1,8 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
-{% from "components/page-footer.html" import page_footer %}
-{% from "components/form.html" import form_wrapper %}
 
 {% set title = "Make service page live" %}
 
@@ -44,7 +42,7 @@
         <li>any internal requirements of your organisation</li>
       </ul>
 
-    {{ govukButton({"element": "a", "text": "Continue", "href": ""}) }}
+    {{ govukButton({"element": "a", "text": "Continue", "href": url_for('.org_member_make_service_live_service_name', service_id=current_service.id)}) }}
 
     </div>
   </div>
