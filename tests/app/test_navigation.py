@@ -152,6 +152,7 @@ EXCLUDED_ENDPOINTS = set(
             "guidance_pricing_letters",
             "guidance_pricing_text_messages",
             "guidance_pricing",
+            "guidance_qr_codes",
             "guidance_receive_text_messages",
             "guidance_reply_to_email_address",
             "guidance_roadmap",
