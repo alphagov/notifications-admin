@@ -841,6 +841,10 @@ def test_GET_letter_template_change_language(
 
     mock_get_service_letter_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, None)
 
+    assert (
+        page.select_one("a[class='govuk-back-link']").get("href") == f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}"
+    )
+
 
 def test_GET_letter_template_change_language_404s_if_template_is_not_a_letter(
     client_request,
