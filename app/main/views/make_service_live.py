@@ -39,3 +39,18 @@ def make_service_live(service_id):
         title="Make service live",
         organisation=current_service.organisation_id,
     )
+
+
+@main.route("/services/<uuid:service_id>/make-service-live/start", methods=["GET"])
+@user_has_permissions(allow_org_user=True)
+def org_member_make_service_live_start(service_id):
+    if current_service.live:
+        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+
+    if not current_user.can_make_service_live(current_service):
+        abort(403)
+
+    return render_template(
+        "views/org-service-approver-start.html",
+        organisation=current_service.organisation_id,
+    )

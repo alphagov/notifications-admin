@@ -223,6 +223,7 @@ EXCLUDED_ENDPOINTS = set(
             "organisation_settings",
             "organisation_trial_mode_services",
             "organisations",
+            "org_member_make_service_live_start",
             "performance",
             "platform_admin_archive_email_branding",
             "platform_admin_confirm_archive_email_branding",

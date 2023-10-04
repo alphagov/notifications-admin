@@ -353,6 +353,7 @@ class MainNavigation(Navigation):
         },
         "make-service-live": {
             "make_service_live",
+            "org_member_make_service_live_start",
         },
     }
 

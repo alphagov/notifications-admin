@@ -291,3 +291,43 @@ def test_post_make_service_live_page_has_flash_message_after_redirect(
         _follow_redirects=True,
     )
     assert normalize_spaces(page.select_one(expected_banner_class).text) == expected_flash_message
+
+
+@pytest.mark.parametrize(*pytest_user_auth_combinations)
+def test_get_org_member_make_service_live_start(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    user,
+    organisation_can_approve_own_go_live_requests,
+    service_has_active_go_live_request,
+    expected_status,
+):
+    organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = service_has_active_go_live_request
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.org_member_make_service_live_start",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 200:
+        assert (
+            normalize_spaces(page.select_one("main p")) == "Test User has requested for this service to be made live."
+        )
+        assert [normalize_spaces(li) for li in page.select_one("main ul").select("li")] == [
+            "111,111 emails per year",
+            "222,222 text messages per year",
+            "No letters",
+        ]
+
+        assert page.select_one("a.govuk-button").text.strip() == "Continue"
