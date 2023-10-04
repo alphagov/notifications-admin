@@ -88,4 +88,39 @@ def org_member_make_service_live_service_name(service_id):
 @main.route("/services/<uuid:service_id>/make-service-live/duplicate-service", methods=["GET", "POST"])
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_duplicate_service(service_id):
+    if current_service.live:
+        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+
+    if not current_user.can_make_service_live(current_service):
+        abort(403)
+
+    form = YesNoSettingForm(name="Is the service name similar to another service?")
+    if form.validate_on_submit():
+        if request.args.get("name") == "bad" or form.enabled.data is True:
+            return redirect(url_for(".org_member_make_service_live_contact_user", service_id=current_service.id))
+
+        return redirect(url_for(".org_member_make_service_live_decision", service_id=current_service.id))
+
+    return render_template(
+        "views/org-service-approver-duplicate-service.html",
+        organisation=current_service.organisation_id,
+        form=form,
+        error_summary_enabled=True,
+        back_link=url_for(
+            ".org_member_make_service_live_service_name",
+            service_id=current_service.id,
+            name=request.args.get("name"),
+        ),
+    )
+
+
+@main.route("/services/<uuid:service_id>/make-service-live/contact-user", methods=["GET", "POST"])
+@user_has_permissions(allow_org_user=True)
+def org_member_make_service_live_contact_user(service_id):
+    return "ok"
+
+
+@main.route("/services/<uuid:service_id>/make-service-live/decision", methods=["GET", "POST"])
+@user_has_permissions(allow_org_user=True)
+def org_member_make_service_live_decision(service_id):
     return "ok"

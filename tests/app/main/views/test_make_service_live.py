@@ -434,3 +434,121 @@ def test_post_org_member_make_service_live_service_name(
         _expected_redirect=expected_redirect_url,
         _data=data,
     )
+
+
+@pytest.mark.parametrize(*pytest_user_auth_combinations)
+def test_get_org_member_make_duplicate_service_service_name(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    user,
+    organisation_can_approve_own_go_live_requests,
+    service_has_active_go_live_request,
+    expected_status,
+):
+    organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = service_has_active_go_live_request
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.org_member_make_service_live_duplicate_service",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 200:
+        assert "Duplicate service" in normalize_spaces(page.select_one("main").text)
+
+        form = page.select_one("form")
+        button = form.select_one("button")
+        assert button.text.strip() == "Continue"
+
+
+def test_post_org_member_make_service_live_duplicate_service_error_summary(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+):
+    user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
+    )
+    organisation_one["can_approve_own_go_live_requests"] = True
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.post(
+        "main.org_member_make_service_live_duplicate_service",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=200,
+        _data={},
+    )
+
+    error_summary = page.select_one(".govuk-error-summary")
+    assert "There is a problem" in error_summary.text
+    assert "Select yes or no" in error_summary.text
+
+
+@pytest.mark.parametrize(
+    "request_url, data, expected_redirect_url",
+    (
+        (
+            f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=ok",
+            {"enabled": True},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user",
+        ),
+        (
+            f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=ok",
+            {"enabled": False},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision",
+        ),
+        (
+            f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=bad",
+            {"enabled": True},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user",
+        ),
+        (
+            f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=bad",
+            {"enabled": False},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user",
+        ),
+    ),
+)
+def test_post_org_member_make_service_live_duplicate_service(
+    mocker, client_request, service_one, organisation_one, request_url, data, expected_redirect_url
+):
+    user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
+    )
+    organisation_one["can_approve_own_go_live_requests"] = True
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    client_request.post_url(
+        request_url,
+        _expected_redirect=expected_redirect_url,
+        _data=data,
+    )

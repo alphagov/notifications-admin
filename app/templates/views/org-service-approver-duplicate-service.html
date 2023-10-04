@@ -1,0 +1,45 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+
+{% set title = "Duplicate service" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      <p class="govuk-body">
+        View the list of services in the organisation to check if the service name is:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>unique</li>
+        <li>not similar to another service</li>
+      </ul>
+
+      <p class="govuk-body">
+        The service name is: {{ current_service.name }}
+      </p>
+
+    {% call form_wrapper() %}
+      {{ form.enabled }}
+      {{ page_footer('Continue') }}
+    {% endcall %}
+
+    </div>
+  </div>
+
+{% endblock %}
