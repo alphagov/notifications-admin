@@ -1178,11 +1178,11 @@ def letter_template_change_language(template_id, service_id):
     if template.template_type != "letter" or not isinstance(template, TemplatedLetterImageTemplate):
         abort(404)
 
-    current_language = template._template.get("letter_languages")
-    form = LetterTemplateLanguagesForm(data=dict(languages=current_language))
+    current_languages = template._template.get("letter_languages")
+    form = LetterTemplateLanguagesForm(data=dict(languages=current_languages))
     if form.validate_on_submit():
         languages = form.languages.data
-        if languages != current_language:
+        if languages != current_languages:
             if languages == LetterLanguageOptions.welsh_then_english:
                 welsh_subject = "Welsh subject line goes here"
                 welsh_content = "Welsh content goes here"
