@@ -14,7 +14,7 @@
         <input type="text" class="radio-select__selected-day-and-time" id="radio-select__selected-day-and-time" readonly value="${params.selectedTime.label}">
         <input type="hidden" class="radio-select__selected-value" value="${params.selectedTime.value}" name="${params.componentName}">
         <div class="radio-select__expander-and-expandee">
-          <button type="button" class="govuk-button govuk-button--secondary radio-select__expander" aria-expanded="false" aria-controls="${params.componentName}-expanding-section">Choose another time</button>
+          <button type="button" class="govuk-button govuk-button--secondary radio-select__expander" aria-expanded="false" aria-controls="${params.componentName}-expanding-section">Choose a different time</button>
           <div class="radio-select__expandee" id="${params.componentName}-expanding-section" hidden>
             <div class="radio-select__view">
               <fieldset class="govuk-fieldset radio-select__days">
