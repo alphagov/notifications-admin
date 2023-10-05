@@ -54,7 +54,7 @@ class ImageProcessor:
         if new_width > self.width:
             raise NotImplementedError("Cannot increase image size with this method")
 
-        self._image.thumbnail((new_width, self.height), PIL.Image.ANTIALIAS)
+        self._image.thumbnail((new_width, self.height), PIL.Image.LANCZOS)
 
     def pad(self, to_height=None, to_width=None):
         """Pads a smaller image to increase to size.
