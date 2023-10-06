@@ -44,6 +44,7 @@ from wtforms import RadioField as WTFormsRadioField
 from wtforms.validators import (
     UUID,
     DataRequired,
+    InputRequired,
     NumberRange,
     Optional,
     Regexp,
@@ -2392,7 +2393,7 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
     days_of_retention = GovukIntegerField(
         label="Days of retention",
         things="days of retention",
-        validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
+        validators=[validators.NumberRange(min=3, max=90, message="The number of days must be between 3 and 90")],
     )
 
 

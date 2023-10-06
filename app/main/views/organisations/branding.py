@@ -367,4 +367,5 @@ def add_organisation_letter_branding_options(org_id):
         "views/organisations/organisation/settings/add-letter-branding-options.html",
         form=form,
         _search_form=SearchByNameForm(),
+        error_summary_enabled=True,
     )

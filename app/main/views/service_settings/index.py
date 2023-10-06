@@ -1298,6 +1298,7 @@ def edit_data_retention(service_id, data_retention_id):
         form=form,
         data_retention_id=data_retention_id,
         notification_type=data_retention_item["notification_type"],
+        error_summary_enabled=True,
     )
 
 
