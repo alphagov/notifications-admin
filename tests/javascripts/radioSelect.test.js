@@ -1,23 +1,40 @@
 const helpers = require('./support/helpers');
 
+let consoleErrorSpy;
+
 beforeAll(() => {
-  window.Hogan = require('hogan.js');
+
   require('../../app/assets/javascripts/radioSelect.js');
+
+  // The sticky JS should be called whenever the times are shown so stub it out as a mock
+  window.GOVUK.stickAtBottomWhenScrolling = {
+    recalculate: jest.fn(() => {})
+  };
+
+  // spy on console.error to track JSDOM errors
+  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
 });
 
 afterAll(() => {
+
+  consoleErrorSpy.mockRestore();
+
   require('./support/teardown.js');
+
 });
 
 describe('RadioSelect', () => {
-  const CATEGORIES = [
-    'Later today',
+  const DAYS = [
+    'Today',
     'Tomorrow',
     'Friday',
     'Saturday'
   ];
   const HOURS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
-  let originalOptionsForAllCategories;
+  const scrollPosition = 504;
+  let originalOptionsForAllDays;
+  let screenMock;
 
   const getDataFromOption = (option) => {
     return {
@@ -26,17 +43,30 @@ describe('RadioSelect', () => {
            };
   };
 
-  const clickButtonForCategory = (category) => {
-
-    // click the button for this category
-    const categoryButton = document.querySelector(`.radio-select__column:nth-child(2) input[value="${category}"]`);
-    helpers.triggerEvent(categoryButton, 'click');
-
+  function getEnterKeyEvent (eventType) {
+    return new $.Event(eventType, {
+      which: 13,
+      charCode: 13,
+      keyCode: 13,
+      code: 'Enter',
+      key: 'Enter',
+      bubbles: true,
+    });
   };
 
   beforeEach(() => {
+    screenMock = new helpers.ScreenMock(jest);
+    screenMock.setWindow({
+      scrollTop: scrollPosition
+    });
+
+    // reset all tracking of calls to console.error
+    consoleErrorSpy.mockClear();
+
+
     const options = () => {
       let result = '';
+      let optionIdx = 0;
 
       const getHourLabel = (hour) => {
         let label = hour;
@@ -56,7 +86,7 @@ describe('RadioSelect', () => {
         let result = '';
         let hours = HOURS;
         let dayAsNumber = {
-          'Later today': 22,
+          'Today': 22,
           'Tomorrow': 23,
           'Friday': 24,
           'Saturday': 25
@@ -68,12 +98,13 @@ describe('RadioSelect', () => {
 
         hours.forEach((hour, idx) => {
           const hourLabel = getHourLabel(hour);
-          const num = idx + 1;
+
+          optionIdx++;
 
           result +=
             `<div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="scheduled_for-${num}" name="scheduled_for" type="radio" value="2019-05-${dayAsNumber}T${hour}:00:00.459156">
-              <label class="govuk-label govuk-radios__label" for="scheduled_for-${num}">
+              <input class="govuk-radios__input" id="scheduled_for-${optionIdx}" name="scheduled_for" type="radio" value="2019-05-${dayAsNumber}T${hour}:00:00.459156">
+              <label class="govuk-label govuk-radios__label" for="scheduled_for-${optionIdx}">
                 ${day} at ${hourLabel}
               </label>
             </div>`;
@@ -82,7 +113,7 @@ describe('RadioSelect', () => {
         return result;
       };
 
-      CATEGORIES.forEach((day, idx) => {
+      DAYS.forEach((day, idx) => {
         if (idx === 0) {
           result += hours(day, 11);
         } else {
@@ -96,368 +127,479 @@ describe('RadioSelect', () => {
     };
 
     document.body.innerHTML = `
-      <fieldset>
-        <legend class="form-label">
-          When should Notify send these messages?
-        </legend>
-        <div class="radio-select" data-notify-module="radio-select" data-categories="${CATEGORIES.join(',')}" data-show-now-as-default="true">
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" checked="" id="scheduled_for-0" name="scheduled_for" type="radio" value="">
-            <label class="govuk-label govuk-radios__label" for="scheduled_for-0">
-              Now
-            </label>
+      <form method="post" enctype="multipart/form-data" action="/services/6658542f-0cad-491f-bec8-ab8457700ead/start-job/ab3080c8-f2d1-4524-b199-9718ecf6eabc">
+        <fieldset>
+          <legend class="form-label">
+            When should Notify send these messages?
+          </legend>
+          <div class="radio-select" data-notify-module="radio-select" data-days="${DAYS.join(',')}">
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" checked="" id="scheduled_for-0" name="scheduled_for" type="radio" value="">
+              <label class="govuk-label govuk-radios__label" for="scheduled_for-0">
+                Now
+              </label>
+            </div>
+            ${options()}
           </div>
-          ${options()}
-        </div>
-      </fieldset>`;
+        </fieldset>
+        <button class="govuk-button" data-module="govuk-button">Send 6 emails</button>
+      </form>`;
 
-      originalOptionsForAllCategories = Array.from(document.querySelectorAll('.govuk-radios__item:not(:first-of-type)'))
+      originalOptionsForAllDays = Array.from(document.querySelectorAll('.govuk-radios__item:not(:first-of-type)'))
                                           .map(option => getDataFromOption(option));
+
+      window.GOVUK.notifyModules.start();
   });
 
   afterEach(() => {
     document.body.innerHTML = '';
+    window.GOVUK.stickAtBottomWhenScrolling.recalculate.mockClear();
   });
 
   describe("when the page has loaded", () => {
 
-    describe("if the 'data-show-now-as-default' attribute", () => {
+    test("it should show the right time and set the right name:value pairing in the form data", () => {
 
-      test("is set to true the module should have a 'Now' option", () => {
+      const visibleField = document.querySelector('.radio-select__selected-day-and-time');
+      const formData = new FormData(visibleField.form);
 
-        // default is for it to be set to true
+      expect(visibleField.value).toEqual('Now');
 
-        // start module
-        window.GOVUK.notifyModules.start();
+      expect(formData.get('scheduled_for')).toEqual('') // Now has an empty value;
 
-        expect(document.querySelectorAll('.radio-select__column').length).toEqual(2);
+    });
 
-      });
+    test("all times originally in the page should be present and split by day", () => {
 
-      test("is set to false the module should not have a 'Now' option", () => {
+      originalOptionsForAllDays.forEach(option => {
 
-        document.querySelector('.radio-select').setAttribute('data-show-now-as-default', 'false');
+        const radioWithValue = document.querySelector(`input[value="${option.value}"]`);
+        let labelForRadio;
 
-        // start module
-        window.GOVUK.notifyModules.start();
+        expect(radioWithValue).not.toBeNull();
 
-        expect(document.querySelectorAll('.radio-select__column').length).toEqual(1);
+        labelForRadio = document.querySelector(`label[for=${radioWithValue.getAttribute('id')}]`);
+
+        expect(labelForRadio).not.toBeNull();
+        expect(labelForRadio.textContent.trim()).toEqual(option.label);
 
       });
 
     });
 
-    describe("it should have a button for each category", () => {
+    test("it should have a button that shows or hides a section for choosing a time", () => {
 
-      let categoryButtons;
+      const expanderButton = document.querySelector('.radio-select__expander');
+      let expandingSection;
 
-      beforeEach(() => {
+      expect(expanderButton.getAttribute('aria-expanded')).toEqual('false');
+      expect(expanderButton.hasAttribute('aria-controls')).toBe(true);
 
-        // start module
-        window.GOVUK.notifyModules.start();
-
-        categoryButtons = document.querySelectorAll('.radio-select__column:nth-child(2) .radio-select__button--category');
-
-      });
-
-      test("the number of buttons should match the categories", () => {
-
-        expect(categoryButtons.length).toBe(CATEGORIES.length);
-
-      });
-
-      test("each button's text should match their category", () => {
-
-        // check the buttons have the right text
-        CATEGORIES.forEach((category, idx) => {
-          expect(categoryButtons[idx].getAttribute('value')).toEqual(category);
-        });
-
-      });
-
-      test("each button's semantics should show it controls another region and that region is collapsed", () => {
-
-        categoryButtons.forEach(btn => {
-          expect(btn.getAttribute('aria-expanded')).toEqual('false');
-        });
-
-      });
+      expect(
+        document.getElementById(expanderButton.getAttribute('aria-controls'))
+      ).not.toBeNull();
 
     });
 
-  });
+    test("the section for choosing a time should be collapsed", () => {
 
-  describe("category buttons", () => {
+      const expandingSection = document.getElementById(
+        document.querySelector('.radio-select__expander').getAttribute('aria-controls')
+      );
 
-    CATEGORIES.forEach((category, idx) => {
-
-      describe(`clicking the button for ${category} should`, () => {
-
-        const categoryRegExp = new RegExp('^' + category);
-        let originalOptionsForcategory;
-
-        beforeEach(() => {
-
-          // get all the options in the original page for this category
-          originalOptionsForCategory = originalOptionsForAllCategories.filter(option => categoryRegExp.test(option.label));
-
-          // start module
-          window.GOVUK.notifyModules.start();
-
-          clickButtonForCategory(category);
-
-        });
-
-        test("show the options for it, with the right label and value", () => {
-
-          // check options this reveals against those originally in the page for this category
-          const options = document.querySelectorAll('.radio-select__column:nth-child(2) .govuk-radios__item');
-
-          const optionsThatMatchOriginals = Array.from(options).filter((option, idx) => {
-            const optionData = getDataFromOption(option);
-            const originalOption = originalOptionsForCategory[idx];
-
-            return optionData.value === originalOption.value && optionData.label === originalOption.label;
-          });
-
-          expect(optionsThatMatchOriginals.length).toEqual(originalOptionsForCategory.length);
-
-        });
-
-        test("focus the first time slot", () => {
-
-          expect(document.activeElement).toBe(document.getElementById('scheduled_for-1'));
-
-        });
-
-      });
+      expect(expandingSection.hasAttribute('hidden')).toBe(true);
 
     });
 
-    test(`clicking the button for a category should add a 'Done' button below its options`, () => {
+    test("You should be able to submit the form again", () => {
 
-      // start module
-      window.GOVUK.notifyModules.start();
+      const form = document.querySelector('.radio-select__selected-day-and-time').form;
 
-      clickButtonForCategory(CATEGORIES[0]);
+      const submitEvent = new $.Event('submit');
 
-      const button = document.querySelector('.radio-select__column:nth-child(2) input[type=button]');
+      $(form).trigger(submitEvent);
 
-      expect(button).not.toBeNull();
-      expect(button.getAttribute('value')).toEqual('Done');
-      expect(button.getAttribute('aria-expanded')).toEqual('true');
+      // JSDOM doesn't implement form submissions
+      // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
+      //
+      // If a form submission is fired, this instead outputs a 'not implemented' error from the requestSubmit method.
+      //
+      // That means we can assume any errors of that type would be the same as a form submission in
+      // browsers.
+      expect(consoleErrorSpy.mock.calls.length).toEqual(1);
+      expect(consoleErrorSpy.mock.calls[0][0].message).toEqual('Not implemented: HTMLFormElement.prototype.submit');
 
     });
 
   });
 
-  describe("after clicking the button to select that category", () => {
+  describe("When you click the button to expand the section for choosing a time", () => {
+
+    let expanderButton;
+    let expandingSection;
+    let daysView;
+    let timesView;
 
     beforeEach(() => {
 
-      // start module
-      window.GOVUK.notifyModules.start();
+      expanderButton = document.querySelector('.radio-select__expander');
+      expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
+      daysView = expandingSection.querySelector('.radio-select__days').parentElement;
+      timesView = expandingSection.querySelector('.radio-select__times').parentElement;
 
-      clickButtonForCategory(CATEGORIES[0]);
+      helpers.triggerEvent(expanderButton, 'click');
 
     });
 
-    describe("clicking on an option with the mouse/trackpad should", () => {
+    test("the expanding section for choosing a time should show", () => {
 
-      let optionsColumn;
-      let firstOptionPositionSpy;
-      let firstOptionLabel;
+      expect(expandingSection.hasAttribute('hidden')).toBe(false);
+
+    });
+
+    test("the buttons for choosing the day should be shown and match those set in the component config", () => {
+
+      const daysSetInConfig = document.querySelector('[data-notify-module=radio-select]').dataset.days.split(',');
+      let daysFromButtons;
+
+      expect(daysView.hasAttribute('hidden')).toBe(false);
+
+      daysFromButtons = Array.from(expandingSection.querySelectorAll('.radio-select__days button[type=button]'))
+                              .map(button => button.textContent.trim());
+
+      daysSetInConfig.forEach(day => expect(daysFromButtons).toContain(day));
+
+    });
+
+    test("the buttons for choosing the time should be hidden", () => {
+
+      expect(timesView.hasAttribute('hidden')).toBe(true);
+
+    });
+
+    test("it should hide the submit button and prevent the form being submitted", () => {
+
+      expect(expanderButton.form.querySelector('button:not([type=button])').hasAttribute('hidden')).toBe(true);
+
+      const submitEvent = new $.Event('submit');
+
+      jest.spyOn(submitEvent, 'preventDefault');
+      $(expanderButton.form).trigger(submitEvent);
+
+      expect(submitEvent.preventDefault).toHaveBeenCalled();
+
+    });
+
+  });
+
+  describe("When you click the button that expands the section if it is already expanded", () => {
+
+    let expanderButton;
+    let expandingSection;
+
+    beforeEach(() => {
+
+      expanderButton = document.querySelector('.radio-select__expander');
+      expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
+
+      helpers.triggerEvent(expanderButton, 'click');
+      helpers.triggerEvent(expanderButton, 'click');
+
+    });
+
+    test("it should collapse the section", () => {
+
+      expect(expanderButton.getAttribute('aria-expanded')).toEqual('false');
+      expect(expandingSection.hasAttribute('hidden')).toBe(true);
+
+    });
+
+    test("it should show the submit button again and allow the form to be submitted again", () => {
+
+      expect(expanderButton.form.querySelector('button:not([type=button])').hasAttribute('hidden')).toBe(false);
+
+      const submitEvent = new $.Event('submit');
+
+      $(expanderButton.form).trigger(submitEvent);
+
+      // JSDOM doesn't implement form submissions
+      // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
+      //
+      // If a form submission is fired, this instead outputs a 'not implemented' error from the requestSubmit method.
+      //
+      // That means we can assume any errors of that type would be the same as a form submission in
+      // browsers.
+      expect(consoleErrorSpy.mock.calls.length).toEqual(1);
+      expect(consoleErrorSpy.mock.calls[0][0].message).toEqual('Not implemented: HTMLFormElement.prototype.submit');
+
+    });
+
+  });
+
+  describe("When you click the button for a day", () => {
+
+    let expanderButton;
+    let expandingSection;
+    let buttonForTomorrow;
+    let daysView;
+    let timesView;
+    let stickyJsRecalculateMock;
+
+    beforeEach(() => {
+
+      expanderButton = document.querySelector('.radio-select__expander');
+      expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
+      daysView = expandingSection.querySelector('.radio-select__days').parentElement;
+      timesView = expandingSection.querySelector('.radio-select__times').parentElement;
+      buttonForTomorrow = daysView.querySelectorAll('button[type=button]')[1];
+
+      helpers.triggerEvent(expanderButton, 'click');
+
+    });
+
+    test("the days view should be hidden", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      expect(daysView.hasAttribute('hidden')).toBe(true);
+
+    });
+
+    test("the times view and the times for that day should show", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      expect(timesView.hasAttribute('hidden')).toBe(false);
+
+      // There should be a radio for each hour of the day still remaining and tomorrow should have them all.
+      expect(timesView.querySelectorAll('input[name=times-for-tomorrow]').length).toEqual(24);
+
+    });
+
+    test("if no times are selected yet for that day, the first radio should be focused", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      expect(document.activeElement).toBe(timesView.querySelector('#radio-select__times-for-tomorrow .govuk-radios__item:nth-of-type(1) input[type=radio]'));
+
+    });
+
+    test("if a time is already selected for that day, its radio should be focused", () => {
+
+      const radioFor2amTomorrow = timesView.querySelector('#radio-select__times-for-tomorrow .govuk-radios__item:nth-of-type(2) input');
+
+      radioFor2amTomorrow.setAttribute('checked', 'checked');
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      expect(document.activeElement).toBe(timesView.querySelector('#radio-select__times-for-tomorrow .govuk-radios__item:nth-of-type(2) input'));
+
+    });
+
+    test("there should be a link to return to the days view", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      const backLink = expandingSection.querySelector('.radio-select__times').parentElement.querySelector('.govuk-back-link');
+
+      expect(backLink).not.toBeNull();
+      expect(backLink.textContent.trim()).toEqual('Change the day');
+
+    });
+
+    test("the radios should have a hidden legend and help text to give context for screen reader users", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      const fieldsetForRadios = timesView.querySelector('fieldset.radio-select__times:not([hidden])');
+      const legend = fieldsetForRadios.querySelector('legend');
+      const helpText = fieldsetForRadios.querySelector('.radio-select__times-help');
+
+      expect(legend).not.toBeNull();
+      expect(legend.classList.contains('govuk-visually-hidden')).toBe(true);
+      expect(helpText).not.toBeNull();
+
+      // help text should be set as the description for the fieldset with WAI ARIA
+      expect(fieldsetForRadios.getAttribute('aria-describedby')).toEqual(helpText.getAttribute('id'));
+
+    });
+
+    test("the 'confirm' button container should be made sticky", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      const container = expandingSection.querySelector('.radio-select__confirm');
+
+      expect(container.classList.contains('js-stick-at-bottom-when-scrolling')).toBe(true);
+      expect(GOVUK.stickAtBottomWhenScrolling.recalculate).toHaveBeenCalled();
+
+    });
+
+    test("if you select a time but don't confirm it and collapse the section, neither the selected time and day field or form data should be updated", () => {
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      expandingSection.querySelectorAll('.radio-select__times input[name=times-for-tomorrow]')[2].checked = true;
+
+      helpers.triggerEvent(expanderButton, 'click');
+
+      expect(expanderButton.getAttribute('aria-expanded')).toEqual('false');
+      expect(expandingSection.hasAttribute('hidden')).toBe(true);
+
+      const formData = new FormData(expanderButton.form);
+
+      expect(document.querySelector('.radio-select__selected-day-and-time').value).toEqual('Now');
+      expect(formData.get('scheduled_for')).toEqual('');
+
+    });
+
+  });
+
+  describe("When you select a time and confirm", () => {
+
+    let expanderButton;
+    let expandingSection;
+    let buttonForTomorrow;
+    let radioFor3amTomorrow;
+
+    beforeEach(() => {
+
+      expanderButton = document.querySelector('.radio-select__expander');
+      expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
+      buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
+      radioFor3amTomorrow = expandingSection.querySelectorAll('.radio-select__times input[name=times-for-tomorrow]')[2];
+
+      helpers.triggerEvent(expanderButton, 'click');
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+      radioFor3amTomorrow.checked = true;
+      helpers.triggerEvent(expandingSection.querySelector('.radio-select__confirm button'), 'click');
+
+    });
+
+    test("the times view should be hidden, the days view should show and the section containing both should be hidden", () => {
+
+      expect(expandingSection.querySelector('.radio-select__times').parentElement.hasAttribute('hidden')).toBe(true);
+      expect(expandingSection.querySelector('.radio-select__days').parentElement.hasAttribute('hidden')).toBe(false);
+      expect(expandingSection.hasAttribute('hidden')).toBe(true);
+      expect(expanderButton.getAttribute('aria-expanded')).toEqual('false');
+
+    });
+
+    test("the time chosen should show in the selected day and time field and its value be updated in the form data", () => {
+
+      const timeLabel = expandingSection.querySelector(`label[for=${radioFor3amTomorrow.id}]`).textContent.trim();
+      const timeValue = radioFor3amTomorrow.value;
+      const formData = new FormData(radioFor3amTomorrow.form);
+
+      expect(document.querySelector('.radio-select__selected-day-and-time').value).toEqual(timeLabel);
+      expect(formData.get('scheduled_for')).toEqual(timeValue);
+
+    });
+
+    test("the field showing the selected day and time should be focused", () => {
+
+      expect(document.activeElement).toBe(document.querySelector('.radio-select__selected-day-and-time'));
+
+    });
+
+  });
+
+  describe("When the section for selecting a time is expanded", () => {
+
+    let expanderButton;
+    let expandingSection;
+    let buttonForTomorrow;
+    let radioFor3amTomorrow;
+    let enterKeydownEvent;
+    let enterKeyupEvent;
+
+    beforeEach(() => {
+
+      expanderButton = document.querySelector('.radio-select__expander');
+      expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
+
+      helpers.triggerEvent(expanderButton, 'click');
+
+      buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
+      radioFor3amTomorrow = expandingSection.querySelectorAll('.radio-select__times input[name=times-for-tomorrow]')[2];
+
+      helpers.triggerEvent(buttonForTomorrow, 'click');
+
+    });
+
+    describe("if the enter key is pressed on a selected radio", () => {
 
       beforeEach(() => {
 
-        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
+        enterKeydownEvent = getEnterKeyEvent('keydown');
+        enterKeyupEvent = getEnterKeyEvent('keyup');
 
-        const firstOption = optionsColumn.querySelector('input[type=radio]');
-        firstOptionLabel = firstOption.parentNode.querySelector('label').textContent.trim();
-
-        helpers.clickElementWithMouse(firstOption);
-
-      });
-
-      test("remove all the other options", () => {
-
-        // module replaces the column node so this needs querying again
-        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
-
-        expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
-        expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(firstOptionLabel);
+        radioFor3amTomorrow.focus();
+        radioFor3amTomorrow.setAttribute('checked', 'checked');
+        $(radioFor3amTomorrow).trigger(enterKeydownEvent);
+        $(radioFor3amTomorrow).trigger(enterKeyupEvent);
 
       });
 
-      test("add a button for choosing a different time", () => {
+      test("the time chosen should show in the field showing the selected day and time and its value be updated in the form data", () => {
 
-        const button = document.querySelector('.radio-select__column:nth-child(3) input[type=button]');
+        const timeLabel = expandingSection.querySelector(`label[for=${radioFor3amTomorrow.id}]`).textContent.trim();
+        const timeValue = radioFor3amTomorrow.value;
+        const formData = new FormData(radioFor3amTomorrow.form);
 
-        expect(button).not.toBeNull();
-        expect(button.getAttribute('value')).toEqual('Choose a different time');
+        expect(document.querySelector('.radio-select__selected-day-and-time').value).toEqual(timeLabel);
+        expect(formData.get('scheduled_for')).toEqual(timeValue);
 
-      })
+      });
 
-      test("focus the selected option", () => {
+      test("the field showing the selected day and time should be focused", () => {
 
-        selectedOption = document.querySelector('.radio-select__column input[checked=checked]');
-
-        expect(document.activeElement).toBe(selectedOption);
+        expect(document.activeElement).toBe(document.querySelector('.radio-select__selected-day-and-time'));
 
       });
 
     });
 
-    describe("selecting an option with the space key should", () => {
+    describe("When you click the a 'Back to days' link", () => {
 
-      let optionsColumn;
-      let secondOptionLabel;
+      let expanderButton;
+      let expandingSection;
+      let daysView;
+      let timesView;
+      let buttonForTomorrow;
+      let backLink;
 
       beforeEach(() => {
 
-        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
+        expanderButton = document.querySelector('.radio-select__expander');
+        expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
+        daysView = expandingSection.querySelector('.radio-select__days').parentElement;
+        timesView = expandingSection.querySelector('.radio-select__times').parentElement;
+        buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
+        backLink = expandingSection.querySelector('.govuk-back-link');
 
-        const options = optionsColumn.querySelectorAll('input[type=radio]');
-        secondOptionLabel = options[1].parentNode.querySelector('label').textContent.trim();
-
-        helpers.moveSelectionToRadio(options[1], { 'direction': 'down' });
-        helpers.activateRadioWithSpace(options[1]);
-      });
-
-      test("remove all the other options", () => {
-
-        // module replaces the column node so this needs querying again
-        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
-
-        expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
-        expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(secondOptionLabel);
+        helpers.triggerEvent(expanderButton, 'click');
+        helpers.triggerEvent(buttonForTomorrow, 'click');
+        helpers.triggerEvent(backLink, 'click');
 
       });
 
-      test("add a button for choosing a different time", () => {
+      test("the times view should be hidden", () => {
 
-        const button = document.querySelector('.radio-select__column:nth-child(3) input[type=button]');
-
-        expect(button).not.toBeNull();
-        expect(button.getAttribute('value')).toEqual('Choose a different time');
-
-      })
-
-      test("focus the selected option", () => {
-
-        selectedOption = document.querySelector('.radio-select__column input[checked=checked]');
-
-        expect(document.activeElement).toBe(selectedOption);
+        expect(timesView.hasAttribute('hidden')).toBe(true);
 
       });
 
-    });
+      test("the days view should show", () => {
 
-    describe("selecting an option with the enter key should", () => {
-
-      let optionsColumn;
-      let secondOptionLabel;
-
-      beforeEach(() => {
-
-        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
-
-        const options = optionsColumn.querySelectorAll('input[type=radio]');
-        secondOptionLabel = options[1].parentNode.querySelector('label').textContent.trim();
-
-        // simulate events for arrow key press moving selection to 2nd option
-        // event for down arrow key press
-        helpers.triggerEvent(options[1], 'keydown', {
-          eventInit: { which: 40 }
-        });
-        // click event fired from option radio being activated
-        helpers.triggerEvent(options[1], 'click', {
-          eventInit: { pageX: 0 }
-        });
-
-        // simulate events for enter key press to confirm selection
-        // event for enter key press
-        helpers.triggerEvent(options[1], 'keydown', {
-          eventInit: { which: 13 }
-        });
+        expect(daysView.hasAttribute('hidden')).toBe(false);
 
       });
 
-      test("remove all the other options", () => {
+      test("the button for the day you clicked before should be focused", () => {
 
-        // module replaces the column node so this needs querying again
-        optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
-
-        expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
-        expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(secondOptionLabel);
-
-      });
-
-      test("add a button for choosing a different time", () => {
-
-        const button = document.querySelector('.radio-select__column:nth-child(3) input[type=button]');
-
-        expect(button).not.toBeNull();
-        expect(button.getAttribute('value')).toEqual('Choose a different time');
-
-      })
-
-      test("focus the selected option", () => {
-
-        selectedOption = document.querySelector('.radio-select__column input[checked=checked]');
-
-        expect(document.activeElement).toBe(selectedOption);
-
-      });
-
-    });
-
-    test("clicking the 'Done' button should choose whatever time is selected", () => {
-
-      let optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
-      const secondOption = optionsColumn.querySelectorAll('input[type=radio]')[1];
-      const secondOptionLabel = document.querySelector('label[for=' + secondOption.getAttribute('id')).textContent.trim();
-      const doneButton = document.querySelector('.radio-select__column:nth-child(2) input[type=button]');
-
-      // select second option
-      secondOption.checked = true;
-      secondOption.setAttribute('checked', '');
-
-      helpers.triggerEvent(doneButton, 'click');
-
-      optionsColumn = document.querySelector('.radio-select__column:nth-child(2)');
-
-      expect(optionsColumn.querySelectorAll('input[type=radio]').length).toEqual(1);
-      expect(optionsColumn.querySelector('label').textContent.trim()).toEqual(secondOptionLabel);
-
-    });
-
-    describe("after selecting an option clicking the 'Choose a different time' button should", () => {
-
-      beforeEach(() => {
-
-        // select the first option
-        const firstOption = document.querySelector('.radio-select__column:nth-child(2) input[type=radio]');
-
-        helpers.clickElementWithMouse(firstOption);
-
-        // click the 'Choose a different time' button
-        const resetButton = document.querySelector('.radio-select__column:nth-child(3) input[type=button]');
-        helpers.triggerEvent(resetButton, 'click');
-
-      });
-
-      test("reset the module", () => {
-
-        categoryButtons = document.querySelectorAll('.radio-select__column:nth-child(2) .radio-select__button--category');
-
-        expect(categoryButtons.length).toEqual(CATEGORIES.length);
-
-      });
-
-      test("focus the default option", () => {
-
-        expect(document.activeElement).toBe(document.getElementById('scheduled_for-0'));
+        expect(document.activeElement).toBe(buttonForTomorrow);
 
       });
 

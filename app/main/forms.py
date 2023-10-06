@@ -118,11 +118,11 @@ def get_human_time(time):
     return {"0": "midnight", "12": "midday"}.get(time.strftime("%-H"), time.strftime("%-I%p").lower())
 
 
-def get_human_day(time, prefix_today_with="T"):
+def get_human_day(time):
     #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
     time = (time - timedelta(hours=1)).strftime("%A")
     if time == datetime.utcnow().strftime("%A"):
-        return f"{prefix_today_with}oday"
+        return "Today"
     if time == (datetime.utcnow() + timedelta(days=1)).strftime("%A"):
         return "Tomorrow"
     return time
@@ -144,10 +144,7 @@ def get_next_hours_until(until):
 def get_next_days_until(until):
     now = datetime.utcnow()
     days = int((until - now).total_seconds() / (60 * 60 * 24))
-    return [
-        get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc), prefix_today_with="Later t")
-        for i in range(0, days + 1)
-    ]
+    return [get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc)) for i in range(0, days + 1)]
 
 
 class RadioField(WTFormsRadioField):
@@ -1616,10 +1613,10 @@ class ChooseTimeForm(StripWhitespaceForm):
         self.scheduled_for.choices = [("", "Now")] + [
             get_time_value_and_label(hour) for hour in get_next_hours_until(get_furthest_possible_scheduled_time())
         ]
-        self.scheduled_for.categories = get_next_days_until(get_furthest_possible_scheduled_time())
+        self.scheduled_for.days = get_next_days_until(get_furthest_possible_scheduled_time())
 
     scheduled_for = GovukRadiosField(
-        "When should Notify send these messages?",
+        "When to send these messages",
         default="",
     )
 

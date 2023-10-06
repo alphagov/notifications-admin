@@ -34,18 +34,22 @@
 
   {{ template|string }}
   <div class="bottom-gutter-3-2">
-    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}" class='page-footer'>
+    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}" class="govuk-!-margin-bottom-6">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <input type="hidden" name="contact_list_id" value="{{ request.args.get('contact_list_id', '') }}" />
       {% if _choose_time_form and template.template_type != 'letter' %}
-        {{ _choose_time_form.scheduled_for(param_extensions={
-          'formGroup': {'classes': 'bottom-gutter-2-3'},
-          'attributes': {
-            'data-notify-module': 'radio-select',
-            'data-categories': _choose_time_form.scheduled_for.categories|join(','),
-            'data-show-now-as-default': 'true'
-          }
-        }) }}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-half">
+            {{ _choose_time_form.scheduled_for(param_extensions={
+              'formGroup': {'classes': 'bottom-gutter-2-3'},
+              'classes': 'radio-select',
+              'attributes': {
+                'data-notify-module': 'radio-select',
+                'data-days': _choose_time_form.scheduled_for.days|join(','),
+              }
+            }) }}
+          </div>
+        </div>
       {% endif %}
       {% if (template.template_type != 'letter' or not request.args.from_test) and not template.too_many_pages %}
         {% set button_text %}

@@ -4,56 +4,98 @@ $border-thickness: 4px;
 $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 
 .radio-select {
-
   min-height: 39px;
+}
 
-  &__column {
+.radio-select__selection-and-button {
+  @include govuk-responsive-margin(6, "bottom");
+}
 
-    display: inline-block;
-    vertical-align: top;
+// make focus ring appear above button
+.radio-select__selected-day-and-time:focus {
+  position: relative;
+  z-index: 1;
+}
 
-    .multiple-choice {
-      padding-right: 10px;
-      padding-left: 54px - 10px;
-    }
+.radio-select__selected-day-and-time {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 5px 6px;
+  border: solid 2px $govuk-input-border-colour;
+  text-align: center;
+}
 
-  }
+.radio-select__selected-day-and-time:focus {
+  padding: 5px 5px 5px;
+  border-width: 3px;
+}
 
-  &__button--category {
+.radio-select__expander {
+  border-top-color: rgba(255, 255, 255, 0.2);
+  border-left-color: rgba(0, 0, 0, 0.02);
+  border-right-color: rgba(0, 0, 0, 0.02);
+  display: block;
+  width: 100%;
+}
 
-    margin-right: govuk-spacing(3);
-    width: auto;
+.radio-select__expander::before {
+  transform:translateY(-35%) rotate(45deg) scale(1);
+  border-color: black;
+  border-bottom:2px solid govuk-colour('black');
+  border-right:2px solid govuk-colour('black');
+  content:"";
+  display:inline-block;
+  height:8px;
+  margin: 0 10px 0 -18px; // negative left margin means the element effectively occupies 0 width
+  vertical-align:middle;
+  width:8px;
+  position: static; // override GOV.UK Frontend styling from the Button component
+}
 
-  }
+.radio-select__expander[aria-expanded=true]::before {
+  transform:translateY(1px) rotate(225deg) scale(1);
+}
 
-  &__button--done {
+.radio-select__expandee > .radio-select__view {
+  @include govuk-responsive-margin(3, "top");
+}
 
-    display: block;
-    clear: both;
-    margin: 0 0 govuk-spacing(6) 0;
-    position: relative;
-    top: govuk-spacing(3);
+.radio-select__expandee > .radio-select__view:nth-of-type(2) {
+  margin: 5px 0 3px;
+}
 
-    &:active {
-      top: govuk-spacing(3) + 2px;
-    }
+.radio-select__days,
+.radio-select__times {
+  display: flex;
+  flex-direction: column;
+}
 
-  }
+.radio-select__times[hidden] {
+  display: none;
+}
 
-  .js-enabled & {
+// Gaps for flexbox layouts for IE11 (which doesn't support column|row-gap or gap)
+.radio-select__day {
+  @include govuk-responsive-margin(3, "top");
+}
 
-    overflow: visible;
+.radio-select__day:first-of-type {
+  margin-top: 0;
+}
 
-    .multiple-choice {
-      display: none;
-    }
+.radio-select__return-to-days {
+  margin-top: 8px; // 10px minus 2px for drop shadow below expander button
+  margin-right: 2px;
+  margin-left: 2px;
+}
 
-    .js-multiple-choice {
-      display: block;
-    }
+.radio-select__confirm.js-stick-at-bottom-when-scrolling {
+  margin-top: 0;
+}
 
-  }
-
+.radio-select__confirm__button {
+  width: 100%;
 }
 
 .govuk-form-group--nested-radio{
