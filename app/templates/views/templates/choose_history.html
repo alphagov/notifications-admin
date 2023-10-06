@@ -1,19 +1,25 @@
 {% extends "withnav_template.html" %}
 
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/previous-next-navigation.html" import previous_next_navigation %}
+
 {% block service_page_title %}
   Previous versions
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
   <h1 class="heading-large">Previous versions</h1>
   <div class="govuk-grid-row">
     {% for template in versions %}
-      {% with show_title=True %}
+      {% with version_heading=True %}
         {% include 'views/templates/_template_history.html' %}
       {% endwith %}
     {% endfor %}
   </div>
-  <p class="govuk-body">
-    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(".choose_template", service_id=current_service.id) }}">Back to current templates</a>
-  </p>
+
+  {{ previous_next_navigation(previous_page, next_page) }}
 {% endblock %}
