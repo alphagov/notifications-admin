@@ -38,7 +38,7 @@
     <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ main_navigation.is_selected('team-members') }}" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">Team members</a></li>
   {% endif %}
   {% if current_user.can_make_service_live(current_service) %}
-    <li class="navigation__item navigation__item--with-separator"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ main_navigation.is_selected('make-service-live') }}" href="{{ url_for('main.make_service_live', service_id=current_service.id) }}">Make service live</a></li>
+    <li class="navigation__item navigation__item--with-separator"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ main_navigation.is_selected('make-service-live') }}" href="{{ url_for('main.org_member_make_service_live_start', service_id=current_service.id) }}">Make service live</a></li>
   {% endif %}
   </ul>
 </nav>

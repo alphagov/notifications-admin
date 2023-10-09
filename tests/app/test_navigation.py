@@ -196,7 +196,6 @@ EXCLUDED_ENDPOINTS = set(
             "live_services_csv",
             "live_services",
             "main.redirects.historical_redirects",
-            "make_service_live",
             "manage_org_users",
             "manage_template_folder",
             "manage_users",
@@ -638,6 +637,6 @@ def test_make_service_live_link_is_shown_in_limited_circumstances(
     assert last_navigation_item["class"] == ["navigation__item", "navigation__item--with-separator"]
     assert normalize_spaces(last_navigation_item.text) == "Make service live"
     assert last_navigation_item.select_one("a")["href"] == url_for(
-        "main.make_service_live",
+        "main.org_member_make_service_live_start",
         service_id=SERVICE_ONE_ID,
     )
