@@ -437,7 +437,7 @@ def test_post_org_member_make_service_live_service_name(
 
 
 @pytest.mark.parametrize(*pytest_user_auth_combinations)
-def test_get_org_member_make_duplicate_service_service_name(
+def test_get_org_member_make_service_live_duplicate_service(
     mocker,
     client_request,
     service_one,
@@ -510,22 +510,22 @@ def test_post_org_member_make_service_live_duplicate_service_error_summary(
         (
             f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=ok",
             {"enabled": True},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user",
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=ok&duplicate=yes",
         ),
         (
             f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=ok",
             {"enabled": False},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/decision",
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&duplicate=no",
         ),
         (
             f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=bad",
             {"enabled": True},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user",
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&duplicate=yes",
         ),
         (
             f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=bad",
             {"enabled": False},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user",
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&duplicate=no",
         ),
     ),
 )
@@ -551,4 +551,181 @@ def test_post_org_member_make_service_live_duplicate_service(
         request_url,
         _expected_redirect=expected_redirect_url,
         _data=data,
+    )
+
+
+@pytest.mark.parametrize(
+    "name, duplicate, expected_redirect",
+    (
+        ("ok", "no", f"/services/{SERVICE_ONE_ID}/make-service-live/decision"),
+        ("bad", "no", None),
+        ("ok", "yes", None),
+        ("bad", "yes", None),
+    ),
+)
+@pytest.mark.parametrize(*pytest_user_auth_combinations)
+def test_get_org_member_make_service_live_contact_user(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    user,
+    organisation_can_approve_own_go_live_requests,
+    service_has_active_go_live_request,
+    expected_status,
+    name,
+    duplicate,
+    expected_redirect,
+):
+    organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = service_has_active_go_live_request
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.org_member_make_service_live_contact_user",
+        service_id=SERVICE_ONE_ID,
+        name=name,
+        duplicate=duplicate,
+        _expected_redirect=expected_redirect if expected_status == 200 else None,
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 200 and not expected_redirect:
+        assert "Contact Test User" in normalize_spaces(page.select_one("main").text)
+
+        finish = page.select_one("main a")
+        assert finish.text.strip() == "Finish"
+        assert finish.get("href") == f"/organisations/{ORGANISATION_ID}"
+
+
+@pytest.mark.parametrize(*pytest_user_auth_combinations)
+def test_get_org_member_make_service_live_decision(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    user,
+    organisation_can_approve_own_go_live_requests,
+    service_has_active_go_live_request,
+    expected_status,
+):
+    organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = service_has_active_go_live_request
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.org_member_make_service_live_decision",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 200:
+        assert [
+            (radio.select_one("input[type=radio]")["value"], normalize_spaces(radio.select_one("label").text))
+            for radio in page.select(".govuk-radios__item")
+        ] == [
+            ("True", "Approve the request and make this service live"),
+            ("False", "Reject the request"),
+        ]
+
+
+def test_post_org_member_make_service_live_decision_error_summary(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+):
+    user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
+    )
+    organisation_one["can_approve_own_go_live_requests"] = True
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.post(
+        "main.org_member_make_service_live_decision",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=200,
+        _data={},
+    )
+
+    error_summary = page.select_one(".govuk-error-summary")
+    assert "There is a problem" in error_summary.text
+    assert "Select approve or reject" in error_summary.text
+
+
+@pytest.mark.parametrize(
+    "post_data, expected_arguments_to_update_service",
+    (
+        (
+            True,
+            {
+                "email_message_limit": 250_000,
+                "sms_message_limit": 250_000,
+                "letter_message_limit": 20_000,
+                "restricted": False,
+                "go_live_at": "2022-12-22 12:12:12",
+                "has_active_go_live_request": False,
+            },
+        ),
+        (
+            False,
+            {
+                "email_message_limit": 50,
+                "sms_message_limit": 50,
+                "letter_message_limit": 50,
+                "restricted": True,
+                "go_live_at": None,
+                "has_active_go_live_request": False,
+            },
+        ),
+    ),
+)
+@freeze_time("2022-12-22 12:12:12")
+def test_post_org_member_make_service_live_decision(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_organisation,
+    mock_update_service,
+    post_data,
+    expected_arguments_to_update_service,
+):
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        "main.org_member_make_service_live_decision",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            "enabled": post_data,
+        },
+        _expected_redirect=url_for("main.organisation_dashboard", org_id=ORGANISATION_ID),
+    )
+
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        **expected_arguments_to_update_service,
     )

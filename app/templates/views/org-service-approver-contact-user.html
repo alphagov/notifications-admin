@@ -1,0 +1,56 @@
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+
+{% set title = "Contact " + current_service.go_live_user.name %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      {% set reasons = [] %}
+      {% if bad_name %}
+        {% do reasons.append('update the service name so it’s easy to understand') %}
+      {% endif %}
+      {% if duplicate_service %}
+        {% do reasons.append('change the service name so it’s not similar to something already in use') %}
+      {% endif %}
+
+      {% if reasons|length == 0 %}
+        {{ ('no reasons to contact user') / 0 }}
+      {% elif reasons|length == 1 %}
+        <p class="govuk-body">Contact {{ current_service.go_live_user.name }} directly at {{ current_service.go_live_user.email_address }} to {{ reasons[0] }}.</p>
+      {% else %}
+        <p class="govuk-body">Contact {{ current_service.go_live_user.name }} directly at {{ current_service.go_live_user.email_address }} to:</p>
+        <ul class="govuk-list govuk-list--bullet">
+          {% for reason in reasons %}
+          <li>{{ reason }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <p class="govuk-body">
+        Use the link in the ‘request to go-live’ email to approve the request after any changes have been made.
+      </p>
+
+      {{ govukButton({
+        "element": "a",
+        "text": "Finish",
+        "href": url_for('main.organisation_dashboard', org_id=organisation),
+      }) }}
+
+    </div>
+  </div>
+{% endblock %}
