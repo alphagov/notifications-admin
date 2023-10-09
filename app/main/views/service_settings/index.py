@@ -1282,7 +1282,11 @@ def add_data_retention(service_id):
             service_id, form.notification_type.data, form.days_of_retention.data
         )
         return redirect(url_for(".data_retention", service_id=service_id))
-    return render_template("views/service-settings/data-retention/add.html", form=form)
+    return render_template(
+        "views/service-settings/data-retention/add.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/services/<uuid:service_id>/data-retention/<uuid:data_retention_id>/edit", methods=["GET", "POST"])

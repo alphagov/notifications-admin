@@ -1737,13 +1737,13 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
     contact_details_type = GovukRadiosField(
         "Type of contact details",
         choices=[
-            ("url", "Link"),
+            ("url", "Link to a website"),
             ("email_address", "Email address"),
             ("phone_number", "Phone number"),
         ],
     )
 
-    url = GovukTextInputField("URL")
+    url = GovukTextInputField("URL", param_extensions={"hint": {"text": "For example, https://www.example.gov.uk"}})
     email_address = GovukEmailField("Email address")
     # This is a text field because the number provided by the user can also be a short code
     phone_number = GovukTextInputField("Phone number")
@@ -2388,11 +2388,11 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
             ("sms", "SMS"),
             ("letter", "Letter"),
         ],
-        thing="notification type",
+        thing="a type of notification",
     )
     days_of_retention = GovukIntegerField(
         label="Days of retention",
-        things="days of retention",
+        things="a number of days",
         validators=[validators.NumberRange(min=3, max=90, message="The number of days must be between 3 and 90")],
     )
 
@@ -2400,8 +2400,8 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
 class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
     days_of_retention = GovukIntegerField(
         label="Days of retention",
-        things="days of retention",
-        validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
+        things="a number of days",
+        validators=[validators.NumberRange(min=3, max=90, message="The number of days must be between 3 and 90")],
     )
 
 

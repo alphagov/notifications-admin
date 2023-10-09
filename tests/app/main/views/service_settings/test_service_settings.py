@@ -5812,7 +5812,7 @@ def test_update_service_data_retention_return_validation_error_for_negative_days
         _data={"days_of_retention": -5},
         _expected_status=200,
     )
-    assert "Must be between 3 and 90" in page.select_one(".govuk-error-message").text
+    assert "The number of days must be between 3 and 90" in page.select_one(".govuk-error-message").text
     assert mock_get_service_data_retention.called
     assert not mock_update_service_data_retention.called
 
