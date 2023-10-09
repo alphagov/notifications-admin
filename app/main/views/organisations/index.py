@@ -69,7 +69,7 @@ def add_organisation():
         except HTTPError as e:
             msg = "Organisation name already exists"
             if e.status_code == 400 and msg in e.message:
-                form.name.errors.append("This organisation name is already in use")
+                form.name.errors.append("This organisation name is already in use - contact GOV.UK Notify support")
             else:
                 raise e
 
