@@ -639,8 +639,8 @@ def test_should_show_service_name_with_no_prefixing(
 @pytest.mark.parametrize(
     "name, error_message",
     [
-        ("", "Cannot be empty"),
-        (".", "Must include at least two alphanumeric characters"),
+        ("", "Error: Enter a service name"),
+        (".", "Service name must include at least 2 letters or numbers"),
         ("a" * 256, "Service name cannot be longer than 255 characters"),
     ],
 )
@@ -2692,8 +2692,8 @@ def test_no_senders_message_shows(client_request, sender_list_page, endpoint_to_
 @pytest.mark.parametrize(
     "reply_to_input, expected_error",
     [
-        ("", "Cannot be empty"),
-        ("testtest", "Enter a valid email address"),
+        ("", "Enter an email address"),
+        ("testtest", "Enter an email address in the correct format, like name@example.gov.uk"),
     ],
 )
 def test_incorrect_reply_to_email_address_input(
@@ -2712,8 +2712,11 @@ def test_incorrect_reply_to_email_address_input(
 @pytest.mark.parametrize(
     "contact_block_input, expected_error",
     [
-        ("", "Cannot be empty"),
-        ("1 \n 2 \n 3 \n 4 \n 5 \n 6 \n 7 \n 8 \n 9 \n 0 \n a", "Contains 11 lines, maximum is 10"),
+        ("", "Enter a sender address"),
+        (
+            "1 \n 2 \n 3 \n 4 \n 5 \n 6 \n 7 \n 8 \n 9 \n 0 \n a",
+            "This address is 11 lines long - the most you can have is 10 lines",
+        ),
     ],
 )
 def test_incorrect_letter_contact_block_input(
@@ -2734,11 +2737,11 @@ def test_incorrect_letter_contact_block_input(
     [
         ("elevenchars", None),
         ("11 chars", None),
-        ("", "Cannot be empty"),
+        ("", "Enter a text message sender"),
         ("abcdefghijkhgkg", "Text message sender cannot be longer than 11 characters"),
-        (r" ¯\_(ツ)_/¯ ", "Use letters and numbers only"),
+        (r" ¯\_(ツ)_/¯ ", "Text message sender can only include letters and numbers"),
         ("blood.co.uk", None),
-        ("00123", "Cannot start with 00"),
+        ("00123", "Text message sender cannot start with 00"),
     ],
 )
 def test_incorrect_sms_sender_input(
@@ -2754,7 +2757,6 @@ def test_incorrect_sms_sender_input(
         _data={"sms_sender": sms_sender_input},
         _expected_status=(200 if expected_error else 302),
     )
-
     error_message = page.select_one(".govuk-error-message")
     count_of_api_calls = len(mock_add_sms_sender.call_args_list)
 
@@ -2762,6 +2764,7 @@ def test_incorrect_sms_sender_input(
         assert not error_message
         assert count_of_api_calls == 1
     else:
+
         assert expected_error in error_message.text
         assert count_of_api_calls == 0
 
@@ -3126,11 +3129,11 @@ def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_chan
 @pytest.mark.parametrize(
     "url, header_text",
     [
-        ("main.service_edit_email_reply_to", "Reply-to email addresses"),
+        ("main.service_edit_email_reply_to", "Change reply-to email address"),
         ("main.service_add_email_reply_to", "Add reply-to email address"),
     ],
 )
-def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
+def test_add_and_edit_reply_to_email_address(
     mocker, fake_uuid, client_request, mock_update_reply_to_email_address, url, header_text
 ):
     reply_to_email_address = create_reply_to_email_address()
@@ -3152,12 +3155,7 @@ def test_add_edit_reply_to_email_address_goes_straight_to_update_if_address_not_
     )
 
     assert page.select_one("h1").text == header_text
-
-    if url == "main.service_edit_email_reply_to":
-        assert error_message in page.select_one("div.banner-dangerous").text
-    else:
-        assert error_message in page.select_one(".govuk-error-message").text
-
+    assert error_message in page.select_one(".govuk-error-message").text
     assert mock_update_reply_to_email_address.called is False
 
 
@@ -3229,7 +3227,7 @@ def test_shows_delete_link_for_error_on_post_request_for_edit_email_reply_to_add
 ):
     mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
 
-    data = {"email_address": "not a valid email address"}
+    data = {"email_address": "Enter an email address"}
     if default_checkbox_checked:
         data["is_default"] = "y"
 
@@ -3246,8 +3244,11 @@ def test_shows_delete_link_for_error_on_post_request_for_edit_email_reply_to_add
         ".service_email_reply_to",
         service_id=SERVICE_ONE_ID,
     )
-    assert page.select_one(".govuk-error-message").text.strip() == "Error: Enter a valid email address"
-    assert page.select_one("input#email_address").get("value") == "not a valid email address"
+    assert (
+        page.select_one(".govuk-error-message").text.strip()
+        == "Error: Enter an email address in the correct format, like name@example.gov.uk"
+    )
+    assert page.select_one("input#email_address").get("value") == "Enter an email address"
 
     if default_choice_and_delete_link_expected:
         link = page.select_one(".page-footer a")
@@ -4438,7 +4439,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_minute_rate_limit",
             {},
             {"rate_limit": ""},
-            "Error: Cannot be empty",
+            "Error: Enter a number of messages",
             {},
         ),
         (
@@ -4459,7 +4460,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_day_message_limit",
             {"notification_type": "sms"},
             {"message_limit": ""},
-            "Error: Cannot be empty",
+            "Error: Enter a number of text messages",
             {},
         ),
         (
@@ -4480,7 +4481,7 @@ def test_should_set_per_minute_rate_limit(
             "main.set_per_day_message_limit",
             {"notification_type": "letter"},
             {"message_limit": "12.34"},
-            "Error: The number of letters must be a whole number",
+            "Error: Enter the number of letters in digits",
             {},
         ),
         (
@@ -4970,9 +4971,9 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
 @pytest.mark.parametrize(
     "contact_details_type, invalid_value, error",
     [
-        ("url", "invalid.com/", "Must be a valid URL"),
-        ("email_address", "me@co", "Enter a valid email address"),
-        ("phone_number", "abcde", "Must be a valid phone number"),
+        ("url", "invalid.com/", "Enter a URL in the correct format"),
+        ("email_address", "me@co", "Enter an email address in the correct format, like name@example.gov.uk"),
+        ("phone_number", "abcde", "Enter a phone number in the correct format"),
     ],
 )
 def test_send_files_by_email_contact_details_does_not_update_invalid_contact_details(
@@ -5811,7 +5812,7 @@ def test_update_service_data_retention_return_validation_error_for_negative_days
         _data={"days_of_retention": -5},
         _expected_status=200,
     )
-    assert "Must be between 3 and 90" in page.select_one(".govuk-error-message").text
+    assert "The number of days must be between 3 and 90" in page.select_one(".govuk-error-message").text
     assert mock_get_service_data_retention.called
     assert not mock_update_service_data_retention.called
 

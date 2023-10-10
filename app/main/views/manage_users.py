@@ -172,7 +172,13 @@ def edit_user_email(service_id, user_id):
 
         return redirect(url_for(".confirm_edit_user_email", user_id=user.id, service_id=service_id))
 
-    return render_template("views/manage-users/edit-user-email.html", user=user, form=form, service_id=service_id)
+    return render_template(
+        "views/manage-users/edit-user-email.html",
+        user=user,
+        form=form,
+        service_id=service_id,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/services/<uuid:service_id>/users/<uuid:user_id>/edit-email/confirm", methods=["GET", "POST"])
@@ -218,7 +224,13 @@ def edit_user_mobile_number(service_id, user_id):
         session["team_member_mobile_change"] = form.mobile_number.data
 
         return redirect(url_for(".confirm_edit_user_mobile_number", user_id=user.id, service_id=service_id))
-    return render_template("views/manage-users/edit-user-mobile.html", user=user, form=form, service_id=service_id)
+    return render_template(
+        "views/manage-users/edit-user-mobile.html",
+        user=user,
+        form=form,
+        service_id=service_id,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/services/<uuid:service_id>/users/<uuid:user_id>/edit-mobile-number/confirm", methods=["GET", "POST"])

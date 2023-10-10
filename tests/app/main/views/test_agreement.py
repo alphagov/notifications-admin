@@ -259,7 +259,7 @@ def test_accept_agreement_page_populates(
             },
             [
                 "Error: Select an option",
-                "Error: Must be a number",
+                "Error: Enter a version number",
             ],
         ),
         (
@@ -270,7 +270,7 @@ def test_accept_agreement_page_populates(
                 "on_behalf_of_email": "",
             },
             [
-                "Error: Must be a number",
+                "Error: Enter a version number in digits, like 3.1",
             ],
         ),
         (
@@ -281,8 +281,8 @@ def test_accept_agreement_page_populates(
                 "on_behalf_of_email": "",
             },
             [
-                "Error: Cannot be empty",
-                "Error: Cannot be empty",
+                "Error: Enter the name of the person accepting the agreement",
+                "Error: Enter the email address of the person accepting the agreement",
             ],
         ),
         (
@@ -293,7 +293,7 @@ def test_accept_agreement_page_populates(
                 "on_behalf_of_email": "",
             },
             [
-                "Error: Cannot be empty",
+                "Error: Enter the email address of the person accepting the agreement",
             ],
         ),
         (
@@ -304,7 +304,7 @@ def test_accept_agreement_page_populates(
                 "on_behalf_of_email": "test@example.com",
             },
             [
-                "Error: Cannot be empty",
+                "Error: Enter the name of the person accepting the agreement",
             ],
         ),
     ),

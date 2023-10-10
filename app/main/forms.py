@@ -42,7 +42,6 @@ from wtforms import (
 )
 from wtforms import RadioField as WTFormsRadioField
 from wtforms.validators import (
-    URL,
     UUID,
     DataRequired,
     InputRequired,
@@ -76,6 +75,8 @@ from app.main.validators import (
     NoPlaceholders,
     NoTextInSVG,
     NotifyDataRequired,
+    NotifyInputRequired,
+    NotifyUrlValidator,
     OnlySMSCharacters,
     StringsNotAllowed,
     ValidEmail,
@@ -355,11 +356,8 @@ class GovukIntegerField(GovukTextInputField):
 
         if self.data:
 
-            if isinstance(self.data, str):
-                raise StopValidation(f"Enter {self.things} in digits")
-
             if not isinstance(self.data, int):
-                raise StopValidation(f"{sentence_case(self.things)} must be a whole number")
+                raise StopValidation(f"Enter {self.things} in digits")
 
             if self.data > self.POSTGRES_MAX_INT:
                 raise ValidationError(
@@ -1158,8 +1156,8 @@ class RenameServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Service name",
         validators=[
-            DataRequired(message="Cannot be empty"),
-            MustContainAlphanumericCharacters(),
+            NotifyDataRequired(thing="a service name"),
+            MustContainAlphanumericCharacters(thing="service name"),
             Length(max=255, thing="service name"),
         ],
     )
@@ -1313,23 +1311,16 @@ class AdminNewOrganisationForm(
 class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
         "Numbers of text message fragments per year",
-        things="text message fragments",
+        things="the number of text message fragments",
         validators=[
-            InputRequired(message="Cannot be empty"),
+            NotifyInputRequired(thing="a number of text messages"),
             NumberRange(min=0, message="Number must be greater than or equal to 0"),
         ],
     )
 
 
 class AdminServiceMessageLimitForm(StripWhitespaceForm):
-    message_limit = GovukIntegerField(
-        "",
-        things="the number of messages",
-        validators=[
-            DataRequired(message="Cannot be empty"),
-            NumberRange(min=0, message="Number must be greater than or equal to 0"),
-        ],
-    )
+    message_limit = GovukIntegerField("", things="the number of messages", validators=[])
 
     def __init__(self, notification_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1343,6 +1334,10 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
                 )
             }
         }
+        self.message_limit.validators = [
+            NotifyInputRequired(thing=f"a number of {message_count_noun(2, notification_type)}"),
+            NumberRange(min=0, message="Number must be greater than or equal to 0"),
+        ]
 
 
 class AdminServiceRateLimitForm(StripWhitespaceForm):
@@ -1350,7 +1345,7 @@ class AdminServiceRateLimitForm(StripWhitespaceForm):
         "Number of messages the service can send in a rolling 60 second window",
         things="the number of messages",
         validators=[
-            DataRequired(message="Cannot be empty"),
+            NotifyDataRequired(thing="a number of messages"),
             NumberRange(min=0, message="Number must be greater than or equal to 0"),
         ],
     )
@@ -1711,7 +1706,7 @@ class AdminProviderRatioForm(OrderableFieldsForm):
                 provider["identifier"],
                 GovukIntegerField(
                     f"{provider['display_name']} (%)",
-                    things="percentage",
+                    things="a percentage",
                     validators=[validators.NumberRange(min=0, max=100, message="Must be between 0 and 100")],
                     param_extensions={
                         "classes": "govuk-input--width-3",
@@ -1742,24 +1737,27 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
     contact_details_type = GovukRadiosField(
         "Type of contact details",
         choices=[
-            ("url", "Link"),
+            ("url", "Link to a website"),
             ("email_address", "Email address"),
             ("phone_number", "Phone number"),
         ],
     )
 
-    url = GovukTextInputField("URL")
+    url = GovukTextInputField("URL", param_extensions={"hint": {"text": "For example, https://www.example.gov.uk"}})
     email_address = GovukEmailField("Email address")
     # This is a text field because the number provided by the user can also be a short code
     phone_number = GovukTextInputField("Phone number")
 
     def validate(self):
         if self.contact_details_type.data == "url":
-            self.url.validators = [DataRequired(), URL(message="Must be a valid URL")]
+            self.url.validators = [
+                NotifyDataRequired(thing="a URL in the correct format"),
+                NotifyUrlValidator(),
+            ]
 
         elif self.contact_details_type.data == "email_address":
             self.email_address.validators = [
-                DataRequired(),
+                NotifyDataRequired(thing="an email address"),
                 Length(min=5, max=255, thing="email address"),
                 ValidEmail(),
             ]
@@ -1771,15 +1769,15 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
                 try:
                     normalised_number = normalise_phone_number(num.data)
                 except InvalidPhoneError as e:
-                    raise ValidationError("Must be a valid phone number") from e
+                    raise ValidationError("Enter a phone number in the correct format") from e
 
                 if normalised_number in {"999", "112"}:
-                    raise ValidationError("Must not be an emergency number")
+                    raise ValidationError("Phone number cannot be an emergency number")
 
                 return True
 
             self.phone_number.validators = [
-                DataRequired(),
+                NotifyDataRequired(thing="a phone number"),
                 Length(min=3, max=20, thing="phone number"),
                 valid_non_emergency_phone_number,
             ]
@@ -1788,7 +1786,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
-    email_address = make_email_address_field(label="Reply-to email address", gov_user=False)
+    email_address = make_email_address_field(label="Reply-to email address", thing="an email address", gov_user=False)
     is_default = GovukCheckboxField("Make this email address the default")
 
 
@@ -1796,7 +1794,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
     sms_sender = GovukTextInputField(
         "Text message sender",
         validators=[
-            DataRequired(message="Cannot be empty"),
+            NotifyDataRequired(thing="a text message sender"),
             Length(min=3, thing="text message sender"),
             Length(max=11, thing="text message sender"),
             LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly(),
@@ -1823,13 +1821,15 @@ class AdminBillingDetailsForm(StripWhitespaceForm):
 
 
 class ServiceLetterContactBlockForm(StripWhitespaceForm):
-    letter_contact_block = TextAreaField(validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()])
+    letter_contact_block = TextAreaField(
+        validators=[NotifyDataRequired(thing="a sender address"), NoCommasInPlaceHolders()]
+    )
     is_default = GovukCheckboxField("Set as your default address")
 
     def validate_letter_contact_block(self, field):
         line_count = field.data.strip().count("\n")
         if line_count >= 10:
-            raise ValidationError(f"Contains {line_count + 1} lines, maximum is 10")
+            raise ValidationError(f"This address is {line_count + 1} lines long - the most you can have is 10 lines")
 
 
 class OnOffSettingForm(StripWhitespaceForm):
@@ -2388,20 +2388,20 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
             ("sms", "SMS"),
             ("letter", "Letter"),
         ],
-        thing="notification type",
+        thing="a type of notification",
     )
     days_of_retention = GovukIntegerField(
         label="Days of retention",
-        things="days of retention",
-        validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
+        things="a number of days",
+        validators=[validators.NumberRange(min=3, max=90, message="The number of days must be between 3 and 90")],
     )
 
 
 class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
     days_of_retention = GovukIntegerField(
         label="Days of retention",
-        things="days of retention",
-        validators=[validators.NumberRange(min=3, max=90, message="Must be between 3 and 90")],
+        things="a number of days",
+        validators=[validators.NumberRange(min=3, max=90, message="The number of days must be between 3 and 90")],
     )
 
 
@@ -2685,7 +2685,10 @@ class AcceptAgreementForm(StripWhitespaceForm):
             on_behalf_of_email=org.agreement_signed_on_behalf_of_email_address,
         )
 
-    version = GovukTextInputField("Which version of the agreement do you want to accept?")
+    version = GovukTextInputField(
+        "Which version of the agreement do you want to accept?",
+        validators=[NotifyDataRequired(thing="a version number")],
+    )
 
     who = GovukRadiosField(
         "Who are you accepting the agreement for?",
@@ -2710,9 +2713,16 @@ class AcceptAgreementForm(StripWhitespaceForm):
     )
 
     def __validate_if_nominating(self, field):
+
+        error_messages = {
+            "on_behalf_of_name": "Enter the name of the person accepting the agreement",
+            "on_behalf_of_email": "Enter the email address of the person accepting the agreement",
+        }
+
         if self.who.data == "someone-else":
             if not field.data:
-                raise ValidationError("Cannot be empty")
+                error_message = error_messages[field.name]
+                raise ValidationError(error_message)
         else:
             field.data = ""
 
@@ -2723,7 +2733,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
         try:
             float(field.data)
         except (TypeError, ValueError) as e:
-            raise ValidationError("Must be a number") from e
+            raise ValidationError("Enter a version number in digits, like 3.1") from e
 
 
 class BroadcastAreaForm(StripWhitespaceForm):

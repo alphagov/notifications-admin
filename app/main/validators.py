@@ -9,7 +9,7 @@ from notifications_utils.sanitise_text import SanitiseSMS
 from notifications_utils.template import BroadcastMessageTemplate
 from orderedset import OrderedSet
 from wtforms import ValidationError
-from wtforms.validators import DataRequired, StopValidation
+from wtforms.validators import URL, DataRequired, InputRequired, StopValidation
 from wtforms.validators import Length as WTFormsLength
 
 from app import antivirus_client
@@ -58,7 +58,7 @@ class ValidGovEmail:
 
 
 class ValidEmail:
-    def __init__(self, message="Enter a valid email address"):
+    def __init__(self, message="Enter an email address in the correct format, like name@example.gov.uk"):
         self.message = message
 
     def __call__(self, form, field):
@@ -161,7 +161,7 @@ class LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly:
 
     regex = re.compile(r"^[a-zA-Z0-9\s\._']+$")
 
-    def __init__(self, message="Use letters and numbers only"):
+    def __init__(self, message="Text message sender can only include letters and numbers"):
         self.message = message
 
     def __call__(self, form, field):
@@ -170,7 +170,7 @@ class LettersNumbersSingleQuotesFullStopsAndUnderscoresOnly:
 
 
 class DoesNotStartWithDoubleZero:
-    def __init__(self, message="Cannot start with 00"):
+    def __init__(self, message="Text message sender cannot start with 00"):
         self.message = message
 
     def __call__(self, form, field):
@@ -241,6 +241,16 @@ class FileIsVirusFree:
 
 class NotifyDataRequired(DataRequired):
     def __init__(self, thing):
+        super().__init__(message=f"Enter {thing}")
+
+
+class NotifyInputRequired(InputRequired):
+    def __init__(self, thing):
+        super().__init__(message=f"Enter {thing}")
+
+
+class NotifyUrlValidator(URL):
+    def __init__(self, thing="a URL in the correct format"):
         super().__init__(message=f"Enter {thing}")
 
 

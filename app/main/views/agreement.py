@@ -50,10 +50,7 @@ def service_accept_agreement(service_id):
         )
         return redirect(url_for("main.service_confirm_agreement", service_id=current_service.id))
 
-    return render_template(
-        "views/agreement/agreement-accept.html",
-        form=form,
-    )
+    return render_template("views/agreement/agreement-accept.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/agreement/confirm", methods=["GET", "POST"])

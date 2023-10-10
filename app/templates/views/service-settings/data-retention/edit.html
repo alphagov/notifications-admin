@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.edit_data_retention', service_id=current_service.id, data_retention_id=data_retention_id) }) }}
+  {{ govukBackLink({ "href": url_for('main.data_retention', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}

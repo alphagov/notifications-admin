@@ -126,6 +126,7 @@ def service_name_change(service_id):
         "views/service-settings/name.html",
         form=form,
         organisation_type=current_service.organisation_type,
+        error_summary_enabled=True,
     )
 
 
@@ -427,7 +428,10 @@ def send_files_by_email_contact_details(service_id):
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
-        "views/service-settings/send-files-by-email.html", form=form, contact_details=contact_details
+        "views/service-settings/send-files-by-email.html",
+        form=form,
+        contact_details=contact_details,
+        error_summary_enabled=True,
     )
 
 
@@ -578,7 +582,6 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
 def service_edit_email_reply_to(service_id, reply_to_email_id):
     form = ServiceReplyToEmailForm()
     reply_to_email_address = current_service.get_email_reply_to_address(reply_to_email_id)
-    print(reply_to_email_address)
     if request.method == "GET":
         form.email_address.data = reply_to_email_address["email_address"]
         form.is_default.data = reply_to_email_address["is_default"]
@@ -601,20 +604,18 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
             ]["id"]
 
         except HTTPError as e:
-            if e.status_code == 409:
-                flash(e.message, "error")
-                return redirect(url_for(".service_email_reply_to", service_id=service_id))
-            else:
-                raise e
-        return redirect(
-            url_for(
-                ".service_verify_reply_to_address",
-                service_id=service_id,
-                notification_id=notification_id,
-                is_default=True if reply_to_email_address["is_default"] else form.is_default.data,
-                replace=reply_to_email_id,
+            handle_reply_to_email_address_http_error(e, form)
+
+        else:
+            return redirect(
+                url_for(
+                    ".service_verify_reply_to_address",
+                    service_id=service_id,
+                    notification_id=notification_id,
+                    is_default=True if reply_to_email_address["is_default"] else form.is_default.data,
+                    replace=reply_to_email_id,
+                )
             )
-        )
 
     if request.endpoint == "main.service_confirm_delete_email_reply_to":
         flash("Are you sure you want to delete this reply-to email address?", "delete")
@@ -623,6 +624,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
         form=form,
         reply_to_email_address_id=reply_to_email_id,
         show_choice_of_default_checkbox=show_choice_of_default_checkbox,
+        error_summary_enabled=True,
     )
 
 
@@ -915,6 +917,7 @@ def service_add_letter_contact(service_id):
             if from_template
             else url_for(".service_letter_contact_details", service_id=current_service.id)
         ),
+        error_summary_enabled=True,
     )
 
 
@@ -945,7 +948,10 @@ def service_edit_letter_contact(service_id, letter_contact_id):
     if request.endpoint == "main.service_confirm_delete_letter_contact":
         flash("Are you sure you want to delete this contact block?", "delete")
     return render_template(
-        "views/service-settings/letter-contact/edit.html", form=form, letter_contact_id=letter_contact_block["id"]
+        "views/service-settings/letter-contact/edit.html",
+        form=form,
+        letter_contact_id=letter_contact_block["id"],
+        error_summary_enabled=True,
     )
 
 
@@ -989,7 +995,12 @@ def service_add_sms_sender(service_id):
             is_default=first_sms_sender if first_sms_sender else form.is_default.data,
         )
         return redirect(url_for(".service_sms_senders", service_id=service_id))
-    return render_template("views/service-settings/sms-sender/add.html", form=form, first_sms_sender=first_sms_sender)
+    return render_template(
+        "views/service-settings/sms-sender/add.html",
+        form=form,
+        first_sms_sender=first_sms_sender,
+        error_summary_enabled=True,
+    )
 
 
 @main.route(
@@ -1029,6 +1040,7 @@ def service_edit_sms_sender(service_id, sms_sender_id):
         sms_sender=sms_sender,
         inbound_number=is_inbound_number,
         sms_sender_id=sms_sender_id,
+        error_summary_enabled=True,
     )
 
 
@@ -1055,10 +1067,7 @@ def set_free_sms_allowance(service_id):
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
-    return render_template(
-        "views/service-settings/set-free-sms-allowance.html",
-        form=form,
-    )
+    return render_template("views/service-settings/set-free-sms-allowance.html", form=form, error_summary_enabled=True)
 
 
 @main.route(
@@ -1077,10 +1086,7 @@ def set_per_day_message_limit(service_id, notification_type):
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
-    return render_template(
-        "views/service-settings/set-message-limit.html",
-        form=form,
-    )
+    return render_template("views/service-settings/set-message-limit.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-rate-limit", methods=["GET", "POST"])
@@ -1093,10 +1099,7 @@ def set_per_minute_rate_limit(service_id):
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
-    return render_template(
-        "views/service-settings/set-rate-limit.html",
-        form=form,
-    )
+    return render_template("views/service-settings/set-rate-limit.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-<notification_type>-branding", methods=["GET", "POST"])
@@ -1279,7 +1282,11 @@ def add_data_retention(service_id):
             service_id, form.notification_type.data, form.days_of_retention.data
         )
         return redirect(url_for(".data_retention", service_id=service_id))
-    return render_template("views/service-settings/data-retention/add.html", form=form)
+    return render_template(
+        "views/service-settings/data-retention/add.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/services/<uuid:service_id>/data-retention/<uuid:data_retention_id>/edit", methods=["GET", "POST"])
@@ -1295,6 +1302,7 @@ def edit_data_retention(service_id, data_retention_id):
         form=form,
         data_retention_id=data_retention_id,
         notification_type=data_retention_item["notification_type"],
+        error_summary_enabled=True,
     )
 
 
