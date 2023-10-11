@@ -87,7 +87,7 @@
           'label': labelText,
           'value': relatedRadio.value
         };
-        let day = labelText.split(' ')[0].toLowerCase();
+        let day = labelText.split(' at ')[0].toLowerCase();
 
         if (idx === 0) { // Store the first time
           this.selectedTime = _getTimeFromRadio(relatedRadio);

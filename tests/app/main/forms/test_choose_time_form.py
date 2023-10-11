@@ -5,7 +5,7 @@ from app.main.forms import ChooseTimeForm
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
-def test_form_contains_next_24h(notify_admin):
+def test_form_contains_next_7_days_in_hour_intervals(notify_admin):
 
     choices = ChooseTimeForm().scheduled_for.choices
 
@@ -19,14 +19,24 @@ def test_form_contains_next_24h(notify_admin):
     assert choices[37] == ("2016-01-03T00:00:00", "Tomorrow at midnight")
 
     # Sunday
-    assert choices[38] == ("2016-01-03T01:00:00", "Sunday at 1am")
+    assert choices[38] == ("2016-01-03T01:00:00", "Sunday 3 January at 1am")
 
     # Monday
-    assert choices[84] == ("2016-01-04T23:00:00", "Monday at 11pm")
-    assert choices[85] == ("2016-01-05T00:00:00", "Monday at midnight")
+    assert choices[84] == ("2016-01-04T23:00:00", "Monday 4 January at 11pm")
+    assert choices[85] == ("2016-01-05T00:00:00", "Monday 4 January at midnight")
+
+    # Tuesday
+    assert choices[86] == ("2016-01-05T01:00:00", "Tuesday 5 January at 1am")
+
+    # Wednesday
+    assert choices[110] == ("2016-01-06T01:00:00", "Wednesday 6 January at 1am")
+
+    # Thursday
+    assert choices[134] == ("2016-01-07T01:00:00", "Thursday 7 January at 1am")
+    assert choices[-1] == ("2016-01-08T00:00:00", "Thursday 7 January at midnight")
 
     with pytest.raises(IndexError):
-        assert choices[12 + (3 * 24) + 2]  # hours left in the day  # 3 days  # magic number
+        assert choices[12 + (6 * 24) + 2]  # hours left in the day  # 3 days  # magic number
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
@@ -35,5 +45,13 @@ def test_form_defaults_to_now(notify_admin):
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
-def test_form_contains_next_three_days(notify_admin):
-    assert ChooseTimeForm().scheduled_for.days == ["Today", "Tomorrow", "Sunday", "Monday"]
+def test_form_contains_next_7_days(notify_admin):
+    assert ChooseTimeForm().scheduled_for.days == [
+        "Today",
+        "Tomorrow",
+        "Sunday 3 January",
+        "Monday 4 January",
+        "Tuesday 5 January",
+        "Wednesday 6 January",
+        "Thursday 7 January",
+    ]
