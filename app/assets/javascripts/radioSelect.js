@@ -64,10 +64,14 @@
         };
       }
 
+      function _getKeyFromDayLabel (label) {
+        return label.toLowerCase().replace(/\s/g, '-');
+      }
+
       const timesByDay = {};
 
       const days = this.$component.data('days').split(',').map(day => {
-        const dayValue = day.toLowerCase();
+        const dayValue = _getKeyFromDayLabel(day);
 
         timesByDay[dayValue] = [];
 
@@ -87,7 +91,7 @@
           'label': labelText,
           'value': relatedRadio.value
         };
-        let day = labelText.split(' at ')[0].toLowerCase();
+        let day = _getKeyFromDayLabel(labelText.split(' at ')[0]);
 
         if (idx === 0) { // Store the first time
           this.selectedTime = _getTimeFromRadio(relatedRadio);

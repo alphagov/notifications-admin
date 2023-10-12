@@ -28,8 +28,11 @@ describe('RadioSelect', () => {
   const DAYS = [
     'Today',
     'Tomorrow',
-    'Friday',
-    'Saturday'
+    'Friday 13 October',
+    'Saturday 14 October',
+    'Sunday 15 October',
+    'Monday 16 October',
+    'Tuesday 17 October'
   ];
   const HOURS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
   const scrollPosition = 504;
@@ -88,8 +91,11 @@ describe('RadioSelect', () => {
         let dayAsNumber = {
           'Today': 22,
           'Tomorrow': 23,
-          'Friday': 24,
-          'Saturday': 25
+          'Friday 13 October': 24,
+          'Saturday 14 October': 25,
+          'Sunday 15 October': 26,
+          'Monday 16 October': 27,
+          'Tuesday 17 October': 28,
         }[day];
 
         if (start !== undefined) {
@@ -175,13 +181,24 @@ describe('RadioSelect', () => {
 
         const radioWithValue = document.querySelector(`input[value="${option.value}"]`);
         let labelForRadio;
+        let labelText;
+        let dayName;
+        let fieldsetWithDayName;
 
         expect(radioWithValue).not.toBeNull();
 
         labelForRadio = document.querySelector(`label[for=${radioWithValue.getAttribute('id')}]`);
+        labelText = labelForRadio.textContent.trim();
+        dayName = labelText.split(' at ')[0].toLowerCase().replace(/\s/g, '-');
+        fieldsetWithDayName = document.getElementById(`radio-select__times-for-${dayName}`);
 
         expect(labelForRadio).not.toBeNull();
-        expect(labelForRadio.textContent.trim()).toEqual(option.label);
+        expect(labelText).toEqual(option.label);
+
+        // check radios have the right name for their day and their fieldset id matches this
+        expect(radioWithValue.getAttribute('name')).toEqual(`times-for-${dayName}`);
+        expect(fieldsetWithDayName).not.toBeNull();
+        expect(fieldsetWithDayName.contains(radioWithValue)).toBe(true);
 
       });
 
