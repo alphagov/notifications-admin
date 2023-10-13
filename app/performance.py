@@ -1,9 +1,6 @@
 import os
-import re
 from functools import partial
 from urllib.parse import parse_qs
-
-org_dashboard_endpoint = re.compile(r"^/organisations/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/?$")
 
 
 def sentry_sampler(sampling_context, sample_rate: float = 0.0):
@@ -18,10 +15,6 @@ def sentry_sampler(sampling_context, sample_rate: float = 0.0):
         query_params = parse_qs(wsgi_environ.get("QUERY_STRING", ""), keep_blank_values=False)
         query_param_value = query_params["sentry-trace"][0] if "sentry-trace" in query_params else None
         if header_value == force_trace_value or query_param_value == force_trace_value:
-            return 1
-
-    if request_uri := wsgi_environ.get("PATH_INFO", None):
-        if org_dashboard_endpoint.match(request_uri):
             return 1
 
     return sample_rate
