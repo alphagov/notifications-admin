@@ -8,10 +8,9 @@ def sentry_sampler(sampling_context, sample_rate: float = 0.0):
         return 1
 
     wsgi_environ = sampling_context.get("wsgi_environ", {})
-    request = wsgi_environ.get("werkzeug.request")
-    force_trace_value = os.environ.get("SENTRY_FORCE_TRACE_HEADER_VALUE")
-    if request and force_trace_value:
-        header_value = request.headers.get("X-Notify-Sentry-Trace")
+    force_trace_value = os.environ.get("SENTRY_FORCE_TRACE_HEADER_VALUE", "development")
+    if force_trace_value:
+        header_value = wsgi_environ.get("HTTP_X_NOTIFY_SENTRY_TRACE")
         query_params = parse_qs(wsgi_environ.get("QUERY_STRING", ""), keep_blank_values=False)
         query_param_value = query_params["sentry-trace"][0] if "sentry-trace" in query_params else None
         if header_value == force_trace_value or query_param_value == force_trace_value:
