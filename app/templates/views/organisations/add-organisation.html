@@ -1,38 +1,23 @@
-{% extends "withoutnav_template.html" %}
+{% extends "views/platform-admin/_base_template.html" %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
   New organisation
 {% endblock %}
 
-{% block main %}
-  <div class="govuk-width-container">
-    <div class="navigation-service">
-      <a href="{{ url_for('main.organisations') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-back-to">All organisations</a>
-      <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-switch">Switch service</a>
-    </div>
+{% block backLink %}
+{{ govukBackLink({ "href": url_for('main.organisations')  }) }}
+{% endblock %}
 
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-quarter">
-        &nbsp;
-      </div>
-      <div class="govuk-grid-column-three-quarters">
-        <main class="govuk-main-wrapper column-main govuk-!-padding-top-0 govuk-!-padding-bottom-0" id="main-content" role="main" >
-          {% block beforeContent %}{% endblock %}
-          {% block content %}
-            {{ page_header('New organisation') }}
-            {% call form_wrapper() %}
-              {{ form.name }}
-              {{ form.organisation_type }}
-              {{ form.crown_status }}
-              {{ page_footer('Save') }}
-            {% endcall %}
-          {% endblock %}
-        </main>
-      </div>
-    </div>
-  </div>
-
+{% block platform_admin_content %}
+    {{ page_header('New organisation') }}
+    {% call form_wrapper() %}
+        {{ form.name }}
+        {{ form.organisation_type }}
+        {{ form.crown_status }}
+        {{ page_footer('Save') }}
+    {% endcall %}
 {% endblock %}

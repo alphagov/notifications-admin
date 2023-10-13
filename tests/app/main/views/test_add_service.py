@@ -201,7 +201,7 @@ def test_add_service_has_to_choose_org_type(
         },
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select the type of organisation"
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select a type of organisation"
     assert mock_create_service.called is False
     assert mock_create_service_template.called is False
 

@@ -73,7 +73,7 @@ def add_organisation():
             else:
                 raise e
 
-    return render_template("views/organisations/add-organisation.html", form=form)
+    return render_template("views/organisations/add-organisation.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/add-gp-organisation", methods=["GET", "POST"])
