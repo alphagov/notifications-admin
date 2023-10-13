@@ -256,7 +256,9 @@ def view_letter_template_preview(service_id, template_id, filetype):
 
     template = current_service.get_template(template_id)
 
-    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get("page"))
+    return TemplatePreview.get_preview_for_templated_letter(
+        db_template=template._template, filetype=filetype, values=template.values, page=request.args.get("page")
+    )
 
 
 @no_cookie.route("/templates/letter-preview-image/<filename>")
@@ -291,7 +293,7 @@ def _view_template_version(service_id, template_id, version):
         template_id,
         version=version,
         letter_preview_url=url_for(
-            "no_cookie.view_template_version_preview",
+            "no_cookie.view_letter_template_version_preview",
             service_id=service_id,
             template_id=template_id,
             version=version,
@@ -311,9 +313,12 @@ def view_template_version(service_id, template_id, version):
 
 @no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<filetype>")
 @user_has_permissions(allow_org_user=True)
-def view_template_version_preview(service_id, template_id, version, filetype):
+def view_letter_template_version_preview(service_id, template_id, version, filetype):
     template = current_service.get_template(template_id, version=version)
-    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get("page"))
+
+    return TemplatePreview.get_preview_for_templated_letter(
+        db_template=template._template, filetype=filetype, values=template.values, page=request.args.get("page")
+    )
 
 
 def _add_template_by_type(template_type, template_folder_id):
@@ -864,7 +869,7 @@ def view_template_versions(service_id, template_id):
                 template,
                 current_service,
                 letter_preview_url=url_for(
-                    "no_cookie.view_template_version_preview",
+                    "no_cookie.view_letter_template_version_preview",
                     service_id=service_id,
                     template_id=template_id,
                     version=template["version"],

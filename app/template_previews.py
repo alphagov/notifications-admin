@@ -36,10 +36,10 @@ class LetterAttachmentPreview(AuthPreview):
 
 class TemplatePreview(AuthPreview):
     @classmethod
-    def from_database_object(cls, template, filetype, values=None, page=None):
+    def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None):
         data = {
-            "letter_contact_block": template.get("reply_to_text", ""),
-            "template": template,
+            "letter_contact_block": db_template.get("reply_to_text", ""),
+            "template": db_template,
             "values": values,
             "filename": current_service.letter_branding.filename,
         }
@@ -53,6 +53,18 @@ class TemplatePreview(AuthPreview):
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
+
+    @classmethod
+    def from_notification(cls, notification: dict, filetype: str, page=None):
+        if notification["template"]["is_precompiled_letter"]:
+            abort(400)
+
+        return cls.get_preview_for_templated_letter(
+            notification["template"],
+            filetype,
+            notification["personalisation"],
+            page=page,
+        )
 
     @classmethod
     def from_valid_pdf_file(cls, pdf_file, page):
@@ -96,33 +108,12 @@ class TemplatePreview(AuthPreview):
         )
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
-    @classmethod
-    def from_utils_template(cls, template, filetype, page=None):
-        return cls.from_database_object(
-            template._template,
-            filetype,
-            template.values,
-            page=page,
-        )
-
-    @classmethod
-    def from_notification(cls, notification: dict, filetype: str, page=None):
-        if notification["template"]["is_precompiled_letter"]:
-            abort(400)
-
-        return cls.from_database_object(
-            notification["template"],
-            filetype,
-            notification["personalisation"],
-            page=page,
-        )
-
 
 def get_page_count_for_letter(template, values=None):
     if template["template_type"] != "letter":
         return None
 
-    page_count, _, _ = TemplatePreview.from_database_object(template, "json", values)
+    page_count, _, _ = TemplatePreview.get_preview_for_templated_letter(template, "json", values)
     page_count = json.loads(page_count.decode("utf-8"))["count"]
 
     return page_count

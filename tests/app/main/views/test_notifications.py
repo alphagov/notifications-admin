@@ -591,7 +591,9 @@ def test_should_show_image_of_letter_notification(
 
     notification = create_notification(template_type="letter")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocked_preview = mocker.patch("app.main.views.templates.TemplatePreview.from_database_object", return_value="foo")
+    mocked_preview = mocker.patch(
+        "app.main.views.templates.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
+    )
     # only called for precompiled letters
     mock_api = mocker.patch("app.main.views.notifications.notification_api_client.get_notification_letter_preview")
 

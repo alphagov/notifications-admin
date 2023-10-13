@@ -1708,14 +1708,16 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
     [
         ("no_cookie.view_letter_template_preview", {}),
         ("no_cookie.view_letter_template_preview", {"page": "2"}),
-        ("no_cookie.view_template_version_preview", {"version": 1}),
-        ("no_cookie.view_template_version_preview", {"version": 1, "page": "2"}),
+        ("no_cookie.view_letter_template_version_preview", {"version": 1}),
+        ("no_cookie.view_letter_template_version_preview", {"version": 1, "page": "2"}),
     ],
 )
 def test_should_show_preview_letter_templates(
     view, extra_view_args, filetype, client_request, mock_get_service_email_template, service_one, fake_uuid, mocker
 ):
-    mocked_preview = mocker.patch("app.main.views.templates.TemplatePreview.from_database_object", return_value="foo")
+    mocked_preview = mocker.patch(
+        "app.main.views.templates.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
+    )
 
     service_id, template_id = service_one["id"], fake_uuid
 
@@ -1725,9 +1727,9 @@ def test_should_show_preview_letter_templates(
 
     assert response.get_data(as_text=True) == "foo"
     mock_get_service_email_template.assert_called_with(service_id, template_id, extra_view_args.get("version"))
-    assert mocked_preview.call_args[0][0]["id"] == template_id
-    assert mocked_preview.call_args[0][0]["service"] == service_id
-    assert mocked_preview.call_args[0][1] == filetype
+    assert mocked_preview.call_args_list[0].kwargs["db_template"]["id"] == template_id
+    assert mocked_preview.call_args_list[0].kwargs["db_template"]["service"] == service_id
+    assert mocked_preview.call_args_list[0].kwargs["filetype"] == filetype
 
     if "page" in extra_view_args:
         assert mocked_preview.call_args[1]["page"] == extra_view_args["page"]

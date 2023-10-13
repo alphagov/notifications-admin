@@ -527,9 +527,12 @@ def send_test_preview(service_id, template_id, filetype):
         ),
     )
 
-    template.values = get_normalised_placeholders_from_session()
-
-    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get("page"))
+    return TemplatePreview.get_preview_for_templated_letter(
+        db_template=template._template,
+        filetype=filetype,
+        values=get_normalised_placeholders_from_session(),
+        page=request.args.get("page"),
+    )
 
 
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>" "/from-contact-list")
@@ -727,7 +730,9 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
         abort(404)
 
     template = _check_messages(service_id, template_id, upload_id, row_index)["template"]
-    return TemplatePreview.from_utils_template(template, filetype, page=page)
+    return TemplatePreview.get_preview_for_templated_letter(
+        db_template=template._template, filetype=filetype, values=template.values, page=page
+    )
 
 
 @no_cookie.route(
@@ -747,7 +752,9 @@ def check_notification_preview(service_id, template_id, filetype):
         service_id,
         template_id,
     )["template"]
-    return TemplatePreview.from_utils_template(template, filetype, page=page)
+    return TemplatePreview.get_preview_for_templated_letter(
+        db_template=template._template, filetype=filetype, values=template.values, page=page
+    )
 
 
 @main.route("/services/<uuid:service_id>/start-job/<uuid:upload_id>", methods=["POST"])

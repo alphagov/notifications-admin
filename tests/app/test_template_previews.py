@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 import pytest
 import werkzeug
-from notifications_utils.template import LetterPreviewTemplate
 
 from app import load_service_before_request
 from app.models.branding import LetterBranding
@@ -17,40 +16,18 @@ from tests.conftest import create_notification
 
 
 @pytest.mark.parametrize(
-    "partial_call, expected_page_argument",
-    [
-        (partial(TemplatePreview.from_utils_template), None),
-        (partial(TemplatePreview.from_utils_template, page=99), 99),
-    ],
-)
-def test_from_utils_template_calls_through(
-    mocker,
-    mock_get_service_letter_template,
-    partial_call,
-    expected_page_argument,
-):
-    mock_from_db = mocker.patch("app.template_previews.TemplatePreview.from_database_object")
-    template = LetterPreviewTemplate(mock_get_service_letter_template(None, None)["data"])
-
-    ret = partial_call(template, "foo")
-
-    assert ret == mock_from_db.return_value
-    mock_from_db.assert_called_once_with(template._template, "foo", template.values, page=expected_page_argument)
-
-
-@pytest.mark.parametrize(
     "partial_call, expected_url",
     [
         (
-            partial(TemplatePreview.from_database_object, filetype="bar"),
+            partial(TemplatePreview.get_preview_for_templated_letter, filetype="bar"),
             "http://localhost:9999/preview.bar",
         ),
         (
-            partial(TemplatePreview.from_database_object, filetype="baz"),
+            partial(TemplatePreview.get_preview_for_templated_letter, filetype="baz"),
             "http://localhost:9999/preview.baz",
         ),
         (
-            partial(TemplatePreview.from_database_object, filetype="bar", page=99),
+            partial(TemplatePreview.get_preview_for_templated_letter, filetype="bar", page=99),
             "http://localhost:9999/preview.bar?page=99",
         ),
     ],
@@ -59,7 +36,7 @@ def test_from_utils_template_calls_through(
     "letter_branding, expected_filename",
     [(LetterBranding({"filename": "hm-government"}), "hm-government"), (LetterBranding.from_id(None), None)],
 )
-def test_from_database_object_makes_request(
+def test_get_preview_for_templated_letter_makes_request(
     mocker,
     client_request,
     partial_call,
@@ -77,7 +54,7 @@ def test_from_database_object_makes_request(
     mocker.patch("app.template_previews.current_service", letter_branding=letter_branding)
     template = mock_get_service_letter_template("123", "456")["data"]
 
-    response = partial_call(template=template)
+    response = partial_call(db_template=template)
 
     assert response[0] == "a"
     assert response[1] == "b"
@@ -199,7 +176,7 @@ def test_page_count_unpacks_from_json_response(
     partial_call,
     expected_template_preview_args,
 ):
-    mock_template_preview = mocker.patch("app.template_previews.TemplatePreview.from_database_object")
+    mock_template_preview = mocker.patch("app.template_previews.TemplatePreview.get_preview_for_templated_letter")
     mock_template_preview.return_value = (b'{"count": 99}', 200, {})
 
     assert partial_call({"template_type": "letter"}) == 99
