@@ -48,7 +48,6 @@ from app.s3_client.s3_csv_client import (
 from app.template_previews import TemplatePreview
 from app.utils import PermanentRedirect, should_skip_template_page, unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
-from app.utils.templates import get_template
 from app.utils.user import user_has_permissions
 
 letter_address_columns = [column.replace("_", " ") for column in address_lines_1_to_7_keys]
@@ -174,10 +173,7 @@ def send_messages(service_id, template_id):
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>.csv", methods=["GET"])
 @user_has_permissions("send_messages", "manage_templates")
 def get_example_csv(service_id, template_id):
-    template = get_template(
-        service_api_client.get_service_template(service_id, template_id)["data"],
-        current_service,
-    )
+    template = current_service.get_template(template_id)
     return (
         Spreadsheet.from_rows(
             [get_spreadsheet_column_headings_from_template(template), get_example_csv_rows(template)]
