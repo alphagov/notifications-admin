@@ -139,9 +139,9 @@ def test_create_new_organisation_validates(
     assert [
         (error["data-error-label"], normalize_spaces(error.text)) for error in page.select(".govuk-error-message")
     ] == [
-        ("name", "Error: Cannot be empty"),
-        ("organisation_type", "Error: Select the type of organisation"),
-        ("crown_status", "Error: Select whether this organisation is a crown body"),
+        ("name", "Error: Enter an organisation name"),
+        ("organisation_type", "Error: Select a type of organisation"),
+        ("crown_status", "Error: Select yes if the organisation is a Crown body"),
     ]
     assert mock_create_organisation.called is False
 
@@ -149,8 +149,8 @@ def test_create_new_organisation_validates(
 @pytest.mark.parametrize(
     "name, error_message",
     [
-        ("", "Cannot be empty"),
-        ("a", "at least two alphanumeric characters"),
+        ("", "Enter an organisation name"),
+        ("a", "Organisation name must include at least 2 letters or numbers"),
         ("a" * 256, "Organisation name cannot be longer than 255 characters"),
     ],
 )
@@ -1771,8 +1771,8 @@ def test_update_organisation_name(
 @pytest.mark.parametrize(
     "name, error_message",
     [
-        ("", "Cannot be empty"),
-        ("a", "at least two alphanumeric characters"),
+        ("", "Enter an organisation name"),
+        ("a", "Organisation name must include at least 2 letters or numbers"),
         ("a" * 256, "Organisation name cannot be longer than 255 characters"),
     ],
 )

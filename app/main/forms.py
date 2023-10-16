@@ -866,7 +866,7 @@ class OrganisationTypeField(GovukRadiosField):
                 for value, label in Organisation.TYPE_LABELS.items()
                 if not include_only or value in include_only
             ],
-            thing="the type of organisation",
+            thing="a type of organisation",
             validators=validators or [],
             **kwargs,
         )
@@ -1172,8 +1172,8 @@ class RenameOrganisationForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Organisation name",
         validators=[
-            DataRequired(message="Cannot be empty"),
-            MustContainAlphanumericCharacters(),
+            NotifyDataRequired(thing="an organisation name"),
+            MustContainAlphanumericCharacters(thing="organisation name"),
             Length(max=255, thing="organisation name"),
         ],
     )
@@ -1239,7 +1239,7 @@ class OrganisationCrownStatusForm(StripWhitespaceForm):
             ("non-crown", "No"),
             ("unknown", "Not sure"),
         ],
-        thing="whether this organisation is a crown body",
+        thing="yes if the organisation is a Crown body",
     )
 
 
