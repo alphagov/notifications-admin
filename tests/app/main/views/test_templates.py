@@ -1741,7 +1741,7 @@ def test_should_show_preview_letter_attachment(
     client_request, mock_get_service_email_template, service_one, fake_uuid, mocker
 ):
     mocked_preview = mocker.patch(
-        "app.main.views.templates.LetterAttachmentPreview.from_attachment_data", return_value="foo"
+        "app.main.views.templates.TemplatePreview.get_png_for_letter_attachment_page", return_value="foo"
     )
 
     service_id, attachment_id = service_one["id"], fake_uuid

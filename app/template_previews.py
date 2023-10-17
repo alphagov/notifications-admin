@@ -8,33 +8,13 @@ from notifications_utils.pdf import extract_page_from_pdf
 from app import current_service
 
 
-class AuthPreview:
+class TemplatePreview:
     @staticmethod
     def get_allowed_headers(headers):
         header_allowlist = {"content-type", "cache-control"}
         allowed_headers = {header: value for header, value in headers.items() if header.lower() in header_allowlist}
         return allowed_headers.items()
 
-
-class LetterAttachmentPreview(AuthPreview):
-    @classmethod
-    def from_attachment_data(cls, attachment_id, page=None):
-        data = {
-            "letter_attachment_id": attachment_id,
-            "service_id": current_service.id,
-        }
-        resp = requests.post(
-            "{}/letter_attachment_preview.png{}".format(
-                current_app.config["TEMPLATE_PREVIEW_API_HOST"],
-                "?page={}".format(page) if page else "",
-            ),
-            json=data,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
-        )
-        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
-
-
-class TemplatePreview(AuthPreview):
     @classmethod
     def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None):
         if db_template["is_precompiled_letter"]:
@@ -93,6 +73,22 @@ class TemplatePreview(AuthPreview):
         }
         resp = requests.post(
             f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.png",
+            json=data,
+            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+        )
+        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
+
+    @classmethod
+    def get_png_for_letter_attachment_page(cls, attachment_id, page=None):
+        data = {
+            "letter_attachment_id": attachment_id,
+            "service_id": current_service.id,
+        }
+        resp = requests.post(
+            "{}/letter_attachment_preview.png{}".format(
+                current_app.config["TEMPLATE_PREVIEW_API_HOST"],
+                "?page={}".format(page) if page else "",
+            ),
             json=data,
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )

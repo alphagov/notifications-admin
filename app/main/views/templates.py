@@ -59,7 +59,6 @@ from app.s3_client.s3_letter_upload_client import (
     upload_letter_to_s3,
 )
 from app.template_previews import (
-    LetterAttachmentPreview,
     TemplatePreview,
     sanitise_letter,
 )
@@ -1020,7 +1019,7 @@ def letter_template_attach_pages(service_id, template_id):
 @no_cookie.route("/services/<uuid:service_id>/attachment/<uuid:attachment_id>.png")
 @user_has_permissions(allow_org_user=True)
 def view_letter_attachment_preview(service_id, attachment_id):
-    return LetterAttachmentPreview.from_attachment_data(attachment_id, page=request.args.get("page"))
+    return TemplatePreview.get_png_for_letter_attachment_page(attachment_id, page=request.args.get("page"))
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages/edit", methods=["GET", "POST"])
