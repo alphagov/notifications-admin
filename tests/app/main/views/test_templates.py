@@ -1776,8 +1776,10 @@ def test_letter_branding_preview_image(
     original_filename,
     new_filename,
 ):
-    mocked_preview = mocker.patch("app.main.views.templates.TemplatePreview.from_example_template", return_value="foo")
-    resp = client_request.get_response(
+    mocked_preview = mocker.patch(
+        "app.main.views.templates.TemplatePreview.get_png_for_example_template", return_value="foo"
+    )
+    response = client_request.get_response(
         "no_cookie.letter_branding_preview_image",
         filename=original_filename,
     )
@@ -1790,7 +1792,7 @@ def test_letter_branding_preview_image(
         },
         new_filename,
     )
-    assert resp.get_data(as_text=True) == "foo"
+    assert response.get_data(as_text=True) == "foo"
 
 
 def test_choosing_to_copy_redirects(

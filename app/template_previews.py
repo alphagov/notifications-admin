@@ -84,12 +84,12 @@ class TemplatePreview(AuthPreview):
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
     @classmethod
-    def from_example_template(cls, template, filename):
+    def get_png_for_example_template(cls, template, branding_filename):
         data = {
             "letter_contact_block": template.get("reply_to_text"),
             "template": template,
             "values": None,
-            "filename": filename,
+            "filename": branding_filename,
         }
         resp = requests.post(
             f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.png",

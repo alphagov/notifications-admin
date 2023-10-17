@@ -187,17 +187,17 @@ def test_page_count_unpacks_from_json_response(
     mock_template_preview.assert_called_once_with(*expected_template_preview_args)
 
 
-def test_from_example_template_makes_request(mocker, client_request):
+def test_get_png_for_example_template_makes_request(mocker, client_request):
     request_mock = mocker.patch("app.template_previews.requests.post")
     template = {}
-    filename = "geo"
+    branding_filename = "geo"
 
-    TemplatePreview.from_example_template(template, filename)
+    TemplatePreview.get_png_for_example_template(template, branding_filename)
 
     request_mock.assert_called_once_with(
         "http://localhost:9999/preview.png",
         headers={"Authorization": "Token my-secret-key"},
-        json={"values": None, "template": template, "filename": filename, "letter_contact_block": None},
+        json={"values": None, "template": template, "filename": branding_filename, "letter_contact_block": None},
     )
 
 

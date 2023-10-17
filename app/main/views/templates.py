@@ -283,9 +283,9 @@ def letter_branding_preview_image(filename):
         ),
         "template_type": "letter",
     }
-    filename = None if filename == "no-branding" else filename
+    branding_filename = None if filename == "no-branding" else filename
 
-    return TemplatePreview.from_example_template(template, filename)
+    return TemplatePreview.get_png_for_example_template(template, branding_filename)
 
 
 def _view_template_version(service_id, template_id, version):
