@@ -2739,7 +2739,7 @@ def test_incorrect_letter_contact_block_input(
         ("11 chars", None),
         ("", "Enter a text message sender"),
         ("abcdefghijkhgkg", "Text message sender cannot be longer than 11 characters"),
-        (r" ¯\_(ツ)_/¯ ", "Text message sender can only include letters and numbers"),
+        (r" ¯\_(ツ)_/¯ ", "Text message sender can only include: letters, numbers, spaces, and & . - _"),
         ("blood.co.uk", None),
         ("00123", "Text message sender cannot start with 00"),
     ],

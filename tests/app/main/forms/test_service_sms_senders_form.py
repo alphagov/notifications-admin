@@ -11,11 +11,13 @@ from app.main.forms import ServiceSmsSenderForm
         ("333", False, None),
         ("elevenchars", False, None),  # 11 chars
         ("twelvecharas", True, "Text message sender cannot be longer than 11 characters"),  # 12 chars
-        ("###", True, "Text message sender can only include letters and numbers"),
+        ("###", True, "Text message sender can only include: letters, numbers, spaces, and & . - _"),
         ("00111222333", True, "Text message sender cannot start with 00"),
         ("UK_GOV", False, None),  # Underscores are allowed
+        ("UK-GOV", False, None),  # Simple dashes are allowed
         ("UK.GOV", False, None),  # Full stops are allowed
-        ("'UC'", False, None),  # Straight single quotes are allowed
+        ("UK&GOV", False, None),  # Ampersands are allowed
+        pytest.param("'UC'", False, None, marks=pytest.mark.xfail),  # Apostrophes can cause SMS delivery issues
     ],
 )
 def test_sms_sender_form_validation(client_request, mock_get_user_by_email, sms_sender, error_expected, error_message):
