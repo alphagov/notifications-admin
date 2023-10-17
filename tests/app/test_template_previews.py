@@ -126,14 +126,14 @@ def test_get_preview_for_templated_letter_from_notification_rejects_precompiled_
         ("2", "http://localhost:9999/precompiled-preview.png"),
     ],
 )
-def test_from_valid_pdf_file_makes_request(mocker, client_request, page_number, expected_url):
+def test_get_png_for_valid_pdf_page_makes_request(mocker, client_request, page_number, expected_url):
     mocker.patch("app.template_previews.extract_page_from_pdf", return_value=b"pdf page")
     request_mock = mocker.patch(
         "app.template_previews.requests.post",
         return_value=Mock(content="a", status_code="b", headers={"content-type": "image/png"}),
     )
 
-    response = TemplatePreview.from_valid_pdf_file(b"pdf file", page_number)
+    response = TemplatePreview.get_png_for_valid_pdf_page(b"pdf file", page_number)
 
     assert response == ("a", "b", {"content-type": "image/png"}.items())
     request_mock.assert_called_once_with(
@@ -143,14 +143,14 @@ def test_from_valid_pdf_file_makes_request(mocker, client_request, page_number, 
     )
 
 
-def test_from_invalid_pdf_file_makes_request(mocker, client_request):
+def test_get_png_for_invalid_pdf_page_makes_request(mocker, client_request):
     mocker.patch("app.template_previews.extract_page_from_pdf", return_value=b"pdf page")
     request_mock = mocker.patch(
         "app.template_previews.requests.post",
         return_value=Mock(content="a", status_code="b", headers={"content-type": "image/png"}),
     )
 
-    response = TemplatePreview.from_invalid_pdf_file(b"pdf file", "1")
+    response = TemplatePreview.get_png_for_invalid_pdf_page(b"pdf file", "1")
 
     assert response == ("a", "b", {"content-type": "image/png"}.items())
     request_mock.assert_called_once_with(

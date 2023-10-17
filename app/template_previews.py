@@ -57,7 +57,7 @@ class TemplatePreview(AuthPreview):
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
     @classmethod
-    def from_valid_pdf_file(cls, pdf_file, page):
+    def get_png_for_valid_pdf_page(cls, pdf_file, page):
         pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)
 
         resp = requests.post(
@@ -70,7 +70,7 @@ class TemplatePreview(AuthPreview):
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
 
     @classmethod
-    def from_invalid_pdf_file(cls, pdf_file, page, is_an_attachment=False):
+    def get_png_for_invalid_pdf_page(cls, pdf_file, page, is_an_attachment=False):
         pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)
 
         resp = requests.post(

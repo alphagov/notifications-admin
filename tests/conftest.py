@@ -3736,9 +3736,10 @@ def mock_template_preview(mocker):
     mocker.patch(
         "app.template_previews.TemplatePreview.get_preview_for_templated_letter", return_value=example_response
     )
-    mocker.patch("app.template_previews.TemplatePreview.from_valid_pdf_file", return_value=example_response)
-    mocker.patch("app.template_previews.TemplatePreview.from_invalid_pdf_file", return_value=example_response)
-    mocker.patch("app.template_previews.TemplatePreview.from_example_template", return_value=example_response)
+
+    mocker.patch("app.template_previews.TemplatePreview.get_png_for_valid_pdf_page", return_value=example_response)
+    mocker.patch("app.template_previews.TemplatePreview.get_png_for_invalid_pdf_page", return_value=example_response)
+    mocker.patch("app.template_previews.TemplatePreview.get_png_for_example_template", return_value=example_response)
 
 
 @pytest.fixture(scope="function")

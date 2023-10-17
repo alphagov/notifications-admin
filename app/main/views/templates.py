@@ -1196,9 +1196,9 @@ def view_invalid_letter_attachment_as_preview(service_id, file_id):
     invalid_pages = json.loads(metadata.get("invalid_pages", "[]"))
 
     if metadata.get("message") == "content-outside-printable-area" and page in invalid_pages:
-        return TemplatePreview.from_invalid_pdf_file(pdf_file, page, is_an_attachment=True)
+        return TemplatePreview.get_png_for_invalid_pdf_page(pdf_file, page, is_an_attachment=True)
     else:
-        return TemplatePreview.from_valid_pdf_file(pdf_file, page)
+        return TemplatePreview.get_png_for_valid_pdf_page(pdf_file, page)
 
 
 def _get_page_numbers(page_count):

@@ -3525,10 +3525,12 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
         ),
     )
     template_preview_mock_valid = mocker.patch(
-        "app.main.views.templates.TemplatePreview.from_valid_pdf_file", return_value=make_response("page.html", 200)
+        "app.main.views.templates.TemplatePreview.get_png_for_valid_pdf_page",
+        return_value=make_response("page.html", 200),
     )
     template_preview_mock_invalid = mocker.patch(
-        "app.main.views.templates.TemplatePreview.from_invalid_pdf_file", return_value=make_response("page.html", 200)
+        "app.main.views.templates.TemplatePreview.get_png_for_invalid_pdf_page",
+        return_value=make_response("page.html", 200),
     )
 
     client_request.get_response(
