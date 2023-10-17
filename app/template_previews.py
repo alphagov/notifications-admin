@@ -37,6 +37,8 @@ class LetterAttachmentPreview(AuthPreview):
 class TemplatePreview(AuthPreview):
     @classmethod
     def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None):
+        if db_template["is_precompiled_letter"]:
+            abort(400)
         data = {
             "letter_contact_block": db_template.get("reply_to_text", ""),
             "template": db_template,
@@ -53,18 +55,6 @@ class TemplatePreview(AuthPreview):
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
         return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
-
-    @classmethod
-    def from_notification(cls, notification: dict, filetype: str, page=None):
-        if notification["template"]["is_precompiled_letter"]:
-            abort(400)
-
-        return cls.get_preview_for_templated_letter(
-            notification["template"],
-            filetype,
-            notification["personalisation"],
-            page=page,
-        )
 
     @classmethod
     def from_valid_pdf_file(cls, pdf_file, page):

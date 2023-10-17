@@ -209,7 +209,12 @@ def get_preview_error_image():
 def view_letter_notification_as_preview(service_id, notification_id, filetype, with_metadata=False):
     notification = notification_api_client.get_notification(service_id, notification_id)
     if not notification["template"]["is_precompiled_letter"]:
-        return TemplatePreview.from_notification(notification, filetype=filetype, page=request.args.get("page"))
+        return TemplatePreview.get_preview_for_templated_letter(
+            db_template=notification["template"],
+            filetype=filetype,
+            values=notification["personalisation"],
+            page=request.args.get("page"),
+        )
 
     image_data = get_letter_file_data(service_id, notification_id, filetype, with_metadata)
     file = io.BytesIO(image_data)

@@ -71,7 +71,7 @@ def test_get_preview_for_templated_letter_makes_request(
     request_mock.assert_called_once_with(expected_url, json=data, headers=headers)
 
 
-def test_from_notification_has_correct_args(mocker, client_request):
+def test_get_preview_for_templated_letter_from_notification_has_correct_args(mocker, client_request):
     # This test is calling `current_service` outside a Flask endpoint, so we need to make sure
     # `service` is in the `_request_ctx_stack` to avoid an error
     load_service_before_request()
@@ -86,7 +86,9 @@ def test_from_notification_has_correct_args(mocker, client_request):
         template_name="sample template",
         is_precompiled_letter=False,
     )
-    response = TemplatePreview.from_notification(notification, "png")
+    response = TemplatePreview.get_preview_for_templated_letter(
+        notification["template"], "png", notification["personalisation"]
+    )
 
     assert response[0] == "a"
     assert response[1] == "b"
@@ -103,7 +105,7 @@ def test_from_notification_has_correct_args(mocker, client_request):
     request_mock.assert_called_once_with("http://localhost:9999/preview.png", json=data, headers=headers)
 
 
-def test_from_notification_rejects_precompiled_templates(mocker):
+def test_get_preview_for_templated_letter_from_notification_rejects_precompiled_templates(mocker):
     notification = create_notification(
         service_id="abcd",
         template_type="letter",
@@ -112,7 +114,9 @@ def test_from_notification_rejects_precompiled_templates(mocker):
     )
 
     with pytest.raises(werkzeug.exceptions.BadRequest):
-        TemplatePreview.from_notification(notification, "png")
+        TemplatePreview.get_preview_for_templated_letter(
+            notification["template"], "png", notification["personalisation"]
+        )
 
 
 @pytest.mark.parametrize(
