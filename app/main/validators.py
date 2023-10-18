@@ -157,28 +157,6 @@ class BroadcastLength:
             raise ValidationError(f"Content must be {template.max_content_count:,.0f} characters or fewer")
 
 
-class SmsSenderCharacterSetValidator:
-    """Validate acceptable characters inside SMS Sender IDs
-
-    Specifically allowed are:
-    - Alphanumerics
-    - Plain spaces
-    - Ampersands
-    - Periods
-    - Plain dashes
-    - Plain underscores
-    """
-
-    regex = re.compile(r"^[a-zA-Z0-9 &.\-_]+$")
-
-    def __init__(self, message="Text message sender can only include: letters, numbers, spaces, and & . - _"):
-        self.message = message
-
-    def __call__(self, form, field):
-        if field.data and not re.match(self.regex, field.data):
-            raise ValidationError(self.message)
-
-
 class DoesNotStartWithDoubleZero:
     def __init__(self, message="Text message sender cannot start with 00"):
         self.message = message

@@ -77,7 +77,6 @@ from app.main.validators import (
     NotifyInputRequired,
     NotifyUrlValidator,
     OnlySMSCharacters,
-    SmsSenderCharacterSetValidator,
     StringsNotAllowed,
     ValidEmail,
     ValidGovEmail,
@@ -1802,7 +1801,10 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             NotifyDataRequired(thing="a text message sender"),
             Length(min=3, thing="text message sender"),
             Length(max=11, thing="text message sender"),
-            SmsSenderCharacterSetValidator(),
+            Regexp(
+                r"^[a-zA-Z0-9 &.\-_]+$",
+                message="Text message sender can only include: letters, numbers, spaces, and & . - _",
+            ),
             DoesNotStartWithDoubleZero(),
         ],
     )
