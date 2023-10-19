@@ -215,7 +215,7 @@ texttable==1.6.4
     # via pyexcel
 typing-extensions==4.8.0
     # via pypdf
-urllib3==1.26.17
+urllib3==1.26.18
     # via
     #   botocore
     #   requests
