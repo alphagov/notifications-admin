@@ -3,6 +3,7 @@
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/table.html" import list_table, text_field, index_field %}
 
 {% block service_page_title %}
   {{ job.original_file_name }}
@@ -25,6 +26,46 @@
     {% endif %}
     {{ ajax_block(partials, updates_url, 'counts', finished=job.processing_finished) }}
     {{ ajax_block(partials, updates_url, 'notifications', finished=job.processing_finished) }}
+
+    {% if scheduled_recipients %}
+
+        <div class="fullscreen-content" data-notify-module="fullscreen-table">
+          {% call(item, row_number) list_table(
+            scheduled_recipients.displayed_rows,
+            caption=job.original_file_name,
+            caption_visible=False,
+            field_headings=[
+              '<span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
+            ] + scheduled_recipients.column_headers
+          ) %}
+            {% call index_field() %}
+              <span>
+                {{ item.index + 2 }}
+              </span>
+            {% endcall %}
+            {% for column in scheduled_recipients.column_headers %}
+              {% if item[column].ignore %}
+                {{ text_field(item[column].data or '', status='default') }}
+              {% else %}
+                {{ text_field(item[column].data or '') }}
+              {% endif %}
+            {% endfor %}
+            {% if item[None].data %}
+              {% for column in item[None].data %}
+                {{ text_field(column, status='default') }}
+              {% endfor %}
+            {% endif %}
+          {% endcall %}
+        </div>
+
+        <div class="table-show-more-link">
+          {% if scheduled_recipients|length > scheduled_recipients.displayed_rows|list|length %}
+            <p class="govuk-!-margin-bottom-1">Only showing the first {{ scheduled_recipients.displayed_rows|list|length }} rows</p>
+          {% endif %}
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job_original_file_csv', service_id=current_service.id, job_id=job.id) }}" download>Download this file (CSV)</a>
+        </div>
+
+    {% endif %}
 
     {% if job.letter_job_can_be_cancelled %}
       <div class="js-stick-at-bottom-when-scrolling">
