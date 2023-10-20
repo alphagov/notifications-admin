@@ -98,7 +98,7 @@ def add_organisation_from_gp_service(service_id):
             )
         )
 
-    return render_template("views/organisations/add-gp-organisation.html", form=form)
+    return render_template("views/organisations/add-gp-organisation.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/add-nhs-local-organisation", methods=["GET", "POST"])

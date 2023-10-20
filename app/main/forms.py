@@ -1202,6 +1202,7 @@ class AddGPOrganisationForm(StripWhitespaceForm):
             (True, "Yes"),
             (False, "No"),
         ],
+        choices_for_error_message="yes to confirm the name of your GP surgery",
     )
 
     name = GovukTextInputField(
@@ -1211,7 +1212,7 @@ class AddGPOrganisationForm(StripWhitespaceForm):
     def validate_name(self, field):
         if self.same_as_service_name.data is False:
             if not field.data:
-                raise ValidationError("Cannot be empty")
+                raise ValidationError("Enter the name of your GP surgery")
         else:
             field.data = ""
 
