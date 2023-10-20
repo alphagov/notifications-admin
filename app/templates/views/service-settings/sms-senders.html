@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Text message senders
+  Text message sender IDs
 {% endblock %}
 
 {% block backLink %}
@@ -14,12 +14,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Text message senders') }}
+  {{ page_header('Text message sender IDs') }}
 
   <div class="user-list">
     {% if not current_service.sms_senders %}
       <div class="user-list-item">
-        <p class="govuk-body user-list-item-blank hint">You have not added any text message senders yet</p>
+        <p class="govuk-body user-list-item-blank hint">You have not added any text message sender IDs yet</p>
       </div>
     {% endif %}
     {% for item in current_service.sms_senders_with_hints %}
@@ -56,13 +56,13 @@
       <div class="govuk-grid-column-full">
         {{ govukButton({
           "element": "a",
-          "text": "Add text message sender",
+          "text": "Add text message sender ID",
           "href": url_for('main.service_add_sms_sender', service_id=current_service.id)
         }) }}
       </div>
     </div>
   {% endif %}
   <p class="govuk-body">
-    The text message sender tells your users who the message is from.
+    The text message sender ID tells your users who the message is from.
   </p>
 {% endblock %}

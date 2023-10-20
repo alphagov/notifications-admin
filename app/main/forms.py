@@ -1796,26 +1796,26 @@ class ServiceReplyToEmailForm(StripWhitespaceForm):
 
 class ServiceSmsSenderForm(StripWhitespaceForm):
     sms_sender = GovukTextInputField(
-        "Text message sender",
+        "Text message sender ID",
         validators=[
-            NotifyDataRequired(thing="a text message sender"),
-            Length(min=3, thing="text message sender"),
-            Length(max=11, thing="text message sender"),
+            NotifyDataRequired(thing="a text message sender ID"),
+            Length(min=3, thing="text message sender ID"),
+            Length(max=11, thing="text message sender ID"),
             Regexp(
                 r"^[a-zA-Z0-9 &.\-_]+$",
                 message=(
-                    "Text message sender name can only include letters, numbers, spaces, "
+                    "Text message sender ID can only include letters, numbers, spaces, "
                     "and the following characters: & . - _"
                 ),
             ),
             DoesNotStartWithDoubleZero(),
         ],
     )
-    is_default = GovukCheckboxField("Make this text message sender the default")
+    is_default = GovukCheckboxField("Make this text message sender ID the default")
 
 
 class ServiceEditInboundNumberForm(StripWhitespaceForm):
-    is_default = GovukCheckboxField("Make this text message sender the default")
+    is_default = GovukCheckboxField("Make this text message sender ID the default")
 
 
 class AdminNotesForm(StripWhitespaceForm):

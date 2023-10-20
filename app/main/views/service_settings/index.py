@@ -1033,7 +1033,7 @@ def service_edit_sms_sender(service_id, sms_sender_id):
 
     form.is_default.data = sms_sender["is_default"]
     if request.endpoint == "main.service_confirm_delete_sms_sender":
-        flash("Are you sure you want to delete this text message sender?", "delete")
+        flash("Are you sure you want to delete this text message sender ID?", "delete")
     return render_template(
         "views/service-settings/sms-sender/edit.html",
         form=form,

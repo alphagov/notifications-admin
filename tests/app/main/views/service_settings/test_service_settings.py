@@ -75,7 +75,7 @@ def mock_get_service_settings_page_common(
                 "Send files by email contact_us@gov.uk Manage sending files by email",
                 "Label Value Action",
                 "Send text messages On Change your settings for sending text messages",
-                "Text message senders GOVUK Manage text message senders",
+                "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
@@ -117,7 +117,7 @@ def mock_get_service_settings_page_common(
                 "Send files by email contact_us@gov.uk Manage sending files by email",
                 "Label Value Action",
                 "Send text messages On Change your settings for sending text messages",
-                "Text message senders GOVUK Manage text message senders",
+                "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
@@ -435,7 +435,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send files by email Not set up Manage sending files by email",
                 "Label Value Action",
                 "Send text messages On Change your settings for sending text messages",
-                "Text message senders GOVUK Manage text message senders",
+                "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Send international text messages On Change your settings for sending international text messages",
                 "Receive text messages On Change your settings for receiving text messages",
@@ -456,7 +456,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send files by email Not set up Manage sending files by email",
                 "Label Value Action",
                 "Send text messages On Change your settings for sending text messages",
-                "Text message senders GOVUK Manage text message senders",
+                "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
@@ -1231,21 +1231,21 @@ def test_request_to_go_live_redirects_if_service_already_live(
             "local",
             1,
             [],
-            "Change your text message sender name Not completed",
+            "Change your Text message sender ID Not completed",
         ),
         (
             1,
             "nhs_local",
             0,
             [],
-            "Change your text message sender name Not completed",
+            "Change your Text message sender ID Not completed",
         ),
         (
             None,
             "school_or_college",
             1,
             [{"is_default": True, "sms_sender": "GOVUK"}],
-            "Change your text message sender name Not completed",
+            "Change your Text message sender ID Not completed",
         ),
         (
             None,
@@ -1255,14 +1255,14 @@ def test_request_to_go_live_redirects_if_service_already_live(
                 {"is_default": False, "sms_sender": "GOVUK"},
                 {"is_default": True, "sms_sender": "KUVOG"},
             ],
-            "Change your text message sender name Completed",
+            "Change your Text message sender ID Completed",
         ),
         (
             None,
             "nhs_local",
             1,
             [{"is_default": True, "sms_sender": "KUVOG"}],
-            "Change your text message sender name Completed",
+            "Change your Text message sender ID Completed",
         ),
     ],
 )
@@ -2552,7 +2552,8 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         == "Reply-to email addresses test@example.com …and 2 more Manage reply-to email addresses"
     )
     assert (
-        get_row(page, "Text message senders") == "Text message senders Example …and 2 more Manage text message senders"
+        get_row(page, "Text message sender IDs")
+        == "Text message sender IDs Example …and 2 more Manage text message sender IDs"
     )
     assert get_row(page, "Sender addresses") == "Sender addresses 1 Example Street …and 2 more Manage sender addresses"
 
@@ -2676,7 +2677,7 @@ def test_remove_default_from_default_letter_contact_block(
         (
             "main.service_sms_senders",
             "app.service_api_client.get_sms_senders",
-            "You have not added any text message senders yet",
+            "You have not added any text message sender IDs yet",
         ),
     ],
 )
@@ -2737,14 +2738,14 @@ def test_incorrect_letter_contact_block_input(
     [
         ("elevenchars", None),
         ("11 chars", None),
-        ("", "Enter a text message sender"),
-        ("abcdefghijkhgkg", "Text message sender cannot be longer than 11 characters"),
+        ("", "Enter a text message sender ID"),
+        ("abcdefghijkhgkg", "Text message sender ID cannot be longer than 11 characters"),
         (
             r" ¯\_(ツ)_/¯ ",
-            "Text message sender name can only include letters, numbers, spaces, and the following characters: & . - _",
+            "Text message sender ID can only include letters, numbers, spaces, and the following characters: & . - _",
         ),
         ("blood.co.uk", None),
-        ("00123", "Text message sender cannot start with 00"),
+        ("00123", "Text message sender ID cannot start with 00"),
     ],
 )
 def test_incorrect_sms_sender_input(
@@ -2786,7 +2787,7 @@ def test_incorrect_sms_sender_input_with_multiple_errors_only_shows_the_first(
     error_message = page.select_one(".govuk-error-message")
     count_of_api_calls = len(mock_add_sms_sender.call_args_list)
 
-    assert normalize_spaces(error_message.text) == "Error: Text message sender must be at least 3 characters long"
+    assert normalize_spaces(error_message.text) == "Error: Text message sender ID must be at least 3 characters long"
     assert count_of_api_calls == 0
 
 
@@ -3422,7 +3423,7 @@ def test_edit_sms_sender(sms_sender, data, api_default_args, mocker, fake_uuid, 
             "main.service_edit_sms_sender",
             "app.service_api_client.get_sms_sender",
             create_sms_sender(is_default=True),
-            "This is the default text message sender.",
+            "This is the default text message sender ID.",
             "sms_sender_id",
             False,
         ),
@@ -3430,7 +3431,7 @@ def test_edit_sms_sender(sms_sender, data, api_default_args, mocker, fake_uuid, 
             "main.service_edit_sms_sender",
             "app.service_api_client.get_sms_sender",
             create_sms_sender(is_default=False),
-            "This is the default text message sender.",
+            "This is the default text message sender ID.",
             "sms_sender_id",
             True,
         ),
@@ -3533,7 +3534,7 @@ def test_confirm_delete_sms_sender(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Are you sure you want to delete this text message sender? Yes, delete"
+        "Are you sure you want to delete this text message sender ID? Yes, delete"
     )
     assert "action" not in page.select_one(".banner-dangerous form")
     assert page.select_one(".banner-dangerous form")["method"] == "post"
@@ -5456,7 +5457,7 @@ def test_service_receive_text_messages_when_inbound_number_is_not_set(
                 "You can also download the last 7 days’ worth of received text messages.",
                 "If you’re using the API, you can fetch received messages or set up a "
                 "callback to push the message to your service.",
-                "You can still send text messages from a sender name if you need to, but people "
+                "You can still send text messages from a sender ID if you need to, but people "
                 "will not be able to reply to those messages.",
                 "Stop receiving text messages",
             ],
@@ -5467,7 +5468,7 @@ def test_service_receive_text_messages_when_inbound_number_is_not_set(
                 "Your service will receive text messages sent to:",
                 "You can see the number of received messages on your dashboard.",
                 "You can also download the last 7 days’ worth of received text messages.",
-                "You can still send text messages from a sender name if you need to, but people "
+                "You can still send text messages from a sender ID if you need to, but people "
                 "will not be able to reply to those messages.",
                 "Stop receiving text messages",
             ],

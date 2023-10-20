@@ -40,7 +40,7 @@
           </p>
         {% endif %}
         <p class="govuk-body">
-          You can still send text messages from a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">sender name</a> if you need to, but people will not be able to reply to those messages.
+          You can still send text messages from a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">sender ID</a> if you need to, but people will not be able to reply to those messages.
         </p>
         <p class="govuk-body">
           <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.service_receive_text_messages_stop', service_id=current_service.id) }}">Stop receiving text messages</a>
@@ -52,7 +52,7 @@
           If you want to receive text messages, Notify will give you a unique 11-digit phone number.
         </p>
         <p class="govuk-body">
-          You can send text messages from this number instead of your current sender name.
+          You can send text messages from this number instead of your current sender ID.
         </p>
         <p class="govuk-body">
           When someone replies to the number, you’ll see it on your dashboard.
