@@ -155,7 +155,7 @@ def using_notify_nav():
                     "link": "main.guidance_templates",
                 },
                 {
-                    "name": "Text message sender",
+                    "name": "Text message sender ID",
                     "link": "main.guidance_text_message_sender",
                 },
                 {

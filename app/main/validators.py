@@ -158,7 +158,7 @@ class BroadcastLength:
 
 
 class DoesNotStartWithDoubleZero:
-    def __init__(self, message="Text message sender cannot start with 00"):
+    def __init__(self, message="Text message sender ID cannot start with 00"):
         self.message = message
 
     def __call__(self, form, field):

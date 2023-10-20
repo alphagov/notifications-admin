@@ -38,13 +38,13 @@
 
       <h2 class="heading heading-medium">If you might need to use this number again</h2>
       <p class="govuk-body">
-        Change your text message sender to send messages that no one can reply to.
+        Change your text message sender ID to send messages that no one can reply to.
       </p>
       <p class="govuk-body">
         You can make {{ current_service.inbound_number }} the default sender again at any time.
       </p>
       <p class="govuk-body">
-        Add a new <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">text message sender</a>.
+        Add a new <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">text message sender ID</a>.
       </p>
 
       <h2 class="heading heading-medium">If you’re sure you want to delete your number</h2>

@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Change text message sender
+  Change text message sender ID
 {% endblock %}
 
 {% block backLink %}
@@ -16,7 +16,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change text message sender') }}
+  {{ page_header('Change text message sender ID') }}
   {% call form_wrapper() %}
     {% if inbound_number %}
       <p class="govuk-body">
@@ -31,7 +31,7 @@
     {% endif %}
     {% if form.is_default.data %}
       <p class="form-group">
-        This is the default text message sender.
+        This is the default text message sender ID.
       </p>
       {{ page_footer('Save') }}
     {% else %}
