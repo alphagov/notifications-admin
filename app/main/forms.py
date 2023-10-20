@@ -1803,7 +1803,10 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             Length(max=11, thing="text message sender"),
             Regexp(
                 r"^[a-zA-Z0-9 &.\-_]+$",
-                message="Text message sender can only include: letters, numbers, spaces, and & . - _",
+                message=(
+                    "Text message sender name can only include letters, numbers, spaces, "
+                    "and the following characters: & . - _"
+                ),
             ),
             DoesNotStartWithDoubleZero(),
         ],

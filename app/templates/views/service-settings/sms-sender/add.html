@@ -14,12 +14,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Add text message sender') }}
+  {{ page_header(service_page_title) }}
 
   {% call form_wrapper() %}
     {{ form.sms_sender(param_extensions={
       "classes": "govuk-!-width-one-quarter",
-      "hint": {"text": "Up to 11 characters, letters, numbers and spaces only"}
+      "hint": {"text": "Text message sender name can only include letters, numbers, spaces, and the following characters: & . - _"}
     }) }}
     {% if not first_sms_sender %}
       {{ form.is_default }}

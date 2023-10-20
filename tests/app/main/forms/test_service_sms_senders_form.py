@@ -11,7 +11,11 @@ from app.main.forms import ServiceSmsSenderForm
         ("333", False, None),
         ("elevenchars", False, None),  # 11 chars
         ("twelvecharas", True, "Text message sender cannot be longer than 11 characters"),  # 12 chars
-        ("###", True, "Text message sender can only include: letters, numbers, spaces, and & . - _"),
+        (
+            "###",
+            True,
+            "Text message sender name can only include letters, numbers, spaces, and the following characters: & . - _",
+        ),
         ("00111222333", True, "Text message sender cannot start with 00"),
         ("UK_GOV", False, None),  # Underscores are allowed
         ("UK-GOV", False, None),  # Simple dashes are allowed
