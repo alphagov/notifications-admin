@@ -25,7 +25,7 @@ class TemplatePreview:
             "values": values,
             "filename": current_service.letter_branding.filename,
         }
-        resp = requests.post(
+        response = requests.post(
             "{}/preview.{}{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"],
                 filetype,
@@ -34,26 +34,26 @@ class TemplatePreview:
             json=data,
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
-        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
+        return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
     @classmethod
     def get_png_for_valid_pdf_page(cls, pdf_file, page):
         pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)
 
-        resp = requests.post(
+        response = requests.post(
             "{}/precompiled-preview.png{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"], "?hide_notify=true" if page == "1" else ""
             ),
             data=base64.b64encode(pdf_page).decode("utf-8"),
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
-        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
+        return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
     @classmethod
     def get_png_for_invalid_pdf_page(cls, pdf_file, page, is_an_attachment=False):
         pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)
 
-        resp = requests.post(
+        response = requests.post(
             "{}/precompiled/overlay.png{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"],
                 f"?page_number={page}&is_an_attachment={is_an_attachment}",
@@ -61,7 +61,7 @@ class TemplatePreview:
             data=pdf_page,
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
-        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
+        return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
     @classmethod
     def get_png_for_example_template(cls, template, branding_filename):
@@ -71,12 +71,12 @@ class TemplatePreview:
             "values": None,
             "filename": branding_filename,
         }
-        resp = requests.post(
+        response = requests.post(
             f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.png",
             json=data,
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
-        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
+        return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
     @classmethod
     def get_png_for_letter_attachment_page(cls, attachment_id, page=None):
@@ -84,7 +84,7 @@ class TemplatePreview:
             "letter_attachment_id": attachment_id,
             "service_id": current_service.id,
         }
-        resp = requests.post(
+        response = requests.post(
             "{}/letter_attachment_preview.png{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"],
                 "?page={}".format(page) if page else "",
@@ -92,7 +92,7 @@ class TemplatePreview:
             json=data,
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
-        return resp.content, resp.status_code, cls.get_allowed_headers(resp.headers)
+        return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
 
 def get_page_count_for_letter(template, values=None):
