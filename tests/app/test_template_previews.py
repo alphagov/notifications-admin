@@ -166,25 +166,42 @@ def test_page_count_returns_none_for_non_letter_templates(template_type):
 
 
 @pytest.mark.parametrize(
-    "partial_call, expected_template_preview_args",
+    "values, expected_template_preview_args",
     [
-        (partial(get_page_count_for_letter), ({"template_type": "letter"}, "json", None)),
+        (None, ({"template_type": "letter"}, "json", None)),
         (
-            partial(get_page_count_for_letter, values={"foo": "bar"}),
+            ({"foo": "bar"}),
             ({"template_type": "letter"}, "json", {"foo": "bar"}),
         ),
     ],
 )
-def test_page_count_unpacks_from_json_response(
+def test_page_count_makes_a_call_to_template_preview_and_gets_page_count(
     mocker,
-    partial_call,
+    client_request,
+    mock_get_service_letter_template,
+    values,
     expected_template_preview_args,
 ):
-    mock_template_preview = mocker.patch("app.template_previews.TemplatePreview.get_preview_for_templated_letter")
-    mock_template_preview.return_value = (b'{"count": 99}', 200, {})
+    # This test is calling `current_service` outside a Flask endpoint, so we need to make sure
+    # `service` is in the `_request_ctx_stack` to avoid an error
+    load_service_before_request()
 
-    assert partial_call({"template_type": "letter"}) == 99
-    mock_template_preview.assert_called_once_with(*expected_template_preview_args)
+    request_mock_returns = Mock(content=b'{"count": 99}', status_code=200, headers={"content-type": "image/png"})
+    request_mock = mocker.patch("app.template_previews.requests.post", return_value=request_mock_returns)
+    mocker.patch("app.template_previews.current_service", letter_branding=LetterBranding({"filename": "hm-government"}))
+    template = mock_get_service_letter_template("123", "456")["data"]
+
+    assert get_page_count_for_letter(template, values=values) == 99
+
+    data = {
+        "letter_contact_block": None,
+        "template": template,
+        "values": values,
+        "filename": "hm-government",
+    }
+    headers = {"Authorization": "Token my-secret-key"}
+
+    request_mock.assert_called_once_with("http://localhost:9999/preview.json", json=data, headers=headers)
 
 
 def test_get_png_for_example_template_makes_request(mocker, client_request):

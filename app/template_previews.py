@@ -95,12 +95,23 @@ class TemplatePreview:
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
 
-def get_page_count_for_letter(template, values=None):
-    if template["template_type"] != "letter":
+def get_page_count_for_letter(db_template, values=None):
+    if db_template["template_type"] != "letter":
         return None
 
-    page_count, _, _ = TemplatePreview.get_preview_for_templated_letter(template, "json", values)
-    page_count = json.loads(page_count.decode("utf-8"))["count"]
+    data = {
+        "letter_contact_block": db_template.get("reply_to_text", ""),
+        "template": db_template,
+        "values": values,
+        "filename": current_service.letter_branding.filename,
+    }
+    response = requests.post(
+        f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.json".format(),
+        json=data,
+        headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+    )
+
+    page_count = json.loads(response.content.decode("utf-8"))["count"]
 
     return page_count
 
