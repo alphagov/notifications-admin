@@ -1707,6 +1707,7 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
     "view, extra_view_args",
     [
         ("no_cookie.view_letter_template_preview", {}),
+        ("no_cookie.view_letter_template_preview", {"page": "2"}),
         ("no_cookie.view_template_version_preview", {"version": 1}),
         ("no_cookie.view_template_version_preview", {"version": 1, "page": "2"}),
     ],
