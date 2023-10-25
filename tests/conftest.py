@@ -3729,7 +3729,7 @@ def mock_get_returned_letter_summary_with_no_returned_letters(mocker):
 
 @pytest.fixture
 def mock_template_preview(mocker):
-    content = b'{"count":1}'
+    content = b"letter preview as png or pdf"
     status_code = 200
     headers = {}
     example_response = (content, status_code, headers)
