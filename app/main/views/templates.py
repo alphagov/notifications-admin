@@ -313,7 +313,7 @@ def view_template_version(service_id, template_id, version):
 @user_has_permissions(allow_org_user=True)
 def view_template_version_preview(service_id, template_id, version, filetype):
     template = current_service.get_template(template_id, version=version)
-    return TemplatePreview.from_utils_template(template, filetype)
+    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get("page"))
 
 
 def _add_template_by_type(template_type, template_folder_id):

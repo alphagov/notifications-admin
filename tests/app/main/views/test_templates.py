@@ -1707,7 +1707,9 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
     "view, extra_view_args",
     [
         ("no_cookie.view_letter_template_preview", {}),
+        ("no_cookie.view_letter_template_preview", {"page": "2"}),
         ("no_cookie.view_template_version_preview", {"version": 1}),
+        ("no_cookie.view_template_version_preview", {"version": 1, "page": "2"}),
     ],
 )
 def test_should_show_preview_letter_templates(
@@ -1726,6 +1728,11 @@ def test_should_show_preview_letter_templates(
     assert mocked_preview.call_args[0][0]["id"] == template_id
     assert mocked_preview.call_args[0][0]["service"] == service_id
     assert mocked_preview.call_args[0][1] == filetype
+
+    if "page" in extra_view_args:
+        assert mocked_preview.call_args[1]["page"] == extra_view_args["page"]
+    else:
+        assert mocked_preview.call_args[1]["page"] is None
 
 
 def test_should_show_preview_letter_attachment(
