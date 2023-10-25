@@ -28,7 +28,7 @@
     {{ ajax_block(partials, updates_url, 'notifications', finished=job.processing_finished) }}
 
     {% if scheduled_recipients %}
-
+      <div data-notify-module="remove-in-presence-of" data-target-element-id="job-notifications">
         <div class="fullscreen-content" data-notify-module="fullscreen-table">
           {% call(item, row_number) list_table(
             scheduled_recipients.displayed_rows,
@@ -64,7 +64,7 @@
           {% endif %}
           <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job_original_file_csv', service_id=current_service.id, job_id=job.id) }}" download>Download this file (CSV)</a>
         </div>
-
+      </div>
     {% endif %}
 
     {% if job.letter_job_can_be_cancelled %}

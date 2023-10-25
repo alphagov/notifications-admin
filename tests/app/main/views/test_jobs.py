@@ -111,7 +111,7 @@ def test_should_show_page_for_one_job(
     )
     assert csv_link.text == "Download this report (CSV)"
     assert page.select_one("span#time-left").text == "Data available for 7 days"
-
+    assert page.select_one("#job-notifications")
     assert normalize_spaces(page.select_one("tbody tr").text) == normalize_spaces(
         "07123456789 template content Delivered 1 January at 11:10am"
     )
@@ -478,7 +478,10 @@ def test_should_show_scheduled_job(
     assert page.select_one("form button").text.strip() == "Cancel sending"
     assert not page.select_one(".govuk-back-link")
 
-    recipients_table = page.select_one('.fullscreen-content[data-notify-module="fullscreen-table"] table')
+    recipients_table = page.select_one(
+        "[data-notify-module=remove-in-presence-of][data-target-element-id=job-notifications] "
+        '.fullscreen-content[data-notify-module="fullscreen-table"] table'
+    )
     assert [normalize_spaces(column_heading.text) for column_heading in recipients_table.select("thead tr th")] == [
         "Row in file1",
         "phone number",
