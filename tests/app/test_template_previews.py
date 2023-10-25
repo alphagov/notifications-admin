@@ -3,7 +3,6 @@ from functools import partial
 from unittest.mock import Mock
 
 import pytest
-import werkzeug
 
 from app import load_service_before_request
 from app.models.branding import LetterBranding
@@ -113,7 +112,7 @@ def test_get_preview_for_templated_letter_from_notification_rejects_precompiled_
         is_precompiled_letter=True,
     )
 
-    with pytest.raises(werkzeug.exceptions.BadRequest):
+    with pytest.raises(ValueError):
         TemplatePreview.get_preview_for_templated_letter(
             notification["template"], "png", notification["personalisation"]
         )
