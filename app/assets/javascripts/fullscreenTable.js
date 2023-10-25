@@ -89,7 +89,7 @@
 
       this.$scrollableTable
         .css({
-            'width': this.$component.parent('main').width() - indexColumnWidth,
+            'width': this.$component.parent().width() - indexColumnWidth,
             'margin-left': indexColumnWidth
         });
 
