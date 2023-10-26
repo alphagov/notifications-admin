@@ -3729,15 +3729,18 @@ def mock_get_returned_letter_summary_with_no_returned_letters(mocker):
 
 @pytest.fixture
 def mock_template_preview(mocker):
-    content = b'{"count":1}'
+    content = b"letter preview as png or pdf"
     status_code = 200
     headers = {}
     example_response = (content, status_code, headers)
-    mocker.patch("app.template_previews.TemplatePreview.from_database_object", return_value=example_response)
-    mocker.patch("app.template_previews.TemplatePreview.from_valid_pdf_file", return_value=example_response)
-    mocker.patch("app.template_previews.TemplatePreview.from_invalid_pdf_file", return_value=example_response)
-    mocker.patch("app.template_previews.TemplatePreview.from_example_template", return_value=example_response)
-    mocker.patch("app.template_previews.TemplatePreview.from_utils_template", return_value=example_response)
+    mocker.patch(
+        "app.template_previews.TemplatePreview.get_preview_for_templated_letter", return_value=example_response
+    )
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
+
+    mocker.patch("app.template_previews.TemplatePreview.get_png_for_valid_pdf_page", return_value=example_response)
+    mocker.patch("app.template_previews.TemplatePreview.get_png_for_invalid_pdf_page", return_value=example_response)
+    mocker.patch("app.template_previews.TemplatePreview.get_png_for_example_template", return_value=example_response)
 
 
 @pytest.fixture(scope="function")

@@ -299,9 +299,9 @@ def view_letter_upload_as_preview(service_id, file_id):
     invalid_pages = json.loads(metadata.get("invalid_pages", "[]"))
 
     if metadata.get("message") == "content-outside-printable-area" and page in invalid_pages:
-        return TemplatePreview.from_invalid_pdf_file(pdf_file, page)
+        return TemplatePreview.get_png_for_invalid_pdf_page(pdf_file, page)
     else:
-        return TemplatePreview.from_valid_pdf_file(pdf_file, page)
+        return TemplatePreview.get_png_for_valid_pdf_page(pdf_file, page)
 
 
 @main.route("/services/<uuid:service_id>/upload-letter/send/<uuid:file_id>", methods=["POST"])

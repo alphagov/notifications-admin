@@ -59,7 +59,6 @@ from app.s3_client.s3_letter_upload_client import (
     upload_letter_to_s3,
 )
 from app.template_previews import (
-    LetterAttachmentPreview,
     TemplatePreview,
     sanitise_letter,
 )
@@ -256,7 +255,9 @@ def view_letter_template_preview(service_id, template_id, filetype):
 
     template = current_service.get_template(template_id)
 
-    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get("page"))
+    return TemplatePreview.get_preview_for_templated_letter(
+        db_template=template._template, filetype=filetype, values=template.values, page=request.args.get("page")
+    )
 
 
 @no_cookie.route("/templates/letter-preview-image/<filename>")
@@ -281,9 +282,9 @@ def letter_branding_preview_image(filename):
         ),
         "template_type": "letter",
     }
-    filename = None if filename == "no-branding" else filename
+    branding_filename = None if filename == "no-branding" else filename
 
-    return TemplatePreview.from_example_template(template, filename)
+    return TemplatePreview.get_png_for_example_template(template, branding_filename)
 
 
 def _view_template_version(service_id, template_id, version):
@@ -291,7 +292,7 @@ def _view_template_version(service_id, template_id, version):
         template_id,
         version=version,
         letter_preview_url=url_for(
-            "no_cookie.view_template_version_preview",
+            "no_cookie.view_letter_template_version_preview",
             service_id=service_id,
             template_id=template_id,
             version=version,
@@ -311,9 +312,12 @@ def view_template_version(service_id, template_id, version):
 
 @no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<filetype>")
 @user_has_permissions(allow_org_user=True)
-def view_template_version_preview(service_id, template_id, version, filetype):
+def view_letter_template_version_preview(service_id, template_id, version, filetype):
     template = current_service.get_template(template_id, version=version)
-    return TemplatePreview.from_utils_template(template, filetype, page=request.args.get("page"))
+
+    return TemplatePreview.get_preview_for_templated_letter(
+        db_template=template._template, filetype=filetype, values=template.values, page=request.args.get("page")
+    )
 
 
 def _add_template_by_type(template_type, template_folder_id):
@@ -864,7 +868,7 @@ def view_template_versions(service_id, template_id):
                 template,
                 current_service,
                 letter_preview_url=url_for(
-                    "no_cookie.view_template_version_preview",
+                    "no_cookie.view_letter_template_version_preview",
                     service_id=service_id,
                     template_id=template_id,
                     version=template["version"],
@@ -1015,7 +1019,7 @@ def letter_template_attach_pages(service_id, template_id):
 @no_cookie.route("/services/<uuid:service_id>/attachment/<uuid:attachment_id>.png")
 @user_has_permissions(allow_org_user=True)
 def view_letter_attachment_preview(service_id, attachment_id):
-    return LetterAttachmentPreview.from_attachment_data(attachment_id, page=request.args.get("page"))
+    return TemplatePreview.get_png_for_letter_attachment_page(attachment_id, page=request.args.get("page"))
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages/edit", methods=["GET", "POST"])
@@ -1191,9 +1195,9 @@ def view_invalid_letter_attachment_as_preview(service_id, file_id):
     invalid_pages = json.loads(metadata.get("invalid_pages", "[]"))
 
     if metadata.get("message") == "content-outside-printable-area" and page in invalid_pages:
-        return TemplatePreview.from_invalid_pdf_file(pdf_file, page, is_an_attachment=True)
+        return TemplatePreview.get_png_for_invalid_pdf_page(pdf_file, page, is_an_attachment=True)
     else:
-        return TemplatePreview.from_valid_pdf_file(pdf_file, page)
+        return TemplatePreview.get_png_for_valid_pdf_page(pdf_file, page)
 
 
 def _get_page_numbers(page_count):

@@ -20,7 +20,7 @@ from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.utils import get_default_sms_sender
 from app.utils.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
-from app.utils.templates import get_template
+from app.utils.templates import get_template as get_template_as_rich_object
 
 
 class Service(JSONModel):
@@ -208,7 +208,7 @@ class Service(JSONModel):
 
     def get_template(self, template_id, version=None, **kwargs):
         template = service_api_client.get_service_template(self.id, template_id, version)["data"]
-        return get_template(template, service=self, **kwargs)
+        return get_template_as_rich_object(template, service=self, **kwargs)
 
     def get_template_folder_with_user_permission_or_403(self, folder_id, user):
         template_folder = self.get_template_folder(folder_id)
@@ -226,7 +226,7 @@ class Service(JSONModel):
         return template
 
     def get_precompiled_letter_template(self, *, letter_preview_url, page_count):
-        return get_template(
+        return get_template_as_rich_object(
             service_api_client.get_precompiled_template(self.id),
             self,
             letter_preview_url=letter_preview_url,

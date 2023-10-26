@@ -19,7 +19,6 @@ from notifications_utils.template import SMSPreviewTemplate
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateAmbiguous, XLDateError, XLDateNegative, XLDateTooLarge
 
-from app.utils.templates import TemplatedLetterImageTemplate
 from tests import (
     sample_uuid,
     template_json,
@@ -2195,7 +2194,9 @@ def test_send_test_works_as_letter_preview(
     service_one["permissions"] = ["letter"]
     mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
     mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
-    mocked_preview = mocker.patch("app.main.views.send.TemplatePreview.from_utils_template", return_value="foo")
+    mocked_preview = mocker.patch(
+        "app.main.views.send.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
+    )
 
     service_id = service_one["id"]
     template_id = fake_uuid
@@ -2212,10 +2213,9 @@ def test_send_test_works_as_letter_preview(
     mock_get_service_letter_template.assert_called_with(service_id, template_id, None)
 
     assert response.get_data(as_text=True) == "foo"
-    assert mocked_preview.call_args[0][0].id == template_id
-    assert type(mocked_preview.call_args[0][0]) == TemplatedLetterImageTemplate
-    assert mocked_preview.call_args[0][0].values == {"addressline1": "Jo Lastname"}
-    assert mocked_preview.call_args[0][1] == filetype
+    assert mocked_preview.call_args_list[0].kwargs["db_template"]["id"] == template_id
+    assert mocked_preview.call_args_list[0].kwargs["values"] == {"addressline1": "Jo Lastname"}
+    assert mocked_preview.call_args_list[0].kwargs["filetype"] == filetype
 
 
 def test_send_one_off_clears_session(
@@ -2835,7 +2835,9 @@ def test_should_show_preview_letter_message(
         "app.main.views.send.get_csv_metadata",
         return_value={"original_file_name": f"example.{filetype}"},
     )
-    mocked_preview = mocker.patch("app.main.views.send.TemplatePreview.from_utils_template", return_value="foo")
+    mocked_preview = mocker.patch(
+        "app.main.views.send.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
+    )
 
     service_id = service_one["id"]
     template_id = fake_uuid
@@ -2856,11 +2858,10 @@ def test_should_show_preview_letter_message(
 
     assert response.get_data(as_text=True) == "foo"
     mocked_preview.assert_called_once()
-    assert mocked_preview.call_args[0][0].id == template_id
-    assert type(mocked_preview.call_args[0][0]) == TemplatedLetterImageTemplate
-    assert mocked_preview.call_args[0][1] == filetype
-    assert mocked_preview.call_args[0][0].values == expected_values
-    assert mocked_preview.call_args[1] == {"page": expected_page}
+    assert mocked_preview.call_args_list[0].kwargs["db_template"]["id"] == template_id
+    assert mocked_preview.call_args_list[0].kwargs["filetype"] == filetype
+    assert mocked_preview.call_args_list[0].kwargs["values"] == expected_values
+    assert mocked_preview.call_args_list[0].kwargs["page"] == expected_page
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(
