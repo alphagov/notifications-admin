@@ -1,8 +1,6 @@
 import re
-import unicodedata
 import urllib
 from datetime import datetime, timedelta, timezone
-from functools import lru_cache
 from math import floor, log10
 from numbers import Number
 
@@ -62,7 +60,6 @@ def format_time_24h(date):
 
 
 def get_human_day(time, date_prefix=""):
-
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
     date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
     now = datetime.utcnow()
@@ -302,22 +299,6 @@ def format_thousands(value):
     return value
 
 
-@lru_cache(maxsize=4)
-def email_safe(string, whitespace="."):
-    # strips accents, diacritics etc
-    string = "".join(c for c in unicodedata.normalize("NFD", string) if unicodedata.category(c) != "Mn")
-    string = "".join(
-        word.lower() if word.isalnum() or word == whitespace else ""
-        for word in re.sub(r"\s+", whitespace, string.strip())
-    )
-    string = re.sub(r"\.{2,}", ".", string)
-    return string.strip(".")
-
-
-def id_safe(string):
-    return email_safe(string, whitespace="-")
-
-
 def round_to_significant_figures(value, number_of_significant_figures):
     if value == 0:
         return value
@@ -363,7 +344,6 @@ def normalize_spaces(name):
 
 
 def guess_name_from_email_address(email_address):
-
     possible_name = re.split(r"[\@\+]", email_address)[0]
 
     if "." not in possible_name or starts_with_initial(possible_name):

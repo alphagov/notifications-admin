@@ -2,9 +2,9 @@ from pathlib import Path
 
 from flask import current_app
 from flask_login import current_user
+from notifications_utils.safe_string import make_string_safe
 
 from app import asset_fingerprinter
-from app.formatters import email_safe
 from app.models import JSONModel, ModelList
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
@@ -24,7 +24,7 @@ class Branding(JSONModel):
         return cls({key: None for key in cls.ALLOWED_PROPERTIES} | kwargs)
 
     def name_like(self, name):
-        return email_safe(name, whitespace="") == email_safe(self.name, whitespace="")
+        return make_string_safe(name, whitespace="") == make_string_safe(self.name, whitespace="")
 
     def serialize(self):
         return self._dict.copy()

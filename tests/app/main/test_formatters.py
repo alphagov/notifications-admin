@@ -5,7 +5,6 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.formatters import (
-    email_safe,
     format_datetime_relative,
     format_notification_status_as_url,
     format_number_in_pounds_as_currency,
@@ -115,25 +114,6 @@ def test_format_datetime_relative(time, human_readable_datetime):
 )
 def test_round_to_significant_figures(value, significant_figures, expected_result):
     assert round_to_significant_figures(value, significant_figures) == expected_result
-
-
-@pytest.mark.parametrize(
-    "service_name, safe_email",
-    [
-        ("name with spaces", "name.with.spaces"),
-        ("singleword", "singleword"),
-        ("UPPER CASE", "upper.case"),
-        ("Service - with dash", "service.with.dash"),
-        ("lots      of spaces", "lots.of.spaces"),
-        ("name.with.dots", "name.with.dots"),
-        ("name-with-other-delimiters", "namewithotherdelimiters"),
-        (".leading", "leading"),
-        ("trailing.", "trailing"),
-        ("üńïçödë wördś", "unicode.words"),
-    ],
-)
-def test_email_safe_return_dot_separated_email_domain(service_name, safe_email):
-    assert email_safe(service_name) == safe_email
 
 
 @pytest.mark.parametrize(
