@@ -9,7 +9,8 @@ from numbers import Number
 import ago
 import dateutil
 import humanize
-from flask import Markup, url_for
+from flask import url_for
+from markupsafe import Markup
 from notifications_utils.field import Field
 from notifications_utils.formatters import make_quotes_smart
 from notifications_utils.formatters import nl2br as utils_nl2br
