@@ -1727,12 +1727,14 @@ def test_should_show_preview_letter_templates(
     mock_get_service_email_template.assert_called_with(service_id, template_id, extra_view_args.get("version"))
     assert mocked_preview.call_args[0][0]["id"] == template_id
     assert mocked_preview.call_args[0][0]["service"] == service_id
-    assert mocked_preview.call_args[0][1] == filetype
+    assert mocked_preview.call_args[1]["filetype"] == filetype
 
     if "page" in extra_view_args:
         assert mocked_preview.call_args[1]["page"] == extra_view_args["page"]
     else:
         assert mocked_preview.call_args[1]["page"] is None
+
+    assert mocked_preview.call_args[1]["values"] == {}
 
 
 def test_should_show_preview_letter_attachment(

@@ -607,9 +607,9 @@ def test_should_show_image_of_letter_notification(
     assert mock_api.called is False
     mocked_preview.assert_called_once_with(
         notification["template"],
-        filetype,
-        notification["personalisation"],
+        filetype=filetype,
         page=None,
+        values=notification["personalisation"],
     )
 
 

@@ -1,5 +1,6 @@
 import base64
 from functools import partial
+from unittest import mock
 from unittest.mock import Mock
 
 import pytest
@@ -35,18 +36,20 @@ def test_from_utils_template_calls_through(
     ret = partial_call(template, "foo")
 
     assert ret == mock_from_db.return_value
-    mock_from_db.assert_called_once_with(template._template, "foo", template.values, page=expected_page_argument)
+    mock_from_db.assert_called_once_with(
+        template._template, filetype="foo", page=expected_page_argument, values=template.values
+    )
 
 
 @pytest.mark.parametrize(
     "partial_call, expected_url",
     [
         (
-            partial(TemplatePreview.from_database_object, filetype="bar"),
+            partial(TemplatePreview.from_database_object, filetype="bar", page=None),
             "http://localhost:9999/preview.bar",
         ),
         (
-            partial(TemplatePreview.from_database_object, filetype="baz"),
+            partial(TemplatePreview.from_database_object, filetype="baz", page=None),
             "http://localhost:9999/preview.baz",
         ),
         (
@@ -185,25 +188,28 @@ def test_page_count_returns_none_for_non_letter_templates(template_type):
 
 
 @pytest.mark.parametrize(
-    "partial_call, expected_template_preview_args",
+    "partial_call, expected_fn_call",
     [
-        (partial(get_page_count_for_letter), ({"template_type": "letter"}, "json", None)),
+        (
+            partial(get_page_count_for_letter),
+            mock.call({"template_type": "letter"}, filetype="json", page=None, values=None),
+        ),
         (
             partial(get_page_count_for_letter, values={"foo": "bar"}),
-            ({"template_type": "letter"}, "json", {"foo": "bar"}),
+            mock.call({"template_type": "letter"}, filetype="json", page=None, values={"foo": "bar"}),
         ),
     ],
 )
 def test_page_count_unpacks_from_json_response(
     mocker,
     partial_call,
-    expected_template_preview_args,
+    expected_fn_call,
 ):
     mock_template_preview = mocker.patch("app.template_previews.TemplatePreview.from_database_object")
     mock_template_preview.return_value = (b'{"count": 99}', 200, {})
 
     assert partial_call({"template_type": "letter"}) == 99
-    mock_template_preview.assert_called_once_with(*expected_template_preview_args)
+    assert mock_template_preview.call_args_list == [expected_fn_call]
 
 
 def test_from_example_template_makes_request(mocker, client_request):

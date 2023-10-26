@@ -1,5 +1,6 @@
 import base64
 from io import BytesIO
+from typing import Optional
 
 import requests
 from flask import abort, current_app, json
@@ -36,7 +37,7 @@ class LetterAttachmentPreview(AuthPreview):
 
 class TemplatePreview(AuthPreview):
     @classmethod
-    def from_database_object(cls, template, filetype, values=None, page=None):
+    def from_database_object(cls, template, *, filetype, page: Optional[int], values=None):
         data = {
             "letter_contact_block": template.get("reply_to_text", ""),
             "template": template,
@@ -98,12 +99,7 @@ class TemplatePreview(AuthPreview):
 
     @classmethod
     def from_utils_template(cls, template, filetype, page=None):
-        return cls.from_database_object(
-            template._template,
-            filetype,
-            template.values,
-            page=page,
-        )
+        return cls.from_database_object(template._template, filetype=filetype, page=page, values=template.values)
 
     @classmethod
     def from_notification(cls, notification: dict, filetype: str, page=None):
@@ -111,10 +107,7 @@ class TemplatePreview(AuthPreview):
             abort(400)
 
         return cls.from_database_object(
-            notification["template"],
-            filetype,
-            notification["personalisation"],
-            page=page,
+            notification["template"], filetype=filetype, page=page, values=notification["personalisation"]
         )
 
 
@@ -122,7 +115,7 @@ def get_page_count_for_letter(template, values=None):
     if template["template_type"] != "letter":
         return None
 
-    page_count, _, _ = TemplatePreview.from_database_object(template, "json", values)
+    page_count, _, _ = TemplatePreview.from_database_object(template, filetype="json", page=None, values=values)
     page_count = json.loads(page_count.decode("utf-8"))["count"]
 
     return page_count
