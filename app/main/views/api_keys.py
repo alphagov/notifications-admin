@@ -1,6 +1,7 @@
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from markupsafe import Markup
+from notifications_utils.safe_string import make_string_safe
 
 from app import (
     api_key_api_client,
@@ -8,7 +9,6 @@ from app import (
     notification_api_client,
     service_api_client,
 )
-from app.formatters import email_safe
 from app.main import main
 from app.main.forms import CallbackForm, CreateKeyForm, GuestList
 from app.notify_client.api_key_api_client import (
@@ -99,7 +99,7 @@ def create_api_key(service_id):
             "views/api/keys/show.html",
             secret=secret,
             service_id=service_id,
-            key_name=email_safe(form.key_name.data, whitespace="_"),
+            key_name=make_string_safe(form.key_name.data, whitespace="_"),
         )
     return render_template("views/api/keys/create.html", form=form, error_summary_enabled=True)
 

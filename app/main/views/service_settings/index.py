@@ -13,6 +13,7 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
+from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
@@ -29,7 +30,6 @@ from app.event_handlers import (
     create_set_inbound_sms_on_event,
 )
 from app.extensions import zendesk_client
-from app.formatters import email_safe
 from app.main import json_updates, main
 from app.main.forms import (
     AdminBillingDetailsForm,
@@ -106,7 +106,7 @@ def service_name_change(service_id):
 
     if form.validate_on_submit():
         try:
-            normalised_service_name = email_safe(form.name.data)
+            normalised_service_name = make_string_safe_for_email_local_part(form.name.data)
             current_service.update(
                 name=form.name.data,
                 normalised_service_name=normalised_service_name,
@@ -598,7 +598,6 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
             )
             return redirect(url_for(".service_email_reply_to", service_id=service_id))
         try:
-
             notification_id = service_api_client.verify_reply_to_email_address(service_id, form.email_address.data)[
                 "data"
             ]["id"]

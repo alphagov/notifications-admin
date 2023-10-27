@@ -1,9 +1,9 @@
 from flask import current_app, redirect, render_template, session, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
+from notifications_utils.safe_string import make_string_safe_for_email_local_part
 
 from app import service_api_client
-from app.formatters import email_safe
 from app.main import main
 from app.main.forms import CreateNhsServiceForm, CreateServiceForm
 from app.models.service import Service
@@ -58,7 +58,7 @@ def add_service():
         form = CreateServiceForm(organisation_type=default_organisation_type)
 
     if form.validate_on_submit():
-        normalised_service_name = email_safe(form.name.data)
+        normalised_service_name = make_string_safe_for_email_local_part(form.name.data)
         service_name = form.name.data
 
         service_id, error = _create_service(

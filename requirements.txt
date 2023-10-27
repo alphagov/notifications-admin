@@ -83,7 +83,9 @@ govuk-frontend-jinja==2.3.0
 greenlet==1.1.2
     # via eventlet
 gunicorn[eventlet]==21.2.0
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   gunicorn
 humanize==4.4.0
     # via -r requirements.in
 idna==3.3
@@ -124,7 +126,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==8.0.1
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@70.0.6
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@72.0.1
     # via -r requirements.in
 openpyxl==3.0.10
     # via pyexcel-xlsx
@@ -200,7 +202,9 @@ s3transfer==0.6.0
 segno==1.5.2
     # via notifications-utils
 sentry-sdk[flask]==1.32.0
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   sentry-sdk
 shapely==1.8.4
     # via notifications-utils
 six==1.16.0

@@ -27,6 +27,7 @@ from notifications_utils.formatters import (
     get_lines_with_normalised_whitespace,
 )
 from notifications_utils.recipients import format_phone_number_human_readable
+from notifications_utils.safe_string import make_string_safe_for_id
 from notifications_utils.sanitise_text import SanitiseASCII
 from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
@@ -66,7 +67,6 @@ from app.formatters import (
     format_thousands,
     format_time,
     format_yes_no,
-    id_safe,
     iteration_count,
     linkable_name,
     message_count,
@@ -583,7 +583,7 @@ def add_template_filters(application):
         nl2br,
         format_phone_number_human_readable,
         format_thousands,
-        id_safe,
+        make_string_safe_for_id,
         convert_to_boolean,
         format_list_items,
         iteration_count,
