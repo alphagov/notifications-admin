@@ -1,7 +1,8 @@
 import copy
 from abc import ABC, abstractmethod
 
-from flask import Markup, render_template_string
+from flask import render_template_string
+from markupsafe import Markup
 
 from app.utils import merge_jsonlike
 
