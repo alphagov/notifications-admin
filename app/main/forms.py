@@ -854,7 +854,7 @@ class OnOffField(GovukRadiosField):
             # This overrides WTForms default behaviour which is to check
             # self.coerce(value) == self.data
             # where self.coerce returns a string for a boolean input
-            yield (value, label, (self.data in {value, self.coerce(value)}))
+            yield (value, label, (self.data in {value, self.coerce(value)}), {})
 
 
 class OrganisationTypeField(GovukRadiosField):
