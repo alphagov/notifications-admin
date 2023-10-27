@@ -293,19 +293,6 @@ def load_user(user_id):
     return User.from_id(user_id)
 
 
-def make_session_permanent():
-    """
-    Make sessions permanent. By permanent, we mean "admin app sets when it expires". Normally the cookie would expire
-    whenever you close the browser. With this, the session expiry is set in `config['PERMANENT_SESSION_LIFETIME']`
-    (20 hours) and is refreshed after every request. IE: you will be logged out after twenty hours of inactivity.
-
-    We don't _need_ to set this every request (it's saved within the cookie itself under the `_permanent` flag), only
-    when you first log in/sign up/get invited/etc, but we do it just to be safe. For more reading, check here:
-    https://stackoverflow.com/questions/34118093/flask-permanent-session-where-to-define-them
-    """
-    session.permanent = True
-
-
 def load_service_before_request():
     g.current_service = None
 
@@ -350,20 +337,6 @@ def load_organisation_before_request():
 
 def load_user_id_before_request():
     g.user_id = get_user_id_from_flask_login_session()
-
-
-def save_service_or_org_after_request(response):
-    # Only save the current session if the request is 200
-    service_id = request.view_args.get("service_id", None) if request.view_args else None
-    organisation_id = request.view_args.get("org_id", None) if request.view_args else None
-    if response.status_code == 200:
-        if service_id:
-            session["service_id"] = service_id
-            session["organisation_id"] = None
-        elif organisation_id:
-            session["service_id"] = None
-            session["organisation_id"] = organisation_id
-    return response
 
 
 #  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
@@ -531,9 +504,6 @@ def setup_blueprints(application):
     from app.main import main as main_blueprint
     from app.main import no_cookie as no_cookie_blueprint
     from app.status import status as status_blueprint
-
-    main_blueprint.before_request(make_session_permanent)
-    main_blueprint.after_request(save_service_or_org_after_request)
 
     application.register_blueprint(main_blueprint)
     application.register_blueprint(json_updates_blueprint)
