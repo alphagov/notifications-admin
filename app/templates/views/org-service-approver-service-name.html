@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 
-{% set title = "Service name" %}
+{% set title = "Check the service name" %}
 
 {% block service_page_title %}
   {{ title }}
@@ -22,7 +22,7 @@
     <div class="govuk-grid-column-five-sixths">
 
       <p class="govuk-body">
-        Check the service name is easy to understand. The service name must be unique and tell people what your messages are about. For example:
+        A service name should tell the recipient what your message is about, as well as who it’s from. For example:
       </p>
 
       <ul class="govuk-list govuk-list--bullet">
@@ -38,7 +38,7 @@
       </ul>
 
       <p class="govuk-body">
-        The service name is: {{ current_service.name }}
+        Avoid acronyms and initialisms unless they’re well known.
       </p>
 
     {% call form_wrapper() %}

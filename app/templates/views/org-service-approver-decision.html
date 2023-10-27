@@ -21,10 +21,15 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       {% if organisation %}
+        {% if cannot_approve %}
+          <p class="govuk-body">You must reject the request to go live because this service is not unique.</p>
+        {% else %}
+          <p class="govuk-body">You should check if the service meets your organisation’s requirements</p>
+        {% endif %}
         {% call form_wrapper() %}
           {{ form.enabled(param_extensions={
             "items": [
-              {"hint": {"text": "We’ll email this service’s team members to let them know"} },
+              {"hint": {"text": "We’ll email this service’s team members to let them know"}, "disabled": cannot_approve },
               {"hint": {"html": "You should contact " + current_service.go_live_user.name + " to explain why the request has not been approved"} },
             ]
           }) }}

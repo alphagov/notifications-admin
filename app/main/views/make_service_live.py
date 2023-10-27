@@ -3,7 +3,7 @@ from flask_login import current_user
 
 from app import current_service
 from app.main import main
-from app.main.forms import OnOffSettingForm, YesNoSettingForm
+from app.main.forms import OnOffSettingForm, UniqueServiceForm
 from app.utils.user import user_has_permissions
 
 
@@ -22,6 +22,46 @@ def org_member_make_service_live_start(service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/make-service-live/unique-service", methods=["GET", "POST"])
+@user_has_permissions(allow_org_user=True)
+def org_member_make_service_live_check_unique(service_id):
+    if current_service.live:
+        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+
+    if not current_user.can_make_service_live(current_service):
+        abort(403)
+
+    form = UniqueServiceForm(service_name=current_service.name)
+    if (unique := request.args.get("unique")) and unique in {"yes", "unsure", "no"} and request.method == "GET":
+        form.is_unique.data = unique
+
+    if form.validate_on_submit():
+        unique = form.is_unique.data
+        if unique == "no":
+            return redirect(
+                url_for(
+                    ".org_member_make_service_live_decision",
+                    service_id=current_service.id,
+                    unique=unique,
+                )
+            )
+
+        return redirect(
+            url_for(".org_member_make_service_live_service_name", service_id=current_service.id, unique=unique)
+        )
+
+    return render_template(
+        "views/org-service-approver-check-unique.html",
+        organisation=current_service.organisation_id,
+        form=form,
+        error_summary_enabled=True,
+        back_link=url_for(
+            ".org_member_make_service_live_start",
+            service_id=current_service.id,
+        ),
+    )
+
+
 @main.route("/services/<uuid:service_id>/make-service-live/service-name", methods=["GET", "POST"])
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_service_name(service_id):
@@ -31,15 +71,29 @@ def org_member_make_service_live_service_name(service_id):
     if not current_user.can_make_service_live(current_service):
         abort(403)
 
-    form = YesNoSettingForm(name="Is the service name easy to understand?")
+    if "unique" not in request.args:
+        return redirect(url_for(".org_member_make_service_live_start", service_id=current_service.id))
+
+    unique = request.args.get("unique").lower()
+    form = OnOffSettingForm(
+        truthy="Yes",
+        falsey="No",
+        name=f"Is the service name ‘{current_service.name}’ easy to understand?",
+        choices_for_error_message="‘yes’ if the service name is easy to understand",
+    )
     if (name := request.args.get("name")) and name in {"ok", "bad"} and request.method == "GET":
         form.enabled.data = name == "ok"
 
     if form.validate_on_submit():
-        redirect_kwargs = {"name": "ok" if form.enabled.data else "bad"}
+        redirect_kwargs = {"name": "ok" if form.enabled.data else "bad", "unique": unique}
+
+        if form.enabled.data and unique == "yes":
+            return redirect(
+                url_for(".org_member_make_service_live_decision", service_id=current_service.id, **redirect_kwargs)
+            )
 
         return redirect(
-            url_for(".org_member_make_service_live_duplicate_service", service_id=current_service.id, **redirect_kwargs)
+            url_for(".org_member_make_service_live_contact_user", service_id=current_service.id, **redirect_kwargs)
         )
 
     return render_template(
@@ -47,55 +101,15 @@ def org_member_make_service_live_service_name(service_id):
         organisation=current_service.organisation,
         form=form,
         error_summary_enabled=True,
-        back_link=url_for(".org_member_make_service_live_start", service_id=current_service.id),
-    )
-
-
-@main.route("/services/<uuid:service_id>/make-service-live/duplicate-service", methods=["GET", "POST"])
-@user_has_permissions(allow_org_user=True)
-def org_member_make_service_live_duplicate_service(service_id):
-    if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
-
-    if not current_user.can_make_service_live(current_service):
-        abort(403)
-
-    form = YesNoSettingForm(name="Is the service name similar to another service?")
-    if (duplicate := request.args.get("duplicate")) and duplicate in {"yes", "no"} and request.method == "GET":
-        form.enabled.data = duplicate == "yes"
-
-    if form.validate_on_submit():
-        duplicate = "yes" if form.enabled.data else "no"
-        if (name := request.args.get("name")) == "bad" or form.enabled.data is True:
-            return redirect(
-                url_for(
-                    ".org_member_make_service_live_contact_user",
-                    service_id=current_service.id,
-                    name=name,
-                    duplicate=duplicate,
-                )
-            )
-
-        return redirect(
-            url_for(
-                ".org_member_make_service_live_decision", service_id=current_service.id, name=name, duplicate=duplicate
-            )
-        )
-
-    return render_template(
-        "views/org-service-approver-duplicate-service.html",
-        organisation=current_service.organisation_id,
-        form=form,
-        error_summary_enabled=True,
         back_link=url_for(
-            ".org_member_make_service_live_service_name",
+            ".org_member_make_service_live_check_unique",
             service_id=current_service.id,
-            name=request.args.get("name"),
+            unique=request.args.get("unique"),
         ),
     )
 
 
-@main.route("/services/<uuid:service_id>/make-service-live/contact-user", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/make-service-live/contact-user", methods=["GET"])
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_contact_user(service_id):
     if current_service.live:
@@ -104,22 +118,28 @@ def org_member_make_service_live_contact_user(service_id):
     if not current_user.can_make_service_live(current_service):
         abort(403)
 
-    bad_name = request.args.get("name", "ok").lower() == "bad"
-    duplicate_service = request.args.get("duplicate", "no").lower() == "yes"
-
-    if not bad_name and not duplicate_service:
-        return redirect(url_for(".org_member_make_service_live_decision", service_id=current_service.id))
+    # Validate expected query params
+    name = request.args.get("name", "").lower()
+    unique = request.args.get("unique", "").lower()
+    if "name" not in request.args or "unique" not in request.args:
+        return redirect(url_for(".org_member_make_service_live_start", service_id=current_service.id))
+    elif name not in {"ok", "bad"} or unique not in {"yes", "unsure", "no"}:
+        abort(400)
+    elif unique == "no" or (name == "ok" and unique == "yes"):
+        return redirect(
+            url_for(".org_member_make_service_live_decision", service_id=current_service.id, name=name, unique=unique)
+        )
 
     return render_template(
         "views/org-service-approver-contact-user.html",
         organisation=current_service.organisation_id,
-        bad_name=bad_name,
-        duplicate_service=duplicate_service,
+        name=name,
+        unique=unique,
         back_link=url_for(
-            ".org_member_make_service_live_duplicate_service",
+            ".org_member_make_service_live_service_name",
             service_id=current_service.id,
             name=request.args.get("name"),
-            duplicate=request.args.get("duplicate"),
+            unique=request.args.get("unique"),
         ),
     )
 
@@ -133,12 +153,21 @@ def org_member_make_service_live_decision(service_id):
     if not current_user.can_make_service_live(current_service):
         abort(403)
 
+    if "unique" not in request.args:
+        return redirect(url_for(".org_member_make_service_live_start", service_id=current_service.id))
+
+    unique = request.args.get("unique").lower()
+    cannot_approve = unique == "no"
+
     form = OnOffSettingForm(
         name="What would you like to do?",
         truthy="Approve the request and make this service live",
         falsey="Reject the request",
         choices_for_error_message="approve or reject",
     )
+    if cannot_approve and form.enabled.data is True:
+        form.enabled.data = None
+
     if form.validate_on_submit():
         current_service.update_status(live=form.enabled.data)
 
@@ -149,15 +178,26 @@ def org_member_make_service_live_decision(service_id):
 
         return redirect(url_for(".organisation_dashboard", org_id=current_service.organisation_id))
 
+    back_link = (
+        url_for(
+            ".org_member_make_service_live_service_name",
+            service_id=current_service.id,
+            name=request.args.get("name"),
+            unique=request.args.get("unique"),
+        )
+        if "name" in request.args
+        else url_for(
+            ".org_member_make_service_live_check_unique",
+            service_id=current_service.id,
+            unique=request.args.get("unique"),
+        )
+    )
+
     return render_template(
         "views/org-service-approver-decision.html",
         form=form,
+        cannot_approve=cannot_approve,
         error_summary_enabled=True,
         organisation=current_service.organisation_id,
-        back_link=url_for(
-            ".org_member_make_service_live_duplicate_service",
-            service_id=current_service.id,
-            name=request.args.get("name"),
-            duplicate=request.args.get("duplicate"),
-        ),
+        back_link=back_link,
     )

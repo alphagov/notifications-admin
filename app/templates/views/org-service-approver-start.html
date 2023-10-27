@@ -2,7 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
-{% set title = "Make service page live" %}
+{% set title = "Make this service live" %}
 
 {% block service_page_title %}
   {{ title }}
@@ -15,11 +15,11 @@
     <div class="govuk-grid-column-five-sixths">
 
       <p class="govuk-body">
-        {{ current_service.go_live_user.name }} has requested for this service to be made live.
+        {{ current_service.go_live_user.name }} has sent a request to go live for ‘{{ current_service.name }}’.
       </p>
 
       <p class="govuk-body">
-        They estimate the service will send:
+        They estimate that this service will send:
       </p>
       <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
         {% for channel, volumes in current_service.volumes_by_channel.items() %}
@@ -34,15 +34,17 @@
       </ul>
 
       <p class="govuk-body">
-        To approve this request, you will need to check:
+        Before you approve this request, you’ll need to check that:
       </p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>the service name</li>
-        <li>if this is a duplicate service</li>
-        <li>any internal requirements of your organisation</li>
+        <li>this service is unique</li>
+        <li>the service name is easy to understand</li>
       </ul>
+      <p class="govuk-body">
+        You should also make sure that the service meets your organisation’s requirements.
+      </p>
 
-    {{ govukButton({"element": "a", "text": "Continue", "href": url_for('.org_member_make_service_live_service_name', service_id=current_service.id)}) }}
+    {{ govukButton({"element": "a", "text": "Continue", "href": url_for('.org_member_make_service_live_check_unique', service_id=current_service.id)}) }}
 
     </div>
   </div>

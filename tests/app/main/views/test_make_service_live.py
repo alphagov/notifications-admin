@@ -101,7 +101,7 @@ def test_get_org_member_make_service_live_start(
 
     if expected_status == 200:
         assert (
-            normalize_spaces(page.select_one("main p")) == "Test User has requested for this service to be made live."
+            normalize_spaces(page.select_one("main p")) == "Test User has sent a request to go live for ‘service one’."
         )
         assert [normalize_spaces(li) for li in page.select_one("main ul").select("li")] == [
             "111,111 emails per year",
@@ -111,7 +111,7 @@ def test_get_org_member_make_service_live_start(
 
         button = page.select_one("a.govuk-button")
         assert button.text.strip() == "Continue"
-        assert button.get("href") == f"/services/{SERVICE_ONE_ID}/make-service-live/service-name"
+        assert button.get("href") == f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service"
 
 
 @pytest.mark.parametrize(*pytest_user_auth_combinations)
@@ -138,11 +138,12 @@ def test_get_org_member_make_service_live_service_name(
     page = client_request.get(
         "main.org_member_make_service_live_service_name",
         service_id=SERVICE_ONE_ID,
+        unique="yes",
         _expected_status=expected_status,
     )
 
     if expected_status == 200:
-        assert f"The service name is: {service_one['name']}" in normalize_spaces(page.select_one("main").text)
+        assert "Check the service name" in normalize_spaces(page.select_one("main").text)
 
         form = page.select_one("form")
         button = form.select_one("button")
@@ -173,24 +174,53 @@ def test_post_org_member_make_service_live_service_name_error_summary(
     page = client_request.post(
         "main.org_member_make_service_live_service_name",
         service_id=SERVICE_ONE_ID,
+        unique="yes",
         _expected_status=200,
         _data={},
     )
 
     error_summary = page.select_one(".govuk-error-summary")
     assert "There is a problem" in error_summary.text
-    assert "Select yes or no" in error_summary.text
+    assert "Select ‘yes’ if the service name is easy to understand" in error_summary.text
 
 
 @pytest.mark.parametrize(
-    "data, expected_redirect_url",
+    "data, query_args, expected_redirect_url",
     (
-        ({"enabled": True}, f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=ok"),
-        ({"enabled": False}, f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=bad"),
+        (
+            {"enabled": True},
+            {"unique": "yes"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&unique=yes",
+        ),
+        (
+            {"enabled": True},
+            {"unique": "no"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=ok&unique=no",
+        ),
+        (
+            {"enabled": True},
+            {"unique": "unsure"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=ok&unique=unsure",
+        ),
+        (
+            {"enabled": False},
+            {"unique": "yes"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=yes",
+        ),
+        (
+            {"enabled": False},
+            {"unique": "no"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=no",
+        ),
+        (
+            {"enabled": False},
+            {"unique": "unsure"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=unsure",
+        ),
     ),
 )
 def test_post_org_member_make_service_live_service_name(
-    mocker, client_request, service_one, organisation_one, data, expected_redirect_url
+    mocker, client_request, service_one, organisation_one, data, query_args, expected_redirect_url
 ):
     user = create_user(
         id=sample_uuid(),
@@ -210,13 +240,14 @@ def test_post_org_member_make_service_live_service_name(
     client_request.post(
         "main.org_member_make_service_live_service_name",
         service_id=SERVICE_ONE_ID,
+        **query_args,
         _expected_redirect=expected_redirect_url,
         _data=data,
     )
 
 
 @pytest.mark.parametrize(*pytest_user_auth_combinations)
-def test_get_org_member_make_service_live_duplicate_service(
+def test_get_org_member_make_service_live_unique_service(
     mocker,
     client_request,
     service_one,
@@ -237,20 +268,20 @@ def test_get_org_member_make_service_live_duplicate_service(
     client_request.login(user)
 
     page = client_request.get(
-        "main.org_member_make_service_live_duplicate_service",
+        "main.org_member_make_service_live_check_unique",
         service_id=SERVICE_ONE_ID,
         _expected_status=expected_status,
     )
 
     if expected_status == 200:
-        assert "Duplicate service" in normalize_spaces(page.select_one("main").text)
+        assert "Confirm this service is unique" in normalize_spaces(page.select_one("main").text)
 
         form = page.select_one("form")
         button = form.select_one("button")
         assert button.text.strip() == "Continue"
 
 
-def test_post_org_member_make_service_live_duplicate_service_error_summary(
+def test_post_org_member_make_service_live_unique_service_error_summary(
     mocker,
     client_request,
     service_one,
@@ -272,7 +303,7 @@ def test_post_org_member_make_service_live_duplicate_service_error_summary(
     client_request.login(user)
 
     page = client_request.post(
-        "main.org_member_make_service_live_duplicate_service",
+        "main.org_member_make_service_live_check_unique",
         service_id=SERVICE_ONE_ID,
         _expected_status=200,
         _data={},
@@ -280,35 +311,30 @@ def test_post_org_member_make_service_live_duplicate_service_error_summary(
 
     error_summary = page.select_one(".govuk-error-summary")
     assert "There is a problem" in error_summary.text
-    assert "Select yes or no" in error_summary.text
+    assert "Select ‘yes’ if this service is unique" in error_summary.text
 
 
 @pytest.mark.parametrize(
     "request_url, data, expected_redirect_url",
     (
         (
-            f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=ok",
-            {"enabled": True},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=ok&duplicate=yes",
+            f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service",
+            {"is_unique": "yes"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/service-name?unique=yes",
         ),
         (
-            f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=ok",
-            {"enabled": False},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&duplicate=no",
+            f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service",
+            {"is_unique": "unsure"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/service-name?unique=unsure",
         ),
         (
-            f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=bad",
-            {"enabled": True},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&duplicate=yes",
-        ),
-        (
-            f"/services/{SERVICE_ONE_ID}/make-service-live/duplicate-service?name=bad",
-            {"enabled": False},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&duplicate=no",
+            f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service",
+            {"is_unique": "no"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?unique=no",
         ),
     ),
 )
-def test_post_org_member_make_service_live_duplicate_service(
+def test_post_org_member_make_service_live_unique_service(
     mocker, client_request, service_one, organisation_one, request_url, data, expected_redirect_url
 ):
     user = create_user(
@@ -334,12 +360,15 @@ def test_post_org_member_make_service_live_duplicate_service(
 
 
 @pytest.mark.parametrize(
-    "name, duplicate, expected_redirect",
+    "data, expected_redirect",
     (
-        ("ok", "no", f"/services/{SERVICE_ONE_ID}/make-service-live/decision"),
-        ("bad", "no", None),
-        ("ok", "yes", None),
-        ("bad", "yes", None),
+        ({}, f"/services/{SERVICE_ONE_ID}/make-service-live"),
+        ({"name": "ok", "unique": "yes"}, f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&unique=yes"),
+        ({"name": "bad", "unique": "yes"}, None),
+        ({"name": "ok", "unique": "no"}, f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&unique=no"),
+        ({"name": "bad", "unique": "no"}, f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=bad&unique=no"),
+        ({"name": "ok", "unique": "unsure"}, None),
+        ({"name": "bad", "unique": "unsure"}, None),
     ),
 )
 @pytest.mark.parametrize(*pytest_user_auth_combinations)
@@ -352,8 +381,7 @@ def test_get_org_member_make_service_live_contact_user(
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
     expected_status,
-    name,
-    duplicate,
+    data,
     expected_redirect,
 ):
     organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
@@ -369,8 +397,7 @@ def test_get_org_member_make_service_live_contact_user(
     page = client_request.get(
         "main.org_member_make_service_live_contact_user",
         service_id=SERVICE_ONE_ID,
-        name=name,
-        duplicate=duplicate,
+        **data,
         _expected_redirect=expected_redirect if expected_status == 200 else None,
         _expected_status=expected_status,
     )
@@ -407,6 +434,8 @@ def test_get_org_member_make_service_live_decision(
     page = client_request.get(
         "main.org_member_make_service_live_decision",
         service_id=SERVICE_ONE_ID,
+        unique="yes",
+        name="ok",
         _expected_status=expected_status,
     )
 
@@ -444,6 +473,8 @@ def test_post_org_member_make_service_live_decision_error_summary(
     page = client_request.post(
         "main.org_member_make_service_live_decision",
         service_id=SERVICE_ONE_ID,
+        name="ok",
+        unique="yes",
         _expected_status=200,
         _data={},
     )
@@ -454,10 +485,11 @@ def test_post_org_member_make_service_live_decision_error_summary(
 
 
 @pytest.mark.parametrize(
-    "post_data, expected_arguments_to_update_service",
+    "query_args, post_data, expected_arguments_to_update_service",
     (
         (
-            True,
+            {"name": "ok", "unique": "yes"},
+            {"enabled": True},
             {
                 "email_message_limit": 250_000,
                 "sms_message_limit": 250_000,
@@ -468,7 +500,8 @@ def test_post_org_member_make_service_live_decision_error_summary(
             },
         ),
         (
-            False,
+            {"name": "ok", "unique": "yes"},
+            {"enabled": False},
             {
                 "email_message_limit": 50,
                 "sms_message_limit": 50,
@@ -487,6 +520,7 @@ def test_post_org_member_make_service_live_decision(
     service_one,
     mock_get_organisation,
     mock_update_service,
+    query_args,
     post_data,
     expected_arguments_to_update_service,
 ):
@@ -498,9 +532,8 @@ def test_post_org_member_make_service_live_decision(
     client_request.post(
         "main.org_member_make_service_live_decision",
         service_id=SERVICE_ONE_ID,
-        _data={
-            "enabled": post_data,
-        },
+        **query_args,
+        _data=post_data,
         _expected_redirect=url_for("main.organisation_dashboard", org_id=ORGANISATION_ID),
     )
 

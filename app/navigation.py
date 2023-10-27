@@ -354,7 +354,7 @@ class MainNavigation(Navigation):
         "make-service-live": {
             "org_member_make_service_live_start",
             "org_member_make_service_live_service_name",
-            "org_member_make_service_live_duplicate_service",
+            "org_member_make_service_live_check_unique",
             "org_member_make_service_live_contact_user",
         },
     }
