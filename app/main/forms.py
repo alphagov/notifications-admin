@@ -1139,7 +1139,7 @@ class TwoFactorForm(StripWhitespaceForm):
 
     sms_code = SMSCode("Text message code")
 
-    def validate(self):
+    def validate(self, *args, **kwargs):
 
         if not self.sms_code.validate(self):
             return False
@@ -1723,7 +1723,7 @@ class AdminProviderRatioForm(OrderableFieldsForm):
 
         super().__init__(data={provider["identifier"]: provider["priority"] for provider in providers})
 
-    def validate(self):
+    def validate(self, *args, **kwargs):
         if not super().validate():
             return False
 
@@ -1753,7 +1753,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
     # This is a text field because the number provided by the user can also be a short code
     phone_number = GovukTextInputField("Phone number")
 
-    def validate(self):
+    def validate(self, *args, **kwargs):
         if self.contact_details_type.data == "url":
             self.url.validators = [
                 NotifyDataRequired(thing="a URL in the correct format"),
@@ -1928,7 +1928,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         if op == "email-branding-details" and not self.name.data:
             raise ValidationError("Enter a name for the branding")
 
-    def validate(self):
+    def validate(self, *args, **kwargs):
         rv = super().validate()
 
         op = request.form.get("operation")
@@ -2193,8 +2193,8 @@ class CallbackForm(StripWhitespaceForm):
         validators=[DataRequired(message="Cannot be empty"), Length(min=10, thing="the bearer token")],
     )
 
-    def validate(self):
-        return super().validate() or self.url.data == ""
+    def validate(self, *args, **kwargs):
+        return super().validate(*args, **kwargs) or self.url.data == ""
 
 
 class SMSPrefixForm(StripWhitespaceForm):
@@ -2527,7 +2527,7 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
     def is_selected(self, template_folder_id):
         return template_folder_id in (self.templates_and_folders.data or [])
 
-    def validate(self):
+    def validate(self, *args, **kwargs):
         self.op = request.form.get("operation")
 
         self.is_move_op = self.op in {"move-to-existing-folder", "move-to-new-folder"}
