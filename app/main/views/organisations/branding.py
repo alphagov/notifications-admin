@@ -1,7 +1,6 @@
 from typing import Optional
 
 from flask import (
-    Markup,
     abort,
     current_app,
     flash,
@@ -10,6 +9,7 @@ from flask import (
     request,
     url_for,
 )
+from markupsafe import Markup
 from werkzeug import Response
 
 from app import current_organisation, organisations_client

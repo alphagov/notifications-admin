@@ -3,7 +3,6 @@
 from functools import partial
 
 from flask import (
-    Markup,
     Response,
     abort,
     flash,
@@ -14,6 +13,7 @@ from flask import (
     stream_with_context,
     url_for,
 )
+from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils.template import (
     EmailPreviewTemplate,
