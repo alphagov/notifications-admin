@@ -12,7 +12,6 @@ Werkzeug==2.2.3
 jinja2==3.1.2
 Pillow==10.0.1
 
-blinker==1.5
 pyexcel==0.7.0
 pyexcel-io==0.6.6
 pyexcel-xls==0.7.0

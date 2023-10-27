@@ -14,7 +14,6 @@ awscli-cwlogs==1.4.6
     # via -r requirements.in
 blinker==1.5
     # via
-    #   -r requirements.in
     #   gds-metrics
     #   sentry-sdk
 boto3==1.28.5
