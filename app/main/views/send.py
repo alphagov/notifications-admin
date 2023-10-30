@@ -381,6 +381,7 @@ def send_one_off_letter_address(service_id, template_id):
         form=form,
         back_link=get_back_link(service_id, template, 0),
         link_to_upload=True,
+        error_summary_enabled=True,
     )
 
 

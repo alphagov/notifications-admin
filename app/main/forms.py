@@ -1489,7 +1489,7 @@ class LetterAddressForm(StripWhitespaceForm):
         self.allow_international_letters = allow_international_letters
         super().__init__(*args, **kwargs)
 
-    address = PostalAddressField("Address", validators=[DataRequired(message="Cannot be empty")])
+    address = PostalAddressField("Address", validators=[NotifyDataRequired(thing="an address")])
 
     def validate_address(self, field):
         address = PostalAddress(
@@ -1504,18 +1504,20 @@ class LetterAddressForm(StripWhitespaceForm):
             raise ValidationError(f"Address must be no more than {PostalAddress.MAX_LINES} lines long")
 
         if address.has_invalid_country_for_bfpo_address:
-            raise ValidationError("The last line of a BFPO address must not be a country.")
+            raise ValidationError(
+                "The last line of a British Forces Post Office (BFPO) address cannot be the name of a country"
+            )
 
         if not address.has_valid_last_line:
             if self.allow_international_letters:
-                raise ValidationError("Last line of the address must be a UK postcode or another country")
+                raise ValidationError("The last line of the address must be a UK postcode or the name of a country")
             if address.international:
                 raise ValidationError("You do not have permission to send letters to other countries")
             raise ValidationError("Last line of the address must be a real UK postcode")
 
         if address.has_invalid_characters:
             raise ValidationError(
-                "Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~"
+                'Address lines cannot start with any of the following characters: @ ( ) = [ ] " " \\ / , < > ~'
             )
 
 
