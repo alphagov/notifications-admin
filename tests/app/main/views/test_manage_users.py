@@ -1523,7 +1523,7 @@ def test_user_cant_invite_themselves(
     )
     assert page.select_one("h1").string.strip() == "Invite a team member"
     form_error = page.select_one(".govuk-error-message").text.strip()
-    assert form_error == "Error: You cannot send an invitation to yourself"
+    assert form_error == "Error: Enter an email address that is not your own"
     assert not mock_create_invite.called
 
 
