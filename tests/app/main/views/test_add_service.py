@@ -299,7 +299,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
 @pytest.mark.parametrize(
     "name, error_message",
     [
-        ("", "Cannot be empty"),
+        ("", "Enter a service name"),
         (".", "Must include at least two alphanumeric characters"),
         ("a" * 256, "Service name cannot be longer than 255 characters"),
     ],

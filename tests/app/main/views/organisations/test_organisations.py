@@ -351,7 +351,7 @@ def test_gps_can_name_their_organisation(
             {
                 "name": "Dr. Example",
             },
-            "Select yes to confirm the name of your GP surgery",
+            "Select ‘yes‘ to confirm the name of your GP surgery",
         ),
         (
             {

@@ -1,5 +1,4 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
@@ -12,9 +11,9 @@
 {% block maincolumn_content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    {{ page_header(heading) }}
-    <p class="govuk-body">This is the name your emails will come from.</p>
-    <p class="govuk-body">You can also display it at the start of every text message you send.</p>
+      <h1 class="govuk-heading-l"> {{ heading }} </h1>
+      <p class="govuk-body">This is the name your emails will come from.</p>
+      <p class="govuk-body">You can also display it at the start of every text message you send.</p>
 
     {% if default_organisation_type == 'central' or default_organisation_type == 'local'  %}
       <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from. For example:</p>

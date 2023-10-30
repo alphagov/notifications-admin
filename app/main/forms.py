@@ -1202,7 +1202,7 @@ class AddGPOrganisationForm(StripWhitespaceForm):
             (True, "Yes"),
             (False, "No"),
         ],
-        choices_for_error_message="yes to confirm the name of your GP surgery",
+        choices_for_error_message="‘yes‘ to confirm the name of your GP surgery",
     )
 
     name = GovukTextInputField(
@@ -1288,7 +1288,7 @@ class CreateServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Service name",
         validators=[
-            DataRequired(message="Cannot be empty"),
+            DataRequired(message="Enter a service name"),
             MustContainAlphanumericCharacters(),
             Length(max=255, thing="service name"),
         ],

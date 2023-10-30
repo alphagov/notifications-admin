@@ -91,4 +91,5 @@ def _render_add_service_page(form, default_organisation_type):
         "views/add-service.html",
         form=form,
         default_organisation_type=default_organisation_type,
+        error_summary_enabled=True,
     )
