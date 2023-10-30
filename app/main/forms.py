@@ -1150,7 +1150,7 @@ class TwoFactorForm(StripWhitespaceForm):
             self.sms_code.errors.append(reason)
             return False
 
-        return True
+        return super().validate(*args, **kwargs)
 
 
 class TextNotReceivedForm(StripWhitespaceForm):
@@ -1724,7 +1724,7 @@ class AdminProviderRatioForm(OrderableFieldsForm):
         super().__init__(data={provider["identifier"]: provider["priority"] for provider in providers})
 
     def validate(self, *args, **kwargs):
-        if not super().validate():
+        if not super().validate(*args, **kwargs):
             return False
 
         total = sum(getattr(self, provider["identifier"]).data for provider in self._providers)
@@ -1787,7 +1787,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
                 valid_non_emergency_phone_number,
             ]
 
-        return super().validate()
+        return super().validate(*args, **kwargs)
 
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
@@ -1929,7 +1929,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
             raise ValidationError("Enter a name for the branding")
 
     def validate(self, *args, **kwargs):
-        rv = super().validate()
+        rv = super().validate(*args, **kwargs)
 
         op = request.form.get("operation")
         if op == "email-branding-details":
@@ -2537,7 +2537,7 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
         if not (self.is_add_folder_op or self.is_move_op or self.is_add_template_op):
             return False
 
-        return super().validate()
+        return super().validate(*args, **kwargs)
 
     def get_folder_name(self):
         if self.op == "add-new-folder":
