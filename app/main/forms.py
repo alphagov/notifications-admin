@@ -1442,7 +1442,7 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
 
 
 class TemplateNameMixin:
-    name = GovukTextInputField("Template name", validators=[DataRequired(message="Cannot be empty")])
+    name = GovukTextInputField("Template name", validators=[NotifyDataRequired(thing="a name for this template")])
 
 
 class RenameTemplateForm(StripWhitespaceForm, TemplateNameMixin):
@@ -1451,7 +1451,7 @@ class RenameTemplateForm(StripWhitespaceForm, TemplateNameMixin):
 
 class BaseTemplateForm(StripWhitespaceForm):
     template_content = TextAreaField(
-        "Message", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
+        "Message", validators=[NotifyDataRequired(thing="your message"), NoCommasInPlaceHolders()]
     )
 
     def __init__(self, *args, **kwargs):

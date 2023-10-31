@@ -796,7 +796,7 @@ def test_write_new_broadcast_posts(
 @pytest.mark.parametrize(
     "content, expected_error_message",
     (
-        ("", "Cannot be empty"),
+        ("", "Enter your message"),
         ("ŵ" * 616, "Content must be 615 characters or fewer because it contains ŵ"),
         ("w" * 1_396, "Content must be 1,395 characters or fewer"),
         ("hello ((name))", "You can’t use ((double brackets)) to personalise this message"),
