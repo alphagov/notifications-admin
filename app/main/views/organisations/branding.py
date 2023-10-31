@@ -205,6 +205,7 @@ def add_organisation_email_branding_options(org_id):
         "views/organisations/organisation/settings/add-email-branding-options.html",
         form=form,
         _search_form=SearchByNameForm(),
+        error_summary_enabled=True,
     )
 
 

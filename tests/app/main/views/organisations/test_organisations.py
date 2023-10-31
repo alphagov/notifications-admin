@@ -351,14 +351,14 @@ def test_gps_can_name_their_organisation(
             {
                 "name": "Dr. Example",
             },
-            "Select yes or no",
+            "Select ‘yes‘ to confirm the name of your GP surgery",
         ),
         (
             {
                 "same_as_service_name": False,
                 "name": "",
             },
-            "Cannot be empty",
+            "Enter the name of your GP surgery",
         ),
     ),
 )
@@ -1771,7 +1771,7 @@ def test_update_organisation_name(
 @pytest.mark.parametrize(
     "name, error_message",
     [
-        ("", "Enter an organisation name"),
+        ("", "Enter your organisation name"),
         ("a", "Organisation name must include at least 2 letters or numbers"),
         ("a" * 256, "Organisation name cannot be longer than 255 characters"),
     ],

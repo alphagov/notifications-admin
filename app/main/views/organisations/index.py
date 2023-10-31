@@ -69,7 +69,7 @@ def add_organisation():
         except HTTPError as e:
             msg = "Organisation name already exists"
             if e.status_code == 400 and msg in e.message:
-                form.name.errors.append("This organisation name is already in use")
+                form.name.errors.append("This organisation name is already in use.")
             else:
                 raise e
 
@@ -98,7 +98,7 @@ def add_organisation_from_gp_service(service_id):
             )
         )
 
-    return render_template("views/organisations/add-gp-organisation.html", form=form)
+    return render_template("views/organisations/add-gp-organisation.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/add-nhs-local-organisation", methods=["GET", "POST"])
@@ -311,8 +311,7 @@ def edit_organisation_name(org_id):
             return redirect(url_for(".organisation_settings", org_id=org_id))
 
     return render_template(
-        "views/organisations/organisation/settings/edit-name.html",
-        form=form,
+        "views/organisations/organisation/settings/edit-name.html", form=form, error_summary_enabled=True
     )
 
 

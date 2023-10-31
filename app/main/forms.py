@@ -1104,7 +1104,7 @@ class BaseInviteUserForm:
         if current_user.platform_admin:
             return
         if field.data.lower() == self.inviter_email_address.lower():
-            raise ValidationError("You cannot send an invitation to yourself")
+            raise ValidationError("Enter an email address that is not your own")
 
 
 class InviteUserForm(BaseInviteUserForm, PermissionsForm):
@@ -1172,7 +1172,7 @@ class RenameOrganisationForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Organisation name",
         validators=[
-            NotifyDataRequired(thing="an organisation name"),
+            NotifyDataRequired(thing="your organisation name"),
             MustContainAlphanumericCharacters(thing="organisation name"),
             Length(max=255, thing="organisation name"),
         ],
@@ -1202,6 +1202,7 @@ class AddGPOrganisationForm(StripWhitespaceForm):
             (True, "Yes"),
             (False, "No"),
         ],
+        choices_for_error_message="‘yes‘ to confirm the name of your GP surgery",
     )
 
     name = GovukTextInputField(
@@ -1211,7 +1212,7 @@ class AddGPOrganisationForm(StripWhitespaceForm):
     def validate_name(self, field):
         if self.same_as_service_name.data is False:
             if not field.data:
-                raise ValidationError("Cannot be empty")
+                raise ValidationError("Enter the name of your GP surgery")
         else:
             field.data = ""
 
@@ -1287,7 +1288,7 @@ class CreateServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
         "Service name",
         validators=[
-            DataRequired(message="Cannot be empty"),
+            DataRequired(message="Enter a service name"),
             MustContainAlphanumericCharacters(),
             Length(max=255, thing="service name"),
         ],
@@ -1311,6 +1312,15 @@ class AdminNewOrganisationForm(
         super().__init__(*args, **kwargs)
         # Don’t offer the ‘not sure’ choice
         self.crown_status.choices = self.crown_status.choices[:-1]
+
+    name = GovukTextInputField(
+        "Organisation name",
+        validators=[
+            NotifyDataRequired(thing="an organisation name"),
+            MustContainAlphanumericCharacters(thing="organisation name"),
+            Length(max=255, thing="organisation name"),
+        ],
+    )
 
 
 class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
