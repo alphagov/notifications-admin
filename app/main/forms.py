@@ -1522,7 +1522,7 @@ class LetterAddressForm(StripWhitespaceForm):
 
 
 class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    subject = TextAreaField("Subject", validators=[DataRequired(message="Cannot be empty")])
+    subject = TextAreaField("Subject", validators=[NotifyDataRequired(thing="the subject of the email")])
 
 
 class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):

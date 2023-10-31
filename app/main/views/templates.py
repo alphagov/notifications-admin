@@ -194,6 +194,7 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         user_has_template_folder_permission=user_has_template_folder_permission,
         single_notification_channel=single_notification_channel,
         option_hints=option_hints,
+        error_summary_enabled=True,
     )
 
 
