@@ -1526,10 +1526,9 @@ class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
 
 
 class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    subject = TextAreaField("Main heading", validators=[DataRequired(message="Cannot be empty")])
-
+    subject = TextAreaField("Main heading", validators=[NotifyDataRequired(thing="a main heading for your letter")])
     template_content = TextAreaField(
-        "Body", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
+        "Body", validators=[NotifyDataRequired(thing="the body text of your letter"), NoCommasInPlaceHolders()]
     )
 
 
