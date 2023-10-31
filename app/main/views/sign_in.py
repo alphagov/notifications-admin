@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from flask import (
-    Markup,
     abort,
     flash,
     redirect,
@@ -11,6 +10,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
+from markupsafe import Markup
 
 from app import login_manager
 from app.main import main

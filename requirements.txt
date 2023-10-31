@@ -12,9 +12,9 @@ awscli==1.29.5
     # via awscli-cwlogs
 awscli-cwlogs==1.4.6
     # via -r requirements.in
-blinker==1.5
+blinker==1.6.3
     # via
-    #   -r requirements.in
+    #   flask
     #   gds-metrics
     #   sentry-sdk
 boto3==1.28.5
@@ -55,7 +55,7 @@ eventlet==0.33.1
     # via gunicorn
 fido2==1.1.0
     # via -r requirements.in
-flask==2.2.5
+flask==3.0.0
     # via
     #   -r requirements.in
     #   flask-login
@@ -64,11 +64,11 @@ flask==2.2.5
     #   gds-metrics
     #   notifications-utils
     #   sentry-sdk
-flask-login==0.6.2
+flask-login @ git+https://github.com/maxcountryman/flask-login.git@2204b4eee7b215977ba5a1bf85e2061f7fa65e20
     # via -r requirements.in
 flask-redis==0.4.0
     # via notifications-utils
-flask-wtf==1.0.1
+flask-wtf==1.2.1
     # via -r requirements.in
 gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
     # via -r requirements.in
@@ -225,12 +225,12 @@ urllib3==1.26.18
     #   botocore
     #   requests
     #   sentry-sdk
-werkzeug==2.2.3
+werkzeug==3.0.1
     # via
     #   -r requirements.in
     #   flask
     #   flask-login
-wtforms==3.0.1
+wtforms==3.1.0
     # via
     #   -r requirements.in
     #   flask-wtf

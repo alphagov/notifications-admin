@@ -326,7 +326,11 @@ def test_two_factor_sms_should_activate_pending_user(
 
 @pytest.mark.parametrize(
     "extra_args, expected_encoded_next_arg",
-    (({}, ""), ({"next": "https://example.com"}, "?next=https%3A%2F%2Fexample.com")),
+    (
+        ({}, ""),
+        ({"next": "https://example.com"}, "?next=https://example.com"),
+        ({"next": "https://example.com?foo=bar&baz=waz"}, "?next=https://example.com?foo%3Dbar%26baz%3Dwaz"),
+    ),
 )
 def test_valid_two_factor_email_link_shows_interstitial(
     client_request,

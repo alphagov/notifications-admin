@@ -854,7 +854,7 @@ class OnOffField(GovukRadiosField):
             # This overrides WTForms default behaviour which is to check
             # self.coerce(value) == self.data
             # where self.coerce returns a string for a boolean input
-            yield (value, label, (self.data in {value, self.coerce(value)}))
+            yield (value, label, (self.data in {value, self.coerce(value)}), {})
 
 
 class OrganisationTypeField(GovukRadiosField):
@@ -1139,7 +1139,7 @@ class TwoFactorForm(StripWhitespaceForm):
 
     sms_code = SMSCode("Text message code")
 
-    def validate(self):
+    def validate(self, *args, **kwargs):
 
         if not self.sms_code.validate(self):
             return False
@@ -1150,7 +1150,7 @@ class TwoFactorForm(StripWhitespaceForm):
             self.sms_code.errors.append(reason)
             return False
 
-        return True
+        return super().validate(*args, **kwargs)
 
 
 class TextNotReceivedForm(StripWhitespaceForm):
@@ -1723,8 +1723,8 @@ class AdminProviderRatioForm(OrderableFieldsForm):
 
         super().__init__(data={provider["identifier"]: provider["priority"] for provider in providers})
 
-    def validate(self):
-        if not super().validate():
+    def validate(self, *args, **kwargs):
+        if not super().validate(*args, **kwargs):
             return False
 
         total = sum(getattr(self, provider["identifier"]).data for provider in self._providers)
@@ -1753,7 +1753,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
     # This is a text field because the number provided by the user can also be a short code
     phone_number = GovukTextInputField("Phone number")
 
-    def validate(self):
+    def validate(self, *args, **kwargs):
         if self.contact_details_type.data == "url":
             self.url.validators = [
                 NotifyDataRequired(thing="a URL in the correct format"),
@@ -1787,7 +1787,7 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
                 valid_non_emergency_phone_number,
             ]
 
-        return super().validate()
+        return super().validate(*args, **kwargs)
 
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
@@ -1928,8 +1928,8 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         if op == "email-branding-details" and not self.name.data:
             raise ValidationError("Enter a name for the branding")
 
-    def validate(self):
-        rv = super().validate()
+    def validate(self, *args, **kwargs):
+        rv = super().validate(*args, **kwargs)
 
         op = request.form.get("operation")
         if op == "email-branding-details":
@@ -2193,8 +2193,8 @@ class CallbackForm(StripWhitespaceForm):
         validators=[DataRequired(message="Cannot be empty"), Length(min=10, thing="the bearer token")],
     )
 
-    def validate(self):
-        return super().validate() or self.url.data == ""
+    def validate(self, *args, **kwargs):
+        return super().validate(*args, **kwargs) or self.url.data == ""
 
 
 class SMSPrefixForm(StripWhitespaceForm):
@@ -2527,7 +2527,7 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
     def is_selected(self, template_folder_id):
         return template_folder_id in (self.templates_and_folders.data or [])
 
-    def validate(self):
+    def validate(self, *args, **kwargs):
         self.op = request.form.get("operation")
 
         self.is_move_op = self.op in {"move-to-existing-folder", "move-to-new-folder"}
@@ -2537,7 +2537,7 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
         if not (self.is_add_folder_op or self.is_move_op or self.is_add_template_op):
             return False
 
-        return super().validate()
+        return super().validate(*args, **kwargs)
 
     def get_folder_name(self):
         if self.op == "add-new-folder":
