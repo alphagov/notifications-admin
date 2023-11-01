@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pytz
-from flask import redirect, render_template, request, session, url_for
+from flask import current_app, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_utils.bank_holidays import BankHolidays
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
@@ -118,8 +118,15 @@ def feedback(ticket_type):
             out_of_hours_emergency=out_of_hours_emergency,
         )
 
+        prefix = (
+            ""
+            if current_app.config["NOTIFY_ENVIRONMENT"] == "production"
+            else f"[env: {current_app.config['NOTIFY_ENVIRONMENT']}] "
+        )
+        subject = prefix + ticket_type_names[ticket_type]["ticket_subject"]
+
         ticket = NotifySupportTicket(
-            subject=ticket_type_names[ticket_type]["ticket_subject"],
+            subject=subject,
             message=feedback_msg,
             ticket_type=get_zendesk_ticket_type(ticket_type),
             notify_ticket_type=None,  # don't set technical/non-technical, we'll do this as part of triage on support
