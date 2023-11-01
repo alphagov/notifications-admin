@@ -16,7 +16,7 @@
 
     {{ content_metadata(
       data={
-        "Last updated": "24 January 2023"
+        "Last updated": "1 November 2023"
       }
     ) }}
 
@@ -40,11 +40,11 @@
       caption_visible=False
     ) %}
       {% for sheets, second, first, international in [
-        ('1 sheet', '47p', '72p', '£1.05'),
-        ('2 sheets', '52p', '77p', '£1.13'),
-        ('3 sheets', '57p', '82p', '£1.21'),
-        ('4 sheets', '62p', '87p', '£1.29'),
-        ('5 sheets', '67p', '92p', '£1.37'),
+        ('1 sheet', '54p', '82p', '£1.26'),
+        ('2 sheets', '59p', '86p', '£1.31'),
+        ('3 sheets', '63p', '90p', '£1.35'),
+        ('4 sheets', '68p', '96p', '£1.40'),
+        ('5 sheets', '73p', '£1.00', '£1.45'),
       ] %}
         {% call row() %}
           {% call row_heading() %} {{ sheets }} {% endcall %}
@@ -54,17 +54,6 @@
         {% endcall %}
       {% endfor %}
     {% endcall %}
-  </div>
-
-
-  <div class="govuk-inset-text">
-    <p class="govuk-body">On 1 November 2023:</p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>second class postage will go up by between 6 and 7 pence</li>
-      <li>first class postage will go up by between 8 and 10 pence</li>
-      <li>international postage will go up by between 8 and 21 pence</li>
-    </ul>
-    <p class="govuk-body">The exact difference will depend on how many sheets of paper you need. The changes listed do not include VAT.</p>
   </div>
 
 {% endblock %}
