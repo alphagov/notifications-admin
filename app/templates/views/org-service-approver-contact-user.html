@@ -23,6 +23,7 @@
       {% endif %}
 
       {% if reasons|length == 0 %}
+        {# This will throw a DivideByZero (arbitrary) error so we can investigate what happened #}
         {{ ('no reasons to contact user') / 0 }}
       {% elif reasons|length == 1 %}
         <p class="govuk-body">Before you can approve or reject this request, contact {{ current_service.go_live_user.name }} to {{ reasons[0] }}.</p>
