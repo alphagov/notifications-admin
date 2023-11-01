@@ -178,11 +178,21 @@ def org_member_make_service_live_decision(service_id):
         form.enabled.data = None
 
     if form.validate_on_submit():
-        current_service.update_status(live=form.enabled.data)
+        # TODO: uncomment
+        # current_service.update_status(live=form.enabled.data)
 
         if form.enabled.data:
             flash(f"‘{current_service.name}’ is now live", "default_with_tick")
         else:
+            organisations_client.notify_service_member_of_rejected_request_to_go_live(
+                service_id=service_id,
+                service_member_name=current_service.go_live_user.name,
+                service_name=current_service.name,
+                organisation_name=current_service.organisation.name,
+                rejection_reason="",
+                organisation_team_member_name=current_user.name,
+                organisation_team_member_email=current_user.email_address,
+            )
             flash("Request to go live rejected", "default")
 
         return redirect(url_for(".organisation_dashboard", org_id=current_service.organisation_id))
