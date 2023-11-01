@@ -29,8 +29,14 @@
         {% call form_wrapper() %}
           {{ form.enabled(param_extensions={
             "items": [
-              {"hint": {"text": "We’ll email this service’s team members to let them know"}, "disabled": cannot_approve },
-              {"hint": {"html": "You should contact " + current_service.go_live_user.name + " to explain why the request has not been approved"} },
+              {
+                "hint": {"text": "We’ll email this service’s team members to let them know"},
+                "disabled": cannot_approve
+              },
+              {
+                "hint": {"html": "Enter the reason for your decision. Notify will share this with the person that made the request to go live."},
+                "conditional": { "html": form.rejection_reason(param_extensions={ "label": { "classes": "govuk-visually-hidden" }, "hint": None }) }
+              },
             ]
           }) }}
           {{ page_footer('Confirm') }}

@@ -3,7 +3,7 @@ from flask_login import current_user
 
 from app import current_service, organisations_client
 from app.main import main
-from app.main.forms import OnOffSettingForm, UniqueServiceForm
+from app.main.forms import OnOffSettingForm, ServiceGoLiveDecisionForm, UniqueServiceForm
 from app.utils.user import user_has_permissions
 
 
@@ -168,7 +168,7 @@ def org_member_make_service_live_decision(service_id):
     unique = request.args.get("unique").lower()
     cannot_approve = unique == "no"
 
-    form = OnOffSettingForm(
+    form = ServiceGoLiveDecisionForm(
         name="What would you like to do?",
         truthy="Approve the request and make this service live",
         falsey="Reject the request",
@@ -178,8 +178,7 @@ def org_member_make_service_live_decision(service_id):
         form.enabled.data = None
 
     if form.validate_on_submit():
-        # TODO: uncomment
-        # current_service.update_status(live=form.enabled.data)
+        current_service.update_status(live=form.enabled.data)
 
         if form.enabled.data:
             flash(f"‘{current_service.name}’ is now live", "default_with_tick")
@@ -189,7 +188,7 @@ def org_member_make_service_live_decision(service_id):
                 service_member_name=current_service.go_live_user.name,
                 service_name=current_service.name,
                 organisation_name=current_service.organisation.name,
-                rejection_reason="",
+                rejection_reason=form.rejection_reason.data,
                 organisation_team_member_name=current_user.name,
                 organisation_team_member_email=current_user.email_address,
             )

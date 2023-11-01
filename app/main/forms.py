@@ -2917,3 +2917,15 @@ class UniqueServiceForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
 
         self.is_unique.label.text = f"Is ‘{service_name}’ unique?"
+
+
+class ServiceGoLiveDecisionForm(OnOffSettingForm):
+    rejection_reason = GovukTextareaField("Rejection reason")
+
+    def validate(self, *args, **kwargs):
+        if self.enabled.data is False:
+            self.rejection_reason.validators = [
+                NotifyDataRequired(thing="a reason"),
+            ]
+
+        return super().validate(*args, **kwargs)

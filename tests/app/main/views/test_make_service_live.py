@@ -491,11 +491,15 @@ def test_get_org_member_make_service_live_decision(
         ]
 
 
+@pytest.mark.parametrize(
+    "post_data, expected_error_message",
+    (
+        ({}, "Select approve or reject"),
+        ({"enabled": False}, "Enter a reason"),
+    ),
+)
 def test_post_org_member_make_service_live_decision_error_summary(
-    mocker,
-    client_request,
-    service_one,
-    organisation_one,
+    mocker, client_request, service_one, organisation_one, post_data, expected_error_message
 ):
     user = create_user(
         id=sample_uuid(),
@@ -518,16 +522,16 @@ def test_post_org_member_make_service_live_decision_error_summary(
         name="ok",
         unique="yes",
         _expected_status=200,
-        _data={},
+        _data=post_data,
     )
 
     error_summary = page.select_one(".govuk-error-summary")
     assert "There is a problem" in error_summary.text
-    assert "Select approve or reject" in error_summary.text
+    assert expected_error_message in error_summary.text
 
 
 @pytest.mark.parametrize(
-    "query_args, post_data, expected_arguments_to_update_service",
+    "query_args, post_data, expected_arguments_to_update_service, should_notify",
     (
         (
             {"name": "ok", "unique": "yes"},
@@ -540,10 +544,11 @@ def test_post_org_member_make_service_live_decision_error_summary(
                 "go_live_at": "2022-12-22 12:12:12",
                 "has_active_go_live_request": False,
             },
+            False,
         ),
         (
             {"name": "ok", "unique": "yes"},
-            {"enabled": False},
+            {"enabled": False, "rejection_reason": "It's a stinker"},
             {
                 "email_message_limit": 50,
                 "sms_message_limit": 50,
@@ -552,11 +557,13 @@ def test_post_org_member_make_service_live_decision_error_summary(
                 "go_live_at": None,
                 "has_active_go_live_request": False,
             },
+            True,
         ),
     ),
 )
 @freeze_time("2022-12-22 12:12:12")
 def test_post_org_member_make_service_live_decision(
+    mocker,
     client_request,
     platform_admin_user,
     service_one,
@@ -565,9 +572,11 @@ def test_post_org_member_make_service_live_decision(
     query_args,
     post_data,
     expected_arguments_to_update_service,
+    should_notify,
 ):
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
+    mock_notify = mocker.patch("app.organisations_client.notify_service_member_of_rejected_request_to_go_live")
 
     client_request.login(platform_admin_user)
 
@@ -583,3 +592,16 @@ def test_post_org_member_make_service_live_decision(
         SERVICE_ONE_ID,
         **expected_arguments_to_update_service,
     )
+
+    if should_notify:
+        assert mock_notify.call_args_list == [
+            mocker.call(
+                service_id=service_one["id"],
+                service_member_name="Platform admin user",
+                service_name="service one",
+                organisation_name="Test organisation",
+                rejection_reason="It's a stinker",
+                organisation_team_member_name="Platform admin user",
+                organisation_team_member_email="platform@admin.gov.uk",
+            )
+        ]
