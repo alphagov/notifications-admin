@@ -31,9 +31,9 @@
       {% if reasons|length == 0 %}
         {{ ('no reasons to contact user') / 0 }}
       {% elif reasons|length == 1 %}
-        <p class="govuk-body">Before you can approve or reject this request, contact {{ current_service.go_live_user.name }} directly at {{ current_service.go_live_user.email_address }} to {{ reasons[0] }}.</p>
+        <p class="govuk-body">Before you can approve or reject this request, contact {{ current_service.go_live_user.name }} to {{ reasons[0] }}.</p>
       {% else %}
-        <p class="govuk-body">Before you can approve or reject this request, contact {{ current_service.go_live_user.name }} directly at {{ current_service.go_live_user.email_address }} to:</p>
+        <p class="govuk-body">Before you can approve or reject this request, contact {{ current_service.go_live_user.name }} to:</p>
         <ul class="govuk-list govuk-list--bullet">
           {% for reason in reasons %}
           <li>{{ reason }}</li>
