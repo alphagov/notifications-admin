@@ -181,7 +181,7 @@ def org_member_make_service_live_decision(service_id):
         current_service.update_status(live=form.enabled.data)
 
         if form.enabled.data:
-            flash(f"‘{current_service.name}’ is now live", "default_with_tick")
+            flash("This service is now live. We’ll email the team to let them know.", "default_with_tick")
         else:
             organisations_client.notify_service_member_of_rejected_request_to_go_live(
                 service_id=service_id,
@@ -192,7 +192,13 @@ def org_member_make_service_live_decision(service_id):
                 organisation_team_member_name=current_user.name,
                 organisation_team_member_email=current_user.email_address,
             )
-            flash("Request to go live rejected", "default")
+            flash(
+                (
+                    "You rejected the request to go live for this service. "
+                    f"We’ll email {current_service.go_live_user.name} to let them know."
+                ),
+                "default",
+            )
 
         return redirect(url_for(".organisation_dashboard", org_id=current_service.organisation_id))
 
