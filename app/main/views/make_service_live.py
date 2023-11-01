@@ -178,8 +178,6 @@ def org_member_make_service_live_decision(service_id):
         form.enabled.data = None
 
     if form.validate_on_submit():
-        current_service.update_status(live=form.enabled.data)
-
         if form.enabled.data:
             flash("This service is now live. We’ll email the team to let them know.", "default_with_tick")
         else:
@@ -199,6 +197,8 @@ def org_member_make_service_live_decision(service_id):
                 ),
                 "default",
             )
+
+        current_service.update_status(live=form.enabled.data)
 
         return redirect(url_for(".organisation_dashboard", org_id=current_service.organisation_id))
 
