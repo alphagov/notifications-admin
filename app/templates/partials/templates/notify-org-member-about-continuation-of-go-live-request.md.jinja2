@@ -1,0 +1,46 @@
+Hi {{ current_user.name }}
+
+# Contact the team member that made this request to go live
+
+Service name: {{ current_service.name }}
+
+{% if check_if_unique and unclear_service_name %}
+You told us that:
+
+* this service might not be unique
+* the service name is not easy to understand
+{% elif check_if_unique %}
+You told us that this service might not be unique.
+{% else %}
+You told us that the service name is not easy to understand.
+{% endif %}
+
+Before you can accept or reject the request to go live, you need to speak to {{ current_service.go_live_user.name }}.
+
+Their email address is {{ current_service.go_live_user.email_address }}
+
+{% if check_if_unique %}
+# Find out if the service is unique
+
+{{ current_service.organisation.name }} cannot have more than one live service for the same thing.
+
+If this service is not unique, you must reject the request to go live.
+{% endif %}
+
+{% if unclear_service_name %}
+# Update the service name
+
+If the service is unique, you need to ask {{ current_service.go_live_user.name }} to:
+
+1. Go to the Settings page for their service.
+2. Select ‘Change’ on the ‘Service name’ row.
+3. Follow the guidance for naming their service.
+4. Tell you when they have done this.
+{% endif %}
+
+^ [Approve or reject the request to go live]( {{ url_for('.org_member_make_service_live_start', service_id=current_service.id, _external=True) }} )
+
+Thanks
+
+GOV.UK Notify team
+https://www.gov.uk/notify

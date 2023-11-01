@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from flask import url_for
 from freezegun import freeze_time
@@ -185,42 +187,79 @@ def test_post_org_member_make_service_live_service_name_error_summary(
 
 
 @pytest.mark.parametrize(
-    "data, query_args, expected_redirect_url",
+    "data, query_args, expected_redirect_url, expected_notify_calls",
     (
         (
             {"enabled": True},
             {"unique": "yes"},
             f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&unique=yes",
-        ),
-        (
-            {"enabled": True},
-            {"unique": "no"},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=ok&unique=no",
+            [],
         ),
         (
             {"enabled": True},
             {"unique": "unsure"},
             f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=ok&unique=unsure",
+            [
+                mock.call(
+                    service_id=SERVICE_ONE_ID,
+                    service_name="service one",
+                    to="test@user.gov.uk",
+                    check_if_unique=True,
+                    unclear_service_name=False,
+                )
+            ],
+        ),
+        (
+            {"enabled": True},
+            {"unique": "no"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?unique=no",
+            [],
         ),
         (
             {"enabled": False},
             {"unique": "yes"},
             f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=yes",
+            [
+                mock.call(
+                    service_id=SERVICE_ONE_ID,
+                    service_name="service one",
+                    to="test@user.gov.uk",
+                    check_if_unique=False,
+                    unclear_service_name=True,
+                )
+            ],
         ),
         (
             {"enabled": False},
             {"unique": "no"},
-            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=no",
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?unique=no",
+            [],
         ),
         (
             {"enabled": False},
             {"unique": "unsure"},
             f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=unsure",
+            [
+                mock.call(
+                    service_id=SERVICE_ONE_ID,
+                    service_name="service one",
+                    to="test@user.gov.uk",
+                    check_if_unique=True,
+                    unclear_service_name=True,
+                )
+            ],
         ),
     ),
 )
 def test_post_org_member_make_service_live_service_name(
-    mocker, client_request, service_one, organisation_one, data, query_args, expected_redirect_url
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    data,
+    query_args,
+    expected_redirect_url,
+    expected_notify_calls,
 ):
     user = create_user(
         id=sample_uuid(),
@@ -230,6 +269,7 @@ def test_post_org_member_make_service_live_service_name(
     organisation_one["can_approve_own_go_live_requests"] = True
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mock_notify = mocker.patch("app.organisations_client.notify_org_member_about_continuation_of_go_live_request")
 
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
@@ -244,6 +284,8 @@ def test_post_org_member_make_service_live_service_name(
         _expected_redirect=expected_redirect_url,
         _data=data,
     )
+
+    assert mock_notify.call_args_list == expected_notify_calls
 
 
 @pytest.mark.parametrize(*pytest_user_auth_combinations)

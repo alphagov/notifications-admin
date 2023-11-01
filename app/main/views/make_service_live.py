@@ -1,7 +1,7 @@
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 
-from app import current_service
+from app import current_service, organisations_client
 from app.main import main
 from app.main.forms import OnOffSettingForm, UniqueServiceForm
 from app.utils.user import user_has_permissions
@@ -73,8 +73,9 @@ def org_member_make_service_live_service_name(service_id):
 
     if "unique" not in request.args:
         return redirect(url_for(".org_member_make_service_live_start", service_id=current_service.id))
+    elif (unique := request.args.get("unique").lower()) == "no":
+        return redirect(url_for(".org_member_make_service_live_decision", service_id=current_service.id, unique=unique))
 
-    unique = request.args.get("unique").lower()
     form = OnOffSettingForm(
         truthy="Yes",
         falsey="No",
@@ -91,6 +92,14 @@ def org_member_make_service_live_service_name(service_id):
             return redirect(
                 url_for(".org_member_make_service_live_decision", service_id=current_service.id, **redirect_kwargs)
             )
+
+        organisations_client.notify_org_member_about_continuation_of_go_live_request(
+            service_id=current_service.id,
+            service_name=current_service.name,
+            to=current_user.email_address,
+            check_if_unique=unique == "unsure",
+            unclear_service_name=form.enabled.data is False,
+        )
 
         return redirect(
             url_for(".org_member_make_service_live_contact_user", service_id=current_service.id, **redirect_kwargs)
