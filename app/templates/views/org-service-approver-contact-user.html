@@ -1,17 +1,11 @@
 {% extends "withnav_template.html" %}
-{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "components/page-header.html" import page_header %}
-{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 
-{% set title = "Contact " + current_service.go_live_user.name %}
+{% set title = "Contact the team member that made the request to go live" %}
 
 {% block service_page_title %}
   {{ title }}
-{% endblock %}
-
-{% block backLink %}
-  {{ govukBackLink({ "href": back_link }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -42,14 +36,8 @@
       {% endif %}
 
       <p class="govuk-body">
-        Use the link in the ‘request to go-live’ email to approve the request after any changes have been made.
+        We have sent you an email with instructions.
       </p>
-
-      {{ govukButton({
-        "element": "a",
-        "text": "Finish",
-        "href": url_for('main.organisation_dashboard', org_id=organisation),
-      }) }}
 
     </div>
   </div>

@@ -445,11 +445,9 @@ def test_get_org_member_make_service_live_contact_user(
     )
 
     if expected_status == 200 and not expected_redirect:
-        assert "Contact Test User" in normalize_spaces(page.select_one("main").text)
-
-        finish = page.select_one("main a")
-        assert finish.text.strip() == "Finish"
-        assert finish.get("href") == f"/organisations/{ORGANISATION_ID}"
+        assert "Contact the team member that made the request to go live" in normalize_spaces(
+            page.select_one("main").text
+        )
 
 
 @pytest.mark.parametrize(*pytest_user_auth_combinations)

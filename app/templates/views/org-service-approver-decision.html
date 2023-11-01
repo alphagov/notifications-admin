@@ -24,7 +24,7 @@
         {% if cannot_approve %}
           <p class="govuk-body">You must reject the request to go live because this service is not unique.</p>
         {% else %}
-          <p class="govuk-body">You should check if the service meets your organisation’s requirements</p>
+          <p class="govuk-body">You should check if the service meets your organisation’s requirements.</p>
         {% endif %}
         {% call form_wrapper() %}
           {{ form.enabled(param_extensions={

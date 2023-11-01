@@ -172,7 +172,7 @@ def org_member_make_service_live_decision(service_id):
         name="What would you like to do?",
         truthy="Approve the request and make this service live",
         falsey="Reject the request",
-        choices_for_error_message="approve or reject",
+        choices_for_error_message="reject" if unique == "no" else "approve or reject",
     )
     if cannot_approve and form.enabled.data is True:
         form.enabled.data = None
