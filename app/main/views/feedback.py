@@ -45,7 +45,7 @@ def support():
                     )
                 )
 
-    return render_template("views/support/index.html", form=form)
+    return render_template("views/support/index.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/support/public")
@@ -155,6 +155,7 @@ def feedback(ticket_type):
         back_link=(url_for(".support") if severe is None else url_for(".triage", ticket_type=ticket_type)),
         show_status_page_banner=(ticket_type == PROBLEM_TICKET_TYPE),
         page_title=page_title,
+        error_summary_enabled=True,
     )
 
 
