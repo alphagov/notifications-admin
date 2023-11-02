@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pytz
-from flask import redirect, render_template, request, session, url_for
+from flask import current_app, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_utils.bank_holidays import BankHolidays
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
@@ -23,7 +23,6 @@ bank_holidays = BankHolidays(use_cached_holidays=True)
 @main.route("/support", methods=["GET", "POST"])
 @hide_from_search_engines
 def support():
-
     if current_user.is_authenticated:
         form = SupportType()
         if form.validate_on_submit():
@@ -73,6 +72,15 @@ def triage(ticket_type=PROBLEM_TICKET_TYPE):
 def feedback(ticket_type):
     form = FeedbackOrProblem()
 
+    ticket_type_names = {
+        GENERAL_TICKET_TYPE: {
+            "page_title": "Contact GOV.UK Notify support",
+            "ticket_subject": "General Notify Support",
+        },
+        PROBLEM_TICKET_TYPE: {"page_title": "Report a problem", "ticket_subject": "Reported Problem"},
+        QUESTION_TICKET_TYPE: {"page_title": "Ask a question or give feedback", "ticket_subject": "Question/Feedback"},
+    }
+
     if not form.feedback.data:
         form.feedback.data = session.pop("feedback_message", "")
 
@@ -110,8 +118,15 @@ def feedback(ticket_type):
             out_of_hours_emergency=out_of_hours_emergency,
         )
 
+        prefix = (
+            ""
+            if current_app.config["NOTIFY_ENVIRONMENT"] == "production"
+            else f"[env: {current_app.config['NOTIFY_ENVIRONMENT']}] "
+        )
+        subject = prefix + ticket_type_names[ticket_type]["ticket_subject"]
+
         ticket = NotifySupportTicket(
-            subject="Notify feedback",
+            subject=subject,
             message=feedback_msg,
             ticket_type=get_zendesk_ticket_type(ticket_type),
             notify_ticket_type=None,  # don't set technical/non-technical, we'll do this as part of triage on support
@@ -134,13 +149,8 @@ def feedback(ticket_type):
 
     if severe:
         page_title = "Tell us about the emergency"
-
     else:
-        page_title = {
-            GENERAL_TICKET_TYPE: "Contact GOV.UK Notify support",
-            PROBLEM_TICKET_TYPE: "Report a problem",
-            QUESTION_TICKET_TYPE: "Ask a question or give feedback",
-        }.get(ticket_type)
+        page_title = ticket_type_names[ticket_type]["page_title"]
 
     return render_template(
         "views/support/form.html",
@@ -154,7 +164,6 @@ def feedback(ticket_type):
 @main.route("/support/escalate", methods=["GET", "POST"])
 @hide_from_search_engines
 def bat_phone():
-
     if current_user.is_authenticated:
         return redirect(url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE))
 
@@ -173,7 +182,6 @@ def thanks():
 
 
 def in_business_hours():
-
     now = datetime.utcnow().replace(tzinfo=pytz.utc)
 
     if is_weekend(now) or is_bank_holiday(now):
