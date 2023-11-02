@@ -1715,7 +1715,7 @@ class Triage(StripWhitespaceForm):
             ("yes", "Yes"),
             ("no", "No"),
         ],
-        thing="yes or no",
+        thing="‘yes’ if you want us to contact you when we’re doing user research",
     )
 
 

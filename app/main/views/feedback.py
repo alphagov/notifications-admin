@@ -61,10 +61,7 @@ def triage(ticket_type=PROBLEM_TICKET_TYPE):
     form = Triage()
     if form.validate_on_submit():
         return redirect(url_for(".feedback", ticket_type=ticket_type, severe=form.severe.data))
-    return render_template(
-        "views/support/triage.html",
-        form=form,
-    )
+    return render_template("views/support/triage.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/support/<ticket_type:ticket_type>", methods=["GET", "POST"])
