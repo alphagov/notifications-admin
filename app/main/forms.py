@@ -1703,11 +1703,11 @@ class SupportRedirect(StripWhitespaceForm):
 
 
 class FeedbackOrProblem(StripWhitespaceForm):
+    feedback = TextAreaField("Your message", validators=[NotifyDataRequired(thing="your message")])
     name = GovukTextInputField("Name (optional)")
     email_address = make_email_address_field(
         label="Email address", gov_user=False, required=True, thing="your email address"
     )
-    feedback = TextAreaField("Your message", validators=[NotifyDataRequired(thing="your message")])
 
 
 class Triage(StripWhitespaceForm):
@@ -1717,7 +1717,7 @@ class Triage(StripWhitespaceForm):
             ("yes", "Yes"),
             ("no", "No"),
         ],
-        thing="‘yes’ if you want us to contact you when we’re doing user research",
+        thing="‘yes’ if it is an emergency",
     )
 
 
