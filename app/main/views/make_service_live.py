@@ -181,7 +181,7 @@ def org_member_make_service_live_decision(service_id):
         if form.enabled.data:
             flash("This service is now live. We’ll email the team to let them know.", "default_with_tick")
         else:
-            organisations_client.notify_service_member_of_rejected_request_to_go_live(
+            organisations_client.notify_service_member_of_rejected_go_live_request(
                 service_id=service_id,
                 service_member_name=current_service.go_live_user.name,
                 service_name=current_service.name,

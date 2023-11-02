@@ -151,7 +151,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
             data={"to": to, "service_name": service_name, "body": body},
         )
 
-    def notify_service_member_of_rejected_request_to_go_live(
+    def notify_service_member_of_rejected_go_live_request(
         self,
         service_id: str,
         service_member_name: str,
@@ -163,7 +163,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
     ):
         inset_reason = "\n".join(f"^ {line}" for line in rejection_reason.split("\n"))
         self.post(
-            url=f"/organisations/notify-service-member-of-rejected-request-to-go-live/{service_id}",
+            url=f"/organisations/notify-service-member-of-rejected-go-live-request/{service_id}",
             data={
                 "name": service_member_name,
                 "service_name": service_name,

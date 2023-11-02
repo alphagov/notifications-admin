@@ -574,7 +574,7 @@ def test_post_org_member_make_service_live_decision(
 ):
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
-    mock_notify = mocker.patch("app.organisations_client.notify_service_member_of_rejected_request_to_go_live")
+    mock_notify = mocker.patch("app.organisations_client.notify_service_member_of_rejected_go_live_request")
 
     client_request.login(platform_admin_user)
 
