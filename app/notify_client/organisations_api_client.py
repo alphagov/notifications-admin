@@ -138,16 +138,16 @@ class OrganisationsClient(NotifyAdminAPIClient):
             data=None,
         )
 
-    def notify_org_member_about_continuation_of_go_live_request(
+    def notify_org_member_about_next_steps_of_go_live_request(
         self, service_id, service_name, to, check_if_unique: bool, unclear_service_name: bool
     ):
         body = render_template(
-            "partials/templates/notify-org-member-about-continuation-of-go-live-request.md.jinja2",
+            "partials/templates/notify-org-member-about-next-steps-of-go-live-request.md.jinja2",
             check_if_unique=check_if_unique,
             unclear_service_name=unclear_service_name,
         )
         self.post(
-            url=f"/organisations/notify-org-member-about-continuation-of-go-live-request/{service_id}",
+            url=f"/organisations/notify-org-member-about-next-steps-of-go-live-request/{service_id}",
             data={"to": to, "service_name": service_name, "body": body},
         )
 

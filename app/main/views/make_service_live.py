@@ -93,7 +93,7 @@ def org_member_make_service_live_service_name(service_id):
                 url_for(".org_member_make_service_live_decision", service_id=current_service.id, **redirect_kwargs)
             )
 
-        organisations_client.notify_org_member_about_continuation_of_go_live_request(
+        organisations_client.notify_org_member_about_next_steps_of_go_live_request(
             service_id=current_service.id,
             service_name=current_service.name,
             to=current_user.email_address,

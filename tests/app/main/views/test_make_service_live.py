@@ -269,7 +269,7 @@ def test_post_org_member_make_service_live_service_name(
     organisation_one["can_approve_own_go_live_requests"] = True
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
-    mock_notify = mocker.patch("app.organisations_client.notify_org_member_about_continuation_of_go_live_request")
+    mock_notify = mocker.patch("app.organisations_client.notify_org_member_about_next_steps_of_go_live_request")
 
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
