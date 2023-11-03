@@ -656,6 +656,7 @@ def edit_service_template(service_id, template_id):
     form = form_objects[template.template_type](**template._template)
     if form.validate_on_submit():
         subject = form.subject.data if hasattr(form, "subject") else None
+        name = form.name.data if hasattr(form, "name") else None
 
         current_template_data = {
             "id": template.id,
@@ -663,12 +664,14 @@ def edit_service_template(service_id, template_id):
             "template_type": template.template_type,
         }
         new_template_data = {
-            "name": form.name.data,
             "content": form.template_content.data,
         }
 
         if subject:
             new_template_data["subject"] = subject
+
+        if name:
+            new_template_data["name"] = name
 
         new_template = get_template(
             current_template_data | new_template_data,

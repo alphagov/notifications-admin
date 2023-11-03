@@ -2534,10 +2534,10 @@ def test_should_not_allow_template_edits_without_correct_permission(
 
 
 @pytest.mark.parametrize(
-    "template_type",
+    "template_type, additional_data",
     (
-        "email",
-        "letter",
+        ("email", {"name": "new name"}),
+        ("letter", {}),
     ),
 )
 @pytest.mark.parametrize(
@@ -2574,6 +2574,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     old_content,
     expected_paragraphs,
     template_type,
+    additional_data,
 ):
     service_one["permissions"] += [template_type]
 
@@ -2584,12 +2585,11 @@ def test_should_show_interstitial_when_making_breaking_change(
 
     data = {
         "id": fake_uuid,
-        "name": "new name",
         "template_content": new_content,
         "template_type": "email",
         "subject": "reminder '\" <span> & ((thing))",
         "service": SERVICE_ONE_ID,
-    }
+    } | additional_data
 
     page = client_request.post(
         ".edit_service_template",
@@ -2607,12 +2607,14 @@ def test_should_show_interstitial_when_making_breaking_change(
     )
     assert [normalize_spaces(paragraph.text) for paragraph in page.select("main p")] == expected_paragraphs
 
-    for key, value in {
-        "name": "new name",
-        "subject": "reminder '\" <span> & ((thing))",
-        "template_content": new_content,
-        "confirm": "true",
-    }.items():
+    for key, value in (
+        {
+            "subject": "reminder '\" <span> & ((thing))",
+            "template_content": new_content,
+            "confirm": "true",
+        }
+        | additional_data
+    ).items():
         assert page.select_one(f"input[name={key}]")["value"] == value
 
     # BeautifulSoup returns the value attribute as unencoded, let’s make
