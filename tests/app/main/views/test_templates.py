@@ -624,6 +624,60 @@ def test_user_with_only_send_and_view_redirected_to_set_sender_for_one_off(
 @pytest.mark.parametrize(
     "permissions",
     (
+        pytest.param({"manage_templates"}),
+        pytest.param({"send_messages", "view_activity", "manage_settings"}, marks=pytest.mark.xfail),
+    ),
+)
+@pytest.mark.parametrize(
+    "template_type",
+    (
+        pytest.param("letter"),
+        pytest.param("email", marks=pytest.mark.xfail),
+        pytest.param("sms", marks=pytest.mark.xfail),
+    ),
+)
+def test_letter_page_has_rename_link(
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_get_service_letter_template,
+    single_letter_contact_block,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+    permissions,
+    template_type,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": create_template(template_id=fake_uuid, template_type=template_type)},
+    )
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
+    active_user_with_permissions["permissions"][SERVICE_ONE_ID] = permissions
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        "main.view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+    first_row = page.select_one("main > .govuk-grid-row")
+    folder_nav = first_row.select_one(".govuk-grid-column-five-sixths")
+    link = first_row.select_one(".govuk-grid-column-one-sixth a.govuk-link.folder-heading-manage-link")
+
+    assert normalize_spaces(folder_nav.text) == "Templates sample template"
+
+    assert normalize_spaces(link.text) == "Rename this template"
+    assert link["href"] == url_for(
+        "main.rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+
+@pytest.mark.parametrize(
+    "permissions",
+    (
         {"send_messages", "view_activity"},
         {"send_messages"},
         {"view_activity"},
