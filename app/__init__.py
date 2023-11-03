@@ -296,7 +296,7 @@ def load_user(user_id):
 def load_service_before_request():
     g.current_service = None
 
-    if "/static/" in request.url:
+    if request.path.startswith("/static/"):
         return
 
     if request.view_args:
@@ -318,7 +318,7 @@ def load_service_before_request():
 def load_organisation_before_request():
     g.current_organisation = None
 
-    if "/static/" in request.url:
+    if request.path.startswith("/static/"):
         return
 
     if request.view_args:

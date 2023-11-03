@@ -1,5 +1,5 @@
 import pytest
-from flask import Response, url_for
+from flask import Response, g, url_for
 from flask_wtf.csrf import CSRFError
 from notifications_python_client.errors import HTTPError
 
@@ -24,6 +24,41 @@ def test_load_service_before_request_handles_404(client_request, mocker):
     )
 
     get_service.assert_called_once_with("00000000-0000-0000-0000-000000000000")
+
+
+def test_load_service_before_request_ignores_static_appropriately(notify_admin, client_request, mock_get_service):
+    with notify_admin.test_client() as test_client:
+        test_client.get("/static/something")
+        assert g.current_service is None
+
+    with notify_admin.test_client() as test_client:
+        test_client.get("/services/00000000-0000-0000-0000-000000000000")
+        assert g.current_service is not None
+
+    # We should only ignore loading service if `/static/` appears at the start of the URL
+    with notify_admin.test_client() as test_client:
+        test_client.get(
+            "/services/00000000-0000-0000-0000-000000000000"
+            "/service-settings/letter-branding/set-name?temp-filename=letters/static/images/letter-template/my-logo.svg"
+        )
+        assert g.current_service is not None
+
+
+def test_load_organisation_before_request_ignores_static_appropriately(
+    notify_admin, client_request, mock_get_organisation
+):
+    with notify_admin.test_client() as test_client:
+        test_client.get("/static/something")
+        assert g.current_organisation is None
+
+    with notify_admin.test_client() as test_client:
+        test_client.get("/organisations/00000000-0000-0000-0000-000000000000")
+        assert g.current_organisation is not None
+
+    # We should only ignore loading org if `/static/` appears at the start of the URL
+    with notify_admin.test_client() as test_client:
+        test_client.get("/organisations/00000000-0000-0000-0000-000000000000?something=/bad/static/fragment")
+        assert g.current_organisation is not None
 
 
 @pytest.mark.parametrize(
