@@ -616,6 +616,10 @@ def abort_403_if_not_admin_user():
 @user_has_permissions("manage_templates")
 def rename_template(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
+    if template.template_type != "letter":
+        abort(404)
+
     form = RenameTemplateForm(obj=template)
     previous_page = url_for("main.view_template", service_id=current_service.id, template_id=template.id)
 

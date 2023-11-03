@@ -2378,6 +2378,29 @@ def test_name_required_to_rename_template(
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Cannot be empty"
 
 
+@pytest.mark.parametrize("template_type", ("email", "sms"))
+def test_only_letters_can_be_renamed_through_rename_page(
+    mocker,
+    client_request,
+    fake_uuid,
+    template_type,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": create_template(template_type=template_type)},
+    )
+
+    client_request.post(
+        ".rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": "",
+        },
+        _expected_status=404,
+    )
+
+
 @pytest.mark.parametrize(
     "service_id, template_id",
     (
