@@ -408,7 +408,6 @@ def copy_template(service_id, template_id):
     if request.method == "POST":
         return add_service_template(service_id, template["template_type"])
 
-    template["template_content"] = template["content"]
     template["name"] = _get_template_copy_name(template, current_service.all_templates)
     form = form_objects[template["template_type"]](**template)
 
@@ -652,29 +651,11 @@ def edit_service_template(service_id, template_id):
             )
         )
 
-    template._template["template_content"] = template.content
     form = form_objects[template.template_type](**template._template)
+
     if form.validate_on_submit():
-        subject = form.subject.data if hasattr(form, "subject") else None
-        name = form.name.data if hasattr(form, "name") else None
-
-        current_template_data = {
-            "id": template.id,
-            "reply_to_text": template.get_raw("reply_to_text"),
-            "template_type": template.template_type,
-        }
-        new_template_data = {
-            "content": form.template_content.data,
-        }
-
-        if subject:
-            new_template_data["subject"] = subject
-
-        if name:
-            new_template_data["name"] = name
-
         new_template = get_template(
-            current_template_data | new_template_data,
+            template._template | form.new_template_data,
             current_service,
         )
         template_change = template.compare_to(new_template)
@@ -690,7 +671,7 @@ def edit_service_template(service_id, template_id):
             service_api_client.update_service_template(
                 service_id=service_id,
                 template_id=template_id,
-                **new_template_data,
+                **form.new_template_data,
             )
         except HTTPError as e:
             if e.status_code == 400:
