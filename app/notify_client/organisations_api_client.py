@@ -161,14 +161,13 @@ class OrganisationsClient(NotifyAdminAPIClient):
         organisation_team_member_name: str,
         organisation_team_member_email: str,
     ):
-        inset_reason = "\n".join(f"^ {line}" for line in rejection_reason.split("\n"))
         self.post(
             url=f"/organisations/notify-service-member-of-rejected-go-live-request/{service_id}",
             data={
                 "name": service_member_name,
                 "service_name": service_name,
                 "organisation_name": organisation_name,
-                "reason": inset_reason,
+                "reason": rejection_reason,
                 "organisation_team_member_name": organisation_team_member_name,
                 "organisation_team_member_email": organisation_team_member_email,
             },
