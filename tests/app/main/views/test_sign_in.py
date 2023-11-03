@@ -334,3 +334,22 @@ def test_when_signing_in_as_invited_user_you_cannot_accept_an_invite_for_another
     assert mock_accept_invite.called is False
     assert mock_send_verify_code.called is False
     assert page.select_one(".banner-dangerous").text.strip() == "You cannot accept an invite for another person."
+
+
+def test_sign_in_again_handler_passes_next_url_with_params(client_request, fake_uuid):
+    client_request.logout()
+    client_request.get(
+        "main.service_verify_reply_to_address",
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        is_default=True,
+        _expected_redirect=url_for(
+            ".sign_in",
+            next=url_for(
+                ".service_verify_reply_to_address",
+                service_id=SERVICE_ONE_ID,
+                notification_id=fake_uuid,
+                is_default=True,
+            ),
+        ),
+    )
