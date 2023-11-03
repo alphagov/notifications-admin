@@ -2308,12 +2308,12 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
 
 @pytest.mark.parametrize("method", ("get", "post"))
 @pytest.mark.parametrize(
-    "type_of_template, expected_error",
+    "type_of_template, expected_status, expected_error",
     [
-        ("email", "Sending emails has been disabled for your service."),
-        ("sms", "Sending text messages has been disabled for your service."),
-        ("letter", "Sending letters has been disabled for your service."),
-        ("broadcast", "Sending broadcasts has been disabled for your service."),
+        ("email", 403, "Sending emails has been disabled for your service."),
+        ("sms", 403, "Sending text messages has been disabled for your service."),
+        ("letter", 404, None),
+        ("broadcast", 403, "Sending broadcasts has been disabled for your service."),
     ],
 )
 def test_should_not_allow_creation_of_a_template_without_correct_permission(
@@ -2322,6 +2322,7 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
     mocker,
     method,
     type_of_template,
+    expected_status,
     expected_error,
 ):
     service_one["permissions"] = []
@@ -2331,14 +2332,15 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
         service_id=SERVICE_ONE_ID,
         template_type=type_of_template,
         _follow_redirects=True,
-        _expected_status=403,
+        _expected_status=expected_status,
     )
-    assert page.select("main p")[0].text.strip() == expected_error
-    assert page.select_one(".govuk-back-link").text.strip() == "Back"
-    assert page.select(".govuk-back-link")[0]["href"] == url_for(
-        ".choose_template",
-        service_id=service_one["id"],
-    )
+    if expected_error:
+        assert page.select("main p")[0].text.strip() == expected_error
+        assert page.select_one(".govuk-back-link").text.strip() == "Back"
+        assert page.select(".govuk-back-link")[0]["href"] == url_for(
+            ".choose_template",
+            service_id=service_one["id"],
+        )
 
 
 @pytest.mark.parametrize(
@@ -2665,34 +2667,6 @@ def test_should_not_create_too_big_template(
         _expected_status=200,
     )
     assert "Content has a character count greater than the limit of 459" in page.text
-
-
-def test_should_not_create_letter_template_with_too_big_qr_code(
-    client_request,
-    mock_get_service_template,
-    mock_create_service_template_qr_code_too_big,
-    fake_uuid,
-    service_one,
-):
-    service_one["permissions"].append("letter")
-
-    page = client_request.post(
-        ".add_service_template",
-        service_id=SERVICE_ONE_ID,
-        template_type="letter",
-        _data={
-            "name": "new name",
-            "subject": "subject",
-            "template_content": "qr: " + ("content" * 100),
-            "template_type": "letter",
-            "service": SERVICE_ONE_ID,
-        },
-        _expected_status=200,
-    )
-    assert (
-        normalize_spaces(page.select_one(".error-message").text)
-        == "Cannot create a usable QR code - the link you entered is too long"
-    )
 
 
 def test_should_not_update_too_big_template(

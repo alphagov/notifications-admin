@@ -555,6 +555,9 @@ def delete_template_folder(service_id, template_folder_id):
 )
 @user_has_permissions("manage_templates")
 def add_service_template(service_id, template_type, template_folder_id=None):
+    if template_type == "letter":
+        abort(404)
+
     if template_type not in current_service.available_template_types:
         return redirect(
             url_for(
@@ -584,12 +587,6 @@ def add_service_template(service_id, template_type, template_folder_id=None):
                 and any(["character count greater than" in x for x in e.message["content"]])
             ):
                 form.template_content.errors.extend(e.message["content"])
-            elif (
-                e.status_code == 400
-                and "content" in e.message
-                and any(x == QR_CODE_TOO_LONG for x in e.message["content"])
-            ):
-                form.template_content.errors.append("Cannot create a usable QR code - the link you entered is too long")
             else:
                 raise e
         else:

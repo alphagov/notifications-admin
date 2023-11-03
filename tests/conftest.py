@@ -973,22 +973,6 @@ def mock_create_service_template_content_too_big(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_create_service_template_qr_code_too_big(mocker):
-    def _create(name, type_, content, service, subject=None, parent_folder_id=None):
-        json_mock = Mock(
-            return_value={
-                "message": {"content": ["qr-code-too-long"]},
-                "result": "error",
-            }
-        )
-        resp_mock = Mock(status_code=400, json=json_mock)
-        http_error = HTTPError(response=resp_mock, message={"content": ["qr-code-too-long"]})
-        raise http_error
-
-    return mocker.patch("app.service_api_client.create_service_template", side_effect=_create)
-
-
-@pytest.fixture(scope="function")
 def mock_update_service_template_400_content_too_big(mocker):
     def _update(*, service_id, template_id, name=None, content=None, subject=None):
         json_mock = Mock(
