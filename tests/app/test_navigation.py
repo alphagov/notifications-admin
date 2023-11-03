@@ -372,6 +372,7 @@ EXCLUDED_ENDPOINTS = set(
             "view_current_broadcast",
             "view_job_csv",
             "view_job",
+            "view_job_original_file_csv",
             "view_jobs",
             "view_letter_notification_as_preview",
             "view_letter_upload_as_preview",

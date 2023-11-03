@@ -132,6 +132,7 @@ const javascripts = () => {
     paths.src + 'javascripts/updateStatus.js',
     paths.src + 'javascripts/errorBanner.js',
     paths.src + 'javascripts/homepage.js',
+    paths.src + 'javascripts/removeInPresenceOf.js',
     paths.src + 'javascripts/main.js',
   ])
   .pipe(plugins.prettyerror())

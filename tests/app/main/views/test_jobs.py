@@ -111,7 +111,7 @@ def test_should_show_page_for_one_job(
     )
     assert csv_link.text == "Download this report (CSV)"
     assert page.select_one("span#time-left").text == "Data available for 7 days"
-
+    assert page.select_one("#job-notifications")
     assert normalize_spaces(page.select_one("tbody tr").text) == normalize_spaces(
         "07123456789 template content Delivered 1 January at 11:10am"
     )
@@ -445,6 +445,7 @@ def test_should_show_letter_job_with_banner_after_sending_after_1730(
 
 @freeze_time("2016-01-01T00:00:00.061258")
 def test_should_show_scheduled_job(
+    mocker,
     client_request,
     mock_get_service_template,
     mock_get_scheduled_job,
@@ -452,6 +453,14 @@ def test_should_show_scheduled_job(
     mock_get_notifications,
     fake_uuid,
 ):
+    mocker.patch(
+        "app.main.views.jobs.s3download",
+        return_value="""
+            phone number,name
+            +447700900986,John
+            +447700900986,Smith
+        """,
+    )
     page = client_request.get(
         "main.view_job",
         service_id=SERVICE_ONE_ID,
@@ -468,6 +477,66 @@ def test_should_show_scheduled_job(
     )
     assert page.select_one("form button").text.strip() == "Cancel sending"
     assert not page.select_one(".govuk-back-link")
+
+    recipients_table = page.select_one(
+        "[data-notify-module=remove-in-presence-of][data-target-element-id=job-notifications] "
+        '.fullscreen-content[data-notify-module="fullscreen-table"] table'
+    )
+    assert [normalize_spaces(column_heading.text) for column_heading in recipients_table.select("thead tr th")] == [
+        "Row in file1",
+        "phone number",
+        "name",
+    ]
+    assert [
+        [normalize_spaces(column.text) for column in row.select("td")] for row in recipients_table.select("tbody tr")
+    ] == [
+        ["2", "+447700900986", "John"],
+        ["3", "+447700900986", "Smith"],
+    ]
+
+    download_link = page.select_one(".table-show-more-link a")
+    assert normalize_spaces(download_link.text) == "Download this file (CSV)"
+    assert download_link["href"] == url_for(
+        "main.view_job_original_file_csv",
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+    )
+
+
+def test_should_download_scheduled_job(
+    mocker,
+    client_request,
+    mock_get_scheduled_job,
+    fake_uuid,
+):
+    original_file_contents = "phone number,name\n" "+447700900986,John\n" "+447700900986,Smith\n"
+    mocker.patch(
+        "app.main.views.jobs.s3download",
+        return_value=original_file_contents,
+    )
+    response = client_request.get_response(
+        "main.view_job_original_file_csv",
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+    )
+    assert response.data.decode("utf-8") == original_file_contents
+    assert response.headers["Content-Disposition"] == 'inline; filename="thisisatest.csv"'
+
+
+def test_should_not_download_unscheduled_job(
+    mocker,
+    client_request,
+    mock_get_job,
+    mock_get_service_data_retention,
+    mock_get_notifications,
+    fake_uuid,
+):
+    client_request.get(
+        "main.view_job_original_file_csv",
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+        _expected_status=404,
+    )
 
 
 def test_should_cancel_job(
