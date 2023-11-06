@@ -624,6 +624,60 @@ def test_user_with_only_send_and_view_redirected_to_set_sender_for_one_off(
 @pytest.mark.parametrize(
     "permissions",
     (
+        pytest.param({"manage_templates"}),
+        pytest.param({"send_messages", "view_activity", "manage_settings"}, marks=pytest.mark.xfail),
+    ),
+)
+@pytest.mark.parametrize(
+    "template_type",
+    (
+        pytest.param("letter"),
+        pytest.param("email", marks=pytest.mark.xfail),
+        pytest.param("sms", marks=pytest.mark.xfail),
+    ),
+)
+def test_letter_page_has_rename_link(
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_get_service_letter_template,
+    single_letter_contact_block,
+    active_user_with_permissions,
+    mocker,
+    fake_uuid,
+    permissions,
+    template_type,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": create_template(template_id=fake_uuid, template_type=template_type)},
+    )
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
+    active_user_with_permissions["permissions"][SERVICE_ONE_ID] = permissions
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        "main.view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+    first_row = page.select_one("main > .govuk-grid-row")
+    folder_nav = first_row.select_one(".govuk-grid-column-five-sixths")
+    link = first_row.select_one(".govuk-grid-column-one-sixth a.govuk-link.folder-heading-manage-link")
+
+    assert normalize_spaces(folder_nav.text) == "Templates sample template"
+
+    assert normalize_spaces(link.text) == "Rename this template"
+    assert link["href"] == url_for(
+        "main.rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+
+@pytest.mark.parametrize(
+    "permissions",
+    (
         {"send_messages", "view_activity"},
         {"send_messages"},
         {"view_activity"},
@@ -2254,12 +2308,12 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
 
 @pytest.mark.parametrize("method", ("get", "post"))
 @pytest.mark.parametrize(
-    "type_of_template, expected_error",
+    "type_of_template, expected_status, expected_error",
     [
-        ("email", "Sending emails has been disabled for your service."),
-        ("sms", "Sending text messages has been disabled for your service."),
-        ("letter", "Sending letters has been disabled for your service."),
-        ("broadcast", "Sending broadcasts has been disabled for your service."),
+        ("email", 403, "Sending emails has been disabled for your service."),
+        ("sms", 403, "Sending text messages has been disabled for your service."),
+        ("letter", 404, None),
+        ("broadcast", 403, "Sending broadcasts has been disabled for your service."),
     ],
 )
 def test_should_not_allow_creation_of_a_template_without_correct_permission(
@@ -2268,6 +2322,7 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
     mocker,
     method,
     type_of_template,
+    expected_status,
     expected_error,
 ):
     service_one["permissions"] = []
@@ -2277,14 +2332,15 @@ def test_should_not_allow_creation_of_a_template_without_correct_permission(
         service_id=SERVICE_ONE_ID,
         template_type=type_of_template,
         _follow_redirects=True,
-        _expected_status=403,
+        _expected_status=expected_status,
     )
-    assert page.select("main p")[0].text.strip() == expected_error
-    assert page.select_one(".govuk-back-link").text.strip() == "Back"
-    assert page.select(".govuk-back-link")[0]["href"] == url_for(
-        ".choose_template",
-        service_id=service_one["id"],
-    )
+    if expected_error:
+        assert page.select("main p")[0].text.strip() == expected_error
+        assert page.select_one(".govuk-back-link").text.strip() == "Back"
+        assert page.select(".govuk-back-link")[0]["href"] == url_for(
+            ".choose_template",
+            service_id=service_one["id"],
+        )
 
 
 @pytest.mark.parametrize(
@@ -2313,6 +2369,91 @@ def test_should_redirect_to_one_off_if_template_type_is_letter(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _expected_status=expected_status_code,
+    )
+
+
+def test_should_show_page_to_rename_template(
+    client_request,
+    mock_get_service_letter_template,
+    fake_uuid,
+):
+    page = client_request.get(
+        ".rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Rename template"
+    form = page.select_one("form[method=post]")
+    assert "action" not in form
+
+    assert form.select_one("input[name=name]")
+    assert normalize_spaces(form.select_one("label[for=name]").text) == "Template name"
+
+
+def test_should_show_rename_template(
+    client_request,
+    mock_get_service_letter_template,
+    mock_update_service_template,
+    fake_uuid,
+):
+    client_request.post(
+        ".rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": "new name",
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_update_service_template.assert_called_with(
+        template_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        name="new name",
+    )
+
+
+def test_name_required_to_rename_template(
+    client_request,
+    mock_get_service_letter_template,
+    fake_uuid,
+):
+    page = client_request.post(
+        ".rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": "",
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Cannot be empty"
+
+
+@pytest.mark.parametrize("template_type", ("email", "sms"))
+def test_only_letters_can_be_renamed_through_rename_page(
+    mocker,
+    client_request,
+    fake_uuid,
+    template_type,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": create_template(template_type=template_type)},
+    )
+
+    client_request.post(
+        ".rename_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": "",
+        },
+        _expected_status=404,
     )
 
 
@@ -2393,10 +2534,10 @@ def test_should_not_allow_template_edits_without_correct_permission(
 
 
 @pytest.mark.parametrize(
-    "template_type",
+    "template_type, additional_data",
     (
-        "email",
-        "letter",
+        ("email", {"name": "new name"}),
+        ("letter", {}),
     ),
 )
 @pytest.mark.parametrize(
@@ -2433,6 +2574,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     old_content,
     expected_paragraphs,
     template_type,
+    additional_data,
 ):
     service_one["permissions"] += [template_type]
 
@@ -2443,12 +2585,11 @@ def test_should_show_interstitial_when_making_breaking_change(
 
     data = {
         "id": fake_uuid,
-        "name": "new name",
         "template_content": new_content,
         "template_type": "email",
         "subject": "reminder '\" <span> & ((thing))",
         "service": SERVICE_ONE_ID,
-    }
+    } | additional_data
 
     page = client_request.post(
         ".edit_service_template",
@@ -2466,12 +2607,14 @@ def test_should_show_interstitial_when_making_breaking_change(
     )
     assert [normalize_spaces(paragraph.text) for paragraph in page.select("main p")] == expected_paragraphs
 
-    for key, value in {
-        "name": "new name",
-        "subject": "reminder '\" <span> & ((thing))",
-        "template_content": new_content,
-        "confirm": "true",
-    }.items():
+    for key, value in (
+        {
+            "subject": "reminder '\" <span> & ((thing))",
+            "template_content": new_content,
+            "confirm": "true",
+        }
+        | additional_data
+    ).items():
         assert page.select_one(f"input[name={key}]")["value"] == value
 
     # BeautifulSoup returns the value attribute as unencoded, let’s make
@@ -2526,34 +2669,6 @@ def test_should_not_create_too_big_template(
         _expected_status=200,
     )
     assert "Content has a character count greater than the limit of 459" in page.text
-
-
-def test_should_not_create_letter_template_with_too_big_qr_code(
-    client_request,
-    mock_get_service_template,
-    mock_create_service_template_qr_code_too_big,
-    fake_uuid,
-    service_one,
-):
-    service_one["permissions"].append("letter")
-
-    page = client_request.post(
-        ".add_service_template",
-        service_id=SERVICE_ONE_ID,
-        template_type="letter",
-        _data={
-            "name": "new name",
-            "subject": "subject",
-            "template_content": "qr: " + ("content" * 100),
-            "template_type": "letter",
-            "service": SERVICE_ONE_ID,
-        },
-        _expected_status=200,
-    )
-    assert (
-        normalize_spaces(page.select_one(".error-message").text)
-        == "Cannot create a usable QR code - the link you entered is too long"
-    )
 
 
 def test_should_not_update_too_big_template(

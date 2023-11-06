@@ -307,6 +307,7 @@
     "/services/<uuid:service_id>/templates/<uuid:template_id>/edit",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/edit-postage",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/redact",
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/rename",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/set-template-sender",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<filetype>",

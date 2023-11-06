@@ -42,6 +42,7 @@ from app.main.forms import (
     LetterTemplateLanguagesForm,
     LetterTemplatePostageForm,
     PDFUploadForm,
+    RenameTemplateForm,
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
@@ -407,7 +408,6 @@ def copy_template(service_id, template_id):
     if request.method == "POST":
         return add_service_template(service_id, template["template_type"])
 
-    template["template_content"] = template["content"]
     template["name"] = _get_template_copy_name(template, current_service.all_templates)
     form = form_objects[template["template_type"]](**template)
 
@@ -554,6 +554,9 @@ def delete_template_folder(service_id, template_folder_id):
 )
 @user_has_permissions("manage_templates")
 def add_service_template(service_id, template_type, template_folder_id=None):
+    if template_type == "letter":
+        abort(404)
+
     if template_type not in current_service.available_template_types:
         return redirect(
             url_for(
@@ -583,12 +586,6 @@ def add_service_template(service_id, template_type, template_folder_id=None):
                 and any(["character count greater than" in x for x in e.message["content"]])
             ):
                 form.template_content.errors.extend(e.message["content"])
-            elif (
-                e.status_code == 400
-                and "content" in e.message
-                and any(x == QR_CODE_TOO_LONG for x in e.message["content"])
-            ):
-                form.template_content.errors.append("Cannot create a usable QR code - the link you entered is too long")
             else:
                 raise e
         else:
@@ -611,6 +608,33 @@ def abort_403_if_not_admin_user():
         abort(403)
 
 
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/rename", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def rename_template(service_id, template_id):
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
+    if template.template_type != "letter":
+        abort(404)
+
+    form = RenameTemplateForm(obj=template)
+    previous_page = url_for("main.view_template", service_id=current_service.id, template_id=template.id)
+
+    if form.validate_on_submit():
+        service_api_client.update_service_template(
+            service_id=service_id,
+            template_id=template_id,
+            name=form.name.data,
+        )
+        return redirect(previous_page)
+
+    return render_template(
+        "views/rename-template.html",
+        form=form,
+        back_link=previous_page,
+        error_summary_enabled=True,
+    )
+
+
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def edit_service_template(service_id, template_id):
@@ -627,26 +651,11 @@ def edit_service_template(service_id, template_id):
             )
         )
 
-    template._template["template_content"] = template.content
     form = form_objects[template.template_type](**template._template)
+
     if form.validate_on_submit():
-        subject = form.subject.data if hasattr(form, "subject") else None
-
-        current_template_data = {
-            "id": template.id,
-            "reply_to_text": template.get_raw("reply_to_text"),
-            "template_type": template.template_type,
-        }
-        new_template_data = {
-            "name": form.name.data,
-            "content": form.template_content.data,
-        }
-
-        if subject:
-            new_template_data["subject"] = subject
-
         new_template = get_template(
-            current_template_data | new_template_data,
+            template._template | form.new_template_data,
             current_service,
         )
         template_change = template.compare_to(new_template)
@@ -662,7 +671,7 @@ def edit_service_template(service_id, template_id):
             service_api_client.update_service_template(
                 service_id=service_id,
                 template_id=template_id,
-                **new_template_data,
+                **form.new_template_data,
             )
         except HTTPError as e:
             if e.status_code == 400:

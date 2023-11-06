@@ -29,7 +29,7 @@
     </div>
   {% else %}
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full">
+      <div class="{% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %} govuk-grid-column-five-sixths {% else %} govuk-grid-column-full {% endif %}">
         {{ folder_path(
           folders=current_service.get_template_path(template._template),
           service=current_service,
@@ -37,6 +37,11 @@
           current_user=current_user
         ) }}
       </div>
+      {% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %}
+        <div class="govuk-grid-column-one-sixth">
+          <a href="{{ url_for('main.rename_template', service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-manage-link">Rename<span class="govuk-visually-hidden"> this template</span></a>
+        </div>
+      {% endif %}
     </div>
   {% endif %}
 

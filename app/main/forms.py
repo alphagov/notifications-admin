@@ -1430,15 +1430,38 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
                 return message
 
 
-class BaseTemplateForm(StripWhitespaceForm):
+class TemplateNameMixin:
     name = GovukTextInputField("Template name", validators=[DataRequired(message="Cannot be empty")])
 
+
+class RenameTemplateForm(StripWhitespaceForm, TemplateNameMixin):
+    pass
+
+
+class BaseTemplateForm(StripWhitespaceForm):
     template_content = TextAreaField(
         "Message", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
     )
 
+    def __init__(self, *args, **kwargs):
+        if "content" in kwargs:
+            kwargs["template_content"] = kwargs["content"]
+        super().__init__(*args, **kwargs)
 
-class SMSTemplateForm(BaseTemplateForm):
+    @property
+    def new_template_data(self):
+        new_template_data = {"content": self.template_content.data}
+
+        if hasattr(self, "subject"):
+            new_template_data["subject"] = self.subject.data
+
+        if hasattr(self, "name"):
+            new_template_data["name"] = self.name.data
+
+        return new_template_data
+
+
+class SMSTemplateForm(BaseTemplateForm, TemplateNameMixin):
     def validate_template_content(self, field):
         OnlySMSCharacters(template_type="sms")(None, field)
 
@@ -1486,11 +1509,11 @@ class LetterAddressForm(StripWhitespaceForm):
             )
 
 
-class EmailTemplateForm(BaseTemplateForm):
+class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
     subject = TextAreaField("Subject", validators=[DataRequired(message="Cannot be empty")])
 
 
-class LetterTemplateForm(EmailTemplateForm):
+class LetterTemplateForm(BaseTemplateForm):
     subject = TextAreaField("Main heading", validators=[DataRequired(message="Cannot be empty")])
 
     template_content = TextAreaField(

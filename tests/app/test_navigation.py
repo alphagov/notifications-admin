@@ -251,6 +251,7 @@ EXCLUDED_ENDPOINTS = set(
             "remove_broadcast_area",
             "remove_user_from_organisation",
             "remove_user_from_service",
+            "rename_template",
             "request_to_go_live",
             "resend_email_link",
             "resend_email_verification",
