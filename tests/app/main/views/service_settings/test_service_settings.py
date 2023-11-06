@@ -912,6 +912,19 @@ def test_should_not_allow_duplicate_service_names(
     assert "This service name is already in use" in page.text
 
 
+def test_service_name_change_doesnt_suppress_api_errors(client_request, mocker, service_one):
+    mocker.patch(
+        "app.main.views.service_settings.index.service_api_client.update_service",
+        side_effect=HTTPError(response=Mock(status_code=500)),
+    )
+    client_request.post(
+        "main.service_name_change",
+        service_id=SERVICE_ONE_ID,
+        _data={"name": "SERVICE TWO"},
+        _expected_status=500,
+    )
+
+
 def test_should_redirect_after_service_name_change(
     client_request,
     mock_update_service,
