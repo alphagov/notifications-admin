@@ -90,6 +90,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "contact_link",
             "created_by",
             "count_as_live",
+            "custom_email_sender_name",
             "email_branding",
             "free_sms_fragment_limit",
             "go_live_at",
@@ -505,6 +506,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
         elif http_error.message.get("name"):
             return "This service name is already in use - enter a unique name"
+
+        return None
+
+    @classmethod
+    def parse_custom_email_sender_name_http_error(cls, http_error):
+        """Inspect the HTTPError from a update_service call and return a human-friendly error message"""
+        if http_error.message.get("email_sender_local_part"):
+            return "Sender name cannot include characters from a non-Latin alphabet"
 
         return None
 

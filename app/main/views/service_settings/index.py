@@ -54,6 +54,7 @@ from app.main.forms import (
     ServiceBroadcastNetworkForm,
     ServiceContactDetailsForm,
     ServiceEditInboundNumberForm,
+    ServiceEmailSenderForm,
     ServiceLetterContactBlockForm,
     ServiceReplyToEmailForm,
     ServiceSmsSenderForm,
@@ -119,6 +120,29 @@ def service_name_change(service_id):
 
     return render_template(
         "views/service-settings/name.html",
+        form=form,
+        organisation_type=current_service.organisation_type,
+        error_summary_enabled=True,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/email-sender", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_email_sender_change(service_id):
+    form = ServiceEmailSenderForm(
+        use_custom_email_sender_name=current_service.custom_email_sender_name is not None,
+        custom_email_sender_name=current_service.custom_email_sender_name,
+    )
+
+    if form.validate_on_submit():
+        new_sender = form.custom_email_sender_name.data if form.use_custom_email_sender_name.data else None
+
+        current_service.update(custom_email_sender_name=new_sender)
+
+        return redirect(url_for(".service_settings", service_id=service_id))
+
+    return render_template(
+        "views/service-settings/custom-email-sender-name.html",
         form=form,
         organisation_type=current_service.organisation_type,
         error_summary_enabled=True,
