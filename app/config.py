@@ -1,13 +1,6 @@
 import json
 import os
 
-if os.environ.get("VCAP_APPLICATION"):
-    # on cloudfoundry, config is a json blob in VCAP_APPLICATION - unpack it, and populate
-    # standard environment variables from it
-    from app.cloudfoundry_config import extract_cloudfoundry_config
-
-    extract_cloudfoundry_config()
-
 
 class Config:
     ADMIN_CLIENT_SECRET = os.environ.get("ADMIN_CLIENT_SECRET")
