@@ -638,7 +638,9 @@ def test_should_show_service_name_with_no_prefixing(
     [
         ("", "Error: Enter a service name"),
         (".", "Service name must include at least 2 letters or numbers"),
-        ("a" * 256, "Service name cannot be longer than 255 characters"),
+        ("GOV.UK Ειδοποίηση", "Service name cannot include characters from a non-Latin alphabet"),
+        # under the 255 db col length, but when combined with normalised service name to make an email, it's too long
+        ("a" * 150 + " " * 100 + "a", "Service name cannot be longer than 143 characters"),
     ],
 )
 def test_service_name_change_fails_if_new_name_fails_validation(
