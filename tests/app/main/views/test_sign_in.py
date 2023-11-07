@@ -338,18 +338,7 @@ def test_when_signing_in_as_invited_user_you_cannot_accept_an_invite_for_another
 
 def test_sign_in_again_handler_passes_next_url_with_params(client_request, fake_uuid):
     client_request.logout()
-    client_request.get(
-        "main.service_verify_reply_to_address",
-        service_id=SERVICE_ONE_ID,
-        notification_id=fake_uuid,
-        is_default=True,
-        _expected_redirect=url_for(
-            ".sign_in",
-            next=url_for(
-                ".service_verify_reply_to_address",
-                service_id=SERVICE_ONE_ID,
-                notification_id=fake_uuid,
-                is_default=True,
-            ),
-        ),
+    url = url_for(
+        "main.service_verify_reply_to_address", service_id=SERVICE_ONE_ID, notification_id=fake_uuid, is_default=True
     )
+    client_request.get_url(url, _expected_redirect=url_for(".sign_in", next=url))
