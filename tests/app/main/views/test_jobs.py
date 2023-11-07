@@ -88,7 +88,6 @@ def test_should_show_page_for_one_job(
     expected_api_call,
     user,
 ):
-
     page = client_request.get("main.view_job", service_id=SERVICE_ONE_ID, job_id=fake_uuid, status=status_argument)
 
     assert page.select_one("h1").text.strip() == "thisisatest.csv"
@@ -136,7 +135,6 @@ def test_should_show_page_for_one_job_with_flexible_data_retention(
     mock_get_service_data_retention,
     fake_uuid,
 ):
-
     mock_get_service_data_retention.side_effect = [[{"days_of_retention": 10, "notification_type": "sms"}]]
     page = client_request.get("main.view_job", service_id=SERVICE_ONE_ID, job_id=fake_uuid, status="delivered")
 

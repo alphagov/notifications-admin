@@ -175,7 +175,6 @@ def cancel_letter_job(service_id, job_id):
 @json_updates.route("/services/<uuid:service_id>/jobs/<uuid:job_id>.json")
 @user_has_permissions()
 def view_job_updates(service_id, job_id):
-
     job = Job.from_id(job_id, service_id=service_id)
 
     return jsonify(**get_job_partials(job))
@@ -403,13 +402,11 @@ def get_job_partials(job):
 
 
 def add_preview_of_content_to_notifications(notifications):
-
     for notification in notifications:
         yield dict(preview_of_content=get_preview_of_content(notification), **notification)
 
 
 def get_preview_of_content(notification):
-
     if notification["template"].get("redact_personalisation"):
         notification["personalisation"] = {}
 

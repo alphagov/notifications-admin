@@ -4,7 +4,6 @@ from app.main.forms import get_placeholder_form_instance
 
 
 def test_form_class_not_mutated(notify_admin):
-
     with notify_admin.test_request_context(method="POST", data={"placeholder_value": ""}):
         form1 = get_placeholder_form_instance("name", {}, "sms")
         form2 = get_placeholder_form_instance("city", {}, "sms")

@@ -83,9 +83,7 @@ govuk-frontend-jinja==2.3.0
 greenlet==1.1.2
     # via eventlet
 gunicorn[eventlet]==21.2.0
-    # via
-    #   -r requirements.in
-    #   gunicorn
+    # via -r requirements.in
 humanize==4.4.0
     # via -r requirements.in
 idna==3.3
@@ -202,9 +200,7 @@ s3transfer==0.6.0
 segno==1.5.2
     # via notifications-utils
 sentry-sdk[flask]==1.32.0
-    # via
-    #   -r requirements.in
-    #   sentry-sdk
+    # via -r requirements.in
 shapely==1.8.4
     # via notifications-utils
 six==1.16.0

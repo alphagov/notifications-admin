@@ -10,7 +10,6 @@ from app.utils.user import user_has_permissions
 @main.route("/services/<uuid:service_id>/make-service-live", methods=["GET", "POST"])
 @user_has_permissions(allow_org_user=True)
 def make_service_live(service_id):
-
     if current_service.live:
         return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
 

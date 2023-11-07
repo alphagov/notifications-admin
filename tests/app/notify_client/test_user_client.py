@@ -17,7 +17,6 @@ def test_client_gets_all_users_for_service(
     mocker,
     fake_uuid,
 ):
-
     user_api_client.max_failed_login_count = 99  # doesn't matter for this test
     mock_get = mocker.patch(
         "app.notify_client.user_api_client.UserApiClient.get",
@@ -36,7 +35,6 @@ def test_client_gets_all_users_for_service(
 
 
 def test_client_uses_correct_find_by_email(mocker, api_user_active):
-
     expected_url = "/user/email"
     expected_data = {"email": api_user_active["email_address"]}
 
@@ -160,7 +158,6 @@ def test_returns_value_from_cache(
     expected_api_calls,
     expected_cache_set_calls,
 ):
-
     mock_redis_get = mocker.patch(
         "app.extensions.RedisClient.get",
         return_value=cache_value,
@@ -245,7 +242,6 @@ def test_add_user_to_service_calls_correct_endpoint_and_deletes_keys_from_cache(
 
 
 def test_get_webauthn_credentials_for_user(mocker, webauthn_credential, fake_uuid):
-
     mock_get = mocker.patch(
         "app.notify_client.user_api_client.UserApiClient.get", return_value={"data": [webauthn_credential]}
     )

@@ -43,7 +43,6 @@ class BaseUser(JSONModel):
 
 
 class User(BaseUser, UserMixin):
-
     MAX_FAILED_LOGIN_COUNT = 10
 
     ALLOWED_PROPERTIES = {
@@ -472,7 +471,6 @@ class User(BaseUser, UserMixin):
 
 
 class InvitedUser(BaseUser):
-
     ALLOWED_PROPERTIES = {
         "id",
         "service",
@@ -601,7 +599,6 @@ class InvitedUser(BaseUser):
 
 
 class InvitedOrgUser(BaseUser):
-
     ALLOWED_PROPERTIES = {
         "id",
         "organisation",
@@ -692,7 +689,6 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 class Users(ModelList):
-
     client_method = user_api_client.get_users_for_service
     model = User
 
@@ -714,7 +710,6 @@ class OrganisationUsers(Users):
 
 
 class InvitedUsers(Users):
-
     client_method = invite_api_client.get_invites_for_service
     model = InvitedUser
 

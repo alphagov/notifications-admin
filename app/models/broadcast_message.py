@@ -24,7 +24,6 @@ ESTIMATED_AREA_OF_LARGEST_UK_COUNTY = broadcast_area_libraries.get_areas(["ctyua
 
 
 class BroadcastMessage(JSONModel):
-
     ALLOWED_PROPERTIES = {
         "id",
         "service_id",
@@ -308,7 +307,6 @@ class BroadcastMessage(JSONModel):
 
 
 class BroadcastMessages(ModelList):
-
     model = BroadcastMessage
     client_method = broadcast_message_api_client.get_broadcast_messages
 

@@ -16,7 +16,6 @@ from app.notify_client.organisations_api_client import organisations_client
 
 
 class Organisation(JSONModel):
-
     TYPE_CENTRAL = "central"
     TYPE_LOCAL = "local"
     TYPE_NHS_CENTRAL = "nhs_central"
@@ -109,7 +108,6 @@ class Organisation(JSONModel):
         )
 
     def __init__(self, _dict):
-
         super().__init__(_dict)
 
         if self._dict == {}:

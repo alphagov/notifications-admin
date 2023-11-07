@@ -171,7 +171,6 @@ def test_generate_notifications_csv_calls_twice_if_next_link(
     mocker,
     job_id,
 ):
-
     mocker.patch(
         "app.s3_client.s3_csv_client.s3download",
         return_value="""

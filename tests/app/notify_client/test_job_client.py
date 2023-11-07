@@ -33,7 +33,6 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
 
 
 def test_client_schedules_job(mocker, fake_uuid):
-
     mocker.patch("app.notify_client.current_user", id="1")
 
     mock_post = mocker.patch("app.notify_client.job_api_client.JobApiClient.post")
@@ -46,7 +45,6 @@ def test_client_schedules_job(mocker, fake_uuid):
 
 
 def test_client_links_job_to_contact_list(mocker, fake_uuid):
-
     mocker.patch("app.notify_client.current_user", id="1")
 
     contact_list_id = uuid.uuid4()

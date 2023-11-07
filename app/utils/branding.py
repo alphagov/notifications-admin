@@ -5,7 +5,6 @@ from app.models.branding import EmailBranding, LetterBranding
 
 def get_email_choices(service):
     if service.can_use_govuk_branding:
-
         if not service.email_branding.is_govuk:
             yield ("govuk", "GOV.UK")
 
@@ -26,7 +25,6 @@ def get_email_choices(service):
 
 
 def get_letter_choices(service):
-
     if service.is_nhs and not service.letter_branding.is_nhs:
         yield (LetterBranding.NHS_ID, "NHS")
 

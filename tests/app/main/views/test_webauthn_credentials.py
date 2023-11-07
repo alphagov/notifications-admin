@@ -10,7 +10,6 @@ from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 
 @pytest.fixture
 def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client_request):
-
     _set_up_webauthn_session(fake_uuid, client_request)
 
     credential_id = WebAuthnCredential(webauthn_credential).to_credential_data().credential_id
@@ -390,7 +389,6 @@ def test_verify_webauthn_login_signs_user_in_doesnt_sign_user_in_if_api_rejects(
     mocker,
     platform_admin_user,
 ):
-
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": platform_admin_user["id"], "email": platform_admin_user["email_address"]}
     client_request.login(platform_admin_user)

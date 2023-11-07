@@ -11,7 +11,6 @@ from tests.conftest import create_email_branding, normalize_spaces
 
 
 def test_email_branding_page_shows_full_branding_list(client_request, platform_admin_user, mock_get_all_email_branding):
-
     client_request.login(platform_admin_user)
     page = client_request.get(".email_branding")
 

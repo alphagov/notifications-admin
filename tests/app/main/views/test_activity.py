@@ -365,7 +365,6 @@ def test_shows_message_when_no_notifications(
     mock_get_notifications_with_no_notifications,
     mock_get_no_api_keys,
 ):
-
     page = client_request.get(
         "main.view_notifications",
         service_id=SERVICE_ONE_ID,

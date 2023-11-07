@@ -132,7 +132,6 @@ def uploaded_letters(service_id, letter_print_day):
 
 
 def add_preview_of_content_uploaded_letters(notifications):
-
     for notification in notifications:
         yield dict(
             preview_of_content=", ".join(notification.pop("to").splitlines()),
@@ -376,7 +375,7 @@ def upload_contact_list(service_id):
             )
         except (UnicodeDecodeError, BadZipFile, XLRDError):
             flash(f"Could not read {form.file.data.filename}. Try using a different file format.")
-        except (XLDateError):
+        except XLDateError:
             flash(
                 (
                     "{} contains numbers or dates that Notify cannot understand. "
@@ -402,7 +401,6 @@ def upload_contact_list(service_id):
 )
 @user_has_permissions("send_messages")
 def check_contact_list(service_id, upload_id):
-
     form = CsvUploadForm()
 
     contents = ContactList.download(service_id, upload_id)

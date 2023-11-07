@@ -153,7 +153,6 @@ def polygons_and_simplified_polygons(feature):
 
 
 def estimate_number_of_smartphones_in_area(country_or_ward_code):
-
     if country_or_ward_code in CITY_OF_LONDON.WARDS:
         # We don’t have population figures for wards of the City of
         # London. We’ll leave it empty here and estimate on the fly

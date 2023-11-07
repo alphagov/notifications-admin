@@ -4,7 +4,6 @@ from flask import request, url_for
 
 
 class Navigation:
-
     mapping = {}
     selected_class = "selected"
 
@@ -33,7 +32,6 @@ class Navigation:
 
 
 class HeaderNavigation(Navigation):
-
     mapping = {
         "support": {
             "bat_phone",
@@ -186,7 +184,6 @@ class HeaderNavigation(Navigation):
 
 
 class MainNavigation(Navigation):
-
     mapping = {
         "dashboard": {
             "broadcast_tour",
@@ -361,7 +358,6 @@ class MainNavigation(Navigation):
 
 
 class CaseworkNavigation(Navigation):
-
     mapping = {
         "dashboard": {
             "broadcast_tour",
@@ -397,7 +393,6 @@ class CaseworkNavigation(Navigation):
 
 
 class OrgNavigation(Navigation):
-
     mapping = {
         "dashboard": {
             "organisation_dashboard",

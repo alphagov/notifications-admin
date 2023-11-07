@@ -443,7 +443,6 @@ def test_should_validate_guestlist_items(
     client_request,
     mock_update_guest_list,
 ):
-
     page = client_request.post(
         "main.guest_list",
         service_id=SERVICE_ONE_ID,

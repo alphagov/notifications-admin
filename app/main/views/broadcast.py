@@ -430,7 +430,6 @@ def view_broadcast(service_id, broadcast_message_id):
 @user_has_permissions("approve_broadcasts", restrict_admin_usage=True)
 @service_has_permission("broadcast")
 def approve_broadcast_message(service_id, broadcast_message_id):
-
     broadcast_message = BroadcastMessage.from_id(
         broadcast_message_id,
         service_id=current_service.id,
@@ -486,7 +485,6 @@ def approve_broadcast_message(service_id, broadcast_message_id):
 @user_has_permissions("create_broadcasts", "approve_broadcasts", restrict_admin_usage=True)
 @service_has_permission("broadcast")
 def reject_broadcast_message(service_id, broadcast_message_id):
-
     broadcast_message = BroadcastMessage.from_id(
         broadcast_message_id,
         service_id=current_service.id,

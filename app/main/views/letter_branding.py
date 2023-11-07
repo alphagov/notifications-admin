@@ -136,7 +136,6 @@ def create_letter_branding(logo=None):
 
     if details_form_submitted and letter_branding_details_form.validate_on_submit():
         if temporary_logo_key:
-
             try:
                 permanent_logo_key = logo_client.save_permanent_logo(
                     temporary_logo_key,

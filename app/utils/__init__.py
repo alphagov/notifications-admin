@@ -24,7 +24,6 @@ NOTIFICATION_TYPES = ["sms", "email", "letter", "broadcast"]
 
 
 def service_has_permission(permission):
-
     from app import current_service
 
     def wrap(func):
@@ -40,7 +39,6 @@ def service_has_permission(permission):
 
 
 def service_belongs_to_org_type(org_type):
-
     from app import current_service
 
     def wrap(func):

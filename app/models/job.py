@@ -20,7 +20,6 @@ from app.utils.time import is_less_than_days_ago
 
 
 class Job(JSONModel):
-
     ALLOWED_PROPERTIES = {
         "id",
         "service",
@@ -142,7 +141,6 @@ class Job(JSONModel):
 
     @property
     def letter_job_can_be_cancelled(self):
-
         if self.template["template_type"] != "letter":
             return False
 

@@ -280,7 +280,6 @@ def test_example_spreadsheet(
     mock_get_service_template_with_placeholders_same_as_recipient,
     fake_uuid,
 ):
-
     page = client_request.get(".send_messages", service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
     assert normalize_spaces(page.select_one("tbody tr").text) == "1 phone number name date"
@@ -472,7 +471,6 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
     mock_get_jobs,
     fake_uuid,
 ):
-
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -517,7 +515,6 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
     mock_get_jobs,
     fake_uuid,
 ):
-
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -885,7 +882,6 @@ def test_upload_csv_file_with_missing_columns_shows_error(
     file_contents,
     expected_error,
 ):
-
     mocker.patch("app.main.views.send.s3download", return_value=file_contents)
 
     page = client_request.post(
@@ -911,7 +907,6 @@ def test_upload_csv_invalid_extension(
     mock_get_service_template,
     fake_uuid,
 ):
-
     page = client_request.post(
         "main.send_messages",
         service_id=service_one["id"],
@@ -931,7 +926,6 @@ def test_upload_csv_size_too_big(
     mock_get_service_template,
     fake_uuid,
 ):
-
     page = client_request.post(
         "main.send_messages",
         service_id=service_one["id"],
@@ -1006,7 +1000,6 @@ def test_upload_valid_csv_shows_preview_and_table(
     expected_recipient,
     expected_message,
 ):
-
     with client_request.session_transaction() as session:
         session["file_uploads"] = {fake_uuid: {"template_id": fake_uuid}}
 
@@ -1114,7 +1107,6 @@ def test_upload_valid_csv_only_sets_meta_if_filename_known(
     mock_template_preview,
     fake_uuid,
 ):
-
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -1151,7 +1143,6 @@ def test_show_all_columns_if_there_are_duplicate_recipient_columns(
     fake_uuid,
     mock_s3_get_metadata,
 ):
-
     with client_request.session_transaction() as session:
         session["file_uploads"] = {fake_uuid: {"template_id": fake_uuid}}
 
@@ -1201,7 +1192,6 @@ def test_404_for_previewing_a_row_out_of_range(
     row_index,
     expected_status,
 ):
-
     with client_request.session_transaction() as session:
         session["file_uploads"] = {fake_uuid: {"template_id": fake_uuid}}
 
@@ -1981,7 +1971,6 @@ def test_send_one_off_populates_field_from_session(
     mock_get_service_template_with_placeholders,
     fake_uuid,
 ):
-
     with client_request.session_transaction() as session:
         session["recipient"] = None
         session["placeholders"] = {}
@@ -2533,7 +2522,6 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     mock_s3_upload,
     mocker,
 ):
-
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="\n".join(["phone number"] + [f"07700 9007{final_two:02d}" for final_two in range(0, 53)]),
@@ -3259,7 +3247,6 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     fake_uuid,
     mock_s3_get_metadata,
 ):
-
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="\n".join(
@@ -3352,7 +3339,6 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     mock_get_jobs,
     mock_s3_get_metadata,
 ):
-
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="\n".join(["address_line_1,address_line_2,foo"] + ["First Lastname,1 Example Road,SW1 1AA"]),
@@ -3496,7 +3482,6 @@ def test_letters_from_csv_files_dont_have_download_link(
     mock_s3_set_metadata,
     extra_args,
 ):
-
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -3593,7 +3578,6 @@ def test_send_one_off_letter_errors_in_trial_mode(
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
 ):
-
     mocker.patch(
         "app.template_previews.get_page_count_for_letter",
         return_value=5,
@@ -3637,7 +3621,6 @@ def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
 ):
-
     mocker.patch(
         "app.template_previews.get_page_count_for_letter",
         return_value=11,
@@ -4120,7 +4103,6 @@ def test_sms_sender_is_previewed(
     extra_args,
     sms_sender,
 ):
-
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -4151,7 +4133,6 @@ def test_redirects_to_template_if_job_exists_already(
     mock_get_job,
     fake_uuid,
 ):
-
     client_request.get(
         "main.check_messages",
         service_id=SERVICE_ONE_ID,

@@ -91,7 +91,6 @@ def test_returns_value_from_cache(
     expected_api_calls,
     expected_cache_set_calls,
 ):
-
     mock_redis_get = mocker.patch(
         "app.extensions.RedisClient.get",
         return_value=cache_value,
@@ -183,7 +182,6 @@ def test_update_organisation_when_not_updating_org_type(
     post_data,
     expected_cache_delete_calls,
 ):
-
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
     mock_post = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.post")
 

@@ -6,7 +6,6 @@ from app.utils.templates import get_sample_template
 
 
 def get_errors_for_csv(recipients, template_type):
-
     errors = []
 
     if any(recipients.rows_with_bad_recipients):

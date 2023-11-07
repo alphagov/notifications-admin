@@ -197,7 +197,6 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
 ):
-
     service_one["permissions"] = []
 
     page = client_request.get(
@@ -284,7 +283,6 @@ def test_inbox_showing_inbound_messages(
     index,
     expected_row,
 ):
-
     service_one["permissions"] = ["inbound_sms"]
 
     page = client_request.get(
@@ -335,7 +333,6 @@ def test_empty_inbox(
     mock_get_most_recent_inbound_sms_with_no_messages,
     mock_get_inbound_number_for_service,
 ):
-
     service_one["permissions"] = ["inbound_sms"]
 
     page = client_request.get(
@@ -379,7 +376,6 @@ def test_anyone_can_see_inbox(
     mock_get_most_recent_inbound_sms_with_no_messages,
     mock_get_inbound_number_for_service,
 ):
-
     service_one["permissions"] = ["inbound_sms"]
 
     validate_route_permission_with_client(
@@ -460,7 +456,6 @@ def test_download_inbox_strips_formulae(
     message_content,
     expected_cell,
 ):
-
     mocker.patch(
         "app.service_api_client.get_inbound_sms",
         return_value={
@@ -910,7 +905,6 @@ def test_correct_font_size_for_big_numbers(
     permissions,
     totals,
 ):
-
     service_one["permissions"] = permissions
 
     mocker.patch("app.main.views.dashboard.get_dashboard_totals", return_value=totals)

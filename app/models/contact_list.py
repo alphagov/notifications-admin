@@ -19,7 +19,6 @@ from app.utils.templates import get_sample_template
 
 
 class ContactList(JSONModel):
-
     ALLOWED_PROPERTIES = {
         "id",
         "created_at",
@@ -101,7 +100,6 @@ class ContactList(JSONModel):
 
     @classmethod
     def create(cls, service_id, upload_id):
-
         metadata = cls.get_metadata(service_id, upload_id)
 
         if not metadata.get("valid"):
@@ -151,7 +149,6 @@ class ContactList(JSONModel):
 
 
 class ContactLists(ModelList):
-
     client_method = contact_list_api_client.get_contact_lists
     model = ContactList
     sort_function = partial(
@@ -166,7 +163,6 @@ class ContactLists(ModelList):
 
 
 class ContactListsAlphabetical(ContactLists):
-
     sort_function = partial(
         sorted,
         key=lambda item: item["original_file_name"].lower(),

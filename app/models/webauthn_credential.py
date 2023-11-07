@@ -70,7 +70,6 @@ class WebAuthnCredential(JSONModel):
 
 
 class WebAuthnCredentials(ModelList):
-
     model = WebAuthnCredential
     client_method = user_api_client.get_webauthn_credentials_for_user
 

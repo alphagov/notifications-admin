@@ -63,7 +63,6 @@ def email_branding_options(service_id):
     form = ChooseEmailBrandingForm(current_service)
 
     if form.validate_on_submit():
-
         branding_choice = form.options.data
 
         if branding_choice == EmailBranding.NHS_ID:
@@ -225,7 +224,6 @@ def email_branding_choose_logo(service_id):
 
     if form.validate_on_submit():
         if form.branding_options.data == "org":
-
             if branding_choice == "govuk_and_org":
                 return redirect(
                     url_for(

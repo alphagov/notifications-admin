@@ -135,7 +135,6 @@ def check_tour_notification(service_id, template_id):
 @main.route("/services/<uuid:service_id>/end-tour/<uuid:example_template_id>")
 @user_has_permissions("manage_templates")
 def go_to_dashboard_after_tour(service_id, example_template_id):
-
     service_api_client.delete_service_template(service_id, example_template_id)
 
     return redirect(url_for("main.service_dashboard", service_id=service_id))

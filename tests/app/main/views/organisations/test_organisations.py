@@ -2017,7 +2017,6 @@ def test_add_delete_can_ask_to_join_a_service(
     post_data,
     expected_parameter,
 ):
-
     client_request.login(platform_admin_user)
     client_request.post(
         "main.edit_organisation_can_ask_to_join_a_service",
