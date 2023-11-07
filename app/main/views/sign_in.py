@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from urllib.parse import urlparse, urlunparse
 
 from flask import (
     abort,
@@ -89,4 +90,9 @@ def sign_in_again():
     if request.blueprint == JSON_UPDATES_BLUEPRINT_NAME:
         return abort(HTTPStatus.UNAUTHORIZED)
 
-    return redirect(url_for("main.sign_in", next=request.path))
+    return redirect(url_for("main.sign_in", next=_get_next_url(request)))
+
+
+def _get_next_url(request):
+    next_url = urlparse(request.url)
+    return urlunparse(("", "", next_url.path, next_url.params, next_url.query, ""))
