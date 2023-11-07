@@ -88,7 +88,6 @@ class BroadcastAreasRepository:
             conn.execute("DELETE FROM broadcast_areas;")
 
     def insert_broadcast_area_library(self, id, *, name, name_singular, is_group):
-
         q = """
         INSERT INTO broadcast_area_libraries (id, name, name_singular, is_group)
         VALUES (?, ?, ?, ?)
@@ -98,7 +97,6 @@ class BroadcastAreasRepository:
             conn.execute(q, (id, name, name_singular, is_group))
 
     def insert_broadcast_areas(self, areas, keep_old_features):
-
         areas_q = """
         INSERT INTO broadcast_areas (
             id, name,

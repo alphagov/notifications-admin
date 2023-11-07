@@ -213,7 +213,6 @@ def test_post_make_service_live_page(
     post_data,
     expected_arguments_to_update_service,
 ):
-
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
 
@@ -242,7 +241,6 @@ def test_post_make_service_live_page_error(
     mock_get_organisation,
     mock_update_service,
 ):
-
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
 

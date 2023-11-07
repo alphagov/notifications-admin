@@ -18,7 +18,6 @@ def returned_letter_summary(service_id):
 @main.route("/services/<uuid:service_id>/returned-letters/<simple_date:reported_at>")
 @user_has_permissions("view_activity")
 def returned_letters(service_id, reported_at):
-
     page_size = 50
     returned_letters = service_api_client.get_returned_letters(service_id, reported_at)
     count_of_returned_letters = len(returned_letters)

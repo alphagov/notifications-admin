@@ -3,7 +3,6 @@ from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
 
 class JobApiClient(NotifyAdminAPIClient):
-
     JOB_STATUSES = {
         "scheduled",
         "pending",

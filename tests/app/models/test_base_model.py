@@ -13,7 +13,6 @@ def test_looks_up_from_dict():
 
 def test_raises_when_overriding_custom_properties():
     class Custom(JSONModel):
-
         ALLOWED_PROPERTIES = {"foo"}
         __sort_attribute__ = "foo"
 

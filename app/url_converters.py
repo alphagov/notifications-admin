@@ -9,17 +9,14 @@ from app.models.service import Service
 
 
 class TemplateTypeConverter(BaseConverter):
-
     regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)})"
 
 
 class TicketTypeConverter(BaseConverter):
-
     regex = f"(?:{PROBLEM_TICKET_TYPE}|{QUESTION_TICKET_TYPE}|{GENERAL_TICKET_TYPE})"
 
 
 class LetterFileExtensionConverter(BaseConverter):
-
     regex = "(?:pdf|png)"
 
 

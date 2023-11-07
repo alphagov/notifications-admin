@@ -14,7 +14,6 @@ from app.utils.user import user_has_permissions
 @main.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>")
 @user_has_permissions("view_activity")
 def conversation(service_id, notification_id):
-
     user_number = get_user_number(service_id, notification_id)
 
     return render_template(
@@ -31,7 +30,6 @@ def conversation(service_id, notification_id):
 @json_updates.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>.json")
 @user_has_permissions("view_activity")
 def conversation_updates(service_id, notification_id):
-
     return jsonify(get_conversation_partials(service_id, get_user_number(service_id, notification_id)))
 
 
@@ -62,7 +60,6 @@ def conversation_reply_with_template(
     notification_id,
     template_id,
 ):
-
     session["recipient"] = get_user_number(service_id, notification_id)
     session["placeholders"] = {"phone number": session["recipient"]}
 
@@ -77,7 +74,6 @@ def conversation_reply_with_template(
 
 
 def get_conversation_partials(service_id, user_number):
-
     return {
         "messages": render_template(
             "views/conversations/messages.html",
@@ -97,7 +93,6 @@ def get_user_number(service_id, notification_id):
 
 
 def get_sms_thread(service_id, user_number):
-
     for notification in sorted(
         (  # noqa: B020
             notification_api_client.get_notifications_for_service(service_id, to=user_number, template_type="sms")[
@@ -107,7 +102,6 @@ def get_sms_thread(service_id, user_number):
         ),
         key=lambda notification: notification["created_at"],
     ):
-
         is_inbound = "notify_number" in notification
         redact_personalisation = not is_inbound and notification["template"]["redact_personalisation"]
 

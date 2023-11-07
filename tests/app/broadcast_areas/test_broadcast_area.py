@@ -95,7 +95,6 @@ def test_get_names_of_areas():
 
 
 def test_has_polygons():
-
     england = broadcast_area_libraries.get_areas(["ctry19-E92000001"])[0]
     scotland = broadcast_area_libraries.get_areas(["ctry19-S92000003"])[0]
 
@@ -117,7 +116,6 @@ def test_polygons_are_enclosed():
 
 
 def test_lat_long_order():
-
     england = broadcast_area_libraries.get_areas(["ctry19-E92000001"])[0]
 
     lat_long = england.polygons.as_coordinate_pairs_lat_long
@@ -129,7 +127,6 @@ def test_lat_long_order():
 
 
 def test_includes_electoral_wards():
-
     areas = broadcast_area_libraries.get_areas(["wd21-E05009289"])
     assert len(areas) == 1
 

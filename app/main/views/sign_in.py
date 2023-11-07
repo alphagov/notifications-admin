@@ -35,7 +35,6 @@ def sign_in():  # noqa: C901
     password_reset_url = url_for(".forgot_password", next=request.args.get("next"))
 
     if form.validate_on_submit():
-
         user = User.from_email_address_and_password_or_none(form.email_address.data, form.password.data)
 
         if user:

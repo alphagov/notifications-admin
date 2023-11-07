@@ -553,7 +553,6 @@ def test_shows_link_to_end_tour(
     mock_get_notification,
     fake_uuid,
 ):
-
     page = client_request.get(
         "main.view_notification",
         service_id=SERVICE_ONE_ID,

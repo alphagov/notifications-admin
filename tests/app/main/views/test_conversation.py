@@ -20,7 +20,6 @@ VIS_PARENT_FOLDER_ID = "bbbb222b-2b22-2b22-222b-b222b22b2222"
 
 
 def test_get_user_phone_number_when_only_inbound_exists(mocker):
-
     mock_get_inbound_sms = mocker.patch(
         "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
         return_value={"user_number": "4407900900123", "notify_number": "07900000002"},
@@ -175,7 +174,6 @@ def test_view_conversation_updates(
     mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
 ):
-
     mocker.patch(
         "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
         side_effect=HTTPError(response=Mock(status_code=404)),
@@ -281,7 +279,6 @@ def test_conversation_reply_shows_link_to_add_templates_if_service_has_no_templa
 def test_conversation_reply_shows_templates(
     client_request, fake_uuid, mocker, mock_get_template_folders, active_user_with_permissions, service_one
 ):
-
     all_templates = {
         "data": [
             _template("sms", "sms_template_one", parent=INV_PARENT_FOLDER_ID),
@@ -359,7 +356,6 @@ def test_conversation_reply_redirects_with_phone_number_from_notification(
     mock_get_notification,
     mock_get_service_template,
 ):
-
     page = client_request.get(
         "main.conversation_reply_with_template",
         service_id=SERVICE_ONE_ID,

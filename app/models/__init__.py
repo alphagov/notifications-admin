@@ -63,7 +63,6 @@ class ModelList(SerialisedModelCollection):
 
 
 class PaginatedModelList(ModelList):
-
     response_key = "data"
 
     def __init__(self, *args, page=None, **kwargs):

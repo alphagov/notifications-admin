@@ -7,11 +7,9 @@ import pyexcel_xlsx
 
 
 class Spreadsheet:
-
     ALLOWED_FILE_EXTENSIONS = ("csv", "xlsx", "xls", "ods", "xlsm", "tsv")
 
     def __init__(self, csv_data=None, rows=None, filename=""):
-
         self.filename = filename
 
         if csv_data and rows:

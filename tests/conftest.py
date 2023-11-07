@@ -60,7 +60,6 @@ def notify_admin_without_context():
 
 @pytest.fixture
 def notify_admin(notify_admin_without_context):
-
     with notify_admin_without_context.app_context():
         yield notify_admin_without_context
 

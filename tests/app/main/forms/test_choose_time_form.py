@@ -6,7 +6,6 @@ from app.main.forms import ChooseTimeForm
 
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_form_contains_next_7_days_in_hour_intervals(notify_admin):
-
     choices = ChooseTimeForm().scheduled_for.choices
 
     # Friday

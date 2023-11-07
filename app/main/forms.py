@@ -333,7 +333,6 @@ class SMSCode(GovukTextInputField):
 
 
 class GovukIntegerField(GovukTextInputField):
-
     #  Actual value is 2,147,483,647 but this is a scary looking arbitrary number
     POSTGRES_MAX_INT = 2_000_000_000
 
@@ -342,9 +341,7 @@ class GovukIntegerField(GovukTextInputField):
         super().__init__(label, **kwargs)
 
     def process_formdata(self, valuelist):
-
         if valuelist:
-
             value = valuelist[0].replace(",", "").replace(" ", "")
 
             for type_ in (int, float):
@@ -358,9 +355,7 @@ class GovukIntegerField(GovukTextInputField):
         return super().process_formdata([value])
 
     def pre_validate(self, form):
-
         if self.data:
-
             if not isinstance(self.data, int):
                 raise StopValidation(f"Enter {self.things} in digits")
 
@@ -372,7 +367,6 @@ class GovukIntegerField(GovukTextInputField):
         return super().pre_validate(form)
 
     def __call__(self, **kwargs):
-
         if not hasattr(self, "get_form"):
             # If the field is unbound – not yet attached to a Form instance – then
             # it won’t have a submitted value yet so we can return early
@@ -412,7 +406,6 @@ class HexColourCodeField(GovukTextInputField, RequiredValidatorsMixin):
 
 
 class FieldWithNoneOption:
-
     # This is a special value that is specific to our forms. This is
     # more expicit than casting `None` to a string `'None'` which can
     # have unexpected edge cases
@@ -437,7 +430,6 @@ class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
 
 class NestedFieldMixin:
     def children(self):
-
         # start map with root option as a single child entry
         child_map = {None: [option for option in self if option.data == self.NONE_OPTION_VALUE]}
 
@@ -1140,7 +1132,6 @@ class TwoFactorForm(StripWhitespaceForm):
     sms_code = SMSCode("Text message code")
 
     def validate(self, *args, **kwargs):
-
         if not self.sms_code.validate(self):
             return False
 
@@ -1481,7 +1472,6 @@ class LetterAddressForm(StripWhitespaceForm):
     address = PostalAddressField("Address", validators=[DataRequired(message="Cannot be empty")])
 
     def validate_address(self, field):
-
         address = PostalAddress(
             field.data,
             allow_international_letters=self.allow_international_letters,
@@ -1572,7 +1562,6 @@ class ForgotPasswordForm(StripWhitespaceForm):
 
 
 class NewPasswordForm(StripWhitespaceForm):
-
     new_password = make_password_field(thing="your new password")
 
 
@@ -2516,7 +2505,6 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
         *args,
         **kwargs,
     ):
-
         super().__init__(*args, **kwargs)
 
         self.available_template_types = available_template_types
@@ -2714,7 +2702,6 @@ class ServiceBroadcastAccountTypeForm(StripWhitespaceForm):
 class AcceptAgreementForm(StripWhitespaceForm):
     @classmethod
     def from_organisation(cls, org):
-
         if org.agreement_signed_on_behalf_of_name and org.agreement_signed_on_behalf_of_email_address:
             who = "someone-else"
         elif org.agreement_signed_version:  # only set if user has submitted form previously
@@ -2757,7 +2744,6 @@ class AcceptAgreementForm(StripWhitespaceForm):
     )
 
     def __validate_if_nominating(self, field):
-
         error_messages = {
             "on_behalf_of_name": "Enter the name of the person accepting the agreement",
             "on_behalf_of_email": "Enter the email address of the person accepting the agreement",

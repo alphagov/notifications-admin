@@ -254,7 +254,6 @@ def test_shows_hidden_email_address_on_registration_page_from_invite(
     sample_invite,
     mock_get_invited_user_by_id,
 ):
-
     with client_request.session_transaction() as session:
         session["invited_user_id"] = sample_invite
 

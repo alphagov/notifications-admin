@@ -370,7 +370,6 @@ def choose_template_to_copy(
     from_folder=None,
 ):
     if from_service:
-
         current_user.belongs_to_service_or_403(from_service)
         service = Service(service_api_client.get_service(from_service)["data"])
 
@@ -518,7 +517,6 @@ def delete_template_folder(service_id, template_folder_id):
         )
 
     if request.method == "POST":
-
         try:
             template_folder_api_client.delete_template_folder(current_service.id, template_folder_id)
 

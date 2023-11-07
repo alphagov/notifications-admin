@@ -63,7 +63,6 @@ class BaseBroadcastArea(ABC):
 
 
 class BroadcastArea(BaseBroadcastArea, SortingAndEqualityMixin):
-
     __sort_attribute__ = "name"
 
     def __init__(self, row):
@@ -195,7 +194,6 @@ class CustomBroadcastAreas(SerialisedModelCollection):
 
 
 class BroadcastAreaLibrary(SerialisedModelCollection, SortingAndEqualityMixin, GetItemByIdMixin):
-
     model = BroadcastArea
 
     __sort_attribute__ = "name"
@@ -221,7 +219,6 @@ class BroadcastAreaLibrary(SerialisedModelCollection, SortingAndEqualityMixin, G
 
 
 class BroadcastAreaLibraries(SerialisedModelCollection, GetItemByIdMixin):
-
     model = BroadcastAreaLibrary
 
     def __init__(self):

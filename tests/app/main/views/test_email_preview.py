@@ -3,7 +3,6 @@ import pytest
 
 @pytest.mark.parametrize("query_args, result", [({}, True), ({"govuk_banner": "false"}, "false")])
 def test_renders(client_request, mocker, query_args, result):
-
     mocker.patch("app.main.views.index.HTMLEmailTemplate.__str__", return_value="rendered")
 
     response = client_request.get_response("main.email_template", **query_args)
@@ -12,7 +11,6 @@ def test_renders(client_request, mocker, query_args, result):
 
 
 def test_displays_govuk_branding_by_default(client_request):
-
     page = client_request.get("main.email_template", _test_page_title=False)
 
     assert page.select_one("a")["href"] == "https://www.gov.uk"
@@ -34,7 +32,6 @@ def test_displays_govuk_branding(client_request, params):
 
 
 def test_displays_both_branding(client_request, mock_get_email_branding_with_both_brand_type):
-
     page = client_request.get("main.email_template", branding_style="1", _test_page_title=False)
 
     mock_get_email_branding_with_both_brand_type.assert_called_once_with("1")
@@ -82,7 +79,6 @@ def test_displays_org_branding_with_banner(client_request, mock_get_email_brandi
 def test_displays_org_branding_with_banner_without_brand_text(
     client_request, mock_get_email_branding_without_brand_text
 ):
-
     # mock_get_email_branding_without_brand_text has 'brand_type' of 'org_banner'
     page = client_request.get("main.email_template", branding_style="1", _test_page_title=False)
 

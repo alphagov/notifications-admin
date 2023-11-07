@@ -2768,7 +2768,6 @@ def test_incorrect_sms_sender_input(
         assert not error_message
         assert count_of_api_calls == 1
     else:
-
         assert expected_error in error_message.text
         assert count_of_api_calls == 0
 

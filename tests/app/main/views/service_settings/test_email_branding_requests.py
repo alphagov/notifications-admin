@@ -134,7 +134,6 @@ def test_email_branding_options_page_shows_branding_pool_options_if_branding_poo
     organisation_type,
     expected_options,
 ):
-
     service_one["organisation_type"] = organisation_type
     organisation_one["organisation_type"] = organisation_type
     service_one["organisation"] = organisation_one

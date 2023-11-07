@@ -12,7 +12,6 @@ from app.utils.user import user_has_permissions
 @main.route("/services/<uuid:service_id>/history")
 @user_has_permissions("manage_service")
 def history(service_id):
-
     events = _get_events(current_service.id, request.args.get("selected"))
 
     return render_template(
@@ -32,7 +31,6 @@ def _get_events(service_id, selected):
 
 
 def _chunk_events_by_day(events):
-
     days = defaultdict(list)
 
     for event in sorted(events, key=attrgetter("time"), reverse=True):

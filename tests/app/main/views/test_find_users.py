@@ -118,7 +118,6 @@ def test_change_user_auth_preselects_current_auth_type(
 
 
 def test_change_user_auth(client_request, platform_admin_user, api_user_active, mocker):
-
     client_request.login(platform_admin_user)
 
     mocker.patch(

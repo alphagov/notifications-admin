@@ -41,7 +41,6 @@ class CsvFileValidator:
 
 class ValidGovEmail:
     def __call__(self, form, field):
-
         if field.data == "":
             return
 
@@ -167,7 +166,6 @@ class DoesNotStartWithDoubleZero:
 
 
 class MustContainAlphanumericCharacters:
-
     regex = re.compile(r".*[a-zA-Z0-9].*[a-zA-Z0-9].*")
 
     def __init__(self, *, thing=None, message="Must include at least two alphanumeric characters"):

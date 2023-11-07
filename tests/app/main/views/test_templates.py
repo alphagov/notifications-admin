@@ -57,7 +57,6 @@ def test_should_show_empty_page_when_no_templates(
     permissions,
     expected_message,
 ):
-
     service_one["permissions"] = permissions
 
     page = client_request.get(
@@ -288,7 +287,6 @@ def test_should_not_show_template_nav_if_only_one_type_of_template(
     mock_get_service_templates_with_only_one_template,
     mock_get_no_api_keys,
 ):
-
     page = client_request.get(
         "main.choose_template",
         service_id=SERVICE_ONE_ID,
@@ -303,7 +301,6 @@ def test_should_not_show_live_search_if_list_of_templates_fits_onscreen(
     mock_get_service_templates,
     mock_get_no_api_keys,
 ):
-
     page = client_request.get(
         "main.choose_template",
         service_id=SERVICE_ONE_ID,
@@ -318,7 +315,6 @@ def test_should_show_live_search_if_list_of_templates_taller_than_screen(
     mock_get_more_service_templates_than_can_fit_onscreen,
     mock_get_no_api_keys,
 ):
-
     page = client_request.get(
         "main.choose_template",
         service_id=SERVICE_ONE_ID,
@@ -351,7 +347,6 @@ def test_should_show_live_search_if_service_has_lots_of_folders(
     mock_get_service_templates,  # returns 4 templates
     mock_get_no_api_keys,
 ):
-
     mock_get_template_folders.return_value = [
         _folder("one", PARENT_FOLDER_ID),
         _folder("two", None, parent=PARENT_FOLDER_ID),
@@ -577,7 +572,6 @@ def test_caseworker_sees_template_page_if_template_is_deleted(
     mocker,
     active_caseworking_user,
 ):
-
     mocker.patch("app.user_api_client.get_user", return_value=active_caseworking_user)
 
     template_id = fake_uuid
@@ -2876,7 +2870,6 @@ def test_should_redirect_when_deleting_a_template(
     mock_get_template_folders,
     parent,
 ):
-
     mock_get_template_folders.return_value = [
         {"id": PARENT_FOLDER_ID, "name": "Folder", "parent": None, "users_with_permission": [ANY]}
     ]
@@ -3171,7 +3164,6 @@ def test_should_show_message_before_redacting_template(
     service_one,
     fake_uuid,
 ):
-
     page = client_request.get(
         "main.redact_template",
         service_id=SERVICE_ONE_ID,
@@ -3196,7 +3188,6 @@ def test_should_show_redact_template(
     service_one,
     fake_uuid,
 ):
-
     page = client_request.post(
         "main.redact_template",
         service_id=SERVICE_ONE_ID,
@@ -3239,7 +3230,6 @@ def test_should_not_show_redaction_stuff_for_letters(
     mock_get_template_folders,
     single_letter_contact_block,
 ):
-
     mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(

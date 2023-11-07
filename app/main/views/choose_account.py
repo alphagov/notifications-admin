@@ -37,7 +37,6 @@ def choose_account():
 
 @main.route("/accounts-or-dashboard")
 def show_accounts_or_dashboard():
-
     if not current_user.is_authenticated:
         return redirect(url_for(".index"))
 

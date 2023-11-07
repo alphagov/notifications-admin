@@ -2,7 +2,6 @@ from app.notify_client.events_api_client import EventsApiClient
 
 
 def test_events_client_calls_correct_api_endpoint(mocker):
-
     expected_url = "/events"
     event_type = "anything"
     event_data = {"does_not": "matter"}

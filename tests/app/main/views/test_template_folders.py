@@ -736,7 +736,6 @@ def test_get_manage_folder_page_no_permissions(
 def test_user_access_denied_to_template_folder_actions_without_folder_permission(
     client_request, active_user_with_permissions, service_one, mock_get_template_folders, mocker, endpoint
 ):
-
     mock = mocker.patch(
         "app.models.service.Service.get_template_folder_with_user_permission_or_403",
         side_effect=lambda *args: abort(403),
@@ -771,7 +770,6 @@ def test_user_access_denied_to_template_folder_actions_without_folder_permission
 def test_user_access_denied_to_template_actions_without_folder_permission(
     client_request, active_user_with_permissions, service_one, mocker, endpoint
 ):
-
     mock = mocker.patch(
         "app.models.service.Service.get_template_with_user_permission_or_403",
         side_effect=lambda *args, **kwargs: abort(403),

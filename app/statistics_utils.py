@@ -5,7 +5,6 @@ from dateutil import parser
 
 
 def sum_of_statistics(delivery_statistics):
-
     statistics_keys = (
         "emails_delivered",
         "emails_requested",
@@ -22,7 +21,6 @@ def sum_of_statistics(delivery_statistics):
 
 
 def add_rates_to(delivery_statistics):
-
     return dict(
         emails_failure_rate=get_formatted_percentage(
             delivery_statistics["emails_failed"], delivery_statistics["emails_requested"]
