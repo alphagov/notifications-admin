@@ -5,3 +5,6 @@
 
 # Ignore bulk reformatting to f-strings from flynt
 fa3c94d74db7f03f33837595633ff04b405d1abe
+
+# Bump to black 23.10.1
+223881be235937833ecdee5f9ae6f04823f55661
