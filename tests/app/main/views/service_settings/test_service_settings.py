@@ -208,8 +208,7 @@ def test_should_show_overview(
     assert page.select_one("h1").text == "Settings"
     rows = page.select("tr")
     assert len(rows) == len(expected_rows)
-    for index, row in enumerate(expected_rows):
-        assert row == " ".join(rows[index].text.split())
+    assert [" ".join(row.text.split()) for row in rows] == expected_rows
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
@@ -291,8 +290,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
     ]
 
     assert len(rows) == len(expected_rows)
-    for index, row in enumerate(expected_rows):
-        assert row == " ".join(rows[index].text.split())
+    assert [" ".join(row.text.split()) for row in rows] == expected_rows
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
@@ -507,8 +505,7 @@ def test_should_show_overview_for_service_with_more_things_set(
     service_one["permissions"] = permissions
     service_one["email_branding"] = uuid4()
     page = client_request.get("main.service_settings", service_id=service_one["id"])
-    for index, row in enumerate(expected_rows):
-        assert row == " ".join(page.select("tr")[index + 1].text.split())
+    assert [" ".join(row.text.split()) for row in page.select("tr")[1:]] == expected_rows
 
 
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
