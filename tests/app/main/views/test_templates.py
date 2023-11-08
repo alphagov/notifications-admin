@@ -513,6 +513,18 @@ def test_should_show_page_for_one_template(
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 
 
+def test_editing_letter_template_should_have_hidden_name_field(
+    client_request, mock_get_service_letter_template, fake_uuid, service_one
+):
+    service_one["permissions"].append("letter")
+    template_id = fake_uuid
+    page = client_request.get(".edit_service_template", service_id=SERVICE_ONE_ID, template_id=template_id)
+
+    name_input = page.select_one("input[name=name]")
+    assert name_input["value"] == "Two week reminder"
+    assert name_input["type"] == "hidden"
+
+
 def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_characters(
     client_request,
     service_one,
