@@ -41,7 +41,7 @@
 
       {% else %}
         <p class="govuk-body">
-          The service needs to <a id="link-org" href="{{url_for('main.link_service_to_organisation', service_id=current_service.id)}}" class="govuk-link govuk-link--no-visited-state">link an organisation</a> first before it can be made live.
+          The service needs to <a id="link-org" href="{{url_for('main.link_service_to_organisation', service_id=current_service.id)}}" class="govuk-link govuk-link--no-visited-state">link to an organisation</a> first before it can be made live.
         </p>
       {% endif %}
     </div>
