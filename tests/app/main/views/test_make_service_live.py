@@ -187,17 +187,17 @@ def test_post_org_member_make_service_live_service_name_error_summary(
 
 
 @pytest.mark.parametrize(
-    "data, query_args, expected_redirect_url, expected_notify_calls",
+    "form_data, query_args, expected_redirect_url, expected_notify_calls",
     (
         (
-            {"enabled": True},
-            {"unique": "yes"},
+            {"enabled": True},  # service name is clear/easy to understand
+            {"unique": "yes"},  # service has a unique purpose
             f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&unique=yes",
             [],
         ),
         (
-            {"enabled": True},
-            {"unique": "unsure"},
+            {"enabled": True},  # service name is clear/easy to understand
+            {"unique": "unsure"},  # user is unsure if service is unique
             f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=ok&unique=unsure",
             [
                 mock.call(
@@ -210,14 +210,14 @@ def test_post_org_member_make_service_live_service_name_error_summary(
             ],
         ),
         (
-            {"enabled": True},
-            {"unique": "no"},
+            {"enabled": True},  # service name is clear/easy to understand
+            {"unique": "no"},  # user believes service is not unique within the org
             f"/services/{SERVICE_ONE_ID}/make-service-live/decision?unique=no",
             [],
         ),
         (
-            {"enabled": False},
-            {"unique": "yes"},
+            {"enabled": False},  # service name is unclear/hard to understandable
+            {"unique": "yes"},  # service has a unique purpose
             f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=yes",
             [
                 mock.call(
@@ -230,14 +230,14 @@ def test_post_org_member_make_service_live_service_name_error_summary(
             ],
         ),
         (
-            {"enabled": False},
-            {"unique": "no"},
+            {"enabled": False},  # service name is unclear/hard to understandable
+            {"unique": "no"},  # user believes service is not unique within the org
             f"/services/{SERVICE_ONE_ID}/make-service-live/decision?unique=no",
             [],
         ),
         (
-            {"enabled": False},
-            {"unique": "unsure"},
+            {"enabled": False},  # service name is unclear/hard to understandable
+            {"unique": "unsure"},  # user is unsure if service is unique
             f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=unsure",
             [
                 mock.call(
@@ -256,7 +256,7 @@ def test_post_org_member_make_service_live_service_name(
     client_request,
     service_one,
     organisation_one,
-    data,
+    form_data,
     query_args,
     expected_redirect_url,
     expected_notify_calls,
@@ -282,7 +282,7 @@ def test_post_org_member_make_service_live_service_name(
         service_id=SERVICE_ONE_ID,
         **query_args,
         _expected_redirect=expected_redirect_url,
-        _data=data,
+        _data=form_data,
     )
 
     assert mock_notify.call_args_list == expected_notify_calls
