@@ -13,7 +13,7 @@ from tests.conftest import (
     sample_uuid,
 )
 
-pytest_user_auth_combinations = (
+test_user_auth_combinations = (
     "user, organisation_can_approve_own_go_live_requests, service_has_active_go_live_request, expected_status",
     (
         (
@@ -74,7 +74,7 @@ pytest_user_auth_combinations = (
 )
 
 
-@pytest.mark.parametrize(*pytest_user_auth_combinations)
+@pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_start(
     mocker,
     client_request,
@@ -116,7 +116,7 @@ def test_get_org_member_make_service_live_start(
         assert button.get("href") == f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service"
 
 
-@pytest.mark.parametrize(*pytest_user_auth_combinations)
+@pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_service_name(
     mocker,
     client_request,
@@ -288,7 +288,7 @@ def test_post_org_member_make_service_live_service_name(
     assert mock_notify.call_args_list == expected_notify_calls
 
 
-@pytest.mark.parametrize(*pytest_user_auth_combinations)
+@pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_unique_service(
     mocker,
     client_request,
@@ -413,7 +413,7 @@ def test_post_org_member_make_service_live_unique_service(
         ({"name": "bad", "unique": "unsure"}, None),
     ),
 )
-@pytest.mark.parametrize(*pytest_user_auth_combinations)
+@pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_contact_user(
     mocker,
     client_request,
@@ -450,7 +450,7 @@ def test_get_org_member_make_service_live_contact_user(
         )
 
 
-@pytest.mark.parametrize(*pytest_user_auth_combinations)
+@pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_decision(
     mocker,
     client_request,
