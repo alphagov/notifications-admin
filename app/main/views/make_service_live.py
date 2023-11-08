@@ -17,7 +17,7 @@ def org_member_make_service_live_start(service_id):
         abort(403)
 
     return render_template(
-        "views/org-service-approver-start.html",
+        "views/organisations-admin/approve-service-start.html",
         organisation=current_service.organisation_id,
     )
 
@@ -54,7 +54,7 @@ def org_member_make_service_live_check_unique(service_id):
         )
 
     return render_template(
-        "views/org-service-approver-check-unique.html",
+        "views/organisations-admin/approve-service-check-unique.html",
         organisation=current_service.organisation_id,
         form=form,
         error_summary_enabled=True,
@@ -112,7 +112,7 @@ def org_member_make_service_live_service_name(service_id):
         )
 
     return render_template(
-        "views/org-service-approver-service-name.html",
+        "views/organisations-admin/approve-service-service-name.html",
         organisation=current_service.organisation,
         form=form,
         error_summary_enabled=True,
@@ -146,7 +146,7 @@ def org_member_make_service_live_contact_user(service_id):
         )
 
     return render_template(
-        "views/org-service-approver-contact-user.html",
+        "views/organisations-admin/approve-service-contact-user.html",
         organisation=current_service.organisation_id,
         name=name,
         unique=unique,
@@ -224,7 +224,7 @@ def org_member_make_service_live_decision(service_id):
     )
 
     return render_template(
-        "views/org-service-approver-decision.html",
+        "views/organisations-admin/approve-service-decision.html",
         form=form,
         cannot_approve=cannot_approve,
         error_summary_enabled=True,
