@@ -1517,7 +1517,8 @@ class LetterAddressForm(StripWhitespaceForm):
 
         if address.has_invalid_characters:
             raise ValidationError(
-                'Address lines cannot start with any of the following characters: @ ( ) = [ ] " " \\ / , < > ~'
+                "Address lines cannot start with any of the following characters: "
+                + " ".join(PostalAddress.INVALID_CHARACTERS_AT_START_OF_ADDRESS_LINE)
             )
 
 
