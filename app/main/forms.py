@@ -1503,7 +1503,7 @@ class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
     subject = TextAreaField("Subject", validators=[DataRequired(message="Cannot be empty")])
 
 
-class LetterTemplateForm(BaseTemplateForm):
+class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
     subject = TextAreaField("Main heading", validators=[DataRequired(message="Cannot be empty")])
 
     template_content = TextAreaField(

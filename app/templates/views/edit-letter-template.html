@@ -27,6 +27,10 @@
           {{ sticky_page_footer(
             'Save'
           ) }}
+
+          {# this needs to be passed through if we're showing this from the copy page #}
+          <input type="hidden" name="name" value="{{ form.name.data }}" />
+
         </div>
         <div class="govuk-grid-column-full">
           {% include "partials/templates/guidance-formatting-letters.html" %}
