@@ -1149,6 +1149,7 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
         template_id=template.id,
         upload_id=upload_id,
         original_filename=original_filename,
+        original_file=pdf_file_bytes,
         sanitise_response=response,
     )
 
@@ -1162,7 +1163,7 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
     )
 
 
-def _save_letter_attachment(*, service_id, template_id, upload_id, original_filename, sanitise_response):
+def _save_letter_attachment(*, service_id, template_id, upload_id, original_filename, original_file, sanitise_response):
     response_json = sanitise_response.json()
     attachment_page_count = response_json["page_count"]
     file_contents = base64.b64decode(response_json["file"].encode())
@@ -1178,7 +1179,7 @@ def _save_letter_attachment(*, service_id, template_id, upload_id, original_file
 
     # we've changed fonts and cmyk, so retain original in case we need to investigate errors
     backup_original_letter_to_s3(
-        file_contents,
+        original_file,
         upload_id=upload_id,
     )
 

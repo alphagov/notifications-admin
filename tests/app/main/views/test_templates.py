@@ -1154,16 +1154,13 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
-@pytest.mark.parametrize("page_count, expected_pages_content", [(1, "1 page"), (2, "2 pages")])
+@pytest.mark.parametrize("page_count", [1, 2])
 def test_post_attach_pages_redirects_to_template_view_when_validation_successful(
     mocker,
     client_request,
-    fake_uuid,
     service_one,
     mock_get_service_letter_template,
-    mock_get_template_folders,
     page_count,
-    expected_pages_content,
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
@@ -1194,23 +1191,23 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
 
     upload_id = mock_sanitise.call_args[1]["upload_id"]
 
-    mock_save.assert_called_once_with(
-        service_id=service_one["id"],
-        template_id=template_id,
-        upload_id=upload_id,
-        original_filename="tests/test_pdf_files/one_page_pdf.pdf",
-        sanitise_response=mock_sanitise.return_value,
-    )
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        mock_save.assert_called_once_with(
+            service_id=service_one["id"],
+            template_id=template_id,
+            upload_id=upload_id,
+            original_filename="tests/test_pdf_files/one_page_pdf.pdf",
+            original_file=file.read(),
+            sanitise_response=mock_sanitise.return_value,
+        )
 
 
 def test_post_attach_pages_archives_existing_attachment_when_it_exists(
     mocker,
     client_request,
-    fake_uuid,
     service_one,
     active_user_with_permissions,
     mock_get_service_letter_template_with_attachment,
-    mock_get_template_folders,
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
@@ -1243,13 +1240,15 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
 
     upload_id = mock_sanitise.call_args[1]["upload_id"]
 
-    mock_save.assert_called_once_with(
-        service_id=service_one["id"],
-        template_id=template_id,
-        upload_id=upload_id,
-        original_filename="tests/test_pdf_files/one_page_pdf.pdf",
-        sanitise_response=mock_sanitise.return_value,
-    )
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        mock_save.assert_called_once_with(
+            service_id=service_one["id"],
+            template_id=template_id,
+            upload_id=upload_id,
+            original_filename="tests/test_pdf_files/one_page_pdf.pdf",
+            original_file=file.read(),
+            sanitise_response=mock_sanitise.return_value,
+        )
 
     mock_archive_attachment.assert_called_once_with(
         letter_attachment_id=sample_uuid(),
@@ -1329,6 +1328,7 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
         template_id=template_id,
         upload_id=upload_id,
         original_filename="foo.pdf",
+        original_file=b"the_original_file",
         sanitise_response=mock_sanitise_response,
     )
 
@@ -1338,7 +1338,7 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
         page_count=attachment_page_count,
         original_filename="foo.pdf",
     )
-    mock_backup.assert_called_once_with(b"The sanitised content", upload_id=upload_id)
+    mock_backup.assert_called_once_with(b"the_original_file", upload_id=upload_id)
     mock_save_to_db.assert_called_once_with(
         upload_id=upload_id,
         template_id=template_id,
