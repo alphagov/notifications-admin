@@ -4,7 +4,7 @@ import math
 import uuid
 from functools import partial
 from io import BytesIO
-from typing import Dict
+from typing import Dict, Literal
 
 from flask import (
     abort,
@@ -76,12 +76,16 @@ from app.utils.pagination import generate_optional_previous_and_next_dicts, get_
 from app.utils.templates import TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
-form_objects = {
-    "email": EmailTemplateForm,
-    "sms": SMSTemplateForm,
-    "letter": LetterTemplateForm,
-    "broadcast": BroadcastTemplateForm,
-}
+
+def get_template_form(template_type: Literal["email", "sms", "letter", "broadcast"]):
+    if template_type == "email":
+        return EmailTemplateForm
+    elif template_type == "sms":
+        return SMSTemplateForm
+    elif template_type == "broadcast":
+        return BroadcastTemplateForm
+    else:
+        return LetterTemplateForm
 
 
 class LetterAttachmentFormError(Exception):
@@ -408,7 +412,7 @@ def copy_template(service_id, template_id):
         return add_service_template(service_id, template["template_type"])
 
     template["name"] = _get_template_copy_name(template, current_service.all_templates)
-    form = form_objects[template["template_type"]](**template)
+    form = get_template_form(template["template_type"])(**template)
 
     if template["folder"]:
         back_link = url_for(
@@ -568,7 +572,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             )
         )
 
-    form = form_objects[template_type]()
+    form = get_template_form(template_type)()
     if form.validate_on_submit():
         try:
             new_template = service_api_client.create_service_template(
@@ -637,7 +641,7 @@ def rename_template(service_id, template_id):
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def edit_service_template(service_id, template_id):
+def edit_service_template(service_id, template_id, language=None):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if template.template_type not in current_service.available_template_types:
@@ -651,7 +655,7 @@ def edit_service_template(service_id, template_id):
             )
         )
 
-    form = form_objects[template.template_type](**template._template)
+    form = get_template_form(template.template_type)(**template._template)
 
     if form.validate_on_submit():
         new_template = get_template(
