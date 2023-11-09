@@ -1531,6 +1531,30 @@ class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
     )
 
 
+class WelshLetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
+    subject = TextAreaField("Main heading in Welsh", validators=[DataRequired(message="Cannot be empty")])
+    template_content = TextAreaField(
+        "Body in Welsh", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
+    )
+
+    def __init__(self, *args, subject, content, letter_welsh_subject, letter_welsh_content, **kwargs):
+        # Populate subject and template_content form fields using the Welsh template values; we can discard the English
+        # data for this form.
+        super().__init__(*args, subject=letter_welsh_subject, content=letter_welsh_content, **kwargs)
+
+    @property
+    def new_template_data(self):
+        data = super().new_template_data
+
+        if "subject" in data:
+            data["letter_welsh_subject"] = data.pop("subject")
+
+        if "content" in data:
+            data["letter_welsh_content"] = data.pop("content")
+
+        return data
+
+
 class LetterTemplatePostageForm(StripWhitespaceForm):
     postage = GovukRadiosField(
         "Choose the postage for this letter template",

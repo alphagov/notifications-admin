@@ -15,6 +15,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
 from app import create_app, webauthn_server
+from app.constants import LetterLanguageOptions
 
 from . import (
     NotifyBeautifulSoup,
@@ -875,6 +876,26 @@ def mock_get_service_letter_template(mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_get_service_letter_template_welsh_language(mocker):
+    def _get(service_id, template_id, version=None, postage="second"):
+        template = template_json(
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="letter",
+            content="Template <em>content</em> with & entity",
+            subject="Subject",
+            postage=postage,
+            letter_languages=LetterLanguageOptions.welsh_then_english.value,
+            letter_welsh_subject="Pennawd y llythyr",
+            letter_welsh_content="Corff y llythyr",
+        )
+        return {"data": template}
+
+    return mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
 def mock_get_service_letter_template_with_attachment(mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(
@@ -943,8 +964,25 @@ def mock_create_service_template(mocker, fake_uuid):
 
 @pytest.fixture(scope="function")
 def mock_update_service_template(mocker):
-    def _update(*, service_id, template_id, name=None, content=None, subject=None):
-        template = template_json(service_id=service_id, id_=template_id, name=name, content=content, subject=subject)
+    def _update(
+        *,
+        service_id,
+        template_id,
+        name=None,
+        content=None,
+        subject=None,
+        letter_welsh_subject=None,
+        letter_welsh_content=None,
+    ):
+        template = template_json(
+            service_id=service_id,
+            id_=template_id,
+            name=name,
+            content=content,
+            subject=subject,
+            letter_welsh_subject=None,
+            letter_welsh_content=None,
+        )
         return {"data": template}
 
     return mocker.patch("app.service_api_client.update_service_template", side_effect=_update)

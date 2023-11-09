@@ -4,7 +4,7 @@ import math
 import uuid
 from functools import partial
 from io import BytesIO
-from typing import Dict, Literal
+from typing import Dict, Literal, Optional
 
 from flask import (
     abort,
@@ -48,6 +48,7 @@ from app.main.forms import (
     SMSTemplateForm,
     TemplateAndFoldersSelectionForm,
     TemplateFolderForm,
+    WelshLetterTemplateForm,
 )
 from app.main.views.send import get_sender_details
 from app.models.service import Service
@@ -77,7 +78,9 @@ from app.utils.templates import TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
 
-def get_template_form(template_type: Literal["email", "sms", "letter", "broadcast"]):
+def get_template_form(
+    template_type: Literal["email", "sms", "letter", "broadcast"], language: Optional[Literal["welsh"]] = None
+):
     if template_type == "email":
         return EmailTemplateForm
     elif template_type == "sms":
@@ -85,6 +88,9 @@ def get_template_form(template_type: Literal["email", "sms", "letter", "broadcas
     elif template_type == "broadcast":
         return BroadcastTemplateForm
     else:
+        if language == "welsh":
+            return WelshLetterTemplateForm
+
         return LetterTemplateForm
 
 
@@ -639,7 +645,25 @@ def rename_template(service_id, template_id):
     )
 
 
+def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: Optional[str], template):
+    if language is None:
+        return
+
+    if template.template_type != "letter":
+        abort(404)
+
+    if not current_service.has_permission("extra_letter_formatting"):
+        abort(403)
+
+    if language.lower() != "welsh":
+        abort(404)
+
+    if template._template["letter_languages"] != LetterLanguageOptions.welsh_then_english.value:
+        abort(404)
+
+
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit/<language>", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def edit_service_template(service_id, template_id, language=None):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
@@ -655,7 +679,9 @@ def edit_service_template(service_id, template_id, language=None):
             )
         )
 
-    form = get_template_form(template.template_type)(**template._template)
+    abort_for_unauthorised_bilingual_letters_or_invalid_options(language, template)
+
+    form = get_template_form(template.template_type, language=language)(**template._template)
 
     if form.validate_on_submit():
         new_template = get_template(
