@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from flask import url_for
 from freezegun import freeze_time
@@ -11,8 +13,7 @@ from tests.conftest import (
     sample_uuid,
 )
 
-
-@pytest.mark.parametrize(
+test_user_auth_combinations = (
     "user, organisation_can_approve_own_go_live_requests, service_has_active_go_live_request, expected_status",
     (
         (
@@ -71,7 +72,10 @@ from tests.conftest import (
         ),
     ),
 )
-def test_get_make_service_live_page(
+
+
+@pytest.mark.parametrize(*test_user_auth_combinations)
+def test_get_org_member_make_service_live_start(
     mocker,
     client_request,
     service_one,
@@ -92,21 +96,390 @@ def test_get_make_service_live_page(
     client_request.login(user)
 
     page = client_request.get(
-        "main.make_service_live",
+        "main.org_member_make_service_live_start",
         service_id=SERVICE_ONE_ID,
         _expected_status=expected_status,
     )
 
     if expected_status == 200:
         assert (
-            normalize_spaces(page.select_one("main p")) == "Test User has requested for this service to be made live."
+            normalize_spaces(page.select_one("main p")) == "Test User has sent a request to go live for ‘service one’."
         )
-        assert [normalize_spaces(li) for li in page.select("main li")] == [
+        assert [normalize_spaces(li) for li in page.select_one("main ul").select("li")] == [
             "111,111 emails per year",
             "222,222 text messages per year",
             "No letters",
         ]
 
+        button = page.select_one("a.govuk-button")
+        assert button.text.strip() == "Continue"
+        assert button.get("href") == f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service"
+
+
+@pytest.mark.parametrize(*test_user_auth_combinations)
+def test_get_org_member_make_service_live_service_name(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    user,
+    organisation_can_approve_own_go_live_requests,
+    service_has_active_go_live_request,
+    expected_status,
+):
+    organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = service_has_active_go_live_request
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.org_member_make_service_live_service_name",
+        service_id=SERVICE_ONE_ID,
+        unique="yes",
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 200:
+        assert "Check the service name" in normalize_spaces(page.select_one("main").text)
+
+        form = page.select_one("form")
+        button = form.select_one("button")
+        assert button.text.strip() == "Continue"
+
+
+def test_post_org_member_make_service_live_service_name_error_summary(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+):
+    user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
+    )
+    organisation_one["can_approve_own_go_live_requests"] = True
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.post(
+        "main.org_member_make_service_live_service_name",
+        service_id=SERVICE_ONE_ID,
+        unique="yes",
+        _expected_status=200,
+        _data={},
+    )
+
+    error_summary = page.select_one(".govuk-error-summary")
+    assert "There is a problem" in error_summary.text
+    assert "Select ‘yes’ if the service name is easy to understand" in error_summary.text
+
+
+@pytest.mark.parametrize(
+    "form_data, query_args, expected_redirect_url, expected_notify_calls",
+    (
+        (
+            {"enabled": True},  # service name is clear/easy to understand
+            {"unique": "yes"},  # service has a unique purpose
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&unique=yes",
+            [],
+        ),
+        (
+            {"enabled": True},  # service name is clear/easy to understand
+            {"unique": "unsure"},  # user is unsure if service is unique
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=ok&unique=unsure",
+            [
+                mock.call(
+                    service_id=SERVICE_ONE_ID,
+                    service_name="service one",
+                    to="test@user.gov.uk",
+                    check_if_unique=True,
+                    unclear_service_name=False,
+                )
+            ],
+        ),
+        (
+            {"enabled": True},  # service name is clear/easy to understand
+            {"unique": "no"},  # user believes service is not unique within the org
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?unique=no",
+            [],
+        ),
+        (
+            {"enabled": False},  # service name is unclear/hard to understandable
+            {"unique": "yes"},  # service has a unique purpose
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=yes",
+            [
+                mock.call(
+                    service_id=SERVICE_ONE_ID,
+                    service_name="service one",
+                    to="test@user.gov.uk",
+                    check_if_unique=False,
+                    unclear_service_name=True,
+                )
+            ],
+        ),
+        (
+            {"enabled": False},  # service name is unclear/hard to understandable
+            {"unique": "no"},  # user believes service is not unique within the org
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?unique=no",
+            [],
+        ),
+        (
+            {"enabled": False},  # service name is unclear/hard to understandable
+            {"unique": "unsure"},  # user is unsure if service is unique
+            f"/services/{SERVICE_ONE_ID}/make-service-live/contact-user?name=bad&unique=unsure",
+            [
+                mock.call(
+                    service_id=SERVICE_ONE_ID,
+                    service_name="service one",
+                    to="test@user.gov.uk",
+                    check_if_unique=True,
+                    unclear_service_name=True,
+                )
+            ],
+        ),
+    ),
+)
+def test_post_org_member_make_service_live_service_name(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    form_data,
+    query_args,
+    expected_redirect_url,
+    expected_notify_calls,
+):
+    user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
+    )
+    organisation_one["can_approve_own_go_live_requests"] = True
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+    mock_notify = mocker.patch("app.organisations_client.notify_org_member_about_next_steps_of_go_live_request")
+
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    client_request.post(
+        "main.org_member_make_service_live_service_name",
+        service_id=SERVICE_ONE_ID,
+        **query_args,
+        _expected_redirect=expected_redirect_url,
+        _data=form_data,
+    )
+
+    assert mock_notify.call_args_list == expected_notify_calls
+
+
+@pytest.mark.parametrize(*test_user_auth_combinations)
+def test_get_org_member_make_service_live_unique_service(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    user,
+    organisation_can_approve_own_go_live_requests,
+    service_has_active_go_live_request,
+    expected_status,
+):
+    organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = service_has_active_go_live_request
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.org_member_make_service_live_check_unique",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 200:
+        assert "Confirm this service is unique" in normalize_spaces(page.select_one("main").text)
+
+        form = page.select_one("form")
+        button = form.select_one("button")
+        assert button.text.strip() == "Continue"
+
+
+def test_post_org_member_make_service_live_unique_service_error_summary(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+):
+    user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
+    )
+    organisation_one["can_approve_own_go_live_requests"] = True
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.post(
+        "main.org_member_make_service_live_check_unique",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=200,
+        _data={},
+    )
+
+    error_summary = page.select_one(".govuk-error-summary")
+    assert "There is a problem" in error_summary.text
+    assert "Select ‘yes’ if this service is unique" in error_summary.text
+
+
+@pytest.mark.parametrize(
+    "request_url, data, expected_redirect_url",
+    (
+        (
+            f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service",
+            {"is_unique": "yes"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/service-name?unique=yes",
+        ),
+        (
+            f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service",
+            {"is_unique": "unsure"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/service-name?unique=unsure",
+        ),
+        (
+            f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service",
+            {"is_unique": "no"},
+            f"/services/{SERVICE_ONE_ID}/make-service-live/decision?unique=no",
+        ),
+    ),
+)
+def test_post_org_member_make_service_live_unique_service(
+    mocker, client_request, service_one, organisation_one, request_url, data, expected_redirect_url
+):
+    user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
+    )
+    organisation_one["can_approve_own_go_live_requests"] = True
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    client_request.post_url(
+        request_url,
+        _expected_redirect=expected_redirect_url,
+        _data=data,
+    )
+
+
+@pytest.mark.parametrize(
+    "data, expected_redirect",
+    (
+        ({}, f"/services/{SERVICE_ONE_ID}/make-service-live"),
+        ({"name": "ok", "unique": "yes"}, f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&unique=yes"),
+        ({"name": "bad", "unique": "yes"}, None),
+        ({"name": "ok", "unique": "no"}, f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=ok&unique=no"),
+        ({"name": "bad", "unique": "no"}, f"/services/{SERVICE_ONE_ID}/make-service-live/decision?name=bad&unique=no"),
+        ({"name": "ok", "unique": "unsure"}, None),
+        ({"name": "bad", "unique": "unsure"}, None),
+    ),
+)
+@pytest.mark.parametrize(*test_user_auth_combinations)
+def test_get_org_member_make_service_live_contact_user(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    user,
+    organisation_can_approve_own_go_live_requests,
+    service_has_active_go_live_request,
+    expected_status,
+    data,
+    expected_redirect,
+):
+    organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = service_has_active_go_live_request
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.org_member_make_service_live_contact_user",
+        service_id=SERVICE_ONE_ID,
+        **data,
+        _expected_redirect=expected_redirect if expected_status == 200 else None,
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 200 and not expected_redirect:
+        assert "Contact the team member that made the request to go live" in normalize_spaces(
+            page.select_one("main").text
+        )
+
+
+@pytest.mark.parametrize(*test_user_auth_combinations)
+def test_get_org_member_make_service_live_decision(
+    mocker,
+    client_request,
+    service_one,
+    organisation_one,
+    user,
+    organisation_can_approve_own_go_live_requests,
+    service_has_active_go_live_request,
+    expected_status,
+):
+    organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = service_has_active_go_live_request
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_letter"] = None
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.org_member_make_service_live_decision",
+        service_id=SERVICE_ONE_ID,
+        unique="yes",
+        name="ok",
+        _expected_status=expected_status,
+    )
+
+    if expected_status == 200:
         assert [
             (radio.select_one("input[type=radio]")["value"], normalize_spaces(radio.select_one("label").text))
             for radio in page.select(".govuk-radios__item")
@@ -116,70 +489,51 @@ def test_get_make_service_live_page(
         ]
 
 
-def test_get_make_service_live_page_without_org(
-    client_request,
-    service_one,
-    organisation_one,
+@pytest.mark.parametrize(
+    "post_data, expected_error_message",
+    (
+        ({}, "Select approve or reject"),
+        ({"enabled": False}, "Enter a reason"),
+    ),
+)
+def test_post_org_member_make_service_live_decision_error_summary(
+    mocker, client_request, service_one, organisation_one, post_data, expected_error_message
 ):
-    user = create_user(id=sample_uuid(), platform_admin=True)
+    user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
+    )
+    organisation_one["can_approve_own_go_live_requests"] = True
+
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
     service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
     service_one["volume_letter"] = None
 
     client_request.login(user)
 
-    page = client_request.get(
-        "main.make_service_live",
+    page = client_request.post(
+        "main.org_member_make_service_live_decision",
         service_id=SERVICE_ONE_ID,
+        name="ok",
+        unique="yes",
         _expected_status=200,
+        _data=post_data,
     )
 
-    assert normalize_spaces(page.select_one("a#link-org")) == "link an organisation"
+    error_summary = page.select_one(".govuk-error-summary")
+    assert "There is a problem" in error_summary.text
+    assert expected_error_message in error_summary.text
 
 
 @pytest.mark.parametrize(
-    "method",
-    ("get", "post"),
-)
-@pytest.mark.parametrize(
-    "user",
-    (
-        create_user(id=sample_uuid(), organisations=[ORGANISATION_ID]),
-        create_user(id=sample_uuid(), platform_admin=True),
-    ),
-)
-def test_service_is_already_live(
-    mocker,
-    client_request,
-    service_one,
-    organisation_one,
-    mock_update_service,
-    user,
-    method,
-):
-    organisation_one["can_approve_own_go_live_requests"] = True
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
-
-    service_one["restricted"] = False
-    service_one["organisation"] = ORGANISATION_ID
-
-    client_request.login(user)
-
-    page = getattr(client_request, method)(
-        "main.make_service_live",
-        service_id=SERVICE_ONE_ID,
-        _expected_status=410,
-    )
-
-    assert normalize_spaces(page.select_one("h1").text) == "This service is already live"
-    assert mock_update_service.called is False
-
-
-@pytest.mark.parametrize(
-    "post_data, expected_arguments_to_update_service",
+    "query_args, post_data, expected_arguments_to_update_service, should_notify",
     (
         (
-            True,
+            {"name": "ok", "unique": "yes"},
+            {"enabled": True},
             {
                 "email_message_limit": 250_000,
                 "sms_message_limit": 250_000,
@@ -188,9 +542,11 @@ def test_service_is_already_live(
                 "go_live_at": "2022-12-22 12:12:12",
                 "has_active_go_live_request": False,
             },
+            False,
         ),
         (
-            False,
+            {"name": "ok", "unique": "yes"},
+            {"enabled": False, "rejection_reason": "It's a stinker"},
             {
                 "email_message_limit": 50,
                 "sms_message_limit": 50,
@@ -199,31 +555,34 @@ def test_service_is_already_live(
                 "go_live_at": None,
                 "has_active_go_live_request": False,
             },
+            True,
         ),
     ),
 )
 @freeze_time("2022-12-22 12:12:12")
-def test_post_make_service_live_page(
+def test_post_org_member_make_service_live_decision(
     mocker,
     client_request,
     platform_admin_user,
     service_one,
     mock_get_organisation,
     mock_update_service,
+    query_args,
     post_data,
     expected_arguments_to_update_service,
+    should_notify,
 ):
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
+    mock_notify = mocker.patch("app.organisations_client.notify_service_member_of_rejected_go_live_request")
 
     client_request.login(platform_admin_user)
 
     client_request.post(
-        "main.make_service_live",
+        "main.org_member_make_service_live_decision",
         service_id=SERVICE_ONE_ID,
-        _data={
-            "enabled": post_data,
-        },
+        **query_args,
+        _data=post_data,
         _expected_redirect=url_for("main.organisation_dashboard", org_id=ORGANISATION_ID),
     )
 
@@ -232,60 +591,15 @@ def test_post_make_service_live_page(
         **expected_arguments_to_update_service,
     )
 
-
-def test_post_make_service_live_page_error(
-    mocker,
-    client_request,
-    platform_admin_user,
-    service_one,
-    mock_get_organisation,
-    mock_update_service,
-):
-    service_one["has_active_go_live_request"] = True
-    service_one["organisation"] = ORGANISATION_ID
-
-    client_request.login(platform_admin_user)
-
-    page = client_request.post(
-        "main.make_service_live",
-        service_id=SERVICE_ONE_ID,
-        _data={},
-        _expected_status=200,
-    )
-    assert normalize_spaces(page.select_one(".govuk-error-message")) == "Error: Select approve or reject"
-    assert mock_update_service.called is False
-
-
-@pytest.mark.parametrize(
-    "post_data, expected_banner_class, expected_flash_message",
-    (
-        (True, ".banner-default-with-tick", "‘service one’ is now live"),
-        (False, ".banner-default", "Request to go live rejected"),
-    ),
-)
-def test_post_make_service_live_page_has_flash_message_after_redirect(
-    mocker,
-    client_request,
-    platform_admin_user,
-    service_one,
-    mock_get_organisation,
-    mock_update_service,
-    post_data,
-    expected_banner_class,
-    expected_flash_message,
-):
-    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": [], "updated_at": None})
-    service_one["has_active_go_live_request"] = True
-    service_one["organisation"] = ORGANISATION_ID
-
-    client_request.login(platform_admin_user)
-
-    page = client_request.post(
-        "main.make_service_live",
-        service_id=SERVICE_ONE_ID,
-        _data={
-            "enabled": post_data,
-        },
-        _follow_redirects=True,
-    )
-    assert normalize_spaces(page.select_one(expected_banner_class).text) == expected_flash_message
+    if should_notify:
+        assert mock_notify.call_args_list == [
+            mocker.call(
+                service_id=service_one["id"],
+                service_member_name="Platform admin user",
+                service_name="service one",
+                organisation_name="Test organisation",
+                rejection_reason="It's a stinker",
+                organisation_team_member_name="Platform admin user",
+                organisation_team_member_email="platform@admin.gov.uk",
+            )
+        ]

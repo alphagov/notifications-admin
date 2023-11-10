@@ -1,0 +1,53 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+
+{% set title = "Contact the team member that made the request to go live" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      <p class="govuk-body">
+        We have sent you an email with instructions.
+      </p>
+
+      {% set reasons = [] %}
+      {% if unique != 'yes' %}
+        {% do reasons.append('find out if ‘' + current_service.name + '’ is unique') %}
+      {% endif %}
+      {% if name == 'bad' %}
+        {% do reasons.append('update the service name so it’s easy to understand') %}
+      {% endif %}
+
+      {% if reasons|length == 0 %}
+        {# This will throw a DivideByZero (arbitrary) error so we can investigate what happened #}
+        {{ ('no reasons to contact user') / 0 }}
+      {% elif reasons|length == 1 %}
+        <p class="govuk-body">Before you can approve or reject this request, contact {{ current_service.go_live_user.name }} to {{ reasons[0] }}.</p>
+      {% else %}
+        <p class="govuk-body">Before you can approve or reject this request, contact {{ current_service.go_live_user.name }} to:</p>
+        <ul class="govuk-list govuk-list--bullet">
+          {% for reason in reasons %}
+          <li>{{ reason }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <p class="govuk-body">
+        Their email address is {{ current_service.go_live_user.email_address }}
+      </p>
+
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation_id) }}">Go back to the dashboard for {{ current_service.organisation.name }}</a>
+      </p>
+
+    </div>
+  </div>
+{% endblock %}

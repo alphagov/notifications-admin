@@ -2904,3 +2904,28 @@ class PlatformAdminSearchForm(StripWhitespaceForm):
         "Search",
         validators=[NotifyDataRequired(thing="a search term")],
     )
+
+
+class UniqueServiceForm(StripWhitespaceForm):
+    is_unique = GovukRadiosField(
+        label="Is the service unique?",
+        choices=[("yes", "Yes"), ("no", "No"), ("unsure", "I‘m not sure")],
+        validators=[DataRequired(message="Select ‘yes’ if this service is unique")],
+    )
+
+    def __init__(self, service_name, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.is_unique.label.text = f"Is ‘{service_name}’ unique?"
+
+
+class ServiceGoLiveDecisionForm(OnOffSettingForm):
+    rejection_reason = GovukTextareaField("Rejection reason")
+
+    def validate(self, *args, **kwargs):
+        if self.enabled.data is False:
+            self.rejection_reason.validators = [
+                NotifyDataRequired(thing="a reason"),
+            ]
+
+        return super().validate(*args, **kwargs)
