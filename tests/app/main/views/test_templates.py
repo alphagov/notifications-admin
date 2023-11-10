@@ -979,7 +979,7 @@ def test_POST_letter_template_change_to_english_redirects_to_confirmation_page(
     mocker,
     fake_uuid,
     active_user_with_permissions,
-    mock_get_service_letter_template,
+    mock_get_service_letter_template_welsh_language,
 ):
     service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
@@ -991,7 +991,9 @@ def test_POST_letter_template_change_to_english_redirects_to_confirmation_page(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _data={"languages": "english"},
-        _follow_redirects=True,
+        _expected_redirect=url_for(
+            "main.letter_template_confirm_remove_welsh", service_id=SERVICE_ONE_ID, template_id=fake_uuid
+        ),
     )
     assert mock_template_change_language.call_args_list == []
 
