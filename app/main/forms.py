@@ -18,10 +18,13 @@ from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.postal_address import PostalAddress
 from notifications_utils.recipients import (
+    InvalidEmailError,
     InvalidPhoneError,
     normalise_phone_number,
+    validate_email_address,
     validate_phone_number,
 )
+from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from orderedset import OrderedSet
 from werkzeug.utils import cached_property
 from wtforms import (
@@ -1154,9 +1157,26 @@ class RenameServiceForm(StripWhitespaceForm):
         validators=[
             NotifyDataRequired(thing="a service name"),
             MustContainAlphanumericCharacters(thing="service name"),
-            Length(max=255, thing="service name"),
         ],
     )
+
+    def validate_name(self, field):
+        """
+        Validate that the email from name ("Service Name" <service.name@notifications.service.gov.uk)
+        is under 320 characters (if it's over, SES will reject the email and we'll end up with technical errors)
+        """
+        normalised_service_name = make_string_safe_for_email_local_part(field.data)
+        try:
+            # TODO: should probs store this value in config["NOTIFY_EMAIL_DOMAIN"] or similar
+            email = validate_email_address(f"{normalised_service_name}@notifications.service.gov.uk")
+        except InvalidEmailError as e:
+            raise ValidationError("Service name cannot include characters from a non-Latin alphabet") from e
+
+        if len(f'"{field.data}" <{email}>') > 320:
+            # This is a little white lie - the service name _can_ be longer, provided the normalised name is short so
+            # that the whole email is under 320 characters. 143 is chosen because a 143 char name + 143 char normalised
+            # name + 34 characters of email domain, quotes, angle brackets etc = 320 characters total.
+            raise ValidationError("Service name cannot be longer than 143 characters")
 
 
 class RenameOrganisationForm(StripWhitespaceForm):

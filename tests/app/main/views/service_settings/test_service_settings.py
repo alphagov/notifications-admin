@@ -208,8 +208,7 @@ def test_should_show_overview(
     assert page.select_one("h1").text == "Settings"
     rows = page.select("tr")
     assert len(rows) == len(expected_rows)
-    for index, row in enumerate(expected_rows):
-        assert row == " ".join(rows[index].text.split())
+    assert [" ".join(row.text.split()) for row in rows] == expected_rows
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
@@ -291,8 +290,7 @@ def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
     ]
 
     assert len(rows) == len(expected_rows)
-    for index, row in enumerate(expected_rows):
-        assert row == " ".join(rows[index].text.split())
+    assert [" ".join(row.text.split()) for row in rows] == expected_rows
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
@@ -507,8 +505,7 @@ def test_should_show_overview_for_service_with_more_things_set(
     service_one["permissions"] = permissions
     service_one["email_branding"] = uuid4()
     page = client_request.get("main.service_settings", service_id=service_one["id"])
-    for index, row in enumerate(expected_rows):
-        assert row == " ".join(page.select("tr")[index + 1].text.split())
+    assert [" ".join(row.text.split()) for row in page.select("tr")[1:]] == expected_rows
 
 
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
@@ -641,7 +638,9 @@ def test_should_show_service_name_with_no_prefixing(
     [
         ("", "Error: Enter a service name"),
         (".", "Service name must include at least 2 letters or numbers"),
-        ("a" * 256, "Service name cannot be longer than 255 characters"),
+        ("GOV.UK Ειδοποίηση", "Service name cannot include characters from a non-Latin alphabet"),
+        # under the 255 db col length, but when combined with normalised service name to make an email, it's too long
+        ("a" * 150 + " " * 100 + "a", "Service name cannot be longer than 143 characters"),
     ],
 )
 def test_service_name_change_fails_if_new_name_fails_validation(
@@ -912,6 +911,19 @@ def test_should_not_allow_duplicate_service_names(
     assert "This service name is already in use" in page.text
 
 
+def test_service_name_change_doesnt_suppress_api_errors(client_request, mocker, service_one):
+    mocker.patch(
+        "app.main.views.service_settings.index.service_api_client.update_service",
+        side_effect=HTTPError(response=Mock(status_code=500)),
+    )
+    client_request.post(
+        "main.service_name_change",
+        service_id=SERVICE_ONE_ID,
+        _data={"name": "SERVICE TWO"},
+        _expected_status=500,
+    )
+
+
 def test_should_redirect_after_service_name_change(
     client_request,
     mock_update_service,
@@ -927,11 +939,7 @@ def test_should_redirect_after_service_name_change(
         ),
     )
 
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        name="New Name",
-        normalised_service_name="new.name",
-    )
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="New Name")
 
 
 @pytest.mark.parametrize(
