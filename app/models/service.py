@@ -42,6 +42,7 @@ class Service(JSONModel):
         "letter_message_limit",
         "rate_limit",
         "name",
+        "normalised_service_name",
         "notes",
         "prefix_sms",
         "purchase_order_number",
