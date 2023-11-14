@@ -71,7 +71,6 @@ def test_client_creates_service_with_correct_data(
         1,
         True,
         fake_uuid,
-        "some.test.name",
     )
     mock_post.assert_called_once_with(
         "/service",
@@ -88,7 +87,6 @@ def test_client_creates_service_with_correct_data(
             letter_message_limit=1,
             restricted=True,
             user_id=fake_uuid,
-            normalised_service_name="some.test.name",
         ),
     )
 
@@ -570,7 +568,6 @@ def test_client_updates_service_with_allowed_attributes(
         "contact_link",
         "count_as_live",
         "email_branding",
-        "normalised_service_name",
         "free_sms_fragment_limit",
         "go_live_at",
         "go_live_user",
