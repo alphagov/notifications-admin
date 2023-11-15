@@ -6,6 +6,7 @@ then
 
 elif [ "$1" == "web-local" ]
 then
+  npm run build
   flask run --host 0.0.0.0 --port $PORT
 
 else
