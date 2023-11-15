@@ -248,7 +248,8 @@
             {{ edit_field(
               'Change',
               url_for('main.service_set_international_letters', service_id=current_service.id),
-              permissions=['manage_service']
+              permissions=['manage_service'],
+              suffix='your settings for sending international letters',
             )}}
           {% endcall %}
 
