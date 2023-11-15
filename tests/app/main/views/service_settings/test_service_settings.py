@@ -6513,9 +6513,21 @@ def test_should_set_default_org_email_branding_succeeds_if_all_conditions_are_me
 
 
 class TestServiceEmailSenderChange:
-    def test_service_email_sender_change_page_renders(self, client_request):
+    @pytest.mark.parametrize(
+        "custom_email_sender_name, expected_email",
+        [
+            ("custom sender name", '"custom sender name" <local.part@notifications.service.gov.uk>'),
+            (None, '"service one" <local.part@notifications.service.gov.uk>'),
+        ],
+    )
+    def test_service_email_sender_change_page_shows_your_current_email_sender_name(
+        self, client_request, service_one, custom_email_sender_name, expected_email
+    ):
+        service_one["custom_email_sender_name"] = custom_email_sender_name
+        service_one["email_sender_local_part"] = "local.part"
         page = client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=200)
         assert page.select_one("h1").text == "Sender name and email address"
+        assert page.select_one(".govuk-inset-text").text.strip() == expected_email
 
     @pytest.mark.parametrize(
         "custom_email_sender_name, error_message",

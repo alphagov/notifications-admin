@@ -18,6 +18,13 @@
 {% block maincolumn_content %}
     {{ page_header(heading) }}
 
+    <p class="govuk-body">Your emails currently come from:</p>
+
+    {% set full_from_email %}
+        "{{current_service.custom_email_sender_name or current_service.name}}" &lt;{{current_service.email_sender_local_part}}@notifications.service.gov.uk&gt;
+    {% endset %}
+    {{ govukInsetText({"text": full_from_email, "classes": "govuk-!-margin-top-0"}) }}
+
     <p class="govuk-body">Your sender name should tell the recipient what your message is about, as well as who it’s from.</p>
 
     <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
