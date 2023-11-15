@@ -62,14 +62,41 @@ describe('File upload', () => {
 
   });
 
-  test("An 'upload' button should be added", () => {
+  describe("An 'upload' button should visually replace the file field", () => {
 
-    // start module
-    window.GOVUK.notifyModules.start();
+    var uploadButton;
+    var uploadButtonLabel;
+    var originalControlId;
 
-    var uploadButton = form.querySelector('button');
+    beforeEach(() => {
 
-    expect(uploadButton).not.toBeNull();
+      originalControlId = uploadControl.id;
+
+      // start module
+      window.GOVUK.notifyModules.start();
+
+      uploadButton = form.querySelector('button');
+
+    });
+
+    test("Its text should be set by the module config", () => {
+
+      expect(uploadButton).not.toBeNull();
+      expect(uploadButton.textContent.trim()).toEqual(uploadControl.dataset.buttonText);
+
+    });
+
+    // We generate links in the error summary to the original field, by id, so our new elements need to match this
+    test("The file field's id should be copied to the it and the original rewritten", () => {
+
+      var rewrittenId = `hidden-${originalControlId}`;
+
+      expect(uploadButton.id).toEqual(originalControlId);
+
+      expect(uploadControl.id).not.toEqual(originalControlId);
+      expect(uploadLabel.getAttribute('for')).toEqual(uploadControl.id);
+
+    });
 
     // Note: the existing form controls are also hidden but this is through CSS so out of scope
 

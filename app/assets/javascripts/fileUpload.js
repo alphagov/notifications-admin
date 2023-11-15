@@ -27,8 +27,11 @@
     this.addFakeButton = function () {
 
       var buttonText = this.$field.data('buttonText');
+      var fieldId = this.$field.attr('id'); // copy the id across so error links work
+      var oldFieldId = `hidden-${fieldId}`;
+      var oldLabel = this.$field.parent().find(`label[for=${fieldId}]`);
       var buttonHTMLStr = `
-        <button type="button" class="file-upload-button govuk-button govuk-!-margin-right-1" id="file-upload-button">
+        <button type="button" class="file-upload-button govuk-button govuk-!-margin-right-1" id="${fieldId}">
           ${buttonText}
         </button>`; // Styled as a submit button to raise prominence. The type shouldn't change.
 
@@ -37,12 +40,16 @@
       // errors need to be added to that.
       if (this.$fieldErrors.length > 0) {
         buttonHTMLStr = `
-          <label class="file-upload-button-label error-message" for="file-upload-button">
+          <label class="file-upload-button-label error-message" for="${fieldId}">
             <span class="govuk-visually-hidden">${buttonText} </span>
             ${this.$fieldErrors.eq(0).text()}
           </label>
           ${buttonHTMLStr}`;
       }
+
+      // Change id of field now we're using it for the button
+      this.$field.attr('id', oldFieldId);
+      this.$field.parent().find(`label[for=${fieldId}]`).attr('for', oldFieldId);
 
       $(buttonHTMLStr)
       .on('click', e => this.$field.click())
