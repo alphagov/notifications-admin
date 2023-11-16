@@ -75,6 +75,8 @@ FROM production as test
 # If bumping this node version, also bump:
 #   `.nvmrc` in notifications-admin
 #   `concourse/docker/unit-tests-image-node16.Dockerfile` in notifications-aws
+# Keep NVM_VERSION in sync as well.
+ARG NVM_VERSION=0.39.5
 ARG NODE_VERSION=16.16.0
 
 USER root
@@ -102,7 +104,7 @@ COPY --from=python_build --chown=notify:notify /opt/venv /opt/venv
 
 COPY .nvmrc .nvmrc
 RUN echo "Installing nvm and NodeJS v${NODE_VERSION}" && \
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh | bash && \
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash && \
     . ${NVM_DIR}/nvm.sh && \
     nvm install
 
