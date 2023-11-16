@@ -2490,7 +2490,7 @@ def required_for_ops(*operations):
             # super weird
             raise validators.StopValidation("Must be empty")
         if form.op in operations and not any(field.raw_data):
-            raise validators.StopValidation("Cannot be empty")
+            raise validators.StopValidation("Enter a name for this folder")
 
     return validate
 
