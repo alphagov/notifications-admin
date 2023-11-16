@@ -2350,7 +2350,7 @@ class BrandingRequestForm(StripWhitespaceForm):
 class GovernmentIdentityLogoForm(StripWhitespaceForm):
     logo_text = GovukTextInputField(
         "Enter the text that will appear in your logo",
-        validators=[DataRequired("Enter the text that will appear in your logo")],
+        validators=[NotifyDataRequired(thing="the text that will appear in your logo")],
     )
 
 
