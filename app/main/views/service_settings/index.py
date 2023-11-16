@@ -13,7 +13,6 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
-from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
@@ -106,11 +105,7 @@ def service_name_change(service_id):
 
     if form.validate_on_submit():
         try:
-            normalised_service_name = make_string_safe_for_email_local_part(form.name.data)
-            current_service.update(
-                name=form.name.data,
-                normalised_service_name=normalised_service_name,
-            )
+            current_service.update(name=form.name.data)
         except HTTPError as http_error:
             if http_error.status_code == 400 and (
                 error_message := service_api_client.parse_edit_service_http_error(http_error)
