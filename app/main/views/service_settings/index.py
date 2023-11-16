@@ -126,8 +126,10 @@ def service_name_change(service_id):
     )
 
 
+# TODO: change permissions to manage_service
+# @user_has_permissions("manage_service")
 @main.route("/services/<uuid:service_id>/service-settings/email-sender", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
+@user_is_platform_admin
 def service_email_sender_change(service_id):
     form = ServiceEmailSenderForm(
         use_custom_email_sender_name=current_service.custom_email_sender_name is not None,
