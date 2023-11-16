@@ -72,7 +72,10 @@ CMD [ "web" ]
 ##### Test Image ##############################################################
 FROM production as test
 
-ARG NODE_VERSION=16.14.0
+# If bumping this node version, also bump:
+#   `.nvmrc` in notifications-admin
+#   `concourse/docker/unit-tests-image-node16.Dockerfile` in notifications-aws
+ARG NODE_VERSION=16.16.0
 
 USER root
 
