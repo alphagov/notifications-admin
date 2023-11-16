@@ -507,6 +507,7 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
         skip_link=get_skip_link(step_index, template),
         back_link=back_link,
         link_to_upload=(request.endpoint == "main.send_one_off_step" and step_index == 0),
+        error_summary_enabled=True,
     )
 
 

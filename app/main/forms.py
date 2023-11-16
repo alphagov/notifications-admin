@@ -2252,7 +2252,7 @@ def get_placeholder_form_instance(
     allow_international_phone_numbers=False,
 ):
     if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template_type == "email":
-        field = make_email_address_field(label=placeholder_name, gov_user=False)
+        field = make_email_address_field(label=placeholder_name, gov_user=False, thing="an email address")
     elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template_type == "sms":
         if allow_international_phone_numbers:
             field = international_phone_number(label=placeholder_name)
