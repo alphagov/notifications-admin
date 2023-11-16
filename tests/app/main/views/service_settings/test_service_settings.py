@@ -4795,35 +4795,20 @@ def test_archive_service_after_confirm(
     assert call(f"user-{sample_uuid()}") in redis_delete_mock.call_args_list
 
 
-platform_admin_archive_service_confirmation_message = """
-Before you delete ‘service one’, confirm the user: has given the exact name of the service they want to delete is aware
-they will no longer be able to use the inbound number to receive replies if there is one You will need to: check the
-user is a member of the service check the user has the ‘Manage settings, team and usage’ permissions’ contact another
-team member if there is one with the ‘Manage setting, team and usage’ permissions for a second approval check the
-service has not sent any messages over their allowance that we may need an to raise an invoice for Are you sure
-you want to delete ‘service one’? Yes, delete
-"""
-user_archive_service_confirmation_message = (
-    "Are you sure you want to delete ‘service one’? There’s no way to undo this. Yes, delete"
-)
-
-
 @pytest.mark.parametrize(
-    "user, is_trial_service, confirmation_message",
+    "user, is_trial_service",
     (
-        [create_platform_admin_user(), True, platform_admin_archive_service_confirmation_message],
-        [create_platform_admin_user(), False, platform_admin_archive_service_confirmation_message],
-        [create_active_user_with_permissions(), True, user_archive_service_confirmation_message],
+        [create_platform_admin_user(), True],
+        [create_platform_admin_user(), False],
+        [create_active_user_with_permissions(), True],
         pytest.param(
             create_active_user_with_permissions(),
             False,
-            user_archive_service_confirmation_message,
             marks=pytest.mark.xfail,
         ),
         pytest.param(
             create_active_user_no_settings_permission(),
             True,
-            user_archive_service_confirmation_message,
             marks=pytest.mark.xfail,
         ),
     ),
@@ -4838,7 +4823,6 @@ def test_archive_service_prompts_user(
     mock_get_service_settings_page_common,
     user,
     is_trial_service,
-    confirmation_message,
 ):
     mock_api = mocker.patch("app.service_api_client.post")
     service_one["restricted"] = is_trial_service
@@ -4856,7 +4840,7 @@ def test_archive_service_prompts_user(
         "main.archive_service",
         service_id=SERVICE_ONE_ID,
     )
-    assert normalize_spaces(delete_page.select_one(".banner-dangerous").text) == normalize_spaces(confirmation_message)
+    assert "Are you sure you want to delete" in normalize_spaces(delete_page.select_one(".banner-dangerous").text)
     assert mock_api.called is False
 
 

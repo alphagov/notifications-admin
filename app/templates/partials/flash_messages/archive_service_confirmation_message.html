@@ -1,15 +1,14 @@
 {% if platform_admin %}
-      <h3 class="govuk-body govuk-!-font-weight-bold">Before you delete ‘{{service_name}}’: </h3>
-           <ol class="govuk-list govuk-list--number">
-             <li>Confirm the exact name of the service the user wants to delete.</li>
-             <li>Check the user has the ‘Manage settings, team and usage’ permission for this service.</li>
-             <li>Confirm the request with another team member who has the ‘Manage settings, team and usage’ permission.</li> 
-             <li>Check if we need to raise an invoice.</li>           
-           </ol>
-           
-       <p class="govuk-body">If the service can receive text messages, tell the user that their phone number will stop working.</p>
-
       <h2 class="banner-title">Are you sure you want to delete ‘{{service_name}}’?</h2>
+      <br>
+      <p class="govuk-body">Before you delete ‘{{service_name}}’: </p>
+           <ul class="govuk-list govuk-list--bullet">
+             <li>confirm the exact name of the service the user wants to delete</li>
+             <li>check the user has the ‘Manage settings, team and usage’ permission for this service</li>
+             <li>confirm the request with another team member who has the ‘Manage settings, team and usage’ permission</li>
+             <li>check if we need to raise an invoice</li>
+           </ul>
+       <p class="govuk-body">If the service can receive text messages, tell the user that the phone number for this service will stop working.</p>
 {% else %}
       <h2 class="govuk-body govuk-!-font-weight-bold">
           Are you sure you want to delete ‘{{current_service.name}}’? There’s no way to undo this.
