@@ -525,7 +525,7 @@ def test_editing_letter_template_should_have_hidden_name_field(
     assert name_input["type"] == "hidden"
 
 
-def test_editing_welsh_content_for_letter_template(
+def test_GET_edit_service_template_for_welsh_letter(
     client_request, mock_get_service_letter_template_welsh_language, fake_uuid, service_one
 ):
     service_one["permissions"].append("letter")
