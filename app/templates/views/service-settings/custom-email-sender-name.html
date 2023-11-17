@@ -43,7 +43,7 @@
             }
         ) }}
         <div class="govuk-hint" data-notify-module="update-status" data-target="custom_email_sender_name" data-updates-url="{{ url_for('main.service_email_sender_preview', service_id=current_service.id) }}" aria-live="polite">
-            {% with email_sender_name = current_service.custom_email_sender_name %}
+            {% with email_sender_name = current_service.custom_email_sender_name or '' %}
                 {% include "partials/preview-email-sender-name.html" %}
             {% endwith %}
         </div>

@@ -112,7 +112,7 @@ def mock_get_service_settings_page_common(
                 "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails On Change your settings for sending emails",
-                "Email sender name Test Service Change email sender name",
+                "Email sender name Test Service test.service@notifications.service.gov.uk Change email sender name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
