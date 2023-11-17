@@ -11,6 +11,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user
+from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
@@ -394,9 +395,16 @@ def archive_service(service_id):
         return redirect(url_for(".choose_account"))
     else:
         flash(
-            f"Are you sure you want to delete ‘{current_service.name}’? There’s no way to undo this.",
+            Markup(
+                render_template(
+                    "partials/flash_messages/archive_service_confirmation_message.html",
+                    service_name=current_service.name,
+                    platform_admin=current_user.platform_admin,
+                )
+            ),
             "delete",
         )
+
         return service_settings(service_id)
 
 

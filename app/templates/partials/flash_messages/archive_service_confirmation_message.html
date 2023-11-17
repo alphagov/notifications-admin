@@ -1,0 +1,16 @@
+{% if platform_admin %}
+      <h2 class="banner-title">Are you sure you want to delete ‘{{service_name}}’?</h2>
+      <br>
+      <p class="govuk-body">Before you delete this service: </p>
+           <ul class="govuk-list govuk-list--bullet">
+             <li>confirm the exact name of the service the user wants to delete</li>
+             <li>check the user has the ‘Manage settings, team and usage’ permission for this service</li>
+             <li>confirm the request with another team member who has the ‘Manage settings, team and usage’ permission</li>
+             <li>check if we need to raise an invoice</li>
+           </ul>
+       <p class="govuk-body">If the service can receive text messages, tell the user that the phone number for this service will stop working.</p>
+{% else %}
+      <h2 class="govuk-body govuk-!-font-weight-bold">
+          Are you sure you want to delete ‘{{current_service.name}}’? There’s no way to undo this.
+      </h2>
+{% endif %}
