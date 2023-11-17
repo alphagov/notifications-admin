@@ -27,7 +27,7 @@ from notifications_utils.formatters import (
     get_lines_with_normalised_whitespace,
 )
 from notifications_utils.recipients import format_phone_number_human_readable
-from notifications_utils.safe_string import make_string_safe_for_id
+from notifications_utils.safe_string import make_string_safe_for_email_local_part, make_string_safe_for_id
 from notifications_utils.sanitise_text import SanitiseASCII
 from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
@@ -567,6 +567,7 @@ def add_template_filters(application):
         format_mobile_network,
         format_yes_no,
         square_metres_to_square_miles,
+        make_string_safe_for_email_local_part,
     ]:
         application.add_template_filter(fn)
 

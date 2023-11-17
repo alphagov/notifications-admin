@@ -151,6 +151,19 @@ def service_email_sender_change(service_id):
     )
 
 
+@main.post("/services/<uuid:service_id>/service-settings/email-sender/preview-address")
+@user_has_permissions("manage_service")
+def service_email_sender_preview(service_id):
+    return jsonify(
+        {
+            "html": render_template(
+                "partials/preview-email-sender-name.html",
+                email_sender_name=request.form.get("custom_email_sender_name"),
+            )
+        }
+    )
+
+
 @main.route("/services/<uuid:service_id>/service-settings/set-data-retention", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_data_retention(service_id):
