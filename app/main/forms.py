@@ -1944,6 +1944,14 @@ class ServiceSwitchChannelForm(OnOffSettingForm):
 
 
 class ServiceEmailSenderForm(StripWhitespaceForm):
+    BAD_EMAIL_LOCAL_PARTS = {
+        "noreply",
+        "no.reply",
+        "info",
+        "support",
+        "alert",
+    }
+
     use_custom_email_sender_name = OnOffField(
         "Choose a sender name",
         choices_for_error_message="same or custom",
@@ -1985,6 +1993,9 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
             # that the whole email is under 320 characters. 143 is chosen because a 143 char name + 143 char normalised
             # name + 34 characters of email domain, quotes, angle brackets etc = 320 characters total.
             raise ValidationError("Sender name cannot be longer than 143 characters")
+
+        if normalised_sender_name in self.BAD_EMAIL_LOCAL_PARTS:
+            raise ValidationError("Sender name needs to be more specific")
 
 
 class AdminSetEmailBrandingForm(StripWhitespaceForm):

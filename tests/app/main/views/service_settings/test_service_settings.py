@@ -6567,6 +6567,11 @@ class TestServiceEmailSenderChange:
             ("", "Error: Enter a sender name"),
             (".", "Sender name must include at least 2 letters or numbers"),
             ("GOV.UK Ειδοποίηση", "Sender name cannot include characters from a non-Latin alphabet"),
+            ("no reply", "Sender name needs to be more specific"),
+            ("NO-REPLY", "Sender name needs to be more specific"),
+            ("info", "Sender name needs to be more specific"),
+            ("Support", "Sender name needs to be more specific"),
+            ("ALERT", "Sender name needs to be more specific"),
             # under the 255 db col length, but too long when combined with email_sender_local_part to make an email
             ("a" * 150 + " " * 100 + "a", "Sender name cannot be longer than 143 characters"),
         ],
