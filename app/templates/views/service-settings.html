@@ -96,6 +96,23 @@
             )}}
           {% endcall %}
 
+          {% if current_user.platform_admin %}
+          {% call settings_row(if_has_permission='email') %}
+            {{ text_field('Email sender name') }}
+            {{ text_field(
+              current_service.custom_email_sender_name or current_service.name,
+              truncate=true
+            )}}
+            {{ edit_field(
+                'Change',
+                url_for('main.service_email_sender_change', service_id=current_service.id),
+                permissions=['manage_service'],
+                suffix='email sender name',
+              )
+            }}
+          {% endcall %}
+          {% endif %}
+
           {% call settings_row(if_has_permission='email') %}
             {{ text_field('Reply-to email addresses') }}
             {% call field(status='default' if current_service.count_email_reply_to_addresses == 0 else '') %}
