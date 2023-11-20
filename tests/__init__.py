@@ -316,6 +316,9 @@ def template_json(
     postage=None,
     folder=None,
     letter_attachment=None,
+    letter_languages="english",
+    letter_welsh_subject=None,
+    letter_welsh_content=None,
 ):
     template = {
         "id": id_,
@@ -334,6 +337,9 @@ def template_json(
         "folder": folder,
         "postage": postage,
         "letter_attachment": letter_attachment,
+        "letter_languages": letter_languages,
+        "letter_welsh_subject": letter_welsh_subject,
+        "letter_welsh_content": letter_welsh_content,
     }
     if content is None:
         template["content"] = "template content"

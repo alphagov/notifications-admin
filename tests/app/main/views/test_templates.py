@@ -525,6 +525,23 @@ def test_editing_letter_template_should_have_hidden_name_field(
     assert name_input["type"] == "hidden"
 
 
+def test_GET_edit_service_template_for_welsh_letter(
+    client_request, mock_get_service_letter_template_welsh_language, fake_uuid, service_one
+):
+    service_one["permissions"].append("letter")
+    service_one["permissions"].append("extra_letter_formatting")
+    template_id = fake_uuid
+    page = client_request.get(
+        ".edit_service_template", service_id=SERVICE_ONE_ID, template_id=template_id, language="welsh"
+    )
+
+    subject_label = page.select_one("label[for=subject]")
+    assert subject_label.text.strip() == "Main heading in Welsh"
+
+    content_label = page.select_one("label[for=template_content]")
+    assert content_label.text.strip() == "Body in Welsh"
+
+
 def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_characters(
     client_request,
     service_one,
@@ -962,7 +979,7 @@ def test_POST_letter_template_change_to_english_redirects_to_confirmation_page(
     mocker,
     fake_uuid,
     active_user_with_permissions,
-    mock_get_service_letter_template,
+    mock_get_service_letter_template_welsh_language,
 ):
     service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
@@ -974,7 +991,9 @@ def test_POST_letter_template_change_to_english_redirects_to_confirmation_page(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _data={"languages": "english"},
-        _follow_redirects=True,
+        _expected_redirect=url_for(
+            "main.letter_template_confirm_remove_welsh", service_id=SERVICE_ONE_ID, template_id=fake_uuid
+        ),
     )
     assert mock_template_change_language.call_args_list == []
 
@@ -2822,6 +2841,164 @@ def test_should_redirect_when_saving_a_template_email(
         name=name,
         content=content,
         subject=subject,
+    )
+
+
+def test_should_redirect_when_saving_a_template_letter(
+    client_request,
+    mock_get_service_letter_template,
+    mock_update_service_template,
+    mock_get_user_by_email,
+    fake_uuid,
+    service_one,
+):
+    service_one["permissions"].append("letter")
+    name = "new template name"
+    content = "new letter content"
+    subject = "new letter subject"
+    client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": name,
+            "subject": subject,
+            "template_content": content,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_update_service_template.assert_called_with(
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        name=name,
+        content=content,
+        subject=subject,
+    )
+
+
+@pytest.mark.parametrize(
+    "letter_formatting_permission, language, mock_fixturename",
+    (
+        pytest.param(
+            False,
+            "welsh",
+            "mock_get_service_letter_template",
+            marks=pytest.mark.xfail(
+                raises=AssertionError,
+                reason="Cannot edit Welsh language content on template with letter_languages=english",
+            ),
+        ),
+        pytest.param(
+            True,
+            "welsh",
+            "mock_get_service_letter_template",
+            marks=pytest.mark.xfail(
+                raises=AssertionError,
+                reason="Cannot edit Welsh language content on template with letter_languages=english",
+            ),
+        ),
+        pytest.param(
+            False,
+            "welsh",
+            "mock_get_service_letter_template_welsh_language",
+            marks=pytest.mark.xfail(
+                raises=AssertionError,
+                reason="Cannot edit Welsh content as service does not have extra_letter_formatting set",
+            ),
+        ),
+        pytest.param(
+            False,
+            "gaelic",
+            "mock_get_service_letter_template_welsh_language",
+            marks=pytest.mark.xfail(
+                raises=AssertionError,
+                reason="The only accepted explicit language for editing letter templates is Welsh",
+            ),
+        ),
+        (
+            True,
+            "welsh",
+            "mock_get_service_letter_template_welsh_language",
+        ),
+    ),
+)
+def test_update_template_for_welsh_language_content(
+    request,
+    client_request,
+    mock_update_service_template,
+    mock_get_user_by_email,
+    fake_uuid,
+    service_one,
+    letter_formatting_permission,
+    language,
+    mock_fixturename,
+):
+    # Load get_service_letter_template fixture
+    request.getfixturevalue(mock_fixturename)
+
+    service_one["permissions"].append("letter")
+    if letter_formatting_permission:
+        service_one["permissions"].append("extra_letter_formatting")
+    name = "new template name"
+    content = "Welsh letter content"
+    subject = "Welsh letter subject"
+    client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        language=language,
+        _data={
+            "name": name,
+            "subject": subject,
+            "template_content": content,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_update_service_template.assert_called_with(
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        name=name,
+        letter_welsh_subject=subject,
+        letter_welsh_content=content,
+    )
+
+
+@pytest.mark.parametrize("mock_fixturename", ["mock_get_service_email_template", "mock_get_service_template"])
+def test_cannot_edit_welsh_content_for_email_or_sms_templates(
+    request,
+    client_request,
+    mock_fixturename,
+    mock_update_service_template,
+    mock_get_user_by_email,
+    fake_uuid,
+):
+    # Load fixture to mock get email/sms template
+    request.getfixturevalue(mock_fixturename)
+
+    name = "new name"
+    content = "new content"
+    subject = "new subject"
+    client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        language="welsh",
+        _data={
+            "name": name,
+            "template_content": content,
+            "subject": subject,
+        },
+        _expected_status=404,
     )
 
 

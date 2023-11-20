@@ -4,7 +4,7 @@ import math
 import uuid
 from functools import partial
 from io import BytesIO
-from typing import Dict
+from typing import Dict, Literal, Optional
 
 from flask import (
     abort,
@@ -48,6 +48,7 @@ from app.main.forms import (
     SMSTemplateForm,
     TemplateAndFoldersSelectionForm,
     TemplateFolderForm,
+    WelshLetterTemplateForm,
 )
 from app.main.views.send import get_sender_details
 from app.models.service import Service
@@ -76,12 +77,21 @@ from app.utils.pagination import generate_optional_previous_and_next_dicts, get_
 from app.utils.templates import TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
-form_objects = {
-    "email": EmailTemplateForm,
-    "sms": SMSTemplateForm,
-    "letter": LetterTemplateForm,
-    "broadcast": BroadcastTemplateForm,
-}
+
+def get_template_form(
+    template_type: Literal["email", "sms", "letter", "broadcast"], language: Optional[Literal["welsh"]] = None
+):
+    if template_type == "email":
+        return EmailTemplateForm
+    elif template_type == "sms":
+        return SMSTemplateForm
+    elif template_type == "broadcast":
+        return BroadcastTemplateForm
+    else:
+        if language == "welsh":
+            return WelshLetterTemplateForm
+
+        return LetterTemplateForm
 
 
 class LetterAttachmentFormError(Exception):
@@ -408,7 +418,7 @@ def copy_template(service_id, template_id):
         return add_service_template(service_id, template["template_type"])
 
     template["name"] = _get_template_copy_name(template, current_service.all_templates)
-    form = form_objects[template["template_type"]](**template)
+    form = get_template_form(template["template_type"])(**template)
 
     if template["folder"]:
         back_link = url_for(
@@ -568,7 +578,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             )
         )
 
-    form = form_objects[template_type]()
+    form = get_template_form(template_type)()
     if form.validate_on_submit():
         try:
             new_template = service_api_client.create_service_template(
@@ -635,9 +645,27 @@ def rename_template(service_id, template_id):
     )
 
 
+def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: Optional[str], template):
+    if language is None:
+        return
+
+    if template.template_type != "letter":
+        abort(404)
+
+    if not current_service.has_permission("extra_letter_formatting"):
+        abort(403)
+
+    if language.lower() != "welsh":
+        abort(404)
+
+    if template._template["letter_languages"] != LetterLanguageOptions.welsh_then_english.value:
+        abort(404)
+
+
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit/<language>", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def edit_service_template(service_id, template_id):
+def edit_service_template(service_id, template_id, language=None):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if template.template_type not in current_service.available_template_types:
@@ -651,7 +679,9 @@ def edit_service_template(service_id, template_id):
             )
         )
 
-    form = form_objects[template.template_type](**template._template)
+    abort_for_unauthorised_bilingual_letters_or_invalid_options(language, template)
+
+    form = get_template_form(template.template_type, language=language)(**template._template)
 
     if form.validate_on_submit():
         new_template = get_template(
@@ -1223,7 +1253,7 @@ def letter_template_change_language(template_id, service_id):
     if template.template_type != "letter" or not isinstance(template, TemplatedLetterImageTemplate):
         abort(404)
 
-    current_languages = template._template.get("letter_languages")
+    current_languages = template._template["letter_languages"]
     form = LetterTemplateLanguagesForm(data=dict(languages=current_languages))
     if form.validate_on_submit():
         languages = form.languages.data
