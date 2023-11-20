@@ -1,4 +1,4 @@
 {% set email_sender_name = email_sender_name or '' %}
 
-{{ email_sender_name }}<br>
-{{ email_sender_name|make_string_safe_for_email_local_part or '…' }}@notifications.service.gov.uk
+{{ email_sender_name or 'Example' }}<br>
+{{ email_sender_name|make_string_safe_for_email_local_part or 'example' }}@notifications.service.gov.uk

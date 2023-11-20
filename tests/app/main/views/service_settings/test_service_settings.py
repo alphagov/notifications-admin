@@ -6528,7 +6528,7 @@ class TestServiceEmailSenderChange:
             (
                 None,
                 "False",
-                "Sender name …@notifications.service.gov.uk",
+                "Sender name Example example@notifications.service.gov.uk",
             ),
         ],
     )
@@ -6592,8 +6592,8 @@ class TestServiceEmailSenderChange:
     @pytest.mark.parametrize(
         "custom_email_sender_name, expected_preview",
         [
-            ("", "<br> …@notifications.service.gov.uk"),
-            (".", ".<br> …@notifications.service.gov.uk"),
+            ("", "Example<br> example@notifications.service.gov.uk"),
+            (".", ".<br> example@notifications.service.gov.uk"),
             ("Custom Name", "Custom Name<br> custom.name@notifications.service.gov.uk"),
             ("GOV.UK Ειδοποίηση", "GOV.UK Ειδοποίηση<br> gov.uk.ειδοποιηση@notifications.service.gov.uk"),
             (
