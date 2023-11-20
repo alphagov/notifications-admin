@@ -652,7 +652,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         "123 Example St. SW!A !AA",
         "6 Address must be no more than 7 lines long",
         "1 2 3 4 5 6 7 8",
-        "7 Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~",
+        '7 Address lines must not start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
         "=Firstname Lastname 123 Example St. SW1A 1AA",
     ]
 
@@ -2365,7 +2365,7 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
 @pytest.mark.parametrize(
     "form_data, extra_permissions, expected_error_message",
     [
-        ("", [], "Cannot be empty"),
+        ("", [], "Enter an address"),
         (
             "a\n\n\n\nb",
             [],
@@ -2385,17 +2385,17 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
         (
             "\n".join(["a", "b", "c", "d", "e", "f", "g"]),
             ["international_letters"],
-            "Last line of the address must be a UK postcode or another country",
+            "The last line of the address must be a UK postcode or the name of a country",
         ),
         (
             "a\n(b\nSW1A 1AA",
             [],
-            "Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~",
+            'Address lines cannot start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
         ),
         (
             "a\nb\nBFPO 1234\nBFPO\nBF1 1AA\nUSA",
             [],
-            "The last line of a BFPO address must not be a country.",
+            "The last line of a British Forces Post Office (BFPO) address cannot be the name of a country",
         ),
     ],
 )

@@ -2487,7 +2487,7 @@ def test_name_required_to_rename_template(
         },
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Cannot be empty"
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Enter a name for this template"
 
 
 @pytest.mark.parametrize("template_type", ("email", "sms"))

@@ -204,6 +204,7 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         user_has_template_folder_permission=user_has_template_folder_permission,
         single_notification_channel=single_notification_channel,
         option_hints=option_hints,
+        error_summary_enabled=True,
     )
 
 
@@ -610,6 +611,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
         template_folder_id=template_folder_id,
         heading_action="New",
         back_link=url_for("main.choose_template", service_id=current_service.id, template_folder_id=template_folder_id),
+        error_summary_enabled=True,
     )
 
 

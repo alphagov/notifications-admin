@@ -1442,7 +1442,7 @@ class ConfirmBroadcastForm(StripWhitespaceForm):
 
 
 class TemplateNameMixin:
-    name = GovukTextInputField("Template name", validators=[DataRequired(message="Cannot be empty")])
+    name = GovukTextInputField("Template name", validators=[NotifyDataRequired(thing="a name for this template")])
 
 
 class RenameTemplateForm(StripWhitespaceForm, TemplateNameMixin):
@@ -1451,7 +1451,7 @@ class RenameTemplateForm(StripWhitespaceForm, TemplateNameMixin):
 
 class BaseTemplateForm(StripWhitespaceForm):
     template_content = TextAreaField(
-        "Message", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
+        "Message", validators=[NotifyDataRequired(thing="your message"), NoCommasInPlaceHolders()]
     )
 
     def __init__(self, *args, **kwargs):
@@ -1489,7 +1489,7 @@ class LetterAddressForm(StripWhitespaceForm):
         self.allow_international_letters = allow_international_letters
         super().__init__(*args, **kwargs)
 
-    address = PostalAddressField("Address", validators=[DataRequired(message="Cannot be empty")])
+    address = PostalAddressField("Address", validators=[NotifyDataRequired(thing="an address")])
 
     def validate_address(self, field):
         address = PostalAddress(
@@ -1504,30 +1504,32 @@ class LetterAddressForm(StripWhitespaceForm):
             raise ValidationError(f"Address must be no more than {PostalAddress.MAX_LINES} lines long")
 
         if address.has_invalid_country_for_bfpo_address:
-            raise ValidationError("The last line of a BFPO address must not be a country.")
+            raise ValidationError(
+                "The last line of a British Forces Post Office (BFPO) address cannot be the name of a country"
+            )
 
         if not address.has_valid_last_line:
             if self.allow_international_letters:
-                raise ValidationError("Last line of the address must be a UK postcode or another country")
+                raise ValidationError("The last line of the address must be a UK postcode or the name of a country")
             if address.international:
                 raise ValidationError("You do not have permission to send letters to other countries")
             raise ValidationError("Last line of the address must be a real UK postcode")
 
         if address.has_invalid_characters:
             raise ValidationError(
-                "Address lines must not start with any of the following characters: @ ( ) = [ ] ” \\ / , < > ~"
+                "Address lines cannot start with any of the following characters: "
+                + " ".join(PostalAddress.INVALID_CHARACTERS_AT_START_OF_ADDRESS_LINE)
             )
 
 
 class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    subject = TextAreaField("Subject", validators=[DataRequired(message="Cannot be empty")])
+    subject = TextAreaField("Subject", validators=[NotifyDataRequired(thing="the subject of the email")])
 
 
 class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    subject = TextAreaField("Main heading", validators=[DataRequired(message="Cannot be empty")])
-
+    subject = TextAreaField("Main heading", validators=[NotifyDataRequired(thing="a main heading for your letter")])
     template_content = TextAreaField(
-        "Body", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
+        "Body", validators=[NotifyDataRequired(thing="the body text of your letter"), NoCommasInPlaceHolders()]
     )
 
 
@@ -2318,7 +2320,7 @@ def get_placeholder_form_instance(
     allow_international_phone_numbers=False,
 ):
     if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template_type == "email":
-        field = make_email_address_field(label=placeholder_name, gov_user=False)
+        field = make_email_address_field(label=placeholder_name, gov_user=False, thing="an email address")
     elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template_type == "sms":
         if allow_international_phone_numbers:
             field = international_phone_number(label=placeholder_name)
@@ -2556,7 +2558,7 @@ def required_for_ops(*operations):
             # super weird
             raise validators.StopValidation("Must be empty")
         if form.op in operations and not any(field.raw_data):
-            raise validators.StopValidation("Cannot be empty")
+            raise validators.StopValidation("Enter a name for this folder")
 
     return validate
 
