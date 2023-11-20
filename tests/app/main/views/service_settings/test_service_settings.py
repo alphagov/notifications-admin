@@ -6518,16 +6518,16 @@ class TestServiceEmailSenderChange:
         client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=403)
 
     @pytest.mark.parametrize(
-        "custom_email_sender_name, expected_email, expected_conditional_content",
+        "custom_email_sender_name, expected_value, expected_conditional_content",
         [
             (
                 "custom sender name",
-                '"custom sender name" <local.part@notifications.service.gov.uk>',
+                "True",
                 "Sender name custom sender name custom.sender.name@notifications.service.gov.uk",
             ),
             (
                 None,
-                '"service one" <local.part@notifications.service.gov.uk>',
+                "False",
                 "Sender name …@notifications.service.gov.uk",
             ),
         ],
@@ -6538,7 +6538,7 @@ class TestServiceEmailSenderChange:
         platform_admin_user,
         service_one,
         custom_email_sender_name,
-        expected_email,
+        expected_value,
         expected_conditional_content,
     ):
         service_one["custom_email_sender_name"] = custom_email_sender_name
@@ -6546,11 +6546,11 @@ class TestServiceEmailSenderChange:
         client_request.login(platform_admin_user)
         page = client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=200)
         assert page.select_one("h1").text == "Sender name and email address"
-        assert page.select_one(".govuk-inset-text").text.strip() == expected_email
         assert [normalize_spaces(radio.text) for radio in page.select(".govuk-radios__item")] == [
             "Use the name of your service service one service.one@notifications.service.gov.uk",
             "Enter a custom sender name",
         ]
+        assert page.select_one("input[name=use_custom_email_sender_name][checked]")["value"] == expected_value
         assert normalize_spaces(page.select_one(".govuk-radios__conditional").text) == expected_conditional_content
         custom_preview = page.select_one(
             "#conditional-use_custom_email_sender_name-1 .govuk-hint[data-notify-module=update-status]"
