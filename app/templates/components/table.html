@@ -110,6 +110,11 @@
   {% endcall %}
 {%- endmacro %}
 
+{% macro callable_text_field(status='', truncate=false, wrap=False) %}
+  {{ text_field(caller(), status=status, truncate=truncate, wrap=wrap) }}
+{% endmacro %}
+
+
 {% macro optional_text_field(text, default='Not set', truncate=false, wrap=False) -%}
   {{ text_field(
     text or default,

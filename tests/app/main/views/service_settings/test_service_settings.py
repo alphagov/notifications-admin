@@ -112,7 +112,7 @@ def mock_get_service_settings_page_common(
                 "Data retention period 7 days Change data retention",
                 "Label Value Action",
                 "Send emails On Change your settings for sending emails",
-                "Email sender name Test Service Change email sender name",
+                "Email sender name Test Service test.service@notifications.service.gov.uk Change email sender name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
@@ -6518,21 +6518,48 @@ class TestServiceEmailSenderChange:
         client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=403)
 
     @pytest.mark.parametrize(
-        "custom_email_sender_name, expected_email",
+        "custom_email_sender_name, expected_value, expected_conditional_content",
         [
-            ("custom sender name", '"custom sender name" <local.part@notifications.service.gov.uk>'),
-            (None, '"service one" <local.part@notifications.service.gov.uk>'),
+            (
+                "custom sender name",
+                "True",
+                "Sender name custom sender name custom.sender.name@notifications.service.gov.uk",
+            ),
+            (
+                None,
+                "False",
+                "Sender name Example example@notifications.service.gov.uk",
+            ),
         ],
     )
     def test_service_email_sender_change_page_shows_your_current_email_sender_name(
-        self, client_request, platform_admin_user, service_one, custom_email_sender_name, expected_email
+        self,
+        client_request,
+        platform_admin_user,
+        service_one,
+        custom_email_sender_name,
+        expected_value,
+        expected_conditional_content,
     ):
         service_one["custom_email_sender_name"] = custom_email_sender_name
         service_one["email_sender_local_part"] = "local.part"
         client_request.login(platform_admin_user)
         page = client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=200)
         assert page.select_one("h1").text == "Sender name and email address"
-        assert page.select_one(".govuk-inset-text").text.strip() == expected_email
+        assert [normalize_spaces(radio.text) for radio in page.select(".govuk-radios__item")] == [
+            "Use the name of your service service one service.one@notifications.service.gov.uk",
+            "Enter a custom sender name",
+        ]
+        assert page.select_one("input[name=use_custom_email_sender_name][checked]")["value"] == expected_value
+        assert normalize_spaces(page.select_one(".govuk-radios__conditional").text) == expected_conditional_content
+        custom_preview = page.select_one(
+            "#conditional-use_custom_email_sender_name-1 .govuk-hint[data-notify-module=update-status]"
+        )
+        assert custom_preview["data-target"] == "custom_email_sender_name"
+        assert page.select_one("input#custom_email_sender_name[type=text]")
+        assert custom_preview["data-updates-url"] == url_for(
+            "main.service_email_sender_preview", service_id=SERVICE_ONE_ID
+        )
 
     @pytest.mark.parametrize(
         "custom_email_sender_name, error_message",
@@ -6540,6 +6567,11 @@ class TestServiceEmailSenderChange:
             ("", "Error: Enter a sender name"),
             (".", "Sender name must include at least 2 letters or numbers"),
             ("GOV.UK Ειδοποίηση", "Sender name cannot include characters from a non-Latin alphabet"),
+            ("no reply", "Sender name needs to be more specific"),
+            ("NO-REPLY", "Sender name needs to be more specific"),
+            ("info", "Sender name needs to be more specific"),
+            ("Support", "Sender name needs to be more specific"),
+            ("ALERT", "Sender name needs to be more specific"),
             # under the 255 db col length, but too long when combined with email_sender_local_part to make an email
             ("a" * 150 + " " * 100 + "a", "Sender name cannot be longer than 143 characters"),
         ],
@@ -6556,6 +6588,31 @@ class TestServiceEmailSenderChange:
         )
         assert not mock_update_service.called
         assert error_message in page.select_one(".govuk-error-message").text
+
+    @pytest.mark.parametrize(
+        "custom_email_sender_name, expected_preview",
+        [
+            ("", "Example<br> example@notifications.service.gov.uk"),
+            (".", ".<br> example@notifications.service.gov.uk"),
+            ("Custom Name", "Custom Name<br> custom.name@notifications.service.gov.uk"),
+            ("GOV.UK Ειδοποίηση", "GOV.UK Ειδοποίηση<br> gov.uk.ειδοποιηση@notifications.service.gov.uk"),
+            (
+                "<script>alert()</script>",
+                "&lt;script&gt;alert()&lt;/script&gt;<br> scriptalertscript@notifications.service.gov.uk",
+            ),
+        ],
+    )
+    def test_service_preview_email_sender_name(
+        self, client_request, platform_admin_user, mock_update_service, custom_email_sender_name, expected_preview
+    ):
+        client_request.login(platform_admin_user)
+        response = client_request.post_response(
+            "main.service_email_sender_preview",
+            service_id=SERVICE_ONE_ID,
+            _data={"custom_email_sender_name": custom_email_sender_name},
+            _expected_status=200,
+        )
+        assert normalize_spaces(response.get_json()["html"]) == expected_preview
 
     @pytest.mark.parametrize(
         "use_custom_email_sender_name, custom_email_sender_name, expected_custom_email_sender_name",

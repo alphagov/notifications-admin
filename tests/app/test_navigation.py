@@ -297,6 +297,7 @@ EXCLUDED_ENDPOINTS = set(
             "service_edit_sms_sender",
             "service_email_reply_to",
             "service_email_sender_change",
+            "service_email_sender_preview",
             "service_letter_contact_details",
             "service_make_blank_default_letter_contact",
             "service_name_change",

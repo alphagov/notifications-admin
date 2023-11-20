@@ -3,7 +3,6 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {% set heading = 'Sender name and email address' %}
 
@@ -16,35 +15,52 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-    {{ page_header(heading) }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-five-sixths">
+            {{ page_header(heading) }}
 
-    <p class="govuk-body">Your emails currently come from:</p>
+            <p class="govuk-body">Your sender name should tell the recipient what your email is about, as well as who it’s from.</p>
 
-    {% set full_from_email %}
-        "{{current_service.custom_email_sender_name or current_service.name}}" &lt;{{current_service.email_sender_local_part}}@notifications.service.gov.uk&gt;
-    {% endset %}
-    {{ govukInsetText({"text": full_from_email, "classes": "govuk-!-margin-top-0"}) }}
+            <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
 
-    <p class="govuk-body">Your sender name should tell the recipient what your message is about, as well as who it’s from.</p>
+            {% set default_email_sender_name_hint %}
+                {% with email_sender_name = current_service.name %}
+                    {% include "partials/preview-email-sender-name.html" %}
+                {% endwith %}
+            {% endset %}
 
-    <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
-
-    {% call form_wrapper() %}
-        {{ form.use_custom_email_sender_name(param_extensions={
-            "items": [
-                {"hint": {"text": service_based_sender} },
-                {
-                    "conditional": {
-                        "html": form.custom_email_sender_name(
-                            param_extensions={
-                                "label": {"classes": "govuk-visually-hidden"},
-                                "hint": {"text": "Enter a sender name"}
-                            }
-                        )
+            {% set custom_email_sender_name_field_html %}
+                {{ form.custom_email_sender_name(
+                    param_extensions={
+                        "classes": "",
+                        "label": {"classes": "govuk-visually-hidden"}, "hint": None,
+                        "formGroup": {"classes": "govuk-!-margin-bottom-3"},
                     }
-                },
-            ]
-        }) }}
-        {{ page_footer('Save') }}
-    {% endcall %}
+                ) }}
+                <div class="govuk-hint" data-notify-module="update-status" data-target="custom_email_sender_name" data-updates-url="{{ url_for('main.service_email_sender_preview', service_id=current_service.id) }}" aria-live="polite">
+                    {% with email_sender_name = current_service.custom_email_sender_name or '' %}
+                        {% include "partials/preview-email-sender-name.html" %}
+                    {% endwith %}
+                </div>
+            {% endset %}
+
+            {% call form_wrapper() %}
+                {{ form.use_custom_email_sender_name(param_extensions={
+                    "items": [
+                        {
+                            "hint": {
+                                "html": default_email_sender_name_hint,
+                            },
+                        },
+                        {
+                            "conditional": {
+                                "html": custom_email_sender_name_field_html,
+                            },
+                        },
+                    ]
+                }) }}
+                {{ page_footer('Save') }}
+            {% endcall %}
+        </div>
+    </div>
 {% endblock %}
