@@ -472,6 +472,40 @@ def test_should_add_data_attributes_for_services_that_only_allow_one_type_of_not
         assert page.select_one("#add_new_template_form").attrs.get("data-service") is None
 
 
+@pytest.mark.parametrize(
+    "custom_email_sender_name, expected_email_from",
+    (
+        (None, "service one"),
+        ("custom", "custom"),
+    ),
+)
+def test_should_show_page_for_email_template(
+    client_request,
+    mock_get_service_email_template,
+    service_one,
+    fake_uuid,
+    custom_email_sender_name,
+    expected_email_from,
+):
+    service_one["custom_email_sender_name"] = custom_email_sender_name
+    page = client_request.get(
+        ".view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert [
+        (normalize_spaces(row.select_one("th").text), normalize_spaces(row.select_one("td").text))
+        for row in page.select("table.email-message-meta tr")
+    ] == [
+        ("From", expected_email_from),
+        ("To", "email address"),
+        ("Subject", "Your ((thing)) is due soon"),
+    ]
+    assert normalize_spaces(page.select_one(".email-message-body").text) == "Your vehicle tax expires on ((date))"
+
+
 def test_should_show_page_for_one_template(
     client_request,
     mock_get_service_template,

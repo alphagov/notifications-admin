@@ -603,6 +603,10 @@ class Service(JSONModel):
 
         return SIGN_IN_METHOD_TEXT
 
+    @property
+    def email_sender_name(self) -> str:
+        return self.custom_email_sender_name or self.name
+
 
 class Services(SerialisedModelCollection):
     model = Service
