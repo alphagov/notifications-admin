@@ -96,7 +96,6 @@
             )}}
           {% endcall %}
 
-          {% if current_user.platform_admin %}
           {% call settings_row(if_has_permission='email') %}
             {{ text_field('Email sender name') }}
             {% call callable_text_field() %}
@@ -112,7 +111,6 @@
               )
             }}
           {% endcall %}
-          {% endif %}
 
           {% call settings_row(if_has_permission='email') %}
             {{ text_field('Reply-to email addresses') }}
