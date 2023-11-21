@@ -6513,10 +6513,6 @@ def test_should_set_default_org_email_branding_succeeds_if_all_conditions_are_me
 
 
 class TestServiceEmailSenderChange:
-    # TODO: when we delete this test, make sure to update the existing tests below to remove the platform_admin_user too
-    def test_service_email_sender_change_page_is_platform_admin_only(self, client_request):
-        client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=403)
-
     @pytest.mark.parametrize(
         "custom_email_sender_name, expected_value, expected_conditional_content",
         [
@@ -6535,7 +6531,6 @@ class TestServiceEmailSenderChange:
     def test_service_email_sender_change_page_shows_your_current_email_sender_name(
         self,
         client_request,
-        platform_admin_user,
         service_one,
         custom_email_sender_name,
         expected_value,
@@ -6543,7 +6538,6 @@ class TestServiceEmailSenderChange:
     ):
         service_one["custom_email_sender_name"] = custom_email_sender_name
         service_one["email_sender_local_part"] = "local.part"
-        client_request.login(platform_admin_user)
         page = client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=200)
         assert page.select_one("h1").text == "Sender name and email address"
         assert [normalize_spaces(radio.text) for radio in page.select(".govuk-radios__item")] == [
@@ -6577,9 +6571,8 @@ class TestServiceEmailSenderChange:
         ],
     )
     def test_service_email_sender_change_fails_if_new_name_fails_validation(
-        self, client_request, mock_update_service, custom_email_sender_name, error_message, platform_admin_user
+        self, client_request, mock_update_service, custom_email_sender_name, error_message
     ):
-        client_request.login(platform_admin_user)
         page = client_request.post(
             "main.service_email_sender_change",
             service_id=SERVICE_ONE_ID,
@@ -6602,10 +6595,7 @@ class TestServiceEmailSenderChange:
             ),
         ],
     )
-    def test_service_preview_email_sender_name(
-        self, client_request, platform_admin_user, mock_update_service, custom_email_sender_name, expected_preview
-    ):
-        client_request.login(platform_admin_user)
+    def test_service_preview_email_sender_name(self, client_request, custom_email_sender_name, expected_preview):
         response = client_request.post_response(
             "main.service_email_sender_preview",
             service_id=SERVICE_ONE_ID,
@@ -6630,9 +6620,7 @@ class TestServiceEmailSenderChange:
         use_custom_email_sender_name,
         custom_email_sender_name,
         expected_custom_email_sender_name,
-        platform_admin_user,
     ):
-        client_request.login(platform_admin_user)
         client_request.post(
             "main.service_email_sender_change",
             service_id=SERVICE_ONE_ID,

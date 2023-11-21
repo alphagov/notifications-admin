@@ -91,7 +91,7 @@ def get_template(
     if "email" == template["template_type"]:
         return EmailPreviewTemplate(
             template,
-            from_name=service.name,
+            from_name=service.email_sender_name,
             show_recipient=show_recipient,
             redact_missing_personalisation=redact_missing_personalisation,
             reply_to=email_reply_to,
