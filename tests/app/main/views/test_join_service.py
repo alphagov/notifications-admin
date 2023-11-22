@@ -2,16 +2,55 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from tests import organisation_json
+from tests import organisation_json, service_json
 from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
+    SERVICE_TWO_ID,
     create_active_user_empty_permissions,
     create_active_user_manage_template_permissions,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
+    create_user,
     normalize_spaces,
 )
+
+
+def test_choose_service_to_join(
+    mocker,
+    client_request,
+    mock_get_organisation_by_domain,
+):
+    mocker.patch(
+        "app.organisations_client.get_organisation_services",
+        return_value=[
+            service_json(SERVICE_ONE_ID, "service one", restricted=False),
+            service_json(SERVICE_TWO_ID, "service two", restricted=False),
+            service_json("1234", "service three (trial mode)"),
+        ],
+    )
+    mocker.patch(
+        "app.models.user.Users.client_method",
+        return_value=[
+            create_user(permissions={SERVICE_TWO_ID: ["manage_service"]}),
+            create_user(permissions={SERVICE_TWO_ID: []}),
+        ],
+    )
+    page = client_request.get(
+        "main.choose_service_to_join",
+        service_to_join_id=SERVICE_ONE_ID,
+    )
+    assert normalize_spaces(page.select_one("main p").text) == (
+        "These are all the Test Organisation teams who have a live service on Notify."
+    )
+    assert [normalize_spaces(item.text) for item in page.select(".browse-list-item")] == [
+        "service one You are already a team member of this service",
+        "service two 1 team member",
+    ]
+    assert [link["href"] for link in page.select(".browse-list-item a")] == [
+        url_for("main.join_service", service_to_join_id=SERVICE_ONE_ID),
+        url_for("main.join_service", service_to_join_id=SERVICE_TWO_ID),
+    ]
 
 
 def test_cannot_join_service_without_organisation(client_request):

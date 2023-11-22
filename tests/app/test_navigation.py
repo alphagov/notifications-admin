@@ -53,6 +53,7 @@ EXCLUDED_ENDPOINTS = set(
             "choose_account",
             "choose_from_contact_list",
             "choose_service",
+            "choose_service_to_join",
             "choose_template_to_copy",
             "choose_template",
             "clear_cache",

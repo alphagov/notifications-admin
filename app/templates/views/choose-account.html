@@ -112,8 +112,16 @@
         "element": "a",
         "text": "Add a new service",
         "href": url_for('main.add_service'),
-        "classes": "govuk-button--secondary"
+        "classes": "govuk-button--secondary govuk-!-margin-right-3"
       }) }}
+      {% if current_user.default_organisation.can_ask_to_join_a_service %}
+        {{ govukButton({
+          "element": "a",
+          "text": "Join an existing team",
+          "href": url_for('main.choose_service_to_join'),
+          "classes": "govuk-button--secondary"
+        }) }}
+      {% endif %}
       {% if current_user.has_access_to_live_and_trial_mode_services %}
           </div>
         </div>

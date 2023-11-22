@@ -2,9 +2,19 @@ from flask import abort, redirect, render_template, url_for
 
 from app import current_user
 from app.main import main
-from app.main.forms import JoinServiceForm
+from app.main.forms import JoinServiceForm, SearchByNameForm
 from app.models.service import Service
 from app.utils.user import user_is_gov_user, user_is_logged_in
+
+
+@main.route("/choose-service-to-join", methods=["GET", "POST"])
+@user_is_logged_in
+@user_is_gov_user
+def choose_service_to_join():
+    return render_template(
+        "views/choose-service-to-join.html",
+        _search_form=SearchByNameForm(),
+    )
 
 
 @main.route("/services/<uuid:service_to_join_id>/join", methods=["GET", "POST"])
