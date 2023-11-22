@@ -1,6 +1,8 @@
+import pytest
 from flask import url_for
 from freezegun import freeze_time
 
+from tests import organisation_json
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_user_empty_permissions,
@@ -11,11 +13,53 @@ from tests.conftest import (
 )
 
 
+def test_cannot_join_service_without_organisation(client_request):
+    client_request.get(
+        "main.join_service",
+        service_to_join_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+
+
+@pytest.mark.parametrize(
+    "can_ask_to_join_a_service",
+    (
+        False,
+        pytest.param(True, marks=pytest.mark.xfail),
+    ),
+)
+def test_cannot_join_service_without_organisation_permission(
+    mocker,
+    client_request,
+    service_one,
+    fake_uuid,
+    can_ask_to_join_a_service,
+):
+    service_one["organisation"] = fake_uuid
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(can_ask_to_join_a_service=can_ask_to_join_a_service),
+    )
+    client_request.get(
+        "main.join_service",
+        service_to_join_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+
+
 @freeze_time("2023-02-03 01:00")
 def test_page_lists_team_members_of_service(
     mocker,
     client_request,
+    fake_uuid,
+    service_one,
 ):
+    service_one["organisation"] = fake_uuid
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(can_ask_to_join_a_service=True),
+    )
+
     manage_service_user_1 = create_active_user_with_permissions()
     manage_service_user_2 = create_active_user_with_permissions()
     manage_service_user_1["name"] = "Manage service user 1"
@@ -75,7 +119,13 @@ def test_page_redirects_on_post(
     client_request,
     mock_request_invite_for,
     fake_uuid,
+    service_one,
 ):
+    service_one["organisation"] = fake_uuid
+    mocker.patch(
+        "app.models.organisation.organisations_client.get_organisation",
+        return_value=organisation_json(can_ask_to_join_a_service=True),
+    )
     current_user = create_active_user_with_permissions(with_unique_id=True)
     manage_service_user_1 = create_active_user_with_permissions(with_unique_id=True)
     manage_service_user_2 = create_active_user_with_permissions(with_unique_id=True)

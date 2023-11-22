@@ -1,4 +1,4 @@
-from flask import redirect, render_template, url_for
+from flask import abort, redirect, render_template, url_for
 
 from app import current_user
 from app.main import main
@@ -12,6 +12,10 @@ from app.utils.user import user_is_gov_user, user_is_logged_in
 @user_is_gov_user
 def join_service(service_to_join_id):
     service = Service.from_id(service_to_join_id)
+
+    if not service.organisation.can_ask_to_join_a_service:
+        abort(403)
+
     form = JoinServiceForm(
         users=service.active_users_with_permission("manage_service"),
     )
