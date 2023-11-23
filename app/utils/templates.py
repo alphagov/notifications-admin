@@ -1,16 +1,126 @@
+from flask import current_app, render_template
+from markupsafe import Markup
+from notifications_utils.countries import Postage
+from notifications_utils.formatters import formatted_list
 from notifications_utils.template import (
+    BaseLetterTemplate,
     BroadcastPreviewTemplate,
     EmailPreviewTemplate,
     SMSPreviewTemplate,
 )
-from notifications_utils.template import LetterImageTemplate as UtilsLetterImageTemplate
 
 from app.extensions import redis_client
 from app.models import JSONModel
 from app.notify_client import cache
 
 
-class PrecompiledLetterImageTemplate(UtilsLetterImageTemplate):
+class BaseLetterImageTemplate(BaseLetterTemplate):
+    first_page_number = 1
+    allowed_postage_types = (
+        Postage.FIRST,
+        Postage.SECOND,
+        Postage.EUROPE,
+        Postage.REST_OF_WORLD,
+    )
+
+    def __init__(
+        self,
+        template,
+        values=None,
+        image_url=None,
+        page_count=None,
+        contact_block=None,
+    ):
+        super().__init__(template, values, contact_block=contact_block)
+        self.image_url = image_url
+        self._page_count = page_count
+        self.postage = template.get("postage")
+
+    @property
+    def jinja_template(self):
+        return current_app.jinja_env.get_template("templates/letter_image_template.jinja2")
+
+    @property
+    def page_count(self):
+        return self._page_count
+
+    @property
+    def postage(self):
+        if self.postal_address.international:
+            return self.postal_address.postage
+        return self._postage
+
+    @postage.setter
+    def postage(self, value):
+        if value not in [None] + list(self.allowed_postage_types):
+            raise TypeError(
+                "postage must be None, {}".format(
+                    formatted_list(
+                        self.allowed_postage_types,
+                        conjunction="or",
+                        before_each="'",
+                        after_each="'",
+                    )
+                )
+            )
+        self._postage = value
+
+    @property
+    def last_page_number(self):
+        return min(self.page_count, self.max_page_count) + self.first_page_number
+
+    @property
+    def page_numbers(self):
+        return list(range(self.first_page_number, self.last_page_number))
+
+    @property
+    def postage_description(self):
+        return {
+            Postage.FIRST: "first class",
+            Postage.SECOND: "second class",
+            Postage.EUROPE: "international",
+            Postage.REST_OF_WORLD: "international",
+        }.get(self.postage)
+
+    @property
+    def postage_class_value(self):
+        return {
+            Postage.FIRST: "letter-postage-first",
+            Postage.SECOND: "letter-postage-second",
+            Postage.EUROPE: "letter-postage-international",
+            Postage.REST_OF_WORLD: "letter-postage-international",
+        }.get(self.postage)
+
+    @property
+    def first_page_of_attachment(self):
+        if getattr(self, "attachment", None):
+            return self.page_count - self.attachment.page_count + 1
+
+    def __str__(self):
+        for attr in ("page_count", "image_url"):
+            if not getattr(self, attr):
+                raise TypeError(f"{attr} is required to render {type(self).__name__}")
+        return Markup(
+            render_template(
+                self.jinja_template,
+                **{
+                    "image_url": self.image_url,
+                    "page_numbers": self.page_numbers,
+                    "first_page_of_attachment": self.first_page_of_attachment,
+                    "address": self._address_block,
+                    "contact_block": self._contact_block,
+                    "date": self._date,
+                    "subject": self.subject,
+                    "message": self._message,
+                    "show_postage": bool(self.postage),
+                    "postage_description": self.postage_description,
+                    "postage_class_value": self.postage_class_value,
+                },
+            )
+        )
+
+
+class PrecompiledLetterImageTemplate(BaseLetterImageTemplate):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Override pre compiled letter template postage to None as it has not
@@ -20,7 +130,7 @@ class PrecompiledLetterImageTemplate(UtilsLetterImageTemplate):
         self.postage = None
 
 
-class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
+class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
     @property
     def page_count(self):
         from app.template_previews import get_page_count_for_letter
@@ -52,7 +162,7 @@ class TemplatedLetterImageTemplate(UtilsLetterImageTemplate):
     def values(self, value):
         # If the personalisation changes then we might need to recalculate the page count
         self._page_count = None
-        super(UtilsLetterImageTemplate, type(self)).values.fset(self, value)
+        super(BaseLetterImageTemplate, type(self)).values.fset(self, value)
 
     @property
     def attachment(self):
