@@ -214,6 +214,14 @@ def guidance_message_status(notification_type=None):
     )
 
 
+@main.route("/using-notify/data-retention-period")
+def guidance_data_retention_period():
+    return render_template(
+        "views/guidance/using-notify/data-retention-period.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/delivery-times")
 def guidance_delivery_times():
     return render_template(
