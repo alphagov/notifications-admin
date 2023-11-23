@@ -1,0 +1,32 @@
+{% extends "content_template.html" %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Data retention period
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Data retention period</h1>
+
+  <p class="govuk-body">GOV.UK Notify keeps a temporary record of:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>the content of the emails, text messages and letters you send</li>
+    <li>recipient email addresses, mobile numbers and addresses</li>
+  </ul>
+
+  <p class="govuk-body">By default, this data is only held for 7 days.</p>
+
+  <p class="govuk-body">Once your service is live, you can choose the number of days you want Notify to keep details of the messages you send.</p>
+
+  <p class="govuk-body">To change your data retention period:</p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Go to the Settings page.</li>
+    <li>Select Change on the Data retention period row.</li>
+  </ol>
+
+{% endblock %}
