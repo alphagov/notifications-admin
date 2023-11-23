@@ -2714,6 +2714,80 @@ def test_should_show_interstitial_when_making_breaking_change(
     )
 
 
+@pytest.mark.parametrize(
+    "url_kwargs",
+    [
+        {},
+        {"language": "welsh"},
+    ],
+)
+def test_confirm_breaking_change_on_letter_template_saves_correct_language_content(
+    client_request,
+    service_one,
+    mock_update_service_template,
+    mock_get_user_by_email,
+    mock_get_api_keys,
+    fake_uuid,
+    mocker,
+    url_kwargs,
+):
+    service_one["permissions"] += ["letter", "extra_letter_formatting"]
+
+    letter_template = template_json(
+        id_=fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        type_="letter",
+        name="a letter template",
+        subject="old english subject",
+        content="old english content",
+        letter_languages="welsh_then_english",
+        letter_welsh_subject="old welsh subject",
+        letter_welsh_content="old welsh content",
+        redact_personalisation=False,
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": letter_template})
+    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=2)
+    mocker.patch("app.service_api_client.get_letter_contacts", return_value=[create_letter_contact_block()])
+
+    data = {
+        "id": fake_uuid,
+        "subject": "updated subject ((new_var))",
+        "template_content": "updated content ((new_var2))",
+        "service": SERVICE_ONE_ID,
+        "confirm": True,
+    }
+
+    client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        **url_kwargs,
+        _data=data,
+        _follow_redirects=True,
+    )
+
+    if url_kwargs:
+        assert mock_update_service_template.call_args_list == [
+            mocker.call(
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+                name="a letter template",
+                letter_welsh_subject="updated subject ((new_var))",
+                letter_welsh_content="updated content ((new_var2))",
+            )
+        ]
+    else:
+        assert mock_update_service_template.call_args_list == [
+            mocker.call(
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+                name="a letter template",
+                subject="updated subject ((new_var))",
+                content="updated content ((new_var2))",
+            )
+        ]
+
+
 def test_removing_placeholders_is_not_a_breaking_change(
     client_request,
     mock_get_service_email_template,
