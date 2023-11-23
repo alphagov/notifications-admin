@@ -185,12 +185,18 @@ def test_page_count_makes_a_call_to_template_preview_and_gets_page_count(
     # `service` is in the `_request_ctx_stack` to avoid an error
     load_service_before_request()
 
-    request_mock_returns = Mock(content=b'{"count": 99}', status_code=200, headers={"content-type": "image/png"})
+    request_mock_returns = Mock(
+        content=b'{"count": 9, "welsh_page_count": 4, "attachment_page_count": 1}', status_code=200
+    )
     request_mock = mocker.patch("app.template_previews.requests.post", return_value=request_mock_returns)
     mocker.patch("app.template_previews.current_service", letter_branding=LetterBranding({"filename": "hm-government"}))
     template = mock_get_service_letter_template("123", "456")["data"]
 
-    assert get_page_count_for_letter(template, values=values) == 99
+    assert get_page_count_for_letter(template, values=values) == {
+        "count": 9,
+        "welsh_page_count": 4,
+        "attachment_page_count": 1,
+    }
 
     data = {
         "letter_contact_block": None,

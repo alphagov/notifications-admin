@@ -7,14 +7,17 @@ from markupsafe import Markup
 from notifications_utils.template import SubjectMixin, Template
 from orderedset import OrderedSet
 
+from app import load_service_before_request
 from app.utils.templates import TemplatedLetterImageTemplate, get_sample_template
 from tests import template_json
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_count_for_letter
 
 
 @pytest.fixture(scope="function", autouse=True)
-def app_context(notify_admin):
-    yield notify_admin
+def app_context(notify_admin, fake_uuid, mock_get_service, mock_get_page_count_for_letter):
+    with notify_admin.test_request_context(f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}"):
+        load_service_before_request()
+        yield notify_admin
 
 
 @pytest.mark.parametrize("template_type", ["sms", "letter", "email"])
@@ -39,7 +42,7 @@ def test_get_page_count_for_letter_caches(
     mock_redis_set = mocker.patch(
         "app.extensions.RedisClient.set",
     )
-    mock_get_page_count = mocker.patch("app.template_previews.get_page_count_for_letter", return_value=5)
+    mock_get_page_count = do_mock_get_page_count_for_letter(mocker, count=5)
 
     template = TemplatedLetterImageTemplate(
         template_json(
@@ -53,8 +56,12 @@ def test_get_page_count_for_letter_caches(
         assert template.page_count == 5
 
     # Redis and template preview only get called once each because the instance also caches the value
-    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-page-count")
-    mock_redis_set.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-page-count", 5, ex=2_419_200)
+    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-all-page-counts")
+    mock_redis_set.assert_called_once_with(
+        f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-all-page-counts",
+        '{"count": 5, "welsh_page_count": 0, "attachment_page_count": 0}',
+        ex=2_419_200,
+    )
     assert len(mock_get_page_count.call_args_list) == 1
 
 
@@ -69,7 +76,7 @@ def test_get_page_count_for_letter_returns_cached_value(
 
     mock_redis_get = mocker.patch(
         "app.extensions.RedisClient.get",
-        return_value="5",
+        return_value=b'{"count": 5, "welsh_page_count": 0, "attachment_page_count": 0}',
     )
 
     template = TemplatedLetterImageTemplate(
@@ -84,7 +91,7 @@ def test_get_page_count_for_letter_returns_cached_value(
         assert template.page_count == 5
 
     # Redis only gets called once because the instance also caches the value
-    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-page-count")
+    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-all-page-counts")
 
 
 def test_get_page_count_for_letter_does_not_cache_for_personalised_letters(
@@ -96,7 +103,7 @@ def test_get_page_count_for_letter_does_not_cache_for_personalised_letters(
 ):
     client_request.login(api_user_active, service_one)
 
-    mock_get_page_count = mocker.patch("app.template_previews.get_page_count_for_letter", return_value=5)
+    mock_get_page_count = do_mock_get_page_count_for_letter(mocker, count=5)
 
     template = TemplatedLetterImageTemplate(
         template_json(
@@ -146,7 +153,6 @@ def test_letter_image_renderer_shows_international_post(
                 "address line 3": "Peru",
             },
             image_url="http://example.com/endpoint.png",
-            page_count=1,
         )
     )
     assert mock_render.call_args_list[0][1]["postage_description"] == "international"
@@ -163,7 +169,6 @@ def test_letter_image_template_renders_visually_hidden_address():
                     "postcode": "postcode",
                 },
                 image_url="http://example.com/endpoint.png",
-                page_count=1,
             )
         ),
         features="html.parser",
@@ -183,12 +188,12 @@ def test_letter_image_template_renders_visually_hidden_address():
         pytest.param("http://example.com/endpoint.png?page=4", marks=pytest.mark.xfail),
     ],
 )
-def test_letter_image_renderer_pagination(page_image_url):
+def test_letter_image_renderer_pagination(mocker, page_image_url):
+    do_mock_get_page_count_for_letter(mocker, count=3)
     assert page_image_url in str(
         TemplatedLetterImageTemplate(
-            {"content": "", "subject": "", "template_type": "letter"},
+            {"service": SERVICE_ONE_ID, "content": "", "subject": "", "template_type": "letter"},
             image_url="http://example.com/endpoint.png",
-            page_count=3,
         )
     )
 
@@ -223,7 +228,7 @@ def test_letter_image_renderer_pagination(page_image_url):
 def test_letter_image_renderer_requires_valid_postage():
     with pytest.raises(TypeError) as exception:
         TemplatedLetterImageTemplate(
-            {"content": "", "subject": "", "template_type": "letter", "postage": "third"},
+            {"service": SERVICE_ONE_ID, "content": "", "subject": "", "template_type": "letter", "postage": "third"},
             image_url="foo",
         )
     assert str(exception.value) == ("postage must be None, 'first', 'second', 'europe' or 'rest-of-world'")
@@ -253,7 +258,7 @@ def test_letter_image_renderer_requires_valid_postage():
 )
 def test_letter_image_renderer_postage_can_be_overridden(initial_postage_value, postage_value):
     template = TemplatedLetterImageTemplate(
-        {"content": "", "subject": "", "template_type": "letter"} | initial_postage_value
+        {"service": SERVICE_ONE_ID, "content": "", "subject": "", "template_type": "letter"} | initial_postage_value
     )
     assert template.postage == initial_postage_value.get("postage")
 
@@ -263,8 +268,7 @@ def test_letter_image_renderer_postage_can_be_overridden(initial_postage_value, 
 
 def test_letter_image_renderer_requires_image_url_to_render():
     template = TemplatedLetterImageTemplate(
-        {"content": "", "subject": "", "template_type": "letter"},
-        page_count=1,
+        {"service": SERVICE_ONE_ID, "content": "", "subject": "", "template_type": "letter"},
     )
     with pytest.raises(TypeError) as exception:
         str(template)
@@ -305,9 +309,14 @@ def test_letter_image_renderer_passes_postage_to_html_attribute(
     template = BeautifulSoup(
         str(
             TemplatedLetterImageTemplate(
-                {"content": "", "subject": "", "template_type": "letter", "postage": postage},
+                {
+                    "service": SERVICE_ONE_ID,
+                    "content": "",
+                    "subject": "",
+                    "template_type": "letter",
+                    "postage": postage,
+                },
                 image_url="foo",
-                page_count=1,
             )
         ),
         features="html.parser",
@@ -379,13 +388,13 @@ def test_letter_image_renderer(
     expected_postage_class_value,
     expected_postage_description,
 ):
+    do_mock_get_page_count_for_letter(mocker, count=page_count)
     mock_render = mocker.patch("app.utils.templates.render_template")
     str(
         TemplatedLetterImageTemplate(
             {"service": SERVICE_ONE_ID, "content": "Content", "subject": "Subject", "template_type": "letter"}
             | postage_args,
             image_url="http://example.com/endpoint.png",
-            page_count=page_count,
             contact_block="10 Downing Street",
         )
     )
@@ -444,15 +453,16 @@ def test_letter_image_renderer(
     ),
 )
 def test_letter_image_renderer_adds_classes_to_pages(
+    mocker,
     page_count,
     expected_classes,
 ):
+    do_mock_get_page_count_for_letter(mocker, count=page_count)
     template = BeautifulSoup(
         str(
             TemplatedLetterImageTemplate(
-                {"content": "Content", "subject": "Subject", "template_type": "letter"},
+                {"service": SERVICE_ONE_ID, "content": "Content", "subject": "Subject", "template_type": "letter"},
                 image_url="http://example.com/endpoint.png",
-                page_count=page_count,
             )
         ),
         features="html.parser",
@@ -470,12 +480,13 @@ def test_letter_image_renderer_adds_classes_to_pages(
     ),
 )
 def test_letter_image_renderer_knows_if_letter_is_too_long(
+    mocker,
     page_count,
     expected_too_many_pages,
 ):
+    do_mock_get_page_count_for_letter(mocker, count=page_count)
     template = TemplatedLetterImageTemplate(
-        {"content": "Content", "subject": "Subject", "template_type": "letter"},
-        page_count=page_count,
+        {"service": SERVICE_ONE_ID, "content": "Content", "subject": "Subject", "template_type": "letter"},
     )
     assert template.too_many_pages is expected_too_many_pages
     assert template.max_page_count == 10
@@ -488,7 +499,7 @@ def test_subject_line_gets_applied_to_correct_template_types():
 
 def test_subject_line_gets_replaced():
     template = TemplatedLetterImageTemplate(
-        {"content": "", "template_type": "letter", "subject": "((name))"},
+        {"service": SERVICE_ONE_ID, "content": "", "template_type": "letter", "subject": "((name))"},
         **{
             "image_url": "http://example.com",
             "page_count": 1,
@@ -507,9 +518,8 @@ def test_templates_handle_html_and_redacting(
 ):
     assert str(
         TemplatedLetterImageTemplate(
-            {"content": "content", "subject": "subject", "template_type": "letter"},
+            {"service": SERVICE_ONE_ID, "content": "content", "subject": "subject", "template_type": "letter"},
             image_url="http://example.com",
-            page_count=1,
             contact_block="www.gov.uk",
         )
     )
@@ -536,28 +546,28 @@ def test_templates_handle_html_and_redacting(
 
 def test_templates_extract_placeholders():
     assert TemplatedLetterImageTemplate(
-        {"content": "((content))", "subject": "((subject))", "template_type": "letter"},
+        {"service": SERVICE_ONE_ID, "content": "((content))", "subject": "((subject))", "template_type": "letter"},
         contact_block="((contact_block))",
         image_url="http://example.com",
-        page_count=99,
     ).placeholders == OrderedSet(["contact_block", "subject", "content"])
 
 
 def test_message_too_long_limit_bigger_or_nonexistent_for_non_sms_templates():
     body = "a" * 1000
     template = TemplatedLetterImageTemplate(
-        {"content": body, "subject": "foo", "template_type": "letter"}, image_url="foo", page_count=1
+        {"service": SERVICE_ONE_ID, "content": body, "subject": "foo", "template_type": "letter"},
+        image_url="foo",
     )
     assert template.is_message_too_long() is False
 
 
-def test_letter_preview_template_lazy_loads_images():
+def test_letter_preview_template_lazy_loads_images(mocker):
+    do_mock_get_page_count_for_letter(mocker, count=3)
     page = BeautifulSoup(
         str(
             TemplatedLetterImageTemplate(
-                {"content": "Content", "subject": "Subject", "template_type": "letter"},
+                {"service": SERVICE_ONE_ID, "content": "Content", "subject": "Subject", "template_type": "letter"},
                 image_url="http://example.com/endpoint.png",
-                page_count=3,
             )
         ),
         "html.parser",
@@ -569,18 +579,19 @@ def test_letter_preview_template_lazy_loads_images():
     ]
 
 
-def test_letter_image_template_marks_first_page_of_attachment():
-    class Attachment:
-        page_count = 3
-
-    class LetterImageTemplateWithAttachment(TemplatedLetterImageTemplate):
-        attachment = Attachment()
-        page_count = 8
+def test_letter_image_template_marks_first_page_of_attachment(mocker, fake_uuid):
+    do_mock_get_page_count_for_letter(mocker, count=8, attachment_page_count=3)
 
     template = BeautifulSoup(
         str(
-            LetterImageTemplateWithAttachment(
-                {"content": "Content", "subject": "Subject", "template_type": "letter"},
+            TemplatedLetterImageTemplate(
+                {
+                    "service": SERVICE_ONE_ID,
+                    "content": "Content",
+                    "subject": "Subject",
+                    "template_type": "letter",
+                    "letter_attachment": {"id": fake_uuid, "page_count": 3},
+                },
                 image_url="http://example.com/endpoint.png",
             )
         ),
@@ -598,3 +609,79 @@ def test_letter_image_template_marks_first_page_of_attachment():
         '<img alt="" loading="lazy" src="http://example.com/endpoint.png?page=7"/>',
         '<img alt="" loading="lazy" src="http://example.com/endpoint.png?page=8"/>',
     ]
+
+
+class TestTemplatedLetterImageTemplate:
+    @pytest.mark.parametrize(
+        "mocker_kwargs, expected_english_pages, expected_welsh_pages, expected_attachment_pages",
+        (
+            (dict(count=1), 1, 0, 0),
+            (dict(count=5), 5, 0, 0),
+            (dict(count=2, welsh_page_count=1), 1, 1, 0),
+            (dict(count=5, welsh_page_count=3), 2, 3, 0),
+            (dict(count=4, attachment_page_count=2), 2, 0, 2),
+            (dict(count=7, welsh_page_count=2, attachment_page_count=3), 2, 2, 3),
+        ),
+    )
+    def test_page_count_attributes(
+        self,
+        mocker,
+        fake_uuid,
+        mocker_kwargs,
+        expected_english_pages,
+        expected_welsh_pages,
+        expected_attachment_pages,
+    ):
+        do_mock_get_page_count_for_letter(mocker, **mocker_kwargs)
+        t = TemplatedLetterImageTemplate(template_json(service_id=SERVICE_ONE_ID, id_=fake_uuid, type_="letter"))
+
+        assert t.english_page_count == expected_english_pages
+        assert t.welsh_page_count == expected_welsh_pages
+        assert t.attachment_page_count == expected_attachment_pages
+
+    @pytest.mark.parametrize(
+        "mocker_kwargs, expected_value",
+        (
+            (dict(count=1), 1),
+            (dict(count=5), 1),
+            (dict(count=2, welsh_page_count=1), 2),
+            (dict(count=5, welsh_page_count=3), 4),
+            (dict(count=4, attachment_page_count=2), 1),
+            (dict(count=7, welsh_page_count=2, attachment_page_count=3), 3),
+        ),
+    )
+    def test_first_english_page(self, mocker, fake_uuid, mocker_kwargs, expected_value):
+        do_mock_get_page_count_for_letter(mocker, **mocker_kwargs)
+        t = TemplatedLetterImageTemplate(template_json(service_id=SERVICE_ONE_ID, id_=fake_uuid, type_="letter"))
+
+        assert t.first_english_page == expected_value
+
+    @pytest.mark.parametrize(
+        "mocker_kwargs, expected_value",
+        (
+            (dict(count=1), None),
+            (dict(count=5), None),
+            (dict(count=2, welsh_page_count=1), None),
+            (dict(count=5, welsh_page_count=3), None),
+            (dict(count=4, attachment_page_count=2), 3),
+            (dict(count=7, welsh_page_count=2, attachment_page_count=3), 5),
+        ),
+    )
+    def test_first_attachment_page(self, mocker, fake_uuid, mocker_kwargs, expected_value):
+        do_mock_get_page_count_for_letter(mocker, **mocker_kwargs)
+        t = TemplatedLetterImageTemplate(
+            template_json(
+                service_id=SERVICE_ONE_ID,
+                id_=fake_uuid,
+                type_="letter",
+                letter_attachment={
+                    "id": "abc",
+                    "original_filename": "blah.pdf",
+                    "page_count": mocker_kwargs["attachment_page_count"],
+                }
+                if expected_value
+                else {},
+            ),
+        )
+
+        assert t.first_attachment_page == expected_value

@@ -111,7 +111,7 @@ def get_page_count_for_letter(db_template, values=None):
         headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
     )
 
-    page_count = json.loads(response.content.decode("utf-8"))["count"]
+    page_count = json.loads(response.content.decode("utf-8"))
 
     return page_count
 

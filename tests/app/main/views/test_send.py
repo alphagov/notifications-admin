@@ -32,6 +32,7 @@ from tests.conftest import (
     create_multiple_email_reply_to_addresses,
     create_multiple_sms_senders,
     create_template,
+    do_mock_get_page_count_for_letter,
     mock_get_service_email_template,
     mock_get_service_letter_template,
     mock_get_service_template,
@@ -293,9 +294,9 @@ def test_example_spreadsheet_for_letters(
     mocker,
     mock_get_service_letter_template_with_placeholders,
     fake_uuid,
+    mock_get_page_count_for_letter,
 ):
     service_one["permissions"] += ["letter"]
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(".send_messages", service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
@@ -617,7 +618,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     fake_uuid,
 ):
     service_one["permissions"] += ["letter"]
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -672,7 +673,7 @@ def test_upload_csv_file_with_bad_bfpo_postal_address_shows_check_page_with_erro
     fake_uuid,
 ):
     service_one["permissions"] += ["letter", "international_letters"]
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -714,7 +715,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
     fake_uuid,
 ):
     service_one["permissions"] += ["letter", "international_letters"]
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -769,7 +770,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_correct_pos
     expected_postage,
 ):
     service_one["permissions"] += ["letter", "international_letters"]
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -1114,10 +1115,7 @@ def test_upload_valid_csv_only_sets_meta_if_filename_known(
         House       , 1 Street    , SW1A 1AA
     """,
     )
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=5,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=5)
 
     client_request.get(
         "no_cookie.check_messages_preview",
@@ -1292,7 +1290,7 @@ def test_send_one_off_has_correct_page_title(
     mocker.patch("app.user_api_client.get_user", return_value=user)
     template_data = create_template(template_type="sms", name="Two week reminder", content="Hi there ((name))")
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
 
     page = client_request.get(
         "main.send_one_off",
@@ -1384,7 +1382,7 @@ def test_send_one_off_has_skip_link(
 ):
     template_data = create_template(template_id=fake_uuid, template_type=template_type)
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
 
     client_request.login(user)
     page = client_request.get(
@@ -1427,7 +1425,7 @@ def test_send_one_off_has_sticky_header_for_email(
 ):
     template_data = create_template(template_type=template_type, content="((body))")
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
 
     page = client_request.get(
         "main.send_one_off_step",
@@ -1448,7 +1446,7 @@ def test_send_one_off_has_sticky_header_for_letter_on_non_address_placeholders(
 ):
     template_data = create_template(template_type="letter", content="((body))")
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
 
     with client_request.session_transaction() as session:
         session["recipient"] = ""
@@ -1896,7 +1894,7 @@ def test_send_one_off_letter_redirects_to_right_url(
     mock_get_service_statistics,
     mocker,
 ):
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
     with client_request.session_transaction() as session:
         session["recipient"] = ""
         session["placeholders"] = {
@@ -1933,7 +1931,7 @@ def test_send_one_off_letter_qr_code_placeholder_too_big(
     mock_get_service_statistics,
     mocker,
 ):
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=9)
+    do_mock_get_page_count_for_letter(mocker, count=9)
     with client_request.session_transaction() as session:
         session["recipient"] = ""
         session["placeholders"] = {
@@ -2179,10 +2177,10 @@ def test_send_test_works_as_letter_preview(
     service_one,
     fake_uuid,
     mocker,
+    mock_get_page_count_for_letter,
 ):
     service_one["permissions"] = ["letter"]
     mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
     mocked_preview = mocker.patch(
         "app.main.views.send.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
     )
@@ -2663,10 +2661,10 @@ def test_letter_can_only_be_sent_now(
     mock_get_job_doesnt_exist,
     mock_get_jobs,
     fake_uuid,
+    mock_get_page_count_for_letter,
 ):
     mocker.patch("app.main.views.send.s3download", return_value="addressline1, addressline2, postcode\na,b,sw1 1aa")
     mocker.patch("app.main.views.send.set_metadata_on_csv_upload")
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     page = client_request.get(
         "main.check_messages",
@@ -2994,10 +2992,7 @@ def test_check_messages_back_link(
     template_data = create_template(template_id=fake_uuid, template_type=template_type, content=content)
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
 
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=5,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=5)
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {
@@ -3145,10 +3140,7 @@ def test_check_messages_shows_trial_mode_error_for_letters(
             ["address_line_1,address_line_2,postcode,"] + ["First Last,    123 Street,    SW1 1AA"] * number_of_rows
         ),
     )
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=3,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=3)
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {
@@ -3210,10 +3202,7 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
             ["address_line_1,address_line_2,postcode,"] + ["First Last,    123 Street,    SW1 1AA"] * number_of_rows
         ),
     )
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=11,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=11)
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {
@@ -3256,10 +3245,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
         ),
     )
 
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=5,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=5)
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {
@@ -3344,10 +3330,7 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
         return_value="\n".join(["address_line_1,address_line_2,foo"] + ["First Lastname,1 Example Road,SW1 1AA"]),
     )
 
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=5,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=5)
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {
@@ -3433,10 +3416,7 @@ def test_check_messages_does_not_add_sender_id_in_session_to_metadata_for_letter
         """,
     )
 
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=5,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=5)
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {fake_uuid: {"template_id": fake_uuid}}
@@ -3490,10 +3470,7 @@ def test_letters_from_csv_files_dont_have_download_link(
     """,
     )
 
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=5,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=5)
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {
@@ -3535,10 +3512,7 @@ def test_one_off_letters_have_download_link(
     service_one["restricted"] = restricted
     mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
 
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=5,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=5)
 
     with client_request.session_transaction() as session:
         session["recipient"] = None
@@ -3578,10 +3552,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
 ):
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=5,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=5)
 
     with client_request.session_transaction() as session:
         session["recipient"] = None
@@ -3621,10 +3592,7 @@ def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
 ):
-    mocker.patch(
-        "app.template_previews.get_page_count_for_letter",
-        return_value=11,
-    )
+    do_mock_get_page_count_for_letter(mocker, count=11)
 
     with client_request.session_transaction() as session:
         session["recipient"] = None

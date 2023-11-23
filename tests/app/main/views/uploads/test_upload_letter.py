@@ -6,7 +6,7 @@ from requests import RequestException
 
 from app.formatters import normalize_spaces
 from app.s3_client.s3_letter_upload_client import LetterMetadata, LetterNotFoundError
-from tests.conftest import SERVICE_ONE_ID, sample_uuid
+from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_count_for_letter, sample_uuid
 
 
 def test_get_upload_letter(client_request):
@@ -112,6 +112,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
     fake_uuid,
 ):
     letter_template = {
+        "service": SERVICE_ONE_ID,
         "template_type": "letter",
         "reply_to_text": "",
         "postage": "second",
@@ -132,6 +133,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
     mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
     mocker.patch("app.main.views.uploads.pdf_page_count", return_value=3)
+    do_mock_get_page_count_for_letter(mocker, count=3)
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
         return_value=LetterMetadata(
@@ -179,6 +181,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
     fake_uuid,
 ):
     letter_template = {
+        "service": SERVICE_ONE_ID,
         "template_type": "letter",
         "reply_to_text": "",
         "postage": "second",
@@ -198,6 +201,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
     mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
     mocker.patch("app.main.views.uploads.pdf_page_count", return_value=3)
+    do_mock_get_page_count_for_letter(mocker, count=3)
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
         return_value=LetterMetadata(
@@ -399,6 +403,7 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
 
 def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client_request, fake_uuid):
     letter_template = {
+        "service": SERVICE_ONE_ID,
         "template_type": "letter",
         "reply_to_text": "",
         "postage": "first",
@@ -426,6 +431,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(mocker, client
             }
         ),
     )
+    do_mock_get_page_count_for_letter(mocker, count=1)
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         page = client_request.post(

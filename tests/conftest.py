@@ -3745,8 +3745,26 @@ def mock_get_returned_letter_summary_with_no_returned_letters(mocker):
     )
 
 
+def do_mock_get_page_count_for_letter(mocker, count, welsh_page_count=0, attachment_page_count=0):
+    return mocker.patch(
+        "app.template_previews.get_page_count_for_letter",
+        return_value={
+            "count": count,
+            "welsh_page_count": welsh_page_count,
+            "attachment_page_count": attachment_page_count,
+        },
+    )
+
+
+@pytest.fixture(scope="function")
+def mock_get_page_count_for_letter(mocker, count=1, welsh_page_count=0, attachment_page_count=0):
+    return do_mock_get_page_count_for_letter(
+        mocker=mocker, count=count, welsh_page_count=welsh_page_count, attachment_page_count=attachment_page_count
+    )
+
+
 @pytest.fixture
-def mock_template_preview(mocker):
+def mock_template_preview(mocker, mock_get_page_count_for_letter):
     content = b"letter preview as png or pdf"
     status_code = 200
     headers = {}
@@ -3754,7 +3772,6 @@ def mock_template_preview(mocker):
     mocker.patch(
         "app.template_previews.TemplatePreview.get_preview_for_templated_letter", return_value=example_response
     )
-    mocker.patch("app.template_previews.get_page_count_for_letter", return_value=1)
 
     mocker.patch("app.template_previews.TemplatePreview.get_png_for_valid_pdf_page", return_value=example_response)
     mocker.patch("app.template_previews.TemplatePreview.get_png_for_invalid_pdf_page", return_value=example_response)

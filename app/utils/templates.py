@@ -1,3 +1,6 @@
+import json
+from typing import Optional
+
 from flask import current_app, render_template
 from markupsafe import Markup
 from notifications_utils.countries import Postage
@@ -100,6 +103,7 @@ class BaseLetterImageTemplate(BaseLetterTemplate):
         for attr in ("page_count", "image_url"):
             if not getattr(self, attr):
                 raise TypeError(f"{attr} is required to render {type(self).__name__}")
+
         return Markup(
             render_template(
                 self.jinja_template,
@@ -131,28 +135,64 @@ class PrecompiledLetterImageTemplate(BaseLetterImageTemplate):
 
 
 class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
+    def __init__(
+        self,
+        template,
+        values=None,
+        image_url=None,
+        page_count=None,
+        contact_block=None,
+    ):
+        super().__init__(template, values, image_url=image_url, page_count=None, contact_block=contact_block)
+        self._all_page_counts = None
+
     @property
-    def page_count(self):
+    def all_page_counts(self):
         from app.template_previews import get_page_count_for_letter
 
-        if self._page_count:
-            return self._page_count
+        if self._all_page_counts:
+            return self._all_page_counts
 
         if self.values:
-            self._page_count = get_page_count_for_letter(self._template, self.values)
-            return self._page_count
+            self._all_page_counts = get_page_count_for_letter(self._template, self.values)
+            return self._all_page_counts
 
-        cache_key = f"service-{self._template['service']}-template-{self.id}-page-count"
-
+        cache_key = f"service-{self._template['service']}-template-{self.id}-all-page-counts"
         if cached_value := redis_client.get(cache_key):
-            self._page_count = int(cached_value)
-            return self._page_count
+            self._all_page_counts = json.loads(cached_value)
+            return self._all_page_counts
 
-        self._page_count = get_page_count_for_letter(self._template)
+        self._all_page_counts = get_page_count_for_letter(self._template, self.values)
+        redis_client.set(cache_key, json.dumps(self._all_page_counts), ex=cache.DEFAULT_TTL)
 
-        redis_client.set(cache_key, self._page_count, ex=cache.DEFAULT_TTL)
+        return self._all_page_counts
 
-        return self._page_count
+    @property
+    def page_count(self):
+        return self.all_page_counts["count"]
+
+    @property
+    def welsh_page_count(self) -> int:
+        return self.all_page_counts["welsh_page_count"]
+
+    @property
+    def english_page_count(self) -> int:
+        return self.page_count - self.welsh_page_count - self.attachment_page_count
+
+    @property
+    def attachment_page_count(self) -> int:
+        return self.all_page_counts["attachment_page_count"]
+
+    @property
+    def first_english_page(self) -> int:
+        return self.welsh_page_count + 1
+
+    @property
+    def first_attachment_page(self) -> Optional[int]:
+        if not self.attachment:
+            return None
+
+        return self.welsh_page_count + self.english_page_count + 1
 
     @property
     def values(self):
@@ -161,7 +201,7 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
     @values.setter
     def values(self, value):
         # If the personalisation changes then we might need to recalculate the page count
-        self._page_count = None
+        self._all_page_counts = None
         super(BaseLetterImageTemplate, type(self)).values.fset(self, value)
 
     @property
