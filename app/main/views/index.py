@@ -310,6 +310,14 @@ def guidance_send_files_by_email():
     )
 
 
+@main.route("/using-notify/sign-in-method")
+def guidance_sign_in_method():
+    return render_template(
+        "views/guidance/using-notify/sign-in-method.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/team-members-and-permissions")
 def guidance_team_members_and_permissions():
     return render_template(
