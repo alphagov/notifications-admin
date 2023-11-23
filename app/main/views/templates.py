@@ -440,6 +440,7 @@ def copy_template(service_id, template_id):
         form=form,
         template=template,
         heading_action="Add",
+        show_name_field=True,
         services=current_user.service_ids,
         back_link=back_link,
     )

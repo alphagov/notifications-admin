@@ -22,14 +22,18 @@
     {% call form_wrapper() %}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-five-sixths">
+          {% if show_name_field %}
+            {{ form.name(param_extensions={"classes": "govuk-!-width-full"}) }}
+          {% else %}
+            {# this needs to be passed through if we're showing this from the copy page #}
+            <input type="hidden" name="name" value="{{ form.name.data }}" />
+          {% endif %}
+
           {{ textbox(form.subject, width='1-1', highlight_placeholders=True, rows=2) }}
           {{ textbox(form.template_content, highlight_placeholders=True, width='1-1', rows=8) }}
           {{ sticky_page_footer(
             'Save'
           ) }}
-
-          {# this needs to be passed through if we're showing this from the copy page #}
-          <input type="hidden" name="name" value="{{ form.name.data }}" />
 
         </div>
         <div class="govuk-grid-column-full">
