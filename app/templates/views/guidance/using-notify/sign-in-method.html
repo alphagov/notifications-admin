@@ -1,0 +1,40 @@
+{% extends "content_template.html" %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Sign-in method
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Sign-in method</h1>
+
+  <p class="govuk-body">When you sign in to Notify, you’ll need to enter:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>your email address</li>
+    <li>your password</li>
+    <li>a text message code that Notify sends to your phone</li>
+  </ul>
+
+  <p class="govuk-body">If signing in with a text message is a problem for your team, you can also sign in using a link that’s sent in an email.</p>
+
+  <p class="govuk-body">For security, you should only do this if you use:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>a work-managed device</li>
+    <li>a work email address protected by multi-factor authentication (MFA)</li>
+  </ul>
+
+  <p class="govuk-body">You must keep to the [terms of use for signing in to Notify].</p>
+
+  <h2 class="heading-medium">How to change the sign-in method for your team</h2>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Go to the Settings page.</li>
+    <li>Select Change on the Sign-in method row.</li>
+  </ol>
+
+{% endblock %}
