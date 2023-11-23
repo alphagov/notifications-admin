@@ -95,33 +95,26 @@ class BaseLetterImageTemplate(BaseLetterTemplate):
         }.get(self.postage)
 
     @property
-    def first_page_of_attachment(self):
-        if getattr(self, "attachment", None):
-            return self.page_count - self.attachment.page_count + 1
+    def jinja_render_data(self):
+        return {
+            "image_url": self.image_url,
+            "page_numbers": self.page_numbers,
+            "address": self._address_block,
+            "contact_block": self._contact_block,
+            "date": self._date,
+            "subject": self.subject,
+            "message": self._message,
+            "show_postage": bool(self.postage),
+            "postage_description": self.postage_description,
+            "postage_class_value": self.postage_class_value,
+        }
 
     def __str__(self):
         for attr in ("page_count", "image_url"):
             if not getattr(self, attr):
                 raise TypeError(f"{attr} is required to render {type(self).__name__}")
 
-        return Markup(
-            render_template(
-                self.jinja_template,
-                **{
-                    "image_url": self.image_url,
-                    "page_numbers": self.page_numbers,
-                    "first_page_of_attachment": self.first_page_of_attachment,
-                    "address": self._address_block,
-                    "contact_block": self._contact_block,
-                    "date": self._date,
-                    "subject": self.subject,
-                    "message": self._message,
-                    "show_postage": bool(self.postage),
-                    "postage_description": self.postage_description,
-                    "postage_class_value": self.postage_class_value,
-                },
-            )
-        )
+        return Markup(render_template(self.jinja_template, **self.jinja_render_data))
 
 
 class PrecompiledLetterImageTemplate(BaseLetterImageTemplate):
@@ -208,6 +201,10 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
     def attachment(self):
         if attachment := self.get_raw("letter_attachment"):
             return LetterAttachment(attachment)
+
+    @property
+    def jinja_render_data(self):
+        return super().jinja_render_data | {"first_page_of_attachment": self.first_attachment_page}
 
 
 class LetterAttachment(JSONModel):
