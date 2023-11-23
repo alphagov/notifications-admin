@@ -147,6 +147,10 @@ def using_notify_nav():
                     "link": "main.guidance_send_files_by_email",
                 },
                 {
+                    "name": "Sign-in method",
+                    "link": "main.guidance_sign_in_method",
+                },
+                {
                     "name": "Team members and permissions",
                     "link": "main.guidance_team_members_and_permissions",
                 },
