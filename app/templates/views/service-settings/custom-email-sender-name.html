@@ -19,11 +19,16 @@
         <div class="govuk-grid-column-five-sixths">
             {{ page_header(heading) }}
 
-            <p class="govuk-body">Choose a sender name that tells people what your email is about, as well as who it’s from.</p>
-            
-            <p class="govuk-body">Adding a custom sender name will also change the email address for your service.</p>
+            <p class="govuk-body">You should choose a sender name that tells people:</p>
+
+            <ul class="govuk-list govuk-list--bullet">
+                <li>who the email is from</li>
+                <li>what the email is about</li>
+            </ul>
 
             <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
+
+            <p class="govuk-body">Adding a custom sender name will also change the email address for your service.</p>
 
             {% set default_email_sender_name_hint %}
                 {% with email_sender_name = current_service.name %}
