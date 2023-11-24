@@ -97,6 +97,7 @@ class BaseLetterImageTemplate(BaseLetterTemplate):
     @property
     def jinja_render_data(self):
         return {
+            "template": self,
             "image_url": self.image_url,
             "page_numbers": self.page_numbers,
             "address": self._address_block,
@@ -135,9 +136,11 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
         image_url=None,
         page_count=None,
         contact_block=None,
+        include_letter_edit_ui_overlay=False,
     ):
         super().__init__(template, values, image_url=image_url, page_count=None, contact_block=contact_block)
         self._all_page_counts = None
+        self.include_letter_edit_ui_overlay = include_letter_edit_ui_overlay
 
     @property
     def all_page_counts(self):
@@ -204,7 +207,10 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
 
     @property
     def jinja_render_data(self):
-        return super().jinja_render_data | {"first_page_of_attachment": self.first_attachment_page}
+        return super().jinja_render_data | {
+            "first_page_of_attachment": self.first_attachment_page,
+            "first_page_of_english": self.first_english_page,
+        }
 
 
 class LetterAttachment(JSONModel):
@@ -234,6 +240,7 @@ def get_template(
     redact_missing_personalisation=False,
     email_reply_to=None,
     sms_sender=None,
+    include_letter_edit_ui_overlay=False,
 ):
     if "email" == template["template_type"]:
         return EmailPreviewTemplate(
@@ -264,6 +271,7 @@ def get_template(
             template,
             image_url=letter_preview_url,
             contact_block=template["reply_to_text"],
+            include_letter_edit_ui_overlay=include_letter_edit_ui_overlay,
         )
     if "broadcast" == template["template_type"]:
         return BroadcastPreviewTemplate(
