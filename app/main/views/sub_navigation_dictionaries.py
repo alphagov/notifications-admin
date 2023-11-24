@@ -97,7 +97,7 @@ def using_notify_nav():
                 {
                     "name": "Data retention period",
                     "link": "main.guidance_data_retention_period",
-                },                
+                },
                 {
                     "name": "Delivery times",
                     "link": "main.guidance_delivery_times",
