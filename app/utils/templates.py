@@ -134,7 +134,6 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
         template,
         values=None,
         image_url=None,
-        page_count=None,
         contact_block=None,
         include_letter_edit_ui_overlay=False,
     ):

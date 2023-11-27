@@ -504,10 +504,7 @@ def test_subject_line_gets_applied_to_correct_template_types():
 def test_subject_line_gets_replaced():
     template = TemplatedLetterImageTemplate(
         {"service": SERVICE_ONE_ID, "content": "", "template_type": "letter", "subject": "((name))"},
-        **{
-            "image_url": "http://example.com",
-            "page_count": 1,
-        },
+        image_url="http://example.com",
     )
     assert template.subject == Markup("<span class='placeholder'>&#40;&#40;name&#41;&#41;</span>")
     template.values = {"name": "Jo"}
