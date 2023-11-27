@@ -1970,6 +1970,7 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
             self.custom_email_sender_name.validators = [
                 NotifyDataRequired(thing="a sender name"),
                 MustContainAlphanumericCharacters(thing="sender name"),
+                CharactersNotAllowed("@"),
                 Length(max=255, thing="sender name"),
             ]
 

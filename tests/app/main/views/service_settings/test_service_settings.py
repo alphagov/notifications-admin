@@ -6571,6 +6571,7 @@ class TestServiceEmailSenderChange:
             ("ALERT", "Sender name needs to be more specific"),
             # under the 255 db col length, but too long when combined with email_sender_local_part to make an email
             ("a" * 150 + " " * 100 + "a", "Sender name cannot be longer than 143 characters"),
+            ("foo@example.com", "Cannot contain @"),
         ],
     )
     def test_service_email_sender_change_fails_if_new_name_fails_validation(
