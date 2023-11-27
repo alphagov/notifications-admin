@@ -1999,6 +1999,10 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
         if normalised_sender_name in self.BAD_EMAIL_LOCAL_PARTS:
             raise ValidationError("Sender name needs to be more specific")
 
+        with suppress(InvalidEmailError):
+            validate_email_address(field.data)
+            raise ValidationError("Sender name cannot be an email address")
+
 
 class AdminSetEmailBrandingForm(StripWhitespaceForm):
     branding_style = GovukRadiosFieldWithNoneOption(

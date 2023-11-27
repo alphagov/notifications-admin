@@ -6569,6 +6569,8 @@ class TestServiceEmailSenderChange:
             ("info", "Sender name needs to be more specific"),
             ("Support", "Sender name needs to be more specific"),
             ("ALERT", "Sender name needs to be more specific"),
+            ("test@example.com", "Sender name cannot be an email address"),
+            ("Foo.BAR@example.gov.uk", "Sender name cannot be an email address"),
             # under the 255 db col length, but too long when combined with email_sender_local_part to make an email
             ("a" * 150 + " " * 100 + "a", "Sender name cannot be longer than 143 characters"),
         ],
@@ -6586,6 +6588,40 @@ class TestServiceEmailSenderChange:
         assert error_message in page.select_one(".govuk-error-message").text
 
     @pytest.mark.parametrize(
+        "custom_email_sender_name",
+        [
+            # Minimum allowable length
+            ("eg"),
+            # Maximum allowable length
+            ("a" * 143),
+            # At symbol is allowed as long as the name isn’t an email address
+            ("Example@Foo"),
+        ],
+    )
+    def test_service_email_sender_change_updates_service(
+        self,
+        client_request,
+        mock_update_service,
+        custom_email_sender_name,
+    ):
+        client_request.post(
+            "main.service_email_sender_change",
+            service_id=SERVICE_ONE_ID,
+            _data={
+                "use_custom_email_sender_name": "True",
+                "custom_email_sender_name": custom_email_sender_name,
+            },
+            _expected_redirect=url_for(
+                "main.service_settings",
+                service_id=SERVICE_ONE_ID,
+            ),
+        )
+        mock_update_service.assert_called_once_with(
+            SERVICE_ONE_ID,
+            custom_email_sender_name=custom_email_sender_name,
+        )
+
+    @pytest.mark.parametrize(
         "custom_email_sender_name, expected_preview",
         [
             ("", "Example<br> example@notifications.service.gov.uk"),
@@ -6596,6 +6632,8 @@ class TestServiceEmailSenderChange:
                 "<script>alert()</script>",
                 "&lt;script&gt;alert()&lt;/script&gt;<br> scriptalertscript@notifications.service.gov.uk",
             ),
+            # This example isn’t valid but we still preview it
+            ("test@example.com", "test@example.com<br> testexample.com@notifications.service.gov.uk"),
         ],
     )
     def test_service_preview_email_sender_name(self, client_request, custom_email_sender_name, expected_preview):
