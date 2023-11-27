@@ -6569,6 +6569,8 @@ class TestServiceEmailSenderChange:
             ("info", "Sender name needs to be more specific"),
             ("Support", "Sender name needs to be more specific"),
             ("ALERT", "Sender name needs to be more specific"),
+            ("test@example.com", "Sender name cannot be an email address"),
+            ("Foo.BAR@example.gov.uk", "Sender name cannot be an email address"),
             # under the 255 db col length, but too long when combined with email_sender_local_part to make an email
             ("a" * 150 + " " * 100 + "a", "Sender name cannot be longer than 143 characters"),
         ],
