@@ -6542,7 +6542,7 @@ class TestServiceEmailSenderChange:
         service_one["custom_email_sender_name"] = custom_email_sender_name
         service_one["email_sender_local_part"] = "local.part"
         page = client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=200)
-        assert page.select_one("h1").text == "Sender name and email address"
+        assert page.select_one("h1").text == "Email sender name"
         assert [normalize_spaces(radio.text) for radio in page.select(".govuk-radios__item")] == [
             "Use the name of your service service one service.one@notifications.service.gov.uk",
             "Enter a custom sender name",
