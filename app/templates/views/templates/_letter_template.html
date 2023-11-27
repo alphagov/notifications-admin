@@ -8,6 +8,13 @@
   </div>
 {% endif %}
 
+{#
+  In a slight change from the email/text templates, we render the edit UI elements inside the template's built-in Jinja
+  template. This is because rendering a letter's preview via images is more complex, and there are more complex UI
+  requirements - specifically, we show the 'Edit' body button next to the appropriate body of the letter. We show
+  'edit' buttons for potentially multiple languages (Welsh and English), and those can be on arbitrary pages.
+  So we need to be inside the central rendering logic to get those placed correctly.
+#}
 {{ template|string }}
 
 <div class="govuk-!-margin-bottom-2">
