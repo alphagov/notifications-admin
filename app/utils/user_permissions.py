@@ -8,8 +8,6 @@ permission_mappings = {
     "manage_service": ["manage_users", "manage_settings"],
     "manage_api_keys": ["manage_api_keys"],
     "view_activity": ["view_activity"],
-    "create_broadcasts": ["create_broadcasts", "reject_broadcasts", "cancel_broadcasts"],
-    "approve_broadcasts": ["approve_broadcasts", "reject_broadcasts", "cancel_broadcasts"],
 }
 
 all_ui_permissions = set(permission_mappings.keys())
