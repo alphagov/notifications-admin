@@ -6,7 +6,6 @@ from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
 from notifications_utils.recipients import InvalidEmailError, validate_email_address
 from notifications_utils.sanitise_text import SanitiseSMS
-from notifications_utils.template import BroadcastMessageTemplate
 from orderedset import OrderedSet
 from wtforms import ValidationError
 from wtforms.validators import URL, DataRequired, InputRequired, StopValidation
@@ -121,35 +120,6 @@ class OnlySMSCharacters:
                     ("It" if len(non_sms_characters) == 1 else "These characters"),
                 )
             )
-
-
-class NoPlaceholders:
-    def __init__(self, message=None):
-        self.message = message or "You can’t use ((double brackets)) to personalise this message"
-
-    def __call__(self, form, field):
-        if Field(field.data).placeholders:
-            raise ValidationError(self.message)
-
-
-class BroadcastLength:
-    def __call__(self, form, field):
-        template = BroadcastMessageTemplate(
-            {
-                "template_type": "broadcast",
-                "content": field.data,
-            }
-        )
-
-        if template.content_too_long:
-            non_gsm_characters = list(sorted(template.non_gsm_characters))
-            if non_gsm_characters:
-                raise ValidationError(
-                    f"Content must be {template.max_content_count:,.0f} "
-                    f"characters or fewer because it contains "
-                    f'{formatted_list(non_gsm_characters, conjunction="and", before_each="", after_each="")}'
-                )
-            raise ValidationError(f"Content must be {template.max_content_count:,.0f} characters or fewer")
 
 
 class DoesNotStartWithDoubleZero:

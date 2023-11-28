@@ -23,12 +23,6 @@ permission_options = (
     ("manage_api_keys", "Manage API integration"),
 )
 
-broadcast_permission_options = (
-    ("manage_templates", "Add and edit templates"),
-    ("create_broadcasts", "Create new alerts"),
-    ("approve_broadcasts", "Approve alerts"),
-)
-
 organisation_user_permission_names = {PERMISSION_CAN_MAKE_SERVICES_LIVE}
 organisation_user_permission_options = ((PERMISSION_CAN_MAKE_SERVICES_LIVE, "Make new services live"),)
 
