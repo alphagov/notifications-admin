@@ -3,7 +3,6 @@ import json
 import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
-from functools import partial
 from unittest import mock
 from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
@@ -4277,96 +4276,6 @@ def mock_get_live_broadcast_message(
 
     return mocker.patch(
         "app.broadcast_message_api_client.get_broadcast_message",
-        side_effect=_get,
-    )
-
-
-@pytest.fixture(scope="function")
-def mock_get_no_broadcast_messages(
-    mocker,
-    fake_uuid,
-):
-    return mocker.patch(
-        "app.models.broadcast_message.BroadcastMessages.client_method",
-        return_value=[
-            broadcast_message_json(
-                id_=fake_uuid,
-                service_id=SERVICE_ONE_ID,
-                template_id=fake_uuid,
-                status="draft",  # draft broadcasts aren’t shown on the dashboard
-                created_by_id=fake_uuid,
-            ),
-        ],
-    )
-
-
-@pytest.fixture(scope="function")
-def mock_get_broadcast_messages(
-    mocker,
-    fake_uuid,
-):
-    def _get(service_id):
-        partial_json = partial(
-            broadcast_message_json,
-            service_id=service_id,
-            template_id=fake_uuid,
-            created_by_id=fake_uuid,
-        )
-        return [
-            partial_json(
-                id_=uuid4(),
-                status="draft",
-            ),
-            partial_json(
-                id_=uuid4(),
-                status="pending-approval",
-                updated_at=(datetime.utcnow() - timedelta(minutes=30)).isoformat(),
-                template_name="Half an hour ago",
-                finishes_at=None,
-            ),
-            partial_json(
-                id_=uuid4(),
-                status="pending-approval",
-                updated_at=(datetime.utcnow() - timedelta(hours=1, minutes=30)).isoformat(),
-                template_name="Hour and a half ago",
-                finishes_at=None,
-            ),
-            partial_json(
-                id_=uuid4(),
-                status="broadcasting",
-                updated_at=(datetime.utcnow()).isoformat(),
-                starts_at=(datetime.utcnow()).isoformat(),
-                finishes_at=(datetime.utcnow() + timedelta(hours=24)).isoformat(),
-            ),
-            partial_json(
-                id_=uuid4(),
-                status="broadcasting",
-                updated_at=(datetime.utcnow() - timedelta(hours=1)).isoformat(),
-                starts_at=(datetime.utcnow() - timedelta(hours=1)).isoformat(),
-                finishes_at=(datetime.utcnow() + timedelta(hours=24)).isoformat(),
-            ),
-            partial_json(
-                id_=uuid4(),
-                status="completed",
-                starts_at=(datetime.utcnow() - timedelta(hours=12)).isoformat(),
-                finishes_at=(datetime.utcnow() - timedelta(hours=6)).isoformat(),
-            ),
-            partial_json(
-                id_=uuid4(),
-                status="cancelled",
-                starts_at=(datetime.utcnow() - timedelta(days=1)).isoformat(),
-                finishes_at=(datetime.utcnow() - timedelta(days=100)).isoformat(),
-                cancelled_at=(datetime.utcnow() - timedelta(days=10)).isoformat(),
-            ),
-            partial_json(
-                id_=uuid4(),
-                status="rejected",
-                updated_at=(datetime.utcnow() - timedelta(hours=1)).isoformat(),
-            ),
-        ]
-
-    return mocker.patch(
-        "app.models.broadcast_message.BroadcastMessages.client_method",
         side_effect=_get,
     )
 
