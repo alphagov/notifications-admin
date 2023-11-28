@@ -26,7 +26,6 @@ from app import (
 )
 from app.event_handlers import (
     create_archive_service_event,
-    create_broadcast_account_type_change_event,
     create_set_inbound_sms_on_event,
 )
 from app.extensions import zendesk_client
@@ -49,9 +48,6 @@ from app.main.forms import (
     OnOffSettingForm,
     RenameServiceForm,
     SearchByNameForm,
-    ServiceBroadcastAccountTypeForm,
-    ServiceBroadcastChannelForm,
-    ServiceBroadcastNetworkForm,
     ServiceContactDetailsForm,
     ServiceEditInboundNumberForm,
     ServiceEmailSenderForm,
@@ -308,106 +304,6 @@ def service_set_permission(service_id, permission):
     return render_template(
         "views/service-settings/set-service-setting.html",
         title=title,
-        form=form,
-    )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/broadcasts", methods=["GET", "POST"])
-@user_is_platform_admin
-def service_set_broadcast_channel(service_id):
-    if current_service.has_permission("broadcast"):
-        if current_service.live:
-            channel = current_service.broadcast_channel
-        else:
-            channel = "training"
-    else:
-        channel = None
-
-    form = ServiceBroadcastChannelForm(channel=channel)
-
-    if form.validate_on_submit():
-        if form.channel.data == "training":
-            return redirect(
-                url_for(
-                    ".service_confirm_broadcast_account_type",
-                    service_id=current_service.id,
-                    account_type="training-test-all",
-                )
-            )
-        return redirect(
-            url_for(
-                ".service_set_broadcast_network",
-                service_id=current_service.id,
-                broadcast_channel=form.channel.data,
-            )
-        )
-
-    return render_template(
-        "views/service-settings/service-set-broadcast-channel.html",
-        form=form,
-    )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/broadcasts/<broadcast_channel>", methods=["GET", "POST"])
-@user_is_platform_admin
-def service_set_broadcast_network(service_id, broadcast_channel):
-    # only populate old settings when the channel is unchanged
-    if current_service.broadcast_channel == broadcast_channel:
-        provider = current_service.allowed_broadcast_provider
-
-        form = ServiceBroadcastNetworkForm(
-            broadcast_channel=broadcast_channel,
-            all_networks=provider == "all",
-            network=provider if provider != "all" else None,
-        )
-    else:
-        form = ServiceBroadcastNetworkForm(broadcast_channel=broadcast_channel)
-
-    if form.validate_on_submit():
-        return redirect(
-            url_for(
-                ".service_confirm_broadcast_account_type",
-                service_id=current_service.id,
-                account_type=form.account_type,
-            )
-        )
-
-    return render_template(
-        "views/service-settings/service-set-broadcast-network.html",
-        form=form,
-    )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/broadcasts/<account_type>/confirm", methods=["GET", "POST"])
-@user_is_platform_admin
-def service_confirm_broadcast_account_type(service_id, account_type):
-    form = ServiceBroadcastAccountTypeForm(account_type=account_type)
-    form.validate()
-
-    if form.account_type.errors:
-        abort(404)
-
-    if form.validate_on_submit():
-        cached_service_user_ids = [user.id for user in current_service.active_users]
-
-        service_api_client.set_service_broadcast_settings(
-            current_service.id,
-            service_mode=form.account_type.service_mode,
-            broadcast_channel=form.account_type.broadcast_channel,
-            provider_restriction=form.account_type.provider_restriction,
-            cached_service_user_ids=cached_service_user_ids,
-        )
-        create_broadcast_account_type_change_event(
-            service_id=current_service.id,
-            changed_by_id=current_user.id,
-            service_mode=form.account_type.service_mode,
-            broadcast_channel=form.account_type.broadcast_channel,
-            provider_restriction=form.account_type.provider_restriction,
-        )
-        return redirect(url_for(".service_settings", service_id=service_id))
-
-    return render_template(
-        "views/service-settings/service-confirm-broadcast-account-type.html",
         form=form,
     )
 

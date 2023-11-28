@@ -67,50 +67,6 @@ def test_existing_user_accept_invite_calls_api_and_redirects_to_dashboard(
     )
 
 
-@pytest.mark.parametrize(
-    "trial_mode, expected_endpoint",
-    (
-        (True, ".broadcast_tour"),
-        (False, ".broadcast_tour_live"),
-    ),
-)
-def test_broadcast_service_shows_tour(
-    client_request,
-    service_one,
-    mock_check_invite_token,
-    mock_get_existing_user_by_email,
-    mock_no_users_for_service,
-    mock_accept_invite,
-    mock_add_user_to_service,
-    mock_update_user_attribute,
-    mocker,
-    mock_events,
-    mock_get_user,
-    trial_mode,
-    expected_endpoint,
-):
-    client_request.logout()
-    service_one["permissions"] = ["broadcast"]
-    service_one["restricted"] = trial_mode
-
-    mocker.patch(
-        "app.service_api_client.get_service",
-        return_value={
-            "data": service_one,
-        },
-    )
-
-    client_request.get(
-        "main.accept_invite",
-        token="thisisnotarealtoken",
-        _expected_redirect=url_for(
-            expected_endpoint,
-            service_id=SERVICE_ONE_ID,
-            step_index=1,
-        ),
-    )
-
-
 def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
     client_request,
     mocker,
@@ -669,15 +625,7 @@ def test_new_invited_user_verifies_and_added_to_service(
     assert page.select_one("h1").text == "Dashboard"
 
 
-@pytest.mark.parametrize(
-    "service_permissions, trial_mode, expected_endpoint, extra_args",
-    (
-        ([], True, "main.service_dashboard", {}),
-        ([], False, "main.service_dashboard", {}),
-        (["broadcast"], True, "main.broadcast_tour", {"step_index": 1}),
-        (["broadcast"], False, "main.broadcast_tour_live", {"step_index": 1}),
-    ),
-)
+@pytest.mark.parametrize("trial_mode", (True, False))
 def test_new_invited_user_is_redirected_to_correct_place(
     mocker,
     client_request,
@@ -690,10 +638,7 @@ def test_new_invited_user_is_redirected_to_correct_place(
     mock_get_invited_user_by_id,
     mock_events,
     mock_get_service,
-    service_permissions,
     trial_mode,
-    expected_endpoint,
-    extra_args,
 ):
     client_request.logout()
     mocker.patch(
@@ -702,7 +647,6 @@ def test_new_invited_user_is_redirected_to_correct_place(
             "data": service_json(
                 sample_invite["service"],
                 restricted=trial_mode,
-                permissions=service_permissions,
             )
         },
     )
@@ -721,7 +665,7 @@ def test_new_invited_user_is_redirected_to_correct_place(
     client_request.post(
         "main.verify",
         _data={"sms_code": "12345"},
-        _expected_redirect=url_for(expected_endpoint, service_id=sample_invite["service"], **extra_args),
+        _expected_redirect=url_for("main.service_dashboard", service_id=sample_invite["service"]),
     )
 
 

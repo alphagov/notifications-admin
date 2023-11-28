@@ -10,7 +10,6 @@ from app.main.views import (  # noqa
     add_service,
     agreement,
     api_keys,
-    broadcast,
     choose_account,
     code_not_received,
     conversation,

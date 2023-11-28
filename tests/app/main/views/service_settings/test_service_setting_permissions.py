@@ -40,19 +40,6 @@ def test_service_set_permission_requires_platform_admin(
     )
 
 
-def test_service_set_permission_does_not_exist_for_broadcast_permission(
-    mocker,
-    client_request,
-    platform_admin_user,
-    service_one,
-    mock_get_inbound_number_for_service,
-):
-    client_request.login(platform_admin_user)
-    client_request.get(
-        "main.service_set_permission", service_id=service_one["id"], permission="broadcast", _expected_status=404
-    )
-
-
 @pytest.mark.parametrize(
     "initial_permissions, permission, form_data, expected_update",
     [
