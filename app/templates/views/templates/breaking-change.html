@@ -34,7 +34,9 @@
 
   {% call form_wrapper() %}
     <input type="hidden" name="name" value="{{ new_template.name }}" />
-    <input type="hidden" name="subject" value="{{ form.subject.data or '' }}" />
+    {% if form.subject %}
+      <input type="hidden" name="subject" value="{{ form.subject.data or '' }}" />
+    {% endif %}
     <input type="hidden" name="template_content" value="{{ form.template_content.data }}" />
     <input type="hidden" name="template_id" value="{{ new_template.id }}" />
 

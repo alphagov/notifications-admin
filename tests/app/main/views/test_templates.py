@@ -2624,6 +2624,81 @@ def test_should_not_allow_template_edits_without_correct_permission(
 
 
 @pytest.mark.parametrize(
+    "old_content, new_content, expected_paragraphs",
+    [
+        (
+            "my favourite colour is blue",
+            "my favourite colour is ((colour))",
+            [
+                "You added ((colour))",
+                "Before you send any messages, make sure your API calls include colour.",
+            ],
+        ),
+        (
+            "hello ((name))",
+            "hello ((first name)) ((middle name)) ((last name))",
+            [
+                "You removed ((name))",
+                "You added ((first name)) ((middle name)) and ((last name))",
+                "Before you send any messages, make sure your API calls include first name, middle name and last name.",
+            ],
+        ),
+    ],
+)
+def test_should_show_interstitial_when_making_breaking_change_to_sms_template(
+    client_request,
+    service_one,
+    mock_update_service_template,
+    mock_get_user_by_email,
+    mock_get_api_keys,
+    fake_uuid,
+    mocker,
+    new_content,
+    old_content,
+    expected_paragraphs,
+):
+    service_one["permissions"] += ["sms"]
+
+    email_template = create_template(
+        template_id=fake_uuid, template_type="sms", name="my old name", content=old_content
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+
+    data = {
+        "id": fake_uuid,
+        "name": "my new template name",
+        "template_content": new_content,
+        "template_type": "sms",
+        "service": SERVICE_ONE_ID,
+    }
+
+    page = client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data=data,
+        _expected_status=200,
+    )
+
+    assert page.select_one("h1").string.strip() == "Confirm changes"
+    assert page.select_one("a.govuk-back-link")["href"] == url_for(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert [normalize_spaces(paragraph.text) for paragraph in page.select("main p")] == expected_paragraphs
+
+    for key, value in (
+        {
+            "name": "my new template name",
+            "template_content": new_content,
+            "confirm": "true",
+        }
+    ).items():
+        assert page.select_one(f"input[name={key}]")["value"] == value
+
+
+@pytest.mark.parametrize(
     "template_type, additional_data",
     (
         ("email", {"name": "new name"}),
