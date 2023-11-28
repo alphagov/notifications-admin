@@ -254,45 +254,6 @@ def test_shows_individual_data_retentions_if_different(
     )
 
 
-def test_platform_admin_sees_only_relevant_settings_for_broadcast_service(
-    client_request,
-    mocker,
-    api_user_active,
-    no_reply_to_email_addresses,
-    no_letter_contact_blocks,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-):
-    service_one = service_json(
-        SERVICE_ONE_ID,
-        users=[api_user_active["id"]],
-        permissions=["broadcast"],
-        restricted=True,
-        organisation_id=ORGANISATION_ID,
-        contact_link="contact_us@gov.uk",
-    )
-    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
-
-    client_request.login(create_platform_admin_user(), service_one)
-    page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
-
-    assert page.select_one("h1").text == "Settings"
-    rows = page.select("tr")
-
-    expected_rows = [
-        "Label Value Action",
-        "Service name Test Service Change service name",
-        "Sign-in method Text message code Change sign-in method",
-        "Label Value Action",
-        "Notes None Change the notes for the service",
-        "Email authentication Off Change your settings for Email authentication",
-    ]
-
-    assert len(rows) == len(expected_rows)
-    assert [" ".join(row.text.split()) for row in rows] == expected_rows
-    app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
-
-
 def test_no_go_live_link_for_service_without_organisation(
     client_request,
     mocker,
@@ -429,13 +390,6 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses 1 Example Street Manage sender addresses",
                 "Letter branding Not set Change letter branding",
-            ],
-        ),
-        (
-            ["broadcast"],
-            [
-                "Service name service one Change service name",
-                "Sign-in method Text message code Change sign-in method",
             ],
         ),
     ],
@@ -694,25 +648,6 @@ def test_show_limits_for_live_service(
     ]
     assert normalize_spaces(page.select_one("main ul + p").text) == "If you need to discuss these limits, contact us."
     assert page.select_one("main ul + p a")["href"] == url_for("main.support")
-
-
-def test_broadcast_service_in_training_mode_doesnt_show_trial_mode_content(
-    client_request,
-    service_one,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-):
-    service_one["permissions"] = "broadcast"
-    page = client_request.get(
-        "main.service_settings",
-        service_id=SERVICE_ONE_ID,
-    )
-
-    assert "Your service is in trial mode" not in page.select("main")[0].text
-    assert "To remove these restrictions, you can send us a request to go live" not in page.select("main")[0].text
-    assert not page.select_one("main ul")
 
 
 @freeze_time("2017-04-01 11:09:00.061258")
@@ -4623,37 +4558,6 @@ def test_switch_service_channels_on_and_off(
     )
     assert set(mocked_fn.call_args[1]["permissions"]) == set(expected_updated_permissions)
     assert mocked_fn.call_args[0][0] == service_one["id"]
-
-
-@pytest.mark.parametrize(
-    "channel",
-    (
-        "email",
-        "sms",
-        "letter",
-    ),
-)
-def test_broadcast_service_cant_post_to_set_other_channels_endpoint(
-    client_request,
-    service_one,
-    channel,
-):
-    service_one["permissions"] = ["broadcast"]
-
-    client_request.get(
-        "main.service_set_channel",
-        service_id=SERVICE_ONE_ID,
-        channel=channel,
-        _expected_status=403,
-    )
-
-    client_request.post(
-        "main.service_set_channel",
-        service_id=SERVICE_ONE_ID,
-        channel=channel,
-        _data={"enabled": "True"},
-        _expected_status=403,
-    )
 
 
 @pytest.mark.parametrize(

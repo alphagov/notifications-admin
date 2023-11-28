@@ -19,16 +19,12 @@
      {{ page_header(page_title, size='medium') }}
 
      <p class="govuk-body">
-       {% if current_service.has_permission('broadcast') %}
-          You haven’t added any templates yet.
-       {% else %}
-         {% if current_user.has_permissions('manage_templates') %}
-           You need a template before you can
-         {% else %}
-           You need to ask your service manager to add templates before you can
-         {% endif %}
-         send emails, text messages or letters.
-       {% endif %}
+      {% if current_user.has_permissions('manage_templates') %}
+        You need a template before you can
+      {% else %}
+        You need to ask your service manager to add templates before you can
+      {% endif %}
+      send emails, text messages or letters.
      </p>
 
   {% else %}

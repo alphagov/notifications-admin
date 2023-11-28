@@ -1,6 +1,5 @@
 {% extends "withnav_template.html" %}
 {% from "components/table.html" import mapping_table, row, settings_row, text_field, callable_text_field, optional_text_field, edit_field, field, boolean_field with context %}
-
 {% block service_page_title %}
   Settings
 {% endblock %}
@@ -45,8 +44,6 @@
             )
           }}
         {% endcall %}
-
-        {% if not current_service.has_permission('broadcast') %}
           {% call row() %}
             {{ text_field('Data retention period') }}
             {% if current_service.get_consistent_data_retention_period() %}
@@ -68,10 +65,7 @@
               )
             }}
           {% endcall %}
-        {% endif %}
       {% endcall %}
-
-      {% if not current_service.has_permission('broadcast') %}
 
         {% call mapping_table(
           caption='Email settings',
@@ -305,10 +299,8 @@
           {% endcall %}
 
         {% endcall %}
-      {% endif %}
     </div>
 
-    {% if not current_service.has_permission('broadcast')%}
       {% if current_service.trial_mode %}
         <h2 class="heading-medium top-gutter-0">Your service is in trial mode</h2>
 
@@ -346,7 +338,7 @@
         </p>
 
       {% endif %}
-    {% endif %}
+
 
     {% if current_user.platform_admin %}
 
@@ -361,7 +353,6 @@
           caption_visible=False
         ) %}
 
-          {% if not current_service.has_permission('broadcast') %}
           {% call row() %}
             {{ text_field('Live')}}
             {% if current_service.trial_mode and not current_service.organisation_id %}
@@ -383,7 +374,6 @@
             {{ optional_text_field(current_service.billing_details, default="None", wrap=True) }}
             {{ edit_field('Change', url_for('main.edit_service_billing_details', service_id=current_service.id), suffix='billing details for service') }}
           {% endcall %}
-          {% endif %}
 
           {% call row() %}
             {{ text_field('Notes')}}
@@ -391,7 +381,6 @@
             {{ edit_field('Change', url_for('main.edit_service_notes', service_id=current_service.id), suffix='the notes for the service') }}
           {% endcall %}
 
-          {% if not current_service.has_permission('broadcast') %}
           {% call row() %}
             {{ text_field('Organisation')}}
             {% call field() %}
@@ -455,7 +444,6 @@
             {% endcall %}
             {{ edit_field('Change', url_for('main.data_retention', service_id=current_service.id), suffix='data retention') }}
           {% endcall %}
-          {% endif %}
 
           {% for permission in service_permissions %}
             {% if not service_permissions[permission].requires or current_service.has_permission(service_permissions[permission].requires) %}

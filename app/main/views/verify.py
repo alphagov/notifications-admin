@@ -8,7 +8,6 @@ from app import user_api_client
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.main import main
 from app.main.forms import TwoFactorForm
-from app.models.service import Service
 from app.models.user import InvitedOrgUser, InvitedUser, User
 from app.utils.login import redirect_to_sign_in
 
@@ -73,12 +72,6 @@ def activate_user(user_id):
     invited_user = InvitedUser.from_session()
     if invited_user:
         service_id = _add_invited_user_to_service(invited_user)
-        service = Service.from_id(service_id)
-        if service.has_permission("broadcast"):
-            if service.live:
-                return redirect(url_for("main.broadcast_tour_live", service_id=service.id, step_index=1))
-            else:
-                return redirect(url_for("main.broadcast_tour", service_id=service.id, step_index=1))
         return redirect(url_for("main.service_dashboard", service_id=service_id))
 
     invited_org_user = InvitedOrgUser.from_session()

@@ -698,15 +698,9 @@ def service_set_letters(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-<channel>", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/service-settings/set-<template_type:channel>", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_channel(service_id, channel):
-    if channel not in {"email", "sms", "letter"}:
-        abort(404)
-
-    if current_service.has_permission("broadcast"):
-        abort(403)
-
     form = ServiceSwitchChannelForm(channel=channel, enabled=current_service.has_permission(channel))
 
     if form.validate_on_submit():
