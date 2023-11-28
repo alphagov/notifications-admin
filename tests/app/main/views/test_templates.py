@@ -34,7 +34,7 @@ from tests.conftest import (
     create_active_user_view_permissions,
     create_letter_contact_block,
     create_template,
-    do_mock_get_page_count_for_letter,
+    do_mock_get_page_counts_for_letter,
     normalize_spaces,
 )
 
@@ -705,7 +705,7 @@ def test_letter_page_has_rename_link(
     fake_uuid,
     permissions,
     template_type,
-    mock_get_page_count_for_letter,
+    mock_get_page_counts_for_letter,
 ):
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -753,7 +753,7 @@ def test_user_with_only_send_and_view_sees_letter_page(
     mocker,
     fake_uuid,
     permissions,
-    mock_get_page_count_for_letter,
+    mock_get_page_counts_for_letter,
 ):
     active_user_with_permissions["permissions"][SERVICE_ONE_ID] = permissions
     client_request.login(active_user_with_permissions)
@@ -799,7 +799,7 @@ def test_letter_with_default_branding_has_add_logo_button(
     letter_branding,
     expected_link,
     expected_link_text,
-    mock_get_page_count_for_letter,
+    mock_get_page_counts_for_letter,
     user_has_manage_settings_permission,
     active_user_with_permissions,
 ):
@@ -840,7 +840,7 @@ def test_view_letter_template_displays_postage(
     fake_uuid,
     template_postage,
     expected_result,
-    mock_get_page_count_for_letter,
+    mock_get_page_counts_for_letter,
 ):
     client_request.login(active_user_with_permissions)
     mocker.patch(
@@ -884,7 +884,7 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
     mocker,
     fake_uuid,
 ):
-    do_mock_get_page_count_for_letter(mocker, count=11)
+    do_mock_get_page_counts_for_letter(mocker, count=11)
     client_request.login(active_user_with_permissions)
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -912,7 +912,7 @@ def test_view_letter_template_displays_change_language_button(
     active_user_with_permissions,
     mocker,
     fake_uuid,
-    mock_get_page_count_for_letter,
+    mock_get_page_counts_for_letter,
 ):
     service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
@@ -1195,7 +1195,7 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
         },
     )
     mocker.patch("app.main.views.templates.sanitise_letter")
-    do_mock_get_page_count_for_letter(mocker, count=9)
+    do_mock_get_page_counts_for_letter(mocker, count=9)
 
     with open("tests/test_pdf_files/multi_page_pdf.pdf", "rb") as file:
         page = client_request.post(
@@ -1219,7 +1219,7 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
 
 @pytest.mark.parametrize("page_count", [1, 2])
 def test_post_attach_pages_redirects_to_template_view_when_validation_successful(
-    mocker, client_request, service_one, mock_get_service_letter_template, page_count, mock_get_page_count_for_letter
+    mocker, client_request, service_one, mock_get_service_letter_template, page_count, mock_get_page_counts_for_letter
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
@@ -1264,7 +1264,7 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
     service_one,
     active_user_with_permissions,
     mock_get_service_letter_template_with_attachment,
-    mock_get_page_count_for_letter,
+    mock_get_page_counts_for_letter,
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
@@ -1598,7 +1598,7 @@ def test_should_be_able_to_view_a_letter_template_with_links(
     active_user_with_permissions,
     single_letter_contact_block,
     fake_uuid,
-    mock_get_page_count_for_letter,
+    mock_get_page_counts_for_letter,
 ):
     page = client_request.get(
         "main.view_template",
@@ -1784,7 +1784,7 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
     fake_uuid,
     contact_block_data,
     expected_partial_url,
-    mock_get_page_count_for_letter,
+    mock_get_page_counts_for_letter,
 ):
     mocker.patch("app.service_api_client.get_letter_contacts", return_value=contact_block_data)
 
@@ -2746,7 +2746,7 @@ def test_confirm_breaking_change_on_letter_template_saves_correct_language_conte
         redact_personalisation=False,
     )
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": letter_template})
-    do_mock_get_page_count_for_letter(mocker, count=2)
+    do_mock_get_page_counts_for_letter(mocker, count=2)
     mocker.patch("app.service_api_client.get_letter_contacts", return_value=[create_letter_contact_block()])
 
     data = {
@@ -3557,7 +3557,7 @@ def test_should_not_show_redaction_stuff_for_letters(
     mock_get_service_letter_template,
     mock_get_template_folders,
     single_letter_contact_block,
-    mock_get_page_count_for_letter,
+    mock_get_page_counts_for_letter,
 ):
     page = client_request.get(
         "main.view_template",

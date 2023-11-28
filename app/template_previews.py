@@ -95,7 +95,11 @@ class TemplatePreview:
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
 
-def get_page_count_for_letter(db_template, values=None):
+def get_page_counts_for_letter(db_template, values=None):
+    """
+    Expected return value format (mimics the template-preview endpoint:
+        {'count': int, 'welsh_page_count': int, 'attachment_page_count': int}
+    """
     if db_template["template_type"] != "letter":
         return None
 

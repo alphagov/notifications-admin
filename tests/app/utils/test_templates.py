@@ -10,11 +10,11 @@ from orderedset import OrderedSet
 from app import load_service_before_request
 from app.utils.templates import TemplatedLetterImageTemplate, get_sample_template
 from tests import template_json
-from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_count_for_letter
+from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_counts_for_letter
 
 
 @pytest.fixture(scope="function", autouse=True)
-def app_context(notify_admin, fake_uuid, mock_get_service, mock_get_page_count_for_letter):
+def app_context(notify_admin, fake_uuid, mock_get_service, mock_get_page_counts_for_letter):
     with notify_admin.test_request_context(f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}"):
         load_service_before_request()
         yield notify_admin
@@ -26,7 +26,7 @@ def test_get_sample_template_returns_template(template_type):
     assert isinstance(template, Template)
 
 
-def test_get_page_count_for_letter_caches(
+def test_get_page_counts_for_letter_caches(
     client_request,
     service_one,
     api_user_active,
@@ -42,7 +42,7 @@ def test_get_page_count_for_letter_caches(
     mock_redis_set = mocker.patch(
         "app.extensions.RedisClient.set",
     )
-    mock_get_page_count = do_mock_get_page_count_for_letter(mocker, count=5)
+    mock_get_page_count = do_mock_get_page_counts_for_letter(mocker, count=5)
 
     template = TemplatedLetterImageTemplate(
         template_json(
@@ -65,7 +65,7 @@ def test_get_page_count_for_letter_caches(
     assert len(mock_get_page_count.call_args_list) == 1
 
 
-def test_get_page_count_for_letter_returns_cached_value(
+def test_get_page_counts_for_letter_returns_cached_value(
     client_request,
     service_one,
     api_user_active,
@@ -94,7 +94,7 @@ def test_get_page_count_for_letter_returns_cached_value(
     mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-all-page-counts")
 
 
-def test_get_page_count_for_letter_does_not_cache_for_personalised_letters(
+def test_get_page_counts_for_letter_does_not_cache_for_personalised_letters(
     client_request,
     service_one,
     api_user_active,
@@ -103,7 +103,7 @@ def test_get_page_count_for_letter_does_not_cache_for_personalised_letters(
 ):
     client_request.login(api_user_active, service_one)
 
-    mock_get_page_count = do_mock_get_page_count_for_letter(mocker, count=5)
+    mock_get_page_count = do_mock_get_page_counts_for_letter(mocker, count=5)
 
     template = TemplatedLetterImageTemplate(
         template_json(
@@ -189,7 +189,7 @@ def test_letter_image_template_renders_visually_hidden_address():
     ],
 )
 def test_letter_image_renderer_pagination(mocker, page_image_url):
-    do_mock_get_page_count_for_letter(mocker, count=3)
+    do_mock_get_page_counts_for_letter(mocker, count=3)
     assert page_image_url in str(
         TemplatedLetterImageTemplate(
             {"service": SERVICE_ONE_ID, "content": "", "subject": "", "template_type": "letter"},
@@ -388,7 +388,7 @@ def test_letter_image_renderer(
     expected_postage_class_value,
     expected_postage_description,
 ):
-    do_mock_get_page_count_for_letter(mocker, count=page_count)
+    do_mock_get_page_counts_for_letter(mocker, count=page_count)
     mock_render = mocker.patch("app.utils.templates.render_template")
     str(
         TemplatedLetterImageTemplate(
@@ -461,7 +461,7 @@ def test_letter_image_renderer_adds_classes_to_pages(
     page_count,
     expected_classes,
 ):
-    do_mock_get_page_count_for_letter(mocker, count=page_count)
+    do_mock_get_page_counts_for_letter(mocker, count=page_count)
     template = BeautifulSoup(
         str(
             TemplatedLetterImageTemplate(
@@ -488,7 +488,7 @@ def test_letter_image_renderer_knows_if_letter_is_too_long(
     page_count,
     expected_too_many_pages,
 ):
-    do_mock_get_page_count_for_letter(mocker, count=page_count)
+    do_mock_get_page_counts_for_letter(mocker, count=page_count)
     template = TemplatedLetterImageTemplate(
         {"service": SERVICE_ONE_ID, "content": "Content", "subject": "Subject", "template_type": "letter"},
     )
@@ -563,7 +563,7 @@ def test_message_too_long_limit_bigger_or_nonexistent_for_non_sms_templates():
 
 
 def test_letter_preview_template_lazy_loads_images(mocker):
-    do_mock_get_page_count_for_letter(mocker, count=3)
+    do_mock_get_page_counts_for_letter(mocker, count=3)
     page = BeautifulSoup(
         str(
             TemplatedLetterImageTemplate(
@@ -581,7 +581,7 @@ def test_letter_preview_template_lazy_loads_images(mocker):
 
 
 def test_letter_image_template_marks_first_page_of_attachment(mocker, fake_uuid):
-    do_mock_get_page_count_for_letter(mocker, count=8, attachment_page_count=3)
+    do_mock_get_page_counts_for_letter(mocker, count=8, attachment_page_count=3)
 
     template = BeautifulSoup(
         str(
@@ -633,7 +633,7 @@ class TestTemplatedLetterImageTemplate:
         expected_welsh_pages,
         expected_attachment_pages,
     ):
-        do_mock_get_page_count_for_letter(mocker, **mocker_kwargs)
+        do_mock_get_page_counts_for_letter(mocker, **mocker_kwargs)
         t = TemplatedLetterImageTemplate(template_json(service_id=SERVICE_ONE_ID, id_=fake_uuid, type_="letter"))
 
         assert t.english_page_count == expected_english_pages
@@ -652,7 +652,7 @@ class TestTemplatedLetterImageTemplate:
         ),
     )
     def test_first_english_page(self, mocker, fake_uuid, mocker_kwargs, expected_value):
-        do_mock_get_page_count_for_letter(mocker, **mocker_kwargs)
+        do_mock_get_page_counts_for_letter(mocker, **mocker_kwargs)
         t = TemplatedLetterImageTemplate(template_json(service_id=SERVICE_ONE_ID, id_=fake_uuid, type_="letter"))
 
         assert t.first_english_page == expected_value
@@ -669,7 +669,7 @@ class TestTemplatedLetterImageTemplate:
         ),
     )
     def test_first_attachment_page(self, mocker, fake_uuid, mocker_kwargs, expected_value):
-        do_mock_get_page_count_for_letter(mocker, **mocker_kwargs)
+        do_mock_get_page_counts_for_letter(mocker, **mocker_kwargs)
         t = TemplatedLetterImageTemplate(
             template_json(
                 service_id=SERVICE_ONE_ID,
