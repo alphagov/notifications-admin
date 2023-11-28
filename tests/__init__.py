@@ -181,8 +181,6 @@ def service_json(
     billing_contact_names=None,
     billing_reference=None,
     purchase_order_number=None,
-    broadcast_channel=None,
-    allowed_broadcast_provider=None,
     has_active_go_live_request=False,
     go_live_user=None,
 ):
@@ -230,8 +228,6 @@ def service_json(
         "billing_contact_names": billing_contact_names,
         "billing_reference": billing_reference,
         "purchase_order_number": purchase_order_number,
-        "broadcast_channel": broadcast_channel,
-        "allowed_broadcast_provider": allowed_broadcast_provider,
         "has_active_go_live_request": has_active_go_live_request,
         "go_live_user": go_live_user,
     }
@@ -697,55 +693,6 @@ def assert_url_expected(actual, expected):
 
 def find_element_by_tag_and_partial_text(page, tag, string):
     return [e for e in page.select(tag) if string in e.text][0]
-
-
-def broadcast_message_json(
-    *,
-    id_=None,
-    service_id=None,
-    template_id=None,
-    status="draft",
-    created_by_id=None,
-    starts_at=None,
-    finishes_at=None,
-    cancelled_at=None,
-    updated_at=None,
-    approved_by_id=None,
-    cancelled_by_id=None,
-    areas=None,
-    area_ids=None,
-    simple_polygons=None,
-    content=None,
-    reference=None,
-    cap_event=None,
-    template_name="Example template",
-):
-    return {
-        "id": id_,
-        "service_id": service_id,
-        "template_id": template_id,
-        "template_version": 123,
-        "template_name": template_name,
-        "content": content or "This is a test",
-        "reference": reference,
-        "cap_event": cap_event,
-        "personalisation": {},
-        "areas": areas
-        or {
-            "ids": area_ids or ["ctry19-E92000001", "ctry19-S92000003"],
-            "simple_polygons": simple_polygons or [],
-        },
-        "status": status,
-        "starts_at": starts_at,
-        "finishes_at": finishes_at,
-        "created_at": None,
-        "approved_at": None,
-        "cancelled_at": cancelled_at,
-        "updated_at": updated_at,
-        "created_by_id": created_by_id,
-        "approved_by_id": approved_by_id,
-        "cancelled_by_id": cancelled_by_id,
-    }
 
 
 def contact_list_json(

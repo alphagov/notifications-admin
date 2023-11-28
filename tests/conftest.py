@@ -21,7 +21,6 @@ from . import (
     TestClient,
     api_key_json,
     assert_url_expected,
-    broadcast_message_json,
     contact_list_json,
     generate_uuid,
     inbound_sms_json,
@@ -824,23 +823,6 @@ def mock_get_service_email_template(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_broadcast_template(mocker):
-    def _get(service_id, template_id, version=None):
-        template = template_json(
-            service_id=service_id,
-            id_=template_id,
-            name="Test alert",
-            type_="broadcast",
-            content="This is a test",
-        )
-        if version:
-            template.update({"version": version})
-        return {"data": template}
-
-    return mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
-
-
-@pytest.fixture(scope="function")
 def mock_get_service_email_template_without_placeholders(mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
@@ -1204,16 +1186,6 @@ def api_nongov_user_active(fake_uuid):
 @pytest.fixture(scope="function")
 def active_user_with_permissions(fake_uuid):
     return create_active_user_with_permissions()
-
-
-@pytest.fixture(scope="function")
-def active_user_create_broadcasts_permission():
-    return create_active_user_create_broadcasts_permissions()
-
-
-@pytest.fixture(scope="function")
-def active_user_approve_broadcasts_permission():
-    return create_active_user_approve_broadcasts_permissions()
 
 
 @pytest.fixture(scope="function")
@@ -3815,38 +3787,6 @@ def create_active_user_view_permissions(with_unique_id=False):
     )
 
 
-def create_active_user_create_broadcasts_permissions(with_unique_id=False):
-    return create_service_one_user(
-        id=str(uuid4()) if with_unique_id else sample_uuid(),
-        name="Test User Create Broadcasts Permission",
-        permissions={
-            SERVICE_ONE_ID: [
-                "create_broadcasts",
-                "reject_broadcasts",
-                "cancel_broadcasts",
-                "view_activity",  # added automatically by API
-            ]
-        },
-        auth_type="webauthn_auth",
-    )
-
-
-def create_active_user_approve_broadcasts_permissions(with_unique_id=False):
-    return create_service_one_user(
-        id=str(uuid4()) if with_unique_id else sample_uuid(),
-        name="Test User Approve Broadcasts Permission",
-        permissions={
-            SERVICE_ONE_ID: [
-                "approve_broadcasts",
-                "reject_broadcasts",
-                "cancel_broadcasts",
-                "view_activity",  # added automatically by API
-            ]
-        },
-        auth_type="webauthn_auth",
-    )
-
-
 def create_active_caseworking_user(with_unique_id=False):
     return create_user(
         id=str(uuid4()) if with_unique_id else sample_uuid(),
@@ -4213,98 +4153,6 @@ def create_template(
         redact_personalisation=redact_personalisation,
         postage=postage,
         folder=folder,
-    )
-
-
-@pytest.fixture(scope="function")
-def mock_create_broadcast_message(
-    mocker,
-    fake_uuid,
-):
-    def _create(
-        *,
-        service_id,
-        template_id,
-        content,
-        reference,
-    ):
-        return {
-            "id": fake_uuid,
-        }
-
-    return mocker.patch(
-        "app.broadcast_message_api_client.create_broadcast_message",
-        side_effect=_create,
-    )
-
-
-@pytest.fixture(scope="function")
-def mock_get_draft_broadcast_message(
-    mocker,
-    fake_uuid,
-):
-    def _get(*, service_id, broadcast_message_id):
-        return broadcast_message_json(
-            id_=broadcast_message_id,
-            service_id=service_id,
-            template_id=fake_uuid,
-            status="draft",
-            created_by_id=fake_uuid,
-        )
-
-    return mocker.patch(
-        "app.broadcast_message_api_client.get_broadcast_message",
-        side_effect=_get,
-    )
-
-
-@pytest.fixture(scope="function")
-def mock_get_live_broadcast_message(
-    mocker,
-    fake_uuid,
-):
-    def _get(*, service_id, broadcast_message_id):
-        return broadcast_message_json(
-            id_=broadcast_message_id,
-            service_id=service_id,
-            template_id=fake_uuid,
-            status="broadcasting",
-            created_by_id=fake_uuid,
-            starts_at=(datetime.utcnow()).isoformat(),
-            finishes_at=(datetime.utcnow() + timedelta(hours=24)).isoformat(),
-        )
-
-    return mocker.patch(
-        "app.broadcast_message_api_client.get_broadcast_message",
-        side_effect=_get,
-    )
-
-
-@pytest.fixture(scope="function")
-def mock_update_broadcast_message(
-    mocker,
-    fake_uuid,
-):
-    def _update(*, service_id, broadcast_message_id, data):
-        pass
-
-    return mocker.patch(
-        "app.broadcast_message_api_client.update_broadcast_message",
-        side_effect=_update,
-    )
-
-
-@pytest.fixture(scope="function")
-def mock_update_broadcast_message_status(
-    mocker,
-    fake_uuid,
-):
-    def _update(status, *, service_id, broadcast_message_id):
-        pass
-
-    return mocker.patch(
-        "app.broadcast_message_api_client.update_broadcast_message_status",
-        side_effect=_update,
     )
 
 
