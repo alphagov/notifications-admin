@@ -247,36 +247,3 @@ details .arrow {
     box-shadow: inset 0 0 0 2px govuk-colour("red"), inset 0 0 0 4px govuk-colour("white");
   }
 }
-
-.live-broadcast {
-
-  color: govuk-colour("red");
-  font-weight: bold;
-  position: relative;
-  display: inline-block;
-
-  &:before {
-    content: "";
-    display: block;
-    float: right;
-    margin-top: 1px;
-    margin-left: 5px;
-    border: none;
-    background: govuk-colour("red");
-    width: 19px;
-    height: 19px;
-    border-radius: 50%;
-    animation: live-pulse 1.5s infinite;
-  }
-
-  &--left {
-
-    &:before {
-      float: left;
-      margin-left: 0;
-      margin-right: 10px;
-    }
-
-  }
-
-}
