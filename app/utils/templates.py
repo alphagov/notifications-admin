@@ -41,7 +41,7 @@ class BaseLetterImageTemplate(BaseLetterTemplate):
 
     @property
     def jinja_template(self):
-        return current_app.jinja_env.get_template("templates/letter_image_template.jinja2")
+        return current_app.jinja_env.get_template("partials/templates/letter_image_template.jinja2")
 
     @property
     def page_count(self):
