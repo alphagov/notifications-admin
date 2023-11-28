@@ -59,7 +59,6 @@ class Service(JSONModel):
         "email",
         "sms",
         "letter",
-        "broadcast",
     )
 
     ALL_PERMISSIONS = TEMPLATE_TYPES + (

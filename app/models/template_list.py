@@ -296,11 +296,6 @@ class TemplateListTemplate(TemplateListItem):
 
     @property
     def hint(self):
-        if self.template_type == "broadcast":
-            max_length_in_chars = 40
-            if len(self.content) > (max_length_in_chars + 2):
-                return self.content[:max_length_in_chars].strip() + "…"
-            return self.content
         return format_notification_type(self.template_type) + " template"
 
 

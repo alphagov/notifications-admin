@@ -7,7 +7,6 @@ from notifications_utils.countries import Postage
 from notifications_utils.formatters import formatted_list
 from notifications_utils.template import (
     BaseLetterTemplate,
-    BroadcastPreviewTemplate,
     EmailPreviewTemplate,
     SMSPreviewTemplate,
 )
@@ -274,8 +273,4 @@ def get_template(
             image_url=letter_preview_url,
             contact_block=template["reply_to_text"],
             include_letter_edit_ui_overlay=include_letter_edit_ui_overlay,
-        )
-    if "broadcast" == template["template_type"]:
-        return BroadcastPreviewTemplate(
-            template,
         )
