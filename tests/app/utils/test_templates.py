@@ -616,12 +616,12 @@ class TestTemplatedLetterImageTemplate:
     @pytest.mark.parametrize(
         "mocker_kwargs, expected_english_pages, expected_welsh_pages, expected_attachment_pages",
         (
-            (dict(count=1), 1, 0, 0),
-            (dict(count=5), 5, 0, 0),
-            (dict(count=2, welsh_page_count=1), 1, 1, 0),
-            (dict(count=5, welsh_page_count=3), 2, 3, 0),
-            (dict(count=4, attachment_page_count=2), 2, 0, 2),
-            (dict(count=7, welsh_page_count=2, attachment_page_count=3), 2, 2, 3),
+            ({"count": 1}, 1, 0, 0),
+            ({"count": 5}, 5, 0, 0),
+            ({"count": 2, "welsh_page_count": 1}, 1, 1, 0),
+            ({"count": 5, "welsh_page_count": 3}, 2, 3, 0),
+            ({"count": 4, "attachment_page_count": 2}, 2, 0, 2),
+            ({"count": 7, "welsh_page_count": 2, "attachment_page_count": 3}, 2, 2, 3),
         ),
     )
     def test_page_count_attributes(
@@ -643,12 +643,12 @@ class TestTemplatedLetterImageTemplate:
     @pytest.mark.parametrize(
         "mocker_kwargs, expected_value",
         (
-            (dict(count=1), 1),
-            (dict(count=5), 1),
-            (dict(count=2, welsh_page_count=1), 2),
-            (dict(count=5, welsh_page_count=3), 4),
-            (dict(count=4, attachment_page_count=2), 1),
-            (dict(count=7, welsh_page_count=2, attachment_page_count=3), 3),
+            ({"count": 1}, 1),
+            ({"count": 5}, 1),
+            ({"count": 2, "welsh_page_count": 1}, 2),
+            ({"count": 5, "welsh_page_count": 3}, 4),
+            ({"count": 4, "attachment_page_count": 2}, 1),
+            ({"count": 7, "welsh_page_count": 2, "attachment_page_count": 3}, 3),
         ),
     )
     def test_first_english_page(self, mocker, fake_uuid, mocker_kwargs, expected_value):
@@ -660,12 +660,12 @@ class TestTemplatedLetterImageTemplate:
     @pytest.mark.parametrize(
         "mocker_kwargs, expected_value",
         (
-            (dict(count=1), None),
-            (dict(count=5), None),
-            (dict(count=2, welsh_page_count=1), None),
-            (dict(count=5, welsh_page_count=3), None),
-            (dict(count=4, attachment_page_count=2), 3),
-            (dict(count=7, welsh_page_count=2, attachment_page_count=3), 5),
+            ({"count": 1}, None),
+            ({"count": 5}, None),
+            ({"count": 2, "welsh_page_count": 1}, None),
+            ({"count": 5, "welsh_page_count": 3}, None),
+            ({"count": 4, "attachment_page_count": 2}, 3),
+            ({"count": 7, "welsh_page_count": 2, "attachment_page_count": 3}, 5),
         ),
     )
     def test_first_attachment_page(self, mocker, fake_uuid, mocker_kwargs, expected_value):
