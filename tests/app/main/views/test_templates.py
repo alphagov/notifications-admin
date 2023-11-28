@@ -784,6 +784,10 @@ def test_user_with_only_send_and_view_sees_letter_page(
         ),
     ),
 )
+@pytest.mark.parametrize(
+    "user_has_manage_settings_permission",
+    (True, pytest.mark.xfail(False)),
+)
 def test_letter_with_default_branding_has_add_logo_button(
     mocker,
     fake_uuid,
@@ -796,9 +800,14 @@ def test_letter_with_default_branding_has_add_logo_button(
     expected_link,
     expected_link_text,
     mock_get_page_count_for_letter,
+    user_has_manage_settings_permission,
+    active_user_with_permissions,
 ):
     service_one["permissions"] += ["letter"]
     service_one["letter_branding"] = letter_branding
+
+    if not user_has_manage_settings_permission:
+        active_user_with_permissions["permissions"].remove("manage_settings")
 
     page = client_request.get(
         "main.view_template",
