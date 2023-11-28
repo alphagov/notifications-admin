@@ -24,7 +24,6 @@
     "govuk-frontend": "4.2.0",
     "hogan": "1.0.2",
     "jquery": "3.5.0",
-    "leaflet": "1.6.0",
     "morphdom": "2.6.1",
     "query-command-supported": "1.0.0",
     "textarea-caret": "3.1.0",
