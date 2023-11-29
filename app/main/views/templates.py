@@ -116,6 +116,7 @@ def view_template(service_id, template_id):
             filetype="png",
         ),
         show_recipient=True,
+        include_letter_edit_ui_overlay=True,
     )
     template_folder = current_service.get_template_folder(template.get_raw("folder"))
 

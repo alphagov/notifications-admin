@@ -8,7 +8,7 @@ from app import load_service_before_request
 from app.models.branding import LetterBranding
 from app.template_previews import (
     TemplatePreview,
-    get_page_count_for_letter,
+    get_page_counts_for_letter,
     sanitise_letter,
 )
 from tests.conftest import create_notification
@@ -161,7 +161,7 @@ def test_get_png_for_invalid_pdf_page_makes_request(mocker, client_request):
 
 @pytest.mark.parametrize("template_type", ["email", "sms"])
 def test_page_count_returns_none_for_non_letter_templates(template_type):
-    assert get_page_count_for_letter({"template_type": template_type}) is None
+    assert get_page_counts_for_letter({"template_type": template_type}) is None
 
 
 @pytest.mark.parametrize(
@@ -185,12 +185,18 @@ def test_page_count_makes_a_call_to_template_preview_and_gets_page_count(
     # `service` is in the `_request_ctx_stack` to avoid an error
     load_service_before_request()
 
-    request_mock_returns = Mock(content=b'{"count": 99}', status_code=200, headers={"content-type": "image/png"})
+    request_mock_returns = Mock(
+        content=b'{"count": 9, "welsh_page_count": 4, "attachment_page_count": 1}', status_code=200
+    )
     request_mock = mocker.patch("app.template_previews.requests.post", return_value=request_mock_returns)
     mocker.patch("app.template_previews.current_service", letter_branding=LetterBranding({"filename": "hm-government"}))
     template = mock_get_service_letter_template("123", "456")["data"]
 
-    assert get_page_count_for_letter(template, values=values) == 99
+    assert get_page_counts_for_letter(template, values=values) == {
+        "count": 9,
+        "welsh_page_count": 4,
+        "attachment_page_count": 1,
+    }
 
     data = {
         "letter_contact_block": None,
