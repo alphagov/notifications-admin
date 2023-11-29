@@ -1,4 +1,5 @@
 {% extends "content_template.html" %}
+{% macro service_link(service, endpoint, link_text) -%}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
