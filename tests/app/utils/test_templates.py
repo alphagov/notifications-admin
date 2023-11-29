@@ -56,9 +56,9 @@ def test_get_page_counts_for_letter_caches(
         assert template.page_count == 5
 
     # Redis and template preview only get called once each because the instance also caches the value
-    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-all-page-counts")
+    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-version-1-all-page-counts")
     mock_redis_set.assert_called_once_with(
-        f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-all-page-counts",
+        f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-version-1-all-page-counts",
         '{"count": 5, "welsh_page_count": 0, "attachment_page_count": 0}',
         ex=2_419_200,
     )
@@ -91,7 +91,7 @@ def test_get_page_counts_for_letter_returns_cached_value(
         assert template.page_count == 5
 
     # Redis only gets called once because the instance also caches the value
-    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-all-page-counts")
+    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-version-1-all-page-counts")
 
 
 def test_get_page_counts_for_letter_does_not_cache_for_personalised_letters(
