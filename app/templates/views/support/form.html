@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/textbox.html" import textbox %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/page-footer.html" import sticky_page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
@@ -15,7 +16,7 @@
 
 {% block maincolumn_content %}
 
-<h1 class="govuk-heading-l" id="page-header">{{ page_title }}</h1>
+{{ govuk_page_header(page_title) }}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         {% if show_status_page_banner %}
