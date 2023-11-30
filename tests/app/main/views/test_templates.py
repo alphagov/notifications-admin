@@ -420,6 +420,66 @@ def test_should_show_page_for_email_template(
     assert normalize_spaces(page.select_one(".email-message-body").text) == "Your vehicle tax expires on ((date))"
 
 
+@pytest.mark.parametrize(
+    "permissions, template_content, expected_hint_text",
+    (
+        (
+            {},
+            "Hello world",
+            "",
+        ),
+        (
+            {"view_activity"},
+            "Hello ((name)) today is ((day of week))",
+            "",
+        ),
+        (
+            {"manage_templates"},
+            "Hello world",
+            "Will be charged as 1 text message",
+        ),
+        (
+            {"manage_service"},
+            "Hello ((name)) today is ((day of week))",
+            "Will be charged as 1 text message (not including personalisation)",
+        ),
+        (
+            {"manage_api_keys"},
+            "a" * 919,
+            # This is one character more than our max (918) but we don’t want to show an error here
+            "Will be charged as 7 text messages",
+        ),
+    ),
+)
+def test_should_show_page_for_sms_template(
+    mocker,
+    client_request,
+    mock_get_service_template,
+    service_one,
+    fake_uuid,
+    active_user_with_permissions,
+    permissions,
+    template_content,
+    expected_hint_text,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": create_template(template_id=fake_uuid, template_type="sms", content=template_content)},
+    )
+    active_user_with_permissions["permissions"][SERVICE_ONE_ID] = permissions
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        ".view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert normalize_spaces(page.select_one(".sms-message-recipient").text) == "To: phone number"
+    assert normalize_spaces(page.select_one(".sms-message-wrapper").text) == f"service one: {template_content}"
+    assert normalize_spaces(getattr(page.select_one(".govuk-hint"), "text", "")) == expected_hint_text
+
+
 def test_should_show_page_for_one_template(
     client_request,
     mock_get_service_template,
