@@ -81,7 +81,7 @@ def email_template():
 
     template = {
         "template_type": "email",
-        "subject": "Email branding preview",
+        "subject": "Preview of email branding",
         "content": render_template("example-email.md"),
     }
 

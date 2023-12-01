@@ -273,7 +273,7 @@ def test_email_branding_preview(
     email_branding_retrieved,
 ):
     page = client_request.get("main.email_template", _test_page_title=False, **extra_args)
-    assert page.select_one("title").text == "Email branding preview"
+    assert page.select_one("title").text == "Preview of email branding"
     assert mock_get_email_branding.called is email_branding_retrieved
 
 
