@@ -1,6 +1,13 @@
 .notify-radios-with-images {
   display: flex;
+  flex-direction: column;
   margin-top: govuk-spacing(3);
+  margin-bottom: govuk-spacing(2);
+
+  @include govuk-media-query($from: tablet) {
+    flex-direction: row;
+    margin-bottom: 0;
+  }
 }
 
 .notify-radios-with-images__item {
@@ -8,6 +15,11 @@
   @include govuk-responsive-margin(4, "right");
 
   padding-left: 0;
+  margin-bottom: govuk-spacing(4);
+
+  @include govuk-media-query($from: tablet) {
+    margin-bottom: 0
+  }
 
   &:last-of-type {
     margin-right: 0;
@@ -16,7 +28,7 @@
 
 .notify-radios-with-images__image {
   display: block;
-  max-width: 100%;
+  width: 100%;
   height: auto;
   box-sizing: border-box;
   margin-bottom: govuk-spacing(4);

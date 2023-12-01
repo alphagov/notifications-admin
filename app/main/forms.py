@@ -2476,7 +2476,7 @@ class EmailBrandingChooseBanner(OrderableFieldsForm):
             "image": {
                 "url": asset_fingerprinter.get_url("images/branding/org_banner.png"),
                 "alt_text": "An example of an email with a logo on a blue banner.",
-                "dimensions": {"width": 404, "height": 454},
+                "dimensions": {"width": 606, "height": 404},
             },
         },
         "org": {
@@ -2484,7 +2484,7 @@ class EmailBrandingChooseBanner(OrderableFieldsForm):
             "image": {
                 "url": asset_fingerprinter.get_url("images/branding/org.png"),
                 "alt_text": "An example of an email with a logo on a clear background.",
-                "dimensions": {"width": 404, "height": 454},
+                "dimensions": {"width": 606, "height": 404},
             },
         },
     }
