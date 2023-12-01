@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/page-footer.html" import page_footer %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
@@ -14,7 +15,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="govuk-heading-l">{{ page_title }}</h1>
+  {{govuk_page_header(''+ page_title)}}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
