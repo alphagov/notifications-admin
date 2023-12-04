@@ -30,7 +30,7 @@
 
 <!-- PERSONALISED BULLET POINTS -->
 {% set personalisedBullets %}
-    <p class="govuk-body">Copy this example to add personalised bullet points each time you send a message:</p>
+    <p class="govuk-body">Copy this example to add a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_personalisation') }}">placeholder</a> to your message template:</p>
 
     <pre class="formatting-example"><code class="lang-md">
         Introduce bullet points with a lead-in line ending in a colon:
@@ -40,26 +40,14 @@
         Leave one empty line space before the next paragraph.
     </code></pre>
 
-    <p class="govuk-body">Your spreadsheet of recipient details should include a column for each of the bullet points. </p>
+    <p class="govuk-body">To send the message, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">upload a list of recipient details</a>.</p>
 
-    <p class="govuk-body">
-        Create a column with the placeholder name as a title for each bullet point your list will have.
-        Then add one list item per column.
-    </p>
+    <p class="govuk-body">Your spreadsheet should include one column for each bullet point. The column names must match the placeholder in the template.</p>
+    <p class="govuk-body">Notify will fill in the placeholder with your bullet points.</p>
 
-    <p class="govuk-body">This is an example of a spreadsheet that will create personalised bullet points:</p>
-
-    <pre class="formatting-example"><code class="lang-md">
-    email address, bullet points, bullet points, bullet points
-    recipient-email@example.com, item 1, item 2, item 3
-    recipient2-email@example.com, item 1, item 2
-
-    </code></pre>
-
-    <p class="govuk-body">When you send a message, Notify will replace the placeholder with the bullet points in your spreadsheet.</p>
 {% endset %}
 
 {{ govukDetails({
-    "summaryText": "add personalised bullet points each time you send a message",
+    "summaryText": "How to add personalised bullet points",
     "html": personalisedBullets
 }) }}
