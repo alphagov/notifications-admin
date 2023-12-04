@@ -10,7 +10,7 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_utils.recipients import RecipientCSV
-from notifications_utils.template import HTMLEmailTemplate, LetterImageTemplate
+from notifications_utils.template import HTMLEmailTemplate
 
 from app import letter_branding_client, status_api_client
 from app.formatters import message_count
@@ -19,6 +19,7 @@ from app.main.forms import FieldWithNoneOption
 from app.main.views.pricing import CURRENT_SMS_RATE
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
+from app.utils.templates import TemplatedLetterImageTemplate
 
 redirects = Blueprint("redirects", __name__)
 main.register_blueprint(redirects)
@@ -121,10 +122,10 @@ def letter_template():
     image_url = url_for("no_cookie.letter_branding_preview_image", filename=filename)
 
     template_image = str(
-        LetterImageTemplate(
+        TemplatedLetterImageTemplate(
             template,
             image_url=image_url,
-            page_count=1,
+            page_counts={"count": 1, "welsh_page_count": 0, "attachment_page_count": 0},
         )
     )
 
