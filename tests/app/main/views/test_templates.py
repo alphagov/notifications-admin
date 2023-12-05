@@ -972,7 +972,6 @@ def test_GET_letter_template_change_language_404s_if_template_is_not_a_letter(
     service_one,
     mock_get_service_template,
     active_user_with_permissions,
-    mocker,
     fake_uuid,
 ):
     service_one["permissions"].append("extra_letter_formatting")
@@ -1012,8 +1011,67 @@ def test_POST_letter_template_change_to_welsh_and_english_sets_subject_and_conte
         SERVICE_ONE_ID,
         fake_uuid,
         letter_languages="welsh_then_english",
-        letter_welsh_subject="Welsh subject line goes here",
-        letter_welsh_content="Welsh content goes here",
+        letter_welsh_subject="Welsh heading",
+        letter_welsh_content="Welsh body text",
+    )
+
+
+@pytest.mark.parametrize(
+    "subject, content, extra_kwargs",
+    (
+        ("Main heading", "Body", {"subject": "English heading", "content": "English body text"}),
+        ("Some custom heading", "Body", {"content": "English body text"}),
+        ("Main heading", "Some custom body", {"subject": "English heading"}),
+        ("Some custom heading", "Some custom body", {}),
+    ),
+)
+def test_POST_letter_template_change_to_welsh_and_english_resets_english_subject_and_content(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    subject,
+    content,
+    extra_kwargs,
+):
+    def _get(service_id, template_id, version=None, postage="second"):
+        template = template_json(
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="letter",
+            content=content,
+            subject=subject,
+            postage=postage,
+        )
+        return {"data": template}
+
+    mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
+
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+
+    client_request.post(
+        "main.letter_template_change_language",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"languages": "welsh_then_english"},
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_template_change_language.assert_called_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        letter_languages="welsh_then_english",
+        letter_welsh_subject="Welsh heading",
+        letter_welsh_content="Welsh body text",
+        **extra_kwargs,
     )
 
 
@@ -1095,6 +1153,65 @@ def test_POST_letter_template_confirm_remove_welsh(
         letter_languages="english",
         letter_welsh_subject=None,
         letter_welsh_content=None,
+    )
+
+
+@pytest.mark.parametrize(
+    "subject, content, extra_kwargs",
+    (
+        ("English heading", "English body text", {"subject": "Main heading", "content": "Body"}),
+        ("Some custom heading", "English body text", {"content": "Body"}),
+        ("English heading", "Some custom body", {"subject": "Main heading"}),
+        ("Some custom heading", "Some custom body", {}),
+    ),
+)
+def test_POST_letter_template_confirm_remove_welsh_resets_english_subject_and_content(
+    client_request,
+    service_one,
+    mocker,
+    fake_uuid,
+    active_user_with_permissions,
+    subject,
+    content,
+    extra_kwargs,
+):
+    def _get(service_id, template_id, version=None, postage="second"):
+        template = template_json(
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="letter",
+            content=content,
+            subject=subject,
+            postage=postage,
+        )
+        return {"data": template}
+
+    mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
+
+    service_one["permissions"].append("extra_letter_formatting")
+    client_request.login(active_user_with_permissions)
+
+    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+
+    client_request.post(
+        "main.letter_template_confirm_remove_welsh",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"confirm": "true"},
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_template_change_language.assert_called_with(
+        SERVICE_ONE_ID,
+        fake_uuid,
+        letter_languages="english",
+        letter_welsh_subject=None,
+        letter_welsh_content=None,
+        **extra_kwargs,
     )
 
 

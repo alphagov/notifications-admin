@@ -1248,6 +1248,27 @@ def _get_page_numbers(page_count):
     return [*range(1, page_count + 1)]
 
 
+def _change_template_language(service_id, template, language: LetterLanguageOptions):
+    update_kwargs: dict[str, Optional[str]] = {}
+
+    if language == LetterLanguageOptions.english:
+        if template.subject == "English heading":
+            update_kwargs["subject"] = "Main heading"
+        if template.content == "English body text":
+            update_kwargs["content"] = "Body"
+        update_kwargs["letter_welsh_subject"] = None
+        update_kwargs["letter_welsh_content"] = None
+    else:
+        if template.subject == "Main heading":
+            update_kwargs["subject"] = "English heading"
+        if template.content == "Body":
+            update_kwargs["content"] = "English body text"
+        update_kwargs["letter_welsh_subject"] = "Welsh heading"
+        update_kwargs["letter_welsh_content"] = "Welsh body text"
+
+    service_api_client.update_service_template(service_id, template.id, letter_languages=language, **update_kwargs)
+
+
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/change-language", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 @service_has_permission("extra_letter_formatting")
@@ -1257,14 +1278,13 @@ def letter_template_change_language(template_id, service_id):
     if template.template_type != "letter" or not isinstance(template, TemplatedLetterImageTemplate):
         abort(404)
 
-    current_languages = template._template["letter_languages"]
+    current_languages = template.get_raw("letter_languages")
     form = LetterTemplateLanguagesForm(data=dict(languages=current_languages))
     if form.validate_on_submit():
         languages = form.languages.data
         if languages != current_languages:
             if languages == LetterLanguageOptions.welsh_then_english:
-                welsh_subject = "Welsh subject line goes here"
-                welsh_content = "Welsh content goes here"
+                _change_template_language(service_id, template, languages)
             elif languages == LetterLanguageOptions.english:
                 return redirect(
                     url_for(
@@ -1275,14 +1295,6 @@ def letter_template_change_language(template_id, service_id):
                 )
             else:
                 abort(500, f"Unknown/unhandled form option: {languages}")
-
-            service_api_client.update_service_template(
-                service_id,
-                template_id,
-                letter_languages=languages,
-                letter_welsh_subject=welsh_subject,
-                letter_welsh_content=welsh_content,
-            )
 
         return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
@@ -1304,13 +1316,7 @@ def letter_template_confirm_remove_welsh(template_id, service_id):
         abort(404)
 
     if request.method == "POST" and request.form.get("confirm"):
-        service_api_client.update_service_template(
-            service_id,
-            template_id,
-            letter_languages=LetterLanguageOptions.english.value,
-            letter_welsh_subject=None,
-            letter_welsh_content=None,
-        )
+        _change_template_language(service_id, template, LetterLanguageOptions.english.value)
         return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
     return render_template(
