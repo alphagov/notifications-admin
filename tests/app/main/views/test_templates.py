@@ -571,10 +571,10 @@ def test_GET_edit_service_template_for_welsh_letter(
     )
 
     subject_label = page.select_one("label[for=subject]")
-    assert subject_label.text.strip() == "Main heading in Welsh"
+    assert subject_label.text.strip() == "Heading (Welsh)"
 
     content_label = page.select_one("label[for=template_content]")
-    assert content_label.text.strip() == "Body in Welsh"
+    assert content_label.text.strip() == "Body text (Welsh)"
 
 
 def test_broadcast_template_doesnt_highlight_placeholders_but_does_count_characters(

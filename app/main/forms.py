@@ -1527,16 +1527,22 @@ class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
 
 
 class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    subject = TextAreaField("Main heading", validators=[NotifyDataRequired(thing="a main heading for your letter")])
+    subject = TextAreaField("Heading", validators=[NotifyDataRequired(thing="a main heading for your letter")])
     template_content = TextAreaField(
-        "Body", validators=[NotifyDataRequired(thing="the body text of your letter"), NoCommasInPlaceHolders()]
+        "Body text", validators=[NotifyDataRequired(thing="the body text of your letter"), NoCommasInPlaceHolders()]
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if kwargs.get("letter_languages") == LetterLanguageOptions.welsh_then_english:
+            self.subject.label.text = f"{self.subject.label.text} (English)"
+            self.template_content.label.text = f"{self.template_content.label.text} (English)"
 
 
 class WelshLetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    subject = TextAreaField("Main heading in Welsh", validators=[DataRequired(message="Cannot be empty")])
+    subject = TextAreaField("Heading (Welsh)", validators=[DataRequired(message="Cannot be empty")])
     template_content = TextAreaField(
-        "Body in Welsh", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
+        "Body text (Welsh)", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
     )
 
     def __init__(self, *args, subject, content, letter_welsh_subject, letter_welsh_content, **kwargs):
