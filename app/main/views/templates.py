@@ -66,7 +66,6 @@ from app.template_previews import (
 )
 from app.utils import (
     NOTIFICATION_TYPES,
-    service_has_permission,
     should_skip_template_page,
 )
 from app.utils.letters import (
@@ -655,9 +654,6 @@ def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: Option
 
     if template.template_type != "letter":
         abort(404)
-
-    if not current_service.has_permission("extra_letter_formatting"):
-        abort(403)
 
     if language.lower() != "welsh":
         abort(404)
@@ -1250,7 +1246,6 @@ def _get_page_numbers(page_count):
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/change-language", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-@service_has_permission("extra_letter_formatting")
 def letter_template_change_language(template_id, service_id):
     template = current_service.get_template(template_id)
 
@@ -1296,7 +1291,6 @@ def letter_template_change_language(template_id, service_id):
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/change-language/confirm", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-@service_has_permission("extra_letter_formatting")
 def letter_template_confirm_remove_welsh(template_id, service_id):
     template = current_service.get_template(template_id)
 
