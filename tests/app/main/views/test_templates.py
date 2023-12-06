@@ -1035,19 +1035,20 @@ def test_POST_letter_template_change_to_welsh_and_english_resets_english_subject
     content,
     extra_kwargs,
 ):
-    def _get(service_id, template_id, version=None, postage="second"):
-        template = template_json(
-            service_id=service_id,
-            id_=template_id,
-            name="Two week reminder",
-            type_="letter",
-            content=content,
-            subject=subject,
-            postage=postage,
-        )
-        return {"data": template}
-
-    mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": template_json(
+                service_id=SERVICE_ONE_ID,
+                id_=fake_uuid,
+                name="Two week reminder",
+                type_="letter",
+                content=content,
+                subject=subject,
+                postage="second",
+            )
+        },
+    )
 
     service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
