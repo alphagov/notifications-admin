@@ -346,9 +346,9 @@ def _add_template_by_type(template_type, template_folder_id):
         blank_letter = service_api_client.create_service_template(
             name="Untitled letter template",
             type_="letter",
-            content="Body",
+            content="Body text",
             service_id=current_service.id,
-            subject="Main heading",
+            subject="Heading",
             parent_folder_id=template_folder_id,
         )
         return redirect(
@@ -1256,15 +1256,15 @@ def _change_template_language(service_id, template, language: LetterLanguageOpti
 
     if language == LetterLanguageOptions.english:
         if template.subject == "English heading":
-            update_kwargs["subject"] = "Main heading"
+            update_kwargs["subject"] = "Heading"
         if template.content == "English body text":
-            update_kwargs["content"] = "Body"
+            update_kwargs["content"] = "Body text"
         update_kwargs["letter_welsh_subject"] = None
         update_kwargs["letter_welsh_content"] = None
     else:
-        if template.subject == "Main heading":
+        if template.subject == "Heading":
             update_kwargs["subject"] = "English heading"
-        if template.content == "Body":
+        if template.content == "Body text":
             update_kwargs["content"] = "English body text"
         update_kwargs["letter_welsh_subject"] = "Welsh heading"
         update_kwargs["letter_welsh_content"] = "Welsh body text"

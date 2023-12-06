@@ -1019,9 +1019,9 @@ def test_POST_letter_template_change_to_welsh_and_english_sets_subject_and_conte
 @pytest.mark.parametrize(
     "subject, content, extra_kwargs",
     (
-        ("Main heading", "Body", {"subject": "English heading", "content": "English body text"}),
-        ("Some custom heading", "Body", {"content": "English body text"}),
-        ("Main heading", "Some custom body", {"subject": "English heading"}),
+        ("Heading", "Body text", {"subject": "English heading", "content": "English body text"}),
+        ("Some custom heading", "Body text", {"content": "English body text"}),
+        ("Heading", "Some custom body", {"subject": "English heading"}),
         ("Some custom heading", "Some custom body", {}),
     ),
 )
@@ -1160,9 +1160,9 @@ def test_POST_letter_template_confirm_remove_welsh(
 @pytest.mark.parametrize(
     "subject, content, extra_kwargs",
     (
-        ("English heading", "English body text", {"subject": "Main heading", "content": "Body"}),
-        ("Some custom heading", "English body text", {"content": "Body"}),
-        ("English heading", "Some custom body", {"subject": "Main heading"}),
+        ("English heading", "English body text", {"subject": "Heading", "content": "Body text"}),
+        ("Some custom heading", "English body text", {"content": "Body text"}),
+        ("English heading", "Some custom body", {"subject": "Heading"}),
         ("Some custom heading", "Some custom body", {}),
     ),
 )
@@ -2067,9 +2067,9 @@ def test_choosing_letter_creates(
     mock_create_service_template.assert_called_once_with(
         name="Untitled letter template",
         type_="letter",
-        content="Body",
+        content="Body text",
         service_id=SERVICE_ONE_ID,
-        subject="Main heading",
+        subject="Heading",
         parent_folder_id=None,
     )
 
