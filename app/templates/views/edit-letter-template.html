@@ -5,8 +5,22 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
+{% set heading %}
+  {% if heading_action == 'Edit' %}
+    {% if letter_languages == language_options.english.value %}
+      Edit heading and body text
+    {% elif language is none %}
+      Edit English heading and body text
+    {% else %}
+      Edit Welsh heading and body text
+    {% endif %}
+  {% else %}
+    {{ heading_action }} letter template
+  {% endif %}
+{% endset %}
+
 {% block service_page_title %}
-  {{ heading_action }} letter template
+  {{ heading }}
 {% endblock %}
 
 {% block backLink %}
@@ -17,7 +31,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('{} letter template'.format(heading_action)) }}
+    {{ page_header(heading) }}
 
     {% call form_wrapper() %}
       <div class="govuk-grid-row">
