@@ -165,6 +165,39 @@ class DoesNotStartWithDoubleZero:
             raise ValidationError(self.message)
 
 
+class IsNotAGenericSenderID:
+    generic_sender_ids = ["info", "verify", "alert"]
+
+    def __init__(
+        self,
+        message="Text message sender ID cannot be Alert, Info or Verify as those are prohibited due to "
+        "usage by spam",
+    ):
+        self.message = message
+
+    def __call__(self, form, field):
+        if field.data and field.data.lower() in self.generic_sender_ids:
+            raise ValidationError(self.message)
+
+
+class IsAUKMobileNumberOrShortCode:
+    number_regex = re.compile(r"^[0-9\.]+$")
+    mobile_regex = re.compile(r"^07[0-9]{9}$")
+    shortcode_regex = re.compile(r"^[6-8][0-9]{4}$")
+
+    def __init__(self, message="A numeric sender id should be a valid mobile number or short code"):
+        self.message = message
+
+    def __call__(self, form, field):
+        if (
+            field.data
+            and re.match(self.number_regex, field.data)
+            and not re.match(self.mobile_regex, field.data)
+            and not re.match(self.shortcode_regex, field.data)
+        ):
+            raise ValidationError(self.message)
+
+
 class MustContainAlphanumericCharacters:
     regex = re.compile(r".*[a-zA-Z0-9].*[a-zA-Z0-9].*")
 
