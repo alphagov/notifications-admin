@@ -26,19 +26,20 @@
 {% endif %}
 
 {% for page_number in page_numbers %}
-  <div class="letter page--{{ loop.cycle('odd', 'even') }}{% if loop.first %} page--first{% endif %}{% if loop.last %} page--last{% endif %}">
+  {% set first_page_of_english_in_bilingual_letter = template.welsh_page_count and page_number == first_page_of_english %}
+  <div class="letter page--{{ loop.cycle('odd', 'even') }}{% if loop.first %} page--first{% endif %}{% if loop.last %} page--last{% endif %}"{% if first_page_of_english_in_bilingual_letter %} id="first-page-of-english-in-bilingual-letter"{% endif %}>
     {% if loop.first and show_postage %}
       <p class="letter-postage {{ postage_class_value }}">
         Postage: {{ postage_description }}
       </p>
     {% endif %}
-    {% if template.include_letter_edit_ui_overlay and template.welsh_page_count and page_number == first_page_of_english %}
+    {% if template.include_letter_edit_ui_overlay and first_page_of_english_in_bilingual_letter %}
       <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> English pages of the letter template</span></a>
     {% endif %}
     {% if page_number == first_page_of_attachment %}
     <div id="first-page-of-attachment"></div>
     {% endif %}
-    <img src="{{ image_url }}?page={{ page_number }}" alt="" loading="{{ 'eager' if page_number in (1, first_page_of_attachment) else 'lazy' }}">
+    <img src="{{ image_url }}?page={{ page_number }}" alt="" loading="{{ 'eager' if page_number in (1, first_page_of_attachment, first_page_of_english) else 'lazy' }}">
   </div>
 {% endfor %}
 
