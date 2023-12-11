@@ -31,7 +31,6 @@ EXCLUDED_ENDPOINTS = set(
             "api_documentation",
             "api_integration",
             "api_keys",
-            "approve_broadcast_message",
             "archive_organisation",
             "archive_service",
             "archive_user",
@@ -39,13 +38,6 @@ EXCLUDED_ENDPOINTS = set(
             "begin_tour",
             "branding_option_preview",
             "branding_nhs",
-            "broadcast_dashboard_previous",
-            "broadcast_dashboard_rejected",
-            "broadcast_dashboard",
-            "broadcast_tour_live",
-            "broadcast_tour",
-            "broadcast",
-            "cancel_broadcast_message",
             "cancel_invited_org_user",
             "cancel_invited_user",
             "cancel_job",
@@ -59,9 +51,6 @@ EXCLUDED_ENDPOINTS = set(
             "check_notification",
             "check_tour_notification",
             "choose_account",
-            "choose_broadcast_area",
-            "choose_broadcast_library",
-            "choose_broadcast_sub_area",
             "choose_from_contact_list",
             "choose_service",
             "choose_template_to_copy",
@@ -175,7 +164,6 @@ EXCLUDED_ENDPOINTS = set(
             "index",
             "invite_org_user",
             "invite_user",
-            "json_updates.broadcast_dashboard_updates",
             "json_updates.conversation_updates",
             "json_updates.get_notifications_page_partials_as_json",
             "json_updates.inbox_updates",
@@ -202,7 +190,6 @@ EXCLUDED_ENDPOINTS = set(
             "manage_template_folder",
             "manage_users",
             "monthly",
-            "new_broadcast",
             "new_password",
             "no_cookie.check_messages_preview",
             "no_cookie.check_notification_preview",
@@ -241,8 +228,6 @@ EXCLUDED_ENDPOINTS = set(
             "platform_admin_view_email_branding",
             "platform_admin_view_letter_branding",
             "platform_admin",
-            "preview_broadcast_areas",
-            "preview_broadcast_message",
             "privacy",
             "public_agreement",
             "public_download_agreement",
@@ -253,8 +238,6 @@ EXCLUDED_ENDPOINTS = set(
             "register_from_org_invite",
             "register",
             "registration_continue",
-            "reject_broadcast_message",
-            "remove_broadcast_area",
             "remove_user_from_organisation",
             "remove_user_from_service",
             "rename_template",
@@ -283,7 +266,6 @@ EXCLUDED_ENDPOINTS = set(
             "service_add_sms_sender",
             "service_agreement",
             "service_confirm_agreement",
-            "service_confirm_broadcast_account_type",
             "service_confirm_delete_email_reply_to",
             "service_confirm_delete_letter_contact",
             "service_confirm_delete_sms_sender",
@@ -311,8 +293,6 @@ EXCLUDED_ENDPOINTS = set(
             "service_set_auth_type",
             "service_set_branding_add_to_branding_pool_step",
             "service_set_branding",
-            "service_set_broadcast_channel",
-            "service_set_broadcast_network",
             "service_set_channel",
             "service_set_inbound_number",
             "service_set_international_letters",
@@ -378,7 +358,6 @@ EXCLUDED_ENDPOINTS = set(
             "user_profile_take_part_in_user_research",
             "verify_email",
             "verify",
-            "view_current_broadcast",
             "view_job_csv",
             "view_job",
             "view_job_original_file_csv",
@@ -387,10 +366,8 @@ EXCLUDED_ENDPOINTS = set(
             "view_letter_upload_as_preview",
             "view_notification",
             "view_notifications",
-            "view_previous_broadcast",
             "view_provider",
             "view_providers",
-            "view_rejected_broadcast",
             "view_template_version",
             "view_template_versions",
             "view_template",
@@ -398,7 +375,6 @@ EXCLUDED_ENDPOINTS = set(
             "webauthn_begin_register",
             "webauthn_complete_authentication",
             "webauthn_complete_register",
-            "write_new_broadcast",
         },
     )
 )
@@ -542,50 +518,6 @@ def test_navigation_urls(
         f"/services/{SERVICE_ONE_ID}/usage",
         f"/services/{SERVICE_ONE_ID}/service-settings",
         f"/services/{SERVICE_ONE_ID}/api",
-    ]
-
-
-def test_navigation_for_services_with_broadcast_permission(
-    client_request,
-    service_one,
-    mock_get_service_templates,
-    mock_get_template_folders,
-    mock_get_api_keys,
-    active_user_create_broadcasts_permission,
-):
-    service_one["permissions"] += ["broadcast"]
-    client_request.login(active_user_create_broadcasts_permission)
-
-    page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
-    assert [a["href"] for a in page.select(".navigation a")] == [
-        f"/services/{SERVICE_ONE_ID}/current-alerts",
-        f"/services/{SERVICE_ONE_ID}/past-alerts",
-        f"/services/{SERVICE_ONE_ID}/rejected-alerts",
-        f"/services/{SERVICE_ONE_ID}/templates",
-        f"/services/{SERVICE_ONE_ID}/users",
-    ]
-
-
-def test_navigation_for_services_with_broadcast_permission_platform_admin(
-    client_request,
-    service_one,
-    mock_get_service_templates,
-    mock_get_template_folders,
-    mock_get_api_keys,
-    platform_admin_user,
-):
-    service_one["permissions"] += ["broadcast"]
-
-    client_request.login(platform_admin_user)
-    page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
-    assert [a["href"] for a in page.select(".navigation a")] == [
-        f"/services/{SERVICE_ONE_ID}/current-alerts",
-        f"/services/{SERVICE_ONE_ID}/past-alerts",
-        f"/services/{SERVICE_ONE_ID}/rejected-alerts",
-        f"/services/{SERVICE_ONE_ID}/templates",
-        f"/services/{SERVICE_ONE_ID}/users",
-        f"/services/{SERVICE_ONE_ID}/service-settings",
-        f"/services/{SERVICE_ONE_ID}/api/keys",
     ]
 
 

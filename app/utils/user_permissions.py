@@ -8,8 +8,6 @@ permission_mappings = {
     "manage_service": ["manage_users", "manage_settings"],
     "manage_api_keys": ["manage_api_keys"],
     "view_activity": ["view_activity"],
-    "create_broadcasts": ["create_broadcasts", "reject_broadcasts", "cancel_broadcasts"],
-    "approve_broadcasts": ["approve_broadcasts", "reject_broadcasts", "cancel_broadcasts"],
 }
 
 all_ui_permissions = set(permission_mappings.keys())
@@ -21,12 +19,6 @@ permission_options = (
     ("manage_templates", "Add and edit templates"),
     ("manage_service", "Manage settings, team and usage"),
     ("manage_api_keys", "Manage API integration"),
-)
-
-broadcast_permission_options = (
-    ("manage_templates", "Add and edit templates"),
-    ("create_broadcasts", "Create new alerts"),
-    ("approve_broadcasts", "Approve alerts"),
 )
 
 organisation_user_permission_names = {PERMISSION_CAN_MAKE_SERVICES_LIVE}

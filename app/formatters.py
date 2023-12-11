@@ -378,9 +378,6 @@ def message_count_noun(count, template_type):
     if template_type == "letter":
         return "letter" if singular else "letters"
 
-    if template_type == "broadcast":
-        return "broadcast" if singular else "broadcasts"
-
     return "message" if singular else "messages"
 
 

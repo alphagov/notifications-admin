@@ -75,7 +75,3 @@ def normalise_email_address_aliases(email_address):
     local_part = local_part.split("+")[0].replace(".", "")
 
     return f"{local_part}@{domain}".lower()
-
-
-def distinct_email_addresses(*args):
-    return len(args) == len(set(map(normalise_email_address_aliases, args)))

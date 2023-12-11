@@ -288,46 +288,6 @@ def test_should_show_caseworker_on_overview_page(
     )
 
 
-def test_should_show_overview_page_for_broadcast_service(
-    client_request,
-    mocker,
-    mock_get_invites_for_service,
-    mock_get_template_folders,
-    service_one,
-    active_user_view_permissions,
-    active_user_create_broadcasts_permission,
-    active_user_approve_broadcasts_permission,
-):
-    service_one["permissions"].append("broadcast")
-    mocker.patch(
-        "app.models.user.Users.client_method",
-        return_value=[
-            active_user_create_broadcasts_permission,
-            active_user_approve_broadcasts_permission,
-            active_user_view_permissions,
-        ],
-    )
-    page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select(".user-list-item")[0].text) == (
-        "Test User Create Broadcasts Permission (you) "
-        "Cannot Add and edit templates "
-        "Can Create new alerts "
-        "Cannot Approve alerts"
-    )
-    assert normalize_spaces(page.select(".user-list-item")[1].text) == (
-        "Test User Approve Broadcasts Permission (you) "
-        "Cannot Add and edit templates "
-        "Cannot Create new alerts "
-        "Can Approve alerts"
-    )
-    assert normalize_spaces(page.select(".user-list-item")[2].text) == (
-        "Test User With Permissions (you) "
-        "Cannot Add and edit templates "
-        "Cannot Create new alerts "
-        "Cannot Approve alerts"
-    )
-
-
 @pytest.mark.parametrize(
     "endpoint, extra_args, service_has_email_auth, auth_options_hidden",
     [
@@ -385,36 +345,6 @@ def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
     assert permission_checkboxes[2]["value"] == "manage_templates"
     assert permission_checkboxes[3]["value"] == "manage_service"
     assert permission_checkboxes[4]["value"] == "manage_api_keys"
-
-
-@pytest.mark.parametrize(
-    "endpoint, extra_args",
-    [
-        (
-            "main.edit_user_permissions",
-            {"user_id": sample_uuid()},
-        ),
-        (
-            "main.invite_user",
-            {},
-        ),
-    ],
-)
-def test_broadcast_service_only_shows_relevant_permissions(
-    client_request,
-    service_one,
-    mock_get_users_by_service,
-    mock_get_template_folders,
-    endpoint,
-    extra_args,
-):
-    service_one["permissions"] = ["broadcast"]
-    page = client_request.get(endpoint, service_id=SERVICE_ONE_ID, **extra_args)
-    assert [(field["name"], field["value"]) for field in page.select("input[type=checkbox]")] == [
-        ("permissions_field", "manage_templates"),
-        ("permissions_field", "create_broadcasts"),
-        ("permissions_field", "approve_broadcasts"),
-    ]
 
 
 @pytest.mark.parametrize("service_has_email_auth, displays_auth_type", [(True, True), (False, False)])
@@ -669,81 +599,6 @@ def test_edit_user_permissions(
     submitted_permissions,
     permissions_sent_to_api,
 ):
-    client_request.post(
-        "main.edit_user_permissions",
-        service_id=SERVICE_ONE_ID,
-        user_id=fake_uuid,
-        _data=dict(email_address="test@example.com", **submitted_permissions),
-        _expected_status=302,
-        _expected_redirect=url_for(
-            "main.manage_users",
-            service_id=SERVICE_ONE_ID,
-        ),
-    )
-    mock_set_user_permissions.assert_called_with(
-        fake_uuid, SERVICE_ONE_ID, permissions=permissions_sent_to_api, folder_permissions=[]
-    )
-
-
-@pytest.mark.parametrize(
-    "submitted_permissions, permissions_sent_to_api",
-    [
-        (
-            {
-                "permissions_field": [
-                    "create_broadcasts",
-                ]
-            },
-            {
-                "view_activity",
-                "create_broadcasts",
-            },
-        ),
-        (
-            {
-                "permissions_field": [
-                    "approve_broadcasts",
-                ]
-            },
-            {
-                "view_activity",
-                "approve_broadcasts",
-            },
-        ),
-        (
-            {
-                "permissions_field": [
-                    "create_broadcasts",
-                    "approve_broadcasts",
-                ]
-            },
-            {
-                "view_activity",
-                "create_broadcasts",
-                "approve_broadcasts",
-            },
-        ),
-        (
-            {},
-            {
-                "view_activity",
-            },
-        ),
-    ],
-)
-def test_edit_user_permissions_for_broadcast_service(
-    client_request,
-    service_one,
-    mocker,
-    mock_get_users_by_service,
-    mock_get_invites_for_service,
-    mock_set_user_permissions,
-    mock_get_template_folders,
-    fake_uuid,
-    submitted_permissions,
-    permissions_sent_to_api,
-):
-    service_one["permissions"] = "broadcast"
     client_request.post(
         "main.edit_user_permissions",
         service_id=SERVICE_ONE_ID,
@@ -1308,91 +1163,6 @@ def test_invite_user_with_email_auth_service(
     )
 
 
-@pytest.mark.parametrize(
-    "post_data, expected_permissions_to_api",
-    (
-        (
-            {
-                "permissions_field": [
-                    "create_broadcasts",
-                ]
-            },
-            {
-                "view_activity",
-                "create_broadcasts",
-            },
-        ),
-        (
-            {
-                "permissions_field": [
-                    "view_activity",
-                    "manage_api_keys",
-                    "foo",
-                ]
-            },
-            {
-                "view_activity",
-            },
-        ),
-    ),
-)
-def test_invite_user_to_broadcast_service(
-    client_request,
-    service_one,
-    active_user_with_permissions,
-    mocker,
-    sample_invite,
-    mock_get_template_folders,
-    mock_get_organisations,
-    post_data,
-    expected_permissions_to_api,
-):
-    service_one["permissions"] = ["broadcast"]
-    mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
-    mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
-    mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
-    post_data["email_address"] = "broadcast@example.gov.uk"
-    client_request.post(
-        "main.invite_user",
-        service_id=SERVICE_ONE_ID,
-        _data=post_data,
-    )
-    app.invite_api_client.create_invite.assert_called_once_with(
-        sample_invite["from_user"],
-        sample_invite["service"],
-        "broadcast@example.gov.uk",
-        expected_permissions_to_api,
-        "sms_auth",
-        [],
-    )
-
-
-def test_invite_non_govt_user_to_broadcast_service_fails_validation(
-    client_request,
-    service_one,
-    active_user_with_permissions,
-    mocker,
-    sample_invite,
-    mock_get_template_folders,
-    mock_get_organisations,
-):
-    service_one["permissions"] = ["broadcast"]
-    mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
-    mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
-    mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
-    post_data = {
-        "permissions_field": [
-            "send_messages",
-            "manage_templates",
-            "manage_service",
-        ],
-        "email_address": "random@example.com",
-    }
-    page = client_request.post("main.invite_user", service_id=SERVICE_ONE_ID, _data=post_data, _expected_status=200)
-    assert app.invite_api_client.create_invite.called is False
-    assert "Enter a public sector email address" in page.select_one(".govuk-error-message").text
-
-
 def test_cancel_invited_user_cancels_user_invitations(
     client_request,
     mock_get_invites_for_service,
@@ -1525,70 +1295,6 @@ def test_user_cant_invite_themselves(
     form_error = page.select_one(".govuk-error-message").text.strip()
     assert form_error == "Error: Enter an email address that is not your own"
     assert not mock_create_invite.called
-
-
-@pytest.mark.parametrize(
-    "email_address",
-    (
-        "test@user.gov.uk",
-        "TEST@user.gov.uk",
-        "test@USER.gov.uk",
-        "test+test@user.gov.uk",
-        "te.st@user.gov.uk",
-        pytest.param("test2@user.gov.uk", marks=pytest.mark.xfail),
-        pytest.param("test@other.gov.uk", marks=pytest.mark.xfail),
-    ),
-)
-def test_broadcast_user_cant_invite_themselves_or_their_aliases(
-    client_request,
-    service_one,
-    mocker,
-    active_user_with_permissions,
-    mock_create_invite,
-    mock_get_template_folders,
-    email_address,
-):
-    service_one["permissions"] += ["broadcast"]
-    page = client_request.post(
-        "main.invite_user",
-        service_id=SERVICE_ONE_ID,
-        _data={"email_address": email_address, "permissions_field": []},
-        _expected_status=200,
-    )
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
-        "Error: You cannot send an invitation to yourself"
-    )
-    assert mock_create_invite.called is False
-
-
-@pytest.mark.parametrize(
-    "extra_service_permissions",
-    (
-        pytest.param([], marks=pytest.mark.xfail),
-        ["broadcast"],
-    ),
-)
-def test_platform_admin_cant_invite_themselves_to_broadcast_services(
-    client_request,
-    service_one,
-    mocker,
-    platform_admin_user,
-    mock_create_invite,
-    mock_get_template_folders,
-    extra_service_permissions,
-):
-    service_one["permissions"] += extra_service_permissions
-    client_request.login(platform_admin_user)
-    page = client_request.post(
-        "main.invite_user",
-        service_id=SERVICE_ONE_ID,
-        _data={"email_address": platform_admin_user["email_address"], "permissions_field": []},
-        _expected_status=200,
-    )
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
-        "Error: You cannot send an invitation to yourself"
-    )
-    assert mock_create_invite.called is False
 
 
 def test_no_permission_manage_users_page(

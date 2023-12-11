@@ -36,7 +36,6 @@ from app.constants import QR_CODE_TOO_LONG, LetterLanguageOptions
 from app.formatters import character_count, message_count
 from app.main import main, no_cookie
 from app.main.forms import (
-    BroadcastTemplateForm,
     EmailTemplateForm,
     LetterTemplateForm,
     LetterTemplateLanguagesForm,
@@ -78,15 +77,11 @@ from app.utils.templates import TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
 
-def get_template_form(
-    template_type: Literal["email", "sms", "letter", "broadcast"], language: Optional[Literal["welsh"]] = None
-):
+def get_template_form(template_type: Literal["email", "sms", "letter"], language: Optional[Literal["welsh"]] = None):
     if template_type == "email":
         return EmailTemplateForm
     elif template_type == "sms":
         return SMSTemplateForm
-    elif template_type == "broadcast":
-        return BroadcastTemplateForm
     else:
         if language == "welsh":
             return WelshLetterTemplateForm
@@ -239,7 +234,6 @@ def get_template_nav_label(value):
         "sms": "Text message",
         "email": "Email",
         "letter": "Letter",
-        "broadcast": "Broadcast",
     }[value]
 
 
@@ -754,7 +748,7 @@ def edit_service_template(service_id, template_id, language=None):
 )
 @user_has_permissions()
 def count_content_length(service_id, template_type):
-    if template_type not in {"sms", "broadcast"}:
+    if template_type != "sms":
         abort(404)
 
     error, message = _get_content_count_error_and_message_for_template(
@@ -792,20 +786,6 @@ def _get_content_count_error_and_message_for_template(template):
                 f"(not including personalisation)"
             )
         return False, f"Will be charged as {message_count(template.fragment_count, template.template_type)} "
-
-    if template.template_type == "broadcast":
-        if template.content_too_long:
-            return True, (
-                f"You have "
-                f"{character_count(template.encoded_content_count - template.max_content_count)} "
-                f"too many"
-            )
-        else:
-            return False, (
-                f"You have "
-                f"{character_count(template.max_content_count - template.encoded_content_count)} "
-                f"remaining"
-            )
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/delete", methods=["GET", "POST"])

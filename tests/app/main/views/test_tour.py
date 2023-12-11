@@ -53,7 +53,7 @@ def test_should_clear_session_on_tour_start(
         assert session["placeholders"] == {}
 
 
-@pytest.mark.parametrize("template_type", ["email", "letter", "broadcast"])
+@pytest.mark.parametrize("template_type", ["email", "letter"])
 def test_should_404_if_non_sms_template_for_tour_start(
     client_request,
     fake_uuid,
@@ -178,7 +178,7 @@ def test_should_prefill_answers_for_get_tour_step(
     assert page.select(".govuk-input")[0]["value"] == "hello"
 
 
-@pytest.mark.parametrize("template_type", ["email", "letter", "broadcast"])
+@pytest.mark.parametrize("template_type", ["email", "letter"])
 @pytest.mark.parametrize("method", ["get", "post"])
 def test_should_404_if_non_sms_template_for_tour_step(client_request, fake_uuid, mocker, template_type, method):
     mocker.patch(

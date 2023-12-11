@@ -17,13 +17,6 @@ EVENT_SCHEMAS = {
         "set_by_id",
     },
     "archive_user": {"user_id", "user_email_address", "archived_by_id"},
-    "change_broadcast_account_type": {
-        "service_id",
-        "changed_by_id",
-        "service_mode",
-        "broadcast_channel",
-        "provider_restriction",
-    },
     "archive_service": {"service_id", "archived_by_id"},
     "update_email_branding": {"email_branding_id", "updated_by_id", "old_email_branding"},
     "update_letter_branding": {"letter_branding_id", "updated_by_id", "old_letter_branding"},
@@ -61,10 +54,6 @@ def create_set_organisation_user_permissions_event(**kwargs):
 
 def create_archive_user_event(**kwargs):
     _send_event("archive_user", **kwargs)
-
-
-def create_broadcast_account_type_change_event(**kwargs):
-    _send_event("change_broadcast_account_type", **kwargs)
 
 
 def create_archive_service_event(**kwargs):

@@ -79,9 +79,6 @@ class Config:
     ASSET_DOMAIN = ""
     ASSET_PATH = "/static/"
 
-    # as defined in api db migration 0331_add_broadcast_org.py
-    BROADCAST_ORGANISATION_ID = "38e4bf69-93b0-445d-acee-53ea53fe02df"
-
     NOTIFY_SERVICE_ID = "d6aa2c68-a2d9-4437-ab19-3ae8eb202553"
 
     NOTIFY_BILLING_DETAILS = json.loads(os.environ.get("NOTIFY_BILLING_DETAILS") or "null") or {

@@ -188,7 +188,6 @@ class HeaderNavigation(Navigation):
 class MainNavigation(Navigation):
     mapping = {
         "dashboard": {
-            "broadcast_tour",
             "conversation",
             "inbox",
             "monthly",
@@ -198,20 +197,6 @@ class MainNavigation(Navigation):
             "template_usage",
             "view_notification",
             "view_notifications",
-        },
-        "current-broadcasts": {
-            "broadcast_dashboard",
-            "view_current_broadcast",
-            "new_broadcast",
-            "write_new_broadcast",
-        },
-        "previous-broadcasts": {
-            "broadcast_dashboard_previous",
-            "view_previous_broadcast",
-        },
-        "rejected-broadcasts": {
-            "broadcast_dashboard_rejected",
-            "view_rejected_broadcast",
         },
         "templates": {
             "action_blocked",
@@ -242,16 +227,6 @@ class MainNavigation(Navigation):
             "view_template",
             "view_template_version",
             "view_template_versions",
-            "broadcast",
-            "preview_broadcast_areas",
-            "choose_broadcast_library",
-            "choose_broadcast_area",
-            "choose_broadcast_sub_area",
-            "remove_broadcast_area",
-            "preview_broadcast_message",
-            "approve_broadcast_message",
-            "reject_broadcast_message",
-            "cancel_broadcast_message",
             "rename_template",
         },
         "uploads": {
@@ -324,10 +299,7 @@ class MainNavigation(Navigation):
             "service_set_auth_type",
             "service_set_channel",
             "send_files_by_email_contact_details",
-            "service_confirm_broadcast_account_type",
             "service_set_branding",
-            "service_set_broadcast_channel",
-            "service_set_broadcast_network",
             "service_set_inbound_number",
             "service_set_international_letters",
             "service_set_international_sms",
@@ -365,11 +337,6 @@ class MainNavigation(Navigation):
 
 class CaseworkNavigation(Navigation):
     mapping = {
-        "dashboard": {
-            "broadcast_tour",
-            "broadcast_dashboard",
-            "broadcast_dashboard_previous",
-        },
         "send-one-off": {
             "choose_from_contact_list",
             "choose_template",

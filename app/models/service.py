@@ -26,11 +26,9 @@ from app.utils.templates import get_template as get_template_as_rich_object
 class Service(JSONModel):
     ALLOWED_PROPERTIES = {
         "active",
-        "allowed_broadcast_provider",
         "billing_contact_email_addresses",
         "billing_contact_names",
         "billing_reference",
-        "broadcast_channel",
         "contact_link",
         "count_as_live",
         "custom_email_sender_name",
@@ -59,7 +57,6 @@ class Service(JSONModel):
         "email",
         "sms",
         "letter",
-        "broadcast",
     )
 
     ALL_PERMISSIONS = TEMPLATE_TYPES + (
@@ -71,7 +68,6 @@ class Service(JSONModel):
         "international_letters",
         "international_sms",
         "upload_document",
-        "broadcast",
     )
 
     @classmethod

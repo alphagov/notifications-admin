@@ -52,8 +52,7 @@
     justify-content: space-between;
 
     // note: first-child of a section should be a heading
-    & > :first-child,
-    & > .area-list {
+    & > :first-child {
       width: 100%;
       text-align: left;
     }

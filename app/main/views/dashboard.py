@@ -42,9 +42,6 @@ def service_dashboard(service_id):
         session.pop("invited_user_id", None)
         session["service_id"] = service_id
 
-    if current_service.has_permission("broadcast"):
-        return redirect(url_for("main.broadcast_dashboard", service_id=service_id))
-
     if not current_user.has_permissions("view_activity"):
         return redirect(url_for("main.choose_template", service_id=service_id))
 
