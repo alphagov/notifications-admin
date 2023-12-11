@@ -1777,6 +1777,54 @@ def test_should_be_able_to_view_a_letter_template_with_links(
     ]
 
 
+def test_should_be_able_to_view_a_letter_template_with_bilingual_content(
+    mocker,
+    client_request,
+    service_one,
+    mock_get_service_letter_template_welsh_language,
+    mock_get_template_folders,
+    active_user_with_permissions,
+    single_letter_contact_block,
+    fake_uuid,
+):
+    service_one["permissions"].append("extra_letter_formatting")
+    do_mock_get_page_counts_for_letter(mocker, count=5, welsh_page_count=3)
+    page = client_request.get(
+        "main.view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+    assert [(str(ele)) for ele in page.select(".letter img, .letter div")] == [
+        (
+            '<img alt="" loading="eager" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=1"/>'
+        ),
+        (
+            '<img alt="" loading="lazy" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=2"/>'
+        ),
+        (
+            '<img alt="" loading="lazy" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=3"/>'
+        ),
+        '<div id="first-page-of-english-in-bilingual-letter"></div>',
+        (
+            '<img alt="" loading="eager" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=4"/>'
+        ),
+        (
+            '<img alt="" loading="lazy" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=5"/>'
+        ),
+    ]
+
+
 def test_view_broadcast_template(
     client_request,
     service_one,
@@ -3148,6 +3196,7 @@ def test_should_redirect_when_saving_a_template_email(
 def test_should_redirect_when_saving_a_template_letter(
     client_request,
     mock_get_service_letter_template,
+    mock_get_page_counts_for_letter,
     mock_update_service_template,
     mock_get_user_by_email,
     fake_uuid,
@@ -3232,6 +3281,7 @@ def test_update_template_for_welsh_language_content(
     request,
     client_request,
     mock_update_service_template,
+    mock_get_page_counts_for_letter,
     mock_get_user_by_email,
     fake_uuid,
     service_one,
@@ -3271,6 +3321,47 @@ def test_update_template_for_welsh_language_content(
         name=name,
         letter_welsh_subject=subject,
         letter_welsh_content=content,
+    )
+
+
+def test_update_template_for_english_content_in_welsh_letter(
+    mocker,
+    client_request,
+    mock_update_service_template,
+    mock_get_service_letter_template_welsh_language,
+    mock_get_user_by_email,
+    fake_uuid,
+    service_one,
+):
+    do_mock_get_page_counts_for_letter(mocker, count=1, welsh_page_count=1)
+    service_one["permissions"].append("letter")
+    service_one["permissions"].append("extra_letter_formatting")
+    name = "new template name"
+    content = "English letter content"
+    subject = "English letter subject"
+    client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": name,
+            "subject": subject,
+            "template_content": content,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _anchor="first-page-of-english-in-bilingual-letter",
+        ),
+    )
+    mock_update_service_template.assert_called_with(
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        name=name,
+        subject=subject,
+        content=content,
     )
 
 

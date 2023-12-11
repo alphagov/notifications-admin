@@ -720,7 +720,21 @@ def edit_service_template(service_id, template_id, language=None):
             else:
                 raise e
         else:
-            return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
+            editing_english_content_in_bilingual_letter = (
+                template.template_type == "letter" and template.welsh_page_count and language != "welsh"
+            )
+            return redirect(
+                url_for(
+                    "main.view_template",
+                    service_id=service_id,
+                    template_id=template_id,
+                    **(
+                        {"_anchor": "first-page-of-english-in-bilingual-letter"}
+                        if editing_english_content_in_bilingual_letter
+                        else {}
+                    ),
+                )
+            )
 
     return render_template(
         f"views/edit-{template.template_type}-template.html",
