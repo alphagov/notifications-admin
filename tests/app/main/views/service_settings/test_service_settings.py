@@ -2110,6 +2110,23 @@ def test_should_redirect_after_request_to_go_live(
     )
 
 
+@pytest.mark.parametrize(
+    "can_approve_own_go_live_requests, expected_go_live_notes",
+    (
+        (
+            False,
+            "This service is not allowed to go live",
+        ),
+        (
+            True,
+            (
+                "This organisation can approve its own go live requests. "
+                "No action should be needed from us. "
+                "This service is not allowed to go live"
+            ),
+        ),
+    ),
+)
 def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     client_request,
     mocker,
@@ -2124,15 +2141,17 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     mock_get_users_by_service,
     mock_update_service,
     mock_get_invites_without_manage_permission,
+    mock_notify_users_of_request_to_go_live_for_service,
+    can_approve_own_go_live_requests,
+    expected_go_live_notes,
 ):
-    go_live_note = "This service is not allowed to go live"
-
     mocker.patch(
         "app.organisations_client.get_organisation",
         side_effect=lambda org_id: organisation_json(
             ORGANISATION_ID,
             "Org 1",
-            request_to_go_live_notes=go_live_note,
+            request_to_go_live_notes="This service is not allowed to go live",
+            can_approve_own_go_live_requests=can_approve_own_go_live_requests,
         ),
     )
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
@@ -2148,7 +2167,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         "\n"
         "---\n"
         "Organisation type: Central government\n"
-        "Agreement signed: No (organisation is Org 1, a crown body). {go_live_note}\n"
+        "Agreement signed: No (organisation is Org 1, a crown body). {expected_go_live_notes}\n"
         "\n"
         "Other live services for that user: No\n"
         "\n"
@@ -2157,7 +2176,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         "Requester’s user page: http://localhost/users/{user_id}\n"
     ).format(
         service_id=SERVICE_ONE_ID,
-        go_live_note=go_live_note,
+        expected_go_live_notes=expected_go_live_notes,
         user_id=active_user_with_permissions["id"],
     )
 

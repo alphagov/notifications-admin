@@ -12,6 +12,7 @@ Agreement signed: {{ organisation.agreement_signed|format_yes_no(none='Can’t t
 {%- elif organisation.name %} (organisation is {{ organisation.name }}, {{ organisation.crown|format_yes_no(yes='a crown body', no='a non-crown body', none='crown status unknown') }})
 {%- else %} (domain is {{ user.email_domain }})
 {%- endif %}.
+{%- if organisation.can_approve_own_go_live_requests %} This organisation can approve its own go live requests. No action should be needed from us.{% endif %}
 {%- if organisation.request_to_go_live_notes %} {{ organisation.request_to_go_live_notes }}{% endif %}
 {%- if organisation.agreement_signed_by %}
 Agreement signed by: {{ organisation.agreement_signed_by.email_address }}
