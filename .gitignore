@@ -26,7 +26,6 @@
 !tests/spreadsheet_files/excel_97.xls
 !tests/non_spreadsheet_files/actually_a_png.xlsx
 !tests/spreadsheet_files/excel 2007.xlsx
-!app/broadcast_areas/source_files/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
