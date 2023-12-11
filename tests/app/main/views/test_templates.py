@@ -1795,19 +1795,33 @@ def test_should_be_able_to_view_a_letter_template_with_bilingual_content(
         template_id=fake_uuid,
         _test_page_title=False,
     )
-    assert [page.get("id") for page in page.select(".letter")] == [
-        None,
-        None,
-        None,
-        "first-page-of-english-in-bilingual-letter",
-        None,
-    ]
-    assert [img["loading"] for img in page.select(".letter img")] == [
-        "eager",
-        "lazy",
-        "lazy",
-        "eager",
-        "lazy",
+    assert [(str(ele)) for ele in page.select(".letter img, .letter div")] == [
+        (
+            '<img alt="" loading="eager" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=1"/>'
+        ),
+        (
+            '<img alt="" loading="lazy" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=2"/>'
+        ),
+        (
+            '<img alt="" loading="lazy" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=3"/>'
+        ),
+        '<div id="first-page-of-english-in-bilingual-letter"></div>',
+        (
+            '<img alt="" loading="eager" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=4"/>'
+        ),
+        (
+            '<img alt="" loading="lazy" '
+            'src="/services/596364a0-858e-42c8-9062-a8fe822260eb/templates/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6.png'
+            '?page=5"/>'
+        ),
     ]
 
 
