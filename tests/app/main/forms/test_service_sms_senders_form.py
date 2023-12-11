@@ -8,7 +8,15 @@ from app.main.forms import ServiceSmsSenderForm
     [
         ("", True, "Enter a text message sender ID"),
         ("22", True, "Text message sender ID must be at least 3 characters long"),
-        ("333", False, None),
+        ("333", True, "A numeric sender id should be a valid mobile number or short code"),
+        ("70000", False, None),
+        ("07000000000", False, None),
+        (
+            "Info",
+            True,
+            "Text message sender ID cannot be Alert, Info or Verify as those are prohibited due to usage by spam",
+        ),
+        ("Inform Uk", False, None),
         ("elevenchars", False, None),  # 11 chars
         ("twelvecharas", True, "Text message sender ID cannot be longer than 11 characters"),  # 12 chars
         (

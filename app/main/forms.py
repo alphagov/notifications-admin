@@ -71,6 +71,8 @@ from app.main.validators import (
     CsvFileValidator,
     DoesNotStartWithDoubleZero,
     FileIsVirusFree,
+    IsAUKMobileNumberOrShortCode,
+    IsNotAGenericSenderID,
     Length,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
@@ -1886,6 +1888,8 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
                 ),
             ),
             DoesNotStartWithDoubleZero(),
+            IsNotAGenericSenderID(),
+            IsAUKMobileNumberOrShortCode(),
         ],
     )
     is_default = GovukCheckboxField("Make this text message sender ID the default")
