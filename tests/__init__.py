@@ -322,7 +322,7 @@ def template_json(
     postage=None,
     folder=None,
     letter_attachment=None,
-    letter_languages="english",
+    letter_languages=None,
     letter_welsh_subject=None,
     letter_welsh_content=None,
 ):
@@ -343,7 +343,7 @@ def template_json(
         "folder": folder,
         "postage": postage,
         "letter_attachment": letter_attachment,
-        "letter_languages": letter_languages,
+        "letter_languages": letter_languages or "english" if type_ == "letter" else None,
         "letter_welsh_subject": letter_welsh_subject,
         "letter_welsh_content": letter_welsh_content,
     }
