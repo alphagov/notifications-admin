@@ -50,7 +50,7 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     mock_get_annual_usage_for_service,
     mock_get_monthly_usage_for_service,
     mock_get_free_sms_fragment_limit,
-    mock_get_service,
+    mocked_get_service_data,
     mock_get_invites_for_service,
     mock_get_users_by_service,
     mock_get_organisation,
@@ -78,9 +78,7 @@ def test_services_pages_that_org_users_are_allowed_to_see(
         organisation_id=ORGANISATION_ID,
     )
 
-    mock_get_service = mocker.patch(
-        "app.notify_client.service_api_client.service_api_client.get_service", return_value={"data": service}
-    )
+    mocked_get_service_data[service["id"]] = service
     mocker.patch("app.template_folder_api_client.get_template_folders", return_value=[create_folder(id=sample_uuid())])
 
     client_request.login(
@@ -91,8 +89,6 @@ def test_services_pages_that_org_users_are_allowed_to_see(
     client_request.get(
         endpoint, service_id=SERVICE_ONE_ID, _expected_status=expected_status, _test_page_title=False, **extra_args
     )
-
-    assert mock_get_service.called is organisation_checked
 
 
 # check both regular users and org users

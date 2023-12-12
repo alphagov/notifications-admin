@@ -14,7 +14,7 @@ from app.models.user import User
 
 
 class TestClient(FlaskClient):
-    def login(self, user, mocker=None, service=None):
+    def login(self, user, mocker=None, service=None, request=None):
         # Skipping authentication here and just log them in
         model_user = User(user)
         with self.session_transaction() as session:
@@ -25,7 +25,13 @@ class TestClient(FlaskClient):
         if mocker and service:
             with self.session_transaction() as session:
                 session["service_id"] = service["id"]
-            mocker.patch("app.service_api_client.get_service", return_value={"data": service})
+
+        # Add the service to the services available via the mock on `service_api_client.get_service` so that requests
+        # for it will return the correct JSON.
+        if request and service:
+            request.getfixturevalue("mock_get_service")  # make sure fixture is loaded
+            mocked_get_service_data = request.getfixturevalue("mocked_get_service_data")
+            mocked_get_service_data[service["id"]] = service
 
         with patch("app.events_api_client.create_event"):
             login_user(model_user)
