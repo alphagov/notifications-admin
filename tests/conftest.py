@@ -3,6 +3,7 @@ import json
 import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
+from typing import Optional
 from unittest import mock
 from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
@@ -948,7 +949,17 @@ def mock_get_service_letter_template_with_qr_placeholder(mocker):
 
 @pytest.fixture(scope="function")
 def mock_create_service_template(mocker, fake_uuid):
-    def _create(name, type_, content, service_id, subject=None, parent_folder_id=None):
+    def _create(
+        name,
+        type_,
+        content,
+        service_id,
+        subject=None,
+        parent_folder_id=None,
+        letter_languages: Optional[LetterLanguageOptions] = None,
+        letter_welsh_subject: str = None,
+        letter_welsh_content: str = None,
+    ):
         template = template_json(
             service_id=service_id, id_=fake_uuid, name=name, type_=type_, content=content, folder=parent_folder_id
         )
