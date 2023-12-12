@@ -24,7 +24,7 @@ from notifications_utils.recipients import (
     validate_phone_number,
 )
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
-from orderedset import OrderedSet
+from ordered_set import OrderedSet
 from werkzeug.utils import cached_property
 from wtforms import (
     BooleanField,

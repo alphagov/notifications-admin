@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from flask import current_app
 from jinja2.nodes import Call, FromImport, Name
-from orderedset import OrderedSet
+from ordered_set import OrderedSet
 
 
 class UnusedJinjaImports(Exception):

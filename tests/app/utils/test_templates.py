@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from markupsafe import Markup
 from notifications_utils.template import SubjectMixin, Template
-from orderedset import OrderedSet
+from ordered_set import OrderedSet
 
 from app import load_service_before_request
 from app.utils.templates import TemplatedLetterImageTemplate, get_sample_template
