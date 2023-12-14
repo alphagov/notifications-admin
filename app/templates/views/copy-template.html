@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% set heading %}
-  Copy template
+  Copy an existing template
 {% endset %}
 
 {% block service_page_title %}
@@ -27,7 +27,7 @@
       {{ form.name }}
       {{ template|string }}
       {{ sticky_page_footer(
-        'Copy template'
+        'Copy this template'
       ) }}
     {% endcall %}
 
