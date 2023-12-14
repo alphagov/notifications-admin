@@ -477,7 +477,6 @@ def test_GET_edit_service_template_for_welsh_letter(
     client_request, mock_get_service_letter_template_welsh_language, fake_uuid, service_one
 ):
     service_one["permissions"].append("letter")
-    service_one["permissions"].append("extra_letter_formatting")
     template_id = fake_uuid
     page = client_request.get(
         ".edit_service_template", service_id=SERVICE_ONE_ID, template_id=template_id, language="welsh"
@@ -797,7 +796,6 @@ def test_view_letter_template_displays_change_language_button(
     fake_uuid,
     mock_get_page_counts_for_letter,
 ):
-    service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
     template_id = fake_uuid
     mocker.patch(
@@ -822,7 +820,6 @@ def test_view_letter_template_displays_change_language_button(
 def test_GET_letter_template_change_language(
     client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template, active_user_with_permissions
 ):
-    service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
     page = client_request.get(
         "main.letter_template_change_language",
@@ -857,7 +854,6 @@ def test_GET_letter_template_change_language_404s_if_template_is_not_a_letter(
     active_user_with_permissions,
     fake_uuid,
 ):
-    service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
     page = client_request.get(
         "main.letter_template_change_language", service_id=SERVICE_ONE_ID, template_id=fake_uuid, _expected_status=404
@@ -874,7 +870,6 @@ def test_POST_letter_template_change_to_welsh_and_english_sets_subject_and_conte
     active_user_with_permissions,
     mock_get_service_letter_template,
 ):
-    service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
 
     mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
@@ -967,7 +962,6 @@ def test_POST_letter_template_change_to_english_redirects_to_confirmation_page(
     active_user_with_permissions,
     mock_get_service_letter_template_welsh_language,
 ):
-    service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
 
     mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
@@ -992,7 +986,6 @@ def test_GET_letter_template_confirm_remove_welsh(
     active_user_with_permissions,
     mock_get_service_letter_template,
 ):
-    service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
 
     mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
@@ -1015,7 +1008,6 @@ def test_POST_letter_template_confirm_remove_welsh(
     active_user_with_permissions,
     mock_get_service_letter_template,
 ):
-    service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
 
     mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
@@ -2793,7 +2785,7 @@ def test_confirm_breaking_change_on_letter_template_saves_correct_language_conte
     mocker,
     url_kwargs,
 ):
-    service_one["permissions"] += ["letter", "extra_letter_formatting"]
+    service_one["permissions"].append("letter")
 
     letter_template = template_json(
         id_=fake_uuid,
@@ -3024,10 +3016,9 @@ def test_should_redirect_when_saving_a_template_letter(
 
 
 @pytest.mark.parametrize(
-    "letter_formatting_permission, language, mock_fixturename",
+    "language, mock_fixturename",
     (
         pytest.param(
-            False,
             "welsh",
             "mock_get_service_letter_template",
             marks=pytest.mark.xfail(
@@ -3036,7 +3027,6 @@ def test_should_redirect_when_saving_a_template_letter(
             ),
         ),
         pytest.param(
-            True,
             "welsh",
             "mock_get_service_letter_template",
             marks=pytest.mark.xfail(
@@ -3045,16 +3035,6 @@ def test_should_redirect_when_saving_a_template_letter(
             ),
         ),
         pytest.param(
-            False,
-            "welsh",
-            "mock_get_service_letter_template_welsh_language",
-            marks=pytest.mark.xfail(
-                raises=AssertionError,
-                reason="Cannot edit Welsh content as service does not have extra_letter_formatting set",
-            ),
-        ),
-        pytest.param(
-            False,
             "gaelic",
             "mock_get_service_letter_template_welsh_language",
             marks=pytest.mark.xfail(
@@ -3063,7 +3043,6 @@ def test_should_redirect_when_saving_a_template_letter(
             ),
         ),
         (
-            True,
             "welsh",
             "mock_get_service_letter_template_welsh_language",
         ),
@@ -3077,7 +3056,6 @@ def test_update_template_for_welsh_language_content(
     mock_get_user_by_email,
     fake_uuid,
     service_one,
-    letter_formatting_permission,
     language,
     mock_fixturename,
 ):
@@ -3085,8 +3063,6 @@ def test_update_template_for_welsh_language_content(
     request.getfixturevalue(mock_fixturename)
 
     service_one["permissions"].append("letter")
-    if letter_formatting_permission:
-        service_one["permissions"].append("extra_letter_formatting")
     name = "new template name"
     content = "Welsh letter content"
     subject = "Welsh letter subject"
