@@ -6,7 +6,7 @@ from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
 from notifications_utils.recipients import InvalidEmailError, validate_email_address
 from notifications_utils.sanitise_text import SanitiseSMS
-from orderedset import OrderedSet
+from ordered_set import OrderedSet
 from wtforms import ValidationError
 from wtforms.validators import URL, DataRequired, InputRequired, StopValidation
 from wtforms.validators import Length as WTFormsLength
