@@ -116,6 +116,27 @@ def test_get_org_member_make_service_live_start(
         assert button.get("href") == f"/services/{SERVICE_ONE_ID}/make-service-live/unique-service"
 
 
+def test_make_service_live_start_with_no_organisation(
+    mocker,
+    client_request,
+    service_one,
+):
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = None
+
+    page = client_request.get(
+        "main.org_member_make_service_live_start",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=410,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "This service does not belong to an organisation"
+    assert page.select_one("main a")["href"] == url_for(
+        ".link_service_to_organisation",
+        service_id=SERVICE_ONE_ID,
+    )
+
+
 @pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_service_name(
     mocker,
