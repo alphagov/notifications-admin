@@ -3023,7 +3023,7 @@ def test_check_messages_back_link(
     [
         (None, "‘example.csv’ contains 1,234 phone numbers."),
         ("0", "‘example.csv’ contains 1,234 phone numbers."),
-        ("1", "You can still send 49 text messages today, but ‘example.csv’ contains 1,234 phone numbers."),
+        ("1", "You can still send 999 text messages today, but ‘example.csv’ contains 1,234 phone numbers."),
     ],
     ids=["none_sent", "none_sent", "some_sent"],
 )

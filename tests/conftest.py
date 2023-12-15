@@ -519,17 +519,31 @@ def fake_uuid():
     return sample_uuid()
 
 
+@pytest.fixture
+def mocked_get_service_data():
+    """Data source for `mock_get_service`
+
+    This fixture is the underlying data source for `mock_get_service`. Insert service JSON blobs into this dictionary,
+    with service ID as the key, to allow multiple services to be queried from `get_service` calls.
+    """
+    return {}
+
+
 @pytest.fixture(scope="function")
-def mock_get_service(mocker, api_user_active):
+def mock_get_service(mocker, api_user_active, mocked_get_service_data):
     def _get(service_id):
-        service = service_json(
-            service_id,
-            users=[api_user_active["id"]],
-            email_message_limit=50,
-            sms_message_limit=50,
-            letter_message_limit=50,
-        )
-        return {"data": service}
+        return {
+            "data": mocked_get_service_data.get(
+                service_id,
+                service_json(
+                    service_id,
+                    users=[api_user_active["id"]],
+                    email_message_limit=50,
+                    sms_message_limit=50,
+                    letter_message_limit=50,
+                ),
+            )
+        }
 
     return mocker.patch("app.service_api_client.get_service", side_effect=_get)
 
@@ -2834,11 +2848,11 @@ def _client(notify_admin):
 
 
 @pytest.fixture(scope="function")
-def _logged_in_client(_client, active_user_with_permissions, mocker, service_one, mock_login):
+def _logged_in_client(_client, request, active_user_with_permissions, mocker, service_one, mock_login):
     """
     Do not use this fixture directly – use `client_request` instead
     """
-    _client.login(active_user_with_permissions, mocker, service_one)
+    _client.login(active_user_with_permissions, mocker, service_one, request=request)
     yield _client
 
 
@@ -2856,7 +2870,7 @@ def os_environ():
 
 
 @pytest.fixture  # noqa (C901 too complex)
-def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too complex)
+def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C901 too complex)
     def block_method(object, method_name, preferred_method_name):
         def blocked_method(*args, **kwargs):
             raise AttributeError(
@@ -2875,7 +2889,7 @@ def client_request(_logged_in_client, mocker, service_one):  # noqa (C901 too co
 
         @staticmethod
         def login(user, service=service_one):
-            _logged_in_client.login(user, mocker, service)
+            _logged_in_client.login(user, mocker, service, request)
 
         @staticmethod
         def logout():

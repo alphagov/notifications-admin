@@ -6,7 +6,7 @@ from notifications_python_client.errors import HTTPError
 
 from app.utils.user import is_gov_user
 from tests import organisation_json
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces
+from tests.conftest import normalize_spaces
 
 
 def test_non_gov_user_cannot_see_add_service_button(
@@ -372,8 +372,8 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
     api_user_active_email_auth,
     client_request,
     mock_get_no_organisation_by_domain,
-    mock_create_service,
     mock_get_services,
+    mock_create_service,
     mock_create_service_template,
     mock_update_service,
 ):
@@ -391,7 +391,5 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
         ),
     )
     assert mock_create_service.called
-    # confusingly not the same as the id of `101` returned by mock_create_service that we see
-    # in the redirect, because Service.from_id is mocked to return `service_one`
-    assert mock_update_service.call_args[0][0] == SERVICE_ONE_ID
+    assert mock_update_service.call_args[0][0] == 101
     assert "email_auth" in mock_update_service.call_args[1]["permissions"]
