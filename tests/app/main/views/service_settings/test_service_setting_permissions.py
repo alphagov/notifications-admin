@@ -4,6 +4,7 @@ import pytest
 from flask import url_for
 
 from app.main.views.service_settings.index import PLATFORM_ADMIN_SERVICE_PERMISSIONS
+from tests import organisation_json
 from tests.conftest import normalize_spaces
 
 
@@ -160,6 +161,10 @@ def test_service_setting_toggles_show(
     kwargs,
     text,
 ):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(agreement_signed=True),
+    )
     link_url = url_for(endpoint, **kwargs, service_id=service_one["id"])
     service_one.update(service_fields)
     page = get_service_settings_page()

@@ -126,7 +126,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Send letters Off Change your settings for sending letters",
                 "Label Value Action",
-                "Live Off Change service status",
+                "Live No (organisation must accept the data sharing and financial agreement)",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -162,7 +162,7 @@ def mock_get_service_settings_page_common(
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
                 "Label Value Action",
-                "Live Off Change service status",
+                "Live No (organisation must accept the data sharing and financial agreement)",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -650,10 +650,28 @@ def test_show_limits_for_live_service(
     assert page.select_one("main ul + p a")["href"] == url_for("main.support")
 
 
+@pytest.mark.parametrize(
+    "agreement_signed",
+    (
+        True,
+        None,
+        pytest.param(False, marks=pytest.mark.xfail),
+    ),
+)
 @freeze_time("2017-04-01 11:09:00.061258")
 def test_switch_service_to_live(
-    client_request, platform_admin_user, mock_update_service, mock_get_inbound_number_for_service
+    mocker,
+    client_request,
+    platform_admin_user,
+    mock_update_service,
+    mock_get_inbound_number_for_service,
+    mock_get_service_organisation,
+    agreement_signed,
 ):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(agreement_signed=agreement_signed),
+    )
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_switch_live",
@@ -673,6 +691,20 @@ def test_switch_service_to_live(
         restricted=False,
         go_live_at="2017-04-01 11:09:00.061258",
         has_active_go_live_request=False,
+    )
+
+
+def test_switch_service_to_live_with_no_organisation(
+    fake_uuid,
+    client_request,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.service_switch_live",
+        service_id=SERVICE_ONE_ID,
+        _data={"enabled": "True"},
+        _expected_status=403,
     )
 
 
