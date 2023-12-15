@@ -462,6 +462,8 @@ class User(BaseUser, UserMixin):
     def can_make_service_live(self, service):
         if not service.has_active_go_live_request:
             return False
+        if not service.organisation_id:
+            return False
         if self.platform_admin:
             return True
         return (
