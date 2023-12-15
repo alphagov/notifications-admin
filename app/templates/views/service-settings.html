@@ -356,10 +356,16 @@
           {% call row() %}
             {{ text_field('Live')}}
             {% if current_service.trial_mode and not current_service.organisation_id %}
-              {{ text_field('No (organisation must be set first)') }}
+              {% call field() %}
+                No
+                <div class="hint">Organisation must be set first</div>
+              {% endcall %}
               {{ text_field('') }}
             {% elif current_service.trial_mode and current_service.organisation.agreement_signed is false %}
-              {{ text_field('No (organisation must accept the data sharing and financial agreement)') }}
+              {% call field(wrap=True) %}
+                No
+                <div class="hint">Organisation must accept the data sharing and financial agreement first</div>
+              {% endcall %}
               {{ text_field('') }}
             {% else %}
               {{ boolean_field(not current_service.trial_mode) }}

@@ -126,7 +126,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Send letters Off Change your settings for sending letters",
                 "Label Value Action",
-                "Live No (organisation must accept the data sharing and financial agreement)",
+                "Live No Organisation must accept the data sharing and financial agreement first",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -162,7 +162,7 @@ def mock_get_service_settings_page_common(
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
                 "Label Value Action",
-                "Live No (organisation must accept the data sharing and financial agreement)",
+                "Live No Organisation must accept the data sharing and financial agreement first",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -270,9 +270,9 @@ def test_no_go_live_link_for_service_without_organisation(
     assert page.select_one("h1").text == "Settings"
 
     is_live = find_element_by_tag_and_partial_text(page, tag="td", string="Live")
-    assert normalize_spaces(is_live.find_next_sibling().text) == "No (organisation must be set first)"
+    assert normalize_spaces(is_live.find_next_sibling().text) == "No Organisation must be set first"
 
-    organisation = find_element_by_tag_and_partial_text(page, tag="td", string="Organisation")
+    organisation = find_element_by_tag_and_partial_text(page, tag="td:first-child", string="Organisation")
     assert normalize_spaces(organisation.find_next_siblings()[0].text) == "Not set Central government"
     assert normalize_spaces(organisation.find_next_siblings()[1].text) == "Change organisation for service"
 
@@ -292,7 +292,7 @@ def test_organisation_name_links_to_org_dashboard(
     client_request.login(platform_admin_user, service_one)
     response = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
 
-    org_row = find_element_by_tag_and_partial_text(response, tag="tr", string="Organisation")
+    org_row = find_element_by_tag_and_partial_text(response, tag="td:first-child", string="Organisation").parent
     assert org_row.find("a")["href"] == url_for("main.organisation_dashboard", org_id=ORGANISATION_ID)
     assert normalize_spaces(org_row.find("a").text) == "Test organisation"
 
