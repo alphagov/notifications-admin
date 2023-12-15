@@ -255,6 +255,11 @@ def submit_request_to_go_live(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/switch-live", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_switch_live(service_id):
+    if current_service.trial_mode and (
+        not current_service.organisation or current_service.organisation.agreement_signed is False
+    ):
+        abort(403)
+
     form = OnOffSettingForm(name="Make service live", enabled=not current_service.trial_mode)
 
     if form.validate_on_submit():

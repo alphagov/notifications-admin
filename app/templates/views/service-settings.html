@@ -358,6 +358,9 @@
             {% if current_service.trial_mode and not current_service.organisation_id %}
               {{ text_field('No (organisation must be set first)') }}
               {{ text_field('') }}
+            {% elif current_service.trial_mode and current_service.organisation.agreement_signed is false %}
+              {{ text_field('No (organisation must accept the data sharing and financial agreement)') }}
+              {{ text_field('') }}
             {% else %}
               {{ boolean_field(not current_service.trial_mode) }}
               {{ edit_field('Change', url_for('main.service_switch_live', service_id=current_service.id), suffix='service status') }}
