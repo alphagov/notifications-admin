@@ -39,18 +39,12 @@
       field_headings_visible=True,
       caption_visible=False
     ) %}
-      {% for sheets, second, first, international in [
-        ('1 sheet', '54p', '82p', '£1.26'),
-        ('2 sheets', '59p', '86p', '£1.31'),
-        ('3 sheets', '63p', '90p', '£1.35'),
-        ('4 sheets', '68p', '96p', '£1.40'),
-        ('5 sheets', '73p', '£1.00', '£1.45'),
-      ] %}
+      {% for sheets, sheet_prices in letter_prices.items() %}
         {% call row() %}
           {% call row_heading() %} {{ sheets }} {% endcall %}
-          {{ text_field(second + ' + VAT') }}
-          {{ text_field(first + ' + VAT') }}
-          {{ text_field(international + ' + VAT') }}
+          {{ text_field(sheet_prices.second|format_currency(long=False) + ' + VAT') }}
+          {{ text_field(sheet_prices.first|format_currency(long=False) + ' + VAT') }}
+          {{ text_field(sheet_prices.international|format_currency(long=False) + ' + VAT') }}
         {% endcall %}
       {% endfor %}
     {% endcall %}

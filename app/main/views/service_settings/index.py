@@ -18,6 +18,7 @@ from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
     billing_api_client,
+    constants,
     current_service,
     inbound_number_client,
     notification_api_client,
@@ -719,6 +720,8 @@ def service_set_channel(service_id, channel):
         f"views/service-settings/set-{channel}.html",
         form=form,
         sms_rate=CURRENT_SMS_RATE,
+        min_letter_price=constants.MIN_LETTER_PRICE,
+        max_letter_price=constants.MAX_LETTER_PRICE,
     )
 
 

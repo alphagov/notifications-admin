@@ -454,3 +454,12 @@ def format_auth_type(auth_type, with_indefinite_article=False):
 def sentence_case(sentence):
     first_word, rest_of_sentence = (sentence + " ").split(" ", 1)
     return f"{first_word.title()} {rest_of_sentence}"[:-1]
+
+
+def format_currency(pennies: int, long: bool) -> str:
+    if pennies >= 100:
+        return f"£{pennies//100}.{pennies%100}"
+    elif long:
+        return f"{pennies} pence"
+
+    return f"{pennies}p"
