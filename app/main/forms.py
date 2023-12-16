@@ -2856,6 +2856,7 @@ class CopyTemplateForm(StripWhitespaceForm, TemplateNameMixin):
     template_id = HiddenField(
         "The template ID to copy", validators=[NotifyDataRequired(thing="the template ID to copy")]
     )
+    parent_folder_id = HiddenField("The folder ID to copy the template into")
 
 
 class AddOrJoinServiceForm(StripWhitespaceForm):

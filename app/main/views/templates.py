@@ -333,6 +333,7 @@ def _add_template_by_type(template_type, template_folder_id):
             url_for(
                 ".choose_template_to_copy",
                 service_id=current_service.id,
+                to_folder_id=template_folder_id,
             )
         )
 
@@ -375,6 +376,7 @@ def choose_template_to_copy(
     from_service=None,
     from_folder=None,
 ):
+    to_folder_id = request.args.get("to_folder_id")
     if from_service:
         current_user.belongs_to_service_or_403(from_service)
         service = Service(service_api_client.get_service(from_service)["data"])
@@ -387,6 +389,7 @@ def choose_template_to_copy(
             template_folder_path=service.get_template_folder_path(from_folder),
             from_service=service,
             _search_form=SearchTemplatesForm(current_service.api_keys),
+            to_folder_id=to_folder_id,
         )
 
     else:
@@ -394,6 +397,7 @@ def choose_template_to_copy(
             "views/templates/copy.html",
             services_templates_and_folders=UserTemplateLists(current_user),
             _search_form=SearchTemplatesForm(current_service.api_keys),
+            to_folder_id=to_folder_id,
         )
 
 
@@ -401,6 +405,7 @@ def choose_template_to_copy(
 @user_has_permissions("manage_templates")
 def copy_template(service_id, template_id):
     from_service_id = request.args.get("from_service")
+    to_folder_id = request.args.get("to_folder_id")
 
     current_user.belongs_to_service_or_403(from_service_id)
     from_service = Service.from_id(from_service_id)
@@ -424,7 +429,7 @@ def copy_template(service_id, template_id):
     if not current_user.has_template_folder_permission(template_folder, service=current_service):
         abort(403)
 
-    form = CopyTemplateForm(template_id=template.id, name=template.name)
+    form = CopyTemplateForm(template_id=template.id, name=template.name, parent_folder_id=to_folder_id)
 
     if request.method == "POST":
         new_template = service_api_client.create_service_template(
@@ -433,6 +438,7 @@ def copy_template(service_id, template_id):
             service_id=current_service.id,
             subject=template.get_raw("subject"),
             content=template.content,
+            parent_folder_id=form.parent_folder_id.data,
             letter_languages=template.get_raw("letter_languages"),
             letter_welsh_subject=template.get_raw("letter_welsh_subject"),
             letter_welsh_content=template.get_raw("letter_welsh_content"),
@@ -448,12 +454,14 @@ def copy_template(service_id, template_id):
             service_id=current_service.id,
             from_service=from_service_id,
             from_folder=template.get_raw("folder"),
+            to_folder_id=to_folder_id,
         )
     else:
         back_link = url_for(
             ".choose_template_to_copy",
             service_id=current_service.id,
             from_service=from_service_id,
+            to_folder_id=to_folder_id,
         )
 
     return render_template(
