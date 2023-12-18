@@ -42,9 +42,9 @@
       {% for sheets, sheet_prices in letter_prices_by_sheets.items() %}
         {% call row() %}
           {% call row_heading() %} {{ sheets }} {% endcall %}
-          {{ text_field(sheet_prices.second|format_currency(long=False) + ' + VAT') }}
-          {{ text_field(sheet_prices.first|format_currency(long=False) + ' + VAT') }}
-          {{ text_field(sheet_prices.international|format_currency(long=False) + ' + VAT') }}
+          {{ text_field(sheet_prices.second|format_pennies_as_currency(long=False) + ' + VAT') }}
+          {{ text_field(sheet_prices.first|format_pennies_as_currency(long=False) + ' + VAT') }}
+          {{ text_field(sheet_prices.international|format_pennies_as_currency(long=False) + ' + VAT') }}
         {% endcall %}
       {% endfor %}
     {% endcall %}

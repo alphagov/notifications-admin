@@ -1,8 +1,10 @@
+import decimal
 import re
 import urllib
 from datetime import datetime, timedelta, timezone
 from math import floor, log10
 from numbers import Number
+from typing import Union
 
 import ago
 import dateutil
@@ -271,11 +273,20 @@ def nl2br(value):
     return ""
 
 
-def format_number_in_pounds_as_currency(number):
-    if number >= 1:
-        return f"£{number:,.2f}"
+def format_pounds_as_currency(number: float):
+    return format_pennies_as_currency(round(number * 100), long=False)
 
-    return f"{number * 100:.0f}p"
+
+def format_pennies_as_currency(pennies: Union[int, float], long: bool) -> str:
+    # \/ Avoid floating point precision errors with fractional pennies, eg for SMS rates \/
+    pennies = decimal.Decimal(str(pennies))
+    if pennies >= 100:
+        pennies = round(pennies)
+        return f"£{pennies//100:,}.{pennies%100:02}"
+    elif long:
+        return f"{pennies} pence"
+
+    return f"{pennies}p"
 
 
 def format_list_items(items, format_string, *args, **kwargs):
@@ -454,12 +465,3 @@ def format_auth_type(auth_type, with_indefinite_article=False):
 def sentence_case(sentence):
     first_word, rest_of_sentence = (sentence + " ").split(" ", 1)
     return f"{first_word.title()} {rest_of_sentence}"[:-1]
-
-
-def format_currency(pennies: int, long: bool) -> str:
-    if pennies >= 100:
-        return f"£{pennies//100}.{pennies%100}"
-    elif long:
-        return f"{pennies} pence"
-
-    return f"{pennies}p"

@@ -7,7 +7,8 @@ from freezegun import freeze_time
 from app.formatters import (
     format_datetime_relative,
     format_notification_status_as_url,
-    format_number_in_pounds_as_currency,
+    format_pennies_as_currency,
+    format_pounds_as_currency,
     round_to_significant_figures,
     sentence_case,
 )
@@ -58,8 +59,33 @@ def test_format_notification_status_as_url(
         (144820, "£144,820.00"),
     ],
 )
-def test_format_number_in_pounds_as_currency(input_number, formatted_number):
-    assert format_number_in_pounds_as_currency(input_number) == formatted_number
+def test_format_pounds_as_currency(input_number, formatted_number):
+    assert format_pounds_as_currency(input_number) == formatted_number
+
+
+@pytest.mark.parametrize(
+    "input_number, long, formatted_number",
+    [
+        (0, False, "0p"),
+        (0, True, "0 pence"),
+        (1, False, "1p"),
+        (1.97, False, "1.97p"),
+        (1.97, True, "1.97 pence"),
+        (50, False, "50p"),
+        (50, True, "50 pence"),
+        (100, False, "£1.00"),
+        (100, True, "£1.00"),
+        (101, False, "£1.01"),
+        (100.6, False, "£1.01"),
+        (100.6, True, "£1.01"),
+        (525, False, "£5.25"),
+        (570, False, "£5.70"),
+        (38100, False, "£381.00"),
+        (14482000, False, "£144,820.00"),
+    ],
+)
+def test_format_pennies_as_currency(input_number, long, formatted_number):
+    assert format_pennies_as_currency(input_number, long=long) == formatted_number
 
 
 @pytest.mark.parametrize(

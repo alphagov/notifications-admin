@@ -117,7 +117,7 @@
               {% for letter in item.letter_breakdown %}
                 {% if letter.sent %}
                   <li class="tabular-numbers">{{ "{:,} {}".format(letter.sent, letter.postage_description) }} {{ letter.sent|message_count_label('letter', suffix='') }} at
-                  {{ letter.rate | format_number_in_pounds_as_currency }}</li>
+                  {{ letter.rate | format_pounds_as_currency }}</li>
                 {% endif %}
               {% endfor %}
               {% if not (item.sms_free_allowance_used or item.sms_cost or item.letter_breakdown) %}
