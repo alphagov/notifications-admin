@@ -37,7 +37,7 @@ def guidance_pricing_letters():
     return render_template(
         "views/guidance/pricing/letter-pricing.html",
         navigation_links=pricing_nav(),
-        letter_prices=constants.LETTER_PRICES,
+        letter_prices_by_sheets=constants.LETTER_PRICES_BY_SHEETS,
     )
 
 

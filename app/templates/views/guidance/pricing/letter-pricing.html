@@ -39,7 +39,7 @@
       field_headings_visible=True,
       caption_visible=False
     ) %}
-      {% for sheets, sheet_prices in letter_prices.items() %}
+      {% for sheets, sheet_prices in letter_prices_by_sheets.items() %}
         {% call row() %}
           {% call row_heading() %} {{ sheets }} {% endcall %}
           {{ text_field(sheet_prices.second|format_currency(long=False) + ' + VAT') }}
