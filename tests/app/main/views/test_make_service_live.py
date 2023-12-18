@@ -124,6 +124,23 @@ def test_make_service_live_start_with_no_organisation(
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = None
 
+    client_request.get(
+        "main.org_member_make_service_live_start",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+
+
+def test_make_service_live_start_with_no_organisation_platform_admin(
+    mocker,
+    client_request,
+    service_one,
+    platform_admin_user,
+):
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = None
+    client_request.login(platform_admin_user)
+
     page = client_request.get(
         "main.org_member_make_service_live_start",
         service_id=SERVICE_ONE_ID,
