@@ -12,7 +12,7 @@ from flask_login import current_user
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import HTMLEmailTemplate
 
-from app import letter_branding_client, status_api_client
+from app import constants, letter_branding_client, status_api_client
 from app.formatters import message_count
 from app.main import main
 from app.main.forms import FieldWithNoneOption
@@ -34,6 +34,7 @@ def index():
         "views/signedout.html",
         sms_rate=CURRENT_SMS_RATE,
         counts=status_api_client.get_count_of_live_services_and_organisations(),
+        one_page_second_class_letter_cost=constants.LETTER_PRICES_BY_SHEETS[1]["second"],
     )
 
 
