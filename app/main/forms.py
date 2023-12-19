@@ -2849,7 +2849,4 @@ class JoinServiceForm(StripWhitespaceForm):
             }
         },
     )
-    reason = GovukTextareaField(
-        "Explain why you need access",
-        param_extensions={"hint": {"text": "Optional"}},
-    )
+    reason = GovukTextareaField("Explain why you need access (optional)")
