@@ -168,15 +168,19 @@ class Service(JSONModel):
     def active_users(self):
         return Users(self.id)
 
+    def active_users_with_permission(self, permission):
+        return tuple(user for user in self.active_users if user.has_permission_for_service(self.id, permission))
+
     @cached_property
     def team_members(self):
         return self.invited_users + self.active_users
 
+    def team_members_with_permission(self, permission):
+        return tuple(user for user in self.team_members if user.has_permission_for_service(self.id, permission))
+
     @cached_property
-    def has_team_members(self):
-        return (
-            len([user for user in self.team_members if user.has_permission_for_service(self.id, "manage_service")]) > 1
-        )
+    def has_team_members_with_manage_service_permission(self):
+        return len(self.team_members_with_permission("manage_service")) > 1
 
     def cancel_invite(self, invited_user_id):
         if str(invited_user_id) not in {user.id for user in self.invited_users}:
@@ -185,6 +189,14 @@ class Service(JSONModel):
         return invite_api_client.cancel_invited_user(
             service_id=self.id,
             invited_user_id=str(invited_user_id),
+        )
+
+    def request_invite_for(self, user_to_invite, *, service_managers_ids, reason):
+        invite_api_client.request_invite_for(
+            user_to_invite_id=user_to_invite.id,
+            service_id=self.id,
+            service_managers_ids=service_managers_ids,
+            reason=reason,
         )
 
     def get_team_member(self, user_id):
@@ -389,7 +401,7 @@ class Service(JSONModel):
         return all(
             (
                 any(self.volumes_by_channel.values()),
-                self.has_team_members,
+                self.has_team_members_with_manage_service_permission,
                 self.has_templates,
                 not self.needs_to_add_email_reply_to_address,
                 not self.needs_to_change_sms_sender,

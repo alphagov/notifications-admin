@@ -58,6 +58,7 @@ from app import asset_fingerprinter, current_organisation
 from app.constants import LetterLanguageOptions
 from app.formatters import (
     format_auth_type,
+    format_date_human,
     format_thousands,
     guess_name_from_email_address,
     message_count_noun,
@@ -2824,3 +2825,28 @@ class ServiceGoLiveDecisionForm(OnOffSettingForm):
             ]
 
         return super().validate(*args, **kwargs)
+
+
+class JoinServiceForm(StripWhitespaceForm):
+    def __init__(self, users, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.users.choices = [(user.id, user.name) for user in users]
+        self.users.param_extensions["items"] = [
+            {"hint": {"text": f"Last used Notify {format_date_human(user.logged_in_at)}"}} for user in users
+        ]
+
+    users = GovukCheckboxesField(
+        "Who do you want to ask?",
+        validators=[NotifyDataRequired(thing="at least 1 person to ask")],
+        param_extensions={
+            "fieldset": {
+                "legend": {
+                    # This removes the `govuk-fieldset__legend--s` class, thereby
+                    # making the form label font regular weight, not bold
+                    "classes": "",
+                },
+            }
+        },
+    )
+    reason = GovukTextareaField("Explain why you need access (optional)")

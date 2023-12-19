@@ -270,6 +270,10 @@ def organisation_json(
         users = []
     if services is None:
         services = []
+    if permissions is None:
+        permissions = []
+    if can_ask_to_join_a_service:
+        permissions.extend(["can_ask_to_join_a_service"])
     return {
         "id": id_,
         "name": "Test Organisation" if name is False else name,

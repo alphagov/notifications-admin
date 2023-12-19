@@ -1213,7 +1213,7 @@ def test_should_check_for_sms_sender_on_go_live(
     )
 
     mocker.patch(
-        "app.models.service.Service.has_team_members",
+        "app.models.service.Service.has_team_members_with_manage_service_permission",
         return_value=True,
     )
 
@@ -1263,7 +1263,7 @@ def test_should_check_for_mou_on_request_to_go_live(
     expected_item,
 ):
     mocker.patch(
-        "app.models.service.Service.has_team_members",
+        "app.models.service.Service.has_team_members_with_manage_service_permission",
         return_value=False,
     )
     mocker.patch(
@@ -1311,7 +1311,7 @@ def test_gp_without_organisation_is_shown_agreement_step(
     organisation_type,
 ):
     mocker.patch(
-        "app.models.service.Service.has_team_members",
+        "app.models.service.Service.has_team_members_with_manage_service_permission",
         return_value=False,
     )
     mocker.patch(
@@ -1361,7 +1361,7 @@ def test_non_gov_user_is_told_they_cant_go_live(
     mock_get_organisation,
 ):
     mocker.patch(
-        "app.models.service.Service.has_team_members",
+        "app.models.service.Service.has_team_members_with_manage_service_permission",
         return_value=False,
     )
     mocker.patch(
@@ -2211,7 +2211,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
 
 @pytest.mark.parametrize(
     (
-        "has_team_members,"
+        "has_team_members_with_manage_service_permission,"
         "has_templates,"
         "has_email_templates,"
         "has_sms_templates,"
@@ -2329,7 +2329,7 @@ def test_ready_to_go_live(
     client_request,
     mocker,
     mock_get_service_organisation,
-    has_team_members,
+    has_team_members_with_manage_service_permission,
     has_templates,
     has_email_templates,
     has_sms_templates,
@@ -2347,7 +2347,7 @@ def test_ready_to_go_live(
     )
 
     for prop in {
-        "has_team_members",
+        "has_team_members_with_manage_service_permission",
         "has_templates",
         "has_email_templates",
         "has_sms_templates",
