@@ -2859,16 +2859,30 @@ class CopyTemplateForm(StripWhitespaceForm, TemplateNameMixin):
 
 
 class AddOrJoinServiceForm(StripWhitespaceForm):
+    def __init__(self, *args, organisation, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        count_of_live_services = len(organisation.live_services)
+        plural = "" if count_of_live_services == 1 else "s"
+        count_of_live_services = format_thousands(count_of_live_services)
+
+        self.add_or_join.param_extensions["items"] = [
+            {
+                "hint": {
+                    "text": "You can invite your team members later",
+                }
+            },
+            {
+                "hint": {
+                    "text": f"{count_of_live_services} team{plural} from {organisation.name} are using Notify already",
+                }
+            },
+        ]
+
     add_or_join = GovukRadiosField(
         "Start using Notify",
         choices=(
             ("main.add_service", "Add a new service"),
             ("main.choose_service_to_join", "Join an existing team"),
         ),
-        param_extensions={
-            "items": [
-                {"hint": {"text": "You can invite your team members later"}},
-                {"hint": {"text": "Teams are using Notify already"}},
-            ],
-        },
     )

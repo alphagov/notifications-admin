@@ -1,9 +1,8 @@
 import json
 import uuid
-
-import pytest
 from unittest.mock import Mock
 
+import pytest
 from flask import session as flask_session
 from flask import url_for
 from itsdangerous import SignatureExpired

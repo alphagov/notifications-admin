@@ -48,7 +48,7 @@ def _create_example_template(service_id):
 @user_is_logged_in
 @user_is_gov_user
 def add_or_join_service():
-    form = AddOrJoinServiceForm()
+    form = AddOrJoinServiceForm(organisation=current_user.default_organisation)
 
     if form.validate_on_submit():
         return redirect(url_for(form.add_or_join.data, back="add_or_join"))

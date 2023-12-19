@@ -5,8 +5,8 @@ from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 from app.utils.user import is_gov_user
-from tests import organisation_json
-from tests.conftest import normalize_spaces
+from tests import organisation_json, service_json
+from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
 
 
 def test_non_gov_user_cannot_see_add_service_button(
@@ -396,9 +396,19 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
 
 
 def test_join_or_add_service_page(
+    mocker,
     client_request,
     mock_get_organisation_by_domain,
+    mock_get_organisation_services,
 ):
+    mocker.patch(
+        "app.organisations_client.get_organisation_services",
+        return_value=[
+            service_json(SERVICE_ONE_ID, "service one", restricted=False),
+            service_json(SERVICE_TWO_ID, "service two", restricted=False),
+            service_json("1234", "service three (trial mode)"),
+        ],
+    )
     page = client_request.get(
         "main.add_or_join_service",
     )
@@ -406,11 +416,20 @@ def test_join_or_add_service_page(
         (
             radio["value"],
             normalize_spaces(page.select_one(f"label[for={radio['id']}]")),
+            normalize_spaces(page.select_one(f"#{radio['aria-describedby']}.govuk-hint")),
         )
         for radio in page.select("input[type=radio][name=add_or_join]")
     ] == [
-        ("main.add_service", "Add a new service"),
-        ("main.choose_service_to_join", "Join an existing team"),
+        (
+            "main.add_service",
+            "Add a new service",
+            "You can invite your team members later",
+        ),
+        (
+            "main.choose_service_to_join",
+            "Join an existing team",
+            "2 teams from Test Organisation are using Notify already",
+        ),
     ]
 
 
@@ -423,6 +442,8 @@ def test_join_or_add_service_page(
 )
 def test_post_join_or_add_service_page(
     client_request,
+    mock_get_organisation_by_domain,
+    mock_get_organisation_services,
     choice,
 ):
     client_request.post(
