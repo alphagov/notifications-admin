@@ -19,8 +19,11 @@ from tests.conftest import (
 def test_choose_service_to_join(
     mocker,
     client_request,
-    mock_get_organisation_by_domain,
 ):
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation_json(can_ask_to_join_a_service=True),
+    )
     mocker.patch(
         "app.organisations_client.get_organisation_services",
         return_value=[
@@ -79,6 +82,14 @@ def test_cannot_join_service_without_organisation_permission(
     mocker.patch(
         "app.organisations_client.get_organisation",
         return_value=organisation_json(can_ask_to_join_a_service=can_ask_to_join_a_service),
+    )
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation_json(can_ask_to_join_a_service=can_ask_to_join_a_service),
+    )
+    client_request.get(
+        "main.choose_service_to_join",
+        _expected_status=403,
     )
     client_request.get(
         "main.join_service",

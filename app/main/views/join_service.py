@@ -11,6 +11,9 @@ from app.utils.user import user_is_gov_user, user_is_logged_in
 @user_is_logged_in
 @user_is_gov_user
 def choose_service_to_join():
+    if not current_user.default_organisation.can_ask_to_join_a_service:
+        abort(403)
+
     return render_template(
         "views/choose-service-to-join.html",
         _search_form=SearchByNameForm(),
