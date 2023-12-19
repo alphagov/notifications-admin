@@ -24,7 +24,7 @@
           url_for('main.estimate_usage', service_id=current_service.id),
         ) }}
         {{ task_list_item(
-          current_service.has_team_members,
+          current_service.has_team_members_with_manage_service_permission,
           'Add a team member who can manage settings, team and usage',
           url_for('main.manage_users', service_id=current_service.id),
         ) }}

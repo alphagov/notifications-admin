@@ -179,7 +179,7 @@ class Service(JSONModel):
         return tuple(user for user in self.team_members if user.has_permission_for_service(self.id, permission))
 
     @cached_property
-    def has_team_members(self):
+    def has_team_members_with_manage_service_permission(self):
         return len(self.team_members_with_permission("manage_service")) > 1
 
     def cancel_invite(self, invited_user_id):
@@ -393,7 +393,7 @@ class Service(JSONModel):
         return all(
             (
                 any(self.volumes_by_channel.values()),
-                self.has_team_members,
+                self.has_team_members_with_manage_service_permission,
                 self.has_templates,
                 not self.needs_to_add_email_reply_to_address,
                 not self.needs_to_change_sms_sender,
