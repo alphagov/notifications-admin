@@ -393,3 +393,42 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
     assert mock_create_service.called
     assert mock_update_service.call_args[0][0] == 101
     assert "email_auth" in mock_update_service.call_args[1]["permissions"]
+
+
+def test_join_or_add_service_page(
+    client_request,
+    mock_get_organisation_by_domain,
+):
+    page = client_request.get(
+        "main.add_or_join_service",
+    )
+    assert [
+        (
+            radio["value"],
+            normalize_spaces(page.select_one(f"label[for={radio['id']}]")),
+        )
+        for radio in page.select("input[type=radio][name=add_or_join]")
+    ] == [
+        ("main.add_service", "Add a new service"),
+        ("main.choose_service_to_join", "Join an existing team"),
+    ]
+
+
+@pytest.mark.parametrize(
+    "choice",
+    (
+        ("main.add_service"),
+        ("main.choose_service_to_join"),
+    ),
+)
+def test_post_join_or_add_service_page(
+    client_request,
+    choice,
+):
+    client_request.post(
+        "main.add_or_join_service",
+        _data={
+            "add_or_join": choice,
+        },
+        _expected_redirect=url_for(choice, back="add_or_join"),
+    )

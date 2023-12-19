@@ -2856,3 +2856,19 @@ class CopyTemplateForm(StripWhitespaceForm, TemplateNameMixin):
     template_id = HiddenField(
         "The template ID to copy", validators=[NotifyDataRequired(thing="the template ID to copy")]
     )
+
+
+class AddOrJoinServiceForm(StripWhitespaceForm):
+    add_or_join = GovukRadiosField(
+        "Start using Notify",
+        choices=(
+            ("main.add_service", "Add a new service"),
+            ("main.choose_service_to_join", "Join an existing team"),
+        ),
+        param_extensions={
+            "items": [
+                {"hint": {"text": "You can invite your team members later"}},
+                {"hint": {"text": "Teams are using Notify already"}},
+            ],
+        },
+    )

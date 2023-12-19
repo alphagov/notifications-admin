@@ -1,5 +1,7 @@
 import json
 import uuid
+
+import pytest
 from unittest.mock import Mock
 
 from flask import session as flask_session
@@ -8,6 +10,7 @@ from itsdangerous import SignatureExpired
 from notifications_python_client.errors import HTTPError
 
 from app.main.views.verify import activate_user
+from tests import organisation_json
 from tests.conftest import create_user
 
 
@@ -28,6 +31,13 @@ def test_should_return_verify_template(
     assert message == "We’ve sent you a text message with a security code."
 
 
+@pytest.mark.parametrize(
+    "can_ask_to_join_a_service, expected_redirect, extra_args",
+    (
+        (False, "main.add_service", {"first": "first"}),
+        (True, "main.add_or_join_service", {}),
+    ),
+)
 def test_should_redirect_to_add_service_when_sms_code_is_correct(
     client_request,
     api_user_active,
@@ -36,9 +46,17 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(
     mock_check_verify_code,
     mock_create_event,
     fake_uuid,
+    mock_get_organisation_by_domain,
+    can_ask_to_join_a_service,
+    expected_redirect,
+    extra_args,
 ):
     api_user_active["current_session_id"] = str(uuid.UUID(int=1))
     mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation_json(can_ask_to_join_a_service=can_ask_to_join_a_service),
+    )
 
     with client_request.session_transaction() as session:
         session["user_details"] = {"email_address": api_user_active["email_address"], "id": api_user_active["id"]}
@@ -48,7 +66,7 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(
     client_request.post(
         "main.verify",
         _data={"sms_code": "12345"},
-        _expected_redirect=url_for("main.add_service", first="first"),
+        _expected_redirect=url_for(expected_redirect, **extra_args),
     )
 
     # make sure the current_session_id has changed to what the API returned
@@ -66,6 +84,7 @@ def test_should_activate_user_after_verify(
     mock_check_verify_code,
     mock_create_event,
     mock_activate_user,
+    mock_get_organisation_by_domain,
 ):
     client_request.logout()
     mocker.patch("app.user_api_client.get_user", return_value=api_user_pending)
@@ -127,6 +146,7 @@ def test_verify_email_doesnt_verify_sms_if_user_on_email_auth(
     mock_check_verify_code,
     mock_activate_user,
     fake_uuid,
+    mock_get_organisation_by_domain,
 ):
     pending_user_with_email_auth = create_user(auth_type="email_auth", state="pending", id=fake_uuid)
 
