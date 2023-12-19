@@ -16,6 +16,9 @@ def join_service(service_to_join_id):
     if not service.organisation.can_ask_to_join_a_service:
         abort(403)
 
+    if service.organisation != current_user.default_organisation:
+        abort(403)
+
     form = JoinServiceForm(
         users=service.active_users_with_permission("manage_service"),
     )

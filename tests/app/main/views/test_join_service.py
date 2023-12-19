@@ -4,6 +4,7 @@ from freezegun import freeze_time
 
 from tests import organisation_json
 from tests.conftest import (
+    ORGANISATION_ID,
     SERVICE_ONE_ID,
     create_active_user_empty_permissions,
     create_active_user_manage_template_permissions,
@@ -47,17 +48,40 @@ def test_cannot_join_service_without_organisation_permission(
     )
 
 
+def test_cannot_join_service_for_different_organisation(
+    mocker,
+    client_request,
+    service_one,
+    fake_uuid,
+):
+    service_one["organisation"] = fake_uuid
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation_json(id_="1234", can_ask_to_join_a_service=True),
+    )
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_="4321", can_ask_to_join_a_service=True),
+    )
+    client_request.get(
+        "main.join_service",
+        service_to_join_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+
+
 @freeze_time("2023-02-03 01:00")
 def test_page_lists_team_members_of_service(
     mocker,
     client_request,
     fake_uuid,
     service_one,
+    mock_get_organisation_by_domain,
 ):
-    service_one["organisation"] = fake_uuid
+    service_one["organisation"] = ORGANISATION_ID
     mocker.patch(
         "app.organisations_client.get_organisation",
-        return_value=organisation_json(can_ask_to_join_a_service=True),
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
     )
 
     manage_service_user_1 = create_active_user_with_permissions()
@@ -120,11 +144,12 @@ def test_page_redirects_on_post(
     mock_request_invite_for,
     fake_uuid,
     service_one,
+    mock_get_organisation_by_domain,
 ):
-    service_one["organisation"] = fake_uuid
+    service_one["organisation"] = ORGANISATION_ID
     mocker.patch(
         "app.models.organisation.organisations_client.get_organisation",
-        return_value=organisation_json(can_ask_to_join_a_service=True),
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
     )
     current_user = create_active_user_with_permissions(with_unique_id=True)
     manage_service_user_1 = create_active_user_with_permissions(with_unique_id=True)
