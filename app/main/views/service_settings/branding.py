@@ -651,13 +651,6 @@ def letter_branding_request(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/letter-branding/option-preview", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
-def old_letter_branding_option_preview(service_id):
-    # TODO: remove this view, it's temporary
-    return redirect(url_for("branding_option_preview", service_id=service_id, branding_type="letter"), code=301)
-
-
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/upload-branding", methods=["GET", "POST"])
 def letter_branding_upload_branding(service_id):
     form = LetterBrandingUploadBranding()

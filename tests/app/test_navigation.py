@@ -203,7 +203,6 @@ EXCLUDED_ENDPOINTS = set(
             "no_cookie.view_letter_template_version_preview",
             "notifications_sent_by_service",
             "old_guest_list",
-            "old_letter_branding_option_preview",
             "old_service_dashboard",
             "organisation_billing",
             "organisation_dashboard",
