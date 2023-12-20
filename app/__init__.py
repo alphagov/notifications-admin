@@ -48,7 +48,6 @@ from app.formatters import (
     format_date_numeric,
     format_date_short,
     format_datetime,
-    format_datetime_24h,
     format_datetime_human,
     format_datetime_normal,
     format_datetime_relative,
@@ -57,7 +56,6 @@ from app.formatters import (
     format_delta,
     format_delta_days,
     format_list_items,
-    format_mobile_network,
     format_notification_status,
     format_notification_status_as_field_status,
     format_notification_status_as_time,
@@ -77,8 +75,6 @@ from app.formatters import (
     recipient_count,
     recipient_count_label,
     redact_mobile_number,
-    round_to_significant_figures,
-    square_metres_to_square_miles,
     valid_phone_number,
 )
 from app.models.organisation import Organisation
@@ -525,7 +521,6 @@ def add_template_filters(application):
         format_auth_type,
         format_billions,
         format_datetime,
-        format_datetime_24h,
         format_datetime_normal,
         format_datetime_short,
         format_time,
@@ -560,13 +555,10 @@ def add_template_filters(application):
         recipient_count,
         recipient_count_label,
         redact_mobile_number,
-        round_to_significant_figures,
         message_count_label,
         message_count,
         message_count_noun,
-        format_mobile_network,
         format_yes_no,
-        square_metres_to_square_miles,
         make_string_safe_for_email_local_part,
     ]:
         application.add_template_filter(fn)
