@@ -59,7 +59,18 @@ def generate_notifications_csv(**kwargs):
         original_column_headers = original_upload.column_headers
         fieldnames = ["Row number"] + original_column_headers + ["Template", "Type", "Job", "Status", "Time"]
     else:
-        fieldnames = ["Recipient", "Reference", "Template", "Type", "Sent by", "Sent by email", "Job", "Status", "Time"]
+        fieldnames = [
+            "Recipient",
+            "Reference",
+            "Template",
+            "Type",
+            "Sent by",
+            "Sent by email",
+            "Job",
+            "Status",
+            "Time",
+            "API key id",
+        ]
 
     yield ",".join(fieldnames) + "\n"
 
@@ -95,6 +106,7 @@ def generate_notifications_csv(**kwargs):
                     notification["job_name"] or "",
                     notification["status"],
                     notification["created_at"],
+                    notification["api_key_id"] or "",
                 ]
             yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
 
