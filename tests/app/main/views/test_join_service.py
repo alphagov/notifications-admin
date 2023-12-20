@@ -238,3 +238,23 @@ def test_page_redirects_on_post(
         reason="Let me in",
         service_id=SERVICE_ONE_ID,
     )
+
+
+def test_confirmation_page(
+    mocker,
+    client_request,
+    fake_uuid,
+):
+    page = client_request.get(
+        "main.join_service_requested",
+        service_to_join_id=SERVICE_ONE_ID,
+        number_of_users_emailed=1,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "You’ve asked to join ‘service one’"
+    assert normalize_spaces(page.select_one("main p").text) == "We’ve emailed 1 of the team members."
+
+    assert [(normalize_spaces(link.text), link["href"]) for link in page.select("main a")] == [
+        ("try out Notify by creating your own service", url_for("main.add_service")),
+        ("sign out for now", url_for("main.sign_out")),
+    ]
