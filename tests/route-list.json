@@ -232,7 +232,6 @@
     "/services/<uuid:service_id>/service-settings/email-sender",
     "/services/<uuid:service_id>/service-settings/email-sender/preview-address",
     "/services/<uuid:service_id>/service-settings/letter-branding",
-    "/services/<uuid:service_id>/service-settings/letter-branding/option-preview",
     "/services/<uuid:service_id>/service-settings/letter-branding/request",
     "/services/<uuid:service_id>/service-settings/letter-branding/set-name",
     "/services/<uuid:service_id>/service-settings/letter-branding/upload-branding",

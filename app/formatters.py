@@ -2,7 +2,6 @@ import decimal
 import re
 import urllib
 from datetime import datetime, timedelta, timezone
-from math import floor, log10
 from numbers import Number
 from typing import Union
 
@@ -31,10 +30,6 @@ def convert_to_boolean(value):
 
 def format_datetime(date):
     return f"{format_date(date)} at {format_time(date)}"
-
-
-def format_datetime_24h(date):
-    return f"{format_date(date)} at {format_time_24h(date)}"
 
 
 def format_datetime_normal(date):
@@ -310,12 +305,6 @@ def format_thousands(value):
     return value
 
 
-def round_to_significant_figures(value, number_of_significant_figures):
-    if value == 0:
-        return value
-    return int(round(value, number_of_significant_figures - int(floor(log10(abs(value)))) - 1))
-
-
 def redact_mobile_number(mobile_number, spacing=""):
     indices = [-4, -5, -6, -7]
     redact_character = spacing + "•" + spacing
@@ -429,12 +418,6 @@ def character_count(count):
     return f"{format_thousands(count)} characters"
 
 
-def format_mobile_network(network):
-    if network in ("three", "vodafone", "o2"):
-        return network.capitalize()
-    return "EE"
-
-
 def format_billions(count):
     return humanize.intword(count)
 
@@ -443,10 +426,6 @@ def format_yes_no(value, yes="Yes", no="No", none="No"):
     if value is None:
         return none
     return yes if value else no
-
-
-def square_metres_to_square_miles(area):
-    return area * 3.86e-7
 
 
 def format_auth_type(auth_type, with_indefinite_article=False):
