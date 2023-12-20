@@ -2215,6 +2215,32 @@ def test_copy_template_loads_template_from_within_subfolder(
     assert mock_get_template_folder.call_args_list == [mocker.call(SERVICE_TWO_ID, PARENT_FOLDER_ID)]
 
 
+def test_copy_letter_template_across_service_boundary(
+    mocker,
+    client_request,
+    active_user_with_permission_to_two_services,
+    mock_get_service_templates,
+    multiple_sms_senders,
+):
+    template = template_json(service_id=SERVICE_TWO_ID, id_=TEMPLATE_ONE_ID, name="foo", folder=None, type_="letter")
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template})
+    client_request.login(active_user_with_permission_to_two_services)
+    request_mock_returns = Mock(
+        content=b'{"count": 4, "welsh_page_count": 1, "attachment_page_count": 2}', status_code=200
+    )
+    mocker.patch("app.template_previews.requests.post", return_value=request_mock_returns)
+
+    page = client_request.get(
+        "main.copy_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+    )
+
+    for img in page.select("img"):
+        assert img.get("src").startswith(f"/services/{SERVICE_TWO_ID}/templates/{TEMPLATE_ONE_ID}.png")
+
+
 def test_cant_copy_template_from_non_member_service(
     client_request,
     mock_get_service_email_template,

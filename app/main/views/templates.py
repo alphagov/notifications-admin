@@ -409,7 +409,7 @@ def copy_template(service_id, template_id):
         template_id,
         letter_preview_url=url_for(
             "no_cookie.view_letter_template_preview",
-            service_id=service_id,
+            service_id=from_service.id,
             template_id=template_id,
             filetype="png",
         ),
