@@ -2219,7 +2219,7 @@ def test_choose_a_template_to_copy_from_folder_within_service(
         (["Two week reminder (copy)", "Two week reminder (copy 10)"], "Two week reminder (copy 2)"),
     ),
 )
-def test_load_edit_template_with_copy_of_template(
+def test_copy_template_page_renders_preview(
     mocker,
     api_user_active,
     client_request,
