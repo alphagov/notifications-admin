@@ -69,13 +69,14 @@ def generate_notifications_csv(**kwargs):
             "Job",
             "Status",
             "Time",
-            "API key id",
+            "API key name",
         ]
 
     yield ",".join(fieldnames) + "\n"
 
     while kwargs["page"]:
         notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
+
         for notification in notifications_resp["notifications"]:
             if kwargs.get("job_id"):
                 values = (
@@ -106,7 +107,7 @@ def generate_notifications_csv(**kwargs):
                     notification["job_name"] or "",
                     notification["status"],
                     notification["created_at"],
-                    notification["api_key_id"] or "",
+                    notification["api_key_name"] or "",
                 ]
             yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
 

@@ -21,7 +21,7 @@ def _get_notifications_csv(
     job_id=fake_uuid,
     created_by_name=None,
     created_by_email_address=None,
-    api_key_id=None,
+    api_key_name=None,
 ):
     def _get(
         service_id,
@@ -53,7 +53,7 @@ def _get_notifications_csv(
                     "updated_at": None,
                     "created_by_name": created_by_name,
                     "created_by_email_address": created_by_email_address,
-                    "api_key_id": api_key_id,
+                    "api_key_name": api_key_name,
                 }
                 for i in range(rows)
             ],
@@ -78,21 +78,21 @@ def _get_notifications_csv_mock(
 
 
 @pytest.mark.parametrize(
-    "created_by_name, api_key_id, expected_content",
+    "created_by_name, api_key_name, expected_content",
     [
         (
             None,
-            "some-id",
+            "my-key-name",
             [
-                "Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time,API key id\n",
-                "foo@bar.com,ref 1234,foo,sms,,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00,some-id\r\n",
+                "Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time,API key name\n",
+                "foo@bar.com,ref 1234,foo,sms,,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00,my-key-name\r\n",
             ],
         ),
         (
             "Anne Example",
             None,
             [
-                "Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time,API key id\n",
+                "Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time,API key name\n",
                 "foo@bar.com,ref 1234,foo,sms,Anne Example,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00,\r\n",
             ],
         ),
@@ -102,7 +102,7 @@ def test_generate_notifications_csv_without_job(
     notify_admin,
     mocker,
     created_by_name,
-    api_key_id,
+    api_key_name,
     expected_content,
 ):
     mocker.patch(
@@ -112,7 +112,7 @@ def test_generate_notifications_csv_without_job(
             created_by_email_address="sender@email.gov.uk",
             job_id=None,
             job_name=None,
-            api_key_id=api_key_id,
+            api_key_name=api_key_name,
         ),
     )
     assert list(generate_notifications_csv(service_id=fake_uuid)) == expected_content
