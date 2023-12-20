@@ -13,6 +13,9 @@ def org_member_make_service_live_start(service_id):
     if current_service.live:
         return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
 
+    if current_user.platform_admin and not current_service.organisation_id:
+        return render_template("views/service-settings/service-no-organisation.html"), 410
+
     if not current_user.can_make_service_live(current_service):
         abort(403)
 
