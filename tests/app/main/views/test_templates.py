@@ -2137,8 +2137,11 @@ def test_choose_a_template_to_copy_from_folder_within_service(
     ),
 )
 def test_load_edit_template_with_copy_of_template(
+    mocker,
+    api_user_active,
     client_request,
     active_user_with_permission_to_two_services,
+    multiple_sms_senders,
     mock_get_service_templates,
     mock_get_service_email_template,
     mock_get_non_empty_organisations_and_services_for_user,
@@ -2168,18 +2171,16 @@ def test_load_edit_template_with_copy_of_template(
 
     assert page.select_one("form")["method"] == "post"
 
-    assert page.select_one("input")["value"] == (expected_name)
-    assert page.select_one("textarea").text == "\r\nYour ((thing)) is due soon"
-    mock_get_service_email_template.assert_called_once_with(
-        SERVICE_TWO_ID,
-        TEMPLATE_ONE_ID,
-    )
+    assert page.select_one("input[id=name]")["value"] == expected_name
+    assert page.select_one("div[class=email-message]") is not None  # template is rendered on page
+    assert mock_get_service_email_template.call_args_list == [mocker.call(SERVICE_TWO_ID, TEMPLATE_ONE_ID, None)]
 
 
 def test_copy_template_loads_template_from_within_subfolder(
     client_request,
     active_user_with_permission_to_two_services,
     mock_get_service_templates,
+    multiple_sms_senders,
     mock_get_non_empty_organisations_and_services_for_user,
     mocker,
 ):
@@ -2209,9 +2210,9 @@ def test_copy_template_loads_template_from_within_subfolder(
         from_folder=PARENT_FOLDER_ID,
     )
 
-    assert page.select_one("input")["value"] == "foo (copy)"
-    mock_get_service_template.assert_called_once_with(SERVICE_TWO_ID, TEMPLATE_ONE_ID)
-    mock_get_template_folder.assert_called_once_with(SERVICE_TWO_ID, PARENT_FOLDER_ID)
+    assert page.select_one("input[id=name]")["value"] == "foo (copy)"
+    assert mock_get_service_template.call_args_list == [mocker.call(SERVICE_TWO_ID, TEMPLATE_ONE_ID, None)]
+    assert mock_get_template_folder.call_args_list == [mocker.call(SERVICE_TWO_ID, PARENT_FOLDER_ID)]
 
 
 def test_cant_copy_template_from_non_member_service(
@@ -2232,27 +2233,39 @@ def test_cant_copy_template_from_non_member_service(
 def test_post_copy_template(
     mocker,
     client_request,
+    active_user_with_permissions,
+    mock_get_service,
+    multiple_sms_senders,
     mock_get_service_email_template,
+    mock_get_service_templates,
     mock_get_organisations_and_services_for_user,
     mock_create_service_template,
 ):
+    active_user_with_permissions["services"].append(SERVICE_TWO_ID)
+    active_user_with_permissions["permissions"][SERVICE_TWO_ID] = active_user_with_permissions["permissions"][
+        SERVICE_ONE_ID
+    ]
     client_request.post(
         "main.copy_template",
         service_id=SERVICE_ONE_ID,
-        from_service=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
         template_id=TEMPLATE_ONE_ID,
         _data={
-            "name": "template (copy)",
-            "subject": "some email",
-            "template_content": "this is a copy of that other template",
-            "template_type": "sms",
             "service": SERVICE_ONE_ID,
+            "name": "Two week reminder (copy)",
         },
         _expected_status=302,
     )
     assert mock_create_service_template.call_args_list == [
         mocker.call(
-            "template (copy)", "email", "this is a copy of that other template", SERVICE_ONE_ID, "some email", None
+            name="Two week reminder (copy)",
+            type_="email",
+            service_id=SERVICE_ONE_ID,
+            subject="Your ((thing)) is due soon",
+            content="Your vehicle tax expires on ((date))",
+            letter_languages=None,
+            letter_welsh_subject=None,
+            letter_welsh_content=None,
         )
     ]
 
@@ -2261,6 +2274,8 @@ def test_post_copy_letter_template(
     mocker,
     client_request,
     mock_get_service_letter_template,
+    mock_get_service_templates,
+    multiple_sms_senders,
     mock_get_organisations_and_services_for_user,
     mock_create_service_template,
     service_one,
@@ -2273,17 +2288,21 @@ def test_post_copy_letter_template(
         from_service=SERVICE_ONE_ID,
         template_id=TEMPLATE_ONE_ID,
         _data={
-            "name": "template (copy)",
-            "subject": "some letter",
-            "template_content": "this is a copy of that other template",
-            "template_type": "letter",
             "service": SERVICE_ONE_ID,
+            "name": "Two week reminder (copy)",
         },
         _expected_status=302,
     )
     assert mock_create_service_template.call_args_list == [
         mocker.call(
-            "template (copy)", "letter", "this is a copy of that other template", SERVICE_ONE_ID, "some letter", None
+            name="Two week reminder (copy)",
+            type_="letter",
+            service_id=SERVICE_ONE_ID,
+            subject="Subject",
+            content="Template <em>content</em> with & entity",
+            letter_languages="english",
+            letter_welsh_subject=None,
+            letter_welsh_content=None,
         )
     ]
 
@@ -2381,7 +2400,6 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     [
         ("email", 403, "Sending emails has been disabled for your service."),
         ("sms", 403, "Sending text messages has been disabled for your service."),
-        ("letter", 404, None),
         ("foo", 404, None),
     ],
 )

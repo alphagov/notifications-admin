@@ -10,21 +10,6 @@ letters_urls = [
 ]
 
 
-@pytest.mark.parametrize("method", ("get", "post"))
-def test_add_template_page_doesnt_work_for_letters(
-    client_request,
-    service_one,
-    method,
-):
-    service_one["permissions"] += ["letter"]
-    getattr(client_request, method)(
-        "main.add_service_template",
-        template_type="letter",
-        service_id=service_one["id"],
-        _expected_status=404,
-    )
-
-
 @pytest.mark.parametrize("url", letters_urls)
 @pytest.mark.parametrize("permissions, response_code", [(["letter"], 200), ([], 403)])
 def test_letters_access_restricted(

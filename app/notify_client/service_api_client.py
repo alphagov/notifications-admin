@@ -1,7 +1,9 @@
 from datetime import datetime
+from typing import Optional
 
 from notifications_utils.clients.redis import daily_limit_cache_key
 
+from app.constants import LetterLanguageOptions
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 
@@ -169,7 +171,18 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.delete(endpoint, data)
 
     @cache.delete("service-{service_id}-templates")
-    def create_service_template(self, name, type_, content, service_id, subject=None, parent_folder_id=None):
+    def create_service_template(
+        self,
+        name,
+        type_,
+        content,
+        service_id,
+        subject=None,
+        parent_folder_id=None,
+        letter_languages: Optional[LetterLanguageOptions] = None,
+        letter_welsh_subject: str = None,
+        letter_welsh_content: str = None,
+    ):
         """
         Create a service template.
         """
@@ -184,6 +197,12 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             data.update({"subject": subject})
         if parent_folder_id:
             data.update({"parent_folder_id": parent_folder_id})
+        if letter_languages is not None:
+            data |= {
+                "letter_languages": letter_languages,
+                "letter_welsh_subject": letter_welsh_subject,
+                "letter_welsh_content": letter_welsh_content,
+            }
         data = _attach_current_user(data)
         endpoint = f"/service/{service_id}/template"
         return self.post(endpoint, data)

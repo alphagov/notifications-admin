@@ -2850,3 +2850,9 @@ class JoinServiceForm(StripWhitespaceForm):
         },
     )
     reason = GovukTextareaField("Explain why you need access (optional)")
+
+
+class CopyTemplateForm(StripWhitespaceForm, TemplateNameMixin):
+    template_id = HiddenField(
+        "The template ID to copy", validators=[NotifyDataRequired(thing="the template ID to copy")]
+    )

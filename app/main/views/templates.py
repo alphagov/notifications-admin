@@ -36,6 +36,7 @@ from app.constants import QR_CODE_TOO_LONG, LetterLanguageOptions
 from app.formatters import character_count, message_count
 from app.main import main, no_cookie
 from app.main.forms import (
+    CopyTemplateForm,
     EmailTemplateForm,
     LetterTemplateForm,
     LetterTemplateLanguagesForm,
@@ -399,42 +400,66 @@ def choose_template_to_copy(
 @main.route("/services/<uuid:service_id>/templates/copy/<uuid:template_id>", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def copy_template(service_id, template_id):
-    from_service = request.args.get("from_service")
+    from_service_id = request.args.get("from_service")
 
-    current_user.belongs_to_service_or_403(from_service)
+    current_user.belongs_to_service_or_403(from_service_id)
+    from_service = Service.from_id(from_service_id)
 
-    template = service_api_client.get_service_template(from_service, template_id)["data"]
+    template = from_service.get_template(
+        template_id,
+        letter_preview_url=url_for(
+            "no_cookie.view_letter_template_preview",
+            service_id=service_id,
+            template_id=template_id,
+            filetype="png",
+        ),
+        show_recipient=True,
+        sms_sender=current_service.default_sms_sender,
+    )
+    if template.template_type == "email":
+        template.from_name = current_service.email_sender_name
+    template.name = _get_template_copy_name(template._template, current_service.all_templates)
 
-    template_folder = template_folder_api_client.get_template_folder(from_service, template["folder"])
+    template_folder = template_folder_api_client.get_template_folder(from_service_id, template.get_raw("folder"))
     if not current_user.has_template_folder_permission(template_folder, service=current_service):
         abort(403)
 
+    form = CopyTemplateForm(template_id=template.id, name=template.name)
+
     if request.method == "POST":
-        return add_service_template(service_id, template["template_type"])
+        new_template = service_api_client.create_service_template(
+            name=form.name.data,
+            type_=template.template_type,
+            service_id=current_service.id,
+            subject=template.get_raw("subject"),
+            content=template.content,
+            letter_languages=template.get_raw("letter_languages"),
+            letter_welsh_subject=template.get_raw("letter_welsh_subject"),
+            letter_welsh_content=template.get_raw("letter_welsh_content"),
+        )["data"]
+        if template.template_type == "letter" and template.get_raw("letter_attachment"):
+            # TODO: handle letter attachments
+            pass
+        return redirect(url_for(".view_template", service_id=service_id, template_id=new_template["id"]))
 
-    template["name"] = _get_template_copy_name(template, current_service.all_templates)
-    form = get_template_form(template["template_type"])(**template)
-
-    if template["folder"]:
+    if template.get_raw("folder"):
         back_link = url_for(
             ".choose_template_to_copy",
             service_id=current_service.id,
-            from_service=from_service,
-            from_folder=template["folder"],
+            from_service=from_service_id,
+            from_folder=template.get_raw("folder"),
         )
     else:
         back_link = url_for(
             ".choose_template_to_copy",
             service_id=current_service.id,
-            from_service=from_service,
+            from_service=from_service_id,
         )
 
     return render_template(
-        f"views/edit-{template['template_type']}-template.html",
-        form=form,
+        "views/copy-template.html",
         template=template,
-        heading_action="Add",
-        show_name_field=True,
+        form=form,
         services=current_user.service_ids,
         back_link=back_link,
     )
@@ -558,11 +583,6 @@ def delete_template_folder(service_id, template_folder_id):
 )
 @user_has_permissions("manage_templates")
 def add_service_template(service_id, template_type, template_folder_id=None):
-    # letter templates are created for the user straight from the choose_template page, but this
-    # code path is still accessed if the user has come via the copy an existing template flow
-    if template_type == "letter" and request.endpoint == "main.add_service_template":
-        abort(404)
-
     if template_type not in current_service.available_template_types:
         return redirect(
             url_for(
