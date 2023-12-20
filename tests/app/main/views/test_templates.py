@@ -2400,7 +2400,6 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     [
         ("email", 403, "Sending emails has been disabled for your service."),
         ("sms", 403, "Sending text messages has been disabled for your service."),
-        ("letter", 404, None),
         ("foo", 404, None),
     ],
 )

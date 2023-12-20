@@ -583,11 +583,6 @@ def delete_template_folder(service_id, template_folder_id):
 )
 @user_has_permissions("manage_templates")
 def add_service_template(service_id, template_type, template_folder_id=None):
-    # letter templates are created for the user straight from the choose_template page, but this
-    # code path is still accessed if the user has come via the copy an existing template flow
-    if template_type == "letter" and request.endpoint == "main.add_service_template":
-        abort(404)
-
     if template_type not in current_service.available_template_types:
         return redirect(
             url_for(
