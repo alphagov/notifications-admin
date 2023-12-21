@@ -78,7 +78,10 @@ class Organisation(JSONModel):
 
     @classmethod
     def from_domain(cls, domain):
-        return cls(organisations_client.get_organisation_by_domain(domain))
+        organisation_json = organisations_client.get_organisation_by_domain(domain)
+        if not organisation_json:
+            organisation_json = organisations_client.get_organisation_by_domain("example.gov.uk")
+        return cls(organisation_json)
 
     @classmethod
     def from_service(cls, service_id):
