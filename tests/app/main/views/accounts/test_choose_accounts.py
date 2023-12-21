@@ -4,6 +4,7 @@ from itertools import repeat
 import pytest
 from flask import url_for
 
+from tests import organisation_json
 from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
 
 OS1, OS2, OS3, S1, S2, S3 = repeat(uuid.uuid4(), 6)
@@ -76,6 +77,7 @@ def test_choose_account_should_show_choose_accounts_page(
     client_request,
     mock_get_non_empty_organisations_and_services_for_user,
     mock_get_organisation,
+    mock_get_organisation_by_domain,
 ):
     resp = client_request.get("main.choose_account")
     page = resp.select_one("main#main-content")
@@ -133,6 +135,7 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     mock_get_orgs_and_services,
     mock_get_organisation,
     mock_get_organisation_services,
+    mock_get_organisation_by_domain,
 ):
     mock_get_orgs_and_services.return_value = {"organisations": [], "services": []}
     page = client_request.get("main.choose_account")
@@ -144,6 +147,31 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     assert normalize_spaces(add_service_link.text) == "Add a new service"
     assert not page.select("main h2")
     assert add_service_link["href"] == url_for("main.add_service")
+
+
+def test_choose_account_should_show_join_service_button(
+    mocker,
+    client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
+):
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation_json(can_ask_to_join_a_service=True),
+    )
+    page = client_request.get("main.choose_account")
+
+    assert [
+        (normalize_spaces(button.text), button["href"]) for button in page.select("main a.govuk-button--secondary")
+    ] == [
+        (
+            "Add a new service",
+            url_for("main.add_service"),
+        ),
+        (
+            "Join an existing team",
+            url_for("main.choose_service_to_join"),
+        ),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -206,6 +234,7 @@ def test_choose_account_should_should_organisations_link_for_platform_admin(
     mock_get_orgs_and_services,
     mock_get_organisation_services,
     mock_get_service_and_organisation_counts,
+    mock_get_organisation_by_domain,
     orgs_and_services,
     expected_headings,
 ):
@@ -229,6 +258,7 @@ def test_choose_account_should_show_back_to_service_link(
     mock_get_orgs_and_services,
     mock_get_organisation,
     mock_get_organisation_services,
+    mock_get_organisation_by_domain,
 ):
     resp = client_request.get("main.choose_account")
 
@@ -243,6 +273,7 @@ def test_choose_account_should_not_show_back_to_service_link_if_no_service_in_se
     mock_get_orgs_and_services,
     mock_get_organisation,
     mock_get_organisation_services,
+    mock_get_organisation_by_domain,
 ):
     with client_request.session_transaction() as session:
         session["service_id"] = None
@@ -278,6 +309,7 @@ def test_choose_account_should_not_show_back_to_service_link_if_service_archived
     mock_get_orgs_and_services,
     mock_get_organisation,
     mock_get_organisation_services,
+    mock_get_organisation_by_domain,
     active,
 ):
     service_one["active"] = active

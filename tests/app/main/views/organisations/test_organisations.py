@@ -1257,6 +1257,7 @@ def test_archive_organisation_after_confirmation(
     mock_get_organisations,
     mock_get_organisations_and_services_for_user,
     mock_get_service_and_organisation_counts,
+    mock_get_organisation_by_domain,
 ):
     mock_api = mocker.patch("app.organisations_client.post")
     redis_delete_mock = mocker.patch("app.notify_client.organisations_api_client.redis_client.delete")

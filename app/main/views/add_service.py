@@ -4,7 +4,7 @@ from notifications_python_client.errors import HTTPError
 
 from app import service_api_client
 from app.main import main
-from app.main.forms import CreateNhsServiceForm, CreateServiceForm
+from app.main.forms import AddOrJoinServiceForm, CreateNhsServiceForm, CreateServiceForm
 from app.models.service import Service
 from app.utils.user import user_is_gov_user, user_is_logged_in
 
@@ -42,6 +42,22 @@ def _create_example_template(service_id):
         service_id,
     )
     return example_sms_template
+
+
+@main.route("/add-or-join-service", methods=["GET", "POST"])
+@user_is_logged_in
+@user_is_gov_user
+def add_or_join_service():
+    form = AddOrJoinServiceForm(organisation=current_user.default_organisation)
+
+    if form.validate_on_submit():
+        return redirect(url_for(form.add_or_join.data, back="add_or_join"))
+
+    return render_template(
+        "views/add-or-join-service.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/add-service", methods=["GET", "POST"])

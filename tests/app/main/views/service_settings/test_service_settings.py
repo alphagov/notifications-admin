@@ -4672,6 +4672,7 @@ def test_archive_service_after_confirm(
     client_request,
     mocker,
     mock_get_organisations,
+    mock_get_organisation_by_domain,
     mock_get_service_and_organisation_counts,
     mock_get_organisations_and_services_for_user,
     mock_get_users_by_service,
