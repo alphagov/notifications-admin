@@ -65,6 +65,10 @@
     {% include 'views/templates/_letter_template.html' %}
   {% endif %}
 
+  {% if content_count_message and current_user.has_permissions('manage_templates', 'manage_service', 'manage_api_keys') %}
+    <p class="govuk-body govuk-hint govuk-!-margin-bottom-5">{{ content_count_message }}</p>
+  {% endif %}
+
   <div class="govuk-!-margin-bottom-3">
     {{ copy_to_clipboard(template.id, name="Template ID", thing='template ID') }}
   </div>

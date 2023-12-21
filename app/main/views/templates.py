@@ -119,10 +119,13 @@ def view_template(service_id, template_id):
     if should_skip_template_page(template):
         return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
+    content_count_message = _get_fragment_count_message_for_template(template)
+
     return render_template(
         "views/templates/template.html",
         template=template,
         user_has_template_permission=user_has_template_permission,
+        content_count_message=content_count_message,
     )
 
 
@@ -796,12 +799,14 @@ def _get_content_count_error_and_message_for_template(template):
                 f"{character_count(template.content_count_without_prefix - SMS_CHAR_COUNT_LIMIT)} "
                 f"too many"
             )
-        if template.placeholders:
-            return False, (
-                f"Will be charged as {message_count(template.fragment_count, template.template_type)} "
-                f"(not including personalisation)"
-            )
-        return False, f"Will be charged as {message_count(template.fragment_count, template.template_type)} "
+        return False, _get_fragment_count_message_for_template(template)
+
+
+def _get_fragment_count_message_for_template(template):
+    if template.template_type != "sms":
+        return None
+    personalisation_hint = " (not including personalisation)" if template.placeholders else ""
+    return f"Will be charged as {message_count(template.fragment_count, template.template_type)}{personalisation_hint}"
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/delete", methods=["GET", "POST"])
