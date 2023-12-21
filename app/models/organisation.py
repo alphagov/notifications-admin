@@ -169,7 +169,7 @@ class Organisation(JSONModel):
 
     @property
     def can_ask_to_join_a_service(self):
-        return "can_ask_to_join_a_service" in self.permissions
+        return True
 
     @cached_property
     def invited_users(self):
