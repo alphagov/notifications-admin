@@ -103,7 +103,9 @@ def test_letter_branding_options_page_when_branding_is_set_already(
     page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one("main p").text) == "Your letters currently have HM Government branding."
 
-    assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style=fake_uuid)
+    assert page.select_one("iframe")["src"] == url_for(
+        "main.letter_template", branding_style=fake_uuid, title="Preview of current letter branding"
+    )
 
 
 @pytest.mark.parametrize(
@@ -486,7 +488,9 @@ def test_GET_letter_branding_set_name_renders(client_request, service_one):
         temp_filename="temp_something",
     )
 
-    assert page.select_one("iframe")["src"] == url_for("main.letter_template", filename="temp_something")
+    assert page.select_one("iframe")["src"] == url_for(
+        "main.letter_template", title="Preview of new letter branding", filename="temp_something"
+    )
 
     assert normalize_spaces(page.select_one("h1").text) == "Preview your letter branding"
     assert normalize_spaces(page.select_one("label[for=name]").text) == "Enter the name of your branding"
@@ -702,7 +706,9 @@ def test_letter_branding_option_preview_page_displays_preview_of_chosen_branding
         ".branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="1234", branding_type="letter"
     )
 
-    assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="1234")
+    assert page.select_one("iframe")["src"] == url_for(
+        "main.letter_template", branding_style="1234", title="Preview of new letter branding"
+    )
 
 
 def test_letter_branding_option_preview_page_redirects_to_branding_options_page_if_branding_option_not_found(
@@ -774,7 +780,9 @@ def test_letter_branding_nhs_page_displays_preview(
         branding_type="letter",
     )
 
-    assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style=LetterBranding.NHS_ID)
+    assert page.select_one("iframe")["src"] == url_for(
+        "main.letter_template", branding_style=LetterBranding.NHS_ID, title="Preview of new letter branding"
+    )
     assert x.called
     assert mock_get_letter_branding_pool.called
 

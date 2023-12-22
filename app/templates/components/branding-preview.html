@@ -2,18 +2,18 @@
   <iframe src="{{ url_for(endpoint, branding_style=branding_style, **(url_kwargs or {})) }}" class="branding-preview {{ classes }}" scrolling="no" title="{{ title }}"></iframe>
 {% endmacro %}
 
-{% macro custom_email_branding_preview(preview_settings) %}
-  {{ branding_preview('main.email_template', branding_style='custom', title='Preview of email branding', url_kwargs=preview_settings) }}
+{% macro custom_email_branding_preview(preview_settings, title='Preview of email branding') %}
+  {{ branding_preview('main.email_template', branding_style='custom', title=title, url_kwargs=preview_settings) }}
 {% endmacro %}
 
-{% macro custom_letter_branding_preview(filename) %}
-  {{ branding_preview('main.letter_template', branding_style=None, title='Preview of letter branding', url_kwargs={"filename": filename}) }}
+{% macro custom_letter_branding_preview(filename, title='Preview of letter branding') %}
+  {{ branding_preview('main.letter_template', branding_style=None, title=title, url_kwargs={"filename": filename}) }}
 {% endmacro %}
 
-{% macro email_branding_preview(branding_style, classes='') %}
-  {{ branding_preview('main.email_template', branding_style, title='Preview of email branding', classes=classes) }}
+{% macro email_branding_preview(branding_style, title='Preview of email branding', classes='') %}
+  {{ branding_preview('main.email_template', branding_style, title=title, classes=classes) }}
 {% endmacro %}
 
-{% macro letter_branding_preview(branding_style, classes='') %}
-  {{ branding_preview('main.letter_template', branding_style, title='Preview of letter branding', classes=classes) }}
+{% macro letter_branding_preview(branding_style, title='Preview of letter branding', classes='') %}
+  {{ branding_preview('main.letter_template', branding_style, title=title, classes=classes) }}
 {% endmacro %}

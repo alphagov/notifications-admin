@@ -54,7 +54,11 @@ def test_view_letter_branding_requires_platform_admin(
 
     if expected_response_status == 200:
         preview = page.select_one("iframe")
-        assert preview["src"] == "/_letter?branding_style=6ce466d0-fd6a-11e5-82f5-e0accb9d11a6"
+        assert preview["src"] == url_for(
+            "main.letter_template",
+            branding_style="6ce466d0-fd6a-11e5-82f5-e0accb9d11a6",
+            title="Preview of letter branding",
+        )
 
 
 def test_view_letter_branding_with_services_but_no_orgs(

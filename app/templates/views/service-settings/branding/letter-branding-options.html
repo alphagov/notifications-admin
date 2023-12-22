@@ -24,7 +24,7 @@
   </p>
 
   {% if current_service.letter_branding %}
-    {{ letter_branding_preview(current_service.letter_branding_id) }}
+    {{ letter_branding_preview(current_service.letter_branding_id, title='Preview of current letter branding') }}
   {% endif %}
 
   {% call form_wrapper() %}

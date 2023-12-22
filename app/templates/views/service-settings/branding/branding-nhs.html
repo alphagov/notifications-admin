@@ -27,9 +27,9 @@
   </p>
 
   {% if branding_type == 'email' %}
-    {{ email_branding_preview(nhs_branding_id) }}
+    {{ email_branding_preview(nhs_branding_id, title="Preview of new email branding") }}
   {% else %}
-    {{ letter_branding_preview(nhs_branding_id) }}
+    {{ letter_branding_preview(nhs_branding_id, title="Preview of new letter branding") }}
   {% endif %}
 
   <h2 class="heading-medium">Before you continue</h2>

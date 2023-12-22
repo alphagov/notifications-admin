@@ -3680,7 +3680,9 @@ def test_service_preview_letter_branding_shows_preview_letter(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert page.select_one("iframe")["src"] == url_for("main.letter_template", branding_style="hm-government")
+    assert page.select_one("iframe")["src"] == url_for(
+        "main.letter_template", branding_style="hm-government", title="Preview of letter branding"
+    )
 
 
 @pytest.mark.parametrize(
