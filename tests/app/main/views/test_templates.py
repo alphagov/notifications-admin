@@ -1973,6 +1973,29 @@ def test_choosing_to_copy_redirects(
     )
 
 
+def test_choosing_to_copy_redirects_and_includes_folder_id(
+    client_request,
+    service_one,
+    mock_get_service_templates,
+    mock_get_template_folders,
+):
+    mock_get_template_folders.return_value = [
+        _folder("Parent folder", PARENT_FOLDER_ID),
+    ]
+    client_request.post(
+        "main.choose_template",
+        service_id=SERVICE_ONE_ID,
+        template_folder_id=PARENT_FOLDER_ID,
+        _data={"operation": "add-new-template", "add_template_by_template_type": "copy-existing"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.choose_template_to_copy",
+            service_id=SERVICE_ONE_ID,
+            to_folder_id=PARENT_FOLDER_ID,
+        ),
+    )
+
+
 def test_choosing_letter_creates(
     client_request,
     service_one,
@@ -2056,6 +2079,66 @@ def test_choose_a_template_to_copy(
         service_id=SERVICE_ONE_ID,
         template_id=TEMPLATE_ONE_ID,
         from_service=SERVICE_TWO_ID,
+    )
+
+
+def test_choose_a_template_to_copy_passes_through_folder_id(
+    client_request,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_get_no_api_keys,
+    mock_get_just_services_for_user,
+):
+    page = client_request.get(
+        "main.choose_template_to_copy",
+        service_id=SERVICE_ONE_ID,
+        to_folder_id=PARENT_FOLDER_ID,
+    )
+
+    assert page.select(".folder-heading") == []
+
+    expected = [
+        "Service 1 6 templates",
+        "Service 1 sms_template_one Text message template",
+        "Service 1 sms_template_two Text message template",
+        "Service 1 email_template_one Email template",
+        "Service 1 email_template_two Email template",
+        "Service 1 letter_template_one Letter template",
+        "Service 1 letter_template_two Letter template",
+        "Service 2 6 templates",
+        "Service 2 sms_template_one Text message template",
+        "Service 2 sms_template_two Text message template",
+        "Service 2 email_template_one Email template",
+        "Service 2 email_template_two Email template",
+        "Service 2 letter_template_one Letter template",
+        "Service 2 letter_template_two Letter template",
+    ]
+    actual = page.select(".template-list-item")
+
+    assert len(actual) == len(expected)
+
+    for actual, expected in zip(actual, expected):  # noqa: B020
+        assert normalize_spaces(actual.text) == expected
+
+    links = page.select(".template-list-item a")
+    assert links[0]["href"] == url_for(
+        "main.choose_template_to_copy",
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+        to_folder_id=PARENT_FOLDER_ID,
+    )
+    assert links[1]["href"] == url_for(
+        "main.choose_template_to_copy",
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+        to_folder_id=PARENT_FOLDER_ID,
+    )
+    assert links[2]["href"] == url_for(
+        "main.copy_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+        to_folder_id=PARENT_FOLDER_ID,
     )
 
 
@@ -2196,7 +2279,7 @@ def test_choose_a_template_to_copy_from_folder_within_service(
         (["Two week reminder (copy)", "Two week reminder (copy 10)"], "Two week reminder (copy 2)"),
     ),
 )
-def test_load_edit_template_with_copy_of_template(
+def test_copy_template_page_renders_preview(
     mocker,
     api_user_active,
     client_request,
@@ -2347,8 +2430,51 @@ def test_post_copy_template(
             name="Two week reminder (copy)",
             type_="email",
             service_id=SERVICE_ONE_ID,
+            parent_folder_id=None,
             subject="Your ((thing)) is due soon",
             content="Your vehicle tax expires on ((date))",
+            letter_languages=None,
+            letter_welsh_subject=None,
+            letter_welsh_content=None,
+        )
+    ]
+
+
+def test_post_copy_template_into_folder(
+    mocker,
+    client_request,
+    active_user_with_permissions,
+    mock_get_service,
+    multiple_sms_senders,
+    mock_get_service_email_template,
+    mock_get_service_templates,
+    mock_get_organisations_and_services_for_user,
+    mock_create_service_template,
+):
+    active_user_with_permissions["services"].append(SERVICE_TWO_ID)
+    active_user_with_permissions["permissions"][SERVICE_TWO_ID] = active_user_with_permissions["permissions"][
+        SERVICE_ONE_ID
+    ]
+    client_request.post(
+        "main.copy_template",
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+        template_id=TEMPLATE_ONE_ID,
+        to_folder_id=PARENT_FOLDER_ID,
+        _data={
+            "service": SERVICE_ONE_ID,
+            "name": "Two week reminder (copy)",
+        },
+        _expected_status=302,
+    )
+    assert mock_create_service_template.call_args_list == [
+        mocker.call(
+            name="Two week reminder (copy)",
+            type_="email",
+            service_id=SERVICE_ONE_ID,
+            subject="Your ((thing)) is due soon",
+            content="Your vehicle tax expires on ((date))",
+            parent_folder_id=PARENT_FOLDER_ID,
             letter_languages=None,
             letter_welsh_subject=None,
             letter_welsh_content=None,
@@ -2385,6 +2511,7 @@ def test_post_copy_letter_template(
             type_="letter",
             service_id=SERVICE_ONE_ID,
             subject="Subject",
+            parent_folder_id=None,
             content="Template <em>content</em> with & entity",
             letter_languages="english",
             letter_welsh_subject=None,

@@ -46,12 +46,13 @@
   folder_path,
   current_service_id,
   from_service,
-  current_user
+  current_user,
+  to_folder_id
 ) %}
   {% if folder_path %}
     <h2 class="heading-medium folder-heading">
       {% if folder_path|length == 1 %}
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id) }}">Services</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, to_folder_id=to_folder_id) }}">Services</a>
         {{ folder_path_separator() }}
       {% endif %}
       {% for folder in folder_path %}
@@ -63,7 +64,7 @@
         {% else %}
           {% if folder.id %}
             {% if current_user.has_template_folder_permission(folder, service=from_service) %}
-              <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, from_service=from_service.id, from_folder=folder.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder">
+              <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, from_service=from_service.id, from_folder=folder.id, to_folder_id=to_folder_id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder">
                 {{ svgs.folder(classes="folder-heading-folder__icon") }}
                 {{ folder.name }}
               </a>
@@ -75,12 +76,12 @@
             {% endif %}
             {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
           {% elif folder.parent_id == None %}
-            <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, from_service=from_service.id, from_folder=folder.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder">
+            <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, from_service=from_service.id, from_folder=folder.id, to_folder_id=to_folder_id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder">
               {{ svgs.folder(classes="folder-heading-folder__icon") }}
               {{ from_service.name }}
             </a> {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
           {% else %}
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, from_service=from_service.id) }}">
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, from_service=from_service.id, to_folder_id=to_folder_id) }}">
               {{ svgs.folder(classes="folder-heading-folder__icon") }}
               {{ from_service.name }}
             </a> {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
