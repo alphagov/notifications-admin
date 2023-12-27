@@ -4,12 +4,18 @@ from unittest.mock import call
 import pytest
 from flask import url_for
 
-from tests import sample_uuid, validate_route_permission
+from tests import generate_uuid, sample_uuid, validate_route_permission
 from tests.conftest import SERVICE_ONE_ID, create_notifications, normalize_spaces
 
 
 def test_should_show_api_page(
-    client_request, mock_login, api_user_active, mock_get_service, mock_has_permissions, mock_get_notifications
+    client_request,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications,
+    mock_get_service_data_retention,
 ):
     page = client_request.get(
         "main.api_integration",
@@ -29,6 +35,7 @@ def test_should_show_api_page_with_lots_of_notifications(
     mock_get_service,
     mock_has_permissions,
     mock_get_notifications_with_previous_next,
+    mock_get_service_data_retention,
 ):
     page = client_request.get(
         "main.api_integration",
@@ -47,6 +54,7 @@ def test_should_show_api_page_with_no_notifications(
     mock_get_service,
     mock_has_permissions,
     mock_get_notifications_with_no_notifications,
+    mock_get_service_data_retention,
 ):
     page = client_request.get(
         "main.api_integration",
@@ -54,6 +62,156 @@ def test_should_show_api_page_with_no_notifications(
     )
     rows = page.select("div.api-notifications-item")
     assert "When you send messages via the API they’ll appear here." in rows[len(rows) - 1].text.strip()
+
+
+@pytest.mark.parametrize("has_data_retention_defined, expected_data_retention", [(True, 10), (False, 7)])
+def test_should_show_service_retention_on_api_page_with_no_notifications(
+    client_request,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications_with_no_notifications,
+    mocker,
+    has_data_retention_defined,
+    expected_data_retention,
+):
+    data = (
+        [
+            {
+                "id": str(generate_uuid()),
+                "notification_type": "email",
+                "days_of_retention": 10,
+            },
+            {
+                "id": str(generate_uuid()),
+                "notification_type": "sms",
+                "days_of_retention": 10,
+            },
+            {
+                "id": str(generate_uuid()),
+                "notification_type": "letter",
+                "days_of_retention": 10,
+            },
+        ]
+        if has_data_retention_defined
+        else []
+    )
+    mocker.patch("app.service_api_client.get_service_data_retention", return_value=data)
+
+    page = client_request.get(
+        "main.api_integration",
+        service_id=SERVICE_ONE_ID,
+    )
+    rows = page.select("div.api-notifications-item")
+    assert f"Notify deletes messages after {expected_data_retention} days." in rows[len(rows) - 1].text.strip()
+
+
+@pytest.mark.parametrize("has_data_retention_defined, expected_data_retention", [(True, 30), (False, 7)])
+def test_should_show_service_retention_on_api_page_with_lots_of_notifications(
+    client_request,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications_with_previous_next,
+    mock_get_service_data_retention,
+    mocker,
+    has_data_retention_defined,
+    expected_data_retention,
+):
+    data = (
+        [
+            {
+                "id": str(generate_uuid()),
+                "notification_type": "email",
+                "days_of_retention": 30,
+            },
+            {
+                "id": str(generate_uuid()),
+                "notification_type": "sms",
+                "days_of_retention": 30,
+            },
+            {
+                "id": str(generate_uuid()),
+                "notification_type": "letter",
+                "days_of_retention": 30,
+            },
+        ]
+        if has_data_retention_defined
+        else []
+    )
+    mocker.patch("app.service_api_client.get_service_data_retention", return_value=data)
+
+    page = client_request.get(
+        "main.api_integration",
+        service_id=SERVICE_ONE_ID,
+    )
+    rows = page.select("div.api-notifications-item")
+    assert " ".join(rows[len(rows) - 1].text.split()) == (
+        f"Only showing the first 50 messages. Notify deletes messages after {expected_data_retention} days."
+    )
+
+
+def test_should_not_show_service_retention_on_api_page_with_no_notifications_if_inconsistent_retention(
+    client_request,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications_with_no_notifications,
+    mocker,
+):
+    data = [
+        {
+            "id": str(generate_uuid()),
+            "notification_type": "email",
+            "days_of_retention": 10,
+        }
+    ]
+    mocker.patch("app.service_api_client.get_service_data_retention", return_value=data)
+
+    page = client_request.get(
+        "main.api_integration",
+        service_id=SERVICE_ONE_ID,
+    )
+    assert "Notify deletes messages after" not in page.select_one("main").text
+
+
+def test_should_not_show_service_retention_on_api_page_with_lots_of_notifications_if_inconsistent_retention(
+    client_request,
+    mock_login,
+    api_user_active,
+    mock_get_service,
+    mock_has_permissions,
+    mock_get_notifications_with_previous_next,
+    mock_get_service_data_retention,
+    mocker,
+):
+    data = [
+        {
+            "id": str(generate_uuid()),
+            "notification_type": "email",
+            "days_of_retention": 30,
+        },
+        {
+            "id": str(generate_uuid()),
+            "notification_type": "sms",
+            "days_of_retention": 10,
+        },
+        {
+            "id": str(generate_uuid()),
+            "notification_type": "letter",
+            "days_of_retention": 5,
+        },
+    ]
+    mocker.patch("app.service_api_client.get_service_data_retention", return_value=data)
+
+    page = client_request.get(
+        "main.api_integration",
+        service_id=SERVICE_ONE_ID,
+    )
+    assert "Notify deletes messages after" not in page.select_one("main").text
 
 
 @pytest.mark.parametrize(
@@ -67,6 +225,7 @@ def test_should_show_api_page_with_no_notifications(
 def test_letter_notifications_should_have_link_to_view_letter(
     client_request,
     mock_has_permissions,
+    mock_get_service_data_retention,
     mocker,
     template_type,
     link_text,
@@ -83,7 +242,12 @@ def test_letter_notifications_should_have_link_to_view_letter(
 
 @pytest.mark.parametrize("status", ["pending-virus-check", "virus-scan-failed"])
 def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_states(
-    client_request, fake_uuid, mock_has_permissions, mocker, status
+    client_request,
+    fake_uuid,
+    mock_has_permissions,
+    mock_get_service_data_retention,
+    mocker,
+    status,
 ):
     notifications = create_notifications(status=status)
     mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
@@ -104,7 +268,13 @@ def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_st
     ],
 )
 def test_letter_notifications_should_show_client_reference(
-    client_request, fake_uuid, mock_has_permissions, mocker, client_reference, shows_ref
+    client_request,
+    fake_uuid,
+    mock_has_permissions,
+    mock_get_service_data_retention,
+    mocker,
+    client_reference,
+    shows_ref,
 ):
     notifications = create_notifications(client_reference=client_reference)
     mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
@@ -123,7 +293,13 @@ def test_letter_notifications_should_show_client_reference(
 
 
 def test_should_show_api_page_for_live_service(
-    client_request, mock_login, api_user_active, mock_get_notifications, mock_get_live_service, mock_has_permissions
+    client_request,
+    mock_login,
+    api_user_active,
+    mock_get_notifications,
+    mock_get_live_service,
+    mock_has_permissions,
+    mock_get_service_data_retention,
 ):
     page = client_request.get("main.api_integration", service_id=uuid.uuid4())
     assert "Your service is in trial mode" not in page.select_one("main").text
@@ -594,7 +770,13 @@ def test_callback_forms_can_be_cleared_when_callback_and_inbound_apis_are_empty(
     ],
 )
 def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_inbound_sms(
-    client_request, service_one, mocker, mock_get_notifications, has_inbound_sms, expected_link
+    client_request,
+    service_one,
+    mocker,
+    mock_get_notifications,
+    mock_get_service_data_retention,
+    has_inbound_sms,
+    expected_link,
 ):
     if has_inbound_sms:
         service_one["permissions"] = ["inbound_sms"]
@@ -608,10 +790,7 @@ def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_in
 
 
 def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_sms(
-    client_request,
-    service_one,
-    mocker,
-    mock_get_valid_service_callback_api,
+    client_request, service_one, mocker, mock_get_valid_service_callback_api
 ):
     page = client_request.get(
         "main.api_callbacks",

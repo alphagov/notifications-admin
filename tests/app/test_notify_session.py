@@ -26,7 +26,13 @@ class TestNotifyAdminSessionInterface:
             yield client
 
     def test_logged_user_session_expiration(
-        self, request, active_user_with_permissions, mock_get_service, mock_has_permissions, mock_get_notifications
+        self,
+        request,
+        active_user_with_permissions,
+        mock_get_service,
+        mock_has_permissions,
+        mock_get_notifications,
+        mock_get_service_data_retention,
     ):
         app = request.getfixturevalue("clean_app")
         client = request.getfixturevalue("clean_app_client")
@@ -60,7 +66,13 @@ class TestNotifyAdminSessionInterface:
             ), "A new anonymous session should be created with a permanent lifetime of 1 hour"
 
     def test_logged_platform_user_session_full_expiration(
-        self, request, platform_admin_user, mock_get_service, mock_has_permissions, mock_get_notifications
+        self,
+        request,
+        platform_admin_user,
+        mock_get_service,
+        mock_has_permissions,
+        mock_get_notifications,
+        mock_get_service_data_retention,
     ):
         # webauthn auth needs some more complex mocking/patching not relevant to the code under test, so let's bypass it
         platform_admin_user["auth_type"] = "sms_auth"

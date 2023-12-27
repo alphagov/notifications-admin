@@ -39,9 +39,11 @@
         <p class="api-notifications-item__meta">
           When you send messages via the API they’ll appear here.
         </p>
+        {% if current_service.get_consistent_data_retention_period() %}
         <p class="api-notifications-item__meta">
-          Notify deletes messages after 7 days.
+          Notify deletes messages after {{ current_service.get_consistent_data_retention_period() }} days.
         </p>
+        {% endif %}
       </div>
     {% endif %}
     {% for notification in api_notifications.notifications %}
@@ -92,9 +94,11 @@
             Only showing the first 50 messages.
           </p>
         {% endif %}
+        {% if current_service.get_consistent_data_retention_period() %}
         <p class="api-notifications-item__meta">
-          Notify deletes messages after 7 days.
+          Notify deletes messages after {{ current_service.get_consistent_data_retention_period() }} days.
         </p>
+        {% endif %}
       </div>
     {% endif %}
   </div>
