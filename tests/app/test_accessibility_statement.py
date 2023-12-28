@@ -8,12 +8,19 @@ def test_last_review_date():
 
     # test local changes against main for a full diff of what will be merged
     statement_diff = subprocess.run(
-        [f"git diff --unified=0 --exit-code origin/main -- {statement_file_path}"], stdout=subprocess.PIPE, shell=True
+        [f"git diff --unified=0 --exit-code origin/main -- {statement_file_path}"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True,
     )
 
+    assert not statement_diff.stderr, (
+        "Error comparing the accessiblity_statement.html file to origin/main - "
+        "make sure this test is run from a local git checkout"
+    )
     date_format = "%d %B %Y"
 
-    # if statement has changed, test the review date was part of those changes
+    # if statement has changed, make sure the review date was part of those changes
     if statement_diff.returncode == 1:
         raw_diff = statement_diff.stdout.decode("utf-8")
         with open(statement_file_path, "r") as statement_file:
