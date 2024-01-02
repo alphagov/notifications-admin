@@ -14,11 +14,11 @@ class LetterLanguageOptions(str, enum.Enum):
 
 
 LETTER_PRICES_BY_SHEETS = {
-    1: {"second": 54, "first": 82, "international": 126},
-    2: {"second": 59, "first": 86, "international": 131},
-    3: {"second": 63, "first": 90, "international": 135},
-    4: {"second": 68, "first": 96, "international": 140},
-    5: {"second": 73, "first": 100, "international": 145},
+    1: {"second": 54, "first": 82, "international": 144},
+    2: {"second": 59, "first": 86, "international": 149},
+    3: {"second": 63, "first": 90, "international": 153},
+    4: {"second": 68, "first": 96, "international": 158},
+    5: {"second": 73, "first": 100, "international": 163},
 }
 MIN_LETTER_PRICE = min(pennies for prices in LETTER_PRICES_BY_SHEETS.values() for pennies in prices.values())
 MAX_LETTER_PRICE = max(pennies for prices in LETTER_PRICES_BY_SHEETS.values() for pennies in prices.values())

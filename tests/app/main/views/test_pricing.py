@@ -7,4 +7,4 @@ def test_guidance_pricing_letters(client_request):
     # Update these values if letter prices change
     assert "54p + VAT" in first_row.text
     assert "82p + VAT" in first_row.text
-    assert "£1.26 + VAT" in first_row.text
+    assert "£1.44 + VAT" in first_row.text
