@@ -69,6 +69,7 @@ def design_content():
 @main.route("/_email")
 def email_template():
     branding_style = request.args.get("branding_style")
+    subject = request.args.get("title", default="Preview of email branding")
 
     if not branding_style or branding_style in {"govuk", FieldWithNoneOption.NONE_OPTION_VALUE}:
         branding = EmailBranding.govuk_branding()
@@ -81,7 +82,7 @@ def email_template():
 
     template = {
         "template_type": "email",
-        "subject": "Preview of email branding",
+        "subject": subject,
         "content": render_template("example-email.md"),
     }
 

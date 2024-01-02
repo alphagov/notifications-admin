@@ -277,6 +277,20 @@ def test_email_branding_preview(
     assert mock_get_email_branding.called is email_branding_retrieved
 
 
+def test_email_branding_preview_allows_custom_page_title(
+    client_request,
+    mock_get_email_branding,
+):
+    page = client_request.get(
+        "main.email_template",
+        _test_page_title=False,
+        branding_style="custom",
+        type="org",
+        title="Preview of new email branding",
+    )
+    assert page.select_one("title").text == "Preview of new email branding"
+
+
 @pytest.mark.parametrize("filename", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
 @pytest.mark.parametrize("branding_style", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
 def test_letter_template_preview_handles_no_branding_style_or_filename_correctly(
