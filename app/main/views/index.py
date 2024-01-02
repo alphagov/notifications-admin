@@ -107,6 +107,7 @@ def email_template():
 @main.route("/_letter")
 def letter_template():
     branding_style = request.args.get("branding_style")
+    subject = request.args.get("title", default="Preview of letter branding")
     filename = request.args.get("filename")
 
     if branding_style == FieldWithNoneOption.NONE_OPTION_VALUE:
@@ -121,7 +122,7 @@ def letter_template():
     elif not filename:
         filename = "no-branding"
 
-    template = {"subject": "", "content": "", "template_type": "letter"}
+    template = {"subject": subject, "content": "", "template_type": "letter"}
     image_url = url_for("no_cookie.letter_branding_preview_image", filename=filename)
 
     template_image = str(
@@ -132,7 +133,9 @@ def letter_template():
         )
     )
 
-    resp = make_response(render_template("views/service-settings/letter-preview.html", template=template_image))
+    resp = make_response(
+        render_template("views/service-settings/letter-preview.html", template=template_image, subject=subject)
+    )
 
     resp.headers["X-Frame-Options"] = "SAMEORIGIN"
     return resp

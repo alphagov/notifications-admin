@@ -365,6 +365,35 @@ def test_letter_template_preview_returns_400_if_both_branding_style_and_filename
     )
 
 
+@pytest.mark.parametrize(
+    "extra_args, expected_page_title",
+    (
+        (
+            {},
+            "Preview of letter branding",
+        ),
+        (
+            {"title": "Preview of new letter branding"},
+            "Preview of new letter branding",
+        ),
+    ),
+)
+def test_letter_template_preview_works_with_and_without_custom_page_title(
+    client_request,
+    extra_args,
+    expected_page_title,
+):
+    page = client_request.get(
+        "main.letter_template",
+        _test_page_title=False,
+        # Letter HTML doesn’t use the Design System, so elements won’t have class attributes
+        _test_for_elements_without_class=False,
+        filename="some-filename",
+        **extra_args,
+    )
+    assert page.select_one("title").text == expected_page_title
+
+
 def test_letter_template_preview_headers(
     client_request,
     mock_get_letter_branding_by_id,
