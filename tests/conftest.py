@@ -4250,3 +4250,32 @@ def mock_request_invite_for(mocker):
         return
 
     return mocker.patch("app.invite_api_client.request_invite_for", side_effect=_request_invite_for)
+
+
+@pytest.fixture(scope="function")
+def mock_get_letter_rates(mocker):
+    def _get_letter_rates():
+        return [
+            {"post_class": "second", "rate": "0.54", "sheet_count": 1, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "first", "rate": "0.82", "sheet_count": 1, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "europe", "rate": "1.44", "sheet_count": 1, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.44", "sheet_count": 1, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "second", "rate": "0.59", "sheet_count": 2, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "first", "rate": "0.86", "sheet_count": 2, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "europe", "rate": "1.49", "sheet_count": 2, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.49", "sheet_count": 2, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "second", "rate": "0.63", "sheet_count": 3, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "first", "rate": "0.9", "sheet_count": 3, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "europe", "rate": "1.53", "sheet_count": 3, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.53", "sheet_count": 3, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "second", "rate": "0.68", "sheet_count": 4, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "first", "rate": "0.96", "sheet_count": 4, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "europe", "rate": "1.58", "sheet_count": 4, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.58", "sheet_count": 4, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "second", "rate": "0.73", "sheet_count": 5, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "first", "rate": "1", "sheet_count": 5, "start_date": "2023-11-01T00:00:00"},
+            {"post_class": "europe", "rate": "1.63", "sheet_count": 5, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.63", "sheet_count": 5, "start_date": "2024-01-02T00:00:00"},
+        ]
+
+    return mocker.patch("app.models.letter_rates.LetterRates.client_method", side_effect=_get_letter_rates)

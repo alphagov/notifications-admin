@@ -2,6 +2,7 @@ def test_owasp_useful_headers_set(
     client_request,
     mocker,
     mock_get_service_and_organisation_counts,
+    mock_get_letter_rates,
 ):
     client_request.logout()
     response = client_request.get_response(".index")
@@ -29,6 +30,7 @@ def test_headers_non_ascii_characters_are_replaced(
     client_request,
     mocker,
     mock_get_service_and_organisation_counts,
+    mock_get_letter_rates,
 ):
     client_request.logout()
     mocker.patch.dict(

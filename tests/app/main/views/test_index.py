@@ -12,6 +12,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
 def test_non_logged_in_user_can_see_homepage(
     client_request,
     mock_get_service_and_organisation_counts,
+    mock_get_letter_rates,
 ):
     client_request.logout()
     page = client_request.get("main.index", _test_page_title=False)
@@ -74,6 +75,7 @@ def test_robots(client_request):
 def test_hiding_pages_from_search_engines(
     client_request,
     mock_get_service_and_organisation_counts,
+    mock_get_letter_rates,
     endpoint,
     kwargs,
 ):
@@ -119,6 +121,7 @@ def test_hiding_pages_from_search_engines(
 def test_static_pages(
     client_request,
     mock_get_organisation_by_domain,
+    mock_get_letter_rates,
     view,
 ):
     request = partial(client_request.get, f"main.{view}")
@@ -381,6 +384,7 @@ def test_letter_spec_redirect_with_non_logged_in_user(client_request):
 def test_font_preload(
     client_request,
     mock_get_service_and_organisation_counts,
+    mock_get_letter_rates,
 ):
     client_request.logout()
     page = client_request.get("main.index", _test_page_title=False)
@@ -397,6 +401,7 @@ def test_font_preload(
 def test_sms_price(
     client_request,
     mock_get_service_and_organisation_counts,
+    mock_get_letter_rates,
 ):
     client_request.logout()
 

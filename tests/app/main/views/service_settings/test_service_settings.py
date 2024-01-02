@@ -4555,6 +4555,7 @@ def test_switch_service_channels_on_and_off(
     service_one,
     mocker,
     mock_get_free_sms_fragment_limit,
+    mock_get_letter_rates,
     channel,
     expected_first_para,
     expected_legend,

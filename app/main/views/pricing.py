@@ -2,10 +2,10 @@ from flask import current_app, render_template
 from flask_login import current_user
 from notifications_utils.international_billing_rates import INTERNATIONAL_BILLING_RATES
 
-from app import constants
 from app.main import main
 from app.main.forms import SearchByNameForm
 from app.main.views.sub_navigation_dictionaries import pricing_nav
+from app.models.letter_rates import LetterRates
 
 CURRENT_SMS_RATE = "1.97"
 
@@ -37,7 +37,7 @@ def guidance_pricing_letters():
     return render_template(
         "views/guidance/pricing/letter-pricing.html",
         navigation_links=pricing_nav(),
-        letter_prices_by_sheets=constants.LETTER_PRICES_BY_SHEETS,
+        letter_rates=LetterRates(),
     )
 
 
