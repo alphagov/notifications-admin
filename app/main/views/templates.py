@@ -20,6 +20,8 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.pdf import pdf_page_count
+from notifications_utils.s3 import s3download
+from notifications_utils.template import Template
 from pypdf.errors import PdfReadError
 from requests import RequestException
 
@@ -447,8 +449,7 @@ def copy_template(service_id, template_id):
             letter_welsh_content=template.get_raw("letter_welsh_content"),
         )["data"]
         if template.template_type == "letter" and template.get_raw("letter_attachment"):
-            # TODO: handle letter attachments
-            pass
+            _copy_letter_attachment(from_template=template, to_template=new_template)
         return redirect(url_for(".view_template", service_id=service_id, template_id=new_template["id"]))
 
     if template.get_raw("folder"):
@@ -1220,6 +1221,35 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
             template_id=template.id,
             _anchor="first-page-of-attachment",
         )
+    )
+
+
+def _copy_letter_attachment(from_template: Template, to_template: dict):
+    letter_attachment_data: dict = from_template.get_raw("letter_attachment")
+    if not letter_attachment_data:
+        current_app.logger.warning("No letter attachment found when copying template %s", from_template.id)
+        abort(400)
+
+    letter_attachment = s3download(
+        current_app.config["S3_BUCKET_LETTER_ATTACHMENTS"],
+        get_transient_letter_file_location(from_template.get_raw("service"), letter_attachment_data["id"]),
+    ).read()
+
+    upload_id = uuid.uuid4()
+    file_location = get_transient_letter_file_location(current_service.id, upload_id)
+    upload_letter_attachment_to_s3(
+        letter_attachment,
+        file_location=file_location,
+        page_count=letter_attachment_data["page_count"],
+        original_filename=letter_attachment_data["original_filename"],
+    )
+
+    letter_attachment_client.create_letter_attachment(
+        upload_id=upload_id,
+        original_filename=letter_attachment_data["original_filename"],
+        page_count=letter_attachment_data["page_count"],
+        template_id=to_template["id"],
+        service_id=to_template["service"],
     )
 
 

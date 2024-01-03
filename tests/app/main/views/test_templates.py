@@ -1,6 +1,7 @@
 import json
 import uuid
 from functools import partial
+from io import BytesIO
 from unittest.mock import ANY, Mock
 
 import pytest
@@ -2516,6 +2517,69 @@ def test_post_copy_letter_template(
             letter_languages="english",
             letter_welsh_subject=None,
             letter_welsh_content=None,
+        )
+    ]
+
+
+@pytest.mark.parametrize("from_service", (SERVICE_ONE_ID, SERVICE_TWO_ID))
+def test_copy_letter_template_with_letter_attachment(
+    mocker,
+    client_request,
+    active_user_with_permission_to_two_services,
+    mock_get_service_templates,
+    mock_get_service_letter_template_with_attachment,
+    mock_create_service_template,
+    multiple_sms_senders,
+    from_service,
+):
+    client_request.login(active_user_with_permission_to_two_services)
+    mocker.patch(
+        "app.main.views.templates.s3download",
+        return_value=BytesIO(b"PDF"),
+    )
+    mock_upload = mocker.patch("app.main.views.templates.upload_letter_attachment_to_s3")
+    mock_save_to_db = mocker.patch("app.letter_attachment_client.create_letter_attachment")
+    mocker.patch("uuid.uuid4", return_value="12341234-1234-1234-1234-123412341234")
+
+    client_request.post(
+        "main.copy_template",
+        service_id=SERVICE_ONE_ID,
+        from_service=from_service,
+        template_id=TEMPLATE_ONE_ID,
+        _data={
+            "service": SERVICE_ONE_ID,
+            "name": "Two week reminder (copy)",
+        },
+        _expected_status=302,
+    )
+    assert mock_create_service_template.call_args_list == [
+        mocker.call(
+            name="Two week reminder (copy)",
+            type_="letter",
+            service_id=SERVICE_ONE_ID,
+            subject="Subject",
+            parent_folder_id=None,
+            content="Template <em>content</em> with & entity",
+            letter_languages="english",
+            letter_welsh_subject=None,
+            letter_welsh_content=None,
+        )
+    ]
+    assert mock_upload.call_args_list == [
+        mocker.call(
+            b"PDF",
+            file_location=f"service-{SERVICE_ONE_ID}/12341234-1234-1234-1234-123412341234.pdf",
+            page_count=1,
+            original_filename="original file.pdf",
+        )
+    ]
+    assert mock_save_to_db.call_args_list == [
+        mocker.call(
+            upload_id="12341234-1234-1234-1234-123412341234",
+            original_filename="original file.pdf",
+            page_count=1,
+            template_id=mocker.ANY,
+            service_id=SERVICE_ONE_ID,
         )
     ]
 
