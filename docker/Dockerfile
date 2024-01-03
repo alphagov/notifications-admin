@@ -1,4 +1,4 @@
-FROM python:3.9-slim-bullseye as base
+FROM python:3.11-slim-bullseye as base
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
@@ -14,7 +14,7 @@ WORKDIR /home/vcap/app
 
 
 ##### Frontend Build Image ###################################################
-FROM ghcr.io/alphagov/notify/unit-tests-image:python39-node16x-npm831 as frontend_build
+FROM ghcr.io/alphagov/notify/unit-tests-image:python311-node20 as frontend_build
 
 ARG NOTIFY_ENVIRONMENT=development
 
@@ -34,6 +34,7 @@ RUN echo "Install OS dependencies for python app requirements" &&  \
     && apt-get install -y --no-install-recommends \
     build-essential \
     git \
+    libxml2-dev libxslt-dev zlib1g-dev \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/* /tmp/*
 
@@ -74,10 +75,10 @@ FROM production as test
 
 # If bumping this node version, also bump:
 #   `.nvmrc` in notifications-admin
-#   `concourse/docker/unit-tests-image-node16.Dockerfile` in notifications-aws
+#   `concourse/docker/unit-tests-image.Dockerfile` in notifications-aws
 # Keep NVM_VERSION in sync as well.
-ARG NVM_VERSION=0.39.5
-ARG NODE_VERSION=16.16.0
+ARG NVM_VERSION=0.39.7
+ARG NODE_VERSION=20.10.0
 
 USER root
 
