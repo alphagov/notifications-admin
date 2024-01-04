@@ -18,7 +18,6 @@ from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
     billing_api_client,
-    constants,
     current_service,
     inbound_number_client,
     notification_api_client,
@@ -69,6 +68,7 @@ from app.models.branding import (
     EmailBranding,
     LetterBranding,
 )
+from app.models.letter_rates import LetterRates
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
@@ -720,8 +720,7 @@ def service_set_channel(service_id, channel):
         f"views/service-settings/set-{channel}.html",
         form=form,
         sms_rate=CURRENT_SMS_RATE,
-        min_letter_price=constants.MIN_LETTER_PRICE,
-        max_letter_price=constants.MAX_LETTER_PRICE,
+        letter_rates=LetterRates().rates,
     )
 
 

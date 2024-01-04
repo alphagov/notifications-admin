@@ -99,6 +99,7 @@ from app.notify_client.job_api_client import job_api_client
 from app.notify_client.letter_attachment_client import letter_attachment_client
 from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.letter_jobs_client import letter_jobs_client
+from app.notify_client.letter_rate_api_client import letter_rate_api_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.organisations_api_client import organisations_client
@@ -179,6 +180,7 @@ def create_app(application):
         letter_attachment_client,
         letter_branding_client,
         letter_jobs_client,
+        letter_rate_api_client,
         notification_api_client,
         org_invite_api_client,
         organisations_client,
