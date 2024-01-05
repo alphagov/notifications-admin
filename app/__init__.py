@@ -3,6 +3,7 @@ import pathlib
 from time import monotonic
 
 import jinja2
+import requests
 import werkzeug
 from flask import (
     current_app,
@@ -383,9 +384,9 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     @application.errorhandler(HTTPError)
     def render_http_error(error):
         application.logger.warning(
-            "API %(api)s failed with status %(status)s message %(message)s",
+            "API %(api)s failed with status=%(status)s, message='%(message)s'",
             dict(
-                api=error.response.url if error.response else "unknown",
+                api=error.response.url if isinstance(error.response, requests.Response) else "unknown",
                 status=error.status_code,
                 message=error.message,
             ),
@@ -396,9 +397,9 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             # it might be a 400, which we should handle as if it's an internal server error. If the API might
             # legitimately return a 400, we should handle that within the view or the client that calls it.
             application.logger.exception(
-                "API %(api)s failed with status %(status)s message %(message)s",
+                "API %(api)s failed with status=%(status)s message='%(message)s'",
                 dict(
-                    api=error.response.url if error.response else "unknown",
+                    api=error.response.url if isinstance(error.response, requests.Response) else "unknown",
                     status=error.status_code,
                     message=error.message,
                 ),
