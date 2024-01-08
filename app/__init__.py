@@ -86,6 +86,7 @@ from app.navigation import (
     HeaderNavigation,
     MainNavigation,
     OrgNavigation,
+    PlatformAdminNavigation,
 )
 from app.notify_client import InviteTokenError
 from app.notify_client.api_key_api_client import api_key_api_client
@@ -142,6 +143,7 @@ navigation = {
     "main_navigation": MainNavigation(),
     "header_navigation": HeaderNavigation(),
     "org_navigation": OrgNavigation(),
+    "platform_admin_navigation": PlatformAdminNavigation(),
 }
 
 

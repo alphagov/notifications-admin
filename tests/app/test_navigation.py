@@ -8,6 +8,7 @@ from app.navigation import (
     MainNavigation,
     Navigation,
     OrgNavigation,
+    PlatformAdminNavigation,
 )
 from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, normalize_spaces
 
@@ -400,6 +401,7 @@ navigation_instances = (
     HeaderNavigation(),
     OrgNavigation(),
     CaseworkNavigation(),
+    PlatformAdminNavigation(),
 )
 
 
@@ -501,6 +503,27 @@ def test_a_page_should_nave_selected_org_navigation_item(
 ):
     mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": [], "updated_at": None})
     page = client_request.get(endpoint, org_id=ORGANISATION_ID)
+    selected_nav_items = page.select(".navigation a.selected")
+    assert len(selected_nav_items) == 1
+    assert selected_nav_items[0].text.strip() == selected_nav_item
+
+
+@pytest.mark.parametrize(
+    "endpoint, selected_nav_item",
+    [
+        ("main.platform_admin_search", "Search"),
+        ("main.email_branding", "Email branding"),
+    ],
+)
+def test_a_page_should_nave_selected_platform_admin_navigation_item(
+    client_request,
+    platform_admin_user,
+    mock_get_all_email_branding,
+    endpoint,
+    selected_nav_item,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(endpoint)
     selected_nav_items = page.select(".navigation a.selected")
     assert len(selected_nav_items) == 1
     assert selected_nav_items[0].text.strip() == selected_nav_item

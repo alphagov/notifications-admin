@@ -400,3 +400,62 @@ class OrgNavigation(Navigation):
             "organisation_billing",
         },
     }
+
+
+class PlatformAdminNavigation(Navigation):
+    mapping = {
+        "search": {
+            "platform_admin_search",
+        },
+        "summary": {
+            "platform_admin",
+        },
+        "live-services": {
+            "live_services",
+        },
+        "trial-mode-services": {
+            "trial_services",
+        },
+        "organisations": {
+            "organisations",
+        },
+        "providers": {
+            "view_providers",
+            "edit_sms_provider_ratio",
+        },
+        "reports": {
+            "platform_admin_reports",
+            "notifications_sent_by_service",
+            "get_billing_report",
+            "get_dvla_billing_report",
+            "get_volumes_by_service",
+            "get_daily_volumes",
+            "get_daily_sms_provider_volumes",
+        },
+        "email-branding": {
+            "email_branding",
+            "platform_admin_view_email_branding",
+            "platform_admin_update_email_branding",
+            "platform_admin_create_email_branding",
+            "create_email_branding_government_identity_logo",
+            "create_email_branding_government_identity_colour",
+        },
+        "letter-branding": {
+            "letter_branding",
+            "platform_admin_view_letter_branding",
+            "create_letter_branding",
+            "update_letter_branding",
+        },
+        "inbound-sms-numbers": {
+            "inbound_sms_admin",
+        },
+        "email-complaints": {
+            "platform_admin_list_complaints",
+        },
+        "returned-letters": {
+            "platform_admin_returned_letters",
+        },
+        "clear-cache": {
+            "clear_cache",
+        },
+    }
