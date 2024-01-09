@@ -21,6 +21,8 @@ class TemplatePreview:
             raise ValueError
         if db_template["template_type"] != "letter":
             abort(404)
+        if filetype == "pdf" and page:
+            abort(400)
         data = {
             "letter_contact_block": db_template.get("reply_to_text", ""),
             "template": db_template,
