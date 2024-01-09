@@ -1938,7 +1938,7 @@ def test_letter_branding_preview_image(
     new_filename,
 ):
     mocked_preview = mocker.patch(
-        "app.main.views.templates.TemplatePreview.get_png_for_example_template", return_value="foo"
+        "app.main.views.templates.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
     )
     response = client_request.get_response(
         "no_cookie.letter_branding_preview_image",
@@ -1951,7 +1951,8 @@ def test_letter_branding_preview_image(
             "content": ANY,
             "template_type": "letter",
         },
-        new_filename,
+        filetype="png",
+        branding_filename=new_filename,
     )
     assert response.get_data(as_text=True) == "foo"
 

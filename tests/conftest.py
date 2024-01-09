@@ -3771,7 +3771,6 @@ def mock_template_preview(mocker, mock_get_page_counts_for_letter):
 
     mocker.patch("app.template_previews.TemplatePreview.get_png_for_valid_pdf_page", return_value=example_response)
     mocker.patch("app.template_previews.TemplatePreview.get_png_for_invalid_pdf_page", return_value=example_response)
-    mocker.patch("app.template_previews.TemplatePreview.get_png_for_example_template", return_value=example_response)
 
 
 @pytest.fixture(scope="function")

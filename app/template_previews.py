@@ -64,21 +64,6 @@ class TemplatePreview:
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
     @classmethod
-    def get_png_for_example_template(cls, template, branding_filename):
-        data = {
-            "letter_contact_block": template.get("reply_to_text"),
-            "template": template,
-            "values": None,
-            "filename": branding_filename,
-        }
-        response = requests.post(
-            f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.png",
-            json=data,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
-        )
-        return response.content, response.status_code, cls.get_allowed_headers(response.headers)
-
-    @classmethod
     def get_png_for_letter_attachment_page(cls, attachment_id, page=None):
         data = {
             "letter_attachment_id": attachment_id,

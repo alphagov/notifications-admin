@@ -209,20 +209,6 @@ def test_page_count_makes_a_call_to_template_preview_and_gets_page_count(
     request_mock.assert_called_once_with("http://localhost:9999/preview.json", json=data, headers=headers)
 
 
-def test_get_png_for_example_template_makes_request(mocker, client_request):
-    request_mock = mocker.patch("app.template_previews.requests.post")
-    template = {}
-    branding_filename = "geo"
-
-    TemplatePreview.get_png_for_example_template(template, branding_filename)
-
-    request_mock.assert_called_once_with(
-        "http://localhost:9999/preview.png",
-        headers={"Authorization": "Token my-secret-key"},
-        json={"values": None, "template": template, "filename": branding_filename, "letter_contact_block": None},
-    )
-
-
 @pytest.mark.parametrize("allow_international_letters, query_param_value", [[False, "false"], [True, "true"]])
 def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file(
     mocker,
