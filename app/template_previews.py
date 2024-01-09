@@ -16,7 +16,7 @@ class TemplatePreview:
         return allowed_headers.items()
 
     @classmethod
-    def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None):
+    def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None, branding_filename=None):
         if db_template["is_precompiled_letter"]:
             raise ValueError
         if db_template["template_type"] != "letter":
@@ -27,7 +27,7 @@ class TemplatePreview:
             "letter_contact_block": db_template.get("reply_to_text", ""),
             "template": db_template,
             "values": values,
-            "filename": current_service.letter_branding.filename,
+            "filename": branding_filename or current_service.letter_branding.filename,
         }
         response = requests.post(
             "{}/preview.{}{}".format(

@@ -71,6 +71,34 @@ def test_get_preview_for_templated_letter_makes_request(
     request_mock.assert_called_once_with(expected_url, json=data, headers=headers)
 
 
+@pytest.mark.parametrize(
+    "extra_args, expected_filename",
+    (
+        ({}, "hm-government"),
+        ({"branding_filename": "custom"}, "custom"),
+    ),
+)
+def test_get_preview_for_templated_letter_allows_service_branding_to_be_overridden(
+    mocker,
+    client_request,
+    extra_args,
+    expected_filename,
+    mock_get_service_letter_template,
+):
+    load_service_before_request()
+
+    request_mock = mocker.patch("app.template_previews.requests.post")
+    mocker.patch("app.template_previews.current_service", letter_branding=LetterBranding({"filename": "hm-government"}))
+
+    TemplatePreview.get_preview_for_templated_letter(
+        db_template=create_notification(template_type="letter")["template"],
+        filetype="png",
+        **extra_args,
+    )
+
+    assert request_mock.call_args[1]["json"]["filename"] == expected_filename
+
+
 def test_get_preview_for_templated_letter_from_notification_has_correct_args(mocker, client_request):
     # This test is calling `current_service` outside a Flask endpoint, so we need to make sure
     # `service` is in the `_request_ctx_stack` to avoid an error

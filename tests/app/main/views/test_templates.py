@@ -1950,6 +1950,7 @@ def test_letter_branding_preview_image(
             "subject": "An example letter",
             "content": ANY,
             "template_type": "letter",
+            "is_precompiled_letter": False,
         },
         filetype="png",
         branding_filename=new_filename,

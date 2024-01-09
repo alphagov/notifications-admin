@@ -293,6 +293,7 @@ def letter_branding_preview_image(filename):
             "here, content here’, making it look like readable English."
         ),
         "template_type": "letter",
+        "is_precompiled_letter": False,
     }
     branding_filename = None if filename == "no-branding" else filename
 
