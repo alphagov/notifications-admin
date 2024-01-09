@@ -2,7 +2,7 @@ import base64
 from io import BytesIO
 
 import requests
-from flask import current_app, json
+from flask import abort, current_app, json
 from notifications_utils.pdf import extract_page_from_pdf
 
 from app import current_service
@@ -19,6 +19,10 @@ class TemplatePreview:
     def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None):
         if db_template["is_precompiled_letter"]:
             raise ValueError
+        if db_template["template_type"] != "letter":
+            abort(404)
+        if filetype == "pdf" and page:
+            abort(400)
         data = {
             "letter_contact_block": db_template.get("reply_to_text", ""),
             "template": db_template,
@@ -59,21 +63,6 @@ class TemplatePreview:
                 f"?page_number={page}&is_an_attachment={is_an_attachment}",
             ),
             data=pdf_page,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
-        )
-        return response.content, response.status_code, cls.get_allowed_headers(response.headers)
-
-    @classmethod
-    def get_png_for_example_template(cls, template, branding_filename):
-        data = {
-            "letter_contact_block": template.get("reply_to_text"),
-            "template": template,
-            "values": None,
-            "filename": branding_filename,
-        }
-        response = requests.post(
-            f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.png",
-            json=data,
             headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)

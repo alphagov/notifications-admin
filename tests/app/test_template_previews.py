@@ -3,6 +3,7 @@ from functools import partial
 from unittest.mock import Mock
 
 import pytest
+from werkzeug.exceptions import BadRequest, NotFound
 
 from app import load_service_before_request
 from app.models.branding import LetterBranding
@@ -118,6 +119,36 @@ def test_get_preview_for_templated_letter_from_notification_rejects_precompiled_
         )
 
 
+@pytest.mark.parametrize("template_type", ("email", "sms"))
+@pytest.mark.parametrize("file_type", ("pdf", "png"))
+def test_get_preview_for_templated_letter_from_notification_404s_non_letter_templates(mocker, template_type, file_type):
+    notification = create_notification(
+        service_id="abcd",
+        template_type=template_type,
+        template_name="sample template",
+    )
+
+    with pytest.raises(NotFound):
+        TemplatePreview.get_preview_for_templated_letter(
+            notification["template"], file_type, notification["personalisation"]
+        )
+
+
+def test_get_preview_for_templated_letter_from_notification_400s_for_page_of_pdf(mocker):
+    notification = create_notification(
+        service_id="abcd",
+        template_type="letter",
+        template_name="sample template",
+    )
+
+    with pytest.raises(BadRequest):
+        TemplatePreview.get_preview_for_templated_letter(
+            notification["template"],
+            "pdf",
+            page=1,
+        )
+
+
 @pytest.mark.parametrize(
     "page_number, expected_url",
     [
@@ -207,20 +238,6 @@ def test_page_count_makes_a_call_to_template_preview_and_gets_page_count(
     headers = {"Authorization": "Token my-secret-key"}
 
     request_mock.assert_called_once_with("http://localhost:9999/preview.json", json=data, headers=headers)
-
-
-def test_get_png_for_example_template_makes_request(mocker, client_request):
-    request_mock = mocker.patch("app.template_previews.requests.post")
-    template = {}
-    branding_filename = "geo"
-
-    TemplatePreview.get_png_for_example_template(template, branding_filename)
-
-    request_mock.assert_called_once_with(
-        "http://localhost:9999/preview.png",
-        headers={"Authorization": "Token my-secret-key"},
-        json={"values": None, "template": template, "filename": branding_filename, "letter_contact_block": None},
-    )
 
 
 @pytest.mark.parametrize("allow_international_letters, query_param_value", [[False, "false"], [True, "true"]])
