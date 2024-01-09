@@ -876,7 +876,7 @@ def test_email_branding_create_government_identity_logo(
         assert iframe["src"] == url_for(
             "main.email_template",
             branding_style=expected_branding_id_in_iframe,
-            title="Preview of a government identity email branding",
+            title="Example of an email with a government identity logo",
         )
     else:
         assert not iframe
