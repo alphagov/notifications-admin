@@ -6,7 +6,7 @@
 #
 ago==0.0.95
     # via -r requirements.in
-async-timeout==4.0.2
+async-timeout==4.0.3
     # via redis
 awscli==1.29.5
     # via awscli-cwlogs
