@@ -148,9 +148,9 @@ class Organisation(JSONModel):
 
     @cached_property
     def services(self):
-        from app.models.service import Services
+        from app.models.service import OrganisationServices
 
-        return Services(organisations_client.get_organisation_services(self.id))
+        return OrganisationServices(organisations_client.get_organisation_services(self.id))
 
     @cached_property
     def service_ids(self):

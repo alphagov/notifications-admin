@@ -618,3 +618,17 @@ class Service(JSONModel):
 
 class Services(SerialisedModelCollection):
     model = Service
+
+
+class OrganisationService(Service):
+    ALLOWED_PROPERTIES = {
+        "id",
+        "name",
+        "active",
+        "restriced",
+        "count_of_users_with_manage_service_permission",
+    }
+
+
+class OrganisationServices(Services):
+    model = OrganisationService
