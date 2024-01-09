@@ -2,7 +2,7 @@ import base64
 from io import BytesIO
 
 import requests
-from flask import current_app, json
+from flask import abort, current_app, json
 from notifications_utils.pdf import extract_page_from_pdf
 
 from app import current_service
@@ -19,6 +19,8 @@ class TemplatePreview:
     def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None):
         if db_template["is_precompiled_letter"]:
             raise ValueError
+        if db_template["template_type"] != "letter":
+            abort(404)
         data = {
             "letter_contact_block": db_template.get("reply_to_text", ""),
             "template": db_template,

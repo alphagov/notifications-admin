@@ -3,6 +3,7 @@ from functools import partial
 from unittest.mock import Mock
 
 import pytest
+from werkzeug.exceptions import NotFound
 
 from app import load_service_before_request
 from app.models.branding import LetterBranding
@@ -115,6 +116,21 @@ def test_get_preview_for_templated_letter_from_notification_rejects_precompiled_
     with pytest.raises(ValueError):
         TemplatePreview.get_preview_for_templated_letter(
             notification["template"], "png", notification["personalisation"]
+        )
+
+
+@pytest.mark.parametrize("template_type", ("email", "sms"))
+@pytest.mark.parametrize("file_type", ("pdf", "png"))
+def test_get_preview_for_templated_letter_from_notification_404s_non_letter_templates(mocker, template_type, file_type):
+    notification = create_notification(
+        service_id="abcd",
+        template_type=template_type,
+        template_name="sample template",
+    )
+
+    with pytest.raises(NotFound):
+        TemplatePreview.get_preview_for_templated_letter(
+            notification["template"], file_type, notification["personalisation"]
         )
 
 
