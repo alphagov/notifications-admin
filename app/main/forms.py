@@ -662,7 +662,7 @@ class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
             "id": self.id,
             "rows": 8,
             "label": {"text": self.label.text, "classes": None, "isPageHeading": False},
-            "hint": {"text": None},
+            "hint": None,
             "errorMessage": error_message,
         }
 
