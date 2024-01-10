@@ -86,4 +86,45 @@
     <li>the phone’s country of origin (for international numbers)</li>
   </ul>
 
+  <h2 class="heading-medium" id="protecting-data-in-transit">Protecting data in transit</h2>
+  <p class="govuk-body">GOV.UK Notify uses Transport Layer Security (TLS) version 1.2 to encrypt data when:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>users access the Notify website or API</li>
+    <li>data passes through Notify</li>
+    <li>we exchange data with our sub-processors</li>
+  </ul>
+
+  <h3 class="heading-small">Emails</h3>
+  <p class="govuk-body">We always try to encrypt emails using TLS 1.2, 1.1 or 1.0. If the recipient’s mail server does not support TLS, we will send the email without protection.</p>
+  <p class="govuk-body">Email cannot provide end-to-end encryption.</p>
+
+  <h3 class="heading-small">Text messages</h3>
+  <p class="govuk-body">Text messages cannot provide end-to-end encryption.</p>
+
+  <h2 class="heading-medium" id="protecting-data-at-rest">Protecting data at rest</h2>
+  <p class="govuk-body">GOV.UK Notify encrypts the data stored in our databases and backups using AES-256 encryption.</p>
+  <p class="govuk-body">This includes any files that you upload to Notify when you:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">send messages in bulk</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">attach pages to a letter template</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">upload a letter</a></li>
+  </ul>
+
+  <h3 class="heading-small" id="sending-files-by-email">Sending files by email</h3>
+  <p class="govuk-body">When you upload a file we encrypt it with <a class="govuk-link govuk-link--no-visited-state" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerSideEncryptionCustomerKeys.html">AWS SSE-C</a>, which uses AES-256 encryption.</p>
+  <p class="govuk-body">We will only share the unique link with the intended recipient. We cannot access or decrypt your file.</p>
+  <p class="govuk-body">For more information about this feature, see <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_send_files_by_email') }}">send files by email</a>.</p>
+
+  <h2 class="heading-medium" id="building-and-managing-notify">Building and managing GOV.UK Notify</h2>
+  <p class="govuk-body">We follow an Agile software development lifecycle, as described in <a class="govuk-link govuk-link--no-visited-state" href="https://gds-way.cloudapps.digital/">the GDS Way</a>.</p>
+  <p class="govuk-body">To protect our code, we:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>run separate development, testing and production environments</li>
+    <li>deploy code through a continuous integration/continuous delivery (CI/CD) pipeline</li>
+    <li>track vulnerabilities for any third-party libraries we use</li>
+    <li>use AWS secrets manager</li>
+  </ul>
+
+
+
 {% endblock %}
