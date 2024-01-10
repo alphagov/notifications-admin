@@ -125,6 +125,24 @@
     <li>use AWS secrets manager</li>
   </ul>
 
+  <h3 class="heading-small" id="how-we-manage-code-changes">How we manage code changes</h3>
+  <p class="govuk-body">To manage GOV.UK Notify, we use:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>GDS-managed devices</li>
+    <li>multi-factor authentication (MFA)</li>
+  </ul>
+  <p class="govuk-body">We manage Notify through the www.notifications.service.gov.uk website.</p>
+  <p class="govuk-body">AWS manages the hardware we use.</p>
+  <p class="govuk-body">We use infrastructure as code (IaC) to manage the systems and services that host Notify.</p>
+  <p class="govuk-body">All code changes must be reviewed by the team before we can deploy them.</p>
+  <p class="govuk-body">We monitor our production environment for unauthorised changes.</p>
+  <p class="govuk-body">The GDS Information Assurance team assesses significant code changes for any potential security impact.</p>
+  <p class="govuk-body">We give our users appropriate notice before:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>any planned outages or downtime</li>
+    <li>making significant functional changes</li>
+  </ul>
+  <p class="govuk-body">We announce planned downtime on the <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">Notify status page</a>.</p>
 
 
 {% endblock %}
