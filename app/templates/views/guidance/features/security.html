@@ -9,79 +9,66 @@
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Security</h1>
-  <p class="govuk-body">GOV.UK Notify is built for the needs of government services. It has processes in place to:</p>
+  <h1 class="heading-large">Security features</h1>
+  <p class="govuk-body">GOV.UK Notify is built for the security needs of government services.</p>
+  <p class="govuk-body">This page describes our approach to:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>protect user data</li>
-    <li>keep systems secure</li>
-    <li>manage risks around information</li>
+    <li>running a secure service</li>
+    <li>storing and processing your data</li>
+    <li>protecting data in transit</li>
+    <li>protecting data at rest</li>
+    <li>building and managing Notify</li>
+    <li>finding and fixing security issues</li>
+    <li>security incidents</li>
+    <li>sign in and API access</li>
+    <li>protecting our website and API</li>
+    <li>email security</li>
+    <li>security classifications</li>
+    <li>staff, suppliers and governance</li>
   </ul>
 
-  <h2 class="heading-medium" id="data">Data</h2>
-  <p class="govuk-body">On Notify, data is encrypted when:</p>
+  <h2 class="heading-medium" id="running-a-secure-service">Running a secure service</h2>
+  <p class="govuk-body">GOV.UK Notify:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>it passes through the service</li>
-    <li>it’s stored on the service</li>
+    <li>follows the principles of the <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/service-standard">Service Standard</a></li>
+    <li>has been through a successful live service assessment</li>
   </ul>
-  <p class="govuk-body">Any recipient data you upload is only held for 7 days.</p>
-  <p class="govuk-body">If you <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_send_files_by_email") }}">send a file by email</a>, the file will be available for the recipient to download for up to 78 weeks (18 months).</p>
-  <p class="govuk-body">The Cabinet Office acts as data processor for Notify. Your organisation is the data controller.</p>
-  <h3 class="heading-small">Data Protection Act</h3>
-  <p class="govuk-body">Notify complies with data protection law. To make sure it stays compliant, there are regular legal reviews of the service’s:</p>
+  <p class="govuk-body">We monitor the threat landscape so we can:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>privacy policy</li>
-    <li>terms of use</li>
-    <li>approach to data sharing</li>
+    <li>continue to improve our security</li>
+    <li>meet <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/collection/caf/caf-principles-and-guidance">UK government cyber security standards</a></li>
+    <li>deal with common threats like Distributed Denial of Service (DDoS) attacks</li>
   </ul>
+  <p class="govuk-body">We conduct regular <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/information/check-penetration-testing">CHECK penetration testing</a> to confirm that our data protection is effective.</p>
+  <p class="govuk-body">Notify’s cyber security is periodically assessed in line with the <a class="govuk-link govuk-link--no-visited-state" href="https://www.security.gov.uk/guidance/govassure/">GovAssure approach</a>.</p>
 
-  <h2 class="heading-medium" id="technical-security">Technical security</h2>
-  <p class="govuk-body">Other technical security controls on Notify include:</p>
+  <h2 class="heading-medium" id="storing-and-processing-your-data">Storing and processing your data</h2>
+  <p class="govuk-body">GOV.UK Notify uses Amazon Web Services (AWS) as our cloud service provider.</p>
+  <p class="govuk-body">Data on Notify is stored and processed in:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>compliance with National Cyber Security Centre (NCSC) Cloud Security Principles</li>
-    <li>protective monitoring to record activity, and raise alerts about any suspicious activity</li>
-    <li>using JSON Web Tokens, to avoid sending API keys when your service talks to Notify</li>
+    <li>AWS data centres in the UK and Ireland</li>
+    <li>locations where our sub-processors store and process data (UK and EEA)</li>
   </ul>
 
-  <h3 class="heading-small">Protect sensitive information</h3>
-  <p class="govuk-body">Some messages include sensitive information like security codes or password reset links.</p>
-  <p class="govuk-body">If you’re sending a message with sensitive information, you can choose to hide those details on the Notify dashboard once the message has been sent. This means that only the message recipient will be able to see that information.</p>
-
-  <h2 class="heading-medium" id="user-permissions-signing-in">User permissions and signing in</h2>
-  <p class="govuk-body">You can set different user permissions in Notify. This lets you control who in your team has access to certain parts of the service.</p>
-  <h3 class="heading-small">Two-factor authentication</h3>
-  <p class="govuk-body">To sign in to Notify, you’ll need to enter:</p>
+  <h3 class="heading-small" id="how-long-we-keep-your-data">How long we keep your data</h3>
+  <p class="govuk-body">GOV.UK Notify keeps a temporary record of:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>your email address and password</li>
-    <li>a text message code that Notify sends to your phone</li>
+    <li>the content of the emails, text messages and letters you send</li>
+    <li>recipient email addresses, mobile numbers and addresses</li>
   </ul>
-  <p class="govuk-body">If signing in with a text message is a problem for your team, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a> to find out about using an email link instead.</p>
+  <p class="govuk-body">By default, we keep this data for 7 days.</p>
+  <p class="govuk-body">Once your service is live, you can choose the number of days you want Notify to keep details of the messages you send.</p>
+  <p class="govuk-body">For more information, see <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_data_retention_period') }}">data retention period</a>.</p>
 
-  <h2 class="heading-medium" id="information-risk-management">Information risk management</h2>
-  <p class="govuk-body">Our approach to information risk management follows NCSC guidance. It assesses:</p>
+  <h3 class="heading-small" id="how-long-we-keep-your-data">Who can access your data</h3>
+  <p class="govuk-body">Your data could be accessed by:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>how Notify is built</li>
-    <li>the infrastructure Notify is built upon</li>
-    <li>support for the Notify service</li>
+    <li>the Notify team</li>
+    <li>our sub-processors</li>
+    <li>law enforcement agencies (where legally required)</li>
   </ul>
-  <p class="govuk-body">This approach also applies to the service providers Notify uses to send messages.</p>
-
-  <h2 class="heading-medium" id="how-we-manage-risk">How we manage risks on Notify</h2>
-  <p class="govuk-body">Things we do to manage risks on Notify include:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>formal risk assessments based on <a class="govuk-link govuk-link--no-visited-state" href="http://www.iso.org/iso/catalogue_detail?csnumber=56742">ISO 27005:2011</a> and National Cyber Security Centre guidance</li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/information/check-penetration-testing">CHECK</a>-based testing, both annually and when any major changes are made to Notify</li>
-    <li>residual risk statement preparation and active management of the risk treatment plan</li>
-    <li>regular updates to the Privacy Impact Assessment</li>
-    <li>security impact assessments</li>
-  </ul>
-
-  <h2 class="heading-medium" id="cabinet-office-approval">Cabinet Office approval</h2>
-  <p class="govuk-body">Notify has been assessed and approved by the Cabinet Office Senior Information Risk Officer (SIRO). The SIRO checks this approval once a year.</p>
-  <p class="govuk-body">Notify also has approval from the Office of the Government’s SIRO to host data within the EEA.</p>
-
-  <h2 class="heading-medium" id="classifications-and-security-vetting">Classifications and security vetting</h2>
-  <p class="govuk-body">You can use Notify to send messages classified as ‘OFFICIAL’ or ‘OFFICIAL-SENSITIVE’ under the <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/government/publications/government-security-classifications">Government Security Classifications</a> policy.</p>
-  <p class="govuk-body">Notify does not process data classified as ‘SECRET’ or ‘TOP SECRET’.</p>
-  <p class="govuk-body">The Notify team has Security Check (SC) level clearance from <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/government/organisations/united-kingdom-security-vetting">United Kingdom Security Vetting</a> (UKSV).</p>
+  <p class="govuk-body">Teams using GOV.UK Notify can only access their own data.</p>
+  <p class="govuk-body">You can set <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_team_members_and_permissions') }}">different permissions for each member of your team</a>.</p>
+  <p class="govuk-body">AWS provides logical separation between different AWS customers.</p>
 
 {% endblock %}
