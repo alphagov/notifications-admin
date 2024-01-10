@@ -11,7 +11,6 @@ from tests.conftest import (
     create_active_user_manage_template_permissions,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
-    create_user,
     normalize_spaces,
 )
 
@@ -32,13 +31,6 @@ def test_choose_service_to_join(
             service_json("1234", "service three (trial mode)"),
         ],
     )
-    mocker.patch(
-        "app.models.user.Users.client_method",
-        return_value=[
-            create_user(permissions={SERVICE_TWO_ID: ["manage_service"]}),
-            create_user(permissions={SERVICE_TWO_ID: []}),
-        ],
-    )
     page = client_request.get(
         "main.choose_service_to_join",
         service_to_join_id=SERVICE_ONE_ID,
@@ -48,7 +40,7 @@ def test_choose_service_to_join(
     )
     assert [normalize_spaces(item.text) for item in page.select(".browse-list-item")] == [
         "service one You are already a team member of this service",
-        "service two 1 team member",
+        "service two",
     ]
     assert [link["href"] for link in page.select(".browse-list-item a")] == [
         url_for("main.join_service", service_to_join_id=SERVICE_ONE_ID),

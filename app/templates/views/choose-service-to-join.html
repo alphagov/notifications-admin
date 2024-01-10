@@ -36,9 +36,6 @@
           <p class="browse-list-hint">
               {% if current_user.belongs_to_service(service.id) %}
                 You are already a team member of this service
-              {% else %}
-                {% set team_members = service.active_users_with_permission("manage_service") %}
-                {{ team_members | length | format_thousands }} team member{{ "" if team_members | length == 1 else "s" }}
               {% endif %}
           </p>
         </li>
