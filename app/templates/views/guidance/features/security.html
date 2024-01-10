@@ -105,7 +105,7 @@
   <p class="govuk-body">GOV.UK Notify encrypts the data stored in our databases and backups using AES-256 encryption.</p>
   <p class="govuk-body">This includes any files that you upload to Notify when you:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">send messages in bulk</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">send a batch of messages</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">attach pages to a letter template</a></li>
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">upload a letter</a></li>
   </ul>
@@ -122,7 +122,7 @@
     <li>run separate development, testing and production environments</li>
     <li>deploy code through a continuous integration/continuous delivery (CI/CD) pipeline</li>
     <li>track vulnerabilities for any third-party libraries we use</li>
-    <li>use AWS secrets manager</li>
+    <li>use AWS Secrets Manager</li>
   </ul>
 
   <h3 class="heading-small" id="how-we-manage-code-changes">How we manage code changes</h3>
@@ -195,8 +195,14 @@
   </ul>
 
   <h2 class="heading-medium" id="security-classifications">Security classifications</h2>
-  <p class="govuk-body">You can use Notify to send messages classified as ‘OFFICIAL’ or ‘OFFICIAL-SENSITIVE’ under the <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/government/publications/government-security-classifications">Government Security Classifications policy</a>.</p>
-  <p class="govuk-body">Notify does not process data classified as ‘SECRET’ or ‘TOP SECRET’.</p>
+  <p class="govuk-body">We have designed GOV.UK Notify for sending messages classified as ‘OFFICIAL’, including ‘OFFICIAL-SENSITIVE’, under the <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/government/publications/government-security-classifications">Government Security Classifications policy</a>.</p>
+  <p class="govuk-body">Before you send any messages classified as ‘OFFICIAL’, you must make sure that GOV.UK Notify meets your organisation’s standards for:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>using, processing, storing and sending information</li>
+    <li>cyber security</li>
+    <li>data protection</li>
+  </ul>
+  <p class="govuk-body">Notify must not be used to process data classified as ‘SECRET’ or ‘TOP SECRET’.</p>
 
   <h2 class="heading-medium" id="staff-suppliers-and-governance">Staff, suppliers and governance</h2>
   <h3 class="heading-small">GOV.UK Notify staff</h3>
@@ -207,7 +213,7 @@
     <li>receive security training</li>
     <li>complete <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/government/publications/government-baseline-personnel-security-standard">personnel screening equivalent to BPSS</a></li>
   </ul>
-  <p class="govuk-body">Team members who need greater access must complete <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/government/publications/united-kingdom-security-vetting-clearance-levels/national-security-vetting-clearance-levels#security-check-sc">National Security Vetting to Security Check (SC) level</a>.</p>
+  <p class="govuk-body">Team members who need greater access to the data stored on Notify must complete <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/government/publications/united-kingdom-security-vetting-clearance-levels/national-security-vetting-clearance-levels#security-check-sc">National Security Vetting to Security Check (SC) level</a>.</p>
   <p class="govuk-body">We only give additional access to GOV.UK Notify’s production environment to privileged users:</p>
   <ul class="govuk-list govuk-list--bullet">
     <li>by exception</li>
@@ -238,7 +244,7 @@
     <li>organises information assurance activities</li>
     <li>oversees risk treatment activities</li>
     <li>reports its findings and recommendations to the SRO and COO</li>
-    <li>escalate risk management decisions to the GDS Senior Leadership Team as necessary</li>
+    <li>escalates risk management decisions to the GDS Senior Leadership Team as necessary</li>
   </ul>
   <p class="govuk-body">The Data Protection, Privacy and Accessibility Monitoring teams make sure that Notify complies with any legal and regulatory requirements.</p>
 
