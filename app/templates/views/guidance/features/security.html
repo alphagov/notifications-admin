@@ -60,7 +60,7 @@
   <p class="govuk-body">Once your service is live, you can choose the number of days you want Notify to keep details of the messages you send.</p>
   <p class="govuk-body">For more information, see <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_data_retention_period') }}">data retention period</a>.</p>
 
-  <h3 class="heading-small" id="how-long-we-keep-your-data">Who can access your data</h3>
+  <h3 class="heading-small" id="who-can-access-your-data">Who can access your data</h3>
   <p class="govuk-body">Your data could be accessed by:</p>
   <ul class="govuk-list govuk-list--bullet">
     <li>the Notify team</li>
@@ -70,5 +70,20 @@
   <p class="govuk-body">Teams using GOV.UK Notify can only access their own data.</p>
   <p class="govuk-body">You can set <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_team_members_and_permissions') }}">different permissions for each member of your team</a>.</p>
   <p class="govuk-body">AWS provides logical separation between different AWS customers.</p>
+
+  <h3 class="heading-small" id="data-centre-security">Data centre security</h3>
+  <p class="govuk-body">AWS provides a description of their:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="https://aws.amazon.com/compliance/data-center/controls/">physical security measures, data sanitisation and equipment disposal arrangements</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="https://aws.amazon.com/compliance/programs/">security assurance materials</a></li>
+  </ul>
+
+  <h3 class="heading-small" id="how-text-messages-are-stored-and-processed">How text messages are stored and processed</h3>
+  <p class="govuk-body">Text messages are stored and processed in:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>the UK and Ireland</li>
+    <li>the country where the recipient’s phone is</li>
+    <li>the phone’s country of origin (for international numbers)</li>
+  </ul>
 
 {% endblock %}
