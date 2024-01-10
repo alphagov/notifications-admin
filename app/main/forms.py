@@ -2884,6 +2884,6 @@ class AddOrJoinServiceForm(StripWhitespaceForm):
         "Start using Notify",
         choices=(
             ("main.add_service", "Add a new service"),
-            ("main.choose_service_to_join", "Join an existing team"),
+            ("main.choose_service_to_join", "Join an existing service"),
         ),
     )

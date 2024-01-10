@@ -18,11 +18,16 @@
         If they accept your request you’ll get an email with an invite.
       </p>
       <p class="govuk-body">
-        In the mean time you can
-        <a href="{{ url_for('main.add_service') }}" class="govuk-link govuk-link--no-visited-state">try out Notify by creating your own service</a>
-        or
-        <a href="{{ url_for('main.sign_out') }}" class="govuk-link govuk-link--no-visited-state">sign out for now</a>.
+        In the meantime you can:
       </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>
+          <a href="{{ url_for('main.add_service') }}" class="govuk-link govuk-link--no-visited-state">add a new service</a> and try Notify for yourself
+        </li>
+        <li>
+          <a href="{{ url_for('main.sign_out') }}" class="govuk-link govuk-link--no-visited-state">sign out for now</a>
+        </li>
+      </ul>
     </div>
   </div>
 {% endblock %}
