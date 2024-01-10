@@ -117,7 +117,7 @@
       {% if current_user.default_organisation.can_ask_to_join_a_service %}
         {{ govukButton({
           "element": "a",
-          "text": "Join an existing team",
+          "text": "Join an existing service",
           "href": url_for('main.choose_service_to_join'),
           "classes": "govuk-button--secondary"
         }) }}

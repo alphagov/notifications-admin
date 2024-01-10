@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set heading = 'Ask to join {}'.format(service.name) %}
+{% set heading = 'Ask to join ‘{}’'.format(service.name) %}
 
 {% block per_page_title %}
   {{ heading }}
@@ -21,7 +21,7 @@
     {% call form_wrapper() %}
       {{ form.users }}
       {{ form.reason }}
-      {{ page_footer('Ask for access') }}
+      {{ page_footer('Ask to join this service') }}
     {% endcall %}
   </div>
 </div>
