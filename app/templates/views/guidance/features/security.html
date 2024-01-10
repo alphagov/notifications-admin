@@ -144,5 +144,24 @@
   </ul>
   <p class="govuk-body">We announce planned downtime on the <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">Notify status page</a>.</p>
 
+  <h2 class="heading-medium" id="building-and-managing-notify">Finding and fixing security issues</h2>
+  <p class="govuk-body">GOV.UK Notify:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>follows <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/collection/developers-collection/principles">secure development principles</a></li>
+    <li>tracks third-party dependencies in our code base</li>
+    <li>monitors our logs for attacks, misuse and malfunctions</li>
+    <li>provides <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">24-hour online support</a></li>
+  </ul>
+  <p class="govuk-body">We use <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/information/web-check">Web Check</a> and other services to:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>scan for vulnerabilities</li>
+    <li>prioritise which software patches to test and deploy first</li>
+  </ul>
+  <p class="govuk-body">AWS is responsible for patching our infrastructure:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>firmware</li>
+    <li>hardware</li>
+    <li>operating system (OS) kernel</li>
+  </ul>
 
 {% endblock %}
