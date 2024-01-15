@@ -5069,7 +5069,7 @@ class TestConfirmDisableEmailAuth:
         )
 
     def test_save_disables_email_auth_for_service_users(
-        self, mocker, client_request, service_one, active_user_with_permissions
+        self, mocker, client_request, service_one, active_user_with_permissions, mock_update_user_attribute
     ):
         active_user_with_permissions["auth_type"] = "email_auth"
         active_user_with_permissions["permissions"][service_one["id"]].append("email_auth")
@@ -5205,7 +5205,13 @@ class TestSetAuthTypeForUsers:
         ]
 
     def test_sets_email_auth_for_users(
-        self, mocker, client_request, service_one, active_user_with_permissions, mock_get_invites_for_service
+        self,
+        mocker,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mock_get_invites_for_service,
+        mock_update_user_attribute,
     ):
         mocker.patch(
             "app.models.user.Users.client_method",
@@ -5217,9 +5223,6 @@ class TestSetAuthTypeForUsers:
                     id="b", name="Zulu", email_address="notify+2@notify.test", auth_type="email_auth"
                 ),
             ],
-        )
-        mock_update_user = mocker.patch(
-            "app.notify_client.user_api_client.user_api_client.update_user_attribute", autospec=True
         )
         service_one["permissions"] += ["email_auth"]
         client_request.login(active_user_with_permissions)
@@ -5229,10 +5232,16 @@ class TestSetAuthTypeForUsers:
             _data={"users": ["a", "b"]},
         )
 
-        assert mock_update_user.call_args_list == [mocker.call("a", auth_type="email_auth")]
+        assert mock_update_user_attribute.call_args_list == [mocker.call("a", auth_type="email_auth")]
 
     def test_sets_sms_auth_for_deselected_users(
-        self, mocker, client_request, service_one, active_user_with_permissions, mock_get_invites_for_service
+        self,
+        mocker,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mock_get_invites_for_service,
+        mock_update_user_attribute,
     ):
         mocker.patch(
             "app.models.user.Users.client_method",
@@ -5244,9 +5253,6 @@ class TestSetAuthTypeForUsers:
                     id="b", name="Zulu", email_address="notify+2@notify.test", auth_type="email_auth"
                 ),
             ],
-        )
-        mock_update_user = mocker.patch(
-            "app.notify_client.user_api_client.user_api_client.update_user_attribute", autospec=True
         )
         service_one["permissions"] += ["email_auth"]
         client_request.login(active_user_with_permissions)
@@ -5258,7 +5264,7 @@ class TestSetAuthTypeForUsers:
             _data={"csrf": "token"},
         )
 
-        assert mock_update_user.call_args_list == [mocker.call("b", auth_type="sms_auth")]
+        assert mock_update_user_attribute.call_args_list == [mocker.call("b", auth_type="sms_auth")]
 
     def test_updates_invited_users(
         self, mocker, client_request, service_one, active_user_with_permissions, sample_invite
@@ -5288,7 +5294,7 @@ class TestSetAuthTypeForUsers:
         "form_data, should_fail",
         (
             (dict(users=["a"]), False),  # Change user a to email_auth
-            (dict(users=[]), False),  # Change user b to sms_auth
+            (dict(users=[]), False),  # Change both user a and user b to sms_auth
             (dict(users=["c"]), True),  # Change user c to email_auth
         ),
     )
@@ -5301,6 +5307,7 @@ class TestSetAuthTypeForUsers:
         mock_get_invites_for_service,
         form_data,
         should_fail,
+        mock_update_user_attribute,
     ):
         mocker.patch(
             "app.models.user.Users.client_method",
@@ -5316,9 +5323,6 @@ class TestSetAuthTypeForUsers:
                 ),
             ],
         )
-        mock_update_user = mocker.patch(
-            "app.notify_client.user_api_client.user_api_client.update_user_attribute", autospec=True
-        )
         service_one["permissions"] += ["email_auth"]
         client_request.login(active_user_with_permissions)
         page = client_request.post(
@@ -5330,9 +5334,9 @@ class TestSetAuthTypeForUsers:
 
         if should_fail:
             assert "not a valid choice for this field" in page.text
-            assert mock_update_user.call_args_list == []
+            assert mock_update_user_attribute.call_args_list == []
         else:
-            assert mock_update_user.call_args_list != []
+            assert mock_update_user_attribute.call_args_list != []
 
 
 def test_service_settings_page_loads_when_inbound_number_is_not_set(

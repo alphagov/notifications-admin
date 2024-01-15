@@ -20,7 +20,6 @@ def test_user_information_page_shows_information_about_user(
     mocker.patch(
         "app.user_api_client.get_user",
         return_value=user_json(name="Apple Bloom", services=[user_service_one, user_service_two]),
-        autospec=True,
     )
 
     mocker.patch(
@@ -67,7 +66,6 @@ def test_user_information_page_shows_change_auth_type_link(
     mocker.patch(
         "app.user_api_client.get_user",
         return_value=user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type="sms_auth"),
-        autospec=True,
     )
 
     page = client_request.get("main.user_information", user_id=api_user_active["id"])
@@ -87,7 +85,6 @@ def test_user_information_page_doesnt_show_change_auth_type_link_if_user_on_weba
             platform_admin_user,
             user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type="webauthn_auth"),
         ],
-        autospec=True,
     )
 
     page = client_request.get("main.user_information", user_id=api_user_active["id"])
@@ -105,7 +102,6 @@ def test_change_user_auth_preselects_current_auth_type(
     mocker.patch(
         "app.user_api_client.get_user",
         return_value=user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type=current_auth_type),
-        autospec=True,
     )
 
     checked_radios = client_request.get(
@@ -123,7 +119,6 @@ def test_change_user_auth(client_request, platform_admin_user, api_user_active, 
     mocker.patch(
         "app.user_api_client.get_user",
         return_value=user_json(id_=api_user_active["id"], name="Apple Bloom", auth_type="sms_auth"),
-        autospec=True,
     )
 
     mock_update = mocker.patch("app.user_api_client.update_user_attribute")
@@ -151,7 +146,6 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
     mocker.patch(
         "app.user_api_client.get_user",
         return_value=user_json(name="Apple Bloom", failed_login_count=2),
-        autospec=True,
     )
 
     mocker.patch(
@@ -187,7 +181,7 @@ def test_user_information_page_does_not_show_archive_link_for_inactive_users(
     inactive_user_id = uuid.uuid4()
     inactive_user = user_json(id_=inactive_user_id, state="inactive")
     client_request.login(platform_admin_user)
-    mocker.patch("app.user_api_client.get_user", side_effect=[platform_admin_user, inactive_user], autospec=True)
+    mocker.patch("app.user_api_client.get_user", side_effect=[platform_admin_user, inactive_user])
 
     page = client_request.get("main.user_information", user_id=inactive_user_id)
 
