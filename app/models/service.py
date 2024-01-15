@@ -1,9 +1,11 @@
 from typing import Optional
 
-from flask import abort, current_app
+from flask import abort, current_app, render_template
+from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
+from app.extensions import zendesk_client
 from app.models import JSONModel
 from app.models.branding import EmailBranding, LetterBranding
 from app.models.contact_list import ContactLists
@@ -415,6 +417,29 @@ class Service(JSONModel):
     def notify_organisation_users_of_request_to_go_live(self):
         if self.organisation.can_approve_own_go_live_requests:
             return organisations_client.notify_users_of_request_to_go_live_for_service(self.id)
+
+    def raise_support_ticket_for_request_to_go_live(self, user):
+        ticket_message = render_template("support-tickets/go-live-request.txt") + "\n"
+
+        ticket = NotifySupportTicket(
+            subject=f"Request to go live - {self.name}",
+            message=ticket_message,
+            ticket_type=NotifySupportTicket.TYPE_QUESTION,
+            notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
+            user_name=user.name,
+            user_email=user.email_address,
+            requester_sees_message_content=False,
+            org_id=self.organisation_id,
+            org_type=self.organisation_type,
+            service_id=self.id,
+            ticket_categories=["notify_go_live_request"],
+        )
+        zendesk_client.send_ticket_to_zendesk(ticket)
+
+    def make_request_to_go_live(self, user):
+        self.update(go_live_user=user.id, has_active_go_live_request=True)
+        self.notify_organisation_users_of_request_to_go_live()
+        self.raise_support_ticket_for_request_to_go_live(user)
 
     @cached_property
     def free_sms_fragment_limit(self):

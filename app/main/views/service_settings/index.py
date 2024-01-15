@@ -13,7 +13,6 @@ from flask import (
 from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
@@ -28,7 +27,6 @@ from app.event_handlers import (
     create_archive_service_event,
     create_set_inbound_sms_on_event,
 )
-from app.extensions import zendesk_client
 from app.main import json_updates, main
 from app.main.forms import (
     AdminBillingDetailsForm,
@@ -225,29 +223,7 @@ def request_to_go_live(service_id):
 @user_has_permissions("manage_service")
 @user_is_gov_user
 def submit_request_to_go_live(service_id):
-    ticket_message = render_template("support-tickets/go-live-request.txt") + "\n"
-
-    ticket = NotifySupportTicket(
-        subject=f"Request to go live - {current_service.name}",
-        message=ticket_message,
-        ticket_type=NotifySupportTicket.TYPE_QUESTION,
-        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
-        user_name=current_user.name,
-        user_email=current_user.email_address,
-        requester_sees_message_content=False,
-        org_id=current_service.organisation_id,
-        org_type=current_service.organisation_type,
-        service_id=current_service.id,
-        ticket_categories=["notify_go_live_request"],
-    )
-    zendesk_client.send_ticket_to_zendesk(ticket)
-
-    current_service.update(
-        go_live_user=current_user.id,
-        has_active_go_live_request=True,
-    )
-
-    current_service.notify_organisation_users_of_request_to_go_live()
+    current_service.make_request_to_go_live(current_user)
 
     flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")
     return redirect(url_for(".service_settings", service_id=service_id))

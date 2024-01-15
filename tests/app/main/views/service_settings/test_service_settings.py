@@ -1976,7 +1976,7 @@ def test_should_redirect_after_request_to_go_live(
 ):
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
-        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
+        "app.models.service.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
     page = client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
@@ -2071,7 +2071,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     )
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
-        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
+        "app.models.service.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
     client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
@@ -2139,7 +2139,7 @@ def test_request_to_go_live_displays_mou_signatories(
         ),
     )
     mocker.patch(
-        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
+        "app.models.service.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
@@ -2173,9 +2173,7 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             new_callable=PropertyMock,
             return_value=1,
         )
-    mock_post = mocker.patch(
-        "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True
-    )
+    mock_post = mocker.patch("app.models.service.zendesk_client.send_ticket_to_zendesk", autospec=True)
 
     client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
 
@@ -2202,7 +2200,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
 ):
     organisation_one["can_approve_own_go_live_requests"] = can_approve_own_go_live_requests
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
-    mocker.patch("app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True)
+    mocker.patch("app.models.service.zendesk_client.send_ticket_to_zendesk", autospec=True)
 
     client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID)
 
