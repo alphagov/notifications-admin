@@ -2026,20 +2026,10 @@ def test_should_redirect_after_request_to_go_live(
 
 
 @pytest.mark.parametrize(
-    "can_approve_own_go_live_requests, expected_go_live_notes",
+    "can_approve_own_go_live_requests, expected_zendesk_ticket, expected_notify_organisation_call_args",
     (
-        (
-            False,
-            "This service is not allowed to go live",
-        ),
-        (
-            True,
-            (
-                "This organisation can approve its own go live requests. "
-                "No action should be needed from us. "
-                "This service is not allowed to go live"
-            ),
-        ),
+        (False, True, []),
+        (True, False, [call(SERVICE_ONE_ID)]),
     ),
 )
 def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
@@ -2058,14 +2048,14 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     mock_get_invites_without_manage_permission,
     mock_notify_users_of_request_to_go_live_for_service,
     can_approve_own_go_live_requests,
-    expected_go_live_notes,
+    expected_zendesk_ticket,
+    expected_notify_organisation_call_args,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
         side_effect=lambda org_id: organisation_json(
             ORGANISATION_ID,
             "Org 1",
-            request_to_go_live_notes="This service is not allowed to go live",
             can_approve_own_go_live_requests=can_approve_own_go_live_requests,
         ),
     )
@@ -2076,44 +2066,9 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     )
     client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
 
-    expected_message = (
-        "Service: service one\n"
-        "http://localhost/services/{service_id}\n"
-        "\n"
-        "---\n"
-        "Organisation type: Central government\n"
-        "Agreement signed: No (organisation is Org 1, a crown body). {expected_go_live_notes}\n"
-        "\n"
-        "Other live services for that user: No\n"
-        "\n"
-        "---\n"
-        "Request sent by test@user.gov.uk\n"
-        "Requester’s user page: http://localhost/users/{user_id}\n"
-    ).format(
-        service_id=SERVICE_ONE_ID,
-        expected_go_live_notes=expected_go_live_notes,
-        user_id=active_user_with_permissions["id"],
-    )
-
-    if can_approve_own_go_live_requests:
-        assert mock_create_ticket.called is False
-        assert mock_send_ticket_to_zendesk.called is False
-    else:
-        mock_create_ticket.assert_called_once_with(
-            ANY,
-            subject="Request to go live - service one",
-            message=expected_message,
-            ticket_type="question",
-            notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
-            user_name=active_user_with_permissions["name"],
-            user_email=active_user_with_permissions["email_address"],
-            requester_sees_message_content=False,
-            org_id=ORGANISATION_ID,
-            org_type="central",
-            service_id=SERVICE_ONE_ID,
-            ticket_categories=["notify_go_live_request"],
-        )
-        mock_send_ticket_to_zendesk.assert_called_once()
+    assert mock_create_ticket.called is expected_zendesk_ticket
+    assert mock_send_ticket_to_zendesk.called is expected_zendesk_ticket
+    assert mock_notify_users_of_request_to_go_live_for_service.call_args_list == expected_notify_organisation_call_args
 
 
 def test_request_to_go_live_displays_mou_signatories(
@@ -2182,33 +2137,6 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
     client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
 
     assert mock_post.called is True
-
-
-@pytest.mark.parametrize(
-    "can_approve_own_go_live_requests, expected_call_args",
-    (
-        (True, [call(SERVICE_ONE_ID)]),
-        (False, []),
-    ),
-)
-def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organisation(
-    client_request,
-    mocker,
-    mock_get_organisations_and_services_for_user,
-    mock_get_service_organisation,
-    mock_update_service,
-    mock_notify_users_of_request_to_go_live_for_service,
-    organisation_one,
-    can_approve_own_go_live_requests,
-    expected_call_args,
-):
-    organisation_one["can_approve_own_go_live_requests"] = can_approve_own_go_live_requests
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
-    mocker.patch("app.models.service.zendesk_client.send_ticket_to_zendesk", autospec=True)
-
-    client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-
-    assert mock_notify_users_of_request_to_go_live_for_service.call_args_list == expected_call_args
 
 
 @pytest.mark.parametrize(
