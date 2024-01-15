@@ -415,8 +415,7 @@ class Service(JSONModel):
         return User.from_id(self._dict["go_live_user"])
 
     def notify_organisation_users_of_request_to_go_live(self):
-        if self.organisation.can_approve_own_go_live_requests:
-            return organisations_client.notify_users_of_request_to_go_live_for_service(self.id)
+        return organisations_client.notify_users_of_request_to_go_live_for_service(self.id)
 
     def raise_support_ticket_for_request_to_go_live(self, user):
         ticket_message = render_template("support-tickets/go-live-request.txt") + "\n"
@@ -438,8 +437,11 @@ class Service(JSONModel):
 
     def make_request_to_go_live(self, user):
         self.update(go_live_user=user.id, has_active_go_live_request=True)
-        self.notify_organisation_users_of_request_to_go_live()
-        self.raise_support_ticket_for_request_to_go_live(user)
+
+        if self.organisation.can_approve_own_go_live_requests:
+            self.notify_organisation_users_of_request_to_go_live()
+        else:
+            self.raise_support_ticket_for_request_to_go_live(user)
 
     @cached_property
     def free_sms_fragment_limit(self):
