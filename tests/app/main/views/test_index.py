@@ -273,8 +273,22 @@ def test_email_branding_preview(
     email_branding_retrieved,
 ):
     page = client_request.get("main.email_template", _test_page_title=False, **extra_args)
-    assert page.select_one("title").text == "Email branding preview"
+    assert page.select_one("title").text == "Preview of email branding"
     assert mock_get_email_branding.called is email_branding_retrieved
+
+
+def test_email_branding_preview_allows_custom_page_title(
+    client_request,
+    mock_get_email_branding,
+):
+    page = client_request.get(
+        "main.email_template",
+        _test_page_title=False,
+        branding_style="custom",
+        type="org",
+        title="Preview of new email branding",
+    )
+    assert page.select_one("title").text == "Preview of new email branding"
 
 
 @pytest.mark.parametrize("filename", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
@@ -349,6 +363,35 @@ def test_letter_template_preview_returns_400_if_both_branding_style_and_filename
         _test_page_title=False,
         _expected_status=400,
     )
+
+
+@pytest.mark.parametrize(
+    "extra_args, expected_page_title",
+    (
+        (
+            {},
+            "Preview of letter branding",
+        ),
+        (
+            {"title": "Preview of new letter branding"},
+            "Preview of new letter branding",
+        ),
+    ),
+)
+def test_letter_template_preview_works_with_and_without_custom_page_title(
+    client_request,
+    extra_args,
+    expected_page_title,
+):
+    page = client_request.get(
+        "main.letter_template",
+        _test_page_title=False,
+        # Letter HTML doesn’t use the Design System, so elements won’t have class attributes
+        _test_for_elements_without_class=False,
+        filename="some-filename",
+        **extra_args,
+    )
+    assert page.select_one("title").text == expected_page_title
 
 
 def test_letter_template_preview_headers(

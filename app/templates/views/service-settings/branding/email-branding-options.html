@@ -24,7 +24,8 @@
   </p>
 
   {{ email_branding_preview(
-    current_service.email_branding_id if current_service.email_branding else '__NONE__'
+    current_service.email_branding_id if current_service.email_branding else '__NONE__',
+    title='Preview of current email branding'
   ) }}
 
   {% if current_service.needs_to_change_email_branding %}

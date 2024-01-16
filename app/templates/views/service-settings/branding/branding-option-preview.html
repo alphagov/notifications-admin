@@ -27,9 +27,9 @@
   </p>
 
   {% if branding_type == 'email' %}
-    {{ email_branding_preview(chosen_branding.id) }}
+    {{ email_branding_preview(chosen_branding.id, title='Preview of new email branding') }}
   {% else %}
-    {{ letter_branding_preview(chosen_branding.id) }}
+    {{ letter_branding_preview(chosen_branding.id, title='Preview of new letter branding') }}
   {% endif %}
 
 
