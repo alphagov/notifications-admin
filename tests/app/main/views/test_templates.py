@@ -1937,23 +1937,31 @@ def test_letter_branding_preview_image(
     original_filename,
     new_filename,
 ):
-    mocked_preview = mocker.patch(
-        "app.main.views.templates.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
-    )
+    class MockedResponse:
+        content = "foo"
+        status_code = 200
+        headers = {}
+
+    mocked_preview = mocker.patch("app.template_previews.requests.post", return_value=MockedResponse())
     response = client_request.get_response(
         "no_cookie.letter_branding_preview_image",
         filename=original_filename,
     )
 
     mocked_preview.assert_called_with(
-        {
-            "subject": "An example letter",
-            "content": ANY,
-            "template_type": "letter",
-            "is_precompiled_letter": False,
+        "http://localhost:9999/preview.png",
+        json={
+            "letter_contact_block": "",
+            "template": {
+                "subject": "An example letter",
+                "content": ANY,
+                "template_type": "letter",
+                "is_precompiled_letter": False,
+            },
+            "values": None,
+            "filename": new_filename,
         },
-        filetype="png",
-        branding_filename=new_filename,
+        headers={"Authorization": "Token my-secret-key"},
     )
     assert response.get_data(as_text=True) == "foo"
 
