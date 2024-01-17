@@ -27,7 +27,7 @@ class TemplatePreview:
             "letter_contact_block": db_template.get("reply_to_text", ""),
             "template": db_template,
             "values": values,
-            "filename": branding_filename or current_service.letter_branding.filename,
+            "filename": branding_filename or (current_service.letter_branding.filename if current_service else None),
         }
         response = requests.post(
             "{}/preview.{}{}".format(
