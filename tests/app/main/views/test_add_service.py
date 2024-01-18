@@ -94,6 +94,15 @@ def test_show_different_page_content_based_on_user_org_type(client_request, mock
     assert page.select_one("h1").text.strip() == "Enter a service name"
     assert page.select_one("input[name=name]").get("value") is None
     assert all(content in page.select_one("main").text for content in expected_content_lines)
+    assert not page.select(".govuk-back-link")
+
+
+def test_shows_back_link_if_come_from_join_service_page(
+    client_request,
+    mock_get_no_organisation_by_domain,
+):
+    page = client_request.get("main.add_service", back="add_or_join")
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.add_or_join_service")
 
 
 @pytest.mark.parametrize(
