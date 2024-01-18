@@ -411,7 +411,7 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
         organisation_json(ORGANISATION_ID),
     ),
 )
-def test_join_or_add_service_page_redirects_without_permission(
+def test_join_or_add_service_page_403s_without_permission(
     mocker,
     client_request,
     organisation,
