@@ -6,7 +6,7 @@ from notifications_python_client.errors import HTTPError
 
 from app.utils.user import is_gov_user
 from tests import organisation_json, service_json
-from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
+from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
 
 
 def test_non_gov_user_cannot_see_add_service_button(
@@ -395,12 +395,36 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
     assert "email_auth" in mock_update_service.call_args[1]["permissions"]
 
 
+@pytest.mark.parametrize(
+    "organisation",
+    (
+        None,
+        organisation_json(ORGANISATION_ID),
+    ),
+)
+def test_join_or_add_service_page_redirects_without_permission(
+    mocker,
+    client_request,
+    organisation,
+):
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation,
+    )
+    client_request.get(
+        "main.add_or_join_service",
+        _expected_status=403,
+    )
+
+
 def test_join_or_add_service_page(
     mocker,
     client_request,
-    mock_get_organisation_by_domain,
-    mock_get_organisation_services,
 ):
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation_json(ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
     mocker.patch(
         "app.organisations_client.get_organisation_services",
         return_value=[
@@ -441,11 +465,15 @@ def test_join_or_add_service_page(
     ),
 )
 def test_post_join_or_add_service_page(
+    mocker,
     client_request,
-    mock_get_organisation_by_domain,
     mock_get_organisation_services,
     choice,
 ):
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation_json(ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
     client_request.post(
         "main.add_or_join_service",
         _data={
