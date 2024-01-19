@@ -301,7 +301,10 @@ def test_example_spreadsheet_for_letters(
     page = client_request.get(".send_messages", service_id=SERVICE_ONE_ID, template_id=fake_uuid)
 
     assert list(
-        zip(*[[normalize_spaces(cell.text) for cell in page.select("tbody tr")[row].select("td")] for row in (0, 1)])
+        zip(
+            *[[normalize_spaces(cell.text) for cell in page.select("tbody tr")[row].select("td")] for row in (0, 1)],
+            strict=True,
+        )
     ) == [
         ("1", "2"),
         ("address line 1", "A. Name"),
@@ -318,8 +321,8 @@ def test_example_spreadsheet_for_letters(
 
 @pytest.mark.parametrize(
     "filename, acceptable_file, expected_status",
-    list(zip(test_spreadsheet_files, repeat(True), repeat(302)))
-    + list(zip(test_non_spreadsheet_files, repeat(False), repeat(200))),
+    list(zip(test_spreadsheet_files, repeat(True), repeat(302), strict=False))
+    + list(zip(test_non_spreadsheet_files, repeat(False), repeat(200), strict=False)),
 )
 def test_upload_files_in_different_formats(
     filename,

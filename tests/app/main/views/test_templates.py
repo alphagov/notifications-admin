@@ -2075,7 +2075,7 @@ def test_choose_a_template_to_copy(
 
     assert len(actual) == len(expected)
 
-    for actual, expected in zip(actual, expected):  # noqa: B020
+    for actual, expected in zip(actual, expected, strict=True):  # noqa: B020
         assert normalize_spaces(actual.text) == expected
 
     links = page.select(".template-list-item a")
@@ -2132,7 +2132,7 @@ def test_choose_a_template_to_copy_passes_through_folder_id(
 
     assert len(actual) == len(expected)
 
-    for actual, expected in zip(actual, expected):  # noqa: B020
+    for actual, expected in zip(actual, expected, strict=True):  # noqa: B020
         assert normalize_spaces(actual.text) == expected
 
     links = page.select(".template-list-item a")
@@ -2183,7 +2183,7 @@ def test_choose_a_template_to_copy_when_user_has_one_service(
 
     assert len(actual) == len(expected)
 
-    for actual, expected in zip(actual, expected):  # noqa: B020
+    for actual, expected in zip(actual, expected, strict=True):  # noqa: B020
         assert normalize_spaces(actual.text) == expected
 
     assert page.select(".template-list-item a")[0]["href"] == url_for(
@@ -2254,7 +2254,7 @@ def test_choose_a_template_to_copy_from_folder_within_service(
 
     assert len(actual) == len(expected)
 
-    for actual, expected in zip(actual, expected):  # noqa: B020
+    for actual, expected in zip(actual, expected, strict=True):  # noqa: B020
         assert normalize_spaces(actual.text) == expected
 
     links = page.select(".template-list-item a")

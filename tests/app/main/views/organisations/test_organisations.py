@@ -36,8 +36,7 @@ def test_organisation_page_shows_all_organisations(client_request, platform_admi
             link["href"],
         )
         for link, hint in zip(
-            page.select(".browse-list-item a"),
-            page.select(".browse-list-item .browse-list-hint"),
+            page.select(".browse-list-item a"), page.select(".browse-list-item .browse-list-hint"), strict=True
         )
     ] == [
         ("Test 1", "1 live service", url_for("main.organisation_dashboard", org_id="B1")),
