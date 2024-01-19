@@ -6,11 +6,11 @@
 
 {% set heading = 'Enter a service name' %}
 
-{% if request.args.get("back") == "add_or_join" %}
-  {% block backLink %}
+{% block backLink %}
+  {% if request.args.get("back") == "add_or_join" %}
     {{ govukBackLink({ "href": url_for('main.add_or_join_service') }) }}
-  {% endblock %}
-{% endif %}
+  {% endif %}
+{% endblock %}
 
 {% block per_page_title %}
   {{ heading }}

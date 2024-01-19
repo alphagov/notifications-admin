@@ -1,4 +1,4 @@
-from flask import current_app, redirect, render_template, session, url_for
+from flask import abort, current_app, redirect, render_template, session, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
@@ -48,6 +48,9 @@ def _create_example_template(service_id):
 @user_is_logged_in
 @user_is_gov_user
 def add_or_join_service():
+    if not current_user.default_organisation.can_ask_to_join_a_service:
+        abort(403)
+
     form = AddOrJoinServiceForm(organisation=current_user.default_organisation)
 
     if form.validate_on_submit():
