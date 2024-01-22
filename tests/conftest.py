@@ -3743,7 +3743,7 @@ def mock_get_returned_letter_summary_with_no_returned_letters(mocker):
 
 def do_mock_get_page_counts_for_letter(mocker, count, welsh_page_count=0, attachment_page_count=0):
     return mocker.patch(
-        "app.template_previews.get_page_counts_for_letter",
+        "app.template_previews.TemplatePreview.get_page_counts_for_letter",
         return_value={
             "count": count,
             "welsh_page_count": welsh_page_count,

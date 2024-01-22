@@ -83,30 +83,30 @@ class TemplatePreview:
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
+    @classmethod
+    def get_page_counts_for_letter(cls, db_template, values=None):
+        """
+        Expected return value format (mimics the template-preview endpoint:
+            {'count': int, 'welsh_page_count': int, 'attachment_page_count': int}
+        """
+        if db_template["template_type"] != "letter":
+            return None
 
-def get_page_counts_for_letter(db_template, values=None):
-    """
-    Expected return value format (mimics the template-preview endpoint:
-        {'count': int, 'welsh_page_count': int, 'attachment_page_count': int}
-    """
-    if db_template["template_type"] != "letter":
-        return None
+        data = {
+            "letter_contact_block": db_template.get("reply_to_text", ""),
+            "template": db_template,
+            "values": values,
+            "filename": current_service.letter_branding.filename,
+        }
+        response = requests.post(
+            f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.json".format(),
+            json=data,
+            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+        )
 
-    data = {
-        "letter_contact_block": db_template.get("reply_to_text", ""),
-        "template": db_template,
-        "values": values,
-        "filename": current_service.letter_branding.filename,
-    }
-    response = requests.post(
-        f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.json".format(),
-        json=data,
-        headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
-    )
+        page_count = json.loads(response.content.decode("utf-8"))
 
-    page_count = json.loads(response.content.decode("utf-8"))
-
-    return page_count
+        return page_count
 
 
 def sanitise_letter(pdf_file, *, upload_id, allow_international_letters, is_an_attachment=False):
