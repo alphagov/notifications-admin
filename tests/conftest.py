@@ -4278,3 +4278,10 @@ def mock_get_letter_rates(mocker):
         ]
 
     return mocker.patch("app.models.letter_rates.LetterRates.client_method", side_effect=_get_letter_rates)
+
+
+@pytest.fixture(scope="function")
+def mock_onwards_request_headers(mocker):
+    mock_gorh = mocker.patch("notifications_utils.request_helper.NotifyRequest.get_onwards_request_headers")
+    mock_gorh.return_value = {"some-onwards": "request-headers"}
+    return mock_gorh

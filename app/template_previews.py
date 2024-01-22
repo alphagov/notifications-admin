@@ -2,7 +2,8 @@ import base64
 from io import BytesIO
 
 import requests
-from flask import abort, current_app, json
+from flask import abort, current_app, json, request
+from flask.ctx import has_request_context
 from notifications_utils.pdf import extract_page_from_pdf
 
 from app import current_service
@@ -17,7 +18,10 @@ class TemplatePreview:
 
     @classmethod
     def _get_outbound_headers(cls):
-        return {"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"}
+        headers = {"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"}
+        if has_request_context() and hasattr(request, "get_onwards_request_headers"):
+            headers.update(request.get_onwards_request_headers())
+        return headers
 
     @classmethod
     def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None, branding_filename=None):

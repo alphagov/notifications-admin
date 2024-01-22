@@ -1934,6 +1934,7 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 def test_letter_branding_preview_image(
     mocker,
     client_request,
+    mock_onwards_request_headers,
     original_filename,
     new_filename,
 ):
@@ -1961,7 +1962,10 @@ def test_letter_branding_preview_image(
             "values": None,
             "filename": new_filename,
         },
-        headers={"Authorization": "Token my-secret-key"},
+        headers={
+            "Authorization": "Token my-secret-key",
+            "some-onwards": "request-headers",
+        },
     )
     assert response.get_data(as_text=True) == "foo"
 
