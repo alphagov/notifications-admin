@@ -16,6 +16,10 @@ class TemplatePreview:
         return allowed_headers.items()
 
     @classmethod
+    def _get_outbound_headers(cls):
+        return {"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"}
+
+    @classmethod
     def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None, branding_filename=None):
         if db_template["is_precompiled_letter"]:
             raise ValueError
@@ -36,7 +40,7 @@ class TemplatePreview:
                 "?page={}".format(page) if page else "",
             ),
             json=data,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
@@ -49,7 +53,7 @@ class TemplatePreview:
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"], "?hide_notify=true" if page == "1" else ""
             ),
             data=base64.b64encode(pdf_page).decode("utf-8"),
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
@@ -63,7 +67,7 @@ class TemplatePreview:
                 f"?page_number={page}&is_an_attachment={is_an_attachment}",
             ),
             data=pdf_page,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
@@ -79,7 +83,7 @@ class TemplatePreview:
                 "?page={}".format(page) if page else "",
             ),
             json=data,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
@@ -101,7 +105,7 @@ class TemplatePreview:
         response = requests.post(
             f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.json".format(),
             json=data,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
 
         page_count = json.loads(response.content.decode("utf-8"))
@@ -120,5 +124,5 @@ class TemplatePreview:
         return requests.post(
             url,
             data=pdf_file,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
