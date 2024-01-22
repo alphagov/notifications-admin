@@ -131,7 +131,7 @@ packaging==23.1
     # via gunicorn
 phonenumbers==8.13.18
     # via notifications-utils
-pillow==10.0.1
+pillow==10.2.0
     # via -r requirements.in
 prometheus-client==0.15.0
     # via
