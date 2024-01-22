@@ -43,7 +43,7 @@ from app.s3_client.s3_letter_upload_client import (
     get_transient_letter_file_location,
     upload_letter_to_s3,
 )
-from app.template_previews import TemplatePreview, sanitise_letter
+from app.template_previews import TemplatePreview
 from app.utils import unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.letters import (
@@ -164,7 +164,7 @@ def upload_letter(service_id):
         file_location = get_transient_letter_file_location(service_id, upload_id)
 
         try:
-            response = sanitise_letter(
+            response = TemplatePreview.sanitise_letter(
                 BytesIO(pdf_file_bytes),
                 upload_id=upload_id,
                 allow_international_letters=current_service.has_permission("international_letters"),

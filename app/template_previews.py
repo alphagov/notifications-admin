@@ -108,17 +108,17 @@ class TemplatePreview:
 
         return page_count
 
-
-def sanitise_letter(pdf_file, *, upload_id, allow_international_letters, is_an_attachment=False):
-    url = "{host_url}/precompiled/sanitise?allow_international_letters={allow_intl}&upload_id={upload_id}".format(
-        host_url=current_app.config["TEMPLATE_PREVIEW_API_HOST"],
-        allow_intl="true" if allow_international_letters else "false",
-        upload_id=upload_id,
-    )
-    if is_an_attachment:
-        url = url + "&is_an_attachment=true"
-    return requests.post(
-        url,
-        data=pdf_file,
-        headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
-    )
+    @classmethod
+    def sanitise_letter(cls, pdf_file, *, upload_id, allow_international_letters, is_an_attachment=False):
+        url = "{host_url}/precompiled/sanitise?allow_international_letters={allow_intl}&upload_id={upload_id}".format(
+            host_url=current_app.config["TEMPLATE_PREVIEW_API_HOST"],
+            allow_intl="true" if allow_international_letters else "false",
+            upload_id=upload_id,
+        )
+        if is_an_attachment:
+            url = url + "&is_an_attachment=true"
+        return requests.post(
+            url,
+            data=pdf_file,
+            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+        )

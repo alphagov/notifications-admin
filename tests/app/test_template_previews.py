@@ -7,10 +7,7 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from app import load_service_before_request
 from app.models.branding import LetterBranding
-from app.template_previews import (
-    TemplatePreview,
-    sanitise_letter,
-)
+from app.template_previews import TemplatePreview
 from tests.conftest import create_notification
 
 
@@ -277,7 +274,9 @@ def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file(
 ):
     request_mock = mocker.patch("app.template_previews.requests.post")
 
-    sanitise_letter("pdf_data", upload_id=fake_uuid, allow_international_letters=allow_international_letters)
+    TemplatePreview.sanitise_letter(
+        "pdf_data", upload_id=fake_uuid, allow_international_letters=allow_international_letters
+    )
 
     expected_url = (
         f"http://localhost:9999/precompiled/sanitise"
@@ -297,7 +296,9 @@ def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file_for_
 ):
     request_mock = mocker.patch("app.template_previews.requests.post")
 
-    sanitise_letter("pdf_data", upload_id=fake_uuid, allow_international_letters=False, is_an_attachment=True)
+    TemplatePreview.sanitise_letter(
+        "pdf_data", upload_id=fake_uuid, allow_international_letters=False, is_an_attachment=True
+    )
 
     expected_url = (
         f"http://localhost:9999/precompiled/sanitise"
