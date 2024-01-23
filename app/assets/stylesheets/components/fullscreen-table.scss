@@ -15,8 +15,8 @@
 
       margin-bottom: 0;
 
-      tr:last-child {
-        td {
+      tbody tr:last-child {
+        th, td {
           border-bottom: 1px solid govuk-colour("white");
         }
       }
@@ -56,11 +56,6 @@
 
     overflow-x: auto;
     overflow-y: hidden;
-
-    .table-field-heading-first,
-    .table-field-index {
-      display: none;
-    }
 
     .table-field-left-aligned {
       position: relative;
@@ -108,7 +103,7 @@
     }
 
     .table-field-heading-first,
-    .table-field-index {
+    tbody th.table-field {
       transition: none;
       position: relative;
       z-index: 200;
@@ -122,7 +117,7 @@
     padding-bottom: 20px;
 
     .table-field-heading-first,
-    .table-field-index {
+    tbody th.table-field {
       transition: box-shadow 0.3s ease-in-out;
       box-shadow: 1px 0 0 0 $govuk-border-colour, 3px 0 0 0 rgba($govuk-border-colour, 0.2);
     }
