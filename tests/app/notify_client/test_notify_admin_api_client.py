@@ -20,11 +20,11 @@ def test_generate_headers_sets_standard_headers(notify_admin):
     assert headers["X-Custom-Forwarder"] == "proxy-secret"
 
 
-def test_generate_headers_sets_request_id_if_in_request_context(notify_admin):
+def test_generate_headers_sets_request_id_if_in_request_context(notify_admin, mock_onwards_request_headers):
     api_client = NotifyAdminAPIClient()
     api_client.init_app(notify_admin)
 
-    with notify_admin.test_request_context() as request_context:
+    with notify_admin.test_request_context():
         notify_admin.preprocess_request()
         headers = api_client.generate_headers("api_token")
 
@@ -33,11 +33,9 @@ def test_generate_headers_sets_request_id_if_in_request_context(notify_admin):
         "Content-type",
         "User-agent",
         "X-Custom-Forwarder",
-        "X-B3-TraceId",
-        "X-B3-SpanId",
+        "some-onwards",
     }
-    assert headers["X-B3-TraceId"] == request_context.request.request_id
-    assert headers["X-B3-SpanId"] == request_context.request.span_id
+    assert headers["some-onwards"] == "request-headers"
 
 
 def test_get_notification_status_by_service(mocker):

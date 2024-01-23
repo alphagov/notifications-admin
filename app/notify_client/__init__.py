@@ -30,18 +30,14 @@ class NotifyAdminAPIClient(BaseAPIClient):
             "X-Custom-Forwarder": self.route_secret,
             "User-agent": f"NOTIFY-API-PYTHON-CLIENT/{__version__}",
         }
-        return self._add_request_id_header(headers)
-
-    @staticmethod
-    def _add_request_id_header(headers):
-        if not has_request_context():
-            return headers
-
-        headers["X-B3-TraceId"] = request.request_id
-        headers["X-B3-SpanId"] = request.span_id
-
-        if g.user_id:
-            headers["X-Notify-User-Id"] = g.user_id
+        if has_request_context():
+            if hasattr(request, "get_onwards_request_headers"):
+                headers = {
+                    **request.get_onwards_request_headers(),
+                    **headers,
+                }
+            if g.user_id:
+                headers["X-Notify-User-Id"] = g.user_id
 
         return headers
 
