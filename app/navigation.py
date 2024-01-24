@@ -79,6 +79,7 @@ class HeaderNavigation(Navigation):
             "guidance_team_members_and_permissions",
             "guidance_templates",
             "guidance_text_message_sender",
+            "guidance_unsubscribe_links",
             "guidance_upload_a_letter",
         },
         "user-profile": {
