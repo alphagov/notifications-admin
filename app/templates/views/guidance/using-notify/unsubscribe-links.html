@@ -1,0 +1,53 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Unsubscribe links
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Unsubscribe links</h1>
+
+  <p class="govuk-body">Subscription emails must include an unsubscribe link in the body of the message.</p>
+
+  <p class="govuk-body">Transactional emails do not need to include an unsubscribe link.</p>
+
+  <p class="govuk-body">For more information, read the <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">GOV.UK Service Manual</a>.</p>
+
+  <h2 class="heading-medium">How to add an unsubscribe link to an email</h2>
+
+  <p class="govuk-body">GOV.UK Notify uses Markdown to format unsubscribe links.</p>
+
+  <p class="govuk-body">Use square brackets around the link text and round brackets around the URL. Make sure there are no spaces between the brackets or the link will not work. For example:</p>
+
+  <pre class="formatting-example"><code class="lang-md">[Unsubscribe](https://www.gov.uk/example)</code></pre>
+
+  <h2 class="heading-medium">One-click unsubscribe</h2>
+
+  <p class="govuk-body">We are working on adding one-click unsubscribe to GOV.UK Notify. We expect to make this feature available by June 2024.</p>
+
+  <p class="govuk-body">Your emails will still need to include unsubscribe links in the body of the message.</p>
+
+  <h2 class="heading-medium">Only send emails to people who want them</h2>
+
+  <p class="govuk-body">You should only send emails to people who want to hear from you.</p>
+
+  <p class="govuk-body">You must:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>make sure recipients opt in to get messages from you</li>
+    <li>confirm each recipient’s email address before subscribing them</li>
+    <li>send regular messages to confirm that recipients want to stay subscribed</li>
+  </ul>
+
+  <p class="govuk-body">Recipients who have agreed to receive emails from you are less likely to report them as spam.</p>
+
+  <p class="govuk-body">If recipients do report your emails as spam, it has a negative effect on everyone using Notify.</p>
+
+{% endblock %}
