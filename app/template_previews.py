@@ -2,7 +2,8 @@ import base64
 from io import BytesIO
 
 import requests
-from flask import abort, current_app, json
+from flask import abort, current_app, json, request
+from flask.ctx import has_request_context
 from notifications_utils.pdf import extract_page_from_pdf
 
 from app import current_service
@@ -14,6 +15,13 @@ class TemplatePreview:
         header_allowlist = {"content-type", "cache-control"}
         allowed_headers = {header: value for header, value in headers.items() if header.lower() in header_allowlist}
         return allowed_headers.items()
+
+    @classmethod
+    def _get_outbound_headers(cls):
+        headers = {"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"}
+        if has_request_context() and hasattr(request, "get_onwards_request_headers"):
+            headers.update(request.get_onwards_request_headers())
+        return headers
 
     @classmethod
     def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None, branding_filename=None):
@@ -36,7 +44,7 @@ class TemplatePreview:
                 "?page={}".format(page) if page else "",
             ),
             json=data,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
@@ -49,7 +57,7 @@ class TemplatePreview:
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"], "?hide_notify=true" if page == "1" else ""
             ),
             data=base64.b64encode(pdf_page).decode("utf-8"),
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
@@ -63,7 +71,7 @@ class TemplatePreview:
                 f"?page_number={page}&is_an_attachment={is_an_attachment}",
             ),
             data=pdf_page,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
@@ -79,46 +87,46 @@ class TemplatePreview:
                 "?page={}".format(page) if page else "",
             ),
             json=data,
-            headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
+            headers=cls._get_outbound_headers(),
         )
         return response.content, response.status_code, cls.get_allowed_headers(response.headers)
 
+    @classmethod
+    def get_page_counts_for_letter(cls, db_template, values=None):
+        """
+        Expected return value format (mimics the template-preview endpoint:
+            {'count': int, 'welsh_page_count': int, 'attachment_page_count': int}
+        """
+        if db_template["template_type"] != "letter":
+            return None
 
-def get_page_counts_for_letter(db_template, values=None):
-    """
-    Expected return value format (mimics the template-preview endpoint:
-        {'count': int, 'welsh_page_count': int, 'attachment_page_count': int}
-    """
-    if db_template["template_type"] != "letter":
-        return None
+        data = {
+            "letter_contact_block": db_template.get("reply_to_text", ""),
+            "template": db_template,
+            "values": values,
+            "filename": current_service.letter_branding.filename,
+        }
+        response = requests.post(
+            f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.json".format(),
+            json=data,
+            headers=cls._get_outbound_headers(),
+        )
 
-    data = {
-        "letter_contact_block": db_template.get("reply_to_text", ""),
-        "template": db_template,
-        "values": values,
-        "filename": current_service.letter_branding.filename,
-    }
-    response = requests.post(
-        f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.json".format(),
-        json=data,
-        headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
-    )
+        page_count = json.loads(response.content.decode("utf-8"))
 
-    page_count = json.loads(response.content.decode("utf-8"))
+        return page_count
 
-    return page_count
-
-
-def sanitise_letter(pdf_file, *, upload_id, allow_international_letters, is_an_attachment=False):
-    url = "{host_url}/precompiled/sanitise?allow_international_letters={allow_intl}&upload_id={upload_id}".format(
-        host_url=current_app.config["TEMPLATE_PREVIEW_API_HOST"],
-        allow_intl="true" if allow_international_letters else "false",
-        upload_id=upload_id,
-    )
-    if is_an_attachment:
-        url = url + "&is_an_attachment=true"
-    return requests.post(
-        url,
-        data=pdf_file,
-        headers={"Authorization": f"Token {current_app.config['TEMPLATE_PREVIEW_API_KEY']}"},
-    )
+    @classmethod
+    def sanitise_letter(cls, pdf_file, *, upload_id, allow_international_letters, is_an_attachment=False):
+        url = "{host_url}/precompiled/sanitise?allow_international_letters={allow_intl}&upload_id={upload_id}".format(
+            host_url=current_app.config["TEMPLATE_PREVIEW_API_HOST"],
+            allow_intl="true" if allow_international_letters else "false",
+            upload_id=upload_id,
+        )
+        if is_an_attachment:
+            url = url + "&is_an_attachment=true"
+        return requests.post(
+            url,
+            data=pdf_file,
+            headers=cls._get_outbound_headers(),
+        )

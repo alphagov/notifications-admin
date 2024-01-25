@@ -1191,7 +1191,7 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
-    mocker.patch("app.main.views.templates.sanitise_letter", return_value=mock_sanitise_response)
+    mocker.patch("app.template_previews.TemplatePreview.sanitise_letter", return_value=mock_sanitise_response)
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         file_contents = file.read()
@@ -1248,7 +1248,7 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
             "data": template_version_json(SERVICE_ONE_ID, fake_uuid, api_user_active, version=1, type_="letter")
         },
     )
-    mocker.patch("app.main.views.templates.sanitise_letter")
+    mocker.patch("app.template_previews.TemplatePreview.sanitise_letter")
     do_mock_get_page_counts_for_letter(mocker, count=9)
 
     with open("tests/test_pdf_files/multi_page_pdf.pdf", "rb") as file:
@@ -1277,7 +1277,7 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
-    mock_sanitise = mocker.patch("app.main.views.templates.sanitise_letter")
+    mock_sanitise = mocker.patch("app.template_previews.TemplatePreview.sanitise_letter")
 
     # page count for the attachment
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
@@ -1322,7 +1322,7 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
-    mock_sanitise = mocker.patch("app.main.views.templates.sanitise_letter")
+    mock_sanitise = mocker.patch("app.template_previews.TemplatePreview.sanitise_letter")
 
     # page count for the attachment
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
@@ -1380,7 +1380,7 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
-    mocker.patch("app.main.views.templates.sanitise_letter", return_value=mock_sanitise_response)
+    mocker.patch("app.template_previews.TemplatePreview.sanitise_letter", return_value=mock_sanitise_response)
 
     mocker.patch("app.main.views.templates.upload_letter_to_s3")
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
@@ -1934,6 +1934,7 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 def test_letter_branding_preview_image(
     mocker,
     client_request,
+    mock_onwards_request_headers,
     original_filename,
     new_filename,
 ):
@@ -1961,7 +1962,10 @@ def test_letter_branding_preview_image(
             "values": None,
             "filename": new_filename,
         },
-        headers={"Authorization": "Token my-secret-key"},
+        headers={
+            "Authorization": "Token my-secret-key",
+            "some-onwards": "request-headers",
+        },
     )
     assert response.get_data(as_text=True) == "foo"
 

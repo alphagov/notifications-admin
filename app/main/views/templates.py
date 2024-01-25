@@ -62,10 +62,7 @@ from app.s3_client.s3_letter_upload_client import (
     upload_letter_attachment_to_s3,
     upload_letter_to_s3,
 )
-from app.template_previews import (
-    TemplatePreview,
-    sanitise_letter,
-)
+from app.template_previews import TemplatePreview
 from app.utils import (
     NOTIFICATION_TYPES,
     should_skip_template_page,
@@ -1164,7 +1161,7 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
     file_location = get_transient_letter_file_location(service_id, upload_id)
 
     try:
-        response = sanitise_letter(
+        response = TemplatePreview.sanitise_letter(
             BytesIO(pdf_file_bytes),
             upload_id=upload_id,
             allow_international_letters=current_service.has_permission("international_letters"),
