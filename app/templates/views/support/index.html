@@ -10,9 +10,10 @@
 {% block maincolumn_content %}
 
    {{ govuk_page_header("Support") }}
-  <p class="govuk-body">GOV.UK Notify provides 24-hour online support.</p>
-  <p class="govuk-body">If it’s an emergency, we’ll reply within 30 minutes and update you every hour until we fix the problem.</p>
-<p class="govuk-body">If it’s not an emergency, we’ll reply within 1 working day.</p>
+  <p class="govuk-body">GOV.UK Notify provides 24/7 support for emergencies.</p>
+  <p class="govuk-body">If you have an emergency, we’ll reply within 30 minutes.</p>
+  <p class="govuk-body">If it’s not an emergency, we’ll reply by the end of the next working day.</p>
+  <p class="govuk-body">Our working days are Monday to Friday.</p>
 
   {% call form_wrapper() %}
     {% if current_user.is_authenticated %}
