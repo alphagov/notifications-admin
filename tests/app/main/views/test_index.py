@@ -111,6 +111,7 @@ def test_hiding_pages_from_search_engines(
         "guidance_send_files_by_email",
         "guidance_templates",
         "guidance_text_message_sender",
+        "guidance_unsubscribe_links",
         "guidance_upload_a_letter",
         "guidance_using_notify",
         "guidance_who_can_use_notify",

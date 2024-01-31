@@ -374,6 +374,14 @@ def guidance_upload_a_letter():
     )
 
 
+@main.route("/using-notify/unsubscribe-links")
+def guidance_unsubscribe_links():
+    return render_template(
+        "views/guidance/using-notify/unsubscribe-links.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 # --- Redirects --- #
 
 

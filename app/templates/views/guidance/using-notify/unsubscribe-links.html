@@ -1,0 +1,34 @@
+{% extends "content_template.html" %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Unsubscribe links
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Unsubscribe links</h1>
+
+  <p class="govuk-body">Subscription emails must include an unsubscribe link in the body of the message.</p>
+
+  <p class="govuk-body">Transactional emails do not need to include an unsubscribe link.</p>
+
+  <p class="govuk-body">The GOV.​UK Service Manual explains the difference between <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#transactional-messages">transactional messages and subscription emails</a>.</p>
+
+  <h2 class="heading-medium">How to add an unsubscribe link to an email</h2>
+
+  <p class="govuk-body">GOV.UK Notify uses Markdown to format links.</p>
+
+  <p class="govuk-body">To add an unsubscribe link, use square brackets around the link text and round brackets around the URL. Make sure there are no spaces between the brackets or the link will not work.</p>
+  <p class="govuk-body">Use this example if you have a webpage where users can manage their email subscriptions:</p>
+
+  <pre class="formatting-example"><code class="lang-md">[Unsubscribe](https://www.gov.uk/example/unsubscribe)</code></pre>
+  
+  <p class="govuk-body">If you do not have your own webpage, you can add a ‘mailto’ link to let users send an email to your team instead. For example:</p>  
+  <pre class="formatting-example"><code class="lang-md">[Unsubscribe](mailto:unsubscribe@gov.uk?subject=unsubscribe)</code></pre>
+  <p class="govuk-body">The email address should be a shared inbox managed by your team, not your own email address.</p>
+
+{% endblock %}

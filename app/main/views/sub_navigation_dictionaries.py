@@ -174,6 +174,10 @@ def using_notify_nav():
                     "name": "Upload a letter",
                     "link": "main.guidance_upload_a_letter",
                 },
+                {
+                    "name": "Unsubscribe links",
+                    "link": "main.guidance_unsubscribe_links",
+                },
             ],
         },
     ]
