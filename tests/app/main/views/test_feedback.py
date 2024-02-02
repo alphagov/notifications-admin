@@ -395,7 +395,8 @@ ids, params = zip(
                 partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
             ),
         ),
-    ]
+    ],
+    strict=True
 )
 
 

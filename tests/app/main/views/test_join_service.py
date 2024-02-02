@@ -165,9 +165,10 @@ def test_page_lists_team_members_of_service(
             normalize_spaces(hint.text),
         )
         for checkbox, label, hint in zip(
-            page.select("input[type=checkbox][name=users]"),
-            page.select(".govuk-label"),
-            page.select(".govuk-hint"),
+            page.select("#users input[type=checkbox][name=users]"),
+            page.select("#users .govuk-label"),
+            page.select("#users .govuk-hint"),
+            strict=True,
         )
     ] == [
         (

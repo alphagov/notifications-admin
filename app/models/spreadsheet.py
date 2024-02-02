@@ -51,7 +51,7 @@ class Spreadsheet:
     @classmethod
     def from_dict(cls, dictionary, filename=""):
         return cls.from_rows(
-            zip(*sorted(dictionary.items(), key=lambda pair: pair[0])),
+            zip(*sorted(dictionary.items(), key=lambda pair: pair[0]), strict=True),
             filename=filename,
         )
 

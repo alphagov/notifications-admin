@@ -814,7 +814,7 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
     values = [input["value"] for input in inputs]
     images = [page.select_one("label[for=" + input["id"] + "] img")["src"] for input in inputs]
 
-    assert list(zip(values, images)) == [
+    assert list(zip(values, images, strict=True)) == [
         (
             "Department for Business & Trade",
             "https://static.example.com/images/branding/insignia/"
@@ -888,7 +888,7 @@ def test_create_email_branding_government_identity_colour(client_request, platfo
     labels = [normalize_spaces(page.select_one("label[for=" + input["id"] + "]").text) for input in inputs]
     values = [input["value"] for input in inputs]
 
-    assert list(zip(labels, values)) == [
+    assert list(zip(labels, values, strict=True)) == [
         ("Attorney General’s Office", "#9f1888"),
         ("Cabinet Office", "#005abb"),
         ("Civil Service", "#af292e"),

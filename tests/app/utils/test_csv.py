@@ -162,7 +162,7 @@ def test_generate_notifications_csv_returns_correct_csv_file(
     csv_content = generate_notifications_csv(service_id="1234", job_id=fake_uuid, template_type="sms")
     csv_file = DictReader(StringIO("\n".join(csv_content)))
     assert csv_file.fieldnames == expected_column_headers
-    assert next(csv_file) == dict(zip(expected_column_headers, expected_1st_row))
+    assert next(csv_file) == dict(zip(expected_column_headers, expected_1st_row, strict=True))
 
 
 def test_generate_notifications_csv_only_calls_once_if_no_next_link(

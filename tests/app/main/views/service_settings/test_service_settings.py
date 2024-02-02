@@ -881,7 +881,7 @@ def test_should_check_if_estimated_volumes_provided(
     volumes,
     expected_estimated_volumes_item,
 ):
-    for volume, channel in zip(volumes, ("sms", "email", "letter")):
+    for volume, channel in zip(volumes, ("sms", "email", "letter"), strict=True):
         mocker.patch(
             f"app.models.service.Service.volume_{channel}",
             create=True,
