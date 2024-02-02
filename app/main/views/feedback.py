@@ -140,7 +140,6 @@ def feedback(ticket_type):
             url_for(
                 ".thanks",
                 out_of_hours_emergency=out_of_hours_emergency,
-                email_address_provided=(current_user.is_authenticated or bool(form.email_address.data)),
             )
         )
 
@@ -174,7 +173,6 @@ def thanks():
     return render_template(
         "views/support/thanks.html",
         out_of_hours_emergency=convert_to_boolean(request.args.get("out_of_hours_emergency")),
-        email_address_provided=convert_to_boolean(request.args.get("email_address_provided")),
         out_of_hours=not in_business_hours(),
     )
 

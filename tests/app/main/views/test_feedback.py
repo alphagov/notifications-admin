@@ -137,7 +137,6 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
         _expected_redirect=url_for(
             "main.thanks",
             out_of_hours_emergency=False,
-            email_address_provided=True,
         ),
     )
 
@@ -190,7 +189,6 @@ def test_passes_user_details_through_flow(
         _expected_status=302,
         _expected_redirect=url_for(
             "main.thanks",
-            email_address_provided=True,
             out_of_hours_emergency=False,
         ),
     )
@@ -244,7 +242,6 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
             _expected_status=302,
             _expected_redirect=url_for(
                 "main.thanks",
-                email_address_provided=True,
                 out_of_hours_emergency=False,
             ),
         )
@@ -357,7 +354,6 @@ def test_urgency(
         _expected_redirect=url_for(
             "main.thanks",
             out_of_hours_emergency=is_out_of_hours_emergency,
-            email_address_provided=True,
         ),
     )
     assert mock_ticket.call_args[1]["p1"] == is_out_of_hours_emergency
@@ -721,43 +717,27 @@ def test_bat_email_page(
 
 
 @pytest.mark.parametrize(
-    "out_of_hours_emergency, email_address_provided, out_of_hours, message",
+    "out_of_hours_emergency, out_of_hours, message",
     (
         # Out of hours emergencies trump everything else
         (
             True,
             True,
-            True,
-            "We’ll reply in the next 30 minutes and update you every hour until we fix the problem.",
+            "We’ll reply in the next 30 minutes.",
         ),
         (
             True,
-            False,
             False,  # Not a real scenario
-            "We’ll reply in the next 30 minutes and update you every hour until we fix the problem.",
-        ),
-        # Anonymous tickets don’t promise a reply
-        (
-            False,
-            False,
-            False,
-            "We’ll aim to read your message in the next 30 minutes.",
-        ),
-        (
-            False,
-            False,
-            True,
-            "We’ll read your message when we’re back in the office.",
+            "We’ll reply in the next 30 minutes.",
         ),
         # When we look at your ticket depends on whether we’re in normal
         # business hours
         (
             False,
-            True,
             False,
-            "We’ll aim to read your message in the next 30 minutes and we’ll reply within one working day.",
+            "We’ll reply by the end of the next working day.",
         ),
-        (False, True, True, "We’ll reply within one working day."),
+        (False, True, "We’ll reply by the end of the next working day."),
     ),
 )
 def test_thanks(
@@ -766,7 +746,6 @@ def test_thanks(
     api_user_active,
     mock_get_user,
     out_of_hours_emergency,
-    email_address_provided,
     out_of_hours,
     message,
 ):
@@ -774,6 +753,5 @@ def test_thanks(
     page = client_request.get(
         "main.thanks",
         out_of_hours_emergency=out_of_hours_emergency,
-        email_address_provided=email_address_provided,
     )
     assert normalize_spaces(page.select_one("main").find("p").text) == message
