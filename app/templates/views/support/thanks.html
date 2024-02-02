@@ -17,19 +17,7 @@
       {% if out_of_hours_emergency %}
         We’ll reply in the next 30 minutes.
       {% else %}
-        {% if email_address_provided %}
-          {% if out_of_hours %}
-            We’ll reply by the end of the next working day.
-          {% else %}
-            We’ll reply by the end of the next working day.
-          {% endif %}
-        {% else %}
-          {% if out_of_hours %}
-            We’ll read your message when we’re back in the office.
-          {% else %}
-            We’ll reply by the end of the next working day.
-          {% endif %}
-        {% endif %}
+        We’ll reply by the end of the next working day.
       {% endif %}
     </p>
 
