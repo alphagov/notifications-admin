@@ -33,7 +33,7 @@ def test_backup_original_letter_to_s3(mocker, notify_admin):
     )
 
 
-def test_upload_letter_to_s3(mocker):
+def test_upload_letter_to_s3(mocker, notify_admin):
     s3_mock = mocker.patch("app.s3_client.s3_letter_upload_client.utils_s3upload")
 
     recipient = "Bugs Bunny\n123 Big Hole\nLooney Town"
@@ -60,7 +60,7 @@ def test_upload_letter_to_s3(mocker):
     )
 
 
-def test_upload_letter_to_s3_with_message_and_invalid_pages(mocker):
+def test_upload_letter_to_s3_with_message_and_invalid_pages(mocker, notify_admin):
     s3_mock = mocker.patch("app.s3_client.s3_letter_upload_client.utils_s3upload")
 
     upload_letter_to_s3(
@@ -107,7 +107,7 @@ def test_lettermetadata_unquotes_special_keys():
     "will_raise_custom_error,expected_exception",
     [(True, LetterNotFoundError), (False, botocore.exceptions.ClientError)],
 )
-def test_get_letter_s3_object_raises_custom_error(will_raise_custom_error, expected_exception):
+def test_get_letter_s3_object_raises_custom_error(will_raise_custom_error, expected_exception, notify_admin):
     bucket_name = current_app.config["S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"]
     s3 = boto3.client("s3", region_name="eu-west-1")
 

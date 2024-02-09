@@ -118,6 +118,7 @@ def test_has_templates_of_type_includes_folders(
     ),
 )
 def test_get_consistent_data_retention_period(
+    notify_admin,
     mocker,
     service_one,
     mock_get_template_folders,
