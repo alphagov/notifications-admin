@@ -325,6 +325,7 @@ def template_json(
     letter_languages=None,
     letter_welsh_subject=None,
     letter_welsh_content=None,
+    updated_at=None,
 ):
     template = {
         "id": id_,
@@ -333,7 +334,7 @@ def template_json(
         "content": content,
         "service": service_id,
         "version": version,
-        "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
+        "updated_at": updated_at or datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
         "archived": archived,
         "process_type": "normal",
         "service_letter_contact": service_letter_contact,
