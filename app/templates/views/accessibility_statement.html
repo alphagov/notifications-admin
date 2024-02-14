@@ -110,16 +110,16 @@
     The following content on the Notify website is not compliant with the WCAG version 2.1 AA standard:
   </p>
 
-  <ul class="govuk-list govuk-list--bullet">
-    <li>duplicate titles and h1 headings between pages breaks<a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/page-titled.html">Success criterion 2.4.2: Page Titled</a></li>
-    <li>problems with the skip link breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html">success criterion 2.4.3: Focus Order</a></li>
-    <li>the email address field being focused on page load breaks success criterion 2.4.3: Focus Order</li>
-    <li>the table showing example CSV data being focusable breaks success criterion 2.4.3: Focus Order</li>
-    <li>the table showing example CSV data not having its column and row headings announced breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html">success criterion 1.3.1: Info and Relationships</a></li>
-    <li>the lack of a title on iframes showing a preview of a branding breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html">success criterion 4.1.2: Name, Role, Value</a></li>
-    <li>iframes showing a preview of a branding being wrapped in a fixed-width container breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/reflow.html">success criterion 1.4.10: Reflow</a></li>
-    <li>the content of the iframe showing a preview of an email branding has a link with text that breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/link-purpose-link-only.html">success criterion 2.4.9: Link Purpose - Link Only</a> and success criterion 2.4.3: Focus Order</li>
-   </ul>
+  <ol class="govuk-list govuk-list--number">
+    <li>Duplicate titles and h1 headings between pages breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/page-titled.html">success criterion 2.4.2: Page Titled</a>.</li>
+    <li>Problems with the skip link breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html">success criterion 2.4.3: Focus Order</a>.</li>
+    <li>The email address field being focused on page load breaks success criterion 2.4.3: Focus Order.</li>
+    <li>The table showing example CSV data being focusable breaks success criterion 2.4.3: Focus Order.</li>
+    <li>The table showing example CSV data not having its column and row headings announced breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html">success criterion 1.3.1: Info and Relationships</a>.</li>
+    <li>The lack of a title on iframes showing a preview of a branding breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html">success criterion 4.1.2: Name, Role, Value</a>.</li>
+    <li>Iframes showing a preview of a branding being wrapped in a fixed-width container breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/reflow.html">success criterion 1.4.10: Reflow</a>.</li>
+    <li>The content of the iframe showing a preview of an email branding has a link with text that breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/link-purpose-link-only.html">success criterion 2.4.9: Link Purpose - Link Only</a> and success criterion 2.4.3: Focus Order.</li>
+   </ol>
 
   <p class="govuk-body">
     The content listed below is non-accessible for the following reasons.
@@ -201,9 +201,10 @@
 
   <p class="govuk-body">
     The parts of the website used to add <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_email_branding') }}">email branding</a> or <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_letter_branding') }}">letter branding</a> were tested on 9 October 2023. The button for copying text in the page to your clipboard and the component for choosing the day and time to send notifications were also tested as part of this.
+  </p>
+  <p class="govuk-body">
     The parts of the website used to send text messages, emails and letters were last tested in February 2021. The emails we send out, the web pages users see when they are sent a file by Notify and a sample letter PDF were last tested on 11 March 2019. All tests were carried out by the Digital Accessibility Centre.
   </p>
-
   <p class="govuk-body">
     We originally decided which pages to test based on the most common tasks that GOV.UK Notify users need to complete. We also tested a sample of pages with common user interface components. Since then, we test any new features or substantial changes to the service.
   </p>
