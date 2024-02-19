@@ -38,7 +38,7 @@ def test_displays_both_branding(client_request, mock_get_email_branding_with_bot
 
     assert page.select_one("a")["href"] == "https://www.gov.uk"
     assert page.select("img")[0]["src"] == (
-        "https://static.notifications.service.gov.uk/images/gov.uk_logotype_crown.png"
+        "https://static.notifications.service.gov.uk/images/govuk-logotype-tudor-crown.png"
     )
     assert page.select("img")[1]["src"] == "https://static-logos.test.com/example.png"
     assert (
