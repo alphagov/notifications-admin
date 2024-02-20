@@ -797,7 +797,7 @@ def test_email_branding_request_submit(
     )
     mock_send_ticket_to_zendesk.assert_called_once()
     assert normalize_spaces(page.select_one(".banner-default").text) == (
-        "Thanks for your branding request. We’ll get back to you within one working day."
+        "Thanks for your branding request. We’ll get back to you by the end of the next working day."
     )
 
 
