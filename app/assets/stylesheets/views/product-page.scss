@@ -92,23 +92,6 @@ $button-shadow-size: $govuk-border-width-form-element;
   // based on the govuk-button styles:
   // https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/button/_button.scss
   @include govuk-font($size: 24, $weight: bold);
-  color: $product-page-blue;
   box-shadow: 0 $button-shadow-size 0 govuk-shade($colour: $product-page-blue, $percentage: 15%);
-  background: govuk-colour("white");
-
-  &:link,
-  &:visited,
-  &:hover {
-    color: $product-page-blue;
-  }
-
-  &:focus {
-    background: govuk-colour("white");
-  }
-
-  &:hover {
-    background: govuk-tint(govuk-colour("light-blue"), 75);
-    outline: none;
-  }
 
 }
