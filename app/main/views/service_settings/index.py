@@ -85,7 +85,9 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = {
     "extra_letter_formatting": {"title": "Extra letter formatting options", "requires": "letter"},
 }
 
-THANKS_FOR_BRANDING_REQUEST_MESSAGE = "Thanks for your branding request. We’ll get back to you within one working day."
+THANKS_FOR_BRANDING_REQUEST_MESSAGE = (
+    "Thanks for your branding request. We’ll get back to you by the end of the next working day."
+)
 
 
 @main.route("/services/<uuid:service_id>/service-settings")
