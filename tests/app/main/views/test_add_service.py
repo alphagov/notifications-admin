@@ -460,7 +460,7 @@ def test_join_or_add_service_page(
         ),
         (
             "main.choose_service_to_join",
-            "Join an existing team",
+            "Join an existing service",
             "2 teams from Test Organisation are using Notify already",
         ),
     ]

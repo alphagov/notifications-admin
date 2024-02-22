@@ -2,7 +2,7 @@
 {% from "components/live-search.html" import live_search %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set heading = 'Join an existing team' %}
+{% set heading = 'Join an existing service' %}
 
 {% block per_page_title %}
   {{ heading }}
@@ -19,8 +19,11 @@
 {% block maincolumn_content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="heading-large"> {{ heading }} </h1>
-    <p class="govuk-body govuk-!-margin-bottom-6">These are all the {{ current_user.default_organisation.name }} teams who have a live service on Notify.</p>
+    <h1 class="heading-large">
+      {{ heading }}
+    </h1>
+    <p class="govuk-body govuk-!-margin-bottom-6">
+      {{ current_user.default_organisation.name }} has {{ current_user.default_organisation.live_services | length }} live service{{ '' if current_user.default_organisation.live_services | length == 1 else 's' }}</p>
 
     {{ live_search(
       target_selector='.browse-list-item',
@@ -36,9 +39,6 @@
           <p class="browse-list-hint">
               {% if current_user.belongs_to_service(service.id) %}
                 You are already a team member of this service
-              {% else %}
-                {% set team_members = service.active_users_with_permission("manage_service") %}
-                {{ team_members | length | format_thousands }} team member{{ "" if team_members | length == 1 else "s" }}
               {% endif %}
           </p>
         </li>
