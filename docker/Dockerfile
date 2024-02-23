@@ -88,6 +88,7 @@ RUN echo "Install OS dependencies for test build" && \
       sudo \
       make \
       curl \
+      libxml2-dev libxslt-dev zlib1g-dev \
       git && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
