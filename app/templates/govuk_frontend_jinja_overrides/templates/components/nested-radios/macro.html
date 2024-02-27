@@ -1,6 +1,6 @@
 {#
-  A copy of the radios component from v2.6.0 of govuk_frontend_jinja
-  Blob permalink: https://raw.githubusercontent.com/LandRegistry/govuk-frontend-jinja/2.6.0/govuk_frontend_jinja/templates/components/radios/macro.html
+  A copy of the radios component from v2.8.0 of govuk_frontend_jinja
+  Blob permalink: https://raw.githubusercontent.com/LandRegistry/govuk-frontend-jinja/2.8.0/govuk_frontend_jinja/templates/components/radios/macro.html
 
   Changes we have made:
   1) Rename macro to `govukNestedRadios`
@@ -78,9 +78,7 @@
         {%- else %}
         {% set isChecked = item.checked | default(params.value and item.value == params.value) %}
         {% set hasHint = True if (item.hint.text if item.hint and item.hint.text) or (item.hint.html if item.hint and item.hint.html) %}
-
         {% set itemHintId = id + '-item-hint' %}
-
         <li class="govuk-radios__item">
           <input class="govuk-radios__input" id="{{ id }}" name="{{ params.name }}" type="radio" value="{{ item.value }}"
           {{-" checked" if isChecked }}
@@ -88,30 +86,26 @@
           {%- if item.conditional and item.conditional.html %} data-aria-controls="{{ conditionalId }}"{% endif -%}
           {%- if hasHint %} aria-describedby="{{ itemHintId }}"{% endif -%}
           {%- for attribute, value in (item.attributes.items() if item.attributes else {}.items()) %} {{ attribute }}="{{ value }}"{% endfor -%}>
-
-            {{ govukLabel({
-                'html': item.html,
-                'text': item.text,
-                'classes': 'govuk-radios__label' + (' ' + item.label.classes if item.label and item.label.classes else ''),
-                'attributes': (item.label.attributes if item.label and item.label.attributes),
-                'for': id
-              }) | indent(6) | trim }}
-
-            {% if hasHint %}
-              {{ govukHint({
-                'id': itemHintId,
-                'classes': 'govuk-radios__hint' + (' ' + item.hint.classes if item.hint.classes else ''),
-                'attributes': item.hint.attributes,
-                'html': item.hint.html,
-                'text': item.hint.text
-              }) | indent(6) | trim }}
-            {% endif %}
-
-            {%- if item.children %}
-              {{ item.children | safe }}
-            {%- endif %}
+          {{ govukLabel({
+            'html': item.html,
+            'text': item.text,
+            'classes': 'govuk-radios__label' + (' ' + item.label.classes if item.label and item.label.classes else ''),
+            'attributes': (item.label.attributes if item.label and item.label.attributes),
+            'for': id
+          }) | indent(6) | trim }}
+          {% if hasHint %}
+          {{ govukHint({
+            'id': itemHintId,
+            'classes': 'govuk-radios__hint' + (' ' + item.hint.classes if item.hint.classes else ''),
+            'attributes': item.hint.attributes,
+            'html': item.hint.html,
+            'text': item.hint.text
+          }) | indent(6) | trim }}
+          {% endif %}
+          {%- if item.children %}
+            {{ item.children | safe }}
+          {%- endif %}
         </li>
-
         {% if item.conditional and item.conditional.html %}
           <div class="govuk-radios__conditional{% if not isChecked %} govuk-radios__conditional--hidden{% endif %}" id="{{ conditionalId }}">
             {{ item.conditional.html | safe }}

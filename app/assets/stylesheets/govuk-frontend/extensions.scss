@@ -59,19 +59,6 @@ $govuk-destructive-link-active-colour: $govuk-text-colour;
   @include govuk-link-style-destructive-no-visited-state;
 }
 
-// TODO: Remove when updating to v5 of govuk-frontend
-// Absolute positioning has the unintended consequence of removing any
-// whitespace surrounding visually hidden text from the accessibility tree.
-// Insert a space character before and after visually hidden text to separate
-// it from any visible text surrounding it.
-.govuk-visually-hidden::before {
-  content: "\00a0";
-}
-
-.govuk-visually-hidden::after {
-  content: "\00a0";
-}
-
 // GOVUK Frontend's grid-column classes are built from the $govuk-grid-widths map
 // that means we can extend the map to get extra classes
 $notify-grid-widths: (
