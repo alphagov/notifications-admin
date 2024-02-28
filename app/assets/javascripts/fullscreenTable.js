@@ -85,15 +85,28 @@
 
     this.maintainWidth = () => {
 
-      let indexColumnWidth = this.$fixedTable.find('.table-field-index').outerWidth();
+      const $scrollableIndexColumnHeader = this.$scrollableTable.find('.table-field-heading-first').eq(0);
+      const $fixedIndexColumnHeader = this.$fixedTable.find('.table-field-heading-first').eq(0);
 
       this.$scrollableTable
         .css({
-            'width': this.$component.parent().width()
+          'width': this.$component.parent().width()
         });
 
+      // The table layout algorithm can sometimes work differently on the two tables, because they are
+      // positioned differently. This results in both versions of the index column having different widths.
+      // If this happens, set both by the width of the fixed column.
+      if ($fixedIndexColumnHeader.width() !== $scrollableIndexColumnHeader.width()) {
+        $scrollableIndexColumnHeader.css({
+          'width': $fixedIndexColumnHeader.width()
+        });
+      }
+
+      // The fixed table container is positioned absolutely to needs a width set explicity
       this.$fixedTable
-        .width(indexColumnWidth + 4);
+        .css({
+          'width': $fixedIndexColumnHeader.outerWidth() + 4 // allow 4px space for the shadow
+        });
 
     };
 
