@@ -1,0 +1,99 @@
+
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+{% from "components/table.html" import mapping_table, row, settings_row, text_field, callable_text_field, optional_text_field, edit_field, field, boolean_field with context %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Check your verified sender
+{% endblock %}
+
+{% block backLink %}
+  {% if not request.args.get('from_template') %}
+    {{ govukBackLink({ "href": url_for('main.service_verify_sms_sender_branding', service_id=current_service.id, sms_sender_id=sms_sender.id) }) }}
+  {% endif %}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div>
+    {{ page_header('Check your verified sender ') }}
+  </div>
+
+  <div class="settings-table body-copy-table govuk-!-margin-bottom-6">
+    {% call mapping_table(
+      caption='General',
+      field_headings=['Label', 'Value', 'Action'],
+      field_headings_visible=False,
+      caption_visible=False
+    ) %}
+
+      {% call row() %}
+        {{ text_field('Sender name') }}
+        {% call field() %}
+            {{ sms_sender.sms_sender }}<br>
+            <span class="hint">{{ sms_sender.sms_sender }}</span>
+        {% endcall %}
+        {{ edit_field('Change', url_for(".service_verify_sms_sender_name", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
+      {% endcall %}
+      {% call row() %}
+        {{ text_field('Phone number') }}
+        {{ text_field('Example') }}
+        {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
+      {% endcall %}
+      {% call row() %}
+        {{ text_field('Website') }}
+        {{ text_field('Example') }}
+        {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
+      {% endcall %}
+      {% call row() %}
+        {{ text_field('Email address') }}
+        {{ text_field('Example') }}
+        {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
+      {% endcall %}
+      {% call row() %}
+        {{ text_field('Privacy Policy URL') }}
+        {{ text_field('Example') }}
+        {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
+      {% endcall %}
+      {% call row() %}
+        {{ text_field('Terms of Service URL') }}
+        {{ text_field('Example') }}
+        {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
+      {% endcall %}
+      {% call row() %}
+        {{ text_field('Branding') }}
+        <td class="table-field-left-aligned" style="padding-bottom: 0;">
+          <div style="position: relative">
+            <div style="
+              position: absolute;
+              box-sizing: border-box;
+              width: 100%;
+              top: 44px;
+              font-family: roboto, arial, sans-serif;
+              font-size: 16px;
+              text-align: center;
+            ">
+              {{ sms_sender.sms_sender }}
+            </div>
+            <img src="{{ asset_url('images/rcs/example.svg') }}" style="display:block;">
+          </div>
+        </td>
+        {{ edit_field('Change', url_for(".service_verify_sms_sender_branding", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
+      {% endcall %}
+
+    {% endcall %}
+  </div>
+
+
+  <p class="govuk-body">Takes 2 weeks</p>
+
+  <p class="govuk-body">We’ll let you know when it’s done</p>
+
+  <a class="govuk-button" href="{{ url_for(".service_sms_senders", service_id=current_service.id, in_progress=sms_sender.sms_sender) }}">Confirm</a>
+
+{% endblock %}

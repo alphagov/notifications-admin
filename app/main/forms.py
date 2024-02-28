@@ -1799,6 +1799,30 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender ID the default")
 
 
+class SmsSenderVerifiedNameForm(StripWhitespaceForm):
+    long = GovukTextInputField(
+        "Long name",
+        param_extensions={"hint": {"text": "Should be the same as short name unless…"}},
+    )
+
+
+class SmsSenderBranding(StripWhitespaceForm):
+    file = VirusScannedFileField(
+        "Upload logo",
+        validators=[
+            NotifyDataRequired(thing="an image containing your logo"),
+        ],
+    )
+
+
+class SmsSenderContactDetailsForm(StripWhitespaceForm):
+    phone = GovukTextInputField("Phone number")
+    web = GovukTextInputField("Website")
+    email = GovukTextInputField("Email address")
+    privacy = GovukTextInputField("Privacy policy URL")
+    terms = GovukTextInputField("Terms of service URL")
+
+
 class ServiceEditInboundNumberForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender ID the default")
 

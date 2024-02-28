@@ -1,0 +1,99 @@
+
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+{% from "components/table.html" import mapping_table, row, settings_row, text_field, callable_text_field, optional_text_field, edit_field, field, boolean_field with context %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Verify text message sender ID
+{% endblock %}
+
+{% block backLink %}
+  {% if not request.args.get('from_template') %}
+    {{ govukBackLink({ "href": url_for('main.service_edit_sms_sender', service_id=current_service.id, sms_sender_id=sms_sender.id) }) }}
+  {% endif %}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-!-margin-bottom-6">
+    {{ page_header('Verify text message sender ID') }}
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+      <ul class="govuk-list govuk-list--bullet">
+      <li>add branding</li>
+      <li>blue tick</li>
+    </ul>
+    <p class="govuk-body">Takes about 2 weeks</p>
+    </div>
+    <div class="govuk-grid-column-one-half" style="position: relative;"">
+      <div style="
+        position: absolute;
+        box-sizing: border-box;
+        width: 100%;
+        padding-right: 45px;
+        top: 44px;
+        font-family: roboto, arial, sans-serif;
+        font-size: 16px;
+        text-align: center;
+      ">{{ sms_sender.sms_sender }}</div>
+      <img src="{{ asset_url('images/rcs/example.svg') }}" style="display:block;margin-right:15px">
+    </div>
+  </div>
+  <div class="keyline-block govuk-!-margin-bottom-4"></div>
+
+
+  <h2 class="govuk-heading-m">Pricing</h2>
+  <p class="govuk-body">Verified messages cost the same as or less than normal text messages.</p>
+    <p class="govuk-body">There is no monthly charge or setup fee.</p>
+
+  {% set verified_rates %}
+    <div class="body-copy-table">
+        {% call mapping_table(
+        caption='Text message pricing',
+        field_headings=['Message length', 'Normal text message', 'Verified text message'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for message_length, charge, charge_verified in [
+          ('Up to 160 characters', 1.97, '1.97'),
+          ('Up to 306 characters', 1.97 * 2, '3.90'),
+          ('Up to 459 characters', 1.97 * 3, '3.90'),
+          ('Up to 612 characters', 1.97 * 4, '3.90'),
+          ('Up to 765 characters', 1.97 * 5, '3.90'),
+          ('Up to 918 characters', 1.97 * 6, '3.90'),
+        ] %}
+          {% call row() %}
+            {{ text_field(message_length) }}
+            {{ text_field(charge|string + 'p') }}
+            {{ text_field(charge_verified|string + 'p') }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+
+    </div>
+  {% endset %}
+
+  {{ govukDetails({
+    "summaryText": "Verified text message rates",
+    "html": verified_rates
+  }) }}
+
+  <h2 class="govuk-heading-m">Support</h2>
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+    <li>20% adoption</li>
+    <li>no international</li>
+    <li>auto fallback</li>
+  </ul>
+
+  {% call form_wrapper(method="get", action=url_for(".service_verify_sms_sender_name", service_id=current_service.id, sms_sender_id=sms_sender.id)) %}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+{% endblock %}

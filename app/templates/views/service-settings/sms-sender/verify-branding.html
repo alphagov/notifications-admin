@@ -1,0 +1,30 @@
+
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+{% from "components/table.html" import mapping_table, row, settings_row, text_field, callable_text_field, optional_text_field, edit_field, field, boolean_field with context %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/file-upload.html" import file_upload %}
+
+{% block service_page_title %}
+  Verify text message sender branding
+{% endblock %}
+
+{% block backLink %}
+  {% if not request.args.get('from_template') %}
+    {{ govukBackLink({ "href": url_for('main.service_verify_sms_sender_name', service_id=current_service.id, sms_sender_id=sms_sender.id) }) }}
+  {% endif %}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-!-margin-bottom-6">
+    {{ page_header('Verify text message sender branding') }}
+  </div>
+
+  {{ file_upload(form.file) }}
+
+{% endblock %}

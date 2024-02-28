@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
@@ -27,26 +27,27 @@
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-three-quarters">
             <h2 class="user-list-item-heading">
-              <span class="heading-small">{{ item.sms_sender }}</span>
+              <p class="heading-small govuk-!-margin-bottom-1 govuk-!-margin-top-0">{{ item.sms_sender }}</p>
               {% if item.hint %}
-                &ensp;
-                <span class="hint">
+                <p class="govuk-body govuk-hint govuk-!-margin-bottom-1">
                   {{ item.hint }}
-                </span>
+                </p>
+              {% endif %}
+              {% if request.args.get("in_progress") == item.sms_sender %}
+                <p class="govuk-body govuk-hint">
+                  Verification in progress
+                </p>
               {% endif %}
             </h2>
           </div>
           <div class="govuk-grid-column-one-quarter">
             {% if current_user.has_permissions('manage_service') %}
               <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">
-               Change<span class="govuk-visually-hidden"> {{ item.sms_sender }}</span>
+               Manage<span class="govuk-visually-hidden"> {{ item.sms_sender }}</span>
               </a>
             {% endif %}
           </div>
         </div>
-        {% if current_service.count_sms_senders > 1 %}
-          {{ copy_to_clipboard(item.id, name=item.sms_sender, thing="ID") }}
-        {% endif %}
       </div>
     {% endfor %}
   </div>
