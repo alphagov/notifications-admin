@@ -54,7 +54,10 @@ def test_email_branding_options_page_shows_branding_if_set(
 
     page = client_request.get(".email_branding_options", service_id=SERVICE_ONE_ID)
     assert page.select_one("iframe")["src"] == url_for(
-        "main.email_template", branding_style="some-random-branding", title="Preview of current email branding"
+        "main.email_template",
+        branding_style="some-random-branding",
+        title="Preview of current email branding",
+        email_branding_preview=True,
     )
 
 
@@ -82,7 +85,10 @@ def test_email_branding_options_page_when_no_branding_is_set(
 
     assert mock_get_email_branding.called is False
     assert page.select_one("iframe")["src"] == url_for(
-        "main.email_template", branding_style="__NONE__", title="Preview of current email branding"
+        "main.email_template",
+        branding_style="__NONE__",
+        title="Preview of current email branding",
+        email_branding_preview=True,
     )
     assert mock_get_letter_branding_by_id.called is False
 
@@ -481,7 +487,10 @@ def test_email_branding_option_preview_page_displays_preview_of_chosen_branding(
     )
 
     assert page.select_one("iframe")["src"] == url_for(
-        "main.email_template", branding_style="email-branding-1-id", title="Preview of new email branding"
+        "main.email_template",
+        branding_style="email-branding-1-id",
+        title="Preview of new email branding",
+        email_branding_preview=True,
     )
 
 
@@ -584,7 +593,7 @@ def test_email_branding_govuk_and_nhs_pages(
     assert page.select_one("h1").text == "Check your new branding"
     assert "Emails from service one will look like this" in normalize_spaces(page.text)
     assert page.select_one("iframe")["src"] == url_for(
-        "main.email_template", branding_style=branding_preview_id, title=iframe_title
+        "main.email_template", branding_style=branding_preview_id, title=iframe_title, email_branding_preview=True
     )
     assert normalize_spaces(page.select_one(".page-footer button").text) == "Use this branding"
 
@@ -877,6 +886,7 @@ def test_email_branding_create_government_identity_logo(
             "main.email_template",
             branding_style=expected_branding_id_in_iframe,
             title="Example of an email with a government identity logo",
+            email_branding_preview=True,
         )
     else:
         assert not iframe

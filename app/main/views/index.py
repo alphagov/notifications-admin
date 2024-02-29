@@ -70,6 +70,7 @@ def design_content():
 def email_template():
     branding_style = request.args.get("branding_style")
     subject = request.args.get("title", default="Preview of email branding")
+    email_branding_preview = request.args.get("email_branding_preview", False)
 
     if not branding_style or branding_style in {"govuk", FieldWithNoneOption.NONE_OPTION_VALUE}:
         branding = EmailBranding.govuk_branding()
@@ -83,7 +84,9 @@ def email_template():
     template = {
         "template_type": "email",
         "subject": subject,
-        "content": render_template("example-email.md"),
+        "content": render_template(
+            "example-email.md" if not email_branding_preview else "email-branding-preview-example-email.md"
+        ),
     }
 
     resp = make_response(
@@ -121,7 +124,6 @@ def letter_template():
         filename = letter_branding_client.get_letter_branding(branding_style)["filename"]
     elif not filename:
         filename = "no-branding"
-
     template = {"subject": subject, "content": "", "template_type": "letter"}
     image_url = url_for("no_cookie.letter_branding_preview_image", filename=filename)
 
