@@ -17,12 +17,16 @@ Text message pricing
 
     {{ content_metadata(
       data={
-        "Last updated": "11 July 2023"
+        "Last updated": "4 March 2024"
       }
     ) }}
 
   <p class="govuk-body">Each unique service you add has an annual allowance of free text messages.</p>
   <p class="govuk-body">When a service has used its annual allowance, it costs {{ sms_rate }} pence (plus VAT) for each text message you send.</p>
+
+  <div class="govuk-inset-text">  
+    <p class="govuk-body">On 1 April 2024 the cost of sending a text message will go up to 2.2 pence (plus VAT).</p>
+  </div>
 
   <p class="govuk-body">You may use more free messages, or pay more for each message, if you:</p>
   <ul class="govuk-list govuk-list--bullet">
@@ -38,9 +42,20 @@ Text message pricing
       <ul class="govuk-list govuk-list--bullet">
         <li>40,000 free text messages for national services</li>
         <li>20,000 free text messages for regional services</li>
-        <li>10,000 free text messages for state-funded schools and GP practices</li>
+        <li>10,000 free text messages for state-funded schools and GP surgeries</li>
     </ul>
   <p class="govuk-body">Each unique service you add has a separate allowance.</p>
+
+  <div class="govuk-inset-text">  
+    <p class="govuk-body">From 1 April 2024 the free allowance will be:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>30,000 free text messages for national services</li>
+        <li>10,000 free text messages for regional services</li>
+        <li>5,000 free text messages for state-funded schools</li>
+    </ul>
+    <p class=”govuk-body”><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">GP surgeries</a>
+ will no longer get a free allowance.</p>
+  </div>
 
   <h2 class="heading-medium" id="long-text-messages">Long text messages</h2>
   <p class="govuk-body">If a text message is longer than 160 characters (including spaces), it counts as more than one message.</p>
