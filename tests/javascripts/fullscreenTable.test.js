@@ -112,6 +112,7 @@ describe('FullscreenTable', () => {
 
   afterEach(() => {
 
+    $(window).off('scroll resize');
     document.body.innerHTML = '';
 
   });
