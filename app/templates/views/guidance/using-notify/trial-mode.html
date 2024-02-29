@@ -20,6 +20,8 @@
     <li>create letter templates, but not send them</li>
   </ul>
 
+  <p class="govuk-body">GP surgeries cannot send any text messages in trial mode.</p>
+
     {% if current_service and current_service.trial_mode %}
   <p class="govuk-body">
     To remove these restrictions, you can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.</p>
