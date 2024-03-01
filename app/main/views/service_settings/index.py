@@ -1192,6 +1192,7 @@ def link_service_to_organisation(service_id):
     if form.validate_on_submit():
         if form.organisations.data != current_service.organisation_id:
             organisations_client.update_service_organisation(service_id, form.organisations.data)
+            current_service.update(has_active_go_live_request=False)
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(

@@ -5589,6 +5589,7 @@ def test_update_service_organisation(
     mock_get_organisation,
     mock_get_organisations,
     mock_update_service_organisation,
+    mock_update_service,
 ):
     client_request.login(platform_admin_user)
     client_request.post(
@@ -5597,6 +5598,7 @@ def test_update_service_organisation(
         _data={"organisations": "7aa5d4e9-4385-4488-a489-07812ba13384"},
     )
     mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
+    mock_update_service.assert_called_once_with(service_one["id"], has_active_go_live_request=False)
 
 
 def test_update_service_organisation_does_not_update_if_same_value(
