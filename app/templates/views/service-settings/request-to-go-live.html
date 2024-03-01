@@ -66,6 +66,10 @@
         <p class="govuk-body">
           You must complete these steps before you can request to go live.
         </p>
+      {% elif current_service.has_active_go_live_request %}
+        <p class="govuk-body">
+          has_active_go_live_request
+        </p>
       {% else %}
         <p class="govuk-body">
           When we receive your request we’ll get back to you by the end of the next working day.

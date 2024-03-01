@@ -1087,6 +1087,62 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
 
 
 @pytest.mark.parametrize(
+    "has_active_go_live_request, expected_button",
+    (
+        (True, False),
+        (False, True),
+    ),
+)
+def test_should_not_show_go_live_button_if_checklist_not_complete(
+    client_request,
+    mocker,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    mock_get_service_organisation,
+    mock_get_invites_for_service,
+    single_sms_sender,
+    has_active_go_live_request,
+    expected_button,
+):
+    mocker.patch(
+        "app.models.service.Service.has_active_go_live_request",
+        new_callable=PropertyMock,
+        return_value=has_active_go_live_request,
+        create=True,
+    )
+    mocker.patch(
+        "app.models.service.Service.go_live_checklist_completed",
+        new_callable=PropertyMock,
+        return_value=True,
+    )
+    mocker.patch(
+        "app.models.organisation.Organisation.agreement_signed",
+        new_callable=PropertyMock,
+        return_value=True,
+        create=True,
+    )
+
+    for channel in ("email", "sms", "letter"):
+        mocker.patch(
+            f"app.models.service.Service.volume_{channel}",
+            create=True,
+            new_callable=PropertyMock,
+            return_value=0,
+        )
+
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+    assert page.select_one("h1").text == "Before you request to go live"
+
+    if expected_button:
+        assert page.select_one("form button").text.strip() == "Request to go live"
+    else:
+        assert not page.select("form")
+        assert not page.select("form button")
+        assert len(page.select("main p")) == 1
+        assert normalize_spaces(page.select_one("main p").text) == ("has_active_go_live_request")
+
+
+@pytest.mark.parametrize(
     "go_live_at, message",
     [
         (None, "‘service one’ is already live."),
