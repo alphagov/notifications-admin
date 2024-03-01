@@ -67,8 +67,8 @@ def add_organisation():
                 )
             )
         except HTTPError as e:
-            msg = "Organisation name already exists"
-            if e.status_code == 400 and msg in e.message:
+            org_name_exists_message = "Organisation name already exists"
+            if e.status_code == 400 and org_name_exists_message in e.message:
                 form.name.errors.append("This organisation name is already in use.")
             else:
                 raise e
@@ -85,18 +85,22 @@ def add_organisation_from_gp_service(service_id):
     form = AddGPOrganisationForm(service_name=current_service.name)
 
     if form.validate_on_submit():
-        Organisation.create(
-            form.get_organisation_name(),
-            crown=False,
-            organisation_type="nhs_gp",
-            agreement_signed=False,
-        ).associate_service(service_id)
-        return redirect(
-            url_for(
-                ".service_agreement",
-                service_id=service_id,
-            )
-        )
+        try:
+            Organisation.create(
+                form.get_organisation_name(),
+                crown=False,
+                organisation_type="nhs_gp",
+                agreement_signed=False,
+            ).associate_service(service_id)
+        except HTTPError as e:
+            org_name_exists_message = "Organisation name already exists"
+            if e.status_code == 400 and org_name_exists_message in e.message:
+                flash("This organisation name is already in use.")
+            else:
+                raise e
+
+        else:
+            return redirect(url_for(".service_agreement", service_id=service_id))
 
     return render_template("views/organisations/add-gp-organisation.html", form=form, error_summary_enabled=True)
 

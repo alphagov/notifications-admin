@@ -370,10 +370,8 @@ def test_add_organisation_from_gp_service_when_that_org_name_already_exists(
         _expected_status=200,
     )
 
-    assert (
-        "This organisation name already exists. Choose a different name or contact support."
-        in page.select_one(".govuk-error-message, .error-message").text
-    )
+    expected_message = "This organisation name is already in use."
+    assert expected_message in page.select_one(".banner-dangerous").text
 
 
 @pytest.mark.parametrize(
