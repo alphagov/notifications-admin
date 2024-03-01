@@ -5602,6 +5602,7 @@ def test_update_service_organisation(
         _data={"organisations": "7aa5d4e9-4385-4488-a489-07812ba13384"},
     )
     mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
+    mock_update_service.assert_called_once_with(service_one["id"], has_active_go_live_request=False)
 
 
 def test_update_service_organisation_sets_daily_sms_limit_to_zero_for_trial_mode_gp(
@@ -5621,7 +5622,10 @@ def test_update_service_organisation_sets_daily_sms_limit_to_zero_for_trial_mode
         _data={"organisations": "7aa5d4e9-4385-4488-a489-07812ba13384"},
     )
     mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
-    mock_update_service.assert_called_once_with(service_one["id"], sms_message_limit=0)
+    assert mock_update_service.call_args_list == [
+        call(service_one["id"], sms_message_limit=0),
+        call(service_one["id"], has_active_go_live_request=False),
+    ]
 
 
 def test_update_service_organisation_doesnt_change_daily_sms_limit_for_live_gp(
@@ -5641,7 +5645,7 @@ def test_update_service_organisation_doesnt_change_daily_sms_limit_for_live_gp(
         _data={"organisations": "7aa5d4e9-4385-4488-a489-07812ba13384"},
     )
     mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
-    assert mock_update_service.called is False
+    mock_update_service.assert_called_once_with(service_one["id"], has_active_go_live_request=False)
 
 
 def test_update_service_organisation_does_not_update_if_same_value(
