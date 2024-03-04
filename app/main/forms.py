@@ -1158,7 +1158,7 @@ class RenameOrganisationForm(StripWhitespaceForm):
 class AddGPOrganisationForm(StripWhitespaceForm):
     def __init__(self, *args, service_name="unknown", **kwargs):
         super().__init__(*args, **kwargs)
-        self.same_as_service_name.label.text = f"Is your GP practice called ‘{service_name}’?"
+        self.same_as_service_name.label.text = f"Is your GP surgery called ‘{service_name}’?"
         self.service_name = service_name
         self.same_as_service_name.param_extensions = {
             "items": [
@@ -1173,7 +1173,7 @@ class AddGPOrganisationForm(StripWhitespaceForm):
         return self.name.data
 
     same_as_service_name = OnOffField(
-        "Is your GP practice called the same name as your service?",
+        "Is your GP surgery called the same name as your service?",
         choices=[
             (True, "Yes"),
             (False, "No"),
@@ -1182,7 +1182,7 @@ class AddGPOrganisationForm(StripWhitespaceForm):
     )
 
     name = GovukTextInputField(
-        "What’s your practice called?",
+        "What’s your GP surgery called?",
     )
 
     def validate_name(self, field):
