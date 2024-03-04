@@ -229,8 +229,13 @@ def request_to_go_live(service_id):
 def submit_request_to_go_live(service_id):
     ticket_message = render_template("support-tickets/go-live-request.txt") + "\n"
 
+    if current_service.organisation.can_approve_own_go_live_requests:
+        subject = f"Self approve go live request - {current_service.name}"
+    else:
+        subject = f"Request to go live - {current_service.name}"
+
     ticket = NotifySupportTicket(
-        subject=f"Request to go live - {current_service.name}",
+        subject=subject,
         message=ticket_message,
         ticket_type=NotifySupportTicket.TYPE_QUESTION,
         notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
