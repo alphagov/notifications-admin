@@ -36,7 +36,7 @@ class Organisation(JSONModel):
         TYPE_LOCAL: "Local government",
         TYPE_NHS_CENTRAL: "NHS – central government agency or public body",
         TYPE_NHS_LOCAL: "NHS Trust or Clinical Commissioning Group",
-        TYPE_NHS_GP: "GP practice",
+        TYPE_NHS_GP: "GP surgery",
         TYPE_EMERGENCY_SERVICE: "Emergency service",
         TYPE_SCHOOL_OR_COLLEGE: "School or college",
         TYPE_OTHER: "Other",
