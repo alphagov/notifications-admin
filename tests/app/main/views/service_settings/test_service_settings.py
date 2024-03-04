@@ -2026,14 +2026,16 @@ def test_should_redirect_after_request_to_go_live(
 
 
 @pytest.mark.parametrize(
-    "can_approve_own_go_live_requests, expected_go_live_notes",
+    "can_approve_own_go_live_requests, expected_subject, expected_go_live_notes",
     (
         (
             False,
+            "Request to go live - service one",
             "This service is not allowed to go live",
         ),
         (
             True,
+            "Self approve go live request - service one",
             (
                 "This organisation can approve its own go live requests. "
                 "No action should be needed from us. "
@@ -2059,6 +2061,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     mock_notify_users_of_request_to_go_live_for_service,
     can_approve_own_go_live_requests,
     expected_go_live_notes,
+    expected_subject,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -2097,7 +2100,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
 
     mock_create_ticket.assert_called_once_with(
         ANY,
-        subject="Request to go live - service one",
+        subject=expected_subject,
         message=expected_message,
         ticket_type="question",
         notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
