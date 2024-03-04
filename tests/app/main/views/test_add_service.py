@@ -46,7 +46,7 @@ def test_get_should_render_add_service_template(
         "Local government",
         "NHS – central government agency or public body",
         "NHS Trust or Clinical Commissioning Group",
-        "GP practice",
+        "GP surgery",
         "Emergency service",
         "School or college",
         "Other",
@@ -241,7 +241,7 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
         "NHS – central government agency or public body",
         "NHS Trust or Clinical Commissioning Group",
-        "GP practice",
+        "GP surgery",
     ]
     assert [radio["value"] for radio in page.select(".govuk-radios__item input")] == [
         "nhs_central",
