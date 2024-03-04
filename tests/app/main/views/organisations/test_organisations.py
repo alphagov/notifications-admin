@@ -234,7 +234,7 @@ def test_gps_can_create_own_organisations(
         return
 
     assert page.select_one("input[type=text]")["name"] == "name"
-    assert normalize_spaces(page.select_one("label[for=name]").text) == "What’s your practice called?"
+    assert normalize_spaces(page.select_one("label[for=name]").text) == "What’s your GP surgery called?"
 
 
 @pytest.mark.parametrize(
