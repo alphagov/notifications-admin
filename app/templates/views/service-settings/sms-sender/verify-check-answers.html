@@ -42,27 +42,27 @@
       {% endcall %}
       {% call row() %}
         {{ text_field('Phone number') }}
-        {{ text_field('Example') }}
-        {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Website') }}
-        {{ text_field('Example') }}
+        {{ text_field('08081 570000 ') }}
         {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
       {% endcall %}
       {% call row() %}
         {{ text_field('Email address') }}
-        {{ text_field('Example') }}
+        {{ text_field('example@example.gov.uk') }}
+        {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
+      {% endcall %}
+      {% call row() %}
+        {{ text_field('Website') }}
+        {{ text_field('https://www.example.gov.uk') }}
         {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
       {% endcall %}
       {% call row() %}
         {{ text_field('Privacy policy webpage') }}
-        {{ text_field('Example') }}
+        {{ text_field('https://www.example.gov.uk/privacy') }}
         {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
       {% endcall %}
       {% call row() %}
         {{ text_field('Terms of use webpage') }}
-        {{ text_field('Example') }}
+        {{ text_field('https://www.example.gov.uk/terms') }}
         {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
       {% endcall %}
       {% call row() %}
