@@ -1319,7 +1319,7 @@ def test_archive_organisation_does_not_allow_orgs_with_team_members_or_services_
                 {"value": "local", "label": "Local government"},
                 {"value": "nhs_central", "label": "NHS – central government agency or public body"},
                 {"value": "nhs_local", "label": "NHS Trust or Clinical Commissioning Group"},
-                {"value": "nhs_gp", "label": "GP practice"},
+                {"value": "nhs_gp", "label": "GP surgery"},
                 {"value": "emergency_service", "label": "Emergency service"},
                 {"value": "school_or_college", "label": "School or college"},
                 {"value": "other", "label": "Other"},
