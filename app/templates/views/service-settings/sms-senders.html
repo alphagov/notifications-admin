@@ -27,14 +27,15 @@
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-three-quarters">
             <h2 class="user-list-item-heading">
-              <p class="heading-small govuk-!-margin-bottom-1 govuk-!-margin-top-0">{{ item.sms_sender }}</p>
+              <span class="heading-small">{{ item.sms_sender }}</span>
               {% if item.hint %}
-                <p class="govuk-body govuk-hint govuk-!-margin-bottom-1">
+                &ensp;
+                <span class="hint">
                   {{ item.hint }}
-                </p>
+                </span>
               {% endif %}
               {% if request.args.get("in_progress") == item.sms_sender %}
-                <p class="govuk-body govuk-hint">
+                <p class="govuk-body govuk-hint govuk-!-margin-top-1">
                   Verification in progress
                 </p>
               {% endif %}
@@ -64,6 +65,6 @@
     </div>
   {% endif %}
   <p class="govuk-body">
-    The text message sender ID tells your users who the message is from.
+    The text message sender ID tells recipients who the message is from.
   </p>
 {% endblock %}

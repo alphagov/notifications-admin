@@ -56,12 +56,12 @@
         {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
       {% endcall %}
       {% call row() %}
-        {{ text_field('Privacy Policy URL') }}
+        {{ text_field('Privacy policy webpage') }}
         {{ text_field('Example') }}
         {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
       {% endcall %}
       {% call row() %}
-        {{ text_field('Terms of Service URL') }}
+        {{ text_field('Terms of use webpage') }}
         {{ text_field('Example') }}
         {{ edit_field('Change', url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
       {% endcall %}
@@ -80,7 +80,7 @@
             ">
               {{ sms_sender.sms_sender }}
             </div>
-            <img src="{{ asset_url('images/rcs/example.svg') }}" style="display:block;">
+            <img src="{{ asset_url('images/rcs/example-custom.svg') }}" style="display:block;">
           </div>
         </td>
         {{ edit_field('Change', url_for(".service_verify_sms_sender_branding", service_id=current_service.id, sms_sender_id=sms_sender.id)) }}
@@ -89,11 +89,10 @@
     {% endcall %}
   </div>
 
+  <p class="govuk-body">It takes around 2 weeks to get your sender ID verified.</p>
 
-  <p class="govuk-body">Takes 2 weeks</p>
+  <p class="govuk-body">You’ll get another email if your request is approved.</p>
 
-  <p class="govuk-body">We’ll let you know when it’s done</p>
-
-  <a class="govuk-button" href="{{ url_for(".service_sms_senders", service_id=current_service.id, in_progress=sms_sender.sms_sender) }}">Confirm</a>
+  <a class="govuk-button" href="{{ url_for(".service_sms_senders", service_id=current_service.id, in_progress=sms_sender.sms_sender) }}">Verify your sender ID</a>
 
 {% endblock %}

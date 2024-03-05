@@ -9,7 +9,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Verify text message sender ID
+  Verify your text message sender ID
 {% endblock %}
 
 {% block backLink %}
@@ -21,16 +21,17 @@
 {% block maincolumn_content %}
 
   <div class="govuk-!-margin-bottom-6">
-    {{ page_header('Verify text message sender ID') }}
+    {{ page_header('Verify your text message sender ID') }}
   </div>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
+      <p class="govuk-body">If you verify your sender ID, your text messages will come with:</p>
       <ul class="govuk-list govuk-list--bullet">
-      <li>add branding</li>
-      <li>blue tick</li>
-    </ul>
-    <p class="govuk-body">Takes about 2 weeks</p>
+        <li>your own branding</li>
+        <li>a verified badge (blue tick)</li>
+      </ul>
+      <p class="govuk-body">It takes around 2 weeks to get your sender ID verified.</p>
     </div>
     <div class="govuk-grid-column-one-half" style="position: relative;"">
       <div style="
@@ -85,12 +86,17 @@
     "html": verified_rates
   }) }}
 
-  <h2 class="govuk-heading-m">Support</h2>
-  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
-    <li>20% adoption</li>
-    <li>no international</li>
-    <li>auto fallback</li>
-  </ul>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <h2 class="govuk-heading-m">Supported phones</h2>
+      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+        <li>about 20% of phones can receive verified text messages now</li>
+        <li>by the end of 2024 we expect the number to be more than 50%</li>
+        <li>verified text messages can’t be sent to international phone numbers</li>
+        <li>if a phone can’t receive verified text messages Notify will send a normal text message automatically</li>
+      </ul>
+    </div>
+  </div>
 
   {% call form_wrapper(method="get", action=url_for(".service_verify_sms_sender_name", service_id=current_service.id, sms_sender_id=sms_sender.id)) %}
     {{ page_footer('Continue') }}

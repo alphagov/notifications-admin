@@ -320,11 +320,11 @@ class Service(JSONModel):
         def attach_hint(sender):
             hints = []
             if sender["is_default"]:
-                hints += ["Default"]
+                hints += ["default"]
             if sender["inbound_number_id"]:
                 hints += ["receives replies"]
             if hints:
-                sender["hint"] = " and ".join(hints)
+                sender["hint"] = "(" + " and ".join(hints) + ")"
             return sender
 
         return [attach_hint(sender) for sender in self.sms_senders]

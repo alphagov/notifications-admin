@@ -49,7 +49,7 @@
       {% endcall %}
 
       {% call row() %}
-        {{ text_field('Default') }}
+        {{ text_field('Make this the default sender ID') }}
         {{ optional_text_field('Yes' if sms_sender.is_default else None, default='No') }}
         {{ edit_field(
             'Change',

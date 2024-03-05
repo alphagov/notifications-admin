@@ -9,7 +9,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Verify text message sender ID
+  Add a custom sender ID
 {% endblock %}
 
 {% block backLink %}
@@ -21,11 +21,11 @@
 {% block maincolumn_content %}
 
   <div class="govuk-!-margin-bottom-6">
-    {{ page_header('Verify text message sender ID') }}
+    {{ page_header('Add a custom sender ID') }}
   </div>
 
-  <p class="govuk-body govuk-!-margin-bottom-2">Short name</p>
-  <p class="govuk-body govuk-hint govuk-!-margin-bottom-2">Will continue to be used for normal text messages</p>
+  <p class="govuk-body govuk-!-margin-bottom-2">Default sender ID</p>
+  <p class="govuk-body govuk-hint govuk-!-margin-bottom-2">Used for normal text messages</p>
   <div class="govuk-inset-text govuk-!-margin-top-0">
     <p class="govuk-body">{{ sms_sender.sms_sender }}</p>
   </div>

@@ -7,10 +7,9 @@
 {% from "components/table.html" import mapping_table, row, settings_row, text_field, callable_text_field, optional_text_field, edit_field, field, boolean_field with context %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "components/file-upload.html" import file_upload %}
 
 {% block service_page_title %}
-  Upload a logo for your sender ID
+  Enter contact details for your service
 {% endblock %}
 
 {% block backLink %}
@@ -22,27 +21,18 @@
 {% block maincolumn_content %}
 
   <div class="govuk-!-margin-bottom-6">
-    {{ page_header('Upload a logo for your sender ID') }}
+    {{ page_header('Enter contact details for your service') }}
   </div>
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-five-sixths">
-      <p class="govuk-body">
-        Your logo must be:
-      </p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>a PNG file</li>
-        <li>at least 256 pixels high</li>
-        <li>a square image with a transparent background</li>
-      </ul>
-      <p class="govuk-body">
-        We do not recommend using landscape or portrait images because they will be cropped to fit inside a circle.
-      </p>
+  <p class="govuk-body">We’ll use this information to verify your sender ID.</p>
 
-      {{ file_upload(form.file) }}
-
-      <p class="govuk-body govuk-!-margin-top-6"><a class="govuk-link govuk-link--no-visited-state" href="#">I do not have a file to upload</a></p>
-    </div>
-  </div>
+  {% call form_wrapper() %}
+    {{ form.phone }}
+    {{ form.web }}
+    {{ form.email }}
+    {{ form.privacy }}
+    {{ form.terms }}
+    {{ page_footer('Continue') }}
+  {% endcall %}
 
 {% endblock %}

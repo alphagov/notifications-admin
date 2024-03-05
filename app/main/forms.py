@@ -1801,8 +1801,12 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
 
 class SmsSenderVerifiedNameForm(StripWhitespaceForm):
     long = GovukTextInputField(
-        "Long name",
-        param_extensions={"hint": {"text": "Should be the same as short name unless…"}},
+        "Custom sender ID (optional)",
+        param_extensions={
+            "hint": {
+                "text": "Add a custom sender ID if you want your verified messages to come from a longer, more descriptive sender name"
+            }
+        },
     )
 
 
@@ -1817,10 +1821,19 @@ class SmsSenderBranding(StripWhitespaceForm):
 
 class SmsSenderContactDetailsForm(StripWhitespaceForm):
     phone = GovukTextInputField("Phone number")
-    web = GovukTextInputField("Website")
+    web = GovukTextInputField(
+        "Website",
+        param_extensions={"hint": {"text": "Enter a URL"}},
+    )
     email = GovukTextInputField("Email address")
-    privacy = GovukTextInputField("Privacy policy URL")
-    terms = GovukTextInputField("Terms of service URL")
+    privacy = GovukTextInputField(
+        "Privacy policy webpage",
+        param_extensions={"hint": {"text": "Enter a URL"}},
+    )
+    terms = GovukTextInputField(
+        "Terms of use webpage",
+        param_extensions={"hint": {"text": "Enter a URL"}},
+    )
 
 
 class ServiceEditInboundNumberForm(StripWhitespaceForm):
