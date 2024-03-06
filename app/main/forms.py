@@ -1820,18 +1820,37 @@ class SmsSenderBranding(StripWhitespaceForm):
 
 
 class SmsSenderContactDetailsForm(StripWhitespaceForm):
-    phone = GovukTextInputField("Phone number")
+    phone = GovukTextInputField(
+        "Phone number",
+        validators=[
+            NotifyDataRequired(thing="a phone number"),
+        ],
+    )
     web = GovukTextInputField(
         "Website",
+        validators=[
+            NotifyDataRequired(thing="a website"),
+        ],
         param_extensions={"hint": {"text": "Enter a URL"}},
     )
-    email = GovukTextInputField("Email address")
+    email = GovukTextInputField(
+        "Email address",
+        validators=[
+            NotifyDataRequired(thing="an email address"),
+        ],
+    )
     privacy = GovukTextInputField(
         "Privacy policy webpage",
+        validators=[
+            NotifyDataRequired(thing="a webpage where users can find your service’s privacy policy"),
+        ],
         param_extensions={"hint": {"text": "Enter a URL"}},
     )
     terms = GovukTextInputField(
         "Terms of use webpage",
+        validators=[
+            NotifyDataRequired(thing="a webpage where users can find your service’s terms of use"),
+        ],
         param_extensions={"hint": {"text": "Enter a URL"}},
     )
 
