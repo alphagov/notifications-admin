@@ -343,6 +343,37 @@ def test_gps_can_name_their_organisation(
     mock_update_service_organisation.assert_called_once_with(SERVICE_ONE_ID, ORGANISATION_ID)
 
 
+def test_add_organisation_from_gp_service_when_that_org_name_already_exists(
+    client_request,
+    mocker,
+    service_one,
+    mock_update_service_organisation,
+):
+    service_one["organisation_type"] = "nhs_gp"
+    mocker.patch(
+        "app.organisations_client.create_organisation",
+        side_effect=HTTPError(
+            response=mocker.Mock(
+                status_code=400, json={"result": "error", "message": "Organisation name already exists"}
+            ),
+            message="Organisation name already exists",
+        ),
+    )
+
+    page = client_request.post(
+        ".add_organisation_from_gp_service",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            "same_as_service_name": True,
+            "name": "This is ignored",
+        },
+        _expected_status=200,
+    )
+
+    expected_message = "This organisation name is already in use."
+    assert expected_message in page.select_one(".banner-dangerous").text
+
+
 @pytest.mark.parametrize(
     "data, expected_error",
     (

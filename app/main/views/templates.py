@@ -552,9 +552,10 @@ def manage_template_folder(service_id, template_folder_id):
 def delete_template_folder(service_id, template_folder_id):
     template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
     template_list = TemplateList(service=current_service, template_folder_id=template_folder_id)
+    must_empty_folder_message = "You must empty this folder before you can delete it"
 
     if not template_list.folder_is_empty:
-        flash("You must empty this folder before you can delete it", "info")
+        flash(must_empty_folder_message, "info")
         return redirect(
             url_for(
                 ".choose_template", service_id=service_id, template_type="all", template_folder_id=template_folder_id
@@ -571,7 +572,7 @@ def delete_template_folder(service_id, template_folder_id):
         except HTTPError as e:
             msg = "Folder is not empty"
             if e.status_code == 400 and msg in e.message:
-                flash("You must empty this folder before you can delete it", "info")
+                flash(must_empty_folder_message, "info")
                 return redirect(
                     url_for(
                         ".choose_template",
