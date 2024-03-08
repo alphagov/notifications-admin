@@ -57,6 +57,15 @@
     overflow-x: auto;
     overflow-y: hidden;
 
+    // hide the header cells, but only visually and in a way that doesn't disrupt the table layout
+    .table-field-heading-first,
+    tbody th.table-field {
+      color: transparent;
+      border-color: transparent;
+      border-right-color: $govuk-border-colour;
+      background: govuk-colour("white");
+    }
+
     .table-field-left-aligned {
       position: relative;
       z-index: 150;
@@ -91,8 +100,11 @@
     top: 0;
     overflow: hidden;
 
-    .table-field-heading {
+    // hide all cells except the headers
+    .table-field-heading,
+    .table-field-left-aligned {
       visibility: hidden;
+      border-color: transparent;
     }
 
     .table-field-left-aligned {

@@ -122,6 +122,11 @@ td {
     text-align: center;
   }
 
+  // precedence of spreadsheet CSS means we need this to stop this style being overwritten
+  & .fullscreen-scrollable-table tbody th.table-field {
+    background: govuk-colour("white");
+  }
+
   th, td {
     padding-left: 10px;
     padding-right: 10px;
