@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Text message sender IDs
+  Text message sender names
 {% endblock %}
 
 {% block backLink %}
@@ -14,7 +14,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Text message sender IDs') }}
+  {{ page_header('Text message sender names') }}
 
   <div class="user-list">
     {% if not current_service.sms_senders %}

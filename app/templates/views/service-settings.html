@@ -173,7 +173,7 @@
         {% endcall %}
 
         {% call settings_row(if_has_permission='sms') %}
-          {{ text_field('Text message sender IDs') }}
+          {{ text_field('Text message sender names') }}
           {% call field(status='default' if current_service.default_sms_sender == "None" else '') %}
             {{ current_service.default_sms_sender | nl2br if current_service.default_sms_sender else 'None'}}
             {% if current_service.count_sms_senders > 1 %}
@@ -186,7 +186,7 @@
               'Manage',
               url_for('main.service_sms_senders', service_id=current_service.id),
               permissions=['manage_service','manage_api_keys'],
-              suffix='text message sender IDs',
+              suffix='text message sender names',
           )
           }}
         {% endcall %}
