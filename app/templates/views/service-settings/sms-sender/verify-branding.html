@@ -10,19 +10,19 @@
 {% from "components/file-upload.html" import file_upload %}
 
 {% block service_page_title %}
-  Upload a logo for your sender ID
+  Upload a logo for your sender name
 {% endblock %}
 
 {% block backLink %}
   {% if not request.args.get('from_template') %}
-    {{ govukBackLink({ "href": url_for('main.service_verify_sms_sender_name', service_id=current_service.id, sms_sender_id=sms_sender.id) }) }}
+    {{ govukBackLink({ "href": url_for('main.service_verify_sms_sender', service_id=current_service.id, sms_sender_id=sms_sender.id) }) }}
   {% endif %}
 {% endblock %}
 
 {% block maincolumn_content %}
 
   <div class="govuk-!-margin-bottom-6">
-    {{ page_header('Upload a logo for your sender ID') }}
+    {{ page_header('Upload a logo for your sender name') }}
   </div>
 
   <div class="govuk-grid-row">

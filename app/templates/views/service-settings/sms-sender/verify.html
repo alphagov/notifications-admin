@@ -9,7 +9,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Verify your text message sender ID
+  Verify your text message sender name
 {% endblock %}
 
 {% block backLink %}
@@ -21,21 +21,21 @@
 {% block maincolumn_content %}
 
   <div class="govuk-!-margin-bottom-6">
-    {{ page_header('Verify your text message sender ID') }}
+    {{ page_header('Verify your text message sender name') }}
   </div>
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
-      <p class="govuk-body">Sending text messages from a verified sender ID can:</p>
+      <p class="govuk-body">Sending text messages from a verified sender name can:</p>
 
       <ul class="govuk-list govuk-list--bullet">
         <li>save you money</li>
         <li>make your messages look more trustworthy</li>
       </ul>
 
-      <p class="govuk-body">When you verify your sender ID, your text messages will come with:</p>
+      <p class="govuk-body">When you verify your sender name, your text messages will come with:</p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>your own branding</li>
+        <li>your own logo</li>
         <li>a verified badge (blue tick)</li>
       </ul>
 
@@ -58,9 +58,20 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      <h2 class="govuk-heading-m">Save money on long text messages</h2>
-      <p class="govuk-body">Using a verified sender ID can cut the cost of sending text messages longer than 160 characters. </p>
-      <p class="govuk-body">It’s free to verify your sender ID and there’s no monthly charge for sending verified text messages.</p>
+      <h2 class="govuk-heading-m">
+        How it works
+      </h2>
+      <p class="govuk-body">Verified sender names use a technology called Rich Communication Services (RCS). It gives the recipient more information about who the message is from.</p>
+      <p class="govuk-body">Most phones will support RCS by the end of 2024.</p>
+      <p class="govuk-body">If a phone does not support RCS, Notify will send a standard text message instead.</p>
+      <p class="govuk-body">RCS messages cannot be sent to international phone numbers.</p>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <h2 class="govuk-heading-m">Save money</h2>
+      <p class="govuk-body">If your message is over 160 characters long, an RCS message is cheaper than a standard text message.</p>
     </div>
   </div>
 
@@ -68,52 +79,40 @@
     <div class="body-copy-table">
         {% call mapping_table(
         caption='Text message pricing',
-        field_headings=['Message length', 'Normal text message', 'Verified text message'],
+        field_headings=['Message length', 'Standard text message', 'Verified sender name'],
         field_headings_visible=True,
         caption_visible=False
       ) %}
         {% for message_length, charge, charge_verified in [
-          ('Up to 160 characters', 1.97, '1.97'),
-          ('Up to 306 characters', 1.97 * 2, '3.90'),
-          ('Up to 459 characters', 1.97 * 3, '3.90'),
-          ('Up to 612 characters', 1.97 * 4, '3.90'),
-          ('Up to 765 characters', 1.97 * 5, '3.90'),
-          ('Up to 918 characters', 1.97 * 6, '3.90'),
+          ('Up to 160 characters', 2.27, 2.27),
+          ('Up to 306 characters', 2.27 * 2, 4.40),
+          ('Up to 459 characters', 2.27 * 3, 4.40),
+          ('Up to 612 characters', 2.27 * 4, 4.40),
+          ('Up to 765 characters', 2.27 * 5, 4.40),
+          ('Up to 918 characters', 2.27 * 6, 4.40),
         ] %}
           {% call row() %}
             {{ text_field(message_length) }}
-            {{ text_field(charge|string + 'p') }}
-            {{ text_field(charge_verified|string + 'p') }}
+            {{ text_field(charge|round(2)|format_pennies_as_currency(long=False)) }}
+            {{ text_field(charge_verified|format_pennies_as_currency(long=False)) }}
           {% endcall %}
         {% endfor %}
       {% endcall %}
-
     </div>
   {% endset %}
 
   {{ govukDetails({
-    "summaryText": "Verified text message rates",
+    "summaryText": "Text message rates for verified sender names",
     "html": verified_rates
   }) }}
 
 
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-five-sixths">
-      <h2 class="govuk-heading-m">
-        How it works
-      </h2>
-      <p class="govuk-body">Verified text messages use a technology called Rich Communication Services (RCS).</p>
-      <p class="govuk-body">Using RCS means we can give the recipient more information about who the message is from.</p>
-      <p class="govuk-body">Currently, about 20% of phones can receive verified text messages. By the end of 2024 we expect the number to be more than 50%.</p>
-      <p class="govuk-body">If the recipient’s phone is not compatible with RCS, Notify will send a standard text message instead.</p>
-      <p class="govuk-body">You cannot send verified text messages to international phone numbers.</p>
-    </div>
-  </div>
+
 
   <div class="govuk-grid-row govuk-!-margin-top-4 govuk-!-margin-bottom-4">
     <div class="govuk-grid-column-five-sixths">
       <h2 class="govuk-heading-m">
-        Before you verify your sender ID
+        Before you verify your sender name
       </h2>
       <p class="govuk-body">
         You will need to:
@@ -123,12 +122,12 @@
         <li>upload a logo</li>
       </ul>
       <p class="govuk-body">
-        It takes around 2 weeks to get your sender ID verified.
+        It’s free to verify your sender name, and the process will take around 2&nbsp;weeks.
       </p>
     </div>
   </div>
 
-  {% call form_wrapper(method="get", action=url_for(".service_verify_sms_sender_name", service_id=current_service.id, sms_sender_id=sms_sender.id)) %}
+  {% call form_wrapper(method="get", action=url_for(".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender.id)) %}
     {{ page_footer('Continue') }}
   {% endcall %}
 

@@ -1006,27 +1006,6 @@ def service_verify_sms_sender(service_id, sms_sender_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/sms-sender/<uuid:sms_sender_id>/verify-name",
-    methods=["GET", "POST"],
-)
-@user_has_permissions("manage_service")
-def service_verify_sms_sender_name(service_id, sms_sender_id):
-    sms_sender = current_service.get_sms_sender(sms_sender_id)
-    form = SmsSenderVerifiedNameForm(long=sms_sender["sms_sender"])
-    if form.validate_on_submit():
-        return redirect(
-            url_for(
-                ".service_verify_sms_sender_contact_details", service_id=current_service.id, sms_sender_id=sms_sender_id
-            )
-        )
-    return render_template(
-        "views/service-settings/sms-sender/verify-name.html",
-        sms_sender=sms_sender,
-        form=form,
-    )
-
-
-@main.route(
     "/services/<uuid:service_id>/service-settings/sms-sender/<uuid:sms_sender_id>/verify-contact-details",
     methods=["GET", "POST"],
 )
