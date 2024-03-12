@@ -92,7 +92,7 @@ class Config:
         ],
     }
 
-    NOTIFY_RUNTIME_PLATFORM = os.environ.get("NOTIFY_RUNTIME_PLATFORM", "paas")
+    NOTIFY_RUNTIME_PLATFORM = os.environ.get("NOTIFY_RUNTIME_PLATFORM", "ecs")
 
     EMAIL_BRANDING_MIN_LOGO_HEIGHT_PX = 108
     EMAIL_BRANDING_MAX_LOGO_WIDTH_PX = 640
