@@ -265,7 +265,11 @@ def view_letter_template_preview(service_id, template_id, filetype):
     template = current_service.get_template(template_id)
 
     return TemplatePreview.get_preview_for_templated_letter(
-        db_template=template._template, filetype=filetype, values=template.values, page=request.args.get("page")
+        db_template=template._template,
+        filetype=filetype,
+        values=template.values,
+        page=request.args.get("page"),
+        cache_key=template._template + template._template["version"],
     )
 
 
@@ -298,6 +302,8 @@ def letter_branding_preview_image(filename):
         template,
         filetype="png",
         branding_filename=branding_filename,
+        cache_key="1251f359-7c93-4b33-92f3-966d29ab7f9c"
+        + branding_filename,  # id always the same, as only branding changes
     )
 
 
@@ -330,7 +336,11 @@ def view_letter_template_version_preview(service_id, template_id, version, filet
     template = current_service.get_template(template_id, version=version)
 
     return TemplatePreview.get_preview_for_templated_letter(
-        db_template=template._template, filetype=filetype, values=template.values, page=request.args.get("page")
+        db_template=template._template,
+        filetype=filetype,
+        values=template.values,
+        page=request.args.get("page"),
+        cache_key=template._template + template._template["version"],
     )
 
 

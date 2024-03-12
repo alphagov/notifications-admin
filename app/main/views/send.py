@@ -1,3 +1,4 @@
+import hashlib
 import itertools
 from string import ascii_uppercase
 from zipfile import BadZipFile
@@ -527,12 +528,13 @@ def send_test_preview(service_id, template_id, filetype):
             filetype="png",
         ),
     )
-
+    values = get_normalised_placeholders_from_session()
     return TemplatePreview.get_preview_for_templated_letter(
         db_template=template._template,
         filetype=filetype,
-        values=get_normalised_placeholders_from_session(),
+        values=values,
         page=request.args.get("page"),
+        cache_key=template._template + template._template["version"] + hashlib.md5(values.__str__),
     )
 
 
@@ -730,7 +732,11 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
 
     template = _check_messages(service_id, template_id, upload_id, row_index)["template"]
     return TemplatePreview.get_preview_for_templated_letter(
-        db_template=template._template, filetype=filetype, values=template.values, page=page
+        db_template=template._template,
+        filetype=filetype,
+        values=template.values,
+        page=page,
+        cache_key=template._template + template._template["version"] + hashlib.md5(template.values.__str__),
     )
 
 
@@ -752,7 +758,11 @@ def check_notification_preview(service_id, template_id, filetype):
         template_id,
     )["template"]
     return TemplatePreview.get_preview_for_templated_letter(
-        db_template=template._template, filetype=filetype, values=template.values, page=page
+        db_template=template._template,
+        filetype=filetype,
+        values=template.values,
+        page=page,
+        cache_key=template._template + template._template["version"] + hashlib.md5(template.values.__str__),
     )
 
 

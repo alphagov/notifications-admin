@@ -214,6 +214,7 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype, w
             filetype=filetype,
             values=notification["personalisation"],
             page=request.args.get("page"),
+            cache_key=notification["id"],
         )
 
     image_data = get_letter_file_data(service_id, notification_id, filetype, with_metadata)

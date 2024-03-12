@@ -1,4 +1,5 @@
 import base64
+import uuid
 from io import BytesIO
 
 import requests
@@ -24,7 +25,27 @@ class TemplatePreview:
         return headers
 
     @classmethod
-    def get_preview_for_templated_letter(cls, db_template, filetype, values=None, page=None, branding_filename=None):
+    def get_preview_for_templated_letter(
+        cls,
+        db_template,
+        filetype,
+        values=None,
+        page=None,
+        branding_filename=None,
+        cache_key=None,
+    ):
+        """
+        Arguments:
+        - db_template: template object, as serialized from the db
+        - filetype: png or pdf - we want preview as png to show on the page, and preview as pdf for users to download
+        - page: only important for png preview, page number we want previewed as png
+        - branding_filename: name of letter branding file to use for the letter
+        - cache_key: one of the following:
+            - template id + version (for templates), or
+            - notification id (for notifications), or
+            - template id + version + hash of personalisation (for template with filled in placeholders, in review step)
+            - fixed uuid + branding filename (for preview on letter branding journeys)
+        """
         if db_template["is_precompiled_letter"]:
             raise ValueError
         if db_template["template_type"] != "letter":
@@ -36,6 +57,7 @@ class TemplatePreview:
             "template": db_template,
             "values": values,
             "filename": branding_filename or (current_service.letter_branding.filename if current_service else None),
+            "cache_key": cache_key or "random-" + uuid.uuid4(),
         }
         response = requests.post(
             "{}/preview.{}{}".format(
