@@ -22,6 +22,8 @@ class NotifyAdminAPIClient(BaseAPIClient):
         self.service_id = app.config["ADMIN_CLIENT_USER_NAME"]
         self.api_key = app.config["ADMIN_CLIENT_SECRET"]
         self.route_secret = app.config["ROUTE_SECRET_KEY_1"]
+        # TODO: remove this increase after the live services CSV report is taking less than 30 seconds
+        self.timeout = 40
 
     def generate_headers(self, api_token):
         headers = {
