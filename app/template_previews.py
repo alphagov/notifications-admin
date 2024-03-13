@@ -107,7 +107,7 @@ class TemplatePreview:
             "filename": current_service.letter_branding.filename,
         }
         response = requests.post(
-            f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/preview.json".format(),
+            f"{current_app.config['TEMPLATE_PREVIEW_API_HOST']}/get_page_count",
             json=data,
             headers=cls._get_outbound_headers(),
         )
