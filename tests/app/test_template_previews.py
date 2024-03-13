@@ -292,7 +292,7 @@ def test_page_count_makes_a_call_to_template_preview_and_gets_page_count(
         "some-onwards": "request-headers",
     }
 
-    request_mock.assert_called_once_with("http://localhost:9999/get_page_count", json=data, headers=headers)
+    request_mock.assert_called_once_with("http://localhost:9999/get-page-count", json=data, headers=headers)
 
 
 @pytest.mark.parametrize("allow_international_letters, query_param_value", [[False, "false"], [True, "true"]])
