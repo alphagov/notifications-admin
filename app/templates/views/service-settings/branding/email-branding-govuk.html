@@ -5,8 +5,10 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/branding-preview.html" import email_branding_preview %}
 
+{% set page_title = 'Confirm email branding ' %}
+
 {% block service_page_title %}
-  Check your new branding
+  {{ page_title }}
 {% endblock %}
 
 {% block backLink %}
@@ -17,7 +19,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Check your new branding') }}
+  {{ page_header(page_title) }}
 
   <p class="govuk-body">
     Emails from {{ current_service.name }} will look like this.
@@ -37,7 +39,7 @@
   </p>
 
   {% call form_wrapper() %}
-    {{ page_footer('Use this branding') }}
+    {{ page_footer(page_title) }}
   {% endcall %}
 
 {% endblock %}

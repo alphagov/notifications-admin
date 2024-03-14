@@ -5,8 +5,10 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/branding-preview.html" import letter_branding_preview %}
 
+{% set page_title = 'Change letter branding' %}
+
 {% block service_page_title %}
-  Change letter branding
+  {{ page_title }}
 {% endblock %}
 
 {% block backLink %}
@@ -17,7 +19,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change letter branding') }}
+  {{ page_header(page_title) }}
 
   <p class="govuk-body">
     Your letters currently have {{ current_service.letter_branding.name or 'no' }} branding.

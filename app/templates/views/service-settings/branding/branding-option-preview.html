@@ -6,10 +6,12 @@
 {% from "components/branding-preview.html" import email_branding_preview %}
 {% from "components/branding-preview.html" import letter_branding_preview %}
 
-{% set page_title = "Change {} branding".format(branding_type) %}
+{% set page_title %}
+  Confirm {{ branding_type }} branding
+{% endset %}
 
 {% block service_page_title %}
-{{ page_title }}
+  {{ page_title }}
 {% endblock %}
 
 {% block backLink %}
@@ -34,7 +36,7 @@
 
 
   {% call form_wrapper() %}
-    {{ page_footer('Change {} branding'.format(branding_type)) }}
+    {{ page_footer(page_title) }}
   {% endcall %}
 
 {% endblock %}

@@ -6,10 +6,12 @@
 {% from "components/branding-preview.html" import email_branding_preview %}
 {% from "components/branding-preview.html" import letter_branding_preview %}
 
-{% set page_title = "Check your new branding" %}
+{% set page_title %}
+  Confirm {{ branding_type }} branding
+{% endset %}
 
 {% block service_page_title %}
-{{ page_title }}
+  {{ page_title }}
 {% endblock %}
 
 {% block backLink %}
@@ -41,7 +43,7 @@
   </p>
 
   {% call form_wrapper() %}
-    {{ page_footer('Use this branding') }}
+    {{ page_footer(page_title) }}
   {% endcall %}
 
 {% endblock %}
