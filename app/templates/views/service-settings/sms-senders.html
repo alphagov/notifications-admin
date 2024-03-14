@@ -58,13 +58,13 @@
       <div class="govuk-grid-column-full">
         {{ govukButton({
           "element": "a",
-          "text": "Add text message sender ID",
+          "text": "Add text message sender name",
           "href": url_for('main.service_add_sms_sender', service_id=current_service.id)
         }) }}
       </div>
     </div>
   {% endif %}
   <p class="govuk-body">
-    The text message sender ID tells recipients who the message is from.
+    The text message sender name tells recipients who the message is from.
   </p>
 {% endblock %}
