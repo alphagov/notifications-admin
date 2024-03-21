@@ -590,12 +590,12 @@ def test_email_branding_govuk_and_nhs_pages(
         service_id=SERVICE_ONE_ID,
         **extra_args,
     )
-    assert page.select_one("h1").text == "Check your new branding"
+    assert page.select_one("h1").text.strip() == "Confirm email branding"
     assert "Emails from service one will look like this" in normalize_spaces(page.text)
     assert page.select_one("iframe")["src"] == url_for(
         "main.email_template", branding_style=branding_preview_id, title=iframe_title, email_branding_preview=True
     )
-    assert normalize_spaces(page.select_one(".page-footer button").text) == "Use this branding"
+    assert normalize_spaces(page.select_one(".page-footer button").text.strip()) == "Confirm email branding"
 
 
 @pytest.mark.parametrize(
