@@ -1799,6 +1799,62 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender ID the default")
 
 
+class SmsSenderVerifiedNameForm(StripWhitespaceForm):
+    long = GovukTextInputField(
+        "Custom sender ID (optional)",
+        param_extensions={
+            "hint": {
+                "text": "Add a custom sender ID if you want your verified messages to come from a longer, more descriptive sender name"
+            }
+        },
+    )
+
+
+class SmsSenderBranding(StripWhitespaceForm):
+    file = VirusScannedFileField(
+        "Upload logo",
+        validators=[
+            NotifyDataRequired(thing="an image containing your logo"),
+        ],
+    )
+
+
+class SmsSenderContactDetailsForm(StripWhitespaceForm):
+    phone = GovukTextInputField(
+        "Phone number",
+        validators=[
+            NotifyDataRequired(thing="a phone number"),
+        ],
+    )
+    web = GovukTextInputField(
+        "Website",
+        validators=[
+            NotifyDataRequired(thing="a website"),
+        ],
+        param_extensions={"hint": {"text": "Enter a URL"}},
+    )
+    email = GovukTextInputField(
+        "Email address",
+        validators=[
+            NotifyDataRequired(thing="an email address"),
+        ],
+    )
+    privacy = GovukTextInputField(
+        "Privacy policy webpage",
+        validators=[
+            NotifyDataRequired(thing="a webpage where users can find your service’s privacy policy"),
+        ],
+        param_extensions={"hint": {"text": "Enter a URL"}},
+    )
+    terms = GovukTextInputField(
+        "Terms of use webpage",
+        validators=[
+            NotifyDataRequired(thing="a webpage where users can find your service’s terms of use"),
+        ],
+        param_extensions={"hint": {"text": "Enter a URL"}},
+    )
+
+
 class ServiceEditInboundNumberForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender ID the default")
 
