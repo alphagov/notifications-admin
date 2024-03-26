@@ -11,16 +11,16 @@
     {% endif %}
   {% endif %}
   {% if current_user.has_permissions('manage_templates') %}
-    <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-postage">Change<span class="govuk-visually-hidden"> postage</span></a>
+    <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-postage">Change postage</a>
     {% if template.welsh_page_count %}
-      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id, language='welsh') }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> Welsh pages of the letter template</span></a>
+      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id, language='welsh') }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit Welsh heading and body text</a>
     {% else %}
-      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> letter template</span></a>
+      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit heading and body text</a>
     {% endif %}
     {% if current_service.count_letter_contact_details %}
-      <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Edit<span class="govuk-visually-hidden"> letter contact block</span></a>
+      <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Change sender address</a>
     {% else %}
-      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Edit<span class="govuk-visually-hidden"> letter contact block</span></a>
+      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Add a sender address</a>
     {% endif %}
   {% endif %}
 {% endif %}
@@ -35,7 +35,7 @@
     {% if template.welsh_page_count and page_number == first_page_of_english %}
       <div id="first-page-of-english-in-bilingual-letter"></div>
       {% if template.include_letter_edit_ui_overlay  %}
-        <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> English pages of the letter template</span></a>
+        <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit English heading and body text</a>
       {% endif %}
     {% endif %}
     {% if page_number == first_page_of_attachment %}
@@ -55,7 +55,7 @@
   {%- endfor -%}
   </ul>
   <h3>
-    Contact block
+    Sender address
   </h3>
   <p>
     {{ contact_block }}
