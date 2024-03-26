@@ -842,7 +842,7 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
         _test_page_title=False,
     )
 
-    assert "Send" not in page.text
+    assert "Get ready to send" not in page.text
     assert page.select_one("h1", {"data-error-type": "letter-too-long"})
 
 
@@ -1693,7 +1693,7 @@ def test_should_be_able_to_view_a_letter_template_with_links(
                 service_id=SERVICE_ONE_ID,
                 template_id=fake_uuid,
             ),
-            "Edit letter template",
+            "Edit heading and body text",
         ),
         (
             url_for(
@@ -1701,7 +1701,7 @@ def test_should_be_able_to_view_a_letter_template_with_links(
                 service_id=SERVICE_ONE_ID,
                 template_id=fake_uuid,
             ),
-            "Edit letter contact block",
+            "Change sender address",
         ),
         (
             url_for(
