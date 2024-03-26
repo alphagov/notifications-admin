@@ -295,7 +295,7 @@ describe('FullscreenTable', () => {
   });
 
   // the layout algorithms browsers use can make the first column different between tables so detection and a fix are both requried
-describe('the first column of both the scrollable table and that with fixed row headers should be the same width', () => {
+  describe('the first column of both the scrollable table and that with fixed row headers should be the same width', () => {
 
     afterEach(() => {
 
@@ -307,8 +307,8 @@ describe('the first column of both the scrollable table and that with fixed row 
     // we can't fake the columns being different when it starts so our test needs to run after a resize
     test('when the page has resized', () => {
 
-      let tableFrameNumberColumnHeader = container.querySelector('.table-field-heading-first');
-      let numberColumnFrameNumberColumnHeader;
+      let invisibleScrollableTopLeftCell;
+      let fixedTopLeftHeaderCell;
 
       // set main content column width (used by module as gauge for table width)
       screenMock.window.setWidthTo(1024);
@@ -317,14 +317,15 @@ describe('the first column of both the scrollable table and that with fixed row 
       // start module
       window.GOVUK.notifyModules.start();
 
-      numberColumnFrameNumberColumnHeader = document.querySelector('.fullscreen-fixed-table .table-field-heading-first');
+      invisibleScrollableTopLeftCell = document.querySelector('.fullscreen-scrollable-table .table-field-heading-first');
+      fixedTopLeftHeaderCell = document.querySelector('.fullscreen-fixed-table .table-field-heading-first');
 
-      tableFrameNumberColumnHeader.setAttribute('style', 'width: 30px');
-      numberColumnFrameNumberColumnHeader.setAttribute('style', 'width: 9px');
+      invisibleScrollableTopLeftCell.setAttribute('style', 'width: 30px');
+      fixedTopLeftHeaderCell.setAttribute('style', 'width: 9px');
 
       screenMock.window.resizeTo({ height: 1000, width: 600 });
 
-      expect(window.getComputedStyle(tableFrameNumberColumnHeader)['width']).toEqual('9px');
+      expect(window.getComputedStyle(invisibleScrollableTopLeftCell)['width']).toEqual('9px');
 
     });
 
