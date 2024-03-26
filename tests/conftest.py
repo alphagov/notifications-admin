@@ -4281,6 +4281,14 @@ def mock_get_letter_rates(mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_get_sms_rate(mocker):
+    def _get_sms_rate():
+        return {"rate": 1.97}
+
+    return mocker.patch("app.models.sms_rate.sms_rate_api_client.get_sms_rate", side_effect=_get_sms_rate)
+
+
+@pytest.fixture(scope="function")
 def mock_onwards_request_headers(mocker):
     mock_gorh = mocker.patch("notifications_utils.request_helper.NotifyRequest.get_onwards_request_headers")
     mock_gorh.return_value = {"some-onwards": "request-headers"}
