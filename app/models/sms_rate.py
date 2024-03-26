@@ -11,3 +11,6 @@ class SMSRate(JSONModel):
 
     def __str__(self):
         return str(self.rate)
+
+    def __eq__(self, other):
+        return float(self.rate) == float(other)
