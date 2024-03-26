@@ -15,7 +15,7 @@
     {% if template.welsh_page_count %}
       <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id, language='welsh') }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit Welsh heading and body text</a>
     {% else %}
-      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit heading and body text</a>
+      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> heading and body text</span></a>
     {% endif %}
     {% if current_service.count_letter_contact_details %}
       <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Change sender address</a>
