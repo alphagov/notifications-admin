@@ -17,7 +17,10 @@ Text message pricing
 
     {{ content_metadata(
       data={
-        "Last updated": "8 March 2024"
+        "Last updated": [
+          "2024-03-08",
+          sms_rate.valid_from
+        ]|max|format_date_normal
       }
     ) }}
 

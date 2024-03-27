@@ -4283,7 +4283,10 @@ def mock_get_letter_rates(mocker):
 @pytest.fixture(scope="function")
 def mock_get_sms_rate(mocker):
     def _get_sms_rate():
-        return {"rate": 1.97}
+        return {
+            "rate": 1.97,
+            "valid_from": "2024-01-02T12:00:00",
+        }
 
     return mocker.patch("app.models.sms_rate.sms_rate_api_client.get_sms_rate", side_effect=_get_sms_rate)
 
