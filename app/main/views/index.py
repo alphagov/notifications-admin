@@ -16,10 +16,10 @@ from app import letter_branding_client, status_api_client
 from app.formatters import message_count
 from app.main import main
 from app.main.forms import FieldWithNoneOption
-from app.main.views.pricing import CURRENT_SMS_RATE
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
+from app.models.sms_rate import SMSRate
 from app.utils.templates import TemplatedLetterImageTemplate
 
 redirects = Blueprint("redirects", __name__)
@@ -33,7 +33,7 @@ def index():
 
     return render_template(
         "views/signedout.html",
-        sms_rate=CURRENT_SMS_RATE,
+        sms_rate=SMSRate(),
         counts=status_api_client.get_count_of_live_services_and_organisations(),
         one_page_second_class_letter_cost=LetterRates().get(sheet_count=1, post_class="second"),
     )

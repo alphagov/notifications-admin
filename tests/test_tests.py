@@ -5,6 +5,7 @@ def test_BeautifulSoup_methods_are_overridden(
     client_request,
     mock_get_service_and_organisation_counts,
     mock_get_letter_rates,
+    mock_get_sms_rate,
 ):
     client_request.logout()
     page = client_request.get("main.index", _test_page_title=False)

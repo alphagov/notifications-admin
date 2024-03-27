@@ -13,6 +13,7 @@ def test_non_logged_in_user_can_see_homepage(
     client_request,
     mock_get_service_and_organisation_counts,
     mock_get_letter_rates,
+    mock_get_sms_rate,
 ):
     client_request.logout()
     page = client_request.get("main.index", _test_page_title=False)
@@ -76,6 +77,7 @@ def test_hiding_pages_from_search_engines(
     client_request,
     mock_get_service_and_organisation_counts,
     mock_get_letter_rates,
+    mock_get_sms_rate,
     endpoint,
     kwargs,
 ):
@@ -123,6 +125,7 @@ def test_static_pages(
     client_request,
     mock_get_organisation_by_domain,
     mock_get_letter_rates,
+    mock_get_sms_rate,
     view,
 ):
     request = partial(client_request.get, f"main.{view}")
@@ -429,6 +432,7 @@ def test_font_preload(
     client_request,
     mock_get_service_and_organisation_counts,
     mock_get_letter_rates,
+    mock_get_sms_rate,
 ):
     client_request.logout()
     page = client_request.get("main.index", _test_page_title=False)
@@ -446,6 +450,7 @@ def test_sms_price(
     client_request,
     mock_get_service_and_organisation_counts,
     mock_get_letter_rates,
+    mock_get_sms_rate,
 ):
     client_request.logout()
 

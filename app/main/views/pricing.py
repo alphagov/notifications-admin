@@ -6,8 +6,7 @@ from app.main import main
 from app.main.forms import SearchByNameForm
 from app.main.views.sub_navigation_dictionaries import pricing_nav
 from app.models.letter_rates import LetterRates
-
-CURRENT_SMS_RATE = "1.97"
+from app.models.sms_rate import SMSRate
 
 
 @main.route("/pricing")
@@ -22,7 +21,7 @@ def guidance_pricing():
 def guidance_pricing_text_messages():
     return render_template(
         "views/guidance/pricing/text-message-pricing.html",
-        sms_rate=CURRENT_SMS_RATE,
+        sms_rate=SMSRate(),
         international_sms_rates=sorted(
             [(cc, country["names"], country["billable_units"]) for cc, country in INTERNATIONAL_BILLING_RATES.items()],
             key=lambda x: x[0],

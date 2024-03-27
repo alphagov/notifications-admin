@@ -112,6 +112,7 @@ from app.notify_client.platform_admin_api_client import admin_api_client
 from app.notify_client.platform_stats_api_client import platform_stats_api_client
 from app.notify_client.provider_client import provider_client
 from app.notify_client.service_api_client import service_api_client
+from app.notify_client.sms_rate_client import sms_rate_api_client
 from app.notify_client.status_api_client import status_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.notify_client.template_statistics_api_client import template_statistics_client
@@ -191,6 +192,7 @@ def create_app(application):
         platform_stats_api_client,
         provider_client,
         service_api_client,
+        sms_rate_api_client,
         status_api_client,
         template_folder_api_client,
         template_statistics_client,
