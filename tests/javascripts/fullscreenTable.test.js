@@ -146,18 +146,59 @@ describe('FullscreenTable', () => {
 
     });
 
-    test("the scrolling section is focusable and has an accessible name matching the table caption", () => {
+    describe("and the scrolling section is wider than its container", () => {
 
-      // start module
-      window.GOVUK.notifyModules.start();
+      beforeEach(() => {
+        $(container).css({ 'width': '640px' });
+        $('table', container).css({ 'width': '990px' });
 
-      tableFrame = document.querySelector('.fullscreen-scrollable-table');
-      caption = tableFrame.querySelector('caption');
+        window.GOVUK.notifyModules.start();
+      });
 
-      expect(tableFrame.hasAttribute('role')).toBe(true);
-      expect(tableFrame.getAttribute('role')).toEqual('region');
-      expect(tableFrame.hasAttribute('aria-labelledby')).toBe(true);
-      expect(tableFrame.getAttribute('aria-labelledby')).toEqual(caption.getAttribute('id'));
+      test("it should be made focusable and have an accessible name matching the table caption", () => {
+
+        tableFrame = document.querySelector('.fullscreen-scrollable-table');
+        caption = tableFrame.querySelector('caption');
+
+        // focusable
+        expect(tableFrame.hasAttribute('tabindex')).toBe(true);
+        expect(tableFrame.getAttribute('tabindex')).toEqual('0');
+
+        // has a semantic role
+        expect(tableFrame.hasAttribute('role')).toBe(true);
+        expect(tableFrame.getAttribute('role')).toEqual('region');
+
+        // has an accessible name
+        expect(tableFrame.hasAttribute('aria-labelledby')).toBe(true);
+        expect(tableFrame.getAttribute('aria-labelledby')).toEqual(caption.getAttribute('id'));
+
+      });
+
+    });
+
+    describe("and the scrolling section is the same width as its container", () => {
+
+      beforeEach(() => {
+        $(container).css({ 'width': '640px' });
+        $('table', container).css({ 'width': '640px' });
+
+        window.GOVUK.notifyModules.start();
+      });
+
+      test("it shouldn't be made focusable or have an accessible name", () => {
+
+        tableFrame = document.querySelector('.fullscreen-scrollable-table');
+
+        // isn't focusable
+        expect(tableFrame.hasAttribute('tabindex')).toBe(false);
+
+        // has no semantic role
+        expect(tableFrame.hasAttribute('role')).toBe(false);
+
+        // has no accessible name
+        expect(tableFrame.hasAttribute('aria-labelledby')).toBe(false);
+
+      });
 
     });
 
@@ -386,6 +427,10 @@ describe('FullscreenTable', () => {
   describe("when the table is focused", () => {
 
     beforeEach(() => {
+
+      // make table wider than its container so it is made focusable
+      $(container).css({ 'width': '640px' });
+      $('table', container).css({ 'width': '990px' });
 
       // start module
       window.GOVUK.notifyModules.start();
