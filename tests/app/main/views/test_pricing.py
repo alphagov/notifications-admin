@@ -24,7 +24,7 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     ),
 )
 @pytest.mark.parametrize(
-    "rate, expected_current_paragraph, expected_new_paragraph",
+    "rate, expected_paragraph",
     (
         (
             0.0197,
@@ -32,7 +32,6 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
                 "When a service has used its annual allowance, it costs 1.97 pence (plus VAT)"
                 " for each text message you send."
             ),
-            "On 1 April 2024 the cost of sending a text message will go up to 2.27 pence (plus VAT).",
         ),
         (
             0.0227,
@@ -40,7 +39,6 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
                 "When a service has used its annual allowance, it costs 2.27 pence (plus VAT)"
                 " for each text message you send."
             ),
-            None,
         ),
     ),
 )
@@ -48,8 +46,7 @@ def test_guidance_pricing_sms(
     mocker,
     client_request,
     rate,
-    expected_current_paragraph,
-    expected_new_paragraph,
+    expected_paragraph,
     valid_from,
     expected_last_updated,
 ):
@@ -64,6 +61,4 @@ def test_guidance_pricing_sms(
     page = client_request.get(".guidance_pricing_text_messages")
 
     assert normalize_spaces(page.select_one(".content-metadata").text) == expected_last_updated
-    assert normalize_spaces(page.select("main .govuk-body")[1].text) == expected_current_paragraph
-    if expected_new_paragraph:
-        assert normalize_spaces(page.select_one(".govuk-inset-text .govuk-body").text) == expected_new_paragraph
+    assert normalize_spaces(page.select("main .govuk-body")[1].text) == expected_paragraph
