@@ -4284,7 +4284,7 @@ def mock_get_letter_rates(mocker):
 def mock_get_sms_rate(mocker):
     def _get_sms_rate():
         return {
-            "rate": 1.97,
+            "rate": 0.0197,
             "valid_from": "2024-01-02T12:00:00",
         }
 

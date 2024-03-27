@@ -27,7 +27,7 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     "rate, expected_current_paragraph, expected_new_paragraph",
     (
         (
-            1.97,
+            0.0197,
             (
                 "When a service has used its annual allowance, it costs 1.97 pence (plus VAT)"
                 " for each text message you send."
@@ -35,7 +35,7 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
             "On 1 April 2024 the cost of sending a text message will go up to 2.27 pence (plus VAT).",
         ),
         (
-            2.27,
+            0.0227,
             (
                 "When a service has used its annual allowance, it costs 2.27 pence (plus VAT)"
                 " for each text message you send."
