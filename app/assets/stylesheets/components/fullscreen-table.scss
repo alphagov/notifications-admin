@@ -15,8 +15,8 @@
 
       margin-bottom: 0;
 
-      tbody tr:last-child {
-        th, td {
+      tr:last-child {
+        td {
           border-bottom: 1px solid govuk-colour("white");
         }
       }
@@ -57,13 +57,9 @@
     overflow-x: auto;
     overflow-y: hidden;
 
-    // hide the header cells, but only visually and in a way that doesn't disrupt the table layout
     .table-field-heading-first,
-    tbody th.table-field {
-      color: transparent;
-      border-color: transparent;
-      border-right-color: $govuk-border-colour;
-      background: govuk-colour("white");
+    .table-field-index {
+      display: none;
     }
 
     .table-field-left-aligned {
@@ -100,11 +96,8 @@
     top: 0;
     overflow: hidden;
 
-    // hide all cells except the headers
-    .table-field-heading,
-    .table-field-left-aligned {
+    .table-field-heading {
       visibility: hidden;
-      border-color: transparent;
     }
 
     .table-field-left-aligned {
@@ -115,7 +108,7 @@
     }
 
     .table-field-heading-first,
-    tbody th.table-field {
+    .table-field-index {
       transition: none;
       position: relative;
       z-index: 200;
@@ -129,7 +122,7 @@
     padding-bottom: 20px;
 
     .table-field-heading-first,
-    tbody th.table-field {
+    .table-field-index {
       transition: box-shadow 0.3s ease-in-out;
       box-shadow: 1px 0 0 0 $govuk-border-colour, 3px 0 0 0 rgba($govuk-border-colour, 0.2);
     }
