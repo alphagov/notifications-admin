@@ -6,8 +6,9 @@
     "node": ">=10.15.3"
   },
   "scripts": {
-    "test": "gulp lint && jest",
-    "test-watch": "jest --watch",
+    "test": "gulp lint && jest tests/javascripts",
+    "test-watch": "jest --watch tests/javascripts",
+    "debug": "node --inspect-brk node_modules/.bin/jest --runInBand $npm_config_test",
     "build": "gulp",
     "watch": "gulp watch",
     "audit": "better-npm-audit audit --production --level high"

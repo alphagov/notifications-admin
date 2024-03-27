@@ -85,6 +85,8 @@ npx jest <pathToAJavascriptTestfile>
 # continuously run js tests
 npm run test-watch
 
+# debug a js test in chrome
+npm run debug --test=[name of test file]
 ```
 
 To run a specific JavaScript test, you'll need to copy the full command from `package.json`.
