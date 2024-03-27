@@ -20,7 +20,7 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     "valid_from, expected_last_updated",
     (
         ("2040-04-01T12:00:00", "Last updated 1 April 2040"),
-        ("2023-04-01T12:00:00", "Last updated 8 March 2024"),
+        ("2023-04-01T12:00:00", "Last updated 28 March 2024"),
     ),
 )
 @pytest.mark.parametrize(
@@ -40,7 +40,7 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
                 "When a service has used its annual allowance, it costs 2.27 pence (plus VAT)"
                 " for each text message you send."
             ),
-            "From 1 April 2024 the free allowance will be:",
+            None,
         ),
     ),
 )
@@ -65,4 +65,5 @@ def test_guidance_pricing_sms(
 
     assert normalize_spaces(page.select_one(".content-metadata").text) == expected_last_updated
     assert normalize_spaces(page.select("main .govuk-body")[1].text) == expected_current_paragraph
-    assert normalize_spaces(page.select_one(".govuk-inset-text .govuk-body").text) == expected_new_paragraph
+    if expected_new_paragraph:
+        assert normalize_spaces(page.select_one(".govuk-inset-text .govuk-body").text) == expected_new_paragraph
