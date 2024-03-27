@@ -9,6 +9,7 @@
       this.$table = this.$component.find('table');
       this.nativeHeight = this.$component.innerHeight() + 20; // 20px to allow room for scrollbar
       this.topOffset = this.$component.offset().top;
+      this.isFocusable = this.$table.width() > this.$component.width(); // only make focusable if table scrolls
 
       this.insertShims();
       this.maintainWidth();
@@ -21,8 +22,11 @@
 
       this.$scrollableTable
         .on('scroll', this.toggleShadows)
-        .on('scroll', this.maintainHeight)
-        .on('focus blur', () => this.$component.toggleClass('js-focus-style'));
+        .on('scroll', this.maintainHeight);
+
+      if (this.isFocusable) {
+        this.$scrollableTable.on('focus blur', () => this.$component.toggleClass('js-focus-style'));
+      }
 
       if (
         window.GOVUK.stickAtBottomWhenScrolling &&
@@ -37,11 +41,12 @@
 
     this.insertShims = () => {
 
-      const attributesForFocus = 'role aria-labelledby tabindex';
       let captionId = this.$table.find('caption').text().toLowerCase().replace(/[^A-Za-z]+/g, '');
+      const attributesForFocus = ` role="region" aria-labelledby="${captionId}" tabindex="0"`;
+      const namesOfAttributesForFocus = 'role aria-labelledby tabindex';
 
       this.$table.find('caption').attr('id', captionId);
-      this.$table.wrap(`<div class="fullscreen-scrollable-table" role="region" aria-labelledby="${captionId}" tabindex="0"/>`);
+      this.$table.wrap(`<div class="fullscreen-scrollable-table"${this.isFocusable ? attributesForFocus : ''}/>`);
 
       this.$component
         .append(
@@ -49,7 +54,7 @@
             .clone()
             .addClass('fullscreen-fixed-table')
             .removeClass('fullscreen-scrollable-table')
-            .removeAttr(attributesForFocus)
+            .removeAttr(namesOfAttributesForFocus)
             .attr('aria-hidden', true)
             .find('caption')
             .removeAttr('id')
