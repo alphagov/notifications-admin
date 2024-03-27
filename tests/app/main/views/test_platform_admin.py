@@ -706,7 +706,7 @@ def test_clear_cache_shows_form(
         "email_branding",
         "letter_branding",
         "organisation",
-        "letter_rates",
+        "text_message_and_letter_rates",
     }
 
 
@@ -750,11 +750,12 @@ def test_clear_cache_shows_form(
             "Removed 26 objects across 13 key formats for service, organisation",
         ),
         (
-            ["letter_rates"],
+            ["text_message_and_letter_rates"],
             [
                 call("letter-rates"),
+                call("sms-rate"),
             ],
-            "Removed 2 objects across 1 key formats for letter_rates",
+            "Removed 4 objects across 2 key formats for text_message_and_letter_rates",
         ),
     ),
 )
