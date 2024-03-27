@@ -486,8 +486,7 @@ def test_should_show_scheduled_job(
         "name",
     ]
     assert [
-        [normalize_spaces(column.text) for column in row.select("th, td")]
-        for row in recipients_table.select("tbody tr")
+        [normalize_spaces(column.text) for column in row.select("td")] for row in recipients_table.select("tbody tr")
     ] == [
         ["2", "+447700900986", "John"],
         ["3", "+447700900986", "Smith"],
