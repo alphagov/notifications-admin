@@ -4561,6 +4561,7 @@ def test_switch_service_channels_on_and_off(
     mocker,
     mock_get_free_sms_fragment_limit,
     mock_get_letter_rates,
+    mock_get_sms_rate,
     channel,
     expected_first_para,
     expected_legend,
@@ -5592,6 +5593,7 @@ def test_update_service_organisation(
     mock_get_organisation,
     mock_get_organisations,
     mock_update_service_organisation,
+    mock_update_service,
 ):
     client_request.login(platform_admin_user)
     client_request.post(

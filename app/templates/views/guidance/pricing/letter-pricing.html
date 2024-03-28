@@ -16,7 +16,7 @@
 
     {{ content_metadata(
       data={
-        "Last updated": letter_rates.last_updated
+        "Last updated": letter_rates.last_updated | format_date_normal
       }
     ) }}
 

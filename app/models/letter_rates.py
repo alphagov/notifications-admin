@@ -3,7 +3,7 @@ from app.notify_client.letter_rate_api_client import letter_rate_api_client
 
 
 class LetterRate(JSONModel):
-    ALLOWED_PROPERTIES = {"sheet_count", "rate", "post_class", "last_updated"}
+    ALLOWED_PROPERTIES = {"sheet_count", "rate", "post_class", "start_date"}
     __sort_attribute__ = "rate"
 
     @property

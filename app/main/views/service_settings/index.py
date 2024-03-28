@@ -61,7 +61,6 @@ from app.main.forms import (
     SMSPrefixForm,
     YesNoSettingForm,
 )
-from app.main.views.pricing import CURRENT_SMS_RATE
 from app.models.branding import (
     AllEmailBranding,
     AllLetterBranding,
@@ -69,6 +68,7 @@ from app.models.branding import (
     LetterBranding,
 )
 from app.models.letter_rates import LetterRates
+from app.models.sms_rate import SMSRate
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
@@ -726,7 +726,7 @@ def service_set_channel(service_id, channel):
     return render_template(
         f"views/service-settings/set-{channel}.html",
         form=form,
-        sms_rate=CURRENT_SMS_RATE,
+        sms_rate=SMSRate(),
         letter_rates=LetterRates().rates,
     )
 
