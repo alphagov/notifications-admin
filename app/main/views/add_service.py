@@ -92,8 +92,11 @@ def add_service():
         if form.organisation_type.data == Organisation.TYPE_NHS_GP:
             new_service.update(sms_message_limit=0)
 
-        # show the tour if the user doesn't have any other services
-        show_tour = len(service_api_client.get_active_services({"user_id": session["user_id"]}).get("data", [])) <= 1
+        # show the tour if the user doesn't have any other services. Never show for NHS GPs
+        show_tour = (
+            len(service_api_client.get_active_services({"user_id": session["user_id"]}).get("data", [])) <= 1
+            and form.organisation_type.data != Organisation.TYPE_NHS_GP
+        )
 
         if show_tour:
             example_sms_template = _create_example_template(service_id)
