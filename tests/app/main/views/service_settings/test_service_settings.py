@@ -5604,6 +5604,46 @@ def test_update_service_organisation(
     mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
 
 
+def test_update_service_organisation_sets_daily_sms_limit_to_zero_for_trial_mode_gp(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_organisation_nhs_gp,
+    mock_get_organisations,
+    mock_update_service_organisation,
+    mock_update_service,
+):
+    service_one["restricted"] = True
+    client_request.login(platform_admin_user)
+    client_request.post(
+        ".link_service_to_organisation",
+        service_id=service_one["id"],
+        _data={"organisations": "7aa5d4e9-4385-4488-a489-07812ba13384"},
+    )
+    mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
+    mock_update_service.assert_called_once_with(service_one["id"], sms_message_limit=0)
+
+
+def test_update_service_organisation_doesnt_change_daily_sms_limit_for_live_gp(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_organisation_nhs_gp,
+    mock_get_organisations,
+    mock_update_service_organisation,
+    mock_update_service,
+):
+    service_one["restricted"] = False
+    client_request.login(platform_admin_user)
+    client_request.post(
+        ".link_service_to_organisation",
+        service_id=service_one["id"],
+        _data={"organisations": "7aa5d4e9-4385-4488-a489-07812ba13384"},
+    )
+    mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
+    assert mock_update_service.called is False
+
+
 def test_update_service_organisation_does_not_update_if_same_value(
     client_request,
     platform_admin_user,
