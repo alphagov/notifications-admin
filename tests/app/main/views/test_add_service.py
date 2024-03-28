@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 import pytest
 from flask import url_for
 from flask_login import current_user
@@ -140,6 +142,8 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     client_request,
     mock_create_service,
     mock_create_service_template,
+    mock_get_service,
+    mock_update_service,
     mock_get_services_with_no_services,
     api_user_active,
     mock_get_all_email_branding,
@@ -270,6 +274,8 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     mock_create_service,
     mock_create_service_template,
     mock_get_services,
+    mock_get_service,
+    mock_update_service,
     mock_get_no_organisation_by_domain,
     api_user_active,
     organisation_type,
@@ -301,6 +307,36 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     assert len(mock_create_service_template.call_args_list) == 0
     with client_request.session_transaction() as session:
         assert session["service_id"] == 101
+
+
+def test_add_service_sets_nhs_gp_daily_sms_limit_to_zero(
+    mocker,
+    mock_get_no_organisation_by_domain,
+    client_request,
+    mock_create_service,
+    mock_create_service_template,
+    mock_get_service,
+    mock_update_service,
+    mock_get_services_with_no_services,
+    api_user_active,
+    fake_uuid,
+):
+    client_request.post(
+        "main.add_service",
+        _data={"name": "testing the post", "organisation_type": "nhs_gp"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.begin_tour",
+            service_id=101,
+            template_id=fake_uuid,
+        ),
+    )
+    assert mock_get_services_with_no_services.called
+    assert mock_create_service.called
+
+    mock_update_service.assert_called_once_with(101, sms_message_limit=0)
+
+    mock_create_service_template.assert_called_once_with("Example text message template", ANY, ANY, 101)
 
 
 @pytest.mark.parametrize(
@@ -382,6 +418,7 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
     client_request,
     mock_get_no_organisation_by_domain,
     mock_get_services,
+    mock_get_service,
     mock_create_service,
     mock_create_service_template,
     mock_update_service,

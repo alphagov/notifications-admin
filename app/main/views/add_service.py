@@ -5,6 +5,7 @@ from notifications_python_client.errors import HTTPError
 from app import service_api_client
 from app.main import main
 from app.main.forms import AddOrJoinServiceForm, CreateNhsServiceForm, CreateServiceForm
+from app.models.organisation import Organisation
 from app.models.service import Service
 from app.utils.user import user_is_gov_user, user_is_logged_in
 
@@ -84,10 +85,16 @@ def add_service():
         )
         if error:
             return _render_add_service_page(form, default_organisation_type)
+
+        new_service = Service.from_id(service_id)
+
+        # GPs have a zero message limit (to prevent them sending messages while in trial mode)
+        if form.organisation_type.data == Organisation.TYPE_NHS_GP:
+            new_service.update(sms_message_limit=0)
+
         if len(service_api_client.get_active_services({"user_id": session["user_id"]}).get("data", [])) > 1:
             # if user has email auth, it makes sense that people they invite to their new service can have it too
             if current_user.email_auth:
-                new_service = Service.from_id(service_id)
                 new_service.force_permission("email_auth", on=True)
 
             return redirect(url_for("main.service_dashboard", service_id=service_id))
