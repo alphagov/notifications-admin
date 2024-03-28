@@ -155,9 +155,9 @@ def api_callbacks(service_id):
 
     return render_template(
         "views/api/callbacks.html",
-        received_text_messages_callback=received_text_messages_callback["url"]
-        if received_text_messages_callback
-        else None,
+        received_text_messages_callback=(
+            received_text_messages_callback["url"] if received_text_messages_callback else None
+        ),
         delivery_status_callback=delivery_status_callback["url"] if delivery_status_callback else None,
     )
 
