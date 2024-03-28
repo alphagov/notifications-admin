@@ -92,18 +92,22 @@ def add_service():
         if form.organisation_type.data == Organisation.TYPE_NHS_GP:
             new_service.update(sms_message_limit=0)
 
-        if len(service_api_client.get_active_services({"user_id": session["user_id"]}).get("data", [])) > 1:
+        # show the tour if the user doesn't have any other services
+        show_tour = len(service_api_client.get_active_services({"user_id": session["user_id"]}).get("data", [])) <= 1
+
+        if show_tour:
+            example_sms_template = _create_example_template(service_id)
+
+            return redirect(
+                url_for("main.begin_tour", service_id=service_id, template_id=example_sms_template["data"]["id"])
+            )
+        else:
             # if user has email auth, it makes sense that people they invite to their new service can have it too
             if current_user.email_auth:
                 new_service.force_permission("email_auth", on=True)
 
             return redirect(url_for("main.service_dashboard", service_id=service_id))
 
-        example_sms_template = _create_example_template(service_id)
-
-        return redirect(
-            url_for("main.begin_tour", service_id=service_id, template_id=example_sms_template["data"]["id"])
-        )
     else:
         return _render_add_service_page(form, default_organisation_type)
 
