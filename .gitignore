@@ -73,6 +73,8 @@ htmlcov/
 coverage.xml
 test_results.xml
 *,cover
+.testmon*
+
 
 # Translations
 *.mo
