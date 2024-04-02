@@ -69,6 +69,10 @@ test: ## Run tests
 	source $(HOME)/.nvm/nvm.sh && npm test
 	py.test -n auto --maxfail=10 tests/
 
+.PHONY: watch-tests
+watch-tests: ## Watch tests and run on change
+	ptw --runner "pytest --testmon -n auto"
+
 .PHONY: fix-imports
 fix-imports: ## Fix imports using ruff
 	ruff --fix --select=I .
