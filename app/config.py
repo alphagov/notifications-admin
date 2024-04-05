@@ -92,8 +92,6 @@ class Config:
         ],
     }
 
-    NOTIFY_RUNTIME_PLATFORM = os.environ.get("NOTIFY_RUNTIME_PLATFORM", "ecs")
-
     EMAIL_BRANDING_MIN_LOGO_HEIGHT_PX = 108
     EMAIL_BRANDING_MAX_LOGO_WIDTH_PX = 640
 
@@ -126,7 +124,6 @@ class Development(Config):
 
     REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
     REDIS_ENABLED = os.environ.get("REDIS_ENABLED") == "1"
-    NOTIFY_RUNTIME_PLATFORM = "local"
 
 
 class Test(Development):
