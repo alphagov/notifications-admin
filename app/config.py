@@ -17,7 +17,6 @@ class Config:
 
     # Logging
     DEBUG = False
-    NOTIFY_LOG_PATH = os.getenv("NOTIFY_LOG_PATH")
 
     ADMIN_CLIENT_USER_NAME = "notify-admin"
 
@@ -98,7 +97,6 @@ class Config:
 
 class Development(Config):
     SERVER_NAME = os.getenv("SERVER_NAME")
-    NOTIFY_LOG_PATH = "application.log"
     DEBUG = True
     SESSION_COOKIE_SECURE = False
     SESSION_PROTECTION = None
