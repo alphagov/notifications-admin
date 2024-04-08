@@ -142,6 +142,7 @@ def mock_get_service_settings_page_common(
                 "Receive inbound SMS Off Change your settings for Receive inbound SMS",
                 "Email authentication Off Change your settings for Email authentication",
                 "Extra email formatting options Off Change your settings for Extra email formatting options",
+                "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
             ],
         ),
         (
@@ -177,6 +178,7 @@ def mock_get_service_settings_page_common(
                 "Custom data retention Email – 7 days Change data retention",
                 "Email authentication Off Change your settings for Email authentication",
                 "Extra letter formatting options Off Change your settings for Extra letter formatting options",
+                "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
             ],
         ),
     ],
