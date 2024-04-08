@@ -21,7 +21,6 @@ from app.main.views.templates import letter_branding_preview_image
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
 from app.models.sms_rate import SMSRate
-from app.utils.templates import TemplatedLetterImageTemplate
 
 redirects = Blueprint("redirects", __name__)
 main.register_blueprint(redirects)
@@ -108,11 +107,9 @@ def email_template():
     return resp
 
 
-@main.route("/_letter")
-@no_cookie.route("/_letter.png", endpoint="letter_template_png")
-def letter_template():
+@no_cookie.route("/_letter.png")
+def letter_template_png():
     branding_style = request.args.get("branding_style")
-    subject = request.args.get("title", default="Preview of letter branding")
     filename = request.args.get("filename")
 
     if branding_style == FieldWithNoneOption.NONE_OPTION_VALUE:
@@ -127,26 +124,7 @@ def letter_template():
     elif not filename:
         filename = "no-branding"
 
-    if request.endpoint == "no_cookie.letter_template_png":
-        return letter_branding_preview_image(filename)
-
-    template = {"subject": subject, "content": "", "template_type": "letter"}
-    image_url = url_for("no_cookie.letter_branding_preview_image", filename=filename)
-
-    template_image = str(
-        TemplatedLetterImageTemplate(
-            template,
-            image_url=image_url,
-            page_counts={"count": 1, "welsh_page_count": 0, "attachment_page_count": 0},
-        )
-    )
-
-    resp = make_response(
-        render_template("views/service-settings/letter-preview.html", template=template_image, subject=subject)
-    )
-
-    resp.headers["X-Frame-Options"] = "SAMEORIGIN"
-    return resp
+    return letter_branding_preview_image(filename)
 
 
 @main.route("/terms-of-use", endpoint="terms_of_use")
