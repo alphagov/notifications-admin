@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from requests import RequestException
 
+from app.main.forms import FieldWithNoneOption
 from app.main.views.templates import _save_letter_attachment
 from app.models.service import Service
 from tests import (
@@ -1965,6 +1966,68 @@ def test_letter_branding_preview_image(
         },
     )
     assert response.get_data(as_text=True) == "foo"
+
+
+@pytest.mark.parametrize("filename", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
+@pytest.mark.parametrize("branding_style", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
+def test_letter_template_preview_handles_no_branding_style_or_filename_correctly(
+    mocker,
+    client_request,
+    branding_style,
+    filename,
+):
+    mocked_preview = mocker.patch("app.template_previews.TemplatePreview.get_preview_for_templated_letter")
+    client_request.get_response(
+        "no_cookie.letter_branding_preview_image",
+        branding_style=branding_style,
+        filename=filename,
+    )
+    mocked_preview.assert_called_once_with(ANY, branding_filename=None, filetype="png")
+
+
+@pytest.mark.parametrize("filename", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
+def test_letter_template_preview_links_to_the_correct_image_when_passed_existing_branding(
+    mocker,
+    client_request,
+    mock_get_letter_branding_by_id,
+    filename,
+):
+    mocked_preview = mocker.patch("app.template_previews.TemplatePreview.get_preview_for_templated_letter")
+    client_request.get_response(
+        "no_cookie.letter_branding_preview_image",
+        branding_style="12341234-1234-1234-1234-123412341234",
+        filename=filename,
+    )
+
+    mock_get_letter_branding_by_id.assert_called_once_with("12341234-1234-1234-1234-123412341234")
+    mocked_preview.assert_called_once_with(ANY, branding_filename="hm-government", filetype="png")
+
+
+@pytest.mark.parametrize("branding_style", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
+def test_letter_template_preview_links_to_the_correct_image_when_passed_a_filename(
+    mocker,
+    client_request,
+    branding_style,
+):
+    mocked_preview = mocker.patch("app.template_previews.TemplatePreview.get_preview_for_templated_letter")
+    client_request.get_response(
+        "no_cookie.letter_branding_preview_image",
+        branding_style=branding_style,
+        filename="foo.svg",
+    )
+    mocked_preview.assert_called_once_with(ANY, branding_filename="foo.svg", filetype="png")
+
+
+def test_letter_template_preview_returns_400_if_both_branding_style_and_filename_provided(
+    client_request,
+):
+    client_request.get(
+        "no_cookie.letter_branding_preview_image",
+        branding_style="some-branding",
+        filename="some-filename",
+        _test_page_title=False,
+        _expected_status=400,
+    )
 
 
 def test_choosing_to_copy_redirects(
