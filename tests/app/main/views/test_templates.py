@@ -1930,13 +1930,10 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     assert mock_get_service_template.called is False
 
 
-@pytest.mark.parametrize("original_filename, new_filename", [("geo", "geo"), ("no-branding", None)])
 def test_letter_branding_preview_image(
     mocker,
     client_request,
     mock_onwards_request_headers,
-    original_filename,
-    new_filename,
 ):
     class MockedResponse:
         content = "foo"
@@ -1946,7 +1943,7 @@ def test_letter_branding_preview_image(
     mocked_preview = mocker.patch("app.template_previews.requests.post", return_value=MockedResponse())
     response = client_request.get_response(
         "no_cookie.letter_branding_preview_image",
-        filename=original_filename,
+        filename="example",
     )
 
     mocked_preview.assert_called_with(
@@ -1960,7 +1957,7 @@ def test_letter_branding_preview_image(
                 "is_precompiled_letter": False,
             },
             "values": None,
-            "filename": new_filename,
+            "filename": "example",
         },
         headers={
             "Authorization": "Token my-secret-key",

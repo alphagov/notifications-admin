@@ -285,8 +285,6 @@ def letter_branding_preview_image(filename=None):
         if filename:
             abort(400, "Cannot provide both branding_style and filename")
         filename = letter_branding_client.get_letter_branding(branding_style)["filename"]
-    elif not filename:
-        filename = "no-branding"
 
     template = {
         "subject": "An example letter",
@@ -309,12 +307,11 @@ def letter_branding_preview_image(filename=None):
         "template_type": "letter",
         "is_precompiled_letter": False,
     }
-    branding_filename = None if filename == "no-branding" else filename
 
     return TemplatePreview.get_preview_for_templated_letter(
         template,
         filetype="png",
-        branding_filename=branding_filename,
+        branding_filename=filename,
     )
 
 
