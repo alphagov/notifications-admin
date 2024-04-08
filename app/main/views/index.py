@@ -14,9 +14,10 @@ from notifications_utils.template import HTMLEmailTemplate
 
 from app import letter_branding_client, status_api_client
 from app.formatters import message_count
-from app.main import main
+from app.main import main, no_cookie
 from app.main.forms import FieldWithNoneOption
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
+from app.main.views.templates import letter_branding_preview_image
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
 from app.models.sms_rate import SMSRate
@@ -108,6 +109,7 @@ def email_template():
 
 
 @main.route("/_letter")
+@no_cookie.route("/_letter.png", endpoint="letter_template_png")
 def letter_template():
     branding_style = request.args.get("branding_style")
     subject = request.args.get("title", default="Preview of letter branding")
@@ -124,6 +126,10 @@ def letter_template():
         filename = letter_branding_client.get_letter_branding(branding_style)["filename"]
     elif not filename:
         filename = "no-branding"
+
+    if request.endpoint == "no_cookie.letter_template_png":
+        return letter_branding_preview_image(filename)
+
     template = {"subject": subject, "content": "", "template_type": "letter"}
     image_url = url_for("no_cookie.letter_branding_preview_image", filename=filename)
 
