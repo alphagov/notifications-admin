@@ -3684,7 +3684,7 @@ def test_service_preview_letter_branding_shows_preview_letter(
     )
 
     assert page.select_one("main img")["src"] == url_for(
-        "no_cookie.letter_template_png",
+        "no_cookie.letter_branding_preview_image",
         branding_style="hm-government",
         filename="",
     )

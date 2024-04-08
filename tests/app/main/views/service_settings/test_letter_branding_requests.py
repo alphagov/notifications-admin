@@ -104,7 +104,7 @@ def test_letter_branding_options_page_when_branding_is_set_already(
     assert normalize_spaces(page.select_one("main p").text) == "Your letters currently have HM Government branding."
 
     assert page.select_one("main img")["src"] == url_for(
-        "no_cookie.letter_template_png",
+        "no_cookie.letter_branding_preview_image",
         branding_style=fake_uuid,
         filename="",
     )
@@ -492,7 +492,7 @@ def test_GET_letter_branding_set_name_renders(client_request, service_one):
     )
 
     assert page.select_one("main img")["src"] == url_for(
-        "no_cookie.letter_template_png",
+        "no_cookie.letter_branding_preview_image",
         filename="temp_something",
     )
 
@@ -711,7 +711,7 @@ def test_letter_branding_option_preview_page_displays_preview_of_chosen_branding
     )
 
     assert page.select_one("main img")["src"] == url_for(
-        "no_cookie.letter_template_png",
+        "no_cookie.letter_branding_preview_image",
         branding_style="1234",
         filename="",
     )
@@ -788,7 +788,7 @@ def test_letter_branding_nhs_page_displays_preview(
     )
 
     assert page.select_one("main img")["src"] == url_for(
-        "no_cookie.letter_template_png",
+        "no_cookie.letter_branding_preview_image",
         branding_style=LetterBranding.NHS_ID,
         filename="",
     )

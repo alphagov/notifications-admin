@@ -8,7 +8,7 @@
 
 {% macro custom_letter_branding_preview(filename, title='Preview of letter branding') %}
   <div class="branding-preview-image">
-    <img src="{{ url_for('no_cookie.letter_template_png', branding_style=None, filename=filename) }}" alt="{{ title }}">
+    <img src="{{ url_for('no_cookie.letter_branding_preview_image', branding_style=None, filename=filename) }}" alt="{{ title }}">
   </div>
 {% endmacro %}
 
@@ -18,6 +18,6 @@
 
 {% macro letter_branding_preview(branding_style, title='Preview of letter branding', classes='') %}
   <div class="branding-preview-image">
-    <img src="{{ url_for('no_cookie.letter_template_png', branding_style=branding_style, filename=filename) }}" alt="{{ title }}">
+    <img src="{{ url_for('no_cookie.letter_branding_preview_image', branding_style=branding_style, filename=filename) }}" alt="{{ title }}">
   </div>
 {% endmacro %}

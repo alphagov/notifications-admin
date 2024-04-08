@@ -55,7 +55,7 @@ def test_view_letter_branding_requires_platform_admin(
     if expected_response_status == 200:
         preview = page.select_one("main img")
         assert preview["src"] == url_for(
-            "no_cookie.letter_template_png",
+            "no_cookie.letter_branding_preview_image",
             branding_style="6ce466d0-fd6a-11e5-82f5-e0accb9d11a6",
             filename="",
         )

@@ -12,12 +12,11 @@ from flask_login import current_user
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import HTMLEmailTemplate
 
-from app import letter_branding_client, status_api_client
+from app import status_api_client
 from app.formatters import message_count
-from app.main import main, no_cookie
+from app.main import main
 from app.main.forms import FieldWithNoneOption
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
-from app.main.views.templates import letter_branding_preview_image
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
 from app.models.sms_rate import SMSRate
@@ -105,26 +104,6 @@ def email_template():
 
     resp.headers["X-Frame-Options"] = "SAMEORIGIN"
     return resp
-
-
-@no_cookie.route("/_letter.png")
-def letter_template_png():
-    branding_style = request.args.get("branding_style")
-    filename = request.args.get("filename")
-
-    if branding_style == FieldWithNoneOption.NONE_OPTION_VALUE:
-        branding_style = None
-    if filename == FieldWithNoneOption.NONE_OPTION_VALUE:
-        filename = None
-
-    if branding_style:
-        if filename:
-            abort(400, "Cannot provide both branding_style and filename")
-        filename = letter_branding_client.get_letter_branding(branding_style)["filename"]
-    elif not filename:
-        filename = "no-branding"
-
-    return letter_branding_preview_image(filename)
 
 
 @main.route("/terms-of-use", endpoint="terms_of_use")
