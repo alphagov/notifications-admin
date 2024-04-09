@@ -41,7 +41,7 @@ def test_form_class_not_mutated(notify_admin):
             "phone number",
             "sms",
             "+1-2345-678890",
-            "This does not look like a UK mobile number - double check the mobile number you entered",
+            "This does not look like a UK mobile number – double check the mobile number you entered",
         ),
         (False, "phone number", "sms", "07900900123", None),
         (False, "phone number", "sms", "+44(0)7900 900-123", None),
