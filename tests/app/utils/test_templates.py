@@ -675,13 +675,15 @@ class TestTemplatedLetterImageTemplate:
                 service_id=SERVICE_ONE_ID,
                 id_=fake_uuid,
                 type_="letter",
-                letter_attachment={
-                    "id": "abc",
-                    "original_filename": "blah.pdf",
-                    "page_count": mocker_kwargs["attachment_page_count"],
-                }
-                if expected_value
-                else {},
+                letter_attachment=(
+                    {
+                        "id": "abc",
+                        "original_filename": "blah.pdf",
+                        "page_count": mocker_kwargs["attachment_page_count"],
+                    }
+                    if expected_value
+                    else {}
+                ),
             ),
         )
 

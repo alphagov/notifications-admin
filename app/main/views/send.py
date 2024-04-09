@@ -613,11 +613,13 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         template=template,
         max_initial_rows_shown=50,
         max_errors_shown=50,
-        guestlist=itertools.chain.from_iterable(
-            [user.name, user.mobile_number, user.email_address] for user in Users(service_id)
-        )
-        if current_service.trial_mode
-        else None,
+        guestlist=(
+            itertools.chain.from_iterable(
+                [user.name, user.mobile_number, user.email_address] for user in Users(service_id)
+            )
+            if current_service.trial_mode
+            else None
+        ),
         remaining_messages=remaining_messages,
         allow_international_sms=current_service.has_permission("international_sms"),
         allow_international_letters=current_service.has_permission("international_letters"),
