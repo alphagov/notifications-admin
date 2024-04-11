@@ -63,9 +63,7 @@ flask-wtf==1.2.1
 gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
     # via -r requirements.in
 govuk-bank-holidays==0.11
-    # via
-    #   -r requirements.in
-    #   notifications-utils
+    # via notifications-utils
 govuk-frontend-jinja==2.8.0
     # via -r requirements.in
 greenlet==3.0.3
