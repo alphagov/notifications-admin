@@ -1352,6 +1352,88 @@ def test_send_one_off_shows_placeholders_in_correct_order(
 
 
 @pytest.mark.parametrize(
+    "template_type, content, recipient, placeholder_values, step_index, css_selector_for_content, expected_content",
+    (
+        (
+            "sms",
+            "((phone_number)) ((Phone Number)) ((PHONENUMBER)) ((name))",
+            "07900900123",
+            {"phonenumber": "07900900123"},
+            1,
+            ".sms-message-wrapper",
+            "service one: 07900900123 07900900123 07900900123 ((name))",
+        ),
+        (
+            "email",
+            "((email-address)) ((emailaddress)) ((name))",
+            "test@example.com",
+            {"emailaddress": "test@example.com"},
+            1,
+            ".email-message-body",
+            "test@example.com test@example.com ((name))",
+        ),
+        (
+            "letter",
+            "((address_line_1)) ((addressLine7)) ((POSTCODE)) ((name))",
+            None,
+            {
+                "addressline1": "1 Example Street",
+                "addressline2": "City of Town",
+                "addressline3": "",
+                "addressline4": "",
+                "addressline5": "",
+                "addressline6": "",
+                "addressline7": "XM4 5HQ",
+                "postcode": "XM4 5HQ",
+            },
+            8,
+            ".letter + .govuk-visually-hidden p:last-child",
+            "1 Example Street XM4 5HQ XM4 5HQ ((name))",
+        ),
+    ),
+)
+def test_send_one_off_only_asks_for_recipient_once(
+    mocker,
+    client_request,
+    fake_uuid,
+    template_type,
+    mock_template_preview,
+    content,
+    recipient,
+    placeholder_values,
+    step_index,
+    css_selector_for_content,
+    expected_content,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": template_json(
+                service_id=SERVICE_ONE_ID,
+                id_=fake_uuid,
+                name="Two week reminder",
+                type_=template_type,
+                content=content,
+            )
+        },
+    )
+
+    with client_request.session_transaction() as session:
+        session["recipient"] = recipient
+        session["placeholders"] = placeholder_values
+
+    page = client_request.get(
+        "main.send_one_off_step",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=step_index,
+    )
+
+    assert normalize_spaces(page.select_one("label").text) == "name"
+    assert normalize_spaces(page.select_one(css_selector_for_content).text) == expected_content
+
+
+@pytest.mark.parametrize(
     "user, template_type, expected_link_text, expected_link_url",
     [
         (

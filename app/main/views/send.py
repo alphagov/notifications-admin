@@ -782,10 +782,14 @@ def start_job(service_id, upload_id):
 
 def fields_to_fill_in(template, prefill_current_user=False):
     if "letter" == template.template_type:
-        return letter_address_columns + list(template.placeholders)
+        return tuple(InsensitiveDict.from_keys(letter_address_columns + list(template.placeholders)).values())
 
     if not prefill_current_user:
-        return first_column_headings[template.template_type] + list(template.placeholders)
+        return tuple(
+            InsensitiveDict.from_keys(
+                first_column_headings[template.template_type] + list(template.placeholders)
+            ).values()
+        )
 
     if template.template_type == "sms":
         session["recipient"] = current_user.mobile_number
@@ -794,7 +798,7 @@ def fields_to_fill_in(template, prefill_current_user=False):
         session["recipient"] = current_user.email_address
         session["placeholders"]["email address"] = current_user.email_address
 
-    return list(template.placeholders)
+    return tuple(InsensitiveDict.from_keys(template.placeholders).values())
 
 
 def get_normalised_placeholders_from_session():
