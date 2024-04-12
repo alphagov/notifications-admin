@@ -41,7 +41,7 @@ docopt==0.6.2
     # via notifications-python-client
 et-xmlfile==1.1.0
     # via openpyxl
-eventlet==0.34.2
+eventlet==0.35.2
     # via gunicorn
 fido2==1.1.0
     # via -r requirements.in
@@ -175,9 +175,7 @@ segno==1.5.2
 sentry-sdk[flask]==1.32.0
     # via -r requirements.in
 six==1.16.0
-    # via
-    #   eventlet
-    #   python-dateutil
+    # via python-dateutil
 smartypants==2.0.1
     # via notifications-utils
 statsd==3.3.0
