@@ -941,7 +941,7 @@ def filter_by_permissions(valuelist, permissions):
 
 class AuthTypeForm(StripWhitespaceForm):
     auth_type = GovukRadiosField(
-        "Sign in using",
+        "Sign-in method",
         choices=[
             ("sms_auth", format_auth_type("sms_auth")),
             ("email_auth", format_auth_type("email_auth")),
@@ -979,7 +979,7 @@ class PermissionsForm(StripWhitespaceForm):
     folder_permissions = GovukCollapsibleNestedCheckboxesField("Folders this team member can see", field_label="folder")
 
     login_authentication = GovukRadiosField(
-        "Sign in using",
+        "Sign-in method",
         choices=[
             ("sms_auth", "Text message code"),
             ("email_auth", "Email link"),
@@ -2766,7 +2766,7 @@ class GovernmentIdentityColour(StripWhitespaceForm):
 
 class SetAuthTypeForm(StripWhitespaceForm):
     sign_in_method = GovukRadiosField(
-        "Sign in method",
+        "Sign-in method",
         choices=(
             (SIGN_IN_METHOD_TEXT, "Text message code"),
             (SIGN_IN_METHOD_TEXT_OR_EMAIL, "Email link or text message code"),
