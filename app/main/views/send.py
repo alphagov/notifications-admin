@@ -15,7 +15,7 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
-from notifications_utils.insensitive_dict import InsensitiveDict
+from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.postal_address import PostalAddress, address_lines_1_to_7_keys
 from notifications_utils.recipients import RecipientCSV, first_column_headings
 from notifications_utils.sanitise_text import SanitiseASCII
@@ -782,14 +782,10 @@ def start_job(service_id, upload_id):
 
 def fields_to_fill_in(template, prefill_current_user=False):
     if "letter" == template.template_type:
-        return tuple(InsensitiveDict.from_keys(letter_address_columns + list(template.placeholders)).values())
+        return InsensitiveSet(letter_address_columns + list(template.placeholders))
 
     if not prefill_current_user:
-        return tuple(
-            InsensitiveDict.from_keys(
-                first_column_headings[template.template_type] + list(template.placeholders)
-            ).values()
-        )
+        return InsensitiveSet(first_column_headings[template.template_type] + list(template.placeholders))
 
     if template.template_type == "sms":
         session["recipient"] = current_user.mobile_number
@@ -798,7 +794,7 @@ def fields_to_fill_in(template, prefill_current_user=False):
         session["recipient"] = current_user.email_address
         session["placeholders"]["email address"] = current_user.email_address
 
-    return tuple(InsensitiveDict.from_keys(template.placeholders).values())
+    return InsensitiveSet(template.placeholders)
 
 
 def get_normalised_placeholders_from_session():

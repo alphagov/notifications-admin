@@ -1356,12 +1356,12 @@ def test_send_one_off_shows_placeholders_in_correct_order(
     (
         (
             "sms",
-            "((phone_number)) ((Phone Number)) ((PHONENUMBER)) ((name))",
+            "((phone_number)) ((Phone Number)) ((PHONENUMBER)) ((name)) ((NAME))",
             "07900900123",
             {"phonenumber": "07900900123"},
             1,
             ".sms-message-wrapper",
-            "service one: 07900900123 07900900123 07900900123 ((name))",
+            "service one: 07900900123 07900900123 07900900123 ((name)) ((NAME))",
         ),
         (
             "email",
