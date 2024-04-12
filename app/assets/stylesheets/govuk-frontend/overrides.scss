@@ -34,3 +34,8 @@ $notify-secondary-button-hover-colour: govuk-shade(govuk-colour("light-grey"), 1
     background-color: $notify-secondary-button-hover-colour;
   }
 }
+
+// by default the cookie banner component has no top padding
+.govuk-cookie-banner {
+  @include govuk-responsive-padding(4, "top");
+}

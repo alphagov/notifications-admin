@@ -25,7 +25,6 @@ $govuk-new-link-styles: true;
 // Specific to this application
 @import './local/typography';
 @import './grids';
-@import './components/cookie-message';
 @import './components/placeholder';
 @import './components/sms-message';
 @import './components/page-footer';
