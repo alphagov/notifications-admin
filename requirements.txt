@@ -74,7 +74,7 @@ gunicorn[eventlet]==21.2.0
     #   notifications-utils
 humanize==4.4.0
     # via -r requirements.in
-idna==3.3
+idna==3.7
     # via requests
 itsdangerous==2.1.2
     # via
