@@ -6,8 +6,8 @@
     "node": ">=10.15.3"
   },
   "scripts": {
-    "test": "gulp lint && jest --config tests/javascripts/jest.config.js tests/javascripts",
-    "test-watch": "jest --watch --config tests/javascripts/jest.config.js tests/javascripts",
+    "test": "gulp lint && jest",
+    "test-watch": "jest --watch",
     "build": "gulp",
     "watch": "gulp watch",
     "audit": "better-npm-audit audit --production --level high"
@@ -61,5 +61,14 @@
   "overrides": {
     "minimist": "1.2.6",
     "lodash.template": "4.5.0"
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/tests/javascripts/support/setup.js"
+    ],
+    "testEnvironmentOptions": {
+      "url": "https://www.notifications.service.gov.uk"
+    },
+    "testEnvironment": "jsdom"
   }
 }
