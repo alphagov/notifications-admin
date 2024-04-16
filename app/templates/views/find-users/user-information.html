@@ -13,6 +13,22 @@
       <p class="govuk-body">{{ user.email_address }}</p>
       <p class="{{ '' if user.mobile_number else 'hint' }}">{{ user.mobile_number or 'No mobile number'}}</p>
 
+      <h2 class="heading-medium">Organisations</h2>
+      <nav class="browse-list">
+        {% if user.organisations %}
+          <ul>
+          {% for org in user.organisations|sort %}
+            <li class="browse-list-item">
+              <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href={{url_for('main.organisation_dashboard', org_id=org.id)}}>{{ org.name }}</a>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="hint">
+            No organisations
+          </p>
+        {% endif %}
+      </nav>
+
       <h2 class="heading-medium">Live services</h2>
       <nav class="browse-list">
         {% if user.live_services %}

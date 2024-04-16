@@ -17,6 +17,7 @@ def test_user_information_page_shows_information_about_user(
     client_request.login(platform_admin_user)
     user_service_one = uuid.uuid4()
     user_service_two = uuid.uuid4()
+    user_organisation = uuid.uuid4()
     mocker.patch(
         "app.user_api_client.get_user",
         return_value=user_json(name="Apple Bloom", services=[user_service_one, user_service_two]),
@@ -25,7 +26,9 @@ def test_user_information_page_shows_information_about_user(
     mocker.patch(
         "app.user_api_client.get_organisations_and_services_for_user",
         return_value={
-            "organisations": [],
+            "organisations": [
+                {"id": user_organisation, "name": "Nature org"},
+            ],
             "services": [
                 {"id": user_service_one, "name": "Fresh Orchard Juice", "restricted": True},
                 {"id": user_service_two, "name": "Nature Therapy", "restricted": False},
@@ -47,6 +50,7 @@ def test_user_information_page_shows_information_about_user(
     assert "0 failed login attempts" not in page.text
 
     assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == [
+        "Organisations",
         "Live services",
         "Trial mode services",
         "Authentication",
@@ -54,6 +58,7 @@ def test_user_information_page_shows_information_about_user(
     ]
 
     assert [normalize_spaces(a.text) for a in page.select("main li a")] == [
+        "Nature org",
         "Nature Therapy",
         "Fresh Orchard Juice",
     ]
