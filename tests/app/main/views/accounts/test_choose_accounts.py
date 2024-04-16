@@ -83,44 +83,48 @@ def test_choose_account_should_show_choose_accounts_page(
     page = resp.select_one("main#main-content")
 
     assert normalize_spaces(page.select_one("h1").text) == "Choose service"
-    outer_list_items = page.select("nav ul")[0].select("li")
+    org_list_items = page.select("nav ul")[0].select("li")
+    service_list_items = page.select("nav ul")[1].select("li")
+    trial_services_list_items = page.select("nav ul")[2].select("li")
     headings = page.select("main h2")
 
-    assert len(outer_list_items) == 8
+    assert len(org_list_items) == 3
+    assert len(service_list_items) == 5
 
-    assert normalize_spaces(headings[0].text) == "Live services"
+    assert normalize_spaces(headings[0].text) == "Organisations"
 
     # first org
-    assert outer_list_items[0].a.text == "Org 1"
-    assert outer_list_items[0].a["href"] == url_for(".organisation_dashboard", org_id="o1")
-    assert normalize_spaces(outer_list_items[0].select_one(".browse-list-hint").text) == "1 live service"
+    assert org_list_items[0].a.text == "Org 1"
+    assert org_list_items[0].a["href"] == url_for(".organisation_dashboard", org_id="o1")
+    assert normalize_spaces(org_list_items[0].select_one(".browse-list-hint").text) == "1 live service"
 
     # second org
-    assert outer_list_items[1].a.text == "Org 2"
-    assert outer_list_items[1].a["href"] == url_for(".organisation_dashboard", org_id="o2")
-    assert normalize_spaces(outer_list_items[1].select_one(".browse-list-hint").text) == "2 live services"
+    assert org_list_items[1].a.text == "Org 2"
+    assert org_list_items[1].a["href"] == url_for(".organisation_dashboard", org_id="o2")
+    assert normalize_spaces(org_list_items[1].select_one(".browse-list-hint").text) == "2 live services"
 
     # third org
-    assert outer_list_items[2].a.text == "Org 3"
-    assert outer_list_items[2].a["href"] == url_for(".organisation_dashboard", org_id="o3")
-    assert normalize_spaces(outer_list_items[2].select_one(".browse-list-hint").text) == "0 live services"
+    assert org_list_items[2].a.text == "Org 3"
+    assert org_list_items[2].a["href"] == url_for(".organisation_dashboard", org_id="o3")
+    assert normalize_spaces(org_list_items[2].select_one(".browse-list-hint").text) == "0 live services"
 
     # live services
-    assert outer_list_items[3].a.text == "Service 1"
-    assert outer_list_items[3].a["href"] == url_for(".service_dashboard", service_id=SERVICE_TWO_ID)
-    assert outer_list_items[4].a.text == "Service 2"
-    assert outer_list_items[4].a["href"] == url_for(".service_dashboard", service_id=SERVICE_TWO_ID)
-    assert outer_list_items[5].a.text == "service one"
-    assert outer_list_items[5].a["href"] == url_for(".service_dashboard", service_id="12345")
-    assert outer_list_items[6].a.text == "service one (org 2)"
-    assert outer_list_items[6].a["href"] == url_for(".service_dashboard", service_id="12345")
-    assert outer_list_items[7].a.text == "service two (org 2)"
-    assert outer_list_items[7].a["href"] == url_for(".service_dashboard", service_id="67890")
+    assert normalize_spaces(headings[1].text) == "Live services"
 
-    assert normalize_spaces(headings[1].text) == "Trial mode services"
+    assert service_list_items[0].a.text == "Service 1"
+    assert service_list_items[0].a["href"] == url_for(".service_dashboard", service_id=SERVICE_TWO_ID)
+    assert service_list_items[1].a.text == "Service 2"
+    assert service_list_items[1].a["href"] == url_for(".service_dashboard", service_id=SERVICE_TWO_ID)
+    assert service_list_items[2].a.text == "service one"
+    assert service_list_items[2].a["href"] == url_for(".service_dashboard", service_id="12345")
+    assert service_list_items[3].a.text == "service one (org 2)"
+    assert service_list_items[3].a["href"] == url_for(".service_dashboard", service_id="12345")
+    assert service_list_items[4].a.text == "service two (org 2)"
+    assert service_list_items[4].a["href"] == url_for(".service_dashboard", service_id="67890")
+
+    assert normalize_spaces(headings[2].text) == "Trial mode services"
 
     # trial services
-    trial_services_list_items = page.select("nav ul")[1].select("li")
     assert len(trial_services_list_items) == 3
     assert trial_services_list_items[0].a.text == "service three"
     assert trial_services_list_items[0].a["href"] == url_for(".service_dashboard", service_id="abcde")
@@ -187,6 +191,7 @@ def test_choose_account_should_show_join_service_button(
             SAMPLE_DATA,
             [
                 "Platform admin",
+                "Organisations",
                 "Live services",
                 "Trial mode services",
             ],
@@ -227,7 +232,7 @@ def test_choose_account_should_show_join_service_button(
         ),
     ),
 )
-def test_choose_account_should_should_organisations_link_for_platform_admin(
+def test_choose_account_should_show_organisations_link_for_platform_admin(
     client_request,
     platform_admin_user,
     mock_get_organisations,
@@ -249,6 +254,70 @@ def test_choose_account_should_should_organisations_link_for_platform_admin(
     assert first_link.text == "All organisations"
     assert first_link["href"] == url_for("main.organisations")
     assert normalize_spaces(first_hint.text) == "3 organisations, 9,999 live services"
+
+    assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == expected_headings
+
+
+@pytest.mark.parametrize(
+    "orgs_and_services, expected_headings",
+    (
+        (
+            {"organisations": [], "services": []},
+            [],
+        ),
+        (
+            SAMPLE_DATA,
+            [
+                "Organisations",
+                "Live services",
+                "Trial mode services",
+            ],
+        ),
+        # no headings as only one thing to show
+        (
+            {
+                "organisations": [],
+                "services": [
+                    {
+                        "name": "Live service",
+                        "id": OS2,
+                        "restricted": False,
+                        "organisation": None,
+                    }
+                ],
+            },
+            [],
+        ),
+        # no headings as only one thing to show
+        (
+            {
+                "organisations": [],
+                "services": [
+                    {
+                        "name": "Trial service",
+                        "id": OS2,
+                        "restricted": True,
+                        "organisation": None,
+                    }
+                ],
+            },
+            [],
+        ),
+    ),
+)
+def test_choose_account_should_show_organisations_link_for_org_user(
+    client_request,
+    mock_get_organisations,
+    mock_get_orgs_and_services,
+    mock_get_organisation_services,
+    mock_get_service_and_organisation_counts,
+    mock_get_organisation_by_domain,
+    orgs_and_services,
+    expected_headings,
+):
+    mock_get_orgs_and_services.return_value = orgs_and_services
+
+    page = client_request.get("main.choose_account")
 
     assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == expected_headings
 

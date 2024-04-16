@@ -7,7 +7,7 @@
   organisations=[],
   services=[]
 ) %}
-  {% if show_heading and (services or organisations) %}
+  {% if show_heading %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-quarter">
         <h2>
@@ -33,7 +33,7 @@
       <a href="{{ url_for('main.service_dashboard', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
     </li>
   {% endfor %}
-  {% if show_heading and (services or organisations) %}
+  {% if show_heading %}
         </ul>
       </div>
     </div>
@@ -48,12 +48,11 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-
-  <h1 class="heading-large {% if current_user.has_access_to_live_and_trial_mode_services %}govuk-visually-hidden{% endif %}">
+  <h1 class="heading-large {% if show_headings %}govuk-visually-hidden{% endif %}">
     Choose service
   </h1>
 
-  <nav class="browse-list {% if current_user.has_access_to_live_and_trial_mode_services %}top-gutter-2-3{% endif %}">
+  <nav class="browse-list {% if show_headings %}top-gutter-2-3{% endif %}">
 
     {% if current_user.platform_admin %}
       <div class="govuk-grid-row">
@@ -76,15 +75,16 @@
 
     {% if current_user.organisations %}
       {{ service_list(
-        heading='Live services',
-        show_heading=current_user.trial_mode_services or current_user.platform_admin,
+        heading='Organisations',
+        show_heading=show_headings,
         organisations=current_user.organisations,
-        services=current_user.live_services
       ) }}
-    {% else %}
+    {% endif %}
+
+    {% if current_user.live_services %}
       {{ service_list(
         heading='Live services',
-        show_heading=(current_user.trial_mode_services and current_user.live_services) or current_user.platform_admin,
+        show_heading=show_headings,
         services=current_user.live_services
       ) }}
     {% endif %}
@@ -92,7 +92,7 @@
     {% if current_user.trial_mode_services %}
       {{ service_list(
         heading='Trial mode services',
-        show_heading=(current_user.organisations or current_user.live_services or current_user.platform_admin),
+        show_heading=show_headings,
         services=current_user.trial_mode_services
       ) }}
     {% endif %}
@@ -101,7 +101,7 @@
 
   {% if can_add_service %}
     <div class="js-stick-at-bottom-when-scrolling">
-      {% if current_user.has_access_to_live_and_trial_mode_services %}
+      {% if show_headings %}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-one-quarter">
             &nbsp;
@@ -122,7 +122,7 @@
           "classes": "govuk-button--secondary"
         }) }}
       {% endif %}
-      {% if current_user.has_access_to_live_and_trial_mode_services %}
+      {% if show_headings %}
           </div>
         </div>
       {% endif %}
