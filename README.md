@@ -76,8 +76,15 @@ make bootstrap
 # run all the tests
 make test
 
+# run the js tests
+npx jest
+
+# run a single js test
+npx jest <pathToAJavascriptTestfile>
+
 # continuously run js tests
 npm run test-watch
+
 ```
 
 To run a specific JavaScript test, you'll need to copy the full command from `package.json`.
