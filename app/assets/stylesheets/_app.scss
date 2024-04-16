@@ -116,10 +116,15 @@ td {
   }
 
   th,
-  .table-field-index {
+  tbody th.table-field {
     background: govuk-colour("light-grey");
     font-weight: bold;
     text-align: center;
+  }
+
+  // precedence of spreadsheet CSS means we need this to stop this style being overwritten
+  & .fullscreen-scrollable-table tbody th.table-field {
+    background: govuk-colour("white");
   }
 
   th, td {
@@ -128,7 +133,8 @@ td {
     border: 1px solid $govuk-border-colour;
   }
 
-  td {
+  td,
+  tbody th {
 
     border-top: 0;
     // 194 is the width of the table * 1/3.5, so the overflow cuts off

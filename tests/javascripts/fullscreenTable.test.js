@@ -112,6 +112,7 @@ describe('FullscreenTable', () => {
 
   afterEach(() => {
 
+    $(window).off('scroll resize');
     document.body.innerHTML = '';
 
   });
@@ -240,18 +241,18 @@ describe('FullscreenTable', () => {
   });
 
   describe("the width of the table should fit the horizontal space available to it", () => {
-    let rowNumberColumnCell;
+    let rowNumberColumnHeader;
 
     beforeEach(() => {
 
-      rowNumberColumnCell = container.querySelector('.table-field-index');
+      rowNumberColumnHeader = container.querySelector('.table-field-heading-first');
 
-      // set main content column width (used as module as gauge for table width)
+      // set main content column width (used by module as gauge for table width)
       screenMock.window.setWidthTo(1024);
-      document.querySelector('main').setAttribute('style', 'width: 742px');
+      document.querySelector('main').setAttribute('style', 'width: 712px');
 
       // set total width of column for row numbers in table to 40px
-      rowNumberColumnCell.setAttribute('style', 'width: 40px');
+      rowNumberColumnHeader.setAttribute('style', 'width: 40px');
 
       // start module
       window.GOVUK.notifyModules.start();
@@ -269,9 +270,8 @@ describe('FullscreenTable', () => {
 
     test("when the page has loaded", () => {
 
-      // table should set its width to be that of `<main>`, minus margin-left for the row numbers column
-      expect(window.getComputedStyle(tableFrame)['width']).toEqual('702px'); // width of content column - numbers column
-      expect(window.getComputedStyle(tableFrame)['margin-left']).toEqual('40px'); // width of numbers column
+      // table should set its width to be that of `<main>`
+      expect(window.getComputedStyle(tableFrame)['width']).toEqual('712px');
 
       // table for number column has 4px extra to allow space for drop shadow
       expect(window.getComputedStyle(numberColumnFrame)['width']).toEqual('44px');
@@ -281,15 +281,51 @@ describe('FullscreenTable', () => {
     test("when the page has resized", () => {
 
       // resize window and content column
-      document.querySelector('main').setAttribute('style', 'width: 720px');
+      document.querySelector('main').setAttribute('style', 'width: 668px');
       screenMock.window.resizeTo({ height: 768, width: 960 });
 
-      // table should set its width to be that of `<main>`, minus margin-left for the row numbers column
-      expect(window.getComputedStyle(tableFrame)['width']).toEqual('680px'); // width of content column - numbers column
-      expect(window.getComputedStyle(tableFrame)['margin-left']).toEqual('40px'); // width of numbers column
+      // table should set its width to be that of `<main>`
+      expect(window.getComputedStyle(tableFrame)['width']).toEqual('668px');
 
       // table for number column has 4px extra to allow space for drop shadow
       expect(window.getComputedStyle(numberColumnFrame)['width']).toEqual('44px');
+
+    });
+
+  });
+
+  // the layout algorithms browsers use can make the first column different between tables so detection and a fix are both requried
+  describe('the first column of both the scrollable table and that with fixed row headers should be the same width', () => {
+
+    afterEach(() => {
+
+      screenMock.reset();
+
+    });
+
+    // table dimensions are set when the module starts and on page resizes
+    // we can't fake the columns being different when it starts so our test needs to run after a resize
+    test('when the page has resized', () => {
+
+      let invisibleScrollableTopLeftCell;
+      let fixedTopLeftHeaderCell;
+
+      // set main content column width (used by module as gauge for table width)
+      screenMock.window.setWidthTo(1024);
+      document.querySelector('main').setAttribute('style', 'width: 712px');
+
+      // start module
+      window.GOVUK.notifyModules.start();
+
+      invisibleScrollableTopLeftCell = document.querySelector('.fullscreen-scrollable-table .table-field-heading-first');
+      fixedTopLeftHeaderCell = document.querySelector('.fullscreen-fixed-table .table-field-heading-first');
+
+      invisibleScrollableTopLeftCell.setAttribute('style', 'width: 30px');
+      fixedTopLeftHeaderCell.setAttribute('style', 'width: 9px');
+
+      screenMock.window.resizeTo({ height: 1000, width: 600 });
+
+      expect(window.getComputedStyle(invisibleScrollableTopLeftCell)['width']).toEqual('9px');
 
     });
 
