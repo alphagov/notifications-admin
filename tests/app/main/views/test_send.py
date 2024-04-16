@@ -302,7 +302,10 @@ def test_example_spreadsheet_for_letters(
 
     assert list(
         zip(
-            *[[normalize_spaces(cell.text) for cell in page.select("tbody tr")[row].select("td")] for row in (0, 1)],
+            *[
+                [normalize_spaces(cell.text) for cell in page.select("tbody tr")[row].select("th, td")]
+                for row in (0, 1)
+            ],
             strict=True,
         )
     ) == [
@@ -1034,10 +1037,10 @@ def test_upload_valid_csv_shows_preview_and_table(
     assert page.select_one(".sms-message-recipient").text.strip() == expected_recipient
     assert page.select_one(".sms-message-wrapper").text.strip() == expected_message
 
-    assert page.select_one(".table-field-index").text.strip() == "2"
+    assert page.select_one("th.table-field").text.strip() == "2"
 
     if expected_link_in_first_row:
-        assert page.select_one(".table-field-index a")["href"] == url_for(
+        assert page.select_one("th.table-field a")["href"] == url_for(
             "main.check_messages",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
@@ -1046,7 +1049,7 @@ def test_upload_valid_csv_shows_preview_and_table(
             original_file_name="example.csv",
         )
     else:
-        assert not page.select_one(".table-field-index").select_one("a")
+        assert not page.select_one("th.table-field").select_one("a")
 
     for row_index, row in enumerate(
         [
@@ -1094,7 +1097,7 @@ def test_upload_valid_csv_shows_preview_and_table(
         for index, cell in enumerate(row):
             row = page.select("table tbody tr")[row_index]
             assert "id" not in row
-            assert normalize_spaces(str(row.select("td")[index + 1])) == cell
+            assert normalize_spaces(str(row.select("th, td")[index + 1])) == cell
 
 
 def test_upload_valid_csv_only_sets_meta_if_filename_known(
@@ -3254,7 +3257,7 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     assert len(page.select(".letter img")) == 3
 
     if number_of_rows > 1:
-        assert page.select_one(".table-field-index a").text == "3"
+        assert page.select_one("th.table-field a").text == "3"
 
 
 @pytest.mark.parametrize(
