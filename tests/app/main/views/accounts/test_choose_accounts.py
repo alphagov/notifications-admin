@@ -259,11 +259,13 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
 
 
 @pytest.mark.parametrize(
-    "orgs_and_services, expected_headings",
+    "orgs_and_services, expected_headings, expected_h1, is_h1_visible",
     (
         (
             {"organisations": [], "services": []},
             [],
+            "Choose service",
+            True,
         ),
         (
             SAMPLE_DATA,
@@ -272,6 +274,24 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 "Live services",
                 "Trial mode services",
             ],
+            "Choose service",
+            False,
+        ),
+        # no headings as only one thing to show
+        (
+            {
+                "organisations": [
+                    {
+                        "name": "org_1",
+                        "id": "o1",
+                        "count_of_live_services": 1,
+                    }
+                ],
+                "services": [],
+            },
+            [],
+            "Choose organisation",
+            True,
         ),
         # no headings as only one thing to show
         (
@@ -287,6 +307,8 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 ],
             },
             [],
+            "Choose service",
+            True,
         ),
         # no headings as only one thing to show
         (
@@ -302,6 +324,8 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 ],
             },
             [],
+            "Choose service",
+            True,
         ),
     ),
 )
@@ -314,10 +338,17 @@ def test_choose_account_should_show_organisations_link_for_org_user(
     mock_get_organisation_by_domain,
     orgs_and_services,
     expected_headings,
+    expected_h1,
+    is_h1_visible,
 ):
     mock_get_orgs_and_services.return_value = orgs_and_services
 
     page = client_request.get("main.choose_account")
+
+    assert normalize_spaces(page.select_one("h1").text) == expected_h1
+
+    # check that the h1 is not hidden
+    assert bool(page.select("h1.govuk-visually-hidden")) != is_h1_visible
 
     assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == expected_headings
 

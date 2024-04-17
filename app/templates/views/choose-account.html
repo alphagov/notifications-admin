@@ -43,13 +43,17 @@
   <div class="keyline-block"></div>
 {% endmacro %}
 
+{% set thing_to_choose_between = 'organisation'
+  if current_user.organisations and not current_user.services
+  else 'service'
+%}
 {% block per_page_title %}
-  Choose service
+  Choose {{ thing_to_choose_between }}
 {% endblock %}
 
 {% block maincolumn_content %}
   <h1 class="heading-large {% if show_headings %}govuk-visually-hidden{% endif %}">
-    Choose service
+    Choose {{ thing_to_choose_between }}
   </h1>
 
   <nav class="browse-list {% if show_headings %}top-gutter-2-3{% endif %}">
