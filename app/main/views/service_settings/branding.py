@@ -607,6 +607,7 @@ def letter_branding_options(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/request", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
 def letter_branding_request(service_id):
     form = BrandingRequestForm()
     from_template = _letter_branding_flow_query_params()["from_template"]
@@ -652,6 +653,7 @@ def letter_branding_request(service_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/upload-branding", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
 def letter_branding_upload_branding(service_id):
     form = LetterBrandingUploadBranding()
     if form.validate_on_submit():
@@ -696,6 +698,7 @@ def _should_set_default_org_letter_branding(branding_choice):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/set-name", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
 def letter_branding_set_name(service_id):
     letter_branding_data = _letter_branding_flow_query_params()
     temporary_logo_key = letter_branding_data["temp_filename"]
