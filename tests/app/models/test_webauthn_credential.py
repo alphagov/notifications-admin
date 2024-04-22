@@ -33,8 +33,8 @@ def test_from_registration_verifies_response(webauthn_dev_server):
     assert credential.registration_response == base64.b64encode(cbor.encode(registration_response)).decode("utf-8")
 
     credential_data = credential.to_credential_data()
-    assert type(credential_data.credential_id) is bytes
-    assert type(credential_data.aaguid) is Aaguid
+    assert isinstance(credential_data.credential_id, bytes)
+    assert isinstance(credential_data.aaguid, Aaguid)
     assert isinstance(credential_data.aaguid, bytes)
     assert credential_data.public_key[3] == ES256.ALGORITHM
 
@@ -49,8 +49,8 @@ def test_from_registration_encodes_as_unicode(webauthn_dev_server):
 
     serialized_credential = credential.serialize()
 
-    assert type(serialized_credential["credential_data"]) == str
-    assert type(serialized_credential["registration_response"]) == str
+    assert isinstance(serialized_credential["credential_data"], str)
+    assert isinstance(serialized_credential["registration_response"], str)
 
 
 def test_from_registration_handles_library_errors(notify_admin):
