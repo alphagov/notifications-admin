@@ -24,7 +24,6 @@ describe("Cookie message", () => {
     const cookieMessageStyles = document.createElement('style');
 
     // add the CSS that hides the cookie message by default
-    cookieMessageStyles.textContent = '.notify-cookie-banner { display: none; }';
     document.getElementsByTagName('head')[0].appendChild(cookieMessageStyles);
 
     // protect against any previous tests setting a cookies-policy cookie
@@ -40,28 +39,71 @@ describe("Cookie message", () => {
     jest.spyOn(window.GOVUK, 'initAnalytics');
 
     cookieMessage = `
-      <div id="global-cookie-message" class="notify-cookie-banner" data-notify-module="cookie-banner" role="region" aria-label="cookie banner">
-        <div class="notify-cookie-banner__wrapper govuk-width-container">
-          <h2 class="notify-cookie-banner__heading govuk-heading-m" id="notify-cookie-banner__heading">Can we store analytics cookies on your device?</h2>
-          <p class="govuk-body">Analytics cookies help us understand how our website is being used.</p>
-          <div class="notify-cookie-banner__buttons">
-            <button type="button" class="govuk-button notify-cookie-banner__button notify-cookie-banner__button-accept" type="button" data-accept-cookies="true" aria-describedby="notify-cookie-banner__heading">
-              Yes<span class="govuk-visually-hidden">, Notify can store analytics cookies on your device</span>
-            </button>
-            <button type="button" class="govuk-button notify-cookie-banner__button notify-cookie-banner__button-reject" type="button" data-accept-cookies="false" aria-describedby="notify-cookie-banner__heading">
-              No<span class="govuk-visually-hidden">, Notify cannot store analytics cookies on your device</span>
-            </button>
-            <a class="govuk-link notify-cookie-banner__link" href="/cookies">How Notify uses cookies</a>
+    <div id="global-cookie-message" class="govuk-cookie-banner" data-notify-module="cookie-banner" data-nosnippet role="region" aria-label="Cookies on GOV.UK Notify" hidden>
+    <div class="govuk-cookie-banner__message js-cookie-banner-message govuk-width-container">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <h2 class="govuk-cookie-banner__heading govuk-heading-m">
+            Can we store analytics cookies on your device?
+          </h2>
+          <div class="govuk-cookie-banner__content">
+            <p class="govuk-body">Analytics cookies help us understand how our website is being used.</p>
           </div>
         </div>
-
-        <div class="notify-cookie-banner__confirmation govuk-width-container" tabindex="-1">
-          <p class="notify-cookie-banner__confirmation-message govuk-body">
-            You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.
-          </p>
-          <button class="notify-cookie-banner__hide-button govuk-link" data-hide-cookie-banner="true" role="link">Hide<span class="govuk-visually-hidden"> cookies message</span></button>
+      </div>
+      <div class="govuk-button-group">
+        <button type="button" class="govuk-button" data-module="govuk-button" data-accept-cookies="true">
+          Accept analytics cookies
+        </button>
+        <button type="button" class="govuk-button" data-module="govuk-button" data-accept-cookies="false">
+          Reject analytics cookies
+        </button>
+        <a class="govuk-link" href="/cookies">How Notify uses cookies</a>
+      </div>
+    </div>
+    <div class="govuk-cookie-banner__message govuk-width-container" hidden>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <div class="govuk-cookie-banner__content">
+            <p class="govuk-body govuk-cookie-banner__confirmation-message">You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
+          </div>
         </div>
-      </div>`;
+      </div>
+      <div class="govuk-button-group">
+        <button value="yes" type="submit" name="cookies[hide]" class="govuk-button" data-module="govuk-button">
+          Hide cookie message
+        </button>
+      </div>
+    </div>
+    <div class="govuk-cookie-banner__message js-cookie-banner__accept-message govuk-width-container" role="alert" hidden>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <div class="govuk-cookie-banner__content">
+            <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
+          </div>
+        </div>
+      </div>
+      <div class="govuk-button-group">
+        <button value="yes" type="submit" name="cookies[hide]" class="govuk-button" data-module="govuk-button" data-hide-cookie-banner="true">
+          Hide cookie message
+        </button>
+      </div>
+    </div>
+    <div class="govuk-cookie-banner__message js-cookie-banner__reject-message govuk-width-container" role="alert" hidden>
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <div class="govuk-cookie-banner__content">
+            <p class="govuk-body">You told us not to use analytics cookies. You can <a class="govuk-link" href="/cookies">change your cookie settings</a> at any time.</p>
+          </div>
+        </div>
+      </div>
+      <div class="govuk-button-group">
+      <button value="yes" type="submit" name="cookies[hide]" class="govuk-button" data-module="govuk-button" data-hide-cookie-banner="true">
+        Hide cookie message
+      </button>
+      </div>
+    </div>
+  </div>`;
 
     document.body.innerHTML += cookieMessage;
 
@@ -85,7 +127,7 @@ describe("Cookie message", () => {
 
   });
 
-  /* 
+  /*
     Note: If no JS, the cookie banner is hidden.
 
     This works through CSS, based on the presence of the `js-enabled` class on the <body> so is not tested here.
@@ -137,7 +179,7 @@ describe("Cookie message", () => {
 
     window.GOVUK.notifyModules.start()
 
-    expect(helpers.element(document.querySelector('.notify-cookie-banner')).is('hidden')).toBe(true);
+    expect(helpers.element(document.querySelector('.govuk-cookie-banner')).is('hidden')).toBe(true);
 
   });
 
@@ -151,7 +193,7 @@ describe("Cookie message", () => {
 
     test("The cookie banner should show", () => {
 
-      const banner = helpers.element(document.querySelector('.notify-cookie-banner'));
+      const banner = helpers.element(document.querySelector('.govuk-cookie-banner'));
 
       expect(banner.is('hidden')).toBe(false);
 
@@ -167,7 +209,7 @@ describe("Cookie message", () => {
 
       beforeEach(() => {
 
-        const acceptButton = document.querySelector('.notify-cookie-banner__button-accept');
+        const acceptButton = document.querySelector('button[data-accept-cookies=true]');
 
         helpers.triggerEvent(acceptButton, 'click');
 
@@ -175,7 +217,7 @@ describe("Cookie message", () => {
 
       test("the banner should confirm your choice and link to the cookies page as a way to change your mind", () => {
 
-        confirmation = helpers.element(document.querySelector('.notify-cookie-banner__confirmation'));
+        confirmation = helpers.element(document.querySelector('.js-cookie-banner__accept-message'));
 
         expect(confirmation.is('hidden')).toBe(false);
         expect(confirmation.el.textContent.trim()).toEqual(expect.stringMatching(/^You’ve accepted analytics cookies/));
@@ -184,14 +226,14 @@ describe("Cookie message", () => {
 
       test("If the user clicks the 'hide' button, the banner should be hidden", () => {
 
-        const hideButton = document.querySelector('.notify-cookie-banner__hide-button');
-        const banner = helpers.element(document.querySelector('.notify-cookie-banner'));
+        const hideButton = document.querySelectorAll('button[data-hide-cookie-banner=true]');
+        const banner = helpers.element(document.querySelector('.govuk-cookie-banner'));
 
-        helpers.triggerEvent(hideButton, 'click');
+        helpers.triggerEvent(hideButton[0], 'click');
 
         expect(banner.is('hidden')).toBe(true);
 
-      }); 
+      });
 
       test("The consent cookie should be set, with analytics set to 'true'", () => {
 
@@ -211,7 +253,7 @@ describe("Cookie message", () => {
 
       beforeEach(() => {
 
-        const rejectButton = document.querySelector('.notify-cookie-banner__button-reject');
+        const rejectButton = document.querySelector('button[data-accept-cookies=false]');
 
         helpers.triggerEvent(rejectButton, 'click');
 
@@ -219,7 +261,7 @@ describe("Cookie message", () => {
 
       test("the banner should confirm your choice and link to the cookies page as a way to change your mind", () => {
 
-        confirmation = helpers.element(document.querySelector('.notify-cookie-banner__confirmation'));
+        confirmation = helpers.element(document.querySelector('.js-cookie-banner__reject-message .govuk-cookie-banner__content'));
 
         expect(confirmation.is('hidden')).toBe(false);
         expect(confirmation.el.textContent.trim()).toEqual(expect.stringMatching(/^You told us not to use analytics cookies/));
@@ -228,14 +270,14 @@ describe("Cookie message", () => {
 
       test("If the user clicks the 'hide' button, the banner should be hidden", () => {
 
-        const hideButton = document.querySelector('.notify-cookie-banner__hide-button');
-        const banner = helpers.element(document.querySelector('.notify-cookie-banner'));
+        const hideButton = document.querySelectorAll('button[data-hide-cookie-banner=true]');
+        const banner = helpers.element(document.querySelector('.govuk-cookie-banner'));
 
-        helpers.triggerEvent(hideButton, 'click');
+        helpers.triggerEvent(hideButton[1], 'click');
 
         expect(banner.is('hidden')).toBe(true);
 
-      }); 
+      });
 
       test("The consent cookie should be set, with analytics set to 'false'", () => {
 

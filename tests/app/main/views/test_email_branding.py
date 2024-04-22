@@ -134,7 +134,7 @@ def test_view_email_branding_shows_created_by_and_helpful_dates_if_available(
 
     page = client_request.get(".platform_admin_view_email_branding", branding_id=fake_uuid)
 
-    created_by_link = page.select("p > a")[1]
+    created_by_link = page.select("main .govuk-body > a")[0]
     assert created_by_link.text.strip() == user["name"]
     assert created_by_link["href"] == url_for(".user_information", user_id=user["id"])
 

@@ -1,5 +1,5 @@
 {% extends "govuk_frontend_jinja/template.html"%}
-{% from "components/cookie-banner.html" import cookie_banner %}
+{% from "govuk_frontend_jinja/components/cookie-banner/macro.html" import govukCookieBanner %}
 
 {% block headIcons %}
   <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ asset_url('images/favicon.ico') }}" type="image/x-icon" />
@@ -42,7 +42,83 @@
   {% endblock %}
 
   {% block cookie_message %}
-    {{ cookie_banner() }}
+    {% set bodyHtml %}
+      <p class="govuk-body">Analytics cookies help us understand how our website is being used.</p>
+    {% endset %}
+    {% set acceptHtml %}
+    <p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href=" {{ url_for("main.cookies") }}">change your cookie settings</a> at any time.</p>
+    {% endset %}
+
+    {% set rejectedHtml %}
+    <p class="govuk-body">You told us not to use analytics cookies. You can <a class="govuk-link" href=" {{ url_for("main.cookies") }}">change your cookie settings</a> at any time.</p>
+    {% endset %}
+
+    {{ govukCookieBanner({
+      'ariaLabel': "Cookies on GOV.UK Notify",
+      'attributes': {
+        'data-notify-module': "cookie-banner"
+      },
+      'hidden': "true",
+      'messages': [
+        {
+          'headingText': "Can we store analytics cookies on your device?",
+          'classes': 'js-cookie-banner-message',
+          'html': bodyHtml,
+          'actions': [
+            {
+              'text': "Accept analytics cookies",
+              'type': "button",
+              'attributes': {
+                'data-accept-cookies': "true"
+              },
+            },
+            {
+              'text': "Reject analytics cookies",
+              'type': "button",
+              'attributes': {
+                'data-accept-cookies': "false"
+              },
+            },
+            {
+              'text': "How Notify uses cookies",
+              'href': url_for("main.cookies")
+            }
+          ]
+        },
+        {
+          'html': acceptHtml,
+          'actions': [
+            {
+              'text': "Hide cookie message",
+              'type': "submit",
+              'name': "cookies[hide]",
+              'value': "yes",
+              'attributes': {
+                'data-hide-cookie-banner': "true"
+              },
+            }
+          ],
+          'hidden': true,
+          'classes': "js-cookie-banner__accept-message"
+        },
+        {
+          'html': rejectedHtml,
+          'actions': [
+            {
+              'text': "Hide cookie message",
+              'type': "submit",
+              'name': "cookies[hide]",
+              'value': "yes",
+              'attributes': {
+                'data-hide-cookie-banner': "true"
+              },
+            }
+          ],
+          'hidden': true,
+          'classes': "js-cookie-banner__reject-message"
+        }
+      ]
+    }) }}
   {% endblock %}
 {% endblock %}
 
