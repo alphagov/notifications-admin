@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.forms import FieldWithNoneOption
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
 
 
@@ -293,118 +292,6 @@ def test_email_branding_preview_allows_custom_page_title(
         title="Preview of new email branding",
     )
     assert page.select_one("title").text == "Preview of new email branding"
-
-
-@pytest.mark.parametrize("filename", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
-@pytest.mark.parametrize("branding_style", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
-def test_letter_template_preview_handles_no_branding_style_or_filename_correctly(
-    client_request,
-    branding_style,
-    filename,
-):
-    page = client_request.get(
-        "main.letter_template",
-        _test_page_title=False,
-        # Letter HTML doesn’t use the Design System, so elements won’t have class attributes
-        _test_for_elements_without_class=False,
-        branding_style=branding_style,
-        filename=filename,
-    )
-
-    image_link = page.select_one("img")["src"]
-
-    assert image_link == url_for("no_cookie.letter_branding_preview_image", filename="no-branding", page=1)
-
-
-@pytest.mark.parametrize("filename", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
-def test_letter_template_preview_links_to_the_correct_image_when_passed_existing_branding(
-    client_request,
-    mock_get_letter_branding_by_id,
-    filename,
-):
-    page = client_request.get(
-        "main.letter_template",
-        _test_page_title=False,
-        # Letter HTML doesn’t use the Design System, so elements won’t have class attributes
-        _test_for_elements_without_class=False,
-        branding_style="12341234-1234-1234-1234-123412341234",
-        filename=filename,
-    )
-
-    mock_get_letter_branding_by_id.assert_called_once_with("12341234-1234-1234-1234-123412341234")
-
-    image_link = page.select_one("img")["src"]
-
-    assert image_link == url_for("no_cookie.letter_branding_preview_image", filename="hm-government", page=1)
-
-
-@pytest.mark.parametrize("branding_style", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
-def test_letter_template_preview_links_to_the_correct_image_when_passed_a_filename(
-    client_request,
-    branding_style,
-):
-    page = client_request.get(
-        "main.letter_template",
-        _test_page_title=False,
-        # Letter HTML doesn’t use the Design System, so elements won’t have class attributes
-        _test_for_elements_without_class=False,
-        branding_style=branding_style,
-        filename="foo.svg",
-    )
-
-    image_link = page.select_one("img")["src"]
-
-    assert image_link == url_for("no_cookie.letter_branding_preview_image", filename="foo.svg", page=1)
-
-
-def test_letter_template_preview_returns_400_if_both_branding_style_and_filename_provided(
-    client_request,
-):
-    client_request.get(
-        "main.letter_template",
-        branding_style="some-branding",
-        filename="some-filename",
-        _test_page_title=False,
-        _expected_status=400,
-    )
-
-
-@pytest.mark.parametrize(
-    "extra_args, expected_page_title",
-    (
-        (
-            {},
-            "Preview of letter branding",
-        ),
-        (
-            {"title": "Preview of new letter branding"},
-            "Preview of new letter branding",
-        ),
-    ),
-)
-def test_letter_template_preview_works_with_and_without_custom_page_title(
-    client_request,
-    extra_args,
-    expected_page_title,
-):
-    page = client_request.get(
-        "main.letter_template",
-        _test_page_title=False,
-        # Letter HTML doesn’t use the Design System, so elements won’t have class attributes
-        _test_for_elements_without_class=False,
-        filename="some-filename",
-        **extra_args,
-    )
-    assert page.select_one("title").text == expected_page_title
-
-
-def test_letter_template_preview_headers(
-    client_request,
-    mock_get_letter_branding_by_id,
-):
-    response = client_request.get_response("main.letter_template")
-
-    assert response.headers.get("X-Frame-Options") == "SAMEORIGIN"
 
 
 def test_letter_spec_redirect(client_request):

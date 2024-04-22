@@ -1,10 +1,22 @@
-.branding-preview {
+.branding-preview,
+.branding-preview-image {
   width: 100%;
   display: block;
   box-sizing: border-box;
   border: solid 1px $govuk-border-colour;
   min-height: 200px;
   margin-bottom: govuk-spacing(6)
+}
+
+.branding-preview-image {
+
+  height: 200px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+  }
+
 }
 
 #logo-img {

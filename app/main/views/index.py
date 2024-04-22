@@ -12,7 +12,7 @@ from flask_login import current_user
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import HTMLEmailTemplate
 
-from app import letter_branding_client, status_api_client
+from app import status_api_client
 from app.formatters import message_count
 from app.main import main
 from app.main.forms import FieldWithNoneOption
@@ -20,7 +20,6 @@ from app.main.views.sub_navigation_dictionaries import features_nav, using_notif
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
 from app.models.sms_rate import SMSRate
-from app.utils.templates import TemplatedLetterImageTemplate
 
 redirects = Blueprint("redirects", __name__)
 main.register_blueprint(redirects)
@@ -101,42 +100,6 @@ def email_template():
                 brand_alt_text=branding.alt_text,
             )
         )
-    )
-
-    resp.headers["X-Frame-Options"] = "SAMEORIGIN"
-    return resp
-
-
-@main.route("/_letter")
-def letter_template():
-    branding_style = request.args.get("branding_style")
-    subject = request.args.get("title", default="Preview of letter branding")
-    filename = request.args.get("filename")
-
-    if branding_style == FieldWithNoneOption.NONE_OPTION_VALUE:
-        branding_style = None
-    if filename == FieldWithNoneOption.NONE_OPTION_VALUE:
-        filename = None
-
-    if branding_style:
-        if filename:
-            abort(400, "Cannot provide both branding_style and filename")
-        filename = letter_branding_client.get_letter_branding(branding_style)["filename"]
-    elif not filename:
-        filename = "no-branding"
-    template = {"subject": subject, "content": "", "template_type": "letter"}
-    image_url = url_for("no_cookie.letter_branding_preview_image", filename=filename)
-
-    template_image = str(
-        TemplatedLetterImageTemplate(
-            template,
-            image_url=image_url,
-            page_counts={"count": 1, "welsh_page_count": 0, "attachment_page_count": 0},
-        )
-    )
-
-    resp = make_response(
-        render_template("views/service-settings/letter-preview.html", template=template_image, subject=subject)
     )
 
     resp.headers["X-Frame-Options"] = "SAMEORIGIN"

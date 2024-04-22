@@ -29,6 +29,7 @@ from app import (
     current_service,
     format_delta,
     letter_attachment_client,
+    letter_branding_client,
     nl2br,
     service_api_client,
     template_folder_api_client,
@@ -40,6 +41,7 @@ from app.main import main, no_cookie
 from app.main.forms import (
     CopyTemplateForm,
     EmailTemplateForm,
+    FieldWithNoneOption,
     LetterTemplateForm,
     LetterTemplateLanguagesForm,
     LetterTemplatePostageForm,
@@ -269,8 +271,21 @@ def view_letter_template_preview(service_id, template_id, filetype):
     )
 
 
+@no_cookie.route("/templates/letter-preview-image")
 @no_cookie.route("/templates/letter-preview-image/<filename>")
-def letter_branding_preview_image(filename):
+def letter_branding_preview_image(filename=None):
+    branding_style = request.args.get("branding_style")
+
+    if branding_style == FieldWithNoneOption.NONE_OPTION_VALUE:
+        branding_style = None
+    if filename == FieldWithNoneOption.NONE_OPTION_VALUE:
+        filename = None
+
+    if branding_style:
+        if filename:
+            abort(400, "Cannot provide both branding_style and filename")
+        filename = letter_branding_client.get_letter_branding(branding_style)["filename"]
+
     template = {
         "subject": "An example letter",
         "content": (
@@ -292,12 +307,11 @@ def letter_branding_preview_image(filename):
         "template_type": "letter",
         "is_precompiled_letter": False,
     }
-    branding_filename = None if filename == "no-branding" else filename
 
     return TemplatePreview.get_preview_for_templated_letter(
         template,
         filetype="png",
-        branding_filename=branding_filename,
+        branding_filename=filename,
     )
 
 
