@@ -92,6 +92,18 @@ def test_service_set_permission_requires_platform_admin(
             "False",
             ["letter"],
         ),
+        (
+            [],
+            "sms_to_uk_landlines",
+            "True",
+            ["sms_to_uk_landlines"],
+        ),
+        (
+            ["sms_to_uk_landlines"],
+            "sms_to_uk_landlines",
+            "False",
+            [],
+        ),
     ],
 )
 def test_service_set_permission(
