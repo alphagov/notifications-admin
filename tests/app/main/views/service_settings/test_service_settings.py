@@ -1089,6 +1089,64 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
 
 
 @pytest.mark.parametrize(
+    "has_active_go_live_request, expected_button",
+    (
+        (True, False),
+        (False, True),
+    ),
+)
+def test_should_not_show_go_live_button_if_service_already_has_go_live_request(
+    client_request,
+    mocker,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    mock_get_service_organisation,
+    mock_get_invites_for_service,
+    single_sms_sender,
+    has_active_go_live_request,
+    expected_button,
+):
+    mocker.patch(
+        "app.models.service.Service.has_active_go_live_request",
+        new_callable=PropertyMock,
+        return_value=has_active_go_live_request,
+        create=True,
+    )
+    mocker.patch(
+        "app.models.service.Service.go_live_checklist_completed",
+        new_callable=PropertyMock,
+        return_value=True,
+    )
+    mocker.patch(
+        "app.models.organisation.Organisation.agreement_signed",
+        new_callable=PropertyMock,
+        return_value=True,
+        create=True,
+    )
+
+    for channel in ("email", "sms", "letter"):
+        mocker.patch(
+            f"app.models.service.Service.volume_{channel}",
+            create=True,
+            new_callable=PropertyMock,
+            return_value=0,
+        )
+
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+    assert page.select_one("h1").text == "Before you request to go live"
+
+    if expected_button:
+        assert page.select_one("form button").text.strip() == "Request to go live"
+    else:
+        assert not page.select("form")
+        assert not page.select("form button")
+        assert len(page.select("main p")) == 1
+        assert normalize_spaces(page.select_one("main p").text) == (
+            "Your team has already sent a request to go live for this service."
+        )
+
+
+@pytest.mark.parametrize(
     "go_live_at, message",
     [
         (None, "‘service one’ is already live."),
@@ -5607,6 +5665,7 @@ def test_update_service_organisation(
         _data={"organisations": "7aa5d4e9-4385-4488-a489-07812ba13384"},
     )
     mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
+    mock_update_service.assert_called_once_with(service_one["id"], has_active_go_live_request=False)
 
 
 def test_update_service_organisation_sets_daily_sms_limit_to_zero_for_trial_mode_gp(
@@ -5626,7 +5685,10 @@ def test_update_service_organisation_sets_daily_sms_limit_to_zero_for_trial_mode
         _data={"organisations": "7aa5d4e9-4385-4488-a489-07812ba13384"},
     )
     mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
-    mock_update_service.assert_called_once_with(service_one["id"], sms_message_limit=0)
+    assert mock_update_service.call_args_list == [
+        call(service_one["id"], sms_message_limit=0),
+        call(service_one["id"], has_active_go_live_request=False),
+    ]
 
 
 def test_update_service_organisation_doesnt_change_daily_sms_limit_for_live_gp(
@@ -5646,7 +5708,7 @@ def test_update_service_organisation_doesnt_change_daily_sms_limit_for_live_gp(
         _data={"organisations": "7aa5d4e9-4385-4488-a489-07812ba13384"},
     )
     mock_update_service_organisation.assert_called_once_with(service_one["id"], "7aa5d4e9-4385-4488-a489-07812ba13384")
-    assert mock_update_service.called is False
+    mock_update_service.assert_called_once_with(service_one["id"], has_active_go_live_request=False)
 
 
 def test_update_service_organisation_does_not_update_if_same_value(

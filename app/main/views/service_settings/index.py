@@ -1205,6 +1205,7 @@ def link_service_to_organisation(service_id):
             if current_service.trial_mode and organisation.organisation_type == Organisation.TYPE_NHS_GP:
                 current_service.update(sms_message_limit=0)
 
+            current_service.update(has_active_go_live_request=False)
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
