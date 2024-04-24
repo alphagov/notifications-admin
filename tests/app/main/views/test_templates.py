@@ -1701,7 +1701,7 @@ def test_should_be_able_to_view_a_letter_template_with_links(
                 service_id=SERVICE_ONE_ID,
                 template_id=fake_uuid,
             ),
-            "Change sender address",
+            "Change your contact details",
         ),
         (
             url_for(
