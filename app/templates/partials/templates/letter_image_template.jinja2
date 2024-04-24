@@ -20,7 +20,7 @@
     {% if current_service.count_letter_contact_details %}
       <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Change sender address</a>
     {% else %}
-      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Add a sender address</a>
+      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Add your contact details</a>
     {% endif %}
   {% endif %}
 {% endif %}
