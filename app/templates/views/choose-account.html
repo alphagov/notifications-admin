@@ -43,10 +43,15 @@
   <div class="keyline-block"></div>
 {% endmacro %}
 
-{% set thing_to_choose_between = 'organisation'
-  if current_user.organisations and not current_user.services
-  else 'service'
-%}
+
+{% if current_user.organisations and current_user.services %}
+  {% set thing_to_choose_between = 'organisation or service' %}
+{% elif current_user.organisations %}
+  {% set thing_to_choose_between = 'organisation' %}
+{% else %}
+  {% set thing_to_choose_between = 'service' %}
+{% endif %}
+
 {% block per_page_title %}
   Choose {{ thing_to_choose_between }}
 {% endblock %}

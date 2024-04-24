@@ -82,7 +82,7 @@ def test_choose_account_should_show_choose_accounts_page(
     resp = client_request.get("main.choose_account")
     page = resp.select_one("main#main-content")
 
-    assert normalize_spaces(page.select_one("h1").text) == "Choose service"
+    assert normalize_spaces(page.select_one("h1").text) == "Choose organisation or service"
     org_list_items = page.select("nav ul")[0].select("li")
     service_list_items = page.select("nav ul")[1].select("li")
     trial_services_list_items = page.select("nav ul")[2].select("li")
@@ -274,7 +274,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 "Live services",
                 "Trial mode services",
             ],
-            "Choose service",
+            "Choose organisation or service",
             False,
         ),
         # no headings as only one thing to show
@@ -417,7 +417,7 @@ def test_choose_account_should_not_show_back_to_service_link_if_service_archived
         session["service_id"] = service_one["id"]
     page = client_request.get("main.choose_account")
 
-    assert normalize_spaces(page.select_one("h1").text) == "Choose service"
+    assert normalize_spaces(page.select_one("h1").text) == "Choose organisation or service"
     assert page.select_one(".navigation-service a") is None
 
 
