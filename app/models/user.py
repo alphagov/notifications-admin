@@ -373,10 +373,6 @@ class User(BaseUser, UserMixin):
         return None
 
     @property
-    def has_access_to_live_and_trial_mode_services(self):
-        return (self.organisations or self.live_services) and (self.trial_mode_services)
-
-    @property
     def has_nhs_email_address(self):
         return self.email_address.lower().endswith(
             (
