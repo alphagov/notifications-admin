@@ -17,6 +17,7 @@ class Config:
 
     # Logging
     DEBUG = False
+    NOTIFY_REQUEST_LOG_LEVEL = os.getenv("NOTIFY_REQUEST_LOG_LEVEL", "INFO")
 
     ADMIN_CLIENT_USER_NAME = "notify-admin"
 
