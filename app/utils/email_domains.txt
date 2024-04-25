@@ -8,3 +8,6 @@ ac.uk
 sch.uk
 suttonmail.org
 hscni.net
+llyw.cymru
+nhs.wales
+judiciary.uk
