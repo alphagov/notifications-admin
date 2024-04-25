@@ -35,13 +35,13 @@ click==8.1.3
     # via flask
 cryptography==39.0.1
     # via fido2
-dnspython==2.4.2
+dnspython==2.6.1
     # via eventlet
 docopt==0.6.2
     # via notifications-python-client
 et-xmlfile==1.1.0
     # via openpyxl
-eventlet==0.34.2
+eventlet==0.35.2
     # via gunicorn
 fido2==1.1.0
     # via -r requirements.in
@@ -74,7 +74,7 @@ gunicorn[eventlet]==21.2.0
     #   notifications-utils
 humanize==4.4.0
     # via -r requirements.in
-idna==3.3
+idna==3.7
     # via requests
 itsdangerous==2.1.2
     # via
@@ -175,9 +175,7 @@ segno==1.5.2
 sentry-sdk[flask]==1.32.0
     # via -r requirements.in
 six==1.16.0
-    # via
-    #   eventlet
-    #   python-dateutil
+    # via python-dateutil
 smartypants==2.0.1
     # via notifications-utils
 statsd==3.3.0
