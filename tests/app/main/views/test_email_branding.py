@@ -772,7 +772,7 @@ def test_logo_persisted_when_organisation_saved(
     client_request.login(platform_admin_user)
     client_request.post(
         "main.platform_admin_create_email_branding",
-        logo="test.png",
+        logo_key="test.png",
         _content_type="multipart/form-data",
     )
 
