@@ -106,7 +106,6 @@ def test_letter_branding_options_page_when_branding_is_set_already(
     assert page.select_one("main img")["src"] == url_for(
         "no_cookie.letter_branding_preview_image",
         branding_style=fake_uuid,
-        filename="",
     )
     assert page.select_one("main img")["alt"] == "Preview of current letter branding"
 
@@ -713,7 +712,6 @@ def test_letter_branding_option_preview_page_displays_preview_of_chosen_branding
     assert page.select_one("main img")["src"] == url_for(
         "no_cookie.letter_branding_preview_image",
         branding_style="1234",
-        filename="",
     )
     assert page.select_one("main img")["alt"] == "Preview of new letter branding"
 
@@ -790,7 +788,6 @@ def test_letter_branding_nhs_page_displays_preview(
     assert page.select_one("main img")["src"] == url_for(
         "no_cookie.letter_branding_preview_image",
         branding_style=LetterBranding.NHS_ID,
-        filename="",
     )
     assert page.select_one("main img")["alt"] == "Preview of new letter branding"
     assert x.called
