@@ -12,8 +12,8 @@
   {{ content_metadata(
     data={
       "Published": "23 September 2020",
-      "Last updated": "14 February 2024",
-      "Next review due": "15 April 2024"
+      "Last updated": "30 April 2024",
+      "Next review due": "25 June 2024"
     }
     ) }}
     {# Last non-functional changes: 21 Feb 2024 #}
@@ -50,14 +50,8 @@
     <li>some validation errors may be confusing for screen reader users</li>
     <li>if a team adds template folders, screen readers may announce the page heading in a confusing way</li>
     <li>screen reader users may find it hard to expand or collapse groups of checkboxes</li>
-    <li>the example content shown in some iframes may be confusing</li>
-    <li>some of the content shown in iframes appears cropped when viewed on a small screen</li>
-    <li>when you choose an existing branding, 2 consecutive pages have the same title and h1</li>
     <li>the ‘skip’ link makes some branding pages load with the main content area focused, which is confusing, especially for screen reader users</li>
     <li>when you go back to the first page of the branding journey, any options you’ve chosen are lost</li>
-    <li>when you try to send an email, the page loads with the focus on the text input field</li>
-    <li>when you upload contact details and then tab through the page you can focus on the table when it does not scroll, which is confusing for some users</li>
-    <li>screen readers do not announce the column or row headings for a table of contact details</li>
     <li>one page links to a PDF document that is not fully accessible</li>
     <li>the Notify status page has several accessibility issues</li>
   </ul>
@@ -110,16 +104,9 @@
     The following content on the Notify website is not compliant with the WCAG version 2.1 AA standard:
   </p>
 
-  <ol class="govuk-list govuk-list--number">
-    <li>Duplicate titles and h1 headings between pages breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/page-titled.html">success criterion 2.4.2: Page Titled</a>.</li>
-    <li>Problems with the skip link breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html">success criterion 2.4.3: Focus Order</a>.</li>
-    <li>The email address field being focused on page load breaks success criterion 2.4.3: Focus Order.</li>
-    <li>The table showing example CSV data being focusable breaks success criterion 2.4.3: Focus Order.</li>
-    <li>The table showing example CSV data not having its column and row headings announced breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html">success criterion 1.3.1: Info and Relationships</a>.</li>
-    <li>The lack of a title on iframes showing a preview of a branding breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html">success criterion 4.1.2: Name, Role, Value</a>.</li>
-    <li>Iframes showing a preview of a branding being wrapped in a fixed-width container breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/reflow.html">success criterion 1.4.10: Reflow</a>.</li>
-    <li>The content of the iframe showing a preview of an email branding has a link with text that breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/link-purpose-link-only.html">success criterion 2.4.9: Link Purpose - Link Only</a> and success criterion 2.4.3: Focus Order.</li>
-   </ol>
+  <p class="govuk-body">
+    Problems with the skip link breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html">success criterion 2.4.3: Focus Order</a>.</li>
+  </p>
 
   <p class="govuk-body">
     The content listed below is non-accessible for the following reasons.
@@ -138,25 +125,10 @@
       Expanding and collapsing groups of checkboxes using a screen reader can be confusing.
     </li>
     <li>
-      There are several problems with our branding preview iframes. They do not have a title attribute and include content that may be confusing for screen reader users. They also have a fixed width, which means they appear cropped on devices with small screens.
-    </li>
-    <li>
-      If you select an existing branding from the list of options, 2 consecutive pages will have the same title and h1. This is especially confusing for screen reader users.
-    </li>
-    <li>
       The ‘skip’ link forces screen readers to jump to the main content area on every branding page. This may be confusing for screen reader users.
     </li>
     <li>
       If you use the ‘back’ link to return to the first page of the branding journey, any options you’ve chosen will be lost.
-    </li>
-    <li>
-      When you select ‘Get ready to send’, the next page loads with the focus on the text input field. This may be confusing for screen reader users.
-    </li>
-    <li>
-      When you upload contact details and then tab through the page, the focus jumps to the table. This may be confusing for screen reader users.
-    </li>
-    <li>
-      Screen readers do not announce the column headings for a table of contact details.
     </li>
   </ol>
 
