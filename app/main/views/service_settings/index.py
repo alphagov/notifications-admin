@@ -1046,7 +1046,10 @@ def set_per_minute_rate_limit(service_id):
     return render_template("views/service-settings/set-rate-limit.html", form=form, error_summary_enabled=True)
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-<notification_type>-branding", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/set-<template_type:notification_type>-branding",
+    methods=["GET", "POST"],
+)
 @user_is_platform_admin
 def service_set_branding(service_id, notification_type):
     notification_type = notification_type.lower()
@@ -1088,13 +1091,12 @@ def service_set_branding(service_id, notification_type):
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/set-<notification_type>-branding/add-to-branding-pool-step",
+    "/services/<uuid:service_id>/service-settings/set-<template_type:notification_type>-branding/add-to-branding-pool-step",
     methods=["GET", "POST"],
 )
 @user_is_platform_admin
 def service_set_branding_add_to_branding_pool_step(service_id, notification_type):
     branding_id = request.args.get("branding_id")
-    notification_type = notification_type.lower()
     branding_type = f"{notification_type}_branding"
 
     if notification_type == "email":
@@ -1140,12 +1142,12 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/preview-<notification_type>-branding", methods=["GET", "POST"]
+    "/services/<uuid:service_id>/service-settings/preview-<template_type:notification_type>-branding",
+    methods=["GET", "POST"],
 )
 @user_is_platform_admin
 def service_preview_branding(service_id, notification_type):
     branding_style = request.args.get("branding_style")
-    notification_type = notification_type.lower()
     branding_type = f"{notification_type}_branding"
 
     if notification_type == "email":

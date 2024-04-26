@@ -334,8 +334,10 @@ def test_routes_have_permissions_decorators():
             ).format(file, function)
 
 
-def test_routes_require_uuids(client_request):
+def test_routes_require_types(client_request):
     for rule in current_app.url_map.iter_rules():
         for param in re.findall("<([^>]*)>", rule.rule):
             if "_id" in param and not param.startswith("uuid:"):
                 pytest.fail(("Should be <uuid:{}> in {}").format(param, rule.rule))
+            if ("template_type" in param or "notification_type" in param) and not param.startswith("template_type:"):
+                pytest.fail(("Should be <template_type:{}> in {}").format(param, rule.rule))
