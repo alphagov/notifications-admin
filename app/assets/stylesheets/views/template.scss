@@ -5,7 +5,7 @@
 // - the height, calculated from the width, which is made of:
 //   - the width of the image, in container query width units: 100cqw
 //   - the height of the image as a fraction of the width: (1008 / 712)
-@mixin scalable_top($top) {
+@mixin scalable-top($top) {
   $max_height_of_image: 1008;
   $max_width_of_image: 712;
 
@@ -35,13 +35,13 @@
 .edit-template-link-letter-contact {
   @extend %edit-template-link;
 
+  @include scalable-top(285);
   // position underneath contact block
   left: 61.3%;
-  @include scalable_top(285);
 
   &:active {
+    @include scalable-top(285);
     margin-top: -2px;
-    @include scalable_top(285);
   }
 }
 
@@ -59,34 +59,34 @@
 
 .edit-template-link-letter-body {
   @extend %edit-template-link;
-  @include scalable_top(393);
+  @include scalable-top(393);
   left: -20px;
 
   &:active {
+    @include scalable-top(393);
     margin-top: -2px;
-    @include scalable_top(393);
   }
 }
 
 .edit-template-link-letter-postage {
   @extend %edit-template-link;
-  @include scalable_top(51);
+  @include scalable-top(51);
   left: 61.3%; // Aligns left edge to ‘Change sender address’ button
 
   &:active {
+    @include scalable-top(51);
     margin-top: -2px;
-    @include scalable_top(51);
   }
 }
 
 .edit-template-link-letter-branding {
   @extend %edit-template-link;
-  @include scalable_top(51);
+  @include scalable-top(51);
   left: 51px; // Aligns to left of logo area
 
   &:active {
+    @include scalable-top(51);
     margin-top: -2px;
-    @include scalable_top(51);
   }
 }
 
@@ -96,12 +96,12 @@
 
 .edit-template-link-get-ready-to-send {
   @extend %edit-template-link;
-  @include scalable_top(234);
+  @include scalable-top(234);
   left: 51px; // Aligns to left of logo area
 
   &:active {
+    @include scalable-top(234);
     margin-top: -2px;
-    @include scalable_top(234);
   }
 }
 
