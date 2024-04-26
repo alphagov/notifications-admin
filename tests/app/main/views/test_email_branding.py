@@ -174,7 +174,6 @@ def test_edit_email_branding_shows_the_correct_branding_info(
     page = client_request.get(
         ".platform_admin_update_email_branding",
         branding_id=fake_uuid,
-        _test_page_title=False,  # TODO: Fix page titles
     )
 
     assert page.select_one("#logo-img > img")["src"].endswith("/example.png")
@@ -188,7 +187,6 @@ def test_create_email_branding_does_not_show_any_branding_info(client_request, p
     client_request.login(platform_admin_user)
     page = client_request.get(
         "main.platform_admin_create_email_branding",
-        _test_page_title=False,  # TODO: Fix page titles
     )
 
     assert page.select_one("#logo-img > img") is None
