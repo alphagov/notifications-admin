@@ -146,6 +146,29 @@ class IsNotAGenericSenderID:
             raise ValidationError(self.message)
 
 
+class IsNotAPotentiallyMaliciousSenderID:
+    potentially_malicious_sender_ids = [
+        "amazon",
+        "evri",
+        "lloydsbank",
+        "coinbase",
+        "fromnab",
+        "nab",
+        "hsbc",
+        "natwest",
+        "tsb",
+        "barclays",
+        "nationwide",
+    ]
+
+    def __call__(self, form, field):
+        if field.data and field.data.lower() in self.potentially_malicious_sender_ids:
+            current_app.logger.warning("User tried to set sender id to potentially malicious one: %s", field.data)
+            raise ValidationError(
+                f"Text message sender ID cannot be ‘{field.data}’ - this is to protect recipients " f"from phishing"
+            )
+
+
 class IsAUKMobileNumberOrShortCode:
     number_regex = re.compile(r"^[0-9\.]+$")
     mobile_regex = re.compile(r"^07[0-9]{9}$")
