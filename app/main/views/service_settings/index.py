@@ -1047,7 +1047,7 @@ def set_per_minute_rate_limit(service_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/set-<template_type:notification_type>-branding",
+    "/services/<uuid:service_id>/service-settings/set-<branding_type:notification_type>-branding",
     methods=["GET", "POST"],
 )
 @user_is_platform_admin
@@ -1065,9 +1065,6 @@ def service_set_branding(service_id, notification_type):
             all_branding_options=AllLetterBranding().as_id_and_name,
             current_branding=current_service.letter_branding_id,
         )
-
-    else:
-        abort(404)
 
     if form.validate_on_submit():
         # As of 2022-12-02 we only get to this point (eg a POST on this endpoint) if JavaScript fails for the user on
@@ -1091,7 +1088,7 @@ def service_set_branding(service_id, notification_type):
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/set-<template_type:notification_type>-branding/add-to-branding-pool-step",
+    "/services/<uuid:service_id>/service-settings/set-<branding_type:notification_type>-branding/add-to-branding-pool-step",
     methods=["GET", "POST"],
 )
 @user_is_platform_admin
@@ -1106,9 +1103,6 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
     elif notification_type == "letter":
         branding = LetterBranding.from_id(branding_id)
         add_brandings_to_pool = organisations_client.add_brandings_to_letter_branding_pool
-
-    else:
-        abort(404)
 
     branding_name = branding.name
     org_id = current_service.organisation.id
@@ -1142,7 +1136,7 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/preview-<template_type:notification_type>-branding",
+    "/services/<uuid:service_id>/service-settings/preview-<branding_type:notification_type>-branding",
     methods=["GET", "POST"],
 )
 @user_is_platform_admin
@@ -1155,9 +1149,6 @@ def service_preview_branding(service_id, notification_type):
 
     elif notification_type == "letter":
         service_branding_pool = current_service.letter_branding_pool
-
-    else:
-        abort(404)
 
     form = AdminPreviewBrandingForm(branding_style=branding_style)
 

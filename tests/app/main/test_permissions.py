@@ -339,5 +339,9 @@ def test_routes_require_types(client_request):
         for param in re.findall("<([^>]*)>", rule.rule):
             if "_id" in param and not param.startswith("uuid:"):
                 pytest.fail(("Should be <uuid:{}> in {}").format(param, rule.rule))
-            if ("template_type" in param or "notification_type" in param) and not param.startswith("template_type:"):
-                pytest.fail(("Should be <template_type:{}> in {}").format(param, rule.rule))
+            if ("template_type" in param or "notification_type" in param) and not (
+                param.startswith("template_type:") or param.startswith("branding_type:")
+            ):
+                pytest.fail(
+                    ("Should be <template_type:{}> or <branding_type:{}> in {}").format(param, param, rule.rule)
+                )

@@ -12,6 +12,10 @@ class TemplateTypeConverter(BaseConverter):
     regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)})"
 
 
+class BrandingTypeConverter(BaseConverter):
+    regex = "(?:email|letter)"
+
+
 class TicketTypeConverter(BaseConverter):
     regex = f"(?:{PROBLEM_TICKET_TYPE}|{QUESTION_TICKET_TYPE}|{GENERAL_TICKET_TYPE})"
 
