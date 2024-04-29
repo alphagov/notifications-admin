@@ -343,6 +343,8 @@ def test_routes_require_types(client_request):
     }
     for rule in current_app.url_map.iter_rules():
         for param in re.findall("<([^>]*)>", rule.rule):
+            if ":" not in param:
+                pytest.fail(f"Should be <type:{param}> in {rule.rule}, where type is string, template_type, uuid, etc")
             for partial_param, required_type in partial_param_name_to_type.items():
                 if partial_param in param and not param.startswith(f"{required_type}:"):
                     pytest.fail(f"Should be <{required_type}:{param}> in {rule.rule}")

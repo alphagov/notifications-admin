@@ -31,12 +31,12 @@ def two_factor_email_sent():
     return render_template("views/two-factor-email.html", title=title, redirect_url=request.args.get("next"))
 
 
-@main.route("/email-auth/<token>", methods=["GET"])
+@main.route("/email-auth/<string:token>", methods=["GET"])
 def two_factor_email_interstitial(token):
     return render_template("views/email-link-interstitial.html")
 
 
-@main.route("/email-auth/<token>", methods=["POST"])
+@main.route("/email-auth/<string:token>", methods=["POST"])
 def two_factor_email(token):
     redirect_url = request.args.get("next")
     if current_user.is_authenticated:

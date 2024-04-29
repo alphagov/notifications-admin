@@ -121,6 +121,7 @@ from app.notify_client.user_api_client import user_api_client
 from app.notify_session import NotifyAdminSessionInterface
 from app.s3_client.logo_client import logo_client
 from app.url_converters import (
+    AgreementTypeConverter,
     BrandingTypeConverter,
     LetterFileExtensionConverter,
     SimpleDateTypeConverter,
@@ -276,6 +277,7 @@ def init_app(application):
         }
 
     application.url_map.converters["uuid"].to_python = lambda self, value: value.lower()
+    application.url_map.converters["agreement_type"] = AgreementTypeConverter
     application.url_map.converters["template_type"] = TemplateTypeConverter
     application.url_map.converters["branding_type"] = BrandingTypeConverter
     application.url_map.converters["ticket_type"] = TicketTypeConverter

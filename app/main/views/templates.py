@@ -258,12 +258,9 @@ def get_template_nav_items(template_folder_id):
     ]
 
 
-@no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>.<filetype>")
+@no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>.<letter_file_extension:filetype>")
 @user_has_permissions(allow_org_user=True)
 def view_letter_template_preview(service_id, template_id, filetype):
-    if filetype not in ("pdf", "png"):
-        abort(404)
-
     template = current_service.get_template(template_id)
 
     return TemplatePreview.get_preview_for_templated_letter(
@@ -272,7 +269,7 @@ def view_letter_template_preview(service_id, template_id, filetype):
 
 
 @no_cookie.route("/templates/letter-preview-image")
-@no_cookie.route("/templates/letter-preview-image/<filename>")
+@no_cookie.route("/templates/letter-preview-image/<string:filename>")
 def letter_branding_preview_image(filename=None):
     branding_style = request.args.get("branding_style")
 
@@ -338,7 +335,9 @@ def view_template_version(service_id, template_id, version):
     )
 
 
-@no_cookie.route("/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<filetype>")
+@no_cookie.route(
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/version/<int:version>.<letter_file_extension:filetype>"
+)
 @user_has_permissions(allow_org_user=True)
 def view_letter_template_version_preview(service_id, template_id, version, filetype):
     template = current_service.get_template(template_id, version=version)
@@ -506,11 +505,11 @@ def _get_template_copy_name(template, existing_templates):
     return f"{template['name']} (copy)"
 
 
-@main.route(("/services/<uuid:service_id>/templates/action-blocked/" "<template_type:notification_type>/<return_to>"))
+@main.route("/services/<uuid:service_id>/templates/action-blocked/<template_type:notification_type>/<string:return_to>")
 @main.route(
     (
         "/services/<uuid:service_id>/templates/action-blocked/"
-        "<template_type:notification_type>/<return_to>/<uuid:template_id>"
+        "<template_type:notification_type>/<string:return_to>/<uuid:template_id>"
     )
 )
 @user_has_permissions("manage_templates")
@@ -706,7 +705,7 @@ def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: Option
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit/<language>", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit/<string:language>", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def edit_service_template(service_id, template_id, language=None):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)

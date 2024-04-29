@@ -8,7 +8,7 @@ from app.models.service import Service
 from app.models.user import InvitedOrgUser, InvitedUser, OrganisationUsers, User, Users
 
 
-@main.route("/invitation/<token>")
+@main.route("/invitation/<string:token>")
 def accept_invite(token):  # noqa: C901
     invited_user = InvitedUser.from_token(token)
 
@@ -71,7 +71,7 @@ def accept_invite(token):  # noqa: C901
         return redirect(url_for("main.register_from_invite"))
 
 
-@main.route("/organisation-invitation/<token>")
+@main.route("/organisation-invitation/<string:token>")
 def accept_org_invite(token):
     invited_org_user = InvitedOrgUser.from_token(token)
 

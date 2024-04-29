@@ -302,7 +302,7 @@ def service_switch_count_as_live(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/permissions/<permission>", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/service-settings/permissions/<string:permission>", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_set_permission(service_id, permission):
     if permission not in PLATFORM_ADMIN_SERVICE_PERMISSIONS:
