@@ -223,9 +223,12 @@ def test_message_status_page_contains_link_to_support(client_request):
 
 def test_terms_page_has_correct_content(client_request):
     terms_page = client_request.get("main.terms_of_use")
-    assert normalize_spaces(terms_page.select("main p")[0].text) == (
-        "These terms apply to your service’s use of GOV.UK Notify. You must be the service manager to accept them."
-    )
+    assert normalize_spaces(terms_page.select("h1")[0].text) == ("Terms of use")
+
+
+def test_new_terms_page_has_correct_content(client_request):
+    terms_page = client_request.get("main.new_terms_of_use")
+    assert normalize_spaces(terms_page.select("h1")[0].text) == ("New terms of use - 2024")
 
 
 def test_css_is_served_from_correct_path(client_request):

@@ -57,6 +57,7 @@
     "/letter-branding/create",
     "/metrics",
     "/new-password/<path:token>",
+    "/new-terms-of-use",
     "/organisation-invitation/<token>",
     "/organisations",
     "/organisations/<uuid:org_id>",
