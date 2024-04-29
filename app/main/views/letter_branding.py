@@ -40,9 +40,8 @@ def platform_admin_view_letter_branding(branding_id):
 
 
 @main.route("/letter-branding/<uuid:branding_id>/edit", methods=["GET", "POST"])
-@main.route("/letter-branding/<uuid:branding_id>/edit/<path:logo>", methods=["GET", "POST"])
 @user_is_platform_admin
-def update_letter_branding(branding_id, logo=None):
+def update_letter_branding(branding_id):
     letter_branding = LetterBranding.from_id(branding_id)
 
     file_upload_form = AdminEditLetterBrandingSVGUploadForm()
@@ -53,13 +52,10 @@ def update_letter_branding(branding_id, logo=None):
     file_upload_form_submitted = file_upload_form.file.data
     details_form_submitted = request.form.get("operation") == "branding-details"
 
-    # TODO: remove the `logo`-based URL path
-    # `logo_key` here can either be a temporary logo key which has been uploaded but not reference in the DB yet,
-    # or a reference to the existing logo if nothing has been uploaded to overwrite
     logo_key = request.args.get(
-        "logo_key", logo or logo_client.get_logo_key(f"{letter_branding.filename}.svg", logo_type="letter")
+        "logo_key", logo_client.get_logo_key(f"{letter_branding.filename}.svg", logo_type="letter")
     )
-    logo_changed = ("logo_key" in request.args) or logo
+    logo_changed = "logo_key" in request.args
 
     if file_upload_form_submitted and file_upload_form.validate_on_submit():
         temporary_logo_key = logo_client.save_temporary_logo(
@@ -114,17 +110,15 @@ def update_letter_branding(branding_id, logo=None):
 
 
 @main.route("/letter-branding/create", methods=["GET", "POST"])
-@main.route("/letter-branding/create/<path:logo>", methods=["GET", "POST"])
 @user_is_platform_admin
-def create_letter_branding(logo=None):
+def create_letter_branding():
     file_upload_form = AdminEditLetterBrandingSVGUploadForm()
     letter_branding_details_form = AdminEditLetterBrandingForm()
 
     file_upload_form_submitted = file_upload_form.file.data
     details_form_submitted = request.form.get("operation") == "branding-details"
 
-    # TODO: remove the `logo`-based URL path
-    temporary_logo_key = request.args.get("logo_key", logo)
+    temporary_logo_key = request.args.get("logo_key")
 
     if file_upload_form_submitted and file_upload_form.validate_on_submit():
         temporary_logo_key = logo_client.save_temporary_logo(

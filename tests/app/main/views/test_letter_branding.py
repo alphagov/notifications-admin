@@ -294,7 +294,7 @@ def test_update_letter_branding_shows_form_errors_on_name_fields(
     page = client_request.post(
         ".update_letter_branding",
         branding_id=fake_uuid,
-        logo=logo_client.get_logo_key("hm-government.svg", logo_type="letter"),
+        logo_key=logo_client.get_logo_key("hm-government.svg", logo_type="letter"),
         _data={"name": "", "operation": "branding-details"},
         _follow_redirects=True,
     )
@@ -353,7 +353,7 @@ def test_update_letter_branding_with_new_file_and_new_details(
     client_request.post(
         ".update_letter_branding",
         branding_id=branding_id,
-        logo="temporary-logo.svg",
+        logo_key="temporary-logo.svg",
         _data={"name": "Updated name", "operation": "branding-details"},
         _follow_redirects=False,
         _expected_redirect=url_for(".platform_admin_view_letter_branding", branding_id=branding_id),
@@ -395,7 +395,7 @@ def test_update_letter_branding_does_not_save_to_db_if_uploading_fails(
     page = client_request.post(
         ".update_letter_branding",
         branding_id=fake_uuid,
-        logo=logo_path,
+        logo_key=logo_path,
         _data={"name": "Updated name", "operation": "branding-details"},
         _expected_status=200,
     )
@@ -551,7 +551,7 @@ def test_create_new_letter_branding_shows_preview_of_logo(client_request, platfo
     client_request.login(platform_admin_user)
     page = client_request.get(
         ".create_letter_branding",
-        logo=temp_logo,
+        logo_key=temp_logo,
     )
 
     assert page.select_one("h1").text == "Add letter branding"
@@ -587,7 +587,7 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     client_request.login(platform_admin_user)
     client_request.post(
         ".create_letter_branding",
-        logo="temporary.svg",
+        logo_key="temporary.svg",
         _data={"name": "Test brand", "operation": "branding-details"},
         _follow_redirects=False,
         _expected_redirect=url_for(".platform_admin_view_letter_branding", branding_id=fake_uuid),
@@ -625,7 +625,6 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
     mocker,
     client_request,
     platform_admin_user,
-    fake_uuid,
 ):
     mocker.patch(
         "app.main.views.letter_branding.letter_branding_client.create_letter_branding",
@@ -639,7 +638,7 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".create_letter_branding",
-        logo="logo.svg",
+        logo_key="logo.svg",
         _data={"name": "my brand", "operation": "branding-details"},
         _expected_status=200,
     )
