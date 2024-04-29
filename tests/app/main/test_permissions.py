@@ -340,6 +340,7 @@ def test_routes_require_types(client_request):
         "_id": ("uuid:",),
         "template_type": ("template_type:", "branding_type:"),
         "notification_type": ("template_type:", "branding_type:"),
+        "branding_type": ("branding_type:",),
     }
     for rule in current_app.url_map.iter_rules():
         for param in re.findall("<([^>]*)>", rule.rule):
