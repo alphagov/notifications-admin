@@ -4,7 +4,6 @@ import re
 
 import pytest
 from flask import current_app
-from notifications_utils.formatters import formatted_list
 
 from tests import sample_uuid, service_json
 from tests.conftest import (
@@ -336,20 +335,14 @@ def test_routes_have_permissions_decorators():
 
 
 def test_routes_require_types(client_request):
-    partial_param_name_to_types = {
-        "_id": ("uuid:",),
-        "template_type": ("template_type:", "branding_type:"),
-        "notification_type": ("template_type:", "branding_type:"),
-        "branding_type": ("branding_type:",),
+    partial_param_name_to_type = {
+        "_id": "uuid",
+        "template_type": "template_type",
+        "notification_type": "template_type",
+        "branding_type": "branding_type",
     }
     for rule in current_app.url_map.iter_rules():
         for param in re.findall("<([^>]*)>", rule.rule):
-            for partial_param, required_types in partial_param_name_to_types.items():
-                if partial_param in param and not param.startswith(required_types):
-                    valid_params = formatted_list(
-                        required_types,
-                        conjunction="or",
-                        before_each="<",
-                        after_each=f"{param}>",
-                    )
-                    pytest.fail(f"Should be {valid_params} in {rule.rule}")
+            for partial_param, required_type in partial_param_name_to_type.items():
+                if partial_param in param and not param.startswith(f"{required_type}:"):
+                    pytest.fail(f"Should be <{required_type}:{param}> in {rule.rule}")
