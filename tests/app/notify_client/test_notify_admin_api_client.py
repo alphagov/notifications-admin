@@ -2,22 +2,19 @@ from datetime import date
 
 from app.notify_client import NotifyAdminAPIClient
 from app.notify_client.notification_api_client import notification_api_client
-from tests.conftest import set_config
 
 
 def test_generate_headers_sets_standard_headers(notify_admin):
     api_client = NotifyAdminAPIClient()
-    with set_config(notify_admin, "ROUTE_SECRET_KEY_1", "proxy-secret"):
-        api_client.init_app(notify_admin)
+    api_client.init_app(notify_admin)
 
     # with patch('app.notify_client.has_request_context', return_value=False):
     headers = api_client.generate_headers("api_token")
 
-    assert set(headers.keys()) == {"Authorization", "Content-type", "User-agent", "X-Custom-Forwarder"}
+    assert set(headers.keys()) == {"Authorization", "Content-type", "User-agent"}
     assert headers["Authorization"] == "Bearer api_token"
     assert headers["Content-type"] == "application/json"
     assert headers["User-agent"].startswith("NOTIFY-API-PYTHON-CLIENT")
-    assert headers["X-Custom-Forwarder"] == "proxy-secret"
 
 
 def test_generate_headers_sets_request_id_if_in_request_context(notify_admin, mock_onwards_request_headers):
@@ -32,7 +29,6 @@ def test_generate_headers_sets_request_id_if_in_request_context(notify_admin, mo
         "Authorization",
         "Content-type",
         "User-agent",
-        "X-Custom-Forwarder",
         "some-onwards",
     }
     assert headers["some-onwards"] == "request-headers"

@@ -68,9 +68,6 @@ class Config:
     S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "local-transient-uploaded-letters"
     S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "local-precompiled-originals-backup-letters"
     S3_BUCKET_LETTER_ATTACHMENTS = "local-letter-attachments"
-    ROUTE_SECRET_KEY_1 = os.environ.get("ROUTE_SECRET_KEY_1", "")
-    ROUTE_SECRET_KEY_2 = os.environ.get("ROUTE_SECRET_KEY_2", "")
-    CHECK_PROXY_HEADER = False
     ANTIVIRUS_ENABLED = True
 
     REDIS_URL = os.environ.get("REDIS_URL")
@@ -160,7 +157,6 @@ class Preview(Config):
     S3_BUCKET_LETTER_ATTACHMENTS = "preview-letter-attachments"
     LOGO_CDN_DOMAIN = "static-logos.notify.works"
     NOTIFY_ENVIRONMENT = "preview"
-    CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = "static.notify.works"
     ASSET_PATH = "https://static.notify.works/"
 
@@ -180,7 +176,6 @@ class Staging(Config):
     S3_BUCKET_LETTER_ATTACHMENTS = "staging-letter-attachments"
     LOGO_CDN_DOMAIN = "static-logos.staging-notify.works"
     NOTIFY_ENVIRONMENT = "staging"
-    CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = "static.staging-notify.works"
     ASSET_PATH = "https://static.staging-notify.works/"
 
@@ -197,7 +192,6 @@ class Production(Config):
     S3_BUCKET_LETTER_ATTACHMENTS = "production-letter-attachments"
     LOGO_CDN_DOMAIN = "static-logos.notifications.service.gov.uk"
     NOTIFY_ENVIRONMENT = "production"
-    CHECK_PROXY_HEADER = False
     ASSET_DOMAIN = "static.notifications.service.gov.uk"
     ASSET_PATH = "https://static.notifications.service.gov.uk/"
 
