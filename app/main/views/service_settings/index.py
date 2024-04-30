@@ -1052,8 +1052,6 @@ def set_per_minute_rate_limit(service_id):
 )
 @user_is_platform_admin
 def service_set_branding(service_id, branding_type):
-    branding_type = branding_type.lower()
-
     if branding_type == "email":
         form = AdminSetEmailBrandingForm(
             all_branding_options=AllEmailBranding().as_id_and_name,
