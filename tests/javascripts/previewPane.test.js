@@ -179,7 +179,7 @@ describe('Preview pane', () => {
         // run preview pane script
         require('../../app/assets/javascripts/previewPane.js');
 
-        expect(document.querySelector('iframe')).not.toBeNull();
+        expect(document.querySelector('img')).not.toBeNull();
 
       });
 
@@ -199,7 +199,7 @@ describe('Preview pane', () => {
 
         const selectedValue = Array.from(radios.querySelectorAll('input[type=radio]')).filter(radio => radio.checked)[0].value;
 
-        expect(document.querySelector('iframe').getAttribute('src')).toEqual(`/_letter?branding_style=${selectedValue}`);
+        expect(document.querySelector('img').getAttribute('src')).toEqual(`/templates/letter-preview-image?branding_style=${selectedValue}`);
 
       });
 
@@ -225,7 +225,7 @@ describe('Preview pane', () => {
 
         helpers.moveSelectionToRadio(newSelection);
 
-        expect(document.querySelector('iframe').getAttribute('src')).toEqual(`/_letter?branding_style=${newSelection.value}`);
+        expect(document.querySelector('img').getAttribute('src')).toEqual(`/templates/letter-preview-image?branding_style=${newSelection.value}`);
 
       });
 
