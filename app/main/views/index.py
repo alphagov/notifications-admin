@@ -106,12 +106,12 @@ def email_template():
     return resp
 
 
-@main.route("/terms-of-use", endpoint="terms_of_use")
+@main.route("/terms-of-use")
 def terms_of_use():
     return render_template("views/terms-of-use.html")
 
 
-@main.route("/new-terms-of-use", endpoint="new_terms_of_use")
+@main.route("/new-terms-of-use")
 def new_terms_of_use():
     return render_template("views/new-terms-of-use.html")
 
