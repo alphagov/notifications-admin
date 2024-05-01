@@ -236,7 +236,6 @@ def init_app(application):
     application.before_request(load_user_id_before_request)
     application.before_request(load_service_before_request)
     application.before_request(load_organisation_before_request)
-    application.before_request(request_helper.check_proxy_header_before_request)
 
     application.session_interface = NotifyAdminSessionInterface()
 
