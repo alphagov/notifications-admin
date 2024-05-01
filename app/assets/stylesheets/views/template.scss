@@ -1,4 +1,22 @@
+// Function to make distance from the top scale when the image of the first page of the letter PDF does
+// We go by the image's largest dimensions, which are: 712px width and 1008px height
+// It has 2 parts:
+// - the fraction of the height of the image (1008) the distance from the top (285) represents: (285 / 1008)
+// - the height, calculated from the width, which is made of:
+//   - the width of the image, in container query width units: 100cqw
+//   - the height of the image as a fraction of the width: (1008 / 712)
+@mixin scalable-top($top) {
+  $max_height_of_image: 1008;
+  $max_width_of_image: 712;
+
+  top: $top * 1px; // for browsers that don't support container queries
+  top: calc((#{$top} / #{$max_height_of_image}) * (100cqw * (#{$max_height_of_image} / #{$max_width_of_image})));
+}
+
 .template-container {
+  container-name: template-container;
+  container-type: inline-size;
+
   position: relative;
 
   &--with-attach-pages-button {
@@ -17,13 +35,13 @@
 .edit-template-link-letter-contact {
   @extend %edit-template-link;
 
+  @include scalable-top(285);
   // position underneath contact block
   left: 61.3%;
-  top: 285px;
 
   &:active {
+    @include scalable-top(285);
     margin-top: -2px;
-    top: 285px;
   }
 }
 
@@ -41,32 +59,34 @@
 
 .edit-template-link-letter-body {
   @extend %edit-template-link;
-  top: 393px; // aligns to top of subject
+  @include scalable-top(393);
   left: -20px;
+
   &:active {
+    @include scalable-top(393);
     margin-top: -2px;
-    top: 393px;
   }
 }
 
 .edit-template-link-letter-postage {
   @extend %edit-template-link;
-  top: 51px; // aligns bottom edge to bottom of postmark
+  @include scalable-top(51);
   left: 61.3%; // Aligns left edge to ‘Change sender address’ button
 
   &:active {
+    @include scalable-top(51);
     margin-top: -2px;
-    top: 51px;
   }
 }
 
 .edit-template-link-letter-branding {
   @extend %edit-template-link;
-  top: 51px; // aligns with ‘change postage’ link
+  @include scalable-top(51);
   left: 51px; // Aligns to left of logo area
+
   &:active {
+    @include scalable-top(51);
     margin-top: -2px;
-    top: 51px;
   }
 }
 
@@ -76,11 +96,12 @@
 
 .edit-template-link-get-ready-to-send {
   @extend %edit-template-link;
-  top: 234px; // covers MDI barcode and aligns to bottom of contact block
+  @include scalable-top(234);
   left: 51px; // Aligns to left of logo area
+
   &:active {
+    @include scalable-top(234);
     margin-top: -2px;
-    top: 234px;
   }
 }
 
