@@ -69,13 +69,10 @@ def service_confirm_agreement(service_id):
     return render_template("views/agreement/agreement-confirm.html")
 
 
-@main.route("/agreement/<variant>", endpoint="public_agreement")
-@main.route("/agreement/<variant>.pdf", endpoint="public_download_agreement")
+@main.route("/agreement/<agreement_type:variant>", endpoint="public_agreement")
+@main.route("/agreement/<agreement_type:variant>.pdf", endpoint="public_download_agreement")
 @hide_from_search_engines
 def public_agreement(variant):
-    if variant not in {"crown", "non-crown"}:
-        abort(404)
-
     if request.endpoint == "main.public_download_agreement":
         return send_file(**get_mou(organisation_is_crown=(variant == "crown")))
 

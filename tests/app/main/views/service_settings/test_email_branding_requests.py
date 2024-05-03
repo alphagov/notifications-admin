@@ -993,7 +993,7 @@ def test_POST_email_branding_enter_government_identity_logo_text(
                 **expected_extra_url_args,
             ),
             service_set_branding=url_for(
-                "main.service_set_branding", service_id=SERVICE_ONE_ID, notification_type="email", _external=True
+                "main.service_set_branding", service_id=SERVICE_ONE_ID, branding_type="email", _external=True
             ),
         )
         .strip()

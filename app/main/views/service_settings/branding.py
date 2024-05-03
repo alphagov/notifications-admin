@@ -495,7 +495,8 @@ def email_branding_choose_banner_colour(service_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/<branding_type>-branding/confirm-change", methods=["GET", "POST"]
+    "/services/<uuid:service_id>/service-settings/<branding_type:branding_type>-branding/confirm-change",
+    methods=["GET", "POST"],
 )
 @user_has_permissions("manage_service")
 def branding_option_preview(service_id, branding_type):
@@ -523,7 +524,9 @@ def branding_option_preview(service_id, branding_type):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/<branding_type>-branding/nhs", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/<branding_type:branding_type>-branding/nhs", methods=["GET", "POST"]
+)
 @user_has_permissions("manage_service")
 def branding_nhs(service_id, branding_type):
     branding = EmailBranding.NHS_ID if branding_type == "email" else LetterBranding.NHS_ID

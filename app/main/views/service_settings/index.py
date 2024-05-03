@@ -302,7 +302,7 @@ def service_switch_count_as_live(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/permissions/<permission>", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/service-settings/permissions/<string:permission>", methods=["GET", "POST"])
 @user_is_platform_admin
 def service_set_permission(service_id, permission):
     if permission not in PLATFORM_ADMIN_SERVICE_PERMISSIONS:
@@ -1046,25 +1046,23 @@ def set_per_minute_rate_limit(service_id):
     return render_template("views/service-settings/set-rate-limit.html", form=form, error_summary_enabled=True)
 
 
-@main.route("/services/<uuid:service_id>/service-settings/set-<notification_type>-branding", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/service-settings/set-<branding_type:branding_type>-branding",
+    methods=["GET", "POST"],
+)
 @user_is_platform_admin
-def service_set_branding(service_id, notification_type):
-    notification_type = notification_type.lower()
-
-    if notification_type == "email":
+def service_set_branding(service_id, branding_type):
+    if branding_type == "email":
         form = AdminSetEmailBrandingForm(
             all_branding_options=AllEmailBranding().as_id_and_name,
             current_branding=current_service.email_branding_id,
         )
 
-    elif notification_type == "letter":
+    elif branding_type == "letter":
         form = AdminSetLetterBrandingForm(
             all_branding_options=AllLetterBranding().as_id_and_name,
             current_branding=current_service.letter_branding_id,
         )
-
-    else:
-        abort(404)
 
     if form.validate_on_submit():
         # As of 2022-12-02 we only get to this point (eg a POST on this endpoint) if JavaScript fails for the user on
@@ -1074,7 +1072,7 @@ def service_set_branding(service_id, notification_type):
             url_for(
                 ".service_preview_branding",
                 service_id=service_id,
-                notification_type=notification_type,
+                branding_type=branding_type,
                 branding_style=form.branding_style.data,
             )
         )
@@ -1083,30 +1081,25 @@ def service_set_branding(service_id, notification_type):
         "views/service-settings/set-branding.html",
         form=form,
         _search_form=SearchByNameForm(),
-        notification_type=notification_type,
+        branding_type=branding_type,
     )
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/set-<notification_type>-branding/add-to-branding-pool-step",
+    "/services/<uuid:service_id>/service-settings/set-<branding_type:branding_type>-branding/add-to-branding-pool-step",
     methods=["GET", "POST"],
 )
 @user_is_platform_admin
-def service_set_branding_add_to_branding_pool_step(service_id, notification_type):
+def service_set_branding_add_to_branding_pool_step(service_id, branding_type):
     branding_id = request.args.get("branding_id")
-    notification_type = notification_type.lower()
-    branding_type = f"{notification_type}_branding"
 
-    if notification_type == "email":
+    if branding_type == "email":
         branding = EmailBranding.from_id(branding_id)
         add_brandings_to_pool = organisations_client.add_brandings_to_email_branding_pool
 
-    elif notification_type == "letter":
+    elif branding_type == "letter":
         branding = LetterBranding.from_id(branding_id)
         add_brandings_to_pool = organisations_client.add_brandings_to_letter_branding_pool
-
-    else:
-        abort(404)
 
     branding_name = branding.name
     org_id = current_service.organisation.id
@@ -1115,16 +1108,16 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
 
     if form.validate_on_submit():
         # The service’s branding gets updated either way
-        current_service.update(**{branding_type: branding_id})
-        message = f"The {notification_type} branding has been set to {branding_name}"
+        current_service.update(**{f"{branding_type}_branding": branding_id})
+        message = f"The {branding_type} branding has been set to {branding_name}"
 
         # If the platform admin chose "yes" the branding is added to the organisation's branding pool
         if form.add_to_pool.data == "yes":
             branding_ids = [branding_id]
             add_brandings_to_pool(org_id, branding_ids)
             message = (
-                f"The {notification_type} branding has been set to {branding_name} and it has been "
-                f"added to {current_service.organisation.name}'s {notification_type} branding pool"
+                f"The {branding_type} branding has been set to {branding_name} and it has been "
+                f"added to {current_service.organisation.name}'s {branding_type} branding pool"
             )
 
         flash(message, "default_with_tick")
@@ -1132,7 +1125,7 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
 
     return render_template(
         "views/service-settings/set-branding-add-to-branding-pool-step.html",
-        back_link=url_for(".service_set_branding", service_id=current_service.id, notification_type=notification_type),
+        back_link=url_for(".service_set_branding", service_id=current_service.id, branding_type=branding_type),
         form=form,
         branding_name=branding_name,
         error_summary_enabled=True,
@@ -1140,22 +1133,18 @@ def service_set_branding_add_to_branding_pool_step(service_id, notification_type
 
 
 @main.route(
-    "/services/<uuid:service_id>/service-settings/preview-<notification_type>-branding", methods=["GET", "POST"]
+    "/services/<uuid:service_id>/service-settings/preview-<branding_type:branding_type>-branding",
+    methods=["GET", "POST"],
 )
 @user_is_platform_admin
-def service_preview_branding(service_id, notification_type):
+def service_preview_branding(service_id, branding_type):
     branding_style = request.args.get("branding_style")
-    notification_type = notification_type.lower()
-    branding_type = f"{notification_type}_branding"
 
-    if notification_type == "email":
+    if branding_type == "email":
         service_branding_pool = current_service.email_branding_pool
 
-    elif notification_type == "letter":
+    elif branding_type == "letter":
         service_branding_pool = current_service.letter_branding_pool
-
-    else:
-        abort(404)
 
     form = AdminPreviewBrandingForm(branding_style=branding_style)
 
@@ -1169,20 +1158,20 @@ def service_preview_branding(service_id, notification_type):
                 url_for(
                     "main.service_set_branding_add_to_branding_pool_step",
                     service_id=service_id,
-                    notification_type=notification_type,
+                    branding_type=branding_type,
                     branding_id=branding_id,
                 )
             )
 
-        current_service.update(**{branding_type: branding_id})
+        current_service.update(**{f"{branding_type}_branding": branding_id})
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
         "views/service-settings/preview-branding.html",
         form=form,
         service_id=service_id,
-        notification_type=notification_type,
-        action=url_for("main.service_preview_branding", service_id=service_id, notification_type=notification_type),
+        notification_type=branding_type,
+        action=url_for("main.service_preview_branding", service_id=service_id, branding_type=branding_type),
     )
 
 

@@ -29,7 +29,7 @@ def verify():
     return render_template("views/two-factor-sms.html", form=form, error_summary_enabled=True)
 
 
-@main.route("/verify-email/<token>")
+@main.route("/verify-email/<string:token>")
 def verify_email(token):
     try:
         token_data = check_token(

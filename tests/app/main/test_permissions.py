@@ -300,42 +300,51 @@ def test_routes_have_permissions_decorators():
         file, function = endpoint.split(".")
 
         assert "user_is_logged_in" not in decorators, (
-            "@user_is_logged_in used on service or organisation specific endpoint\n"
-            "Use @user_has_permissions() or @user_is_platform_admin only\n"
-            "app/main/views/{}.py::{}\n"
-        ).format(file, function)
+            f"@user_is_logged_in used on service or organisation specific endpoint\n"
+            f"Use @user_has_permissions() or @user_is_platform_admin only\n"
+            f"app/main/views/{file}.py::{function}\n"
+        )
 
         if "user_is_platform_admin" in decorators:
             continue
 
         assert "user_has_permissions" in decorators, (
-            "Missing @user_has_permissions decorator\n"
-            "Use @user_has_permissions() or @user_is_platform_admin instead\n"
-            "app/main/views/{}.py::{}\n"
-        ).format(file, function)
+            f"Missing @user_has_permissions decorator\n"
+            f"Use @user_has_permissions() or @user_is_platform_admin instead\n"
+            f"app/main/views/{file}.py::{function}\n"
+        )
 
     for _endpoint, decorators in get_routes_and_decorators():
         assert "login_required" not in decorators, (
-            "@login_required found\n"
-            "For consistency, use @user_is_logged_in() instead (from app.utils)\n"
-            "app/main/views/{}.py::{}\n"
-        ).format(file, function)
+            f"@login_required found\n"
+            f"For consistency, use @user_is_logged_in() instead (from app.utils)\n"
+            f"app/main/views/{file}.py::{function}\n"
+        )
 
         if "user_is_platform_admin" in decorators:
             assert "user_has_permissions" not in decorators, (
-                "@user_has_permissions and @user_is_platform_admin decorating same function\n"
-                "You can only use one of these at a time\n"
-                "app/main/views/{}.py::{}\n"
-            ).format(file, function)
+                f"@user_has_permissions and @user_is_platform_admin decorating same function\n"
+                f"You can only use one of these at a time\n"
+                f"app/main/views/{file}.py::{function}\n"
+            )
             assert "user_is_logged_in" not in decorators, (
-                "@user_is_logged_in used with @user_is_platform_admin\n"
-                "Use @user_is_platform_admin only\n"
-                "app/main/views/{}.py::{}\n"
-            ).format(file, function)
+                f"@user_is_logged_in used with @user_is_platform_admin\n"
+                f"Use @user_is_platform_admin only\n"
+                f"app/main/views/{file}.py::{function}\n"
+            )
 
 
-def test_routes_require_uuids(client_request):
+def test_routes_require_types(client_request):
+    partial_param_name_to_type = {
+        "_id": "uuid",
+        "template_type": "template_type",
+        "notification_type": "template_type",
+        "branding_type": "branding_type",
+    }
     for rule in current_app.url_map.iter_rules():
         for param in re.findall("<([^>]*)>", rule.rule):
-            if "_id" in param and not param.startswith("uuid:"):
-                pytest.fail(("Should be <uuid:{}> in {}").format(param, rule.rule))
+            if ":" not in param:
+                pytest.fail(f"Should be <type:{param}> in {rule.rule}, where type is string, template_type, uuid, etc")
+            for partial_param, required_type in partial_param_name_to_type.items():
+                if partial_param in param and not param.startswith(f"{required_type}:"):
+                    pytest.fail(f"Should be <{required_type}:{param}> in {rule.rule}")

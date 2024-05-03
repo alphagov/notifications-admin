@@ -102,7 +102,7 @@ def user_profile_email_authenticate():
     )
 
 
-@main.route("/user-profile/email/confirm/<token>", methods=["GET"])
+@main.route("/user-profile/email/confirm/<string:token>", methods=["GET"])
 @user_is_logged_in
 def user_profile_email_confirm(token):
     token_data = check_token(

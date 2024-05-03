@@ -8,8 +8,16 @@ from app.models.feedback import (
 from app.models.service import Service
 
 
+class AgreementTypeConverter(BaseConverter):
+    regex = "(?:crown|non-crown)"
+
+
 class TemplateTypeConverter(BaseConverter):
     regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)})"
+
+
+class BrandingTypeConverter(BaseConverter):
+    regex = "(?:email|letter)"
 
 
 class TicketTypeConverter(BaseConverter):

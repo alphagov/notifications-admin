@@ -511,12 +511,11 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
     )
 
 
-@no_cookie.route("/services/<uuid:service_id>/send/<uuid:template_id>/test.<filetype>", methods=["GET"])
+@no_cookie.route(
+    "/services/<uuid:service_id>/send/<uuid:template_id>/test.<letter_file_extension:filetype>", methods=["GET"]
+)
 @user_has_permissions("send_messages")
 def send_test_preview(service_id, template_id, filetype):
-    if filetype not in ("pdf", "png"):
-        abort(404)
-
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
         current_user,
@@ -714,21 +713,19 @@ def check_messages(service_id, template_id, upload_id, row_index=2):
 
 
 @no_cookie.route(
-    "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>.<filetype>",
+    "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>.<letter_file_extension:filetype>",
     methods=["GET"],
 )
 @no_cookie.route(
-    "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>/row-<int:row_index>.<filetype>",
+    "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>/row-<int:row_index>.<letter_file_extension:filetype>",
     methods=["GET"],
 )
 @user_has_permissions("send_messages")
 def check_messages_preview(service_id, template_id, upload_id, filetype, row_index=2):
     if filetype == "pdf":
         page = None
-    elif filetype == "png":
+    if filetype == "png":
         page = request.args.get("page", 1)
-    else:
-        abort(404)
 
     template = _check_messages(service_id, template_id, upload_id, row_index)["template"]
     return TemplatePreview.get_preview_for_templated_letter(
@@ -737,17 +734,15 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
 
 
 @no_cookie.route(
-    "/services/<uuid:service_id>/<uuid:template_id>/check.<filetype>",
+    "/services/<uuid:service_id>/<uuid:template_id>/check.<letter_file_extension:filetype>",
     methods=["GET"],
 )
 @user_has_permissions("send_messages")
 def check_notification_preview(service_id, template_id, filetype):
     if filetype == "pdf":
         page = None
-    elif filetype == "png":
+    if filetype == "png":
         page = request.args.get("page", 1)
-    else:
-        abort(404)
 
     template = _check_notification(
         service_id,

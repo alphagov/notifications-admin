@@ -3627,7 +3627,7 @@ def test_service_set_letter_branding_platform_admin_only(
     client_request.get(
         "main.service_set_branding",
         service_id=SERVICE_ONE_ID,
-        notification_type="letter",
+        branding_type="letter",
         _expected_status=403,
     )
 
@@ -3684,7 +3684,7 @@ def test_service_set_letter_branding_prepopulates(
     page = client_request.get(
         "main.service_set_branding",
         service_id=SERVICE_ONE_ID,
-        notification_type="letter",
+        branding_type="letter",
     )
 
     assert len(page.select("input[checked]")) == 1
@@ -3717,12 +3717,12 @@ def test_service_set_letter_branding_redirects_to_preview_page_when_form_submitt
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_set_branding",
-        notification_type="letter",
+        branding_type="letter",
         _data={"branding_style": selected_letter_branding},
         _expected_status=302,
         _expected_redirect=url_for(
             ".service_preview_branding",
-            notification_type="letter",
+            branding_type="letter",
             branding_style=expected_post_data,
             service_id=SERVICE_ONE_ID,
         ),
@@ -3738,7 +3738,7 @@ def test_service_preview_letter_branding_shows_preview_letter(
 
     page = client_request.get(
         "main.service_preview_branding",
-        notification_type="letter",
+        branding_type="letter",
         branding_style="hm-government",
         service_id=SERVICE_ONE_ID,
     )
@@ -3771,7 +3771,7 @@ def test_service_preview_letter_branding_saves(
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_preview_branding",
-        notification_type="letter",
+        branding_type="letter",
         _data={"branding_style": selected_letter_branding},
         _expected_status=302,
         _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
@@ -3842,7 +3842,7 @@ def test_should_show_branding_styles(
     )
 
     client_request.login(platform_admin_user)
-    page = client_request.get("main.service_set_branding", service_id=SERVICE_ONE_ID, notification_type="email")
+    page = client_request.get("main.service_set_branding", service_id=SERVICE_ONE_ID, branding_type="email")
 
     branding_style_choices = page.select("input[name=branding_style]")
 
@@ -3882,11 +3882,11 @@ def test_should_send_branding_and_organisations_to_preview(
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_set_branding",
-        notification_type="email",
+        branding_type="email",
         _data={"branding_type": "org", "branding_style": "1"},
         _expected_status=302,
         _expected_location=url_for(
-            "main.service_preview_branding", notification_type="email", branding_style="1", **extra_args
+            "main.service_preview_branding", branding_type="email", branding_style="1", **extra_args
         ),
         **extra_args,
     )
@@ -3899,7 +3899,7 @@ def test_should_send_branding_and_organisations_to_preview(
     (
         (
             "main.service_preview_branding",
-            {"service_id": SERVICE_ONE_ID, "notification_type": "email"},
+            {"service_id": SERVICE_ONE_ID, "branding_type": "email"},
         ),
     ),
 )
@@ -3911,7 +3911,7 @@ def test_should_preview_email_branding(
     extra_args,
 ):
     client_request.login(platform_admin_user)
-    page = client_request.get(endpoint, branding_type="org", branding_style="1", **extra_args)
+    page = client_request.get(endpoint, branding_style="1", **extra_args)
 
     iframe = page.select_one("iframe.branding-preview")
     iframeURLComponents = urlparse(iframe["src"])
@@ -3932,7 +3932,7 @@ def test_should_preview_email_branding(
                 url_for,
                 "main.service_set_branding_add_to_branding_pool_step",
                 service_id=SERVICE_ONE_ID,
-                notification_type="email",
+                branding_type="email",
                 branding_id="174",
             ),
             "174",
@@ -3992,7 +3992,7 @@ def test_should_set_branding_for_service_with_organisation(
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_preview_branding",
-        notification_type="email",
+        branding_type="email",
         _data={"branding_style": email_branding_id},
         service_id=service_id,
         _expected_redirect=expected_redirect(),
@@ -4023,7 +4023,7 @@ def test_should_set_branding_for_service_with_no_organisation(
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_preview_branding",
-        notification_type="email",
+        branding_type="email",
         _data={"branding_style": email_branding_id},
         service_id=service_id,
         _expected_redirect=url_for(
@@ -4054,7 +4054,7 @@ def test_get_service_set_email_branding_add_to_branding_pool_step(
         "main.service_set_branding_add_to_branding_pool_step",
         _expected_status=200,
         service_id=SERVICE_ONE_ID,
-        notification_type="email",
+        branding_type="email",
         branding_id=email_branding_id,
     )
     assert f"Apply ‘{email_branding_name}’ branding" in normalize_spaces(page.select_one("title").text)
@@ -4075,7 +4075,7 @@ def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_
         "main.service_set_branding_add_to_branding_pool_step",
         _expected_status=403,
         service_id=SERVICE_ONE_ID,
-        notification_type="email",
+        branding_type="email",
         branding_id=email_branding_id,
     )
 
@@ -4111,7 +4111,7 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
         "main.service_set_branding_add_to_branding_pool_step",
         _data={"add_to_pool": add_to_pool},
         service_id=SERVICE_ONE_ID,
-        notification_type="email",
+        branding_type="email",
         branding_id=email_branding_id,
         _follow_redirects=True,
     )
@@ -4151,7 +4151,7 @@ def test_get_service_set_letter_branding_add_to_branding_pool_step(
         "main.service_set_branding_add_to_branding_pool_step",
         _expected_status=200,
         service_id=SERVICE_ONE_ID,
-        notification_type="letter",
+        branding_type="letter",
         branding_id=letter_branding_id,
     )
     assert f"Apply ‘{letter_branding_name}’ branding" in normalize_spaces(page.select_one("title").text)
@@ -4170,7 +4170,7 @@ def test_get_service_set_letter_branding_add_to_branding_pool_step_protects_agai
         "main.service_set_branding_add_to_branding_pool_step",
         _expected_status=200,
         service_id=SERVICE_ONE_ID,
-        notification_type="letter",
+        branding_type="letter",
         branding_id="234",
     )
     form = page.select_one("form")
@@ -4195,7 +4195,7 @@ def test_service_set_letter_branding_add_to_branding_pool_step_is_platform_admin
         "main.service_set_branding_add_to_branding_pool_step",
         _expected_status=403,
         service_id=SERVICE_ONE_ID,
-        notification_type="letter",
+        branding_type="letter",
         branding_id=letter_branding_id,
     )
 
@@ -4232,7 +4232,7 @@ def test_service_set_letter_branding_add_to_branding_pool_step_choices_yes_or_no
         "main.service_set_branding_add_to_branding_pool_step",
         _data={"add_to_pool": add_to_pool},
         service_id=SERVICE_ONE_ID,
-        notification_type="letter",
+        branding_type="letter",
         branding_id=letter_branding_id,
         _follow_redirects=True,
     )

@@ -429,12 +429,12 @@
           {% call row() %}
             {{ text_field('Email branding' )}}
             {{ text_field(current_service.email_branding.name) }}
-            {{ edit_field('Change', url_for('main.service_set_branding', service_id=current_service.id, notification_type='email'), suffix='email branding (admin view)') }}
+            {{ edit_field('Change', url_for('main.service_set_branding', service_id=current_service.id, branding_type='email'), suffix='email branding (admin view)') }}
           {% endcall %}
           {% call row() %}
             {{ text_field('Letter branding')}}
             {{ optional_text_field(current_service.letter_branding.name) }}
-            {{ edit_field('Change', url_for('main.service_set_branding', service_id=current_service.id, notification_type='letter'), suffix='letter branding (admin view)') }}
+            {{ edit_field('Change', url_for('main.service_set_branding', service_id=current_service.id, branding_type='letter'), suffix='letter branding (admin view)') }}
           {% endcall %}
           {% call row() %}
             {{ text_field('Custom data retention')}}

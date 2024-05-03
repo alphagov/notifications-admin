@@ -5,7 +5,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = "Set " + notification_type + " branding" %}
+{% set page_title = "Set " + branding_type + " branding" %}
 
 {% block backLink %}
   {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
@@ -18,7 +18,7 @@
 {% block maincolumn_content %}
   {{ page_header(page_title) }}
 
-  {% call form_wrapper(data_kwargs={'preview-type': notification_type}) %}
+  {% call form_wrapper(data_kwargs={'preview-type': branding_type}) %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full preview-pane">
       </div>
