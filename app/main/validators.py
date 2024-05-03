@@ -165,7 +165,7 @@ class IsNotAPotentiallyMaliciousSenderID:
         if field.data and field.data.lower() in self.potentially_malicious_sender_ids:
             current_app.logger.warning("User tried to set sender id to potentially malicious one: %s", field.data)
             raise ValidationError(
-                f"Text message sender ID cannot be ‘{field.data}’ - this is to protect recipients " f"from phishing"
+                f"Text message sender ID cannot be ‘{field.data}’ - this is to protect recipients " f"from phishing scams"
             )
 
 

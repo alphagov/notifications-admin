@@ -34,7 +34,7 @@ from app.main.forms import ServiceSmsSenderForm
         (
             "Evri",
             True,
-            "Text message sender ID cannot be ‘Evri’ - this is to protect recipients from phishing",
+            "Text message sender ID cannot be ‘Evri’ - this is to protect recipients from phishing scams",
         ),
         pytest.param("'UC'", False, None, marks=pytest.mark.xfail),  # Apostrophes can cause SMS delivery issues
     ],
