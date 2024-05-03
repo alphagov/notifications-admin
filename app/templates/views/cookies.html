@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <div class="cookie-settings__confirmation banner banner-with-tick" data-cookie-confirmation="true" role="group" tabindex="-1">
+    <div class="cookie-settings__confirmation banner banner-with-tick" data-cookie-confirmation="true" role="group" tabindex="-1" hidden>
       <h2 class="banner-title">Your cookie settings were saved</h2>
       <a class="govuk_link cookie-settings__prev-page govuk-!-margin-top-1" href="#" data-notify-module="track-click" data-track-category="cookieSettings" data-track-action="Back to previous page">
         Go back to the page you were looking at
@@ -119,34 +119,32 @@
         <li>turning on Javascript in your browser</li>
       </ul>
     </div>
-    <div class="cookie-settings__form-wrapper">
-      <form data-notify-module="cookie-settings">
-        <div class="govuk-form-group govuk-!-margin-top-6">
-          <fieldset class="govuk-fieldset" aria-describedby="changed-name-hint">
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-              Do you want to accept analytics cookies?
-            </legend>
-            <div class="govuk-radios govuk-radios--inline">
-              <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="cookies-analytics-yes" name="cookies-analytics" type="radio" value="on">
-                <label class="govuk-label govuk-radios__label" for="cookies-analytics-yes">
-                  Yes
-                </label>
-              </div>
-              <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="cookies-analytics-no" name="cookies-analytics" type="radio" value="off">
-                <label class="govuk-label govuk-radios__label" for="cookies-analytics-no">
-                  No
-                </label>
-              </div>
+    <form class="cookie-settings__form" data-notify-module="cookie-settings" hidden>
+      <div class="govuk-form-group govuk-!-margin-top-6">
+        <fieldset class="govuk-fieldset" aria-describedby="changed-name-hint">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            Do you want to accept analytics cookies?
+          </legend>
+          <div class="govuk-radios govuk-radios--inline">
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="cookies-analytics-yes" name="cookies-analytics" type="radio" value="on">
+              <label class="govuk-label govuk-radios__label" for="cookies-analytics-yes">
+                Yes
+              </label>
             </div>
-          </fieldset>
-        </div>
-        {{ govukButton({
-          "text": "Save cookie settings"
-        }) }}
-      </form>
-    </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="cookies-analytics-no" name="cookies-analytics" type="radio" value="off">
+              <label class="govuk-label govuk-radios__label" for="cookies-analytics-no">
+                No
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      {{ govukButton({
+        "text": "Save cookie settings"
+      }) }}
+    </form>
   </div>
 </div>
 
