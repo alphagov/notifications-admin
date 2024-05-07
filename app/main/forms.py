@@ -107,10 +107,7 @@ def get_time_value_and_label(future_time):
     timestamp = future_time.astimezone(pytz.timezone("Europe/London"))
     return (
         future_time.replace(tzinfo=None).isoformat(),
-        "{} at {}".format(
-            get_human_day(timestamp),
-            get_human_time(timestamp),
-        ),
+        f"{get_human_day(timestamp)} at {get_human_time(timestamp)}",
     )
 
 
@@ -1088,7 +1085,7 @@ class TwoFactorForm(StripWhitespaceForm):
         validate_code_func -- Validates the code with the API.
         """
         self.validate_code_func = validate_code_func
-        super(TwoFactorForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     sms_code = SMSCode("Text message code")
 
@@ -1338,7 +1335,7 @@ class AdminServiceRateLimitForm(StripWhitespaceForm):
 class ConfirmPasswordForm(StripWhitespaceForm):
     def __init__(self, validate_password_func, *args, **kwargs):
         self.validate_password_func = validate_password_func
-        super(ConfirmPasswordForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     password = GovukPasswordField("Enter your password", validators=[NotifyDataRequired(thing="your password")])
 
@@ -1523,7 +1520,7 @@ class NewPasswordForm(StripWhitespaceForm):
 class ChangePasswordForm(StripWhitespaceForm):
     def __init__(self, validate_password_func, *args, **kwargs):
         self.validate_password_func = validate_password_func
-        super(ChangePasswordForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     old_password = make_password_field("Current password", thing="your current password", validate_length=False)
     new_password = make_password_field("New password", thing="your new password")
@@ -1554,7 +1551,7 @@ class ChangeNameForm(StripWhitespaceForm):
 class ChangeEmailForm(StripWhitespaceForm):
     def __init__(self, validate_email_func, *args, **kwargs):
         self.validate_email_func = validate_email_func
-        super(ChangeEmailForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     email_address = make_email_address_field(
         label="Change your email address",
@@ -1586,7 +1583,7 @@ class ChangeMobileNumberForm(StripWhitespaceForm):
 
 class ChooseTimeForm(StripWhitespaceForm):
     def __init__(self, *args, **kwargs):
-        super(ChooseTimeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.scheduled_for.choices = [("", "Now")] + [
             get_time_value_and_label(hour) for hour in get_next_hours_until(get_furthest_possible_scheduled_time())
         ]

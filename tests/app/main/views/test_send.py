@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import uuid
 from functools import partial
 from glob import glob
@@ -390,7 +389,7 @@ def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), filename)},
+        _data={"file": (BytesIO(b""), filename)},
         _content_type="multipart/form-data",
         _follow_redirects=False,
     )
@@ -467,7 +466,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _data={"file": (BytesIO(b""), "example.csv")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )
@@ -511,7 +510,7 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _data={"file": (BytesIO(b""), "example.csv")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )
@@ -561,7 +560,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _data={"file": (BytesIO(b""), "example.csv")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )
@@ -618,7 +617,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _data={"file": (BytesIO(b""), "example.csv")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )
@@ -668,7 +667,7 @@ def test_upload_csv_file_with_bad_bfpo_postal_address_shows_check_page_with_erro
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _data={"file": (BytesIO(b""), "example.csv")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )
@@ -713,7 +712,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _data={"file": (BytesIO(b""), "example.csv")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )
@@ -871,7 +870,7 @@ def test_upload_csv_file_with_missing_columns_shows_error(
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _data={"file": (BytesIO(b""), "example.csv")},
         _follow_redirects=True,
     )
 
@@ -894,7 +893,7 @@ def test_upload_csv_invalid_extension(
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("contents".encode("utf-8")), "invalid.txt")},
+        _data={"file": (BytesIO(b"contents"), "invalid.txt")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )
@@ -932,7 +931,7 @@ def test_upload_valid_csv_redirects_to_check_page(
         "main.send_messages",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "valid.csv")},
+        _data={"file": (BytesIO(b""), "valid.csv")},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.check_messages",
@@ -2591,7 +2590,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
         "main.send_messages",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _data={"file": (BytesIO(b""), "example.csv")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )
@@ -2658,7 +2657,7 @@ def test_upload_csvfile_with_international_validates(
         "main.send_messages",
         service_id=fake_uuid,
         template_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "example.csv")},
+        _data={"file": (BytesIO(b""), "example.csv")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )
@@ -3223,8 +3222,8 @@ def test_check_messages_shows_trial_mode_error_for_letters(
 
     if error_should_be_shown:
         assert normalize_spaces(error[0].text) == (
-            "{} In trial mode you can only preview how your letters will look"
-        ).format(expected_error_message)
+            f"{expected_error_message} In trial mode you can only preview how your letters will look"
+        )
     else:
         assert not error
 

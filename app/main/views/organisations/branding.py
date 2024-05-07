@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import (
     abort,
     current_app,
@@ -26,7 +24,7 @@ from app.models.organisation import Organisation
 from app.utils.user import user_is_platform_admin
 
 
-def _handle_remove_email_branding(remove_branding_id) -> Optional[Response]:
+def _handle_remove_email_branding(remove_branding_id) -> Response | None:
     """
     The user has clicked 'remove' on a brand and is either going to see a confirmation flash message
     or has clicked to confirm that flash message.
@@ -58,7 +56,7 @@ def _handle_remove_email_branding(remove_branding_id) -> Optional[Response]:
     return None
 
 
-def _handle_change_default_email_branding_to_govuk(is_central_government) -> Optional[Response]:
+def _handle_change_default_email_branding_to_govuk(is_central_government) -> Response | None:
     """
     This handles changing a central government organisation from a custom brand back to the default GOV.UK brand.
     If we're in here, then the user has either clicked the 'Reset to GOV.UK' link or they're clicking the
@@ -86,7 +84,7 @@ def _handle_change_default_email_branding_to_govuk(is_central_government) -> Opt
     return None
 
 
-def _handle_change_default_email_branding(form, new_default_branding_id) -> Optional[Response]:
+def _handle_change_default_email_branding(form, new_default_branding_id) -> Response | None:
     """
     Handle any change of branding to a non-default (GOV.UK) brand. This includes going from GOV.UK to a custom
     brand, and going from a custom brand to another custom brand. When moving from GOV.UK to a custom brand,

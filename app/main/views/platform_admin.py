@@ -3,7 +3,6 @@ import itertools
 import re
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from notifications_python_client.errors import HTTPError
@@ -294,9 +293,7 @@ def notifications_sent_by_service():
             {
                 "Content-Type": "text/csv; charset=utf-8",
                 "Content-Disposition": (
-                    'attachment; filename="{} to {} notification status per service report.csv"'.format(
-                        start_date, end_date
-                    )
+                    f'attachment; filename="{start_date} to {end_date} notification status per service report.csv"'
                 ),
             },
         )
@@ -364,9 +361,7 @@ def get_billing_report():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": 'attachment; filename="Billing Report from {} to {}.csv"'.format(
-                        start_date, end_date
-                    ),
+                    "Content-Disposition": f'attachment; filename="Billing Report from {start_date} to {end_date}.csv"',
                 },
             )
         else:
@@ -421,8 +416,8 @@ def get_dvla_billing_report():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": 'attachment; filename="DVLA Billing Report from {} to {}.csv"'.format(
-                        start_date, end_date
+                    "Content-Disposition": (
+                        f"attachment; " f'filename="DVLA Billing Report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
@@ -476,8 +471,8 @@ def get_volumes_by_service():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": 'attachment; filename="Volumes by service report from {} to {}.csv"'.format(
-                        start_date, end_date
+                    "Content-Disposition": (
+                        f"attachment; " f'filename="Volumes by service report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
@@ -527,8 +522,8 @@ def get_daily_volumes():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": 'attachment; filename="Daily volumes report from {} to {}.csv"'.format(
-                        start_date, end_date
+                    "Content-Disposition": (
+                        f"attachment; " f'filename="Daily volumes report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
@@ -717,7 +712,7 @@ def get_url_for_notify_record(uuid_):
     @dataclasses.dataclass
     class _EndpointSpec:
         endpoint: str
-        param: Optional[str] = None
+        param: str | None = None
         with_service_id: bool = False
 
         # Extra parameters to pass to `url_for`.

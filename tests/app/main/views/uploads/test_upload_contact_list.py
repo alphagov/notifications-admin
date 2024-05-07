@@ -175,7 +175,7 @@ def test_upload_csv_file_shows_error_banner(
     page = client_request.post(
         "main.upload_contact_list",
         service_id=SERVICE_ONE_ID,
-        _data={"file": (BytesIO("".encode("utf-8")), "invalid.csv")},
+        _data={"file": (BytesIO(b""), "invalid.csv")},
         _follow_redirects=True,
     )
     mock_upload.assert_called_once_with(
@@ -229,7 +229,7 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
     page = client_request.post(
         "main.upload_contact_list",
         service_id=SERVICE_ONE_ID,
-        _data={"file": (BytesIO("".encode("utf-8")), "invalid.csv")},
+        _data={"file": (BytesIO(b""), "invalid.csv")},
         _follow_redirects=True,
     )
 
@@ -248,7 +248,7 @@ def test_upload_csv_shows_error_with_invalid_extension(
     page = client_request.post(
         "main.upload_contact_list",
         service_id=SERVICE_ONE_ID,
-        _data={"file": (BytesIO("".encode("utf-8")), "invalid.txt")},
+        _data={"file": (BytesIO(b""), "invalid.txt")},
         _follow_redirects=True,
     )
 
@@ -276,7 +276,7 @@ def test_upload_csv_file_sanitises_and_truncates_file_name_in_metadata(
     client_request.post(
         "main.upload_contact_list",
         service_id=SERVICE_ONE_ID,
-        _data={"file": (BytesIO("".encode("utf-8")), filename)},
+        _data={"file": (BytesIO(b""), filename)},
         _follow_redirects=False,
     )
 

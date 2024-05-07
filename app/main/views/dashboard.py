@@ -180,7 +180,7 @@ def inbox_download(service_id):
             + [
                 [
                     format_phone_number_human_readable(message["user_number"]),
-                    message["content"].lstrip(("=+-@")),
+                    message["content"].lstrip("=+-@"),
                     format_datetime_numeric(message["created_at"]),
                 ]
                 for message in service_api_client.get_inbound_sms(service_id)["data"]
@@ -188,8 +188,9 @@ def inbox_download(service_id):
         ).as_csv_data,
         mimetype="text/csv",
         headers={
-            "Content-Disposition": 'inline; filename="Received text messages {}.csv"'.format(
-                format_date_numeric(datetime.utcnow().isoformat())
+            "Content-Disposition": (
+                f"inline; "
+                f'filename="Received text messages {format_date_numeric(datetime.utcnow().isoformat())}.csv"'
             )
         },
     )

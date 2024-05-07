@@ -1,5 +1,4 @@
-import typing
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from flask import Flask, Request, Response, request
 from flask.sessions import SecureCookieSession, SecureCookieSessionInterface
@@ -23,9 +22,9 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
         else:
             refresh_duration = app.permanent_session_lifetime
 
-        return min(datetime.now(timezone.utc) + refresh_duration, absolute_expiration)
+        return min(datetime.now(UTC) + refresh_duration, absolute_expiration)
 
-    def get_expiration_time(self, app: Flask, session: SecureCookieSession) -> typing.Optional[datetime]:
+    def get_expiration_time(self, app: Flask, session: SecureCookieSession) -> datetime | None:
         """Work out the expiry time for the session cookie.
 
         - For regular users the session remains active for at most 20 hours and effectively never needs to be refreshed.
@@ -40,12 +39,12 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
 
         return super().get_expiration_time(app=app, session=session)
 
-    def open_session(self, app: Flask, request: Request) -> typing.Optional[SecureCookieSession]:
+    def open_session(self, app: Flask, request: Request) -> SecureCookieSession | None:
         session = super().open_session(app=app, request=request)
 
         # If we are beyond the expiry timestamp recorded in the session, return a blank session instead.
         if "session_expiry" in session:
-            if datetime.now(timezone.utc) > datetime.fromisoformat(session["session_expiry"]):
+            if datetime.now(UTC) > datetime.fromisoformat(session["session_expiry"]):
                 return self.session_class()
 
         return session
@@ -56,7 +55,7 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
         # usage and are passive views. We don't want the session to be refreshed when someone is inactive on an
         # auto-refreshing page.
         if "user_id" in session and request.blueprint != JSON_UPDATES_BLUEPRINT_NAME:
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             if "session_start" not in session:
                 session["session_start"] = now.isoformat()
             session["session_expiry"] = self._get_inactive_session_expiry(

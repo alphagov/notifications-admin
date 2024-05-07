@@ -63,8 +63,7 @@ class TemplateList:
                 ancestors=ancestors,
                 service_id=self.service.id,
             )
-            for sub_item in self._get_templates_and_folders(template_type, item["id"], ancestors + [item]):
-                yield sub_item
+            yield from self._get_templates_and_folders(template_type, item["id"], ancestors + [item])
 
         for item in self._get_templates(
             template_type,

@@ -1,9 +1,8 @@
 import decimal
 import re
 import urllib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from numbers import Number
-from typing import Union
 
 import ago
 import dateutil
@@ -124,7 +123,7 @@ def naturaltime_without_indefinite_article(date):
 
 
 def format_delta(date):
-    delta = (datetime.now(timezone.utc)) - (utc_string_to_aware_gmt_datetime(date))
+    delta = (datetime.now(UTC)) - (utc_string_to_aware_gmt_datetime(date))
     if delta < timedelta(seconds=30):
         return "just now"
     if delta < timedelta(seconds=60):
@@ -133,7 +132,7 @@ def format_delta(date):
 
 
 def format_delta_days(date):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     date = utc_string_to_aware_gmt_datetime(date)
     if date.strftime("%Y-%m-%d") == now.strftime("%Y-%m-%d"):
         return "today"
@@ -272,7 +271,7 @@ def format_pounds_as_currency(number: float):
     return format_pennies_as_currency(round(number * 100), long=False)
 
 
-def format_pennies_as_currency(pennies: Union[int, float], long: bool) -> str:
+def format_pennies_as_currency(pennies: int | float, long: bool) -> str:
     # \/ Avoid floating point precision errors with fractional pennies, eg for SMS rates \/
     pennies = decimal.Decimal(str(pennies))
     if pennies >= 100:
@@ -316,7 +315,7 @@ def redact_mobile_number(mobile_number, spacing=""):
 
 def get_time_left(created_at, service_data_retention_days=7):
     return ago.human(
-        (datetime.now(timezone.utc))
+        (datetime.now(UTC))
         - (
             dateutil.parser.parse(created_at).replace(hour=0, minute=0, second=0)
             + timedelta(days=service_data_retention_days + 1)

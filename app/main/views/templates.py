@@ -4,7 +4,7 @@ import math
 import uuid
 from functools import partial
 from io import BytesIO
-from typing import Dict, Literal, Optional
+from typing import Literal
 
 from flask import (
     abort,
@@ -78,7 +78,7 @@ from app.utils.templates import TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
 
-def get_template_form(template_type: Literal["email", "sms", "letter"], language: Optional[Literal["welsh"]] = None):
+def get_template_form(template_type: Literal["email", "sms", "letter"], language: Literal["welsh"] | None = None):
     if template_type == "email":
         return EmailTemplateForm
     elif template_type == "sms":
@@ -96,7 +96,7 @@ class LetterAttachmentFormError(Exception):
         self.detail = detail
         self.attachment_page_count = attachment_page_count
 
-    def as_error_dict(self) -> Dict[str, int]:
+    def as_error_dict(self) -> dict[str, int]:
         return {"title": self.title, "detail": self.detail, "attachment_page_count": self.attachment_page_count}
 
 
@@ -512,10 +512,8 @@ def _get_template_copy_name(template, existing_templates):
 
 @main.route("/services/<uuid:service_id>/templates/action-blocked/<template_type:notification_type>/<string:return_to>")
 @main.route(
-    (
-        "/services/<uuid:service_id>/templates/action-blocked/"
-        "<template_type:notification_type>/<string:return_to>/<uuid:template_id>"
-    )
+    "/services/<uuid:service_id>/templates/action-blocked/"
+    "<template_type:notification_type>/<string:return_to>/<uuid:template_id>"
 )
 @user_has_permissions("manage_templates")
 def action_blocked(service_id, notification_type, return_to, template_id=None):
@@ -696,7 +694,7 @@ def rename_template(service_id, template_id):
     )
 
 
-def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: Optional[str], template):
+def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: str | None, template):
     if language is None:
         return
 
@@ -1331,7 +1329,7 @@ def _get_page_numbers(page_count):
 
 
 def _change_template_language(service_id, template, language: LetterLanguageOptions):
-    update_kwargs: dict[str, Optional[str]] = {}
+    update_kwargs: dict[str, str | None] = {}
 
     if language == LetterLanguageOptions.english:
         if template.subject == "English heading":

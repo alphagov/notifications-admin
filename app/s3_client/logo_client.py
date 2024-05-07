@@ -48,7 +48,7 @@ class LogoClient:
         self,
         logo_file_name: str,
         logo_type: LOGO_TYPES,
-        logo_key_extra: typing.Optional[str] = None,
+        logo_key_extra: str | None = None,
         temporary: bool = False,
     ) -> str:
         """Returns the s3 object key for a logo
@@ -94,7 +94,7 @@ class LogoClient:
         return temporary_logo_key
 
     def save_permanent_logo(
-        self, temporary_logo_key: str, logo_type: LOGO_TYPES, logo_key_extra: typing.Optional[str] = None
+        self, temporary_logo_key: str, logo_type: LOGO_TYPES, logo_key_extra: str | None = None
     ) -> str:
         """Takes a temporary logo S3 object key and copies it to an immutable, must-never-be-deleted final location.
 

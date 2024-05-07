@@ -330,7 +330,7 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
     mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo", return_value="temp_filename")
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     data = {
-        "file": (BytesIO("".encode("utf-8")), "test.png"),
+        "file": (BytesIO(b""), "test.png"),
         "colour": "",
         "text": "",
         "name": "",
@@ -364,7 +364,7 @@ def test_create_email_branding_calls_antivirus_scan(
     mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo", return_value="temp_filename")
     mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=scan_result)
     data = {
-        "file": (BytesIO("".encode("utf-8")), "test.png"),
+        "file": (BytesIO(b""), "test.png"),
         "colour": "",
         "text": "",
         "name": "",
@@ -755,7 +755,7 @@ def test_temp_logo_is_shown_after_uploading_logo(
     client_request.login(platform_admin_user)
     page = client_request.post(
         "main.platform_admin_create_email_branding",
-        _data={"file": (BytesIO("".encode("utf-8")), "test.png")},
+        _data={"file": (BytesIO(b""), "test.png")},
         _content_type="multipart/form-data",
         _follow_redirects=True,
     )

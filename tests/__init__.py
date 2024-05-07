@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
@@ -470,7 +470,7 @@ def job_json(
     if template_id is None:
         template_id = "5d729fbd-239c-44ab-b498-75a985f3198f"
     if created_at is None:
-        created_at = str(datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f%z"))
+        created_at = str(datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f%z"))
     data = {
         "id": job_id,
         "service": service_id,
@@ -534,7 +534,7 @@ def notification_json(  # noqa: C901
     if sent_at is None:
         sent_at = str(datetime.utcnow().time())
     if created_at is None:
-        created_at = datetime.now(timezone.utc).isoformat()
+        created_at = datetime.now(UTC).isoformat()
     if updated_at is None:
         updated_at = str((datetime.utcnow() + timedelta(minutes=1)).time())
     if status is None:
@@ -698,9 +698,9 @@ def assert_url_expected(actual, expected):
             # serialized string
             assert parse_qs(expected_parts.query) == parse_qs(actual_parts.query)
         else:
-            assert getattr(actual_parts, attribute) == getattr(expected_parts, attribute), (
-                "Expected redirect: {}\nActual redirect: {}"
-            ).format(expected, actual)
+            assert getattr(actual_parts, attribute) == getattr(
+                expected_parts, attribute
+            ), f"Expected redirect: {expected}\nActual redirect: {actual}"
 
 
 def find_element_by_tag_and_partial_text(page, tag, string):

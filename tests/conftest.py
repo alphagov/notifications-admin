@@ -3,7 +3,6 @@ import json
 import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
-from typing import Optional
 from unittest import mock
 from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
@@ -957,10 +956,10 @@ def mock_create_service_template(mocker, fake_uuid):
         service_id,
         subject=None,
         parent_folder_id=None,
-        letter_languages: Optional[LetterLanguageOptions] = None,
+        letter_languages: LetterLanguageOptions | None = None,
         letter_welsh_subject: str = None,
         letter_welsh_content: str = None,
-        has_unsubscribe_link: Optional[bool] = None,
+        has_unsubscribe_link: bool | None = None,
     ):
         template = template_json(
             service_id=service_id,
