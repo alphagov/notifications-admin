@@ -893,8 +893,8 @@ def test_should_show_page_for_inviting_user_with_email_prefilled(
         # in the page title
         _test_page_title=False,
     )
-    assert normalize_spaces(page.select_one("title").text).startswith("Invite a team member")
-    assert normalize_spaces(page.select_one("h1").text) == "Invite Service Two User"
+    assert normalize_spaces(page.select_one("title").text).startswith("Let someone join your service")
+    assert normalize_spaces(page.select_one("h1").text) == "Let Service Two User join your service"
     assert normalize_spaces(page.select_one("main .govuk-body").text) == "service-two-user@test.gov.uk"
     assert not page.select("input#email_address") or page.select("input[type=email]")
 

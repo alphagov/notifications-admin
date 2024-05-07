@@ -146,7 +146,8 @@ def test_page_lists_team_members_of_service(
 
     page = client_request.get("main.join_service", service_to_join_id=SERVICE_ONE_ID)
 
-    assert normalize_spaces(page.select_one("h1").text) == "Ask to join ‘service one’"
+    assert normalize_spaces(page.select_one("h1").text) == "Ask to join this service"
+    assert normalize_spaces(page.select_one("main p").text) == "You’re asking to join ‘service one’."
 
     assert [
         (
@@ -174,7 +175,10 @@ def test_page_lists_team_members_of_service(
     ]
 
     assert page.select_one("textarea")["name"] == page.select_one("textarea")["id"] == "reason"
-    assert normalize_spaces(page.select_one("label[for=reason]").text) == "Explain why you need access (optional)"
+    assert (
+        normalize_spaces(page.select_one("label[for=reason]").text)
+        == "Tell them why you want to join this service (optional)"
+    )
     assert not page.select("#reason-hint")
 
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
@@ -243,10 +247,14 @@ def test_confirmation_page(
         number_of_users_emailed=1,
     )
 
-    assert normalize_spaces(page.select_one("h1").text) == "You’ve asked to join ‘service one’"
-    assert normalize_spaces(page.select_one("main p").text) == "We’ve emailed 1 of the team members."
+    assert normalize_spaces(page.select_one("h1").text) == "You have asked to join an existing service"
+    assert [normalize_spaces(p.text) for p in page.select("main p")] == [
+        "We have sent your request to 1 member of ‘service one’.",
+        "We’ve also sent you a confirmation email.",
+        "You’ll get another email if your request is approved.",
+        "Sign out of GOV.UK Notify",
+    ]
 
     assert [(normalize_spaces(link.text), link["href"]) for link in page.select("main a")] == [
-        ("add a new service", url_for("main.add_service")),
-        ("sign out for now", url_for("main.sign_out")),
+        ("Sign out of GOV.UK Notify", url_for("main.sign_out"))
     ]

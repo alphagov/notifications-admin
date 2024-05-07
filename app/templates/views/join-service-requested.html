@@ -1,7 +1,8 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 
-{% set heading = 'You’ve asked to join ‘{}’'.format(service.name) %}
+{% set heading = 'You have asked to join an existing service' %}
+{% set number_of_users_emailed = request.args.get('number_of_users_emailed') %}
 
 {% block per_page_title %}
   {{ heading }}
@@ -12,22 +13,17 @@
     <div class="govuk-grid-column-three-quarters">
       {{ page_header(heading) }}
       <p class="govuk-body">
-        We’ve emailed {{ request.args.get('number_of_users_emailed') }} of the team members.
+        We have sent your request to {{ number_of_users_emailed }} member{{ '' if number_of_users_emailed == '1' else 's' }} of ‘{{ service.name }}’.
       </p>
       <p class="govuk-body">
-        If they accept your request you’ll get an email with an invite.
+        We’ve also sent you a confirmation email.
       </p>
       <p class="govuk-body">
-        In the meantime you can:
+        You’ll get another email if your request is approved.
       </p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>
-          <a href="{{ url_for('main.add_service') }}" class="govuk-link govuk-link--no-visited-state">add a new service</a> and try Notify for yourself
-        </li>
-        <li>
-          <a href="{{ url_for('main.sign_out') }}" class="govuk-link govuk-link--no-visited-state">sign out for now</a>
-        </li>
-      </ul>
+      <p class="govuk-body">
+        <a href="{{ url_for('main.sign_out') }}" class="govuk-link govuk-link--no-visited-state">Sign out of GOV.UK Notify</a>
+      </p>
     </div>
   </div>
 {% endblock %}
