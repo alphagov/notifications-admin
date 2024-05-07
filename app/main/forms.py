@@ -72,6 +72,7 @@ from app.main.validators import (
     FileIsVirusFree,
     IsAUKMobileNumberOrShortCode,
     IsNotAGenericSenderID,
+    IsNotAPotentiallyMaliciousSenderID,
     Length,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
@@ -1793,6 +1794,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             ),
             DoesNotStartWithDoubleZero(),
             IsNotAGenericSenderID(),
+            IsNotAPotentiallyMaliciousSenderID(),
             IsAUKMobileNumberOrShortCode(),
         ],
     )

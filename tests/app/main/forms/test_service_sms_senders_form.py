@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 
 from app.main.forms import ServiceSmsSenderForm
@@ -29,6 +31,11 @@ from app.main.forms import ServiceSmsSenderForm
         ("UK-GOV", False, None),  # Simple dashes are allowed
         ("UK.GOV", False, None),  # Full stops are allowed
         ("UK&GOV", False, None),  # Ampersands are allowed
+        (
+            "Evri",
+            True,
+            "Text message sender ID cannot be ‘Evri’ - this is to protect recipients from phishing scams",
+        ),
         pytest.param("'UC'", False, None, marks=pytest.mark.xfail),  # Apostrophes can cause SMS delivery issues
     ],
 )
@@ -43,3 +50,28 @@ def test_sms_sender_form_validation(client_request, mock_get_user_by_email, sms_
         assert error_message == form.errors["sms_sender"][0]
     else:
         assert not form.errors
+
+
+@pytest.mark.parametrize(
+    "sms_sender,log_expected,log_message",
+    [
+        ("UK&GOV", False, None),  # No warning log on valid senderID
+        (
+            "Evri",
+            True,
+            "User tried to set sender id to potentially malicious one: Evri",
+        ),
+    ],
+)
+def test_sms_validation_logs(caplog, sms_sender, log_expected, log_message):
+
+    form = ServiceSmsSenderForm()
+    form.sms_sender.data = sms_sender
+    with caplog.at_level(logging.WARNING):
+        form.validate()
+
+    if log_expected:
+        assert log_message in caplog.messages
+
+    else:
+        assert len(caplog.messages) == 0
