@@ -40,14 +40,14 @@ def get_tickets():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         while next_page:
-            print(next_page)
+            print(next_page)  # noqa
             response = requests.get(
                 next_page,
                 headers={"Content-type": "application/json"},
                 auth=(f"{NOTIFY_ZENDESK_EMAIL}/token", ZENDESK_API_KEY),
             )
             data = response.json()
-            print(data)
+            print(data)  # noqa
             for row in data["results"]:
                 service_url = [
                     x
@@ -84,14 +84,14 @@ def get_tickets_without_service_id():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         while next_page:
-            print(next_page)
+            print(next_page)  # noqa
             response = requests.get(
                 next_page,
                 headers={"Content-type": "application/json"},
                 auth=(f"{NOTIFY_ZENDESK_EMAIL}/token", ZENDESK_API_KEY),
             )
             data = response.json()
-            print(data)
+            print(data)  # noqa
             for row in data["results"]:
                 service_url = [
                     x
@@ -128,14 +128,14 @@ def get_tickets_with_description():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         while next_page:
-            print(next_page)
+            print(next_page)  # noqa
             response = requests.get(
                 next_page,
                 headers={"Content-type": "application/json"},
                 auth=(f"{NOTIFY_ZENDESK_EMAIL}/token", ZENDESK_API_KEY),
             )
             data = response.json()
-            print(data)
+            print(data)  # noqa
             for row in data["results"]:
                 writer.writerow(
                     {
