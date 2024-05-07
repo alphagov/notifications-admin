@@ -32,7 +32,7 @@ describe("Cookie settings", () => {
     jest.spyOn(window.GOVUK, 'initAnalytics');
 
     cookiesPageContent = `
-      <div class="cookie-settings__confirmation banner banner-with-tick" data-cookie-confirmation="true" role="group" tabindex="-1">
+      <div class="cookie-settings__confirmation banner banner-with-tick" data-cookie-confirmation="true" role="group" tabindex="-1" hidden>
         <h2 class="banner-title">Your cookie settings were saved</h2>
         <a class="govuk_link govuk_link--no-visited-state cookie-settings__prev-page" href="#" data-notify-module="track-click" data-track-category="cookieSettings" data-track-action="Back to previous page">
           Go back to the page you were looking at
@@ -52,32 +52,30 @@ describe("Cookie settings", () => {
         </ul>
       </div>
       <h2 class="heading-medium">Analytics cookies (optional)</h2>
-      <div class="cookie-settings__form-wrapper">
-        <form data-notify-module="cookie-settings">
-          <div class="govuk-form-group govuk-!-margin-top-6">
-            <fieldset class="govuk-fieldset" aria-describedby="changed-name-hint">
-              <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                Do you want to accept analytics cookies?
-              </legend>
-              <div class="govuk-radios govuk-radios--inline">
-                <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="cookies-analytics-yes" name="cookies-analytics" type="radio" value="on">
-                  <label class="govuk-label govuk-radios__label" for="cookies-analytics-yes">
-                    Yes
-                  </label>
-                </div>
-                <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="cookies-analytics-no" name="cookies-analytics" type="radio" value="off">
-                  <label class="govuk-label govuk-radios__label" for="cookies-analytics-no">
-                    No
-                  </label>
-                </div>
+      <form class="cookie-settings__form" data-notify-module="cookie-settings" hidden>
+        <div class="govuk-form-group govuk-!-margin-top-6">
+          <fieldset class="govuk-fieldset" aria-describedby="changed-name-hint">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+              Do you want to accept analytics cookies?
+            </legend>
+            <div class="govuk-radios govuk-radios--inline">
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="cookies-analytics-yes" name="cookies-analytics" type="radio" value="on">
+                <label class="govuk-label govuk-radios__label" for="cookies-analytics-yes">
+                  Yes
+                </label>
               </div>
-            </fieldset>
-          </div>
-          <button class="govuk-button" data-module="govuk-button">Save cookie settings</button>
-        </form>
-      </div>`;
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="cookies-analytics-no" name="cookies-analytics" type="radio" value="off">
+                <label class="govuk-label govuk-radios__label" for="cookies-analytics-no">
+                  No
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        <button class="govuk-button" data-module="govuk-button">Save cookie settings</button>
+      </form>`;
 
     document.body.innerHTML += cookiesPageContent;
 
@@ -112,10 +110,22 @@ describe("Cookie settings", () => {
 
           The message displayed to confirm any selection made is also in the page but hidden on load.
 
-    Both of these work through CSS, based on the presence of the `js-enabled` class on the <body> so are not tested here.
+    Both of these work through CSS. The former based on the presence of the `js-enabled` class on the <body>.
+    The later is hidden by the addition of a `hidden` attribute so are not tested here. Both don't use JS to
+    be hidden on load so that isn't tested here.
   */
 
   describe("When the page loads", () => {
+
+    test("the form to accept or reject analytics should be shown", () => {
+
+      expect(helpers.element(document.querySelector('form.cookie-settings__form')).is('hidden')).toBe(true);
+
+      window.GOVUK.notifyModules.start();
+
+      expect(helpers.element(document.querySelector('form.cookie-settings__form')).is('hidden')).toBe(false);
+
+    })
 
     test("If user has not chosen to accept or reject analytics, the radios for making that choice should be set to unchecked", () => {
 
