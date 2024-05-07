@@ -441,6 +441,10 @@ def format_auth_type(auth_type, with_indefinite_article=False):
     return auth_type
 
 
+def extract_path_from_url(url):
+    return urllib.parse.urlunsplit(urllib.parse.urlsplit(url)._replace(scheme="", netloc=""))
+
+
 def sentence_case(sentence):
     first_word, rest_of_sentence = (sentence + " ").split(" ", 1)
     return f"{first_word.title()} {rest_of_sentence}"[:-1]
