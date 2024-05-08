@@ -33,6 +33,10 @@ watch-frontend:  ## Build frontend and watch for changes
 run-flask:  ## Run flask
 	. environment.sh && flask run -p 6012
 
+.PHONY: run-flask-with-docker
+run-flask-with-docker: ## Run flask
+	./scripts/run_with_docker.sh web-local
+
 .PHONY: npm-audit
 npm-audit:  ## Check for vulnerabilities in NPM packages
 	source $(HOME)/.nvm/nvm.sh && npm run audit
@@ -63,6 +67,10 @@ test: ## Run tests
 .PHONY: watch-tests
 watch-tests: ## Watch tests and run on change
 	ptw --runner "pytest --testmon -n auto"
+
+.PHONY: test-with-docker
+test-with-docker: ## Run tests in Docker container
+	./scripts/run_with_docker.sh make test
 
 .PHONY: fix-imports
 fix-imports: ## Fix imports using ruff

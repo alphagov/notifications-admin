@@ -3,7 +3,7 @@ from io import BytesIO
 
 import pytest
 import requests
-from flask import Response, g, url_for
+from flask import Response, current_app, g, url_for
 from flask_wtf.csrf import CSRFError
 from notifications_python_client.errors import HTTPError
 
@@ -137,7 +137,9 @@ def test_api_error_response_logging(
     response.status_code = 400
     response.headers["content-type"] = "application/json"
     response.raw = BytesIO(b'{"message": "not found"}')
-    response.url = "http://localhost:6012/user/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/organisations-and-services"
+    response.url = (
+        f"{current_app.config['ADMIN_BASE_URL']}/user/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/organisations-and-services"
+    )
     requests_mock.get(
         "http://you-forgot-to-mock-an-api-call-to/user/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/organisations-and-services",
         exc=requests.HTTPError(response=response),
@@ -149,6 +151,7 @@ def test_api_error_response_logging(
         )
 
     assert (
-        "API http://localhost:6012/user/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/organisations-and-services "
+        f"API {current_app.config['ADMIN_BASE_URL']}"
+        "/user/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/organisations-and-services "
         "failed with status=400, message='not found'"
     ) in caplog.messages

@@ -1,5 +1,7 @@
 from unittest.mock import ANY
 
+from flask import current_app
+
 from app import invite_api_client
 
 
@@ -41,7 +43,7 @@ def test_client_creates_invite(
             "service": "67890",
             "created_by": ANY,
             "permissions": "send_emails,send_letters,send_texts",
-            "invite_link_host": "http://localhost:6012",
+            "invite_link_host": current_app.config["ADMIN_BASE_URL"],
             "folder_permissions": [fake_uuid],
         },
     )
