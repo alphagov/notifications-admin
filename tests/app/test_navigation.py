@@ -412,9 +412,9 @@ navigation_instances = (
 )
 def test_navigation_items_are_properly_defined(navigation_instance):
     for endpoint in navigation_instance.endpoints_with_navigation:
-        assert endpoint in all_endpoints, (
-            f"{endpoint} is not a real endpoint (in {type(navigation_instance).__name__}.mapping)"
-        )
+        assert (
+            endpoint in all_endpoints
+        ), f"{endpoint} is not a real endpoint (in {type(navigation_instance).__name__}.mapping)"
         assert (
             navigation_instance.endpoints_with_navigation.count(endpoint) == 1
         ), f"{endpoint} found more than once in {type(navigation_instance).__name__}.mapping"

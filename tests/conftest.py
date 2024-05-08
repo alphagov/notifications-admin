@@ -2241,7 +2241,7 @@ def mock_create_invite(mocker, sample_invite):
 def mock_get_invites_for_service(mocker, service_one, sample_invite):
     def _get_invites(service_id):
         data = []
-        for i in range(0, 5):
+        for i in range(5):
             invite = copy.copy(sample_invite)
             invite["email_address"] = f"user_{i}@testnotify.gov.uk"
             data.append(invite)
@@ -3523,7 +3523,7 @@ def sample_org_invite(mocker, organisation_one):
 def mock_get_invites_for_organisation(mocker, sample_org_invite):
     def _get_org_invites(org_id):
         data = []
-        for i in range(0, 5):
+        for i in range(5):
             invite = copy.copy(sample_org_invite)
             invite["email_address"] = f"user_{i}@testnotify.gov.uk"
             data.append(invite)

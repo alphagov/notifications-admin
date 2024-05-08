@@ -145,7 +145,7 @@ def get_next_days_until(until):
     now = datetime.utcnow()
     days = int((until - now).total_seconds() / (60 * 60 * 24))
 
-    return [get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc)) for i in range(0, days + 1)]
+    return [get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc)) for i in range(days + 1)]
 
 
 class RadioField(WTFormsRadioField):

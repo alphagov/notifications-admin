@@ -2583,7 +2583,7 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
 ):
     mocker.patch(
         "app.main.views.send.s3download",
-        return_value="\n".join(["phone number"] + [f"07700 9007{final_two:02d}" for final_two in range(0, 53)]),
+        return_value="\n".join(["phone number"] + [f"07700 9007{final_two:02d}" for final_two in range(53)]),
     )
     mock_get_notification_count = mocker.patch("app.service_api_client.get_notification_count", return_value=0)
     page = client_request.post(

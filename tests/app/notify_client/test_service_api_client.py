@@ -573,7 +573,7 @@ def test_client_updates_service_with_allowed_attributes(
         attrs_dict[attr] = "value"
 
     client.update_service(SERVICE_ONE_ID, **attrs_dict)
-    mock_post.assert_called_once_with(f"/service/{SERVICE_ONE_ID}", {**{"created_by": "123"}, **attrs_dict})
+    mock_post.assert_called_once_with(f"/service/{SERVICE_ONE_ID}", {"created_by": "123", **attrs_dict})
 
 
 @pytest.mark.parametrize(

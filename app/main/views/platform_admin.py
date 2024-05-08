@@ -714,7 +714,7 @@ def get_url_for_notify_record(uuid_):
         with_service_id: bool = False
 
         # Extra parameters to pass to `url_for`.
-        extra: dict = dataclasses.field(default_factory=lambda: {})
+        extra: dict = dataclasses.field(default_factory=dict)
 
     try:
         uuid.UUID(uuid_)
