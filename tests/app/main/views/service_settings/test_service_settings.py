@@ -5340,9 +5340,9 @@ class TestSetAuthTypeForUsers:
     @pytest.mark.parametrize(
         "form_data, should_fail",
         (
-            (dict(users=["a"]), False),  # Change user a to email_auth
-            (dict(users=[]), False),  # Change both user a and user b to sms_auth
-            (dict(users=["c"]), True),  # Change user c to email_auth
+            ({"users": ["a"]}, False),  # Change user a to email_auth
+            ({"users": []}, False),  # Change both user a and user b to sms_auth
+            ({"users": ["c"]}, True),  # Change user c to email_auth
         ),
     )
     def test_user_with_webauthn_auth_not_listed_or_editable(

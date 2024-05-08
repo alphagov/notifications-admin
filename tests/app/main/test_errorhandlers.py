@@ -109,7 +109,7 @@ def test_no_session_for_json_endpoint_returns_401(
     client_request,
     service_one,
 ):
-    with set_config_values(notify_admin, dict(WTF_CSRF_ENABLED=True)):
+    with set_config_values(notify_admin, {"WTF_CSRF_ENABLED": True}):
         client_request.logout()
         client_request.post_response(
             "json_updates.get_notifications_page_partials_as_json",

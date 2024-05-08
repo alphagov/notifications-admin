@@ -244,7 +244,7 @@ def live_services_csv():
     }
 
     # initialise with header row
-    live_services_data = [[x for x in column_names.values()]]
+    live_services_data = [list(column_names.values())]
 
     for row in results:
         if row["live_date"]:

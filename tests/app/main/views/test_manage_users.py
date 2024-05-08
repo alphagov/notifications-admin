@@ -646,7 +646,7 @@ def test_edit_user_folder_permissions(
         "main.edit_user_permissions",
         service_id=SERVICE_ONE_ID,
         user_id=fake_uuid,
-        _data=dict(folder_permissions=["folder-id-1", "folder-id-3"]),
+        _data={"folder_permissions": ["folder-id-1", "folder-id-3"]},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.manage_users",

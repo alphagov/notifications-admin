@@ -217,7 +217,7 @@ class EmailBrandingPool(AllEmailBranding):
     client_method = organisations_client.get_email_branding_pool
 
     def __init__(self, id):
-        self.items = tuple()
+        self.items = ()
         if id:
             self.items = self.client_method(id)
 
@@ -231,7 +231,7 @@ class LetterBrandingPool(AllLetterBranding):
     client_method = organisations_client.get_letter_branding_pool
 
     def __init__(self, id):
-        self.items = tuple()
+        self.items = ()
         if id:
             self.items = self.client_method(id)
 

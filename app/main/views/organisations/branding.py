@@ -98,7 +98,7 @@ def _handle_change_default_email_branding(form, new_default_branding_id) -> Resp
         except current_organisation.email_branding_pool.NotFound:
             current_app.logger.info(
                 "Email branding ID %(branding_id)s is not present in organisation %(org_name)s's email branding pool.",
-                dict(branding_id=branding_id, org_name=current_organisation.name),
+                {"branding_id": branding_id, "org_name": current_organisation.name},
             )
             abort(400)
 
@@ -269,7 +269,7 @@ def _handle_change_default_letter_branding(form, new_default_branding_id):
         except current_organisation.letter_branding_pool.NotFound:
             current_app.logger.info(
                 "Letter branding ID %(id)s is not present in organisation %(org_name)s's letter branding pool.",
-                dict(id=branding_id, org_name=current_organisation.name),
+                {"id": branding_id, "org_name": current_organisation.name},
             )
             abort(400)
 

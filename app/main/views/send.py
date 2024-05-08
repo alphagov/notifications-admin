@@ -123,12 +123,12 @@ def send_messages(service_id, template_id):
         try:
             current_app.logger.info(
                 "User %(user_id)s uploaded %(filename)s",
-                dict(user_id=current_user.id, filename=form.file.data.filename),
+                {"user_id": current_user.id, "filename": form.file.data.filename},
             )
             upload_id = s3upload(service_id, Spreadsheet.from_file_form(form).as_dict, current_app.config["AWS_REGION"])
             current_app.logger.info(
                 "%(filename)s persisted in S3 as %(upload_id)s",
-                dict(filename=form.file.data.filename, upload_id=upload_id),
+                {"filename": form.file.data.filename, "upload_id": upload_id},
             )
             file_name_metadata = unicode_truncate(SanitiseASCII.encode(form.file.data.filename), 1600)
             set_metadata_on_csv_upload(service_id, upload_id, original_file_name=file_name_metadata)
@@ -637,33 +637,33 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
 
     original_file_name = get_csv_metadata(service_id, upload_id).get("original_file_name", "")
 
-    return dict(
-        recipients=recipients,
-        template=template,
-        errors=recipients.has_errors,
-        row_errors=get_errors_for_csv(recipients, template.template_type),
-        count_of_recipients=len(recipients),
-        count_of_displayed_recipients=len(list(recipients.displayed_rows)),
-        original_file_name=original_file_name,
-        upload_id=upload_id,
-        form=CsvUploadForm(),
-        remaining_messages=remaining_messages,
-        _choose_time_form=choose_time_form,
-        back_link=back_link,
-        trying_to_send_letters_in_trial_mode=all(
+    return {
+        "recipients": recipients,
+        "template": template,
+        "errors": recipients.has_errors,
+        "row_errors": get_errors_for_csv(recipients, template.template_type),
+        "count_of_recipients": len(recipients),
+        "count_of_displayed_recipients": len(list(recipients.displayed_rows)),
+        "original_file_name": original_file_name,
+        "upload_id": upload_id,
+        "form": CsvUploadForm(),
+        "remaining_messages": remaining_messages,
+        "_choose_time_form": choose_time_form,
+        "back_link": back_link,
+        "trying_to_send_letters_in_trial_mode": all(
             (
                 current_service.trial_mode,
                 template.template_type == "letter",
             )
         ),
-        first_recipient_column=recipients.recipient_column_headers[0],
-        preview_row=preview_row,
-        sent_previously=job_api_client.has_sent_previously(
+        "first_recipient_column": recipients.recipient_column_headers[0],
+        "preview_row": preview_row,
+        "sent_previously": job_api_client.has_sent_previously(
             service_id, template.id, template.get_raw("version"), original_file_name
         ),
-        letter_min_address_lines=PostalAddress.MIN_LINES,
-        letter_max_address_lines=PostalAddress.MAX_LINES,
-    )
+        "letter_min_address_lines": PostalAddress.MIN_LINES,
+        "letter_max_address_lines": PostalAddress.MAX_LINES,
+    }
 
 
 @main.route("/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>", methods=["GET"])
@@ -981,7 +981,7 @@ def send_notification(service_id, template_id):
     except HTTPError as exception:
         current_app.logger.info(
             'Service %(service_id)s could not send notification: "%(message)s"',
-            dict(service_id=current_service.id, message=exception.message),
+            {"service_id": current_service.id, "message": exception.message},
         )
         return render_template(
             "views/notifications/check.html",

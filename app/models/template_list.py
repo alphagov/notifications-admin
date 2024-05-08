@@ -82,7 +82,7 @@ class TemplateList:
         return [
             template
             for template in self.all_templates
-            if (set([template_type]) & {"all", template["template_type"]})
+            if ({template_type} & {"all", template["template_type"]})
             and template.get("folder") == template_folder_id
         ]
 

@@ -396,7 +396,7 @@ def flask_app():
     yield app
 
 
-all_endpoints = set(rule.endpoint for rule in next(flask_app()).url_map.iter_rules())
+all_endpoints = {rule.endpoint for rule in next(flask_app()).url_map.iter_rules()}
 
 navigation_instances = (
     MainNavigation(),

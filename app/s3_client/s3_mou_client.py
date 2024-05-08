@@ -19,6 +19,6 @@ def get_mou(organisation_is_crown):
         }
     except botocore.exceptions.ClientError as exception:
         current_app.logger.error(
-            "Unable to download s3 file %(bucket)s/%(filename)s", dict(bucket=bucket, filename=filename)
+            "Unable to download s3 file %(bucket)s/%(filename)s", {"bucket": bucket, "filename": filename}
         )
         raise exception

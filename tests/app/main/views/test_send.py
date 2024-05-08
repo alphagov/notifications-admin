@@ -3025,10 +3025,10 @@ def test_route_permissions_sending(
 @pytest.mark.parametrize(
     "template_type, has_placeholders, extra_args, expected_url",
     [
-        ("sms", False, dict(), partial(url_for, ".send_messages")),
-        ("sms", True, dict(), partial(url_for, ".send_messages")),
-        ("letter", False, dict(from_test=True), partial(url_for, ".send_one_off")),
-        ("sms", True, dict(from_test=True), partial(url_for, ".send_one_off")),
+        ("sms", False, {}, partial(url_for, ".send_messages")),
+        ("sms", True, {}, partial(url_for, ".send_messages")),
+        ("letter", False, {"from_test": True}, partial(url_for, ".send_one_off")),
+        ("sms", True, {"from_test": True}, partial(url_for, ".send_one_off")),
     ],
 )
 def test_check_messages_back_link(

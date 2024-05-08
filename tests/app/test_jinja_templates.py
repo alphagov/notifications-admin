@@ -27,7 +27,7 @@ def test_for_unused_jinja_imports(client_request, file):
 
     parse_tree = current_app.jinja_env.parse(file.read_text())
 
-    calls = set(node.node.name for node in parse_tree.find_all(Call) if isinstance(node.node, Name))
+    calls = {node.node.name for node in parse_tree.find_all(Call) if isinstance(node.node, Name)}
     imports = OrderedSet(chain.from_iterable(get_import_names(node.names) for node in parse_tree.find_all(FromImport)))
 
     if unused_imports := imports - calls:

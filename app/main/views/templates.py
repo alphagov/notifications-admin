@@ -641,7 +641,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             if (
                 e.status_code == 400
                 and "content" in e.message
-                and any(["character count greater than" in x for x in e.message["content"]])
+                and any("character count greater than" in x for x in e.message["content"])
             ):
                 form.template_content.errors.extend(e.message["content"])
             else:
@@ -751,7 +751,7 @@ def edit_service_template(service_id, template_id, language=None):
             )
         except HTTPError as e:
             if e.status_code == 400:
-                if "content" in e.message and any(["character count greater than" in x for x in e.message["content"]]):
+                if "content" in e.message and any("character count greater than" in x for x in e.message["content"]):
                     form.template_content.errors.extend(e.message["content"])
                 elif "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
                     form.template_content.errors.append(
@@ -947,7 +947,7 @@ def view_template_versions(service_id, template_id):
         service_id=service_id,
         page=page,
         num_pages=num_pages,
-        url_args=dict(template_id=template_id),
+        url_args={"template_id": template_id},
     )
 
     return render_template(
@@ -1358,7 +1358,7 @@ def letter_template_change_language(template_id, service_id):
         abort(404)
 
     current_languages = template.get_raw("letter_languages")
-    form = LetterTemplateLanguagesForm(data=dict(languages=current_languages))
+    form = LetterTemplateLanguagesForm(data={"languages": current_languages})
     if form.validate_on_submit():
         languages = form.languages.data
         if languages != current_languages:

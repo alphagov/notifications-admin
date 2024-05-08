@@ -61,7 +61,7 @@ def test_organisation_email_branding_page_shows_all_branding_pool_options(
 
     assert page.select_one("h1").text == "Email branding"
     assert (
-        set(normalize_spaces(heading.text) for heading in page.select(".govuk-heading-s")) == expected_branding_options
+        {normalize_spaces(heading.text) for heading in page.select(".govuk-heading-s")} == expected_branding_options
     )
 
     add_options_button = page.select(".govuk-button--secondary")[-1]

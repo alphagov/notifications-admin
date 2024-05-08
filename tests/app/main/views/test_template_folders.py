@@ -441,7 +441,7 @@ def test_should_show_templates_folder_page(
     assert len(all_page_items) == len(all_page_items_styled_with_checkboxes)
 
     checkboxes = page.select("input[name=templates_and_folders]")
-    unique_checkbox_values = set(item["value"] for item in checkboxes)
+    unique_checkbox_values = {item["value"] for item in checkboxes}
     assert len(all_page_items) == len(expected_items)
     assert len(checkboxes) == len(expected_items)
     assert len(unique_checkbox_values) == len(expected_items)
@@ -1114,7 +1114,7 @@ def test_should_show_radios_and_buttons_for_move_destination_if_correct_permissi
         "folder_one_two",
         "folder_two",
     ]
-    assert set(x["value"] for x in page.select("button[name=operation]")) == {
+    assert {x["value"] for x in page.select("button[name=operation]")} == {
         "unknown",
         "move-to-existing-folder",
         "move-to-new-folder",
