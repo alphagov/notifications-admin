@@ -2,6 +2,7 @@ import uuid
 from unittest.mock import Mock, call
 
 import pytest
+from flask import current_app
 from notifications_python_client.errors import HTTPError
 
 from app import invite_api_client, service_api_client, user_api_client
@@ -85,7 +86,7 @@ def test_client_passes_admin_url_when_sending_email_auth(
         f"/user/{fake_uuid}/email-code",
         data={
             "to": "ignored@example.com",
-            "email_auth_link_host": "http://localhost:6012",
+            "email_auth_link_host": current_app.config["ADMIN_BASE_URL"],
         },
     )
 
@@ -315,7 +316,7 @@ def test_reset_password(
         "/user/reset-password",
         data={
             "email": "test@example.com",
-            "admin_base_url": "http://localhost:6012",
+            "admin_base_url": current_app.config["ADMIN_BASE_URL"],
         },
     )
 
@@ -332,6 +333,6 @@ def test_send_registration_email(
         f"/user/{fake_uuid}/email-verification",
         data={
             "to": "test@example.com",
-            "admin_base_url": "http://localhost:6012",
+            "admin_base_url": current_app.config["ADMIN_BASE_URL"],
         },
     )
