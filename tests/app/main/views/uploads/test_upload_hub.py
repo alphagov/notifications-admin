@@ -130,7 +130,7 @@ def test_get_upload_hub_page(
         "some.pdf Sent 1 January 2016 at 11:09am Firstname Lastname 123 Example Street"
     )
     assert normalize_spaces(str(uploads[2].select_one(".govuk-body"))) == (
-        '<p class="govuk-body letter-recipient-summary"> ' "Firstname Lastname<br/> 123 Example Street<br/> " "</p>"
+        '<p class="govuk-body letter-recipient-summary"> Firstname Lastname<br/> 123 Example Street<br/> </p>'
     )
     assert uploads[2].select_one("a.file-list-filename-large")["href"] == (
         f"/services/{SERVICE_ONE_ID}/notification/letter_id_1"

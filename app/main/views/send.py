@@ -530,7 +530,7 @@ def send_test_preview(service_id, template_id, filetype):
     )
 
 
-@main.route("/services/<uuid:service_id>/send/<uuid:template_id>" "/from-contact-list")
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/from-contact-list")
 @user_has_permissions("send_messages")
 def choose_from_contact_list(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
@@ -544,7 +544,7 @@ def choose_from_contact_list(service_id, template_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/send/<uuid:template_id>" "/from-contact-list/<uuid:contact_list_id>")
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/from-contact-list/<uuid:contact_list_id>")
 @user_has_permissions("send_messages")
 def send_from_contact_list(service_id, template_id, contact_list_id):
     contact_list = ContactList.from_id(

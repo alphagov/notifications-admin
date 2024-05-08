@@ -1146,7 +1146,7 @@ def letter_template_edit_pages(template_id, service_id):
         )
 
     flash(
-        f"Are you sure you want to remove the " f"‘{template.attachment.original_filename}’ attachment?",
+        f"Are you sure you want to remove the ‘{template.attachment.original_filename}’ attachment?",
         "remove",
     )
 

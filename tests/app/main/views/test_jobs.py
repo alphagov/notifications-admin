@@ -506,7 +506,7 @@ def test_should_download_scheduled_job(
     mock_get_scheduled_job,
     fake_uuid,
 ):
-    original_file_contents = "phone number,name\n" "+447700900986,John\n" "+447700900986,Smith\n"
+    original_file_contents = "phone number,name\n+447700900986,John\n+447700900986,Smith\n"
     mocker.patch(
         "app.main.views.jobs.s3download",
         return_value=original_file_contents,

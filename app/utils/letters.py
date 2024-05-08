@@ -95,7 +95,7 @@ LETTER_VALIDATION_MESSAGES = {
     "no-encoded-string": {"title": "Sanitise failed - No encoded string"},
     "unable-to-read-the-file": {
         "title": "There’s a problem with your file",
-        "detail": ("Notify cannot read this PDF." "<br>Save a new copy of your file and try again."),
+        "detail": ("Notify cannot read this PDF.<br>Save a new copy of your file and try again."),
         "summary": (
             "Validation failed because Notify cannot read this PDF.<br>Save a new copy of your file and try again."
         ),

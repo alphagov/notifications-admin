@@ -954,7 +954,7 @@ def test_should_show_page_if_prefilled_user_is_already_invited(
     assert normalize_spaces(page.select_one("title").text).startswith("This person has already received an invite")
     assert normalize_spaces(page.select_one("h1").text) == "This person has already received an invite"
     assert normalize_spaces(page.select_one("main .govuk-body").text) == (
-        "Service Two User has not accepted their invitation to " "‘service one’ yet. You do not need to do anything."
+        "Service Two User has not accepted their invitation to ‘service one’ yet. You do not need to do anything."
     )
     assert not page.select("form")
 
