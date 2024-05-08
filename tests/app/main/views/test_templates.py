@@ -345,7 +345,7 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
     )
 
     if not page.select("#add_new_template_form"):
-        raise ElementNotFound()
+        raise ElementNotFound
 
     assert normalize_spaces(page.select_one("#add_new_template_form fieldset legend").text) == "New template"
     assert [choice["value"] for choice in page.select("#add_new_template_form input[type=radio]")] == expected_values
@@ -378,7 +378,7 @@ def test_should_add_data_attributes_for_services_that_only_allow_one_type_of_not
     )
 
     if not page.select("#add_new_template_form"):
-        raise ElementNotFound()
+        raise ElementNotFound
 
     if are_data_attrs_added:
         assert page.select_one("#add_new_template_form").attrs["data-channel"] == permissions[0]
