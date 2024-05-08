@@ -257,9 +257,7 @@ def live_services_csv():
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": 'inline; filename="{} live services report.csv"'.format(
-                format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
-            ),
+            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())} live services report.csv"',
         },
     )
 
@@ -417,7 +415,7 @@ def get_dvla_billing_report():
                 {
                     "Content-Type": "text/csv; charset=utf-8",
                     "Content-Disposition": (
-                        f"attachment; " f'filename="DVLA Billing Report from {start_date} to {end_date}.csv"'
+                        f'attachment; filename="DVLA Billing Report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
@@ -472,7 +470,7 @@ def get_volumes_by_service():
                 {
                     "Content-Type": "text/csv; charset=utf-8",
                     "Content-Disposition": (
-                        f"attachment; " f'filename="Volumes by service report from {start_date} to {end_date}.csv"'
+                        f'attachment; filename="Volumes by service report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
@@ -523,7 +521,7 @@ def get_daily_volumes():
                 {
                     "Content-Type": "text/csv; charset=utf-8",
                     "Content-Disposition": (
-                        f"attachment; " f'filename="Daily volumes report from {start_date} to {end_date}.csv"'
+                        f'attachment; filename="Daily volumes report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
