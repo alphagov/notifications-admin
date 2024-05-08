@@ -141,3 +141,48 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
   padding-top: govuk-spacing(3);
   margin-bottom: govuk-spacing(6);
 }
+
+
+// enhanced govuk-textarea with highlight
+.govuk-textarea-highlight {
+  &__wrapper {
+    position: relative;
+  }
+
+  &__textbox {
+    resize: none;
+    z-index: 20;
+    background: none;
+    position: relative;
+    // govuk-textarea has a default bottom margin of 15px
+    margin-bottom: 0;
+    padding: 4px;
+  }
+
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    color: transparent;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    padding: 4px;
+    border: 2px solid transparent;
+    padding-bottom: govuk-spacing(3);
+    z-index: 10;
+    // match govuk-textarea line height
+    line-height: 1.25;
+
+    // transparent borders become visible in high contrast modes so set to match background
+    @media (-ms-high-contrast: active), (forced-colors: active) {
+      border-color: Canvas;
+    }
+
+    .placeholder,
+    .placeholder-conditional {
+      color: transparent;
+    }
+  }
+}
