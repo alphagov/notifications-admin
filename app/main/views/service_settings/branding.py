@@ -82,6 +82,7 @@ def email_branding_options(service_id):
                     ".branding_option_preview",
                     service_id=current_service.id,
                     branding_option=branding_choice,
+                    branding_choice=branding_choice,
                     branding_type="email",
                 )
             )
@@ -505,7 +506,9 @@ def branding_option_preview(service_id, branding_type):
     else:
         branding_pool = current_service.letter_branding_pool
     try:
-        chosen_branding = branding_pool.get_item_by_id(request.args.get("branding_option"))
+        chosen_branding = branding_pool.get_item_by_id(
+            request.args.get("branding_choice", request.args.get("branding_option"))
+        )
     except branding_pool.NotFound:
         flash("No branding found for this id.")
         return redirect(url_for(f".{branding_type}_branding_options", service_id=current_service.id))
@@ -589,6 +592,7 @@ def letter_branding_options(service_id):
                     ".branding_option_preview",
                     service_id=current_service.id,
                     branding_option=branding_choice,
+                    branding_choice=branding_choice,
                     branding_type="letter",
                 )
             )

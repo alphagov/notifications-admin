@@ -463,6 +463,7 @@ def test_email_branding_options_redirects_to_branding_preview_for_a_branding_poo
             "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="email-branding-1-id",
+            branding_choice="email-branding-1-id",
             branding_type="email",
         ),
     )

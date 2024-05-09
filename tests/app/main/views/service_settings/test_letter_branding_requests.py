@@ -162,6 +162,7 @@ def test_letter_branding_options_redirects_to_branding_preview_for_a_branding_po
             "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="1234",
+            branding_choice="1234",
             branding_type="letter",
         ),
     )
