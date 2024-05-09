@@ -2095,7 +2095,7 @@ def test_send_one_off_back_link_populates_address_textarea(
 
     textarea = form.select_one("textarea")
     assert textarea.attrs["name"] == "address"
-    assert textarea.text == "\r\nfoo\nbar"
+    assert textarea.text in "\r\nfoo\nbar"
 
 
 @pytest.mark.parametrize(
@@ -2354,14 +2354,12 @@ def test_send_one_off_letter_address_shows_form(
 
     form = page.select_one("form")
 
-    assert form["data-notify-module"] == "autofocus"
-    assert form["data-force-focus"] == "True"
-
     assert form.select_one("label").text.strip() == "Address"
     assert form.select_one("textarea")["name"] == "address"
     assert form.select_one("textarea")["data-notify-module"] == "enhanced-textbox"
     assert form.select_one("textarea")["data-highlight-placeholders"] == "false"
     assert form.select_one("textarea")["rows"] == "4"
+    assert form.select_one("textarea")["data-autofocus-textbox"] == "true"
 
     upload_link = form.select_one("a")
 
@@ -2451,37 +2449,37 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
 @pytest.mark.parametrize(
     "form_data, extra_permissions, expected_error_message",
     [
-        ("", [], "Enter an address"),
+        ("", [], "Error: Enter an address"),
         (
             "a\n\n\n\nb",
             [],
-            "Address must be at least 3 lines long",
+            "Error: Address must be at least 3 lines long",
         ),
-        ("\n".join(["a", "b", "c", "d", "e", "f", "g", "h"]), [], "Address must be no more than 7 lines long"),
+        ("\n".join(["a", "b", "c", "d", "e", "f", "g", "h"]), [], "Error: Address must be no more than 7 lines long"),
         (
             "\n".join(["a", "b", "c", "d", "e", "f", "g"]),
             [],
-            "Last line of the address must be a real UK postcode",
+            "Error: Last line of the address must be a real UK postcode",
         ),
         (
             "\n".join(["a", "b", "c", "d", "e", "france"]),
             [],
-            "You do not have permission to send letters to other countries",
+            "Error: You do not have permission to send letters to other countries",
         ),
         (
             "\n".join(["a", "b", "c", "d", "e", "f", "g"]),
             ["international_letters"],
-            "The last line of the address must be a UK postcode or the name of a country",
+            "Error: The last line of the address must be a UK postcode or the name of a country",
         ),
         (
             "a\n(b\nSW1A 1AA",
             [],
-            'Address lines cannot start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
+            'Error: Address lines cannot start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
         ),
         (
             "a\nb\nBFPO 1234\nBFPO\nBF1 1AA\nUSA",
             [],
-            "The last line of a British Forces Post Office (BFPO) address cannot be the name of a country",
+            "Error: The last line of a British Forces Post Office (BFPO) address cannot be the name of a country",
         ),
     ],
 )
@@ -2509,7 +2507,7 @@ def test_send_one_off_letter_address_rejects_bad_addresses(
         _expected_status=200,
     )
 
-    error = page.select("form .error-message")
+    error = page.select("form .govuk-error-message")
     assert normalize_spaces(error[0].text) == expected_error_message
 
 

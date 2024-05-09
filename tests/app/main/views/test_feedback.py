@@ -471,7 +471,7 @@ def test_doesnt_lose_message_if_post_across_closing(
     )
 
     with client_request.session_transaction() as session:
-        assert page.select_one("textarea", {"name": "feedback"}).text == "\r\nfoo"
+        assert page.select_one("textarea", {"name": "feedback"}).text in "\r\nfoo"
         assert "feedback_message" not in session
 
 

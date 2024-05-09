@@ -2702,8 +2702,8 @@ def test_no_senders_message_shows(client_request, sender_list_page, endpoint_to_
 @pytest.mark.parametrize(
     "reply_to_input, expected_error",
     [
-        ("", "Enter an email address"),
-        ("testtest", "Enter an email address in the correct format, like name@example.gov.uk"),
+        ("", "Error: Enter an email address"),
+        ("testtest", "Error: Enter an email address in the correct format, like name@example.gov.uk"),
     ],
 )
 def test_incorrect_reply_to_email_address_input(
@@ -2722,10 +2722,10 @@ def test_incorrect_reply_to_email_address_input(
 @pytest.mark.parametrize(
     "contact_block_input, expected_error",
     [
-        ("", "Enter a sender address"),
+        ("", "Error: Enter a sender address"),
         (
             "1 \n 2 \n 3 \n 4 \n 5 \n 6 \n 7 \n 8 \n 9 \n 0 \n a",
-            "This address is 11 lines long - the most you can have is 10 lines",
+            "Error: This address is 11 lines long - the most you can have is 10 lines",
         ),
     ],
 )
@@ -2739,7 +2739,7 @@ def test_incorrect_letter_contact_block_input(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select_one(".error-message").text) == expected_error
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == expected_error
 
 
 @pytest.mark.parametrize(
@@ -2747,14 +2747,15 @@ def test_incorrect_letter_contact_block_input(
     [
         ("elevenchars", None),
         ("11 chars", None),
-        ("", "Enter a text message sender ID"),
-        ("abcdefghijkhgkg", "Text message sender ID cannot be longer than 11 characters"),
+        ("", "Error: Enter a text message sender ID"),
+        ("abcdefghijkhgkg", "Error: Text message sender ID cannot be longer than 11 characters"),
         (
             r" ¯\_(ツ)_/¯ ",
-            "Text message sender ID can only include letters, numbers, spaces, and the following characters: & . - _",
+            "Error: Text message sender ID can only include letters, "
+            "numbers, spaces, and the following characters: & . - _",
         ),
         ("blood.co.uk", None),
-        ("00123", "Text message sender ID cannot start with 00"),
+        ("00123", "Error: Text message sender ID cannot start with 00"),
     ],
 )
 def test_incorrect_sms_sender_input(
@@ -5906,7 +5907,7 @@ def test_view_edit_service_notes(
         service_id=SERVICE_ONE_ID,
     )
     assert page.select_one("h1").text == "Edit service notes"
-    assert page.select_one("label.form-label").text.strip() == "Notes"
+    assert page.select_one(".govuk-label").text.strip() == "Notes"
     assert page.select_one("textarea").attrs["name"] == "notes"
 
 
