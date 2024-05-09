@@ -346,7 +346,11 @@ def test_GET_letter_branding_upload_branding_renders_form(
     file_input = form.select_one("input")
     abandon_flow_link = page.select("main a")[-1]
 
-    assert back_button["href"] == url_for("main.letter_branding_options", service_id=SERVICE_ONE_ID)
+    assert back_button["href"] == url_for(
+        "main.letter_branding_options",
+        service_id=SERVICE_ONE_ID,
+        branding_choice="something_else",
+    )
     assert form["method"] == "post"
     assert "Submit" in submit_button.text
     assert file_input["name"] == "branding"
@@ -380,14 +384,19 @@ def test_GET_letter_branding_upload_branding_renders_form_without_prompt_if_user
     assert "branding is not set up yet" not in normalize_spaces(page.select_one("main").text)
 
 
-@pytest.mark.parametrize("query_params", [{"from_template": "1234-1234-1234"}, {}])
+@pytest.mark.parametrize(
+    "query_params",
+    [
+        {"from_template": "1234-1234-1234", "branding_choice": "something_else"},
+        {"branding_choice": "something_else"},
+    ],
+)
 def test_GET_letter_branding_upload_branding_passes_from_template_through_to_back_link(
     client_request, service_one, query_params
 ):
     page = client_request.get(
         "main.letter_branding_upload_branding",
         service_id=SERVICE_ONE_ID,
-        branding_choice="something_else",
         **query_params,
     )
     back_link = page.select("a.govuk-back-link")
