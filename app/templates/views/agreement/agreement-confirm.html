@@ -24,11 +24,11 @@
 
       {% if current_service.organisation.agreement_signed_on_behalf_of_name and current_service.organisation.agreement_signed_on_behalf_of_email_address %}
         <p class="govuk-body">
-          I confirm that I have the legal authority to accept the GOV.UK Notify data sharing and financial agreement (version {{ current_service.organisation.agreement_signed_version }}) on behalf of {{ current_service.organisation.agreement_signed_on_behalf_of_name }} ({{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}) and that {{ current_service.organisation.name }} will be bound by it.
+          I confirm that I have the legal authority to accept the GOV.UK Notify data processing and financial agreement (version {{ current_service.organisation.agreement_signed_version }}) on behalf of {{ current_service.organisation.agreement_signed_on_behalf_of_name }} ({{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}) and that {{ current_service.organisation.name }} will be bound by it.
         </p>
       {% else %}
         <p class="govuk-body">
-          I confirm that I have the legal authority to accept the GOV.UK Notify data sharing and financial agreement (version {{ current_service.organisation.agreement_signed_version }}) and that {{ current_service.organisation.name }} will be bound by it.
+          I confirm that I have the legal authority to accept the GOV.UK Notify data processing and financial agreement (version {{ current_service.organisation.agreement_signed_version }}) and that {{ current_service.organisation.name }} will be bound by it.
         </p>
       {% endif %}
 
