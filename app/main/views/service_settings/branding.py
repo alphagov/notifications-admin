@@ -71,10 +71,13 @@ def email_branding_options(service_id):
                     ".branding_nhs",
                     service_id=current_service.id,
                     branding_type="email",
+                    branding_choice=branding_choice,
                 )
             )
         elif branding_choice == "govuk":
-            return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
+            return redirect(
+                url_for(".email_branding_govuk", service_id=current_service.id, branding_choice=branding_choice)
+            )
 
         elif branding_choice in current_service.email_branding_pool.ids:
             return redirect(
@@ -583,6 +586,7 @@ def letter_branding_options(service_id):
                     ".branding_nhs",
                     service_id=current_service.id,
                     branding_type="letter",
+                    branding_choice=branding_choice,
                 )
             )
 

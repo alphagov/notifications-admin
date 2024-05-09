@@ -253,6 +253,7 @@ def test_letter_branding_options_redirects_to_nhs_page(
             "main.branding_nhs",
             service_id=SERVICE_ONE_ID,
             branding_type="letter",
+            branding_choice=LetterBranding.NHS_ID,
         ),
     )
 

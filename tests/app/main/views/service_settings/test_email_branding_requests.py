@@ -283,7 +283,7 @@ def test_email_branding_options_page_shows_preview_if_something_else_is_only_opt
             {"options": "govuk"},
             "central",
             "main.email_branding_govuk",
-            {},
+            {"branding_choice": "govuk"},
         ),
         (
             {"options": "govuk_and_org"},
@@ -319,7 +319,7 @@ def test_email_branding_options_page_shows_preview_if_something_else_is_only_opt
             {"options": EmailBranding.NHS_ID},
             "nhs_local",
             "main.branding_nhs",
-            {"branding_type": "email"},
+            {"branding_type": "email", "branding_choice": EmailBranding.NHS_ID},
         ),
     ),
 )
@@ -433,6 +433,7 @@ def test_email_branding_options_page_redirects_nhs_specific_page(
             "main.branding_nhs",
             service_id=SERVICE_ONE_ID,
             branding_type="email",
+            branding_choice=EmailBranding.NHS_ID,
         ),
     )
 
