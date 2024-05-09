@@ -364,7 +364,7 @@
             {% elif current_service.trial_mode and current_service.organisation.agreement_signed is false %}
               {% call field(wrap=True) %}
                 No
-                <div class="hint">Organisation must accept the data sharing and financial agreement first</div>
+                <div class="hint">Organisation must accept the data processing and financial agreement first</div>
               {% endcall %}
               {{ text_field('') }}
             {% else %}
