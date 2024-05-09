@@ -15,7 +15,7 @@
       // which wraps the text input inside a `govuk-input__wrapper` div.
       const $appendToElement = this.$input.parent();
       $appendToElement.append(
-        this.$preview = $('<span class="textbox-colour-preview"></span>')
+        this.$preview = $('<span class="govuk-input__colour-preview"></span>')
       );
 
       this.$input

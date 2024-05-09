@@ -186,3 +186,17 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
     }
   }
 }
+
+// colour preview widget adjecent to govuk-input field
+.govuk-input__colour-preview {
+  @include govuk-media-query($from: desktop) {
+    width: 38px;
+    height: 38px;
+    margin-left: 5px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(govuk-colour("black"), 0.2);
+    display: inline-block;
+    vertical-align: top;
+    transition: background 0.3s ease-out;
+  }
+}
