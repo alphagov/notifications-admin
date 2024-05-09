@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Accept our data sharing and financial agreement
+  Accept our data processing and financial agreement
 {% endblock %}
 
 {% block backLink %}
@@ -16,10 +16,10 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-five-sixths">
 
-    {{ page_header('Accept our data sharing and financial agreement')}}
+    {{ page_header('Accept our data processing and financial agreement')}}
 
     <p class="govuk-body">
-      Before you can use GOV.UK Notify, you need to accept our data sharing and financial agreement.
+      Before you can use GOV.UK Notify, you need to accept our data processing and financial agreement.
     </p>
     <p class="govuk-body">
       This must be done by, or on behalf of, someone with the authority to sign contracts for {{ current_service.organisation.name }}.
@@ -28,7 +28,7 @@
       Once accepted, the agreement covers all Notify services from {{ current_service.organisation.name }}.
     </p>
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the data sharing and financial agreement (PDF)</a>.
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the data processing and financial agreement (PDF)</a>.
     </p>
     <p class="govuk-body">
       The agreement is confidential and should not be shared outside your organisation.
