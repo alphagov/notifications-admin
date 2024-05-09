@@ -51,7 +51,7 @@
         }}
       {% endcall %}
       {% call row() %}
-        {{ text_field('Data sharing and financial agreement') }}
+        {{ text_field('Data processing and financial agreement') }}
         {{ text_field(
           {
             True: 'Signed',
@@ -62,7 +62,7 @@
         {{ edit_field(
             'Change',
             url_for('main.edit_organisation_agreement', org_id=current_org.id),
-            suffix='data sharing and financial agreement for the organisation'
+            suffix='data processing and financial agreement for the organisation'
           )
         }}
       {% endcall %}
