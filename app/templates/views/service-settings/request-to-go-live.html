@@ -53,7 +53,7 @@
         {% if current_service.able_to_accept_agreement %}
           {{ task_list_item(
             current_service.organisation.agreement_signed,
-            'Accept our data sharing and financial agreement',
+            'Accept our data processing and financial agreement',
             url_for('main.service_agreement', service_id=current_service.id),
           ) }}
         {% endif %}
