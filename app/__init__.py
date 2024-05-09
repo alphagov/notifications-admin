@@ -37,7 +37,7 @@ from werkzeug.local import LocalProxy
 from app import proxy_fix, webauthn_server
 from app.asset_fingerprinter import asset_fingerprinter
 from app.commands import setup_commands
-from app.config import configs
+from app.config import Config, configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
 from app.formatters import (
     convert_to_boolean,
@@ -154,7 +154,11 @@ navigation = {
 def create_app(application):
     notify_environment = os.environ["NOTIFY_ENVIRONMENT"]
 
-    application.config.from_object(configs[notify_environment])
+    if notify_environment in configs:
+        application.config.from_object(configs[notify_environment])
+    else:
+        application.config.from_object(Config)
+
     asset_fingerprinter._asset_root = application.config["ASSET_PATH"]
 
     init_app(application)

@@ -21,7 +21,7 @@ def sentry_sampler(sampling_context, sample_rate: float = 0.0):
 
 def init_performance_monitoring():
     environment = os.getenv("NOTIFY_ENVIRONMENT").lower()
-    not_production = environment in {"development", "preview", "staging"}
+    allow_pii = os.getenv("SENTRY_ALLOW_PII", "0") == "1"
     sentry_enabled = bool(int(os.getenv("SENTRY_ENABLED", "0")))
     sentry_dsn = os.getenv("SENTRY_DSN")
 
@@ -31,8 +31,8 @@ def init_performance_monitoring():
         error_sample_rate = float(os.getenv("SENTRY_ERRORS_SAMPLE_RATE", 0.0))
         trace_sample_rate = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", 0.0))
 
-        send_pii = True if not_production else False
-        send_request_bodies = "medium" if not_production else "never"
+        send_pii = True if allow_pii else False
+        send_request_bodies = "medium" if allow_pii else "never"
 
         traces_sampler = partial(sentry_sampler, sample_rate=trace_sample_rate)
 

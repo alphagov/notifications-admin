@@ -117,9 +117,10 @@ def feedback(ticket_type):
 
         prefix = (
             ""
-            if current_app.config["NOTIFY_ENVIRONMENT"] == "production"
+            if not current_app.config["FEEDBACK_ZENDESK_SUBJECT_PREFIX_ENABLED"]
             else f"[env: {current_app.config['NOTIFY_ENVIRONMENT']}] "
         )
+
         subject = prefix + ticket_type_names[ticket_type]["ticket_subject"]
 
         ticket = NotifySupportTicket(
