@@ -126,7 +126,7 @@ def mock_get_service_settings_page_common(
                 "Label Value Action",
                 "Send letters Off Change your settings for sending letters",
                 "Label Value Action",
-                "Live No Organisation must accept the data sharing and financial agreement first",
+                "Live No Organisation must accept the data processing and financial agreement first",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -163,7 +163,7 @@ def mock_get_service_settings_page_common(
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
                 "Label Value Action",
-                "Live No Organisation must accept the data sharing and financial agreement first",
+                "Live No Organisation must accept the data processing and financial agreement first",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -1305,11 +1305,11 @@ def test_should_check_for_sms_sender_on_go_live(
         pytest.param(None, "", marks=pytest.mark.xfail(raises=IndexError)),
         (
             True,
-            "Accept our data sharing and financial agreement Completed",
+            "Accept our data processing and financial agreement Completed",
         ),
         (
             False,
-            "Accept our data sharing and financial agreement Not completed",
+            "Accept our data processing and financial agreement Not completed",
         ),
     ),
 )
@@ -1408,7 +1408,7 @@ def test_gp_without_organisation_is_shown_agreement_step(
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Before you request to go live"
     assert normalize_spaces(page.select(".task-list .task-list-item")[3].text) == (
-        "Accept our data sharing and financial agreement Not completed"
+        "Accept our data processing and financial agreement Not completed"
     )
 
 
