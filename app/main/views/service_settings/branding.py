@@ -61,6 +61,7 @@ def create_email_branding_zendesk_ticket(detail=None):
 @user_has_permissions("manage_service")
 def email_branding_options(service_id):
     form = ChooseEmailBrandingForm(current_service)
+    form.options.data = form.options.data or request.args.get("branding_choice")
 
     if form.validate_on_submit():
         branding_choice = form.options.data
@@ -599,6 +600,7 @@ def _letter_branding_flow_query_params(**kwargs):
 @user_has_permissions("manage_service")
 def letter_branding_options(service_id):
     form = ChooseLetterBrandingForm(current_service)
+    form.options.data = form.options.data or request.args.get("branding_choice")
     from_template = request.args.get("from_template")
 
     if form.validate_on_submit():

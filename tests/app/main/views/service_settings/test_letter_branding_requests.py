@@ -87,6 +87,7 @@ def test_letter_branding_options_page_when_no_branding_is_set(
     button_text = normalize_spaces(page.select_one(".page-footer button").text)
     assert button_text == "Continue"
 
+    assert not page.select(".govuk-radios__item input[checked]")
     assert [
         (radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip())
         for radio in page.select("input[type=radio]")
@@ -108,6 +109,22 @@ def test_letter_branding_options_page_when_branding_is_set_already(
         branding_style=fake_uuid,
     )
     assert page.select_one("main img")["alt"] == "Preview of current letter branding"
+
+
+def test_letter_branding_options_shows_query_param_branding_choice_selected(
+    client_request, service_one, organisation_one, mocker, mock_get_letter_branding_pool
+):
+    service_one["organisation"] = organisation_one
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+    page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID, branding_choice="1234")
+
+    checked_radio_button = page.select(".govuk-radios__item input[checked]")
+
+    assert len(checked_radio_button) == 1
+    assert checked_radio_button[0]["value"] == "1234"
 
 
 @pytest.mark.parametrize(
