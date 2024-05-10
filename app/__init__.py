@@ -41,6 +41,7 @@ from app.config import configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
 from app.formatters import (
     convert_to_boolean,
+    extract_path_from_url,
     format_auth_type,
     format_billions,
     format_date,
@@ -570,6 +571,7 @@ def add_template_filters(application):
         message_count_noun,
         format_yes_no,
         make_string_safe_for_email_local_part,
+        extract_path_from_url,
     ]:
         application.add_template_filter(fn)
 

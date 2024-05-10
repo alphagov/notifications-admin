@@ -9,7 +9,7 @@
 ) %}
   <form
     method="{{ method }}"
-    {% if action %}action="{{ action }}"{% endif %}
+    {% if action %}action="{{ action }}"{% else %}action="{{ request.url | extract_path_from_url }}"{% endif %}
     {% if not autocomplete %}autocomplete="off"{% endif %}
     {% if class %}class="{{ class }}"{% endif %}
     {% if id %}id="{{ id }}"{% endif %}

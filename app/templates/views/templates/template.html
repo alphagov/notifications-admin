@@ -1,5 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
+{% from "components/form.html" import form_wrapper %}
 {% from "components/folder-path.html" import folder_path, page_title_folder_path %}
 {% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
@@ -21,10 +22,10 @@
             You cannot undo this
           </li>
         </ul>
-        <form method='post'>
+        {% call form_wrapper() %}
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           {{ govukButton({ "text": "Confirm", "classes": "govuk-button--warning govuk-!-margin-top-2" }) }}
-        </form>
+        {% endcall %}
       {% endcall %}
     </div>
   {% else %}

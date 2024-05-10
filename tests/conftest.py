@@ -2916,6 +2916,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             _expected_redirect=None,
             _test_page_title=True,
             _test_for_elements_without_class=True,
+            _test_forms_have_an_action_set=True,
             _optional_args="",
             **endpoint_kwargs,
         ):
@@ -2926,6 +2927,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
                 _expected_redirect=_expected_redirect,
                 _test_page_title=_test_page_title,
                 _test_for_elements_without_class=_test_for_elements_without_class,
+                _test_forms_have_an_action_set=_test_forms_have_an_action_set,
             )
 
         @staticmethod
@@ -2936,6 +2938,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             _expected_redirect=None,
             _test_page_title=True,
             _test_for_elements_without_class=True,
+            _test_forms_have_an_action_set=True,
             **endpoint_kwargs,
         ):
             from flask.templating import _render
@@ -2971,40 +2974,13 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
                     )
 
             if _test_page_title:
-                # Page should have one H1
-                assert len(page.select("h1")) == 1
-                page_title, h1 = (normalize_spaces(page.select_one(selector).text) for selector in ("title", "h1"))
-                assert normalize_spaces(page_title).startswith(
-                    h1
-                ), f"Page {url} title '{page_title}' does not start with H1 '{h1}'"
+                ClientRequest.test_page_title(page, url)
 
             if _test_for_elements_without_class and _expected_status not in (301, 302):
-                for tag, hint in (
-                    ("p", "govuk-body"),
-                    ("a", "govuk-link govuk-link--no-visited-state"),
-                ):
-                    element = page.select_one(f"{tag}:not([class])")
-                    if (
-                        element
-                        and not element.has_attr("style")  # Elements with inline CSS are exempt
-                        and element.text.strip()  # Empty elements are exempt
-                        and "govuk-error-summary__body" not in element.parent["class"]
-                    ):
-                        raise AssertionError(
-                            f"Found a <{tag}> without a class attribute:\n"
-                            f"    {element}\n"
-                            f"\n"
-                            f'(you probably want to add class="{hint}")'
-                        )
+                ClientRequest.test_for_elements_without_class(page)
 
-                assert not page.select(
-                    r"main.govuk-\!-padding-top-0 h1.govuk-heading-l"
-                ), "Use heading-large or set error_summary_enabled=True"
-
-                if page.select("h1.heading-large"):
-                    assert (
-                        "govuk-!-padding-top-0" in page.select_one("main")["class"]
-                    ), "Use govuk-heading-l or set error_summary_enabled=False"
+            if _test_forms_have_an_action_set and _expected_status not in (301, 302):
+                ClientRequest.test_forms_have_an_action_set(page)
 
             return page
 
@@ -3094,6 +3070,52 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             resp = _logged_in_client.post(url, data=_data, **post_kwargs)
             assert resp.status_code == _expected_status
             return resp
+
+        @staticmethod
+        def test_page_title(page, url):
+            # Page should have one H1
+            assert len(page.select("h1")) == 1
+            page_title, h1 = (normalize_spaces(page.select_one(selector).text) for selector in ("title", "h1"))
+            assert normalize_spaces(page_title).startswith(
+                h1
+            ), f"Page {url} title '{page_title}' does not start with H1 '{h1}'"
+
+        @staticmethod
+        def test_for_elements_without_class(page):
+            for tag, hint in (
+                ("p", "govuk-body"),
+                ("a", "govuk-link govuk-link--no-visited-state"),
+            ):
+                element = page.select_one(f"{tag}:not([class])")
+                if (
+                    element
+                    and not element.has_attr("style")  # Elements with inline CSS are exempt
+                    and element.text.strip()  # Empty elements are exempt
+                    and "govuk-error-summary__body" not in element.parent["class"]
+                ):
+                    raise AssertionError(
+                        f"Found a <{tag}> without a class attribute:\n"
+                        f"    {element}\n"
+                        f"\n"
+                        f'(you probably want to add class="{hint}")'
+                    )
+
+            assert not page.select(
+                r"main.govuk-\!-padding-top-0 h1.govuk-heading-l"
+            ), "Use heading-large or set error_summary_enabled=True"
+
+            if page.select("h1.heading-large"):
+                assert (
+                    "govuk-!-padding-top-0" in page.select_one("main")["class"]
+                ), "Use govuk-heading-l or set error_summary_enabled=False"
+
+        @staticmethod
+        def test_forms_have_an_action_set(page):
+            assert not len(
+                page.select("form:not(.js-hidden form):not(form[hidden]):not(form[action])")
+            ), (  # forms hidden when js is enabled, or by default are exempt
+                "Forms that POST need an action set, even if posting to the same page"
+            )
 
     return ClientRequest
 
