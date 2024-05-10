@@ -138,13 +138,13 @@ def test_unknown_gps_and_trusts_are_redirected(
             True,
             200,
             "crown.pdf",
-            "GOV.UK Notify data sharing and financial agreement.pdf",
+            "GOV.UK Notify data processing and financial agreement.pdf",
         ),
         (
             False,
             200,
             "non-crown.pdf",
-            "GOV.UK Notify data sharing and financial agreement (non-crown).pdf",
+            "GOV.UK Notify data processing and financial agreement (non-crown).pdf",
         ),
         (
             None,
@@ -404,7 +404,7 @@ def test_accept_agreement_page_persists(
             None,
             (
                 "I confirm that I have the legal authority to accept the "
-                "GOV.UK Notify data sharing and financial agreement (version "
+                "GOV.UK Notify data processing and financial agreement (version "
                 "1.2) and that Test Organisation will be bound by it."
             ),
         ),
@@ -413,7 +413,7 @@ def test_accept_agreement_page_persists(
             "test@example.com",
             (
                 "I confirm that I have the legal authority to accept the "
-                "GOV.UK Notify data sharing and financial agreement (version "
+                "GOV.UK Notify data processing and financial agreement (version "
                 "1.2) on behalf of Firstname Lastname (test@example.com) and "
                 "that Test Organisation will be bound by it."
             ),

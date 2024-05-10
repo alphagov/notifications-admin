@@ -400,7 +400,7 @@ def test_validation_of_gps_creating_organisations(
     expected_error,
 ):
     service_one["organisation_type"] = "nhs_gp"
-    expected_page_header = "Accept our data sharing and financial agreement"
+    expected_page_header = "Accept our data processing and financial agreement"
     page = client_request.post(
         ".add_organisation_from_gp_service",
         service_id=SERVICE_ONE_ID,
@@ -1035,8 +1035,8 @@ def test_organisation_settings_for_platform_admin(
         "Sector Central government Change sector for the organisation",
         "Crown organisation Yes Change organisation crown status",
         (
-            "Data sharing and financial agreement "
-            "Not signed Change data sharing and financial agreement for the organisation"
+            "Data processing and financial agreement "
+            "Not signed Change data processing and financial agreement for the organisation"
         ),
         "Request to go live notes None Change go live notes for the organisation",
         "Can approve own go-live requests No Change whether this organisation can approve its own go-live requests",
@@ -2312,7 +2312,7 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_perso
     )
 
     assert page.select_one("h1").string == "Billing"
-    assert "2.5 of the GOV.UK Notify data sharing and financial agreement on 20 February 2020" in normalize_spaces(
+    assert "2.5 of the GOV.UK Notify data processing and financial agreement on 20 February 2020" in normalize_spaces(
         page.text
     )
     assert f"{expected_signatory} signed" in page.text
@@ -2336,7 +2336,7 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_an_unknown_pe
 
     assert page.select_one("h1").string == "Billing"
     assert (
-        f'{organisation_one["name"]} has accepted the GOV.UK Notify data ' "sharing and financial agreement."
+        f'{organisation_one["name"]} has accepted the GOV.UK Notify data processing and financial agreement.'
     ) in page.text
     assert page.select_one("main a")["href"] == url_for(".organisation_download_agreement", org_id=ORGANISATION_ID)
 
@@ -2376,13 +2376,13 @@ def test_organisation_billing_page_when_the_agreement_is_not_signed(
             True,
             200,
             "crown.pdf",
-            "GOV.UK Notify data sharing and financial agreement.pdf",
+            "GOV.UK Notify data processing and financial agreement.pdf",
         ),
         (
             False,
             200,
             "non-crown.pdf",
-            "GOV.UK Notify data sharing and financial agreement (non-crown).pdf",
+            "GOV.UK Notify data processing and financial agreement (non-crown).pdf",
         ),
         (
             None,
