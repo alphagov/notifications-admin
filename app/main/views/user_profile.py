@@ -237,6 +237,25 @@ def user_profile_take_part_in_user_research():
     return render_template("views/user-profile/take-part-in-user-research.html", form=form, error_summary_enabled=True)
 
 
+@main.route("/user-profile/get-emails-about-new-features", methods=["GET", "POST"])
+@user_is_logged_in
+def user_profile_get_emails_about_new_features():
+    form = YesNoSettingForm(
+        name="Get emails about new features",
+        enabled=current_user.receives_new_features_email,
+    )
+
+    if form.validate_on_submit():
+        current_user.update(receives_new_features_email=form.enabled.data)
+        return redirect(url_for(".user_profile"))
+
+    return render_template(
+        "views/user-profile/get-emails-about-new-features.html",
+        form=form,
+        error_summary_enabled=True,
+    )
+
+
 @main.route("/user-profile/disable-platform-admin-view", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_disable_platform_admin_view():

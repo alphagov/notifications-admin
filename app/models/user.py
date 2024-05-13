@@ -58,6 +58,7 @@ class User(BaseUser, UserMixin):
         "mobile_number",
         "password_changed_at",
         "permissions",
+        "receives_new_features_email",
         "state",
         "take_part_in_research",
     }

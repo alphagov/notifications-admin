@@ -124,6 +124,25 @@
         ]
       }
     },
+    {
+      "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
+        "text": "Get emails about new features"
+      },
+      "value": {
+        "text": "Yes" if current_user.receives_new_features_email else "No"
+      },
+      "actions": {
+        "items": [
+          {
+          "href": url_for('main.user_profile_get_emails_about_new_features'),
+          "text": "Change",
+          "visuallyHiddenText": "consent to get emails about new features",
+          "classes": "govuk-link--no-visited-state"
+          }
+        ]
+      }
+    },
   ] %}
 
  {% if current_user.can_use_webauthn %}
