@@ -87,6 +87,7 @@ def test_letter_branding_options_page_when_no_branding_is_set(
     button_text = normalize_spaces(page.select_one(".page-footer button").text)
     assert button_text == "Continue"
 
+    assert not page.select(".govuk-radios__item input[checked]")
     assert [
         (radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip())
         for radio in page.select("input[type=radio]")
@@ -108,6 +109,22 @@ def test_letter_branding_options_page_when_branding_is_set_already(
         branding_style=fake_uuid,
     )
     assert page.select_one("main img")["alt"] == "Preview of current letter branding"
+
+
+def test_letter_branding_options_shows_query_param_branding_choice_selected(
+    client_request, service_one, organisation_one, mocker, mock_get_letter_branding_pool
+):
+    service_one["organisation"] = organisation_one
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+    page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID, branding_choice="1234")
+
+    checked_radio_button = page.select(".govuk-radios__item input[checked]")
+
+    assert len(checked_radio_button) == 1
+    assert checked_radio_button[0]["value"] == "1234"
 
 
 @pytest.mark.parametrize(
@@ -162,6 +179,7 @@ def test_letter_branding_options_redirects_to_branding_preview_for_a_branding_po
             "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="1234",
+            branding_choice="1234",
             branding_type="letter",
         ),
     )
@@ -252,6 +270,7 @@ def test_letter_branding_options_redirects_to_nhs_page(
             "main.branding_nhs",
             service_id=SERVICE_ONE_ID,
             branding_type="letter",
+            branding_choice=LetterBranding.NHS_ID,
         ),
     )
 
@@ -344,7 +363,11 @@ def test_GET_letter_branding_upload_branding_renders_form(
     file_input = form.select_one("input")
     abandon_flow_link = page.select("main a")[-1]
 
-    assert back_button["href"] == url_for("main.letter_branding_options", service_id=SERVICE_ONE_ID)
+    assert back_button["href"] == url_for(
+        "main.letter_branding_options",
+        service_id=SERVICE_ONE_ID,
+        branding_choice="something_else",
+    )
     assert form["method"] == "post"
     assert "Submit" in submit_button.text
     assert file_input["name"] == "branding"
@@ -378,14 +401,19 @@ def test_GET_letter_branding_upload_branding_renders_form_without_prompt_if_user
     assert "branding is not set up yet" not in normalize_spaces(page.select_one("main").text)
 
 
-@pytest.mark.parametrize("query_params", [{"from_template": "1234-1234-1234"}, {}])
+@pytest.mark.parametrize(
+    "query_params",
+    [
+        {"from_template": "1234-1234-1234", "branding_choice": "something_else"},
+        {"branding_choice": "something_else"},
+    ],
+)
 def test_GET_letter_branding_upload_branding_passes_from_template_through_to_back_link(
     client_request, service_one, query_params
 ):
     page = client_request.get(
         "main.letter_branding_upload_branding",
         service_id=SERVICE_ONE_ID,
-        branding_choice="something_else",
         **query_params,
     )
     back_link = page.select("a.govuk-back-link")

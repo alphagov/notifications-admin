@@ -61,6 +61,7 @@ def create_email_branding_zendesk_ticket(detail=None):
 @user_has_permissions("manage_service")
 def email_branding_options(service_id):
     form = ChooseEmailBrandingForm(current_service)
+    form.options.data = form.options.data or request.args.get("branding_choice")
 
     if form.validate_on_submit():
         branding_choice = form.options.data
@@ -71,10 +72,13 @@ def email_branding_options(service_id):
                     ".branding_nhs",
                     service_id=current_service.id,
                     branding_type="email",
+                    branding_choice=branding_choice,
                 )
             )
         elif branding_choice == "govuk":
-            return redirect(url_for(".email_branding_govuk", service_id=current_service.id))
+            return redirect(
+                url_for(".email_branding_govuk", service_id=current_service.id, branding_choice=branding_choice)
+            )
 
         elif branding_choice in current_service.email_branding_pool.ids:
             return redirect(
@@ -82,6 +86,7 @@ def email_branding_options(service_id):
                     ".branding_option_preview",
                     service_id=current_service.id,
                     branding_option=branding_choice,
+                    branding_choice=branding_choice,
                     branding_type="email",
                 )
             )
@@ -126,7 +131,12 @@ def email_branding_govuk(service_id):
         flash("You’ve updated your email branding", "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
-    return render_template("views/service-settings/branding/email-branding-govuk.html")
+    return render_template(
+        "views/service-settings/branding/email-branding-govuk.html",
+        back_link=url_for(
+            "main.email_branding_options", service_id=current_service.id, **_email_branding_flow_query_params(request)
+        ),
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/request", methods=["GET", "POST"])
@@ -258,6 +268,11 @@ def email_branding_choose_logo(service_id):
             form=form,
             branding_choice=branding_choice,
             error_summary_enabled=True,
+            back_link=url_for(
+                "main.email_branding_options",
+                service_id=current_service.id,
+                **_email_branding_flow_query_params(request),
+            ),
         ),
         400 if form.errors else 200,
     )
@@ -502,10 +517,14 @@ def email_branding_choose_banner_colour(service_id):
 def branding_option_preview(service_id, branding_type):
     if branding_type == "email":
         branding_pool = current_service.email_branding_pool
+        back_link_query_params = _email_branding_flow_query_params(request)
     else:
         branding_pool = current_service.letter_branding_pool
+        back_link_query_params = _letter_branding_flow_query_params()
     try:
-        chosen_branding = branding_pool.get_item_by_id(request.args.get("branding_option"))
+        chosen_branding = branding_pool.get_item_by_id(
+            request.args.get("branding_choice", request.args.get("branding_option"))
+        )
     except branding_pool.NotFound:
         flash("No branding found for this id.")
         return redirect(url_for(f".{branding_type}_branding_options", service_id=current_service.id))
@@ -518,7 +537,9 @@ def branding_option_preview(service_id, branding_type):
 
     return render_template(
         "views/service-settings/branding/branding-option-preview.html",
-        back_link_url=url_for(f".{branding_type}_branding_options", service_id=current_service.id),
+        back_link_url=url_for(
+            f".{branding_type}_branding_options", service_id=current_service.id, **back_link_query_params
+        ),
         branding_type=branding_type,
         chosen_branding=chosen_branding,
     )
@@ -529,7 +550,13 @@ def branding_option_preview(service_id, branding_type):
 )
 @user_has_permissions("manage_service")
 def branding_nhs(service_id, branding_type):
-    branding = EmailBranding.NHS_ID if branding_type == "email" else LetterBranding.NHS_ID
+    if branding_type == "email":
+        branding = EmailBranding.NHS_ID
+        back_link_query_params = _email_branding_flow_query_params(request)
+    else:
+        branding = LetterBranding.NHS_ID
+        back_link_query_params = _letter_branding_flow_query_params()
+
     check_branding_allowed_for_service(branding, branding_type=branding_type)
 
     if request.method == "POST":
@@ -540,7 +567,11 @@ def branding_nhs(service_id, branding_type):
 
     return render_template(
         "views/service-settings/branding/branding-nhs.html",
-        back_link_url=url_for(f".{branding_type}_branding_options", service_id=current_service.id),
+        back_link_url=url_for(
+            f".{branding_type}_branding_options",
+            service_id=current_service.id,
+            **back_link_query_params,
+        ),
         branding_type=branding_type,
         nhs_branding_id=branding,
     )
@@ -569,6 +600,7 @@ def _letter_branding_flow_query_params(**kwargs):
 @user_has_permissions("manage_service")
 def letter_branding_options(service_id):
     form = ChooseLetterBrandingForm(current_service)
+    form.options.data = form.options.data or request.args.get("branding_choice")
     from_template = request.args.get("from_template")
 
     if form.validate_on_submit():
@@ -580,6 +612,7 @@ def letter_branding_options(service_id):
                     ".branding_nhs",
                     service_id=current_service.id,
                     branding_type="letter",
+                    branding_choice=branding_choice,
                 )
             )
 
@@ -589,6 +622,7 @@ def letter_branding_options(service_id):
                     ".branding_option_preview",
                     service_id=current_service.id,
                     branding_option=branding_choice,
+                    branding_choice=branding_choice,
                     branding_type="letter",
                 )
             )
@@ -679,7 +713,7 @@ def letter_branding_upload_branding(service_id):
         back_link=url_for(
             ".letter_branding_options",
             service_id=current_service.id,
-            **_letter_branding_flow_query_params(branding_choice=None),
+            **_letter_branding_flow_query_params(),
         ),
         # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
         abandon_flow_link=url_for(".letter_branding_request", service_id=current_service.id),

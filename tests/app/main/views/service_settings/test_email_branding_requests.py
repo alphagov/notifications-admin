@@ -94,12 +94,31 @@ def test_email_branding_options_page_when_no_branding_is_set(
 
     button_text = normalize_spaces(page.select_one(".page-footer button").text)
 
+    assert not page.select(".govuk-radios__item input[checked]")
     assert [
         (radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip())
         for radio in page.select("input[type=radio]")
     ] == [(EmailBranding.NHS_ID, "NHS"), ("something_else", "Something else")]
 
     assert button_text == "Continue"
+
+
+def test_email_branding_options_shows_query_param_branding_choice_selected(
+    client_request, service_one, organisation_one, mocker, mock_get_email_branding_pool
+):
+    service_one["organisation"] = organisation_one
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_one,
+    )
+    page = client_request.get(
+        ".email_branding_options", service_id=SERVICE_ONE_ID, branding_choice="email-branding-2-id"
+    )
+
+    checked_radio_button = page.select(".govuk-radios__item input[checked]")
+
+    assert len(checked_radio_button) == 1
+    assert checked_radio_button[0]["value"] == "email-branding-2-id"
 
 
 @pytest.mark.parametrize(
@@ -283,7 +302,7 @@ def test_email_branding_options_page_shows_preview_if_something_else_is_only_opt
             {"options": "govuk"},
             "central",
             "main.email_branding_govuk",
-            {},
+            {"branding_choice": "govuk"},
         ),
         (
             {"options": "govuk_and_org"},
@@ -319,7 +338,7 @@ def test_email_branding_options_page_shows_preview_if_something_else_is_only_opt
             {"options": EmailBranding.NHS_ID},
             "nhs_local",
             "main.branding_nhs",
-            {"branding_type": "email"},
+            {"branding_type": "email", "branding_choice": EmailBranding.NHS_ID},
         ),
     ),
 )
@@ -433,6 +452,7 @@ def test_email_branding_options_page_redirects_nhs_specific_page(
             "main.branding_nhs",
             service_id=SERVICE_ONE_ID,
             branding_type="email",
+            branding_choice=EmailBranding.NHS_ID,
         ),
     )
 
@@ -463,6 +483,7 @@ def test_email_branding_options_redirects_to_branding_preview_for_a_branding_poo
             "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
             branding_option="email-branding-1-id",
+            branding_choice="email-branding-1-id",
             branding_type="email",
         ),
     )
