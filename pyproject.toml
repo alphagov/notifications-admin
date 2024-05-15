@@ -13,7 +13,8 @@ lint.select = [
     "I",  # isort
     "B",  # flake8-bugbear
     "C90",  # mccabe cyclomatic complexity
-    "G"  # flake8-logging-format
+    "G",  # flake8-logging-format
+    "T20"  # flake8-print
 ]
 lint.ignore = []
 exclude = [
