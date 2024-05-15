@@ -257,94 +257,160 @@ def test_letter_attachment_pages_404_for_non_letter_template(
     )
 
 
-@pytest.mark.parametrize(
-    "endpoint,kwargs",
-    [
-        ("main.upload_letter", {"service_id": SERVICE_ONE_ID}),
-        ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
-    ],
-)
-def test_uploading_a_pdf_shows_error_when_file_is_not_a_pdf(
-    client_request, service_one, mocker, endpoint, kwargs, mock_get_service_letter_template
+def test_uploading_a_letter_shows_error_when_file_is_not_a_pdf(
+    client_request, service_one, mocker, mock_get_service_letter_template
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     with open("tests/non_spreadsheet_files/actually_a_png.csv", "rb") as file:
-        page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
+        page = client_request.post(
+            "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": file}, _expected_status=400
+        )
     assert page.select_one(".banner-dangerous h1").text == "Wrong file type"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
     assert page.select_one("input[type=file]")["accept"] == ".pdf"
 
 
-@pytest.mark.parametrize(
-    "endpoint,kwargs",
-    [
-        ("main.upload_letter", {"service_id": SERVICE_ONE_ID}),
-        ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
-    ],
-)
-def test_uploading_a_pdf_shows_error_when_no_file_uploaded(
-    client_request, service_one, endpoint, kwargs, mock_get_service_letter_template
+def test_uploading_a_letter_shows_error_when_no_file_uploaded(
+    client_request, service_one, mock_get_service_letter_template
 ):
-    page = client_request.post(endpoint, **kwargs, _data={"file": ""}, _expected_status=400)
+    page = client_request.post(
+        "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": ""}, _expected_status=400
+    )
     assert page.select_one(".banner-dangerous p").text == "You need to choose a file to upload"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
-@pytest.mark.parametrize(
-    "endpoint,kwargs",
-    [
-        ("main.upload_letter", {"service_id": SERVICE_ONE_ID}),
-        ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
-    ],
-)
-def test_uploading_a_pdf_shows_error_when_file_contains_virus(
-    mocker, client_request, service_one, endpoint, kwargs, mock_get_service_letter_template
+def test_uploading_a_letter_shows_error_when_file_contains_virus(
+    mocker, client_request, service_one, mock_get_service_letter_template
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=False)
     mock_s3_backup = mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
-        page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
+        page = client_request.post(
+            "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": file}, _expected_status=400
+        )
+    assert page.select_one(".banner-dangerous h1").text == "There is a problem"
+    assert page.select_one(".banner-dangerous p").text == "Your file contains a virus"
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+    mock_s3_backup.assert_not_called()
+
+
+def test_uploading_a_letter_errors_when_file_is_too_big(
+    mocker, client_request, service_one, mock_get_service_letter_template
+):
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
+    with open("tests/test_pdf_files/big.pdf", "rb") as file:
+        page = client_request.post(
+            "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": file}, _expected_status=400
+        )
+    assert page.select_one(".banner-dangerous h1").text == "There is a problem"
+    assert page.select_one(".banner-dangerous p").text == "File must be smaller than 2MB"
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+
+
+def test_post_choose_upload_letter_when_file_is_malformed(
+    mocker, client_request, service_one, mock_get_service_letter_template
+):
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
+    with open("tests/test_pdf_files/no_eof_marker.pdf", "rb") as file:
+        page = client_request.post(
+            "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": file}, _expected_status=400
+        )
+    assert page.select_one("div.banner-dangerous").find("h1").text == "There’s a problem with your file"
+    assert (
+        page.select_one("div.banner-dangerous").find("p").text
+        == "Notify cannot read this PDF.Save a new copy of your file and try again."
+    )
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+
+
+def test_uploading_a_letter_attachment_shows_error_when_file_is_not_a_pdf(
+    client_request, service_one, mocker, mock_get_service_letter_template
+):
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+
+    with open("tests/non_spreadsheet_files/actually_a_png.csv", "rb") as file:
+        page = client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+            _data={"file": file},
+            _expected_status=400,
+        )
+    assert page.select_one(".banner-dangerous h1").text == "Wrong file type"
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+    assert page.select_one("input[type=file]")["accept"] == ".pdf"
+
+
+def test_uploading_a_letter_attachment_shows_error_when_no_file_uploaded(
+    client_request, service_one, mock_get_service_letter_template
+):
+    page = client_request.post(
+        "main.letter_template_attach_pages",
+        service_id=SERVICE_ONE_ID,
+        template_id=sample_uuid(),
+        _data={"file": ""},
+        _expected_status=400,
+    )
+    assert page.select_one(".banner-dangerous p").text == "You need to choose a file to upload"
+    assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
+
+
+def test_uploading_a_letter_attachment_shows_error_when_file_contains_virus(
+    mocker, client_request, service_one, mock_get_service_letter_template
+):
+    mocker.patch("app.extensions.antivirus_client.scan", return_value=False)
+    mock_s3_backup = mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
+
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        page = client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+            _data={"file": file},
+            _expected_status=400,
+        )
     assert page.select_one(".banner-dangerous h1").text == "There is a problem"
     assert page.select_one(".banner-dangerous p").text == "This file contains a virus"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
     mock_s3_backup.assert_not_called()
 
 
-@pytest.mark.parametrize(
-    "endpoint,kwargs",
-    [
-        ("main.upload_letter", {"service_id": SERVICE_ONE_ID}),
-        ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
-    ],
-)
-def test_uploading_a_pdf_errors_when_file_is_too_big(
-    mocker, client_request, service_one, endpoint, kwargs, mock_get_service_letter_template
+def test_uploading_a_letter_attachment_errors_when_file_is_too_big(
+    mocker, client_request, service_one, mock_get_service_letter_template
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     with open("tests/test_pdf_files/big.pdf", "rb") as file:
-        page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
+        page = client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+            _data={"file": file},
+            _expected_status=400,
+        )
     assert page.select_one(".banner-dangerous h1").text == "There is a problem"
     assert page.select_one(".banner-dangerous p").text == "File must be smaller than 2MB"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
-@pytest.mark.parametrize(
-    "endpoint,kwargs",
-    [
-        ("main.upload_letter", {"service_id": SERVICE_ONE_ID}),
-        ("main.letter_template_attach_pages", {"service_id": SERVICE_ONE_ID, "template_id": sample_uuid()}),
-    ],
-)
-def test_post_choose_upload_file_when_file_is_malformed(
-    mocker, client_request, service_one, endpoint, kwargs, mock_get_service_letter_template
+def test_post_choose_upload_letter_attachment_when_file_is_malformed(
+    mocker, client_request, service_one, mock_get_service_letter_template
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
     with open("tests/test_pdf_files/no_eof_marker.pdf", "rb") as file:
-        page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
+        page = client_request.post(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=sample_uuid(),
+            _data={"file": file},
+            _expected_status=400,
+        )
     assert page.select_one("div.banner-dangerous").find("h1").text == "There’s a problem with your file"
     assert (
         page.select_one("div.banner-dangerous").find("p").text
