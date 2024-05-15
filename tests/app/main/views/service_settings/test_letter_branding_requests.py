@@ -178,7 +178,6 @@ def test_letter_branding_options_redirects_to_branding_preview_for_a_branding_po
         _expected_redirect=url_for(
             "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
-            branding_option="1234",
             branding_choice="1234",
             branding_type="letter",
         ),
@@ -734,7 +733,7 @@ def test_letter_branding_option_preview_page_displays_preview_of_chosen_branding
     )
 
     page = client_request.get(
-        ".branding_option_preview", service_id=SERVICE_ONE_ID, branding_option="1234", branding_type="letter"
+        ".branding_option_preview", service_id=SERVICE_ONE_ID, branding_choice="1234", branding_type="letter"
     )
 
     assert page.select_one("main img")["src"] == url_for(
@@ -758,7 +757,7 @@ def test_letter_branding_option_preview_page_redirects_to_branding_options_page_
     client_request.get(
         ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
-        branding_option="some-unknown-branding-id",
+        branding_choice="some-unknown-branding-id",
         branding_type="letter",
         _expected_status=302,
         _expected_redirect=url_for("main.letter_branding_options", service_id=SERVICE_ONE_ID),
@@ -787,7 +786,7 @@ def test_letter_branding_option_preview_changes_letter_branding_when_user_confir
     page = client_request.post(
         ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
-        branding_option="1234",
+        branding_choice="1234",
         branding_type="letter",
         _follow_redirects=True,
     )
@@ -833,7 +832,7 @@ def test_letter_branding_nhs_page_returns_404_if_service_not_nhs(
         ".branding_nhs",
         service_id=SERVICE_ONE_ID,
         branding_type="letter",
-        branding_option="some-unknown-branding-id",
+        branding_choice="some-unknown-branding-id",
         _expected_status=404,
     )
 
