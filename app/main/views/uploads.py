@@ -47,7 +47,6 @@ from app.template_previews import TemplatePreview
 from app.utils import unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.letters import (
-    get_error_from_upload_form,
     get_letter_printing_statement,
     get_letter_validation_error,
 )
@@ -144,89 +143,76 @@ def add_preview_of_content_uploaded_letters(notifications):
 @user_has_permissions("send_messages")
 def upload_letter(service_id):
     form = PDFUploadForm()
-    error = {}
 
     if form.validate_on_submit():
         pdf_file_bytes = form.file.data.read()
-        original_filename = form.file.data.filename
 
         try:
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
             current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
-            return _invalid_upload_error(
-                "There’s a problem with your file",
-                "Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
-            )
+            form.file.errors.append("Notify cannot read this PDF. Save a new copy of your file and try again.")
 
-        upload_id = uuid.uuid4()
-        file_location = get_transient_letter_file_location(service_id, upload_id)
+        if not form.errors:
+            original_filename = form.file.data.filename
+            upload_id = uuid.uuid4()
+            file_location = get_transient_letter_file_location(service_id, upload_id)
 
-        try:
-            response = TemplatePreview.sanitise_letter(
-                BytesIO(pdf_file_bytes),
-                upload_id=upload_id,
-                allow_international_letters=current_service.has_permission("international_letters"),
-            )
-            response.raise_for_status()
-        except RequestException as ex:
-            if ex.response is not None and ex.response.status_code == 400:
-                validation_failed_message = response.json().get("message")
-                invalid_pages = response.json().get("invalid_pages")
+            try:
+                response = TemplatePreview.sanitise_letter(
+                    BytesIO(pdf_file_bytes),
+                    upload_id=upload_id,
+                    allow_international_letters=current_service.has_permission("international_letters"),
+                )
+                response.raise_for_status()
+            except RequestException as ex:
+                if ex.response is not None and ex.response.status_code == 400:
+                    validation_failed_message = response.json().get("message")
+                    invalid_pages = response.json().get("invalid_pages")
 
-                status = "invalid"
+                    status = "invalid"
+                    upload_letter_to_s3(
+                        pdf_file_bytes,
+                        file_location=file_location,
+                        status=status,
+                        page_count=page_count,
+                        filename=original_filename,
+                        message=validation_failed_message,
+                        invalid_pages=invalid_pages,
+                    )
+                else:
+                    raise ex
+            else:
+                response = response.json()
+                recipient = response["recipient_address"]
+                status = "valid"
+                file_contents = base64.b64decode(response["file"].encode())
+
                 upload_letter_to_s3(
-                    pdf_file_bytes,
+                    file_contents,
                     file_location=file_location,
                     status=status,
                     page_count=page_count,
                     filename=original_filename,
-                    message=validation_failed_message,
-                    invalid_pages=invalid_pages,
+                    recipient=recipient,
                 )
-            else:
-                raise ex
-        else:
-            response = response.json()
-            recipient = response["recipient_address"]
-            status = "valid"
-            file_contents = base64.b64decode(response["file"].encode())
 
-            upload_letter_to_s3(
-                file_contents,
-                file_location=file_location,
-                status=status,
-                page_count=page_count,
-                filename=original_filename,
-                recipient=recipient,
+                backup_original_letter_to_s3(
+                    pdf_file_bytes,
+                    upload_id=upload_id,
+                )
+
+            return redirect(
+                url_for(
+                    "main.uploaded_letter_preview",
+                    service_id=current_service.id,
+                    file_id=upload_id,
+                )
             )
 
-            backup_original_letter_to_s3(
-                pdf_file_bytes,
-                upload_id=upload_id,
-            )
-
-        return redirect(
-            url_for(
-                "main.uploaded_letter_preview",
-                service_id=current_service.id,
-                file_id=upload_id,
-            )
-        )
-
-    if form.file.errors:
-        error = get_error_from_upload_form(form.file.errors[0])
-
-    return render_template("views/uploads/choose-file.html", error=error, form=form), 400 if error else 200
-
-
-def _invalid_upload_error(error_title, error_detail=None):
-    return (
-        render_template(
-            "views/uploads/choose-file.html", error={"title": error_title, "detail": error_detail}, form=PDFUploadForm()
-        ),
-        400,
+    return render_template("views/uploads/choose-file.html", form=form, error_summary_enabled=True), (
+        400 if form.errors else 200
     )
 
 
