@@ -2,7 +2,6 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/textbox.html" import textbox %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
@@ -22,7 +21,14 @@
         belonging to this organisation requests to go live.
       </p>
       {% call form_wrapper() %}
-        {{ textbox(form.request_to_go_live_notes, width='1-1', rows=3, autosize=True) }}
+        {{ form.request_to_go_live_notes(param_extensions={
+          "classes": "govuk-!-width-full",
+          "rows": "3",
+          "attributes": {
+            "data-notify-module": "enhanced-textbox",
+            "data-highlight-placeholders": "false"
+          },
+        }) }}
         {{ page_footer('Save') }}
       {% endcall %}
     </div>

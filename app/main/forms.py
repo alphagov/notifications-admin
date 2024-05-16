@@ -300,6 +300,23 @@ class GovukSearchField(GovukTextInputFieldMixin, SearchField):
     param_extensions = {"classes": "govuk-!-width-full"}
 
 
+class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
+    govuk_frontend_component_name = "textarea"
+
+    def prepare_params(self, **kwargs):
+        params = {
+            "name": self.name,
+            "id": self.id,
+            "rows": 8,
+            "label": {"text": self.label.text, "classes": None, "isPageHeading": False},
+            "hint": None,
+            "errorMessage": self.get_error_message(),
+            "value": self._value(),
+        }
+
+        return params
+
+
 class NotifyDateField(DateField):
     """A thin wrapper around WTForm's DateField providing our own error message."""
 
@@ -557,7 +574,7 @@ class StripWhitespaceStringField(GovukTextInputField):
         super(GovukTextInputField, self).__init__(label, **kwargs)
 
 
-class PostalAddressField(TextAreaField):
+class PostalAddressField(GovukTextareaField):
     def process_formdata(self, valuelist):
         if valuelist:
             self.data = PostalAddress(valuelist[0]).normalised
@@ -646,27 +663,6 @@ class GovukCheckboxField(GovukFrontendWidgetMixin, BooleanField):
                 }
             ],
         }
-        return params
-
-
-class GovukTextareaField(GovukFrontendWidgetMixin, TextAreaField):
-    govuk_frontend_component_name = "textarea"
-
-    def prepare_params(self, **kwargs):
-        # error messages
-        error_message = None
-        if self.errors:
-            error_message = {"text": self.errors[0]}
-
-        params = {
-            "name": self.name,
-            "id": self.id,
-            "rows": 8,
-            "label": {"text": self.label.text, "classes": None, "isPageHeading": False},
-            "hint": None,
-            "errorMessage": error_message,
-        }
-
         return params
 
 
@@ -1364,7 +1360,7 @@ class RenameTemplateForm(StripWhitespaceForm, TemplateNameMixin):
 
 
 class BaseTemplateForm(StripWhitespaceForm):
-    template_content = TextAreaField(
+    template_content = GovukTextareaField(
         "Message", validators=[NotifyDataRequired(thing="your message"), NoCommasInPlaceHolders()]
     )
 
@@ -1430,12 +1426,12 @@ class LetterAddressForm(StripWhitespaceForm):
 
 
 class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    subject = TextAreaField("Subject", validators=[NotifyDataRequired(thing="the subject of the email")])
+    subject = GovukTextareaField("Subject", validators=[NotifyDataRequired(thing="the subject of the email")])
 
 
 class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    subject = TextAreaField("Heading", validators=[NotifyDataRequired(thing="a main heading for your letter")])
-    template_content = TextAreaField(
+    subject = GovukTextareaField("Heading", validators=[NotifyDataRequired(thing="a main heading for your letter")])
+    template_content = GovukTextareaField(
         "Body text", validators=[NotifyDataRequired(thing="the body text of your letter"), NoCommasInPlaceHolders()]
     )
 
@@ -1447,8 +1443,8 @@ class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
 
 
 class WelshLetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    subject = TextAreaField("Heading (Welsh)", validators=[DataRequired(message="Cannot be empty")])
-    template_content = TextAreaField(
+    subject = GovukTextareaField("Heading (Welsh)", validators=[DataRequired(message="Cannot be empty")])
+    template_content = GovukTextareaField(
         "Body text (Welsh)", validators=[DataRequired(message="Cannot be empty"), NoCommasInPlaceHolders()]
     )
 
@@ -1642,7 +1638,7 @@ class SupportRedirect(StripWhitespaceForm):
 
 
 class FeedbackOrProblem(StripWhitespaceForm):
-    feedback = TextAreaField("Your message", validators=[NotifyDataRequired(thing="your message")])
+    feedback = GovukTextareaField("Your message", validators=[NotifyDataRequired(thing="your message")])
     name = GovukTextInputField("Name (optional)")
     email_address = make_email_address_field(
         label="Email address", gov_user=False, required=True, thing="your email address"
@@ -1806,7 +1802,7 @@ class ServiceEditInboundNumberForm(StripWhitespaceForm):
 
 
 class AdminNotesForm(StripWhitespaceForm):
-    notes = TextAreaField(validators=[])
+    notes = GovukTextareaField("Notes", validators=[])
 
 
 class AdminBillingDetailsForm(StripWhitespaceForm):
@@ -1814,11 +1810,11 @@ class AdminBillingDetailsForm(StripWhitespaceForm):
     billing_contact_names = GovukTextInputField("Contact names")
     billing_reference = GovukTextInputField("Reference")
     purchase_order_number = GovukTextInputField("Purchase order number")
-    notes = TextAreaField(validators=[])
+    notes = GovukTextareaField("Notes", validators=[])
 
 
 class ServiceLetterContactBlockForm(StripWhitespaceForm):
-    letter_contact_block = TextAreaField(
+    letter_contact_block = GovukTextareaField(
         validators=[NotifyDataRequired(thing="a sender address"), NoCommasInPlaceHolders()]
     )
     is_default = GovukCheckboxField("Set as your default address")
@@ -2462,7 +2458,7 @@ class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
 
 
 class AdminReturnedLettersForm(StripWhitespaceForm):
-    references = TextAreaField(
+    references = GovukTextareaField(
         "Letter references",
         validators=[
             NotifyDataRequired(thing="the returned letter references"),
@@ -2624,7 +2620,7 @@ class AdminClearCacheForm(StripWhitespaceForm):
 
 
 class AdminOrganisationGoLiveNotesForm(StripWhitespaceForm):
-    request_to_go_live_notes = TextAreaField(
+    request_to_go_live_notes = GovukTextareaField(
         "Go live notes",
         filters=[lambda x: x or None],
     )

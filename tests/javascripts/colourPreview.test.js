@@ -42,7 +42,7 @@ describe('Colour preview', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
-      swatchEl = document.querySelector('.textbox-colour-preview');
+      swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       expect(swatchEl).not.toBeNull();
 
@@ -52,7 +52,7 @@ describe('Colour preview', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
-      swatchEl = document.querySelector('.textbox-colour-preview');
+      swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // textbox defaults to empty
       // colours are output in RGB
@@ -65,7 +65,7 @@ describe('Colour preview', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
-      swatchEl = document.querySelector('.textbox-colour-preview');
+      swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // textbox defaults to empty
       // colours are output in RGB
@@ -78,7 +78,7 @@ describe('Colour preview', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
-      swatchEl = document.querySelector('.textbox-colour-preview');
+      swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // colours are output in RGB
       expect(swatchEl.style.background).toEqual('rgb(0, 255, 0)');
@@ -91,7 +91,7 @@ describe('Colour preview', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
-      swatchEl = document.querySelector('.textbox-colour-preview');
+      swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // colours are output in RGB
       expect(swatchEl.style.background).toEqual('rgb(0, 255, 0)');
@@ -104,7 +104,7 @@ describe('Colour preview', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
-      swatchEl = document.querySelector('.textbox-colour-preview');
+      swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // colours are output in RGB
       expect(swatchEl.style.background).toEqual('rgb(0, 255, 0)');
@@ -117,7 +117,7 @@ describe('Colour preview', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
-      swatchEl = document.querySelector('.textbox-colour-preview');
+      swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // colours are output in RGB
       expect(swatchEl.style.background).toEqual('rgb(255, 255, 255)');
@@ -132,7 +132,7 @@ describe('Colour preview', () => {
 
       // start the module
       window.GOVUK.notifyModules.start();
-      swatchEl = document.querySelector('.textbox-colour-preview');
+      swatchEl = document.querySelector('.govuk-input__colour-preview');
 
     });
 

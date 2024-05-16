@@ -2,7 +2,6 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
-{% from "components/textbox.html" import textbox %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
@@ -16,14 +15,19 @@
 {% block maincolumn_content %}
 
     {{ page_header('Edit service notes') }}
-    {% call form_wrapper() %}
-    {{ textbox(
-      form.notes,
-      rows=4,
-      width='1-1',
-      autofocus=True,
-      autosize=True,
-    ) }}
+    {% call form_wrapper(
+      module="autofocus",
+      data_kwargs={'force-focus': True}
+    ) %}
+      {{ form.notes(param_extensions={
+        "classes": "govuk-!-width-full",
+        "rows": "4",
+        "attributes": {
+          "data-notify-module": "enhanced-textbox",
+          "data-highlight-placeholders": "false",
+          "data-autofocus-textbox": "true"
+        }
+      }) }}
       {{ page_footer('Save') }}
     {% endcall %}
 

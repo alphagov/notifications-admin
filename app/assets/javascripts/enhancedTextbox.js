@@ -13,17 +13,16 @@
 
       let visibleTextbox;
 
-      this.highlightPlaceholders = (
-        typeof textarea.data('highlightPlaceholders') === 'undefined' ||
-        !!textarea.data('highlightPlaceholders')
-      );
+      this.highlightPlaceholders = Boolean(textarea.data('highlightPlaceholders'));
+
+      this.autofocus = Boolean(textarea.data('autofocusTextbox'));
 
       this.$textbox = $(textarea)
         .wrap(`
-          <div class='textbox-highlight-wrapper' />
+          <div class='govuk-textarea-highlight__wrapper' />
         `)
         .after(this.$background = $(`
-          <div class="textbox-highlight-background" aria-hidden="true" />
+          <div class="govuk-textarea-highlight__background" aria-hidden="true" />
         `))
         .on("input", this.update);
 
@@ -44,6 +43,10 @@
 
       this.$textbox
         .trigger("input");
+
+      if (this.autofocus) {
+        this.$textbox.trigger('focus');
+      }
 
     };
 
@@ -73,7 +76,6 @@
     );
 
     this.update = () => {
-
       this.$background.html(
         this.highlightPlaceholders ? this.contentReplaced() : this.contentEscaped()
       );

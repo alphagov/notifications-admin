@@ -344,7 +344,7 @@ def test_create_email_branding_does_not_require_a_name_when_uploading_a_file(
         _follow_redirects=True,
     )
 
-    assert not page.select_one(".error-message")
+    assert not page.select_one(".govuk-error-message")
 
 
 @pytest.mark.parametrize(

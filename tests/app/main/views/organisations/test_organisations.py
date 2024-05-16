@@ -1914,7 +1914,7 @@ def test_view_edit_organisation_notes(
         org_id=organisation_one["id"],
     )
     assert page.select_one("h1").text == "Edit organisation notes"
-    assert page.select_one("label.form-label").text.strip() == "Notes"
+    assert page.select_one(".govuk-label").text.strip() == "Notes"
     assert page.select_one("textarea").attrs["name"] == "notes"
 
 

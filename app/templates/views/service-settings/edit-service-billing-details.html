@@ -4,7 +4,6 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "components/textbox.html" import textbox %}
 
 {% block service_page_title %}
   Change billing details
@@ -26,13 +25,14 @@
       {{ form.billing_reference(param_extensions={"classes": "govuk-!-width-full"}) }}
       {{ form.purchase_order_number(param_extensions={"classes": "govuk-!-width-full"}) }}
   </div>
-    {{ textbox(
-      form.notes,
-      rows=4,
-      width='1-1',
-      autofocus=False,
-      autosize=True,
-    ) }}
+    {{ form.notes(param_extensions={
+      "classes": "govuk-!-width-full",
+      "rows": "4",
+      "attributes": {
+        "data-notify-module": "enhanced-textbox",
+        "data-highlight-placeholders": "false"
+      }
+    }) }}
     {{ page_footer('Save') }}
   {% endcall %}
 

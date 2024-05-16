@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/textbox.html" import textbox %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -19,14 +18,23 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% call form_wrapper() %}
-        {{ textbox(
-            form.letter_contact_block,
-            label='This will appear as the sender address on your letters.'|safe,
-            hint='10 lines maximum',
-            width='1-2',
-            rows=10,
-            highlight_placeholders=True
-          ) }}
+        {{ form.letter_contact_block(param_extensions={
+          "classes": "govuk-!-width-one-half govuk-textarea-highlight__textbox",
+          "rows": "10",
+          "attributes": {
+            "data-notify-module": "enhanced-textbox",
+            "data-highlight-placeholders": "true"
+          },
+          "label": {
+            "text": "This will appear as the sender address on your letters"
+          },
+          "hint": {
+            "text": "10 lines maximum"
+          },
+          "formGroup": {
+            "classes": "govuk-textarea-highlight",
+          }
+        }) }}
         {% if not first_contact_block %}
           {{ form.is_default }}
         {% endif %}
