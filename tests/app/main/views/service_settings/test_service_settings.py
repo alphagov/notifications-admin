@@ -64,23 +64,19 @@ def mock_get_service_settings_page_common(
             create_active_user_with_permissions(),
             ["sms", "email"],
             [
-                "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
-                "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Email sender name Test Service test.service@notifications.service.gov.uk Change email sender name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
-                "Label Value Action",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
-                "Label Value Action",
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -88,15 +84,11 @@ def mock_get_service_settings_page_common(
             create_active_user_with_permissions(),
             ["letter"],
             [
-                "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
-                "Label Value Action",
                 "Send emails Off Change your settings for sending emails",
-                "Label Value Action",
                 "Send text messages Off Change your settings for sending text messages",
-                "Label Value Action",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
@@ -107,25 +99,20 @@ def mock_get_service_settings_page_common(
             create_platform_admin_user(),
             ["sms", "email"],
             [
-                "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
-                "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Email sender name Test Service test.service@notifications.service.gov.uk Change email sender name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
-                "Label Value Action",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
-                "Label Value Action",
                 "Send letters Off Change your settings for sending letters",
-                "Label Value Action",
                 "Live No Organisation must accept the data processing and financial agreement first",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
@@ -149,20 +136,15 @@ def mock_get_service_settings_page_common(
             create_platform_admin_user(),
             ["letter"],
             [
-                "Label Value Action",
                 "Service name Test Service Change service name",
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
-                "Label Value Action",
                 "Send emails Off Change your settings for sending emails",
-                "Label Value Action",
                 "Send text messages Off Change your settings for sending text messages",
-                "Label Value Action",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
-                "Label Value Action",
                 "Live No Organisation must accept the data processing and financial agreement first",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
@@ -208,7 +190,7 @@ def test_should_show_overview(
     page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
 
     assert page.select_one("h1").text == "Settings"
-    rows = page.select("tr")
+    rows = page.select(".govuk-summary-list__row")
     assert len(rows) == len(expected_rows)
     assert [" ".join(row.text.split()) for row in rows] == expected_rows
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
@@ -271,10 +253,10 @@ def test_no_go_live_link_for_service_without_organisation(
 
     assert page.select_one("h1").text == "Settings"
 
-    is_live = find_element_by_tag_and_partial_text(page, tag="td", string="Live")
+    is_live = find_element_by_tag_and_partial_text(page, tag="dt", string="Live")
     assert normalize_spaces(is_live.find_next_sibling().text) == "No Organisation must be set first"
 
-    organisation = find_element_by_tag_and_partial_text(page, tag="td:first-child", string="Organisation")
+    organisation = find_element_by_tag_and_partial_text(page, tag="dt", string="Organisation")
     assert normalize_spaces(organisation.find_next_siblings()[0].text) == "Not set Central government"
     assert normalize_spaces(organisation.find_next_siblings()[1].text) == "Change organisation for service"
 
@@ -294,7 +276,7 @@ def test_organisation_name_links_to_org_dashboard(
     client_request.login(platform_admin_user, service_one)
     response = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
 
-    org_row = find_element_by_tag_and_partial_text(response, tag="td:first-child", string="Organisation").parent
+    org_row = find_element_by_tag_and_partial_text(response, tag="dt", string="Organisation").parent
     assert org_row.find("a")["href"] == url_for("main.organisation_dashboard", org_id=ORGANISATION_ID)
     assert normalize_spaces(org_row.find("a").text) == "Test organisation"
 
@@ -326,7 +308,9 @@ def test_send_files_by_email_row_on_settings_page(
     client_request.login(platform_admin_user, service_one)
     response = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
 
-    org_row = find_element_by_tag_and_partial_text(response, tag="tr", string="Send files by email")
+    org_row = find_element_by_tag_and_partial_text(
+        response, tag=".govuk-summary-list__row", string="Send files by email"
+    )
     assert normalize_spaces(org_row.get_text()) == expected_text
 
 
@@ -339,19 +323,16 @@ def test_send_files_by_email_row_on_settings_page(
                 "Service name service one Change service name",
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
-                "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Email sender name service one service.one@notifications.service.gov.uk Change email sender name",
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Email branding Organisation name Change email branding",
                 "Send files by email Not set up Manage sending files by email",
-                "Label Value Action",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Send international text messages On Change your settings for sending international text messages",
                 "Receive text messages On Change your settings for receiving text messages",
-                "Label Value Action",
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -361,19 +342,16 @@ def test_send_files_by_email_row_on_settings_page(
                 "Service name service one Change service name",
                 "Sign-in method Email link or text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
-                "Label Value Action",
                 "Send emails On Change your settings for sending emails",
                 "Email sender name service one service.one@notifications.service.gov.uk Change email sender name",
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Email branding Organisation name Change email branding",
                 "Send files by email Not set up Manage sending files by email",
-                "Label Value Action",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
-                "Label Value Action",
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -383,11 +361,8 @@ def test_send_files_by_email_row_on_settings_page(
                 "Service name service one Change service name",
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
-                "Label Value Action",
                 "Send emails Off Change your settings for sending emails",
-                "Label Value Action",
                 "Send text messages Off Change your settings for sending text messages",
-                "Label Value Action",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses 1 Example Street Manage sender addresses",
@@ -413,7 +388,9 @@ def test_should_show_overview_for_service_with_more_things_set(
     service_one["permissions"] = permissions
     service_one["email_branding"] = uuid4()
     page = client_request.get("main.service_settings", service_id=service_one["id"])
-    assert [" ".join(row.text.split()) for row in page.select("tr")[1:]] == expected_rows
+    assert [
+        " ".join(row.text.split()) for row in page.select(".notify-summary-list .govuk-summary-list__row")[0:]
+    ] == expected_rows
 
 
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
@@ -442,9 +419,9 @@ def test_letter_contact_block_shows_none_if_not_set(
         service_id=SERVICE_ONE_ID,
     )
 
-    div = page.select("tr")[11].select("td")[1].div
+    div = page.select(".service-letter-settings .govuk-summary-list__value")[2]
     assert div.text.strip() == "Not set"
-    assert "default" in div.attrs["class"][0]
+    assert "govuk-summary-list__value--default" in div.attrs["class"][1]
 
 
 def test_escapes_letter_contact_block(
@@ -461,8 +438,7 @@ def test_escapes_letter_contact_block(
         "main.service_settings",
         service_id=SERVICE_ONE_ID,
     )
-
-    div = str(page.select("tr")[11].select("td")[1].div)
+    div = str(page.select(".service-letter-settings .govuk-summary-list__value")[2])
     assert "foo<br/>bar" in div
     assert "<script>" not in div
 
@@ -603,7 +579,7 @@ def test_show_restricted_service(
     )
 
     assert page.select_one("h1").text == "Settings"
-    assert page.select("main h2")[0].text == "Your service is in trial mode"
+    assert page.select("main > h2")[0].text == "Your service is in trial mode"
 
     assert [normalize_spaces(li.text) for li in page.select("main ul li")] == [
         "send messages to yourself and other people in your team",
@@ -641,7 +617,7 @@ def test_show_limits_for_live_service(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert page.select_one("main h2").text == "Your service is live"
+    assert page.select_one("main > h2").text == "Your service is live"
     assert normalize_spaces(page.select_one("main p").text) == "You can send up to:"
     assert [normalize_spaces(li.text) for li in page.select("main ul li")] == [
         "1,000 emails per day",
@@ -2554,7 +2530,9 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
     page = client_request.get("main.service_settings", service_id=service_one["id"])
 
     def get_row(page, label):
-        return normalize_spaces(find_element_by_tag_and_partial_text(page, tag="tr", string=label).text)
+        return normalize_spaces(
+            find_element_by_tag_and_partial_text(page, tag=".govuk-summary-list__row", string=label).text
+        )
 
     assert (
         get_row(page, "Reply-to email addresses")
@@ -5773,9 +5751,9 @@ def test_show_service_data_retention(
         service_id=service_one["id"],
     )
 
-    rows = page.select("tbody tr")
+    rows = page.select(".govuk-summary-list__row")
     assert len(rows) == 1
-    assert normalize_spaces(rows[0].text) == "Email 5 days Change"
+    assert normalize_spaces(rows[0].text) == "Email 5 days Change email data retention setting"
 
     assert page.select_one(".govuk-back-link")["href"] == url_for(
         "main.service_settings",

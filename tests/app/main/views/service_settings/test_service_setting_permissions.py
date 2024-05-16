@@ -180,7 +180,12 @@ def test_service_setting_toggles_show(
     link_url = url_for(endpoint, **kwargs, service_id=service_one["id"])
     service_one.update(service_fields)
     page = get_service_settings_page()
-    assert normalize_spaces(page.select_one(f'a[href="{link_url}"]').find_parent("tr").text.strip()) == text
+    assert (
+        normalize_spaces(
+            page.select_one(f'a[href="{link_url}"]').find_parent("div", class_="govuk-summary-list__row").text.strip()
+        )
+        == text
+    )
 
 
 @pytest.mark.parametrize(
@@ -232,7 +237,7 @@ def test_service_settings_doesnt_show_option_if_parent_permission_disabled(
 ):
     service_one["permissions"] = [permissions]
     page = get_service_settings_page()
-    cells = page.select("td")
+    cells = page.select("dd")
     assert any(cell for cell in cells if permissions_text in cell.text) is visible
 
 
