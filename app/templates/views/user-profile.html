@@ -13,7 +13,7 @@
     {% set email_address_row =
       {
         "key": {
-          "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
+          "classes": "notify-summary-list__key notify-summary-list__key",
           "text": "Email address"
         },
         "value": {
@@ -34,7 +34,7 @@
       {
         "classes": "govuk-summary-list__row--no-actions",
         "key": {
-          "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
+          "classes": "notify-summary-list__key notify-summary-list__key",
           "text": "Email address"
         },
         "value": {
@@ -47,7 +47,7 @@
   {% set rows = [
     {
       "key": {
-        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
+        "classes": "notify-summary-list__key notify-summary-list__key",
         "text": "Name"
       },
       "value": {
@@ -67,7 +67,7 @@
     email_address_row,
     {
       "key": {
-        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
+        "classes": "notify-summary-list__key notify-summary-list__key",
         "text": "Mobile number"
       },
       "value": {
@@ -88,7 +88,7 @@
     },
     {
       "key": {
-        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
+        "classes": "notify-summary-list__key notify-summary-list__key",
         "text": "Password"
       },
       "value": {
@@ -107,7 +107,7 @@
     },
     {
       "key": {
-        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
+        "classes": "notify-summary-list__key notify-summary-list__key",
         "text": "Take part in user research"
       },
       "value": {
@@ -124,13 +124,32 @@
         ]
       }
     },
+    {
+      "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key",
+        "text": "Get emails about new features"
+      },
+      "value": {
+        "text": "Yes" if current_user.receives_new_features_email else "No"
+      },
+      "actions": {
+        "items": [
+          {
+          "href": url_for('main.user_profile_get_emails_about_new_features'),
+          "text": "Change",
+          "visuallyHiddenText": "consent to get emails about new features",
+          "classes": "govuk-link--no-visited-state"
+          }
+        ]
+      }
+    },
   ] %}
 
  {% if current_user.can_use_webauthn %}
   {% do rows.append(
     {
       "key": {
-        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
+        "classes": "notify-summary-list__key notify-summary-list__key",
         "text": "Security keys"
       },
       "value": {
@@ -155,7 +174,7 @@
   {% do rows.append(
     {
       "key": {
-        "classes": "notify-summary-list__key notify-summary-list__key--one-quarter",
+        "classes": "notify-summary-list__key notify-summary-list__key",
         "text": "Use platform admin view"
       },
       "value": {

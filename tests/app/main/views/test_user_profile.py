@@ -39,6 +39,7 @@ def test_overview_page_change_links_for_regular_user(client_request):
     assert page.select_one(f'a[href="{url_for("main.user_profile_mobile_number")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_password")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_take_part_in_user_research")}"]')
+    assert page.select_one(f'a[href="{url_for("main.user_profile_get_emails_about_new_features")}"]')
 
     # only platform admins see this
     assert not page.select_one(f'a[href="{url_for("main.user_profile_security_keys")}"]')
@@ -779,3 +780,35 @@ def test_post_user_profile_take_part_in_user_research(client_request, mocker, ac
     ),
 
     mock_update_consent.assert_called_once_with(active_user_with_permissions["id"], take_part_in_research=False)
+
+
+@pytest.mark.parametrize("receives_new_features_email", [True, False])
+def test_get_user_profile_get_emails_about_new_features(
+    client_request, active_user_with_permissions, receives_new_features_email
+):
+    active_user_with_permissions["receives_new_features_email"] = receives_new_features_email
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(("main.user_profile_get_emails_about_new_features"))
+    assert "Get emails about new features" in page.text
+    radios = page.select("input.govuk-radios__input")
+    assert len(radios) == 2
+
+    checked_radio = page.select(".govuk-radios__item input[checked]")
+    assert len(checked_radio) == 1
+    assert checked_radio[0]["value"] == str(receives_new_features_email)
+
+
+def test_post_user_profile_get_emails_about_new_features(client_request, mocker, active_user_with_permissions):
+    active_user_with_permissions["receives_new_features_email"] = True
+    client_request.login(active_user_with_permissions)
+
+    mock_update = mocker.patch("app.user_api_client.update_user_attribute")
+
+    client_request.post(
+        ".user_profile_get_emails_about_new_features",
+        _data={"enabled": False},
+        _expected_status=302,
+        _expected_redirect=url_for("main.user_profile"),
+    ),
+
+    mock_update.assert_called_once_with(active_user_with_permissions["id"], receives_new_features_email=False)

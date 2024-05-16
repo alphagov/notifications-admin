@@ -89,6 +89,7 @@ class HeaderNavigation(Navigation):
             "user_profile_email",
             "user_profile_email_authenticate",
             "user_profile_email_confirm",
+            "user_profile_get_emails_about_new_features",
             "user_profile_mobile_number",
             "user_profile_mobile_number_authenticate",
             "user_profile_mobile_number_confirm",

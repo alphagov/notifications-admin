@@ -353,6 +353,7 @@
     "/user-profile/email",
     "/user-profile/email/authenticate",
     "/user-profile/email/confirm/<string:token>",
+    "/user-profile/get-emails-about-new-features",
     "/user-profile/mobile-number",
     "/user-profile/mobile-number/authenticate",
     "/user-profile/mobile-number/confirm",
