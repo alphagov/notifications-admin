@@ -247,7 +247,7 @@ def test_update_letter_branding_when_uploading_invalid_file(
     )
 
     assert page.select_one("h1").text == "Update letter branding"
-    assert page.select_one(".error-message").text.strip() == "SVG Images only!"
+    assert page.select_one(".error-message").text.strip() == "The logo must be an SVG file"
 
 
 def test_update_letter_branding_with_original_file_and_new_details(
@@ -542,7 +542,7 @@ def test_create_letter_branding_when_uploading_invalid_file(
         _follow_redirects=True,
     )
     assert page.select_one("h1").text == "Add letter branding"
-    assert page.select_one(".error-message").text.strip() == "SVG Images only!"
+    assert page.select_one(".error-message").text.strip() == "The logo must be an SVG file"
 
 
 def test_create_new_letter_branding_shows_preview_of_logo(client_request, platform_admin_user, fake_uuid, logo_client):

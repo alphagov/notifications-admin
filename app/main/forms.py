@@ -1954,7 +1954,7 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         "Alt text", param_extensions={"hint": {"text": "Text for people who cannot see the logo"}}
     )
     colour = HexColourCodeField("Colour")
-    file = VirusScannedFileField("Upload a PNG logo", validators=[FileAllowed(["png"], "PNG Images only!")])
+    file = VirusScannedFileField("Upload a PNG logo", validators=[FileAllowed(["png"], "The logo must be a PNG file")])
     brand_type = GovukRadiosField(
         "Brand type",
         choices=[
@@ -2046,7 +2046,7 @@ class AdminEditLetterBrandingSVGUploadForm(StripWhitespaceForm):
     file = VirusScannedFileField(
         "Upload an SVG logo",
         validators=[
-            FileAllowed(["svg"], "SVG Images only!"),
+            FileAllowed(["svg"], "The logo must be an SVG file"),
             DataRequired(message="You need to upload a file to submit"),
             NoEmbeddedImagesInSVG(),
             NoTextInSVG(),

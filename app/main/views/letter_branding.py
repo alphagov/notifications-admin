@@ -106,6 +106,7 @@ def update_letter_branding(branding_id):
         cdn_url=current_app.config["LOGO_CDN_DOMAIN"],
         logo=logo_key,
         is_update=True,
+        error_summary_enabled=True,
     )
 
 

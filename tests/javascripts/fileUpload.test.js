@@ -106,7 +106,7 @@ describe('File upload', () => {
 
     var buttonLabel;
 
-    uploadLabel.innerHTML += '<span class="error-message">PNG images only!</span>';
+    uploadLabel.innerHTML += '<span class="error-message">The logo must be a PNG file</span>';
 
     // start module
     window.GOVUK.notifyModules.start();
@@ -116,7 +116,7 @@ describe('File upload', () => {
     expect(buttonLabel).not.toBeNull();
 
     // The button's label should include its existing text and the validation errors added together
-    expect(buttonLabel.textContent.trim().replace(/\s{2,}/g, ' ')).toEqual("Upload logo PNG images only!");
+    expect(buttonLabel.textContent.trim().replace(/\s{2,}/g, ' ')).toEqual("Upload logo The logo must be a PNG file");
 
   });
 
