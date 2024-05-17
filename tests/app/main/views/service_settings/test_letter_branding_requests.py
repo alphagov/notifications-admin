@@ -480,7 +480,7 @@ def test_POST_letter_branding_upload_branding_scans_for_viruses(client_request, 
     )
 
     assert normalize_spaces(page.select_one("h1").text) == "Upload letter branding"
-    assert normalize_spaces(page.select_one(".error-message").text) == "Your file contains a virus"
+    assert normalize_spaces(page.select_one(".error-message").text) == "This file contains a virus"
 
 
 def test_POST_letter_branding_upload_branding_redirects_on_success(
