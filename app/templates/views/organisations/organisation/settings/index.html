@@ -1,5 +1,5 @@
 {% extends "org_template.html" %}
-{% from "components/table.html" import mapping_table, optional_text_field, row, field, text_field, edit_field with context %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block org_page_title %}
   Settings
@@ -7,185 +7,309 @@
 
 {% block maincolumn_content %}
   <h1 class="heading-medium">Settings</h1>
-  <div class="bottom-gutter-3-2 settings-table body-copy-table">
-    {% call mapping_table(
-      caption='General',
-      field_headings=['Label', 'Value', 'Action'],
-      field_headings_visible=False,
-      caption_visible=False
-    ) %}
-      {% call row() %}
-        {{ text_field('Name') }}
-        {{ text_field(current_org.name) }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_name', org_id=current_org.id),
-            suffix='organisation name'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Sector') }}
-        {{ optional_text_field(current_org.organisation_type_label) }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_type', org_id=current_org.id),
-            suffix='sector for the organisation'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Crown organisation') }}
-        {{ optional_text_field(
-            {
-              True: 'Yes',
-              False: 'No',
-            }.get(current_org.crown),
-            default='Not sure'
-        ) }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_crown_status', org_id=current_org.id),
-            suffix='organisation crown status'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Data processing and financial agreement') }}
-        {{ text_field(
-          {
-            True: 'Signed',
-            False: 'Not signed',
-            None: 'Not signed (but we have some service-specific agreements in place)'
-          }.get(current_org.agreement_signed)
-        ) }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_agreement', org_id=current_org.id),
-            suffix='data processing and financial agreement for the organisation'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Request to go live notes') }}
-        {{ optional_text_field(current_org.request_to_go_live_notes, default='None') }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_go_live_notes', org_id=current_org.id),
-            suffix='go live notes for the organisation'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Can approve own go-live requests') }}
-        {{ text_field(current_org.can_approve_own_go_live_requests|format_yes_no) }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_can_approve_own_go_live_requests', org_id=current_org.id),
-            suffix='whether this organisation can approve its own go-live requests'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Users can ask to join services') }}
-        {{ text_field(current_org.can_ask_to_join_a_service|format_yes_no) }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_can_ask_to_join_a_service', org_id=current_org.id),
-            suffix='whether this users can ask to join services in this organisation'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Billing details')}}
-        {{ optional_text_field(current_org.billing_details, default="None", wrap=True) }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_billing_details', org_id=current_org.id),
-            suffix='billing details for the organisation'
-          )
-        }}
-      {% endcall %}
+  <div class="bottom-gutter-3-2">
 
-      {% call row() %}
-        {{ text_field('Notes')}}
-        {{ optional_text_field(current_org.notes, default="None", wrap=True) }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_notes', org_id=current_org.id),
-            suffix='the notes for the organisation'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Email branding options') }}
-        {% set email_branding_html %}
-          <div {% if current_org.email_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
-            {{ current_org.email_branding.name }}
-            <br>
-            <div class="table-field-status-default">
-              Default
-            </div>
-          </div>
-
-          {% for item in current_org.email_branding_pool_excluding_default %}
-            {% if loop.first %}<ul>{% endif %}
-              <li>
-                {{ item.name }}
-              </li>
-            {% if loop.last %}</ul>{% endif %}
+    {% set billing_details_html %}
+      {% if current_org.billing_details is iterable and text is not string %}
+        <ul class="govuk-list">
+          {% for item in current_org.billing_details %}
+            {% if item %}
+              <li>{{ item }}</li>
+            {% endif %}
           {% endfor %}
-        {% endset %}
-        {% call field() %}
-          {{ email_branding_html }}
-        {% endcall %}
-        {{ edit_field(
-            'Manage',
-            url_for('main.organisation_email_branding', org_id=current_org.id),
-            suffix='email branding options for the organisation'
-          )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Letter branding options') }}
-        {% set letter_branding_html %}
-          <div {% if current_org.letter_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
-            {{ current_org.letter_branding.name or "No branding" }}
-            <br>
-            <div class="table-field-status-default">
-              Default
-            </div>
-          </div>
-          {% for item in current_org.letter_branding_pool_excluding_default %}
-            {% if loop.first %}<ul>{% endif %}
-              <li>
-                {{ item.name }}
-              </li>
-            {% if loop.last %}</ul>{% endif %}
-          {% endfor %}
-        {% endset %}
+        </ul>
+      {% else %}
+        None
+      {% endif %}
+    {% endset %}
 
-        {% call field() %}
-          {{ letter_branding_html }}
-        {% endcall %}
-        {{ edit_field(
-            'Manage',
-            url_for('main.organisation_letter_branding', org_id=current_org.id),
-            suffix='letter branding options for the organisation'
-            )
-        }}
-      {% endcall %}
-      {% call row() %}
-        {{ text_field('Known email domains') }}
-        {{ optional_text_field(current_org.domains or None, default='None') }}
-        {{ edit_field(
-            'Change',
-            url_for('main.edit_organisation_domains', org_id=current_org.id),
-            suffix='known email domains for the organisation'
-          )
-        }}
-      {% endcall %}
-    {% endcall %}
+    {% set email_branding_html %}
+      <div {% if current_org.email_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
+        {{ current_org.email_branding.name }}
+        <br>
+        <span class="govuk-hint">
+          Default
+        </span>
+      </div>
+
+      {% for item in current_org.email_branding_pool_excluding_default %}
+        {% if loop.first %}<ul class="govuk-list">{% endif %}
+          <li>
+            {{ item.name }}
+          </li>
+        {% if loop.last %}</ul>{% endif %}
+      {% endfor %}
+    {% endset %}
+
+    {% set letter_branding_html %}
+      <div {% if current_org.letter_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
+        {{ current_org.letter_branding.name or "No branding" }}
+        <br>
+        <span class="govuk-hint">
+          Default
+        </span>
+      </div>
+      {% for item in current_org.letter_branding_pool_excluding_default %}
+        {% if loop.first %}<ul class="govuk-list">{% endif %}
+          <li>
+            {{ item.name }}
+          </li>
+        {% if loop.last %}</ul>{% endif %}
+      {% endfor %}
+    {% endset %}
+
+    {% set known_domains_html %}
+      {% if current_org.domains %}
+        <ul class="govuk-list">
+          {% for item in current_org.domains %}
+            {% if item %}
+              <li>{{ item }}</li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% else %}
+        None
+      {% endif %}
+    {% endset %}
+
+    {{ govukSummaryList({
+      "classes": "notify-summary-list organisation-settings",
+      "rows": [
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Name"
+          },
+          "value": {
+            "text": current_org.name
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_name', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "organisation name",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Sector"
+          },
+          "value": {
+            "text": current_org.organisation_type_label or "Not set"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_type', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "sector for the organisation",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Crown organisation"
+          },
+          "value": {
+            "text": "Not sure" if current_org.crown is none else "Yes" if current_org.crown else "No",
+            "classes": "govuk-summary-list__value--default" if current_org.crown is none
+          },
+          "actions": {
+            "items": [
+              {
+                "href":  url_for('main.edit_organisation_crown_status', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "organisation crown status",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Data processing and financial agreement"
+          },
+          "value": {
+            "text": "Not signed (but we have some service-specific agreements in place)" if current_org.agreement_signed is none else "Signed" if current_org.agreement_signed else "Not signed",
+            "classes": "govuk-summary-list__value--truncate" if current_org.agreement_signed is none
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_agreement', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "data processing and financial agreement for the organisation",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Request to go live notes"
+          },
+          "value": {
+            "text": current_org.request_to_go_live_notes or "None",
+            "classes": "govuk-summary-list__value--default" if current_org.request_to_go_live_notes is none else "govuk-summary-list__value--truncate"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_go_live_notes', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "go live notes for the organisation",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Can approve own go-live requests"
+          },
+          "value": {
+            "text": current_org.can_approve_own_go_live_requests|format_yes_no
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_can_approve_own_go_live_requests', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "whether this organisation can approve its own go-live requests",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Users can ask to join services"
+          },
+          "value": {
+            "text": current_org.can_ask_to_join_a_service|format_yes_no
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_can_ask_to_join_a_service', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "whether this users can ask to join services in this organisation",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Billing details"
+          },
+          "value": {
+            "text": billing_details_html
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_billing_details', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "billing details for the organisation",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Notes"
+          },
+          "value": {
+            "text": current_org.notes or "None",
+            "classes": "govuk-summary-list__value--default" if current_org.notes is none
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_notes', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "the notes for the organisation",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Email branding options"
+          },
+          "value": {
+            "text": email_branding_html
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.organisation_email_branding', org_id=current_org.id),
+                "text": "Manage",
+                "visuallyHiddenText": "email branding options for the organisation",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Letter branding options"
+          },
+          "value": {
+            "text": letter_branding_html
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.organisation_letter_branding', org_id=current_org.id),
+                "text": "Manage",
+                "visuallyHiddenText": "letter branding options for the organisation",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Known email domains"
+          },
+          "value": {
+            "text": known_domains_html,
+            "classes": "govuk-summary-list__value--default" if not current_org.domains
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_domains', org_id=current_org.id),
+                "text": "Change",
+                "visuallyHiddenText": "known email domains for the organisation",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        }
+      ]
+    }) }}
     {% if current_org.active %}
       <p class="top-gutter-1-2">
         <span class="page-footer-link page-footer-delete-link-without-button">
