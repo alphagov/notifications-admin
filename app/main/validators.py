@@ -242,7 +242,7 @@ class FileIsVirusFree:
                 try:
                     virus_free = antivirus_client.scan(field.data)
                     if not virus_free:
-                        raise StopValidation("Your file contains a virus")
+                        raise StopValidation("This file contains a virus")
                 finally:
                     field.data.seek(0)
 

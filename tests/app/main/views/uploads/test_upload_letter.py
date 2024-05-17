@@ -307,7 +307,7 @@ def test_uploading_a_pdf_shows_error_when_file_contains_virus(
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         page = client_request.post(endpoint, **kwargs, _data={"file": file}, _expected_status=400)
     assert page.select_one(".banner-dangerous h1").text == "There is a problem"
-    assert page.select_one(".banner-dangerous p").text == "Your file contains a virus"
+    assert page.select_one(".banner-dangerous p").text == "This file contains a virus"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
     mock_s3_backup.assert_not_called()
 
