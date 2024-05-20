@@ -1,0 +1,12 @@
+Organisation: {% if current_service.organisation -%}
+  {{ current_service.organisation.name }}
+{%- else -%}
+  Can’t tell (domain is {{ current_user.email_domain }})
+{%- endif %}
+Service: {{ current_service.name }}
+{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+
+---
+The user asked for a sender ID that is potentially used for phishing - {{ senderID }}. It has been blocked.
+
+Check whether this is just testing, if not raise a security incident.

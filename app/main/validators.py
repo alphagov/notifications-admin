@@ -1,7 +1,9 @@
 import re
 from abc import ABC, abstractmethod
 
-from flask import current_app
+from flask import current_app, render_template
+from flask_login import current_user
+from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
 from notifications_utils.recipients import InvalidEmailError, validate_email_address
@@ -11,7 +13,7 @@ from wtforms import ValidationError
 from wtforms.validators import URL, DataRequired, InputRequired, StopValidation
 from wtforms.validators import Length as WTFormsLength
 
-from app import antivirus_client
+from app import antivirus_client, current_service, zendesk_client
 from app.formatters import sentence_case
 from app.main._commonly_used_passwords import commonly_used_passwords
 from app.models.spreadsheet import Spreadsheet
@@ -146,6 +148,25 @@ class IsNotAGenericSenderID:
             raise ValidationError(self.message)
 
 
+def create_phishing_senderid_zendesk_ticket(senderID=None):
+    ticket_message = render_template(
+        "support-tickets/phishing-senderid.txt",
+        senderID=senderID,
+    )
+    ticket = NotifySupportTicket(
+        subject=f"Possible Phishing sender ID - {current_service.name}",
+        message=ticket_message,
+        ticket_type=NotifySupportTicket.TYPE_INCIDENT,
+        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
+        user_name=current_user.name,
+        user_email=current_user.email_address,
+        org_id=current_service.organisation_id,
+        org_type=current_service.organisation_type,
+        service_id=current_service.id,
+    )
+    zendesk_client.send_ticket_to_zendesk(ticket)
+
+
 class IsNotAPotentiallyMaliciousSenderID:
     potentially_malicious_sender_ids = [
         "amazon",
@@ -163,6 +184,7 @@ class IsNotAPotentiallyMaliciousSenderID:
 
     def __call__(self, form, field):
         if field.data and field.data.lower() in self.potentially_malicious_sender_ids:
+            create_phishing_senderid_zendesk_ticket(senderID=field.data)
             current_app.logger.warning("User tried to set sender id to potentially malicious one: %s", field.data)
             raise ValidationError(
                 f"Text message sender ID cannot be ‘{field.data}’ - this is to protect recipients from phishing scams"
