@@ -271,7 +271,7 @@ def test_uploading_a_letter_shows_error_when_file_is_not_a_pdf(
     assert "Error: Upload a letter – service one – GOV.UK Notify" in normalize_spaces(page.select_one("title").text)
     error_summary = page.select_one(".govuk-error-summary")
     assert "There is a problem" in error_summary.text
-    assert "Save your letter as a PDF and try again." in error_summary.text
+    assert "The file must be a PDF" in error_summary.text
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
 
 

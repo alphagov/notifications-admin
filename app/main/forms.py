@@ -2116,7 +2116,7 @@ class PDFUploadForm(StripWhitespaceForm):
     file = VirusScannedFileField(
         "Upload a letter in PDF format",
         validators=[
-            FileAllowed(["pdf"], "Save your letter as a PDF and try again."),
+            FileAllowed(["pdf"], "The file must be a PDF"),
             DataRequired(message="You need to choose a file to upload"),
             FileSize(max_size=2 * 1024 * 1024, message="File must be smaller than 2MB"),
         ],
