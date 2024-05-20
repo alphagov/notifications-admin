@@ -1259,7 +1259,7 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
             ({"logo": (BytesIO(b""), "logo.svg")}, "Logo must be a PNG file"),
             (
                 {"logo": (BytesIO(b"a" * 3 * 1024 * 1024), "logo.png")},
-                "File must be smaller than 2MB",
+                "The file must be smaller than 2MB",
             ),
             (
                 lambda: {"logo": (open("tests/test_img_files/corrupt-magic-numbers.png", "rb"), "logo.png")},
