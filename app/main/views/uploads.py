@@ -211,7 +211,7 @@ def upload_letter(service_id):
                 )
             )
 
-    return render_template("views/uploads/choose-file.html", form=form, error_summary_enabled=True), (
+    return render_template("views/uploads/upload-letter.html", form=form, error_summary_enabled=True), (
         400 if form.errors else 200
     )
 
