@@ -1714,6 +1714,73 @@ def test_should_be_able_to_view_a_letter_template_with_links(
     ]
 
 
+def test_should_not_be_able_to_view_edit_links_for_an_archived_letter_template(
+    mocker,
+    client_request,
+    mock_get_template_folders,
+    active_user_with_permissions,
+    single_letter_contact_block,
+    fake_uuid,
+    mock_get_page_counts_for_letter,
+):
+    archived_letter_template = template_json(
+        service_id=SERVICE_ONE_ID,
+        id_=fake_uuid,
+        name="Two week reminder",
+        type_="letter",
+        content="Your vehicle tax expires soon",
+        redact_personalisation=False,
+        archived=True,
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": archived_letter_template})
+
+    page = client_request.get(
+        "main.view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    page_links = set(link["href"] for link in page.select("a"))
+
+    edit_links = set(
+        [
+            url_for(
+                "main.set_sender",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            url_for(
+                "main.letter_branding_options",
+                service_id=SERVICE_ONE_ID,
+                from_template=fake_uuid,
+            ),
+            url_for(
+                "main.edit_template_postage",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            url_for(
+                "main.edit_service_template",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            url_for(
+                "main.set_template_sender",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            url_for(
+                "main.letter_template_attach_pages",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+        ]
+    )
+
+    assert len(page_links & edit_links) == 0
+
+
 def test_should_be_able_to_view_a_letter_template_with_bilingual_content(
     mocker,
     client_request,

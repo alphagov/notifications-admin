@@ -114,6 +114,10 @@ def view_template(service_id, template_id):
         show_recipient=True,
         include_letter_edit_ui_overlay=True,
     )
+
+    if template._template["archived"]:
+        template.include_letter_edit_ui_overlay = False
+
     template_folder = current_service.get_template_folder(template.get_raw("folder"))
 
     user_has_template_permission = current_user.has_template_folder_permission(template_folder, service=current_service)
