@@ -338,7 +338,7 @@ def test_post_choose_upload_letter_when_file_is_malformed(
     assert "Error: Upload a letter – service one – GOV.UK Notify" in normalize_spaces(page.select_one("title").text)
     error_summary = page.select_one(".govuk-error-summary")
     assert "There is a problem" in error_summary.text
-    assert "Notify cannot read this PDF. Save a new copy of your file and try again." in error_summary.text
+    assert "Notify cannot read this PDF - save a new copy and try again" in error_summary.text
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
 
 

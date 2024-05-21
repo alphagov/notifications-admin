@@ -152,7 +152,7 @@ def upload_letter(service_id):
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
             current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
-            form.file.errors.append("Notify cannot read this PDF. Save a new copy of your file and try again.")
+            form.file.errors.append("Notify cannot read this PDF - save a new copy and try again")
 
         if not form.errors:
             original_filename = form.file.data.filename
