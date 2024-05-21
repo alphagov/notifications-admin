@@ -28,9 +28,14 @@
   ListEntry.prototype.entryTemplate = Hogan.compile(
     '<div class="list-entry">' +
       '<div class="govuk-form-group{{#error}} govuk-form-group--error{{/error}}">' +
-        '<label for="{{{id}}}" class="govuk-input--numbered__label">' +
+        '<label for="{{{id}}}" class="govuk-label govuk-input--numbered__label{{#error}} govuk-input--numbered__label--error{{/error}}">' +
           '<span class="govuk-visually-hidden">{{listItemName}} number </span>{{number}}.' +
         '</label>' +
+        '{{#error}}' +
+        '<p id="{{{id}}}-error" class="govuk-error-message" data-notify-module="track-error" data-error-type="{{{error}}}" data-error-label="{{{name}}}">' +
+          '<span class="govuk-visually-hidden">Error: </span>{{{error}}}' +
+        '</p>' +
+        '{{/error}}' +
         '<input' +
         ' name="{{name}}"' +
         ' id="{{id}}"' +
