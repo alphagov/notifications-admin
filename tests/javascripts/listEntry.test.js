@@ -71,7 +71,7 @@ describe("List entry", () => {
           For example cabinet-office.gov.uk
         </span>
         <div class="input-list" data-notify-module="list-entry" data-list-item-name="domain" id="list-entry-domains">
-          ${entries()} }
+          ${entries()}
         </div>
       </fieldset>`;
 
