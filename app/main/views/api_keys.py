@@ -55,7 +55,7 @@ def guest_list(service_id):
         return redirect(url_for(".api_integration", service_id=service_id))
     if not form.errors:
         form.populate(**service_api_client.get_guest_list(service_id))
-    return render_template("views/api/guest-list.html", form=form)
+    return render_template("views/api/guest-list.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/services/<uuid:service_id>/api/keys")

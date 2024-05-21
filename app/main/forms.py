@@ -2144,6 +2144,7 @@ class GuestList(StripWhitespaceForm):
         min_entries=5,
         max_entries=5,
         label="Email addresses",
+        thing="email address",
     )
 
     phone_numbers = ListEntryFieldList(
@@ -2151,6 +2152,7 @@ class GuestList(StripWhitespaceForm):
         min_entries=5,
         max_entries=5,
         label="Mobile numbers",
+        thing="mobile number",
     )
 
 
