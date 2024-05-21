@@ -12,10 +12,12 @@
     if (!idPattern) { return false; }
     this.idPattern = idPattern;
     this.elementSelector = '.list-entry, .input-list__button--remove, .input-list__button--add';
+    this.sharedInputClasses = ['govuk-input', 'govuk-input--numbered'];
     this.entries = [];
     this.$wrapper = $elm;
     this.minEntries = 2;
     this.listItemName = this.$wrapper.data('listItemName');
+    this.getCustomClasses();
     this.getSharedAttributes();
 
     this.getValuesAndErrors();
@@ -40,6 +42,7 @@
         ' name="{{name}}"' +
         ' id="{{id}}"' +
         ' {{#value}}value="{{value}}{{/value}}"' +
+        ' class="{{{sharedInputClasses}}}{{#customClasses}} {{{customClasses}}}{{/customClasses}}"' +
         ' {{{sharedAttributes}}}' +
         '/>' +
         '{{#button}}' +
@@ -56,7 +59,7 @@
   ListEntry.prototype.getSharedAttributes = function () {
     var $inputs = this.$wrapper.find('input'),
         attributeTemplate = Hogan.compile(' {{name}}="{{value}}"'),
-        generatedAttributes = ['id', 'name', 'value'],
+        protectedAttributes = ['id', 'name', 'value', 'class'],
         attributes = [],
         attrIdx,
         elmAttributes,
@@ -87,7 +90,7 @@
       attrIdx = elm.attributes.length;
       elmAttributes = [];
       while(attrIdx--) {
-        if ($.inArray(elm.attributes[attrIdx].name, generatedAttributes) === -1) {
+        if ($.inArray(elm.attributes[attrIdx].name, protectedAttributes) === -1) {
           elmAttributes.push({
             'name': elm.attributes[attrIdx].name,
             'value': elm.attributes[attrIdx].value
@@ -100,6 +103,22 @@
     });
 
     this.sharedAttributes = (attributes.length) ? getAttributesHTML(attributes) : '';
+  };
+  ListEntry.prototype.getCustomClasses = function () {
+    this.customClasses = [];
+    this.$wrapper.find('input').each(function (idx, elm) {
+      var customClassesForElm = [];
+
+      elm.classList.forEach(token => {
+        if ($.inArray(token, this.sharedInputClasses) === -1) {
+          customClassesForElm.push(token);
+        }
+      });
+
+      if (customClassesForElm.length > 0) {
+        this.customClasses.push(customClassesForElm);
+      }
+    }.bind(this));
   };
   ListEntry.prototype.getValuesAndErrors = function () {
     this.entries = [];
@@ -184,6 +203,7 @@
     $.each(this.entries, function (idx, entry) {
       var entryNumber = idx + 1,
           error = this.errors[idx],
+          customClasses = this.customClasses[idx],
           dataObj = {
             'id' : this.getId(entryNumber),
             'number' : entryNumber,
@@ -191,6 +211,7 @@
             'name' : this.getId(entryNumber),
             'value' : entry,
             'listItemName' : this.listItemName,
+            'sharedInputClasses': this.sharedInputClasses.join(' '),
             'sharedAttributes': this.sharedAttributes
           };
 
@@ -199,6 +220,9 @@
       }
       if (error !== null) {
         dataObj.error = error;
+      }
+      if (customClasses !== null) {
+        dataObj.customClasses = ' ' + customClasses.join(' ');
       }
       this.$wrapper.append(this.entryTemplate.render(dataObj));
     }.bind(this));
