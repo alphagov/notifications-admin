@@ -18,7 +18,7 @@
     this.listItemName = this.$wrapper.data('listItemName');
     this.getSharedAttributes();
 
-    this.getValues();
+    this.getValuesAndErrors();
     this.maxEntries = this.entries.length;
     this.trimEntries();
     this.render();
@@ -94,12 +94,19 @@
 
     this.sharedAttributes = (attributes.length) ? getAttributesHTML(attributes) : '';
   };
-  ListEntry.prototype.getValues = function () {
+  ListEntry.prototype.getValuesAndErrors = function () {
     this.entries = [];
+    this.errors = [];
     this.$wrapper.find('input').each(function (idx, elm) {
       var val = $(elm).val();
+      var $error = $(elm).prev('p.govuk-error-message');
 
       this.entries.push(val);
+      if ($error.length > 0) {
+        this.errors.push($error.get(0).textContent.trim().replace('Error: ', ''));
+      } else {
+        this.errors.push(null);
+      }
     }.bind(this));
   };
   ListEntry.prototype.trimEntries = function () {
@@ -143,22 +150,16 @@
     }
     this.$wrapper.find('.list-entry').eq(numberTargeted - 1).find('input').focus();
   };
-  ListEntry.prototype.removeEntryFromEntries = function (entryNumber) {
-    var idx,
-        len,
-        newEntries = [];
+  ListEntry.prototype.removeEntryFromEntriesAndErrors = function (entryNumber) {
+    var entryIdx = entryNumber - 1;
 
-    for (idx = 0, len = this.entries.length; idx < len; idx++) {
-      if ((entryNumber - 1) !== idx) {
-        newEntries.push(this.entries[idx]);
-      }
-    }
-    this.entries = newEntries;
+    this.entries.splice(entryIdx, 1);
+    this.errors.splice(entryIdx, 1);
   };
   ListEntry.prototype.addEntry = function ($removeButton) {
     var currentLastEntryNumber = this.entries.length;
 
-    this.getValues();
+    this.getValuesAndErrors();
     this.entries.push('');
     this.render();
     this.shiftFocus({ 'action' : 'add', 'entryNumberFocused' : currentLastEntryNumber });
@@ -166,8 +167,8 @@
   ListEntry.prototype.removeEntry = function ($removeButton) {
     var entryNumber = parseInt($removeButton.find('span').text().match(/\d+/)[0], 10);
 
-    this.getValues();
-    this.removeEntryFromEntries(entryNumber);
+    this.getValuesAndErrors();
+    this.removeEntryFromEntriesAndErrors(entryNumber);
     this.render();
     this.shiftFocus({ 'action' : 'remove', 'entryNumberFocused' : entryNumber });
   };
@@ -175,6 +176,7 @@
     this.$wrapper.find(this.elementSelector).remove();
     $.each(this.entries, function (idx, entry) {
       var entryNumber = idx + 1,
+          error = this.errors[idx],
           dataObj = {
             'id' : this.getId(entryNumber),
             'number' : entryNumber,
@@ -187,6 +189,9 @@
 
       if (entryNumber > 1) {
         dataObj.button = true;
+      }
+      if (error !== null) {
+        dataObj.error = error;
       }
       this.$wrapper.append(this.entryTemplate.render(dataObj));
     }.bind(this));
