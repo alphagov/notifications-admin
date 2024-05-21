@@ -224,6 +224,82 @@ describe("List entry", () => {
       expect(fields[0].getAttribute('aria-describedby')).toEqual('hint1');
       expect(fields[0].classList.contains('top-level-domain')).toBe(true);
     });
+
+    describe("If there are validation errors in the page", () => {
+
+      function markFieldAsInvalid(field) {
+
+        const formGroup = field.querySelector('.govuk-form-group');
+        const label = field.querySelector('.govuk-label');
+        const input = field.querySelector('.govuk-input');
+        const errorMessage = document.createElement('p');
+
+        errorMessageText = 'Enter an email address in the correct format, like name@example.gov.uk';
+        errorMessage.setAttribute('id', `${input.id}-error`);
+        errorMessage.setAttribute('data-notify-module', 'track-error');
+        errorMessage.setAttribute('data-error-label', input.id.replace(/^input-/, ''));
+        errorMessage.setAttribute('data-error-type', errorMessageText);
+        errorMessage.classList.add('govuk-error-message');
+        errorMessage.innerHTML = `<span class="govuk-visually-hidden">Error:</span> ${errorMessageText}`;
+
+        formGroup.classList.add('.govuk-form-group--error');
+        label.classList.add('govuk-input--numbered__label--error');
+        input.classList.add('govuk-input--error');
+        input.setAttribute('aria-describedby', errorMessage.id);
+
+        label.insertAdjacentElement('afterend', errorMessage);
+
+      };
+
+      const invalidFields = [0, 2, 5];
+
+      beforeEach(() => {
+
+        inputList.querySelectorAll('.list-entry').forEach((field, idx) => {
+
+          if (invalidFields.includes(idx)) { markFieldAsInvalid(field); }
+
+        });
+
+        // start module
+        window.GOVUK.notifyModules.start();
+
+      });
+
+      test("only textboxes with errors should have their HTML changed", () => {
+
+        document.querySelectorAll('.list-entry').forEach((field, idx) => {
+
+          const formGroup = field.querySelector('.govuk-form-group');
+          const label = field.querySelector('.govuk-label');
+          const input = field.querySelector('.govuk-input');
+          const errorMessage = field.querySelector('.govuk-error-message');
+
+          if (invalidFields.includes(idx)) {
+
+            expect(formGroup.classList.contains('govuk-form-group--error')).toBe(true);
+            expect(label.classList.contains('govuk-input--numbered__label')).toBe(true);
+            expect(input.classList.contains('govuk-input--error')).toBe(true);
+            expect(errorMessage.matches('[data-notify-module][data-error-label][data-error-type]')).toBe(true);
+            expect(errorMessage.innerHTML.trim()).toEqual(
+              `<span class="govuk-visually-hidden">Error:</span> ${errorMessage.dataset.errorLabel}`);
+
+          } else {
+
+            expect(formGroup.classList.contains('govuk-form-group--error')).toBe(false);
+            expect(label.classList.contains('govuk-input--numbered__label')).toBe(false);
+            expect(input.classList.contains('govuk-input--error')).toBe(false);
+            expect(errorMessage.matches('[data-notify-module][data-error-label][data-error-type]')).toBe(false);
+            expect(errorMessage.innerHTML.trim()).not.toEqual(
+              `<span class="govuk-visually-hidden">Error:</span> ${errorMessage.dataset.errorLabel}`);
+
+          }
+
+        });
+
+      });
+
+    });
   });
 
   describe("When the 'remove' button is clicked", () => {
@@ -267,7 +343,7 @@ describe("List entry", () => {
       // the items have their values set to the 10 domains
       const expectedValues = domains.slice(0, -1);
       const itemValues = Array.from(
-                          inputList.querySelectorAll('.list-entry input[type=text]')
+                           inputList.querySelectorAll('.list-entry input[type=text]')
                          )
                          .map(item => item.getAttribute('value'));
 
@@ -283,7 +359,7 @@ describe("List entry", () => {
       // the items have their values set to the 10 domains
       const expectedValues = domains.slice();
       const itemValues = Array.from(
-                          inputList.querySelectorAll('.list-entry input[type=text]')
+                           inputList.querySelectorAll('.list-entry input[type=text]')
                          )
                          .map(item => item.getAttribute('value'));
 
