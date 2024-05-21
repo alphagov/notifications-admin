@@ -27,20 +27,22 @@
   ListEntry.optionalAttributes = ['aria-describedby'];
   ListEntry.prototype.entryTemplate = Hogan.compile(
     '<div class="list-entry">' +
-      '<label for="{{{id}}}" class="govuk-input--numbered__label">' +
-        '<span class="govuk-visually-hidden">{{listItemName}} number </span>{{number}}.' +
-      '</label>' +
-      '<input' +
+      '<div class="govuk-form-group{{#error}} govuk-form-group--error{{/error}}">' +
+        '<label for="{{{id}}}" class="govuk-input--numbered__label">' +
+          '<span class="govuk-visually-hidden">{{listItemName}} number </span>{{number}}.' +
+        '</label>' +
+        '<input' +
         ' name="{{name}}"' +
         ' id="{{id}}"' +
         ' {{#value}}value="{{value}}{{/value}}"' +
         ' {{{sharedAttributes}}}' +
-      '/>' +
-      '{{#button}}' +
+        '/>' +
+        '{{#button}}' +
         '<button type="button" class="govuk-button govuk-button--secondary input-list__button--remove">' +
-          'Remove<span class="govuk-visually-hidden"> {{listItemName}} number {{number}}</span>' +
+        'Remove<span class="govuk-visually-hidden"> {{listItemName}} number {{number}}</span>' +
         '</button>' +
-      '{{/button}}' +
+        '{{/button}}' +
+      '</div>' +
     '</div>'
   );
   ListEntry.prototype.addButtonTemplate = Hogan.compile(
