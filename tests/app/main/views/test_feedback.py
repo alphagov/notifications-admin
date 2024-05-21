@@ -12,7 +12,7 @@ from app.models.feedback import (
     PROBLEM_TICKET_TYPE,
     QUESTION_TICKET_TYPE,
 )
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config_values
 
 
 def no_redirect():
@@ -234,7 +234,13 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
         autospec=True,
     )
 
-    with set_config(notify_admin, "NOTIFY_ENVIRONMENT", "production"):
+    with set_config_values(
+        notify_admin,
+        {
+            "NOTIFY_ENVIRONMENT": "production",
+            "FEEDBACK_ZENDESK_SUBJECT_PREFIX_ENABLED": False,
+        },
+    ):
         client_request.post(
             "main.feedback",
             ticket_type=GENERAL_TICKET_TYPE,

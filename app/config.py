@@ -36,8 +36,10 @@ class Config:
     EMAIL_EXPIRY_SECONDS = 3600  # 1 hour
     INVITATION_EXPIRY_SECONDS = 3600 * 24 * 2  # 2 days - also set on api
     EMAIL_2FA_EXPIRY_SECONDS = 1800  # 30 Minutes
-    HEADER_COLOUR = "#81878b"  # mix(govuk-colour("dark-grey"), govuk-colour("mid-grey"))
-    HTTP_PROTOCOL = "http"
+
+    # mix(govuk-colour("dark-grey"), govuk-colour("mid-grey"))
+    HEADER_COLOUR = os.environ.get("HEADER_COLOUR", "#81878b")
+    HTTP_PROTOCOL = os.environ.get("HTTP_PROTOCOL", "http")
     NOTIFY_APP_NAME = "admin"
     NOTIFY_LOG_LEVEL = "DEBUG"
 
@@ -58,23 +60,28 @@ class Config:
     WTF_CSRF_TIME_LIMIT = None
     ACTIVITY_STATS_LIMIT_DAYS = 7
 
-    REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT = 45
+    REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT = os.environ.get("REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT", 45)
 
-    NOTIFY_ENVIRONMENT = "development"
-    S3_BUCKET_CSV_UPLOAD = "local-notifications-csv-upload"
-    S3_BUCKET_CONTACT_LIST_UPLOAD = "local-contact-list"
-    S3_BUCKET_LOGO_UPLOAD = "public-logos-local"
-    S3_BUCKET_MOU = "local-mou"
-    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "local-transient-uploaded-letters"
-    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "local-precompiled-originals-backup-letters"
-    S3_BUCKET_LETTER_ATTACHMENTS = "local-letter-attachments"
+    NOTIFY_ENVIRONMENT = os.environ.get("NOTIFY_ENVIRONMENT", "development")
+    S3_BUCKET_CSV_UPLOAD = os.environ.get("S3_BUCKET_CSV_UPLOAD", "local-notifications-csv-upload")
+    S3_BUCKET_CONTACT_LIST_UPLOAD = os.environ.get("S3_BUCKET_CONTACT_LIST_UPLOAD", "local-contact-list")
+    S3_BUCKET_LOGO_UPLOAD = os.environ.get("S3_BUCKET_LOGO_UPLOAD", "public-logos-local")
+    S3_BUCKET_MOU = os.environ.get("S3_BUCKET_MOU", "local-mou")
+    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = os.environ.get(
+        "S3_BUCKET_TRANSIENT_UPLOADED_LETTERS", "local-transient-uploaded-letters"
+    )
+    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = os.environ.get(
+        "S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS", "local-precompiled-originals-backup-letters"
+    )
+    S3_BUCKET_LETTER_ATTACHMENTS = os.environ.get("S3_BUCKET_LETTER_ATTACHMENTS", "local-letter-attachments")
+    LOGO_CDN_DOMAIN = os.environ.get("LOGO_CDN_DOMAIN", "static-logos.notify.tools")
     ANTIVIRUS_ENABLED = True
 
     REDIS_URL = os.environ.get("REDIS_URL")
     REDIS_ENABLED = False if os.environ.get("REDIS_ENABLED") == "0" else True
 
-    ASSET_DOMAIN = ""
-    ASSET_PATH = "/static/"
+    ASSET_DOMAIN = os.environ.get("ASSET_DOMAIN", "")
+    ASSET_PATH = os.environ.get("ASSET_PATH", "/static/")
 
     NOTIFY_SERVICE_ID = "d6aa2c68-a2d9-4437-ab19-3ae8eb202553"
 
@@ -91,6 +98,8 @@ class Config:
 
     EMAIL_BRANDING_MIN_LOGO_HEIGHT_PX = 108
     EMAIL_BRANDING_MAX_LOGO_WIDTH_PX = 640
+
+    FEEDBACK_ZENDESK_SUBJECT_PREFIX_ENABLED = os.environ.get("FEEDBACK_ZENDESK_SUBJECT_PREFIX_ENABLED", "1") == "1"
 
 
 class Development(Config):
@@ -145,57 +154,6 @@ class Test(Development):
     ASSET_PATH = "https://static.example.com/"
 
 
-class Preview(Config):
-    HTTP_PROTOCOL = "https"
-    HEADER_COLOUR = "#F499BE"  # $baby-pink
-    S3_BUCKET_CSV_UPLOAD = "preview-notifications-csv-upload"
-    S3_BUCKET_CONTACT_LIST_UPLOAD = "preview-contact-list"
-    S3_BUCKET_LOGO_UPLOAD = "public-logos-preview"
-    S3_BUCKET_MOU = "notify.works-mou"
-    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "preview-transient-uploaded-letters"
-    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "preview-letters-precompiled-originals-backup"
-    S3_BUCKET_LETTER_ATTACHMENTS = "preview-letter-attachments"
-    LOGO_CDN_DOMAIN = "static-logos.notify.works"
-    NOTIFY_ENVIRONMENT = "preview"
-    ASSET_DOMAIN = "static.notify.works"
-    ASSET_PATH = "https://static.notify.works/"
-
-    # On preview, extend the validation timeout to allow more leniency when running functional tests
-    REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT = 120
-
-
-class Staging(Config):
-    HTTP_PROTOCOL = "https"
-    HEADER_COLOUR = "#6F72AF"  # $mauve
-    S3_BUCKET_CSV_UPLOAD = "staging-notifications-csv-upload"
-    S3_BUCKET_CONTACT_LIST_UPLOAD = "staging-contact-list"
-    S3_BUCKET_LOGO_UPLOAD = "public-logos-staging"
-    S3_BUCKET_MOU = "staging-notify.works-mou"
-    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "staging-transient-uploaded-letters"
-    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "staging-letters-precompiled-originals-backup"
-    S3_BUCKET_LETTER_ATTACHMENTS = "staging-letter-attachments"
-    LOGO_CDN_DOMAIN = "static-logos.staging-notify.works"
-    NOTIFY_ENVIRONMENT = "staging"
-    ASSET_DOMAIN = "static.staging-notify.works"
-    ASSET_PATH = "https://static.staging-notify.works/"
-
-
-class Production(Config):
-    HEADER_COLOUR = "#1d70b8"  # $govuk-blue
-    HTTP_PROTOCOL = "https"
-    S3_BUCKET_CSV_UPLOAD = "live-notifications-csv-upload"
-    S3_BUCKET_CONTACT_LIST_UPLOAD = "production-contact-list"
-    S3_BUCKET_LOGO_UPLOAD = "public-logos-production"
-    S3_BUCKET_MOU = "notifications.service.gov.uk-mou"
-    S3_BUCKET_TRANSIENT_UPLOADED_LETTERS = "production-transient-uploaded-letters"
-    S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "production-letters-precompiled-originals-backup"
-    S3_BUCKET_LETTER_ATTACHMENTS = "production-letter-attachments"
-    LOGO_CDN_DOMAIN = "static-logos.notifications.service.gov.uk"
-    NOTIFY_ENVIRONMENT = "production"
-    ASSET_DOMAIN = "static.notifications.service.gov.uk"
-    ASSET_PATH = "https://static.notifications.service.gov.uk/"
-
-
 class CloudFoundryConfig(Config):
     pass
 
@@ -212,8 +170,5 @@ class Sandbox(CloudFoundryConfig):
 configs = {
     "development": Development,
     "test": Test,
-    "preview": Preview,
-    "staging": Staging,
-    "production": Production,
     "sandbox": Sandbox,
 }
