@@ -11,44 +11,94 @@
 
   <h1 class="heading-large">Terms of use</h1>
 
-  <div class="govuk-inset-text">
-    <p class="govuk-body">
-      We’re updating our terms of use on Monday 3 June 2024.
-    </p>
-    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.new_terms_of_use') }}">Read our new terms of use</a>
-    </p>
-  </div>
+  {{ content_metadata(
+    data={
+      "Published": "23 March 2016",
+      "Last updated": "3 June 2024"
+    }
+    ) }}
 
   <p class="govuk-body">
-    These terms apply to your service’s use of GOV.UK&nbsp;Notify. You must be the service manager to accept them.
+    These terms apply to the way you use GOV.UK Notify.
   </p>
 
-  <h2 class="heading-medium" id="when-using-notify">When using Notify</h2>
-  <p class="govuk-body">You must:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>complete your organisation’s information assurance process (you do not need to include Notify or our delivery partners, we’ve already done that)</li>
-    <li>tell us immediately if you have any security breaches</li>
-    <li>keep your API keys secure</li>
-    <li>get the right levels of consent (to send messages and to use data)</li>
-    <li>not send unsolicited messages, only ones related to a transaction or something the user has subscribed to be updated about (<a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">check the Service Manual</a> if you’re not sure)</li>
-    <li>
-      send messages that meet the GOV.UK Service Manual standards for <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a></li>
-    <li>check that the data you add to Notify is accurate and complies with data protection legislation</li>
-  </ul>
-  <p class="govuk-body">If you do not keep to these terms, we might have to stop sending your messages.</p>
+  <p class="govuk-body">
+    You accept our terms of use when you create an account.
+  </p>
 
-  <p class="govuk-body">Notify will:</p>
+  <p class="govuk-body">
+    You must keep to the terms. If you do not, we will stop sending your messages.
+  </p>
+
+  <h2 class="heading-medium" id="before-using-notify">Before using Notify</h2>
+
+  <p class="govuk-body">Make sure that GOV.UK Notify meets your organisation’s standards for:</p>
+
   <ul class="govuk-list govuk-list--bullet">
-    <li>send all the messages you pass to us, as long as they meet our guidelines</li>
-    <li>
-      show how Notify is performing (through our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.performance') }}">performance</a> and <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk/">status</a> pages)
-    </li>
-    <li>keep your data <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">secure</a></li>
-    <li>give you one month’s notice by email if we change our terms of use or delivery providers</li>
+    <li>using, processing, storing and sending information</li>
+    <li>cyber security</li>
+    <li>data protection</li>
   </ul>
+
+  <p class="govuk-body">You must complete this process:</p>
+  
+  <ul class="govuk-list govuk-list--bullet">
+    <li>before you submit a request to go live</li>
+    <li>at regular intervals once your service is live</li>
+  </ul>
+
+  <p class="govuk-body">
+    To help you do this, we’ve published details of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">Notify’s approach to security</a>.
+  </p>
+  
+  <h2 class="heading-medium" id="when-using-notify">When using Notify</h2>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Report any security breaches immediately to <a class="govuk-link govuk-link--no-visited-state" href="mailto:report@digital.cabinet-office.gov.uk">report@digital.cabinet-office.gov.uk</a>. This includes the suspected compromise of team members’ sign-in details or authentication factors, the suspected compromise of API keys and certificate warning messages.</li>
+    <li>Make sure each live service you add is unique. If you add similar or duplicate services we will stop your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">allowance of free text messages</a>.</li>
+    <li>Check you have the appropriate consent from recipients before using their personal data.</li>
+    <li>Make sure the data you add to Notify is accurate and complies with data protection legislation.</li>
+    <li>Only send messages that meet the GOV.UK Service Manual standards for <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a> or <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/writing-effective-letters">writing effective letters</a>.</li>    
+    <li>Do not send unsolicited messages. Only send messages related to a transaction or something the recipient has subscribed to be updated about.</li>
+    <li>Do not send messages with abusive or offensive content.</li>
+  </ol>
+
+  <h3 class="heading-small" id="signing-in-to-notify">Signing in to Notify</h3>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>You must sign in to the Notify website using a work-managed device. We recommend that, as a minimum, your device meets the requirements of the National Cyber Security Centre (NCSC) <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/files/Cyber-Essentials-Requirements-for-Infrastructure-v3-1-April-2023.pdf">Cyber Essentials Scheme</a>. If possible, your device should use a protective Domain Name System (DNS) service, for example the <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/information/pdns">NCSC’s PDNS</a>.</li>
+    <li>You must sign in to Notify using a work email address. Your mailbox should be protected by <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/guidance/multi-factor-authentication-online-services">multi-factor authentication</a> (MFA). When you open emails sent by Notify, you should only do this from a work-managed device.</li>
+    <li>Take reasonable care to protect your sign-in details. Choose <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/blog-post/three-random-words-or-thinkrandom-0">a strong and unique password</a>. Never share your password with anyone, including other members of your team.</li>
+    <li>Remove team members promptly if they should no longer have access to Notify.</li>
+  </ol>
+
+  <h3 class="heading-small" id="api-keys">API keys</h3>
+
+  <p class="govuk-body">If you <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">use the Notify API</a> to send messages, you must protect your API keys from unauthorised access or disclosure. This includes encrypting the keys at rest and in transit. You should also rotate your keys:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>at least once every year</li>
+    <li>when someone with access to a key leaves your team</li>
+    <li>whenever you suspect that a key may have been compromised</li>
+  </ul>
+
+  <p class="govuk-body">Do not hard-code your API keys.</p>
+
+  <p class="govuk-body">We recommend that you use a cloud service provider’s key management service to keep your API keys secure. For more information, <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/collection/developers-collection/principles">read the NCSC guidance</a>.</p>
+
+  <h2 class="heading-medium" id="what-notify-will-do">What GOV.UK Notify will do</h2>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Show our current status and details of any incidents on our <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk/">status page</a>.</li>
+    <li>Provide up-to-date <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.performance') }}">performance data</a>.</li>
+    <li>Keep your data <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">secure</a>.</li>
+    <li>Give you 30 days notice by email if we change our terms of use or delivery providers.</li>
+  </ol>
 
   <h2 class="heading-medium" id="leaving-notify">Leaving Notify</h2>
+  
   <p class="govuk-body">You can <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact us</a> at any time to close your account.</p>
+  
   <p class="govuk-body">Check our privacy notice to find out <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.privacy')}}#how-long-we-keep-your-data">how long we keep your personal data</a>.</p>
 
 {% endblock %}
