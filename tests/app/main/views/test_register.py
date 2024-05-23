@@ -17,6 +17,10 @@ def test_render_register_returns_template_with_form(
     assert page.select_one("#email_address")["spellcheck"] == "false"
     assert page.select_one("#email_address")["autocomplete"] == "email"
     assert page.select_one("#password")["autocomplete"] == "new-password"
+
+    assert normalize_spaces(page.select("main p")[0].text) == (
+        "When you create an account you accept our terms of use."
+    )
     assert "Create an account" in page.text
 
 

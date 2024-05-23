@@ -113,7 +113,8 @@ def terms_of_use():
 
 @main.route("/new-terms-of-use")
 def new_terms_of_use():
-    return render_template("views/new-terms-of-use.html")
+    # this route will be used occasionally - each time we change terms of use, so we keep the redirect here.
+    return redirect(url_for("main.terms_of_use"))
 
 
 # --- Guidance pages --- #

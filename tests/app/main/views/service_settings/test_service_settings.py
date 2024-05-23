@@ -1051,9 +1051,6 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         assert normalize_spaces(page.select("main p")[0].text) == (
             "When we receive your request we’ll get back to you by the end of the next working day."
         )
-        assert normalize_spaces(page.select("main p")[1].text) == (
-            "By requesting to go live you’re agreeing to our terms of use."
-        )
         assert page.select_one("form button").text.strip() == "Request to go live"
     else:
         assert not page.select("form")

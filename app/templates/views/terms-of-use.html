@@ -1,3 +1,4 @@
+{% from "components/content-metadata.html" import content_metadata %}
 {% extends "content_template.html" %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
@@ -41,7 +42,7 @@
   </ul>
 
   <p class="govuk-body">You must complete this process:</p>
-  
+
   <ul class="govuk-list govuk-list--bullet">
     <li>before you submit a request to go live</li>
     <li>at regular intervals once your service is live</li>
@@ -50,7 +51,7 @@
   <p class="govuk-body">
     To help you do this, we’ve published details of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">Notify’s approach to security</a>.
   </p>
-  
+
   <h2 class="heading-medium" id="when-using-notify">When using Notify</h2>
 
   <ol class="govuk-list govuk-list--number">
@@ -58,7 +59,7 @@
     <li>Make sure each live service you add is unique. If you add similar or duplicate services we will stop your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">allowance of free text messages</a>.</li>
     <li>Check you have the appropriate consent from recipients before using their personal data.</li>
     <li>Make sure the data you add to Notify is accurate and complies with data protection legislation.</li>
-    <li>Only send messages that meet the GOV.UK Service Manual standards for <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a> or <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/writing-effective-letters">writing effective letters</a>.</li>    
+    <li>Only send messages that meet the GOV.UK Service Manual standards for <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">writing text messages and emails</a> or <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/writing-effective-letters">writing effective letters</a>.</li>
     <li>Do not send unsolicited messages. Only send messages related to a transaction or something the recipient has subscribed to be updated about.</li>
     <li>Do not send messages with abusive or offensive content.</li>
   </ol>
@@ -96,9 +97,9 @@
   </ol>
 
   <h2 class="heading-medium" id="leaving-notify">Leaving Notify</h2>
-  
+
   <p class="govuk-body">You can <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact us</a> at any time to close your account.</p>
-  
+
   <p class="govuk-body">Check our privacy notice to find out <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.privacy')}}#how-long-we-keep-your-data">how long we keep your personal data</a>.</p>
 
 {% endblock %}
