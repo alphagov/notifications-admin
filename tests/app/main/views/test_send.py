@@ -942,7 +942,7 @@ def test_upload_csv_size_too_big(
         _follow_redirects=True,
     )
 
-    assert "File must be smaller than 10MB" in page.text
+    assert "The file must be smaller than 10MB" in page.text
 
 
 def test_upload_valid_csv_redirects_to_check_page(

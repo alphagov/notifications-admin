@@ -1,0 +1,32 @@
+{% extends "withnav_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Upload a letter
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.uploads', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('Upload a letter') }}
+      <p class="govuk-body">Upload a single letter as a PDF and we’ll print, pack and post it for you.</p>
+      <p class="govuk-body">You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
+      <div class="govuk-!-margin-bottom-4">
+        {{ file_upload(
+          form.file,
+          allowed_file_extensions=['pdf'],
+          action=url_for('main.upload_letter', service_id=current_service.id)
+          )
+        }}
+      </div>
+    </div>
+  </div>
+
+  <p class="govuk-body">Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter specification</a>.</p>
+{% endblock %}
