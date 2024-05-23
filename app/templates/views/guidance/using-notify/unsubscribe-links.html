@@ -11,28 +11,22 @@
 
   <h1 class="heading-large">Unsubscribe links</h1>
 
-  <p class="govuk-body">Subscription emails must include an unsubscribe link in the body of the message.</p>
-  <p class="govuk-body">If they do not:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>recipients could report your emails as spam</li>
-    <li>email providers may refuse to deliver your messages</li>
-  </ul>
+  <p class="govuk-body">You must let people opt out of receiving subscription emails.</p>
+  <p class="govuk-body">If you do not, recipients can report your emails as spam. If this happens we may stop you from using GOV.UK Notify.</p>
   <p class="govuk-body">Transactional emails do not need to include an unsubscribe link.</p>
-  <p class="govuk-body">The GOV.​UK Service Manual explains the difference between <a class="govuk-link govuk-link--no-visited-state"
+   <p class="govuk-body">The GOV.​UK Service Manual explains the difference between <a class="govuk-link govuk-link--no-visited-state"
     href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#transactional-messages">transactional and subscription messages</a>.</p>
 
-  <h2 class="heading-medium">Add your unsubscribe links by 1 April 2024</h2>
+  <p class="govuk-body">There are 2 ways to let recipients opt out:</p>
+  <ol class="govuk-list govuk-list--number">
+    <li>Add an unsubscribe link to the body of your email.</li>
+    <li>Add one-click unsubscribe to the email header.</li>
+  </ol>
 
-  <p class="govuk-body">Google and Yahoo are introducing new measures to protect people from unwanted emails. They will stop delivering emails from senders that do not follow their rules.</p>
-  <p class="govuk-body">You must check that your subscription emails include an unsubscribe link.</p>
-  <p class="govuk-body">If they do not, you must add one by 1 April or you will no longer be able to send these emails using Notify.</p>
-  <p class="govuk-body">We understand that Google and Yahoo will enforce the rules gradually. This should give us time to find out how they will work in practice before making any changes.</p>
-  <p class="govuk-body">We will not stop you from sending any emails without contacting you first.</p>
-
-  <h2 class="heading-medium">How to add an unsubscribe link to an email</h2>
+  <h2 class="heading-medium">Add an unsubscribe link to the email body</h2>
 
   <p class="govuk-body">GOV.UK Notify uses Markdown to format links.</p>
-  <p class="govuk-body">To add an unsubscribe link, use square brackets around the link text and round brackets around the URL. Make sure there are no spaces between the brackets or the link will not work.</p>
+  <p class="govuk-body">To add an unsubscribe link to the body of your email, use square brackets around the link text and round brackets around the URL. Make sure there are no spaces between the brackets or the link will not work.</p>
   <p class="govuk-body">Use this example if you have a webpage for users to manage their email subscriptions:</p>
 
   <pre class="formatting-example"><code class="lang-md">[Unsubscribe](https://www.example.gov.uk/unsubscribe)</code></pre>
@@ -41,4 +35,8 @@
   <pre class="formatting-example"><code class="lang-md">[Unsubscribe](mailto:example@gov.uk?subject=unsubscribe)</code></pre>
   <p class="govuk-body">The email address should be a shared inbox managed by your team, not your own email address.</p>
 
+  <h2 class="heading-medium">Add one-click unsubscribe to the email header</h2>
+  <p class="govuk-body">This is currently an API-only feature. You’ll need a developer on your team to set it up for you.</p>
+  <p class="govuk-body">To add one-click unsubscribe, follow the instructions in our <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API documentation</a>.</p>
 {% endblock %}
