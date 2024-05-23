@@ -226,9 +226,12 @@ def test_terms_page_has_correct_content(client_request):
     assert normalize_spaces(terms_page.select("h1")[0].text) == ("Terms of use")
 
 
-def test_new_terms_page_has_correct_content(client_request):
-    terms_page = client_request.get("main.new_terms_of_use")
-    assert normalize_spaces(terms_page.select("h1")[0].text) == ("New terms of use - 2024")
+def test_new_terms_view_redirects_to_terms_of_use(client_request):
+    client_request.get(
+        "main.new_terms_of_use",
+        _follow_redirects=False,
+        _expected_redirect=url_for("main.terms_of_use"),
+    )
 
 
 def test_css_is_served_from_correct_path(client_request):
