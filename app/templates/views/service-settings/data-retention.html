@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import mapping_table, row, text_field, edit_field, with context %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block service_page_title %}
   Data retention
@@ -40,21 +40,34 @@
       </div>
     </div>
   {% else %}
-     {% call mapping_table(
-      caption='Data retention',
-      field_headings=['Label', 'Value', 'Action'],
-      field_headings_visible=False,
-      caption_visible=False
-    ) %}
-      {% for item in current_service.data_retention %}
-          {% call row() %}
-            {{ text_field(item.notification_type | format_notification_type)}}
-            {{ text_field(item.days_of_retention|string + ' days') }}
-            {{ edit_field('Change', url_for('main.edit_data_retention', service_id=current_service.id, data_retention_id=item.id)) }}
-          {% endcall %}
-
-      {% endfor %}
-    {% endcall %}
+    {% set data_retention_settings = [] %}
+    {% for item in current_service.data_retention %}
+      {% do data_retention_settings.append(
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": item.notification_type | format_notification_type
+          },
+          "value": {
+            "text": item.days_of_retention|string + " days"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_data_retention', service_id=current_service.id, data_retention_id=item.id),
+                "text": "Change",
+                "visuallyHiddenText": item.notification_type | format_notification_type | lower + " data retention setting",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        }
+      ) %}
+    {% endfor %}
+    {{ govukSummaryList({
+      "classes": "notify-summary-list",
+      "rows": data_retention_settings
+    }) }}
   {% endif %}
 
 {% endblock %}

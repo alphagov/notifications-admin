@@ -128,12 +128,24 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 
 }
 
-.notify-summary-list__key--one-quarter {
+// carrying over from
+// https://github.com/alphagov/notifications-admin/pull/2931
+.notify-summary-list__key--35-100 {
 
   @include govuk-media-query($from: tablet) {
-    width: 25%;
+    width: 35%;
   }
 
+}
+
+.govuk-summary-list__value--default {
+  color: $govuk-secondary-text-colour;
+}
+
+.govuk-summary-list__value--truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .notify-hint--paragraph {

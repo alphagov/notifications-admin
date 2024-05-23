@@ -34,3 +34,31 @@ $notify-secondary-button-hover-colour: govuk-shade(govuk-colour("light-grey"), 1
     background-color: $notify-secondary-button-hover-colour;
   }
 }
+
+ // remove default focus styles in favour of those for :before pseudo class
+.govuk-summary-list__actions .govuk-link {
+  display: block;
+  position: relative;
+
+  &:focus {
+    box-shadow: none;
+  }
+
+  &:before {
+    content: "";
+    display: block;
+
+    position: absolute;
+
+    top: -1 * govuk-spacing(3);
+    right: 0;
+    bottom: -1 * govuk-spacing(3) + 4px;
+    left: -1 * govuk-spacing(3);
+
+    background: transparent;
+  }
+
+  &:focus:before {
+    box-shadow: inset 0px -4px $govuk-focus-text-colour, inset 0px 15px $govuk-focus-colour, inset 15px 0px $govuk-focus-colour, inset 0px -11px $govuk-focus-colour;
+  }
+}

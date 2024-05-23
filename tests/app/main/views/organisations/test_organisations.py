@@ -1030,7 +1030,6 @@ def test_organisation_settings_for_platform_admin(
     organisation_one,
 ):
     expected_rows = [
-        "Label Value Action",
         "Name Test organisation Change organisation name",
         "Sector Central government Change sector for the organisation",
         "Crown organisation Yes Change organisation crown status",
@@ -1052,7 +1051,7 @@ def test_organisation_settings_for_platform_admin(
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
     assert page.select_one("h1").text == "Settings"
-    rows = page.select("tr")
+    rows = page.select(".govuk-summary-list__row")
     assert len(rows) == len(expected_rows)
     for index, row in enumerate(expected_rows):
         assert row == " ".join(rows[index].text.split())
@@ -1070,7 +1069,7 @@ def test_organisation_settings_table_shows_email_branding_pool(
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    email_branding_options_row = page.select("tr")[10]
+    email_branding_options_row = page.select(".govuk-summary-list__row")[9]
 
     assert normalize_spaces(email_branding_options_row.text) == (
         "Email branding options "
@@ -1092,7 +1091,9 @@ def test_organisation_settings_table_shows_letter_branding_pool(
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    letter_branding_options_row = find_element_by_tag_and_partial_text(page, "tr", "Letter branding options")
+    letter_branding_options_row = find_element_by_tag_and_partial_text(
+        page, ".govuk-summary-list__row", "Letter branding options"
+    )
 
     assert normalize_spaces(letter_branding_options_row.text) == (
         "Letter branding options "
@@ -1128,7 +1129,9 @@ def test_organisation_settings_table_shows_letter_branding_pool_with_brand_as_de
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    letter_branding_options_row = find_element_by_tag_and_partial_text(page, "tr", "Letter branding options")
+    letter_branding_options_row = find_element_by_tag_and_partial_text(
+        page, ".govuk-summary-list__row", "Letter branding options"
+    )
 
     assert normalize_spaces(letter_branding_options_row.text) == (
         "Letter branding options "
@@ -1169,7 +1172,7 @@ def test_organisation_settings_table_shows_email_branding_pool_non_govuk_default
         client_request.login(platform_admin_user)
         page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    email_branding_options_row = page.select("tr")[10]
+    email_branding_options_row = page.select(".govuk-summary-list__row")[9]
 
     assert normalize_spaces(email_branding_options_row.text) == (
         "Email branding options "
@@ -1190,7 +1193,7 @@ def test_organisation_settings_table_shows_email_branding_pool_govuk_default(
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    email_branding_options_row = page.select("tr")[10]
+    email_branding_options_row = page.select(".govuk-summary-list__row")[9]
 
     assert normalize_spaces(email_branding_options_row.text) == (
         "Email branding options GOV.UK Default Manage email branding options for the organisation"
@@ -1896,7 +1899,7 @@ def test_organisation_settings_links_to_edit_organisation_notes_page(
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    assert page.select(".table-field-right-aligned a")[4]["href"] == url_for(
+    assert page.select(".govuk-summary-list__actions a")[4]["href"] == url_for(
         ".edit_organisation_go_live_notes",
         org_id=organisation_one["id"],
     )
@@ -1964,7 +1967,7 @@ def test_organisation_settings_links_to_edit_can_approve_own_go_live_request(
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    assert page.select(".table-field-right-aligned a")[5]["href"] == url_for(
+    assert page.select(".govuk-summary-list__actions a")[5]["href"] == url_for(
         ".edit_organisation_can_approve_own_go_live_requests",
         org_id=organisation_one["id"],
     )
@@ -1982,7 +1985,7 @@ def test_organisation_settings_links_to_edit_can_ask_to_join_a_service(
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
 
-    assert page.select(".table-field-right-aligned a")[6]["href"] == url_for(
+    assert page.select(".govuk-summary-list__actions a")[6]["href"] == url_for(
         ".edit_organisation_can_ask_to_join_a_service",
         org_id=organisation_one["id"],
     )
