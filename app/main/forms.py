@@ -1537,7 +1537,7 @@ class CsvUploadForm(StripWhitespaceForm):
     file = FileField(
         "Add recipients",
         validators=[
-            DataRequired(message="Please pick a file"),
+            DataRequired(message="You need to chose a file to upload"),
             CsvFileValidator(),
             FileSize(max_size=10 * 1024 * 1024, message="The file must be smaller than 10MB"),
         ],
