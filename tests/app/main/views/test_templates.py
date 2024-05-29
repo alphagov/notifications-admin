@@ -523,6 +523,138 @@ def test_should_show_page_for_one_template(
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 
 
+@pytest.mark.parametrize(
+    "template_type",
+    (
+        "email",
+        pytest.param("sms", marks=pytest.mark.xfail),
+        pytest.param("letter", marks=pytest.mark.xfail),
+    ),
+)
+@pytest.mark.parametrize(
+    "platform_admin",
+    (
+        True,
+        pytest.param(False, marks=pytest.mark.xfail),
+    ),
+)
+def test_edit_email_template_should_have_unsubscribe_checkbox(
+    mocker,
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+    template_type,
+    platform_admin,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": create_template(template_id=fake_uuid, template_type=template_type)},
+    )
+    if platform_admin:
+        client_request.login(platform_admin_user)
+    page = client_request.get(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert page.select_one("form input[type=checkbox]")["name"] == "has_unsubscribe_link"
+    assert (
+        normalize_spaces(page.select_one("form label[for=has_unsubscribe_link]").text) == "Allow users to unsubscribe"
+    )
+
+
+@pytest.mark.parametrize(
+    "post_data, expected_unsubscribeable",
+    (
+        (
+            {
+                "has_unsubscribe_link": True,
+            },
+            True,
+        ),
+        ({}, False),
+    ),
+)
+def test_edit_email_template_should_update_unsubscribe(
+    mocker,
+    client_request,
+    platform_admin_user,
+    mock_update_service_template,
+    post_data,
+    expected_unsubscribeable,
+    fake_uuid,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": create_template(template_id=fake_uuid, template_type="email")},
+    )
+    client_request.login(platform_admin_user)
+    client_request.post(".edit_service_template", service_id=SERVICE_ONE_ID, template_id=fake_uuid, _data=post_data)
+    mock_update_service_template.assert_called_once_with(
+        content="Template content",
+        name="sample template",
+        service_id=SERVICE_ONE_ID,
+        subject="Template subject",
+        template_id=fake_uuid,
+        has_unsubscribe_link=expected_unsubscribeable,
+    )
+
+
+@pytest.mark.parametrize(
+    "template_type",
+    (
+        "email",
+        pytest.param("sms", marks=pytest.mark.xfail()),
+    ),
+)
+@pytest.mark.parametrize(
+    "platform_admin",
+    (
+        True,
+        pytest.param(False, marks=pytest.mark.xfail()),
+    ),
+)
+def test_add_email_template_should_have_unsubscribe_checkbox(
+    mocker,
+    client_request,
+    platform_admin_user,
+    template_type,
+    platform_admin,
+):
+    if platform_admin:
+        client_request.login(platform_admin_user)
+    page = client_request.get(
+        ".add_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_type=template_type,
+    )
+    assert page.select_one("form input[type=checkbox]")["name"] == "has_unsubscribe_link"
+    assert (
+        normalize_spaces(page.select_one("form label[for=has_unsubscribe_link]").text) == "Allow users to unsubscribe"
+    )
+
+
+def test_add_email_template_should_add_unsubscribe(
+    mocker,
+    client_request,
+    platform_admin_user,
+    mock_create_service_template,
+):
+    client_request.login(platform_admin_user)
+    client_request.post(
+        ".add_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_type="email",
+        _data={
+            "name": "foo",
+            "subject": "bar",
+            "has_unsubscribe_link": True,
+            "template_content": "baz",
+        },
+    )
+    mock_create_service_template.assert_called_once_with("foo", "email", "baz", SERVICE_ONE_ID, "bar", None, True)
+
+
 def test_editing_letter_template_should_have_hidden_name_field(
     client_request, mock_get_service_letter_template, fake_uuid, service_one
 ):
@@ -3410,6 +3542,7 @@ def test_should_redirect_when_saving_a_template_email(
         name=name,
         content=content,
         subject=subject,
+        has_unsubscribe_link=False,
     )
 
 
@@ -3950,6 +4083,7 @@ def test_should_create_sms_template_without_downgrading_unicode_characters(
         ANY,  # service_id
         ANY,  # subject
         ANY,  # parent_folder_id
+        ANY,  # is_unsubcribeable
     )
 
 

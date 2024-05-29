@@ -636,6 +636,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
                 service_id,
                 form.subject.data if hasattr(form, "subject") else None,
                 template_folder_id,
+                form.has_unsubscribe_link.data if hasattr(form, "has_unsubscribe_link") else None,
             )
         except HTTPError as e:
             if (

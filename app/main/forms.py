@@ -1375,6 +1375,9 @@ class BaseTemplateForm(StripWhitespaceForm):
         if hasattr(self, "name"):
             new_template_data["name"] = self.name.data
 
+        if hasattr(self, "has_unsubscribe_link"):
+            new_template_data["has_unsubscribe_link"] = self.has_unsubscribe_link.data
+
         return new_template_data
 
 
@@ -1423,6 +1426,7 @@ class LetterAddressForm(StripWhitespaceForm):
 
 class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
     subject = GovukTextareaField("Subject", validators=[NotifyDataRequired(thing="the subject of the email")])
+    has_unsubscribe_link = GovukCheckboxField("Allow users to unsubscribe")
 
 
 class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):

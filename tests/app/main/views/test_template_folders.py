@@ -564,6 +564,7 @@ def test_can_create_email_template_with_parent_folder(client_request, mock_creat
         SERVICE_ONE_ID,
         data["subject"],
         data["parent_folder_id"],
+        False,
     )
 
 

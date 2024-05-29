@@ -230,7 +230,6 @@ class Service(JSONModel):
 
     def get_template_with_user_permission_or_403(self, template_id, user, **kwargs):
         template = self.get_template(template_id, **kwargs)
-
         self.get_template_folder_with_user_permission_or_403(template.get_raw("folder"), user)
 
         return template
