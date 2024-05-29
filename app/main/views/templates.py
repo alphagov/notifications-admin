@@ -630,13 +630,13 @@ def add_service_template(service_id, template_type, template_folder_id=None):
     if form.validate_on_submit():
         try:
             new_template = service_api_client.create_service_template(
-                form.name.data,
-                template_type,
-                form.template_content.data,
-                service_id,
-                form.subject.data if hasattr(form, "subject") else None,
-                template_folder_id,
-                form.has_unsubscribe_link.data if hasattr(form, "has_unsubscribe_link") else None,
+                name=form.name.data,
+                type_=template_type,
+                content=form.template_content.data,
+                service_id=service_id,
+                subject=form.subject.data if hasattr(form, "subject") else None,
+                parent_folder_id=template_folder_id,
+                has_unsubscribe_link=form.has_unsubscribe_link.data if hasattr(form, "has_unsubscribe_link") else None,
             )
         except HTTPError as e:
             if (

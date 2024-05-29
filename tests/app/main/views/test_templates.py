@@ -652,7 +652,15 @@ def test_add_email_template_should_add_unsubscribe(
             "template_content": "baz",
         },
     )
-    mock_create_service_template.assert_called_once_with("foo", "email", "baz", SERVICE_ONE_ID, "bar", None, True)
+    mock_create_service_template.assert_called_once_with(
+        type_="email",
+        name="foo",
+        subject="bar",
+        content="baz",
+        service_id=SERVICE_ONE_ID,
+        parent_folder_id=None,
+        has_unsubscribe_link=True,
+    )
 
 
 def test_editing_letter_template_should_have_hidden_name_field(
@@ -4077,13 +4085,13 @@ def test_should_create_sms_template_without_downgrading_unicode_characters(
     )
 
     mock_create_service_template.assert_called_with(
-        ANY,  # name
-        ANY,  # type
-        msg,  # content
-        ANY,  # service_id
-        ANY,  # subject
-        ANY,  # parent_folder_id
-        ANY,  # is_unsubcribeable
+        name=ANY,
+        type_=ANY,
+        content=msg,
+        service_id=ANY,
+        subject=ANY,
+        parent_folder_id=ANY,
+        has_unsubscribe_link=ANY,
     )
 
 

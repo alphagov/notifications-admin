@@ -408,8 +408,13 @@ def test_deletes_service_cache(
     [
         (
             "create_service_template",
-            ["name", "type_", "content", SERVICE_ONE_ID],
-            {},
+            [],
+            {
+                "name": "name",
+                "type_": "type_",
+                "content": "content",
+                "service_id": SERVICE_ONE_ID,
+            },
             [f"service-{SERVICE_ONE_ID}-templates"],
             [],
         ),

@@ -174,6 +174,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     @cache.delete("service-{service_id}-templates")
     def create_service_template(
         self,
+        *,
         name,
         type_,
         content,

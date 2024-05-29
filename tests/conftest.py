@@ -950,6 +950,7 @@ def mock_get_service_letter_template_with_qr_placeholder(mocker):
 @pytest.fixture(scope="function")
 def mock_create_service_template(mocker, fake_uuid):
     def _create(
+        *,
         name,
         type_,
         content,
@@ -1005,7 +1006,16 @@ def mock_update_service_template(mocker):
 
 @pytest.fixture(scope="function")
 def mock_create_service_template_content_too_big(mocker):
-    def _create(name, type_, content, service, subject=None, parent_folder_id=None, has_unsubscribe_link=None):
+    def _create(
+        *,
+        name,
+        type_,
+        content,
+        service_id,
+        subject=None,
+        parent_folder_id=None,
+        has_unsubscribe_link=None,
+    ):
         json_mock = Mock(
             return_value={
                 "message": {"content": ["Content has a character count greater than the limit of 459"]},

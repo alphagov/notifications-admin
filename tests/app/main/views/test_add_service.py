@@ -181,10 +181,12 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         user_id=api_user_active["id"],
     )
     mock_create_service_template.assert_called_once_with(
-        "Example text message template",
-        "sms",
-        ("Hey ((name)), I’m trying out Notify. Today is " "((day of week)) and my favourite colour is ((colour))."),
-        101,
+        name="Example text message template",
+        type_="sms",
+        content=(
+            "Hey ((name)), I’m trying out Notify. Today is " "((day of week)) and my favourite colour is ((colour))."
+        ),
+        service_id=101,
     )
     with client_request.session_transaction() as session:
         assert session["service_id"] == 101

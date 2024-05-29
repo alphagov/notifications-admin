@@ -558,13 +558,13 @@ def test_can_create_email_template_with_parent_folder(client_request, mock_creat
         ),
     )
     mock_create_service_template.assert_called_once_with(
-        data["name"],
-        data["template_type"],
-        data["template_content"],
-        SERVICE_ONE_ID,
-        data["subject"],
-        data["parent_folder_id"],
-        False,
+        name=data["name"],
+        type_=data["template_type"],
+        content=data["template_content"],
+        service_id=SERVICE_ONE_ID,
+        subject=data["subject"],
+        parent_folder_id=data["parent_folder_id"],
+        has_unsubscribe_link=False,
     )
 
 
