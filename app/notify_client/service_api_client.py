@@ -191,7 +191,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "template_type": type_,
             "content": content,
             "service": service_id,
-            "process_type": "normal",
         }
         if subject:
             data.update({"subject": subject})
