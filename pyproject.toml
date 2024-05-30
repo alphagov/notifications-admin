@@ -1,3 +1,5 @@
+# This file is automatically copied from notifications-utils@77.1.1
+
 [tool.black]
 line-length = 120
 
@@ -14,13 +16,16 @@ lint.select = [
     "B",  # flake8-bugbear
     "C90",  # mccabe cyclomatic complexity
     "G",  # flake8-logging-format
-    "T20"  # flake8-print
+    "T20", # flake8-print
 ]
 lint.ignore = []
 exclude = [
+    "migrations/versions/",
     "venv*",
     "__pycache__",
     "node_modules",
     "cache",
+    "migrations",
     "build",
+    "sample_cap_xml_documents.py",
 ]
