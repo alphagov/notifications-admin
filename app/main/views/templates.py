@@ -466,6 +466,7 @@ def copy_template(service_id, template_id):
             letter_languages=template.get_raw("letter_languages"),
             letter_welsh_subject=template.get_raw("letter_welsh_subject"),
             letter_welsh_content=template.get_raw("letter_welsh_content"),
+            has_unsubscribe_link=template.get_raw("has_unsubscribe_link"),
         )["data"]
         if template.template_type == "letter" and template.get_raw("letter_attachment"):
             _copy_letter_attachment(from_template=template, to_template=new_template)

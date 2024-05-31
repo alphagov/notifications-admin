@@ -2718,6 +2718,7 @@ def test_post_copy_template(
             letter_languages=None,
             letter_welsh_subject=None,
             letter_welsh_content=None,
+            has_unsubscribe_link=None,
         )
     ]
 
@@ -2760,6 +2761,7 @@ def test_post_copy_template_into_folder(
             letter_languages=None,
             letter_welsh_subject=None,
             letter_welsh_content=None,
+            has_unsubscribe_link=None,
         )
     ]
 
@@ -2798,6 +2800,7 @@ def test_post_copy_letter_template(
             letter_languages="english",
             letter_welsh_subject=None,
             letter_welsh_content=None,
+            has_unsubscribe_link=None,
         )
     ]
 
@@ -2844,6 +2847,7 @@ def test_copy_letter_template_with_letter_attachment(
             letter_languages="english",
             letter_welsh_subject=None,
             letter_welsh_content=None,
+            has_unsubscribe_link=None,
         )
     ]
     assert mock_upload.call_args_list == [
