@@ -3632,11 +3632,15 @@ def test_should_show_delete_template_page_with_time_block_for_empty_notification
             template_id=fake_uuid,
             _test_page_title=False,
         )
-    assert "Are you sure you want to delete ‘Two week reminder’?" in page.select(".banner-dangerous")[0].text
-    assert normalize_spaces(page.select(".banner-dangerous p")[0].text) == "This template has never been used."
-    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == (
-        "service one: Template <em>content</em> with & entity"
-    )
+
+    expected_confirmation_question = "Are you sure you want to delete ‘Two week reminder’?"
+    expected_usage_hint = "This template has not been used within the last year."
+    expected_template_content = "service one: Template <em>content</em> with & entity"
+
+    assert expected_confirmation_question in page.select(".banner-dangerous")[0].text
+    assert normalize_spaces(page.select(".banner-dangerous p")[0].text) == expected_usage_hint
+    assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == expected_template_content
+
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, fake_uuid, None)
 
 
