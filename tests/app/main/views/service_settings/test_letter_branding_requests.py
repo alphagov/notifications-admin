@@ -338,13 +338,13 @@ def test_POST_letter_branding_request_creates_zendesk_ticket(
         "Homer Simpson",
     ]
     assert zendesk_ticket.subject == "Letter branding request - service one"
-    assert zendesk_ticket.ticket_type == "question"
+    assert zendesk_ticket.ticket_type == "task"
     assert zendesk_ticket.user_name == "Test User"
     assert zendesk_ticket.user_email == "test@user.gov.uk"
     assert zendesk_ticket.org_id == org_id
     assert zendesk_ticket.org_type == "central"
     assert zendesk_ticket.service_id == SERVICE_ONE_ID
-    assert zendesk_ticket.ticket_categories == ["notify_email_letter_branding"]
+    assert zendesk_ticket.notify_task_type == "notify_task_letter_branding"
 
 
 def test_GET_letter_branding_upload_branding_renders_form(

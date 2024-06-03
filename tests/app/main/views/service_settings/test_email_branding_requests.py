@@ -815,14 +815,14 @@ def test_email_branding_request_submit(
             ]
         ),
         subject="Email branding request - service one",
-        ticket_type="question",
+        ticket_type="task",
         notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name="Test User",
         user_email="test@user.gov.uk",
         org_id=None,
         org_type="nhs_local",
         service_id=SERVICE_ONE_ID,
-        ticket_categories=["notify_email_letter_branding"],
+        notify_task_type="notify_task_email_branding",
     )
     mock_send_ticket_to_zendesk.assert_called_once()
     assert normalize_spaces(page.select_one(".banner-default").text) == (

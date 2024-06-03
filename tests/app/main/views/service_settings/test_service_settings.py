@@ -2035,7 +2035,7 @@ def test_should_redirect_after_request_to_go_live(
         ANY,
         subject="Request to go live - service one",
         message=expected_message,
-        ticket_type="question",
+        ticket_type="task",
         notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name=active_user_with_permissions["name"],
         user_email=active_user_with_permissions["email_address"],
@@ -2043,7 +2043,7 @@ def test_should_redirect_after_request_to_go_live(
         org_id=None,
         org_type="central",
         service_id=SERVICE_ONE_ID,
-        ticket_categories=["notify_go_live_request"],
+        notify_task_type="notify_task_go_live_request",
     )
     mock_send_ticket_to_zendesk.assert_called_once()
 
@@ -2059,12 +2059,13 @@ def test_should_redirect_after_request_to_go_live(
 
 
 @pytest.mark.parametrize(
-    "can_approve_own_go_live_requests, expected_subject, expected_go_live_notes",
+    "can_approve_own_go_live_requests, expected_subject, expected_go_live_notes, expected_zendesk_task_type",
     (
         (
             False,
             "Request to go live - service one",
             "This service is not allowed to go live",
+            "notify_task_go_live_request",
         ),
         (
             True,
@@ -2074,6 +2075,7 @@ def test_should_redirect_after_request_to_go_live(
                 "No action should be needed from us. "
                 "This service is not allowed to go live"
             ),
+            "notify_task_go_live_request_self_approve",
         ),
     ),
 )
@@ -2095,6 +2097,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     can_approve_own_go_live_requests,
     expected_go_live_notes,
     expected_subject,
+    expected_zendesk_task_type,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -2135,7 +2138,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         ANY,
         subject=expected_subject,
         message=expected_message,
-        ticket_type="question",
+        ticket_type="task",
         notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name=active_user_with_permissions["name"],
         user_email=active_user_with_permissions["email_address"],
@@ -2143,7 +2146,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         org_id=ORGANISATION_ID,
         org_type="central",
         service_id=SERVICE_ONE_ID,
-        ticket_categories=["notify_go_live_request"],
+        notify_task_type=expected_zendesk_task_type,
     )
     mock_send_ticket_to_zendesk.assert_called_once()
 

@@ -156,11 +156,12 @@ def create_phishing_senderid_zendesk_ticket(senderID=None):
     ticket = NotifySupportTicket(
         subject=f"Possible Phishing sender ID - {current_service.name}",
         message=ticket_message,
-        ticket_type=NotifySupportTicket.TYPE_INCIDENT,
+        ticket_type=NotifySupportTicket.TYPE_TASK,
         notify_ticket_type=NotifyTicketType.TECHNICAL,
         user_name=current_user.name,
         user_email=current_user.email_address,
         service_id=current_service.id,
+        notify_task_type="notify_task_blocked_sender",
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 

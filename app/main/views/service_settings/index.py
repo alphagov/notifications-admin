@@ -233,13 +233,15 @@ def submit_request_to_go_live(service_id):
 
     if current_service.organisation.can_approve_own_go_live_requests:
         subject = f"Self approve go live request - {current_service.name}"
+        notify_task_type = "notify_task_go_live_request_self_approve"
     else:
         subject = f"Request to go live - {current_service.name}"
+        notify_task_type = "notify_task_go_live_request"
 
     ticket = NotifySupportTicket(
         subject=subject,
         message=ticket_message,
-        ticket_type=NotifySupportTicket.TYPE_QUESTION,
+        ticket_type=NotifySupportTicket.TYPE_TASK,
         notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name=current_user.name,
         user_email=current_user.email_address,
@@ -247,7 +249,7 @@ def submit_request_to_go_live(service_id):
         org_id=current_service.organisation_id,
         org_type=current_service.organisation_type,
         service_id=current_service.id,
-        ticket_categories=["notify_go_live_request"],
+        notify_task_type=notify_task_type,
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 

@@ -45,14 +45,14 @@ def create_email_branding_zendesk_ticket(detail=None):
     ticket = NotifySupportTicket(
         subject=f"Email branding request - {current_service.name}",
         message=ticket_message,
-        ticket_type=NotifySupportTicket.TYPE_QUESTION,
+        ticket_type=NotifySupportTicket.TYPE_TASK,
         notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         user_name=current_user.name,
         user_email=current_user.email_address,
         org_id=current_service.organisation_id,
         org_type=current_service.organisation_type,
         service_id=current_service.id,
-        ticket_categories=["notify_email_letter_branding"],
+        notify_task_type="notify_task_email_branding",
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 
@@ -208,7 +208,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
             org_id=current_service.organisation_id,
             org_type=current_service.organisation_type,
             service_id=current_service.id,
-            ticket_categories=["notify_email_letter_branding"],
+            notify_task_type="notify_task_email_branding_gov",
         )
         zendesk_client.send_ticket_to_zendesk(ticket)
         flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
@@ -654,14 +654,14 @@ def letter_branding_request(service_id):
         ticket = NotifySupportTicket(
             subject=f"Letter branding request - {current_service.name}",
             message=ticket_message,
-            ticket_type=NotifySupportTicket.TYPE_QUESTION,
+            ticket_type=NotifySupportTicket.TYPE_TASK,
             notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
             user_name=current_user.name,
             user_email=current_user.email_address,
             org_id=current_service.organisation_id,
             org_type=current_service.organisation_type,
             service_id=current_service.id,
-            ticket_categories=["notify_email_letter_branding"],
+            notify_task_type="notify_task_letter_branding",
         )
         zendesk_client.send_ticket_to_zendesk(ticket)
         flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
