@@ -866,7 +866,7 @@ def delete_service_template(service_id, template_id):
     try:
         last_used_notification = template_statistics_client.get_last_used_date_for_template(service_id, template.id)
         message = (
-            "This template has never been used."
+            "This template has not been used within the last year."
             if not last_used_notification
             else f"This template was last used {format_delta(last_used_notification)}."
         )
