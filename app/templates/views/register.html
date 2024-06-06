@@ -10,12 +10,12 @@ Create an account
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="heading-large">Create an account</h1>
+    <h1 class="heading-large">Create a profile</h1>
     {% call form_wrapper(autocomplete=True) %}
       {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
       {{ form.email_address(
         param_extensions={
-          "hint": {"text": "Must be from a public sector organisation"},
+          "hint": {"text": "Must be a public sector organisation email address"},
           "classes": "govuk-!-width-three-quarters",
           "autocomplete": "email"
         },
@@ -31,7 +31,7 @@ Create an account
       {{form.auth_type}}
       {{ page_footer("Continue") }}
     {% endcall %}
-  <p class="bottom-gutter">When you create an account you accept our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a>.</p>
+  <p class="bottom-gutter">When you create a profile you accept our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a>.</p>
   </div>
 </div>
 
