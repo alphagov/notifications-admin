@@ -27,7 +27,7 @@
 
 {% if not current_user.is_authenticated %}
   {% set insetHtml %}
-    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create an account</a> for free and try it yourself.
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Create a profile</a> for free and try it yourself.
   {% endset %}
   {{ govukInsetText({"html": insetHtml}) }}
 {% endif %}
