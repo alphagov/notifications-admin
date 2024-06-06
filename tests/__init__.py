@@ -336,7 +336,6 @@ def template_json(
         "version": version,
         "updated_at": updated_at or datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
         "archived": archived,
-        "process_type": "normal",
         "service_letter_contact": service_letter_contact,
         "reply_to": reply_to,
         "reply_to_text": reply_to_text,
