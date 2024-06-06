@@ -4,16 +4,16 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-Create an account
+Create a profile
 {% endblock %}
 
 {% block maincolumn_content %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    {{ govuk_page_header("Create an account") }}
+    {{ govuk_page_header("Create a profile") }}
     <p class="govuk-body">
-      Your account will be created with this email address:
+      Your profile will be created with this email address:
       <span class="nowrap">{{invited_user.email_address}}</span>
     </p>
     {% call form_wrapper() %}
