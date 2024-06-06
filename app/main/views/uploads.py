@@ -360,24 +360,20 @@ def upload_contact_list(service_id):
                 )
             )
         except (UnicodeDecodeError, BadZipFile, XLRDError):
-            flash(f"Could not read {form.file.data.filename}. Try using a different file format.")
+            form.file.errors = ["Notify cannot read this file - try using a different file type"]
         except XLDateError:
-            flash(
-                (
-                    "{} contains numbers or dates that Notify cannot understand. "
-                    "Try formatting all columns as ‘text’ or export your file as CSV."
-                ).format(form.file.data.filename)
-            )
+            form.file.errors = ["Notify cannot read this file - try saving it as a CSV instead"]
     elif form.errors:
         # just show the first error, as we don't expect the form to have more
         # than one, since it only has one field
         first_field_errors = list(form.errors.values())[0]
-        flash(first_field_errors[0])
+        form.file.errors.append(first_field_errors[0])
 
     return render_template(
         "views/uploads/contact-list/upload.html",
         form=form,
         allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
+        error_summary_enabled=True,
     )
 
 

@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/banner.html" import banner_wrapper %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import list_table, text_field, index_field %}
@@ -16,32 +15,22 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {% if error %}
-    {% call banner_wrapper(type='dangerous') %}
-      <h1 class="banner-title">{{ error.title }}</h1>
-      {% if error.detail %}
-        <p class="govuk-body">{{ error.detail | safe }}</p>
-      {% endif %}
-    {% endcall %}
-  {% else %}
-    {{ page_header('Upload an emergency contact list') }}
-    <p class="govuk-body">
-      Save a list of staff email addresses or phone numbers in Notify.
-    </p>
-    <p class="govuk-body">
-      In an emergency, you can send a message to everyone on the list.
-    </p>
-    <p class="govuk-body">
-      Do not include contact details for members of the public.
-    </p>
-  {% endif %}
+  {{ page_header('Upload an emergency contact list') }}
+  <p class="govuk-body">
+    Save a list of staff email addresses or phone numbers in Notify.
+  </p>
+  <p class="govuk-body">
+    In an emergency, you can send a message to everyone on the list.
+  </p>
+  <p class="govuk-body">
+    Do not include contact details for members of the public.
+  </p>
 
 <div class="bottom-gutter">
   {{ file_upload(
     form.file,
     allowed_file_extensions=allowed_file_extensions,
     button_text='Choose file',
-    show_errors=False,
   )}}
 </div>
 
