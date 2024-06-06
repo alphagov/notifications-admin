@@ -2835,7 +2835,7 @@ class JoinServiceForm(StripWhitespaceForm):
         ]
 
     users = GovukCheckboxesField(
-        "Who do you want to ask?",
+        "Select at least one team member who can approve your request",
         validators=[NotifyDataRequired(thing="at least 1 person to ask")],
         param_extensions={
             "fieldset": {
@@ -2847,7 +2847,7 @@ class JoinServiceForm(StripWhitespaceForm):
             }
         },
     )
-    reason = GovukTextareaField("Explain why you need access (optional)")
+    reason = GovukTextareaField("Tell them why you want to join this service (optional)")
 
 
 class CopyTemplateForm(StripWhitespaceForm, TemplateNameMixin):
