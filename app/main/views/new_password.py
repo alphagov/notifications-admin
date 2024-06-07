@@ -55,4 +55,4 @@ def new_password(token):
             user.send_verify_code()
             return redirect(url_for("main.two_factor_sms", next=request.args.get("next")))
     else:
-        return render_template("views/new-password.html", token=token, form=form, user=user, error_summary_enabled=True)
+        return render_template("views/new-password.html", token=token, form=form, error_summary_enabled=True)
