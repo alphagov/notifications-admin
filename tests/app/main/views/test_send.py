@@ -365,8 +365,8 @@ def test_upload_files_in_different_formats(
         assert f"Could not read {filename}" not in [r.message for r in caplog.records]
     else:
         assert not mock_s3_upload.called
-        assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-            f"Could not read {filename}. Try using a different file format."
+        assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == (
+            "Notify cannot read this file - try using a different file type"
         )
         assert f"{filename} persisted in S3 as {sample_uuid()}" not in [r.message for r in caplog.records]
         assert f"Could not read {filename}" in [r.message for r in caplog.records]
@@ -405,38 +405,14 @@ def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
     [
         (
             partial(UnicodeDecodeError, "codec", b"", 1, 2, "reason"),
-            "Could not read example.xlsx. Try using a different file format.",
+            "Notify cannot read this file - try using a different file type",
         ),
-        (BadZipFile, "Could not read example.xlsx. Try using a different file format."),
-        (XLRDError, "Could not read example.xlsx. Try using a different file format."),
-        (
-            XLDateError,
-            (
-                "example.xlsx contains numbers or dates that Notify cannot understand. "
-                "Try formatting all columns as ‘text’ or export your file as CSV."
-            ),
-        ),
-        (
-            XLDateNegative,
-            (
-                "example.xlsx contains numbers or dates that Notify cannot understand. "
-                "Try formatting all columns as ‘text’ or export your file as CSV."
-            ),
-        ),
-        (
-            XLDateAmbiguous,
-            (
-                "example.xlsx contains numbers or dates that Notify cannot understand. "
-                "Try formatting all columns as ‘text’ or export your file as CSV."
-            ),
-        ),
-        (
-            XLDateTooLarge,
-            (
-                "example.xlsx contains numbers or dates that Notify cannot understand. "
-                "Try formatting all columns as ‘text’ or export your file as CSV."
-            ),
-        ),
+        (BadZipFile, "Notify cannot read this file - try using a different file type"),
+        (XLRDError, "Notify cannot read this file - try using a different file type"),
+        (XLDateError, "Notify cannot read this file - try saving it as a CSV instead"),
+        (XLDateNegative, "Notify cannot read this file - try saving it as a CSV instead"),
+        (XLDateAmbiguous, "Notify cannot read this file - try saving it as a CSV instead"),
+        (XLDateTooLarge, "Notify cannot read this file - try saving it as a CSV instead"),
     ],
 )
 def test_shows_error_if_parsing_exception(
@@ -461,7 +437,7 @@ def test_shows_error_if_parsing_exception(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (expected_error_message)
+    assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == (expected_error_message)
 
 
 def test_upload_csv_file_with_errors_shows_check_page_with_errors(
