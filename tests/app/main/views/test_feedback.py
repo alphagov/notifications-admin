@@ -143,7 +143,7 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
     mock_create_ticket.assert_called_once_with(
         ANY,
         subject="[env: test] General Notify Support",
-        message="blah\n",
+        message="**This ticket was opened using the public support form and not by a logged in user**\n\nblah\n",
         ticket_type="question",
         p1=False,
         user_name="Anne Example",
@@ -208,7 +208,7 @@ def test_passes_user_details_through_flow(
 
     assert mock_create_ticket.call_args[1]["message"] == "\n".join(
         [
-            "blah",
+            "\nblah",
             'Service: "service one"',
             url_for(
                 "main.service_dashboard",

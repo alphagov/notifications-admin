@@ -1,3 +1,6 @@
+{% if not current_user.is_authenticated -%}
+**This ticket was opened using the public support form and not by a logged in user**
+{% endif %}
 {{ content }}
 {% if current_service -%}
 Service: "{{ current_service.name }}"
