@@ -923,7 +923,7 @@ def test_upload_csv_invalid_extension(
         _follow_redirects=True,
     )
 
-    assert "invalid.txt is not a spreadsheet that Notify can read" in page.text
+    assert "The file must be a spreadsheet that Notify can read" in page.text
 
 
 def test_upload_csv_size_too_big(
