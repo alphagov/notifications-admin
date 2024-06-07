@@ -15,14 +15,10 @@ from markupsafe import Markup
 from notifications_utils.countries.data import Postage
 from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict
-from notifications_utils.postal_address import PostalAddress
-from notifications_utils.recipients import (
-    InvalidEmailError,
-    InvalidPhoneError,
-    normalise_phone_number,
-    validate_email_address,
-    validate_phone_number,
-)
+from notifications_utils.recipient_validation.email_address import validate_email_address
+from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
+from notifications_utils.recipient_validation.phone_number import normalise_phone_number, validate_phone_number
+from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from ordered_set import OrderedSet
 from werkzeug.utils import cached_property

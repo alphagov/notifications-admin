@@ -27,7 +27,7 @@ from notifications_utils.formatters import (
     formatted_list,
     get_lines_with_normalised_whitespace,
 )
-from notifications_utils.recipients import format_phone_number_human_readable
+from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
 from notifications_utils.safe_string import make_string_safe_for_email_local_part, make_string_safe_for_id
 from notifications_utils.sanitise_text import SanitiseASCII
 from werkzeug.exceptions import HTTPException as WerkzeugHTTPException

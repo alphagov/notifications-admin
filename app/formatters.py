@@ -13,7 +13,7 @@ from markupsafe import Markup
 from notifications_utils.field import Field
 from notifications_utils.formatters import make_quotes_smart
 from notifications_utils.formatters import nl2br as utils_nl2br
-from notifications_utils.recipients import InvalidPhoneError, validate_phone_number
+from notifications_utils.recipient_validation.phone_number import InvalidPhoneError, validate_phone_number
 from notifications_utils.take import Take
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
