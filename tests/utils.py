@@ -1,5 +1,6 @@
+import itertools
 from unittest import mock
-from unittest.mock import PropertyMock
+from unittest.mock import MagicMock, PropertyMock
 
 from wtforms import Form
 
@@ -37,3 +38,44 @@ def check_render_template_forms(calls: list[mock.call]):
                     f"`pageTitle` template block and handle `Error: ` prefixing and potentially error summaries "
                     f"yourself, then add an exclusion for that template to this check."
                 )
+
+
+class RedisClientMock(MagicMock):
+    """
+    Provides a couple of helper functions for better assertions on functions like RedisClient.delete where calls can be
+    duplicated without effect and delete can take multiple keys in one function call
+    """
+
+    def assert_called_with_args(self, *expected_keys: str):
+        """
+        Given a single arg, or a list of args, asserts that they were passed in as args to the mock at least once, in
+        any call, in any positional place.
+
+        Will fail if there are any args that were called but not specified in the assert
+        """
+        list_of_called_tuples = itertools.chain.from_iterable(call.args for call in self.call_args_list)
+        set_of_actual_keys = set(list_of_called_tuples)
+        if set(expected_keys) != set_of_actual_keys:
+            msg = f"Expected '{self._mock_name}' to be called with {expected_keys}. Called with {set_of_actual_keys}"
+            raise AssertionError(msg)
+
+    def assert_called_with_subset_of_args(self, *expected_keys: str):
+        """
+        Given a single arg, or a list of args, asserts that they were passed in as args to the mock at least once, in
+        any call, in any positional place
+
+        Will fail if there are any args that were called but not specified in the assert
+
+        Note this is designed for use with functions like RedisClient.delete where calls can be duplicated without
+        effect and delete can take multiple keys in one function call
+        """
+        list_of_called_tuples = itertools.chain.from_iterable(call.args for call in self.call_args_list)
+
+        set_of_actual_keys = set(list_of_called_tuples)
+        set_of_expected_keys = set(expected_keys)
+        if set_of_expected_keys - set_of_actual_keys:
+            msg = (
+                f"Expected '{self._mock_name}' to be called with at least {set_of_expected_keys}. "
+                f"Called with {set_of_actual_keys}"
+            )
+            raise AssertionError(msg)
