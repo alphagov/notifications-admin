@@ -127,120 +127,53 @@ def test_deletes_domain_cache(
     assert len(mock_request.call_args_list) == 1
 
 
-@pytest.mark.parametrize(
-    "post_data, expected_cache_keys_to_delete",
-    (
-        (
-            {"foo": "bar"},
-            [
-                "organisations",
-                "domains",
-            ],
-        ),
-        (
-            {"name": "new name"},
-            [
-                "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-name",
-                "organisations",
-                "domains",
-            ],
-        ),
-        (
-            {"letter_branding_id": "new id"},
-            [
-                "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-letter-branding-pool",
-                "organisations",
-                "domains",
-            ],
-        ),
-        (
-            {"letter_branding_id": None},
-            [
-                "organisations",
-                "domains",
-            ],
-        ),
-        (
-            {"email_branding_id": "new id"},
-            [
-                "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-email-branding-pool",
-                "organisations",
-                "domains",
-            ],
-        ),
-        (
-            {"email_branding_id": None},
-            [
-                "organisations",
-                "domains",
-            ],
-        ),
-    ),
-)
-def test_update_organisation_when_not_updating_org_type(
-    mocker,
-    fake_uuid,
-    post_data,
-    expected_cache_keys_to_delete,
-):
+def test_update_organisation_when_org_has_no_services(mocker, fake_uuid):
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
     mock_post = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.post")
 
-    organisations_client.update_organisation(fake_uuid, **post_data)
+    organisations_client.update_organisation(fake_uuid, **{"foo": "bar"})
 
-    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data=post_data)
-    for key in expected_cache_keys_to_delete:
-        assert_mock_has_any_call_with_first_n_args(mock_redis_delete, key)
+    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"foo": "bar"})
+
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
+    assert_mock_has_any_call_with_first_n_args(
+        mock_redis_delete,
+        "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-name",
+    )
+    assert_mock_has_any_call_with_first_n_args(
+        mock_redis_delete, "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-email-branding-pool"
+    )
+    assert_mock_has_any_call_with_first_n_args(
+        mock_redis_delete, "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-letter-branding-pool"
+    )
 
 
-def test_update_organisation_when_updating_org_type_and_org_has_services(mocker, fake_uuid):
+def test_update_organisation_when_org_has_services(mocker, fake_uuid):
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
     mock_post = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.post")
 
     organisations_client.update_organisation(
         fake_uuid,
         cached_service_ids=["a", "b", "c"],
-        organisation_type="central",
+        foo="bar",
     )
 
-    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"organisation_type": "central"})
+    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"foo": "bar"})
 
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
+    assert_mock_has_any_call_with_first_n_args(
+        mock_redis_delete,
+        "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-name",
+    )
+    assert_mock_has_any_call_with_first_n_args(
+        mock_redis_delete, "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-email-branding-pool"
+    )
+    assert_mock_has_any_call_with_first_n_args(
+        mock_redis_delete, "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-letter-branding-pool"
+    )
     assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "service-a", "service-b", "service-c")
-    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
-    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
-
-
-def test_update_organisation_when_updating_org_type_but_org_has_no_services(mocker, fake_uuid):
-    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
-    mock_post = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.post")
-
-    organisations_client.update_organisation(
-        fake_uuid,
-        cached_service_ids=[],
-        organisation_type="central",
-    )
-
-    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"organisation_type": "central"})
-    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
-    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
-
-
-@pytest.mark.parametrize("org_type", ["nhs_central", "nhs_local", "nhs_gp"])
-def test_update_organisation_when_to_updating_to_an_nhs_org_type(mocker, org_type, fake_uuid):
-    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
-    mock_post = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.post")
-
-    organisations_client.update_organisation(
-        fake_uuid,
-        cached_service_ids=[],
-        organisation_type=org_type,
-    )
-
-    mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"organisation_type": org_type})
-    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"organisation-{fake_uuid}-email-branding-pool")
-    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"organisation-{fake_uuid}-letter-branding-pool")
-    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
-    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
 
 
 def test_add_brandings_to_email_branding_pool(mocker, fake_uuid):
