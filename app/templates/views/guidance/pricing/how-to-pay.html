@@ -17,6 +17,27 @@
       If you use GOV.UK Notify to send text messages or letters, you may need to send us a <a class="govuk-link govuk-link--no-visited-state" href="#purchase-orders">purchase order</a>.
     </p>
 
+    <h2 class="heading-medium" id="purchase-orders">
+      Purchase orders
+    </h2>
+    <p class="govuk-body">Before you exceed the free text message allowance or send letters, we will need either:</p>
+     <ul class="govuk-list govuk-list--bullet">
+       <li>a purchase order (PO) for the financial year</li>
+       <li>confirmation your organisation can receive invoices without a PO reference</li>
+</ul>
+<p class="govuk-body">Use our support form to <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">send us your PO or confirmation with the name and email address of your finance contact</a>.</p>
+    <p class="govuk-body">
+      If your organisation’s total estimated spend is more than £500 per quarter (before <abbr title="Value Added Tax">VAT</abbr>), you will need to raise a purchase order (PO).
+    </p>
+
+    <p class="govuk-body">
+      Your organisation should raise a single <abbr title="purchase order">PO</abbr> for the estimated cost of all its services. You can update the <abbr title="purchase order">PO</abbr> any time if your usage increases.
+    </p>
+
+    <p class="govuk-body">
+      Your organisation may need to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">add the Cabinet Office as a supplier</a> before you can raise a <abbr title="purchase order">PO</abbr>.
+    </p>
+
     <h2 class="heading-medium" id="invoices">
       Invoices
     </h2>
@@ -48,27 +69,6 @@
 
     <p class="govuk-body">
       Please start your payment reference with the invoice number.
-    </p>
-
-    <h2 class="heading-medium" id="purchase-orders">
-      Purchase orders
-    </h2>
-    <p class="govuk-body">Before you exceed the free text message allowance or send letters, we will need either:</p>
-     <ul class="govuk-list govuk-list--bullet">
-       <li>a purchase order (PO) for the financial year</li>
-       <li>confirmation your organisation can receive invoices without a PO reference</li>
-</ul>
-<p class="govuk-body">Use our support form to <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">send us your PO or confirmation with the name and email address of your finance contact</a>.</p>
-    <p class="govuk-body">
-      If your organisation’s total estimated spend is more than £500 per quarter (before <abbr title="Value Added Tax">VAT</abbr>), you will need to raise a purchase order (PO).
-    </p>
-
-    <p class="govuk-body">
-      Your organisation should raise a single <abbr title="purchase order">PO</abbr> for the estimated cost of all its services. You can update the <abbr title="purchase order">PO</abbr> any time if your usage increases.
-    </p>
-
-    <p class="govuk-body">
-      Your organisation may need to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">add the Cabinet Office as a supplier</a> before you can raise a <abbr title="purchase order">PO</abbr>.
     </p>
 
 {% endblock %}
