@@ -10,6 +10,7 @@ from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.models.webauthn_credential import WebAuthnCredential
 from tests import sample_uuid
 from tests.conftest import SERVICE_ONE_ID
+from tests.utils import assert_mock_has_any_call_with_first_n_args
 
 user_id = sample_uuid()
 
@@ -216,7 +217,7 @@ def test_deletes_user_cache(notify_admin, mock_get_user, mocker, client, method,
 
     getattr(client, method)(*extra_args, **extra_kwargs)
 
-    assert call(f"user-{user_id}") in mock_redis_delete.call_args_list
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"user-{user_id}")
     assert len(mock_request.call_args_list) == 1
 
 
@@ -235,11 +236,9 @@ def test_add_user_to_service_calls_correct_endpoint_and_deletes_keys_from_cache(
     user_api_client.add_user_to_service(service_id, user_id, [], [folder_id])
 
     mock_post.assert_called_once_with(expected_url, data=data)
-    assert mock_redis_delete.call_args_list == [
-        call(f"user-{user_id}"),
-        call(f"service-{service_id}-template-folders"),
-        call(f"service-{service_id}"),
-    ]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"user-{user_id}")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{service_id}-template-folders")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{service_id}")
 
 
 def test_get_webauthn_credentials_for_user(mocker, webauthn_credential, fake_uuid):

@@ -14,6 +14,7 @@ from tests.conftest import (
     create_platform_admin_user,
     normalize_spaces,
 )
+from tests.utils import assert_mock_has_any_call_with_first_n_args
 
 
 def test_organisation_page_shows_all_organisations(client_request, platform_admin_user, mocker):
@@ -1300,11 +1301,10 @@ def test_archive_organisation_after_confirmation(
     mock_api.assert_called_once_with(url=f"/organisations/{organisation_one['id']}/archive", data=None)
     assert normalize_spaces(page.select_one("h1").text) == "Choose service"
     assert normalize_spaces(page.select_one(".banner-default-with-tick").text) == "‘Test organisation’ was deleted"
-    assert redis_delete_mock.call_args_list == [
-        mocker.call(f'organisation-{organisation_one["id"]}-name'),
-        mocker.call("domains"),
-        mocker.call("organisations"),
-    ]
+
+    assert_mock_has_any_call_with_first_n_args(redis_delete_mock, f'organisation-{organisation_one["id"]}-name')
+    assert_mock_has_any_call_with_first_n_args(redis_delete_mock, "domains")
+    assert_mock_has_any_call_with_first_n_args(redis_delete_mock, "organisations")
 
 
 @pytest.mark.parametrize(

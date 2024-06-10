@@ -1,6 +1,7 @@
 from unittest import mock
 from unittest.mock import PropertyMock
 
+import pytest
 from wtforms import Form
 
 
@@ -37,3 +38,16 @@ def check_render_template_forms(calls: list[mock.call]):
                     f"`pageTitle` template block and handle `Error: ` prefixing and potentially error summaries "
                     f"yourself, then add an exclusion for that template to this check."
                 )
+
+
+def assert_mock_has_any_call_with_first_n_args(mocked, *args):
+    if not any(call[0][: len(args)] == args for call in mocked.call_args_list):
+        err_msg = "\n".join(
+            (
+                f"call{args} not found in Mock {mocked}",
+                "  call_args_list: [",
+                *[f"    {c}" for c in mocked.call_args_list],
+                "  ]",
+            )
+        )
+        pytest.fail(err_msg)

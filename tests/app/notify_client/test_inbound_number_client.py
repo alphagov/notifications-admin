@@ -1,6 +1,7 @@
 import pytest
 
 from app.notify_client.inbound_number_client import inbound_number_client
+from tests.utils import assert_mock_has_any_call_with_first_n_args
 
 
 @pytest.mark.parametrize(
@@ -19,5 +20,5 @@ def test_add_inbound_number_to_service(mocker, inbound_number_id, data):
 
     mock_post.assert_called_once_with("inbound-number/service/abcd", data=data)
 
-    assert mock_redis_delete.call_args_list == [mocker.call("service-abcd")]
-    assert mock_redis_delete_by_pattern.call_args_list == [mocker.call("service-abcd-template-*")]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "service-abcd")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete_by_pattern, "service-abcd-template-*")

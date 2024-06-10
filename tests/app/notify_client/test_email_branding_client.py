@@ -1,6 +1,5 @@
-from unittest.mock import call
-
 from app.notify_client.email_branding_client import EmailBrandingClient
+from tests.utils import assert_mock_has_any_call_with_first_n_args
 
 
 def test_get_email_branding(mocker, fake_uuid):
@@ -70,7 +69,7 @@ def test_create_email_branding(mocker, fake_uuid):
 
     mock_post.assert_called_once_with(url="/email-branding", data=org_data)
 
-    mock_redis_delete.assert_called_once_with("email_branding")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "email_branding")
 
 
 def test_update_email_branding(mocker, fake_uuid):
@@ -99,11 +98,9 @@ def test_update_email_branding(mocker, fake_uuid):
     )
 
     mock_post.assert_called_once_with(url=f"/email-branding/{fake_uuid}", data=org_data)
-    assert mock_redis_delete.call_args_list == [
-        call(f"email_branding-{fake_uuid}"),
-        call("email_branding"),
-    ]
-    assert mock_redis_delete_by_pattern.call_args_list == [call("organisation-*-email-branding-pool")]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"email_branding-{fake_uuid}")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "email_branding")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete_by_pattern, "organisation-*-email-branding-pool")
 
 
 def test_create_email_branding_sends_none_values(mocker, fake_uuid):

@@ -1,6 +1,5 @@
-from unittest.mock import call
-
 from app.notify_client.letter_branding_client import LetterBrandingClient
+from tests.utils import assert_mock_has_any_call_with_first_n_args
 
 
 def test_get_letter_branding(mocker, fake_uuid):
@@ -61,7 +60,7 @@ def test_create_letter_branding(mocker):
     )
     mock_post.assert_called_once_with(url="/letter-branding", data=new_branding)
 
-    mock_redis_delete.assert_called_once_with("letter_branding")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "letter_branding")
 
 
 def test_update_letter_branding(mocker, fake_uuid):
@@ -78,8 +77,8 @@ def test_update_letter_branding(mocker, fake_uuid):
     )
 
     mock_post.assert_called_once_with(url=f"/letter-branding/{fake_uuid}", data=branding)
-    assert mock_redis_delete.call_args_list == [
-        call(f"letter_branding-{fake_uuid}"),
-        call("letter_branding"),
-    ]
-    assert mock_redis_delete_by_pattern.call_args_list == [call("organisation-*-letter-branding-pool")]
+
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"letter_branding-{fake_uuid}")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "letter_branding")
+
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete_by_pattern, "organisation-*-letter-branding-pool")

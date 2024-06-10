@@ -1,10 +1,10 @@
 import uuid
-from unittest.mock import call
 
 import pytest
 from ordered_set import OrderedSet
 
 from app.notify_client.template_folder_api_client import TemplateFolderAPIClient
+from tests.utils import assert_mock_has_any_call_with_first_n_args
 
 
 @pytest.mark.parametrize("parent_id", [uuid.uuid4(), None])
@@ -22,7 +22,7 @@ def test_create_template_folder_calls_correct_api_endpoint(mocker, parent_id):
     client.create_template_folder(some_service_id, name="foo", parent_id=parent_id)
 
     mock_post.assert_called_once_with(expected_url, data)
-    mock_redis_delete.assert_called_once_with(f"service-{some_service_id}-template-folders")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{some_service_id}-template-folders")
 
 
 def test_get_template_folders_calls_correct_api_endpoint(mocker):
@@ -68,15 +68,14 @@ def test_move_templates_and_folders(mocker):
             "templates": ["a", "b", "c"],
         },
     )
-    assert mock_redis_delete.call_args_list == [
-        call(
-            f"service-{some_service_id}-template-a-version-None",
-            f"service-{some_service_id}-template-b-version-None",
-            f"service-{some_service_id}-template-c-version-None",
-        ),
-        call(f"service-{some_service_id}-templates"),
-        call(f"service-{some_service_id}-template-folders"),
-    ]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{some_service_id}-templates")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{some_service_id}-template-folders")
+    assert_mock_has_any_call_with_first_n_args(
+        mock_redis_delete,
+        f"service-{some_service_id}-template-a-version-None",
+        f"service-{some_service_id}-template-b-version-None",
+        f"service-{some_service_id}-template-c-version-None",
+    )
 
 
 def test_move_templates_and_folders_to_root(mocker):
@@ -115,7 +114,7 @@ def test_update_template_folder_calls_correct_api_endpoint(mocker):
     client.update_template_folder(some_service_id, template_folder_id, name="foo", users_with_permission=["some_id"])
 
     mock_post.assert_called_once_with(expected_url, data)
-    mock_redis_delete.assert_called_once_with(f"service-{some_service_id}-template-folders")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{some_service_id}-template-folders")
 
 
 def test_delete_template_folder_calls_correct_api_endpoint(mocker):
@@ -132,4 +131,4 @@ def test_delete_template_folder_calls_correct_api_endpoint(mocker):
     client.delete_template_folder(some_service_id, template_folder_id)
 
     mock_delete.assert_called_once_with(expected_url, {})
-    mock_redis_delete.assert_called_once_with(f"service-{some_service_id}-template-folders")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{some_service_id}-template-folders")

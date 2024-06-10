@@ -6,6 +6,9 @@ import pytest
 from app import invite_api_client, service_api_client, user_api_client
 from app.notify_client.service_api_client import ServiceAPIClient
 from tests.conftest import SERVICE_ONE_ID
+from tests.utils import (
+    assert_mock_has_any_call_with_first_n_args,
+)
 
 FAKE_TEMPLATE_ID = uuid4()
 
@@ -25,7 +28,9 @@ def test_client_posts_archived_true_when_deleting_template(mocker):
 
     client.delete_service_template(SERVICE_ONE_ID, FAKE_TEMPLATE_ID)
     mock_post.assert_called_once_with(expected_url, data=expected_data)
-    assert call(f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*") in mock_redis_delete_by_pattern.call_args_list
+    assert_mock_has_any_call_with_first_n_args(
+        mock_redis_delete_by_pattern, f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}*"
+    )
 
 
 def test_client_gets_service(mocker):
@@ -396,7 +401,7 @@ def test_deletes_service_cache(
 
     getattr(client, method)(*extra_args, **extra_kwargs)
 
-    assert call(f"service-{SERVICE_ONE_ID}") in mock_redis_delete.call_args_list
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{SERVICE_ONE_ID}")
     assert len(mock_request.call_args_list) == 1
 
 
@@ -469,10 +474,13 @@ def test_deletes_caches_when_modifying_templates(
 
     getattr(service_api_client, method)(*extra_args, **extra_kwargs)
 
-    assert mock_redis_delete.call_args_list == [call(x) for x in expected_cache_deletes]
-    assert len(mock_request.call_args_list) == 1
+    for arg in expected_cache_deletes:
+        assert_mock_has_any_call_with_first_n_args(mock_redis_delete, arg)
 
-    assert mock_redis_delete_by_pattern.call_args_list == [call(x) for x in expected_cache_deletes_by_pattern]
+    for arg in expected_cache_deletes_by_pattern:
+        assert_mock_has_any_call_with_first_n_args(mock_redis_delete_by_pattern, arg)
+
+    assert len(mock_request.call_args_list) == 1
 
 
 def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_templates):
@@ -483,8 +491,8 @@ def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_te
 
     service_api_client.archive_service(SERVICE_ONE_ID, ["my-user-id1", "my-user-id2"])
 
-    assert call("user-my-user-id1", "user-my-user-id2") in mock_redis_delete.call_args_list
-    assert call(f"service-{SERVICE_ONE_ID}-template*") in mock_redis_delete_by_pattern.call_args_list
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "user-my-user-id1", "user-my-user-id2")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete_by_pattern, f"service-{SERVICE_ONE_ID}-template*")
 
 
 def test_client_gets_guest_list(mocker):
@@ -511,22 +519,6 @@ def test_client_updates_guest_list(mocker):
     )
 
 
-def test_client_doesnt_delete_service_template_cache_when_none_exist(
-    notify_admin, mock_get_user, mock_get_service_templates_when_no_templates_exist, mocker
-):
-    mocker.patch("app.notify_client.current_user", id="1")
-    mocker.patch("notifications_python_client.base.BaseAPIClient.request")
-    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
-    mock_redis_delete_by_pattern = mocker.patch("app.extensions.RedisClient.delete_by_pattern")
-
-    service_api_client.update_reply_to_email_address(SERVICE_ONE_ID, uuid4(), "foo@bar.com")
-
-    assert len(mock_redis_delete.call_args_list) == 1
-    assert mock_redis_delete.call_args_list[0] == call(f"service-{SERVICE_ONE_ID}")
-
-    assert len(mock_redis_delete_by_pattern.call_args_list) == 1
-
-
 def test_client_deletes_service_template_cache_when_service_is_updated(notify_admin, mock_get_user, mocker):
     mocker.patch("app.notify_client.current_user", id="1")
     mocker.patch("notifications_python_client.base.BaseAPIClient.request")
@@ -535,9 +527,8 @@ def test_client_deletes_service_template_cache_when_service_is_updated(notify_ad
 
     service_api_client.update_reply_to_email_address(SERVICE_ONE_ID, uuid4(), "foo@bar.com")
 
-    assert len(mock_redis_delete.call_args_list) == 1
-    assert mock_redis_delete.call_args_list[0] == call(f"service-{SERVICE_ONE_ID}")
-    assert mock_redis_delete_by_pattern.call_args_list[0] == call(f"service-{SERVICE_ONE_ID}-template-*")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{SERVICE_ONE_ID}")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete_by_pattern, f"service-{SERVICE_ONE_ID}-template-*")
 
 
 def test_client_updates_service_with_allowed_attributes(

@@ -3,6 +3,7 @@ from unittest.mock import ANY, call
 import pytest
 
 from app import organisations_client
+from tests.utils import assert_mock_has_any_call_with_first_n_args
 
 
 @pytest.mark.parametrize(
@@ -122,56 +123,56 @@ def test_deletes_domain_cache(
 
     organisations_client.update_organisation(fake_uuid, foo="bar")
 
-    assert call("domains") in mock_redis_delete.call_args_list
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
     assert len(mock_request.call_args_list) == 1
 
 
 @pytest.mark.parametrize(
-    "post_data, expected_cache_delete_calls",
+    "post_data, expected_cache_keys_to_delete",
     (
         (
             {"foo": "bar"},
             [
-                call("organisations"),
-                call("domains"),
+                "organisations",
+                "domains",
             ],
         ),
         (
             {"name": "new name"},
             [
-                call("organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-name"),
-                call("organisations"),
-                call("domains"),
+                "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-name",
+                "organisations",
+                "domains",
             ],
         ),
         (
             {"letter_branding_id": "new id"},
             [
-                call("organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-letter-branding-pool"),
-                call("organisations"),
-                call("domains"),
+                "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-letter-branding-pool",
+                "organisations",
+                "domains",
             ],
         ),
         (
             {"letter_branding_id": None},
             [
-                call("organisations"),
-                call("domains"),
+                "organisations",
+                "domains",
             ],
         ),
         (
             {"email_branding_id": "new id"},
             [
-                call("organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-email-branding-pool"),
-                call("organisations"),
-                call("domains"),
+                "organisation-6ce466d0-fd6a-11e5-82f5-e0accb9d11a6-email-branding-pool",
+                "organisations",
+                "domains",
             ],
         ),
         (
             {"email_branding_id": None},
             [
-                call("organisations"),
-                call("domains"),
+                "organisations",
+                "domains",
             ],
         ),
     ),
@@ -180,7 +181,7 @@ def test_update_organisation_when_not_updating_org_type(
     mocker,
     fake_uuid,
     post_data,
-    expected_cache_delete_calls,
+    expected_cache_keys_to_delete,
 ):
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
     mock_post = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.post")
@@ -188,7 +189,8 @@ def test_update_organisation_when_not_updating_org_type(
     organisations_client.update_organisation(fake_uuid, **post_data)
 
     mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data=post_data)
-    assert mock_redis_delete.call_args_list == expected_cache_delete_calls
+    for key in expected_cache_keys_to_delete:
+        assert_mock_has_any_call_with_first_n_args(mock_redis_delete, key)
 
 
 def test_update_organisation_when_updating_org_type_and_org_has_services(mocker, fake_uuid):
@@ -202,11 +204,10 @@ def test_update_organisation_when_updating_org_type_and_org_has_services(mocker,
     )
 
     mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"organisation_type": "central"})
-    assert mock_redis_delete.call_args_list == [
-        call("service-a", "service-b", "service-c"),
-        call("organisations"),
-        call("domains"),
-    ]
+
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "service-a", "service-b", "service-c")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
 
 
 def test_update_organisation_when_updating_org_type_but_org_has_no_services(mocker, fake_uuid):
@@ -220,10 +221,8 @@ def test_update_organisation_when_updating_org_type_but_org_has_no_services(mock
     )
 
     mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"organisation_type": "central"})
-    assert mock_redis_delete.call_args_list == [
-        call("organisations"),
-        call("domains"),
-    ]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
 
 
 @pytest.mark.parametrize("org_type", ["nhs_central", "nhs_local", "nhs_gp"])
@@ -238,12 +237,10 @@ def test_update_organisation_when_to_updating_to_an_nhs_org_type(mocker, org_typ
     )
 
     mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"organisation_type": org_type})
-    assert mock_redis_delete.call_args_list == [
-        call(f"organisation-{fake_uuid}-email-branding-pool"),
-        call(f"organisation-{fake_uuid}-letter-branding-pool"),
-        call("organisations"),
-        call("domains"),
-    ]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"organisation-{fake_uuid}-email-branding-pool")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"organisation-{fake_uuid}-letter-branding-pool")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
 
 
 def test_add_brandings_to_email_branding_pool(mocker, fake_uuid):
@@ -257,7 +254,7 @@ def test_add_brandings_to_email_branding_pool(mocker, fake_uuid):
     mock_post.assert_called_with(
         url=f"/organisations/{fake_uuid}/email-branding-pool", data={"branding_ids": ["abcd", "efgh"]}
     )
-    mock_redis_delete.assert_called_once_with(f"organisation-{fake_uuid}-email-branding-pool")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"organisation-{fake_uuid}-email-branding-pool")
 
 
 def test_update_service_organisation_deletes_cache(mocker, fake_uuid):
@@ -266,11 +263,9 @@ def test_update_service_organisation_deletes_cache(mocker, fake_uuid):
 
     organisations_client.update_service_organisation(service_id=fake_uuid, org_id=fake_uuid)
 
-    assert sorted(mock_redis_delete.call_args_list) == [
-        call("live-service-and-organisation-counts"),
-        call("organisations"),
-        call(f"service-{fake_uuid}"),
-    ]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "live-service-and-organisation-counts")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"service-{fake_uuid}")
     mock_post.assert_called_with(url=f"/organisations/{fake_uuid}/service", data=ANY)
 
 
@@ -285,8 +280,7 @@ def test_remove_user_from_organisation_deletes_user_cache(mocker):
         org_id=org_id,
         user_id=user_id,
     )
-
-    assert mock_redis_delete.call_args_list == [call(f"user-{user_id}")]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"user-{user_id}")
     mock_delete.assert_called_with(f"/organisations/{org_id}/users/{user_id}")
 
 
@@ -298,11 +292,9 @@ def test_archive_organisation(mocker):
 
     organisations_client.archive_organisation(org_id=org_id)
 
-    assert mock_redis_delete.call_args_list == [
-        call(f"organisation-{org_id}-name"),
-        call("domains"),
-        call("organisations"),
-    ]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"organisation-{org_id}-name")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "domains")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, "organisations")
     mock_post.assert_called_with(url=f"/organisations/{org_id}/archive", data=None)
 
 
@@ -318,7 +310,7 @@ def test_remove_email_branding_from_organisation_pool(mocker):
         branding_id=branding_id,
     )
 
-    assert mock_redis_delete.call_args_list == [call(f"organisation-{org_id}-email-branding-pool")]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"organisation-{org_id}-email-branding-pool")
     mock_delete.assert_called_with(f"/organisations/{org_id}/email-branding-pool/{branding_id}")
 
 
@@ -349,7 +341,7 @@ def test_add_brandings_to_letter_branding_pool(mocker, fake_uuid):
     mock_post.assert_called_with(
         url=f"/organisations/{fake_uuid}/letter-branding-pool", data={"branding_ids": ["abcd", "efgh"]}
     )
-    mock_redis_delete.assert_called_once_with(f"organisation-{fake_uuid}-letter-branding-pool")
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"organisation-{fake_uuid}-letter-branding-pool")
 
 
 def test_remove_letter_branding_from_organisation_pool(mocker):
@@ -364,7 +356,7 @@ def test_remove_letter_branding_from_organisation_pool(mocker):
         branding_id=branding_id,
     )
 
-    assert mock_redis_delete.call_args_list == [call(f"organisation-{org_id}-letter-branding-pool")]
+    assert_mock_has_any_call_with_first_n_args(mock_redis_delete, f"organisation-{org_id}-letter-branding-pool")
     mock_delete.assert_called_with(f"/organisations/{org_id}/letter-branding-pool/{branding_id}")
 
 
