@@ -14,6 +14,7 @@ from tests.conftest import (
     create_platform_admin_user,
     normalize_spaces,
 )
+from tests.utils import RedisClientMock
 
 
 def test_organisation_page_shows_all_organisations(client_request, platform_admin_user, mocker):
@@ -1293,18 +1294,19 @@ def test_archive_organisation_after_confirmation(
     mock_get_organisation_by_domain,
 ):
     mock_api = mocker.patch("app.organisations_client.post")
-    redis_delete_mock = mocker.patch("app.notify_client.organisations_api_client.redis_client.delete")
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
 
     client_request.login(platform_admin_user)
     page = client_request.post("main.archive_organisation", org_id=organisation_one["id"], _follow_redirects=True)
+
     mock_api.assert_called_once_with(url=f"/organisations/{organisation_one['id']}/archive", data=None)
     assert normalize_spaces(page.select_one("h1").text) == "Choose service"
     assert normalize_spaces(page.select_one(".banner-default-with-tick").text) == "‘Test organisation’ was deleted"
-    assert redis_delete_mock.call_args_list == [
-        mocker.call(f'organisation-{organisation_one["id"]}-name'),
-        mocker.call("domains"),
-        mocker.call("organisations"),
-    ]
+    mock_redis_delete.assert_called_with_args(
+        f'organisation-{organisation_one["id"]}-name',
+        "domains",
+        "organisations",
+    )
 
 
 @pytest.mark.parametrize(

@@ -10,6 +10,7 @@ from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.models.webauthn_credential import WebAuthnCredential
 from tests import sample_uuid
 from tests.conftest import SERVICE_ONE_ID
+from tests.utils import RedisClientMock
 
 user_id = sample_uuid()
 
@@ -211,17 +212,17 @@ def test_returns_value_from_cache(
 )
 def test_deletes_user_cache(notify_admin, mock_get_user, mocker, client, method, extra_args, extra_kwargs):
     mocker.patch("app.notify_client.current_user", id="1")
-    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
     mock_request = mocker.patch("notifications_python_client.base.BaseAPIClient.request")
 
     getattr(client, method)(*extra_args, **extra_kwargs)
 
-    assert call(f"user-{user_id}") in mock_redis_delete.call_args_list
     assert len(mock_request.call_args_list) == 1
+    mock_redis_delete.assert_called_with_subset_of_args(f"user-{user_id}")
 
 
 def test_add_user_to_service_calls_correct_endpoint_and_deletes_keys_from_cache(mocker):
-    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
 
     service_id = uuid.uuid4()
     user_id = uuid.uuid4()
@@ -235,11 +236,11 @@ def test_add_user_to_service_calls_correct_endpoint_and_deletes_keys_from_cache(
     user_api_client.add_user_to_service(service_id, user_id, [], [folder_id])
 
     mock_post.assert_called_once_with(expected_url, data=data)
-    assert mock_redis_delete.call_args_list == [
-        call(f"user-{user_id}"),
-        call(f"service-{service_id}-template-folders"),
-        call(f"service-{service_id}"),
-    ]
+    mock_redis_delete.assert_called_with_args(
+        f"user-{user_id}",
+        f"service-{service_id}-template-folders",
+        f"service-{service_id}",
+    )
 
 
 def test_get_webauthn_credentials_for_user(mocker, webauthn_credential, fake_uuid):

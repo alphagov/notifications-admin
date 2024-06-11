@@ -6,7 +6,7 @@ from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
-from notifications_utils.recipients import InvalidEmailError, validate_email_address
+from notifications_utils.recipient_validation.email_address import InvalidEmailError, validate_email_address
 from notifications_utils.sanitise_text import SanitiseSMS
 from ordered_set import OrderedSet
 from wtforms import ValidationError

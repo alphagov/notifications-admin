@@ -19,7 +19,7 @@ from flask import (
 )
 from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.pdf import pdf_page_count
-from notifications_utils.postal_address import PostalAddress
+from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.sanitise_text import SanitiseASCII
 from pypdf.errors import PdfReadError
