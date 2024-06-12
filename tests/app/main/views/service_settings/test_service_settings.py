@@ -2742,7 +2742,13 @@ def test_incorrect_sms_sender_input(
     client_request,
     no_sms_senders,
     mock_add_sms_sender,
+    mocker,
 ):
+
+    mocker.patch(
+        "app.protected_sender_id_api_client.get_check_sender_id",
+        return_value=False,
+    )
     page = client_request.post(
         "main.service_add_sms_sender",
         service_id=SERVICE_ONE_ID,
@@ -2761,10 +2767,13 @@ def test_incorrect_sms_sender_input(
 
 
 def test_incorrect_sms_sender_input_with_multiple_errors_only_shows_the_first(
-    client_request,
-    no_sms_senders,
-    mock_add_sms_sender,
+    client_request, no_sms_senders, mock_add_sms_sender, mocker
 ):
+    # Setup protected sender id mock
+    mocker.patch(
+        "app.protected_sender_id_api_client.get_check_sender_id",
+        return_value=False,
+    )
     # There are two errors with the SMS sender - the length and characters used. Only one
     # should be displayed on the page.
     page = client_request.post(
@@ -3004,6 +3013,10 @@ def test_add_letter_contact_when_coming_from_template(
     ],
 )
 def test_add_sms_sender(sms_senders, data, api_default_args, mocker, client_request, mock_add_sms_sender):
+    mocker.patch(
+        "app.protected_sender_id_api_client.get_check_sender_id",
+        return_value=False,
+    )
     mocker.patch("app.service_api_client.get_sms_senders", return_value=sms_senders)
     data["sms_sender"] = "Example"
     client_request.post("main.service_add_sms_sender", service_id=SERVICE_ONE_ID, _data=data)
@@ -3362,6 +3375,11 @@ def test_delete_letter_contact_block(
     ],
 )
 def test_edit_sms_sender(sms_sender, data, api_default_args, mocker, fake_uuid, client_request, mock_update_sms_sender):
+
+    mocker.patch(
+        "app.protected_sender_id_api_client.get_check_sender_id",
+        return_value=False,
+    )
     mocker.patch("app.service_api_client.get_sms_sender", return_value=sms_sender)
 
     client_request.post("main.service_edit_sms_sender", service_id=SERVICE_ONE_ID, sms_sender_id=fake_uuid, _data=data)
