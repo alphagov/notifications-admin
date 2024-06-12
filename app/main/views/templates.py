@@ -1177,7 +1177,7 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
         current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
         raise LetterAttachmentFormError(
             title="There’s a problem with your file",
-            detail="Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
+            detail="Notify cannot read this PDF - save a new copy and try again",
         ) from None
 
     file_location = get_transient_letter_file_location(service_id, upload_id)
