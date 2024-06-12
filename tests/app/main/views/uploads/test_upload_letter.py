@@ -355,7 +355,7 @@ def test_uploading_a_letter_attachment_shows_error_when_file_is_not_a_pdf(
             _data={"file": file},
             _expected_status=400,
         )
-    assert page.select_one(".banner-dangerous h1").text == "Wrong file type"
+    assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == "The file must be a PDF"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
     assert page.select_one("input[type=file]")["accept"] == ".pdf"
 
@@ -370,7 +370,7 @@ def test_uploading_a_letter_attachment_shows_error_when_no_file_uploaded(
         _data={"file": ""},
         _expected_status=400,
     )
-    assert page.select_one(".banner-dangerous p").text == "You need to choose a file to upload"
+    assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == "You need to choose a file to upload"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
@@ -388,8 +388,7 @@ def test_uploading_a_letter_attachment_shows_error_when_file_contains_virus(
             _data={"file": file},
             _expected_status=400,
         )
-    assert page.select_one(".banner-dangerous h1").text == "There is a problem"
-    assert page.select_one(".banner-dangerous p").text == "This file contains a virus"
+    assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == "This file contains a virus"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
     mock_s3_backup.assert_not_called()
 
@@ -407,8 +406,7 @@ def test_uploading_a_letter_attachment_errors_when_file_is_too_big(
             _data={"file": file},
             _expected_status=400,
         )
-    assert page.select_one(".banner-dangerous h1").text == "There is a problem"
-    assert page.select_one(".banner-dangerous p").text == "The file must be smaller than 2MB"
+    assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == "The file must be smaller than 2MB"
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
@@ -428,7 +426,7 @@ def test_post_choose_upload_letter_attachment_when_file_is_malformed(
     assert page.select_one("div.banner-dangerous").find("h1").text == "There’s a problem with your file"
     assert (
         page.select_one("div.banner-dangerous").find("p").text
-        == "Notify cannot read this PDF.Save a new copy of your file and try again."
+        == "Notify cannot read this PDF - save a new copy and try again"
     )
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
