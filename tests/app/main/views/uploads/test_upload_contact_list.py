@@ -252,8 +252,8 @@ def test_upload_csv_shows_error_with_invalid_extension(
         _follow_redirects=True,
     )
 
-    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "invalid.txt is not a spreadsheet that Notify can read"
+    assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == (
+        "The file must be a spreadsheet that Notify can read"
     )
 
 

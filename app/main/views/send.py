@@ -5,7 +5,6 @@ from zipfile import BadZipFile
 from flask import (
     abort,
     current_app,
-    flash,
     redirect,
     render_template,
     request,
@@ -143,20 +142,15 @@ def send_messages(service_id, template_id):
             )
         except (UnicodeDecodeError, BadZipFile, XLRDError):
             current_app.logger.warning("Could not read %s", form.file.data.filename, exc_info=True)
-            flash(f"Could not read {form.file.data.filename}. Try using a different file format.")
+            form.file.errors = ["Notify cannot read this file - try using a different file type"]
         except XLDateError:
             current_app.logger.warning("Could not parse numbers/dates in %s", form.file.data.filename, exc_info=True)
-            flash(
-                (
-                    "{} contains numbers or dates that Notify cannot understand. "
-                    "Try formatting all columns as ‘text’ or export your file as CSV."
-                ).format(form.file.data.filename)
-            )
+            form.file.errors = ["Notify cannot read this file - try saving it as a CSV instead"]
     elif form.errors:
         # just show the first error, as we don't expect the form to have more
         # than one, since it only has one field
         first_field_errors = list(form.errors.values())[0]
-        flash(first_field_errors[0])
+        form.file.errors.append(first_field_errors[0])
 
     column_headings = get_spreadsheet_column_headings_from_template(template)
 
@@ -167,6 +161,7 @@ def send_messages(service_id, template_id):
         example=[column_headings, get_example_csv_rows(template)],
         form=form,
         allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
+        error_summary_enabled=True,
     )
 
 
