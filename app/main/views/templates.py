@@ -1058,6 +1058,7 @@ def letter_template_attach_pages(service_id, template_id):
     error = {}
     letter_attachment_image_url = None
     attachment_page_count = 0
+    use_error_summary = False
     if form.validate_on_submit():
         upload_id = uuid.uuid4()
         try:
@@ -1073,6 +1074,7 @@ def letter_template_attach_pages(service_id, template_id):
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
+        use_error_summary = True
 
     if not template.attachment:
         return (
@@ -1083,6 +1085,8 @@ def letter_template_attach_pages(service_id, template_id):
                 error=error,
                 letter_attachment_image_url=letter_attachment_image_url,
                 page_numbers=_get_page_numbers(attachment_page_count),
+                error_summary_enabled=use_error_summary,
+                use_error_summary=use_error_summary,
             ),
             400 if error else 200,
         )
