@@ -26,7 +26,7 @@
     </p>
 
     <p class="govuk-body">
-      If your organisation can process invoices without a <abbr title="purchase order">PO</abbr> reference, <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact us and let us know</a>.
+      If your organisation can process invoices without a <abbr title="purchase order">PO</abbr> number, <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact us and let us know</a>.
     </p>
 
     <h3 class="heading-small" id="billing-details">
@@ -38,11 +38,11 @@
     </p>
 
     <p class="govuk-body">
-      Before you can send us a <abbr title="purchase order">PO</abbr>, your organisation may need to add the Cabinet Office as a supplier.
+      Before you can send us a <abbr title="purchase order">PO</abbr> your organisation may need to add the Cabinet Office as a supplier.
     </p>
 
     <p class="govuk-body">
-      To do this, you’ll need the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">Cabinet Office billing details</a>.
+      To do this, they’ll need the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">Cabinet Office billing details</a>.
     </p>
 
     <h3 class="heading-small" id="where-to-send-your-po">
@@ -50,18 +50,28 @@
     </h3>
 
     <p class="govuk-body">
-      Send your <abbr title="purchase order">PO</abbr> with the name and email address of your finance contact to GDS Business Operations:
+      Send <abbr title="Government Digital Service">GDS</abbr> Business Operations:
     </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>your <abbr title="purchase order">PO</abbr> number</li>
+      <li>the name and email address of your finance contact</li>
+      <li>a copy of your <abbr title="purchase order">PO</abbr></li>
+    </ul>
 
     {% if current_user.is_authenticated %}
     <p class="govuk-body">
-      Their email address is {{ billing_details['notify_billing_email_address'] }}
+      The email address is {{ billing_details['notify_billing_email_address'] }}
     </p>
     {% else %}
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_how_to_pay') )}}">Sign in</a>to see the Business Operations email address.
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_how_to_pay') )}}">Sign in</a> to see their email address.
     </p>
     {% endif %}
+
+    <p class="govuk-body">
+      If you do not have a copy of your <abbr title="purchase order">PO</abbr>, send the <abbr title="purchase order">PO</abbr> number and contact details. You can then send <abbr title="Government Digital Service">GDS</abbr> a copy of the <abbr title="purchase order">PO</abbr> at a later date.
+    </p>
 
     <h2 class="heading-medium" id="invoices">
       Invoices
@@ -85,7 +95,7 @@
     </p>
 
     <p class="govuk-body">
-      You can pay by BACS, debit card, or credit card.
+      You can pay by <abbr title="Bankers’ automated clearing system">BACS</abbr>, debit card, or credit card.
     </p>
 
     <p class="govuk-body">
