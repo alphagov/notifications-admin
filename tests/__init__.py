@@ -326,6 +326,7 @@ def template_json(
     letter_welsh_subject=None,
     letter_welsh_content=None,
     updated_at=None,
+    has_unsubscribe_link=None,
 ):
     template = {
         "id": id_,
@@ -346,6 +347,7 @@ def template_json(
         "letter_languages": letter_languages or "english" if type_ == "letter" else None,
         "letter_welsh_subject": letter_welsh_subject,
         "letter_welsh_content": letter_welsh_content,
+        "has_unsubscribe_link": has_unsubscribe_link,
     }
     if content is None:
         template["content"] = "template content"

@@ -950,6 +950,7 @@ def mock_get_service_letter_template_with_qr_placeholder(mocker):
 @pytest.fixture(scope="function")
 def mock_create_service_template(mocker, fake_uuid):
     def _create(
+        *,
         name,
         type_,
         content,
@@ -959,9 +960,16 @@ def mock_create_service_template(mocker, fake_uuid):
         letter_languages: Optional[LetterLanguageOptions] = None,
         letter_welsh_subject: str = None,
         letter_welsh_content: str = None,
+        has_unsubscribe_link: Optional[bool] = None,
     ):
         template = template_json(
-            service_id=service_id, id_=fake_uuid, name=name, type_=type_, content=content, folder=parent_folder_id
+            service_id=service_id,
+            id_=fake_uuid,
+            name=name,
+            type_=type_,
+            content=content,
+            folder=parent_folder_id,
+            has_unsubscribe_link=has_unsubscribe_link,
         )
         return {"data": template}
 
@@ -979,6 +987,7 @@ def mock_update_service_template(mocker):
         subject=None,
         letter_welsh_subject=None,
         letter_welsh_content=None,
+        has_unsubscribe_link=False,
     ):
         template = template_json(
             service_id=service_id,
@@ -988,6 +997,7 @@ def mock_update_service_template(mocker):
             subject=subject,
             letter_welsh_subject=None,
             letter_welsh_content=None,
+            has_unsubscribe_link=has_unsubscribe_link,
         )
         return {"data": template}
 
@@ -996,7 +1006,16 @@ def mock_update_service_template(mocker):
 
 @pytest.fixture(scope="function")
 def mock_create_service_template_content_too_big(mocker):
-    def _create(name, type_, content, service, subject=None, parent_folder_id=None):
+    def _create(
+        *,
+        name,
+        type_,
+        content,
+        service_id,
+        subject=None,
+        parent_folder_id=None,
+        has_unsubscribe_link=None,
+    ):
         json_mock = Mock(
             return_value={
                 "message": {"content": ["Content has a character count greater than the limit of 459"]},

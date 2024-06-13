@@ -15,6 +15,7 @@ ALLOWED_TEMPLATE_ATTRIBUTES = {
     "subject",
     "letter_welsh_subject",
     "letter_welsh_content",
+    "has_unsubscribe_link",
 }
 
 
@@ -173,6 +174,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     @cache.delete("service-{service_id}-templates")
     def create_service_template(
         self,
+        *,
         name,
         type_,
         content,
@@ -182,6 +184,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         letter_languages: Optional[LetterLanguageOptions] = None,
         letter_welsh_subject: str = None,
         letter_welsh_content: str = None,
+        has_unsubscribe_link: Optional[bool] = None,
     ):
         """
         Create a service template.
@@ -191,6 +194,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "template_type": type_,
             "content": content,
             "service": service_id,
+            "has_unsubscribe_link": has_unsubscribe_link,
         }
         if subject:
             data.update({"subject": subject})
@@ -201,6 +205,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
                 "letter_languages": letter_languages,
                 "letter_welsh_subject": letter_welsh_subject,
                 "letter_welsh_content": letter_welsh_content,
+            }
+        if has_unsubscribe_link is not None:
+            data |= {
+                "has_unsubscribe_link": has_unsubscribe_link,
             }
         data = _attach_current_user(data)
         endpoint = f"/service/{service_id}/template"
