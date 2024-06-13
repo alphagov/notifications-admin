@@ -42,7 +42,7 @@
     </p>
 
     <p class="govuk-body">
-      To do this, you’ll need the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">Cabinet Office billing details</p>.
+      To do this, you’ll need the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">Cabinet Office billing details</a>.
     </p>
 
     <h3 class="heading-small" id="where-to-send-your-po">
@@ -53,9 +53,15 @@
       Send your <abbr title="purchase order">PO</abbr> with the name and email address of your finance contact to GDS Business Operations:
     </p>
 
+    {% if current_user.is_authenticated %}
     <p class="govuk-body">
-      gdsbusinessops@digital.cabinet-office.gov.uk
+      Their email address is {{ billing_details['notify_billing_email_address'] }}
     </p>
+    {% else %}
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_how_to_pay') )}}">Sign in</a>to see the Business Operations email address.
+    </p>
+    {% endif %}
 
     <h2 class="heading-medium" id="invoices">
       Invoices

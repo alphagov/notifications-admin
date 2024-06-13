@@ -41,13 +41,9 @@
       Email address
     </h3>
 
-    <ul class="govuk-list govuk-list--bullet">
-      {% for email in billing_details['notify_billing_email_addresses'] %}
-      <li>
-        {{ email }}
-      </li>
-      {% endfor %}
-    </ul>
+    <p class="govuk-body">
+      {{ billing_details['notify_billing_email_address'] }}
+    </p>
 
     <h3 class="heading-small" id="vat-number">
       <abbr title="Value Added Tax">VAT</abbr> number
