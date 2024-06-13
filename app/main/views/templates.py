@@ -1058,6 +1058,7 @@ def letter_template_attach_pages(service_id, template_id):
     error = {}
     letter_attachment_image_url = None
     attachment_page_count = 0
+    use_error_summary = False
     if form.validate_on_submit():
         upload_id = uuid.uuid4()
         try:
@@ -1073,6 +1074,7 @@ def letter_template_attach_pages(service_id, template_id):
 
     if form.file.errors:
         error = get_error_from_upload_form(form.file.errors[0])
+        use_error_summary = True
 
     if not template.attachment:
         return (
@@ -1083,6 +1085,8 @@ def letter_template_attach_pages(service_id, template_id):
                 error=error,
                 letter_attachment_image_url=letter_attachment_image_url,
                 page_numbers=_get_page_numbers(attachment_page_count),
+                error_summary_enabled=use_error_summary,
+                use_error_summary=use_error_summary,
             ),
             400 if error else 200,
         )
@@ -1173,7 +1177,7 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
         current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
         raise LetterAttachmentFormError(
             title="There’s a problem with your file",
-            detail="Notify cannot read this PDF.<br>Save a new copy of your file and try again.",
+            detail="Notify cannot read this PDF - save a new copy and try again",
         ) from None
 
     file_location = get_transient_letter_file_location(service_id, upload_id)

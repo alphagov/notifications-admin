@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-    {% if error %}
+    {% if error and not use_error_summary %}
         <div class="govuk-!-margin-bottom-4">
             {% call banner_wrapper(type='dangerous') %}
                 <h1 class="banner-title">{{ error.title }}</h1>
@@ -53,7 +53,7 @@
         allowed_file_extensions=['pdf'],
         action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id),
         button_text='Upload your file again' if error else 'Choose a different file',
-        show_errors=False,
+        show_errors=use_error_summary,
         alternate_link=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id) if error else None,
         alternate_link_text='cancel'
     )}}
