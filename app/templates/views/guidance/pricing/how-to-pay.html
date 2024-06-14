@@ -14,16 +14,68 @@
     {{ page_header('How to pay') }}
 
     <p class="govuk-body">
-      If you use GOV.UK Notify to send text messages or letters, you may need to send us a <a class="govuk-link govuk-link--no-visited-state" href="#purchase-orders">purchase order</a>.
+      You must send GOV.UK Notify a purchase order (PO) before you spend any money on text messages or letters.
+    </p>
+
+    <h2 class="heading-medium" id="purchase-orders">
+      Purchase orders
+    </h2>
+
+    <p class="govuk-body">
+      Your organisation should raise a single <abbr title="purchase order">PO</abbr> for the estimated cost of all its services. You can update the <abbr title="purchase order">PO</abbr> any time if your usage increases.
+    </p>
+
+    <p class="govuk-body">
+      If your organisation can process invoices without a <abbr title="purchase order">PO</abbr> number, <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact us and let us know</a>.
+    </p>
+
+    <h3 class="heading-small" id="billing-details">
+      Make sure you have our billing details
+    </h3>
+
+    <p class="govuk-body">
+      GOV.UK Notify is run by the Government Digital Service (GDS), which is part of the Cabinet Office.
+    </p>
+
+    <p class="govuk-body">
+      Before you can send us a <abbr title="purchase order">PO</abbr> your organisation may need to add the Cabinet Office as a supplier.
+    </p>
+
+    <p class="govuk-body">
+      To do this, they’ll need the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">Cabinet Office billing details</a>.
+    </p>
+
+    <h3 class="heading-small" id="where-to-send-your-po">
+      Where to send your purchase order
+    </h3>
+
+    <p class="govuk-body">
+      Send <abbr title="Government Digital Service">GDS</abbr> Business Operations:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>your <abbr title="purchase order">PO</abbr> number</li>
+      <li>the name and email address of your finance contact</li>
+      <li>a copy of your <abbr title="purchase order">PO</abbr></li>
+    </ul>
+
+    {% if current_user.is_authenticated %}
+    <p class="govuk-body">
+      The email address is {{ billing_details['notify_billing_email_address'] }}
+    </p>
+    {% else %}
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_how_to_pay') )}}">Sign in</a> to see their email address.
+    </p>
+    {% endif %}
+
+    <p class="govuk-body">
+      If you do not have a copy of your <abbr title="purchase order">PO</abbr> yet, send <abbr title="Government Digital Service">GDS</abbr> the <abbr title="purchase order">PO</abbr> number and contact details. You can then provide a copy of the <abbr title="purchase order">PO</abbr> at a later date.
     </p>
 
     <h2 class="heading-medium" id="invoices">
       Invoices
     </h2>
-
-    <p class="govuk-body">
-      Notify is run by the Government Digital Service (GDS), part of the Cabinet Office.
-    </p>
 
     <p class="govuk-body">
       The Cabinet Office will send your organisation an invoice each quarter if you:
@@ -35,40 +87,19 @@
     </ul>
 
     <p class="govuk-body">
-      If your organisation has more than one Notify service, you’ll see a breakdown of each service on your invoice.
+      The invoice will show a breakdown of each service’s spend from your organisation.
     </p>
 
     <p class="govuk-body">
-      If the value of an invoice is less than £250 (before <abbr title="Value Added Tax">VAT</abbr>), it will be added to the total for the next quarter to save time and effort.
+      If the value of an invoice is less than £500 (before <abbr title="Value Added Tax">VAT</abbr>), we’ll add it to the total for the next quarter to save time and effort.
     </p>
 
     <p class="govuk-body">
-      You can pay by BACS, debit card, or credit card.
+      You can pay by <abbr title="Bankers’ automated clearing system">BACS</abbr>, debit card, or credit card.
     </p>
 
     <p class="govuk-body">
       Please start your payment reference with the invoice number.
-    </p>
-
-    <h2 class="heading-medium" id="purchase-orders">
-      Purchase orders
-    </h2>
-    <p class="govuk-body">Before you exceed the free text message allowance or send letters, we will need either:</p>
-     <ul class="govuk-list govuk-list--bullet">
-       <li>a purchase order (PO) for the financial year</li>
-       <li>confirmation your organisation can receive invoices without a PO reference</li>
-</ul>
-<p class="govuk-body">Use our support form to <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">send us your PO or confirmation with the name and email address of your finance contact</a>.</p>
-    <p class="govuk-body">
-      If your organisation’s total estimated spend is more than £500 per quarter (before <abbr title="Value Added Tax">VAT</abbr>), you will need to raise a purchase order (PO).
-    </p>
-
-    <p class="govuk-body">
-      Your organisation should raise a single <abbr title="purchase order">PO</abbr> for the estimated cost of all its services. You can update the <abbr title="purchase order">PO</abbr> any time if your usage increases.
-    </p>
-
-    <p class="govuk-body">
-      Your organisation may need to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">add the Cabinet Office as a supplier</a> before you can raise a <abbr title="purchase order">PO</abbr>.
     </p>
 
 {% endblock %}
