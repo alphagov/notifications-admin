@@ -11,7 +11,9 @@
       {{ job.scheduled_for|format_datetime_relative }}
     </p>
     <div class="page-footer">
-      {% call form_wrapper() %}
+      {% call form_wrapper(
+        action=url_for("main.cancel_job", service_id=current_service.id, job_id=job.id)
+      ) %}
         {{ page_footer(
           button_text="Cancel sending",
           destructive=True

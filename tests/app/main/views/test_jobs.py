@@ -7,7 +7,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.jobs import get_time_left
-from tests import job_json, notification_json, sample_uuid, user_json
+from tests import NotifyBeautifulSoup, job_json, notification_json, sample_uuid, user_json
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
@@ -781,6 +781,48 @@ def test_should_show_updates_for_scheduled_job_as_json(
     assert "Delivered" in content["notifications"]
     assert "12:01am" in content["notifications"]
     assert "Sent by Test User on 1 June at 4:00pm" in content["status"]
+
+
+@freeze_time("2016-01-01 00:00:00")
+def test_should_show_updates_for_upcoming_scheduled_job_as_json(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_notifications,
+    mock_get_service_template,
+    mock_get_service_data_retention,
+    mocker,
+    fake_uuid,
+):
+    mocker.patch(
+        "app.job_api_client.get_job",
+        return_value={
+            "data": job_json(
+                SERVICE_ONE_ID,
+                created_by=user_json(),
+                job_id=fake_uuid,
+                scheduled_for="2016-06-01T13:00:00+00:00",
+                job_status="scheduled",
+                processing_started=None,
+            )
+        },
+    )
+
+    response_json = client_request.get_response(
+        "json_updates.view_job_updates",
+        service_id=service_one["id"],
+        job_id=fake_uuid,
+    ).json
+
+    form = NotifyBeautifulSoup(response_json["notifications"], "html.parser").select_one("form")
+
+    assert form["method"] == "post"
+    assert form["action"] == url_for(
+        "main.cancel_job",
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+    )
+    assert form.select_one("button")
 
 
 @pytest.mark.parametrize(
