@@ -64,7 +64,7 @@ class ValidEmail:
     def __init__(
         self,
         message="Enter an email address in the correct format, like name@example.gov.uk",
-        error_summary_message="Enter %s in the correct format, like name@example.gov.uk",
+        error_summary_message="Enter %s in the correct format",
     ):
         self.message = message
         self.error_summary_message = error_summary_message
@@ -94,8 +94,8 @@ class ValidPhoneNumber(ABC):
     _error_summary_messages_map = {
         TOO_SHORT: "%s is too short",
         TOO_LONG: "%s is too long",
-        NOT_UK: "%s does not look like a UK mobile number - double check the mobile number you entered",
-        NO_COUNTRY_CODE: "Country code for %s not found - double check the mobile number you entered",
+        NOT_UK: "%s does not look like a UK mobile number",
+        NO_COUNTRY_CODE: "Country code for %s not found",
         INVALID_CHARS: "%s can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -",
     }
 
