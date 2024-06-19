@@ -96,6 +96,7 @@ const javascripts = () => {
     paths.src + 'javascripts/modules.js',
     paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
     paths.src + 'javascripts/stick-to-window-when-scrolling.js',
+    paths.src + 'javascripts/cookieCleanup.js',
     paths.src + 'javascripts/copyToClipboard.js',
     paths.src + 'javascripts/autofocus.js',
     paths.src + 'javascripts/enhancedTextbox.js',
