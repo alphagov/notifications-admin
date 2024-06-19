@@ -100,7 +100,6 @@ const javascripts = () => {
     paths.src + 'javascripts/analytics/analytics.js',
     paths.src + 'javascripts/analytics/init.js',
     paths.src + 'javascripts/cookieMessage.js',
-    paths.src + 'javascripts/cookieSettings.js',
     paths.src + 'javascripts/stick-to-window-when-scrolling.js',
     paths.src + 'javascripts/copyToClipboard.js',
     paths.src + 'javascripts/autofocus.js',
