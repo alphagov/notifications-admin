@@ -13,12 +13,12 @@ def test_owasp_useful_headers_set(
     assert response.headers["X-XSS-Protection"] == "1; mode=block"
     assert response.headers["Content-Security-Policy"] == (
         "default-src 'self' static.example.com 'unsafe-inline';"
-        "script-src 'self' static.example.com *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
-        "connect-src 'self' *.google-analytics.com;"
+        "script-src 'self' static.example.com 'unsafe-inline' 'unsafe-eval' data:;"
+        "connect-src 'self';"
         "object-src 'self';"
         "font-src 'self' static.example.com data:;"
         "img-src "
-        "'self' static.example.com *.google-analytics.com"
+        "'self' static.example.com"
         " *.notifications.service.gov.uk static-logos.test.com data:;"
         "frame-src 'self';"
     )
@@ -44,12 +44,12 @@ def test_headers_non_ascii_characters_are_replaced(
 
     assert response.headers["Content-Security-Policy"] == (
         "default-src 'self' static.example.com 'unsafe-inline';"
-        "script-src 'self' static.example.com *.google-analytics.com 'unsafe-inline' 'unsafe-eval' data:;"
-        "connect-src 'self' *.google-analytics.com;"
+        "script-src 'self' static.example.com 'unsafe-inline' 'unsafe-eval' data:;"
+        "connect-src 'self';"
         "object-src 'self';"
         "font-src 'self' static.example.com data:;"
         "img-src"
-        " 'self' static.example.com *.google-analytics.com"
+        " 'self' static.example.com"
         " *.notifications.service.gov.uk static-logos??.test.com data:;"
         "frame-src 'self';"
     )
