@@ -474,7 +474,6 @@ def test_post_upload_letter_with_invalid_file(mocker, client_request, fake_uuid)
         )
 
     mock_s3_backup.assert_not_called()
-    assert page.select_one("div.banner-dangerous h1")["data-error-type"] == "content-outside-printable-area"
     assert page.select_one("form").attrs["action"] == url_for("main.upload_letter", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 

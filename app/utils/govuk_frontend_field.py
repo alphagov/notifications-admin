@@ -67,11 +67,6 @@ class GovukFrontendWidgetMixin(ABC):
     def get_error_message(self, error_message_format="text"):
         if self.errors:
             return {
-                "attributes": {
-                    "data-notify-module": "track-error",
-                    "data-error-type": self.errors[0],
-                    "data-error-label": self.name,
-                },
                 error_message_format: self.errors[0],
             }
         else:

@@ -136,12 +136,10 @@ def test_create_new_organisation_validates(
         ".add_organisation",
         _expected_status=200,
     )
-    assert [
-        (error["data-error-label"], normalize_spaces(error.text)) for error in page.select(".govuk-error-message")
-    ] == [
-        ("name", "Error: Enter an organisation name"),
-        ("organisation_type", "Error: Select a type of organisation"),
-        ("crown_status", "Error: Select yes if the organisation is a Crown body"),
+    assert [(normalize_spaces(error.text)) for error in page.select(".govuk-error-message")] == [
+        ("Error: Enter an organisation name"),
+        ("Error: Select a type of organisation"),
+        ("Error: Select yes if the organisation is a Crown body"),
     ]
     assert mock_create_organisation.called is False
 
