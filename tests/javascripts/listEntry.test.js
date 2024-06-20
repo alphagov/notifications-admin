@@ -210,7 +210,7 @@ describe("List entry", () => {
 
       inputList.querySelectorAll('.list-entry input[type=text]').forEach((field, idx) => {
 
-        field.setAttribute('aria-describedby', 'hint1');
+        field.setAttribute('pattern', '[\w\.]+');
         field.classList.add('top-level-domain');
 
       });
@@ -221,7 +221,7 @@ describe("List entry", () => {
       // re-select fields, based on updated DOM
       fields = inputList.querySelectorAll('.list-entry input[type=text]');
 
-      expect(fields[0].getAttribute('aria-describedby')).toEqual('hint1');
+      expect(fields[0].getAttribute('pattern')).toEqual('[\w\.]+');
       expect(fields[0].classList.contains('top-level-domain')).toBe(true);
     });
 
@@ -249,8 +249,18 @@ describe("List entry", () => {
       };
 
       const invalidFields = [0, 2, 5];
+      const sixDomains = domains.slice(0, 8);
+
+      sixDomains[0] = 'gov@uk';
+      sixDomains[2] = 'nhs.uk';
+      sixDomains[5] = 'nhs.net';
 
       beforeEach(() => {
+
+        let fields = inputList.querySelectorAll('.list-entry input[type=text]');
+
+        // set values of first 8 fields
+        sixDomains.forEach((domain, idx) => { fields[idx].setAttribute('value', domain) });
 
         inputList.querySelectorAll('.list-entry').forEach((field, idx) => {
 
@@ -281,6 +291,7 @@ describe("List entry", () => {
             expect(errorMessage.matches('[data-notify-module][data-error-label][data-error-type]')).toBe(true);
             expect(errorMessage.innerHTML.trim()).toEqual(
               `<span class="govuk-visually-hidden">Error: </span>${errorMessage.dataset.errorType}`);
+            expect(input.getAttribute('aria-describedby')).toEqual(errorMessage.id);
 
           } else {
 
@@ -296,6 +307,7 @@ describe("List entry", () => {
       });
 
     });
+
   });
 
   describe("When the 'remove' button is clicked", () => {
