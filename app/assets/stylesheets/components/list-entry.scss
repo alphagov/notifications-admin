@@ -2,12 +2,29 @@
 
   .list-entry {
     vertical-align: middle;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     position: relative;
+
+    @include govuk-media-query($from: tablet) {
+      margin-bottom: 15px;
+    }
 
     // move the left border, signifying the error, out of the main column
     .govuk-form-group--error {
       margin-left: ($govuk-border-width + $govuk-gutter-half) * -1;
+    }
+  }
+
+  .govuk-input--numbered__label--error {
+    // - button padding bottom and top (17px)
+    // - button line-height (1.1875em)
+    // - button margin-top (5px)
+    // - text input border and padding (2px + 5px = 7px)
+    // - half of difference in line-height with text input (0.3125em)
+    bottom: calc(17px + 1.1875em + 5px + 7px + 0.3125em);
+
+    @include govuk-media-query($from: tablet) {
+      bottom: 7px;
     }
   }
 
@@ -17,7 +34,6 @@
   }
 
   &__button--remove {
-    margin-bottom: 15px;
     margin-top: 5px;
     position: static;
     overflow: hidden;
@@ -27,6 +43,11 @@
       position: absolute;
       top: 0;
       left: 100%;
+
+      .govuk-form-group--error & {
+        top: auto;
+        bottom: 2px; // 2px to match the box shadow at the bottom
+      }
     }
   }
 

@@ -87,12 +87,16 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 .govuk-input--numbered__label {
   float: left;
   width: 1.6em;
-  margin: 8px -1.6em 0 0;
+  margin: 10px -1.6em 0 0;
   position: relative;
   left: 10px;
   color: $govuk-secondary-text-colour;
   font-weight: bold;
   pointer-events: none;
+
+  @include govuk-media-query($from: tablet) {
+    margin-top: 8px;
+  }
 }
 
 .govuk-input--numbered__label--error {
