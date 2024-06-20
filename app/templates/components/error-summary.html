@@ -7,7 +7,7 @@
       {%- do errors.append(
         {
           "href": "#" + field.id + '-' + entryNum,
-          "text": entry.error_summary_messages[0] | format((field.thing + ' ' + entryNum)) | capitalize()
+          "text": entry.error_summary_messages[0] | format((field.thing + ' ' + entryNum)) | sentence_case()
         }
       ) -%}
     {%- endif -%}

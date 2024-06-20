@@ -77,6 +77,7 @@ from app.formatters import (
     recipient_count,
     recipient_count_label,
     redact_mobile_number,
+    sentence_case,
     valid_phone_number,
 )
 from app.models.organisation import Organisation
@@ -578,6 +579,7 @@ def add_template_filters(application):
         format_yes_no,
         make_string_safe_for_email_local_part,
         extract_path_from_url,
+        sentence_case,
     ]:
         application.add_template_filter(fn)
 
