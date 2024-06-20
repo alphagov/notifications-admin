@@ -42,7 +42,7 @@
         ' name="{{name}}"' +
         ' id="{{id}}"' +
         ' {{#value}}value="{{value}}{{/value}}"' +
-        ' class="{{{sharedInputClasses}}}{{#customClasses}} {{{customClasses}}}{{/customClasses}}"' +
+        ' class="{{{sharedInputClasses}}}{{#customClasses}} {{{customClasses}}}{{/customClasses}}{{#error}} govuk-input--error{{/error}}"' +
         ' {{#error}}aria-describedby="{{{id}}}-error"{{/error}}' +
         ' {{{sharedAttributes}}}' +
         '/>' +
@@ -111,7 +111,7 @@
       var customClassesForElm = [];
 
       elm.classList.forEach(token => {
-        if ($.inArray(token, this.sharedInputClasses) === -1) {
+        if (($.inArray(token, this.sharedInputClasses) === -1) && (token !== 'govuk-input--error')) {
           customClassesForElm.push(token);
         }
       });
