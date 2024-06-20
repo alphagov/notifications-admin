@@ -43,6 +43,7 @@
         ' id="{{id}}"' +
         ' {{#value}}value="{{value}}{{/value}}"' +
         ' class="{{{sharedInputClasses}}}{{#customClasses}} {{{customClasses}}}{{/customClasses}}"' +
+        ' {{#error}}aria-describedby="{{{id}}}-error"{{/error}}' +
         ' {{{sharedAttributes}}}' +
         '/>' +
         '{{#button}}' +
@@ -59,7 +60,7 @@
   ListEntry.prototype.getSharedAttributes = function () {
     var $inputs = this.$wrapper.find('input'),
         attributeTemplate = Hogan.compile(' {{name}}="{{value}}"'),
-        protectedAttributes = ['id', 'name', 'value', 'class'],
+        protectedAttributes = ['id', 'name', 'value', 'class', 'aria-describedby'],
         attributes = [],
         attrIdx,
         elmAttributes,
