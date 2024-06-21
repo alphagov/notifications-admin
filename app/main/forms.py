@@ -1249,6 +1249,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
         min_entries=20,
         max_entries=20,
         label="Domain names",
+        thing="domain name",
     )
 
 
