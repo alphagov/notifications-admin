@@ -81,10 +81,5 @@ def test_govuk_frontend_widget_mixin_constructs_errors(client_request):
 
     ret = my_form.field.get_error_message(error_message_format="html")
     assert ret == {
-        "attributes": {
-            "data-error-label": "field",
-            "data-error-type": "some error message",
-            "data-notify-module": "track-error",
-        },
         "html": "some error message",
     }

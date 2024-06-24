@@ -10,7 +10,6 @@ $govuk-assets-path: "/static/";
 @import "govuk/objects/all";
 
 // section replacing @import "components/all", specifying which components to include
-@import "govuk/components/cookie-banner/index";
 @import "govuk/components/skip-link/index";
 @import "govuk/components/header/index";
 @import "govuk/components/footer/index";
