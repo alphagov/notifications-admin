@@ -241,7 +241,7 @@ describe("List entry", () => {
         input.setAttribute('aria-describedby', errorMessageId);
 
         label.insertAdjacentHTML('afterend', `
-          <p class="govuk-error-message" id="${errorMessageId}" data-notify-module="track-error" data-error-label="${input.id.replace(/^input-/, '')}" data-error-type="${errorMessageText}">
+          <p class="govuk-error-message" id="${errorMessageId}">
             <span class="govuk-visually-hidden">Error:</span> ${errorMessageText}
           </p>
         `);
