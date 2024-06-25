@@ -16,12 +16,20 @@
   }
 
   .govuk-input--numbered__label--error {
-    // - button padding bottom and top (17px)
+    // - button padding bottom and top and 2px border (7px + 8px + 2px + 2px)
     // - button line-height (1.1875em)
     // - button margin-top (5px)
     // - text input border and padding (2px + 5px = 7px)
-    // - half of difference in line-height with text input (0.3125em)
-    bottom: calc(17px + 1.1875em + 5px + 7px + 0.3125em);
+    // - half of difference in line-height with text input (0.1875em)
+    bottom: calc(19px + 1.1875em + 5px + 7px + 0.1875em);
+
+    @include govuk-media-query($from: tablet) {
+      bottom: 7px;
+    }
+  }
+
+  .list-entry:first-of-type .govuk-input--numbered__label--error {
+    bottom: calc(7px + 0.1875em); // the first input doesn't have a 'remove' button
 
     @include govuk-media-query($from: tablet) {
       bottom: 7px;
