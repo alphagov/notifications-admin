@@ -1,5 +1,5 @@
 # Run `make freeze-requirements` to update requirements.txt
-# with package version changes made in requirements-app.txt
+# with package version changes made in requirements.in
 
 ago==0.0.95
 humanize==4.4.0
