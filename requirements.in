@@ -19,7 +19,6 @@ pyexcel-xlsx==0.6.0
 pyexcel-ods3==0.6.1
 gunicorn[eventlet]>=21.2.0
 notifications-python-client==8.0.1
-rtreelib==0.2.0
 fido2==1.1.0
 
 itsdangerous==2.1.2

@@ -164,8 +164,6 @@ requests==2.32.0
     #   govuk-bank-holidays
     #   notifications-python-client
     #   notifications-utils
-rtreelib==0.2.0
-    # via -r requirements.in
 s3transfer==0.10.1
     # via boto3
 segno==1.5.2
