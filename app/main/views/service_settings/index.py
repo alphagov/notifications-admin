@@ -170,7 +170,7 @@ def service_data_retention(service_id):
         current_service, num_notifications=1_000_000
     )
     single_retention_period = current_service.get_consistent_data_retention_period()
-    form_kwargs = dict(days_of_retention=single_retention_period) if single_retention_period else dict()
+    form_kwargs = {"days_of_retention": single_retention_period} if single_retention_period else {}
     form = SetServiceDataRetentionForm(**form_kwargs)
     if not current_service.trial_mode and not high_volume_service and form.validate_on_submit():
         service_api_client.set_service_data_retention(

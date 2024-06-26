@@ -83,7 +83,7 @@ def save_app_routes(acknowledge_removed_routes: bool) -> int:
                 + "and then run `flask command save-app-routes --acknowledge-removed-routes`."
             )
 
-    sorted_current_routes = sorted(list(current_routes))
+    sorted_current_routes = sorted(current_routes)
     with open("tests/route-list.json", "w") as outfile:
         outfile.write(json.dumps(sorted_current_routes, indent=4) + "\n")
 

@@ -63,8 +63,7 @@ class TemplateList:
                 ancestors=ancestors,
                 service_id=self.service.id,
             )
-            for sub_item in self._get_templates_and_folders(template_type, item["id"], ancestors + [item]):
-                yield sub_item
+            yield from self._get_templates_and_folders(template_type, item["id"], ancestors + [item])
 
         for item in self._get_templates(
             template_type,
@@ -83,8 +82,7 @@ class TemplateList:
         return [
             template
             for template in self.all_templates
-            if (set([template_type]) & {"all", template["template_type"]})
-            and template.get("folder") == template_folder_id
+            if ({template_type} & {"all", template["template_type"]}) and template.get("folder") == template_folder_id
         ]
 
     def _get_template_folders(self, template_type, parent_folder_id):

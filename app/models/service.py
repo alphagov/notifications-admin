@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import abort, current_app
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
@@ -432,7 +430,7 @@ class Service(JSONModel):
             "days_of_retention", current_app.config["ACTIVITY_STATS_LIMIT_DAYS"]
         )
 
-    def get_consistent_data_retention_period(self) -> Optional[int]:
+    def get_consistent_data_retention_period(self) -> int | None:
         """If the service's data retention periods are all the same, returns that period. Otherwise returns None."""
         consistent_data_retention = (
             self.get_days_of_retention("email")

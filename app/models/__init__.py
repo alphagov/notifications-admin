@@ -19,7 +19,6 @@ class SortingAndEqualityMixin(ABC):
         sorted. For example 'email_address' or 'created_at' to sort on
         instance.email_address or instance.created_at respectively.
         """
-        pass
 
     def __repr__(self):
         return f"{self.__class__.__name__}(<{self.id}>)"

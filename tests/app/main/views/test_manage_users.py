@@ -646,7 +646,7 @@ def test_edit_user_folder_permissions(
         "main.edit_user_permissions",
         service_id=SERVICE_ONE_ID,
         user_id=fake_uuid,
-        _data=dict(folder_permissions=["folder-id-1", "folder-id-3"]),
+        _data={"folder_permissions": ["folder-id-1", "folder-id-3"]},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.manage_users",
@@ -954,7 +954,7 @@ def test_should_show_page_if_prefilled_user_is_already_invited(
     assert normalize_spaces(page.select_one("title").text).startswith("This person has already received an invite")
     assert normalize_spaces(page.select_one("h1").text) == "This person has already received an invite"
     assert normalize_spaces(page.select_one("main .govuk-body").text) == (
-        "Service Two User has not accepted their invitation to " "‘service one’ yet. You do not need to do anything."
+        "Service Two User has not accepted their invitation to ‘service one’ yet. You do not need to do anything."
     )
     assert not page.select("form")
 

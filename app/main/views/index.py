@@ -358,7 +358,7 @@ def guidance_unsubscribe_links():
 
 @main.route("/docs/notify-pdf-letter-spec-latest.pdf")
 def letter_spec():
-    return redirect("https://docs.notifications.service.gov.uk" "/documentation/images/notify-pdf-letter-spec-v2.4.pdf")
+    return redirect("https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf")
 
 
 def historical_redirects(new_endpoint, **kwargs):

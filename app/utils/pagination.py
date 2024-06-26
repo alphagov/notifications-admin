@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import request, url_for
 
 
@@ -31,7 +29,7 @@ def generate_previous_next_dict(view, service_id, page, title, url_args):
 
 def generate_optional_previous_and_next_dicts(
     view: str, service_id, page: int, num_pages: int, url_args=None
-) -> tuple[Optional[dict], Optional[dict]]:
+) -> tuple[dict | None, dict | None]:
     previous_page = (
         generate_previous_dict(view, service_id=service_id, page=page, url_args=url_args) if page > 1 else None
     )

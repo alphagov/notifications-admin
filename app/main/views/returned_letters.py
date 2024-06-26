@@ -50,7 +50,7 @@ def returned_letters_report(service_id, reported_at):
     }
 
     # initialise with header row
-    data = [[x for x in column_names.values()]]
+    data = [list(column_names.values())]
 
     for row in returned_letters:
         data.append([row[key] for key in column_names.keys()])

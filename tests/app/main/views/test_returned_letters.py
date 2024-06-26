@@ -148,9 +148,9 @@ def test_returned_letters_reports(client_request, mocker):
     mock.assert_called_once_with(SERVICE_ONE_ID, "2019-12-24")
     assert report.strip() == (
         "Notification ID,Reference,Date sent,Sent by,Template name,Template ID,Template version,"
-        + "Spreadsheet file name,Spreadsheet row number,Uploaded letter file name\r\n"
-        + "12345678,2344567,2019-12-24 13:30,test@gov.uk,"
-        + "First letter template,3445667,2,,,test_letter.pdf"
+        "Spreadsheet file name,Spreadsheet row number,Uploaded letter file name\r\n"
+        "12345678,2344567,2019-12-24 13:30,test@gov.uk,"
+        "First letter template,3445667,2,,,test_letter.pdf"
     )
 
 

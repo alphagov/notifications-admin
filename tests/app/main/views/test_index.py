@@ -305,7 +305,7 @@ def test_letter_spec_redirect(client_request):
         "main.letter_spec",
         _expected_status=302,
         _expected_redirect=(
-            "https://docs.notifications.service.gov.uk" "/documentation/images/notify-pdf-letter-spec-v2.4.pdf"
+            "https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf"
         ),
     )
 
@@ -316,7 +316,7 @@ def test_letter_spec_redirect_with_non_logged_in_user(client_request):
         "main.letter_spec",
         _expected_status=302,
         _expected_redirect=(
-            "https://docs.notifications.service.gov.uk" "/documentation/images/notify-pdf-letter-spec-v2.4.pdf"
+            "https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf"
         ),
     )
 

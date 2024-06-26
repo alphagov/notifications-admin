@@ -23,7 +23,7 @@ def test_owasp_useful_headers_set(
         "frame-src 'self';"
     )
     assert response.headers["Link"] == (
-        "<https://static.example.com>; rel=dns-prefetch, " "<https://static.example.com>; rel=preconnect"
+        "<https://static.example.com>; rel=dns-prefetch, <https://static.example.com>; rel=preconnect"
     )
 
 

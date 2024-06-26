@@ -121,7 +121,7 @@ def test_can_show_notifications(
             page=page_argument,
             _data={"to": to_argument},
             _expected_status=200,
-            **extra_args
+            **extra_args,
         )
     else:
         page = client_request.get(
@@ -129,7 +129,7 @@ def test_can_show_notifications(
             service_id=SERVICE_ONE_ID,
             status=status_argument,
             page=page_argument,
-            **extra_args
+            **extra_args,
         )
     first_row = page.select_one("tbody tr")
     assert normalize_spaces(first_row.select_one("a.file-list-filename.govuk-link").text) == (
@@ -160,10 +160,7 @@ def test_can_show_notifications(
     path_to_json = page.select_one("div[data-key=notifications]")["data-resource"]
 
     url = urlparse(path_to_json)
-    assert url.path == "/services/{}/notifications{}".format(
-        SERVICE_ONE_ID,
-        expected_update_endpoint,
-    )
+    assert url.path == f"/services/{SERVICE_ONE_ID}/notifications{expected_update_endpoint}"
     query_dict = parse_qs(url.query)
     if status_argument:
         assert query_dict["status"] == [status_argument]
@@ -184,7 +181,7 @@ def test_can_show_notifications(
         "json_updates.get_notifications_page_partials_as_json",
         service_id=service_one["id"],
         status=status_argument,
-        **extra_args
+        **extra_args,
     )
     json_content = json.loads(json_response.get_data(as_text=True))
     assert json_content.keys() == {"counts", "notifications", "service_data_retention_days"}
@@ -441,7 +438,7 @@ def test_search_recipient_form(
         service_id=SERVICE_ONE_ID,
         _data=form_post_data,
         _expected_status=200,
-        **initial_query_arguments
+        **initial_query_arguments,
     )
 
     assert page.select_one("form")["method"] == "post"

@@ -1,5 +1,4 @@
 import json
-from typing import Optional
 
 from flask import current_app, render_template
 from markupsafe import Markup
@@ -185,7 +184,7 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
         return self.welsh_page_count + 1
 
     @property
-    def first_attachment_page(self) -> Optional[int]:
+    def first_attachment_page(self) -> int | None:
         if not self.attachment:
             return None
 

@@ -114,7 +114,7 @@ class OnlySMSCharacters:
         super().__init__(*args, **kwargs)
 
     def __call__(self, form, field):
-        non_sms_characters = sorted(list(SanitiseSMS.get_non_compatible_characters(field.data)))
+        non_sms_characters = sorted(SanitiseSMS.get_non_compatible_characters(field.data))
         if non_sms_characters:
             raise ValidationError(
                 "You cannot use {} in text messages. {} will not display properly on some phones.".format(

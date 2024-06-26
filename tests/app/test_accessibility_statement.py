@@ -9,8 +9,7 @@ def test_last_review_date():
     # test local changes against main for a full diff of what will be merged
     statement_diff = subprocess.run(
         [f"git diff --unified=0 --exit-code origin/main -- {statement_file_path}"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         shell=True,
     )
 
@@ -23,7 +22,7 @@ def test_last_review_date():
     # if statement has changed, make sure the review date was part of those changes
     if statement_diff.returncode == 1:
         raw_diff = statement_diff.stdout.decode("utf-8")
-        with open(statement_file_path, "r") as statement_file:
+        with open(statement_file_path) as statement_file:
             contents = statement_file.read()
             last_content_change_at = datetime.strptime(
                 re.search((r'"Last updated": "(\d{1,2} [A-Z]{1}[a-z]+ \d{4})"'), contents).group(1), date_format

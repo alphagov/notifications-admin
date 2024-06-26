@@ -33,7 +33,7 @@ class LetterRates(ModelList):
 
     @property
     def sheet_counts(self):
-        return sorted(set(rate.sheet_count for rate in self))
+        return sorted({rate.sheet_count for rate in self})
 
     @property
     def last_updated(self):

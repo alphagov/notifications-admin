@@ -397,11 +397,11 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
     def render_http_error(error):
         application.logger.warning(
             "API %(api)s failed with status=%(status)s, message='%(message)s'",
-            dict(
-                api=error.response.url if isinstance(error.response, requests.Response) else "unknown",
-                status=error.status_code,
-                message=error.message,
-            ),
+            {
+                "api": error.response.url if isinstance(error.response, requests.Response) else "unknown",
+                "status": error.status_code,
+                "message": error.message,
+            },
         )
         error_code = error.status_code
         if error_code not in [401, 404, 403, 410]:
@@ -410,11 +410,11 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             # legitimately return a 400, we should handle that within the view or the client that calls it.
             application.logger.exception(
                 "API %(api)s failed with status=%(status)s message='%(message)s'",
-                dict(
-                    api=error.response.url if isinstance(error.response, requests.Response) else "unknown",
-                    status=error.status_code,
-                    message=error.message,
-                ),
+                {
+                    "api": error.response.url if isinstance(error.response, requests.Response) else "unknown",
+                    "status": error.status_code,
+                    "message": error.message,
+                },
             )
             error_code = 500
         return _error_response(error_code)
@@ -461,7 +461,7 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
 
         application.logger.warning(
             "csrf.invalid_token: Aborting request, user_id: %(user_id)s",
-            dict(user_id=session["user_id"]),
+            {"user_id": session["user_id"]},
             extra={"user_id": session["user_id"]},  # include as a distinct field in the log output
         )
 

@@ -345,7 +345,7 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
     )
 
     if not page.select("#add_new_template_form"):
-        raise ElementNotFound()
+        raise ElementNotFound
 
     assert normalize_spaces(page.select_one("#add_new_template_form fieldset legend").text) == "New template"
     assert [choice["value"] for choice in page.select("#add_new_template_form input[type=radio]")] == expected_values
@@ -378,7 +378,7 @@ def test_should_add_data_attributes_for_services_that_only_allow_one_type_of_not
     )
 
     if not page.select("#add_new_template_form"):
-        raise ElementNotFound()
+        raise ElementNotFound
 
     if are_data_attrs_added:
         assert page.select_one("#add_new_template_form").attrs["data-channel"] == permissions[0]
@@ -1881,42 +1881,40 @@ def test_should_not_be_able_to_view_edit_links_for_an_archived_letter_template(
         _test_page_title=False,
     )
 
-    page_links = set(link["href"] for link in page.select("a"))
+    page_links = {link["href"] for link in page.select("a")}
 
-    edit_links = set(
-        [
-            url_for(
-                "main.set_sender",
-                service_id=SERVICE_ONE_ID,
-                template_id=fake_uuid,
-            ),
-            url_for(
-                "main.letter_branding_options",
-                service_id=SERVICE_ONE_ID,
-                from_template=fake_uuid,
-            ),
-            url_for(
-                "main.edit_template_postage",
-                service_id=SERVICE_ONE_ID,
-                template_id=fake_uuid,
-            ),
-            url_for(
-                "main.edit_service_template",
-                service_id=SERVICE_ONE_ID,
-                template_id=fake_uuid,
-            ),
-            url_for(
-                "main.set_template_sender",
-                service_id=SERVICE_ONE_ID,
-                template_id=fake_uuid,
-            ),
-            url_for(
-                "main.letter_template_attach_pages",
-                service_id=SERVICE_ONE_ID,
-                template_id=fake_uuid,
-            ),
-        ]
-    )
+    edit_links = {
+        url_for(
+            "main.set_sender",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+        url_for(
+            "main.letter_branding_options",
+            service_id=SERVICE_ONE_ID,
+            from_template=fake_uuid,
+        ),
+        url_for(
+            "main.edit_template_postage",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+        url_for(
+            "main.edit_service_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+        url_for(
+            "main.set_template_sender",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+        url_for(
+            "main.letter_template_attach_pages",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    }
 
     assert len(page_links & edit_links) == 0
 

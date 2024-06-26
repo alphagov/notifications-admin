@@ -219,7 +219,7 @@ def test_update_letter_branding_with_new_valid_file_shows_page_with_file_preview
     page = client_request.post(
         ".update_letter_branding",
         branding_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "logo.svg")},
+        _data={"file": (BytesIO(b""), "logo.svg")},
         _follow_redirects=True,
     )
 
@@ -242,7 +242,7 @@ def test_update_letter_branding_when_uploading_invalid_file(
     page = client_request.post(
         ".update_letter_branding",
         branding_id=fake_uuid,
-        _data={"file": (BytesIO("".encode("utf-8")), "test.png")},
+        _data={"file": (BytesIO(b""), "test.png")},
         _follow_redirects=True,
     )
 
@@ -429,12 +429,10 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
         _data={
             "file": (
                 BytesIO(
-                    """
+                    b"""
             <svg height="100" width="100">
             <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>
-        """.encode(
-                        "utf-8"
-                    )
+        """
                 ),
                 "logo.svg",
             )
@@ -467,12 +465,10 @@ def test_create_letter_branding_calls_antivirus_scan(
         _data={
             "file": (
                 BytesIO(
-                    """
+                    b"""
             <svg height="100" width="100">
             <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>
-        """.encode(
-                        "utf-8"
-                    )
+        """
                 ),
                 "logo.svg",
             )
@@ -538,7 +534,7 @@ def test_create_letter_branding_when_uploading_invalid_file(
     client_request.login(platform_admin_user)
     page = client_request.post(
         ".create_letter_branding",
-        _data={"file": (BytesIO("".encode("utf-8")), "test.png")},
+        _data={"file": (BytesIO(b""), "test.png")},
         _follow_redirects=True,
     )
     assert page.select_one("h1").text == "Add letter branding"

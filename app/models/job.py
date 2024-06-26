@@ -157,7 +157,7 @@ class Job(JSONModel):
     @property
     def letter_printing_statement(self):
         if self.upload_type != "letter_day":
-            raise TypeError()
+            raise TypeError
         return get_letter_printing_statement(
             "created",
             # We have to make the time just before 5:30pm because a

@@ -38,6 +38,6 @@ class TestOrderableFieldsForm:
 
             custom_field_order = ("field2", "field1")
 
-        with set_config_values(notify_admin, dict(WTF_CSRF_ENABLED=True)):
+        with set_config_values(notify_admin, {"WTF_CSRF_ENABLED": True}):
             form = TestForm()
             assert [field.name for field in form] == ["csrf_token", "field2", "field1"]

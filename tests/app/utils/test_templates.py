@@ -174,7 +174,7 @@ def test_letter_image_template_renders_visually_hidden_address():
         features="html.parser",
     )
     assert str(template.select_one(".govuk-visually-hidden ul")) == (
-        "<ul>" "<li>line 1</li>" "<li>line 2</li>" "<li>postcode</li>" "</ul>"
+        "<ul><li>line 1</li><li>line 2</li><li>postcode</li></ul>"
     )
 
 
@@ -401,29 +401,27 @@ def test_letter_image_renderer(
     assert mock_render.call_args_list == [
         mocker.call(
             mocker.ANY,
-            **{
-                "image_url": "http://example.com/endpoint.png",
-                "page_numbers": expected_page_numbers,
-                "first_page_of_attachment": None,
-                "first_page_of_english": 1,
-                "address": [
-                    Markup("<span class='placeholder-no-brackets'>address line 1</span>"),
-                    Markup("<span class='placeholder-no-brackets'>address line 2</span>"),
-                    Markup("<span class='placeholder-no-brackets'>address line 3</span>"),
-                    Markup("<span class='placeholder-no-brackets'>address line 4</span>"),
-                    Markup("<span class='placeholder-no-brackets'>address line 5</span>"),
-                    Markup("<span class='placeholder-no-brackets'>address line 6</span>"),
-                    Markup("<span class='placeholder-no-brackets'>address line 7</span>"),
-                ],
-                "contact_block": "10 Downing Street",
-                "date": "12 December 2012",
-                "subject": "Subject",
-                "message": "<p>Content</p>",
-                "show_postage": expected_show_postage,
-                "postage_class_value": expected_postage_class_value,
-                "postage_description": expected_postage_description,
-                "template": mocker.ANY,
-            },
+            image_url="http://example.com/endpoint.png",
+            page_numbers=expected_page_numbers,
+            first_page_of_attachment=None,
+            first_page_of_english=1,
+            address=[
+                Markup("<span class='placeholder-no-brackets'>address line 1</span>"),
+                Markup("<span class='placeholder-no-brackets'>address line 2</span>"),
+                Markup("<span class='placeholder-no-brackets'>address line 3</span>"),
+                Markup("<span class='placeholder-no-brackets'>address line 4</span>"),
+                Markup("<span class='placeholder-no-brackets'>address line 5</span>"),
+                Markup("<span class='placeholder-no-brackets'>address line 6</span>"),
+                Markup("<span class='placeholder-no-brackets'>address line 7</span>"),
+            ],
+            contact_block="10 Downing Street",
+            date="12 December 2012",
+            subject="Subject",
+            message="<p>Content</p>",
+            show_postage=expected_show_postage,
+            postage_class_value=expected_postage_class_value,
+            postage_description=expected_postage_description,
+            template=mocker.ANY,
         )
     ]
 

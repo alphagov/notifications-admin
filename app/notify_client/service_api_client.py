@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from notifications_utils.clients.redis import daily_limit_cache_key
 
@@ -181,10 +180,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         service_id,
         subject=None,
         parent_folder_id=None,
-        letter_languages: Optional[LetterLanguageOptions] = None,
+        letter_languages: LetterLanguageOptions | None = None,
         letter_welsh_subject: str = None,
         letter_welsh_content: str = None,
-        has_unsubscribe_link: Optional[bool] = None,
+        has_unsubscribe_link: bool | None = None,
     ):
         """
         Create a service template.

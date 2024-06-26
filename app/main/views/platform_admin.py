@@ -3,7 +3,6 @@ import itertools
 import re
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from flask import abort, flash, redirect, render_template, request, url_for
 from notifications_python_client.errors import HTTPError
@@ -245,7 +244,7 @@ def live_services_csv():
     }
 
     # initialise with header row
-    live_services_data = [[x for x in column_names.values()]]
+    live_services_data = [list(column_names.values())]
 
     for row in results:
         if row["live_date"]:
@@ -258,9 +257,7 @@ def live_services_csv():
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": 'inline; filename="{} live services report.csv"'.format(
-                format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
-            ),
+            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())} live services report.csv"',
         },
     )
 
@@ -294,9 +291,7 @@ def notifications_sent_by_service():
             {
                 "Content-Type": "text/csv; charset=utf-8",
                 "Content-Disposition": (
-                    'attachment; filename="{} to {} notification status per service report.csv"'.format(
-                        start_date, end_date
-                    )
+                    f'attachment; filename="{start_date} to {end_date} notification status per service report.csv"'
                 ),
             },
         )
@@ -364,9 +359,7 @@ def get_billing_report():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": 'attachment; filename="Billing Report from {} to {}.csv"'.format(
-                        start_date, end_date
-                    ),
+                    "Content-Disposition": f'attachment; filename="Billing Report from {start_date} to {end_date}.csv"',
                 },
             )
         else:
@@ -421,8 +414,8 @@ def get_dvla_billing_report():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": 'attachment; filename="DVLA Billing Report from {} to {}.csv"'.format(
-                        start_date, end_date
+                    "Content-Disposition": (
+                        f'attachment; filename="DVLA Billing Report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
@@ -476,8 +469,8 @@ def get_volumes_by_service():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": 'attachment; filename="Volumes by service report from {} to {}.csv"'.format(
-                        start_date, end_date
+                    "Content-Disposition": (
+                        f'attachment; filename="Volumes by service report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
@@ -527,8 +520,8 @@ def get_daily_volumes():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": 'attachment; filename="Daily volumes report from {} to {}.csv"'.format(
-                        start_date, end_date
+                    "Content-Disposition": (
+                        f'attachment; filename="Daily volumes report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
@@ -702,7 +695,7 @@ def clear_cache():
 
         num_deleted = sum(redis_client.delete_by_pattern(pattern) for pattern in patterns)
 
-        msg = f"Removed {num_deleted} objects across {len(patterns)} key formats " f'for {", ".join(group_keys)}'
+        msg = f'Removed {num_deleted} objects across {len(patterns)} key formats for {", ".join(group_keys)}'
 
         flash(msg, category="default")
 
@@ -717,11 +710,11 @@ def get_url_for_notify_record(uuid_):
     @dataclasses.dataclass
     class _EndpointSpec:
         endpoint: str
-        param: Optional[str] = None
+        param: str | None = None
         with_service_id: bool = False
 
         # Extra parameters to pass to `url_for`.
-        extra: dict = dataclasses.field(default_factory=lambda: {})
+        extra: dict = dataclasses.field(default_factory=dict)
 
     try:
         uuid.UUID(uuid_)

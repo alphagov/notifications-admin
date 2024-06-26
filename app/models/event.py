@@ -98,13 +98,10 @@ class ServiceEvent(Event):
         return f"Renamed this service from ‘{self.value_from}’ to ‘{self.value_to}’"
 
     def format_permissions(self):
-        added = list(sorted(set(self.value_to) - set(self.value_from)))
-        removed = list(sorted(set(self.value_from) - set(self.value_to)))
+        added = sorted(set(self.value_to) - set(self.value_from))
+        removed = sorted(set(self.value_from) - set(self.value_to))
         if removed and added:
-            return "Removed {} from this service’s permissions, added {}".format(
-                formatted_list(removed),
-                formatted_list(added),
-            )
+            return f"Removed {formatted_list(removed)} from this service’s permissions, added {formatted_list(added)}"
         if added:
             return f"Added {formatted_list(added)} to this service’s permissions"
         if removed:

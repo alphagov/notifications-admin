@@ -901,7 +901,7 @@ def test_should_check_for_reply_to_on_go_live(
 ):
     mocker.patch(
         "app.service_api_client.get_service_templates",
-        return_value={"data": [create_template(template_type="email") for _ in range(0, count_of_email_templates)]},
+        return_value={"data": [create_template(template_type="email") for _ in range(count_of_email_templates)]},
     )
 
     mock_get_reply_to_email_addresses = mocker.patch(
@@ -960,7 +960,7 @@ def test_should_check_for_sending_things_right(
 ):
     mocker.patch(
         "app.service_api_client.get_service_templates",
-        return_value={"data": [create_template(template_type="sms") for _ in range(0, count_of_templates)]},
+        return_value={"data": [create_template(template_type="sms") for _ in range(count_of_templates)]},
     )
 
     mock_get_users = mocker.patch(
@@ -1242,7 +1242,7 @@ def test_should_check_for_sms_sender_on_go_live(
 
     mocker.patch(
         "app.service_api_client.get_service_templates",
-        return_value={"data": [create_template(template_type="sms") for _ in range(0, count_of_sms_templates)]},
+        return_value={"data": [create_template(template_type="sms") for _ in range(count_of_sms_templates)]},
     )
 
     mocker.patch(
@@ -5340,9 +5340,9 @@ class TestSetAuthTypeForUsers:
     @pytest.mark.parametrize(
         "form_data, should_fail",
         (
-            (dict(users=["a"]), False),  # Change user a to email_auth
-            (dict(users=[]), False),  # Change both user a and user b to sms_auth
-            (dict(users=["c"]), True),  # Change user c to email_auth
+            ({"users": ["a"]}, False),  # Change user a to email_auth
+            ({"users": []}, False),  # Change both user a and user b to sms_auth
+            ({"users": ["c"]}, True),  # Change user c to email_auth
         ),
     )
     def test_user_with_webauthn_auth_not_listed_or_editable(
@@ -5608,7 +5608,7 @@ def test_select_organisation(
     )
 
     assert len(page.select(".govuk-radios__item")) == 3
-    for i in range(0, 3):
+    for i in range(3):
         assert normalize_spaces(page.select(".govuk-radios__item label")[i].text) == f"Org {i + 1}"
 
 

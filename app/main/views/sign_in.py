@@ -66,10 +66,8 @@ def sign_in():  # noqa: C901
         # Vague error message for login in case of user not known, locked, inactive or password not verified
         flash(
             Markup(
-                (
-                    f"The email address or password you entered is incorrect."
-                    f"&ensp;<a href={password_reset_url} class='govuk-link'>Forgotten your password?</a>"
-                )
+                f"The email address or password you entered is incorrect."
+                f"&ensp;<a href={password_reset_url} class='govuk-link'>Forgotten your password?</a>"
             )
         )
 

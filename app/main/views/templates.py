@@ -4,7 +4,7 @@ import math
 import uuid
 from functools import partial
 from io import BytesIO
-from typing import Dict, Literal, Optional
+from typing import Literal
 
 from flask import (
     abort,
@@ -78,7 +78,7 @@ from app.utils.templates import TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
 
-def get_template_form(template_type: Literal["email", "sms", "letter"], language: Optional[Literal["welsh"]] = None):
+def get_template_form(template_type: Literal["email", "sms", "letter"], language: Literal["welsh"] | None = None):
     if template_type == "email":
         return EmailTemplateForm
     elif template_type == "sms":
@@ -96,7 +96,7 @@ class LetterAttachmentFormError(Exception):
         self.detail = detail
         self.attachment_page_count = attachment_page_count
 
-    def as_error_dict(self) -> Dict[str, int]:
+    def as_error_dict(self) -> dict[str, int]:
         return {"title": self.title, "detail": self.detail, "attachment_page_count": self.attachment_page_count}
 
 
@@ -512,10 +512,8 @@ def _get_template_copy_name(template, existing_templates):
 
 @main.route("/services/<uuid:service_id>/templates/action-blocked/<template_type:notification_type>/<string:return_to>")
 @main.route(
-    (
-        "/services/<uuid:service_id>/templates/action-blocked/"
-        "<template_type:notification_type>/<string:return_to>/<uuid:template_id>"
-    )
+    "/services/<uuid:service_id>/templates/action-blocked/"
+    "<template_type:notification_type>/<string:return_to>/<uuid:template_id>"
 )
 @user_has_permissions("manage_templates")
 def action_blocked(service_id, notification_type, return_to, template_id=None):
@@ -643,7 +641,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             if (
                 e.status_code == 400
                 and "content" in e.message
-                and any(["character count greater than" in x for x in e.message["content"]])
+                and any("character count greater than" in x for x in e.message["content"])
             ):
                 form.template_content.errors.extend(e.message["content"])
             else:
@@ -696,7 +694,7 @@ def rename_template(service_id, template_id):
     )
 
 
-def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: Optional[str], template):
+def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: str | None, template):
     if language is None:
         return
 
@@ -753,7 +751,7 @@ def edit_service_template(service_id, template_id, language=None):
             )
         except HTTPError as e:
             if e.status_code == 400:
-                if "content" in e.message and any(["character count greater than" in x for x in e.message["content"]]):
+                if "content" in e.message and any("character count greater than" in x for x in e.message["content"]):
                     form.template_content.errors.extend(e.message["content"])
                 elif "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
                     form.template_content.errors.append(
@@ -949,7 +947,7 @@ def view_template_versions(service_id, template_id):
         service_id=service_id,
         page=page,
         num_pages=num_pages,
-        url_args=dict(template_id=template_id),
+        url_args={"template_id": template_id},
     )
 
     return render_template(
@@ -1148,7 +1146,7 @@ def letter_template_edit_pages(template_id, service_id):
         )
 
     flash(
-        f"Are you sure you want to remove the " f"‘{template.attachment.original_filename}’ attachment?",
+        f"Are you sure you want to remove the ‘{template.attachment.original_filename}’ attachment?",
         "remove",
     )
 
@@ -1331,7 +1329,7 @@ def _get_page_numbers(page_count):
 
 
 def _change_template_language(service_id, template, language: LetterLanguageOptions):
-    update_kwargs: dict[str, Optional[str]] = {}
+    update_kwargs: dict[str, str | None] = {}
 
     if language == LetterLanguageOptions.english:
         if template.subject == "English heading":
@@ -1360,7 +1358,7 @@ def letter_template_change_language(template_id, service_id):
         abort(404)
 
     current_languages = template.get_raw("letter_languages")
-    form = LetterTemplateLanguagesForm(data=dict(languages=current_languages))
+    form = LetterTemplateLanguagesForm(data={"languages": current_languages})
     if form.validate_on_submit():
         languages = form.languages.data
         if languages != current_languages:

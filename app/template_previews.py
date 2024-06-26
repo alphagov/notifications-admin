@@ -41,7 +41,7 @@ class TemplatePreview:
             "{}/preview.{}{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"],
                 filetype,
-                "?page={}".format(page) if page else "",
+                f"?page={page}" if page else "",
             ),
             json=data,
             headers=cls._get_outbound_headers(),
@@ -84,7 +84,7 @@ class TemplatePreview:
         response = requests.post(
             "{}/letter_attachment_preview.png{}".format(
                 current_app.config["TEMPLATE_PREVIEW_API_HOST"],
-                "?page={}".format(page) if page else "",
+                f"?page={page}" if page else "",
             ),
             json=data,
             headers=cls._get_outbound_headers(),

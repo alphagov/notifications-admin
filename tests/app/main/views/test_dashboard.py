@@ -423,7 +423,7 @@ def test_download_inbox(
         service_id=SERVICE_ONE_ID,
     )
     assert response.headers["Content-Type"] == "text/csv; charset=utf-8"
-    assert response.headers["Content-Disposition"] == ("inline; " 'filename="Received text messages 2016-07-01.csv"')
+    assert response.headers["Content-Disposition"] == ('inline; filename="Received text messages 2016-07-01.csv"')
     assert response.get_data(as_text=True) == (
         "Phone number,Message,Received\r\n"
         "07900 900000,message-1,2016-07-01 13:00\r\n"
@@ -1790,7 +1790,7 @@ def test_service_dashboard_shows_usage(
     page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one("[data-key=usage]").text) == (
-        "Unlimited free email allowance " "£29.85 spent on text messages " "£30.00 spent on letters"
+        "Unlimited free email allowance £29.85 spent on text messages £30.00 spent on letters"
     )
 
 

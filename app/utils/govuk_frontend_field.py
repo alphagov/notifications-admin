@@ -62,7 +62,6 @@ class GovukFrontendWidgetMixin(ABC):
         Should be a string matching a key in the `govuk_frontend_components` dict - which roughly
         matches up with URLs found in https://design-system.service.gov.uk/components/
         """
-        pass
 
     def get_error_message(self, error_message_format="text"):
         if self.errors:

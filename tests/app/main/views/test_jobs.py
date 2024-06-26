@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from flask import url_for
@@ -278,10 +278,8 @@ def test_should_show_old_job(
             "data": job_json(
                 SERVICE_ONE_ID,
                 active_user_with_permissions,
-                created_at=created_at.replace(tzinfo=timezone.utc).isoformat(),
-                processing_started=(
-                    processing_started.replace(tzinfo=timezone.utc).isoformat() if processing_started else None
-                ),
+                created_at=created_at.replace(tzinfo=UTC).isoformat(),
+                processing_started=(processing_started.replace(tzinfo=UTC).isoformat() if processing_started else None),
             ),
         },
     )
@@ -508,7 +506,7 @@ def test_should_download_scheduled_job(
     mock_get_scheduled_job,
     fake_uuid,
 ):
-    original_file_contents = "phone number,name\n" "+447700900986,John\n" "+447700900986,Smith\n"
+    original_file_contents = "phone number,name\n+447700900986,John\n+447700900986,Smith\n"
     mocker.patch(
         "app.main.views.jobs.s3download",
         return_value=original_file_contents,

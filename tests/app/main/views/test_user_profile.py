@@ -86,7 +86,7 @@ def test_overview_page_shows_security_keys_if_user_they_can_use_webauthn(
 
 
 def test_should_show_name_page(client_request):
-    page = client_request.get(("main.user_profile_name"))
+    page = client_request.get("main.user_profile_name")
     assert page.select_one("h1").text.strip() == "Change your name"
 
 
@@ -233,7 +233,7 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
 def test_should_show_mobile_number_page(
     client_request,
 ):
-    page = client_request.get(("main.user_profile_mobile_number"))
+    page = client_request.get("main.user_profile_mobile_number")
     assert "Change your mobile number" in page.text
     assert "Delete your number" not in page.text
 
@@ -252,7 +252,7 @@ def test_change_your_mobile_number_page_doesnt_show_delete_link_if_user_has_no_m
 ):
     user = create_user(id=fake_uuid, auth_type="email_auth", mobile_number=None)
     mocker.patch("app.user_api_client.get_user", return_value=user)
-    page = client_request.get(("main.user_profile_mobile_number"))
+    page = client_request.get("main.user_profile_mobile_number")
     assert "Change your mobile number" in page.text
     assert "Delete your number" not in page.text
 
@@ -396,7 +396,7 @@ def test_should_redirect_after_mobile_number_confirm(
 def test_should_show_password_page(
     client_request,
 ):
-    page = client_request.get(("main.user_profile_password"))
+    page = client_request.get("main.user_profile_password")
 
     assert page.select_one("h1").text.strip() == "Change your password"
 
@@ -756,7 +756,7 @@ def test_get_user_profile_take_part_in_user_research(
 ):
     active_user_with_permissions["take_part_in_research"] = take_part_in_research
     client_request.login(active_user_with_permissions)
-    page = client_request.get(("main.user_profile_take_part_in_user_research"))
+    page = client_request.get("main.user_profile_take_part_in_user_research")
     assert "Take part in user research" in page.text
     radios = page.select("input.govuk-radios__input")
     assert len(radios) == 2
@@ -788,7 +788,7 @@ def test_get_user_profile_get_emails_about_new_features(
 ):
     active_user_with_permissions["receives_new_features_email"] = receives_new_features_email
     client_request.login(active_user_with_permissions)
-    page = client_request.get(("main.user_profile_get_emails_about_new_features"))
+    page = client_request.get("main.user_profile_get_emails_about_new_features")
     assert "Get emails about new features" in page.text
     radios = page.select("input.govuk-radios__input")
     assert len(radios) == 2

@@ -3,7 +3,6 @@ import json
 import os
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
-from typing import Optional
 from unittest import mock
 from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
@@ -957,10 +956,10 @@ def mock_create_service_template(mocker, fake_uuid):
         service_id,
         subject=None,
         parent_folder_id=None,
-        letter_languages: Optional[LetterLanguageOptions] = None,
+        letter_languages: LetterLanguageOptions | None = None,
         letter_welsh_subject: str = None,
         letter_welsh_content: str = None,
-        has_unsubscribe_link: Optional[bool] = None,
+        has_unsubscribe_link: bool | None = None,
     ):
         template = template_json(
             service_id=service_id,
@@ -2242,7 +2241,7 @@ def mock_create_invite(mocker, sample_invite):
 def mock_get_invites_for_service(mocker, service_one, sample_invite):
     def _get_invites(service_id):
         data = []
-        for i in range(0, 5):
+        for i in range(5):
             invite = copy.copy(sample_invite)
             invite["email_address"] = f"user_{i}@testnotify.gov.uk"
             data.append(invite)
@@ -3524,7 +3523,7 @@ def sample_org_invite(mocker, organisation_one):
 def mock_get_invites_for_organisation(mocker, sample_org_invite):
     def _get_org_invites(org_id):
         data = []
-        for i in range(0, 5):
+        for i in range(5):
             invite = copy.copy(sample_org_invite)
             invite["email_address"] = f"user_{i}@testnotify.gov.uk"
             data.append(invite)
