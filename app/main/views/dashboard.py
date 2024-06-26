@@ -276,6 +276,7 @@ def get_dashboard_partials(service_id):
         service_id,
         get_current_financial_year(),
     )
+    unsubscribe_requests = 300
     return {
         "upcoming": render_template(
             "views/dashboard/_upcoming.html",
@@ -296,6 +297,9 @@ def get_dashboard_partials(service_id):
         "usage": render_template(
             "views/dashboard/_usage.html",
             **get_annual_usage_breakdown(yearly_usage, free_sms_allowance),
+        ),
+        "unsubscribe-requests": render_template(
+            "views/dashboard/_unsubscribe-requests.html", unsubscribe_requests=unsubscribe_requests
         ),
     }
 
