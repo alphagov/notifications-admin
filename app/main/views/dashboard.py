@@ -13,6 +13,7 @@ from app import (
     current_service,
     service_api_client,
     template_statistics_client,
+    unsubscribe_requests_client,
 )
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import json_updates, main
@@ -276,7 +277,7 @@ def get_dashboard_partials(service_id):
         service_id,
         get_current_financial_year(),
     )
-    unsubscribe_requests = 300
+    unsubscribe_requests = unsubscribe_requests_client.get_pending_unsubscribe_requests(service_id)
     return {
         "upcoming": render_template(
             "views/dashboard/_upcoming.html",
