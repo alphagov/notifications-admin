@@ -909,7 +909,7 @@ class GovukRadiosFieldWithRequiredMessage(GovukRadiosField):
 
 
 class ListEntryFieldList(FieldList):
-    def __init__(self, *args, thing="item", **kwargs):
+    def __init__(self, *args, thing, **kwargs):
         super().__init__(*args, **kwargs)
         self.thing = thing
 
@@ -1222,10 +1222,14 @@ class OrganisationAgreementSignedForm(StripWhitespaceForm):
     )
 
 
-class StripWhitespaceStringFieldInListEntry(StripWhitespaceStringField):
+class FieldInListEntry:
     def pre_validate(self, form):
         self.error_summary_messages = []
         super().pre_validate(form)
+
+
+class StripWhitespaceStringFieldInListEntry(FieldInListEntry, StripWhitespaceStringField):
+    pass
 
 
 class AdminOrganisationDomainsForm(StripWhitespaceForm):

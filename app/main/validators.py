@@ -81,7 +81,7 @@ class ValidEmail:
             raise ValidationError(self.message) from e
 
 
-class ValidPhoneNumber(ABC):
+class ValidPhoneNumber:
     is_international = False
     message = None
 
@@ -106,10 +106,7 @@ class ValidPhoneNumber(ABC):
         except InvalidPhoneError as e:
             error_message = str(e)
             if hasattr(field, "error_summary_messages"):
-                if error_message in self._error_summary_messages_map:
-                    error_summary_message = self._error_summary_messages_map[error_message]
-                else:
-                    error_summary_message = f"%s: {error_message}"
+                error_summary_message = self._error_summary_messages_map[error_message]
 
                 field.error_summary_messages.append(error_summary_message)
 
