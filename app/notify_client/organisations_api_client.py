@@ -50,28 +50,14 @@ class OrganisationsClient(NotifyAdminAPIClient):
 
     @cache.delete("domains")
     @cache.delete("organisations")
+    @cache.delete("organisation-{org_id}-name")
+    @cache.delete("organisation-{org_id}-email-branding-pool")
+    @cache.delete("organisation-{org_id}-letter-branding-pool")
     def update_organisation(self, org_id, cached_service_ids=None, **kwargs):
         api_response = self.post(url=f"/organisations/{org_id}", data=kwargs)
 
         if cached_service_ids:
             redis_client.delete(*map("service-{}".format, cached_service_ids))
-
-        if "name" in kwargs:
-            redis_client.delete(f"organisation-{org_id}-name")
-
-        if kwargs.get("email_branding_id"):
-            redis_client.delete(f"organisation-{org_id}-email-branding-pool")
-
-        if kwargs.get("letter_branding_id"):
-            redis_client.delete(f"organisation-{org_id}-letter-branding-pool")
-
-        from app.models.organisation import Organisation
-
-        if kwargs.get("organisation_type") in Organisation.NHS_TYPES:
-            # If an org gets set to an NHS org type we add NHS branding to the branding pools, so need
-            # to clear those caches
-            redis_client.delete(f"organisation-{org_id}-email-branding-pool")
-            redis_client.delete(f"organisation-{org_id}-letter-branding-pool")
 
         return api_response
 
@@ -101,10 +87,9 @@ class OrganisationsClient(NotifyAdminAPIClient):
         return self.get(url=f"/organisations/{org_id}/services-with-usage", params={"year": str(year)})
 
     @cache.delete("organisations")
+    @cache.delete("organisation-{org_id}-name")
     @cache.delete("domains")
     def archive_organisation(self, org_id):
-        redis_client.delete(f"organisation-{org_id}-name")
-
         return self.post(
             url=f"/organisations/{org_id}/archive",
             data=None,

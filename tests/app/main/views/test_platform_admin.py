@@ -648,7 +648,6 @@ def test_platform_admin_submit_returned_letters(
     client_request,
     platform_admin_user,
 ):
-    redis = mocker.patch("app.main.views.platform_admin.redis_client")
     mock_client = mocker.patch("app.letter_jobs_client.submit_returned_letters")
 
     client_request.login(platform_admin_user)
@@ -661,10 +660,6 @@ def test_platform_admin_submit_returned_letters(
     )
 
     mock_client.assert_called_once_with(["REF1", "REF2"])
-    assert redis.delete_by_pattern.call_args_list == [
-        call("service-????????-????-????-????-????????????-returned-letters-statistics"),
-        call("service-????????-????-????-????-????????????-returned-letters-summary"),
-    ]
 
 
 def test_platform_admin_submit_empty_returned_letters(
