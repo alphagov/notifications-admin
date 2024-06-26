@@ -17,6 +17,7 @@ from app import antivirus_client, current_service, zendesk_client
 from app.formatters import sentence_case
 from app.main._commonly_used_passwords import commonly_used_passwords
 from app.models.spreadsheet import Spreadsheet
+from app.notify_client.protected_sender_id_api_client import protected_sender_id_api_client
 from app.utils.user import is_gov_user
 
 
@@ -182,7 +183,8 @@ class IsNotAPotentiallyMaliciousSenderID:
     ]
 
     def __call__(self, form, field):
-        if field.data and field.data.lower() in self.potentially_malicious_sender_ids:
+        if protected_sender_id_api_client.get_check_sender_id(sender_id=field.data):
+
             create_phishing_senderid_zendesk_ticket(senderID=field.data)
             current_app.logger.warning("User tried to set sender id to potentially malicious one: %s", field.data)
             raise ValidationError(
