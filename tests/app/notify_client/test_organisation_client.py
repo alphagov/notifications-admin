@@ -131,7 +131,7 @@ def test_update_organisation(mocker, fake_uuid):
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
     mock_post = mocker.patch("app.notify_client.organisations_api_client.OrganisationsClient.post")
 
-    organisations_client.update_organisation(fake_uuid, **{"foo": "bar"})
+    organisations_client.update_organisation(fake_uuid, foo="bar")
 
     mock_post.assert_called_with(url=f"/organisations/{fake_uuid}", data={"foo": "bar"})
     mock_redis_delete.assert_called_with_args(
