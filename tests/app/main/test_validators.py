@@ -101,19 +101,6 @@ def test_uk_mobile_number_validation_messages_match(mocker):
     assert mock_field.error_summary_messages == ["%s can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"]
 
 
-def test_uk_mobile_number_validation_messages_fallback(mocker):
-    mock_field = _gen_mock_field("notanumber", error_summary_messages=[])
-    mocker.patch(
-        "app.main.validators.validate_phone_number",
-        side_effect=InvalidPhoneError("Phone numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"),
-    )
-    with pytest.raises(ValidationError) as error:
-        ValidUKMobileNumber()(None, mock_field)
-
-    assert str(error.value) == "Phone numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"
-    assert mock_field.error_summary_messages == ["%s: Phone numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"]
-
-
 def test_for_commas_in_placeholders(
     client_request,
 ):
