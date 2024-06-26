@@ -1,3 +1,5 @@
+{% from "components/big-number.html" import big_number %}
+
 <div class="ajax-block-container">
-        {{unsubscribe_requests}} Unsubscribe Requests
+        {{big_number(unsubscribe_requests, 'Unsubscribe Requests')}}
 </div>
