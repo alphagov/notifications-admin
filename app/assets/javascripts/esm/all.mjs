@@ -8,24 +8,10 @@
 // For example, `export { Frontend }` will assign `Frontend` to `window.Frontend`
 
 // GOVUK Frontend modules
-import { Header, Details, Button, Radios, ErrorSummary, SkipLink, Tabs } from 'govuk-frontend';
+import { Header, Button, Radios, ErrorSummary, SkipLink, Tabs } from 'govuk-frontend';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
-
-/**
- * TODO: Ideally this would be a NodeList.prototype.forEach polyfill
- * This seems to fail in IE8, requires more investigation.
- * See: https://github.com/imagitama/nodelist-foreach-polyfill
- */
-function nodeListForEach (nodes, callback) {
-  if (window.NodeList.prototype.forEach) {
-    return nodes.forEach(callback)
-  }
-  for (var i = 0; i < nodes.length; i++) {
-    callback.call(window, nodes[i], i, nodes);
-  }
-}
 
 // Copy of the initAll function from https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/all.js
 // except it only includes, and initialises, the components used by this application.
@@ -38,42 +24,48 @@ function initAll (options) {
   var scope = typeof options.scope !== 'undefined' ? options.scope : document
 
   // Find all buttons with [role=button] on the scope to enhance.
-  new Button(scope).init()
-
-  // Find all global details elements to enhance.
-  var $details = scope.querySelectorAll('[data-module="govuk-details"]')
-  nodeListForEach($details, function ($detail) {
-    new Details($detail).init()
-  })
+  var $buttons = scope.querySelectorAll('[data-module="govuk-button"]')
+  if ($buttons) {
+    $buttons.forEach(($button) => {
+      new Button($button)
+    })
+  }
 
   // Find first header module to enhance.
   var $toggleButton = scope.querySelector('[data-module="govuk-header"]')
-  new Header($toggleButton).init()
+  new Header($toggleButton)
 
   var $radios = scope.querySelectorAll('[data-module="govuk-radios"]')
-  nodeListForEach($radios, function ($radio) {
-    new Radios($radio).init()
-  })
+  if ($radios) {
+    $radios.forEach(($radio) => {
+      new Radios($radio)
+    })
+  }
 
   var $skipLinks = scope.querySelectorAll('[data-module="govuk-skip-link"]')
-  nodeListForEach($skipLinks, function ($skipLink) {
-    new SkipLink($skipLink).init()
-  })
+  if ($skipLinks) {
+    $skipLinks.forEach(($skipLink) => {
+      new SkipLink($skipLink)
+    })
+  }
 
   var $tabs = scope.querySelectorAll('[data-module="govuk-tabs"]')
-  nodeListForEach($tabs, function ($tabs) {
-    new Tabs($tabs).init()
-  })
+  if ($tabs) {
+    $tabs.forEach(($tabs) => {
+      new Tabs($tabs)
+    })
+  }
 
   // There will only every be one error-summary per page
-  var $errorSummary = scope.querySelector('[data-module="govuk-error-summary"]')
-  new ErrorSummary($errorSummary).init()
+  var $errorSummary = scope.querySelector('[data-module="govuk-error-summary"]');
+  if ($errorSummary) {
+    new ErrorSummary($errorSummary);
+  }
 }
 
 // Create separate namespace for GOVUK Frontend.
 var Frontend = {
   "Header": Header,
-  "Details": Details,
   "Button": Button,
   "Radios": Radios,
   "ErrorSummary": ErrorSummary,
