@@ -28,7 +28,7 @@
         {% block beforeContent %}
           {% block backLink %}{% endblock %}
         {% endblock %}
-        <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content" role="main">
+        <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content">
         {% block content %}
           {% include 'flash_messages.html' %}
           {% block errorSummary %}

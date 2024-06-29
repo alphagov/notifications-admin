@@ -724,7 +724,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
     beforeEach(() => {
 
       document.body.innerHTML = `
-        <main role="main" class="govuk-grid-column-three-quarters column-main">
+        <main class="govuk-grid-column-three-quarters column-main">
           <a class="govuk-back-link" href="">Back</a>
           <h1 class="heading-large js-header">
             Preview of ‘Content email’
