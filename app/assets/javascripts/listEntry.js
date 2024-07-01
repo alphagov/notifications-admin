@@ -12,13 +12,15 @@
     if (!idPattern) { return false; }
     this.idPattern = idPattern;
     this.elementSelector = '.list-entry, .input-list__button--remove, .input-list__button--add';
+    this.sharedInputClasses = ['govuk-input', 'govuk-input--numbered'];
     this.entries = [];
     this.$wrapper = $elm;
     this.minEntries = 2;
     this.listItemName = this.$wrapper.data('listItemName');
+    this.getCustomClasses();
     this.getSharedAttributes();
 
-    this.getValues();
+    this.getValuesAndErrors();
     this.maxEntries = this.entries.length;
     this.trimEntries();
     this.render();
@@ -27,20 +29,29 @@
   ListEntry.optionalAttributes = ['aria-describedby'];
   ListEntry.prototype.entryTemplate = Hogan.compile(
     '<div class="list-entry">' +
-      '<label for="{{{id}}}" class="govuk-input--numbered__label">' +
-        '<span class="govuk-visually-hidden">{{listItemName}} number </span>{{number}}.' +
-      '</label>' +
-      '<input' +
+      '<div class="govuk-form-group{{#error}} govuk-form-group--error{{/error}}">' +
+        '<label for="{{{id}}}" class="govuk-label govuk-input--numbered__label{{#error}} govuk-input--numbered__label--error{{/error}}">' +
+          '<span class="govuk-visually-hidden">{{listItemName}} number </span>{{number}}.' +
+        '</label>' +
+        '{{#error}}' +
+        '<p id="{{{id}}}-error" class="govuk-error-message" data-notify-module="track-error" data-error-type="{{{error}}}" data-error-label="{{{name}}}">' +
+          '<span class="govuk-visually-hidden">Error: </span>{{{error}}}' +
+        '</p>' +
+        '{{/error}}' +
+        '<input' +
         ' name="{{name}}"' +
         ' id="{{id}}"' +
         ' {{#value}}value="{{value}}{{/value}}"' +
+        ' class="{{{sharedInputClasses}}}{{#customClasses}} {{{customClasses}}}{{/customClasses}}{{#error}} govuk-input--error{{/error}}"' +
+        ' {{#error}}aria-describedby="{{{id}}}-error"{{/error}}' +
         ' {{{sharedAttributes}}}' +
-      '/>' +
-      '{{#button}}' +
+        '/>' +
+        '{{#button}}' +
         '<button type="button" class="govuk-button govuk-button--secondary input-list__button--remove">' +
-          'Remove<span class="govuk-visually-hidden"> {{listItemName}} number {{number}}</span>' +
+        'Remove<span class="govuk-visually-hidden"> {{listItemName}} number {{number}}</span>' +
         '</button>' +
-      '{{/button}}' +
+        '{{/button}}' +
+      '</div>' +
     '</div>'
   );
   ListEntry.prototype.addButtonTemplate = Hogan.compile(
@@ -49,7 +60,7 @@
   ListEntry.prototype.getSharedAttributes = function () {
     var $inputs = this.$wrapper.find('input'),
         attributeTemplate = Hogan.compile(' {{name}}="{{value}}"'),
-        generatedAttributes = ['id', 'name', 'value'],
+        protectedAttributes = ['id', 'name', 'value', 'class', 'aria-describedby'],
         attributes = [],
         attrIdx,
         elmAttributes,
@@ -80,7 +91,7 @@
       attrIdx = elm.attributes.length;
       elmAttributes = [];
       while(attrIdx--) {
-        if ($.inArray(elm.attributes[attrIdx].name, generatedAttributes) === -1) {
+        if ($.inArray(elm.attributes[attrIdx].name, protectedAttributes) === -1) {
           elmAttributes.push({
             'name': elm.attributes[attrIdx].name,
             'value': elm.attributes[attrIdx].value
@@ -94,12 +105,35 @@
 
     this.sharedAttributes = (attributes.length) ? getAttributesHTML(attributes) : '';
   };
-  ListEntry.prototype.getValues = function () {
+  ListEntry.prototype.getCustomClasses = function () {
+    this.customClasses = [];
+    this.$wrapper.find('input').each(function (idx, elm) {
+      var customClassesForElm = [];
+
+      elm.classList.forEach(token => {
+        if (($.inArray(token, this.sharedInputClasses) === -1) && (token !== 'govuk-input--error')) {
+          customClassesForElm.push(token);
+        }
+      });
+
+      if (customClassesForElm.length > 0) {
+        this.customClasses.push(customClassesForElm);
+      }
+    }.bind(this));
+  };
+  ListEntry.prototype.getValuesAndErrors = function () {
     this.entries = [];
+    this.errors = [];
     this.$wrapper.find('input').each(function (idx, elm) {
       var val = $(elm).val();
+      var $error = $(elm).prev('p.govuk-error-message');
 
       this.entries.push(val);
+      if ($error.length > 0) {
+        this.errors.push($error.get(0).textContent.trim().replace('Error: ', ''));
+      } else {
+        this.errors.push(null);
+      }
     }.bind(this));
   };
   ListEntry.prototype.trimEntries = function () {
@@ -143,22 +177,16 @@
     }
     this.$wrapper.find('.list-entry').eq(numberTargeted - 1).find('input').focus();
   };
-  ListEntry.prototype.removeEntryFromEntries = function (entryNumber) {
-    var idx,
-        len,
-        newEntries = [];
+  ListEntry.prototype.removeEntryFromEntriesAndErrors = function (entryNumber) {
+    var entryIdx = entryNumber - 1;
 
-    for (idx = 0, len = this.entries.length; idx < len; idx++) {
-      if ((entryNumber - 1) !== idx) {
-        newEntries.push(this.entries[idx]);
-      }
-    }
-    this.entries = newEntries;
+    this.entries.splice(entryIdx, 1);
+    this.errors.splice(entryIdx, 1);
   };
   ListEntry.prototype.addEntry = function ($removeButton) {
     var currentLastEntryNumber = this.entries.length;
 
-    this.getValues();
+    this.getValuesAndErrors();
     this.entries.push('');
     this.render();
     this.shiftFocus({ 'action' : 'add', 'entryNumberFocused' : currentLastEntryNumber });
@@ -166,8 +194,8 @@
   ListEntry.prototype.removeEntry = function ($removeButton) {
     var entryNumber = parseInt($removeButton.find('span').text().match(/\d+/)[0], 10);
 
-    this.getValues();
-    this.removeEntryFromEntries(entryNumber);
+    this.getValuesAndErrors();
+    this.removeEntryFromEntriesAndErrors(entryNumber);
     this.render();
     this.shiftFocus({ 'action' : 'remove', 'entryNumberFocused' : entryNumber });
   };
@@ -175,6 +203,8 @@
     this.$wrapper.find(this.elementSelector).remove();
     $.each(this.entries, function (idx, entry) {
       var entryNumber = idx + 1,
+          error = this.errors[idx],
+          customClasses = this.customClasses[idx],
           dataObj = {
             'id' : this.getId(entryNumber),
             'number' : entryNumber,
@@ -182,11 +212,18 @@
             'name' : this.getId(entryNumber),
             'value' : entry,
             'listItemName' : this.listItemName,
+            'sharedInputClasses': this.sharedInputClasses.join(' '),
             'sharedAttributes': this.sharedAttributes
           };
 
       if (entryNumber > 1) {
         dataObj.button = true;
+      }
+      if (error !== null) {
+        dataObj.error = error;
+      }
+      if (customClasses !== null) {
+        dataObj.customClasses = ' ' + customClasses.join(' ');
       }
       this.$wrapper.append(this.entryTemplate.render(dataObj));
     }.bind(this));

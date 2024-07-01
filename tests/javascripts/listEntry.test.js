@@ -71,7 +71,7 @@ describe("List entry", () => {
           For example cabinet-office.gov.uk
         </span>
         <div class="input-list" data-notify-module="list-entry" data-list-item-name="domain" id="list-entry-domains">
-          ${entries()} }
+          ${entries()}
         </div>
       </fieldset>`;
 
@@ -210,7 +210,7 @@ describe("List entry", () => {
 
       inputList.querySelectorAll('.list-entry input[type=text]').forEach((field, idx) => {
 
-        field.setAttribute('aria-describedby', 'hint1');
+        field.setAttribute('pattern', '[\w\.]+');
         field.classList.add('top-level-domain');
 
       });
@@ -221,9 +221,93 @@ describe("List entry", () => {
       // re-select fields, based on updated DOM
       fields = inputList.querySelectorAll('.list-entry input[type=text]');
 
-      expect(fields[0].getAttribute('aria-describedby')).toEqual('hint1');
+      expect(fields[0].getAttribute('pattern')).toEqual('[\w\.]+');
       expect(fields[0].classList.contains('top-level-domain')).toBe(true);
     });
+
+    describe("If there are validation errors in the page", () => {
+
+      function markFieldAsInvalid(field) {
+
+        const formGroup = field.querySelector('.govuk-form-group');
+        const label = field.querySelector('.govuk-label');
+        const input = field.querySelector('.govuk-input');
+        const errorMessageText = 'Enter an email address in the correct format, like name@example.gov.uk';
+        const errorMessageId = `${input.id}-error`;
+
+        formGroup.classList.add('govuk-form-group--error');
+        label.classList.add('govuk-input--numbered__label--error');
+        input.classList.add('govuk-input--error');
+        input.setAttribute('aria-describedby', errorMessageId);
+
+        label.insertAdjacentHTML('afterend', `
+          <p class="govuk-error-message" id="${errorMessageId}">
+            <span class="govuk-visually-hidden">Error:</span> ${errorMessageText}
+          </p>
+        `);
+
+      };
+
+      const invalidFields = [0, 2, 5];
+      const sixDomains = domains.slice(0, 8);
+
+      sixDomains[0] = 'gov@uk';
+      sixDomains[2] = 'nhs.uk';
+      sixDomains[5] = 'nhs.net';
+
+      beforeEach(() => {
+
+        let fields = inputList.querySelectorAll('.list-entry input[type=text]');
+
+        // set values of first 8 fields
+        sixDomains.forEach((domain, idx) => { fields[idx].setAttribute('value', domain) });
+
+        inputList.querySelectorAll('.list-entry').forEach((field, idx) => {
+
+          if (invalidFields.includes(idx)) { markFieldAsInvalid(field); }
+
+        });
+
+        // start module
+        window.GOVUK.notifyModules.start();
+
+      });
+
+      test("only textboxes with errors should have their HTML changed", () => {
+
+        document.querySelectorAll('.list-entry').forEach((field, idx) => {
+
+          const formGroup = field.querySelector('.govuk-form-group');
+          const label = field.querySelector('.govuk-label');
+          const input = field.querySelector('.govuk-input');
+          const errorMessage = field.querySelector('.govuk-error-message');
+
+          if (invalidFields.includes(idx)) {
+
+            expect(formGroup.classList.contains('govuk-form-group--error')).toBe(true);
+            expect(label.classList.contains('govuk-input--numbered__label--error')).toBe(true);
+            expect(input.classList.contains('govuk-input--error')).toBe(true);
+            expect(errorMessage).not.toBeNull();
+            expect(errorMessage.matches('[data-notify-module][data-error-label][data-error-type]')).toBe(true);
+            expect(errorMessage.innerHTML.trim()).toEqual(
+              `<span class="govuk-visually-hidden">Error: </span>${errorMessage.dataset.errorType}`);
+            expect(input.getAttribute('aria-describedby')).toEqual(errorMessage.id);
+
+          } else {
+
+            expect(formGroup.classList.contains('govuk-form-group--error')).toBe(false);
+            expect(label.classList.contains('govuk-input--numbered__label--error')).toBe(false);
+            expect(input.classList.contains('govuk-input--error')).toBe(false);
+            expect(errorMessage).toBeNull();
+
+          }
+
+        });
+
+      });
+
+    });
+
   });
 
   describe("When the 'remove' button is clicked", () => {
@@ -267,7 +351,7 @@ describe("List entry", () => {
       // the items have their values set to the 10 domains
       const expectedValues = domains.slice(0, -1);
       const itemValues = Array.from(
-                          inputList.querySelectorAll('.list-entry input[type=text]')
+                           inputList.querySelectorAll('.list-entry input[type=text]')
                          )
                          .map(item => item.getAttribute('value'));
 
@@ -283,7 +367,7 @@ describe("List entry", () => {
       // the items have their values set to the 10 domains
       const expectedValues = domains.slice();
       const itemValues = Array.from(
-                          inputList.querySelectorAll('.list-entry input[type=text]')
+                           inputList.querySelectorAll('.list-entry input[type=text]')
                          )
                          .map(item => item.getAttribute('value'));
 

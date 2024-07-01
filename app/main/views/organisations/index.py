@@ -409,6 +409,7 @@ def edit_organisation_domains(org_id):
                 return render_template(
                     "views/organisations/organisation/settings/edit-domains.html",
                     form=form,
+                    error_summary_enabled=True,
                 )
             else:
                 raise e
@@ -420,6 +421,7 @@ def edit_organisation_domains(org_id):
     return render_template(
         "views/organisations/organisation/settings/edit-domains.html",
         form=form,
+        error_summary_enabled=True,
     )
 
 
