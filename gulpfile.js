@@ -132,6 +132,24 @@ const javascripts = () => {
     presets: ['@babel/preset-env']
   }));
 
+  const frontend = src(
+    paths.src + 'javascripts/esm/frontend.mjs',
+  )
+  .pipe(plugins.rollup(
+    {
+      plugins: [
+        // determine module entry points from either 'module' or 'main' fields in package.json
+        rollupPluginNodeResolve({
+          mainFields: ['module', 'main']
+        })
+      ]
+    },
+    {
+      format: 'esm',
+    }
+  ))
+  .pipe(dest(paths.dist + 'javascripts/'))
+
   // return single stream of all vinyl objects piped from the end of the vendored stream, then
   // those from the end of the local stream
   return streamqueue({ objectMode: true }, vendored, local)

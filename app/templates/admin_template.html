@@ -132,5 +132,7 @@
 {% block bodyEnd %}
   {% block extra_javascripts %}
   {% endblock %}
+  <script type="module" src="{{ asset_url('javascripts/frontend.mjs') }}"></script>
   <script type="text/javascript" src="{{ asset_url('javascripts/all.js') }}"></script>
+  
 {% endblock %}
