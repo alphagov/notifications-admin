@@ -8,14 +8,16 @@ ago==0.0.95
     # via -r requirements.in
 async-timeout==4.0.2
     # via redis
+awscrt==0.20.11
+    # via botocore
 blinker==1.6.3
     # via
     #   flask
     #   gds-metrics
     #   sentry-sdk
-boto3==1.34.129
+boto3[crt]==1.34.129
     # via notifications-utils
-botocore==1.34.129
+botocore[crt]==1.34.129
     # via
     #   boto3
     #   s3transfer
@@ -110,7 +112,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==8.0.1
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@79.0.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@80.0.1
     # via -r requirements.in
 openpyxl==3.0.10
     # via pyexcel-xlsx
