@@ -8,7 +8,7 @@ class LetterRate(JSONModel):
 
     @property
     def rate_in_pennies(self):
-        return int(float(self.rate) * 100)
+        return int(round(float(self.rate) * 100))
 
 
 class LetterRates(ModelList):
