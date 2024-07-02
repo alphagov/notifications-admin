@@ -267,7 +267,7 @@ def get_dashboard_partials(service_id):
     template_statistics = aggregate_template_usage(all_statistics)
     stats = aggregate_notifications_stats(all_statistics)
 
-    dashboard_totals = (get_dashboard_totals(stats),)
+    dashboard_totals = get_dashboard_totals(stats)
     free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(
         current_service.id,
         get_current_financial_year(),
@@ -286,7 +286,7 @@ def get_dashboard_partials(service_id):
         "totals": render_template(
             "views/dashboard/_totals.html",
             service_id=service_id,
-            statistics=dashboard_totals[0],
+            statistics=dashboard_totals,
         ),
         "template-statistics": render_template(
             "views/dashboard/template-statistics.html",
