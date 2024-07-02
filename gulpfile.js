@@ -30,7 +30,7 @@ const paths = {
   src: 'app/assets/',
   dist: 'app/static/',
   npm: 'node_modules/',
-  govuk_frontend: 'node_modules/govuk-frontend/'
+  govuk_frontend: 'node_modules/govuk-frontend/dist/'
 };
 // Rewrite /static prefix for URLs in CSS files
 let staticPathMatcher = new RegExp('^\/static\/');
@@ -52,6 +52,10 @@ const copy = {
     fonts: () => {
       return src(paths.govuk_frontend + 'govuk/assets/fonts/**/*')
         .pipe(dest(paths.dist + 'fonts/'));
+    },
+    header_icon_manifest: () => {
+      return src(paths.govuk_frontend + 'govuk/assets/manifest.json')
+        .pipe(dest(paths.dist));
     },
   }
 };
@@ -127,6 +131,24 @@ const javascripts = () => {
   .pipe(plugins.babel({
     presets: ['@babel/preset-env']
   }));
+
+  const frontend = src(
+    paths.src + 'javascripts/esm/frontend.mjs',
+  )
+  .pipe(plugins.rollup(
+    {
+      plugins: [
+        // determine module entry points from either 'module' or 'main' fields in package.json
+        rollupPluginNodeResolve({
+          mainFields: ['module', 'main']
+        })
+      ]
+    },
+    {
+      format: 'esm',
+    }
+  ))
+  .pipe(dest(paths.dist + 'javascripts/'))
 
   // return single stream of all vinyl objects piped from the end of the vendored stream, then
   // those from the end of the local stream
@@ -234,6 +256,7 @@ const defaultTask = series(
   clean.everything,
   parallel(
     copy.govuk_frontend.fonts,
+    copy.govuk_frontend.header_icon_manifest,
     copy.error_pages,
     images,
     javascripts,

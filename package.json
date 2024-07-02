@@ -22,7 +22,7 @@
   "homepage": "https://github.com/alphagov/notifications-admin#readme",
   "dependencies": {
     "cbor-js": "0.1.0",
-    "govuk-frontend": "4.8.0",
+    "govuk-frontend": "5.4.0",
     "hogan": "1.0.2",
     "jquery": "3.5.0",
     "morphdom": "2.6.1",

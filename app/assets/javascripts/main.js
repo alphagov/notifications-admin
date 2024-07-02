@@ -1,4 +1,4 @@
-window.GOVUK.Frontend.initAll();
+
 
 $(() => $("time.timeago").timeago());
 
