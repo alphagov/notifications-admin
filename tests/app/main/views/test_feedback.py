@@ -4,7 +4,11 @@ from unittest.mock import ANY, PropertyMock
 import pytest
 from flask import url_for
 from freezegun import freeze_time
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
+from notifications_utils.clients.zendesk.zendesk_client import (
+    NotifySupportTicket,
+    NotifySupportTicketComment,
+    ZendeskError,
+)
 
 from app.main.views.feedback import in_business_hours
 from app.models.feedback import (
@@ -126,6 +130,11 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
     mock_send_ticket_to_zendesk = mocker.patch(
         "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
+        return_value=1234,
+    )
+    mock_update_ticket_with_internal_note = mocker.patch(
+        "app.main.views.feedback.zendesk_client.update_ticket",
+        autospec=True,
     )
 
     data = {"feedback": "blah", "name": "Anne Example", "email_address": "anne@example.com"}
@@ -154,6 +163,51 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
         service_id=None,
     )
     mock_send_ticket_to_zendesk.assert_called_once()
+    mock_update_ticket_with_internal_note.assert_called_once_with(
+        1234,
+        comment=NotifySupportTicketComment(body="Requester not logged in", attachments=(), public=False),
+    )
+
+
+def test_does_not_add_internal_note_to_tickets_created_by_suspended_users(client_request, mocker):
+    client_request.logout()
+    mocker.patch(
+        "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
+        return_value=None,
+    )
+    mock_update_ticket_with_internal_note = mocker.patch("app.main.views.feedback.zendesk_client.update_ticket")
+
+    client_request.post(
+        "main.feedback",
+        ticket_type=GENERAL_TICKET_TYPE,
+        _data={"feedback": "blah", "name": "Anne Example", "email_address": "anne@example.com"},
+        _expected_redirect=url_for(
+            "main.thanks",
+            out_of_hours_emergency=False,
+        ),
+    )
+    assert not mock_update_ticket_with_internal_note.called
+
+
+def test_does_not_add_internal_note_to_ticket_if_error_creating_ticket(client_request, mocker):
+    client_request.logout()
+    mocker.patch(
+        "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
+        side_effect=ZendeskError("error from Zendesk"),
+    )
+    mock_update_ticket_with_internal_note = mocker.patch("app.main.views.feedback.zendesk_client.update_ticket")
+
+    with pytest.raises(ZendeskError):
+        client_request.post(
+            "main.feedback",
+            ticket_type=GENERAL_TICKET_TYPE,
+            _data={"feedback": "blah", "name": "Anne Example", "email_address": "anne@example.com"},
+            _expected_redirect=url_for(
+                "main.thanks",
+                out_of_hours_emergency=False,
+            ),
+        )
+    assert not mock_update_ticket_with_internal_note.called
 
 
 @pytest.mark.freeze_time("2016-12-12 12:00:00.000000")
@@ -180,7 +234,9 @@ def test_passes_user_details_through_flow(
     mock_send_ticket_to_zendesk = mocker.patch(
         "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
+        return_value=1234,
     )
+    mock_update_ticket_with_internal_note = mocker.patch("app.main.views.feedback.zendesk_client.update_ticket")
 
     client_request.post(
         "main.feedback",
@@ -219,6 +275,7 @@ def test_passes_user_details_through_flow(
         ]
     )
     mock_send_ticket_to_zendesk.assert_called_once()
+    assert not mock_update_ticket_with_internal_note.called
 
 
 @pytest.mark.freeze_time("2016-12-12 12:00:00.000000")

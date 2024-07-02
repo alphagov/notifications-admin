@@ -4,7 +4,7 @@ import pytz
 from flask import current_app, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_utils.bank_holidays import BankHolidays
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
+from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifySupportTicketComment
 
 from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
@@ -135,7 +135,13 @@ def feedback(ticket_type):
             org_type=current_service.organisation_type if current_service else None,
             service_id=current_service.id if current_service else None,
         )
-        zendesk_client.send_ticket_to_zendesk(ticket)
+        zendesk_ticket_id = zendesk_client.send_ticket_to_zendesk(ticket)
+
+        if zendesk_ticket_id and not current_user.is_authenticated:
+            zendesk_client.update_ticket(
+                zendesk_ticket_id,
+                comment=NotifySupportTicketComment(body="Requester not logged in", public=False),
+            )
 
         return redirect(
             url_for(
