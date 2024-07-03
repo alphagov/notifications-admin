@@ -16,8 +16,6 @@ PYTHON_EXECUTABLE_PREFIX := $(shell test -d "$${VIRTUALENV_ROOT}" && echo "$${VI
 
 .PHONY: bootstrap
 bootstrap: generate-version-file ## Set up everything to run the app
-	${PYTHON_EXECUTABLE_PREFIX}pip3 install -r requirements.txt
-
 	python -c "from notifications_utils.version_tools import copy_config; copy_config()"
 
 	${PYTHON_EXECUTABLE_PREFIX}pip3 install -r requirements_for_test.txt
