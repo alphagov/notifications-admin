@@ -84,6 +84,7 @@ fix-imports: ## Fix imports using ruff
 freeze-requirements: ## create static requirements.txt
 	${PYTHON_EXECUTABLE_PREFIX}pip3 install --upgrade pip-tools
 	${PYTHON_EXECUTABLE_PREFIX}pip-compile requirements.in
+	${PYTHON_EXECUTABLE_PREFIX}pip-compile requirements_for_test.in
 
 .PHONY: bump-utils
 bump-utils:  # Bump notifications-utils package to latest version
