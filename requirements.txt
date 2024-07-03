@@ -8,14 +8,16 @@ ago==0.0.95
     # via -r requirements.in
 async-timeout==4.0.2
     # via redis
+awscrt==0.20.11
+    # via botocore
 blinker==1.6.3
     # via
     #   flask
     #   gds-metrics
     #   sentry-sdk
-boto3==1.34.129
+boto3[crt]==1.34.129
     # via notifications-utils
-botocore==1.34.129
+botocore[crt]==1.34.129
     # via
     #   boto3
     #   s3transfer
@@ -47,7 +49,6 @@ fido2==1.1.0
     # via -r requirements.in
 flask==3.0.0
     # via
-    #   -r requirements.in
     #   flask-login
     #   flask-redis
     #   flask-wtf
@@ -69,22 +70,18 @@ govuk-frontend-jinja==2.8.0
 greenlet==3.0.3
     # via eventlet
 gunicorn[eventlet]==21.2.0
-    # via
-    #   -r requirements.in
-    #   notifications-utils
+    # via notifications-utils
 humanize==4.4.0
     # via -r requirements.in
 idna==3.7
     # via requests
 itsdangerous==2.1.2
     # via
-    #   -r requirements.in
     #   flask
     #   flask-wtf
     #   notifications-utils
 jinja2==3.1.4
     # via
-    #   -r requirements.in
     #   flask
     #   govuk-frontend-jinja
     #   notifications-utils
@@ -110,7 +107,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==8.0.1
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@79.0.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@80.0.1
     # via -r requirements.in
 openpyxl==3.0.10
     # via pyexcel-xlsx
@@ -164,8 +161,6 @@ requests==2.32.0
     #   govuk-bank-holidays
     #   notifications-python-client
     #   notifications-utils
-rtreelib==0.2.0
-    # via -r requirements.in
 s3transfer==0.10.1
     # via boto3
 segno==1.5.2
@@ -187,13 +182,10 @@ urllib3==1.26.18
     #   sentry-sdk
 werkzeug==3.0.1
     # via
-    #   -r requirements.in
     #   flask
     #   flask-login
 wtforms==3.1.0
-    # via
-    #   -r requirements.in
-    #   flask-wtf
+    # via flask-wtf
 xlrd==2.0.1
     # via pyexcel-xls
 xlwt==1.3.0
