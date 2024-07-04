@@ -1,15 +1,16 @@
 {% extends "withoutnav_template.html" %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% block per_page_title %}
-  If you have not received your security code
+  If you do not receive a security code
 {% endblock %}
 
 {% block maincolumn_content %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="heading-large">If you have not received your security code</h1>
+    <h1 class="heading-large">If you do not receive a security code</h1>
 
     <p class="govuk-body">Wait a few minutes. Text messages sometimes take a while to arrive.</p>
 
@@ -31,24 +32,36 @@
 
     <p class="govuk-body">If this does not work, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.</p>
 
-    <h2 class="heading-medium">If your phone number has changed</h2>
+    <details class="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          If your phone number has changed
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+        <p class="govuk-body">Find a member of your team with the ‘Manage settings, team and usage’ permission. Ask them to:</p>
 
-    <p class="govuk-body">Find a member of your team with the ‘Manage settings, team and usage’ permission. Ask them to:</p>
-
-    <ol class="govuk-list govuk-list--number">
-      <li>Sign in to GOV.UK Notify.</li>
-      <li>Go to the <span class="govuk-body govuk-!-font-weight-bold">Team members</span> page.</li>
-      <li>Find your name and select <span class="govuk-body govuk-!-font-weight-bold">Change details</span>.</li>
-      <li>Select <span class="govuk-body govuk-!-font-weight-bold">Change</span> next to your phone number.</li>
-      <li>Enter your new phone number and select <span class="govuk-body govuk-!-font-weight-bold">Save</span>.</li>
-      <li>Select <span class="govuk-body govuk-!-font-weight-bold">Save</span> again.</li>
-    </ol>
+        <ol class="govuk-list govuk-list--number">
+          <li>Sign in to GOV.UK Notify.</li>
+          <li>Go to the <span class="govuk-body govuk-!-font-weight-bold">Team members</span> page.</li>
+          <li>Find your name and select <span class="govuk-body govuk-!-font-weight-bold">Change details</span>.</li>
+          <li>Select <span class="govuk-body govuk-!-font-weight-bold">Change</span> next to your phone number.</li>
+        </ol>
     
-    <p class="govuk-body">Now try to sign in again.</p>
+        <p class="govuk-body">Now try to sign in again.</p>
+      </div>
+    </details>
 
-    <h2 class="heading-medium">If you want to sign in with an email link instead</h2>
-    
-    <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">change your sign-in method</a>.</p>
+    <details class="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          If you want to sign in with an email link instead
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+        <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">change your sign-in method</a>.</p>
+      </div>
+    </details>
 
   </div>
 </div>
