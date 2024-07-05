@@ -39,7 +39,7 @@ def test_should_render_correct_resend_template_for_active_user(
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
     page = client_request.get("main.check_and_resend_text_code", next=redirect_url)
 
-    assert page.select_one("h1").string == "Resend security code"
+    assert page.select_one("h1").string == "If you do not receive a security code"
     # there shouldn't be a form for updating mobile number
     assert page.select_one("form") is None
     assert page.select_one("a.govuk-button")["href"] == url_for(
@@ -60,7 +60,7 @@ def test_should_render_correct_resend_template_for_pending_user(
         session["user_details"] = {"id": api_user_pending["id"], "email": api_user_pending["email_address"]}
     page = client_request.get("main.check_and_resend_text_code")
 
-    assert page.select_one("h1").string == "Check your mobile number"
+    assert page.select_one("h1").string == "If you do not receive a security code"
 
     expected = "Check your mobile phone number is correct and then resend the security code."
     message = page.select("main p")[0].text
