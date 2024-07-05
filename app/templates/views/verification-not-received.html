@@ -28,13 +28,7 @@
 
     <p class="govuk-body">If this does not work, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.</p>
 
-    <details class="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          If your phone number has changed
-        </span>
-      </summary>
-      <div class="govuk-details__text">
+    {% set change_number %}
         <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to update your phone number.</p>
         
         <p class="govuk-body">To do this, they should:</p>
@@ -46,20 +40,21 @@
           <li>Find your name and select <span class="govuk-body govuk-!-font-weight-bold">Change details</span>.</li>
           <li>Select <span class="govuk-body govuk-!-font-weight-bold">Change</span> next to your phone number.</li>
         </ol>
-    
-      </div>
-    </details>
+    {% endset %}
 
-    <details class="govuk-details">
-      <summary class="govuk-details__summary">
-        <span class="govuk-details__summary-text">
-          If you want to sign in with an email link instead
-        </span>
-      </summary>
-      <div class="govuk-details__text">
+    {{ govukDetails({
+      "summaryText": "If your phone number has changed",
+      "html": change_number
+    }) }}
+
+    {% set email_link %}
         <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">change your sign-in method</a>.</p>
-      </div>
-    </details>
+    {% endset %}
+
+    {{ govukDetails({
+      "summaryText": "If you want to sign in with an email link instead",
+      "html": email_link
+    }) }}
 
   </div>
 </div>
