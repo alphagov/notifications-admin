@@ -337,6 +337,7 @@ EXCLUDED_ENDPOINTS = set(
             "two_factor_sms",
             "two_factor_webauthn",
             "unsubscribe_request_reports_summary",
+            "unsubscribe_request_report",
             "update_letter_branding",
             "upload_contact_list",
             "upload_letter",
