@@ -1,7 +1,8 @@
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import NotifyAdminAPIClient, cache
 
 
 class UnsubscribeRequestsApiClient(NotifyAdminAPIClient):
+    @cache.set("service-{service_id}-unsubscribe-request-statistics")
     def get_pending_unsubscribe_requests(self, service_id):
         return {
             "count_of_pending_unsubscribe_requests": 300,
