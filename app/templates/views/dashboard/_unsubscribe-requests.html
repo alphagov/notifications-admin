@@ -1,5 +1,13 @@
-{% from "components/big-number.html" import big_number %}
-
-<div class="ajax-block-container">
-        {{big_number(unsubscribe_requests, 'Unsubscribe Requests')}}
+<div class="ajax-block">
+        <a id="total-unsubscribe-requests" class="govuk-link govuk-link--no-visited-state banner-dashboard" href="#">
+                <span class="banner-dashboard-count">
+                        {{ unsubscribe_requests|format_thousands }}
+                </span>
+                <span class="banner-dashboard-count-label">
+                        email unsubscribe requests
+                </span>
+                <span class="banner-dashboard-meta">
+                        latest report unknown
+                </span>
+        </a>
 </div>
