@@ -277,14 +277,12 @@ def get_dashboard_partials(service_id):
         service_id,
         get_current_financial_year(),
     )
-    unsubscribe_requests = unsubscribe_requests_client.get_pending_unsubscribe_requests(service_id)
     return {
         "upcoming": render_template(
             "views/dashboard/_upcoming.html",
         ),
         "inbox": render_template(
             "views/dashboard/_inbox.html",
-            unsubscribe_requests=unsubscribe_requests,
         ),
         "totals": render_template(
             "views/dashboard/_totals.html",

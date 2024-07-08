@@ -1,3 +1,5 @@
+from typing import Optional
+
 from flask import abort, current_app
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
@@ -17,6 +19,7 @@ from app.notify_client.job_api_client import job_api_client
 from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
+from app.notify_client.unsubscribe_requests_client import unsubscribe_requests_client
 from app.utils import get_default_sms_sender
 from app.utils.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.utils.templates import get_template as get_template_as_rich_object
@@ -431,7 +434,7 @@ class Service(JSONModel):
             "days_of_retention", current_app.config["ACTIVITY_STATS_LIMIT_DAYS"]
         )
 
-    def get_consistent_data_retention_period(self) -> int | None:
+    def get_consistent_data_retention_period(self) -> Optional[int]:
         """If the service's data retention periods are all the same, returns that period. Otherwise returns None."""
         consistent_data_retention = (
             self.get_days_of_retention("email")
@@ -617,6 +620,10 @@ class Service(JSONModel):
     @property
     def unsubscribe_request_reports_summary(self):
         return UnsubscribeRequestsReports(self.id)
+
+    @property
+    def unsubscribe_requests(self) -> int:
+        return unsubscribe_requests_client.get_pending_unsubscribe_requests(self.id)
 
 
 class Services(SerialisedModelCollection):
