@@ -16,7 +16,7 @@ def test_unsubscribe_request_reports_summary(client_request, mocker):
             "earliest_timestamp": "2024-06-15",
             "latest_timestamp": "2024-06-21",
             "processed_by_service_at": None,
-            "report_id": 347,
+            "report_id": "971bdf41-632c-4fdb-a84f-c5fb1b5d40b3",
             "is_a_batched_report": True,
         },
         {
@@ -24,7 +24,7 @@ def test_unsubscribe_request_reports_summary(client_request, mocker):
             "earliest_timestamp": "2024-06-8",
             "latest_timestamp": "2024-06-14",
             "processed_by_service_at": "2024-06-10",
-            "report_id": 346,
+            "report_id": "368a9f4f-c425-4097-bae7-6d0a4de0f527",
             "is_a_batched_report": True,
         },
     ]

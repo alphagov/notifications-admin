@@ -613,6 +613,10 @@ class Service(JSONModel):
     def email_sender_name(self) -> str:
         return self.custom_email_sender_name or self.name
 
+    @property
+    def unsubscribe_request_reports_summary(self):
+        return service_api_client.get_unsubscribe_reports_summary(self.id)
+
 
 class Services(SerialisedModelCollection):
     model = Service
