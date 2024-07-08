@@ -1348,8 +1348,8 @@ class TemplateNameMixin:
     name = GovukTextInputField(
         "Template name",
         validators=[
-            NotifyDataRequired(thing="a name for this template"),
-            Length(max=255, thing="a name for this template"),
+            NotifyDataRequired(thing="Template name"),
+            Length(max=255, thing="Template name"),
         ],
     )
 
