@@ -197,6 +197,7 @@ class MainNavigation(Navigation):
             "returned_letters",
             "service_dashboard",
             "template_usage",
+            "unsubscribe_request_reports_summary",
             "view_notification",
             "view_notifications",
         },
