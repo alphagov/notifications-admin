@@ -33,7 +33,7 @@
             {%  set processed_status = "Not Downloaded" -%}
         {%  endif %}
       <a class="govuk-link govuk-link--no-visited-state file-list-filename"
-         href="">
+         href="{{url_for('main.unsubscribe_request_report', service_id=current_service.id, report_id=item.report_id)}}"  }}>
           {{ item.earliest_timestamp | format_date_normal }} to {{ item.latest_timestamp | format_date_normal }}
         </a>
        <p class="file-list-hint">

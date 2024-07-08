@@ -9,7 +9,7 @@ def test_unsubscribe_request_reports_summary(client_request, mocker):
                 "earliest_timestamp": "2024-06-15",
                 "latest_timestamp": "2024-06-21",
                 "processed_by_service_at": None,
-                "report_id": 347,
+                "report_id": "ab26e2bc-da34-4326-bc2e-d957c14edde6",
                 "is_a_batched_report": True,
             },
             {
@@ -17,7 +17,7 @@ def test_unsubscribe_request_reports_summary(client_request, mocker):
                 "earliest_timestamp": "2024-06-8",
                 "latest_timestamp": "2024-06-14",
                 "processed_by_service_at": "2024-06-10",
-                "report_id": 346,
+                "report_id": "a46004d4-a4f5-4e9a-ad66-309fe503f7e6",
                 "is_a_batched_report": True,
             },
         ],
@@ -64,7 +64,7 @@ def test_unsubscribe_request_report_for_existing_reports(client_request, mocker)
                 "earliest_timestamp": "2024-06-15",
                 "latest_timestamp": "2024-06-21",
                 "processed_by_service_at": None,
-                "report_id": 347,
+                "report_id": "a8a526f9-84be-44a6-b751-62c95c4b9329",
                 "is_a_batched_report": True,
             },
             {
@@ -72,14 +72,13 @@ def test_unsubscribe_request_report_for_existing_reports(client_request, mocker)
                 "earliest_timestamp": "2024-06-8",
                 "latest_timestamp": "2024-06-14",
                 "processed_by_service_at": "2024-06-10",
-                "report_id": 346,
+                "report_id": "b9c28b5b-e442-4e5f-a9c7-c2544502627a",
                 "is_a_batched_report": True,
             },
         ],
         "unbatched_report_summary": {}
     }
     mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
-
     page = client_request.get(
         "main.unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,

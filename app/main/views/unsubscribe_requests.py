@@ -27,7 +27,7 @@ def _get_unsubscribe_request_reports_summary():
 def unsubscribe_request_report(service_id, report_id):
     reports_summary_data = _get_unsubscribe_request_reports_summary()
     for report_summary in reports_summary_data:
-        if report_summary["id"] == report_id:
+        if report_summary["report_id"] == report_id:
             return render_template(
                 "views/unsubscribe-request-report.html",
                 count=report_summary["count"],
