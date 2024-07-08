@@ -503,6 +503,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         count = redis_client.get(daily_limit_cache_key(service_id, notification_type=notification_type)) or 0
         return int(count)
 
+    @cache.set("service-{service_id}-unsubscribe-request-reports-summary")
+    def get_unsubscribe_reports_summary(self, service_id):
+        return self.get(f"service/{service_id}/unsubscribe-request-reports-summary")
+
     @classmethod
     def parse_edit_service_http_error(cls, http_error):
         """Inspect the HTTPError from a create_service/update_service call and return a human-friendly error message"""
