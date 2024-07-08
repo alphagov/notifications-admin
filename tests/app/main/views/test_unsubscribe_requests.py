@@ -57,30 +57,32 @@ def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocke
 
 
 def test_unsubscribe_request_report_for_existing_reports(client_request, mocker):
-    test_data = [
-        {
-            "count": 200,
-            "earliest_timestamp": "2024-06-15",
-            "latest_timestamp": "2024-06-21",
-            "processed_by_service_at": False,
-            "report_id": "ba10455f-9d87-42ba-b98e-8bfeec0781f1",
-            "is_a_batched_report": True,
-        },
-        {
-            "count": 321,
-            "earliest_timestamp": "2024-06-8",
-            "latest_timestamp": "2024-06-14",
-            "processed_by_service_at": True,
-            "report_id": 346,
-            "is_a_batched_report": True,
-        },
-    ]
+    test_data = test_data = {
+        "batched_reports_summaries": [
+            {
+                "count": 200,
+                "earliest_timestamp": "2024-06-15",
+                "latest_timestamp": "2024-06-21",
+                "processed_by_service_at": None,
+                "report_id": 347,
+                "is_a_batched_report": True,
+            },
+            {
+                "count": 321,
+                "earliest_timestamp": "2024-06-8",
+                "latest_timestamp": "2024-06-14",
+                "processed_by_service_at": "2024-06-10",
+                "report_id": 346,
+                "is_a_batched_report": True,
+            },
+        ],
+        "unbatched_report_summary": {}
+    }
     mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
-    mocker.patch("app.service_api_client.get_unsubscribe_request_report", return_value=test_data[0])
 
     page = client_request.get(
         "main.unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
-        report_id=test_data[0]["report_id"],
+        report_id=test_data["batched_reports_summaries"][1]["report_id"],
     )
     assert page.select("h1")[0].text == "22 June 2024 until 1 July 2024"
