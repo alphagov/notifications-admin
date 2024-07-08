@@ -25,7 +25,7 @@ def register():
         _do_registration(form, send_sms=False)
         return redirect(url_for("main.registration_continue"))
 
-    return render_template("views/register.html", form=form)
+    return render_template("views/register.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/register-from-invite", methods=["GET", "POST"])
