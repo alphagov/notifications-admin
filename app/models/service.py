@@ -622,8 +622,16 @@ class Service(JSONModel):
         return UnsubscribeRequestsReports(self.id)
 
     @property
-    def unsubscribe_requests(self) -> int:
+    def unsubscribe_requests(self) -> dict:
         return unsubscribe_requests_client.get_pending_unsubscribe_requests(self.id)
+
+    @property
+    def count_of_pending_unsubscribe_requests(self) -> int:
+        return self.unsubscribe_requests["count_of_pending_unsubscribe_requests"]
+
+    @property
+    def datetime_of_latest_unsubscribe_request(self) -> str | None:
+        return self.unsubscribe_requests["datetime_of_latest_unsubscribe_request"]
 
 
 class Services(SerialisedModelCollection):
