@@ -1,6 +1,6 @@
 from flask import render_template
 
-from app import current_service
+from app import current_service, service_api_client
 from app.main import main
 from app.utils.user import user_has_permissions
 
