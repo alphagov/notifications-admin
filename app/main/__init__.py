@@ -43,6 +43,7 @@ from app.main.views import (  # noqa
     tour,
     two_factor,
     uploads,
+    unsubscribe_requests,
     user_profile,
     verify,
     webauthn_credentials,
