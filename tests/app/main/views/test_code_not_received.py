@@ -62,8 +62,8 @@ def test_should_render_correct_resend_template_for_pending_user(
 
     assert page.select_one("h1").string == "If you do not receive a security code"
 
-    expected = "Check your mobile phone number is correct and then resend the security code."
-    message = page.select("main p")[0].text
+    expected = "Check that you can receive text messages from other numbers."
+    message = page.select("main li")[0].text
     assert message == expected
     assert page.select_one("form").input["value"] == api_user_pending["mobile_number"]
 
