@@ -2894,3 +2894,31 @@ class AddOrJoinServiceForm(StripWhitespaceForm):
             ("main.choose_service_to_join", "Join an existing service"),
         ),
     )
+
+
+class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
+    report_has_been_processed = GovukCheckboxField("Mark as Completed")
+
+    def __init__(self, is_a_batched_report, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if is_a_batched_report:
+            self.report_has_been_processed.param_extensions = {
+                "items": [
+                    {
+                        "hint": {"text": "I have unsubscribed these recipients from our mailing list"},
+                        "disabled": False,
+                    },
+                ]
+            }
+        else:
+            self.report_has_been_processed.param_extensions = {
+                "items": [
+                    {
+                        "hint": {"text": "You cannot do this until you've downloaded the report"},
+                        "disabled": True,
+                    },
+                ]
+            }
+
+        # TODO Add logic to allow users to tick the checkbox

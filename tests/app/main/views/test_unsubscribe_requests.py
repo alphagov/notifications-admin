@@ -76,12 +76,33 @@ def test_unsubscribe_request_report_for_existing_reports(client_request, mocker)
                 "is_a_batched_report": True,
             },
         ],
-        "unbatched_report_summary": {}
+        "unbatched_report_summary": {},
     }
     mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
     page = client_request.get(
         "main.unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
         report_id=test_data["batched_reports_summaries"][1]["report_id"],
+    )
+    assert page.select("h1")[0].text == "8 June 2024 until 14 June 2024"
+
+
+def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker):
+    test_data = {
+        "batched_reports_summaries": [],
+        "unbatched_report_summary": {
+            "count": 34,
+            "earliest_timestamp": "2024-06-22",
+            "latest_timestamp": "2024-07-01",
+            "processed_by_service_at": None,
+            "report_id": "efcab5ff-31e4-4aa0-ac23-9ecd862073be",
+            "is_a_batched_report": False,
+        },
+    }
+    mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
+    page = client_request.get(
+        "main.unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        report_id=test_data["unbatched_report_summary"]["report_id"],
     )
     assert page.select("h1")[0].text == "22 June 2024 until 1 July 2024"
