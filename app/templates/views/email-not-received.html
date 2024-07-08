@@ -1,17 +1,22 @@
 {% extends "withoutnav_template.html" %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% block per_page_title %}
-  Resend email link
+  If you do not receive an email link
 {% endblock %}
 
 {% block maincolumn_content %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="heading-large">Resend email link</h1>
+    <h1 class="heading-large">If you do not receive an email link</h1>
 
-    <p class="govuk-body">Emails sometimes take a few minutes to arrive. If you do not receive an email link, Notify can send you a new one.</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>Check your spam folder for emails from gov.uk.notify@notifications.service.gov.uk</li>
+      <li>If the email is not in your spam folder, we can send you another one.</li>
+    </ol>
+
     <p class="govuk-body">
       {{ govukButton({
         "element": "a",
@@ -20,14 +25,35 @@
       }) }}
     </p>
 
-    <h2 class="heading-medium">If your email address has changed</h2>
-    <p class="govuk-body">You’ll need to:</p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>find a member of your team who has permission to manage settings, team and usage</li>
-      <li>ask them to change the email address for your account</li>
-      <li>select <span class="govuk-body govuk-!-font-weight-bold">Resend email link</span></li>
-    </ul>
+    <p class="govuk-body">If this does not work, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.</p>
 
+    {% set change_email %}
+        <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to update your email address.</p>
+
+        <p class="govuk-body">To do this, they should:</p>
+
+
+        <ol class="govuk-list govuk-list--number">
+          <li>Sign in to GOV.UK Notify.</li>
+          <li>Go to the <span class="govuk-body govuk-!-font-weight-bold">Team members</span> page.</li>
+          <li>Find your name and select <span class="govuk-body govuk-!-font-weight-bold">Change details</span>.</li>
+          <li>Select <span class="govuk-body govuk-!-font-weight-bold">Change</span> next to your email address.</li>
+        </ol>
+    {% endset %}
+
+    {{ govukDetails({
+      "summaryText": "If your email address has changed",
+      "html": change_email
+    }) }}
+
+    {% set text_message_code %}
+        <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">change your sign-in method</a>.</p>
+    {% endset %}
+
+    {{ govukDetails({
+      "summaryText": "If you want to sign in with a text message code instead",
+      "html": text_message_code
+    }) }}
   </div>
 </div>
 
