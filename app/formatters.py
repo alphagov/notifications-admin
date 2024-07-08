@@ -359,29 +359,32 @@ def guess_name_from_email_address(email_address):
     )
 
 
-def message_count_label(count, template_type, suffix="sent"):
+def message_count_label(count, message_type, suffix="sent"):
     if suffix:
-        return f"{message_count_noun(count, template_type)} {suffix}"
-    return message_count_noun(count, template_type)
+        return f"{message_count_noun(count, message_type)} {suffix}"
+    return message_count_noun(count, message_type)
 
 
-def message_count_noun(count, template_type):
+def message_count_noun(count, message_type):
     singular = count == 1
 
-    if template_type == "sms":
+    if message_type == "sms":
         return "text message" if singular else "text messages"
 
-    if template_type == "email":
+    if message_type == "email":
         return "email" if singular else "emails"
 
-    if template_type == "letter":
+    if message_type == "letter":
         return "letter" if singular else "letters"
+
+    if message_type == "unsubscribe request":
+        return "unsubscribe request" if singular else "unsubscribe requests"
 
     return "message" if singular else "messages"
 
 
-def message_count(count, template_type):
-    return f"{format_thousands(count)} {message_count_noun(count, template_type)}"
+def message_count(count, message_type):
+    return f"{format_thousands(count)} {message_count_noun(count, message_type)}"
 
 
 def recipient_count_label(count, template_type):
