@@ -40,3 +40,17 @@ def test_unsubscribe_request_reports_summary(client_request, mocker):
         "15 June 2024 to 21 June 2024 200 unsubscribe requests Downloaded",
         "8 June 2024 to 14 June 2024 321 unsubscribe requests Completed",
     ] == [normalize_spaces(row.text) for row in page.select("tr")]
+
+
+def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocker):
+    test_data = {
+        "batched_reports_summaries": [],
+        "unbatched_report_summary": {},
+    }
+    mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
+
+    page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
+
+    assert ["Report", "If you have unsubscribed requests they will be listed here"] == [
+        normalize_spaces(row.text) for row in page.select("tr")
+    ]
