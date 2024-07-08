@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/table.html" import list_table, row_heading%}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Email unsubscribe requests
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_dashboard', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ page_header('Email unsubscribe requests') }}
+
+<div class="dashboard-table">
+    {% call(item, row_number) list_table(
+        data,
+        caption="Unsubscribe Request Reports",
+        caption_visible=False,
+        empty_message='If you have unsubscribed requests they will be listed here',
+        field_headings=['Report'],
+        field_headings_visible=False
+    ) %}
+    {% call row_heading() %}
+        {%  if item.processed_by_service_at and item.is_a_batched_report %}
+            {%  set processed_status = "Completed" -%}
+        {% elif  item.is_a_batched_report and not item.processed_by_service_at %}
+            {%  set processed_status = "Downloaded" -%}
+        {%  else %}
+            {%  set processed_status = "Not Downloaded" -%}
+        {%  endif %}
+      <a class="govuk-link govuk-link--no-visited-state file-list-filename"
+         href="{{url_for('')}}">
+          {{ item.earliest_timestamp | format_date_normal }} to {{ item.latest_timestamp | format_date_normal }}
+        </a>
+       <p class="file-list-hint">
+
+         {{ item.count|format_thousands}} {{ item.count | message_count_label('unsubscribe request', suffix='') }}
+           <span class="banner-dashboard-meta">
+        {{ processed_status }}
+      </span>
+
+       </p>
+    {% endcall %}
+  {% endcall %}
+</div>
+
+{% endblock %}
+
