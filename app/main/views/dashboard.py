@@ -284,6 +284,7 @@ def get_dashboard_partials(service_id):
         ),
         "inbox": render_template(
             "views/dashboard/_inbox.html",
+            unsubscribe_requests=unsubscribe_requests,
         ),
         "totals": render_template(
             "views/dashboard/_totals.html",
@@ -298,9 +299,6 @@ def get_dashboard_partials(service_id):
         "usage": render_template(
             "views/dashboard/_usage.html",
             **get_annual_usage_breakdown(yearly_usage, free_sms_allowance),
-        ),
-        "unsubscribe-requests": render_template(
-            "views/dashboard/_unsubscribe-requests.html", unsubscribe_requests=unsubscribe_requests
         ),
     }
 
