@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import list_table, row_heading%}
+{% from "components/table.html" import field, list_table, row_heading%}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
@@ -21,29 +21,27 @@
         caption="Unsubscribe Request Reports",
         caption_visible=False,
         empty_message='If you have unsubscribed requests they will be listed here',
-        field_headings=['Report'],
+        field_headings=['Report', 'Status'],
         field_headings_visible=False
     ) %}
     {% call row_heading() %}
-        {%  if item.processed_by_service_at and item.is_a_batched_report %}
-            {%  set processed_status = "Completed" -%}
-        {% elif  item.is_a_batched_report and not item.processed_by_service_at %}
-            {%  set processed_status = "Downloaded" -%}
-        {%  else %}
-            {%  set processed_status = "Not Downloaded" -%}
-        {%  endif %}
       <a class="govuk-link govuk-link--no-visited-state file-list-filename"
-         href="{{url_for('main.unsubscribe_request_report', service_id=current_service.id, report_id=item.report_id)}}"  }}>
+         href="{{url_for('main.unsubscribe_request_report', service_id=current_service.id, batch_id=item.batch_id)}}"  }}>
           {{ item.earliest_timestamp | format_date_normal }} to {{ item.latest_timestamp | format_date_normal }}
         </a>
        <p class="file-list-hint">
 
          {{ item.count|format_thousands}} {{ item.count | message_count_label('unsubscribe request', suffix='') }}
-           <span class="banner-dashboard-meta">
-        {{ processed_status }}
-      </span>
-
-       </p>
+         </p>
+    {% endcall %}
+    {% call field(align='right') %}
+        {%  if item.processed_by_service_at and item.is_a_batched_report %}
+                Completed
+        {% elif  item.is_a_batched_report and not item.processed_by_service_at %}
+                Downloaded
+        {%  else %}
+                Not downloaded
+        {%  endif %}
     {% endcall %}
   {% endcall %}
 </div>

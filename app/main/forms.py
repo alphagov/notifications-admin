@@ -2891,7 +2891,7 @@ class AddOrJoinServiceForm(StripWhitespaceForm):
 
 
 class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
-    report_has_been_processed = GovukCheckboxField("Mark as Completed")
+    report_has_been_processed = GovukCheckboxField("Mark as completed")
 
     def __init__(self, is_a_batched_report, *args, **kwargs):
         super().__init__(*args, **kwargs)

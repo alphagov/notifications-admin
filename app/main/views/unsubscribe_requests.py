@@ -1,4 +1,4 @@
-from flask import redirect, render_template, url_for
+from flask import abort, render_template
 
 from app import current_service
 from app.main import main
@@ -6,7 +6,7 @@ from app.main.forms import ProcessUnsubscribeRequestForm
 from app.utils.user import user_has_permissions
 
 
-@main.route("/services/<uuid:service_id>/unsubscribe-request-reports-summary")
+@main.route("/services/<uuid:service_id>/unsubscribe-requests/summary")
 @user_has_permissions("view_activity")
 def unsubscribe_request_reports_summary(service_id):
     reports_summary_data = _get_unsubscribe_request_reports_summary()
@@ -23,13 +23,13 @@ def _get_unsubscribe_request_reports_summary():
     return reports_summary_data
 
 
-@main.route("/services/<uuid:service_id>/unsubscribe-request-report/<uuid:report_id>")
+@main.route("/services/<uuid:service_id>/unsubscribe-requests/reports/<uuid:batch_id>")
 @user_has_permissions("view_activity")
-def unsubscribe_request_report(service_id, report_id):
+def unsubscribe_request_report(service_id, batch_id):
     report_data = None
     if reports_summary_data := _get_unsubscribe_request_reports_summary():
         for report_summary in reports_summary_data:
-            if report_summary["report_id"] == report_id:
+            if report_summary["batch_id"] == batch_id:
                 report_data = report_summary
         if report_data:
             form = ProcessUnsubscribeRequestForm(is_a_batched_report=report_data["is_a_batched_report"])
@@ -39,11 +39,10 @@ def unsubscribe_request_report(service_id, report_id):
                 earliest_timestamp=report_data["earliest_timestamp"],
                 latest_timestamp=report_data["latest_timestamp"],
                 processed_by_service_at=report_data["processed_by_service_at"],
-                report_id=report_data["report_id"],
+                batch_id=report_data["batch_id"],
                 is_a_batched_report=report_data["is_a_batched_report"],
                 service_id=service_id,
                 form=form,
             )
 
-    else:
-        return redirect(url_for("main.unsubscribe_request_reports_summary", service_id=service_id))
+    abort(404)
