@@ -586,7 +586,7 @@ class LoginForm(StripWhitespaceForm):
 
 class RegisterUserForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
-    email_address = make_email_address_field(gov_user=True)
+    email_address = make_email_address_field(gov_user=True, thing="your email address")
     mobile_number = international_phone_number()
     password = make_password_field(thing="your password")
     # always register as sms type
