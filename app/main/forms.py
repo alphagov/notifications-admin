@@ -1345,7 +1345,13 @@ class ConfirmPasswordForm(StripWhitespaceForm):
 
 
 class TemplateNameMixin:
-    name = GovukTextInputField("Template name", validators=[NotifyDataRequired(thing="a name for this template")])
+    name = GovukTextInputField(
+        "Template name",
+        validators=[
+            NotifyDataRequired(thing="Template name"),
+            Length(max=255, thing="Template name"),
+        ],
+    )
 
 
 class RenameTemplateForm(StripWhitespaceForm, TemplateNameMixin):
