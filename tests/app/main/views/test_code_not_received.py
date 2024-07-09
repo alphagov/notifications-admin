@@ -193,7 +193,7 @@ def test_should_render_correct_email_not_received_template_for_active_user(
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
     page = client_request.get("main.email_not_received", next=redirect_url)
 
-    assert page.select_one("h1").string == "Resend email link"
+    assert page.select_one("h1").string == "If you do not receive an email link"
     # there shouldn't be a form for updating mobile number
     assert page.select_one("form") is None
     assert page.select_one("a.govuk-button")["href"] == url_for("main.resend_email_link", next=redirect_url)
