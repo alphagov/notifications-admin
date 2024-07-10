@@ -17,11 +17,11 @@ class UnsubscribeRequestsReport(JSONModel):
 
     @property
     def status(self):
-        if self.processed_by_service_at and self.is_a_batched_report:
-            return "Completed"
-        if self.is_a_batched_report and not self.processed_by_service_at:
+        if not self.is_a_batched_report:
+            return "Not downloaded"
+        if not self.processed_by_service_at:
             return "Downloaded"
-        return "Not downloaded"
+        return "Completed"
 
 
 class UnsubscribeRequestsReports(ModelList):
