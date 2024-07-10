@@ -10,7 +10,7 @@ from notifications_utils.clients.zendesk.zendesk_client import (
     ZendeskError,
 )
 
-from app.main.views.feedback import in_business_hours
+from app.main.views.feedback import ZENDESK_USER_LOGGED_OUT_NOTE, in_business_hours
 from app.models.feedback import (
     GENERAL_TICKET_TYPE,
     PROBLEM_TICKET_TYPE,
@@ -165,7 +165,7 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
     mock_send_ticket_to_zendesk.assert_called_once()
     mock_update_ticket_with_internal_note.assert_called_once_with(
         1234,
-        comment=NotifySupportTicketComment(body="Requester not logged in", attachments=(), public=False),
+        comment=NotifySupportTicketComment(body=ZENDESK_USER_LOGGED_OUT_NOTE, attachments=(), public=False),
     )
 
 
