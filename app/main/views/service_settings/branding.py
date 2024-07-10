@@ -401,7 +401,7 @@ def email_branding_set_alt_text(service_id):
 
 
 def _email_branding_flow_query_params(request, **kwargs):
-    """Return a dictionary containing values for the new email branding flow.
+    """Return a dictionary containing values for the email branding flow.
 
     In order to create a new email branding for a user we need to collect and remember a series of information:
     - what kind of brand they want
@@ -519,7 +519,7 @@ def branding_option_preview(service_id, branding_type):
         back_link_query_params = _email_branding_flow_query_params(request)
     else:
         branding_pool = current_service.letter_branding_pool
-        back_link_query_params = _letter_branding_flow_query_params()
+        back_link_query_params = _letter_branding_flow_query_params(request)
     try:
         chosen_branding = branding_pool.get_item_by_id(request.args.get("branding_choice"))
     except branding_pool.NotFound:
@@ -552,7 +552,7 @@ def branding_nhs(service_id, branding_type):
         back_link_query_params = _email_branding_flow_query_params(request)
     else:
         branding = LetterBranding.NHS_ID
-        back_link_query_params = _letter_branding_flow_query_params()
+        back_link_query_params = _letter_branding_flow_query_params(request)
 
     check_branding_allowed_for_service(branding, branding_type=branding_type)
 
@@ -577,7 +577,7 @@ def branding_nhs(service_id, branding_type):
 # ================= LETTER BRANDING ===================
 
 
-def _letter_branding_flow_query_params(**kwargs):
+def _letter_branding_flow_query_params(request, **kwargs):
     """Return a dictionary containing values for the letter branding flow.
 
     We've got a variety of query parameters we want to pass around between pages. Any params that are passed in, we
@@ -627,7 +627,7 @@ def letter_branding_options(service_id):
                 url_for(
                     ".letter_branding_upload_branding",
                     service_id=current_service.id,
-                    **_letter_branding_flow_query_params(branding_choice=branding_choice),
+                    **_letter_branding_flow_query_params(request, branding_choice=branding_choice),
                 )
             )
 
@@ -643,7 +643,7 @@ def letter_branding_options(service_id):
 @user_has_permissions("manage_service")
 def letter_branding_request(service_id):
     form = BrandingRequestForm()
-    from_template = _letter_branding_flow_query_params()["from_template"]
+    from_template = _letter_branding_flow_query_params(request)["from_template"]
 
     if form.validate_on_submit():
         ticket_message = render_template(
@@ -679,7 +679,7 @@ def letter_branding_request(service_id):
         back_link=url_for(
             ".letter_branding_upload_branding",
             service_id=current_service.id,
-            **_letter_branding_flow_query_params(),
+            **_letter_branding_flow_query_params(request),
         ),
         error_summary_enabled=True,
     )
@@ -698,7 +698,7 @@ def letter_branding_upload_branding(service_id):
             url_for(
                 "main.letter_branding_set_name",
                 service_id=current_service.id,
-                **_letter_branding_flow_query_params(temp_filename=temporary_logo_key),
+                **_letter_branding_flow_query_params(request, temp_filename=temporary_logo_key),
             )
         )
 
@@ -709,7 +709,7 @@ def letter_branding_upload_branding(service_id):
         back_link=url_for(
             ".letter_branding_options",
             service_id=current_service.id,
-            **_letter_branding_flow_query_params(),
+            **_letter_branding_flow_query_params(request),
         ),
         # TODO: Create branding-specific zendesk flow that creates branding ticket (see .letter_branding_request)
         abandon_flow_link=url_for(".letter_branding_request", service_id=current_service.id),
@@ -733,7 +733,7 @@ def _should_set_default_org_letter_branding(branding_choice):
 @main.route("/services/<uuid:service_id>/service-settings/letter-branding/set-name", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def letter_branding_set_name(service_id):
-    letter_branding_data = _letter_branding_flow_query_params()
+    letter_branding_data = _letter_branding_flow_query_params(request)
     temporary_logo_key = letter_branding_data["temp_filename"]
 
     if not temporary_logo_key:
@@ -776,7 +776,7 @@ def letter_branding_set_name(service_id):
         back_link=url_for(
             ".letter_branding_upload_branding",
             service_id=service_id,
-            **_letter_branding_flow_query_params(temp_filename=None),
+            **_letter_branding_flow_query_params(request, temp_filename=None),
         ),
         temp_filename=letter_filename_for_db_from_logo_key(temporary_logo_key),
         form=form,
