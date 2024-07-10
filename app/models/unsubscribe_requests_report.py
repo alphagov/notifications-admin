@@ -1,4 +1,5 @@
-from app.models import JSONModel
+from app.models import JSONModel, ModelList
+from app.notify_client.service_api_client import service_api_client
 
 
 class UnsubscribeRequestsReport(JSONModel):
@@ -11,3 +12,12 @@ class UnsubscribeRequestsReport(JSONModel):
         "is_a_batched_report",
     }
     __sort_attribute__ = "earliest_timestamp"
+
+
+class UnsubscribeRequestsReports(ModelList):
+    client_method = service_api_client.get_unsubscribe_reports_summary
+    model = UnsubscribeRequestsReport
+
+    def __init__(self, *args):
+        super().__init__(self, *args)
+        self.items = (self.items["unbatched_report_summary"] or []) + (self.items["batched_reports_summaries"] or [])
