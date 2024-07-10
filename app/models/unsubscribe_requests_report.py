@@ -1,3 +1,5 @@
+from flask import abort
+
 from app.models import JSONModel, ModelList
 from app.notify_client.service_api_client import service_api_client
 
@@ -26,3 +28,4 @@ class UnsubscribeRequestsReports(ModelList):
         for report in self:
             if report.batch_id == batch_id:
                 return report
+        abort(404)
