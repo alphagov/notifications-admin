@@ -19,6 +19,13 @@ from app.utils import hide_from_search_engines
 
 bank_holidays = BankHolidays(use_cached_holidays=True)
 
+ZENDESK_USER_LOGGED_OUT_NOTE = (
+    "The requester is not signed in to GOV.UK Notify.\n\n"
+    "To confirm they have access to the email address they entered in the support form:\n\n"
+    "1. Submit a public reply to this ticket.\n"
+    "2. Wait for the requester to reply."
+)
+
 
 @main.route("/support", methods=["GET", "POST"])
 @hide_from_search_engines
@@ -140,7 +147,7 @@ def feedback(ticket_type):
         if zendesk_ticket_id and not current_user.is_authenticated:
             zendesk_client.update_ticket(
                 zendesk_ticket_id,
-                comment=NotifySupportTicketComment(body="Requester not logged in", public=False),
+                comment=NotifySupportTicketComment(body=ZENDESK_USER_LOGGED_OUT_NOTE, public=False),
             )
 
         return redirect(
