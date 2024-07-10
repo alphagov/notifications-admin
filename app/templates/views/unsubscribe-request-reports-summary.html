@@ -35,13 +35,7 @@
          </p>
     {% endcall %}
     {% call field(align='right') %}
-        {%  if item.processed_by_service_at and item.is_a_batched_report %}
-                Completed
-        {% elif  item.is_a_batched_report and not item.processed_by_service_at %}
-                Downloaded
-        {%  else %}
-                Not downloaded
-        {%  endif %}
+        {{ item.status }}
     {% endcall %}
   {% endcall %}
 </div>
