@@ -7,6 +7,7 @@ from app.models.branding import EmailBranding, LetterBranding
 from app.models.contact_list import ContactLists
 from app.models.job import ImmediateJobs, PaginatedJobs, PaginatedUploads, ScheduledJobs
 from app.models.organisation import Organisation
+from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
 from app.models.user import InvitedUsers, User, Users
 from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
@@ -615,7 +616,7 @@ class Service(JSONModel):
 
     @property
     def unsubscribe_request_reports_summary(self):
-        return service_api_client.get_unsubscribe_reports_summary(self.id)
+        return UnsubscribeRequestsReports(self.id)
 
 
 class Services(SerialisedModelCollection):
