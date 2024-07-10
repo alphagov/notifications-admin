@@ -17,7 +17,7 @@
 
 <div class="dashboard-table">
     {% call(item, row_number) list_table(
-        data,
+        current_service.unsubscribe_request_reports_summary,
         caption="Unsubscribe Request Reports",
         caption_visible=False,
         empty_message='If you have unsubscribed requests they will be listed here',

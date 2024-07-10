@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block service_page_title %}
-{{ earliest_timestamp|format_date_normal }} until {{ latest_timestamp|format_date_normal }}
+{{ report.earliest_timestamp|format_date_normal }} until {{ report.latest_timestamp|format_date_normal }}
 {% endblock %}
 
 
@@ -15,10 +15,10 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('{} until {}'.format(earliest_timestamp|format_date_normal, latest_timestamp|format_date_normal)) }}
+    {{ page_header('{} until {}'.format(report.earliest_timestamp|format_date_normal, report.latest_timestamp|format_date_normal)) }}
 
  <p class="govuk-body">
-     {{ count|format_thousands}} new requests to unsubscribe
+     {{ report.count|format_thousands}} new requests to unsubscribe
  </p>
 
     <p class="govuk-body">You must: </p>
@@ -29,7 +29,7 @@
 
 {% call form_wrapper() %}
    {{ form.report_has_been_processed }}
-    {% if is_a_batched_report %}
+    {% if report.is_a_batched_report %}
       {{  govukButton({ "text": "Update" }) }}
     {% endif %}
 {% endcall %}
