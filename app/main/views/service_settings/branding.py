@@ -173,11 +173,18 @@ def email_branding_request(service_id):
 @service_belongs_to_org_type("central")
 def email_branding_request_government_identity_logo(service_id):
     branding_choice = request.args.get("branding_choice")
+    logo_type = request.args.get("logo_type")
+
     return render_template(
         "views/service-settings/branding/new/email-branding-create-government-identity-logo.html",
         service_id=service_id,
-        back_link=url_for(".email_branding_choose_logo", service_id=service_id, branding_choice=branding_choice),
+        back_link=url_for(
+            ".email_branding_choose_logo",
+            service_id=service_id,
+            **_email_branding_flow_query_params(request),
+        ),
         branding_choice=branding_choice,
+        logo_type=logo_type,
         example=AllEmailBranding().example_government_identity_branding,
     )
 
@@ -218,7 +225,9 @@ def email_branding_enter_government_identity_logo_text(service_id):
         "views/service-settings/branding/new/email-branding-enter-government-identity-logo-text.html",
         form=form,
         back_link=url_for(
-            ".email_branding_request_government_identity_logo", service_id=service_id, branding_choice=branding_choice
+            ".email_branding_request_government_identity_logo",
+            service_id=service_id,
+            **_email_branding_flow_query_params(request),
         ),
         error_summary_enabled=True,
     )
@@ -230,6 +239,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
 def email_branding_choose_logo(service_id):
     form = EmailBrandingChooseLogoForm()
     branding_choice = request.args.get("branding_choice")
+    form.branding_options.data = form.branding_options.data or request.args.get("logo_type")
 
     if form.validate_on_submit():
         if form.branding_options.data == "org":
@@ -238,9 +248,8 @@ def email_branding_choose_logo(service_id):
                     url_for(
                         ".email_branding_upload_logo",
                         service_id=current_service.id,
-                        branding_choice=branding_choice,
-                        brand_type="both",
                         back_link=".email_branding_choose_logo",
+                        **_email_branding_flow_query_params(request, brand_type="both", logo_type="org"),
                     )
                 )
 
@@ -249,7 +258,7 @@ def email_branding_choose_logo(service_id):
                     ".email_branding_choose_banner_type",
                     service_id=current_service.id,
                     back_link=".email_branding_choose_logo",
-                    **_email_branding_flow_query_params(request),
+                    **_email_branding_flow_query_params(request, logo_type="org"),
                 )
             )
         elif form.branding_options.data == "single_identity":
@@ -257,7 +266,7 @@ def email_branding_choose_logo(service_id):
                 url_for(
                     ".email_branding_request_government_identity_logo",
                     service_id=current_service.id,
-                    **_email_branding_flow_query_params(request),
+                    **_email_branding_flow_query_params(request, logo_type="single_identity"),
                 )
             )
 
@@ -270,7 +279,7 @@ def email_branding_choose_logo(service_id):
             back_link=url_for(
                 "main.email_branding_options",
                 service_id=current_service.id,
-                **_email_branding_flow_query_params(request),
+                **_email_branding_flow_query_params(request, logo_type=None),
             ),
         ),
         400 if form.errors else 200,
@@ -361,8 +370,9 @@ def email_branding_set_alt_text(service_id):
     form = EmailBrandingAltTextForm()
 
     if form.validate_on_submit():
-        # we use this key to keep track of user choices through the journey but we don't use it to save the branding
+        # we use these keys to keep track of user choices through the journey but we don't use them to save the branding
         branding_choice = email_branding_data.pop("branding_choice")
+        email_branding_data.pop("logo_type", None)
 
         # Copy the temporary logo to its permanent location in S3 and overwrite the temporary logo key in the
         # email data to use in creating the logo in the DB.
@@ -425,7 +435,9 @@ def _email_branding_flow_query_params(request, **kwargs):
 
     These values can get passed to the `/_email` endpoint to generate a preview of a new brand.
     """
-    return {k: kwargs.get(k, request.args.get(k)) for k in ("brand_type", "branding_choice", "colour", "logo")}
+    return {
+        k: kwargs.get(k, request.args.get(k)) for k in ("brand_type", "branding_choice", "colour", "logo", "logo_type")
+    }
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-branding/add-banner", methods=["GET", "POST"])

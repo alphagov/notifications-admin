@@ -1073,6 +1073,22 @@ def test_email_branding_choose_logo_page_shows_not_setup_message(
     else:
         assert not hint
 
+    assert not page.select(".govuk-radios__item input[checked]")
+
+
+@pytest.mark.parametrize("logo_type", ["single_identity", "org"])
+def test_email_branding_choose_logo_page_shows_form_prefilled(client_request, service_one, logo_type):
+    page = client_request.get(
+        "main.email_branding_choose_logo",
+        service_id=SERVICE_ONE_ID,
+        logo_type=logo_type,
+    )
+
+    checked_radio_button = page.select(".govuk-radios__item input[checked]")
+
+    assert len(checked_radio_button) == 1
+    assert checked_radio_button[0]["value"] == logo_type
+
 
 def test_email_branding_choose_logo_page_prevents_xss_attacks(
     mocker,
@@ -1115,32 +1131,42 @@ def test_only_central_org_services_can_see_email_branding_choose_logo_page(clien
             "something_else",
             "org",
             ".email_branding_choose_banner_type",
-            {"back_link": ".email_branding_choose_logo", "branding_choice": "something_else"},
+            {"back_link": ".email_branding_choose_logo", "branding_choice": "something_else", "logo_type": "org"},
         ),
         (
             "something_else",
             "single_identity",
             ".email_branding_request_government_identity_logo",
-            {"branding_choice": "something_else"},
+            {"branding_choice": "something_else", "logo_type": "single_identity"},
         ),
         (
             "org",
             "org",
             ".email_branding_choose_banner_type",
-            {"back_link": ".email_branding_choose_logo", "branding_choice": "org"},
+            {"back_link": ".email_branding_choose_logo", "branding_choice": "org", "logo_type": "org"},
         ),
-        ("org", "single_identity", ".email_branding_request_government_identity_logo", {"branding_choice": "org"}),
+        (
+            "org",
+            "single_identity",
+            ".email_branding_request_government_identity_logo",
+            {"branding_choice": "org", "logo_type": "single_identity"},
+        ),
         (
             "govuk_and_org",
             "org",
             ".email_branding_upload_logo",
-            {"back_link": ".email_branding_choose_logo", "branding_choice": "govuk_and_org", "brand_type": "both"},
+            {
+                "back_link": ".email_branding_choose_logo",
+                "branding_choice": "govuk_and_org",
+                "brand_type": "both",
+                "logo_type": "org",
+            },
         ),
         (
             "govuk_and_org",
             "single_identity",
             ".email_branding_request_government_identity_logo",
-            {"branding_choice": "govuk_and_org"},
+            {"branding_choice": "govuk_and_org", "logo_type": "single_identity"},
         ),
     ],
 )
