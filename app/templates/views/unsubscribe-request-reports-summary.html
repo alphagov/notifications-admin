@@ -26,7 +26,7 @@
     ) %}
     {% call row_heading() %}
       <a class="govuk-link govuk-link--no-visited-state file-list-filename"
-         href="{{url_for('main.unsubscribe_request_report', service_id=current_service.id, batch_id=item.batch_id)}}"  }}>
+         href="{{url_for('main.unsubscribe_request_report', service_id=current_service.id, batch_id=item.batch_id)}}" }}>
           {{ item.earliest_timestamp | format_date_normal }} to {{ item.latest_timestamp | format_date_normal }}
         </a>
        <p class="file-list-hint">
@@ -35,7 +35,7 @@
          </p>
     {% endcall %}
     {% call field(align='right') %}
-        {{ item.status }}
+        {{ item.status}}
     {% endcall %}
   {% endcall %}
 </div>
