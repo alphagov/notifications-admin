@@ -169,6 +169,7 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
     )
 
 
+@pytest.mark.freeze_time("2024-07-08 12:00")
 def test_does_not_add_internal_note_to_tickets_created_by_suspended_users(client_request, mocker):
     client_request.logout()
     mocker.patch(
@@ -189,6 +190,7 @@ def test_does_not_add_internal_note_to_tickets_created_by_suspended_users(client
     assert not mock_update_ticket_with_internal_note.called
 
 
+@pytest.mark.freeze_time("2024-07-08 12:00")
 def test_does_not_add_internal_note_to_ticket_if_error_creating_ticket(client_request, mocker):
     client_request.logout()
     mocker.patch(
