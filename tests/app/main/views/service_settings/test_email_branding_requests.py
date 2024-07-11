@@ -1184,6 +1184,14 @@ def test_email_branding_choose_logo_redirects_to_right_page(
                 "?back_link=.email_branding_upload_logo&brand_type=org_banner"
             ),
         ),
+        (
+            {"brand_type": "both"},
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/choose-logo?brand_type=both",  # noqa
+            (
+                "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/request"
+                "?back_link=.email_branding_upload_logo&brand_type=both"
+            ),
+        ),
     ),
 )
 def test_GET_email_branding_upload_logo(

@@ -305,6 +305,12 @@ def email_branding_upload_logo(service_id):
             service_id=service_id,
             **_email_branding_flow_query_params(request, colour=None),
         )
+    elif request.args.get("brand_type") == "both":
+        back_link = url_for(
+            ".email_branding_choose_logo",
+            service_id=service_id,
+            **_email_branding_flow_query_params(request),
+        )
     else:
         back_link = url_for(
             ".email_branding_choose_banner_type",
