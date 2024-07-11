@@ -1,36 +1,38 @@
+from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
 def test_unsubscribe_request_reports_summary(client_request, mocker):
-    test_data = {
-        "batched_reports_summaries": [
-            {
-                "count": 200,
-                "earliest_timestamp": "2024-06-15",
-                "latest_timestamp": "2024-06-21",
-                "processed_by_service_at": None,
-                "batch_id": "ab26e2bc-da34-4326-bc2e-d957c14edde6",
-                "is_a_batched_report": True,
-            },
-            {
-                "count": 321,
-                "earliest_timestamp": "2024-06-8",
-                "latest_timestamp": "2024-06-14",
-                "processed_by_service_at": "2024-06-10",
-                "batch_id": "a46004d4-a4f5-4e9a-ad66-309fe503f7e6",
-                "is_a_batched_report": True,
-            },
-        ],
-        "unbatched_report_summary": {
+    test_data = [
+        {
             "count": 34,
             "earliest_timestamp": "2024-06-22",
             "latest_timestamp": "2024-07-01",
             "processed_by_service_at": None,
             "batch_id": "5e2b05ef-7552-49ef-a77f-96d46ab2b9bb",
             "is_a_batched_report": False,
+            "status": "Not downloaded",
         },
-    }
-    mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
+        {
+            "count": 200,
+            "earliest_timestamp": "2024-06-15",
+            "latest_timestamp": "2024-06-21",
+            "processed_by_service_at": None,
+            "batch_id": "c2d11916-ee82-419e-99a8-7e38163e756f",
+            "is_a_batched_report": True,
+            "status": "Downloaded",
+        },
+        {
+            "count": 321,
+            "earliest_timestamp": "2024-06-8",
+            "latest_timestamp": "2024-06-14",
+            "processed_by_service_at": "2024-06-10",
+            "batch_id": "e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
+            "is_a_batched_report": True,
+            "status": "Completed",
+        },
+    ]
+    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
 
@@ -43,11 +45,8 @@ def test_unsubscribe_request_reports_summary(client_request, mocker):
 
 
 def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocker):
-    test_data = {
-        "batched_reports_summaries": [],
-        "unbatched_report_summary": {},
-    }
-    mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
+
+    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=[])
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
 
@@ -57,70 +56,60 @@ def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocke
 
 
 def test_unsubscribe_request_report_for_batched_reports(client_request, mocker):
-    test_data = test_data = {
-        "batched_reports_summaries": [
-            {
-                "count": 200,
-                "earliest_timestamp": "2024-06-15",
-                "latest_timestamp": "2024-06-21",
-                "processed_by_service_at": None,
-                "batch_id": "a8a526f9-84be-44a6-b751-62c95c4b9329",
-                "is_a_batched_report": True,
-            },
-            {
-                "count": 321,
-                "earliest_timestamp": "2024-06-8",
-                "latest_timestamp": "2024-06-14",
-                "processed_by_service_at": "2024-06-10",
-                "batch_id": "b9c28b5b-e442-4e5f-a9c7-c2544502627a",
-                "is_a_batched_report": True,
-            },
-        ],
-        "unbatched_report_summary": {},
-    }
-    mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
+    test_data = [
+        {
+            "count": 200,
+            "earliest_timestamp": "2024-06-15",
+            "latest_timestamp": "2024-06-21",
+            "processed_by_service_at": None,
+            "batch_id": "a8a526f9-84be-44a6-b751-62c95c4b9329",
+            "is_a_batched_report": True,
+        },
+        {
+            "count": 321,
+            "earliest_timestamp": "2024-06-8",
+            "latest_timestamp": "2024-06-14",
+            "processed_by_service_at": "2024-06-10",
+            "batch_id": "b9c28b5b-e442-4e5f-a9c7-c2544502627a",
+            "is_a_batched_report": True,
+        },
+    ]
+
+    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
+
     page = client_request.get(
         "main.unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
-        batch_id=test_data["batched_reports_summaries"][1]["batch_id"],
+        batch_id=test_data[1]["batch_id"],
     )
     assert page.select("h1")[0].text == "8 June 2024 until 14 June 2024"
 
 
 def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker):
-    test_data = {
-        "batched_reports_summaries": [],
-        "unbatched_report_summary": {
+    test_data = [
+        {
             "count": 34,
             "earliest_timestamp": "2024-06-22",
             "latest_timestamp": "2024-07-01",
             "processed_by_service_at": None,
             "batch_id": "efcab5ff-31e4-4aa0-ac23-9ecd862073be",
             "is_a_batched_report": False,
-        },
-    }
-    mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
+            "status": "Not downloaded",
+        }
+    ]
+
+    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
     page = client_request.get(
         "main.unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
-        batch_id=test_data["unbatched_report_summary"]["batch_id"],
+        batch_id=test_data[0]["batch_id"],
     )
     assert page.select("h1")[0].text == "22 June 2024 until 1 July 2024"
 
 
 def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_request, mocker):
-    test_data = {
-        "batched_reports_summaries": [],
-        "unbatched_report_summary": {
-            "count": 34,
-            "earliest_timestamp": "2024-06-22",
-            "latest_timestamp": "2024-07-01",
-            "processed_by_service_at": None,
-            "batch_id": "efcab5ff-31e4-4aa0-ac23-9ecd862073be",
-            "is_a_batched_report": False,
-        },
-    }
-    mocker.patch("app.service_api_client.get_unsubscribe_reports_summary", return_value=test_data)
+
+    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=[])
     page = client_request.get(
         "main.unsubscribe_request_report",
         _expected_status=404,
