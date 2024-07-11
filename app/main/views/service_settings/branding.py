@@ -315,7 +315,7 @@ def email_branding_upload_logo(service_id):
         back_link = url_for(
             ".email_branding_choose_banner_type",
             service_id=service_id,
-            **_email_branding_flow_query_params(request, brand_type=None),
+            **_email_branding_flow_query_params(request),
         )
 
     return (
@@ -432,6 +432,7 @@ def _email_branding_flow_query_params(request, **kwargs):
 @user_has_permissions("manage_service")
 def email_branding_choose_banner_type(service_id):
     form = EmailBrandingChooseBanner()
+    form.banner.data = form.banner.data or request.args.get("brand_type")
 
     if form.validate_on_submit():
         if form.banner.data == "org":
@@ -467,7 +468,7 @@ def email_branding_choose_banner_type(service_id):
             back_link=url_for(
                 back_view,
                 service_id=current_service.id,
-                **_email_branding_flow_query_params(request),
+                **_email_branding_flow_query_params(request, brand_type=None),
             ),
             error_summary_enabled=True,
         ),

@@ -1170,7 +1170,7 @@ def test_email_branding_choose_logo_redirects_to_right_page(
         ),
         (
             {"brand_type": "org"},
-            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner",
+            "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/add-banner?brand_type=org",
             (
                 "/services/596364a0-858e-42c8-9062-a8fe822260eb/service-settings/email-branding/request"
                 "?back_link=.email_branding_upload_logo&brand_type=org"
@@ -1655,6 +1655,7 @@ def test_email_branding_choose_banner_type_page(
     assert form["method"] == "post"
     assert "Continue" in submit_button.text
     assert [radio["value"] for radio in page.select("input[type=radio]")] == ["org_banner", "org"]
+    assert not page.select(".govuk-radios__item input[checked]")
 
     assert back_button["href"] == url_for(back_button_url, service_id=SERVICE_ONE_ID)
 
@@ -1709,6 +1710,16 @@ def test_any_org_type_can_see_email_branding_choose_banner_type_page(
         service_id=SERVICE_ONE_ID,
         _expected_status=expected_status,
     )
+
+
+@pytest.mark.parametrize("banner_type", ["org", "org_banner"])
+def test_email_branding_choose_banner_type_shows_banner_type_form_prefilled(client_request, service_one, banner_type):
+    page = client_request.get(".email_branding_choose_banner_type", service_id=SERVICE_ONE_ID, brand_type=banner_type)
+
+    checked_radio_button = page.select(".govuk-radios__item input[checked]")
+
+    assert len(checked_radio_button) == 1
+    assert checked_radio_button[0]["value"] == banner_type
 
 
 @pytest.mark.parametrize(
