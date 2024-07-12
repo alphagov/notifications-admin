@@ -85,18 +85,12 @@ class ValidPhoneNumber:
     is_international = False
     message = None
 
-    TOO_SHORT = "Mobile number is too short"
-    TOO_LONG = "Mobile number is too long"
-    NOT_UK = "This does not look like a UK mobile number – double check the mobile number you entered"
-    NO_COUNTRY_CODE = "Country code not found - double check the mobile number you entered"
-    INVALID_CHARS = "Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"
-
     _error_summary_messages_map = {
-        TOO_SHORT: "%s is too short",
-        TOO_LONG: "%s is too long",
-        NOT_UK: "%s does not look like a UK mobile number",
-        NO_COUNTRY_CODE: "Country code for %s not found",
-        INVALID_CHARS: "%s can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -",
+        InvalidPhoneError.Codes.TOO_SHORT: "%s is too short",
+        InvalidPhoneError.Codes.TOO_LONG: "%s is too long",
+        InvalidPhoneError.Codes.NOT_A_UK_MOBILE: "%s does not look like a UK mobile number",
+        InvalidPhoneError.Codes.UNSUPPORTED_COUNTRY_CODE: "Country code for %s not found",
+        InvalidPhoneError.Codes.UNKNOWN_CHARACTER: "%s can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -",
     }
 
     def __call__(self, form, field):
@@ -106,7 +100,7 @@ class ValidPhoneNumber:
         except InvalidPhoneError as e:
             error_message = str(e)
             if hasattr(field, "error_summary_messages"):
-                error_summary_message = self._error_summary_messages_map[error_message]
+                error_summary_message = self._error_summary_messages_map[e.code]
 
                 field.error_summary_messages.append(error_summary_message)
 

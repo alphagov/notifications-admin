@@ -92,12 +92,12 @@ def test_uk_mobile_number_validation_messages_match(mocker):
     mock_field = _gen_mock_field("notanumber", error_summary_messages=[])
     mocker.patch(
         "app.main.validators.validate_phone_number",
-        side_effect=InvalidPhoneError("Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"),
+        side_effect=InvalidPhoneError(code=InvalidPhoneError.Codes.UNKNOWN_CHARACTER),
     )
     with pytest.raises(ValidationError) as error:
         ValidUKMobileNumber()(None, mock_field)
 
-    assert str(error.value) == "Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"
+    assert str(error.value) == InvalidPhoneError.ERROR_MESSAGES[InvalidPhoneError.Codes.UNKNOWN_CHARACTER]
     assert mock_field.error_summary_messages == ["%s can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"]
 
 
