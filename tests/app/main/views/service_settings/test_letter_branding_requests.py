@@ -372,7 +372,9 @@ def test_GET_letter_branding_upload_branding_renders_form(
     assert file_input["name"] == "branding"
 
     assert abandon_flow_link is not None
-    assert abandon_flow_link["href"] == url_for("main.letter_branding_request", service_id=SERVICE_ONE_ID)
+    assert abandon_flow_link["href"] == url_for(
+        "main.letter_branding_request", service_id=SERVICE_ONE_ID, branding_choice="something_else"
+    )
     assert abandon_flow_link.text == "I do not have a file to upload"
 
 
