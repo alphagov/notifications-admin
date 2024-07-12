@@ -30,7 +30,7 @@ const paths = {
   src: 'app/assets/',
   dist: 'app/static/',
   npm: 'node_modules/',
-  govuk_frontend: 'node_modules/govuk-frontend/dist'
+  govuk_frontend: 'node_modules/govuk-frontend/dist/'
 };
 // Rewrite /static prefix for URLs in CSS files
 let staticPathMatcher = new RegExp('^\/static\/');
@@ -127,6 +127,26 @@ const javascripts = () => {
   .pipe(plugins.babel({
     presets: ['@babel/preset-env']
   }));
+
+  const frontend = src(
+    paths.src + 'javascripts/esm/govuk-frontend.mjs',
+  )
+  .pipe(plugins.rollup(
+    {
+      plugins: [
+        // determine module entry points from either 'module' or 'main' fields in package.json
+        rollupPluginNodeResolve({
+          mainFields: ['module', 'main']
+        })
+      ]
+    },
+    {
+      format: 'iife',
+    }
+  ))
+  .pipe(dest(paths.dist + 'javascripts/'))
+
+
 
   // return single stream of all vinyl objects piped from the end of the vendored stream, then
   // those from the end of the local stream
