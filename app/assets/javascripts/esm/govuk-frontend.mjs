@@ -7,3 +7,6 @@ createAll(ErrorSummary)
 createAll(SkipLink)
 createAll(Tabs)
 
+// for fileUpload.js
+window.GOVUKButton = Button
+

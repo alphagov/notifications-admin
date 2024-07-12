@@ -16,7 +16,7 @@
       $('button.file-upload-button', this.$form).replaceWith($cancelButton);
 
       // add GOVUK Frontend behaviours
-      new window.GOVUK.Frontend.Button(this.$form[0]).init();
+      new window.GOVUKButton(this.$form[0]);
 
       // move focus to the cancel button, it is lost when the upload button is removed
       $cancelButton.focus();
