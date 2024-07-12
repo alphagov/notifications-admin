@@ -8,7 +8,7 @@
 // For example, `export { Frontend }` will assign `Frontend` to `window.Frontend`
 
 // GOVUK Frontend modules
-import { Header, Details, Button, Radios, ErrorSummary, SkipLink, Tabs } from 'govuk-frontend';
+import { Header, Button, Radios, ErrorSummary, SkipLink, Tabs } from 'govuk-frontend';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -39,12 +39,6 @@ function initAll (options) {
 
   // Find all buttons with [role=button] on the scope to enhance.
   new Button(scope).init()
-
-  // Find all global details elements to enhance.
-  var $details = scope.querySelectorAll('[data-module="govuk-details"]')
-  nodeListForEach($details, function ($detail) {
-    new Details($detail).init()
-  })
 
   // Find first header module to enhance.
   var $toggleButton = scope.querySelector('[data-module="govuk-header"]')
