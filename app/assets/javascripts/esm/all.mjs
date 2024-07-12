@@ -67,7 +67,6 @@ function initAll (options) {
 // Create separate namespace for GOVUK Frontend.
 var Frontend = {
   "Header": Header,
-  "Details": Details,
   "Button": Button,
   "Radios": Radios,
   "ErrorSummary": ErrorSummary,
