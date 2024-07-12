@@ -1,5 +1,5 @@
-@import 'govuk/settings/all';
-@import 'govuk/helpers/all';
+@import 'govuk/settings';
+@import 'govuk/helpers';
 
 @mixin destructive-link-style-default {
   &:link {
@@ -63,6 +63,6 @@
 
 // Font override classes
 .extended-gsm-characters {
-  font-family: $govuk-font-family-tabular;
+  @include govuk-font-tabular-numbers;
   letter-spacing: 0.5em;
 }
