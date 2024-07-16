@@ -53,6 +53,10 @@ const copy = {
       return src(paths.govuk_frontend + 'govuk/assets/fonts/**/*')
         .pipe(dest(paths.dist + 'fonts/'));
     },
+    header_icon_manifest: () => {
+      return src(paths.govuk_frontend + 'govuk/assets/manifest.json')
+        .pipe(dest(paths.dist));
+    },
   }
 };
 
@@ -234,6 +238,7 @@ const defaultTask = series(
   clean.everything,
   parallel(
     copy.govuk_frontend.fonts,
+    copy.govuk_frontend.header_icon_manifest,
     copy.error_pages,
     images,
     javascripts,
