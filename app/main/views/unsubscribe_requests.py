@@ -12,10 +12,14 @@ def unsubscribe_request_reports_summary(service_id):
     return render_template("views/unsubscribe-request-reports-summary.html")
 
 
+@main.route("/services/<uuid:service_id>/unsubscribe-requests/reports/latest")
 @main.route("/services/<uuid:service_id>/unsubscribe-requests/reports/<uuid:batch_id>")
 @user_has_permissions("view_activity")
-def unsubscribe_request_report(service_id, batch_id):
-    report = current_service.unsubscribe_request_reports_summary.get_by_batch_id(batch_id)
+def unsubscribe_request_report(service_id, batch_id=None):
+    if batch_id:
+        report = current_service.unsubscribe_request_reports_summary.get_by_batch_id(batch_id)
+    else:
+        report = current_service.unsubscribe_request_reports_summary.get_unbatched_report()
     form = ProcessUnsubscribeRequestForm(is_a_batched_report=report.is_a_batched_report)
     return render_template(
         "views/unsubscribe-request-report.html",

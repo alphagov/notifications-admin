@@ -1,3 +1,5 @@
+import pytest
+
 from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
@@ -92,7 +94,7 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
             "earliest_timestamp": "2024-06-22",
             "latest_timestamp": "2024-07-01",
             "processed_by_service_at": None,
-            "batch_id": "efcab5ff-31e4-4aa0-ac23-9ecd862073be",
+            "batch_id": None,
             "is_a_batched_report": False,
             "status": "Not downloaded",
         }
@@ -107,13 +109,14 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
     assert page.select("h1")[0].text == "22 June 2024 until 1 July 2024"
 
 
-def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_request, mocker):
+@pytest.mark.parametrize("batch_id", ["32b4e359-d4df-49b6-a92b-2eaa9343cfdd", None])
+def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_request, mocker, batch_id):
 
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=[])
     page = client_request.get(
         "main.unsubscribe_request_report",
         _expected_status=404,
         service_id=SERVICE_ONE_ID,
-        batch_id="32b4e359-d4df-49b6-a92b-2eaa9343cfdd",
+        batch_id=batch_id,
     )
     assert normalize_spaces(page.select("h1")[0].text) == "Page not found"
