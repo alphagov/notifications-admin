@@ -13,7 +13,6 @@ def test_unsubscribe_request_reports_summary(client_request, mocker):
             "processed_by_service_at": None,
             "batch_id": "5e2b05ef-7552-49ef-a77f-96d46ab2b9bb",
             "is_a_batched_report": False,
-            "status": "Not downloaded",
         },
         {
             "count": 200,
@@ -22,7 +21,6 @@ def test_unsubscribe_request_reports_summary(client_request, mocker):
             "processed_by_service_at": None,
             "batch_id": "c2d11916-ee82-419e-99a8-7e38163e756f",
             "is_a_batched_report": True,
-            "status": "Downloaded",
         },
         {
             "count": 321,
@@ -31,7 +29,6 @@ def test_unsubscribe_request_reports_summary(client_request, mocker):
             "processed_by_service_at": "2024-06-10",
             "batch_id": "e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
             "is_a_batched_report": True,
-            "status": "Completed",
         },
     ]
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
@@ -96,7 +93,6 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
             "processed_by_service_at": None,
             "batch_id": None,
             "is_a_batched_report": False,
-            "status": "Not downloaded",
         }
     ]
 
