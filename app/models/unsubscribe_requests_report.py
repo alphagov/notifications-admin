@@ -12,9 +12,16 @@ class UnsubscribeRequestsReport(JSONModel):
         "processed_by_service_at",
         "batch_id",
         "is_a_batched_report",
-        "status",
     }
     __sort_attribute__ = "earliest_timestamp"
+
+    @property
+    def status(self):
+        if not self.is_a_batched_report:
+            return "Not downloaded"
+        if not self.processed_by_service_at:
+            return "Downloaded"
+        return "Completed"
 
 
 class UnsubscribeRequestsReports(ModelList):
