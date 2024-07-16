@@ -26,3 +26,9 @@ class UnsubscribeRequestsReports(ModelList):
             if report.batch_id == batch_id:
                 return report
         abort(404)
+
+    def get_unbatched_report(self):
+        for report in self:
+            if not report.is_a_batched_report:
+                return report
+        abort(404)
