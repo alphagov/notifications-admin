@@ -30,7 +30,7 @@ const paths = {
   src: 'app/assets/',
   dist: 'app/static/',
   npm: 'node_modules/',
-  govuk_frontend: 'node_modules/govuk-frontend/'
+  govuk_frontend: 'node_modules/govuk-frontend/dist/'
 };
 // Rewrite /static prefix for URLs in CSS files
 let staticPathMatcher = new RegExp('^\/static\/');
