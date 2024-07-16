@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
+from notifications_utils.recipient_validation.errors import InvalidPhoneError
 from wtforms import ValidationError
 
 from app.main.validators import (
@@ -10,11 +11,12 @@ from app.main.validators import (
     OnlySMSCharacters,
     StringsNotAllowed,
     ValidGovEmail,
+    ValidUKMobileNumber,
 )
 
 
-def _gen_mock_field(x):
-    return Mock(data=x)
+def _gen_mock_field(x, **kwargs):
+    return Mock(data=x, **kwargs)
 
 
 @pytest.mark.parametrize(
@@ -86,6 +88,19 @@ def test_invalid_list_of_white_list_email_domains(
         email_domain_validators(None, _gen_mock_field(email))
 
 
+def test_uk_mobile_number_validation_messages_match(mocker):
+    mock_field = _gen_mock_field("notanumber", error_summary_messages=[])
+    mocker.patch(
+        "app.main.validators.validate_phone_number",
+        side_effect=InvalidPhoneError(code=InvalidPhoneError.Codes.UNKNOWN_CHARACTER),
+    )
+    with pytest.raises(ValidationError) as error:
+        ValidUKMobileNumber()(None, mock_field)
+
+    assert str(error.value) == InvalidPhoneError.ERROR_MESSAGES[InvalidPhoneError.Codes.UNKNOWN_CHARACTER]
+    assert mock_field.error_summary_messages == ["%s can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"]
+
+
 def test_for_commas_in_placeholders(
     client_request,
 ):
@@ -131,59 +146,74 @@ def test_if_string_contains_alphanumeric_characters_does_not_raise(string):
 
 
 def test_string_cannot_contain_characters():
+    mock_field = _gen_mock_field("abc", error_summary_messages=[])
     with pytest.raises(ValidationError) as error:
-        CharactersNotAllowed("abcdef")(None, _gen_mock_field("abc"))
+        CharactersNotAllowed("abcdef")(None, mock_field)
 
     assert str(error.value) == "Cannot contain a, b or c"
+    assert mock_field.error_summary_messages == ["%s cannot contain a, b or c"]
 
 
 def test_string_cannot_contain_characters_with_custom_error_message():
+    mock_field = _gen_mock_field("abc", error_summary_messages=[])
     with pytest.raises(ValidationError) as error:
-        CharactersNotAllowed("abcdef", message="Cannot use first 3 letters of the alphabet")(
-            None, _gen_mock_field("abc")
-        )
+        CharactersNotAllowed(
+            "abcdef",
+            message="Cannot use first 3 letters of the alphabet",
+            error_summary_message="%s cannot use first 3 letters of the alphabet",
+        )(None, mock_field)
 
     assert str(error.value) == "Cannot use first 3 letters of the alphabet"
+    assert mock_field.error_summary_messages == ["%s cannot use first 3 letters of the alphabet"]
 
 
 @pytest.mark.parametrize(
-    "field_value, expected_error",
+    "field_value, expected_error, expected_error_summary_messages",
     (
-        ("abc", "Cannot be ‘abc’"),
-        ("ABC", "Cannot be ‘abc’"),
-        ("123", "Cannot be ‘123’"),
+        ("abc", "Cannot be ‘abc’", ["%s cannot be ‘abc’"]),
+        ("ABC", "Cannot be ‘abc’", ["%s cannot be ‘abc’"]),
+        ("123", "Cannot be ‘123’", ["%s cannot be ‘123’"]),
         pytest.param(
             "abc123",
             "Cannot be ‘abc’",
+            ["%s cannot be ‘abc’"],
             marks=pytest.mark.xfail(reason="Shouldn’t match on substrings"),
         ),
     ),
 )
-def test_string_cannot_contain_string(field_value, expected_error):
+def test_string_cannot_contain_string(field_value, expected_error, expected_error_summary_messages):
+    mock_field = _gen_mock_field(field_value, error_summary_messages=[])
     with pytest.raises(ValidationError) as error:
-        StringsNotAllowed("abc", "123")(None, _gen_mock_field(field_value))
+        StringsNotAllowed("abc", "123")(None, mock_field)
 
     assert str(error.value) == expected_error
+    assert mock_field.error_summary_messages == expected_error_summary_messages
 
 
 @pytest.mark.parametrize(
-    "field_value, expected_error",
+    "field_value, expected_error, expected_error_summary_messages",
     (
-        ("abc", "Cannot contain ‘abc’"),
-        ("ABC", "Cannot contain ‘abc’"),
-        ("123", "Cannot contain ‘123’"),
-        ("abc123", "Cannot contain ‘abc’"),
+        ("abc", "Cannot contain ‘abc’", ["%s cannot contain ‘abc’"]),
+        ("ABC", "Cannot contain ‘abc’", ["%s cannot contain ‘abc’"]),
+        ("123", "Cannot contain ‘123’", ["%s cannot contain ‘123’"]),
+        ("abc123", "Cannot contain ‘abc’", ["%s cannot contain ‘abc’"]),
     ),
 )
-def test_string_cannot_contain_substrings(field_value, expected_error):
+def test_string_cannot_contain_substrings(field_value, expected_error, expected_error_summary_messages):
+    mock_field = _gen_mock_field(field_value, error_summary_messages=[])
     with pytest.raises(ValidationError) as error:
-        StringsNotAllowed("abc", "123", match_on_substrings=True)(None, _gen_mock_field(field_value))
+        StringsNotAllowed("abc", "123", match_on_substrings=True)(None, mock_field)
 
     assert str(error.value) == expected_error
+    assert mock_field.error_summary_messages == expected_error_summary_messages
 
 
 def test_string_cannot_contain_string_with_custom_error_message():
+    mock_field = _gen_mock_field("abc", error_summary_messages=[])
     with pytest.raises(ValidationError) as error:
-        StringsNotAllowed("abc", "123", message="No sequences please")(None, _gen_mock_field("abc"))
+        StringsNotAllowed(
+            "abc", "123", message="No sequences please", error_summary_message="No sequences in %s please"
+        )(None, mock_field)
 
     assert str(error.value) == "No sequences please"
+    assert mock_field.error_summary_messages == ["No sequences in %s please"]

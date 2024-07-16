@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/list-entry.html" import list_entry %}
@@ -16,28 +15,7 @@
 
 {% block maincolumn_content %}
 
-  {% if form.email_addresses.errors or form.phone_numbers.errors %}
-    {% call banner_wrapper(type='dangerous') %}
-      <h1 class='banner-title'>
-        There was a problem with your guest list
-      </h1>
-      <p class="govuk-body">Fix these errors:</p>
-      <ul class="govuk-list govuk-!-margin-bottom-0">
-        {% if form.email_addresses.errors %}
-          <li>
-            <a class="govuk-link govuk-link--destructive" href="#{{ form.email_addresses.name }}">Enter valid email addresses</a>
-          </li>
-        {% endif %}
-        {% if form.phone_numbers.errors %}
-          <li>
-            <a class="govuk-link govuk-link--destructive" href="#{{ form.phone_numbers.name }}">Enter valid phone numbers</a>
-          </li>
-        {% endif %}
-      </ul>
-    {% endcall %}
-  {% else %}
-    {{ page_header('Guest list') }}
-  {% endif %}
+  {{ page_header('Guest list') }}
 
   <p class="govuk-body">
     You can use a team and guest list key to send real messages to your team and up to 5 other email addresses or phone numbers.

@@ -1731,9 +1731,20 @@ def test_update_organisation_domains_with_more_than_just_domain(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "There is a problem Item 1: Cannot contain @ Item 3: Cannot contain @"
-    )
+    assert normalize_spaces(page.select_one(".govuk-error-summary__title").text) == ("There is a problem")
+
+    error_summary_links = page.select(".govuk-error-summary__list a")
+
+    assert normalize_spaces(error_summary_links[0].text) == "Domain name 1 cannot contain @"
+    assert normalize_spaces(error_summary_links[0]["href"]) == "#domains-1"
+
+    assert normalize_spaces(error_summary_links[1].text) == "Domain name 3 cannot contain @"
+    assert normalize_spaces(error_summary_links[1]["href"]) == "#domains-3"
+
+    assert [normalize_spaces(error_link.text) for error_link in page.select(".govuk-error-summary__list a")] == [
+        "Domain name 1 cannot contain @",
+        "Domain name 3 cannot contain @",
+    ]
 
     assert [field["value"] for field in page.select("input[type=text][value]")] == [
         "test@example.gov.uk",
@@ -1769,8 +1780,21 @@ def test_update_organisation_domains_nhs_domains(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        f"There is a problem Item 1: Cannot be ‘{domain.lower()}’"
+    assert normalize_spaces(page.select_one(".govuk-error-summary__title").text) == ("There is a problem")
+
+    if domain == "NHS.NET":  # NHS.NET fails by being nhs.net (lowercased) so is announced as such
+        failed_domain = domain.lower()
+    else:
+        failed_domain = domain
+
+    assert (
+        normalize_spaces(page.select_one(".govuk-error-summary__list li:first-of-type a").text)
+        == f"Domain name 1 cannot be ‘{failed_domain}’"
+    )
+
+    assert (
+        normalize_spaces(page.select_one(".list-entry:first-of-type .govuk-error-message").text)
+        == f"Error: Cannot be ‘{failed_domain}’"
     )
 
     assert [field["value"] for field in page.select("input[type=text][value]")] == [

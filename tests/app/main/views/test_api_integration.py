@@ -626,14 +626,14 @@ def test_should_validate_guestlist_items(
         _expected_status=200,
     )
 
-    assert page.select_one("h1").string.strip() == "There was a problem with your guest list"
-    jump_links = page.select(".banner-dangerous a")
+    assert page.select_one(".govuk-error-summary__title").string.strip() == "There is a problem"
+    jump_links = page.select(".govuk-error-summary__list a")
 
-    assert jump_links[0].string.strip() == "Enter valid email addresses"
-    assert jump_links[0]["href"] == "#email_addresses"
+    assert jump_links[0].string.strip() == "Enter email address 1 in the correct format"
+    assert jump_links[0]["href"] == "#email_addresses-1"
 
-    assert jump_links[1].string.strip() == "Enter valid phone numbers"
-    assert jump_links[1]["href"] == "#phone_numbers"
+    assert jump_links[1].string.strip() == "Mobile number 1 is too short"
+    assert jump_links[1]["href"] == "#phone_numbers-1"
 
     assert mock_update_guest_list.called is False
 

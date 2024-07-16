@@ -41,10 +41,10 @@
           {% endif %}
           {% set field_name = field.name + "-" + loop.index|string %}
           {% set html -%}
-            <span class="govuk-visually-hidden">{{ item_name }} number </span> + {{ loop.index }}.
+            <span class="govuk-visually-hidden">{{ item_name }} number </span> {{ loop.index }}.
           {%- endset%}
           {{ entry(param_extensions={
-            "id": "input-" + field_name,
+            "id": field_name,
             "name": field_name,
             "label": {
               "html": html,

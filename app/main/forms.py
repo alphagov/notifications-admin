@@ -17,7 +17,7 @@ from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
-from notifications_utils.recipient_validation.phone_number import normalise_phone_number, validate_phone_number
+from notifications_utils.recipient_validation.phone_number import normalise_phone_number
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from ordered_set import OrderedSet
@@ -81,6 +81,8 @@ from app.main.validators import (
     StringsNotAllowed,
     ValidEmail,
     ValidGovEmail,
+    ValidInternationalPhoneNumber,
+    ValidUKMobileNumber,
 )
 from app.models.branding import (
     GOVERNMENT_IDENTITY_SYSTEM_COLOURS,
@@ -233,31 +235,16 @@ class GovukTextInputFieldMixin(GovukFrontendWidgetMixin):
         return params
 
 
-class UKMobileNumber(GovukTextInputFieldMixin, TelField):
+class PhoneNumber(GovukTextInputFieldMixin, TelField):
     input_type = "tel"
-
-    def pre_validate(self, form):
-        try:
-            validate_phone_number(self.data)
-        except InvalidPhoneError as e:
-            raise ValidationError(str(e)) from e
-
-
-class InternationalPhoneNumber(UKMobileNumber, GovukTextInputFieldMixin, TelField):
-    def pre_validate(self, form):
-        try:
-            if self.data:
-                validate_phone_number(self.data, international=True)
-        except InvalidPhoneError as e:
-            raise ValidationError(str(e)) from e
 
 
 def uk_mobile_number(label="Mobile number"):
-    return UKMobileNumber(label, validators=[DataRequired(message="Cannot be empty")])
+    return PhoneNumber(label, validators=[DataRequired(message="Cannot be empty"), ValidUKMobileNumber()])
 
 
 def international_phone_number(label="Mobile number"):
-    return InternationalPhoneNumber(label, validators=[NotifyDataRequired(thing="a mobile number")])
+    return PhoneNumber(label, validators=[NotifyDataRequired(thing="a mobile number"), ValidInternationalPhoneNumber()])
 
 
 def make_password_field(label="Password", thing="a password", validate_length=True):
@@ -611,7 +598,7 @@ class RegisterUserFromInviteForm(RegisterUserForm):
             name=guess_name_from_email_address(invited_user.email_address),
         )
 
-    mobile_number = InternationalPhoneNumber("Mobile number")
+    mobile_number = PhoneNumber("Mobile number", validators=[ValidInternationalPhoneNumber()])
     service = HiddenField("service")
     email_address = HiddenField("email_address")
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
@@ -630,8 +617,8 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
 
     name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
 
-    mobile_number = InternationalPhoneNumber(
-        "Mobile number", validators=[NotifyDataRequired(thing="your mobile number")]
+    mobile_number = PhoneNumber(
+        "Mobile number", validators=[NotifyDataRequired(thing="your mobile number"), ValidInternationalPhoneNumber()]
     )
     password = make_password_field(thing="your password")
     organisation = HiddenField("organisation")
@@ -919,6 +906,12 @@ class GovukRadiosFieldWithRequiredMessage(GovukRadiosField):
             return super().pre_validate(form)
         except ValueError as e:
             raise ValidationError(self.required_message) from e
+
+
+class ListEntryFieldList(FieldList):
+    def __init__(self, *args, thing, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.thing = thing
 
 
 # guard against data entries that aren't a known permission
@@ -1229,13 +1222,23 @@ class OrganisationAgreementSignedForm(StripWhitespaceForm):
     )
 
 
+class FieldInListEntry:
+    def pre_validate(self, form):
+        self.error_summary_messages = []
+        super().pre_validate(form)
+
+
+class StripWhitespaceStringFieldInListEntry(FieldInListEntry, StripWhitespaceStringField):
+    pass
+
+
 class AdminOrganisationDomainsForm(StripWhitespaceForm):
     def populate(self, domains_list):
         for index, value in enumerate(domains_list):
             self.domains[index].data = value
 
-    domains = FieldList(
-        StripWhitespaceStringField(
+    domains = ListEntryFieldList(
+        StripWhitespaceStringFieldInListEntry(
             "",
             validators=[
                 CharactersNotAllowed("@"),
@@ -1247,6 +1250,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
         min_entries=20,
         max_entries=20,
         label="Domain names",
+        thing="domain name",
     )
 
 
@@ -2126,11 +2130,11 @@ class PDFUploadForm(StripWhitespaceForm):
     )
 
 
-class EmailFieldInGuestList(GovukEmailField, StripWhitespaceStringField):
+class EmailFieldInGuestList(GovukEmailField, StripWhitespaceStringFieldInListEntry):
     pass
 
 
-class InternationalPhoneNumberInGuestList(InternationalPhoneNumber, StripWhitespaceStringField):
+class PhoneNumberInGuestList(PhoneNumber, StripWhitespaceStringFieldInListEntry):
     pass
 
 
@@ -2143,18 +2147,20 @@ class GuestList(StripWhitespaceForm):
             for index, value in enumerate(existing_guest_list):
                 form_field[index].data = value
 
-    email_addresses = FieldList(
+    email_addresses = ListEntryFieldList(
         EmailFieldInGuestList("", validators=[Optional(), ValidEmail()], default=""),
         min_entries=5,
         max_entries=5,
         label="Email addresses",
+        thing="email address",
     )
 
-    phone_numbers = FieldList(
-        InternationalPhoneNumberInGuestList("", validators=[Optional()], default=""),
+    phone_numbers = ListEntryFieldList(
+        PhoneNumberInGuestList("", validators=[Optional(), ValidInternationalPhoneNumber()], default=""),
         min_entries=5,
         max_entries=5,
         label="Mobile numbers",
+        thing="mobile number",
     )
 
 
