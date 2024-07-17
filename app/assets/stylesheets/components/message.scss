@@ -27,7 +27,9 @@ $app-body-text-line-height-tablet: get-govuk-typography-style($size: 19, $breakp
   }
 }
 
+$govuk-touch-target-gutter: 4px;
 $govuk-checkboxes-size: 40px;
+$govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 $govuk-checkboxes-label-padding-left-right: govuk-spacing(3);
 $message-type-bottom-spacing: govuk-spacing(4);
 
@@ -56,9 +58,19 @@ a {
 .template-list {
 
   &-item {
+    margin-bottom: 0;
 
     &-with-checkbox {
-      padding-left: $govuk-checkboxes-size + $govuk-checkboxes-label-padding-left-right;
+
+      .template-list-item-hint {
+        margin-top: 0;
+        padding-left: ($govuk-checkboxes-label-padding-left-right + $govuk-touch-target-size);
+      }
+
+      input {
+        margin-right: $govuk-checkboxes-label-padding-left-right;
+        height: 0;
+      }
     }
 
     &-hidden-by-default {
@@ -70,6 +82,11 @@ a {
       a {
 
         display: block;
+        // block focus state for items that have no ancestors
+        // our version of dart-sass (< 1.4.0 still parses calc() as a special function
+        // so we need to interpolate it 
+        // https://sass-lang.com/documentation/syntax/special-functions/#element-progid-and-expression
+        width: calc(100% - #{$govuk-touch-target-size + $govuk-checkboxes-label-padding-left-right});
 
         &.template-list-folder:first-of-type {
           padding-left: 0;
@@ -85,6 +102,7 @@ a {
 
       .template-list-template,
       .template-list-folder {
+        height: fit-content;
 
         &::before {
           content: '';
@@ -95,8 +113,8 @@ a {
           height: $app-body-text-line-height-default;
 
           @include govuk-media-query($from: tablet) {
-            bottom: -1 * $app-body-text-line-height-tablet;
-            height: $app-body-text-line-height-tablet;
+            bottom: -1 * $app-body-text-line-height-tablet - 5px;
+            height: $app-body-text-line-height-tablet + 5px;
           }
         }
 
@@ -141,8 +159,9 @@ a {
       position: absolute;
       left: 0;
       width: $govuk-checkboxes-size + $govuk-checkboxes-label-padding-left-right;
-      height: 100%;
+      top: 0;
       padding: 0;
+      height: 100%;
     }
 
     // Fix for GOVUK Frontend selector with high precendence
@@ -153,6 +172,7 @@ a {
 
     &-hint {
       padding-left: 0;
+      width: auto;
     }
 
   }
@@ -163,6 +183,7 @@ a {
     @include govuk-media-query($from: tablet) {
       line-height: 1.25;
     }
+    vertical-align: top;
     position: relative; /* contain absolutely positioned icon and ::before element */
   }
 
@@ -185,7 +206,7 @@ a {
         top: 3px;
       }
 
-     }
+    }
 
   }
 
