@@ -64,7 +64,8 @@ COPY --from=frontend_build --chown=notify:notify /usr/frontend/app/static app/st
 COPY --from=frontend_build --chown=notify:notify /usr/frontend/app/templates app/templates
 COPY --from=python_build --chown=notify:notify /home/vcap/app/app/version.py app/version.py
 
-RUN chown -R notify:notify /home/vcap/app && \
+RUN python -m compileall . && \
+    chown -R notify:notify /home/vcap/app && \
     chmod +x /home/vcap/app/entrypoint.sh
 
 ENTRYPOINT [ "/home/vcap/app/entrypoint.sh" ]
