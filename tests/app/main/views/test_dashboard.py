@@ -638,6 +638,33 @@ def test_dashboard_shows_count_of_unsubscribe_requests(
     assert banner["href"] == url_for("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
 
 
+def test_dashboard_shows_no_unsubscribe_requests_statistics_when_there_are_no_unsubscribe_requests(
+    client_request,
+    service_one,
+    mocker,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_scheduled_job_stats,
+    mock_get_service_statistics,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+    mock_get_template_statistics,
+    mock_get_annual_usage_for_service,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+):
+    mocker.patch(
+        "app.service_api_client.get_unsubscribe_request_statistics",
+        return_value={},
+    )
+
+    page = client_request.get(
+        "main.service_dashboard",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert not page.select("#total-unsubscribe-requests")
+
+
 def test_should_show_recent_templates_on_dashboard(
     client_request,
     mocker,
