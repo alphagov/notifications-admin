@@ -561,6 +561,17 @@ def mock_get_service_statistics(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
+def mock_get_unsubscribe_requests_statistics(mocker):
+    return mocker.patch(
+        "app.service_api_client.get_unsubscribe_request_statistics",
+        return_value={
+            "count_of_pending_unsubscribe_requests": 250,
+            "datetime_of_latest_unsubscribe_request": "2024-07-14 09:36:17",
+        },
+    )
+
+
+@pytest.fixture(scope="function")
 def mock_get_detailed_services(mocker, fake_uuid):
     service_one = service_json(
         id_=SERVICE_ONE_ID,
