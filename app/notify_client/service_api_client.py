@@ -509,10 +509,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     @cache.set("service-{service_id}-unsubscribe-request-statistics")
     def get_unsubscribe_request_statistics(self, service_id):
-        return {
-            "count_of_pending_unsubscribe_requests": 300,
-            "datetime_of_latest_unsubscribe_request": "2024-07-01T12:12:12.1234",
-        }
+        return self.get(f"service/{service_id}/unsubscribe-request-statistics")
 
     @classmethod
     def parse_edit_service_http_error(cls, http_error):
