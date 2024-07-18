@@ -507,6 +507,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_unsubscribe_reports_summary(self, service_id):
         return self.get(f"service/{service_id}/unsubscribe-request-reports-summary")
 
+    @cache.set("service-{service_id}-unsubscribe-request-statistics")
+    def get_unsubscribe_request_statistics(self, service_id):
+        return {
+            "count_of_pending_unsubscribe_requests": 300,
+            "datetime_of_latest_unsubscribe_request": "2024-07-01T12:12:12.1234",
+        }
+
     @classmethod
     def parse_edit_service_http_error(cls, http_error):
         """Inspect the HTTPError from a create_service/update_service call and return a human-friendly error message"""
