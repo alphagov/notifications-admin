@@ -593,6 +593,51 @@ def test_returned_letters_only_counts_recently_returned_letters(
     assert banner["href"] == url_for("main.returned_letter_summary", service_id=SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize(
+    "last_request_date, count, expected_message",
+    (
+        ("2024-07-16", 250, "250 email unsubscribe requests latest report yesterday"),
+        ("2024-07-13", 70, "70 email unsubscribe requests latest report 4 days ago"),
+        ("2024-06-09", 133, "133 email unsubscribe requests latest report 1 month ago"),
+        ("2024-04-13", 412, "412 email unsubscribe requests latest report 3 months ago"),
+        ("2023-07-13", 163, "163 email unsubscribe requests latest report 1 year, 5 days ago"),
+    ),
+)
+@freeze_time("2024-07-17")
+def test_dashboard_shows_count_of_unsubscribe_requests(
+    count,
+    expected_message,
+    last_request_date,
+    client_request,
+    service_one,
+    mocker,
+    mock_get_service_templates_when_no_templates_exist,
+    mock_get_jobs,
+    mock_get_scheduled_job_stats,
+    mock_get_service_statistics,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+    mock_get_template_statistics,
+    mock_get_annual_usage_for_service,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+):
+    mocker.patch(
+        "app.service_api_client.get_unsubscribe_request_statistics",
+        return_value={
+            "count_of_pending_unsubscribe_requests": count,
+            "datetime_of_latest_unsubscribe_request": last_request_date,
+        },
+    )
+
+    page = client_request.get(
+        "main.service_dashboard",
+        service_id=SERVICE_ONE_ID,
+    )
+    banner = page.select_one("#total-unsubscribe-requests")
+    assert normalize_spaces(banner.text) == expected_message
+    assert banner["href"] == url_for("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
+
+
 def test_should_show_recent_templates_on_dashboard(
     client_request,
     mocker,
