@@ -13,7 +13,6 @@ from app import (
     current_service,
     service_api_client,
     template_statistics_client,
-    unsubscribe_requests_client,
 )
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import json_updates, main
