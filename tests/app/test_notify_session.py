@@ -131,6 +131,7 @@ class TestNotifyAdminSessionInterface:
         mock_get_service,
         mock_get_service_templates,
         mock_get_template_statistics,
+        mock_get_unsubscribe_requests_statistics,
         mock_has_no_jobs,
         mock_get_annual_usage_for_service,
         mock_get_free_sms_fragment_limit,
