@@ -63,14 +63,13 @@ const copy = {
 
 
 
-const javascripts = () => {
-  // JS from third-party sources
-  // We assume none of it will need to pass through Babel
-  const vendored = src(paths.src + 'javascripts/esm/all.mjs')
+const javascripts = {
+  commonJsBundle: () => {
+    // JS from third-party sources
+    // We assume none of it will need to pass through Babel
+    const vendored = src(paths.src + 'javascripts/all.js',{allowEmpty: true})
     // Use Rollup to combine all JS in ECMAScript module format into a Immediately Invoked Function
-    // Expression (IIFE) to:
-    // - deliver it in one bundle
-    // - allow it to run in browsers without support for JS Modules
+    // Expression (IIFE)
     .pipe(plugins.rollup(
       {
         plugins: [
@@ -95,51 +94,69 @@ const javascripts = () => {
       paths.npm + 'cbor-js/cbor.js'
     ]));
 
-  // JS local to this application
-  const local = src([
-    paths.src + 'javascripts/modules.js',
-    paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
-    paths.src + 'javascripts/stick-to-window-when-scrolling.js',
-    paths.src + 'javascripts/cookieCleanup.js',
-    paths.src + 'javascripts/copyToClipboard.js',
-    paths.src + 'javascripts/autofocus.js',
-    paths.src + 'javascripts/enhancedTextbox.js',
-    paths.src + 'javascripts/fileUpload.js',
-    paths.src + 'javascripts/radioSelect.js',
-    paths.src + 'javascripts/updateContent.js',
-    paths.src + 'javascripts/listEntry.js',
-    paths.src + 'javascripts/liveSearch.js',
-    paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
-    paths.src + 'javascripts/fullscreenTable.js',
-    paths.src + 'javascripts/radios-with-images.js',
-    paths.src + 'javascripts/previewPane.js',
-    paths.src + 'javascripts/colourPreview.js',
-    paths.src + 'javascripts/liveCheckboxControls.js',
-    paths.src + 'javascripts/templateFolderForm.js',
-    paths.src + 'javascripts/addBrandingOptionsForm.js',
-    paths.src + 'javascripts/setAuthTypeForm.js',
-    paths.src + 'javascripts/collapsibleCheckboxes.js',
-    paths.src + 'javascripts/registerSecurityKey.js',
-    paths.src + 'javascripts/authenticateSecurityKey.js',
-    paths.src + 'javascripts/updateStatus.js',
-    paths.src + 'javascripts/errorBanner.js',
-    paths.src + 'javascripts/homepage.js',
-    paths.src + 'javascripts/removeInPresenceOf.js',
-    paths.src + 'javascripts/main.js',
-  ])
-  .pipe(plugins.prettyerror())
-  .pipe(plugins.babel({
-    presets: ['@babel/preset-env']
-  }));
+    // JS local to this application
+    const local = src([
+      paths.src + 'javascripts/modules.js',
+      paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
+      paths.src + 'javascripts/stick-to-window-when-scrolling.js',
+      paths.src + 'javascripts/cookieCleanup.js',
+      paths.src + 'javascripts/copyToClipboard.js',
+      paths.src + 'javascripts/autofocus.js',
+      paths.src + 'javascripts/enhancedTextbox.js',
+      paths.src + 'javascripts/fileUpload.js',
+      paths.src + 'javascripts/radioSelect.js',
+      paths.src + 'javascripts/updateContent.js',
+      paths.src + 'javascripts/listEntry.js',
+      paths.src + 'javascripts/liveSearch.js',
+      paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
+      paths.src + 'javascripts/fullscreenTable.js',
+      paths.src + 'javascripts/radios-with-images.js',
+      paths.src + 'javascripts/previewPane.js',
+      paths.src + 'javascripts/colourPreview.js',
+      paths.src + 'javascripts/liveCheckboxControls.js',
+      paths.src + 'javascripts/templateFolderForm.js',
+      paths.src + 'javascripts/addBrandingOptionsForm.js',
+      paths.src + 'javascripts/setAuthTypeForm.js',
+      paths.src + 'javascripts/collapsibleCheckboxes.js',
+      paths.src + 'javascripts/registerSecurityKey.js',
+      paths.src + 'javascripts/authenticateSecurityKey.js',
+      paths.src + 'javascripts/updateStatus.js',
+      paths.src + 'javascripts/errorBanner.js',
+      paths.src + 'javascripts/homepage.js',
+      paths.src + 'javascripts/removeInPresenceOf.js',
+      paths.src + 'javascripts/main.js',
+    ])
+    .pipe(plugins.prettyerror())
+    .pipe(plugins.babel({
+      presets: ['@babel/preset-env']
+    }));
 
-  // return single stream of all vinyl objects piped from the end of the vendored stream, then
-  // those from the end of the local stream
-  return streamqueue({ objectMode: true }, vendored, local)
+    // return single stream of all vinyl objects piped from the end of the vendored stream, then
+    // those from the end of the local stream
+    return streamqueue({ objectMode: true }, vendored, local)
+      .pipe(plugins.uglify())
+      .pipe(plugins.concat('all.js'))
+      .pipe(dest(paths.dist + 'javascripts/'))
+  },
+  esmJsBundle: () => {
+    return src(paths.src + 'javascripts/esm/all-esm.mjs')
+    .pipe(plugins.rollup(
+      {
+        plugins: [
+          // determine module entry points from either 'module' or 'main' fields in package.json
+          rollupPluginNodeResolve({
+            mainFields: ['module', 'main']
+          })
+        ]
+      },
+      {
+        format: 'iife',
+      }
+    ))
     .pipe(plugins.uglify())
-    .pipe(plugins.concat('all.js'))
     .pipe(dest(paths.dist + 'javascripts/'))
+  }
 };
-
 
 const sass = () => {
   return src(paths.src + '/stylesheets/*.scss')
@@ -172,7 +189,7 @@ const images = () => {
 
 const watchFiles = {
   javascripts: (cb) => {
-    watch([paths.src + 'javascripts/**/*'], series(clean.javascripts, javascripts));
+    watch([paths.src + 'javascripts/**/*'], series(clean.javascripts, javascripts.commonJsBundle, javascripts.esmJsBundle));
     cb();
   },
   sass: (cb) => {
@@ -241,7 +258,8 @@ const defaultTask = series(
     copy.govuk_frontend.header_icon_manifest,
     copy.error_pages,
     images,
-    javascripts,
+    javascripts.commonJsBundle,
+    javascripts.esmJsBundle,
     sass
   )
 );
