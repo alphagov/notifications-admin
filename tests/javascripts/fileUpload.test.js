@@ -2,14 +2,8 @@ const helpers = require('./support/helpers.js');
 
 beforeAll(() => {
 
-  // Stub out JS from window.GOVUK namespace used by this component
-  window.GOVUK.Frontend = {
-    Button: function () {
-      return {
-        init: function () {}
-      }
-    }
-  };
+  // Stub out JS from window.GOVUKFrontendButton used by this component
+  window.GOVUKFrontendButton = jest.fn();
 
   require('../../app/assets/javascripts/fileUpload.js');
 
