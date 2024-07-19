@@ -565,7 +565,7 @@ def mock_get_unsubscribe_requests_statistics(mocker):
     return mocker.patch(
         "app.service_api_client.get_unsubscribe_request_statistics",
         return_value={
-            "count_of_pending_unsubscribe_requests": 250,
+            "unprocessed_unsubscribe_requests_count": 250,
             "datetime_of_latest_unsubscribe_request": "2024-07-14 09:36:17",
         },
     )

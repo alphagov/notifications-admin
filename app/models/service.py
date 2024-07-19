@@ -623,8 +623,8 @@ class Service(JSONModel):
         return service_api_client.get_unsubscribe_request_statistics(self.id)
 
     @property
-    def count_of_pending_unsubscribe_requests(self) -> int:
-        return self.unsubscribe_requests_statistics["count_of_pending_unsubscribe_requests"]
+    def unprocessed_unsubscribe_requests_count(self) -> int:
+        return self.unsubscribe_requests_statistics["unprocessed_unsubscribe_requests_count"]
 
     @property
     def datetime_of_latest_unsubscribe_request(self) -> str | None:
