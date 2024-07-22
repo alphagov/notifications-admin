@@ -34,7 +34,7 @@
       {{ current_service.unprocessed_unsubscribe_requests_count|format_thousands }}
     </span>
     <span class="banner-dashboard-count-label">
-        email unsubscribe requests
+        email {{ current_service.unprocessed_unsubscribe_requests_count | message_count_label('unsubscribe request', suffix='') }}
     </span>
     <span class="banner-dashboard-meta">
       latest report {{ current_service.datetime_of_latest_unsubscribe_request|format_delta_days }}
