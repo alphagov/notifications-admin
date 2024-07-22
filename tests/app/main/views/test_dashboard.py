@@ -596,7 +596,7 @@ def test_returned_letters_only_counts_recently_returned_letters(
 @pytest.mark.parametrize(
     "last_request_date, count, expected_message",
     (
-        ("2024-07-16", 1, "1 email unsubscribe requests latest report yesterday"),
+        ("2024-07-16", 1, "1 email unsubscribe request latest report yesterday"),
         ("2024-07-16", 250, "250 email unsubscribe requests latest report yesterday"),
         ("2024-07-13", 70, "70 email unsubscribe requests latest report 4 days ago"),
         ("2024-07-06", 1234, "1,234 email unsubscribe requests latest report 11 days ago"),
