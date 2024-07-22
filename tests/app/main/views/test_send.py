@@ -610,6 +610,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
                               , 123 Example St., SW!A !AA
             "1\n2\n3\n4\n5\n6\n7\n8"
             =Firstname Lastname, 123 Example St., SW1A 1AA
+            Firstname Lastname, NFA, SW1A 1AA
         """,
     )
 
@@ -623,7 +624,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "There’s a problem with example.csv You need to fix 5 addresses."
+        "There’s a problem with example.csv You need to fix 6 addresses."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
         "3 Last line of the address must be a real UK postcode",
@@ -636,6 +637,8 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         "1 2 3 4 5 6 7 8",
         '7 Address lines must not start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
         "=Firstname Lastname 123 Example St. SW1A 1AA",
+        "8 This is not a real address",
+        "Firstname Lastname NFA SW1A 1AA",
     ]
 
 
@@ -2455,6 +2458,11 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
             "a\nb\nBFPO 1234\nBFPO\nBF1 1AA\nUSA",
             [],
             "Error: The last line of a British Forces Post Office (BFPO) address cannot be the name of a country",
+        ),
+        (
+            "a\nNo fixed address\nSW1A 1AA",
+            [],
+            "Error: Enter a real address",
         ),
     ],
 )

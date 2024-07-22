@@ -1430,6 +1430,9 @@ class LetterAddressForm(StripWhitespaceForm):
                 + " ".join(PostalAddress.INVALID_CHARACTERS_AT_START_OF_ADDRESS_LINE)
             )
 
+        if address.has_no_fixed_abode_address:
+            raise ValidationError("Enter a real address")
+
 
 class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
     subject = GovukTextareaField("Subject", validators=[NotifyDataRequired(thing="the subject of the email")])
