@@ -136,7 +136,6 @@ def test_unsubscribe_request_report_checkbox_for_completed_reports_are_checked_b
         service_id=SERVICE_ONE_ID,
         batch_id=test_data[0]["batch_id"],
     )
-
     assert "checked" in page.select("#report_has_been_processed")[0].attrs
 
 
