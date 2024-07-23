@@ -164,6 +164,11 @@ LETTER_VALIDATION_MESSAGES = {
             "Validation failed because your file includes a letter you’ve downloaded from Notify on {invalid_pages}."
         ),
     },
+    "no-fixed-abode-address": {
+        "title": "There is a problem",
+        "detail": "Enter a real address.",
+        "summary": "Validation failed because this is not a real address.",
+    },
 }
 
 

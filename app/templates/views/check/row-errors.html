@@ -90,6 +90,8 @@
                 {% elif item.as_postal_address.has_invalid_characters %}
                   Address lines must not start with any of the following characters:
                   {{ " ".join(item.as_postal_address.INVALID_CHARACTERS_AT_START_OF_ADDRESS_LINE) }}
+                {% elif item.has_no_fixed_abode_address %}
+                  This is not a real address
                 {% endif %}
               </span>
             {% endcall %}
