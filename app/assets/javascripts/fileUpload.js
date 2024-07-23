@@ -64,7 +64,7 @@
       this.$fieldErrors = this.$form.find('.file-upload-label .error-message');
 
       // Note: label.file-upload-label, input.file-upload-field and button.file-upload-submit
-      // are all hidden by CSS that uses the .js-enabled class on the body tag
+      // are all hidden by CSS that uses the .govuk-frontend-supported class on the body tag
 
       this.addFakeButton();
 

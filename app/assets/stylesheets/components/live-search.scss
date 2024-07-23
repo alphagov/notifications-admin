@@ -2,7 +2,7 @@
 
   display: none;
 
-  .js-enabled & {
+  .#{$govuk-frontend-supported-css-class} & {
     display: block;
   }
 

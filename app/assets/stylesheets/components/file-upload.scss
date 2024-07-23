@@ -19,9 +19,9 @@
   }
 
   // Hide normal upload form if we're adding a custom version with JS
-  .js-enabled &-label,
-  .js-enabled &-field,
-  .js-enabled &-submit {
+  .#{$govuk-frontend-supported-css-class} &-label,
+  .#{$govuk-frontend-supported-css-class} &-field,
+  .#{$govuk-frontend-supported-css-class} &-submit {
     display: none;
   }
 
