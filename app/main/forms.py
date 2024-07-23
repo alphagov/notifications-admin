@@ -2936,4 +2936,7 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
                 ]
             }
 
-        # TODO Add logic to allow users to tick the checkbox
+    def validate_report_has_been_processed(self, field):
+        if not field.data:
+            raise ValidationError("There is a problem. "
+                                  "You must confirm that you have removed the email addresses from your mailing list.")
