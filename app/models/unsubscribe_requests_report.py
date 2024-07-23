@@ -1,4 +1,8 @@
+from datetime import datetime, UTC, timedelta
+
+from dateutil.parser import parser
 from flask import abort
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app.models import JSONModel, ModelList
 from app.notify_client.service_api_client import service_api_client
@@ -22,6 +26,16 @@ class UnsubscribeRequestsReport(JSONModel):
         if not self.processed_by_service_at:
             return "Downloaded"
         return "Completed"
+
+    @property
+    def report_latest_download_date(self):
+        if self.status == "Completed":
+            limit = 7
+            starting_date = self.processed_by_service_at
+        else:
+            limit = 90
+            starting_date = self.latest_timestamp
+        return utc_string_to_aware_gmt_datetime(starting_date) + timedelta(days=limit)
 
 
 class UnsubscribeRequestsReports(ModelList):
