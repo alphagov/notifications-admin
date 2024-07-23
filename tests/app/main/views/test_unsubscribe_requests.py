@@ -116,3 +116,47 @@ def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_req
         batch_id=batch_id,
     )
     assert normalize_spaces(page.select("h1")[0].text) == "Page not found"
+
+
+def test_unsubscribe_request_report_checkbox_for_completed_reports_are_checked_by_default(client_request, mocker):
+    test_data = [
+        {
+            "count": 321,
+            "earliest_timestamp": "2024-06-8",
+            "latest_timestamp": "2024-06-14",
+            "processed_by_service_at": None,
+            "batch_id": "b9c28b5b-e442-4e5f-a9c7-c2544502627a",
+            "is_a_batched_report": True,
+        },
+    ]
+
+    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
+    page = client_request.get(
+        "main.unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=test_data[0]["batch_id"],
+    )
+
+    assert "checked" in page.select("#report_has_been_processed")[0].attrs
+
+
+def test_unsubscribe_request_report_checkbox_for_unbatched_reports_are_disabled_checked_by_default(
+        client_request, mocker):
+    test_data = [
+        {
+            "count": 34,
+            "earliest_timestamp": "2024-06-22",
+            "latest_timestamp": "2024-07-01",
+            "processed_by_service_at": None,
+            "batch_id": None,
+            "is_a_batched_report": False,
+        },
+    ]
+
+    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
+    page = client_request.get(
+        "main.unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=test_data[0]["batch_id"],
+    )
+    assert "disabled" in page.select("#report_has_been_processed")[0].attrs
