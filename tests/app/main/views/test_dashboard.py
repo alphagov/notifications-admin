@@ -626,7 +626,7 @@ def test_dashboard_shows_count_of_unsubscribe_requests(
     mocker.patch(
         "app.service_api_client.get_unsubscribe_request_statistics",
         return_value={
-            "unprocessed_unsubscribe_requests_count": count,
+            "unsubscribe_requests_count": count,
             "datetime_of_latest_unsubscribe_request": last_request_date,
         },
     )
@@ -1310,7 +1310,7 @@ def _test_dashboard_menu(client_request, mocker, usr, service, permissions):
     mocker.patch(
         "app.service_api_client.get_unsubscribe_request_statistics",
         return_value={
-            "unprocessed_unsubscribe_requests_count": 250,
+            "unsubscribe_requests_count": 250,
             "datetime_of_latest_unsubscribe_request": "2024-07-14 09:36:17",
         },
     )
