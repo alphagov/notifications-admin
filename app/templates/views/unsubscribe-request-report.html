@@ -17,20 +17,30 @@
 
     {{ page_header('{} until {}'.format(report.earliest_timestamp|format_date_normal, report.latest_timestamp|format_date_normal)) }}
 
- <p class="govuk-body">
+
+{% if report.status != "Completed" %}
+    <p class="govuk-body">
      {{ report.count|format_thousands}} new requests to unsubscribe
- </p>
+    </p>
 
     <p class="govuk-body">You must: </p>
       <ol class="govuk-list govuk-list--number">
         <li><span class="bottom-gutter"><a download href="" class="govuk-link heading-small">Download the report</a>&nbsp;(available for 90 days) </span> </li>
         <li>Remove the email addresses from your mailing list before you send any further emails</li>
       </ol>
-
+{%  else %}
+    <p class="govuk-body"> Report was marked as completed on {{ report.processed_by_service_at | format_date_normal }}</p>
+    <p class="bottom-gutter"><a download href="" class="govuk-link heading-small">Download the report</a>&nbsp;(available for 7 days) </p>
+     </p>
+ {% endif %}
 {% call form_wrapper() %}
-   {{ form.report_has_been_processed }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    {{ form.report_has_been_processed }}
     {% if report.is_a_batched_report %}
-      {{  govukButton({ "text": "Update" }) }}
+        {{  govukButton({ "text": "Update" }) }}
     {% endif %}
+
 {% endcall %}
+
+
 {% endblock %}
