@@ -54,34 +54,32 @@ def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocke
     ]
 
 
-def test_unsubscribe_request_report_for_batched_reports(client_request, mocker):
-    test_data = [
-        {
+def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_request, mocker):
+    test_data = [{
             "count": 200,
             "earliest_timestamp": "2024-06-15",
             "latest_timestamp": "2024-06-21",
             "processed_by_service_at": None,
             "batch_id": "a8a526f9-84be-44a6-b751-62c95c4b9329",
             "is_a_batched_report": True,
-        },
-        {
-            "count": 321,
-            "earliest_timestamp": "2024-06-8",
-            "latest_timestamp": "2024-06-14",
-            "processed_by_service_at": "2024-06-10",
-            "batch_id": "b9c28b5b-e442-4e5f-a9c7-c2544502627a",
-            "is_a_batched_report": True,
-        },
-    ]
+        }]
 
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
 
     page = client_request.get(
         "main.unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
-        batch_id=test_data[1]["batch_id"],
+        batch_id=test_data[0]["batch_id"],
     )
-    assert page.select("h1")[0].text == "8 June 2024 until 14 June 2024"
+    assert page.select("h1")[0].text == "15 June 2024 until 21 June 2024"
+    checkbox = page.select("#report_has_been_processed")[0].attrs
+    checkbox_hint = page.select("#report_has_been_processed-item-hint")[0].text
+    unsubscribe_requests_count_text = page.select("#report-unsubscribe-requests-count")[0].text
+    update_button = page.select("#process_unsubscribe_report")
+    assert "disabled" not in checkbox
+    assert normalize_spaces(checkbox_hint) == "I have unsubscribed these recipients from our mailing list"
+    assert normalize_spaces(unsubscribe_requests_count_text) == "200 new requests to unsubscribe"
+    assert len(update_button) == 1
 
 
 def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker):
@@ -102,7 +100,43 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
         service_id=SERVICE_ONE_ID,
         batch_id=test_data[0]["batch_id"],
     )
+    checkbox = page.select("#report_has_been_processed")[0].attrs
+    checkbox_hint = page.select("#report_has_been_processed-item-hint")[0].text
+    unsubscribe_requests_count_text = page.select("#report-unsubscribe-requests-count")[0].text
+    update_button = page.select("#process_unsubscribe_report")
     assert page.select("h1")[0].text == "22 June 2024 until 1 July 2024"
+    assert "disabled" in checkbox
+    assert normalize_spaces(checkbox_hint) == "You cannot do this until you've downloaded the report"
+    assert normalize_spaces(unsubscribe_requests_count_text) == "34 new requests to unsubscribe"
+    assert len(update_button) == 0
+
+
+def test_unsubscribe_request_report_for_processed_batched_reports(client_request, mocker):
+    test_data = [{
+            "count": 321,
+            "earliest_timestamp": "2024-06-8",
+            "latest_timestamp": "2024-06-14",
+            "processed_by_service_at": "2024-06-10",
+            "batch_id": "e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
+            "is_a_batched_report": True,
+        },
+    ]
+    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
+    page = client_request.get(
+        "main.unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=test_data[0]["batch_id"],
+    )
+    assert page.select("h1")[0].text == "8 June 2024 until 14 June 2024"
+    checkbox = page.select("#report_has_been_processed")[0].attrs
+    checkbox_hint = page.select("#report_has_been_processed-item-hint")[0].text
+    main_body_text = page.select("#completed_unsubscribe_report_main_text")[0].text
+    update_button = page.select("#process_unsubscribe_report")
+    assert "disabled" not in checkbox
+    assert "checked" in checkbox
+    assert normalize_spaces(checkbox_hint) == "I have unsubscribed these recipients from our mailing list"
+    assert normalize_spaces(main_body_text) == "Report was marked as completed on 10 June 2024"
+    assert len(update_button) == 1
 
 
 @pytest.mark.parametrize("batch_id", ["32b4e359-d4df-49b6-a92b-2eaa9343cfdd", None])
@@ -116,46 +150,3 @@ def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_req
         batch_id=batch_id,
     )
     assert normalize_spaces(page.select("h1")[0].text) == "Page not found"
-
-
-def test_unsubscribe_request_report_checkbox_for_completed_reports_are_checked_by_default(client_request, mocker):
-    test_data = [
-        {
-            "count": 321,
-            "earliest_timestamp": "2024-06-8",
-            "latest_timestamp": "2024-06-14",
-            "processed_by_service_at": None,
-            "batch_id": "b9c28b5b-e442-4e5f-a9c7-c2544502627a",
-            "is_a_batched_report": True,
-        },
-    ]
-
-    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
-    page = client_request.get(
-        "main.unsubscribe_request_report",
-        service_id=SERVICE_ONE_ID,
-        batch_id=test_data[0]["batch_id"],
-    )
-    assert "checked" in page.select("#report_has_been_processed")[0].attrs
-
-
-def test_unsubscribe_request_report_checkbox_for_unbatched_reports_are_disabled_checked_by_default(
-        client_request, mocker):
-    test_data = [
-        {
-            "count": 34,
-            "earliest_timestamp": "2024-06-22",
-            "latest_timestamp": "2024-07-01",
-            "processed_by_service_at": None,
-            "batch_id": None,
-            "is_a_batched_report": False,
-        },
-    ]
-
-    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
-    page = client_request.get(
-        "main.unsubscribe_request_report",
-        service_id=SERVICE_ONE_ID,
-        batch_id=test_data[0]["batch_id"],
-    )
-    assert "disabled" in page.select("#report_has_been_processed")[0].attrs

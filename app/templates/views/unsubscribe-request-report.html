@@ -19,7 +19,7 @@
 
 
 {% if report.status != "Completed" %}
-    <p class="govuk-body">
+    <p class="govuk-body" id="report-unsubscribe-requests-count">
      {{ report.count|format_thousands}} new requests to unsubscribe
     </p>
 
@@ -29,15 +29,16 @@
         <li>Remove the email addresses from your mailing list before you send any further emails</li>
       </ol>
 {%  else %}
-    <p class="govuk-body"> Report was marked as completed on {{ report.processed_by_service_at | format_date_normal }}</p>
+    <p class="govuk-body" id="completed_unsubscribe_report_main_text"> Report was marked as completed on {{ report.processed_by_service_at | format_date_normal }}</p>
     <p class="bottom-gutter"><a download href="" class="govuk-link heading-small">Download the report</a>&nbsp;(available for 7 days) </p>
-     </p>
+
  {% endif %}
+
 {% call form_wrapper() %}
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     {{ form.report_has_been_processed }}
     {% if report.is_a_batched_report %}
-        {{  govukButton({ "text": "Update" }) }}
+        {{  govukButton({ "text": "Update", "id":"process_unsubscribe_report" })}}
     {% endif %}
 
 {% endcall %}
