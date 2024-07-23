@@ -25,12 +25,12 @@
 
     <p class="govuk-body">You must: </p>
       <ol class="govuk-list govuk-list--number">
-        <li><span class="bottom-gutter"><a download href="" class="govuk-link heading-small">Download the report</a>&nbsp;(available for 90 days) </span> </li>
+        <li><span class="bottom-gutter"><a download href="" class="govuk-link heading-small">Download the report</a>&nbsp;(available until {{report.report_latest_download_date|format_date_normal}}) </span> </li>
         <li>Remove the email addresses from your mailing list before you send any further emails</li>
       </ol>
 {%  else %}
     <p class="govuk-body" id="completed_unsubscribe_report_main_text"> Report was marked as completed on {{ report.processed_by_service_at | format_date_normal }}</p>
-    <p class="bottom-gutter"><a download href="" class="govuk-link heading-small">Download the report</a>&nbsp;(available for 7 days) </p>
+    <p class="bottom-gutter"><a download href="" class="govuk-link heading-small">Download the report</a>&nbsp;(available until {{report.report_latest_download_date|format_date_normal}}) </p>
 
  {% endif %}
 
