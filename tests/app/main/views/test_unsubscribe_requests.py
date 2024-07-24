@@ -49,7 +49,7 @@ def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocke
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
 
-    assert ["Report Status", "If you have unsubscribed requests they will be listed here"] == [
+    assert ["Report Status", "If you have any email unsubscribe requests they will be listed here"] == [
         normalize_spaces(row.text) for row in page.select("tr")
     ]
 

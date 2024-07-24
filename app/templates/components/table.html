@@ -37,7 +37,7 @@
     {% endfor %}
     {% if not items %}
       {% call row() %}
-        <td class="table-empty-message" colspan="10">
+        <td class="table-empty-message" colspan="{{ field_headings | length }}">
           {{ empty_message }}
         </td>
       {% endcall %}
