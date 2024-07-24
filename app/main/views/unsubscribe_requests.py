@@ -33,6 +33,7 @@ def unsubscribe_request_report(service_id, batch_id=None):
                                     "views/unsubscribe-request-report.html",
                                     report=report,
                                     form=form,
+                                    error_summary_enabled=True,
                                 )
         except HTTPError as http_error:
             if http_error.status_code == 400 and http_error.message.get("batch_id"):
@@ -45,4 +46,5 @@ def unsubscribe_request_report(service_id, batch_id=None):
         "views/unsubscribe-request-report.html",
         report=report,
         form=form,
+        error_summary_enabled=True,
     )
