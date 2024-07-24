@@ -46,14 +46,16 @@
       "html": change_email
     }) }}
 
-    {% set text_message_code %}
-        <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">change your sign-in method</a>.</p>
-    {% endset %}
+    {% if not login_via_sms %}
+        {% set text_message_code %}
+            <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">change your sign-in method</a>.</p>
+        {% endset %}
 
-    {{ govukDetails({
-      "summaryText": "If you want to sign in with a text message code instead",
-      "html": text_message_code
-    }) }}
+        {{ govukDetails({
+          "summaryText": "If you want to sign in with a text message code instead",
+          "html": text_message_code
+        }) }}
+    {% endif %}
   </div>
 </div>
 

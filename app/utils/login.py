@@ -43,7 +43,7 @@ def redirect_when_logged_in(platform_admin):
     return redirect(url_for("main.show_accounts_or_dashboard"))
 
 
-def email_needs_revalidating(user):
+def email_needs_revalidating(user) -> bool:
     return not is_less_than_days_ago(user.email_access_validated_at, 90)
 
 
