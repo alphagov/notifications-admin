@@ -1,6 +1,5 @@
-from datetime import datetime, UTC, timedelta
+from datetime import timedelta
 
-from dateutil.parser import parser
 from flask import abort
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
