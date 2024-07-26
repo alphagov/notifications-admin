@@ -1,15 +1,19 @@
-{% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% extends "unbranded_template.html" %}
 
-{% block per_page_title %}
+{% block pageTitle %}
   Unsubscribe
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block content %}
 
-  {{ page_header('Unsubscribe') }}
-  <p class="govuk-body">
-    You request to unsubscribe could not be processed. Please check the link and try again.
+  <h1>
+    Unsubscribe
+  </h1>
+  <p>
+    Your request to unsubscribe could not be processed.
+  </p>
+  <p>
+    Please check the link and try again.
   </p>
 
 

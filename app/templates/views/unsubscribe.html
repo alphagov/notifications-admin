@@ -1,31 +1,33 @@
-{% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
+
+{% extends "unbranded_template.html" %}
 
 {% block per_page_title %}
   Unsubscribe
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block content %}
 
-{{ page_header('Unsubscribe') }}
+  <h1>
+    Unsubscribe
+  </h1>
 
-{% if confirmed %}
-  <p class="govuk-body">
-    You have been unsubscribed
-  </p>
-{% else %}
-  <div class="js-hidden">
+  {% if confirmed %}
+    <p>
+      You have been unsubscribed
+    </p>
+  {% else %}
+    <div class="js-hidden">
 
-    <form method="post" id="confirm-unsubscription">
-      {{ page_footer('Confirm unsubscription') }}
-    </form>
+      <form method="post" id="confirm-unsubscription">
+        {{ page_footer('Confirm unsubscription') }}
+      </form>
 
-  </div>
+    </div>
 
-  <script type="text/javascript">
-    document.getElementById("confirm-unsubscription").submit();
-  </script>
+    <script type="text/javascript">
+      document.getElementById("confirm-unsubscription").submit();
+    </script>
 {% endif %}
 
 {% endblock %}
