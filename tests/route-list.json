@@ -354,6 +354,8 @@
     "/two-factor-email-sent",
     "/two-factor-sms",
     "/two-factor-webauthn",
+    "/unsubscribe/<uuid:notification_id>/<string:token>",
+    "/unsubscribe/example",
     "/user-profile",
     "/user-profile/disable-platform-admin-view",
     "/user-profile/email",

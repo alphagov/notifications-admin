@@ -119,6 +119,7 @@ from app.notify_client.sms_rate_client import sms_rate_api_client
 from app.notify_client.status_api_client import status_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.notify_client.template_statistics_api_client import template_statistics_client
+from app.notify_client.unsubscribe_api_client import unsubscribe_api_client
 from app.notify_client.upload_api_client import upload_api_client
 from app.notify_client.user_api_client import user_api_client
 from app.notify_session import NotifyAdminSessionInterface
@@ -208,6 +209,7 @@ def create_app(application):
         template_statistics_client,
         upload_api_client,
         user_api_client,
+        unsubscribe_api_client,
         admin_api_client,
         # External API clients
         antivirus_client,
