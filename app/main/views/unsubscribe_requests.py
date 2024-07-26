@@ -1,6 +1,6 @@
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, request, url_for
 
-from app import current_service, format_date_numeric, service_api_client
+from app import current_service, format_date_numeric, service_api_client, unsubscribe_api_client
 from app.main import main
 from app.main.forms import ProcessUnsubscribeRequestForm
 from app.models.spreadsheet import Spreadsheet
@@ -92,3 +92,23 @@ def create_unsubscribe_request_report(service_id):
             batch_id=created_report_data["report_id"],
         )
     )
+
+
+@main.route("/unsubscribe/<uuid:notification_id>/<string:token>", methods=["GET", "POST"])
+def unsubscribe(notification_id, token):
+    confirmed = False
+
+    if request.method == "POST":
+        confirmed = unsubscribe_api_client.unsubscribe(notification_id, token)
+        if not confirmed:
+            return render_template("views/unsubscribe-failed.html"), 404
+
+    return render_template(
+        "views/unsubscribe.html",
+        confirmed=confirmed,
+    )
+
+
+@main.route("/unsubscribe/example")
+def unsubscribe_example():
+    return render_template("views/unsubscribe-example.html")
