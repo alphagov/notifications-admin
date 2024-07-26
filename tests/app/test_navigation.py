@@ -338,6 +338,8 @@ EXCLUDED_ENDPOINTS = set(
             "two_factor_email",
             "two_factor_sms",
             "two_factor_webauthn",
+            "unsubscribe",
+            "unsubscribe_example",
             "unsubscribe_request_reports_summary",
             "unsubscribe_request_report",
             "update_letter_branding",
