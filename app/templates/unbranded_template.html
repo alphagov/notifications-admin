@@ -1,0 +1,61 @@
+{% extends "govuk_frontend_jinja/template.html"%}
+
+{% block headIcons %}
+{% endblock %}
+
+{% block head %}
+  {% block extra_stylesheets %}
+  {% endblock %}
+  <style>
+    body {
+      background: #f3f2f1;
+      color: #0b0c0c;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+    }
+    .govuk-skip-link {
+      display: none;
+    }
+    #main-content {
+      box-sizing: border-box;
+      max-width: 540px;
+      margin: 48px auto;
+      padding: 30px;
+      background: #ffffff;
+    }
+    footer {
+      box-sizing: border-box;
+      max-width: 540px;
+      padding: 0 30px;
+      margin: 48px auto;
+    }
+    h1 {
+      font-size: 30px;
+      line-height: 36px;
+      margin: 0 0 20px 0;
+    }
+    p {
+      font-size: 20px;
+      line-height: 30px;
+      margin: 0 0 12px 0;
+    }
+    footer p {
+      color: #505a5f;
+    }
+    .js-enabled .js-hidden {
+      display: none;
+    }
+  </style>
+  <script type="text/javascript">
+    document.body.className += ' js-enabled';
+  </script>
+  <meta name="robots" content="noindex" />
+  {% block meta %}
+  {% endblock %}
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

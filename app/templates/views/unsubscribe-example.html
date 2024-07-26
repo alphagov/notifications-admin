@@ -1,16 +1,27 @@
-{% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% extends "unbranded_template.html" %}
 
-{% block per_page_title %}
+{% block pageTitle %}
   Unsubscribe
 {% endblock %}
 
-{% block maincolumn_content %}
+{% block content %}
 
-  {{ page_header('Unsubscribe') }}
-  <p class="govuk-body">
-    You have been unsubscribed (this page is an example, no action has been taken)
+  <h1>
+    Unsubscribe
+  </h1>
+  <p>
+    You have been unsubscribed
   </p>
 
+{% endblock %}
+
+{% block footer %}
+
+  <footer>
+    <p>
+      This page is an example, no action has been taken
+    </p>
+  </footer>
 
 {% endblock %}
+
