@@ -2902,12 +2902,12 @@ class AddOrJoinServiceForm(StripWhitespaceForm):
 class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
     report_has_been_processed = GovukCheckboxField("Mark as completed")
 
-    def __init__(self, is_a_batched_report, report_status, *args, **kwargs):
-        self.report_status = report_status
+    def __init__(self, is_a_batched_report, report_completed, *args, **kwargs):
+        self.report_completed = report_completed
         super().__init__(*args, **kwargs)
 
         if is_a_batched_report:
-            if report_status == "Completed":
+            if report_completed:
                 self.report_has_been_processed.param_extensions = {
                     "items": [
                         {
@@ -2938,11 +2938,11 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
             }
 
     def validate_report_has_been_processed(self, field):
-        if not field.data and self.report_status != "Completed":
+        if not field.data and not self.report_completed:
             raise ValidationError(
                 "There is a problem. "
                 "You must confirm that you have removed the email addresses from your mailing list."
             )
 
-        if field.data and self.report_status == "Completed":
+        if field.data and self.report_completed:
             raise ValidationError("There is a problem. You have already marked the report as Completed")
