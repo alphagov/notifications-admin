@@ -2904,6 +2904,7 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
 
     def __init__(self, is_a_batched_report, report_status, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.report_status = report_status
 
         if is_a_batched_report:
             if report_status == "Completed":
@@ -2937,7 +2938,7 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
             }
 
     def validate_report_has_been_processed(self, field):
-        if not field.data:
+        if not field.data and self.report_status != "Completed":
             raise ValidationError(
                 "There is a problem. "
                 "You must confirm that you have removed the email addresses from your mailing list."
