@@ -1,6 +1,5 @@
 import pytest
 from flask import url_for
-from freezegun import freeze_time
 
 from tests.conftest import SERVICE_ONE_ID
 
@@ -179,12 +178,11 @@ def test_redirect_to_sign_in_if_not_logged_in(
     )
 
 
-@freeze_time("2020-11-27T12:00:00")
 @pytest.mark.parametrize(
-    ("redirect_url", "email_access_validated_at"),
+    ("redirect_url", "sms_auth"),
     [
-        (None, "2020-11-23T11:35:21.726132Z"),  # login_via_sms = False
-        (f"/services/{SERVICE_ONE_ID}/templates", "2020-11-23T11:35:21.726132Z"),
+        (None, False),
+        (f"/services/{SERVICE_ONE_ID}/templates", False),
     ],
 )
 def test_should_render_correct_email_not_received_template_for_active_user(
@@ -193,12 +191,12 @@ def test_should_render_correct_email_not_received_template_for_active_user(
     mock_get_user_by_email,
     mock_send_verify_code,
     redirect_url,
-    email_access_validated_at,
+    sms_auth,
 ):
     client_request.logout()
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
-    api_user_active["email_access_validated_at"] = email_access_validated_at
+    api_user_active["sms_auth"] = sms_auth
 
     page = client_request.get("main.email_not_received", next=redirect_url)
 

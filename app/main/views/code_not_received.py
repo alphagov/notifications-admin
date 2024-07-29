@@ -5,7 +5,6 @@ from app.main import main
 from app.main.forms import TextNotReceivedForm
 from app.models.user import User
 from app.utils.login import (
-    email_needs_revalidating,
     redirect_to_sign_in,
 )
 
@@ -54,7 +53,7 @@ def check_and_resend_verification_code():
 def email_not_received():
     # user login from two-factor-sms refactor does not need to see the two-factor-sms details on page
     user = User.from_email_address(session["user_details"]["email"])
-    login_via_sms = email_needs_revalidating(user)
+    login_via_sms = user.sms_auth
 
     redirect_url = request.args.get("next")
     return render_template("views/email-not-received.html", redirect_url=redirect_url, login_via_sms=login_via_sms)
