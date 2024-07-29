@@ -27,6 +27,10 @@ class UnsubscribeRequestsReport(JSONModel):
         return "Completed"
 
     @property
+    def completed(self):
+        return self.processed_by_service_at is not None
+
+    @property
     def report_latest_download_date(self):
         if self.status == "Completed":
             limit = 7
