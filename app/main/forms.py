@@ -2907,34 +2907,16 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
 
         if is_a_batched_report:
-            if report_completed:
-                self.report_has_been_processed.param_extensions = {
-                    "items": [
-                        {
-                            "hint": {"text": "I have unsubscribed these recipients from our mailing list"},
-                            "disabled": False,
-                            "checked": True,
-                        },
-                    ]
-                }
-            else:
-                self.report_has_been_processed.param_extensions = {
-                    "items": [
-                        {
-                            "hint": {"text": "I have unsubscribed these recipients from our mailing list"},
-                            "disabled": False,
-                        },
-                    ]
-                }
-
-        else:
             self.report_has_been_processed.param_extensions = {
                 "items": [
                     {
-                        "hint": {"text": "You cannot do this until you've downloaded the report"},
-                        "disabled": True,
+                        "hint": {"text": "I have unsubscribed these recipients from our mailing list"},
                     },
                 ]
+            }
+        else:
+            self.report_has_been_processed.param_extensions = {
+                "items": [{"hint": {"text": "You cannot do this until you've downloaded the report"}, "disabled": True}]
             }
 
     def validate_report_has_been_processed(self, field):
