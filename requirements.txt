@@ -175,7 +175,7 @@ statsd==4.0.1
     # via notifications-utils
 texttable==1.6.4
     # via pyexcel
-urllib3==1.26.18
+urllib3==1.26.19
     # via
     #   botocore
     #   requests
