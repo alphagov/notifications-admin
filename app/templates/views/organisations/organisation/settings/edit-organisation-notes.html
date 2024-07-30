@@ -18,12 +18,7 @@
     {% call form_wrapper() %}
       {{ form.notes(param_extensions={
         "classes": "govuk-!-width-full",
-        "rows": "4",
-        "attributes": {
-          "data-notify-module": "enhanced-textbox",
-          "data-highlight-placeholders": "false",
-          "data-autofocus-textbox": "true"
-        },
+        "rows": "4"
       }) }}
       {{ page_footer('Save') }}
     {% endcall %}
