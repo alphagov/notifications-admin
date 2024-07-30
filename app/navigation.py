@@ -198,6 +198,8 @@ class MainNavigation(Navigation):
             "service_dashboard",
             "unsubscribe_request_reports_summary",
             "unsubscribe_request_report",
+            "download_unsubscribe_request_report",
+            "create_unsubscribe_request_report",
             "template_usage",
             "view_notification",
             "view_notifications",
