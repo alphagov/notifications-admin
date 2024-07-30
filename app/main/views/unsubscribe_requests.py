@@ -41,3 +41,13 @@ def unsubscribe_request_report(service_id, batch_id=None):
         form=form,
         error_summary_enabled=True,
     )
+
+
+@main.route("/services/<uuid:service_id>/unsubscribe-requests/reports/download")
+@main.route("/services/<uuid:service_id>/unsubscribe-requests/reports/download/<uuid:batch_id>.csv")
+@user_has_permissions("view_activity")
+def download_unsubscribe_request_report(service_id, batch_id=None):
+    if not batch_id:
+        return redirect(url_for("main.create_unsubscribe_request_report", service_id=service_id))
+    else:
+        pass
