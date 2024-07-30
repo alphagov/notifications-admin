@@ -21,7 +21,9 @@ def unsubscribe_request_report(service_id, batch_id=None):
     else:
         report = current_service.unsubscribe_request_reports_summary.get_unbatched_report()
     form = ProcessUnsubscribeRequestForm(
-        is_a_batched_report=report.is_a_batched_report, report_completed=report.completed
+        is_a_batched_report=report.is_a_batched_report,
+        report_completed=report.completed,
+        report_has_been_processed=report.completed,
     )
 
     if form.validate_on_submit():
