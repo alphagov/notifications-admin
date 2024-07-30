@@ -1,6 +1,7 @@
 import pytest
 from freezegun import freeze_time
 
+from app import service_api_client
 from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
@@ -305,3 +306,41 @@ def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_req
         batch_id=batch_id,
     )
     assert normalize_spaces(page.select("h1")[0].text) == "Page not found"
+
+
+def test_download_unsubscribe_request_report_redirects_to_batch_unsubscribe_request_report_endpoint_no_batch_id(
+    client_request,
+):
+    client_request.get_response(
+        "main.download_unsubscribe_request_report", service_id=SERVICE_ONE_ID, batch_id=None, _expected_status=302
+    )
+
+
+def test_create_unsubscribe_request_report_creates_batched_report(client_request, mocker):
+    summary_data = [
+        {
+            "count": 34,
+            "earliest_timestamp": "2024-06-22",
+            "latest_timestamp": "2024-07-01",
+            "processed_by_service_at": None,
+            "batch_id": None,
+            "is_a_batched_report": False,
+        }
+    ]
+    test_batch_id = "daaa3f82-faf0-4199-82da-15ec6aa8abe8"
+    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=summary_data)
+    mock_batch_report = mocker.patch.object(
+        service_api_client, "create_unsubscribe_request_report", return_value={"batch_id": test_batch_id}
+    )
+    client_request.get_response(
+        "main.create_unsubscribe_request_report", service_id=SERVICE_ONE_ID, batch_id=None, _expected_status=302
+    )
+    mock_batch_report.assert_called_once_with(
+        SERVICE_ONE_ID,
+        {
+            "count": 34,
+            "earliest_timestamp": "2024-06-22",
+            "latest_timestamp": "2024-07-01",
+            "processed_by_service_at": None,
+        },
+    )
