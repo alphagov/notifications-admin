@@ -111,7 +111,7 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
     update_button = page.select("#process_unsubscribe_report")
     assert page.select("h1")[0].text == "22 June 2024 until 1 July 2024"
     assert "disabled" in checkbox
-    assert normalize_spaces(checkbox_hint) == "You cannot do this until you've downloaded the report"
+    assert normalize_spaces(checkbox_hint) == "You cannot do this until you’ve downloaded the report"
     assert normalize_spaces(unsubscribe_requests_count_text) == "34 new requests to unsubscribe"
     assert normalize_spaces(availability_date) == "(available until 29 September 2024)"
     assert len(update_button) == 0

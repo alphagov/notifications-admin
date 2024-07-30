@@ -2916,7 +2916,7 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
             }
         else:
             self.report_has_been_processed.param_extensions = {
-                "items": [{"hint": {"text": "You cannot do this until you've downloaded the report"}, "disabled": True}]
+                "items": [{"hint": {"text": "You cannot do this until you’ve downloaded the report"}, "disabled": True}]
             }
 
     def validate_report_has_been_processed(self, field):
