@@ -514,6 +514,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_unsubscribe_request_statistics(self, service_id):
         return self.get(f"service/{service_id}/unsubscribe-request-statistics")
 
+    def create_unsubscribe_request_report(self, service_id, data):
+        return self.post(f"service/{service_id}/create-unsubscribe-request-report", data)
+
     @classmethod
     def parse_edit_service_http_error(cls, http_error):
         """Inspect the HTTPError from a create_service/update_service call and return a human-friendly error message"""
