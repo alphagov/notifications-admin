@@ -114,3 +114,13 @@ $govuk-checkboxes-size: 40px;
   }
 
 }
+
+.govuk-checkboxes__input:disabled+.govuk-checkboxes__label,
+.govuk-checkboxes__input:disabled~.govuk-hint {
+  opacity: 1;
+  color: $govuk-secondary-text-colour;
+}
+
+.govuk-checkboxes__input:disabled+.govuk-checkboxes__label:before {
+  background: govuk-colour("light-grey");
+}
