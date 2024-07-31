@@ -102,8 +102,8 @@ def format_date_human(date):
     return get_human_day(date)
 
 
-def format_datetime_human(date, date_prefix="on"):
-    return f"{get_human_day(date, date_prefix=date_prefix)} at {format_time(date)}"
+def format_datetime_human(date, date_prefix="on", separator="at"):
+    return f"{get_human_day(date, date_prefix=date_prefix)} {separator} {format_time(date)}"
 
 
 def format_day_of_week(date):
