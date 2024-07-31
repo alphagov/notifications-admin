@@ -179,24 +179,21 @@ def test_redirect_to_sign_in_if_not_logged_in(
 
 
 @pytest.mark.parametrize(
-    ("redirect_url", "sms_auth"),
+    "redirect_url",
     [
-        (None, False),
-        (f"/services/{SERVICE_ONE_ID}/templates", False),
+        None,
+        f"/services/{SERVICE_ONE_ID}/templates",
     ],
 )
 def test_should_render_correct_email_not_received_template_for_active_user(
     client_request,
     api_user_active,
     mock_get_user_by_email,
-    mock_send_verify_code,
     redirect_url,
-    sms_auth,
 ):
     client_request.logout()
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
-    api_user_active["sms_auth"] = sms_auth
 
     page = client_request.get("main.email_not_received", next=redirect_url)
 
@@ -204,3 +201,40 @@ def test_should_render_correct_email_not_received_template_for_active_user(
     # there shouldn't be a form for updating mobile number
     assert page.select_one("form") is None
     assert page.select_one("a.govuk-button")["href"] == url_for("main.resend_email_link", next=redirect_url)
+
+    assert (
+        "Ask a member of your team with the ‘Manage settings, team and usage’ "
+        "permission to change your sign-in method"
+    ) not in page.text
+
+
+@pytest.mark.parametrize(
+    "redirect_url",
+    [
+        None,
+        f"/services/{SERVICE_ONE_ID}/templates",
+    ],
+)
+def test_should_render_correct_email_not_received_template_for_email_auth(
+    client_request,
+    api_user_active,
+    mock_get_user_by_email,
+    redirect_url,
+):
+    client_request.logout()
+    with client_request.session_transaction() as session:
+        session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
+
+    api_user_active["auth_type"] = "email_auth"
+
+    page = client_request.get("main.email_not_received", next=redirect_url)
+
+    assert page.select_one("h1").string == "If you do not receive an email link"
+    # there shouldn't be a form for updating mobile number
+    assert page.select_one("form") is None
+    assert page.select_one("a.govuk-button")["href"] == url_for("main.resend_email_link", next=redirect_url)
+
+    assert (
+        "Ask a member of your team with the ‘Manage settings, "
+        "team and usage’ permission to change your sign-in method"
+    ) in page.text
