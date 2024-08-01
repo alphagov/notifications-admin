@@ -57,7 +57,7 @@ def download_unsubscribe_request_report(service_id, batch_id=None):
             column_names = {
                 "email_address": "Email address",
                 "template_name": "Template name",
-                "original_file_name": "Contact list file name",
+                "original_file_name": "Uploaded spreadsheet file name",
                 "template_sent_at": "Template sent at",
             }
             # initialise with header row
@@ -70,8 +70,8 @@ def download_unsubscribe_request_report(service_id, batch_id=None):
                 {
                     "Content-Type": "text/csv; charset=utf-8",
                     "Content-Disposition": f'attachment; filename="Email unsubscribe requests '
-                    f"{format_date_normal(report['earliest_timestamp'])} "
-                    f"to {format_date_normal(report['latest_timestamp'])}.csv",
+                    f"{format_date_numeric(report['earliest_timestamp'])} "
+                    f"to {format_date_numeric(report['latest_timestamp'])}.csv",
                 },
             )
         except HTTPError as e:
