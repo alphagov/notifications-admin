@@ -1,5 +1,5 @@
 .webauthn__no-js {
-  .js-enabled & {
+  .#{$govuk-frontend-supported-css-class} & {
     display: none;
   }
 }
@@ -7,11 +7,11 @@
 .webauthn__api-missing {
   display: none;
 
-  .js-enabled & {
+  .#{$govuk-frontend-supported-css-class} & {
     display: block;
   }
 
-  .js-enabled.webauthn-api-enabled & {
+  .#{$govuk-frontend-supported-css-class}.webauthn-api-enabled & {
     display: none;
   }
 }

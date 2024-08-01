@@ -51,7 +51,7 @@
               "classes": label_classes
             },
             "classes": "govuk-input--numbered govuk-!-width-full",
-            "value": field.data[loop.index0],
+            "value": field.data[loop.index0] if field.data[loop.index0] != '' else None,
             "autocomplete": autocomplete
           }) }}
         </div>

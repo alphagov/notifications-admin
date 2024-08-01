@@ -1,11 +1,9 @@
 .notify-radios-with-images {
-  display: flex;
-  flex-direction: column;
   margin-top: govuk-spacing(3);
   margin-bottom: govuk-spacing(2);
+  flex-wrap: nowrap;
 
   @include govuk-media-query($from: tablet) {
-    flex-direction: row;
     margin-bottom: 0;
   }
 }
@@ -16,6 +14,7 @@
 
   padding-left: 0;
   margin-bottom: govuk-spacing(4);
+  flex: 1;
 
   @include govuk-media-query($from: tablet) {
     margin-bottom: 0
@@ -37,7 +36,6 @@
 }
 
 .notify-radios-with-images__radio {
-  display: block;
+  display: flex;
   position: relative;
-  padding-left: govuk-spacing(7) - 3px;
 }

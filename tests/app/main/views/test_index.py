@@ -249,7 +249,7 @@ def test_css_is_served_from_correct_path(client_request):
 def test_resources_that_use_asset_path_variable_have_correct_path(client_request):
     page = client_request.get("main.guidance_api_documentation")  # easy static page
 
-    favicon = page.select_one('link[type="image/x-icon"]')
+    favicon = page.select_one('link[rel="icon"]')
 
     assert favicon.attrs["href"].startswith("https://static.example.com/images/favicon.ico")
 

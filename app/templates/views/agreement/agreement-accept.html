@@ -22,8 +22,9 @@
     {{ page_header('Accept our data processing and financial agreement') }}
 
     {%  set contentHtml%}
-            {% call govukFieldset(
-            {legend: {classes: "govuk-fieldset__legend--l"}}) %}
+            {% call govukFieldset({
+              "legend": {}
+            }) %}
                 {{ form.on_behalf_of_name }}
                 {{ form.on_behalf_of_email }}
        {% endcall %}

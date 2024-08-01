@@ -3,7 +3,6 @@
 
   var queues = {};
   var timeouts = {};
-  var morphdom = global.GOVUK.vendor.morphdom;
   var defaultInterval = 2000;
   var interval = 0;
 
@@ -60,7 +59,7 @@
 
   var getRenderer = ($contents, key, classesPersister) => response => {
     classesPersister.remove();
-    morphdom(
+    window.Morphdom(
       $contents.get(0),
       $(response[key]).get(0)
     );

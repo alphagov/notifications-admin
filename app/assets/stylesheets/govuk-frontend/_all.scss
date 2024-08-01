@@ -6,10 +6,10 @@
 $govuk-assets-path: "/static/";
 
 @import "govuk/base";
-@import "govuk/core/all";
-@import "govuk/objects/all";
+@import "govuk/core";
+@import "govuk/objects";
 
-// section replacing @import "components/all", specifying which components to include
+// specifying which components to include
 @import "govuk/components/skip-link/index";
 @import "govuk/components/header/index";
 @import "govuk/components/footer/index";
@@ -25,8 +25,8 @@ $govuk-assets-path: "/static/";
 @import "govuk/components/textarea/index";
 @import "govuk/components/summary-list/index";
 
-@import "govuk/utilities/all";
-@import "govuk/overrides/all";
+@import "govuk/utilities";
+@import "govuk/overrides";
 
 // Styles extending those from GOV.UK Frontend
 @import "./extensions";

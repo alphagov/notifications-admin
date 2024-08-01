@@ -1,5 +1,7 @@
-$govuk-touch-target-size: 44px;
+// https://github.com/alphagov/govuk-frontend/blob/v5.4.1/packages/govuk-frontend/src/govuk/components/checkboxes/_index.scss
+$govuk-touch-target-gutter: 4px;
 $govuk-radios-size: 40px;
+$govuk-touch-target-size: ($govuk-radios-size + $govuk-touch-target-gutter);
 $border-thickness: 4px;
 $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 
@@ -98,15 +100,11 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   width: 100%;
 }
 
-.govuk-form-group--nested-radio{
-  $border-thickness: $govuk-touch-target-size - $govuk-radios-size;
-  $border-indent: $govuk-touch-target-size / 2;
-
-  position: relative;
+.govuk-form-group--nested-radio {
 
   // To equalise the spacing between the line and the top/bottom of
   // the radio
-  margin-top: govuk-spacing(1) + ($border-thickness / 2) + 2;
+  margin-top: govuk-spacing(2);
 
   // transparent borders become visible in high contrast modes so set to match background
   @media (-ms-high-contrast: active), (forced-colors: active) {
@@ -115,28 +113,19 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 }
 
 .govuk-form-group--nested-radio .govuk-radios__item > .govuk-form-group{
-  // To equalise the spacing between the line and the top/bottom of
-  // the radio
-  margin-top: govuk-spacing(2);
-}
-
-
-.govuk-form-group--nested-radio .govuk-radios__item{
   padding-left: govuk-spacing(8);
+  flex-basis: 100%;
 }
 
 .govuk-form-group--nested-radio .govuk-radios__item:before{
   content: "";
   position: absolute;
   bottom: 0;
+  top: 2px;
   left: $border-indent;
   width: $border-thickness;
   height: 100%;
   background: $govuk-border-colour;
-}
-
-.govuk-form-group--nested-radio .govuk-radios__label{
-  padding-left: govuk-spacing(0);
 }
 
 .govuk-form-group--nested-radio .govuk-radios__label:before {
@@ -145,7 +134,8 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 }
 
 .govuk-form-group--nested-radio .govuk-radios__hint{
-  padding-left: govuk-spacing(0) ;
+  margin-top: govuk-spacing(-2) ;
+  padding-bottom: govuk-spacing(1) ;
 }
 
 .govuk-form-group--nested-radio .govuk-radios__hint:after {

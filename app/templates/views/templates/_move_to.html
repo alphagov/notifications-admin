@@ -1,10 +1,14 @@
 {% from "components/page-footer.html" import page_footer %}
 
-<div id="sticky_template_forms">
+<div id="sticky_template_forms template-forms">
+  <h2 class="govuk-heading-m js-hidden">Template and folder actions</h2>
   <button name="operation" value="unknown" hidden></button>
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   {% if form.move_to.choices and template_list.templates_to_show %}
-    <div id="move_to_folder_radios" class="sticky-template-form" role="region" aria-label="Choose the folder to move selected items to">
+    {% set move_to_folder_heading_and_aria_label_text = 'Move selected items to a folder'%}
+    {% set move_to_a_new_folder_heading_and_aria_label_text = 'Add and name a new folder to move selected items to'%}
+    <div id="move_to_folder_radios" class="sticky-template-form" role="region" aria-label="{{ move_to_folder_heading_and_aria_label_text }}">
+      <h3 class="govuk-heading-s js-hidden">{{ move_to_folder_heading_and_aria_label_text }}</h3>
       <div class="js-will-stick-at-bottom-when-scrolling">
       {{ form.move_to}}
     </div>
@@ -12,20 +16,25 @@
       {{ page_footer('Move', button_name='operation', button_value='move-to-existing-folder', button_text_hidden_suffix=' selection to folder') }}
       </div>
     </div>
-    <div id="move_to_new_folder_form" class="sticky-template-form" role="region" aria-label="Enter name of the new folder to move selected items to">
+    <div id="move_to_new_folder_form" class="sticky-template-form" role="region" aria-label="{{ move_to_a_new_folder_heading_and_aria_label_text }}">
+      <h3 class="govuk-heading-s js-hidden">{{ move_to_a_new_folder_heading_and_aria_label_text }}</h3>
       <div class="js-will-stick-at-bottom-when-scrolling">
         {{ form.move_to_new_folder_name(param_extensions={"classes": "govuk-!-width-full"}) }}
         {{ page_footer('Add to new folder', button_name='operation', button_value='move-to-new-folder') }}
       </div>
     </div>
   {% endif %}
-  <div id="add_new_folder_form" class="sticky-template-form" role="region" aria-label="Enter name of the new folder">
+  {% set add_a_folder_heading_and_aria_label_text = 'Add a new folder'%}
+  {% set add_a_template_heading_and_aria_label_text = 'Add a new template'%}
+  <div id="add_new_folder_form" class="sticky-template-form" role="region" aria-label="{{ add_a_folder_heading_and_aria_label_text }}">
+    <h3 class="govuk-heading-s js-hidden">{{ add_a_folder_heading_and_aria_label_text }}</h3>
     <div class="js-will-stick-at-bottom-when-scrolling">
       {{ form.add_new_folder_name(param_extensions={"classes": "govuk-!-width-full"}) }}
       {{ page_footer('Add new folder', button_name='operation', button_value='add-new-folder') }}
     </div>
   </div>
-  <div id="add_new_template_form" class="sticky-template-form" role="region" aria-label="Choose template type" {% if single_notification_channel %}data-channel="{{single_notification_channel}}" data-service="{{current_service.id}}"{% endif %}>
+  <div id="add_new_template_form" class="sticky-template-form" role="region" aria-label="{{ add_a_template_heading_and_aria_label_text }}" {% if single_notification_channel %}data-channel="{{single_notification_channel}}" data-service="{{current_service.id}}"{% endif %}>
+    <h3 class="govuk-heading-s js-hidden">{{ add_a_template_heading_and_aria_label_text }}</h3>
     <div class="js-will-stick-at-bottom-when-scrolling">
      {{form.add_template_by_template_type}}
     </div>

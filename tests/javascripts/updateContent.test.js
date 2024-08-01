@@ -57,12 +57,10 @@ beforeAll(() => {
 
   $.ajax.mockImplementation(() => jqueryAJAXReturnObj);
 
-  // RollupJS assigns our bundled module code, including morphdom, to window.GOVUK.
-  // morphdom is assigned to its vendor property so we need to copy that here for the updateContent
+  // We export window.Morphdom from the ESM bundle
+  // so we need to copy that here for the updateContent
   // code to pick it up.
-  window.GOVUK.vendor = {
-    morphdom: require('morphdom')
-  };
+  window.Morphdom = require('morphdom');
   require('../../app/assets/javascripts/updateContent.js');
 
 });

@@ -228,7 +228,7 @@ class GovukTextInputFieldMixin(GovukFrontendWidgetMixin):
             "id": self.id,
             "label": {"text": self.label.text},
             "name": self.name,
-            "value": value,
+            "value": value if value else None,
             "type": self.input_type,
         }
 

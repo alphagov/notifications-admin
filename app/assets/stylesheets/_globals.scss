@@ -22,7 +22,7 @@ abbr[title] {
   cursor: help;
 }
 
-.js-enabled .js-hidden {
+.#{$govuk-frontend-supported-css-class} .js-hidden {
   display: none;
 }
 

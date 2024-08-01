@@ -1,6 +1,14 @@
 // Path to assets for use with file-url()
 $path: '/static/images/';
 
+// By default GOV.UK Frontend adds .js-enabled for all browsers that have
+// javascript enabled which isn't useful as their and our enhancements
+// only run in browsers that support type='module' and add 
+// .govuk-frontend-supported to the body element
+// We use the this CSS class from GOV.UK Frontend to hide/show Javascript enhanced
+// elements in browser that we do/don't support
+$govuk-frontend-supported-css-class: 'govuk-frontend-supported';
+
 // Dependencies from GOVU.UK Frontend Toolkit, rewritten for this application
 @import './url-helpers';
 

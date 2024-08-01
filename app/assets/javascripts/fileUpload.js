@@ -16,7 +16,7 @@
       $('button.file-upload-button', this.$form).replaceWith($cancelButton);
 
       // add GOVUK Frontend behaviours
-      new window.GOVUK.Frontend.Button(this.$form[0]).init();
+      new window.GOVUKFrontendButton(this.$form[0]);
 
       // move focus to the cancel button, it is lost when the upload button is removed
       $cancelButton.focus();
@@ -64,7 +64,7 @@
       this.$fieldErrors = this.$form.find('.file-upload-label .error-message');
 
       // Note: label.file-upload-label, input.file-upload-field and button.file-upload-submit
-      // are all hidden by CSS that uses the .js-enabled class on the body tag
+      // are all hidden by CSS that uses the .govuk-frontend-supported class on the body tag
 
       this.addFakeButton();
 
