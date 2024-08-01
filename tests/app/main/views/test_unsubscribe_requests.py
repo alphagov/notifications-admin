@@ -1,5 +1,6 @@
 import pytest
 from freezegun import freeze_time
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import service_api_client
 from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
@@ -320,8 +321,8 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
     summary_data = [
         {
             "count": 34,
-            "earliest_timestamp": "2024-06-22",
-            "latest_timestamp": "2024-07-01",
+            "earliest_timestamp": "Thu, 18 Jul 2024 15:32:28 GMT",
+            "latest_timestamp": "Sat, 20 Jul 2024 18:22:11 GMT",
             "processed_by_service_at": None,
             "batch_id": None,
             "is_a_batched_report": False,
@@ -339,8 +340,8 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
         SERVICE_ONE_ID,
         {
             "count": 34,
-            "earliest_timestamp": "2024-06-22",
-            "latest_timestamp": "2024-07-01",
+            "earliest_timestamp": utc_string_to_aware_gmt_datetime('Thu, 18 Jul 2024 15:32:28 GMT'),
+            "latest_timestamp": utc_string_to_aware_gmt_datetime('Sat, 20 Jul 2024 18:22:11 GMT'),
             "processed_by_service_at": None,
         },
     )
@@ -349,20 +350,20 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
 def test_download_unsubscribe_request_report(client_request, mocker):
     report_data = {
         "batch_id": "3d466625-6ea4-414f-ac48-add30d895c43",
-        "earliest_timestamp": "2024-07-01",
-        "latest_timestamp": "2024-07-17",
+        "earliest_timestamp": "Thu, 18 Jul 2024 15:32:28 GMT",
+        "latest_timestamp": "Sat, 20 Jul 2024 18:22:11 GMT",
         "unsubscribe_requests": [
             {
                 "email_address": "fizz@bar.com",
                 "template_name": "Template Fizz",
                 "original_file_name": "Contact List 2",
-                "template_sent_at": "2024-06-28",
+                "template_sent_at": "Tue, 16 Jul 2024 17:44:20 GMT",
             },
             {
                 "email_address": "fizzbuzz@bar.com",
                 "template_name": "Template FizzBuzz",
                 "original_file_name": "N/A",
-                "template_sent_at": "2024-06-30",
+                "template_sent_at": "Wed, 17 Jul 2024 17:44:20 GMT",
             },
         ],
     }
@@ -380,6 +381,6 @@ def test_download_unsubscribe_request_report(client_request, mocker):
 
     assert (
         report.strip() == "Email address,Template name,Uploaded spreadsheet file name,Template sent at\r\n"
-        "fizz@bar.com,Template Fizz,Contact List 2,2024-06-28\r\n"
-        "fizzbuzz@bar.com,Template FizzBuzz,N/A,2024-06-30"
+        'fizz@bar.com,Template Fizz,Contact List 2,"Tue, 16 Jul 2024 17:44:20 GMT"\r\n'
+        'fizzbuzz@bar.com,Template FizzBuzz,N/A,"Wed, 17 Jul 2024 17:44:20 GMT"'
     )
