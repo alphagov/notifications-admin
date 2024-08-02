@@ -1020,7 +1020,12 @@ def test_POST_email_branding_enter_government_identity_logo_text(
     )
 
 
-def test_email_branding_choose_logo_page(client_request, service_one):
+def test_email_branding_choose_logo_page(mocker, client_request, service_one):
+    class FakeMD5:
+        def hexdigest(self):
+            return "abc123"
+
+    mocker.patch("app.asset_fingerprinter.hashlib.md5", return_value=FakeMD5())
     page = client_request.get(
         "main.email_branding_choose_logo",
         service_id=SERVICE_ONE_ID,
@@ -1034,11 +1039,23 @@ def test_email_branding_choose_logo_page(client_request, service_one):
     )
 
     assert [
-        (radio["value"], page.select_one(f"label.govuk-label[for=branding_options-{i}]").text.strip())
+        (
+            radio["value"],
+            page.select_one(f"label.govuk-label[for=branding_options-{i}]").text.strip(),
+            page.select_one(f"img#branding_options-{i}-description")["src"],
+        )
         for i, radio in enumerate(page.select("input[type=radio]"))
     ] == [
-        ("single_identity", "Create a government identity logo"),
-        ("org", "Upload a logo"),
+        (
+            "single_identity",
+            "Create a government identity logo",
+            "https://static.example.com/images/branding/single_identity.png?abc123",
+        ),
+        (
+            "org",
+            "Upload a logo",
+            "https://static.example.com/images/branding/org.png?abc123",
+        ),
     ]
 
 
