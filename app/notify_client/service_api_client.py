@@ -507,6 +507,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_unsubscribe_reports_summary(self, service_id):
         return self.get(f"service/{service_id}/unsubscribe-request-reports-summary")
 
+    @cache.delete("service-{service_id}-unsubscribe-request-reports-summary")
     def process_unsubscribe_request_report(self, service_id, batch_id, data):
         return self.post(f"service/{service_id}/process-unsubscribe-request-report/{batch_id}", data=data)
 
