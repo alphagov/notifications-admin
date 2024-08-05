@@ -243,7 +243,7 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     assert page.select_one("input[name=name]").get("value") is None
     assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
         "NHS – central government agency or public body",
-        "NHS Trust or Clinical Commissioning Group",
+        "NHS Trust or Integrated Care Board",
         "GP surgery",
     ]
     assert [radio["value"] for radio in page.select(".govuk-radios__item input")] == [
