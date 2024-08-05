@@ -4,6 +4,12 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
+{% block meta %}
+    {% if report.is_a_batched_report and request.args.get("force_download") %}
+        <meta http-equiv="refresh" content="0;URL='{{ url_for("main.download_unsubscribe_request_report", service_id=current_service.id, batch_id=report.batch_id)}}'" />
+    {% endif %}
+{% endblock %}
+
 {% block service_page_title %}
     {{ report.title }}
 {% endblock %}

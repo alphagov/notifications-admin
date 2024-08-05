@@ -87,8 +87,9 @@ def create_unsubscribe_request_report(service_id):
     created_report_data = service_api_client.create_unsubscribe_request_report(service_id, unbatched_report_data)
     return redirect(
         url_for(
-            "main.download_unsubscribe_request_report",
+            "main.unsubscribe_request_report",
             service_id=service_id,
             batch_id=created_report_data["report_id"],
+            force_download="true",
         )
     )
