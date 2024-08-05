@@ -276,7 +276,7 @@ def test_nhs_local_can_create_own_organisations(
         return
 
     assert normalize_spaces(page.select_one("main p").text) == (
-        "Which NHS Trust or Clinical Commissioning Group do you work for?"
+        "Which NHS Trust or Integrated Care Board do you work for?"
     )
     assert page.select_one("[data-notify-module=live-search]")["data-targets"] == ".govuk-radios__item"
     assert [
