@@ -3,6 +3,7 @@ from datetime import timedelta
 from flask import abort
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
+from app.formatters import format_date_human, format_datetime_human, sentence_case
 from app.models import JSONModel, ModelList
 from app.notify_client.service_api_client import service_api_client
 
@@ -10,9 +11,6 @@ from app.notify_client.service_api_client import service_api_client
 class UnsubscribeRequestsReport(JSONModel):
     ALLOWED_PROPERTIES = {
         "count",
-        "earliest_timestamp",
-        "latest_timestamp",
-        "processed_by_service_at",
         "batch_id",
         "is_a_batched_report",
     }
@@ -38,12 +36,83 @@ class UnsubscribeRequestsReport(JSONModel):
         else:
             limit = 90
             starting_date = self.latest_timestamp
-        return utc_string_to_aware_gmt_datetime(starting_date) + timedelta(days=limit)
+        return starting_date + timedelta(days=limit)
+
+    @property
+    def earliest_timestamp(self):
+        return utc_string_to_aware_gmt_datetime(self._dict["earliest_timestamp"])
+
+    @property
+    def latest_timestamp(self):
+        return utc_string_to_aware_gmt_datetime(self._dict["latest_timestamp"])
+
+    @property
+    def processed_by_service_at(self):
+        if not self._dict["processed_by_service_at"]:
+            return None
+        return utc_string_to_aware_gmt_datetime(self._dict["processed_by_service_at"])
+
+    @property
+    def other_reports(self):
+        return (report for report in self.all_reports if report.batch_id != self.batch_id)
+
+    @property
+    def other_reports_starting_the_same_day(self):
+        return (
+            other for other in self.other_reports if other.earliest_timestamp.date() == self.earliest_timestamp.date()
+        )
+
+    @property
+    def is_first_of_several_reports_on_the_same_day(self):
+        return any(self.other_reports_starting_the_same_day) and all(
+            self.earliest_timestamp < other.earliest_timestamp for other in self.other_reports_starting_the_same_day
+        )
+
+    @property
+    def starts_on_a_day_another_report_ends(self):
+        return self.earliest_timestamp.date() in {other.latest_timestamp.date() for other in self.other_reports}
+
+    @property
+    def ends_on_a_day_another_report_starts(self):
+        return self.latest_timestamp.date() in {other.earliest_timestamp.date() for other in self.other_reports}
+
+    @property
+    def earliest(self):
+        if self.is_first_of_several_reports_on_the_same_day:
+            # Don’t show separate start time
+            return self.latest
+
+        if self.starts_on_a_day_another_report_ends:
+            return format_datetime_human(self.earliest_timestamp, date_prefix="")
+
+        return format_date_human(self.earliest_timestamp)
+
+    @property
+    def latest(self):
+        if self.is_first_of_several_reports_on_the_same_day:
+            return format_datetime_human(self.latest_timestamp, date_prefix="", separator="until")
+
+        if self.starts_on_a_day_another_report_ends or self.ends_on_a_day_another_report_starts:
+            return format_datetime_human(self.latest_timestamp, date_prefix="")
+
+        return format_date_human(self.latest_timestamp)
+
+    @property
+    def title(self):
+        if self.earliest == self.latest:
+            return sentence_case(self.latest)
+
+        return f"{sentence_case(self.earliest)} to {self.latest}"
 
 
 class UnsubscribeRequestsReports(ModelList):
     client_method = service_api_client.get_unsubscribe_reports_summary
     model = UnsubscribeRequestsReport
+
+    def __getitem__(self, index):
+        instance = super().__getitem__(index)
+        instance.all_reports = self
+        return instance
 
     def get_by_batch_id(self, batch_id):
         for report in self:

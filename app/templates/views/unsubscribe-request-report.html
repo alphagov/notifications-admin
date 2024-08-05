@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block service_page_title %}
-{{ report.earliest_timestamp|format_date_normal }} until {{ report.latest_timestamp|format_date_normal }}
+    {{ report.title }}
 {% endblock %}
 
 
@@ -15,7 +15,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('{} until {}'.format(report.earliest_timestamp|format_date_normal, report.latest_timestamp|format_date_normal)) }}
+    {{ page_header(report.title) }}
 
 
 {% if report.status != "Completed" %}
