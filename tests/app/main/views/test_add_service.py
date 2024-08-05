@@ -45,7 +45,7 @@ def test_get_should_render_add_service_template(
         "Central government",
         "Local government",
         "NHS – central government agency or public body",
-        "NHS Trust or Clinical Commissioning Group",
+        "NHS Trust or Integrated Care Board",
         "GP surgery",
         "Emergency service",
         "School or college",
