@@ -50,7 +50,7 @@ const copy = {
   },
   govuk_frontend: {
     fonts: () => {
-      return src(paths.govuk_frontend + 'govuk/assets/fonts/**/*')
+      return src(paths.govuk_frontend + 'govuk/assets/fonts/**/*',{ encoding: false })
         .pipe(dest(paths.dist + 'fonts/'));
     },
     header_icon_manifest: () => {
@@ -182,7 +182,7 @@ const images = () => {
   return src([
       paths.src + 'images/**/*',
       paths.govuk_frontend + 'govuk/assets/images/**/*'
-    ])
+    ],{ encoding: false })
     .pipe(dest(paths.dist + 'images/'))
 };
 
