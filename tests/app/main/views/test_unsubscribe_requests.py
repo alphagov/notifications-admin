@@ -379,7 +379,7 @@ def test_download_unsubscribe_request_report(client_request, mocker):
     report = response.get_data(as_text=True)
 
     assert (
-        report.strip() == "Email address,Template name,Uploaded spreadsheet file name,Template sent at\r\n"
+        report.strip() == "Email address,Template name,Contact list file name,Template sent at\r\n"
         "fizz@bar.com,Template Fizz,Contact List 2,2024-06-28\r\n"
         "fizzbuzz@bar.com,Template FizzBuzz,N/A,2024-06-30"
     )
