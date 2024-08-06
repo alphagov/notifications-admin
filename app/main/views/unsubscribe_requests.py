@@ -1,5 +1,4 @@
 from flask import flash, redirect, render_template, url_for
-from notifications_python_client.errors import HTTPError
 
 from app import current_service, format_date_normal, service_api_client
 from app.main import main
@@ -52,26 +51,3 @@ def download_unsubscribe_request_report(service_id, batch_id=None):
         return redirect(url_for("main.create_unsubscribe_request_report", service_id=service_id))
     else:
         pass
-
-
-@main.route("/services/<uuid:service_id>/unsubscribe-requests/reports/batch-report")
-@user_has_permissions("view_activity")
-def create_unsubscribe_request_report(service_id):
-    try:
-        unbatched_report = current_service.unsubscribe_request_reports_summary.get_unbatched_report()
-        unbatched_report_data = {
-            "count": unbatched_report.count,
-            "earliest_timestamp": unbatched_report.earliest_timestamp,
-            "latest_timestamp": unbatched_report.latest_timestamp,
-            "processed_by_service_at": unbatched_report.processed_by_service_at,
-        }
-        created_report_data = service_api_client.create_unsubscribe_request_report(service_id, unbatched_report_data)
-        return redirect(
-            url_for(
-                "main.download_unsubscribe_request_report",
-                service_id=service_id,
-                batch_id=created_report_data["batch_id"],
-            )
-        )
-    except HTTPError as e:
-        raise e
