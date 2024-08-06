@@ -1,5 +1,6 @@
 import weakref
 from contextlib import suppress
+from copy import deepcopy
 from datetime import datetime, timedelta
 from functools import partial
 from itertools import chain
@@ -886,13 +887,16 @@ class GovukRadiosWithImagesField(GovukRadiosField):
         self.image_data = image_data
 
     def get_item_from_option(self, option):
+        # deepcopy to avoid mutating the same `dict` multiple times
+        image_data = deepcopy(self.image_data[option.data])
+        image_data["url"] = asset_fingerprinter.get_url(image_data["path"])
         return {
             "name": option.name,
             "id": option.id,
             "text": option.label.text,
             "value": str(option.data),  # to protect against non-string types like uuids
             "checked": option.checked,
-            "image": self.image_data[option.data],
+            "image": image_data,
         }
 
 
@@ -2370,7 +2374,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
         "single_identity": {
             "label": "Create a government identity logo",
             "image": {
-                "url": asset_fingerprinter.get_url("images/branding/single_identity.png"),
+                "path": "images/branding/single_identity.png",
                 "alt_text": "An example of an email with a government identity logo,"
                 " including a blue stripe, a crest and department's name",
                 "dimensions": {"width": 606, "height": 404},
@@ -2379,7 +2383,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
         "org": {
             "label": "Upload a logo",
             "image": {
-                "url": asset_fingerprinter.get_url("images/branding/org.png"),
+                "path": "images/branding/org.png",
                 "alt_text": 'An example of an email with the heading "Your logo" in blue text on a white background.',
                 "dimensions": {"width": 606, "height": 404},
             },
@@ -2398,7 +2402,7 @@ class EmailBrandingChooseBanner(OrderableFieldsForm):
         "org_banner": {
             "label": "Yes",
             "image": {
-                "url": asset_fingerprinter.get_url("images/branding/org_banner.png"),
+                "path": "images/branding/org_banner.png",
                 "alt_text": "An example of an email with a logo on a blue banner.",
                 "dimensions": {"width": 606, "height": 404},
             },
@@ -2406,7 +2410,7 @@ class EmailBrandingChooseBanner(OrderableFieldsForm):
         "org": {
             "label": "No",
             "image": {
-                "url": asset_fingerprinter.get_url("images/branding/org.png"),
+                "path": "images/branding/org.png",
                 "alt_text": "An example of an email with a logo on a clear background.",
                 "dimensions": {"width": 606, "height": 404},
             },
