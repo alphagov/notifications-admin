@@ -330,10 +330,10 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
     test_batch_id = "daaa3f82-faf0-4199-82da-15ec6aa8abe8"
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=summary_data)
     mock_batch_report = mocker.patch.object(
-        service_api_client, "create_unsubscribe_request_report", return_value={"report_id": test_batch_id}
+        service_api_client, "create_unsubscribe_request_report", return_value={"batch_id": test_batch_id}
     )
     client_request.get_response(
-        "main.create_unsubscribe_request_report", service_id=SERVICE_ONE_ID, _expected_status=302
+        "main.create_unsubscribe_request_report", service_id=SERVICE_ONE_ID, batch_id=None, _expected_status=302
     )
     mock_batch_report.assert_called_once_with(
         SERVICE_ONE_ID,
@@ -361,7 +361,7 @@ def test_download_unsubscribe_request_report(client_request, mocker):
             {
                 "email_address": "fizzbuzz@bar.com",
                 "template_name": "Template FizzBuzz",
-                "original_file_name": "N/A",
+                "original_file_name": None,
                 "template_sent_at": "2024-06-30",
             },
         ],
@@ -381,5 +381,5 @@ def test_download_unsubscribe_request_report(client_request, mocker):
     assert (
         report.strip() == "Email address,Template name,Contact list file name,Template sent at\r\n"
         "fizz@bar.com,Template Fizz,Contact List 2,2024-06-28\r\n"
-        "fizzbuzz@bar.com,Template FizzBuzz,N/A,2024-06-30"
+        "fizzbuzz@bar.com,Template FizzBuzz,,2024-06-30"
     )

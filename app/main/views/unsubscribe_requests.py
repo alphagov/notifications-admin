@@ -94,7 +94,7 @@ def create_unsubscribe_request_report(service_id):
             url_for(
                 "main.download_unsubscribe_request_report",
                 service_id=service_id,
-                batch_id=created_report_data["report_id"],
+                batch_id=created_report_data["batch_id"],
             )
         )
     except HTTPError as e:
