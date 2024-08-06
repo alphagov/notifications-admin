@@ -889,7 +889,7 @@ class GovukRadiosWithImagesField(GovukRadiosField):
     def get_item_from_option(self, option):
         # deepcopy to avoid mutating the same `dict` multiple times
         image_data = deepcopy(self.image_data[option.data])
-        image_data["url"] = asset_fingerprinter.get_url(image_data["url"])
+        image_data["url"] = asset_fingerprinter.get_url(image_data["path"])
         return {
             "name": option.name,
             "id": option.id,
@@ -2374,7 +2374,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
         "single_identity": {
             "label": "Create a government identity logo",
             "image": {
-                "url": "images/branding/single_identity.png",
+                "path": "images/branding/single_identity.png",
                 "alt_text": "An example of an email with a government identity logo,"
                 " including a blue stripe, a crest and department's name",
                 "dimensions": {"width": 606, "height": 404},
@@ -2383,7 +2383,7 @@ class EmailBrandingChooseLogoForm(StripWhitespaceForm):
         "org": {
             "label": "Upload a logo",
             "image": {
-                "url": "images/branding/org.png",
+                "path": "images/branding/org.png",
                 "alt_text": 'An example of an email with the heading "Your logo" in blue text on a white background.',
                 "dimensions": {"width": 606, "height": 404},
             },
@@ -2402,7 +2402,7 @@ class EmailBrandingChooseBanner(OrderableFieldsForm):
         "org_banner": {
             "label": "Yes",
             "image": {
-                "url": "images/branding/org_banner.png",
+                "path": "images/branding/org_banner.png",
                 "alt_text": "An example of an email with a logo on a blue banner.",
                 "dimensions": {"width": 606, "height": 404},
             },
@@ -2410,7 +2410,7 @@ class EmailBrandingChooseBanner(OrderableFieldsForm):
         "org": {
             "label": "No",
             "image": {
-                "url": "images/branding/org.png",
+                "path": "images/branding/org.png",
                 "alt_text": "An example of an email with a logo on a clear background.",
                 "dimensions": {"width": 606, "height": 404},
             },
