@@ -4,7 +4,6 @@ from notifications_python_client.errors import HTTPError
 from app import current_service, format_date_normal, service_api_client
 from app.main import main
 from app.main.forms import ProcessUnsubscribeRequestForm
-from app.models.spreadsheet import Spreadsheet
 from app.utils.user import user_has_permissions
 
 
@@ -52,30 +51,7 @@ def download_unsubscribe_request_report(service_id, batch_id=None):
     if not batch_id:
         return redirect(url_for("main.create_unsubscribe_request_report", service_id=service_id))
     else:
-        try:
-            report = service_api_client.get_unsubscribe_request_report(service_id, batch_id)
-            column_names = {
-                "email_address": "Email address",
-                "template_name": "Template name",
-                "original_file_name": "Contact list file name",
-                "template_sent_at": "Template sent at",
-            }
-            # initialise with header row
-            data = [list(column_names.values())]
-            for row in report["unsubscribe_requests"]:
-                data.append([row[key] for key in column_names.keys()])
-            return (
-                Spreadsheet.from_rows(data).as_csv_data,
-                200,
-                {
-                    "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": f'attachment; filename="Email unsubscribe requests '
-                    f"{format_date_normal(report['earliest_timestamp'])} "
-                    f"to {format_date_normal(report['latest_timestamp'])}.csv",
-                },
-            )
-        except HTTPError as e:
-            raise e
+        pass
 
 
 @main.route("/services/<uuid:service_id>/unsubscribe-requests/reports/batch-report")
