@@ -3,7 +3,7 @@ from datetime import timedelta
 from flask import abort
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
-from app.formatters import format_date_human, format_datetime_human, sentence_case
+from app.formatters import format_date_human, format_datetime_human
 from app.models import JSONModel, ModelList
 from app.notify_client.service_api_client import service_api_client
 
@@ -100,9 +100,9 @@ class UnsubscribeRequestsReport(JSONModel):
     @property
     def title(self):
         if self.earliest == self.latest:
-            return sentence_case(self.latest)
+            return self.latest
 
-        return f"{sentence_case(self.earliest)} to {self.latest}"
+        return f"{self.earliest} to {self.latest}"
 
 
 class UnsubscribeRequestsReports(ModelList):

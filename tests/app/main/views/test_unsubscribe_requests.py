@@ -341,7 +341,7 @@ def test_mark_report_as_completed(client_request, mocker, fake_uuid):
         data={"report_has_been_processed": True},
     )
     assert normalize_spaces(page.select_one("main .banner-default-with-tick")) == (
-        "Report for Yesterday to today marked as completed"
+        "Report for yesterday to today marked as completed"
     )
 
 

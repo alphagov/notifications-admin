@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block service_page_title %}
-    {{ report.title }}
+    {{ report.title|sentence_case }}
 {% endblock %}
 
 
@@ -15,7 +15,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header(report.title) }}
+    {{ page_header(report.title|sentence_case) }}
 
 
 {% if not report.completed %}
