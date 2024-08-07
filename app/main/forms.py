@@ -2683,7 +2683,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
     on_behalf_of_email = make_email_address_field(
         "What’s their email address?",
         required=False,
-        gov_user=False,
+        gov_user=True,
     )
 
     def __validate_if_nominating(self, field):
