@@ -1,6 +1,6 @@
 from flask import flash, redirect, render_template, url_for
 
-from app import current_service, format_date_normal, format_date_numeric, service_api_client
+from app import current_service, format_date_numeric, service_api_client
 from app.main import main
 from app.main.forms import ProcessUnsubscribeRequestForm
 from app.models.spreadsheet import Spreadsheet
@@ -31,10 +31,10 @@ def unsubscribe_request_report(service_id, batch_id=None):
         report_has_been_processed = form.data["report_has_been_processed"]
         data = {"report_has_been_processed": report_has_been_processed}
         service_api_client.process_unsubscribe_request_report(service_id, batch_id=batch_id, data=data)
-        message = f"""Report for {format_date_normal(report.earliest_timestamp)} until  \
-                  {format_date_normal(report.latest_timestamp)} has been marked as \
-                  {'Completed' if report_has_been_processed else 'not completed.'}"""
-        flash(message, "default_with_tick")
+        flash(
+            f"Report for {report.title} marked as {'completed' if report_has_been_processed else 'not completed'}",
+            "default_with_tick",
+        )
         return redirect(url_for("main.unsubscribe_request_reports_summary", service_id=service_id, batch_id=batch_id))
     return render_template(
         "views/unsubscribe-request-report.html",
