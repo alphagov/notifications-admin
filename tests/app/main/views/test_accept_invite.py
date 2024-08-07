@@ -93,7 +93,7 @@ def test_existing_user_with_no_permissions_or_folder_permissions_accept_invite(
     client_request.get(
         "main.accept_invite",
         token="thisisnotarealtoken",
-        _expected_status=302,
+        _expected_redirect=url_for("main.service_dashboard", service_id=service_one["id"]),
     )
     mock_add_user_to_service.assert_called_with(
         expected_service, api_user_active["id"], expected_permissions, expected_folder_permissions
@@ -655,7 +655,7 @@ def test_new_invited_user_is_redirected_to_correct_place(
     client_request.get(
         "main.accept_invite",
         token="thisisnotarealtoken",
-        _expected_status=302,
+        _expected_redirect=url_for("main.register_from_invite"),
     )
 
     with client_request.session_transaction() as session:

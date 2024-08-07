@@ -2983,6 +2983,9 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             if _expected_redirect and _expected_status == 200:
                 _expected_status = 302
 
+            if 300 <= _expected_status <= 399:
+                assert _expected_redirect, "You must specify a redirect URL, not just a status"
+
             assert resp.status_code == _expected_status, resp.location
 
             if _expected_redirect:

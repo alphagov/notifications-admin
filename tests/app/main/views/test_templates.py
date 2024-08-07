@@ -3016,6 +3016,15 @@ def test_should_redirect_to_one_off_if_template_type_is_letter(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _expected_status=expected_status_code,
+        _expected_redirect=(
+            None
+            if expected_status_code == 200
+            else url_for(
+                "main.send_one_off",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            )
+        ),
     )
 
 

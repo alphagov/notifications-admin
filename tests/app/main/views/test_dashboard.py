@@ -777,6 +777,10 @@ def test_should_show_redirect_from_template_history(
         "main.template_history",
         service_id=SERVICE_ONE_ID,
         _expected_status=301,
+        _expected_redirect=url_for(
+            "main.template_usage",
+            service_id=SERVICE_ONE_ID,
+        ),
         **extra_args,
     )
 

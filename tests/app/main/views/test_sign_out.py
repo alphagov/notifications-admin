@@ -55,11 +55,11 @@ def test_sign_out_user(
 def test_sign_out_of_two_sessions(client_request):
     client_request.get(
         "main.sign_out",
-        _expected_status=302,
+        _expected_redirect=url_for("main.index"),
     )
     with client_request.session_transaction() as session:
         assert not session
     client_request.get(
         "main.sign_out",
-        _expected_status=302,
+        _expected_redirect=url_for("main.index"),
     )
