@@ -1800,7 +1800,11 @@ def test_confirm_edit_user_mobile_number_page_redirects_if_session_empty(
         "main.confirm_edit_user_mobile_number",
         service_id=SERVICE_ONE_ID,
         user_id=active_user_with_permissions["id"],
-        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.edit_user_mobile_number",
+            service_id=SERVICE_ONE_ID,
+            user_id=active_user_with_permissions["id"],
+        ),
     )
     assert "Confirm change of mobile number" not in page.text
 

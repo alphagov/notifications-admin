@@ -44,10 +44,11 @@ def test_logged_in_user_redirects_to_choose_account(
 ):
     client_request.get(
         "main.index",
-        _expected_status=302,
+        _expected_redirect=url_for("main.choose_account"),
     )
     client_request.get(
-        "main.sign_in", _expected_status=302, _expected_redirect=url_for("main.show_accounts_or_dashboard")
+        "main.sign_in",
+        _expected_redirect=url_for("main.show_accounts_or_dashboard"),
     )
 
 

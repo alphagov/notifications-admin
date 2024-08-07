@@ -172,8 +172,7 @@ def test_set_sender_redirects_if_no_reply_to_email_addresses(
         ".set_sender",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _expected_status=302,
-        _expected_url=url_for(
+        _expected_redirect=url_for(
             ".send_one_off",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
@@ -191,8 +190,7 @@ def test_set_sender_redirects_if_no_sms_senders(
         ".set_sender",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _expected_status=302,
-        _expected_url=url_for(
+        _expected_redirect=url_for(
             ".send_one_off",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
@@ -210,8 +208,7 @@ def test_set_sender_redirects_if_one_email_sender(
         ".set_sender",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _expected_status=302,
-        _expected_url=url_for(
+        _expected_redirect=url_for(
             ".send_one_off",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
@@ -232,8 +229,7 @@ def test_set_sender_redirects_if_one_sms_sender(
         ".set_sender",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _expected_status=302,
-        _expected_url=url_for(
+        _expected_redirect=url_for(
             ".send_one_off",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
@@ -1837,7 +1833,7 @@ def test_send_one_off_sms_message_redirects(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _expected_status=302,
-        _expected_response=url_for(
+        _expected_redirect=url_for(
             "main.send_one_off_step",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
@@ -2288,7 +2284,12 @@ def test_send_one_off_clears_session(
         "main.send_one_off",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.send_one_off_step",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            step_index=0,
+        ),
     )
 
     with client_request.session_transaction() as session:
@@ -4337,8 +4338,7 @@ def test_send_to_myself_sets_placeholder_and_redirects_for_email(
         "main.send_one_off_to_myself",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-        _expected_status=302,
-        _expected_url=url_for(
+        _expected_redirect=url_for(
             "main.send_one_off_step",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
@@ -4363,7 +4363,7 @@ def test_send_to_myself_sets_placeholder_and_redirects_for_sms(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _expected_status=302,
-        _expected_url=url_for(
+        _expected_redirect=url_for(
             "main.send_one_off_step",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
