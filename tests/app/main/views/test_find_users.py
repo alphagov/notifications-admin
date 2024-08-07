@@ -43,8 +43,10 @@ def test_user_information_page_shows_information_about_user(
     assert [normalize_spaces(p.text) for p in page.select("main p")] == [
         "test@gov.uk",
         "+447700900986",
-        "Text message code",
+        "Signs in with a text message code",
         "Last logged in just now",
+        "Does not want to receive new features email",
+        "Does not want to take part in user research",
     ]
 
     assert "0 failed login attempts" not in page.text
@@ -54,7 +56,7 @@ def test_user_information_page_shows_information_about_user(
         "Live services",
         "Trial mode services",
         "Authentication",
-        "Last login",
+        "Preferences",
     ]
 
     assert [normalize_spaces(a.text) for a in page.select("main li a")] == [
