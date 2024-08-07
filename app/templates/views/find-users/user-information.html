@@ -63,14 +63,13 @@
       </nav>
 
       <h2 class="heading-medium">Authentication</h2>
-      <p class="govuk-body">{{ user.auth_type | format_auth_type }}</p>
+      <p class="govuk-body">Signs in with {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}</p>
       {% if user.auth_type != 'webauthn_auth' %}
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.change_user_auth', user_id=user.id) }}">
           Change authentication for this user
         </a>
       {% endif %}
 
-      <h2 class="heading-medium">Last login</h2>
       {% if not user.logged_in_at %}
       <p class="hint">This person has never logged in</p>
       {% else %}
@@ -80,6 +79,15 @@
         </time>
       </p>
       {% endif %}
+
+      <h2 class="heading-medium">Preferences</h2>
+      <p class="govuk-body">
+        {{ "Wants" if user.receives_new_features_email else "Does not want"}} to receive new features email
+      </p>
+      <p class="govuk-body">
+        {{ "Wants" if user.take_part_in_research else "Does not want"}} to take part in user research
+      </p>
+
       {% if user.failed_login_count > 0 %}
       <p style="color:#d4351c;">
         {{ user.failed_login_count }} failed login attempts
