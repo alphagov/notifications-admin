@@ -309,6 +309,42 @@ def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_req
     assert normalize_spaces(page.select("h1")[0].text) == "Page not found"
 
 
+@freeze_time("2024-08-07")
+def test_mark_report_as_completed(client_request, mocker, fake_uuid):
+    mocker.patch.object(
+        UnsubscribeRequestsReports,
+        "client_method",
+        return_value=[
+            {
+                "count": 321,
+                "earliest_timestamp": "2024-08-06",
+                "latest_timestamp": "2024-08-07",
+                "processed_by_service_at": None,
+                "batch_id": fake_uuid,
+                "is_a_batched_report": True,
+            },
+        ],
+    )
+    mock_batch_report = mocker.patch.object(service_api_client, "process_unsubscribe_request_report")
+    page = client_request.post(
+        "main.unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=fake_uuid,
+        _data={
+            "report_has_been_processed": True,
+        },
+        _follow_redirects=True,
+    )
+    mock_batch_report.assert_called_once_with(
+        SERVICE_ONE_ID,
+        batch_id=fake_uuid,
+        data={"report_has_been_processed": True},
+    )
+    assert normalize_spaces(page.select_one("main .banner-default-with-tick")) == (
+        "Report for yesterday to today marked as completed"
+    )
+
+
 def test_download_unsubscribe_request_report_redirects_to_batch_unsubscribe_request_report_endpoint_no_batch_id(
     client_request,
 ):
