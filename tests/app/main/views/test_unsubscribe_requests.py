@@ -1,6 +1,10 @@
+from unittest.mock import Mock
+
 import pytest
 from flask import url_for
 from freezegun import freeze_time
+from notifications_python_client.errors import HTTPError
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import service_api_client
 from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
@@ -531,3 +535,60 @@ def test_download_unsubscribe_request_report(client_request, mocker):
         'fizz@bar.com,Template Fizz,Contact List 2,"Tue, 16 Jul 2024 17:44:20 GMT"\r\n'
         'fizzbuzz@bar.com,Template FizzBuzz,N/A,"Wed, 17 Jul 2024 17:44:20 GMT"'
     )
+
+
+def test_unsubscribe_example_page(client_request):
+    page = client_request.get(
+        "main.unsubscribe_example",
+        _test_for_elements_without_class=False,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Unsubscribe"
+    assert normalize_spaces(page.select_one("p").text) == "You have been unsubscribed"
+    assert normalize_spaces(page.select_one("footer p").text) == "This page is an example, no action has been taken"
+
+
+def test_unsubscribe_landing_page(client_request, fake_uuid):
+    page = client_request.get(
+        "main.unsubscribe",
+        notification_id=fake_uuid,
+        token="abc123",
+        _test_for_elements_without_class=False,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Unsubscribe"
+    assert not page.select("p")
+    assert "action" not in page.select_one("form[method=post]")
+    assert normalize_spaces(page.select_one("form[method=post] button[type=submit]").text) == "Confirm unsubscription"
+
+
+def test_unsubscribe_valid_request(mocker, client_request, fake_uuid):
+    mock_unsubscribe = mocker.patch("app.unsubscribe_api_client.unsubscribe", return_value=True)
+    page = client_request.post(
+        "main.unsubscribe",
+        notification_id=fake_uuid,
+        token="abc123",
+        _expected_status=200,
+        _test_for_elements_without_class=False,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Unsubscribe"
+    assert normalize_spaces(page.select_one("p").text) == "You have been unsubscribed"
+    mock_unsubscribe.assert_called_once_with(fake_uuid, "abc123")
+
+
+def test_unsubscribe_request_not_found(mocker, client_request, fake_uuid):
+    def _post(notification_id, token):
+        raise HTTPError(response=Mock(status_code=404))
+
+    mock_post = mocker.patch("app.unsubscribe_api_client.post", side_effect=_post)
+
+    page = client_request.post(
+        "main.unsubscribe",
+        notification_id=fake_uuid,
+        token="abc123",
+        _expected_status=404,
+        _test_for_elements_without_class=False,
+    )
+
+    mock_post.assert_called_once_with(f"/unsubscribe/{fake_uuid}/abc123", None)
+
+    assert normalize_spaces(page.select_one("h1").text) == "Unsubscribe"
+    assert normalize_spaces(page.select_one("p").text) == "Your request to unsubscribe could not be processed."
