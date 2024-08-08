@@ -301,10 +301,26 @@ def test_accept_agreement_page_populates(
                 "version": "1.2",
                 "who": "someone-else",
                 "on_behalf_of_name": "",
-                "on_behalf_of_email": "test@example.com",
+                "on_behalf_of_email": "test@example.gov.uk",
             },
             [
                 "Error: Enter the name of the person accepting the agreement",
+            ],
+        ),
+        (
+            {
+                "version": "1.2",
+                "who": "someone-else",
+                "on_behalf_of_name": "Firstname Lastname",
+                "on_behalf_of_email": "test@example.com",
+            },
+            [
+                (
+                    "Error: Enter a public sector email address or "
+                    '<a class="govuk-link govuk-link--no-visited-state" href="/features/who-can-use-notify">'
+                    "find out who can use Notify"
+                    "</a>"
+                )
             ],
         ),
     ),
@@ -313,6 +329,7 @@ def test_accept_agreement_page_validates(
     mocker,
     client_request,
     mock_get_service_organisation,
+    mock_get_organisations,
     data,
     expected_errors,
 ):
@@ -322,7 +339,9 @@ def test_accept_agreement_page_validates(
         _data=data,
         _expected_status=200,
     )
-    assert [error.text.strip() for error in page.select(".govuk-error-message, .error-message")] == expected_errors
+    assert [
+        normalize_spaces(error.text) for error in page.select(".govuk-error-message, .error-message")
+    ] == expected_errors
 
 
 @pytest.mark.parametrize(
@@ -333,13 +352,13 @@ def test_accept_agreement_page_validates(
                 "version": "1.2",
                 "who": "someone-else",
                 "on_behalf_of_name": "Firstname Lastname",
-                "on_behalf_of_email": "test@example.com",
+                "on_behalf_of_email": "test@example.gov.uk",
             },
             call(
                 ORGANISATION_ID,
                 agreement_signed_version=1.2,
                 agreement_signed_on_behalf_of_name="Firstname Lastname",
-                agreement_signed_on_behalf_of_email_address="test@example.com",
+                agreement_signed_on_behalf_of_email_address="test@example.gov.uk",
                 cached_service_ids=None,
             ),
         ),
@@ -348,7 +367,7 @@ def test_accept_agreement_page_validates(
                 "version": "1.2",
                 "who": "me",
                 "on_behalf_of_name": "Firstname Lastname",
-                "on_behalf_of_email": "test@example.com",
+                "on_behalf_of_email": "test@example.gov.uk",
             },
             call(
                 ORGANISATION_ID,
