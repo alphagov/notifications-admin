@@ -1,4 +1,5 @@
 import pytest
+from flask import url_for
 from freezegun import freeze_time
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
@@ -224,6 +225,11 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
     unsubscribe_requests_count_text = page.select("#report-unsubscribe-requests-count")[0].text
     availability_date = page.select("#unsubscribe_report_availability")[0].text
     update_button = page.select("#process_unsubscribe_report")
+    assert page.select_one("li a[download]")["href"] == url_for(
+        "main.download_unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=test_data[0]["batch_id"],
+    )
     assert "disabled" not in checkbox
     assert normalize_spaces(checkbox_hint) == "I have unsubscribed these recipients from our mailing list"
     assert normalize_spaces(unsubscribe_requests_count_text) == "200 new requests to unsubscribe"
@@ -256,6 +262,11 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
     availability_date = page.select("#unsubscribe_report_availability")[0].text
     update_button = page.select("#process_unsubscribe_report")
     assert page.select("h1")[0].text == "22 June to yesterday"
+    assert page.select_one("li a[download]")["href"] == url_for(
+        "main.download_unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=None,
+    )
     assert "disabled" in checkbox
     assert normalize_spaces(checkbox_hint) == "You cannot do this until you’ve downloaded the report"
     assert normalize_spaces(unsubscribe_requests_count_text) == "34 new requests to unsubscribe"
@@ -288,12 +299,77 @@ def test_unsubscribe_request_report_for_processed_batched_reports(client_request
     availability_date = page.select("#completed_unsubscribe_report_availability")[0].text
     "completed_unsubscribe_report_main_text"
     update_button = page.select("#process_unsubscribe_report")
+    assert page.select_one("p a[download]")["href"] == url_for(
+        "main.download_unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=test_data[0]["batch_id"],
+    )
     assert "disabled" not in checkbox
     assert "checked" in checkbox
     assert normalize_spaces(checkbox_hint) == "I have unsubscribed these recipients from our mailing list"
     assert normalize_spaces(main_body_text) == "Report was marked as completed on 10 June 2024"
     assert normalize_spaces(availability_date) == "(available until 17 June 2024)"
     assert len(update_button) == 1
+
+
+def test_unsubscribe_request_report_with_forced_download(
+    client_request,
+    mocker,
+    fake_uuid,
+):
+    mocker.patch.object(
+        UnsubscribeRequestsReports,
+        "client_method",
+        return_value=[
+            {
+                "count": 321,
+                "earliest_timestamp": "2023-06-8",
+                "latest_timestamp": "2023-06-14",
+                "processed_by_service_at": None,
+                "batch_id": fake_uuid,
+                "is_a_batched_report": True,
+            },
+        ],
+    )
+    page = client_request.get(
+        "main.unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=fake_uuid,
+        force_download="true",
+    )
+    download_url = url_for(
+        "main.download_unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=fake_uuid,
+    )
+    assert page.select_one("head meta[http-equiv=refresh]")["content"] == (f"0;URL='{download_url}'")
+
+
+def test_cannot_force_download_for_unbatched_unsubscribe_request_report(
+    client_request,
+    mocker,
+):
+    mocker.patch.object(
+        UnsubscribeRequestsReports,
+        "client_method",
+        return_value=[
+            {
+                "count": 321,
+                "earliest_timestamp": "2023-06-8",
+                "latest_timestamp": "2023-06-14",
+                "processed_by_service_at": None,
+                "batch_id": None,
+                "is_a_batched_report": False,
+            },
+        ],
+    )
+    page = client_request.get(
+        "main.unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=None,
+        force_download="true",
+    )
+    assert not page.select("head meta[http-equiv=refresh]")
 
 
 @pytest.mark.parametrize("batch_id", ["32b4e359-d4df-49b6-a92b-2eaa9343cfdd", None])
@@ -348,8 +424,14 @@ def test_mark_report_as_completed(client_request, mocker, fake_uuid):
 def test_download_unsubscribe_request_report_redirects_to_batch_unsubscribe_request_report_endpoint_no_batch_id(
     client_request,
 ):
-    client_request.get_response(
-        "main.download_unsubscribe_request_report", service_id=SERVICE_ONE_ID, batch_id=None, _expected_status=302
+    client_request.get(
+        "main.download_unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        batch_id=None,
+        _expected_redirect=url_for(
+            "main.create_unsubscribe_request_report",
+            service_id=SERVICE_ONE_ID,
+        ),
     )
 
 
@@ -369,8 +451,15 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
     mock_batch_report = mocker.patch.object(
         service_api_client, "create_unsubscribe_request_report", return_value={"report_id": test_batch_id}
     )
-    client_request.get_response(
-        "main.create_unsubscribe_request_report", service_id=SERVICE_ONE_ID, _expected_status=302
+    client_request.get(
+        "main.create_unsubscribe_request_report",
+        service_id=SERVICE_ONE_ID,
+        _expected_redirect=url_for(
+            "main.unsubscribe_request_report",
+            service_id=SERVICE_ONE_ID,
+            batch_id=test_batch_id,
+            force_download="true",
+        ),
     )
     mock_batch_report.assert_called_once_with(
         SERVICE_ONE_ID,
