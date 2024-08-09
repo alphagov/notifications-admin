@@ -125,3 +125,15 @@ class UnsubscribeRequestsReports(ModelList):
             if not report.is_a_batched_report:
                 return report
         abort(404)
+
+    def batch_unbatched(self, service_id):
+        unbatched = self.get_unbatched_report()
+        created = service_api_client.create_unsubscribe_request_report(
+            service_id,
+            {
+                "count": unbatched.count,
+                "earliest_timestamp": unbatched.earliest_timestamp.isoformat(),
+                "latest_timestamp": unbatched.latest_timestamp.isoformat(),
+            },
+        )
+        return created["report_id"]

@@ -1,7 +1,6 @@
 import pytest
 from flask import url_for
 from freezegun import freeze_time
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import service_api_client
 from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
@@ -225,11 +224,13 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
     unsubscribe_requests_count_text = page.select("#report-unsubscribe-requests-count")[0].text
     availability_date = page.select("#unsubscribe_report_availability")[0].text
     update_button = page.select("#process_unsubscribe_report")
-    assert page.select_one("li a[download]")["href"] == url_for(
+    download_link = page.select_one("main ol li a")
+    assert download_link["href"] == url_for(
         "main.download_unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
         batch_id=test_data[0]["batch_id"],
     )
+    assert normalize_spaces(download_link.text) == "Download the report"
     assert "disabled" not in checkbox
     assert normalize_spaces(checkbox_hint) == "I have unsubscribed these recipients from our mailing list"
     assert normalize_spaces(unsubscribe_requests_count_text) == "200 new requests to unsubscribe"
@@ -262,11 +263,13 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
     availability_date = page.select("#unsubscribe_report_availability")[0].text
     update_button = page.select("#process_unsubscribe_report")
     assert page.select("h1")[0].text == "22 June to yesterday"
-    assert page.select_one("li a[download]")["href"] == url_for(
+    download_link = page.select_one("main ol li a")
+    assert download_link["href"] == url_for(
         "main.download_unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
-        batch_id=None,
+        batch_id=test_data[0]["batch_id"],
     )
+    assert normalize_spaces(download_link.text) == "Download the report"
     assert "disabled" in checkbox
     assert normalize_spaces(checkbox_hint) == "You cannot do this until you’ve downloaded the report"
     assert normalize_spaces(unsubscribe_requests_count_text) == "34 new requests to unsubscribe"
@@ -439,8 +442,8 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
     summary_data = [
         {
             "count": 34,
-            "earliest_timestamp": "Thu, 18 Jul 2024 15:32:28 GMT",
-            "latest_timestamp": "Sat, 20 Jul 2024 18:22:11 GMT",
+            "earliest_timestamp": "2024-07-18T16:32:28.000000Z",
+            "latest_timestamp": "2024-07-20T19:22:11.000000Z",
             "processed_by_service_at": None,
             "batch_id": None,
             "is_a_batched_report": False,
@@ -465,9 +468,8 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
         SERVICE_ONE_ID,
         {
             "count": 34,
-            "earliest_timestamp": utc_string_to_aware_gmt_datetime("Thu, 18 Jul 2024 15:32:28 GMT"),
-            "latest_timestamp": utc_string_to_aware_gmt_datetime("Sat, 20 Jul 2024 18:22:11 GMT"),
-            "processed_by_service_at": None,
+            "earliest_timestamp": "2024-07-18T17:32:28+01:00",
+            "latest_timestamp": "2024-07-20T20:22:11+01:00",
         },
     )
 

@@ -595,3 +595,18 @@ def test_client_parsing_service_name_errors(err_data, expected_message):
     error_message = client.parse_edit_service_http_error(error)
 
     assert error_message == expected_message
+
+
+def test_deletes_unsubscribe_request_summary_when_batching(
+    notify_admin,
+    mock_get_user,
+    mocker,
+    fake_uuid,
+):
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
+    mock_request = mocker.patch("notifications_python_client.base.BaseAPIClient.request")
+
+    service_api_client.create_unsubscribe_request_report(fake_uuid, data={})
+
+    mock_redis_delete.assert_called_with_subset_of_args(f"service-{fake_uuid}-unsubscribe-request-reports-summary")
+    assert len(mock_request.call_args_list) == 1

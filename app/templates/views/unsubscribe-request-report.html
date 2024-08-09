@@ -31,7 +31,7 @@
 
     <p class="govuk-body">You must: </p>
       <ol class="govuk-list govuk-list--number">
-        <li class="bottom-gutter"><a download href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link heading-small">
+        <li class="bottom-gutter"><a href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link heading-small">
             Download the report</a>&nbsp;<span id="unsubscribe_report_availability">
             (available until {{report.report_latest_download_date|format_date_normal}})</span></li>
         <li>Remove the email addresses from your mailing list before you send any further emails</li>
