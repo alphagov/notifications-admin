@@ -1,7 +1,6 @@
 import pytest
 from flask import url_for
 from freezegun import freeze_time
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import service_api_client
 from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
@@ -465,8 +464,8 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
         SERVICE_ONE_ID,
         {
             "count": 34,
-            "earliest_timestamp": utc_string_to_aware_gmt_datetime("Thu, 18 Jul 2024 15:32:28 GMT"),
-            "latest_timestamp": utc_string_to_aware_gmt_datetime("Sat, 20 Jul 2024 18:22:11 GMT"),
+            "earliest_timestamp": "2024-07-18T16:32:28+01:00",
+            "latest_timestamp": "2024-07-20T19:22:11+01:00",
         },
     )
 
