@@ -18,8 +18,7 @@
 
   {% call form_wrapper(
     class='js-stick-at-top-when-scrolling send-one-off-form' if template.template_type != 'sms' else 'send-one-off-form',
-    module="autofocus" if form.placeholder_value.label.text not in ['email address', 'phone number'] else None,
-    data_kwargs={'force-focus': True}
+    module="autofocus" if not form.errors | length > 0 else None
   ) %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
