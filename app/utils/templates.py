@@ -1,6 +1,6 @@
 import json
 
-from flask import current_app, render_template
+from flask import current_app, render_template, url_for
 from markupsafe import Markup
 from notifications_utils.countries import Postage
 from notifications_utils.formatters import formatted_list
@@ -249,6 +249,7 @@ def get_template(
             show_recipient=show_recipient,
             redact_missing_personalisation=redact_missing_personalisation,
             reply_to=email_reply_to,
+            unsubscribe_link=url_for(".unsubscribe_example") if template.get("has_unsubscribe_link") else None,
         )
     if "sms" == template["template_type"]:
         return SMSPreviewTemplate(
