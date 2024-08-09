@@ -9,7 +9,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
 @pytest.mark.parametrize(
-    "test_data, expected_rows",
+    "test_data, expected_rows, expected_grey_text_statuses",
     (
         (
             # A mixture of reports from different dates
@@ -63,6 +63,10 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                 "15 June to yesterday 200 unsubscribe requests Downloaded",
                 "7 December 2023 to 13 January 321 unsubscribe requests Completed",
             ],
+            [
+                "Not downloaded",
+                "Not downloaded",
+            ],
         ),
         (
             # A single report spanning a long time period
@@ -79,6 +83,9 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             [
                 "Report Status",
                 "1 January 2020 to 1 June 1 unsubscribe request Not downloaded",
+            ],
+            [
+                "Not downloaded",
             ],
         ),
         (
@@ -106,6 +113,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                 "1 May at midday to 1 May at 2:17pm 1 unsubscribe request Completed",
                 "30 April to 1 May at 10:00am 12,345,678 unsubscribe requests Completed",
             ],
+            [],
         ),
         (
             # Three reports on independent, consecutive days
@@ -141,6 +149,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                 "Yesterday 4,567 unsubscribe requests Downloaded",
                 "20 June 7,890 unsubscribe requests Downloaded",
             ],
+            [],
         ),
         (
             # Three reports on the same day
@@ -176,16 +185,27 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                 "1 June at 2:17pm to 1 June at 2:18pm 4,567 unsubscribe requests Downloaded",
                 "1 June until midday 7,890 unsubscribe requests Downloaded",
             ],
+            [],
         ),
     ),
 )
 @freeze_time("2024-06-22 22:22:22")
-def test_unsubscribe_request_reports_summary(client_request, mocker, test_data, expected_rows):
+def test_unsubscribe_request_reports_summary(
+    client_request,
+    mocker,
+    test_data,
+    expected_rows,
+    expected_grey_text_statuses,
+):
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
 
     assert [normalize_spaces(row.text) for row in page.select("tr")] == expected_rows
+    assert [
+        normalize_spaces(field.text)
+        for field in page.select("td.table-field-right-aligned .table-field-status-default .align-with-message-body")
+    ] == expected_grey_text_statuses
 
 
 def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocker):

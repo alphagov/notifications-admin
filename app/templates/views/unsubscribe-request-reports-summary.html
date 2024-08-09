@@ -35,8 +35,10 @@
          {{ item.count|format_thousands}} {{ item.count | message_count_label('unsubscribe request', suffix='') }}
          </p>
     {% endcall %}
-    {% call field(align='right') %}
+    {% call field(align='right', status='' if item.is_a_batched_report else 'default') %}
+      <span class="align-with-message-body">
         {{ item.status}}
+      </span>
     {% endcall %}
   {% endcall %}
 </div>
