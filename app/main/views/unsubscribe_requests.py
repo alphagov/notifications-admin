@@ -77,18 +77,12 @@ def download_unsubscribe_request_report(service_id, batch_id=None):
 @main.route("/services/<uuid:service_id>/unsubscribe-requests/reports/batch-report")
 @user_has_permissions("view_activity")
 def create_unsubscribe_request_report(service_id):
-    unbatched_report = current_service.unsubscribe_request_reports_summary.get_unbatched_report()
-    unbatched_report_data = {
-        "count": unbatched_report.count,
-        "earliest_timestamp": unbatched_report.earliest_timestamp.isoformat(),
-        "latest_timestamp": unbatched_report.latest_timestamp.isoformat(),
-    }
-    created_report_data = service_api_client.create_unsubscribe_request_report(service_id, unbatched_report_data)
+    created_report_id = current_service.unsubscribe_request_reports_summary.batch_unbatched(service_id)
     return redirect(
         url_for(
             "main.unsubscribe_request_report",
             service_id=service_id,
-            batch_id=created_report_data["report_id"],
+            batch_id=created_report_id,
             force_download="true",
         )
     )
