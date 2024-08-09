@@ -82,7 +82,6 @@ def create_unsubscribe_request_report(service_id):
         "count": unbatched_report.count,
         "earliest_timestamp": unbatched_report.earliest_timestamp,
         "latest_timestamp": unbatched_report.latest_timestamp,
-        "processed_by_service_at": unbatched_report.processed_by_service_at,
     }
     created_report_data = service_api_client.create_unsubscribe_request_report(service_id, unbatched_report_data)
     return redirect(

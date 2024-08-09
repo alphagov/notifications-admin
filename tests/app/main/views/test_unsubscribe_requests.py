@@ -467,7 +467,6 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
             "count": 34,
             "earliest_timestamp": utc_string_to_aware_gmt_datetime("Thu, 18 Jul 2024 15:32:28 GMT"),
             "latest_timestamp": utc_string_to_aware_gmt_datetime("Sat, 20 Jul 2024 18:22:11 GMT"),
-            "processed_by_service_at": None,
         },
     )
 
