@@ -438,8 +438,8 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
     summary_data = [
         {
             "count": 34,
-            "earliest_timestamp": "Thu, 18 Jul 2024 15:32:28 GMT",
-            "latest_timestamp": "Sat, 20 Jul 2024 18:22:11 GMT",
+            "earliest_timestamp": "2024-07-18T16:32:28.000000Z",
+            "latest_timestamp": "2024-07-20T19:22:11.000000Z",
             "processed_by_service_at": None,
             "batch_id": None,
             "is_a_batched_report": False,
@@ -464,8 +464,8 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
         SERVICE_ONE_ID,
         {
             "count": 34,
-            "earliest_timestamp": "2024-07-18T16:32:28+01:00",
-            "latest_timestamp": "2024-07-20T19:22:11+01:00",
+            "earliest_timestamp": "2024-07-18T17:32:28+01:00",
+            "latest_timestamp": "2024-07-20T20:22:11+01:00",
         },
     )
 
