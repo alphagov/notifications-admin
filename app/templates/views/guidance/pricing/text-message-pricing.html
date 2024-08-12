@@ -28,22 +28,26 @@ Text message pricing
   <p class="govuk-body">When a service has used its annual allowance, it costs {{ sms_rate }} (plus VAT) for each text message you send.</p>
 
   <div class="bottom-gutter-3-2">
+
+    {% set who_can_use_notify_link %}
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_who_can_use_notify") }}">GP surgeries</a>
+    {% endset %}
     {% call mapping_table(
       caption='Free text message allowance',
       field_headings=['Organisation', 'Annual allowance per service'],
       field_headings_visible=True,
       caption_visible=False
     ) %}
-      {% for message_length, charge in [
+      {% for organisation_type, charge in [
         ('Central government departments and national organisations', '30,000 free text message'),
         ('Local authorities and regional organisations', '10,000 free text messages'),
         ('State-funded schools', '5,000 free text messages'),
-        ('<a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">GP surgeries</a>', 'No free allowance'),
+        (who_can_use_notify_link, 'No free allowance'),
         ('Other organisations', '5,000 free text messages'),
       ] %}
         {% call row() %}
           {{ text_field(organisation_type) }}
-          {{ text_field(allowance) }}
+          {{ text_field(charge) }}
         {% endcall %}
       {% endfor %}
     {% endcall %}
