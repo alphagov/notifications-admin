@@ -4,6 +4,7 @@ from app import current_service, format_date_numeric, service_api_client, unsubs
 from app.main import main
 from app.main.forms import ProcessUnsubscribeRequestForm
 from app.models.spreadsheet import Spreadsheet
+from app.utils import hide_from_search_engines
 from app.utils.user import user_has_permissions
 
 
@@ -89,6 +90,7 @@ def create_unsubscribe_request_report(service_id):
 
 
 @main.route("/unsubscribe/<uuid:notification_id>/<string:token>", methods=["GET", "POST"])
+@hide_from_search_engines
 def unsubscribe(notification_id, token):
     confirmed = False
 
@@ -104,5 +106,6 @@ def unsubscribe(notification_id, token):
 
 
 @main.route("/unsubscribe/example")
+@hide_from_search_engines
 def unsubscribe_example():
     return render_template("views/unsubscribe-example.html")
