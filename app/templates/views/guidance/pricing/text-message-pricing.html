@@ -27,27 +27,6 @@ Text message pricing
   <p class="govuk-body">Each unique service you add has an annual allowance of free text messages.</p>
   <p class="govuk-body">When a service has used its annual allowance, it costs {{ sms_rate }} (plus VAT) for each text message you send.</p>
 
-  <p class="govuk-body">You may use more free messages, or pay more for each message, if you:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>send <a class="govuk-link govuk-link--no-visited-state" href="#long-text-messages">text messages longer than 160 characters</a></li>
-    <li>use certain <a class="govuk-link govuk-link--no-visited-state" href="#symbols">signs and symbols</a></li>
-    <li>use <a class="govuk-link govuk-link--no-visited-state" href="#accents">accents and accented letters</a></li>
-    <li>send text messages to <a class="govuk-link govuk-link--no-visited-state" href="#international-numbers">international numbers</a></li>
-  </ul>
-
-  <p class="govuk-body">It does not cost you anything to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_receive_text_messages') }}">receive text messages</a>.</p>
-
-  <h2 class="heading-medium" id="free-text-message-allowance">Free text message allowance</h2>
-
-
-  <p class="govuk-body">The current allowance is:</p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>30,000 free text messages for central government services and national organisations</li>
-        <li>10,000 free text messages for local authorities and regional organisations</li>
-        <li>5,000 free text messages for state-funded schools</li>
-        <li>5,000 free text messages for other services</li>
-    </ul>
-
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
       caption='Free text message allowance',
@@ -59,6 +38,7 @@ Text message pricing
         ('Central government departments and national organisations', '30,000 free text message'),
         ('Local authorities and regional organisations', '10,000 free text messages'),
         ('State-funded schools', '5,000 free text messages'),
+        ('<a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">GP surgeries</a>', 'No free allowance'),
         ('Other organisations', '5,000 free text messages'),
       ] %}
         {% call row() %}
@@ -69,14 +49,21 @@ Text message pricing
     {% endcall %}
   </div>
 
+  <p class="govuk-body">GOV.UK Notify covers the cost of the free allowance. We do this to help support those teams who need it most. If your service sends a very high volume of text messages in a single year, we may not renew your free allowance the following year.</p>
 
+  <h2 class="heading-medium" id="how-text-message-pricing-works">How text message pricing works</h2>
 
-<p class=”govuk-body”><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">GP surgeries</a>
- do not get a free allowance.</p>
+  <p class="govuk-body">You may use more free messages, or pay more for each message, if you:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>send <a class="govuk-link govuk-link--no-visited-state" href="#long-text-messages">text messages longer than 160 characters</a></li>
+    <li>use certain <a class="govuk-link govuk-link--no-visited-state" href="#symbols">signs and symbols</a></li>
+    <li>use <a class="govuk-link govuk-link--no-visited-state" href="#accents">accents and accented letters</a></li>
+    <li>send text messages to <a class="govuk-link govuk-link--no-visited-state" href="#international-numbers">international numbers</a></li>
+  </ul>
 
-    <p class="govuk-body">GOV.UK Notify covers the cost of the free allowance. We do this to help support those teams who need it most. If your service sends a very high volume of text messages in a single year, we may not renew your free allowance the following year.</p>
+  <p class="govuk-body">It does not cost you anything to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_receive_text_messages') }}">receive text messages</a>.</p>
 
-  <h2 class="heading-medium" id="long-text-messages">Long text messages</h2>
+  <h3 class="heading-small" id="long-text-messages">Long text messages</h3>
   <p class="govuk-body">If a text message is longer than 160 characters (including spaces), it counts as more than one message.</p>
 
   <div class="bottom-gutter-3-2">
@@ -102,7 +89,7 @@ Text message pricing
     {% endcall %}
   </div>
 
-  <h2 class="heading-medium" id="symbols">Signs and symbols</h2>
+  <h3 class="heading-small" id="symbols">Signs and symbols</h3>
 
   <p class="govuk-body">
     The following signs and symbols count as 2 characters each:<br />
@@ -111,7 +98,7 @@ Text message pricing
 
   <p class="govuk-body">Using them can increase the cost of sending text messages.</p>
 
-  <h2 class="heading-medium" id="accents">Accents and accented characters</h2>
+  <h3 class="heading-small" id="accents">Accents and accented characters</h3>
   <p class="govuk-body">Some languages, such as Welsh, use accented characters.</p>
   <p class="govuk-body">The following accented characters do not affect the cost of sending text messages: Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü.</p>
   <p class="govuk-body">Using other accented characters can increase the cost of sending text messages.</p>
@@ -203,7 +190,7 @@ Text message pricing
     {% endcall %}
   </div>
 
-  <h2 class="heading-medium" id="international-numbers">Sending text messages to international numbers</h2>
+  <h3 class="heading-small" id="international-numbers">Sending text messages to international numbers</h3>
   <p class="govuk-body">It might cost more to send text messages to international numbers than UK ones, depending on the country.</p>
   {% set smsIntRates %}
     {{ live_search(target_selector='#international-pricing .table-row', show=True, form=_search_form, label='Search by country name or code') }}
