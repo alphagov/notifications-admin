@@ -4,7 +4,6 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import service_api_client
 from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
