@@ -377,8 +377,8 @@ def message_count_noun(count, message_type):
     if message_type == "letter":
         return "letter" if singular else "letters"
 
-    if message_type == "unsubscribe request":
-        return "unsubscribe request" if singular else "unsubscribe requests"
+    if message_type and message_type.endswith("request"):
+        return message_type if singular else message_type + "s"
 
     return "message" if singular else "messages"
 
