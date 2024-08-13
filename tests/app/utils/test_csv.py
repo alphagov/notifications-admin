@@ -23,17 +23,12 @@ def _get_notifications_csv(
     created_by_email_address=None,
     api_key_name=None,
 ):
-    def _get(
-        service_id,
-        page=1,
-        job_id=None,
-        template_type=template_type,
-    ):
+    def _get(service_id, page=1, job_id=None, template_type=template_type, paginate_by_older_than=True):
         links = {}
         if with_links:
             links = {
                 "prev": f"/service/{service_id}/notifications?page=0",
-                "next": f"/service/{service_id}/notifications?page=1",
+                "next": f"/service/{service_id}/notifications?page=2&older_than=5678",
                 "last": f"/service/{service_id}/notifications?page=2",
             }
 
@@ -172,6 +167,7 @@ def test_generate_notifications_csv_only_calls_once_if_no_next_link(
     list(generate_notifications_csv(service_id="1234"))
 
     assert _get_notifications_csv_mock.call_count == 1
+    assert _get_notifications_csv_mock.mock_calls[0][2]["paginate_by_older_than"]
 
 
 @pytest.mark.parametrize("job_id", ["some", None])
@@ -220,9 +216,15 @@ def test_generate_notifications_csv_calls_twice_if_next_link(
     assert csv[0]["phone_number"] == "07700900000"
     assert csv[9]["phone_number"] == "07700900009"
     assert mock_get_notifications.call_count == 2
+
     # mock_calls[0][2] is the kwargs from first call
     assert mock_get_notifications.mock_calls[0][2]["page"] == 1
+    assert mock_get_notifications.mock_calls[0][2]["paginate_by_older_than"]
+    assert not mock_get_notifications.mock_calls[0][2].get("older_than")
+
     assert mock_get_notifications.mock_calls[1][2]["page"] == 2
+    assert mock_get_notifications.mock_calls[1][2]["paginate_by_older_than"]
+    assert mock_get_notifications.mock_calls[1][2]["older_than"] == "5678"
 
 
 MockRecipients = namedtuple(
