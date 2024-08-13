@@ -25,3 +25,8 @@ def percentage_through_current_financial_year():
 
 def is_less_than_days_ago(date_from_db, number_of_days):
     return (datetime.utcnow().astimezone(pytz.utc) - parser.parse(date_from_db)).days < number_of_days
+
+
+def to_utc_string(aware_datetime):
+    # Format matches app.utils.DATETIME_FORMAT in the API codebase
+    return aware_datetime.astimezone(pytz.utc).replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
