@@ -751,7 +751,7 @@ def test_clear_cache_shows_form(
                 call("letter-rates"),
                 call("sms-rate"),
             ],
-            "Removed 4 objects across 2 key formats for text_message_and_letter_rates",
+            "Removed 4 objects across 2 key formats for text message and letter rates",
         ),
         (
             ["unsubscribe_request_reports"],
@@ -759,7 +759,7 @@ def test_clear_cache_shows_form(
                 call("service-????????-????-????-????-????????????-unsubscribe-request-reports-summary"),
                 call("service-????????-????-????-????-????????????-unsubscribe-request-statistics"),
             ],
-            "Removed 4 objects across 2 key formats for unsubscribe_request_reports",
+            "Removed 4 objects across 2 key formats for unsubscribe request reports",
         ),
     ),
 )
