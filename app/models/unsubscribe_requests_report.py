@@ -6,6 +6,7 @@ from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from app.formatters import format_date_human, format_datetime_human
 from app.models import JSONModel, ModelList
 from app.notify_client.service_api_client import service_api_client
+from app.utils.time import to_utc_string
 
 
 class UnsubscribeRequestsReport(JSONModel):
@@ -125,3 +126,15 @@ class UnsubscribeRequestsReports(ModelList):
             if not report.is_a_batched_report:
                 return report
         abort(404)
+
+    def batch_unbatched(self, service_id):
+        unbatched = self.get_unbatched_report()
+        created = service_api_client.create_unsubscribe_request_report(
+            service_id,
+            {
+                "count": unbatched.count,
+                "earliest_timestamp": to_utc_string(unbatched.earliest_timestamp),
+                "latest_timestamp": to_utc_string(unbatched.latest_timestamp),
+            },
+        )
+        return created["report_id"]
