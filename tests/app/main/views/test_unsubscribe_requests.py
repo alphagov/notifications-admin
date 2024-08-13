@@ -258,7 +258,7 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
     assert normalize_spaces(checkbox_hint) == "I have unsubscribed these recipients from our mailing list"
     assert normalize_spaces(unsubscribe_requests_count_text) == "200 new requests to unsubscribe"
     assert len(update_button) == 1
-    assert normalize_spaces(availability_date) == "(available until 19 September 2024)"
+    assert normalize_spaces(availability_date) == "This report will be deleted in 7 days from now."
 
 
 @freeze_time("2024-07-02")
@@ -296,7 +296,10 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
     assert "disabled" in checkbox
     assert normalize_spaces(checkbox_hint) == "You cannot do this until you’ve downloaded the report"
     assert normalize_spaces(unsubscribe_requests_count_text) == "34 new requests to unsubscribe"
-    assert normalize_spaces(availability_date) == "(available until 29 September 2024)"
+    assert normalize_spaces(availability_date) == (
+        "Once downloaded, reports are available for 7 days. "
+        "Requests which have not been downloaded will be deleted after 90 days."
+    )
     assert len(update_button) == 0
 
 
@@ -321,8 +324,7 @@ def test_unsubscribe_request_report_for_processed_batched_reports(client_request
     assert page.select("h1")[0].text == "8 June 2023 to 14 June 2023"
     checkbox = page.select("#report_has_been_processed")[0].attrs
     checkbox_hint = page.select("#report_has_been_processed-item-hint")[0].text
-    main_body_text = page.select("#completed_unsubscribe_report_main_text")[0].text
-    availability_date = page.select("#completed_unsubscribe_report_availability")[0].text
+    availability_date = page.select("#unsubscribe_report_availability")[0].text
     "completed_unsubscribe_report_main_text"
     update_button = page.select("#process_unsubscribe_report")
     assert page.select_one("p a[download]")["href"] == url_for(
@@ -333,8 +335,7 @@ def test_unsubscribe_request_report_for_processed_batched_reports(client_request
     assert "disabled" not in checkbox
     assert "checked" in checkbox
     assert normalize_spaces(checkbox_hint) == "I have unsubscribed these recipients from our mailing list"
-    assert normalize_spaces(main_body_text) == "Report was marked as completed on 10 June 2024"
-    assert normalize_spaces(availability_date) == "(available until 17 June 2024)"
+    assert normalize_spaces(availability_date) == "This report will be deleted in 7 days from now."
     assert len(update_button) == 1
 
 

@@ -29,22 +29,24 @@
      {{ report.count|format_thousands}} new {{ report.count | message_count_label('request', suffix='') }} to unsubscribe
     </p>
 
-    <p class="govuk-body">You must: </p>
-      <ol class="govuk-list govuk-list--number">
+    <p class="govuk-body govuk-!-margin-bottom-2">You must: </p>
+      <ol class="govuk-list govuk-list--number govuk-!-margin-bottom-6">
         <li class="bottom-gutter"><a href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link heading-small">
-            Download the report</a>&nbsp;<span id="unsubscribe_report_availability">
-            (available until {{report.report_latest_download_date|format_date_normal}})</span></li>
+            Download the report</a>
+        </li>
         <li>Remove the email addresses from your mailing list before you send any further emails</li>
       </ol>
 {%  else %}
-    <p class="govuk-body" id="completed_unsubscribe_report_main_text"> Report was marked as completed on {{ report.processed_by_service_at | format_date_normal }}</p>
+    <p class="govuk-body" id="report-unsubscribe-requests-count">
+        {{ report.count|format_thousands}} unsubscribe {{ report.count | message_count_label('request', suffix='') }}
+    </p>
     <p class="bottom-gutter"><a download href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link heading-small" >
-        Download the report</a>&nbsp;<span id="completed_unsubscribe_report_availability">
-        (available until {{report.report_latest_download_date|format_date_normal}})</span> </p>
+        Download the report</a>
+    </p>
 
  {% endif %}
 
-{% call form_wrapper() %}
+{% call form_wrapper(class="govuk-!-margin-bottom-6") %}
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     {{ form.report_has_been_processed }}
     {% if report.is_a_batched_report %}
@@ -52,6 +54,19 @@
     {% endif %}
 
 {% endcall %}
-
+<div id="unsubscribe_report_availability">
+    {% if report.is_a_batched_report %}
+        This <span id="unsubscribe_report_availability">
+            report will be deleted in {{ report.will_be_archived_at|format_delta_days}}.
+        </span>
+    {% else %}
+        <p class="govuk-body">
+            Once downloaded, reports are available for 7 days.
+        </p>
+        <p class="govuk-body">
+            Requests which have not been downloaded will be deleted after 90 days.
+        </p>
+    {% endif %}
+</div>
 
 {% endblock %}
