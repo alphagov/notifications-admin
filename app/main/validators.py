@@ -8,7 +8,7 @@ from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
-from notifications_utils.recipient_validation.phone_number import validate_phone_number
+from notifications_utils.recipient_validation.phone_number import PhoneNumber, validate_phone_number
 from notifications_utils.sanitise_text import SanitiseSMS
 from ordered_set import OrderedSet
 from wtforms import ValidationError
@@ -83,6 +83,7 @@ class ValidEmail:
 
 class ValidPhoneNumber:
     is_international = False
+    sms_to_landline = False
     message = None
 
     _error_summary_messages_map = {
@@ -96,7 +97,11 @@ class ValidPhoneNumber:
     def __call__(self, form, field):
         try:
             if field.data:
-                validate_phone_number(field.data, international=self.is_international)
+                if self.sms_to_landline:
+                    PhoneNumber(field.data, allow_international=self.is_international)
+                else:
+                    validate_phone_number(field.data, international=self.is_international)
+                    # PhoneNumber(field.data, allow_international=self.is_international)
         except InvalidPhoneError as e:
             error_message = str(e)
             if hasattr(field, "error_summary_messages"):
@@ -111,8 +116,17 @@ class ValidUKMobileNumber(ValidPhoneNumber):
     pass
 
 
+class ValidUKLandlineNumber(ValidPhoneNumber):
+    sms_to_landline = True
+
+
 class ValidInternationalPhoneNumber(ValidPhoneNumber):
     is_international = True
+
+
+class ValidInternationalOrUKLandline(ValidPhoneNumber):
+    is_international = True
+    sms_to_landline = True
 
 
 class NoCommasInPlaceHolders:

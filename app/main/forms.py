@@ -82,7 +82,9 @@ from app.main.validators import (
     StringsNotAllowed,
     ValidEmail,
     ValidGovEmail,
+    ValidInternationalOrUKLandline,
     ValidInternationalPhoneNumber,
+    ValidUKLandlineNumber,
     ValidUKMobileNumber,
 )
 from app.models.branding import (
@@ -244,8 +246,18 @@ def uk_mobile_number(label="Mobile number"):
     return PhoneNumber(label, validators=[DataRequired(message="Cannot be empty"), ValidUKMobileNumber()])
 
 
+def uk_landline_number(label="Mobile number"):
+    return PhoneNumber(label, validators=[NotifyDataRequired(thing="a mobile number"), ValidUKLandlineNumber()])
+
+
 def international_phone_number(label="Mobile number"):
     return PhoneNumber(label, validators=[NotifyDataRequired(thing="a mobile number"), ValidInternationalPhoneNumber()])
+
+
+def international_or_uk_landline_number(label="Mobile number"):
+    return PhoneNumber(
+        label, validators=[NotifyDataRequired(thing="a mobile number"), ValidInternationalOrUKLandline()]
+    )
 
 
 def make_password_field(label="Password", thing="a password", validate_length=True):
@@ -2264,12 +2276,18 @@ def get_placeholder_form_instance(
     dict_to_populate_from,
     template_type,
     allow_international_phone_numbers=False,
+    sms_to_uk_landline=False,
 ):
     if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template_type == "email":
         field = make_email_address_field(label=placeholder_name, gov_user=False, thing="an email address")
     elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template_type == "sms":
-        if allow_international_phone_numbers:
+        if sms_to_uk_landline & allow_international_phone_numbers:
+            field = international_or_uk_landline_number(label=placeholder_name)
+        elif sms_to_uk_landline:
+            field = uk_landline_number(label=placeholder_name)
+        elif allow_international_phone_numbers:
             field = international_phone_number(label=placeholder_name)
+
         else:
             field = uk_mobile_number(label=placeholder_name)
     else:
