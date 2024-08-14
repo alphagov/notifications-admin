@@ -2674,6 +2674,52 @@ def test_upload_csvfile_with_international_validates(
     assert mock_recipients.call_args[1]["allow_international_sms"] == should_allow_international
 
 
+@pytest.mark.parametrize(
+    "sms_to_uk_landline_permission, should_allow_sms_to_uk_landline",
+    [
+        (False, False),
+        (True, True),
+    ],
+)
+def test_upload_csvfile_with_sms_to_landline_validates(
+    mocker,
+    api_user_active,
+    client_request,
+    mock_get_service_template,
+    mock_s3_set_metadata,
+    mock_s3_get_metadata,
+    mock_s3_upload,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+    sms_to_uk_landline_permission,
+    should_allow_sms_to_uk_landline,
+    service_one,
+):
+    if sms_to_uk_landline_permission:
+        service_one["permissions"] += ("sms", "sms_to_uk_landlines")
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+
+    mocker.patch("app.main.views.send.s3download", return_value="")
+    mock_recipients = mocker.patch(
+        "app.main.views.send.RecipientCSV",
+        return_value=RecipientCSV("", template=SMSPreviewTemplate({"content": "foo", "template_type": "sms"})),
+    )
+
+    client_request.post(
+        "main.send_messages",
+        service_id=fake_uuid,
+        template_id=fake_uuid,
+        _data={"file": (BytesIO(b""), "example.csv")},
+        _content_type="multipart/form-data",
+        _follow_redirects=True,
+    )
+    assert mock_recipients.call_args[1]["allow_sms_to_uk_landline"] == should_allow_sms_to_uk_landline
+
+
 def test_job_from_contact_list_knows_where_its_come_from(
     client_request,
     mocker,

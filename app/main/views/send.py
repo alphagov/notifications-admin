@@ -616,7 +616,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         ),
         remaining_messages=remaining_messages,
         allow_international_sms=current_service.has_permission("international_sms"),
-        sms_to_uk_landlines=current_service.has_permission("sms_to_uk_landlines"),
+        allow_sms_to_uk_landline=current_service.has_permission("sms_to_uk_landlines"),
         allow_international_letters=current_service.has_permission("international_letters"),
     )
 
