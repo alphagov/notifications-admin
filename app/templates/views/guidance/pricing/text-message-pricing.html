@@ -31,6 +31,8 @@ Text message pricing
 
     {% set who_can_use_notify_link %}
     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_who_can_use_notify") }}">GP surgeries</a>
+        {% set central_government_organisations %}
+    Central government departments and <br>national organisations
     {% endset %}
     {% call mapping_table(
       caption='Free text message allowance',
