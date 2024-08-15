@@ -15,8 +15,8 @@
 
   {{ content_metadata(
     data={
-      "Last updated": "15 May 2024",
-      "Next review due": "15 August 2024"
+      "Last updated": "15 August 2024",
+      "Next review due": "15 November 2024"
     }
   ) }}
 
@@ -28,26 +28,32 @@
 
   <ul class="govuk-list govuk-list--bullet">
     <li>Let recipients ask to unsubscribe from emails with just one click</li>
-    <li>Make it easier to join an existing service</li>
-    <li>Improve our front-end code to meet our targets for accessibility</li>
     <li>Test Rich Communication Services (RCS) messages</li>
-    <li>Let services that use the Notify API see their billing data</li>
-    <li>Protect recipients from fraudulent text message sender IDs</li>
+    <li>Make it easier to start using Notify</li>
+    <li>Let users ask to join an existing service</li>
+    <li>Improve our front-end code to meet <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> targets for accessibility</li>
+    <li>Use <a class="govuk-link govuk-link--no-visited-state" href="https://design-system.service.gov.uk/components/">GOV.UK Design System version 5 components</a></li>
+    <li>Update Notify’s deployment pipeline so our developers can update code more efficiently</li>
   </ul>
 
   <h2 class="heading-medium" id="things-we-will-do-later">Things we’ll do later</h2>
 
   <ul class="govuk-list govuk-list--bullet">
     <li>Launch RCS messaging (private <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/agile-delivery/how-the-beta-phase-works">beta</a>)</li>
-    <li>Design a simpler way for services to send one-off messages</li>
     <li>Make it easier to understand how text message pricing works</li>
     <li>Explore new ways to increase our capacity</li>
     <li>Improve the Notify API</li>
+    <li>Explore ways to help services write better messages</li>
+    <li>Improve the billing and payment process</li>
+    <li>Let website users send files by email</li>
   </ul>
 
   <h2 class="heading-medium" id="things-we-have-done">Things we’ve done</h2>
 
   <ul class="govuk-list govuk-list--bullet">
+    <li>Reduced the risk of sending letters to addresses that do not exist</li>
+    <li>Taken steps to protect recipients from fraudulent text message sender IDs</li>
+    <li>Made detailed billing data available through the Notify API</li>
     <li>Announced an update to our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a></li>
     <li>Fixed several issues listed on our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.accessibility_statement') }}">accessibility statement</a></li>
     <li>Identified and prioritised API improvements (discovery)</li>
