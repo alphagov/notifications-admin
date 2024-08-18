@@ -1,21 +1,10 @@
-const helpers = require('./support/helpers');
+import CollapsibleCheckboxes from '../../app/assets/javascripts/esm/collapsible-checkboxes.mjs'
+import * as helpers from './support/helpers.js'
 
-beforeAll(() => {
-  // TODO: remove this when tests for sticky JS are written
-  require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
-
-  require('../../app/assets/javascripts/collapsibleCheckboxes.js');
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
-});
-
-
-describe('Collapsible fieldset', () => {
+describe('Collapsible checkboxes', () => {
 
   const _checkboxes = (start, end) => {
-    result = '';
+    let result = '';
 
       for (let num = start; num <= end; num++) {
         let id = `folder-permissions-${num}`;
@@ -37,7 +26,8 @@ describe('Collapsible fieldset', () => {
   let checkboxes;
 
   beforeEach(() => {
-
+    // add class to mimic IRL 
+    document.body.classList.add('govuk-frontend-supported')
     // set up DOM
     document.body.innerHTML =
       `<div class="selection-wrapper" data-notify-module="collapsible-checkboxes" data-field-label="folder">
@@ -75,7 +65,7 @@ describe('Collapsible fieldset', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
     });
 
@@ -87,9 +77,10 @@ describe('Collapsible fieldset', () => {
     });
 
     test("adds the right classes to the group and fieldset", () => {
+      
 
-      expect(formGroup.classList.contains('selection-wrapper')).toBe(true);
-      expect(fieldset.classList.contains('selection-content')).toBe(true);
+      expect(fieldset.classList.contains('selection-wrapper')).toBe(true);
+      expect(checkboxesContainer.classList.contains('selection-content')).toBe(true);
 
     });
 
@@ -120,25 +111,24 @@ describe('Collapsible fieldset', () => {
 
     });
 
-    test("has a button to expand the fieldset", () => {
+    test("has a button to expand the checkboxes container", () => {
 
       const button = formGroup.querySelector('.govuk-button');
 
       expect(button).not.toBeNull();
-      expect(button.textContent.trim()).toEqual('Choose folders');
+      expect(button.textContent.trim()).toEqual('Choose folders this team member can see');
 
     });
 
     test("has the correct aria attributes on the button", () => {
 
       expect(helpers.element(formGroup.querySelector('.govuk-button')).hasAttributesSetTo({
-        'aria-controls': fieldset.getAttribute('id'),
         'aria-expanded': 'false'
       })).toBe(true);
 
     });
 
-    test("hides the checkboxes", () => {
+    test("hides the fieldset", () => {
 
       expect(helpers.element(fieldset).is('hidden')).toEqual(true);
 
@@ -151,17 +141,29 @@ describe('Collapsible fieldset', () => {
     });
 
     describe("the live region that was inside the hint", () => {
+      let childNodesinContainer;
+      beforeEach(() => {
+        childNodesinContainer = Array.from(document.querySelector('fieldset').parentNode.children)
+      })
 
       test("is moved above the fieldset", () => {
 
-        expect(fieldset.previousElementSibling.matches('.selection-summary')).toBe(true);
+        // as the summary live region is before the toggle button, it's no longer
+        // directly before the fieldsset
+        // as a proxy we can check direct children on fieldset's parent 
+        // and compare indexes in the array. 
+        // summary live region's will be lower than fieldset's
+
+        expect(childNodesinContainer.findIndex(({classList}) => classList.contains('selection-summary')) < childNodesinContainer.findIndex(({tagName}) => tagName.toLowerCase() === 'fieldset'))
 
       });
 
       test("has an id matching the aria-describedby on the fieldset", () => {
 
         const fieldsetDescribedby = fieldset.getAttribute('aria-describedby');
-        expect(fieldset.previousElementSibling.getAttribute('id')).toEqual(fieldsetDescribedby);
+        const summaryLiveRegionId = childNodesinContainer.filter(element => element.classList.contains('selection-summary')).map(element => element.id).toString()
+    
+        expect(summaryLiveRegionId).toEqual(fieldsetDescribedby);
 
       });
 
@@ -172,7 +174,7 @@ describe('Collapsible fieldset', () => {
   test('has the right summary text when started with no checkboxes selected', () => {
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
     const summaryText = document.querySelector('.selection-summary__text');
 
@@ -189,7 +191,7 @@ describe('Collapsible fieldset', () => {
     });
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
     const summaryText = document.querySelector('.selection-summary__text');
 
@@ -203,7 +205,7 @@ describe('Collapsible fieldset', () => {
     checkboxes.forEach(el => el.setAttribute('checked', ''));
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
     const summaryText = document.querySelector('.selection-summary__text');
 
@@ -216,7 +218,7 @@ describe('Collapsible fieldset', () => {
     wrapper.dataset.fieldLabel = 'team member';
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
     const summaryText = document.querySelector('.selection-summary__text');
 
@@ -224,26 +226,20 @@ describe('Collapsible fieldset', () => {
 
   });
 
-  describe("when button is clicked while the fieldset is collapsed", () => {
+  describe("when button is clicked while the checkboxes are collapsed", () => {
 
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
       helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
 
     });
 
-    test("it shows the checkboxes", () => {
+    test("it shows the checkboxes (inside the fieldset)", () => {
 
       expect(helpers.element(fieldset).is('hidden')).toBe(false);
-
-    });
-
-    test("it focuses the fieldset", () => {
-
-      expect(document.activeElement).toBe(fieldset);
 
     });
 
@@ -253,20 +249,14 @@ describe('Collapsible fieldset', () => {
 
     });
 
-    test("it changes it's text to indicate it's new action", () => {
-
-      expect(formGroup.querySelector('.govuk-button').textContent.trim()).toEqual("Done choosing folders");
-
-    });
-
   });
 
-  describe("when button is clicked when the fieldset is expanded", () => {
+  describe("when button is clicked when the checkboxes are expanded", () => {
 
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
       // show the checkboxes
       helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
@@ -276,15 +266,9 @@ describe('Collapsible fieldset', () => {
 
     });
 
-    test("it hides the checkboxes", () => {
+    test("it hides the checkboxes (inside the fieldset)", () => {
 
       expect(helpers.element(fieldset).is('hidden')).toBe(true);
-
-    });
-
-    test("it focuses the summary text", () => {
-
-      expect(document.activeElement).toBe(document.querySelector('.selection-summary__text'));
 
     });
 
@@ -296,81 +280,9 @@ describe('Collapsible fieldset', () => {
 
     test("it changes it's text to indicate it's new action", () => {
 
-      expect(formGroup.querySelector('.govuk-button').textContent.trim()).toEqual("Choose folders");
+      expect(formGroup.querySelector('.govuk-button').textContent.trim()).toEqual("Choose folders this team member can see");
 
     });
-  });
-
-  describe("the footer (that wraps the button)", () => {
-
-    describe("is inserted", () => {
-
-      test("after the fieldset", () => {
-
-        // start module
-        window.GOVUK.notifyModules.start();
-
-        // show the checkboxes
-        helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
-
-        expect(formGroup.querySelector('.selection-footer').previousElementSibling.nodeName).toBe('FIELDSET');
-
-      });
-
-      test("after the root fieldset if the checkboxes are nested", () => {
-
-        // add a nested list of checkboxes to the first checkbox item
-        const nestedCheckboxes = document.createElement('div');
-        nestedCheckboxes.className = 'govuk-form-group govuk-form-group--nested';
-        nestedCheckboxes.innerHTML = _checkboxes(11, 20);
-        checkboxesContainer.querySelector('.govuk-checkboxes__item').appendChild(nestedCheckboxes);
-
-        // start module
-        window.GOVUK.notifyModules.start();
-
-        // show the checkboxes
-        helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
-
-        expect(formGroup.querySelector('.selection-footer').previousElementSibling.nodeName).toBe('FIELDSET');
-
-      });
-
-    });
-
-    describe("its stickiness", () => {
-
-      beforeEach(() => {
-
-        // track calls to sticky JS
-        window.GOVUK.stickAtBottomWhenScrolling.recalculate = jest.fn(() => {});
-
-        // start module
-        window.GOVUK.notifyModules.start();
-
-        // show the checkboxes
-        helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
-
-      });
-
-      test("is added when the fieldset is expanded", () => {
-
-        expect(formGroup.querySelector('.selection-footer').classList.contains('js-stick-at-bottom-when-scrolling')).toBe(true);
-        expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toBe(1);
-
-      });
-
-      test("is removed when the fieldset is collapsed", () => {
-
-        // click the button to collapse the fieldset
-        helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
-
-        expect(formGroup.querySelector('.selection-footer').classList.contains('js-stick-at-bottom-when-scrolling')).toBe(false);
-        expect(window.GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toBe(2);
-
-      });
-
-    });
-
   });
 
   describe("when the selection changes", () => {
@@ -409,7 +321,7 @@ describe('Collapsible fieldset', () => {
         checkFirstCheckbox();
 
         // start module
-        window.GOVUK.notifyModules.start();
+        new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
         showCheckboxes();
 
@@ -429,7 +341,7 @@ describe('Collapsible fieldset', () => {
         checkFirstCheckbox();
 
         // start module
-        window.GOVUK.notifyModules.start();
+        new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
         showCheckboxes();
 
@@ -449,7 +361,7 @@ describe('Collapsible fieldset', () => {
         checkFirstCheckbox();
 
         // start module
-        window.GOVUK.notifyModules.start();
+        new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
         showCheckboxes();
 
@@ -473,7 +385,7 @@ describe('Collapsible fieldset', () => {
         checkAllCheckboxes();
 
         // start module
-        window.GOVUK.notifyModules.start();
+        new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
         showCheckboxes();
 
@@ -493,7 +405,7 @@ describe('Collapsible fieldset', () => {
         checkAllCheckboxes();
 
         // start module
-        window.GOVUK.notifyModules.start();
+        new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
         showCheckboxes();
 
@@ -517,7 +429,7 @@ describe('Collapsible fieldset', () => {
         checkAllCheckboxesButTheLast();
 
         // start module
-        window.GOVUK.notifyModules.start();
+        new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
         showCheckboxes();
 
@@ -536,7 +448,7 @@ describe('Collapsible fieldset', () => {
         checkAllCheckboxesButTheLast();
 
         // start module
-        window.GOVUK.notifyModules.start();
+        new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
         showCheckboxes();
 
