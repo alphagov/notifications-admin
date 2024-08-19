@@ -1,5 +1,6 @@
 import json
 import uuid
+from collections import namedtuple
 from functools import partial
 from urllib.parse import parse_qs, urlparse
 
@@ -841,3 +842,59 @@ def test_should_show_address_and_hint_for_letters(
 
     assert page.select_one("a.file-list-filename").text == "Full Name, First address line, postcode"
     assert page.select_one("p.file-list-hint").text.strip() == expected_hint
+
+
+CanDownloadLinkTestCase = namedtuple(
+    "SupportLinkTestCase",
+    ["notifications_count", "can_download", "expected_download_link_present", "expected_support_link_present"],
+)
+
+
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        CanDownloadLinkTestCase(
+            notifications_count=100,
+            can_download=True,
+            expected_download_link_present=True,
+            expected_support_link_present=False,
+        ),
+        CanDownloadLinkTestCase(
+            notifications_count=250001,
+            can_download=False,
+            expected_download_link_present=False,
+            expected_support_link_present=True,
+        ),
+    ],
+    ids=[
+        "Below threshold - Download link present, support link not present",
+        "Above threshold - Download link not present, support link present",
+    ],
+)
+def test_view_notifications_can_download(
+    client_request,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_has_no_jobs,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+    test_case: CanDownloadLinkTestCase,
+):
+    mock_get_notifications_count_for_service.return_value = test_case.notifications_count
+
+    page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID)
+
+    # check download link
+    download_link = page.select_one("a[download=download]")
+    if test_case.expected_download_link_present:
+        assert download_link is not None
+    else:
+        assert download_link is None
+
+    # check support link
+    support_link = page.select_one("a[href*='/support/ask-question-give-feedback']")
+    if test_case.expected_support_link_present:
+        assert support_link is not None
+    else:
+        assert support_link is None
