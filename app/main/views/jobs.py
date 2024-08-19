@@ -192,6 +192,15 @@ def view_notifications(service_id, message_type=None):
 
     max_notifications_for_download = 250000
     can_download = notifications_count <= max_notifications_for_download
+    download_link = None
+
+    if can_download:
+        download_link = url_for(
+            ".download_notifications_csv",
+            service_id=current_service.id,
+            message_type=message_type,
+            status=request.args.get("status"),
+        )
 
     return render_template(
         "views/notifications.html",
@@ -215,12 +224,7 @@ def view_notifications(service_id, message_type=None):
             True: ["reference"],
             False: [],
         }.get(bool(current_service.api_keys)),
-        download_link=url_for(
-            ".download_notifications_csv",
-            service_id=current_service.id,
-            message_type=message_type,
-            status=request.args.get("status"),
-        ),
+        download_link=download_link,
         can_download=can_download,
     )
 

@@ -215,11 +215,12 @@ def test_can_show_notifications_if_data_retention_not_available(
 
 
 @pytest.mark.parametrize(
-    "user, query_parameters, expected_download_link",
+    "user, query_parameters, notifications_count,expected_download_link",
     [
         (
             create_active_user_with_permissions(),
             {},
+            100,
             partial(
                 url_for,
                 ".download_notifications_csv",
@@ -229,11 +230,13 @@ def test_can_show_notifications_if_data_retention_not_available(
         (
             create_active_user_with_permissions(),
             {"status": "failed"},
+            100,
             partial(url_for, ".download_notifications_csv", status="failed"),
         ),
         (
             create_active_user_with_permissions(),
             {"message_type": "sms"},
+            100,
             partial(
                 url_for,
                 ".download_notifications_csv",
@@ -243,6 +246,7 @@ def test_can_show_notifications_if_data_retention_not_available(
         (
             create_active_user_view_permissions(),
             {},
+            100,
             partial(
                 url_for,
                 ".download_notifications_csv",
@@ -251,8 +255,23 @@ def test_can_show_notifications_if_data_retention_not_available(
         (
             create_active_caseworking_user(),
             {},
+            100,
             lambda service_id: None,
         ),
+        (
+            create_active_user_with_permissions(),
+            {},
+            300000,  # Above the threshold, should return None
+            lambda service_id: None,
+        ),
+    ],
+    ids=[
+        "Active user - no filters",
+        "Active user - failed status",
+        "Active user - SMS message type",
+        "View permissions user - no filters",
+        "Caseworking user - no download link",
+        "Active user - notifications count above threshold, no download link",
     ],
 )
 def test_link_to_download_notifications(
@@ -265,8 +284,11 @@ def test_link_to_download_notifications(
     mock_get_notifications_count_for_service,
     user,
     query_parameters,
+    notifications_count,
     expected_download_link,
 ):
+    mock_get_notifications_count_for_service.return_value = notifications_count
+
     client_request.login(user)
     page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID, **query_parameters)
     download_link = page.select_one("a[download=download]")
