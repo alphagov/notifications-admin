@@ -182,9 +182,20 @@ def view_job_updates(service_id, job_id):
 @main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>", methods=["GET", "POST"])
 @user_has_permissions()
 def view_notifications(service_id, message_type=None):
+    partials_data = _get_notifications_dashboard_partials_data(service_id, message_type)
+
+    notifications_count = notification_api_client.get_notifications_count_for_service(
+        service_id,
+        message_type,
+        partials_data["service_data_retention_days"],
+    )
+
+    max_notifications_for_download = 250000
+    can_download = notifications_count <= max_notifications_for_download
+
     return render_template(
         "views/notifications.html",
-        partials=_get_notifications_dashboard_partials_data(service_id, message_type),
+        partials=partials_data,
         message_type=message_type,
         status=request.args.get("status") or "sending,delivered,failed",
         page=request.args.get("page", 1),
@@ -210,6 +221,7 @@ def view_notifications(service_id, message_type=None):
             message_type=message_type,
             status=request.args.get("status"),
         ),
+        can_download=can_download,
     )
 
 
