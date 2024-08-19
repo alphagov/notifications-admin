@@ -6,17 +6,17 @@ import CollapsibleCheckboxes from './collapsible-checkboxes.mjs';
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
 
-createAll(Button)
-createAll(Header)
-createAll(Radios)
-createAll(ErrorSummary)
-createAll(SkipLink)
-createAll(Tabs)
+createAll(Button);
+createAll(Header);
+createAll(Radios);
+createAll(ErrorSummary);
+createAll(SkipLink);
+createAll(Tabs);
 
-const $collapsibleCheckboxes = document.querySelector('[data-notify-module="collapsible-checkboxes"]')
-  if ($collapsibleCheckboxes) {
-    new CollapsibleCheckboxes($collapsibleCheckboxes)
-  }
+const $collapsibleCheckboxes = document.querySelector('[data-notify-module="collapsible-checkboxes"]');
+if ($collapsibleCheckboxes) {
+  new CollapsibleCheckboxes($collapsibleCheckboxes);
+}
 
 
 // ES modu;es do not export to global so in order to

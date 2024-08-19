@@ -221,9 +221,10 @@ const lint = {
       .pipe(plugins.sassLint.failOnError());
   },
   'js': (cb) => {
-    return src(
-        paths.src + 'javascripts/**/*.js'
-      )
+    return src([
+        paths.src + 'javascripts/**/*.js',
+        paths.src + 'javascripts/**/*.mjs'
+      ])
       .pipe(plugins.jshint())
       .pipe(plugins.jshint.reporter(stylish))
       .pipe(plugins.jshint.reporter('fail'))
