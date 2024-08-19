@@ -6,7 +6,7 @@
     "node": ">=10.15.3"
   },
   "scripts": {
-    "test": "gulp lint && jest tests/javascripts",
+    "test": "gulp lint && node --experimental-vm-modules node_modules/.bin/jest tests/javascripts",
     "test-watch": "jest --watch tests/javascripts",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand $npm_config_test",
     "build": "gulp",
@@ -31,8 +31,9 @@
     "timeago": "1.6.5"
   },
   "devDependencies": {
-    "@babel/core": "7.4.0",
+    "@babel/core": "7.25.2",
     "@babel/preset-env": "7.4.2",
+    "babel-jest": "^29.0.1",
     "better-npm-audit": "3.7.3",
     "del": "<7.0.0",
     "gulp": "4.0.2",
@@ -70,6 +71,12 @@
     "testEnvironmentOptions": {
       "url": "https://www.notifications.service.gov.uk"
     },
+    "transform": {
+      "^.+\\mjs$": "babel-jest"
+    },
+    "testMatch": [
+      "<rootDir>/**/?(*.)(test).{js,mjs}"
+    ],
     "testEnvironment": "jsdom"
   }
 }
