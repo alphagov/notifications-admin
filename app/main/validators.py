@@ -82,9 +82,10 @@ class ValidEmail:
 
 
 class ValidPhoneNumber:
-    is_international = False
-    sms_to_landline = False
-    message = None
+    def __init__(self, is_international=False, sms_to_landline=False, message=None):
+        self.is_international = is_international
+        self.sms_to_landline = sms_to_landline
+        self.message = message
 
     _error_summary_messages_map = {
         InvalidPhoneError.Codes.TOO_SHORT: "%s is too short",
@@ -110,23 +111,6 @@ class ValidPhoneNumber:
                 field.error_summary_messages.append(error_summary_message)
 
             raise ValidationError(error_message) from e
-
-
-class ValidUKMobileNumber(ValidPhoneNumber):
-    pass
-
-
-class ValidUKLandlineNumber(ValidPhoneNumber):
-    sms_to_landline = True
-
-
-class ValidInternationalPhoneNumber(ValidPhoneNumber):
-    is_international = True
-
-
-class ValidInternationalOrUKLandline(ValidPhoneNumber):
-    is_international = True
-    sms_to_landline = True
 
 
 class NoCommasInPlaceHolders:
