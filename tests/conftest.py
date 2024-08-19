@@ -4357,3 +4357,11 @@ def mock_onwards_request_headers(mocker):
     mock_gorh = mocker.patch("notifications_utils.request_helper.NotifyRequest.get_onwards_request_headers")
     mock_gorh.return_value = {"some-onwards": "request-headers"}
     return mock_gorh
+
+
+@pytest.fixture(scope="function")
+def mock_get_notifications_count_for_service(mocker):
+    return mocker.patch(
+        "app.notification_api_client.get_notifications_count_for_service",
+        return_value=100,
+    )
