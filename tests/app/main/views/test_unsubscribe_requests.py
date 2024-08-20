@@ -508,12 +508,14 @@ def test_download_unsubscribe_request_report(client_request, mocker):
                 "template_name": "Template Fizz",
                 "original_file_name": "Contact List 2",
                 "template_sent_at": "Tue, 16 Jul 2024 17:44:20 GMT",
+                "unsubscribe_request_received_at": "Thu, 18 Jul 2024 17:44:20 GMT",
             },
             {
                 "email_address": "fizzbuzz@bar.com",
                 "template_name": "Template FizzBuzz",
                 "original_file_name": "N/A",
                 "template_sent_at": "Wed, 17 Jul 2024 17:44:20 GMT",
+                "unsubscribe_request_received_at": "Fri, 19 Jul 2024 17:44:20 GMT",
             },
         ],
     }
@@ -530,9 +532,10 @@ def test_download_unsubscribe_request_report(client_request, mocker):
     report = response.get_data(as_text=True)
 
     assert (
-        report.strip() == "Email address,Template name,Uploaded spreadsheet file name,Template sent at\r\n"
-        'fizz@bar.com,Template Fizz,Contact List 2,"Tue, 16 Jul 2024 17:44:20 GMT"\r\n'
-        'fizzbuzz@bar.com,Template FizzBuzz,N/A,"Wed, 17 Jul 2024 17:44:20 GMT"'
+        report.strip() == "Email address,Template name,Uploaded spreadsheet file name,"
+        "Template sent at,Unsubscribe request received at\r\n"
+        'fizz@bar.com,Template Fizz,Contact List 2,"Tue, 16 Jul 2024 17:44:20 GMT","Thu, 18 Jul 2024 17:44:20 GMT"\r\n'
+        'fizzbuzz@bar.com,Template FizzBuzz,N/A,"Wed, 17 Jul 2024 17:44:20 GMT","Fri, 19 Jul 2024 17:44:20 GMT"'
     )
 
 

@@ -58,6 +58,7 @@ def download_unsubscribe_request_report(service_id, batch_id=None):
         "template_name": "Template name",
         "original_file_name": "Uploaded spreadsheet file name",
         "template_sent_at": "Template sent at",
+        "unsubscribe_request_received_at": "Unsubscribe request received at",
     }
     # initialise with header row
     data = [list(column_names.values())]
