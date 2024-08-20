@@ -72,12 +72,14 @@ def generate_notifications_csv(**kwargs):
             "API key name",
         ]
 
+    kwargs["paginate_by_older_than"] = True
+
     yield ",".join(fieldnames) + "\n"
 
-    while kwargs["page"]:
-        notifications_resp = notification_api_client.get_notifications_for_service(**kwargs)
+    while True:
+        notifications_batch = notification_api_client.get_notifications_for_service(**kwargs)
 
-        for notification in notifications_resp["notifications"]:
+        for notification in notifications_batch["notifications"]:
             if kwargs.get("job_id"):
                 values = (
                     [
@@ -111,8 +113,13 @@ def generate_notifications_csv(**kwargs):
                 ]
             yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
 
-        if notifications_resp["links"].get("next"):
+        if notifications_batch["links"].get("next"):
             kwargs["page"] += 1
+            from urllib import parse
+
+            url = notifications_batch["links"]["next"]
+            if older_than_args := parse.parse_qs(parse.urlparse(url).query).get("older_than"):
+                kwargs["older_than"] = older_than_args[0]
         else:
             return
     raise Exception("Should never reach here")

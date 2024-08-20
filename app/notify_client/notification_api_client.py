@@ -8,6 +8,8 @@ class NotificationApiClient(NotifyAdminAPIClient):
         job_id=None,
         template_type=None,
         status=None,
+        paginate_by_older_than=None,
+        older_than=None,
         page=None,
         page_size=None,
         count_pages=None,
@@ -19,6 +21,8 @@ class NotificationApiClient(NotifyAdminAPIClient):
         include_one_off=None,
     ):
         params = {
+            "paginate_by_older_than": paginate_by_older_than,
+            "older_than": older_than,
             "page": page,
             "page_size": page_size,
             "template_type": template_type,
