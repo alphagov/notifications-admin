@@ -115,7 +115,7 @@ def add_organisation_from_nhs_local_service(service_id):
         organisation_choices=[
             (organisation.id, organisation.name)
             for organisation in sorted(AllOrganisations())
-            if organisation.organisation_type == Organisation.TYPE_NHS_LOCAL
+            if organisation.organisation_type == Organisation.TYPE_NHS_LOCAL and organisation.active
         ]
     )
 
