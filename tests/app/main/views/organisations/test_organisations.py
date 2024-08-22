@@ -258,6 +258,7 @@ def test_nhs_local_can_create_own_organisations(
     mocker.patch(
         "app.models.organisation.AllOrganisations.client_method",
         return_value=[
+            organisation_json("t3", "Trust 3", active=False, organisation_type="nhs_local"),
             organisation_json("t2", "Trust 2", organisation_type="nhs_local"),
             organisation_json("t1", "Trust 1", organisation_type="nhs_local"),
             organisation_json("gp1", "GP 1", organisation_type="nhs_gp"),

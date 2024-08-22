@@ -1187,6 +1187,7 @@ class AddNHSLocalOrganisationForm(StripWhitespaceForm):
 
     organisations = GovukRadiosField(
         "Which NHS Trust or Integrated Care Board do you work for?",
+        param_extensions={"fieldset": {"legend": {"classes": "govuk-visually-hidden"}}},
         thing="an NHS Trust or Integrated Care Board",
     )
 
