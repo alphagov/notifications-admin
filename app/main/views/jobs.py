@@ -27,6 +27,7 @@ from app import (
     notification_api_client,
     service_api_client,
 )
+from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
 from app.formatters import get_time_left, message_count_noun
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
@@ -190,8 +191,7 @@ def view_notifications(service_id, message_type=None):
         partials_data["service_data_retention_days"],
     )
 
-    max_notifications_for_download = 250000
-    can_download = notifications_count <= max_notifications_for_download
+    can_download = notifications_count <= MAX_NOTIFICATION_FOR_DOWNLOAD
     download_link = None
 
     if can_download:
