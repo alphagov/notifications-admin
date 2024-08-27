@@ -249,7 +249,7 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
         return_value="email-branding-1-id",
     )
 
-    mocker.patch("app.models.branding.EmailBrandingPool.client_method", return_value=branding_pool)
+    mocker.patch("app.models.branding.EmailBrandingPool._get_items", return_value=branding_pool)
 
     options = get_email_choices(service)
     assert list(options) == expected_options
@@ -386,7 +386,7 @@ def test_current_letter_branding_is_not_displayed_in_letter_branding_pool_option
     expected_options = [
         ("letter-branding-2-id", "Letter branding name 2"),
     ]
-    mocker.patch("app.models.branding.LetterBrandingPool.client_method", return_value=branding_pool)
+    mocker.patch("app.models.branding.LetterBrandingPool._get_items", return_value=branding_pool)
 
     options = get_letter_choices(service)
     assert list(options) == expected_options

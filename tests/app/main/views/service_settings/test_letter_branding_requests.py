@@ -72,7 +72,7 @@ def test_letter_branding_options_page_when_no_branding_is_set(
             "app.organisations_client.get_organisation",
             return_value=organisation_json(id_=ORGANISATION_ID, name="NHS Org 1", organisation_type=organisation_type),
         )
-        mocker.patch("app.models.branding.LetterBrandingPool.client_method", side_effect=[letter_branding_pool])
+        mocker.patch("app.models.branding.LetterBrandingPool._get_items", side_effect=[letter_branding_pool])
 
     page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID)
 
@@ -257,7 +257,7 @@ def test_letter_branding_options_redirects_to_nhs_page(
     service_one["organisation"] = organisation_one["id"]
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
     mocker.patch(
-        "app.models.branding.LetterBrandingPool.client_method",
+        "app.models.branding.LetterBrandingPool._get_items",
         return_value=[{"name": "NHS", "id": LetterBranding.NHS_ID}],
     )
 

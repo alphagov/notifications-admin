@@ -11,7 +11,7 @@ from notifications_utils.letter_timings import (
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList, PaginatedModelList
-from app.notify_client.job_api_client import job_api_client
+from app.notify_client.job_api_client import JobApiClient, job_api_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
 from app.utils import set_status_filters
@@ -204,17 +204,26 @@ class Job(JSONModel):
 
 
 class ImmediateJobs(ModelList):
-    client_method = job_api_client.get_immediate_jobs
     model = Job
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return job_api_client.get_immediate_jobs(*args, **kwargs)
 
 
 class ScheduledJobs(ImmediateJobs):
-    client_method = job_api_client.get_scheduled_jobs
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return job_api_client.get_scheduled_jobs(*args, **kwargs)
 
 
 class PaginatedJobs(PaginatedModelList, ImmediateJobs):
-    client_method = job_api_client.get_page_of_jobs
     statuses = None
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return job_api_client.get_page_of_jobs(*args, **kwargs)
 
     def __init__(self, service_id, *, contact_list_id=None, page=None, limit_days=None):
         super().__init__(
@@ -227,8 +236,11 @@ class PaginatedJobs(PaginatedModelList, ImmediateJobs):
 
 
 class PaginatedJobsAndScheduledJobs(PaginatedJobs):
-    statuses = job_api_client.NON_CANCELLED_JOB_STATUSES
+    statuses = JobApiClient.NON_CANCELLED_JOB_STATUSES
 
 
 class PaginatedUploads(PaginatedModelList, ImmediateJobs):
-    client_method = job_api_client.get_uploads
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return job_api_client.get_uploads(*args, **kwargs)

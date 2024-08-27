@@ -132,15 +132,21 @@ class APIKeyEvent(Event):
 
 class APIKeyEvents(ModelList):
     model = APIKeyEvent
-    client_method = service_api_client.get_service_api_key_history
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return service_api_client.get_service_api_key_history(*args, **kwargs)
 
 
 class ServiceEvents(ModelList):
-    client_method = service_api_client.get_service_service_history
 
     @property
     def model(self):
         return lambda x: x
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return service_api_client.get_service_service_history(*args, **kwargs)
 
     @staticmethod
     def splat(events):
@@ -158,4 +164,4 @@ class ServiceEvents(ModelList):
                     )
 
     def __init__(self, service_id):
-        self.items = [event for event in self.splat(self.client_method(service_id)) if event.relevant]
+        self.items = [event for event in self.splat(self._get_items(service_id)) if event.relevant]

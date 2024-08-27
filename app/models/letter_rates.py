@@ -20,7 +20,6 @@ class LetterRate(JSONModel):
 
 class LetterRates(ModelList):
     model = LetterRate
-    client_method = letter_rate_api_client.get_letter_rates
 
     post_classes = {
         # The API doesn’t store names or a sort order for the classes
@@ -33,6 +32,10 @@ class LetterRates(ModelList):
         # for `rest-of-world`
         "europe": "International",
     }
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return letter_rate_api_client.get_letter_rates(*args, **kwargs)
 
     @property
     def rates(self):

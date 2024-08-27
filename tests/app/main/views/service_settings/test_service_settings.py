@@ -965,7 +965,7 @@ def test_should_check_for_sending_things_right(
     )
 
     mock_get_users = mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=(
             [active_user_with_permissions] * count_of_users_with_manage_service + [active_user_no_settings_permission]
         ),
@@ -986,7 +986,7 @@ def test_should_check_for_sending_things_right(
     invite_two["permissions"] = "view_activity"
 
     mock_get_invites = mocker.patch(
-        "app.models.user.InvitedUsers.client_method",
+        "app.models.user.InvitedUsers._get_items",
         return_value=(([invite_one] * count_of_invites_with_manage_service) + [invite_two]),
     )
 
@@ -3866,7 +3866,7 @@ def test_should_show_branding_styles(
     assert "checked" not in branding_style_choices[4].attrs
     assert "checked" not in branding_style_choices[5].attrs
 
-    app.models.branding.AllEmailBranding.client_method.assert_called_once_with()
+    app.models.branding.AllEmailBranding._get_items.assert_called_once_with()
     app.service_api_client.get_service.assert_called_once_with(service_one["id"])
 
 
@@ -5015,7 +5015,7 @@ class TestSetAuthType:
         client_request,
         service_one,
     ):
-        mocker.patch("app.models.user.Users.client_method")
+        mocker.patch("app.models.user.Users._get_items")
         page = client_request.get(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
@@ -5028,7 +5028,7 @@ class TestSetAuthType:
         client_request,
         service_one,
     ):
-        mocker.patch("app.models.user.Users.client_method")
+        mocker.patch("app.models.user.Users._get_items")
         page = client_request.get(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
@@ -5041,7 +5041,7 @@ class TestSetAuthType:
 
     def tests_redirects_to_set_auth_type_for_users_on_success(self, mocker, client_request, service_one):
         mock_update_service = mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
-        mocker.patch("app.models.user.Users.client_method")
+        mocker.patch("app.models.user.Users._get_items")
         client_request.post(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
@@ -5058,7 +5058,7 @@ class TestSetAuthType:
     ):
         service_one["permissions"] += ["email_auth"]
         mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
-        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
         client_request.post(
             "main.service_set_auth_type",
             service_id=SERVICE_ONE_ID,
@@ -5070,7 +5070,7 @@ class TestSetAuthType:
         self, mocker, client_request, service_one, active_user_with_permissions
     ):
         active_user_with_permissions["mobile_number"] = None
-        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
         service_one["permissions"] += ["email_auth"]
         mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
         page = client_request.get("main.service_set_auth_type", service_id=SERVICE_ONE_ID)
@@ -5094,7 +5094,7 @@ class TestConfirmDisableEmailAuth:
 
     def test_page_loads(self, mocker, client_request, service_one, active_user_with_permissions):
         service_one["permissions"] += ["email_auth"]
-        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
         client_request.get(
             "main.service_confirm_disable_email_auth",
             service_id=SERVICE_ONE_ID,
@@ -5103,7 +5103,7 @@ class TestConfirmDisableEmailAuth:
     def test_page_redirects_to_set_auth_type_if_service_doesnt_use_email_auth(
         self, mocker, client_request, service_one, active_user_with_permissions
     ):
-        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
         client_request.get(
             "main.service_confirm_disable_email_auth",
             service_id=SERVICE_ONE_ID,
@@ -5114,7 +5114,7 @@ class TestConfirmDisableEmailAuth:
         self, mocker, client_request, service_one, active_user_with_permissions
     ):
         active_user_with_permissions["mobile_number"] = None
-        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
         client_request.get(
             "main.service_confirm_disable_email_auth",
             service_id=SERVICE_ONE_ID,
@@ -5126,7 +5126,7 @@ class TestConfirmDisableEmailAuth:
     ):
         service_one["permissions"] += ["email_auth"]
         mocker.patch(
-            "app.models.user.Users.client_method",
+            "app.models.user.Users._get_items",
             return_value=[active_user_with_permissions],
         )
         mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
@@ -5143,7 +5143,7 @@ class TestConfirmDisableEmailAuth:
         active_user_with_permissions["permissions"][service_one["id"]].append("email_auth")
         mock_update_service = mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
         mock_update_user = mocker.patch("app.notify_client.user_api_client.user_api_client.update_user_attribute")
-        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
         service_one["permissions"] += ["email_auth"]
         client_request.post(
             "main.service_confirm_disable_email_auth",
@@ -5164,7 +5164,7 @@ class TestConfirmDisableEmailAuth:
     ):
         active_user_with_permissions["auth_type"] = "webauthn_auth"
         mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
-        mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+        mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
         mock_update_user = mocker.patch("app.notify_client.user_api_client.user_api_client.update_user_attribute")
         service_one["permissions"] += ["email_auth"]
         client_request.post(
@@ -5212,7 +5212,7 @@ class TestSetAuthTypeForUsers:
         active_user_with_permissions,
         mock_get_users_by_service,
     ):
-        mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[])
+        mocker.patch("app.models.user.InvitedUsers._get_items", return_value=[])
 
         service_one["permissions"] += ["email_auth"]
         client_request.login(active_user_with_permissions)
@@ -5243,7 +5243,7 @@ class TestSetAuthTypeForUsers:
         self, mocker, client_request, service_one, active_user_with_permissions, sample_invite
     ):
         mocker.patch(
-            "app.models.user.Users.client_method",
+            "app.models.user.Users._get_items",
             return_value=[
                 create_service_one_user(
                     id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
@@ -5254,7 +5254,7 @@ class TestSetAuthTypeForUsers:
             ],
         )
         mocker.patch(
-            "app.models.user.InvitedUsers.client_method",
+            "app.models.user.InvitedUsers._get_items",
             return_value=[sample_invite],
         )
         service_one["permissions"] += ["email_auth"]
@@ -5282,7 +5282,7 @@ class TestSetAuthTypeForUsers:
         mock_update_user_attribute,
     ):
         mocker.patch(
-            "app.models.user.Users.client_method",
+            "app.models.user.Users._get_items",
             return_value=[
                 create_service_one_user(
                     id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
@@ -5312,7 +5312,7 @@ class TestSetAuthTypeForUsers:
         mock_update_user_attribute,
     ):
         mocker.patch(
-            "app.models.user.Users.client_method",
+            "app.models.user.Users._get_items",
             return_value=[
                 create_service_one_user(
                     id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
@@ -5338,11 +5338,11 @@ class TestSetAuthTypeForUsers:
         self, mocker, client_request, service_one, active_user_with_permissions, sample_invite
     ):
         mocker.patch(
-            "app.models.user.Users.client_method",
+            "app.models.user.Users._get_items",
             return_value=[],
         )
         mocker.patch(
-            "app.models.user.InvitedUsers.client_method",
+            "app.models.user.InvitedUsers._get_items",
             return_value=[sample_invite],
         )
         mock_update_invite = mocker.patch("app.invite_api_client.update_invite", autospec=True)
@@ -5378,7 +5378,7 @@ class TestSetAuthTypeForUsers:
         mock_update_user_attribute,
     ):
         mocker.patch(
-            "app.models.user.Users.client_method",
+            "app.models.user.Users._get_items",
             return_value=[
                 create_service_one_user(
                     id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
