@@ -226,7 +226,7 @@ def test_unsubscribe_request_reports_summary(
     expected_rows,
     expected_grey_text_statuses,
 ):
-    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
+    mocker.patch.object(UnsubscribeRequestsReports, "_get_items", return_value=test_data)
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
 
@@ -239,7 +239,7 @@ def test_unsubscribe_request_reports_summary(
 
 def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocker):
 
-    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=[])
+    mocker.patch.object(UnsubscribeRequestsReports, "_get_items", return_value=[])
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
 
@@ -262,7 +262,7 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
         }
     ]
 
-    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
+    mocker.patch.object(UnsubscribeRequestsReports, "_get_items", return_value=test_data)
 
     page = client_request.get(
         "main.unsubscribe_request_report",
@@ -302,7 +302,7 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
         }
     ]
 
-    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
+    mocker.patch.object(UnsubscribeRequestsReports, "_get_items", return_value=test_data)
     page = client_request.get(
         "main.unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
@@ -344,7 +344,7 @@ def test_unsubscribe_request_report_for_processed_batched_reports(client_request
             "will_be_archived_at": "2024-01-08 23:00",
         },
     ]
-    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
+    mocker.patch.object(UnsubscribeRequestsReports, "_get_items", return_value=test_data)
     page = client_request.get(
         "main.unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
@@ -375,7 +375,7 @@ def test_unsubscribe_request_report_with_forced_download(
 ):
     mocker.patch.object(
         UnsubscribeRequestsReports,
-        "client_method",
+        "_get_items",
         return_value=[
             {
                 "count": 321,
@@ -408,7 +408,7 @@ def test_cannot_force_download_for_unbatched_unsubscribe_request_report(
 ):
     mocker.patch.object(
         UnsubscribeRequestsReports,
-        "client_method",
+        "_get_items",
         return_value=[
             {
                 "count": 321,
@@ -432,7 +432,7 @@ def test_cannot_force_download_for_unbatched_unsubscribe_request_report(
 @pytest.mark.parametrize("batch_id", ["32b4e359-d4df-49b6-a92b-2eaa9343cfdd", None])
 def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_request, mocker, batch_id):
 
-    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=[])
+    mocker.patch.object(UnsubscribeRequestsReports, "_get_items", return_value=[])
     page = client_request.get(
         "main.unsubscribe_request_report",
         _expected_status=404,
@@ -446,7 +446,7 @@ def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_req
 def test_mark_report_as_completed(client_request, mocker, fake_uuid):
     mocker.patch.object(
         UnsubscribeRequestsReports,
-        "client_method",
+        "_get_items",
         return_value=[
             {
                 "count": 321,
@@ -510,7 +510,7 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
         }
     ]
     test_batch_id = "daaa3f82-faf0-4199-82da-15ec6aa8abe8"
-    mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=summary_data)
+    mocker.patch.object(UnsubscribeRequestsReports, "_get_items", return_value=summary_data)
     mock_batch_report = mocker.patch.object(
         service_api_client, "create_unsubscribe_request_report", return_value={"report_id": test_batch_id}
     )

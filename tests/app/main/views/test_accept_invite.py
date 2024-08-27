@@ -17,7 +17,7 @@ from tests.conftest import (
 
 @pytest.fixture()
 def mock_no_users_for_service(mocker):
-    mocker.patch("app.models.user.Users.client_method", return_value=[])
+    mocker.patch("app.models.user.Users._get_items", return_value=[])
 
 
 @pytest.fixture(scope="function")
@@ -205,7 +205,7 @@ def test_existing_user_of_service_get_redirected_to_signin(
 ):
     client_request.logout()
     sample_invite["email_address"] = api_user_active["email_address"]
-    mocker.patch("app.models.user.Users.client_method", return_value=[api_user_active])
+    mocker.patch("app.models.user.Users._get_items", return_value=[api_user_active])
 
     page = client_request.get(
         "main.accept_invite",
@@ -496,7 +496,7 @@ def test_accept_invite_does_not_treat_email_addresses_as_case_sensitive(
 ):
     # the email address of api_user_active is 'test@user.gov.uk'
     sample_invite["email_address"] = "TEST@user.gov.uk"
-    mocker.patch("app.models.user.Users.client_method", return_value=[api_user_active])
+    mocker.patch("app.models.user.Users._get_items", return_value=[api_user_active])
 
     client_request.get(
         "main.accept_invite",

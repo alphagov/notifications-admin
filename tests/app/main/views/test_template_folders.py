@@ -574,7 +574,7 @@ def test_get_manage_folder_page(
         _folder("folder_two", folder_id, None, [active_user_with_permissions["id"]]),
     ]
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[active_user_with_permissions],
     )
     page = client_request.get(
@@ -607,7 +607,7 @@ def test_get_manage_folder_viewing_permissions_for_users(
         _folder("folder_two", folder_id, None, [active_user_with_permissions["id"], team_member_2["id"]]),
     ]
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[active_user_with_permissions, team_member, team_member_2],
     )
 
@@ -656,7 +656,7 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_man
         },
     ]
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[team_member, team_member_2],
     )
 
@@ -688,7 +688,7 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_for_service
         },
     ]
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[active_user_with_permissions],
     )
 
@@ -796,7 +796,7 @@ def test_rename_folder(client_request, active_user_with_permissions, service_one
         _folder("folder_two", folder_id, None, [active_user_with_permissions["id"]])
     ]
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[active_user_with_permissions],
     )
 
@@ -827,7 +827,7 @@ def test_manage_folder_users(
         _folder("folder_two", folder_id, None, [active_user_with_permissions["id"], team_member["id"]])
     ]
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[active_user_with_permissions, team_member],
     )
 
@@ -874,7 +874,7 @@ def test_manage_folder_users_doesnt_change_permissions_current_user_cannot_manag
         }
     ]
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[team_member],
     )
 

@@ -677,8 +677,11 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 class Users(ModelList):
-    client_method = user_api_client.get_users_for_service
     model = User
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return user_api_client.get_users_for_service(*args, **kwargs)
 
     def get_name_from_id(self, id):
         for user in self:
@@ -694,17 +697,26 @@ class Users(ModelList):
 
 
 class OrganisationUsers(Users):
-    client_method = user_api_client.get_users_for_organisation
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return user_api_client.get_users_for_organisation(*args, **kwargs)
 
 
 class InvitedUsers(Users):
-    client_method = invite_api_client.get_invites_for_service
     model = InvitedUser
 
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return invite_api_client.get_invites_for_service(*args, **kwargs)
+
     def __init__(self, service_id):
-        self.items = [user for user in self.client_method(service_id) if user["status"] != "accepted"]
+        self.items = [user for user in self._get_items(service_id) if user["status"] != "accepted"]
 
 
 class OrganisationInvitedUsers(InvitedUsers):
-    client_method = org_invite_api_client.get_invites_for_organisation
     model = InvitedOrgUser
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return org_invite_api_client.get_invites_for_organisation(*args, **kwargs)

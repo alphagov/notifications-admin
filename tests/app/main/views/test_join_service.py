@@ -131,7 +131,7 @@ def test_page_lists_team_members_of_service(
     manage_service_user_2["logged_in_at"] = "2023-02-03 01:00"
 
     mock_get_users = mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[
             # These three users should not appear on the page
             create_active_user_empty_permissions(),
@@ -202,7 +202,7 @@ def test_page_redirects_on_post(
     manage_service_user_2["logged_in_at"] = "2023-02-03 01:00"
 
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[
             manage_service_user_1,
             manage_service_user_2,

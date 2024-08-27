@@ -8,7 +8,7 @@ from tests.utils import RedisClientMock
 
 @pytest.mark.parametrize(
     (
-        "client_method,"
+        "_get_items,"
         "expected_cache_get_calls,"
         "cache_value,"
         "expected_api_calls,"
@@ -85,7 +85,7 @@ from tests.utils import RedisClientMock
 def test_returns_value_from_cache(
     notify_admin,
     mocker,
-    client_method,
+    _get_items,
     expected_cache_get_calls,
     cache_value,
     expected_return_value,
@@ -104,7 +104,7 @@ def test_returns_value_from_cache(
         "app.extensions.RedisClient.set",
     )
 
-    getattr(organisations_client, client_method)()
+    getattr(organisations_client, _get_items)()
 
     assert mock_redis_get.call_args_list == expected_cache_get_calls
     assert mock_api_get.call_args_list == expected_api_calls

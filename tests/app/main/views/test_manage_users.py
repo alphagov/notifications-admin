@@ -141,7 +141,7 @@ def test_should_show_overview_page(
     other_user["id"] = "zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz"
 
     mock_get_users = mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[
             current_user,
             other_user,
@@ -184,7 +184,7 @@ def test_should_show_change_details_link(
 
     mocker.patch("app.user_api_client.get_user", return_value=current_user)
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[
             current_user,
             other_user,
@@ -219,8 +219,8 @@ def test_should_show_live_search_if_more_than_7_users(
     number_of_users,
 ):
     mocker.patch("app.user_api_client.get_user", return_value=active_user_with_permissions)
-    mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[])
-    mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions] * number_of_users)
+    mocker.patch("app.models.user.InvitedUsers._get_items", return_value=[])
+    mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions] * number_of_users)
 
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
 
@@ -258,7 +258,7 @@ def test_should_show_caseworker_on_overview_page(
     other_user["email_address"] = "zzzzzzz@example.gov.uk"
 
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[
             current_user,
             other_user,
@@ -405,7 +405,7 @@ def test_manage_users_page_does_not_links_to_user_profile_page_if_user_only_invi
     mock_get_template_folders,
 ):
     active_user_with_permissions["platform_admin"] = True
-    mocker.patch("app.models.user.Users.client_method", return_value=[])
+    mocker.patch("app.models.user.Users._get_items", return_value=[])
     client_request.login(active_user_with_permissions)
     page = client_request.get("main.manage_users", service_id=service_one["id"])
     user_links = page.select("h2.user-list-item-heading a")
@@ -1038,8 +1038,8 @@ def test_invite_user(
     sample_invite["email_address"] = email_address
 
     assert is_gov_user(email_address) == gov_user
-    mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
-    mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+    mocker.patch("app.models.user.InvitedUsers._get_items", return_value=[sample_invite])
+    mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
     mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
     page = client_request.post(
         "main.invite_user",
@@ -1126,8 +1126,8 @@ def test_invite_user_with_email_auth_service(
     sample_invite["email_address"] = "test@example.gov.uk"
 
     assert is_gov_user(email_address) is gov_user
-    mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
-    mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+    mocker.patch("app.models.user.InvitedUsers._get_items", return_value=[sample_invite])
+    mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
     mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
 
     page = client_request.post(
@@ -1240,8 +1240,8 @@ def test_manage_users_shows_invited_user(
     expected_text,
 ):
     sample_invite["status"] = invite_status
-    mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
-    mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+    mocker.patch("app.models.user.InvitedUsers._get_items", return_value=[sample_invite])
+    mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
 
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").string.strip() == "Team members"
@@ -1258,8 +1258,8 @@ def test_manage_users_does_not_show_accepted_invite(
     invited_user_id = uuid.uuid4()
     sample_invite["id"] = invited_user_id
     sample_invite["status"] = "accepted"
-    mocker.patch("app.models.user.InvitedUsers.client_method", return_value=[sample_invite])
-    mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+    mocker.patch("app.models.user.InvitedUsers._get_items", return_value=[sample_invite])
+    mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
 
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
 
@@ -1402,7 +1402,7 @@ def test_can_invite_user_as_platform_admin(
     mock_get_template_folders,
     mocker,
 ):
-    mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+    mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
 
     client_request.login(platform_admin_user)
 
@@ -1611,7 +1611,7 @@ def test_confirm_edit_user_email_changes_user_email(
     # We want active_user_with_permissions (the current user) to update the email address for api_user_active
     # By default both users would have the same id, so we change the id of api_user_active
     api_user_active["id"] = str(uuid.uuid4())
-    mocker.patch("app.models.user.Users.client_method", return_value=[api_user_active, active_user_with_permissions])
+    mocker.patch("app.models.user.Users._get_items", return_value=[api_user_active, active_user_with_permissions])
     # get_user gets called twice - first to check if current user can see the page, then to see if the team member
     # whose email address we're changing belongs to the service
     mocker.patch("app.user_api_client.get_user", side_effect=[active_user_with_permissions, api_user_active])
@@ -1799,7 +1799,7 @@ def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
     # By default both users would have the same id, so we change the id of api_user_active
     api_user_active["id"] = str(uuid.uuid4())
 
-    mocker.patch("app.models.user.Users.client_method", return_value=[api_user_active, active_user_with_permissions])
+    mocker.patch("app.models.user.Users._get_items", return_value=[api_user_active, active_user_with_permissions])
     # get_user gets called twice - first to check if current user can see the page, then to see if the team member
     # whose mobile number we're changing belongs to the service
     mocker.patch("app.user_api_client.get_user", side_effect=[active_user_with_permissions, api_user_active])

@@ -24,7 +24,7 @@ def test_organisation_page_shows_all_organisations(client_request, platform_admi
         {"id": "C2", "name": "Test 2", "active": False, "count_of_live_services": 2},
     ]
 
-    get_organisations = mocker.patch("app.models.organisation.AllOrganisations.client_method", return_value=orgs)
+    get_organisations = mocker.patch("app.models.organisation.AllOrganisations._get_items", return_value=orgs)
     client_request.login(platform_admin_user)
     page = client_request.get(".organisations")
 
@@ -256,7 +256,7 @@ def test_nhs_local_can_create_own_organisations(
 ):
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
     mocker.patch(
-        "app.models.organisation.AllOrganisations.client_method",
+        "app.models.organisation.AllOrganisations._get_items",
         return_value=[
             organisation_json("t3", "Trust 3", active=False, organisation_type="nhs_local"),
             organisation_json("t2", "Trust 2", organisation_type="nhs_local"),
@@ -419,7 +419,7 @@ def test_nhs_local_assigns_to_selected_organisation(
     mock_update_service_organisation,
 ):
     mocker.patch(
-        "app.models.organisation.AllOrganisations.client_method",
+        "app.models.organisation.AllOrganisations._get_items",
         return_value=[
             organisation_json(ORGANISATION_ID, "Trust 1", organisation_type="nhs_local"),
         ],
@@ -924,7 +924,7 @@ def test_manage_org_users_shows_no_link_for_cancelled_users(
     mocker,
 ):
     sample_org_invite["status"] = "cancelled"
-    mocker.patch("app.models.user.OrganisationInvitedUsers.client_method", return_value=[sample_org_invite])
+    mocker.patch("app.models.user.OrganisationInvitedUsers._get_items", return_value=[sample_org_invite])
 
     page = client_request.get(
         ".manage_org_users",
@@ -951,11 +951,11 @@ def test_manage_org_users_should_show_live_search_if_more_than_7_users(
     number_of_users,
 ):
     mocker.patch(
-        "app.models.user.OrganisationInvitedUsers.client_method",
+        "app.models.user.OrganisationInvitedUsers._get_items",
         return_value=[],
     )
     mocker.patch(
-        "app.models.user.OrganisationUsers.client_method",
+        "app.models.user.OrganisationUsers._get_items",
         return_value=[active_user_with_permissions] * number_of_users,
     )
 

@@ -1685,7 +1685,7 @@ def test_no_link_to_use_existing_list_for_service_without_lists(
     fake_uuid,
 ):
     mocker.patch(
-        "app.models.contact_list.ContactLists.client_method",
+        "app.models.contact_list.ContactLists._get_items",
         return_value=[],
     )
     client_request.login(platform_admin_user)
@@ -4338,7 +4338,7 @@ def test_choose_from_contact_list_with_no_lists(
     fake_uuid,
 ):
     mocker.patch(
-        "app.models.contact_list.ContactLists.client_method",
+        "app.models.contact_list.ContactLists._get_items",
         return_value=[],
     )
     page = client_request.get(

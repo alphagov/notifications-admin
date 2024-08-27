@@ -229,7 +229,7 @@ def test_email_branding_options_page_shows_divider_if_there_are_lots_of_options(
     )
 
     mocker.patch(
-        "app.models.branding.EmailBrandingPool.client_method",
+        "app.models.branding.EmailBrandingPool._get_items",
         return_value=pool_contents,
     )
 
@@ -257,7 +257,7 @@ def test_email_branding_options_does_not_show_nhs_branding_twice(
         "email_branding"
     ]
     updated_branding_pool = create_email_branding_pool(additional_values=nhs_branding)
-    mocker.patch("app.models.branding.EmailBrandingPool.client_method", return_value=updated_branding_pool)
+    mocker.patch("app.models.branding.EmailBrandingPool._get_items", return_value=updated_branding_pool)
 
     page = client_request.get(".email_branding_options", service_id=SERVICE_ONE_ID)
 
@@ -437,7 +437,7 @@ def test_email_branding_options_page_redirects_nhs_specific_page(
     )
 
     mocker.patch(
-        "app.models.branding.EmailBrandingPool.client_method",
+        "app.models.branding.EmailBrandingPool._get_items",
         return_value=[
             {
                 "name": "NHS",
@@ -887,7 +887,7 @@ def test_email_branding_create_government_identity_logo(
     expected_branding_id_in_iframe,
 ):
     mocker.patch(
-        "app.models.branding.AllEmailBranding.client_method",
+        "app.models.branding.AllEmailBranding._get_items",
         return_value=create_email_brandings(5, non_standard_values=extra_brandings_to_create),
     )
     page = client_request.get("main.email_branding_request_government_identity_logo", service_id=service_one["id"])

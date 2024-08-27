@@ -1751,7 +1751,7 @@ def mock_get_uploads(mocker, api_user_active):
         }
 
     # Why is mocking on the model needed?
-    return mocker.patch("app.models.job.PaginatedUploads.client_method", side_effect=_get_uploads)
+    return mocker.patch("app.models.job.PaginatedUploads._get_items", side_effect=_get_uploads)
 
 
 @pytest.fixture(scope="function")
@@ -1869,7 +1869,7 @@ def mock_get_no_uploaded_letters(mocker):
 @pytest.fixture(scope="function")
 def mock_get_no_uploads(mocker, api_user_active):
     mocker.patch(
-        "app.models.job.PaginatedUploads.client_method",
+        "app.models.job.PaginatedUploads._get_items",
         return_value={
             "data": [],
         },
@@ -1879,7 +1879,7 @@ def mock_get_no_uploads(mocker, api_user_active):
 @pytest.fixture(scope="function")
 def mock_get_no_jobs(mocker, api_user_active):
     return mocker.patch(
-        "app.models.job.PaginatedJobs.client_method",
+        "app.models.job.PaginatedJobs._get_items",
         return_value={
             "data": [],
             "links": {},
@@ -1940,7 +1940,7 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
         ]
 
     return mocker.patch(
-        "app.models.contact_list.ContactLists.client_method",
+        "app.models.contact_list.ContactLists._get_items",
         side_effect=_get,
     )
 
@@ -1974,7 +1974,7 @@ def mock_get_no_contact_list(mocker, api_user_active, fake_uuid):
 @pytest.fixture(scope="function")
 def mock_get_no_contact_lists(mocker):
     return mocker.patch(
-        "app.models.contact_list.ContactLists.client_method",
+        "app.models.contact_list.ContactLists._get_items",
         return_value=[],
     )
 
@@ -2172,7 +2172,7 @@ def mock_get_users_by_service(mocker):
 
     # You shouldn’t be calling the user API client directly, so it’s the
     # instance on the model that’s mocked here
-    return mocker.patch("app.models.user.Users.client_method", side_effect=_get_users_for_service)
+    return mocker.patch("app.models.user.Users._get_items", side_effect=_get_users_for_service)
 
 
 @pytest.fixture(scope="function")
@@ -2248,7 +2248,7 @@ def mock_get_invites_for_service(mocker, service_one, sample_invite):
             data.append(invite)
         return data
 
-    return mocker.patch("app.models.user.InvitedUsers.client_method", side_effect=_get_invites)
+    return mocker.patch("app.models.user.InvitedUsers._get_items", side_effect=_get_invites)
 
 
 @pytest.fixture(scope="function")
@@ -2268,7 +2268,7 @@ def mock_get_invites_without_manage_permission(mocker, service_one, sample_invit
             )
         ]
 
-    return mocker.patch("app.models.user.InvitedUsers.client_method", side_effect=_get_invites)
+    return mocker.patch("app.models.user.InvitedUsers._get_items", side_effect=_get_invites)
 
 
 @pytest.fixture(scope="function")
@@ -2576,7 +2576,7 @@ def mock_get_all_email_branding(mocker):
         return create_email_brandings(5, non_standard_values=non_standard_values, shuffle=shuffle)
 
     return mocker.patch(
-        "app.models.branding.AllEmailBranding.client_method",
+        "app.models.branding.AllEmailBranding._get_items",
         side_effect=_get_all_email_branding,
     )
 
@@ -2602,7 +2602,7 @@ def mock_get_all_letter_branding(mocker):
             },
         ]
 
-    return mocker.patch("app.models.branding.AllLetterBranding.client_method", side_effect=_get_letter_branding)
+    return mocker.patch("app.models.branding.AllLetterBranding._get_items", side_effect=_get_letter_branding)
 
 
 @pytest.fixture
@@ -2638,7 +2638,7 @@ def mock_get_letter_branding_pool(mocker):
             },
         ]
 
-    return mocker.patch("app.models.branding.LetterBrandingPool.client_method", side_effect=_get_branding_pool)
+    return mocker.patch("app.models.branding.LetterBrandingPool._get_items", side_effect=_get_branding_pool)
 
 
 @pytest.fixture(scope="function")
@@ -2646,7 +2646,7 @@ def mock_get_empty_letter_branding_pool(mocker):
     def _get_branding_pool(org_id):
         return []
 
-    return mocker.patch("app.models.branding.LetterBrandingPool.client_method", side_effect=_get_branding_pool)
+    return mocker.patch("app.models.branding.LetterBrandingPool._get_items", side_effect=_get_branding_pool)
 
 
 @pytest.fixture(scope="function")
@@ -2716,7 +2716,7 @@ def mock_get_email_branding_pool(mocker):
     def _get_email_branding_pool(org_id):
         return create_email_branding_pool()
 
-    return mocker.patch("app.models.branding.EmailBrandingPool.client_method", side_effect=_get_email_branding_pool)
+    return mocker.patch("app.models.branding.EmailBrandingPool._get_items", side_effect=_get_email_branding_pool)
 
 
 @pytest.fixture(scope="function")
@@ -2724,7 +2724,7 @@ def mock_get_empty_email_branding_pool(mocker):
     def _get_email_branding_pool(org_id):
         return []
 
-    return mocker.patch("app.models.branding.EmailBrandingPool.client_method", side_effect=_get_email_branding_pool)
+    return mocker.patch("app.models.branding.EmailBrandingPool._get_items", side_effect=_get_email_branding_pool)
 
 
 @pytest.fixture(scope="function")
@@ -3356,7 +3356,7 @@ def mock_get_organisations(mocker):
         ]
 
     mocker.patch(
-        "app.models.organisation.AllOrganisations.client_method",
+        "app.models.organisation.AllOrganisations._get_items",
         side_effect=_get_organisations,
     )
 
@@ -3493,7 +3493,7 @@ def mock_get_users_for_organisation(mocker):
             user_json(id_="5678", name="Test User 2", email_address="testt@gov.uk"),
         ]
 
-    return mocker.patch("app.models.user.OrganisationUsers.client_method", side_effect=_get_users_for_organisation)
+    return mocker.patch("app.models.user.OrganisationUsers._get_items", side_effect=_get_users_for_organisation)
 
 
 @pytest.fixture(scope="function")
@@ -3502,7 +3502,7 @@ def mock_get_invited_users_for_organisation(mocker, sample_org_invite):
         return [sample_org_invite]
 
     return mocker.patch(
-        "app.models.user.OrganisationInvitedUsers.client_method",
+        "app.models.user.OrganisationInvitedUsers._get_items",
         side_effect=_get_invited_invited_users_for_organisation,
     )
 
@@ -3538,7 +3538,7 @@ def mock_get_invites_for_organisation(mocker, sample_org_invite):
             data.append(invite)
         return data
 
-    return mocker.patch("app.models.user.OrganisationInvitedUsers.client_method", side_effect=_get_org_invites)
+    return mocker.patch("app.models.user.OrganisationInvitedUsers._get_items", side_effect=_get_org_invites)
 
 
 @pytest.fixture(scope="function")
@@ -4322,7 +4322,7 @@ def mock_get_letter_rates(mocker):
             {"post_class": "rest-of-world", "rate": "1.63", "sheet_count": 5, "start_date": "2024-01-02T00:00:00"},
         ]
 
-    return mocker.patch("app.models.letter_rates.LetterRates.client_method", side_effect=_get_letter_rates)
+    return mocker.patch("app.models.letter_rates.LetterRates._get_items", side_effect=_get_letter_rates)
 
 
 @pytest.fixture(scope="function")
