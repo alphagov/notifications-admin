@@ -18,7 +18,7 @@
 
   {% call form_wrapper(
     class='js-stick-at-top-when-scrolling send-one-off-form' if template.template_type != 'sms' else 'send-one-off-form',
-    module="autofocus" if form.placeholder_value.label.text not in ['email address', 'phone number'] else None,
+    module="autofocus" if not form.errors else None,
     data_kwargs={'force-focus': True}
   ) %}
     <div class="govuk-grid-row">

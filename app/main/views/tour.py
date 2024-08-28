@@ -91,6 +91,7 @@ def tour_step(service_id, template_id, step_index):
         form=form,
         back_link=back_link,
         help="2",
+        error_summary_enabled=True,
     )
 
 
