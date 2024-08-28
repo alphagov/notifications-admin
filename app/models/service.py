@@ -80,7 +80,7 @@ class Service(JSONModel):
 
     @property
     def permissions(self):
-        return self._permissions
+        raise NotImplementedError('Use Service.has_permission("…") instead')
 
     @property
     def billing_details(self):
@@ -609,7 +609,7 @@ class Service(JSONModel):
 
     @property
     def sign_in_method(self) -> str:
-        if "email_auth" in self._permissions:
+        if self.has_permission("email_auth"):
             return SIGN_IN_METHOD_TEXT_OR_EMAIL
 
         return SIGN_IN_METHOD_TEXT

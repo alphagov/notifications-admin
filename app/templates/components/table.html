@@ -60,7 +60,7 @@
 
 {% macro settings_row(if_has_permission='') -%}
   {% set parent_caller = caller %}
-  {% if if_has_permission in current_service.permissions %}
+  {% if current_service.has_permission(if_has_permission) %}
     {% call row() %}
       {{ parent_caller() }}
     {% endcall %}
