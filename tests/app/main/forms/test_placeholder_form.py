@@ -71,7 +71,6 @@ def test_validates_recipients(
             template_type,
             allow_international_phone_numbers=service_can_send_international_sms,
         )
-
         if expected_error:
             assert not form.validate_on_submit()
             assert form.placeholder_value.errors[0] == expected_error

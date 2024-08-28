@@ -82,8 +82,7 @@ from app.main.validators import (
     StringsNotAllowed,
     ValidEmail,
     ValidGovEmail,
-    ValidInternationalPhoneNumber,
-    ValidUKMobileNumber,
+    ValidPhoneNumber,
 )
 from app.models.branding import (
     GOVERNMENT_IDENTITY_SYSTEM_COLOURS,
@@ -240,12 +239,26 @@ class PhoneNumber(GovukTextInputFieldMixin, TelField):
     input_type = "tel"
 
 
-def uk_mobile_number(label="Mobile number"):
-    return PhoneNumber(label, validators=[DataRequired(message="Cannot be empty"), ValidUKMobileNumber()])
-
-
-def international_phone_number(label="Mobile number"):
-    return PhoneNumber(label, validators=[NotifyDataRequired(thing="a mobile number"), ValidInternationalPhoneNumber()])
+def valid_phone_number(label="Mobile number", international=False, sms_to_uk_landline=False):
+    if not (sms_to_uk_landline or international):
+        return PhoneNumber(
+            label,
+            validators=[
+                DataRequired(message="Cannot be empty"),
+                ValidPhoneNumber(allow_international_sms=international),
+            ],
+        )
+    else:
+        return PhoneNumber(
+            label,
+            validators=[
+                NotifyDataRequired(thing="a mobile number"),
+                ValidPhoneNumber(
+                    allow_sms_to_uk_landlines=sms_to_uk_landline,
+                    allow_international_sms=international,
+                ),
+            ],
+        )
 
 
 def make_password_field(label="Password", thing="a password", validate_length=True):
@@ -575,7 +588,7 @@ class LoginForm(StripWhitespaceForm):
 class RegisterUserForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
     email_address = make_email_address_field(gov_user=True, thing="your email address")
-    mobile_number = international_phone_number()
+    mobile_number = valid_phone_number(international=True)
     password = make_password_field(thing="your password")
     # always register as sms type
     auth_type = HiddenField("auth_type", default="sms_auth")
@@ -599,7 +612,7 @@ class RegisterUserFromInviteForm(RegisterUserForm):
             name=guess_name_from_email_address(invited_user.email_address),
         )
 
-    mobile_number = PhoneNumber("Mobile number", validators=[ValidInternationalPhoneNumber()])
+    mobile_number = PhoneNumber("Mobile number", validators=[ValidPhoneNumber(allow_international_sms=True)])
     service = HiddenField("service")
     email_address = HiddenField("email_address")
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
@@ -619,7 +632,11 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
     name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
 
     mobile_number = PhoneNumber(
-        "Mobile number", validators=[NotifyDataRequired(thing="your mobile number"), ValidInternationalPhoneNumber()]
+        "Mobile number",
+        validators=[
+            NotifyDataRequired(thing="your mobile number"),
+            ValidPhoneNumber(allow_international_sms=True),
+        ],
     )
     password = make_password_field(thing="your password")
     organisation = HiddenField("organisation")
@@ -1100,7 +1117,7 @@ class TwoFactorForm(StripWhitespaceForm):
 
 
 class TextNotReceivedForm(StripWhitespaceForm):
-    mobile_number = international_phone_number()
+    mobile_number = valid_phone_number(international=True)
 
 
 class RenameServiceForm(StripWhitespaceForm):
@@ -1594,9 +1611,7 @@ class ChangeNonGovEmailForm(ChangeEmailForm):
 
 
 class ChangeMobileNumberForm(StripWhitespaceForm):
-    mobile_number = international_phone_number(
-        label="Change your mobile number",
-    )
+    mobile_number = valid_phone_number(label="Change your mobile number", international=True)
 
 
 class ChooseTimeForm(StripWhitespaceForm):
@@ -2164,7 +2179,7 @@ class GuestList(StripWhitespaceForm):
     )
 
     phone_numbers = ListEntryFieldList(
-        PhoneNumberInGuestList("", validators=[Optional(), ValidInternationalPhoneNumber()], default=""),
+        PhoneNumberInGuestList("", validators=[Optional(), ValidPhoneNumber(allow_international_sms=True)], default=""),
         min_entries=5,
         max_entries=5,
         label="Mobile numbers",
@@ -2264,14 +2279,16 @@ def get_placeholder_form_instance(
     dict_to_populate_from,
     template_type,
     allow_international_phone_numbers=False,
+    allow_sms_to_uk_landline=False,
 ):
     if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template_type == "email":
         field = make_email_address_field(label=placeholder_name, gov_user=False, thing="an email address")
     elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template_type == "sms":
-        if allow_international_phone_numbers:
-            field = international_phone_number(label=placeholder_name)
-        else:
-            field = uk_mobile_number(label=placeholder_name)
+        field = valid_phone_number(
+            label=placeholder_name,
+            international=allow_international_phone_numbers,
+            sms_to_uk_landline=allow_sms_to_uk_landline,
+        )
     else:
         field = GovukTextInputField(placeholder_name, validators=[DataRequired(message="Cannot be empty")])
 

@@ -11,7 +11,7 @@ from app.main.validators import (
     OnlySMSCharacters,
     StringsNotAllowed,
     ValidGovEmail,
-    ValidUKMobileNumber,
+    ValidPhoneNumber,
 )
 
 
@@ -95,7 +95,7 @@ def test_uk_mobile_number_validation_messages_match(mocker):
         side_effect=InvalidPhoneError(code=InvalidPhoneError.Codes.UNKNOWN_CHARACTER),
     )
     with pytest.raises(ValidationError) as error:
-        ValidUKMobileNumber()(None, mock_field)
+        ValidPhoneNumber()(None, mock_field)
 
     assert str(error.value) == InvalidPhoneError.ERROR_MESSAGES[InvalidPhoneError.Codes.UNKNOWN_CHARACTER]
     assert mock_field.error_summary_messages == ["%s can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -"]

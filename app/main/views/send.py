@@ -449,12 +449,12 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
                     step_index=step_index + 1,
                 )
             )
-
     form = get_placeholder_form_instance(
         current_placeholder,
         dict_to_populate_from=get_normalised_placeholders_from_session(),
         template_type=template.template_type,
         allow_international_phone_numbers=current_service.has_permission("international_sms"),
+        allow_sms_to_uk_landline=current_service.has_permission("sms_to_uk_landlines"),
     )
 
     template.values = template_values
@@ -616,6 +616,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         ),
         remaining_messages=remaining_messages,
         allow_international_sms=current_service.has_permission("international_sms"),
+        allow_sms_to_uk_landline=current_service.has_permission("sms_to_uk_landlines"),
         allow_international_letters=current_service.has_permission("international_letters"),
     )
 
