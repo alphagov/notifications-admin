@@ -82,9 +82,14 @@ class ValidEmail:
 
 
 class ValidPhoneNumber:
-    def __init__(self, is_international=False, sms_to_landline=False, message=None):
-        self.is_international = is_international
-        self.sms_to_landline = sms_to_landline
+    def __init__(
+        self,
+        allow_international_sms=False,
+        allow_sms_to_uk_landlines=False,
+        message=None,
+    ):
+        self.allow_international_sms = allow_international_sms
+        self.allow_sms_to_uk_landlines = allow_sms_to_uk_landlines
         self.message = message
 
     _error_summary_messages_map = {
@@ -98,11 +103,10 @@ class ValidPhoneNumber:
     def __call__(self, form, field):
         try:
             if field.data:
-                if self.sms_to_landline:
-                    PhoneNumber(field.data, allow_international=self.is_international)
+                if self.allow_sms_to_uk_landlines:
+                    PhoneNumber(field.data, allow_international=self.allow_international_sms)
                 else:
-                    validate_phone_number(field.data, international=self.is_international)
-                    # PhoneNumber(field.data, allow_international=self.is_international)
+                    validate_phone_number(field.data, international=self.allow_international_sms)
         except InvalidPhoneError as e:
             error_message = str(e)
             if hasattr(field, "error_summary_messages"):

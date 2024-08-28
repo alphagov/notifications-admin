@@ -243,14 +243,20 @@ def valid_phone_number(label="Mobile number", international=False, sms_to_uk_lan
     if not (sms_to_uk_landline or international):
         return PhoneNumber(
             label,
-            validators=[DataRequired(message="Cannot be empty"), ValidPhoneNumber(is_international=international)],
+            validators=[
+                DataRequired(message="Cannot be empty"),
+                ValidPhoneNumber(allow_international_sms=international),
+            ],
         )
     else:
         return PhoneNumber(
             label,
             validators=[
                 NotifyDataRequired(thing="a mobile number"),
-                ValidPhoneNumber(sms_to_landline=sms_to_uk_landline, is_international=international),
+                ValidPhoneNumber(
+                    allow_sms_to_uk_landlines=sms_to_uk_landline,
+                    allow_international_sms=international,
+                ),
             ],
         )
 
@@ -606,7 +612,7 @@ class RegisterUserFromInviteForm(RegisterUserForm):
             name=guess_name_from_email_address(invited_user.email_address),
         )
 
-    mobile_number = PhoneNumber("Mobile number", validators=[ValidPhoneNumber(is_international=True)])
+    mobile_number = PhoneNumber("Mobile number", validators=[ValidPhoneNumber(allow_international_sms=True)])
     service = HiddenField("service")
     email_address = HiddenField("email_address")
     auth_type = HiddenField("auth_type", validators=[DataRequired()])
@@ -627,7 +633,10 @@ class RegisterUserFromOrgInviteForm(StripWhitespaceForm):
 
     mobile_number = PhoneNumber(
         "Mobile number",
-        validators=[NotifyDataRequired(thing="your mobile number"), ValidPhoneNumber(is_international=True)],
+        validators=[
+            NotifyDataRequired(thing="your mobile number"),
+            ValidPhoneNumber(allow_international_sms=True),
+        ],
     )
     password = make_password_field(thing="your password")
     organisation = HiddenField("organisation")
@@ -2170,7 +2179,7 @@ class GuestList(StripWhitespaceForm):
     )
 
     phone_numbers = ListEntryFieldList(
-        PhoneNumberInGuestList("", validators=[Optional(), ValidPhoneNumber(is_international=True)], default=""),
+        PhoneNumberInGuestList("", validators=[Optional(), ValidPhoneNumber(allow_international_sms=True)], default=""),
         min_entries=5,
         max_entries=5,
         label="Mobile numbers",
