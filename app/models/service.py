@@ -75,8 +75,12 @@ class Service(JSONModel):
         return cls(service_api_client.get_service(service_id)["data"])
 
     @property
-    def permissions(self):
+    def _permissions(self):
         return self._dict.get("permissions", self.TEMPLATE_TYPES)
+
+    @property
+    def permissions(self):
+        return self._permissions
 
     @property
     def billing_details(self):
@@ -107,7 +111,7 @@ class Service(JSONModel):
         )
 
     def force_permission(self, permission, on=False):
-        permissions, permission = set(self.permissions), {permission}
+        permissions, permission = set(self._permissions), {permission}
 
         return self.update_permissions(
             permissions | permission if on else permissions - permission,
@@ -127,7 +131,7 @@ class Service(JSONModel):
     def has_permission(self, permission):
         if permission not in self.ALL_PERMISSIONS:
             raise KeyError(f"{permission} is not a service permission")
-        return permission in self.permissions
+        return permission in self._permissions
 
     def get_page_of_jobs(self, page):
         return PaginatedJobs(self.id, page=page)
@@ -605,7 +609,7 @@ class Service(JSONModel):
 
     @property
     def sign_in_method(self) -> str:
-        if "email_auth" in self.permissions:
+        if "email_auth" in self._permissions:
             return SIGN_IN_METHOD_TEXT_OR_EMAIL
 
         return SIGN_IN_METHOD_TEXT
