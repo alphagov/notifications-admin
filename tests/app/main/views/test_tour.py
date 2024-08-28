@@ -151,7 +151,7 @@ def test_should_show_empty_text_box(
 
     page = client_request.get("main.tour_step", service_id=SERVICE_ONE_ID, template_id=fake_uuid, step_index=1)
 
-    textbox = page.select_one("[data-notify-module=autofocus][data-force-focus=True] .govuk-input")
+    textbox = page.select_one("[data-notify-module=autofocus] .govuk-input")
     assert "value" not in textbox
     assert textbox["name"] == "placeholder_value"
     assert textbox["class"] == [
@@ -360,6 +360,9 @@ def test_post_tour_step_raises_validation_error_for_form_error(
         _data={"placeholder_value": ""},
         _expected_status=200,  # should this be 400
     )
+
+    error_summary = page.select_one(".govuk-error-summary")
+    assert "There is a problem" in error_summary.text
 
     assert normalize_spaces(page.select(".govuk-error-message")[0].text) == "Error: Cannot be empty"
 
