@@ -102,14 +102,14 @@ ENV NVM_DIR /home/vcap/.nvm
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
-# Copying to overwrite is faster than RUN chown notify:notify ...
-COPY --from=python_build --chown=notify:notify /opt/venv /opt/venv
-
 COPY .nvmrc .nvmrc
 RUN echo "Installing nvm and NodeJS v${NODE_VERSION}" && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash && \
     . ${NVM_DIR}/nvm.sh && \
     nvm install
+
+# Copying to overwrite is faster than RUN chown notify:notify ...
+COPY --from=python_build --chown=notify:notify /opt/venv /opt/venv
 
 # Make sure the app/ directory is there so that "make bootstrap" can create app/version.py
 RUN mkdir -p app
