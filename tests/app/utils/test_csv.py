@@ -18,7 +18,6 @@ def _get_notifications_csv(
     status="Delivered",
     created_at="1943-04-19 12:00:00",
     rows=1,
-    with_links=False,
     job_id=fake_uuid,
     created_by_name=None,
     created_by_email_address=None,
@@ -30,13 +29,6 @@ def _get_notifications_csv(
         service_id, page=1, job_id=None, template_type=template_type, paginate_by_older_than=True, page_size=page_size
     ):
         links = {}
-        if with_links:
-            links = {
-                "prev": f"/service/{service_id}/notifications?page=0",
-                "next": f"/service/{service_id}/notifications?page=2&older_than={sample_uuid()}",
-                "last": f"/service/{service_id}/notifications?page=2",
-            }
-
         data = {
             "notifications": [
                 {
@@ -174,10 +166,12 @@ def test_generate_notifications_csv_returns_correct_csv_file(
     assert next(csv_file) == dict(zip(expected_column_headers, expected_1st_row, strict=True))
 
 
-def test_generate_notifications_csv_only_calls_once_if_no_next_link(
+def test_generate_notifications_csv_only_calls_once_if_notifications_batch_smaller_than_page_size(
     notify_admin,
     _get_notifications_csv_mock,
 ):
+    # our mock returns 1 notification by default, but the page fits 3 notifications - so we know there are no older
+    # unpulled ones
     list(generate_notifications_csv(service_id="1234", page_size=3))
 
     assert _get_notifications_csv_mock.call_count == 1
@@ -185,7 +179,7 @@ def test_generate_notifications_csv_only_calls_once_if_no_next_link(
 
 
 @pytest.mark.parametrize("job_id", ["some", None])
-def test_generate_notifications_csv_calls_twice_if_next_link(
+def test_generate_notifications_csv_calls_twice_if_notifications_batch_equals_page_size(
     notify_admin,
     mocker,
     job_id,
@@ -208,14 +202,14 @@ def test_generate_notifications_csv_calls_twice_if_next_link(
     )
 
     service_id = "1234"
-    response_with_links = _get_notifications_csv(rows=7, with_links=True)
-    response_with_no_links = _get_notifications_csv(rows=3, row_number=8, with_links=False)
+    response_1 = _get_notifications_csv(rows=7)
+    response_2 = _get_notifications_csv(rows=3, row_number=8)
 
     mock_get_notifications = mocker.patch(
         "app.notification_api_client.get_notifications_for_service",
         side_effect=[
-            response_with_links(service_id),
-            response_with_no_links(service_id),
+            response_1(service_id),
+            response_2(service_id),
         ],
     )
 
