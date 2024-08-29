@@ -103,7 +103,11 @@ class ValidPhoneNumber:
         try:
             if field.data:
                 if self.allow_sms_to_uk_landlines:
-                    PhoneNumber(field.data, allow_international=self.allow_international_sms)
+                    number = PhoneNumber(field.data)
+                    number.validate(
+                        allow_international_number=self.allow_international_sms,
+                        allow_uk_landline=self.allow_sms_to_uk_landlines,
+                    )
                 else:
                     validate_phone_number(field.data, international=self.allow_international_sms)
         except InvalidPhoneError as e:
