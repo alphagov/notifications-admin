@@ -5,6 +5,7 @@ from io import StringIO
 import pytest
 
 from app.utils.csv import generate_notifications_csv, get_errors_for_csv
+from tests import sample_uuid
 from tests.conftest import fake_uuid
 
 
@@ -22,19 +23,24 @@ def _get_notifications_csv(
     created_by_name=None,
     created_by_email_address=None,
     api_key_name=None,
+    page_size=50,
 ):
-    def _get(service_id, page=1, job_id=None, template_type=template_type, paginate_by_older_than=True):
+
+    def _get(
+        service_id, page=1, job_id=None, template_type=template_type, paginate_by_older_than=True, page_size=page_size
+    ):
         links = {}
         if with_links:
             links = {
                 "prev": f"/service/{service_id}/notifications?page=0",
-                "next": f"/service/{service_id}/notifications?page=2&older_than=5678",
+                "next": f"/service/{service_id}/notifications?page=2&older_than={sample_uuid()}",
                 "last": f"/service/{service_id}/notifications?page=2",
             }
 
         data = {
             "notifications": [
                 {
+                    "id": sample_uuid(),
                     "row_number": row_number + i,
                     "to": recipient,
                     "recipient": recipient,
@@ -53,7 +59,7 @@ def _get_notifications_csv(
                 for i in range(rows)
             ],
             "total": rows,
-            "page_size": 50,
+            "page_size": page_size,
             "links": links,
         }
 
@@ -110,7 +116,15 @@ def test_generate_notifications_csv_without_job(
             api_key_name=api_key_name,
         ),
     )
-    assert list(generate_notifications_csv(service_id=fake_uuid)) == expected_content
+    assert (
+        list(
+            generate_notifications_csv(
+                service_id=fake_uuid,
+                page_size=3,
+            )
+        )
+        == expected_content
+    )
 
 
 @pytest.mark.parametrize(
@@ -154,7 +168,7 @@ def test_generate_notifications_csv_returns_correct_csv_file(
         "app.s3_client.s3_csv_client.s3download",
         return_value=original_file_contents,
     )
-    csv_content = generate_notifications_csv(service_id="1234", job_id=fake_uuid, template_type="sms")
+    csv_content = generate_notifications_csv(service_id="1234", job_id=fake_uuid, template_type="sms", page_size=3)
     csv_file = DictReader(StringIO("\n".join(csv_content)))
     assert csv_file.fieldnames == expected_column_headers
     assert next(csv_file) == dict(zip(expected_column_headers, expected_1st_row, strict=True))
@@ -164,7 +178,7 @@ def test_generate_notifications_csv_only_calls_once_if_no_next_link(
     notify_admin,
     _get_notifications_csv_mock,
 ):
-    list(generate_notifications_csv(service_id="1234"))
+    list(generate_notifications_csv(service_id="1234", page_size=3))
 
     assert _get_notifications_csv_mock.call_count == 1
     assert _get_notifications_csv_mock.mock_calls[0][2]["paginate_by_older_than"]
@@ -209,6 +223,7 @@ def test_generate_notifications_csv_calls_twice_if_next_link(
         service_id=service_id,
         job_id=job_id or fake_uuid,
         template_type="sms",
+        page_size=7,
     )
     csv = list(DictReader(StringIO("\n".join(csv_content))))
 
@@ -224,7 +239,7 @@ def test_generate_notifications_csv_calls_twice_if_next_link(
 
     assert mock_get_notifications.mock_calls[1][2]["page"] == 2
     assert mock_get_notifications.mock_calls[1][2]["paginate_by_older_than"]
-    assert mock_get_notifications.mock_calls[1][2]["older_than"] == "5678"
+    assert mock_get_notifications.mock_calls[1][2]["older_than"] == sample_uuid()
 
 
 MockRecipients = namedtuple(

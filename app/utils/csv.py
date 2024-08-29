@@ -113,13 +113,9 @@ def generate_notifications_csv(**kwargs):
                 ]
             yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
 
-        if notifications_batch["links"].get("next"):
+        if len(notifications_batch["notifications"]) == kwargs["page_size"]:
             kwargs["page"] += 1
-            from urllib import parse
-
-            url = notifications_batch["links"]["next"]
-            if older_than_args := parse.parse_qs(parse.urlparse(url).query).get("older_than"):
-                kwargs["older_than"] = older_than_args[0]
+            kwargs["older_than"] = notifications_batch["notifications"][-1]["id"]
         else:
             return
     raise Exception("Should never reach here")
