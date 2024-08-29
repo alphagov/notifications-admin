@@ -11,6 +11,11 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
     left: 0;
     width: 39px;
     height: 30px;
+    display: none;
+
+    .#{$govuk-frontend-supported-css-class} & {
+      display: block;
+    }
   }
 
   .selection-summary__text {
