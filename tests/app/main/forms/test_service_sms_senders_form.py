@@ -1,8 +1,11 @@
 import logging
 
 import pytest
+from flask import g
+from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
 from app.main.forms import ServiceSmsSenderForm
+from app.models.service import Service
 
 
 @pytest.mark.parametrize(
@@ -48,8 +51,6 @@ from app.main.forms import ServiceSmsSenderForm
     ],
 )
 def test_sms_sender_form_validation(
-    client_request,
-    mock_get_user_by_email,
     sms_sender,
     error_expected,
     error_message,
@@ -76,32 +77,37 @@ def test_sms_sender_form_validation(
         assert not form.errors
 
     if sends_zendesk_ticket:
-        mock_create_phishing_zendesk_ticket.assert_called_once()
+        mock_create_phishing_zendesk_ticket.assert_called_once_with(senderID=sms_sender)
 
 
-@pytest.mark.parametrize(
-    "sms_sender,log_expected,log_message,sends_zendesk_ticket,protected_sender_id_return",
-    [
-        ("UK&GOV", False, None, False, False),  # No warning log on valid senderID
-        (
-            "Evri",
-            True,
-            "User tried to set sender id to potentially malicious one: Evri",
-            True,
-            True,
-        ),
-    ],
-)
-def test_sms_validation_logs(
-    caplog, sms_sender, log_expected, log_message, sends_zendesk_ticket, protected_sender_id_return, mocker
-):
+def test_sms_validation_logs_and_creates_ticket_for_phishing_sender(client_request, service_one, caplog, mocker):
+    mocker.patch("app.protected_sender_id_api_client.get_check_sender_id", return_value=True)
+    form = ServiceSmsSenderForm(sms_sender="Evri")
+    g.current_service = Service(service_one)
 
-    mocker.patch(
-        "app.protected_sender_id_api_client.get_check_sender_id",
-        return_value=protected_sender_id_return,
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    mock_send_zendesk_ticket = mocker.patch("app.main.validators.zendesk_client.send_ticket_to_zendesk", autospec=True)
+
+    with caplog.at_level(logging.WARNING):
+        form.validate()
+
+    assert "User tried to set sender id to potentially malicious one: Evri" in caplog.messages
+
+    mock_create_ticket.assert_called_once_with(
+        mocker.ANY,
+        subject="Possible Phishing sender ID - service one",
+        message=mocker.ANY,
+        ticket_type="task",
+        notify_ticket_type=NotifyTicketType.TECHNICAL,
+        notify_task_type="notify_task_blocked_sender",
     )
-    form = ServiceSmsSenderForm()
-    form.sms_sender.data = sms_sender
+    mock_send_zendesk_ticket.assert_called_once()
+
+
+def test_sms_validation_does_not_log_or_create_ticket_for_safe_sender(caplog, mocker):
+    mocker.patch("app.protected_sender_id_api_client.get_check_sender_id", return_value=False)
+    form = ServiceSmsSenderForm(sms_sender="UK&GOV")
+
     mock_create_phishing_zendesk_ticket = mocker.patch(
         "app.main.validators.create_phishing_senderid_zendesk_ticket",
         autospec=True,
@@ -109,11 +115,5 @@ def test_sms_validation_logs(
     with caplog.at_level(logging.WARNING):
         form.validate()
 
-    if log_expected:
-        assert log_message in caplog.messages
-
-    else:
-        assert len(caplog.messages) == 0
-
-    if sends_zendesk_ticket:
-        mock_create_phishing_zendesk_ticket.assert_called_once_with(senderID=sms_sender)
+    assert len(caplog.messages) == 0
+    assert not mock_create_phishing_zendesk_ticket.called
