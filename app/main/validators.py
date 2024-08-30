@@ -2,7 +2,6 @@ import re
 from abc import ABC, abstractmethod
 
 from flask import current_app, render_template
-from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
@@ -204,28 +203,12 @@ def create_phishing_senderid_zendesk_ticket(senderID=None):
         message=ticket_message,
         ticket_type=NotifySupportTicket.TYPE_TASK,
         notify_ticket_type=NotifyTicketType.TECHNICAL,
-        user_name=current_user.name,
-        user_email=current_user.email_address,
-        service_id=current_service.id,
         notify_task_type="notify_task_blocked_sender",
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 
 
 class IsNotAPotentiallyMaliciousSenderID:
-    potentially_malicious_sender_ids = [
-        "amazon",
-        "evri",
-        "lloydsbank",
-        "coinbase",
-        "fromnab",
-        "nab",
-        "hsbc",
-        "natwest",
-        "tsb",
-        "barclays",
-        "nationwide",
-    ]
 
     def __call__(self, form, field):
         if protected_sender_id_api_client.get_check_sender_id(sender_id=field.data):
