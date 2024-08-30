@@ -181,6 +181,18 @@ def get_example_csv(service_id, template_id):
     )
 
 
+def _should_show_set_sender_page(service_id, template) -> bool:
+    if template.template_type == "letter":
+        return False
+
+    sender_details = get_sender_details(service_id, template.template_type)
+
+    if len(sender_details) <= 1:
+        return False
+
+    return True
+
+
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def set_sender(service_id, template_id):
@@ -232,6 +244,7 @@ def set_sender(service_id, template_id):
         template_id=template_id,
         sender_context={"title": sender_context["title"], "description": sender_context["description"]},
         option_hints=option_hints,
+        back_link=_get_set_sender_back_link(service_id, template),
     )
 
 
@@ -816,19 +829,26 @@ def get_send_test_page_title(template_type, entering_recipient, name=None):
     return "Personalise this message"
 
 
+def _get_set_sender_back_link(service_id, template):
+    if should_skip_template_page(template):
+        return url_for(
+            ".choose_template",
+            service_id=service_id,
+        )
+    else:
+        return url_for(
+            "main.view_template",
+            service_id=service_id,
+            template_id=template.id,
+        )
+
+
 def get_back_link(service_id, template, step_index, placeholders=None):
     if step_index == 0:
-        if should_skip_template_page(template):
-            return url_for(
-                ".choose_template",
-                service_id=service_id,
-            )
+        if _should_show_set_sender_page(service_id, template):
+            return url_for("main.set_sender", service_id=service_id, template_id=template.id)
         else:
-            return url_for(
-                "main.view_template",
-                service_id=service_id,
-                template_id=template.id,
-            )
+            return _get_set_sender_back_link(service_id, template)
 
     if template.template_type == "letter" and placeholders:
         # Make sure we’re not redirecting users to a page which will
