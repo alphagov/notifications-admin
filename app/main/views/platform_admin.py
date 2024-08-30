@@ -19,6 +19,7 @@ from app import (
     user_api_client,
 )
 from app.extensions import redis_client
+from app.formatters import sentence_case
 from app.main import main
 from app.main.forms import (
     AdminClearCacheForm,
@@ -680,11 +681,15 @@ def clear_cache():
             "letter-rates",
             "sms-rate",
         ],
+        "unsubscribe_request_reports": [
+            "service-????????-????-????-????-????????????-unsubscribe-request-reports-summary",
+            "service-????????-????-????-????-????????????-unsubscribe-request-statistics",
+        ],
     }
 
     form = AdminClearCacheForm()
 
-    form.model_type.choices = [(key, key.replace("_", " ").title()) for key in CACHE_KEYS]
+    form.model_type.choices = [(key, sentence_case(key.replace("_", " "))) for key in CACHE_KEYS]
 
     if form.validate_on_submit():
         group_keys = form.model_type.data
@@ -692,8 +697,9 @@ def clear_cache():
         patterns = list(itertools.chain(*groups))
 
         num_deleted = sum(redis_client.delete_by_pattern(pattern) for pattern in patterns)
+        keys_deleted = ", ".join(group_keys).replace("_", " ").lower()
 
-        msg = f'Removed {num_deleted} objects across {len(patterns)} key formats for {", ".join(group_keys)}'
+        msg = f"Removed {num_deleted} objects across {len(patterns)} key formats for {keys_deleted}"
 
         flash(msg, category="default")
 

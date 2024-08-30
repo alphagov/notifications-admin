@@ -702,6 +702,7 @@ def test_clear_cache_shows_form(
         "letter_branding",
         "organisation",
         "text_message_and_letter_rates",
+        "unsubscribe_request_reports",
     }
 
 
@@ -750,7 +751,15 @@ def test_clear_cache_shows_form(
                 call("letter-rates"),
                 call("sms-rate"),
             ],
-            "Removed 4 objects across 2 key formats for text_message_and_letter_rates",
+            "Removed 4 objects across 2 key formats for text message and letter rates",
+        ),
+        (
+            ["unsubscribe_request_reports"],
+            [
+                call("service-????????-????-????-????-????????????-unsubscribe-request-reports-summary"),
+                call("service-????????-????-????-????-????????????-unsubscribe-request-statistics"),
+            ],
+            "Removed 4 objects across 2 key formats for unsubscribe request reports",
         ),
     ),
 )
