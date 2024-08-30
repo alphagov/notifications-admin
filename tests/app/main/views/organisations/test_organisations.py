@@ -1311,7 +1311,7 @@ def test_archive_organisation_after_confirmation(
 @pytest.mark.parametrize(
     "error_message",
     [
-        "Cannot archive an organisation with services",
+        "Cannot archive an organisation with active services",
         "Cannot archive an organisation with team members or invited team members",
     ],
 )
