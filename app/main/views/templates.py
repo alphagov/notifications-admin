@@ -66,7 +66,6 @@ from app.s3_client.s3_letter_upload_client import (
 )
 from app.template_previews import TemplatePreview
 from app.utils import (
-    NOTIFICATION_TYPES,
     should_skip_template_page,
 )
 from app.utils.letters import (
@@ -165,7 +164,7 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
     )
 
     single_notification_channel = None
-    notification_channels = list(set(current_service.permissions).intersection(NOTIFICATION_TYPES))
+    notification_channels = current_service.available_template_types
     if len(notification_channels) == 1:
         single_notification_channel = notification_channels[0]
 

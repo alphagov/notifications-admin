@@ -48,7 +48,7 @@
               "text": "Sign-in method"
             },
             "value": {
-              "text": ("Email link or text message code" if 'email_auth' in current_service.permissions else "Text message code")
+              "text": ("Email link or text message code" if current_service.has_permission("email_auth") else "Text message code")
             },
             "actions": {
               "items": [
@@ -107,7 +107,7 @@
             "text": "Send emails"
           },
           "value": {
-            "text": "On" if 'email' in current_service.permissions else "Off"
+            "text": "On" if current_service.has_permission("email") else "Off"
           },
           "actions": {
             "items": [
@@ -122,7 +122,7 @@
         }
       ]%}
 
-      {% if 'email' in current_service.permissions %}
+      {% if current_service.has_permission("email") %}
         {% set restricted_email_settings_rows = [
           {
             "key": {
@@ -232,7 +232,7 @@
             "text": "Send text messages"
           },
           "value": {
-            "text": "On" if 'sms' in current_service.permissions else "Off"
+            "text": "On" if current_service.has_permission("sms") else "Off"
           },
           "actions": {
             "items": [
@@ -251,7 +251,7 @@
         }
       ]%}
 
-      {% if 'sms' in current_service.permissions %}
+      {% if current_service.has_permission("sms") %}
         {% set restricted_text_message_settings_rows = [
           {
             "key": {
@@ -298,7 +298,7 @@
               "text": "Send international text messages"
             },
             "value": {
-              "text": "On" if 'international_sms' in current_service.permissions else "Off"
+              "text": "On" if current_service.has_permission("international_sms") else "Off"
             },
             "actions": {
               "items": [
@@ -317,7 +317,7 @@
               "text": "Receive text messages"
             },
             "value": {
-              "text": "On" if 'inbound_sms' in current_service.permissions else "Off"
+              "text": "On" if current_service.has_permission("inbound_sms") else "Off"
             },
             "actions": {
               "items": [
@@ -349,7 +349,7 @@
             "text": "Send letters"
           },
           "value": {
-            "text": "On" if 'letter' in current_service.permissions else "Off"
+            "text": "On" if current_service.has_permission("letter") else "Off"
           },
           "actions": {
             "items": [
@@ -368,7 +368,7 @@
         }
       ]%}
 
-      {% if 'letter' in current_service.permissions %}
+      {% if current_service.has_permission("letter") %}
 
         {% set sender_addresses_html %}
           {% if current_service.default_letter_contact_block %}

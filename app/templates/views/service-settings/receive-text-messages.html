@@ -19,7 +19,7 @@
     <div class="govuk-grid-column-five-sixths">
       {{ page_header('Receive text messages') }}
 
-      {% if 'inbound_sms' in current_service.permissions %}
+      {% if current_service.has_permission("inbound_sms") %}
         <p class="govuk-body">
           Your service will receive text messages sent to:
         </p>
