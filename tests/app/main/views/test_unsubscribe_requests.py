@@ -256,7 +256,7 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
     assert normalize_spaces(download_link.text) == "Download the report"
     assert "disabled" not in checkbox
     assert normalize_spaces(checkbox_hint) == "I have unsubscribed these recipients from our mailing list"
-    assert normalize_spaces(unsubscribe_requests_count_text) == "200 new requests to unsubscribe"
+    assert normalize_spaces(unsubscribe_requests_count_text) == "200 new unsubscribe requests"
     assert len(update_button) == 1
     assert normalize_spaces(availability_date) == "This report will be deleted in 7 days from now."
 
@@ -295,7 +295,7 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
     assert normalize_spaces(download_link.text) == "Download the report"
     assert "disabled" in checkbox
     assert normalize_spaces(checkbox_hint) == "You cannot do this until you’ve downloaded the report"
-    assert normalize_spaces(unsubscribe_requests_count_text) == "34 new requests to unsubscribe"
+    assert normalize_spaces(unsubscribe_requests_count_text) == "34 new unsubscribe requests"
     assert normalize_spaces(availability_date) == (
         "Once downloaded, reports are available for 7 days. "
         "Requests which have not been downloaded will be deleted after 90 days."

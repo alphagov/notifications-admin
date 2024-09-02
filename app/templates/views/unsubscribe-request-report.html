@@ -26,7 +26,7 @@
 
 {% if not report.completed %}
     <p class="govuk-body" id="report-unsubscribe-requests-count">
-     {{ report.count|format_thousands}} new {{ report.count | message_count_label('request', suffix='') }} to unsubscribe
+     {{ report.count|format_thousands}} new unsubscribe {{ report.count | message_count_label('request', suffix='') }}
     </p>
 
     <p class="govuk-body govuk-!-margin-bottom-2">You must: </p>
