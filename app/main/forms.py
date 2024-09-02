@@ -2933,12 +2933,19 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
                 "items": [
                     {
                         "hint": {"text": "I have unsubscribed these recipients from our mailing list"},
+                        "classes": "govuk-checkboxes__item--single-with-hint",
                     },
                 ]
             }
         else:
             self.report_has_been_processed.param_extensions = {
-                "items": [{"hint": {"text": "You cannot do this until you’ve downloaded the report"}, "disabled": True}]
+                "items": [
+                    {
+                        "hint": {"text": "You cannot do this until you’ve downloaded the report"},
+                        "disabled": True,
+                        "classes": "govuk-checkboxes__item--single-with-hint",
+                    },
+                ]
             }
 
     def validate_report_has_been_processed(self, field):
