@@ -196,7 +196,10 @@ def _should_show_set_sender_page(service_id, template) -> bool:
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def set_sender(service_id, template_id):
-    session["sender_id"] = None
+    from_back_link = request.args.get("from_back_link") == "yes"
+    # If we're returning to the page, we want to use the sender_id already in the session instead of resetting it
+    session["sender_id"] = session.get("sender_id") if from_back_link else None
+
     redirect_to_one_off = redirect(url_for(".send_one_off", service_id=service_id, template_id=template_id))
 
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
@@ -214,8 +217,10 @@ def set_sender(service_id, template_id):
 
     sender_context = get_sender_context(sender_details, template.template_type)
 
+    selected_sender = session["sender_id"] or sender_context["default_id"]
+
     form = SetSenderForm(
-        sender=sender_context["default_id"],
+        sender=selected_sender,
         sender_choices=sender_context["value_and_label"],
         sender_label=sender_context["description"],
     )
@@ -846,7 +851,7 @@ def _get_set_sender_back_link(service_id, template):
 def get_back_link(service_id, template, step_index, placeholders=None):
     if step_index == 0:
         if _should_show_set_sender_page(service_id, template):
-            return url_for("main.set_sender", service_id=service_id, template_id=template.id)
+            return url_for("main.set_sender", service_id=service_id, template_id=template.id, from_back_link="yes")
         else:
             return _get_set_sender_back_link(service_id, template)
 

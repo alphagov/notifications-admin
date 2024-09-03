@@ -1974,7 +1974,7 @@ def test_send_one_off_step_0_back_link_when_set_sender_page_should_be_shown(
     )
 
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
-        "main.set_sender", service_id=SERVICE_ONE_ID, template_id=unchanging_fake_uuid
+        "main.set_sender", service_id=SERVICE_ONE_ID, template_id=unchanging_fake_uuid, from_back_link="yes"
     )
 
 
