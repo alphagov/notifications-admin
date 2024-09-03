@@ -117,7 +117,6 @@ const javascripts = {
       paths.src + 'javascripts/templateFolderForm.js',
       paths.src + 'javascripts/addBrandingOptionsForm.js',
       paths.src + 'javascripts/setAuthTypeForm.js',
-      paths.src + 'javascripts/collapsibleCheckboxes.js',
       paths.src + 'javascripts/registerSecurityKey.js',
       paths.src + 'javascripts/authenticateSecurityKey.js',
       paths.src + 'javascripts/updateStatus.js',
@@ -222,9 +221,10 @@ const lint = {
       .pipe(plugins.sassLint.failOnError());
   },
   'js': (cb) => {
-    return src(
-        paths.src + 'javascripts/**/*.js'
-      )
+    return src([
+        paths.src + 'javascripts/**/*.js',
+        paths.src + 'javascripts/**/*.mjs'
+      ])
       .pipe(plugins.jshint())
       .pipe(plugins.jshint.reporter(stylish))
       .pipe(plugins.jshint.reporter('fail'))

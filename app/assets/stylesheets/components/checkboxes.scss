@@ -11,6 +11,11 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
     left: 0;
     width: 39px;
     height: 30px;
+    display: none;
+
+    .#{$govuk-frontend-supported-css-class} & {
+      display: block;
+    }
   }
 
   .selection-summary__text {
@@ -122,4 +127,36 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 
 .govuk-checkboxes__input:disabled+.govuk-checkboxes__label:before {
   background: govuk-colour("light-grey");
+}
+
+// collapsible checkboxes toggle button
+
+// govuk-button with a chevron icon aligned with text
+.notify-button--with-chevron__chevron {
+  display: inline-block;
+  position: relative;
+  margin-left: govuk-spacing(3);
+  
+
+  // inner chevron arrow
+  &::before {
+    transform:translateY(-35%) rotate(45deg) scale(1);
+    border-color: black;
+    border-bottom:2px solid govuk-colour('black');
+    border-right:2px solid govuk-colour('black');
+    content:"";
+    display: inline-block;
+    height: 8px;
+    margin: 0 10px 0 -18px; // negative left margin means the element effectively occupies 0 width
+    vertical-align: middle;
+    width: 8px;
+    // position: static; // override GOV.UK Frontend styling from the Button component
+  }
+}
+
+// Rotate icon to create "Down" version
+.notify-button--with-chevron__chevron--active {
+  &::before {
+    transform:translateY(1px) rotate(225deg) scale(1);
+  }
 }
