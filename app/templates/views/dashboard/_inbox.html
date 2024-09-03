@@ -29,7 +29,7 @@
   {% endif %}
  {% if current_service.unsubscribe_requests_statistics %}
   <a id="total-unsubscribe-requests" class="govuk-link govuk-link--no-visited-state banner-dashboard"
-     href={{ url_for('main.unsubscribe_request_reports_summary', service_id=current_service.id) }}>
+     href="{{ url_for('main.unsubscribe_request_reports_summary', service_id=current_service.id) }}">
     <span class="banner-dashboard-count">
       {{ current_service.unsubscribe_requests_count|format_thousands }}
     </span>
