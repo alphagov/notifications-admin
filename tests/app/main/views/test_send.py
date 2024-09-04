@@ -240,6 +240,36 @@ def test_set_sender_redirects_if_one_sms_sender(
         assert session["sender_id"] == "1234"
 
 
+@pytest.mark.parametrize(
+    "expected_back_link, extra_args, user",
+    [
+        (
+            "main.view_template",
+            {"service_id": SERVICE_ONE_ID, "template_id": unchanging_fake_uuid},
+            create_active_user_with_permissions(),
+        ),
+        ("main.choose_template", {"service_id": SERVICE_ONE_ID}, create_active_caseworking_user()),
+    ],
+)
+def test_set_sender_shows_expected_back_link(
+    client_request,
+    mock_get_service_template,
+    multiple_sms_senders,
+    expected_back_link,
+    extra_args,
+    user,
+):
+    client_request.login(user)
+
+    page = client_request.get(
+        ".set_sender",
+        service_id=SERVICE_ONE_ID,
+        template_id=unchanging_fake_uuid,
+    )
+
+    assert page.select(".govuk-back-link")[0]["href"] == url_for(expected_back_link, **extra_args)
+
+
 def test_that_test_files_exist():
     assert len(test_spreadsheet_files) == 8
     assert len(test_non_spreadsheet_files) == 6
@@ -1263,6 +1293,7 @@ def test_send_one_off_has_correct_page_title(
     service_one,
     mock_has_no_jobs,
     mock_get_no_contact_lists,
+    multiple_sms_senders,
     fake_uuid,
     mocker,
     user,
@@ -1310,6 +1341,7 @@ def test_send_one_off_shows_placeholders_in_correct_order(
     mock_has_no_jobs,
     mock_get_no_contact_lists,
     mock_get_service_template_with_multiple_placeholders,
+    multiple_sms_senders,
     step_index,
     prefilled,
     expected_field_label,
@@ -1436,6 +1468,8 @@ def test_send_one_off_has_skip_link(
     mock_get_service_email_template,
     mock_has_no_jobs,
     mock_get_no_contact_lists,
+    multiple_sms_senders,
+    multiple_reply_to_email_addresses,
     mocker,
     template_type,
     expected_link_text,
@@ -1482,6 +1516,8 @@ def test_send_one_off_has_sticky_header_for_email(
     fake_uuid,
     mock_has_no_jobs,
     mock_get_no_contact_lists,
+    multiple_reply_to_email_addresses,
+    multiple_sms_senders,
     template_type,
     expected_sticky,
 ):
@@ -1546,7 +1582,7 @@ def test_skip_link_will_not_show_on_sms_one_off_if_service_has_no_mobile_number(
     mock_get_service_template,
     mock_has_no_jobs,
     mock_get_no_contact_lists,
-    mocker,
+    multiple_sms_senders,
     user,
 ):
     user["mobile_number"] = None
@@ -1578,6 +1614,7 @@ def test_send_one_off_offers_link_to_upload(
     mock_get_service_template,
     mock_has_jobs,
     mock_get_no_contact_lists,
+    multiple_sms_senders,
     user,
 ):
     client_request.login(user)
@@ -1606,6 +1643,7 @@ def test_send_one_off_has_link_to_use_existing_list(
     mock_get_service_template,
     mock_has_jobs,
     mock_get_contact_lists,
+    multiple_sms_senders,
     fake_uuid,
 ):
     page = client_request.get(
@@ -1648,6 +1686,7 @@ def test_no_link_to_use_existing_list_for_service_without_lists(
     client_request,
     mock_get_service_template,
     mock_has_jobs,
+    multiple_sms_senders,
     platform_admin_user,
     fake_uuid,
 ):
@@ -1894,14 +1933,12 @@ def test_send_one_off_email_to_self_without_placeholders_redirects_to_check_page
         ),
     ),
 )
-def test_send_one_off_step_0_back_link(
+def test_send_one_off_step_0_back_link_for_different_user_permissions_when_set_sender_page_not_shown(
     client_request,
     active_user_with_permissions,
-    mock_login,
-    mock_get_service,
     mock_get_service_template_with_placeholders,
-    mock_has_no_jobs,
     mock_get_contact_lists,
+    single_sms_sender,
     permissions,
     expected_back_link_endpoint,
     extra_args,
@@ -1919,6 +1956,25 @@ def test_send_one_off_step_0_back_link(
 
     assert page.select(".govuk-back-link")[0]["href"] == url_for(
         expected_back_link_endpoint, service_id=SERVICE_ONE_ID, **extra_args
+    )
+
+
+def test_send_one_off_step_0_back_link_when_set_sender_page_should_be_shown(
+    client_request,
+    mock_get_service_template_with_placeholders,
+    mock_get_contact_lists,
+    multiple_sms_senders,
+):
+    with client_request.session_transaction() as session:
+        session["placeholders"] = {}
+        session["recipient"] = None
+
+    page = client_request.get(
+        "main.send_one_off_step", service_id=SERVICE_ONE_ID, template_id=unchanging_fake_uuid, step_index=0
+    )
+
+    assert page.select(".govuk-back-link")[0]["href"] == url_for(
+        "main.set_sender", service_id=SERVICE_ONE_ID, template_id=unchanging_fake_uuid, from_back_link="yes"
     )
 
 
@@ -4126,6 +4182,7 @@ def test_reply_to_is_previewed_if_chosen(
     mock_get_jobs,
     mock_get_no_contact_lists,
     get_default_reply_to_email_address,
+    multiple_reply_to_email_addresses,
     fake_uuid,
     endpoint,
     extra_args,
@@ -4182,6 +4239,7 @@ def test_sms_sender_is_previewed(
     mock_get_jobs,
     mock_get_no_contact_lists,
     get_default_sms_sender,
+    multiple_sms_senders,
     fake_uuid,
     endpoint,
     extra_args,
