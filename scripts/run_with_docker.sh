@@ -28,7 +28,7 @@ docker run -it --rm \
   -e SENTRY_ERRORS_SAMPLE_RATE=${SENTRY_ERRORS_SAMPLE_RATE:-} \
   -e SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-} \
   -e PORT=6012 \
-  -p 6012:6012 \
+  -p 127.0.0.1:6012:6012 \
   -v $(pwd):/home/vcap/app \
   ${DOCKER_ARGS} \
   ${DOCKER_IMAGE_NAME} \
