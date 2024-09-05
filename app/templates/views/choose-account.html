@@ -43,6 +43,28 @@
   <div class="keyline-block"></div>
 {% endmacro %}
 
+{% macro no_service(
+  heading,
+  no_live_service_text
+) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <h2>
+        {{heading}}
+      </h2>
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+        <ul>
+          <li class="browse-list-item">
+            <p class="browse-list-hint">
+              {{no_live_service_text}}
+            </p>
+          </li>
+        </ul>
+    </div>
+  </div>
+  <div class="keyline-block"></div>
+{% endmacro %}
 
 {% if current_user.organisations %}
   {% set thing_to_choose_between = 'organisations and services' %}
@@ -104,15 +126,31 @@
       ) }}
     {% endif %}
 
+    {% if not current_user.live_services and not current_user.trial_mode_services %}
+      {% if not current_user.organisations %}
+        <div class="keyline-block"></div>
+      {% endif %}
+      {{ no_service(
+        heading='Live services',
+        no_live_service_text='No live service yet'
+      ) }}  
+      {{ no_service(
+        heading='Trial mode services',
+        no_live_service_text='No trial mode services yet'
+      ) }}
+    {% endif %}
+
   </nav>
 
   {% if can_add_service %}
-  <div class="js-stick-at-bottom-when-scrolling">
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-quarter">
-        &nbsp;
-      </div>
-      <div class="govuk-grid-column-three-quarters">
+    <div class="js-stick-at-bottom-when-scrolling">
+      {% if (not current_user.live_services and not current_user.trial_mode_services) or show_headings %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-quarter">
+            &nbsp;
+          </div>
+          <div class="govuk-grid-column-three-quarters">
+      {% endif %}
         {{ govukButton({
           "element": "a",
           "text": "Add a new service",
@@ -127,9 +165,11 @@
             "classes": "govuk-button--secondary"
           }) }}
         {% endif %}
-      </div>
+      {% if (not current_user.live_services and not current_user.trial_mode_services) or show_headings %}
+        </div>
+          </div>
+      {% endif %}
     </div>
-  </div>
   {% endif %}
 
 {% endblock %}
