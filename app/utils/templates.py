@@ -143,13 +143,17 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
 
     @property
     def all_page_counts(self):
-        from app.template_previews import TemplatePreview
+        from app import current_service, template_preview_client
 
         if self._all_page_counts:
             return self._all_page_counts
 
         if self.values:
-            self._all_page_counts = TemplatePreview.get_page_counts_for_letter(self._template, self.values)
+            self._all_page_counts = template_preview_client.get_page_counts_for_letter(
+                self._template,
+                service=current_service,
+                values=self.values,
+            )
             return self._all_page_counts
 
         cache_key = (
@@ -159,7 +163,11 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
             self._all_page_counts = json.loads(cached_value)
             return self._all_page_counts
 
-        self._all_page_counts = TemplatePreview.get_page_counts_for_letter(self._template, self.values)
+        self._all_page_counts = template_preview_client.get_page_counts_for_letter(
+            self._template,
+            service=current_service,
+            values=self.values,
+        )
         redis_client.set(cache_key, json.dumps(self._all_page_counts), ex=cache.DEFAULT_TTL)
 
         return self._all_page_counts
