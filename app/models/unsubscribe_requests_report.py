@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 from flask import abort
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
@@ -14,7 +12,6 @@ class UnsubscribeRequestsReport(JSONModel):
         "count",
         "batch_id",
         "is_a_batched_report",
-        "created_at",
     }
     __sort_attribute__ = "earliest_timestamp"
 
@@ -32,8 +29,7 @@ class UnsubscribeRequestsReport(JSONModel):
 
     @property
     def will_be_archived_at(self):
-        # Not all reports have a created_at date currently
-        return datetime.utcnow() + timedelta(days=7)
+        return utc_string_to_aware_gmt_datetime(self._dict["will_be_archived_at"])
 
     @property
     def earliest_timestamp(self):

@@ -221,7 +221,7 @@ def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocke
     ]
 
 
-@freeze_time("2024-06-22")
+@freeze_time("2024-06-22 12:00")
 def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_request, mocker):
     test_data = [
         {
@@ -231,6 +231,7 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
             "processed_by_service_at": None,
             "batch_id": "a8a526f9-84be-44a6-b751-62c95c4b9329",
             "is_a_batched_report": True,
+            "will_be_archived_at": "2024-06-29 23:59",
         }
     ]
 
@@ -313,6 +314,7 @@ def test_unsubscribe_request_report_for_processed_batched_reports(client_request
             "processed_by_service_at": "2024-06-10",
             "batch_id": "e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
             "is_a_batched_report": True,
+            "will_be_archived_at": "2024-01-08 23:00",
         },
     ]
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
@@ -355,6 +357,7 @@ def test_unsubscribe_request_report_with_forced_download(
                 "processed_by_service_at": None,
                 "batch_id": fake_uuid,
                 "is_a_batched_report": True,
+                "will_be_archived_at": "2024-01-08 23:00",
             },
         ],
     )
