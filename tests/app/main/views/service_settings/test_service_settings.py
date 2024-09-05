@@ -4763,7 +4763,7 @@ def test_archive_service_after_confirm(
     mock_api.assert_called_once_with(f"/service/{SERVICE_ONE_ID}/archive", data=None)
     mock_event.assert_called_once_with(service_id=SERVICE_ONE_ID, archived_by_id=user["id"])
 
-    assert normalize_spaces(page.select_one("h1").text) == "Choose service"
+    assert normalize_spaces(page.select_one("h1").text) == "Your services"
     assert normalize_spaces(page.select_one(".banner-default-with-tick").text) == "‘service one’ was deleted"
     # The one user which is part of this service has the sample_uuid as it's user ID
     assert call(f"user-{sample_uuid()}") in redis_delete_mock.call_args_list

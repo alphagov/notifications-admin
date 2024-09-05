@@ -44,24 +44,22 @@
 {% endmacro %}
 
 
-{% if current_user.organisations and current_user.services %}
-  {% set thing_to_choose_between = 'organisation or service' %}
-{% elif current_user.organisations %}
-  {% set thing_to_choose_between = 'organisation' %}
+{% if current_user.organisations %}
+  {% set thing_to_choose_between = 'organisations and services' %}
 {% else %}
-  {% set thing_to_choose_between = 'service' %}
+  {% set thing_to_choose_between = 'services' %}
 {% endif %}
 
 {% block per_page_title %}
-  Choose {{ thing_to_choose_between }}
+  Your {{ thing_to_choose_between }}
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large {% if show_headings %}govuk-visually-hidden{% endif %}">
-    Choose {{ thing_to_choose_between }}
+  <h1 class="heading-large">
+    Your {{ thing_to_choose_between }}
   </h1>
 
-  <nav class="browse-list {% if show_headings %}top-gutter-2-3{% endif %}">
+  <nav class="browse-list">
 
     {% if current_user.platform_admin %}
       <div class="govuk-grid-row">
