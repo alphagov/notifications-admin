@@ -172,7 +172,7 @@ def test_choose_account_should_show_join_service_button(
             url_for("main.add_service"),
         ),
         (
-            "Join an existing service",
+            "Join a live service",
             url_for("main.choose_service_to_join"),
         ),
     ]
