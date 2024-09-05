@@ -163,14 +163,14 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 
 .govuk-checkboxes__item--single-with-hint {
 
-  margin-top: -10px;
+  margin-top: -1 * govuk-spacing(2);
 
   .govuk-checkboxes__label::before {
-    margin-top: 10px;
+    top: govuk-spacing(2) + 2px;  // 2px is existing top position
   }
 
   .govuk-checkboxes__label::after {
-    margin-top: 10px;
+    top: govuk-spacing(2) + 13px;  // 13px is existing top position
   }
 
 }
