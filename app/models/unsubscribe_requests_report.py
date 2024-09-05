@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from flask import abort
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
@@ -30,14 +28,8 @@ class UnsubscribeRequestsReport(JSONModel):
         return self.processed_by_service_at is not None
 
     @property
-    def report_latest_download_date(self):
-        if self.status == "Completed":
-            limit = 7
-            starting_date = self.processed_by_service_at
-        else:
-            limit = 90
-            starting_date = self.latest_timestamp
-        return starting_date + timedelta(days=limit)
+    def will_be_archived_at(self):
+        return utc_string_to_aware_gmt_datetime(self._dict["will_be_archived_at"])
 
     @property
     def earliest_timestamp(self):

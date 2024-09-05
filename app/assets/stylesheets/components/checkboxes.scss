@@ -136,7 +136,7 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
   display: inline-block;
   position: relative;
   margin-left: govuk-spacing(3);
-  
+
 
   // inner chevron arrow
   &::before {
@@ -159,4 +159,18 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
   &::before {
     transform:translateY(1px) rotate(225deg) scale(1);
   }
+}
+
+.govuk-checkboxes__item--single-with-hint {
+
+  margin-top: -1 * govuk-spacing(2);
+
+  .govuk-checkboxes__label::before {
+    top: govuk-spacing(2) + 2px;  // 2px is existing top position
+  }
+
+  .govuk-checkboxes__label::after {
+    top: govuk-spacing(2) + 13px;  // 13px is existing top position
+  }
+
 }
