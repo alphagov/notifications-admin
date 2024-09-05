@@ -2289,9 +2289,7 @@ def test_send_test_works_as_letter_preview(
 ):
     service_one["permissions"] = ["letter"]
     mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
-    mocked_preview = mocker.patch(
-        "app.main.views.send.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
-    )
+    mocked_preview = mocker.patch("app.template_preview_client.get_preview_for_templated_letter", return_value="foo")
 
     service_id = service_one["id"]
     template_id = fake_uuid
@@ -2311,6 +2309,7 @@ def test_send_test_works_as_letter_preview(
     assert mocked_preview.call_args_list[0].kwargs["db_template"]["id"] == template_id
     assert mocked_preview.call_args_list[0].kwargs["values"] == {"addressline1": "Jo Lastname"}
     assert mocked_preview.call_args_list[0].kwargs["filetype"] == filetype
+    assert mocked_preview.call_args_list[0].kwargs["service"].id == service_id
 
 
 def test_send_one_off_clears_session(
@@ -2972,9 +2971,7 @@ def test_should_show_preview_letter_message(
         "app.main.views.send.get_csv_metadata",
         return_value={"original_file_name": f"example.{filetype}"},
     )
-    mocked_preview = mocker.patch(
-        "app.main.views.send.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
-    )
+    mocked_preview = mocker.patch("app.template_preview_client.get_preview_for_templated_letter", return_value="foo")
 
     service_id = service_one["id"]
     template_id = fake_uuid
@@ -2999,6 +2996,7 @@ def test_should_show_preview_letter_message(
     assert mocked_preview.call_args_list[0].kwargs["filetype"] == filetype
     assert mocked_preview.call_args_list[0].kwargs["values"] == expected_values
     assert mocked_preview.call_args_list[0].kwargs["page"] == expected_page
+    assert mocked_preview.call_args_list[0].kwargs["service"].id == service_id
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(

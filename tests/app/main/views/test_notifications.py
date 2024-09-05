@@ -6,6 +6,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import APIError, HTTPError
+from notifications_utils.testing.comparisons import RestrictedAny
 from pypdf.errors import PdfReadError
 
 from tests.conftest import (
@@ -277,7 +278,8 @@ def test_notification_page_shows_page_for_letter_notification(
 
     assert len(mock_page_count.call_args_list) == 1
     assert mock_page_count.call_args_list[0][0][0]["name"] == "sample template"
-    assert mock_page_count.call_args_list[0][0][1] == {"name": "Jo"}
+    assert mock_page_count.call_args_list[0][1]["values"] == {"name": "Jo"}
+    assert mock_page_count.call_args_list[0][1]["service"].id == SERVICE_ONE_ID
 
 
 @freeze_time("2020-01-01 00:00")
@@ -575,9 +577,7 @@ def test_should_show_image_of_letter_notification(
 
     notification = create_notification(template_type="letter")
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mocked_preview = mocker.patch(
-        "app.main.views.templates.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
-    )
+    mocked_preview = mocker.patch("app.template_preview_client.get_preview_for_templated_letter", return_value="foo")
     # only called for precompiled letters
     mock_api = mocker.patch("app.main.views.notifications.notification_api_client.get_notification_letter_preview")
 
@@ -591,12 +591,15 @@ def test_should_show_image_of_letter_notification(
     assert response.get_data(as_text=True) == "foo"
 
     assert mock_api.called is False
-    mocked_preview.assert_called_once_with(
-        db_template=notification["template"],
-        filetype=filetype,
-        values=notification["personalisation"],
-        page=None,
-    )
+    assert mocked_preview.call_args_list == [
+        mocker.call(
+            db_template=notification["template"],
+            filetype=filetype,
+            values=notification["personalisation"],
+            page=None,
+            service=RestrictedAny(lambda s: s.id == SERVICE_ONE_ID),
+        ),
+    ]
 
 
 def test_should_show_image_of_letter_notification_that_failed_validation(client_request, fake_uuid, mocker):

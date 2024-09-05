@@ -3807,7 +3807,7 @@ def mock_get_returned_letter_summary_with_no_returned_letters(notify_admin, mock
 
 def do_mock_get_page_counts_for_letter(mocker, count, welsh_page_count=0, attachment_page_count=0):
     return mocker.patch(
-        "app.template_previews.TemplatePreview.get_page_counts_for_letter",
+        "app.template_preview_client.get_page_counts_for_letter",
         return_value={
             "count": count,
             "welsh_page_count": welsh_page_count,
@@ -3829,12 +3829,10 @@ def mock_template_preview(mocker, mock_get_page_counts_for_letter):
     status_code = 200
     headers = {}
     example_response = (content, status_code, headers)
-    mocker.patch(
-        "app.template_previews.TemplatePreview.get_preview_for_templated_letter", return_value=example_response
-    )
+    mocker.patch("app.template_preview_client.get_preview_for_templated_letter", return_value=example_response)
 
-    mocker.patch("app.template_previews.TemplatePreview.get_png_for_valid_pdf_page", return_value=example_response)
-    mocker.patch("app.template_previews.TemplatePreview.get_png_for_invalid_pdf_page", return_value=example_response)
+    mocker.patch("app.template_preview_client.get_png_for_valid_pdf_page", return_value=example_response)
+    mocker.patch("app.template_preview_client.get_png_for_invalid_pdf_page", return_value=example_response)
 
 
 @pytest.fixture(scope="function")

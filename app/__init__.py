@@ -128,6 +128,7 @@ from app.notify_client.upload_api_client import upload_api_client  # noqa
 from app.notify_client.user_api_client import user_api_client  # noqa
 from app.notify_session import NotifyAdminSessionInterface
 from app.s3_client.logo_client import logo_client
+from app.template_previews import template_preview_client  # noqa
 from app.url_converters import (
     AgreementTypeConverter,
     BrandingTypeConverter,
