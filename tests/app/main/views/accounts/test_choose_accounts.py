@@ -156,6 +156,7 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     assert normalize_spaces(no_live_service[0].text) == "No live service yet"
     assert normalize_spaces(no_live_trial_mode[0].text) == "No trial mode services yet"
 
+
 def test_choose_account_should_show_join_service_button(
     mocker,
     client_request,
