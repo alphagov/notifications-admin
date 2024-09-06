@@ -67,12 +67,12 @@ def test_overview_page_shows_disable_for_platform_admin(client_request, platform
     ],
 )
 def test_overview_page_shows_security_keys_if_user_they_can_use_webauthn(
-    mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
     key_count,
     expected_row_text,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     credentials = [webauthn_credential for _ in range(key_count)]
@@ -495,11 +495,11 @@ def test_user_doesnt_see_security_keys_unless_they_can_use_webauthn(client_reque
 
 @freeze_time("2022-10-10")
 def test_should_show_security_keys_page(
-    mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
     webauthn_credential_2,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
@@ -527,10 +527,10 @@ def test_should_show_security_keys_page(
 
 
 def test_get_key_from_list_of_keys(
-    mocker,
     webauthn_credential,
     webauthn_credential_2,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.models.webauthn_credential.WebAuthnCredentials._get_items",
@@ -540,10 +540,10 @@ def test_get_key_from_list_of_keys(
 
 
 def test_should_show_manage_security_key_page(
-    mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
@@ -562,7 +562,11 @@ def test_should_show_manage_security_key_page(
 
 
 def test_manage_security_key_page_404s_when_key_not_found(
-    mocker, client_request, platform_admin_user, webauthn_credential, webauthn_credential_2
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    webauthn_credential_2,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
@@ -661,10 +665,10 @@ def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_
 
 
 def test_shows_delete_link_for_security_key(
-    mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 

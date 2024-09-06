@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, cache
 
 
@@ -10,4 +17,10 @@ class StatusApiClient(NotifyAdminAPIClient):
         return self.get("/_status/live-service-and-organisation-counts")
 
 
-status_api_client = StatusApiClient()
+_status_api_client_context_var: ContextVar[StatusApiClient] = ContextVar("status_api_client")
+get_status_api_client: LazyLocalGetter[StatusApiClient] = LazyLocalGetter(
+    _status_api_client_context_var,
+    lambda: StatusApiClient(current_app),
+)
+memo_resetters.append(lambda: get_status_api_client.clear())
+status_api_client = LocalProxy(get_status_api_client)

@@ -134,7 +134,6 @@ def test_shows_back_link_if_come_from_join_service_page(
 )
 @freeze_time("2021-01-01")
 def test_should_add_service_and_redirect_to_tour_when_no_services(
-    mocker,
     client_request,
     mock_create_service,
     mock_create_service_template,
@@ -145,6 +144,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     email_address,
     posted,
     persisted,
+    mocker,
 ):
     api_user_active["email_address"] = email_address
     client_request.login(api_user_active)
@@ -188,10 +188,10 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
 
 
 def test_add_service_has_to_choose_org_type(
-    mocker,
     client_request,
     mock_create_service,
     mock_create_service_template,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
@@ -454,9 +454,9 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
     ),
 )
 def test_join_or_add_service_page_403s_without_permission(
-    mocker,
     client_request,
     organisation,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
@@ -469,8 +469,8 @@ def test_join_or_add_service_page_403s_without_permission(
 
 
 def test_join_or_add_service_page(
-    mocker,
     client_request,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
@@ -516,10 +516,10 @@ def test_join_or_add_service_page(
     ),
 )
 def test_post_join_or_add_service_page(
-    mocker,
     client_request,
     mock_get_organisation_services,
     choice,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",

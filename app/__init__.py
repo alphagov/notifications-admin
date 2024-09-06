@@ -1,5 +1,6 @@
 import os
 import pathlib
+from collections.abc import Callable
 from time import monotonic
 
 import jinja2
@@ -36,10 +37,14 @@ from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
+# must be declared before rest of app is imported to satisfy circular import
+# ruff: noqa: E402
+memo_resetters: list[Callable] = []
+
 from app import proxy_fix, webauthn_server
 from app.commands import setup_commands
 from app.config import Config, configs
-from app.extensions import antivirus_client, redis_client, zendesk_client
+from app.extensions import antivirus_client, redis_client, zendesk_client  # noqa
 from app.formatters import (
     convert_to_boolean,
     extract_path_from_url,
@@ -91,36 +96,36 @@ from app.navigation import (
     PlatformAdminNavigation,
 )
 from app.notify_client import InviteTokenError
-from app.notify_client.api_key_api_client import api_key_api_client
-from app.notify_client.billing_api_client import billing_api_client
-from app.notify_client.complaint_api_client import complaint_api_client
-from app.notify_client.contact_list_api_client import contact_list_api_client
-from app.notify_client.email_branding_client import email_branding_client
-from app.notify_client.events_api_client import events_api_client
-from app.notify_client.inbound_number_client import inbound_number_client
-from app.notify_client.invite_api_client import invite_api_client
-from app.notify_client.job_api_client import job_api_client
-from app.notify_client.letter_attachment_client import letter_attachment_client
-from app.notify_client.letter_branding_client import letter_branding_client
-from app.notify_client.letter_jobs_client import letter_jobs_client
-from app.notify_client.letter_rate_api_client import letter_rate_api_client
-from app.notify_client.notification_api_client import notification_api_client
-from app.notify_client.org_invite_api_client import org_invite_api_client
-from app.notify_client.organisations_api_client import organisations_client
+from app.notify_client.api_key_api_client import api_key_api_client  # noqa
+from app.notify_client.billing_api_client import billing_api_client  # noqa
+from app.notify_client.complaint_api_client import complaint_api_client  # noqa
+from app.notify_client.contact_list_api_client import contact_list_api_client  # noqa
+from app.notify_client.email_branding_client import email_branding_client  # noqa
+from app.notify_client.events_api_client import events_api_client  # noqa
+from app.notify_client.inbound_number_client import inbound_number_client  # noqa
+from app.notify_client.invite_api_client import invite_api_client  # noqa
+from app.notify_client.job_api_client import job_api_client  # noqa
+from app.notify_client.letter_attachment_client import letter_attachment_client  # noqa
+from app.notify_client.letter_branding_client import letter_branding_client  # noqa
+from app.notify_client.letter_jobs_client import letter_jobs_client  # noqa
+from app.notify_client.letter_rate_api_client import letter_rate_api_client  # noqa
+from app.notify_client.notification_api_client import notification_api_client  # noqa
+from app.notify_client.org_invite_api_client import org_invite_api_client  # noqa
+from app.notify_client.organisations_api_client import organisations_client  # noqa
 from app.notify_client.performance_dashboard_api_client import (
-    performance_dashboard_api_client,
+    performance_dashboard_api_client,  # noqa
 )
-from app.notify_client.platform_admin_api_client import admin_api_client
-from app.notify_client.protected_sender_id_api_client import protected_sender_id_api_client
-from app.notify_client.provider_client import provider_client
-from app.notify_client.service_api_client import service_api_client
-from app.notify_client.sms_rate_client import sms_rate_api_client
-from app.notify_client.status_api_client import status_api_client
-from app.notify_client.template_folder_api_client import template_folder_api_client
-from app.notify_client.template_statistics_api_client import template_statistics_client
-from app.notify_client.unsubscribe_api_client import unsubscribe_api_client
-from app.notify_client.upload_api_client import upload_api_client
-from app.notify_client.user_api_client import user_api_client
+from app.notify_client.platform_admin_api_client import admin_api_client  # noqa
+from app.notify_client.protected_sender_id_api_client import protected_sender_id_api_client  # noqa
+from app.notify_client.provider_client import provider_client  # noqa
+from app.notify_client.service_api_client import service_api_client  # noqa
+from app.notify_client.sms_rate_client import sms_rate_api_client  # noqa
+from app.notify_client.status_api_client import status_api_client  # noqa
+from app.notify_client.template_folder_api_client import template_folder_api_client  # noqa
+from app.notify_client.template_statistics_api_client import template_statistics_client  # noqa
+from app.notify_client.unsubscribe_api_client import unsubscribe_api_client  # noqa
+from app.notify_client.upload_api_client import upload_api_client  # noqa
+from app.notify_client.user_api_client import user_api_client  # noqa
 from app.notify_session import NotifyAdminSessionInterface
 from app.s3_client.logo_client import logo_client
 from app.url_converters import (
@@ -180,39 +185,8 @@ def create_app(application):
         login_manager,
         proxy_fix,
         request_helper,
-        # API clients
-        api_key_api_client,
-        billing_api_client,
-        contact_list_api_client,
-        complaint_api_client,
-        email_branding_client,
-        events_api_client,
-        inbound_number_client,
-        invite_api_client,
-        job_api_client,
-        letter_attachment_client,
-        letter_branding_client,
-        letter_jobs_client,
-        letter_rate_api_client,
-        notification_api_client,
-        org_invite_api_client,
-        organisations_client,
-        performance_dashboard_api_client,
-        protected_sender_id_api_client,
-        provider_client,
-        service_api_client,
-        sms_rate_api_client,
-        status_api_client,
-        template_folder_api_client,
-        template_statistics_client,
-        upload_api_client,
-        user_api_client,
-        unsubscribe_api_client,
-        admin_api_client,
         # External API clients
-        antivirus_client,
         redis_client,
-        zendesk_client,
         logo_client,
     ):
         client.init_app(application)
@@ -299,6 +273,14 @@ def init_app(application):
     # false flips the behaviour so we still populate the endpoint args with the default values but don't do any
     # automatic redirects. We only make use of this in our old historical_redirects endpoint
     application.url_map.redirect_defaults = False
+
+
+def reset_memos():
+    """
+    Reset all memos registered in memo_resetters
+    """
+    for resetter in memo_resetters:
+        resetter()
 
 
 @login_manager.user_loader

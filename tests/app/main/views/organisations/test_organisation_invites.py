@@ -154,7 +154,12 @@ def test_accepted_invite_when_other_user_already_logged_in(client_request, mock_
 
 
 def test_cancelled_invite_opened_by_user(
-    mocker, client_request, api_user_active, mock_check_org_cancelled_invite_token, mock_get_organisation, fake_uuid
+    client_request,
+    api_user_active,
+    mock_check_org_cancelled_invite_token,
+    mock_get_organisation,
+    fake_uuid,
+    mocker,
 ):
     client_request.logout()
     mock_get_user = mocker.patch("app.user_api_client.get_user", return_value=api_user_active)

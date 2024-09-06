@@ -41,7 +41,13 @@ def test_letter_branding_page_shows_full_branding_list(
     "user_fixture, expected_response_status", (("api_user_active_email_auth", 403), ("platform_admin_user", 200))
 )
 def test_view_letter_branding_requires_platform_admin(
-    mocker, client_request, mock_get_letter_branding_by_id, user_fixture, expected_response_status, request, fake_uuid
+    client_request,
+    mock_get_letter_branding_by_id,
+    user_fixture,
+    expected_response_status,
+    request,
+    fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
@@ -62,11 +68,11 @@ def test_view_letter_branding_requires_platform_admin(
 
 
 def test_view_letter_branding_with_services_but_no_orgs(
-    mocker,
     client_request,
     platform_admin_user,
     mock_get_letter_branding_by_id,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
@@ -96,11 +102,11 @@ def test_view_letter_branding_with_services_but_no_orgs(
 
 
 def test_view_letter_branding_with_org_but_no_services(
-    mocker,
     client_request,
     platform_admin_user,
     mock_get_letter_branding_by_id,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
@@ -168,11 +174,11 @@ def test_view_letter_branding_shows_created_by_and_helpful_dates_if_available(
 
 
 def test_view_letter_branding_bottom_links(
-    mocker,
     client_request,
     platform_admin_user,
     mock_get_letter_branding_by_id,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.letter_branding_client.get_orgs_and_services_associated_with_branding",
@@ -208,7 +214,11 @@ def test_update_letter_branding_shows_the_current_letter_brand(
 
 
 def test_update_letter_branding_with_new_valid_file_shows_page_with_file_preview(
-    mocker, client_request, platform_admin_user, mock_get_letter_branding_by_id, fake_uuid
+    client_request,
+    platform_admin_user,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
+    mocker,
 ):
     mock_save_temporary = mocker.patch(
         "app.main.views.letter_branding.logo_client.save_temporary_logo", return_value="temporary.svg"
@@ -251,7 +261,12 @@ def test_update_letter_branding_when_uploading_invalid_file(
 
 
 def test_update_letter_branding_with_original_file_and_new_details(
-    mocker, client_request, platform_admin_user, mock_get_all_letter_branding, mock_get_letter_branding_by_id, fake_uuid
+    client_request,
+    platform_admin_user,
+    mock_get_all_letter_branding,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
+    mocker,
 ):
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
     mock_save_temporary = mocker.patch("app.main.views.letter_branding.logo_client.save_temporary_logo")
@@ -286,7 +301,12 @@ def test_update_letter_branding_with_original_file_and_new_details(
 
 
 def test_update_letter_branding_shows_form_errors_on_name_fields(
-    mocker, client_request, platform_admin_user, mock_get_letter_branding_by_id, fake_uuid, logo_client
+    client_request,
+    platform_admin_user,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
+    logo_client,
+    mocker,
 ):
     mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
 
@@ -307,11 +327,11 @@ def test_update_letter_branding_shows_form_errors_on_name_fields(
 
 
 def test_update_letter_branding_shows_database_errors_on_name_field(
-    mocker,
     client_request,
     platform_admin_user,
     mock_get_letter_branding_by_id,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.main.views.letter_branding.letter_branding_client.update_letter_branding",
@@ -336,7 +356,11 @@ def test_update_letter_branding_shows_database_errors_on_name_field(
 
 
 def test_update_letter_branding_with_new_file_and_new_details(
-    mocker, client_request, platform_admin_user, mock_get_letter_branding_by_id, fake_uuid
+    client_request,
+    platform_admin_user,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
+    mocker,
 ):
     mock_save_temporary = mocker.patch("app.main.views.letter_branding.logo_client.save_temporary_logo")
     mock_save_permanent = mocker.patch(
@@ -374,12 +398,12 @@ def test_update_letter_branding_with_new_file_and_new_details(
 
 
 def test_update_letter_branding_does_not_save_to_db_if_uploading_fails(
-    mocker,
     client_request,
     platform_admin_user,
     mock_get_letter_branding_by_id,
     fake_uuid,
     logo_client,
+    mocker,
 ):
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
     mock_create_update_letter_branding_event = mocker.patch(
@@ -417,7 +441,12 @@ def test_create_letter_branding_does_not_show_branding_info(
     assert page.select_one("#file").attrs.get("accept") == ".svg"
 
 
-def test_create_letter_branding_when_uploading_valid_file(mocker, client_request, platform_admin_user, fake_uuid):
+def test_create_letter_branding_when_uploading_valid_file(
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+    mocker,
+):
     mock_save_temporary = mocker.patch(
         "app.main.views.letter_branding.logo_client.save_temporary_logo", return_value="temporary.svg"
     )
@@ -452,7 +481,11 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
     ),
 )
 def test_create_letter_branding_calls_antivirus_scan(
-    mocker, client_request, platform_admin_user, scan_result, expected_status_code
+    client_request,
+    platform_admin_user,
+    scan_result,
+    expected_status_code,
+    mocker,
 ):
     mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=scan_result)
     mock_save_temporary = mocker.patch(
@@ -501,11 +534,11 @@ def test_create_letter_branding_calls_antivirus_scan(
     ),
 )
 def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_element(
-    mocker,
     client_request,
     platform_admin_user,
     svg_contents,
     expected_error,
+    mocker,
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_save_temporary = mocker.patch("app.main.views.letter_branding.logo_client.save_temporary_logo")
@@ -569,12 +602,12 @@ def test_create_letter_branding_shows_an_error_when_submitting_details_with_no_l
 
 
 def test_create_letter_branding_persists_logo_when_all_data_is_valid(
-    mocker,
     client_request,
     platform_admin_user,
     mock_get_all_letter_branding,
     fake_uuid,
     mock_create_letter_branding,
+    mocker,
 ):
     mock_save_permanent = mocker.patch(
         "app.main.views.letter_branding.logo_client.save_permanent_logo", return_value="permanent.svg"
@@ -616,9 +649,9 @@ def test_create_letter_branding_shows_form_errors_on_name_field(client_request, 
 
 
 def test_create_letter_branding_shows_database_errors_on_name_fields(
-    mocker,
     client_request,
     platform_admin_user,
+    mocker,
 ):
     mocker.patch(
         "app.main.views.letter_branding.letter_branding_client.create_letter_branding",

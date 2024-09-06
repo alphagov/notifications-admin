@@ -34,7 +34,7 @@ from tests import notification_json, single_notification_json
 )
 def test_client_gets_notifications_for_service_and_job_by_page(mocker, arguments, expected_call):
     mock_get = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get")
-    NotificationApiClient().get_notifications_for_service("abcd1234", **arguments)
+    NotificationApiClient(mocker.MagicMock()).get_notifications_for_service("abcd1234", **arguments)
     mock_get.assert_called_once_with(**expected_call)
 
 
@@ -62,7 +62,7 @@ def test_client_gets_notifications_for_service_and_job_by_page(mocker, arguments
 )
 def test_client_gets_notifications_for_service_and_job_by_page_posts_for_to(mocker, arguments, expected_call):
     mock_post = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.post")
-    NotificationApiClient().get_notifications_for_service("abcd1234", **arguments)
+    NotificationApiClient(mocker.MagicMock()).get_notifications_for_service("abcd1234", **arguments)
     mock_post.assert_called_once_with(**expected_call)
 
 
@@ -107,13 +107,18 @@ def test_client_gets_notifications_for_service_and_job_by_page_posts_for_to(mock
 )
 def test_client_gets_notifications_for_service_for_csv(mocker, arguments, expected_call):
     mock_get = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get")
-    NotificationApiClient().get_notifications_for_service_for_csv("abcd1234", **arguments)
+    NotificationApiClient(mocker.MagicMock()).get_notifications_for_service_for_csv("abcd1234", **arguments)
     mock_get.assert_called_once_with(**expected_call)
 
 
-def test_send_notification(mocker, client_request, active_user_with_permissions):
+def test_send_notification(
+    notify_admin,
+    client_request,
+    active_user_with_permissions,
+    mocker,
+):
     mock_post = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.post")
-    NotificationApiClient().send_notification(
+    NotificationApiClient(notify_admin).send_notification(
         "foo", template_id="bar", recipient="07700900001", personalisation=None, sender_id=None
     )
     mock_post.assert_called_once_with(
@@ -127,9 +132,14 @@ def test_send_notification(mocker, client_request, active_user_with_permissions)
     )
 
 
-def test_send_precompiled_letter(mocker, client_request, active_user_with_permissions):
+def test_send_precompiled_letter(
+    notify_admin,
+    client_request,
+    active_user_with_permissions,
+    mocker,
+):
     mock_post = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.post")
-    NotificationApiClient().send_precompiled_letter(
+    NotificationApiClient(notify_admin).send_precompiled_letter(
         "abcd-1234", "my_file.pdf", "file-ID", "second", "Bugs Bunny, 12 Hole Avenue, Looney Town"
     )
     mock_post.assert_called_once_with(
@@ -146,7 +156,7 @@ def test_send_precompiled_letter(mocker, client_request, active_user_with_permis
 
 def test_get_notification(mocker):
     mock_get = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get")
-    NotificationApiClient().get_notification("foo", "bar")
+    NotificationApiClient(mocker.MagicMock()).get_notification("foo", "bar")
     mock_get.assert_called_once_with(url="/service/foo/notifications/bar")
 
 
@@ -170,7 +180,7 @@ def test_get_api_notifications_changes_letter_statuses(mocker, letter_status, ex
 
     mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get", return_value=notis)
 
-    ret = NotificationApiClient().get_api_notifications_for_service(service_id)
+    ret = NotificationApiClient(mocker.MagicMock()).get_api_notifications_for_service(service_id)
 
     assert ret["notifications"][0]["notification_type"] == "sms"
     assert ret["notifications"][1]["notification_type"] == "email"
@@ -182,7 +192,7 @@ def test_get_api_notifications_changes_letter_statuses(mocker, letter_status, ex
 
 def test_update_notification_to_cancelled(mocker):
     mock_post = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.post")
-    NotificationApiClient().update_notification_to_cancelled("foo", "bar")
+    NotificationApiClient(mocker.MagicMock()).update_notification_to_cancelled("foo", "bar")
     mock_post.assert_called_once_with(
         url="/service/foo/notifications/bar/cancel",
         data={},
@@ -191,7 +201,7 @@ def test_update_notification_to_cancelled(mocker):
 
 def test_get_notification_count_for_job_id(mocker):
     mock_get = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get")
-    NotificationApiClient().get_notification_count_for_job_id(service_id="foo", job_id="bar")
+    NotificationApiClient(mocker.MagicMock()).get_notification_count_for_job_id(service_id="foo", job_id="bar")
     mock_get.assert_called_once_with(
         url="/service/foo/job/bar/notification_count",
     )
@@ -212,7 +222,7 @@ def test_get_notifications_count_for_service(mocker, test_case):
     mock_get = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get")
     mock_get.return_value = {"notifications_sent_count": test_case.expected_count}
 
-    result = NotificationApiClient().get_notifications_count_for_service(
+    result = NotificationApiClient(mocker.MagicMock()).get_notifications_count_for_service(
         service_id="foo", template_type=test_case.template_type, limit_days=test_case.limit_days
     )
 

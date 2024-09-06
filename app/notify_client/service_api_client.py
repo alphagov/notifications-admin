@@ -1,7 +1,12 @@
+from contextvars import ContextVar
 from datetime import datetime
 
+from flask import current_app
 from notifications_utils.clients.redis import daily_limit_cache_key
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
 
+from app import memo_resetters
 from app.constants import LetterLanguageOptions
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
@@ -542,4 +547,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.get(f"/service/service-join-request/{request_id}")
 
 
-service_api_client = ServiceAPIClient()
+_service_api_client_context_var: ContextVar[ServiceAPIClient] = ContextVar("service_api_client")
+get_service_api_client: LazyLocalGetter[ServiceAPIClient] = LazyLocalGetter(
+    _service_api_client_context_var,
+    lambda: ServiceAPIClient(current_app),
+)
+memo_resetters.append(lambda: get_service_api_client.clear())
+service_api_client = LocalProxy(get_service_api_client)

@@ -127,8 +127,8 @@ def test_405_returns_something_went_wrong_page(client_request, mocker):
 
 
 def test_api_error_response_logging(
-    requests_mock,
     client_request,
+    requests_mock,
     caplog,
 ):
     response = requests.Response()

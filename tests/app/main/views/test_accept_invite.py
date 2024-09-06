@@ -583,8 +583,8 @@ def test_new_invited_user_verifies_and_added_to_service(
 
 @pytest.mark.parametrize("trial_mode", (True, False))
 def test_new_invited_user_is_redirected_to_correct_place(
-    mocker,
     client_request,
+    mocker,
     sample_invite,
     mock_check_invite_token,
     mock_dont_get_user_by_email,

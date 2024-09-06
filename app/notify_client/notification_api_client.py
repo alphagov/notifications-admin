@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user
 
 
@@ -142,4 +149,10 @@ class NotificationApiClient(NotifyAdminAPIClient):
         return response.get("notifications_sent_count")
 
 
-notification_api_client = NotificationApiClient()
+_notification_api_client_context_var: ContextVar[NotificationApiClient] = ContextVar("notification_api_client")
+get_notification_api_client: LazyLocalGetter[NotificationApiClient] = LazyLocalGetter(
+    _notification_api_client_context_var,
+    lambda: NotificationApiClient(current_app),
+)
+memo_resetters.append(lambda: get_notification_api_client.clear())
+notification_api_client = LocalProxy(get_notification_api_client)

@@ -494,13 +494,13 @@ def test_should_redirect_after_revoking_api_key(
 
 @pytest.mark.parametrize("route", ["main.api_keys", "main.create_api_key", "main.revoke_api_key"])
 def test_route_permissions(
-    mocker,
     notify_admin,
     fake_uuid,
     api_user_active,
     service_one,
     mock_get_api_keys,
     route,
+    mocker,
 ):
     with notify_admin.test_request_context():
         validate_route_permission(
@@ -517,13 +517,13 @@ def test_route_permissions(
 
 @pytest.mark.parametrize("route", ["main.api_keys", "main.create_api_key", "main.revoke_api_key"])
 def test_route_invalid_permissions(
-    mocker,
     notify_admin,
     fake_uuid,
     api_user_active,
     service_one,
     mock_get_api_keys,
     route,
+    mocker,
 ):
     with notify_admin.test_request_context():
         validate_route_permission(

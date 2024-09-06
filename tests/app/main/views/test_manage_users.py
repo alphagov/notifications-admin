@@ -397,12 +397,12 @@ def test_manage_users_page_links_to_user_profile_page_for_platform_admins(
 
 
 def test_manage_users_page_does_not_links_to_user_profile_page_if_user_only_invited(
-    mocker,
     client_request,
     active_user_with_permissions,
     service_one,
     mock_get_invites_for_service,
     mock_get_template_folders,
+    mocker,
 ):
     active_user_with_permissions["platform_admin"] = True
     mocker.patch("app.models.user.Users._get_items", return_value=[])
@@ -896,12 +896,12 @@ def test_should_show_page_for_inviting_user_with_email_prefilled(
 
 
 def test_should_show_page_if_prefilled_user_is_already_a_team_member(
-    mocker,
     client_request,
     mock_get_template_folders,
     fake_uuid,
     active_user_with_permissions,
     active_caseworking_user,
+    mocker,
 ):
     mocker.patch(
         "app.models.user.user_api_client.get_user",
@@ -927,13 +927,13 @@ def test_should_show_page_if_prefilled_user_is_already_a_team_member(
 
 
 def test_should_show_page_if_prefilled_user_is_already_invited(
-    mocker,
     client_request,
     mock_get_template_folders,
     fake_uuid,
     active_user_with_permissions,
     active_user_with_permission_to_other_service,
     mock_get_invites_for_service,
+    mocker,
 ):
     active_user_with_permission_to_other_service["email_address"] = "user_1@testnotify.gov.uk"
     client_request.login(active_user_with_permissions)
@@ -956,7 +956,6 @@ def test_should_show_page_if_prefilled_user_is_already_invited(
 
 
 def test_should_403_if_trying_to_prefill_email_address_for_user_with_no_organisation(
-    mocker,
     client_request,
     service_one,
     mock_get_template_folders,
@@ -965,6 +964,7 @@ def test_should_403_if_trying_to_prefill_email_address_for_user_with_no_organisa
     active_user_with_permission_to_other_service,
     mock_get_invites_for_service,
     mock_get_no_organisation_by_domain,
+    mocker,
 ):
     service_one["organisation"] = ORGANISATION_ID
     client_request.login(active_user_with_permissions)
@@ -981,7 +981,6 @@ def test_should_403_if_trying_to_prefill_email_address_for_user_with_no_organisa
 
 
 def test_should_403_if_trying_to_prefill_email_address_for_user_from_other_organisation(
-    mocker,
     client_request,
     service_one,
     mock_get_template_folders,
@@ -990,6 +989,7 @@ def test_should_403_if_trying_to_prefill_email_address_for_user_from_other_organ
     active_user_with_permission_to_other_service,
     mock_get_invites_for_service,
     mock_get_organisation_by_domain,
+    mocker,
 ):
     service_one["organisation"] = ORGANISATION_TWO_ID
     client_request.login(active_user_with_permissions)

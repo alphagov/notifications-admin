@@ -763,7 +763,6 @@ def test_letter_branding_option_preview_page_redirects_to_branding_options_page_
 
 
 def test_letter_branding_option_preview_changes_letter_branding_when_user_confirms(
-    mocker,
     service_one,
     organisation_one,
     client_request,
@@ -772,6 +771,7 @@ def test_letter_branding_option_preview_changes_letter_branding_when_user_confir
     mock_get_letter_branding_pool,
     mock_update_service,
     mock_get_service_data_retention,
+    mocker,
 ):
     organisation_one["organisation_type"] = "central"
     service_one["organisation"] = organisation_one
@@ -836,7 +836,6 @@ def test_letter_branding_nhs_page_returns_404_if_service_not_nhs(
 
 
 def test_letter_branding_nhs_changes_letter_branding_when_user_confirms(
-    mocker,
     service_one,
     organisation_one,
     client_request,
@@ -844,6 +843,7 @@ def test_letter_branding_nhs_changes_letter_branding_when_user_confirms(
     single_sms_sender,
     mock_get_letter_branding_pool,
     mock_update_service,
+    mocker,
 ):
     organisation_one["organisation_type"] = "nhs_central"
     service_one["organisation"] = organisation_one

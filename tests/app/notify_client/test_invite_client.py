@@ -70,7 +70,7 @@ def test_client_update_invite(
     )
 
 
-def test_client_returns_invite(mocker, sample_invite):
+def test_client_returns_invite(notify_admin, sample_invite, mocker):
     sample_invite["status"] = "pending"
     service_id = sample_invite["service"]
 

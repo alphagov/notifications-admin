@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, cache
 
@@ -53,4 +60,10 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
         self.delete(f"/service/{service_id}/template-folder/{template_folder_id}", {})
 
 
-template_folder_api_client = TemplateFolderAPIClient()
+_template_folder_api_client_context_var: ContextVar[TemplateFolderAPIClient] = ContextVar("template_folder_api_client")
+get_template_folder_api_client: LazyLocalGetter[TemplateFolderAPIClient] = LazyLocalGetter(
+    _template_folder_api_client_context_var,
+    lambda: TemplateFolderAPIClient(current_app),
+)
+memo_resetters.append(lambda: get_template_folder_api_client.clear())
+template_folder_api_client = LocalProxy(get_template_folder_api_client)

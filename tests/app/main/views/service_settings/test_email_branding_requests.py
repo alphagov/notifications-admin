@@ -41,12 +41,12 @@ def test_email_branding_options_page_back_link(
 
 
 def test_email_branding_options_page_shows_branding_if_set(
-    mocker,
     service_one,
     client_request,
     mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     mock_get_service_organisation,
+    mocker,
 ):
     mocker.patch(
         "app.models.service.Service.email_branding_id",
@@ -156,7 +156,6 @@ def test_email_branding_options_shows_query_param_branding_choice_selected(
     ),
 )
 def test_email_branding_options_page_shows_branding_pool_options_if_branding_pool_set_for_org(
-    mocker,
     service_one,
     organisation_one,
     client_request,
@@ -164,6 +163,7 @@ def test_email_branding_options_page_shows_branding_pool_options_if_branding_poo
     mock_get_email_branding_pool,
     organisation_type,
     expected_options,
+    mocker,
 ):
     service_one["organisation_type"] = organisation_type
     organisation_one["organisation_type"] = organisation_type
@@ -212,7 +212,6 @@ def test_email_branding_options_page_shows_branding_pool_options_if_branding_poo
     ),
 )
 def test_email_branding_options_page_shows_divider_if_there_are_lots_of_options(
-    mocker,
     service_one,
     organisation_one,
     client_request,
@@ -220,6 +219,7 @@ def test_email_branding_options_page_shows_divider_if_there_are_lots_of_options(
     mock_get_email_branding_pool,
     pool_contents,
     expected_options,
+    mocker,
 ):
     service_one["organisation"] = organisation_one
 
@@ -242,11 +242,11 @@ def test_email_branding_options_page_shows_divider_if_there_are_lots_of_options(
 
 
 def test_email_branding_options_does_not_show_nhs_branding_twice(
-    mocker,
     service_one,
     organisation_one,
     client_request,
     mock_get_email_branding,
+    mocker,
 ):
     organisation_one["organisation_type"] = "nhs_central"
     service_one["organisation"] = organisation_one
@@ -273,11 +273,11 @@ def test_email_branding_options_does_not_show_nhs_branding_twice(
 
 
 def test_email_branding_options_page_shows_preview_if_something_else_is_only_option(
-    mocker,
     service_one,
     client_request,
     mock_get_email_branding,
     mock_get_empty_email_branding_pool,
+    mocker,
 ):
     service_one["organisation_type"] = "other"
     mocker.patch(
@@ -397,11 +397,11 @@ def test_email_branding_options_submit_when_no_radio_button_is_selected(
 
 
 def test_email_branding_options_page_redirects_to_choose_banner_type_page_if_something_else_is_only_option(
-    mocker,
     service_one,
     client_request,
     mock_get_email_branding,
     mock_get_empty_email_branding_pool,
+    mocker,
 ):
     service_one["organisation_type"] = "other"
     mocker.patch(
@@ -425,10 +425,10 @@ def test_email_branding_options_page_redirects_to_choose_banner_type_page_if_som
 
 
 def test_email_branding_options_page_redirects_nhs_specific_page(
-    mocker,
     service_one,
     client_request,
     organisation_one,
+    mocker,
 ):
     service_one["organisation"] = organisation_one["id"]
     mocker.patch(
@@ -460,7 +460,12 @@ def test_email_branding_options_page_redirects_nhs_specific_page(
 
 
 def test_email_branding_options_redirects_to_branding_preview_for_a_branding_pool_option(
-    mocker, service_one, organisation_one, client_request, mock_get_email_branding, mock_get_email_branding_pool
+    service_one,
+    organisation_one,
+    client_request,
+    mock_get_email_branding,
+    mock_get_email_branding_pool,
+    mocker,
 ):
     organisation_one["organisation_type"] = "central"
     service_one["organisation"] = organisation_one
@@ -538,7 +543,6 @@ def test_email_branding_option_preview_page_redirects_to_branding_request_page_i
 
 
 def test_email_branding_option_preview_changes_email_branding_when_user_confirms(
-    mocker,
     service_one,
     organisation_one,
     client_request,
@@ -547,6 +551,7 @@ def test_email_branding_option_preview_changes_email_branding_when_user_confirms
     mock_get_email_branding_pool,
     mock_update_service,
     mock_get_service_data_retention,
+    mocker,
 ):
     organisation_one["organisation_type"] = "central"
     service_one["organisation"] = organisation_one
@@ -636,7 +641,6 @@ def test_email_branding_pages_give_404_if_selected_branding_not_allowed(
 
 
 def test_email_branding_govuk_submit(
-    mocker,
     client_request,
     service_one,
     organisation_one,
@@ -646,6 +650,7 @@ def test_email_branding_govuk_submit(
     single_sms_sender,
     mock_update_service,
     mock_get_service_data_retention,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -682,6 +687,7 @@ def test_email_branding_nhs_submit(
     single_sms_sender,
     mock_update_service,
     mock_get_service_data_retention,
+    mocker,
 ):
     service_one["email_branding"] = sample_uuid()
     service_one["organisation_type"] = "nhs_local"
@@ -880,11 +886,11 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
     ),
 )
 def test_email_branding_create_government_identity_logo(
-    mocker,
     client_request,
     service_one,
     extra_brandings_to_create,
     expected_branding_id_in_iframe,
+    mocker,
 ):
     mocker.patch(
         "app.models.branding.AllEmailBranding._get_items",
@@ -986,7 +992,12 @@ def test_GET_email_branding_enter_government_identity_logo_text_protects_against
     ],
 )
 def test_POST_email_branding_enter_government_identity_logo_text(
-    mocker, client_request, service_one, extra_url_args, expected_ticket_content, expected_extra_url_args
+    client_request,
+    service_one,
+    extra_url_args,
+    expected_ticket_content,
+    expected_extra_url_args,
+    mocker,
 ):
     mock_send_ticket_to_zendesk = mocker.patch(
         "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
@@ -1022,7 +1033,11 @@ def test_POST_email_branding_enter_government_identity_logo_text(
     )
 
 
-def test_email_branding_choose_logo_page(mocker, client_request, service_one):
+def test_email_branding_choose_logo_page(
+    client_request,
+    service_one,
+    mocker,
+):
     class FakeMD5:
         def hexdigest(self):
             return "abc123"
@@ -1110,10 +1125,10 @@ def test_email_branding_choose_logo_page_shows_form_prefilled(client_request, se
 
 
 def test_email_branding_choose_logo_page_prevents_xss_attacks(
-    mocker,
     client_request,
     service_one,
     organisation_one,
+    mocker,
 ):
     service_one["organisation"] = organisation_one
     organisation_one["name"] = "<script>evil</script>"
@@ -1272,7 +1287,12 @@ def test_GET_email_branding_upload_logo(
         {"brand_type": "org_banner", "colour": "#abcdef"},
     ),
 )
-def test_POST_email_branding_upload_logo_success(mocker, client_request, service_one, email_branding_data):
+def test_POST_email_branding_upload_logo_success(
+    client_request,
+    service_one,
+    email_branding_data,
+    mocker,
+):
     antivirus_mock = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_save_temporary = mocker.patch(
         "app.main.views.service_settings.branding.logo_client.save_temporary_logo", return_value="my-logo-path"
@@ -1326,7 +1346,11 @@ def test_POST_email_branding_upload_logo_success(mocker, client_request, service
     ),
 )
 def test_POST_email_branding_upload_logo_validation_errors(
-    mocker, client_request, service_one, post_data, expected_error
+    client_request,
+    service_one,
+    post_data,
+    expected_error,
+    mocker,
 ):
     # File opens are wrapped in a lambda (we only want to do this during the test run, not when tests are gathered)
     if callable(post_data):
@@ -1355,7 +1379,11 @@ def test_POST_email_branding_upload_logo_validation_errors(
     ),
 )
 def test_POST_email_branding_upload_logo_enforces_minimum_logo_height(
-    mocker, client_request, service_one, min_logo_height, expect_error
+    client_request,
+    service_one,
+    min_logo_height,
+    expect_error,
+    mocker,
 ):
     mocker.patch("app.main.views.service_settings.branding.logo_client.save_temporary_logo")
     mocker.patch("app.utils.image_processing.ImageProcessor")
@@ -1379,7 +1407,11 @@ def test_POST_email_branding_upload_logo_enforces_minimum_logo_height(
         assert f"Logo must be at least {min_logo_height} pixels high" in page.text
 
 
-def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(mocker, client_request, service_one):
+def test_POST_email_branding_upload_logo_resizes_and_pads_wide_short_logo(
+    client_request,
+    service_one,
+    mocker,
+):
     mocker.patch("app.main.views.service_settings.branding.logo_client.save_temporary_logo")
     mock_image_processor = mocker.patch("app.main.forms.ImageProcessor")
     mock_image_processor().height = ComparablePropertyMock(side_effect=[26, 13])

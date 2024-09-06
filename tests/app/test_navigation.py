@@ -392,17 +392,15 @@ EXCLUDED_ENDPOINTS = set(
 )
 
 
-def flask_app():
+def _get_all_endpoints():
     app = Flask("app")
     create_app(app)
 
-    ctx = app.app_context()
-    ctx.push()
-
-    yield app
+    with app.app_context():
+        return {rule.endpoint for rule in app.url_map.iter_rules()}
 
 
-all_endpoints = {rule.endpoint for rule in next(flask_app()).url_map.iter_rules()}
+all_endpoints = _get_all_endpoints()
 
 navigation_instances = (
     MainNavigation(),

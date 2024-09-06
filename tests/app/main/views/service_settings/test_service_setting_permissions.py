@@ -29,6 +29,7 @@ def get_service_settings_page(
 def test_service_set_permission_requires_platform_admin(
     client_request,
     service_one,
+    mocker,
 ):
     client_request.post(
         "main.service_set_permission",
@@ -105,7 +106,6 @@ def test_service_set_permission_requires_platform_admin(
     ],
 )
 def test_service_set_permission(
-    mocker,
     client_request,
     platform_admin_user,
     service_one,
@@ -114,6 +114,7 @@ def test_service_set_permission(
     initial_permissions,
     form_data,
     expected_update,
+    mocker,
 ):
     service_one["permissions"] = initial_permissions
     mock_update_service = mocker.patch("app.service_api_client.update_service")
@@ -161,7 +162,7 @@ def test_service_set_permission(
     ],
 )
 def test_service_setting_toggles_show(
-    mocker,
+    notify_admin,
     mock_get_service_organisation,
     get_service_settings_page,
     service_one,
@@ -169,6 +170,7 @@ def test_service_setting_toggles_show(
     endpoint,
     kwargs,
     text,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",

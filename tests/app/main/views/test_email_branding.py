@@ -47,7 +47,13 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
     "user_fixture, expected_response_status", (("api_user_active_email_auth", 403), ("platform_admin_user", 200))
 )
 def test_view_email_branding_requires_platform_admin(
-    mocker, client_request, mock_get_email_branding, user_fixture, expected_response_status, request, fake_uuid
+    client_request,
+    mock_get_email_branding,
+    user_fixture,
+    expected_response_status,
+    request,
+    fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.email_branding_client.get_orgs_and_services_associated_with_branding",
@@ -944,7 +950,11 @@ def test_create_email_branding_government_identity_colour_400_if_no_filename_or_
     )
 
 
-def test_post_create_email_branding_government_identity_form_colour(mocker, client_request, platform_admin_user):
+def test_post_create_email_branding_government_identity_form_colour(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
     mock_save_temporary = mocker.patch(
         "app.main.views.email_branding.logo_client.save_temporary_logo",
         return_value="temporary/email/example.png",

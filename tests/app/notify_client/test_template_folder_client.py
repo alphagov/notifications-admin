@@ -15,7 +15,7 @@ def test_create_template_folder_calls_correct_api_endpoint(mocker, parent_id):
     expected_url = f"/service/{some_service_id}/template-folder"
     data = {"name": "foo", "parent_id": parent_id}
 
-    client = TemplateFolderAPIClient()
+    client = TemplateFolderAPIClient(mocker.MagicMock())
 
     mock_post = mocker.patch("app.notify_client.template_folder_api_client.TemplateFolderAPIClient.post")
 
@@ -36,7 +36,7 @@ def test_get_template_folders_calls_correct_api_endpoint(mocker):
     expected_url = f"/service/{some_service_id}/template-folder"
     redis_key = f"service-{some_service_id}-template-folders"
 
-    client = TemplateFolderAPIClient()
+    client = TemplateFolderAPIClient(mocker.MagicMock())
 
     ret = client.get_template_folders(some_service_id)
 
@@ -54,7 +54,7 @@ def test_move_templates_and_folders(mocker):
     some_service_id = uuid.uuid4()
     some_folder_id = uuid.uuid4()
 
-    TemplateFolderAPIClient().move_to_folder(
+    TemplateFolderAPIClient(mocker.MagicMock()).move_to_folder(
         some_service_id,
         some_folder_id,
         template_ids=OrderedSet(("a", "b", "c")),
@@ -82,7 +82,7 @@ def test_move_templates_and_folders_to_root(mocker):
 
     some_service_id = uuid.uuid4()
 
-    TemplateFolderAPIClient().move_to_folder(
+    TemplateFolderAPIClient(mocker.MagicMock()).move_to_folder(
         some_service_id,
         None,
         template_ids=OrderedSet(("a", "b", "c")),
@@ -106,7 +106,7 @@ def test_update_template_folder_calls_correct_api_endpoint(mocker):
     expected_url = f"/service/{some_service_id}/template-folder/{template_folder_id}"
     data = {"name": "foo", "users_with_permission": ["some_id"]}
 
-    client = TemplateFolderAPIClient()
+    client = TemplateFolderAPIClient(mocker.MagicMock())
 
     mock_post = mocker.patch("app.notify_client.template_folder_api_client.TemplateFolderAPIClient.post")
 
@@ -123,7 +123,7 @@ def test_delete_template_folder_calls_correct_api_endpoint(mocker):
     template_folder_id = uuid.uuid4()
     expected_url = f"/service/{some_service_id}/template-folder/{template_folder_id}"
 
-    client = TemplateFolderAPIClient()
+    client = TemplateFolderAPIClient(mocker.MagicMock())
 
     mock_delete = mocker.patch("app.notify_client.template_folder_api_client.TemplateFolderAPIClient.delete")
 

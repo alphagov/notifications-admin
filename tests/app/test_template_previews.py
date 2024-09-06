@@ -33,8 +33,8 @@ from tests.conftest import create_notification
     [(LetterBranding({"filename": "hm-government"}), "hm-government"), (LetterBranding.from_id(None), None)],
 )
 def test_get_preview_for_templated_letter_makes_request(
-    mocker,
     client_request,
+    mocker,
     partial_call,
     expected_url,
     letter_branding,
@@ -79,8 +79,8 @@ def test_get_preview_for_templated_letter_makes_request(
     ),
 )
 def test_get_preview_for_templated_letter_allows_service_branding_to_be_overridden(
-    mocker,
     client_request,
+    mocker,
     extra_args,
     expected_filename,
     mock_get_service_letter_template,
@@ -100,8 +100,8 @@ def test_get_preview_for_templated_letter_allows_service_branding_to_be_overridd
 
 
 def test_get_preview_for_templated_letter_from_notification_has_correct_args(
-    mocker,
     client_request,
+    mocker,
     mock_onwards_request_headers,
 ):
     # This test is calling `current_service` outside a Flask endpoint, so we need to make sure
@@ -192,8 +192,8 @@ def test_get_preview_for_templated_letter_from_notification_400s_for_page_of_pdf
     ],
 )
 def test_get_png_for_valid_pdf_page_makes_request(
-    mocker,
     client_request,
+    mocker,
     mock_onwards_request_headers,
     page_number,
     expected_url,
@@ -218,8 +218,8 @@ def test_get_png_for_valid_pdf_page_makes_request(
 
 
 def test_get_png_for_invalid_pdf_page_makes_request(
-    mocker,
     client_request,
+    mocker,
     mock_onwards_request_headers,
 ):
     mocker.patch("app.template_previews.extract_page_from_pdf", return_value=b"pdf page")
@@ -257,8 +257,8 @@ def test_page_count_returns_none_for_non_letter_templates(template_type):
     ],
 )
 def test_page_count_makes_a_call_to_template_preview_and_gets_page_count(
-    mocker,
     client_request,
+    mocker,
     mock_get_service_letter_template,
     mock_onwards_request_headers,
     values,
@@ -297,8 +297,8 @@ def test_page_count_makes_a_call_to_template_preview_and_gets_page_count(
 
 @pytest.mark.parametrize("allow_international_letters, query_param_value", [[False, "false"], [True, "true"]])
 def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file(
-    mocker,
     client_request,
+    mocker,
     mock_onwards_request_headers,
     allow_international_letters,
     query_param_value,
@@ -327,8 +327,8 @@ def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file(
 
 
 def test_sanitise_letter_calls_template_preview_sanitise_endpoint_with_file_for_an_attachment(
-    mocker,
     client_request,
+    mocker,
     mock_onwards_request_headers,
     fake_uuid,
 ):

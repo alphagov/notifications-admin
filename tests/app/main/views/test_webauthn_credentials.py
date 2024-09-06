@@ -52,10 +52,10 @@ def test_begin_register_forbidden_unless_can_use_webauthn(
 
 
 def test_begin_register_returns_encoded_options(
-    mocker,
     platform_admin_user,
     client_request,
     webauthn_dev_server,
+    mocker,
 ):
     mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items", return_value=[])
 

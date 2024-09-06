@@ -2,7 +2,7 @@ from app.notify_client.letter_rate_api_client import LetterRateApiClient
 
 
 def test_sets_value_in_cache(mocker):
-    client = LetterRateApiClient()
+    client = LetterRateApiClient(mocker.MagicMock())
 
     mock_redis_get = mocker.patch("app.extensions.RedisClient.get", return_value=None)
     mock_api_get = mocker.patch(
@@ -21,7 +21,7 @@ def test_sets_value_in_cache(mocker):
 
 
 def test_returns_value_from_cache(mocker):
-    client = LetterRateApiClient()
+    client = LetterRateApiClient(mocker.MagicMock())
 
     mock_redis_get = mocker.patch(
         "app.extensions.RedisClient.get",

@@ -216,12 +216,12 @@ def test_notification_status_shows_expected_back_link(
     ),
 )
 def test_notification_page_doesnt_link_to_template_in_tour(
-    mocker,
     client_request,
     fake_uuid,
     mock_get_notification,
     time_of_viewing_page,
     expected_message,
+    mocker,
 ):
     with freeze_time("2012-01-01 01:01"):
         notification = create_notification()
@@ -914,10 +914,10 @@ def test_cancel_letter_catches_errors_from_API(
 
 @pytest.mark.parametrize("notification_type", ["sms", "email"])
 def test_should_show_reply_to_from_notification(
-    mocker,
     fake_uuid,
     notification_type,
     client_request,
+    mocker,
 ):
     notification = create_notification(reply_to_text="reply to info", template_type=notification_type)
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)

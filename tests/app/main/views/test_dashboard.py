@@ -452,11 +452,11 @@ def test_download_inbox(
     ],
 )
 def test_download_inbox_strips_formulae(
-    mocker,
     client_request,
     fake_uuid,
     message_content,
     expected_cell,
+    mocker,
 ):
     mocker.patch(
         "app.service_api_client.get_inbound_sms",
@@ -904,7 +904,6 @@ def test_should_show_upcoming_jobs_on_dashboard(
 
 
 def test_should_not_show_upcoming_jobs_on_dashboard_if_count_is_0(
-    mocker,
     client_request,
     mock_get_service_templates,
     mock_get_template_statistics,
@@ -915,6 +914,7 @@ def test_should_not_show_upcoming_jobs_on_dashboard_if_count_is_0(
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
+    mocker,
 ):
     mocker.patch(
         "app.job_api_client.get_scheduled_job_stats",
@@ -933,7 +933,6 @@ def test_should_not_show_upcoming_jobs_on_dashboard_if_count_is_0(
 
 
 def test_should_not_show_upcoming_jobs_on_dashboard_if_service_has_no_jobs(
-    mocker,
     client_request,
     mock_get_service_templates,
     mock_get_template_statistics,
@@ -945,6 +944,7 @@ def test_should_not_show_upcoming_jobs_on_dashboard_if_service_has_no_jobs(
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
+    mocker,
 ):
     page = client_request.get(
         "main.service_dashboard",
@@ -1083,7 +1083,10 @@ def test_usage_page(
 
 @freeze_time("2012-03-31 12:12:12")
 def test_usage_page_no_sms_spend(
-    mocker, client_request, mock_get_monthly_usage_for_service, mock_get_free_sms_fragment_limit
+    client_request,
+    mock_get_monthly_usage_for_service,
+    mock_get_free_sms_fragment_limit,
+    mocker,
 ):
     mocker.patch(
         "app.billing_api_client.get_annual_usage_for_service",
@@ -1143,13 +1146,13 @@ def test_usage_page_no_sms_spend(
 )
 @freeze_time("2012-03-31 12:12:12")
 def test_usage_page_font_size(
-    mocker,
     client_request,
     mock_get_monthly_usage_for_service,
     mock_get_free_sms_fragment_limit,
     annual_usage,
     expected_css_class,
     expected_item_count,
+    mocker,
 ):
     mocker.patch(
         "app.billing_api_client.get_annual_usage_for_service",
@@ -1232,10 +1235,10 @@ def test_usage_page_letter_breakdown_ordered_by_postage_and_rate(
 
 
 def test_usage_page_with_0_free_allowance(
-    mocker,
     client_request,
     mock_get_annual_usage_for_service,
     mock_get_monthly_usage_for_service,
+    mocker,
 ):
     mocker.patch(
         "app.billing_api_client.get_free_sms_fragment_limit_for_year",
@@ -1481,7 +1484,6 @@ def test_menu_all_services_for_platform_admin_user(
 
 
 def test_route_for_service_permissions(
-    mocker,
     notify_admin,
     api_user_active,
     service_one,
@@ -1496,6 +1498,7 @@ def test_route_for_service_permissions(
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
+    mocker,
 ):
     with notify_admin.test_request_context():
         validate_route_permission(
@@ -1541,7 +1544,6 @@ def test_aggregate_notifications_stats():
 
 
 def test_service_dashboard_updates_gets_dashboard_totals(
-    mocker,
     client_request,
     mock_get_service_templates,
     mock_get_template_statistics,
@@ -1552,6 +1554,7 @@ def test_service_dashboard_updates_gets_dashboard_totals(
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
+    mocker,
 ):
     mocker.patch(
         "app.main.views.dashboard.get_dashboard_totals",
@@ -1574,7 +1577,6 @@ def test_service_dashboard_updates_gets_dashboard_totals(
 
 
 def test_service_dashboard_totals_link_to_view_notifications(
-    mocker,
     client_request,
     mock_get_service_templates,
     mock_get_template_statistics,
@@ -1585,6 +1587,7 @@ def test_service_dashboard_totals_link_to_view_notifications(
     mock_get_free_sms_fragment_limit,
     mock_get_inbound_sms_summary,
     mock_get_returned_letter_statistics_with_no_returned_letters,
+    mocker,
 ):
     mocker.patch(
         "app.main.views.dashboard.get_dashboard_totals",
@@ -1745,7 +1748,6 @@ def test_org_breadcrumbs_do_not_show_if_service_has_no_org(
 
 
 def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
-    mocker,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
     active_caseworking_user,
@@ -1754,6 +1756,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
     mock_get_unsubscribe_requests_statistics,
     mock_get_returned_letter_statistics_with_no_returned_letters,
     mock_get_api_keys,
+    mocker,
 ):
     # active_caseworking_user is not an org member
 
@@ -1769,7 +1772,6 @@ def test_org_breadcrumbs_do_not_show_if_user_is_not_an_org_member(
 
 
 def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
-    mocker,
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
@@ -1779,6 +1781,7 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     active_user_with_permissions,
     client_request,
+    mocker,
 ):
     # active_user_with_permissions (used by the client_request) is an org member
 
@@ -1802,7 +1805,6 @@ def test_org_breadcrumbs_show_if_user_is_a_member_of_the_services_org(
 
 
 def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but_service_is_in_trial_mode(
-    mocker,
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
@@ -1812,6 +1814,7 @@ def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but
     mock_get_returned_letter_statistics_with_no_returned_letters,
     active_user_with_permissions,
     client_request,
+    mocker,
 ):
     # active_user_with_permissions (used by the client_request) is an org member
 
@@ -1828,7 +1831,6 @@ def test_org_breadcrumbs_do_not_show_if_user_is_a_member_of_the_services_org_but
 
 
 def test_org_breadcrumbs_show_if_user_is_platform_admin(
-    mocker,
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
@@ -1838,6 +1840,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     platform_admin_user,
     client_request,
+    mocker,
 ):
     service_one_json = service_json(SERVICE_ONE_ID, users=[platform_admin_user["id"]], organisation_id=ORGANISATION_ID)
 
@@ -1859,7 +1862,6 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
 
 
 def test_breadcrumb_shows_if_service_is_suspended(
-    mocker,
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
@@ -1869,6 +1871,7 @@ def test_breadcrumb_shows_if_service_is_suspended(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     platform_admin_user,
     client_request,
+    mocker,
 ):
     service_one_json = service_json(SERVICE_ONE_ID, active=False)
     client_request.login(platform_admin_user, service=service_one_json)
@@ -1906,7 +1909,6 @@ def test_service_dashboard_shows_usage(
 
 
 def test_service_dashboard_shows_free_allowance(
-    mocker,
     client_request,
     service_one,
     mock_get_service_templates,
@@ -1915,6 +1917,7 @@ def test_service_dashboard_shows_free_allowance(
     mock_has_no_jobs,
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
+    mocker,
 ):
     mocker.patch(
         "app.billing_api_client.get_annual_usage_for_service",
@@ -1960,7 +1963,6 @@ def test_service_dashboard_shows_free_allowance(
     ),
 )
 def test_service_dashboard_shows_usage_in_correct_font_size(
-    mocker,
     client_request,
     service_one,
     mock_get_service_templates,
@@ -1971,6 +1973,7 @@ def test_service_dashboard_shows_usage_in_correct_font_size(
     mock_get_returned_letter_statistics_with_no_returned_letters,
     annual_usage,
     expected_css_class,
+    mocker,
 ):
     mocker.patch(
         "app.billing_api_client.get_annual_usage_for_service",

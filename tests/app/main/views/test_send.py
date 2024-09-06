@@ -1219,7 +1219,6 @@ def test_404_for_previewing_a_row_out_of_range(
 
 @pytest.mark.parametrize("template_type", ["sms", "email", "letter"])
 def test_send_one_off_step_redirects_to_start_if_session_not_setup(
-    mocker,
     client_request,
     mock_get_service_statistics,
     mock_get_users_by_service,
@@ -1227,6 +1226,7 @@ def test_send_one_off_step_redirects_to_start_if_session_not_setup(
     mock_get_no_contact_lists,
     fake_uuid,
     template_type,
+    mocker,
 ):
     template_data = create_template(template_type=template_type, content="Hi ((name))")
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
@@ -1396,7 +1396,6 @@ def test_send_one_off_shows_placeholders_in_correct_order(
     ),
 )
 def test_send_one_off_only_asks_for_recipient_once(
-    mocker,
     client_request,
     fake_uuid,
     template_type,
@@ -1407,6 +1406,7 @@ def test_send_one_off_only_asks_for_recipient_once(
     step_index,
     css_selector_for_content,
     expected_content,
+    mocker,
 ):
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -1505,7 +1505,6 @@ def test_send_one_off_has_skip_link(
     ],
 )
 def test_send_one_off_has_sticky_header_for_email(
-    mocker,
     client_request,
     fake_uuid,
     mock_has_no_jobs,
@@ -1514,6 +1513,7 @@ def test_send_one_off_has_sticky_header_for_email(
     multiple_sms_senders,
     template_type,
     expected_sticky,
+    mocker,
 ):
     template_data = create_template(template_type=template_type, content="((body))")
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
@@ -1531,10 +1531,10 @@ def test_send_one_off_has_sticky_header_for_email(
 
 
 def test_send_one_off_has_sticky_header_for_letter_on_non_address_placeholders(
-    mocker,
     client_request,
     fake_uuid,
     mock_get_live_service,
+    mocker,
 ):
     template_data = create_template(template_type="letter", content="((body))")
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
@@ -1676,13 +1676,13 @@ def test_send_one_off_has_link_to_use_existing_list(
 
 
 def test_no_link_to_use_existing_list_for_service_without_lists(
-    mocker,
     client_request,
     mock_get_service_template,
     mock_has_jobs,
     multiple_sms_senders,
     platform_admin_user,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.models.contact_list.ContactLists._get_items",
@@ -2674,7 +2674,6 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     ],
 )
 def test_upload_csvfile_with_international_validates(
-    mocker,
     client_request,
     mock_get_service_template,
     mock_s3_set_metadata,
@@ -2689,6 +2688,7 @@ def test_upload_csvfile_with_international_validates(
     international_sms_permission,
     should_allow_international,
     service_one,
+    mocker,
 ):
     if international_sms_permission:
         service_one["permissions"] += ("sms", "international_sms")
@@ -2720,7 +2720,6 @@ def test_upload_csvfile_with_international_validates(
     ],
 )
 def test_upload_csvfile_with_sms_to_landline_validates(
-    mocker,
     client_request,
     mock_get_service_template,
     mock_s3_set_metadata,
@@ -2735,6 +2734,7 @@ def test_upload_csvfile_with_sms_to_landline_validates(
     sms_to_uk_landline_permission,
     should_allow_sms_to_uk_landline,
     service_one,
+    mocker,
 ):
     if sms_to_uk_landline_permission:
         service_one["permissions"] += ("sms", "sms_to_uk_landlines")
@@ -3019,7 +3019,6 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
     "route, response_code", [("main.send_messages", 200), ("main.get_example_csv", 200), ("main.send_one_off", 302)]
 )
 def test_route_permissions(
-    mocker,
     notify_admin,
     client_request,
     api_user_active,
@@ -3033,6 +3032,7 @@ def test_route_permissions(
     fake_uuid,
     route,
     response_code,
+    mocker,
 ):
     validate_route_permission(
         mocker,
@@ -3050,7 +3050,6 @@ def test_route_permissions(
     "route, response_code, method", [("main.check_notification", 200, "GET"), ("main.send_notification", 302, "POST")]
 )
 def test_route_permissions_send_check_notifications(
-    mocker,
     notify_admin,
     client_request,
     api_user_active,
@@ -3061,6 +3060,7 @@ def test_route_permissions_send_check_notifications(
     route,
     response_code,
     method,
+    mocker,
 ):
     with client_request.session_transaction() as session:
         session["recipient"] = "07700900001"
@@ -3086,7 +3086,6 @@ def test_route_permissions_send_check_notifications(
     ],
 )
 def test_route_permissions_sending(
-    mocker,
     notify_admin,
     client_request,
     api_user_active,
@@ -3099,6 +3098,7 @@ def test_route_permissions_sending(
     fake_uuid,
     route,
     expected_status,
+    mocker,
 ):
     validate_route_permission(
         mocker,
@@ -3179,7 +3179,6 @@ def test_check_messages_back_link(
     ids=["none_sent", "none_sent", "some_sent"],
 )
 def test_check_messages_shows_too_many_messages_errors(
-    mocker,
     client_request,
     mock_get_service,  # set sms_message_limit to 50
     mock_get_users_by_service,
@@ -3190,6 +3189,7 @@ def test_check_messages_shows_too_many_messages_errors(
     num_requested,
     expected_msg,
     mock_s3_get_metadata,
+    mocker,
 ):
     # csv with 100 phone numbers
     mocker.patch(
@@ -3365,7 +3365,6 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
 
 
 def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
-    mocker,
     client_request,
     mock_get_service_letter_template,
     mock_has_permissions,
@@ -3375,6 +3374,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     mock_get_jobs,
     fake_uuid,
     mock_s3_get_metadata,
+    mocker,
 ):
     mocker.patch(
         "app.main.views.send.s3download",
@@ -3454,7 +3454,6 @@ def test_warns_if_file_sent_already(
 
 
 def test_check_messages_column_error_doesnt_show_optional_columns(
-    mocker,
     client_request,
     mock_get_service_letter_template,
     mock_has_permissions,
@@ -3464,6 +3463,7 @@ def test_check_messages_column_error_doesnt_show_optional_columns(
     mock_get_job_doesnt_exist,
     mock_get_jobs,
     mock_s3_get_metadata,
+    mocker,
 ):
     mocker.patch(
         "app.main.views.send.s3download",
@@ -3832,7 +3832,7 @@ def test_check_notification_shows_preview(client_request, service_one, fake_uuid
     )
 
 
-def test_check_notification_shows_back_link(mocker, client_request, service_one, fake_uuid, mock_template_preview):
+def test_check_notification_shows_back_link(client_request, service_one, fake_uuid, mock_template_preview, mocker):
     service_one["restricted"] = False
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -4273,7 +4273,6 @@ def test_redirects_to_template_if_job_exists_already(
 )
 @freeze_time("2020-06-13 13:00")
 def test_choose_from_contact_list(
-    mocker,
     client_request,
     mock_get_contact_lists,
     fake_uuid,
@@ -4282,6 +4281,7 @@ def test_choose_from_contact_list(
     expected_filenames,
     expected_time,
     expected_count,
+    mocker,
 ):
     template = create_template(template_type=template_type)
     mocker.patch(
@@ -4308,10 +4308,10 @@ def test_choose_from_contact_list(
 
 
 def test_choose_from_contact_list_with_personalised_template(
-    mocker,
     client_request,
     mock_get_contact_lists,
     fake_uuid,
+    mocker,
 ):
     template = create_template(content="Hey ((name)) ((thing)) is happening")
     mocker.patch(
@@ -4332,10 +4332,10 @@ def test_choose_from_contact_list_with_personalised_template(
 
 
 def test_choose_from_contact_list_with_no_lists(
-    mocker,
     client_request,
     mock_get_service_template,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.models.contact_list.ContactLists._get_items",
@@ -4358,10 +4358,10 @@ def test_choose_from_contact_list_with_no_lists(
 
 
 def test_send_from_contact_list(
-    mocker,
     client_request,
     fake_uuid,
     mock_get_contact_list,
+    mocker,
 ):
     new_uuid = uuid.uuid4()
     mock_download = mocker.patch("app.models.contact_list.s3download", return_value="contents")
@@ -4394,7 +4394,9 @@ def test_send_from_contact_list(
 
 
 def test_send_to_myself_sets_placeholder_and_redirects_for_email(
-    client_request, fake_uuid, mock_get_service_email_template
+    client_request,
+    fake_uuid,
+    mock_get_service_email_template,
 ):
     with client_request.session_transaction() as session:
         session["recipient"] = None
@@ -4417,7 +4419,11 @@ def test_send_to_myself_sets_placeholder_and_redirects_for_email(
         assert session["placeholders"] == {"email address": "test@user.gov.uk"}
 
 
-def test_send_to_myself_sets_placeholder_and_redirects_for_sms(client_request, fake_uuid, mock_get_service_template):
+def test_send_to_myself_sets_placeholder_and_redirects_for_sms(
+    client_request,
+    fake_uuid,
+    mock_get_service_template,
+):
     with client_request.session_transaction() as session:
         session["recipient"] = None
         session["placeholders"] = {}
@@ -4440,7 +4446,12 @@ def test_send_to_myself_sets_placeholder_and_redirects_for_sms(client_request, f
         assert session["placeholders"] == {"phone number": "07700 900762"}
 
 
-def test_send_to_myself_404s_for_letter(mocker, client_request, fake_uuid, mock_get_service_letter_template):
+def test_send_to_myself_404s_for_letter(
+    client_request,
+    fake_uuid,
+    mock_get_service_letter_template,
+    mocker,
+):
     with client_request.session_transaction() as session:
         session["recipient"] = None
         session["placeholders"] = {}

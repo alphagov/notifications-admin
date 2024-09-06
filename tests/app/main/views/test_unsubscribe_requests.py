@@ -632,7 +632,11 @@ def test_unsubscribe_landing_page(client_request, fake_uuid):
     assert normalize_spaces(page.select_one("form[method=post] button[type=submit]").text) == "Confirm"
 
 
-def test_unsubscribe_valid_request(mocker, client_request, fake_uuid):
+def test_unsubscribe_valid_request(
+    client_request,
+    fake_uuid,
+    mocker,
+):
     mock_unsubscribe = mocker.patch("app.unsubscribe_api_client.unsubscribe", return_value=True)
     client_request.post(
         "main.unsubscribe",
@@ -654,7 +658,11 @@ def test_unsubscribe_confirmation_page(client_request):
     assert not page.select_one("form")
 
 
-def test_unsubscribe_request_not_found(mocker, client_request, fake_uuid):
+def test_unsubscribe_request_not_found(
+    client_request,
+    fake_uuid,
+    mocker,
+):
     def _post(notification_id, token):
         raise HTTPError(response=Mock(status_code=404))
 
