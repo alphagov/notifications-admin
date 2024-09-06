@@ -11,7 +11,7 @@ from tests.utils import RedisClientMock
         ("1234", {"inbound_number_id": "1234"}),
     ],
 )
-def test_add_inbound_number_to_service(mocker, inbound_number_id, data):
+def test_add_inbound_number_to_service(mocker, notify_admin, inbound_number_id, data):
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
     mock_redis_delete_by_pattern = mocker.patch(
         "app.extensions.RedisClient.delete_by_pattern", new_callable=RedisClientMock

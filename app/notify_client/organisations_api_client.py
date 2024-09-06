@@ -1,8 +1,12 @@
+from contextvars import ContextVar
 from itertools import chain
 
-from flask import render_template
+from flask import current_app, render_template
 from notifications_python_client.errors import HTTPError
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
 
+from app import memo_resetters
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, cache
 
@@ -159,4 +163,10 @@ class OrganisationsClient(NotifyAdminAPIClient):
         )
 
 
-organisations_client = OrganisationsClient()
+_organisations_client_context_var: ContextVar[OrganisationsClient] = ContextVar("organisations_client")
+get_organisations_client: LazyLocalGetter[OrganisationsClient] = LazyLocalGetter(
+    _organisations_client_context_var,
+    lambda: OrganisationsClient(current_app),
+)
+memo_resetters.append(lambda: get_organisations_client.clear())
+organisations_client = LocalProxy(get_organisations_client)

@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user
 
 
@@ -33,4 +40,10 @@ class ContactListApiClient(NotifyAdminAPIClient):
         return self.delete(f"/service/{service_id}/contact-list/{contact_list_id}")
 
 
-contact_list_api_client = ContactListApiClient()
+_contact_list_api_client_context_var: ContextVar[ContactListApiClient] = ContextVar("contact_list_api_client")
+get_contact_list_api_client: LazyLocalGetter[ContactListApiClient] = LazyLocalGetter(
+    _contact_list_api_client_context_var,
+    lambda: ContactListApiClient(current_app),
+)
+memo_resetters.append(lambda: get_contact_list_api_client.clear())
+contact_list_api_client = LocalProxy(get_contact_list_api_client)

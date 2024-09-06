@@ -101,9 +101,9 @@ def _get_example_performance_data():
 
 @freeze_time("2021-01-01")
 def test_should_render_performance_page(
-    mocker,
     client_request,
     mock_get_service_and_organisation_counts,
+    mocker,
 ):
     mock_get_performance_data = mocker.patch(
         "app.performance_dashboard_api_client.get_performance_dashboard_stats",

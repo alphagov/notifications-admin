@@ -639,13 +639,13 @@ def test_show_limits_for_live_service(
 )
 @freeze_time("2017-04-01 11:09:00.061258")
 def test_switch_service_to_live(
-    mocker,
     client_request,
     platform_admin_user,
     mock_update_service,
     mock_get_inbound_number_for_service,
     mock_get_service_organisation,
     agreement_signed,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -740,13 +740,13 @@ def test_switch_service_to_restricted(
     ),
 )
 def test_show_switch_service_to_count_as_live_page(
-    mocker,
     client_request,
     platform_admin_user,
     mock_update_service,
     count_as_live,
     selected,
     labelled,
+    mocker,
 ):
     mocker.patch(
         "app.models.service.Service.count_as_live",
@@ -1848,10 +1848,10 @@ class TestServiceDataRetention:
     ),
 )
 def test_should_show_estimate_volumes(
-    mocker,
     client_request,
     volumes,
     displayed_volumes,
+    mocker,
 ):
     for channel, volume in volumes:
         mocker.patch(
@@ -2425,7 +2425,6 @@ def test_ready_to_go_live(
     ],
 )
 def test_route_permissions(
-    mocker,
     notify_admin,
     client_request,
     api_user_active,
@@ -2437,6 +2436,7 @@ def test_route_permissions(
     route,
     mock_get_service_settings_page_common,
     mock_get_service_templates,
+    mocker,
 ):
     validate_route_permission(
         mocker,
@@ -2463,7 +2463,6 @@ def test_route_permissions(
     ],
 )
 def test_route_invalid_permissions(
-    mocker,
     notify_admin,
     client_request,
     api_user_active,
@@ -2471,6 +2470,7 @@ def test_route_invalid_permissions(
     route,
     mock_get_service_templates,
     mock_get_invites_for_service,
+    mocker,
 ):
     validate_route_permission(
         mocker,
@@ -2494,7 +2494,6 @@ def test_route_invalid_permissions(
     ],
 )
 def test_route_for_platform_admin(
-    mocker,
     notify_admin,
     client_request,
     platform_admin_user,
@@ -2506,6 +2505,7 @@ def test_route_for_platform_admin(
     mock_get_service_settings_page_common,
     mock_get_service_templates,
     mock_get_invites_for_service,
+    mocker,
 ):
     validate_route_permission(
         mocker,
@@ -2799,7 +2799,11 @@ def test_incorrect_sms_sender_input_with_multiple_errors_only_shows_the_first(
     ],
 )
 def test_add_reply_to_email_address_sends_test_notification(
-    mocker, client_request, reply_to_addresses, data, api_default_args
+    client_request,
+    reply_to_addresses,
+    data,
+    api_default_args,
+    mocker,
 ):
     mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=reply_to_addresses)
     data["email_address"] = "test@example.com"
@@ -2822,7 +2826,9 @@ def test_add_reply_to_email_address_sends_test_notification(
 
 
 def test_service_add_reply_to_email_address_without_verification_for_platform_admin(
-    mocker, client_request, platform_admin_user
+    client_request,
+    platform_admin_user,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
@@ -2857,7 +2863,6 @@ def test_service_add_reply_to_email_address_without_verification_for_platform_ad
 )
 @freeze_time("2018-06-01 11:11:00.061258")
 def test_service_verify_reply_to_address(
-    mocker,
     client_request,
     fake_uuid,
     get_non_default_reply_to_email_address,
@@ -2867,6 +2872,7 @@ def test_service_verify_reply_to_address(
     is_default,
     replace,
     expected_header,
+    mocker,
 ):
     notification = {
         "id": fake_uuid,
@@ -2916,7 +2922,11 @@ def test_service_verify_reply_to_address(
 
 
 @freeze_time("2018-06-01 11:11:00.061258")
-def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_sec(mocker, client_request, fake_uuid):
+def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_sec(
+    client_request,
+    fake_uuid,
+    mocker,
+):
     notification = {
         "id": fake_uuid,
         "status": "sending",
@@ -2949,7 +2959,12 @@ def test_add_reply_to_email_address_fails_if_notification_not_delivered_in_45_se
     ],
 )
 def test_add_letter_contact(
-    letter_contact_blocks, data, api_default_args, mocker, client_request, mock_add_letter_contact
+    letter_contact_blocks,
+    data,
+    api_default_args,
+    client_request,
+    mock_add_letter_contact,
+    mocker,
 ):
     mocker.patch("app.service_api_client.get_letter_contacts", return_value=letter_contact_blocks)
 
@@ -3015,7 +3030,14 @@ def test_add_letter_contact_when_coming_from_template(
         (create_multiple_sms_senders(), {"is_default": "y"}, True),
     ],
 )
-def test_add_sms_sender(sms_senders, data, api_default_args, mocker, client_request, mock_add_sms_sender):
+def test_add_sms_sender(
+    sms_senders,
+    data,
+    api_default_args,
+    client_request,
+    mock_add_sms_sender,
+    mocker,
+):
     mocker.patch(
         "app.protected_sender_id_api_client.get_check_sender_id",
         return_value=False,
@@ -3034,7 +3056,12 @@ def test_add_sms_sender(sms_senders, data, api_default_args, mocker, client_requ
         (create_multiple_email_reply_to_addresses(), True),
     ],
 )
-def test_default_box_doesnt_show_on_first_email_sender(reply_to_addresses, mocker, checkbox_present, client_request):
+def test_default_box_doesnt_show_on_first_email_sender(
+    reply_to_addresses,
+    checkbox_present,
+    client_request,
+    mocker,
+):
     mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=reply_to_addresses)
 
     page = client_request.get("main.service_add_email_reply_to", service_id=SERVICE_ONE_ID)
@@ -3045,7 +3072,12 @@ def test_default_box_doesnt_show_on_first_email_sender(reply_to_addresses, mocke
 @pytest.mark.parametrize(
     "contact_blocks, checkbox_present", [([], False), (create_multiple_letter_contact_blocks(), True)]
 )
-def test_default_box_doesnt_show_on_first_letter_sender(contact_blocks, mocker, checkbox_present, client_request):
+def test_default_box_doesnt_show_on_first_letter_sender(
+    contact_blocks,
+    checkbox_present,
+    client_request,
+    mocker,
+):
     mocker.patch("app.service_api_client.get_letter_contacts", return_value=contact_blocks)
 
     page = client_request.get("main.service_add_letter_contact", service_id=SERVICE_ONE_ID)
@@ -3066,9 +3098,9 @@ def test_edit_reply_to_email_address_sends_verification_notification_if_address_
     reply_to_address,
     data,
     api_default_args,
-    mocker,
     fake_uuid,
     client_request,
+    mocker,
 ):
     mock_verify = mocker.patch(
         "app.service_api_client.verify_reply_to_email_address", return_value={"data": {"id": "123"}}
@@ -3082,7 +3114,10 @@ def test_edit_reply_to_email_address_sends_verification_notification_if_address_
 
 
 def test_service_edit_email_reply_to_updates_email_address_without_verification_for_platform_admin(
-    mocker, fake_uuid, client_request, platform_admin_user
+    fake_uuid,
+    client_request,
+    platform_admin_user,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
@@ -3118,7 +3153,13 @@ def test_service_edit_email_reply_to_updates_email_address_without_verification_
     ],
 )
 def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_changed(
-    reply_to_address, data, api_default_args, mocker, fake_uuid, client_request, mock_update_reply_to_email_address
+    reply_to_address,
+    data,
+    api_default_args,
+    fake_uuid,
+    client_request,
+    mock_update_reply_to_email_address,
+    mocker,
 ):
     mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
     mock_verify = mocker.patch("app.service_api_client.verify_reply_to_email_address")
@@ -3141,7 +3182,12 @@ def test_edit_reply_to_email_address_goes_straight_to_update_if_address_not_chan
     ],
 )
 def test_add_and_edit_reply_to_email_address(
-    mocker, fake_uuid, client_request, mock_update_reply_to_email_address, url, header_text
+    fake_uuid,
+    client_request,
+    mock_update_reply_to_email_address,
+    url,
+    header_text,
+    mocker,
 ):
     reply_to_email_address = create_reply_to_email_address()
     mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=[reply_to_email_address])
@@ -3180,11 +3226,11 @@ def test_add_and_edit_reply_to_email_address(
     ],
 )
 def test_shows_delete_link_for_get_request_for_edit_email_reply_to_address(
-    mocker,
     reply_to_address,
     default_choice_and_delete_link_expected,
     fake_uuid,
     client_request,
+    mocker,
 ):
     mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
 
@@ -3225,12 +3271,12 @@ def test_shows_delete_link_for_get_request_for_edit_email_reply_to_address(
     ],
 )
 def test_shows_delete_link_for_error_on_post_request_for_edit_email_reply_to_address(
-    mocker,
     reply_to_address,
     default_choice_and_delete_link_expected,
     default_checkbox_checked,
     fake_uuid,
     client_request,
+    mocker,
 ):
     mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
 
@@ -3313,7 +3359,13 @@ def test_delete_reply_to_email_address(
     ],
 )
 def test_edit_letter_contact_block(
-    letter_contact_block, data, api_default_args, mocker, fake_uuid, client_request, mock_update_letter_contact
+    letter_contact_block,
+    data,
+    api_default_args,
+    fake_uuid,
+    client_request,
+    mock_update_letter_contact,
+    mocker,
 ):
     mocker.patch("app.service_api_client.get_letter_contact", return_value=letter_contact_block)
     data["letter_contact_block"] = "1 Example Street"
@@ -3377,7 +3429,15 @@ def test_delete_letter_contact_block(
         (create_sms_sender(is_default=False), {"is_default": "y", "sms_sender": "test"}, True),
     ],
 )
-def test_edit_sms_sender(sms_sender, data, api_default_args, mocker, fake_uuid, client_request, mock_update_sms_sender):
+def test_edit_sms_sender(
+    sms_sender,
+    data,
+    api_default_args,
+    fake_uuid,
+    client_request,
+    mock_update_sms_sender,
+    mocker,
+):
 
     mocker.patch(
         "app.protected_sender_id_api_client.get_check_sender_id",
@@ -3447,7 +3507,6 @@ def test_edit_sms_sender(sms_sender, data, api_default_args, mocker, fake_uuid, 
 )
 def test_default_box_shows_on_non_default_sender_details_while_editing(
     fake_uuid,
-    mocker,
     sender_page,
     endpoint_to_mock,
     sender_details,
@@ -3455,6 +3514,7 @@ def test_default_box_shows_on_non_default_sender_details_while_editing(
     default_message,
     checkbox_present,
     params,
+    mocker,
 ):
     page_arguments = {"service_id": SERVICE_ONE_ID}
     page_arguments[params] = fake_uuid
@@ -3498,12 +3558,12 @@ def test_sender_details_are_escaped(client_request, mocker, fake_uuid):
     ],
 )
 def test_shows_delete_link_for_sms_sender(
-    mocker,
     sms_sender,
     expected_link_text,
     partial_href,
     fake_uuid,
     client_request,
+    mocker,
 ):
     mocker.patch("app.service_api_client.get_sms_sender", return_value=sms_sender)
 
@@ -3669,7 +3729,6 @@ def test_service_set_letter_branding_platform_admin_only(
     ],
 )
 def test_service_set_letter_branding_prepopulates(
-    mocker,
     client_request,
     platform_admin_user,
     service_one,
@@ -3677,6 +3736,7 @@ def test_service_set_letter_branding_prepopulates(
     letter_branding,
     expected_selected,
     expected_items,
+    mocker,
 ):
     service_one["letter_branding"] = letter_branding
 
@@ -3822,7 +3882,6 @@ def test_service_preview_letter_branding_saves(
     ],
 )
 def test_should_show_branding_styles(
-    mocker,
     client_request,
     platform_admin_user,
     service_one,
@@ -3830,6 +3889,7 @@ def test_should_show_branding_styles(
     current_branding,
     expected_values,
     expected_labels,
+    mocker,
 ):
     service_one["email_branding"] = current_branding
     mocker.patch(
@@ -3960,7 +4020,6 @@ def test_should_preview_email_branding(
     ),
 )
 def test_should_set_branding_for_service_with_organisation(
-    mocker,
     client_request,
     platform_admin_user,
     service_one,
@@ -3978,6 +4037,7 @@ def test_should_set_branding_for_service_with_organisation(
     service_should_be_updated,
     expected_redirect,
     expected_branding_id_in_call,
+    mocker,
 ):
     service_one["organisation"] = organisation_one
     service_id = SERVICE_ONE_ID
@@ -4039,7 +4099,11 @@ def test_should_set_branding_for_service_with_no_organisation(
 
 
 def test_get_service_set_email_branding_add_to_branding_pool_step(
-    mocker, client_request, platform_admin_user, service_one, organisation_one
+    client_request,
+    platform_admin_user,
+    service_one,
+    organisation_one,
+    mocker,
 ):
     service_one["organisation"] = organisation_one
     client_request.login(platform_admin_user)
@@ -4061,7 +4125,10 @@ def test_get_service_set_email_branding_add_to_branding_pool_step(
 
 
 def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_only(
-    mocker, client_request, service_one, organisation_one
+    client_request,
+    service_one,
+    organisation_one,
+    mocker,
 ):
     service_one["organisation"] = organisation_one
     email_branding_id = "234"
@@ -4082,7 +4149,6 @@ def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_
 
 @pytest.mark.parametrize("add_to_pool", ["yes", "no"])
 def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
-    mocker,
     client_request,
     platform_admin_user,
     service_one,
@@ -4093,6 +4159,7 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
     mock_get_free_sms_fragment_limit,
     mock_get_service_data_retention,
     mock_update_service,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     service_one["organisation"] = organisation_one
@@ -4135,7 +4202,11 @@ def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
 
 
 def test_get_service_set_letter_branding_add_to_branding_pool_step(
-    mocker, client_request, platform_admin_user, service_one, organisation_one
+    client_request,
+    platform_admin_user,
+    service_one,
+    organisation_one,
+    mocker,
 ):
     service_one["organisation"] = organisation_one
     client_request.login(platform_admin_user)
@@ -4158,7 +4229,11 @@ def test_get_service_set_letter_branding_add_to_branding_pool_step(
 
 
 def test_get_service_set_letter_branding_add_to_branding_pool_step_protects_against_xss(
-    mocker, client_request, platform_admin_user, service_one, organisation_one
+    client_request,
+    platform_admin_user,
+    service_one,
+    organisation_one,
+    mocker,
 ):
     service_one["organisation"] = organisation_one
     service_one["name"] = "<script>evil</script>"
@@ -4180,7 +4255,10 @@ def test_get_service_set_letter_branding_add_to_branding_pool_step_protects_agai
 
 
 def test_service_set_letter_branding_add_to_branding_pool_step_is_platform_admin_only(
-    mocker, client_request, service_one, organisation_one
+    client_request,
+    service_one,
+    organisation_one,
+    mocker,
 ):
     service_one["organisation"] = organisation_one
     letter_branding_id = "234"
@@ -4202,7 +4280,6 @@ def test_service_set_letter_branding_add_to_branding_pool_step_is_platform_admin
 
 @pytest.mark.parametrize("add_to_pool", ["yes", "no"])
 def test_service_set_letter_branding_add_to_branding_pool_step_choices_yes_or_no(
-    mocker,
     client_request,
     platform_admin_user,
     service_one,
@@ -4213,6 +4290,7 @@ def test_service_set_letter_branding_add_to_branding_pool_step_choices_yes_or_no
     mock_get_free_sms_fragment_limit,
     mock_get_service_data_retention,
     mock_update_service,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     service_one["organisation"] = organisation_one
@@ -4971,12 +5049,12 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
     ],
 )
 def test_send_files_by_email_contact_details_does_not_update_invalid_contact_details(
-    mocker,
     client_request,
     service_one,
     contact_details_type,
     invalid_value,
     error,
+    mocker,
 ):
     service_one["contact_link"] = "http://example.com/"
     service_one["permissions"].append("upload_document")
@@ -5011,9 +5089,9 @@ class TestSetAuthType:
 
     def test_page_loads(
         self,
-        mocker,
         client_request,
         service_one,
+        mocker,
     ):
         mocker.patch("app.models.user.Users._get_items")
         page = client_request.get(
@@ -5024,9 +5102,9 @@ class TestSetAuthType:
 
     def test_current_setting_selected(
         self,
-        mocker,
         client_request,
         service_one,
+        mocker,
     ):
         mocker.patch("app.models.user.Users._get_items")
         page = client_request.get(
@@ -5039,7 +5117,12 @@ class TestSetAuthType:
         assert normalize_spaces(radio_items[1].select_one("label").text) == "Email link or text message code"
         assert not radio_items[1].select_one("input").has_attr("checked")
 
-    def tests_redirects_to_set_auth_type_for_users_on_success(self, mocker, client_request, service_one):
+    def tests_redirects_to_set_auth_type_for_users_on_success(
+        self,
+        client_request,
+        service_one,
+        mocker,
+    ):
         mock_update_service = mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
         mocker.patch("app.models.user.Users._get_items")
         client_request.post(
@@ -5054,7 +5137,11 @@ class TestSetAuthType:
         assert set(mock_update_call[1]["permissions"]) == {"email_auth", "email", "sms"}
 
     def test_redirects_to_confirmation_when_disabling_email_auth(
-        self, mocker, client_request, service_one, active_user_with_permissions
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mocker,
     ):
         service_one["permissions"] += ["email_auth"]
         mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
@@ -5067,7 +5154,11 @@ class TestSetAuthType:
         )
 
     def test_cannot_disable_email_auth_if_some_users_dont_have_a_mobile_number(
-        self, mocker, client_request, service_one, active_user_with_permissions
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mocker,
     ):
         active_user_with_permissions["mobile_number"] = None
         mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
@@ -5092,7 +5183,13 @@ class TestConfirmDisableEmailAuth:
             _expected_status=403,
         )
 
-    def test_page_loads(self, mocker, client_request, service_one, active_user_with_permissions):
+    def test_page_loads(
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mocker,
+    ):
         service_one["permissions"] += ["email_auth"]
         mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
         client_request.get(
@@ -5101,7 +5198,11 @@ class TestConfirmDisableEmailAuth:
         )
 
     def test_page_redirects_to_set_auth_type_if_service_doesnt_use_email_auth(
-        self, mocker, client_request, service_one, active_user_with_permissions
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mocker,
     ):
         mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
         client_request.get(
@@ -5111,7 +5212,11 @@ class TestConfirmDisableEmailAuth:
         )
 
     def test_redirects_to_set_auth_type_if_some_users_dont_have_mobile_number(
-        self, mocker, client_request, service_one, active_user_with_permissions
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mocker,
     ):
         active_user_with_permissions["mobile_number"] = None
         mocker.patch("app.models.user.Users._get_items", return_value=[active_user_with_permissions])
@@ -5122,7 +5227,11 @@ class TestConfirmDisableEmailAuth:
         )
 
     def test_save_redirects_to_service_settings(
-        self, mocker, client_request, service_one, active_user_with_permissions
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mocker,
     ):
         service_one["permissions"] += ["email_auth"]
         mocker.patch(
@@ -5137,7 +5246,12 @@ class TestConfirmDisableEmailAuth:
         )
 
     def test_save_disables_email_auth_for_service_users(
-        self, mocker, client_request, service_one, active_user_with_permissions, mock_update_user_attribute
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mock_update_user_attribute,
+        mocker,
     ):
         active_user_with_permissions["auth_type"] = "email_auth"
         active_user_with_permissions["permissions"][service_one["id"]].append("email_auth")
@@ -5160,7 +5274,11 @@ class TestConfirmDisableEmailAuth:
         ]
 
     def test_save_does_not_disable_webauthn_sign_in_for_service_users(
-        self, mocker, client_request, service_one, active_user_with_permissions
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        mocker,
     ):
         active_user_with_permissions["auth_type"] = "webauthn_auth"
         mocker.patch("app.notify_client.service_api_client.service_api_client.update_service")
@@ -5206,11 +5324,11 @@ class TestSetAuthTypeForUsers:
 
     def test_redirects_away_if_no_other_users(
         self,
-        mocker,
         client_request,
         service_one,
         active_user_with_permissions,
         mock_get_users_by_service,
+        mocker,
     ):
         mocker.patch("app.models.user.InvitedUsers._get_items", return_value=[])
 
@@ -5240,7 +5358,12 @@ class TestSetAuthTypeForUsers:
         )
 
     def test_page_shows_other_users_on_service(
-        self, mocker, client_request, service_one, active_user_with_permissions, sample_invite
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        sample_invite,
+        mocker,
     ):
         mocker.patch(
             "app.models.user.Users._get_items",
@@ -5274,12 +5397,12 @@ class TestSetAuthTypeForUsers:
 
     def test_sets_email_auth_for_users(
         self,
-        mocker,
         client_request,
         service_one,
         active_user_with_permissions,
         mock_get_invites_for_service,
         mock_update_user_attribute,
+        mocker,
     ):
         mocker.patch(
             "app.models.user.Users._get_items",
@@ -5304,12 +5427,12 @@ class TestSetAuthTypeForUsers:
 
     def test_sets_sms_auth_for_deselected_users(
         self,
-        mocker,
         client_request,
         service_one,
         active_user_with_permissions,
         mock_get_invites_for_service,
         mock_update_user_attribute,
+        mocker,
     ):
         mocker.patch(
             "app.models.user.Users._get_items",
@@ -5335,7 +5458,12 @@ class TestSetAuthTypeForUsers:
         assert mock_update_user_attribute.call_args_list == [mocker.call("b", auth_type="sms_auth")]
 
     def test_updates_invited_users(
-        self, mocker, client_request, service_one, active_user_with_permissions, sample_invite
+        self,
+        client_request,
+        service_one,
+        active_user_with_permissions,
+        sample_invite,
+        mocker,
     ):
         mocker.patch(
             "app.models.user.Users._get_items",
@@ -5368,7 +5496,6 @@ class TestSetAuthTypeForUsers:
     )
     def test_user_with_webauthn_auth_not_listed_or_editable(
         self,
-        mocker,
         client_request,
         service_one,
         active_user_with_permissions,
@@ -5376,6 +5503,7 @@ class TestSetAuthTypeForUsers:
         form_data,
         should_fail,
         mock_update_user_attribute,
+        mocker,
     ):
         mocker.patch(
             "app.models.user.Users._get_items",
@@ -5745,13 +5873,13 @@ def test_service_settings_links_to_branding_request_page_for_emails(
 
 
 def test_service_settings_links_to_branding_options_page_for_letters(
-    mocker,
     service_one,
     client_request,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
     mock_get_service_data_retention,
+    mocker,
 ):
     service_one["permissions"].append("letter")
     page = client_request.get(".service_settings", service_id=SERVICE_ONE_ID)
@@ -5878,7 +6006,6 @@ def test_update_service_data_retention_populates_form(
 
 
 def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
-    mocker,
     service_one,
     client_request,
     platform_admin_user,
@@ -5886,6 +6013,7 @@ def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
     no_letter_contact_blocks,
     single_sms_sender,
     mock_get_service_settings_page_common,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -5925,7 +6053,6 @@ def test_update_service_notes(client_request, platform_admin_user, service_one, 
 
 
 def test_service_settings_links_to_edit_service_billing_details_page_for_platform_admins(
-    mocker,
     service_one,
     client_request,
     platform_admin_user,
@@ -5933,6 +6060,7 @@ def test_service_settings_links_to_edit_service_billing_details_page_for_platfor
     no_letter_contact_blocks,
     single_sms_sender,
     mock_get_service_settings_page_common,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(

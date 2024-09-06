@@ -25,13 +25,13 @@ def test_organisation_email_branding_page_is_not_accessible_by_non_platform_admi
     ),
 )
 def test_organisation_email_branding_page_shows_all_branding_pool_options(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
     default_email_branding,
     expected_branding_options,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -70,11 +70,11 @@ def test_organisation_email_branding_page_shows_all_branding_pool_options(
 
 
 def test_organisation_email_branding_page_shows_remove_brand_links(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -123,11 +123,11 @@ def test_organisation_email_branding_page_shows_remove_brand_links(
 
 
 def test_get_organisation_email_branding_page_with_remove_param(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -151,11 +151,11 @@ def test_get_organisation_email_branding_page_with_remove_param(
 
 
 def test_post_organisation_email_branding_page_with_remove_param(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -182,11 +182,11 @@ def test_post_organisation_email_branding_page_with_remove_param(
 
 
 def test_remove_org_email_branding_from_pool_invalid_brand_id(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -224,13 +224,13 @@ def test_remove_org_email_branding_from_pool_invalid_brand_id(
     ),
 )
 def test_reset_org_email_branding_to_govuk_only_for_central_government(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
     organisation_type,
     should_be_available,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -278,7 +278,6 @@ def test_reset_org_email_branding_to_govuk_only_for_central_government(
     ),
 )
 def test_reset_org_email_branding_to_govuk_successfully(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
@@ -286,6 +285,7 @@ def test_reset_org_email_branding_to_govuk_successfully(
     mock_update_organisation,
     organisation_type,
     should_succeed,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -311,11 +311,11 @@ def test_reset_org_email_branding_to_govuk_successfully(
 
 
 def test_change_default_org_email_branding_invalid_brand_id(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -337,12 +337,12 @@ def test_change_default_org_email_branding_invalid_brand_id(
 
 
 def test_change_default_org_email_branding_shows_confirmation_question_from_govuk(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
     mock_update_organisation,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -367,13 +367,13 @@ def test_change_default_org_email_branding_shows_confirmation_question_from_govu
 
 
 def test_change_default_org_email_branding_successfully_from_govuk(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
     mock_get_organisation_services,
     mock_update_organisation,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -402,12 +402,12 @@ def test_change_default_org_email_branding_successfully_from_govuk(
 
 
 def test_change_default_org_email_branding_successfully_from_explicit_brand(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_email_branding_pool,
     mock_update_organisation,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -457,12 +457,12 @@ def test_add_organisation_email_branding_options_is_platform_admin_only(
 
 
 def test_add_organisation_email_branding_options_shows_branding_not_in_branding_pool(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_organisation,
     mock_get_all_email_branding,
+    mocker,
 ):
     branding_pool = [
         {
@@ -744,11 +744,11 @@ def test_add_organisation_letter_branding_options_is_platform_admin_only(
 
 
 def test_change_default_org_letter_branding_invalid_brand_id(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_letter_branding_pool,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -770,12 +770,12 @@ def test_change_default_org_letter_branding_invalid_brand_id(
 
 
 def test_change_default_org_letter_branding_shows_confirmation_question_when_changing_from_no_branding(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_letter_branding_pool,
     mock_update_organisation,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -800,13 +800,13 @@ def test_change_default_org_letter_branding_shows_confirmation_question_when_cha
 
 
 def test_change_default_org_letter_branding_successfully_from_no_branding(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_letter_branding_pool,
     mock_get_organisation_services,
     mock_update_organisation,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -833,12 +833,12 @@ def test_change_default_org_letter_branding_successfully_from_no_branding(
 
 
 def test_change_default_org_letter_branding_successfully_from_explicit_brand(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_letter_branding_pool,
     mock_update_organisation,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -863,12 +863,12 @@ def test_change_default_org_letter_branding_successfully_from_explicit_brand(
 
 
 def test_add_organisation_letter_branding_options_shows_branding_not_in_branding_pool(
-    mocker,
     client_request,
     platform_admin_user,
     organisation_one,
     mock_get_organisation,
     mock_get_letter_branding_pool,
+    mocker,
 ):
     # The first 3 items in all_letter_branding are in the pool, the last 2 are not
     all_letter_branding = [

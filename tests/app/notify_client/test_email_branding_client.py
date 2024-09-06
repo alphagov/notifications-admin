@@ -13,7 +13,7 @@ def test_get_email_branding(mocker, fake_uuid):
     mock_redis_set = mocker.patch(
         "app.extensions.RedisClient.set",
     )
-    EmailBrandingClient().get_email_branding(fake_uuid)
+    EmailBrandingClient(mocker.MagicMock()).get_email_branding(fake_uuid)
     mock_get.assert_called_once_with(url=f"/email-branding/{fake_uuid}")
     mock_redis_get.assert_called_once_with(f"email_branding-{fake_uuid}")
     mock_redis_set.assert_called_once_with(
@@ -34,7 +34,7 @@ def test_get_all_email_branding(mocker):
     mock_redis_set = mocker.patch(
         "app.extensions.RedisClient.set",
     )
-    EmailBrandingClient().get_all_email_branding()
+    EmailBrandingClient(mocker.MagicMock()).get_all_email_branding()
     mock_get.assert_called_once_with(url="/email-branding")
     mock_redis_get.assert_called_once_with("email_branding")
     mock_redis_set.assert_called_once_with(
@@ -57,7 +57,7 @@ def test_create_email_branding(mocker, fake_uuid):
 
     mock_post = mocker.patch("app.notify_client.email_branding_client.EmailBrandingClient.post")
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
-    EmailBrandingClient().create_email_branding(
+    EmailBrandingClient(mocker.MagicMock()).create_email_branding(
         logo=org_data["logo"],
         name=org_data["name"],
         alt_text=org_data["alt_text"],
@@ -88,7 +88,7 @@ def test_update_email_branding(mocker, fake_uuid):
     mock_redis_delete_by_pattern = mocker.patch(
         "app.extensions.RedisClient.delete_by_pattern", new_callable=RedisClientMock
     )
-    EmailBrandingClient().update_email_branding(
+    EmailBrandingClient(mocker.MagicMock()).update_email_branding(
         branding_id=fake_uuid,
         logo=org_data["logo"],
         name=org_data["name"],
@@ -127,7 +127,7 @@ def test_create_email_branding_sends_none_values(mocker, fake_uuid):
     }
 
     mock_post = mocker.patch("app.notify_client.email_branding_client.EmailBrandingClient.post")
-    EmailBrandingClient().create_email_branding(**form_data)
+    EmailBrandingClient(mocker.MagicMock()).create_email_branding(**form_data)
 
     mock_post.assert_called_once_with(url="/email-branding", data=expected_data)
 
@@ -155,7 +155,7 @@ def test_update_email_branding_sends_none_values(mocker, fake_uuid):
     }
 
     mock_post = mocker.patch("app.notify_client.email_branding_client.EmailBrandingClient.post")
-    EmailBrandingClient().update_email_branding(**form_data)
+    EmailBrandingClient(mocker.MagicMock()).update_email_branding(**form_data)
 
     mock_post.assert_called_once_with(url=f"/email-branding/{fake_uuid}", data=expected_data)
 
@@ -164,6 +164,6 @@ def test_get_email_branding_name_for_alt_text(mocker):
     mock_post = mocker.patch(
         "app.notify_client.email_branding_client.EmailBrandingClient.post", return_value={"name": "bar"}
     )
-    resp = EmailBrandingClient().get_email_branding_name_for_alt_text("foo")
+    resp = EmailBrandingClient(mocker.MagicMock()).get_email_branding_name_for_alt_text("foo")
     assert resp == "bar"
     mock_post.assert_called_once_with(url="/email-branding/get-name-for-alt-text", data={"alt_text": "foo"})

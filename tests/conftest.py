@@ -13,7 +13,7 @@ from flask import Flask, url_for
 from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
-from app import create_app, webauthn_server
+from app import create_app, reset_memos, webauthn_server
 from app.constants import LetterLanguageOptions
 
 from . import (
@@ -59,8 +59,12 @@ def notify_admin_without_context():
 
 @pytest.fixture
 def notify_admin(notify_admin_without_context):
+    reset_memos()
+
     with notify_admin_without_context.app_context():
         yield notify_admin_without_context
+
+    reset_memos()
 
 
 @pytest.fixture(scope="function")
@@ -110,7 +114,7 @@ def multiple_reply_to_email_addresses(mocker):
 
 
 @pytest.fixture(scope="function")
-def no_reply_to_email_addresses(mocker):
+def no_reply_to_email_addresses(notify_admin, mocker):
     def _get(service_id):
         return []
 
@@ -118,7 +122,7 @@ def no_reply_to_email_addresses(mocker):
 
 
 @pytest.fixture(scope="function")
-def single_reply_to_email_address(mocker):
+def single_reply_to_email_address(notify_admin, mocker):
     def _get(service_id):
         return [
             {
@@ -135,7 +139,7 @@ def single_reply_to_email_address(mocker):
 
 
 @pytest.fixture(scope="function")
-def get_default_reply_to_email_address(mocker):
+def get_default_reply_to_email_address(notify_admin, mocker):
     def _get(service_id, reply_to_email_id):
         return {
             "id": "1234",
@@ -150,7 +154,7 @@ def get_default_reply_to_email_address(mocker):
 
 
 @pytest.fixture(scope="function")
-def get_non_default_reply_to_email_address(mocker):
+def get_non_default_reply_to_email_address(notify_admin, mocker):
     def _get(service_id, reply_to_email_id):
         return {
             "id": "1234",
@@ -165,7 +169,7 @@ def get_non_default_reply_to_email_address(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_add_reply_to_email_address(mocker):
+def mock_add_reply_to_email_address(notify_admin, mocker):
     def _add_reply_to(service_id, email_address, is_default=False):
         return
 
@@ -173,7 +177,7 @@ def mock_add_reply_to_email_address(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_reply_to_email_address(mocker):
+def mock_update_reply_to_email_address(notify_admin, mocker):
     def _update_reply_to(service_id, reply_to_email_id, email_address=None, active=None, is_default=False):
         return
 
@@ -181,7 +185,7 @@ def mock_update_reply_to_email_address(mocker):
 
 
 @pytest.fixture(scope="function")
-def multiple_letter_contact_blocks(mocker):
+def multiple_letter_contact_blocks(notify_admin, mocker):
     def _get(service_id):
         return [
             {
@@ -214,7 +218,7 @@ def multiple_letter_contact_blocks(mocker):
 
 
 @pytest.fixture(scope="function")
-def no_letter_contact_blocks(mocker):
+def no_letter_contact_blocks(notify_admin, mocker):
     def _get(service_id):
         return []
 
@@ -222,7 +226,7 @@ def no_letter_contact_blocks(mocker):
 
 
 @pytest.fixture(scope="function")
-def single_letter_contact_block(mocker):
+def single_letter_contact_block(notify_admin, mocker):
     def _get(service_id):
         return [
             {
@@ -239,7 +243,7 @@ def single_letter_contact_block(mocker):
 
 
 @pytest.fixture(scope="function")
-def injected_letter_contact_block(mocker):
+def injected_letter_contact_block(notify_admin, mocker):
     def _get(service_id):
         return [
             {
@@ -256,7 +260,7 @@ def injected_letter_contact_block(mocker):
 
 
 @pytest.fixture(scope="function")
-def get_default_letter_contact_block(mocker):
+def get_default_letter_contact_block(notify_admin, mocker):
     def _get(service_id, letter_contact_id):
         return {
             "id": "1234",
@@ -271,7 +275,7 @@ def get_default_letter_contact_block(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_add_letter_contact(mocker):
+def mock_add_letter_contact(notify_admin, mocker):
     def _add_letter_contact(service_id, contact_block, is_default=False):
         return {
             "data": {
@@ -288,7 +292,7 @@ def mock_add_letter_contact(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_letter_contact(mocker):
+def mock_update_letter_contact(notify_admin, mocker):
     def _update_letter_contact(service_id, letter_contact_id, contact_block, is_default=False):
         return
 
@@ -296,7 +300,7 @@ def mock_update_letter_contact(mocker):
 
 
 @pytest.fixture(scope="function")
-def multiple_sms_senders(mocker):
+def multiple_sms_senders(notify_admin, mocker):
     def _get(service_id):
         return [
             {
@@ -332,7 +336,7 @@ def multiple_sms_senders(mocker):
 
 
 @pytest.fixture(scope="function")
-def multiple_sms_senders_with_diff_default(mocker):
+def multiple_sms_senders_with_diff_default(notify_admin, mocker):
     def _get(service_id):
         return [
             {
@@ -368,7 +372,7 @@ def multiple_sms_senders_with_diff_default(mocker):
 
 
 @pytest.fixture(scope="function")
-def multiple_sms_senders_no_inbound(mocker):
+def multiple_sms_senders_no_inbound(notify_admin, mocker):
     def _get(service_id):
         return [
             {
@@ -395,7 +399,7 @@ def multiple_sms_senders_no_inbound(mocker):
 
 
 @pytest.fixture(scope="function")
-def no_sms_senders(mocker):
+def no_sms_senders(notify_admin, mocker):
     def _get(service_id):
         return []
 
@@ -403,7 +407,7 @@ def no_sms_senders(mocker):
 
 
 @pytest.fixture(scope="function")
-def single_sms_sender(mocker):
+def single_sms_sender(notify_admin, mocker):
     def _get(service_id):
         return [
             {
@@ -421,7 +425,7 @@ def single_sms_sender(mocker):
 
 
 @pytest.fixture(scope="function")
-def get_default_sms_sender(mocker):
+def get_default_sms_sender(notify_admin, mocker):
     def _get(service_id, sms_sender_id):
         return {
             "id": "1234",
@@ -437,7 +441,7 @@ def get_default_sms_sender(mocker):
 
 
 @pytest.fixture(scope="function")
-def get_non_default_sms_sender(mocker):
+def get_non_default_sms_sender(notify_admin, mocker):
     def _get(service_id, sms_sender_id):
         return {
             "id": "1234",
@@ -453,7 +457,7 @@ def get_non_default_sms_sender(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_add_sms_sender(mocker):
+def mock_add_sms_sender(notify_admin, mocker):
     def _add_sms_sender(service_id, sms_sender, is_default=False):
         return
 
@@ -461,7 +465,7 @@ def mock_add_sms_sender(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_sms_sender(mocker):
+def mock_update_sms_sender(notify_admin, mocker):
     def _update_sms_sender(service_id, sms_sender_id, sms_sender=None, active=None, is_default=False):
         return
 
@@ -469,7 +473,7 @@ def mock_update_sms_sender(mocker):
 
 
 @pytest.fixture(scope="function")
-def multiple_available_inbound_numbers(mocker):
+def multiple_available_inbound_numbers(notify_admin, mocker):
     def _get():
         return {
             "data": [
@@ -507,7 +511,7 @@ def multiple_available_inbound_numbers(mocker):
 
 
 @pytest.fixture(scope="function")
-def no_available_inbound_numbers(mocker):
+def no_available_inbound_numbers(notify_admin, mocker):
     def _get():
         return {"data": []}
 
@@ -530,7 +534,7 @@ def mocked_get_service_data():
 
 
 @pytest.fixture(scope="function")
-def mock_get_service(mocker, api_user_active, mocked_get_service_data):
+def mock_get_service(notify_admin, mocker, api_user_active, mocked_get_service_data):
     def _get(service_id):
         return {
             "data": mocked_get_service_data.get(
@@ -549,7 +553,7 @@ def mock_get_service(mocker, api_user_active, mocked_get_service_data):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_statistics(mocker, api_user_active):
+def mock_get_service_statistics(notify_admin, mocker, api_user_active):
     def _get(service_id, limit_days=None):
         return {
             "email": {"requested": 0, "delivered": 0, "failed": 0},
@@ -561,7 +565,7 @@ def mock_get_service_statistics(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_unsubscribe_requests_statistics(mocker):
+def mock_get_unsubscribe_requests_statistics(notify_admin, mocker):
     return mocker.patch(
         "app.service_api_client.get_unsubscribe_request_statistics",
         return_value={
@@ -572,7 +576,7 @@ def mock_get_unsubscribe_requests_statistics(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_detailed_services(mocker, fake_uuid):
+def mock_get_detailed_services(notify_admin, mocker, fake_uuid):
     service_one = service_json(
         id_=SERVICE_ONE_ID,
         name="service_one",
@@ -609,7 +613,7 @@ def mock_get_detailed_services(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_live_service(mocker, api_user_active):
+def mock_get_live_service(notify_admin, mocker, api_user_active):
     def _get(service_id):
         service = service_json(service_id, users=[api_user_active["id"]], restricted=False)
         return {"data": service}
@@ -618,7 +622,7 @@ def mock_get_live_service(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_create_service(mocker):
+def mock_create_service(notify_admin, mocker):
     def _create(
         service_name,
         organisation_type,
@@ -643,7 +647,7 @@ def mock_create_service(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_service(mocker):
+def mock_update_service(notify_admin, mocker):
     def _update(service_id, **kwargs):
         service = service_json(
             service_id,
@@ -670,7 +674,7 @@ def mock_update_service(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_raise_httperror_duplicate_name(mocker):
+def mock_update_service_raise_httperror_duplicate_name(notify_admin, mocker):
     def _update(service_id, **kwargs):
         json_mock = Mock(return_value={"message": {"name": [f"Duplicate service name '{kwargs.get('name')}'"]}})
         resp_mock = Mock(status_code=400, json=json_mock)
@@ -689,7 +693,7 @@ USER_ONE_ID = "7b395b52-c6c1-469c-9d61-54166461c1ab"
 
 
 @pytest.fixture(scope="function")
-def mock_get_services(mocker, active_user_with_permissions):
+def mock_get_services(notify_admin, mocker, active_user_with_permissions):
     def _get_services(params_dict=None):
         service_one = service_json(
             SERVICE_ONE_ID, "service_one", [active_user_with_permissions["id"]], 1000, True, False
@@ -703,7 +707,7 @@ def mock_get_services(mocker, active_user_with_permissions):
 
 
 @pytest.fixture(scope="function")
-def mock_get_services_with_no_services(mocker):
+def mock_get_services_with_no_services(notify_admin, mocker):
     def _get_services(params_dict=None):
         return {"data": []}
 
@@ -711,7 +715,7 @@ def mock_get_services_with_no_services(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_services_with_one_service(mocker, api_user_active):
+def mock_get_services_with_one_service(notify_admin, mocker, api_user_active):
     def _get_services(params_dict=None):
         return {"data": [service_json(SERVICE_ONE_ID, "service_one", [api_user_active["id"]], 1000, True, True)]}
 
@@ -719,7 +723,7 @@ def mock_get_services_with_one_service(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_template(mocker):
+def mock_get_service_template(notify_admin, mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id=service_id,
@@ -736,7 +740,7 @@ def mock_get_service_template(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_deleted_template(mocker):
+def mock_get_deleted_template(notify_admin, mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id=service_id,
@@ -754,7 +758,7 @@ def mock_get_deleted_template(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_template_version(mocker, api_user_active):
+def mock_get_template_version(notify_admin, mocker, api_user_active):
     def _get(service_id, template_id, version):
         template_version = template_version_json(service_id, template_id, api_user_active, version=version)
         return {"data": template_version}
@@ -763,7 +767,7 @@ def mock_get_template_version(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_template_versions(mocker, api_user_active):
+def mock_get_template_versions(notify_admin, mocker, api_user_active):
     def _get(service_id, template_id):
         template_version = template_version_json(service_id, template_id, api_user_active, version=1)
         return {"data": [template_version]}
@@ -772,7 +776,7 @@ def mock_get_template_versions(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_template_with_placeholders(mocker):
+def mock_get_service_template_with_placeholders(notify_admin, mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id=service_id,
@@ -787,7 +791,7 @@ def mock_get_service_template_with_placeholders(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_empty_service_template_with_optional_placeholder(mocker):
+def mock_get_empty_service_template_with_optional_placeholder(notify_admin, mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id=service_id,
@@ -801,7 +805,7 @@ def mock_get_empty_service_template_with_optional_placeholder(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_template_with_multiple_placeholders(mocker):
+def mock_get_service_template_with_multiple_placeholders(notify_admin, mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id=service_id,
@@ -816,7 +820,7 @@ def mock_get_service_template_with_multiple_placeholders(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_template_with_placeholders_same_as_recipient(mocker):
+def mock_get_service_template_with_placeholders_same_as_recipient(notify_admin, mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id=service_id,
@@ -831,7 +835,7 @@ def mock_get_service_template_with_placeholders_same_as_recipient(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_email_template(mocker):
+def mock_get_service_email_template(notify_admin, mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id=service_id,
@@ -848,7 +852,7 @@ def mock_get_service_email_template(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_email_template_without_placeholders(mocker):
+def mock_get_service_email_template_without_placeholders(notify_admin, mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
             service_id=service_id,
@@ -865,7 +869,7 @@ def mock_get_service_email_template_without_placeholders(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_letter_template(mocker):
+def mock_get_service_letter_template(notify_admin, mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(
             service_id=service_id,
@@ -882,7 +886,7 @@ def mock_get_service_letter_template(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_letter_template_welsh_language(mocker):
+def mock_get_service_letter_template_welsh_language(notify_admin, mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(
             service_id=service_id,
@@ -902,7 +906,7 @@ def mock_get_service_letter_template_welsh_language(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_letter_template_with_attachment(mocker):
+def mock_get_service_letter_template_with_attachment(notify_admin, mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(
             service_id=service_id,
@@ -924,7 +928,7 @@ def mock_get_service_letter_template_with_attachment(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_letter_template_with_placeholders(mocker):
+def mock_get_service_letter_template_with_placeholders(notify_admin, mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(
             service_id=service_id,
@@ -941,7 +945,7 @@ def mock_get_service_letter_template_with_placeholders(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_letter_template_with_qr_placeholder(mocker):
+def mock_get_service_letter_template_with_qr_placeholder(notify_admin, mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(
             service_id=service_id,
@@ -958,7 +962,7 @@ def mock_get_service_letter_template_with_qr_placeholder(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_create_service_template(mocker, fake_uuid):
+def mock_create_service_template(notify_admin, mocker, fake_uuid):
     def _create(
         *,
         name,
@@ -987,7 +991,7 @@ def mock_create_service_template(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_template(mocker):
+def mock_update_service_template(notify_admin, mocker):
     def _update(
         *,
         service_id,
@@ -1015,7 +1019,7 @@ def mock_update_service_template(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_create_service_template_content_too_big(mocker):
+def mock_create_service_template_content_too_big(notify_admin, mocker):
     def _create(
         *,
         name,
@@ -1042,7 +1046,7 @@ def mock_create_service_template_content_too_big(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_template_400_content_too_big(mocker):
+def mock_update_service_template_400_content_too_big(notify_admin, mocker):
     def _update(*, service_id, template_id, name=None, content=None, subject=None):
         json_mock = Mock(
             return_value={
@@ -1060,7 +1064,7 @@ def mock_update_service_template_400_content_too_big(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_template_400_qr_code_too_big(mocker):
+def mock_update_service_template_400_qr_code_too_big(notify_admin, mocker):
     def _update(*, service_id, template_id, name=None, content=None, subject=None):
         json_mock = Mock(
             return_value={
@@ -1112,7 +1116,7 @@ def _template(template_type, name, parent=None, template_id=None):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_templates(mocker):
+def mock_get_service_templates(notify_admin, mocker):
     def _create(service_id):
         return create_service_templates(service_id)
 
@@ -1120,7 +1124,7 @@ def mock_get_service_templates(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_more_service_templates_than_can_fit_onscreen(mocker):
+def mock_get_more_service_templates_than_can_fit_onscreen(notify_admin, mocker):
     def _create(service_id):
         return create_service_templates(service_id, number_of_templates=20)
 
@@ -1128,7 +1132,7 @@ def mock_get_more_service_templates_than_can_fit_onscreen(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_templates_when_no_templates_exist(mocker):
+def mock_get_service_templates_when_no_templates_exist(notify_admin, mocker):
     def _create(service_id):
         return {"data": []}
 
@@ -1136,7 +1140,7 @@ def mock_get_service_templates_when_no_templates_exist(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_templates_with_only_one_template(mocker):
+def mock_get_service_templates_with_only_one_template(notify_admin, mocker):
     def _get(service_id):
         return {
             "data": [
@@ -1154,7 +1158,7 @@ def mock_get_service_templates_with_only_one_template(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_delete_service_template(mocker):
+def mock_delete_service_template(notify_admin, mocker):
     def _delete(service_id, template_id):
         template = template_json(
             service_id=service_id,
@@ -1169,12 +1173,12 @@ def mock_delete_service_template(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_redact_template(mocker):
+def mock_redact_template(notify_admin, mocker):
     return mocker.patch("app.service_api_client.redact_service_template")
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_template_sender(mocker):
+def mock_update_service_template_sender(notify_admin, mocker):
     def _update(service_id, template_id, reply_to):
         return
 
@@ -1319,12 +1323,12 @@ def api_user_changed_password(fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_send_change_email_verification(mocker):
+def mock_send_change_email_verification(notify_admin, mocker):
     return mocker.patch("app.user_api_client.send_change_email_verification")
 
 
 @pytest.fixture(scope="function")
-def mock_register_user(mocker, api_user_pending):
+def mock_register_user(notify_admin, mocker, api_user_pending):
     def _register(name, email_address, mobile_number, password, auth_type):
         api_user_pending["name"] = name
         api_user_pending["email_address"] = email_address
@@ -1344,7 +1348,7 @@ def login_non_govuser(client_request, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_user(mocker, api_user_active):
+def mock_get_user(notify_admin, mocker, api_user_active):
     def _get_user(id_):
         api_user_active["id"] = id_
         return api_user_active
@@ -1353,7 +1357,7 @@ def mock_get_user(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_locked_user(mocker, api_user_locked):
+def mock_get_locked_user(notify_admin, mocker, api_user_locked):
     def _get_user(id_):
         api_user_locked["id"] = id_
         return api_user_locked
@@ -1362,12 +1366,12 @@ def mock_get_locked_user(mocker, api_user_locked):
 
 
 @pytest.fixture(scope="function")
-def mock_get_user_pending(mocker, api_user_pending):
+def mock_get_user_pending(notify_admin, mocker, api_user_pending):
     return mocker.patch("app.user_api_client.get_user", return_value=api_user_pending)
 
 
 @pytest.fixture(scope="function")
-def mock_get_user_by_email(mocker, api_user_active):
+def mock_get_user_by_email(notify_admin, mocker, api_user_active):
     def _get_user(email_address):
         api_user_active["email_address"] = email_address
         return api_user_active
@@ -1376,7 +1380,7 @@ def mock_get_user_by_email(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_dont_get_user_by_email(mocker):
+def mock_dont_get_user_by_email(notify_admin, mocker):
     def _get_user(email_address):
         return None
 
@@ -1384,27 +1388,27 @@ def mock_dont_get_user_by_email(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_user_by_email_request_password_reset(mocker, api_user_request_password_reset):
+def mock_get_user_by_email_request_password_reset(notify_admin, mocker, api_user_request_password_reset):
     return mocker.patch("app.user_api_client.get_user_by_email", return_value=api_user_request_password_reset)
 
 
 @pytest.fixture(scope="function")
-def mock_get_user_by_email_user_changed_password(mocker, api_user_changed_password):
+def mock_get_user_by_email_user_changed_password(notify_admin, mocker, api_user_changed_password):
     return mocker.patch("app.user_api_client.get_user_by_email", return_value=api_user_changed_password)
 
 
 @pytest.fixture(scope="function")
-def mock_get_user_by_email_locked(mocker, api_user_locked):
+def mock_get_user_by_email_locked(notify_admin, mocker, api_user_locked):
     return mocker.patch("app.user_api_client.get_user_by_email", return_value=api_user_locked)
 
 
 @pytest.fixture(scope="function")
-def mock_get_user_by_email_pending(mocker, api_user_pending):
+def mock_get_user_by_email_pending(notify_admin, mocker, api_user_pending):
     return mocker.patch("app.user_api_client.get_user_by_email", return_value=api_user_pending)
 
 
 @pytest.fixture(scope="function")
-def mock_get_user_by_email_not_found(mocker, api_user_active):
+def mock_get_user_by_email_not_found(notify_admin, mocker, api_user_active):
     def _get_user(email):
         json_mock = Mock(return_value={"message": "Not found", "result": "error"})
         resp_mock = Mock(status_code=404, json=json_mock)
@@ -1415,7 +1419,7 @@ def mock_get_user_by_email_not_found(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_verify_password(mocker):
+def mock_verify_password(notify_admin, mocker):
     def _verify_password(user, password):
         return True
 
@@ -1423,7 +1427,7 @@ def mock_verify_password(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_user_password(mocker, api_user_active):
+def mock_update_user_password(notify_admin, mocker, api_user_active):
     def _update(user_id, password):
         api_user_active["id"] = user_id
         return api_user_active
@@ -1432,7 +1436,7 @@ def mock_update_user_password(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_update_user_attribute(mocker, api_user_active):
+def mock_update_user_attribute(notify_admin, mocker, api_user_active):
     def _update(user_id, **kwargs):
         api_user_active["id"] = user_id
         return api_user_active
@@ -1441,7 +1445,7 @@ def mock_update_user_attribute(mocker, api_user_active):
 
 
 @pytest.fixture
-def mock_activate_user(mocker, api_user_active):
+def mock_activate_user(notify_admin, mocker, api_user_active):
     def _activate(user_id):
         api_user_active["id"] = user_id
         return {"data": api_user_active}
@@ -1450,12 +1454,12 @@ def mock_activate_user(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_email_is_not_already_in_use(mocker):
+def mock_email_is_not_already_in_use(notify_admin, mocker):
     return mocker.patch("app.user_api_client.get_user_by_email_or_none", return_value=None)
 
 
 @pytest.fixture(scope="function")
-def mock_revoke_api_key(mocker):
+def mock_revoke_api_key(notify_admin, mocker):
     def _revoke(service_id, key_id):
         return {}
 
@@ -1463,7 +1467,7 @@ def mock_revoke_api_key(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_api_keys(mocker, fake_uuid):
+def mock_get_api_keys(notify_admin, mocker, fake_uuid):
     def _get_keys(service_id, key_id=None):
         keys = {
             "apiKeys": [
@@ -1480,7 +1484,7 @@ def mock_get_api_keys(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_no_api_keys(mocker):
+def mock_get_no_api_keys(notify_admin, mocker):
     def _get_keys(service_id):
         keys = {"apiKeys": []}
         return keys
@@ -1489,7 +1493,7 @@ def mock_get_no_api_keys(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_login(mocker, mock_get_user, mock_update_user_attribute, mock_events):
+def mock_login(notify_admin, mocker, mock_get_user, mock_update_user_attribute, mock_events):
     def _verify_code(user_id, code, code_type):
         return True, ""
 
@@ -1503,17 +1507,17 @@ def mock_login(mocker, mock_get_user, mock_update_user_attribute, mock_events):
 
 
 @pytest.fixture(scope="function")
-def mock_send_verify_code(mocker):
+def mock_send_verify_code(notify_admin, mocker):
     return mocker.patch("app.user_api_client.send_verify_code")
 
 
 @pytest.fixture(scope="function")
-def mock_send_verify_email(mocker):
+def mock_send_verify_email(notify_admin, mocker):
     return mocker.patch("app.user_api_client.send_verify_email")
 
 
 @pytest.fixture(scope="function")
-def mock_check_verify_code(mocker):
+def mock_check_verify_code(notify_admin, mocker):
     def _verify(user_id, code, code_type):
         return True, ""
 
@@ -1521,7 +1525,7 @@ def mock_check_verify_code(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_check_verify_code_code_not_found(mocker):
+def mock_check_verify_code_code_not_found(notify_admin, mocker):
     def _verify(user_id, code, code_type):
         return False, "Code not found"
 
@@ -1529,7 +1533,7 @@ def mock_check_verify_code_code_not_found(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_check_verify_code_code_expired(mocker):
+def mock_check_verify_code_code_expired(notify_admin, mocker):
     def _verify(user_id, code, code_type):
         return False, "Code has expired"
 
@@ -1537,7 +1541,7 @@ def mock_check_verify_code_code_expired(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_create_job(mocker, api_user_active):
+def mock_create_job(notify_admin, mocker, api_user_active):
     def _create(job_id, service_id, scheduled_for=None, contact_list_id=None):
         return job_json(
             service_id,
@@ -1549,7 +1553,7 @@ def mock_create_job(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_job(mocker, api_user_active):
+def mock_get_job(notify_admin, mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {"data": job_json(service_id, api_user_active, job_id=job_id)}
 
@@ -1557,7 +1561,7 @@ def mock_get_job(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_letter_job(mocker, api_user_active):
+def mock_get_letter_job(notify_admin, mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {"data": job_json(service_id, api_user_active, job_id=job_id, template_type="letter")}
 
@@ -1565,7 +1569,7 @@ def mock_get_letter_job(mocker, api_user_active):
 
 
 @pytest.fixture
-def mock_get_job_doesnt_exist(mocker):
+def mock_get_job_doesnt_exist(notify_admin, mocker):
     def _get_job(service_id, job_id):
         raise HTTPError(response=Mock(status_code=404, json={}), message={})
 
@@ -1573,7 +1577,7 @@ def mock_get_job_doesnt_exist(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_scheduled_job(mocker, api_user_active):
+def mock_get_scheduled_job(notify_admin, mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {
             "data": job_json(
@@ -1589,7 +1593,7 @@ def mock_get_scheduled_job(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_cancelled_job(mocker, api_user_active):
+def mock_get_cancelled_job(notify_admin, mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {
             "data": job_json(
@@ -1605,7 +1609,7 @@ def mock_get_cancelled_job(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_job_in_progress(mocker, api_user_active):
+def mock_get_job_in_progress(notify_admin, mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {
             "data": job_json(
@@ -1622,7 +1626,7 @@ def mock_get_job_in_progress(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_job_with_sending_limits_exceeded(mocker, api_user_active):
+def mock_get_job_with_sending_limits_exceeded(notify_admin, mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {
             "data": job_json(
@@ -1639,7 +1643,7 @@ def mock_get_job_with_sending_limits_exceeded(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_letter_job_in_progress(mocker, api_user_active):
+def mock_get_letter_job_in_progress(notify_admin, mocker, api_user_active):
     def _get_job(service_id, job_id):
         return {
             "data": job_json(
@@ -1657,17 +1661,17 @@ def mock_get_letter_job_in_progress(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_has_jobs(mocker):
+def mock_has_jobs(notify_admin, mocker):
     return mocker.patch("app.job_api_client.has_jobs", return_value=True)
 
 
 @pytest.fixture(scope="function")
-def mock_has_no_jobs(mocker):
+def mock_has_no_jobs(notify_admin, mocker):
     return mocker.patch("app.job_api_client.has_jobs", return_value=False)
 
 
 @pytest.fixture(scope="function")
-def mock_get_jobs(mocker, api_user_active, fake_uuid):
+def mock_get_jobs(notify_admin, mocker, api_user_active, fake_uuid):
     def _get_jobs(service_id, limit_days=None, statuses=None, contact_list_id=None, page=1):
         if statuses is None:
             statuses = ["", "scheduled", "pending", "cancelled", "finished"]
@@ -1705,7 +1709,7 @@ def mock_get_jobs(mocker, api_user_active, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_scheduled_job_stats(mocker, api_user_active):
+def mock_get_scheduled_job_stats(notify_admin, mocker, api_user_active):
     return mocker.patch(
         "app.job_api_client.get_scheduled_job_stats",
         return_value={
@@ -1764,7 +1768,7 @@ def mock_get_uploads(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_uploaded_letters(mocker):
+def mock_get_uploaded_letters(notify_admin, mocker):
     def _get_uploaded_letters(service_id, *, letter_print_day, page=1):
         uploads = [
             {
@@ -1868,7 +1872,7 @@ def mock_get_uploaded_letters(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_no_uploaded_letters(mocker):
+def mock_get_no_uploaded_letters(notify_admin, mocker):
     return mocker.patch(
         "app.main.views.uploads.upload_api_client.get_letters_by_service_and_print_day",
         return_value={"notifications": [], "total": 0, "links": {}},
@@ -1897,7 +1901,7 @@ def mock_get_no_jobs(mocker, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_create_contact_list(mocker, api_user_active):
+def mock_create_contact_list(notify_admin, mocker, api_user_active):
     def _create(
         service_id,
         upload_id,
@@ -1955,7 +1959,7 @@ def mock_get_contact_lists(mocker, api_user_active, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_contact_list(mocker, api_user_active, fake_uuid):
+def mock_get_contact_list(notify_admin, mocker, api_user_active, fake_uuid):
     def _get(*, service_id, contact_list_id):
         return contact_list_json(
             id_=fake_uuid,
@@ -1970,7 +1974,7 @@ def mock_get_contact_list(mocker, api_user_active, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_no_contact_list(mocker, api_user_active, fake_uuid):
+def mock_get_no_contact_list(notify_admin, mocker, api_user_active, fake_uuid):
     def _get(*, service_id, contact_list_id):
         raise HTTPError(response=Mock(status_code=404))
 
@@ -1991,6 +1995,7 @@ def mock_get_no_contact_lists(mocker):
 @pytest.fixture(scope="function")
 def mock_get_notifications(
     mocker,
+    notify_admin,
     api_user_active,
 ):
     def _get_notifications(
@@ -2039,7 +2044,7 @@ def mock_get_notifications(
 
 
 @pytest.fixture(scope="function")
-def mock_get_notifications_with_previous_next(mocker):
+def mock_get_notifications_with_previous_next(notify_admin, mocker):
     def _get_notifications(
         service_id,
         job_id=None,
@@ -2059,7 +2064,7 @@ def mock_get_notifications_with_previous_next(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_notifications_with_no_notifications(mocker):
+def mock_get_notifications_with_no_notifications(notify_admin, mocker):
     def _get_notifications(
         service_id,
         job_id=None,
@@ -2079,7 +2084,7 @@ def mock_get_notifications_with_no_notifications(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_inbound_sms(mocker):
+def mock_get_inbound_sms(notify_admin, mocker):
     def _get_inbound_sms(service_id, user_number=None, page=1):
         return inbound_sms_json()
 
@@ -2090,7 +2095,7 @@ def mock_get_inbound_sms(mocker):
 
 
 @pytest.fixture
-def mock_get_inbound_sms_by_id_with_no_messages(mocker):
+def mock_get_inbound_sms_by_id_with_no_messages(notify_admin, mocker):
     def _get_inbound_sms_by_id(service_id, notification_id):
         raise HTTPError(response=Mock(status_code=404))
 
@@ -2101,7 +2106,7 @@ def mock_get_inbound_sms_by_id_with_no_messages(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_most_recent_inbound_sms(mocker):
+def mock_get_most_recent_inbound_sms(notify_admin, mocker):
     def _get_most_recent_inbound_sms(service_id, user_number=None, page=1):
         return inbound_sms_json()
 
@@ -2112,7 +2117,7 @@ def mock_get_most_recent_inbound_sms(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_most_recent_inbound_sms_with_no_messages(mocker):
+def mock_get_most_recent_inbound_sms_with_no_messages(notify_admin, mocker):
     def _get_most_recent_inbound_sms(service_id, user_number=None, page=1):
         return {"has_next": False, "data": []}
 
@@ -2123,7 +2128,7 @@ def mock_get_most_recent_inbound_sms_with_no_messages(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_inbound_sms_summary(mocker):
+def mock_get_inbound_sms_summary(notify_admin, mocker):
     def _get_inbound_sms_summary(
         service_id,
     ):
@@ -2136,7 +2141,7 @@ def mock_get_inbound_sms_summary(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_inbound_sms_summary_with_no_messages(mocker):
+def mock_get_inbound_sms_summary_with_no_messages(notify_admin, mocker):
     def _get_inbound_sms_summary(
         service_id,
     ):
@@ -2149,14 +2154,14 @@ def mock_get_inbound_sms_summary_with_no_messages(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_inbound_number_for_service(mocker):
+def mock_get_inbound_number_for_service(notify_admin, mocker):
     return mocker.patch(
         "app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {"number": "0781239871"}}
     )
 
 
 @pytest.fixture(scope="function")
-def mock_no_inbound_number_for_service(mocker):
+def mock_no_inbound_number_for_service(notify_admin, mocker):
     return mocker.patch("app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {}})
 
 
@@ -2235,7 +2240,7 @@ def sample_invite(mocker, service_one):
 
 
 @pytest.fixture(scope="function")
-def mock_create_invite(mocker, sample_invite):
+def mock_create_invite(notify_admin, mocker, sample_invite):
     def _create_invite(from_user, service_id, email_address, permissions, folder_permissions):
         sample_invite["from_user"] = from_user
         sample_invite["service"] = service_id
@@ -2282,7 +2287,7 @@ def mock_get_invites_without_manage_permission(mocker, service_one, sample_invit
 
 
 @pytest.fixture(scope="function")
-def mock_accept_invite(mocker, sample_invite):
+def mock_accept_invite(notify_admin, mocker, sample_invite):
     def _accept(service_id, invite_id):
         return sample_invite
 
@@ -2290,7 +2295,7 @@ def mock_accept_invite(mocker, sample_invite):
 
 
 @pytest.fixture(scope="function")
-def mock_add_user_to_service(mocker, service_one, api_user_active):
+def mock_add_user_to_service(notify_admin, mocker, service_one, api_user_active):
     def _add_user(service_id, user_id, permissions, folder_permissions):
         return
 
@@ -2298,17 +2303,17 @@ def mock_add_user_to_service(mocker, service_one, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_set_user_permissions(mocker):
+def mock_set_user_permissions(notify_admin, mocker):
     return mocker.patch("app.user_api_client.set_user_permissions", return_value=None)
 
 
 @pytest.fixture(scope="function")
-def mock_remove_user_from_service(mocker):
+def mock_remove_user_from_service(notify_admin, mocker):
     return mocker.patch("app.service_api_client.remove_user_from_service", return_value=None)
 
 
 @pytest.fixture(scope="function")
-def mock_get_template_statistics(mocker, service_one, fake_uuid):
+def mock_get_template_statistics(notify_admin, mocker, service_one, fake_uuid):
     template = template_json(
         service_id=service_one["id"],
         id_=fake_uuid,
@@ -2332,7 +2337,7 @@ def mock_get_template_statistics(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_monthly_template_usage(mocker, service_one, fake_uuid):
+def mock_get_monthly_template_usage(notify_admin, mocker, service_one, fake_uuid):
     def _stats(service_id, year):
         return [
             {"template_id": fake_uuid, "month": 4, "year": year, "count": 2, "name": "My first template", "type": "sms"}
@@ -2342,7 +2347,7 @@ def mock_get_monthly_template_usage(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
+def mock_get_monthly_notification_stats(notify_admin, mocker, service_one, fake_uuid):
     def _stats(service_id, year):
         return {
             "data": {
@@ -2367,7 +2372,7 @@ def mock_get_monthly_notification_stats(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_annual_usage_for_service(mocker, service_one, fake_uuid):
+def mock_get_annual_usage_for_service(notify_admin, mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
             {
@@ -2408,7 +2413,7 @@ def mock_get_annual_usage_for_service(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_monthly_usage_for_service(mocker):
+def mock_get_monthly_usage_for_service(notify_admin, mocker):
     def _get_usage(service_id, year):
         return [
             {
@@ -2505,7 +2510,7 @@ def mock_get_monthly_usage_for_service(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_annual_usage_for_service_in_future(mocker, service_one, fake_uuid):
+def mock_get_annual_usage_for_service_in_future(notify_admin, mocker, service_one, fake_uuid):
     def _get_usage(service_id, year=None):
         return [
             {
@@ -2530,7 +2535,7 @@ def mock_get_annual_usage_for_service_in_future(mocker, service_one, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_monthly_usage_for_service_in_future(mocker):
+def mock_get_monthly_usage_for_service_in_future(notify_admin, mocker):
     def _get_usage(service_id, year):
         return []
 
@@ -2538,7 +2543,7 @@ def mock_get_monthly_usage_for_service_in_future(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_events(mocker):
+def mock_events(notify_admin, mocker):
     def _create_event(event_type, event_data):
         return {"some": "data"}
 
@@ -2546,7 +2551,7 @@ def mock_events(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_send_already_registered_email(mocker):
+def mock_send_already_registered_email(notify_admin, mocker):
     return mocker.patch("app.user_api_client.send_already_registered_email")
 
 
@@ -2616,7 +2621,7 @@ def mock_get_all_letter_branding(mocker):
 
 
 @pytest.fixture
-def mock_get_letter_branding_by_id(mocker):
+def mock_get_letter_branding_by_id(notify_admin, mocker):
     def _get_branding_by_id(_id):
         return {
             "id": _id,
@@ -2660,7 +2665,7 @@ def mock_get_empty_letter_branding_pool(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_no_email_branding(mocker):
+def mock_no_email_branding(notify_admin, mocker):
     def _get_email_branding():
         return []
 
@@ -2738,7 +2743,7 @@ def mock_get_empty_email_branding_pool(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_email_branding(mocker, fake_uuid):
+def mock_get_email_branding(notify_admin, mocker, fake_uuid):
     def _get_email_branding(id):
         return create_email_branding(id)
 
@@ -2746,7 +2751,7 @@ def mock_get_email_branding(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_email_branding_with_govuk_brand_type(mocker, fake_uuid):
+def mock_get_email_branding_with_govuk_brand_type(notify_admin, mocker, fake_uuid):
     def _get_email_branding(id):
         return create_email_branding(fake_uuid, {"brand_type": "govuk"})
 
@@ -2754,7 +2759,7 @@ def mock_get_email_branding_with_govuk_brand_type(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_email_branding_with_both_brand_type(mocker, fake_uuid):
+def mock_get_email_branding_with_both_brand_type(notify_admin, mocker, fake_uuid):
     def _get_email_branding(id):
         return create_email_branding(fake_uuid, {"brand_type": "both"})
 
@@ -2762,7 +2767,7 @@ def mock_get_email_branding_with_both_brand_type(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_email_branding_with_org_banner_brand_type(mocker, fake_uuid):
+def mock_get_email_branding_with_org_banner_brand_type(notify_admin, mocker, fake_uuid):
     def _get_email_branding(id):
         return create_email_branding(fake_uuid, {"brand_type": "org_banner"})
 
@@ -2770,7 +2775,7 @@ def mock_get_email_branding_with_org_banner_brand_type(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
+def mock_get_email_branding_without_brand_text(notify_admin, mocker, fake_uuid):
     def _get_email_branding_without_brand_text(id):
         return create_email_branding(fake_uuid, {"text": "", "brand_type": "org_banner"})
 
@@ -2780,7 +2785,7 @@ def mock_get_email_branding_without_brand_text(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_create_email_branding(mocker, fake_uuid):
+def mock_create_email_branding(notify_admin, mocker, fake_uuid):
     def _create_email_branding(logo, name, alt_text, text, colour, brand_type, created_by_id):
         return create_email_branding(
             fake_uuid,
@@ -2798,7 +2803,7 @@ def mock_create_email_branding(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_create_letter_branding(mocker, fake_uuid):
+def mock_create_letter_branding(notify_admin, mocker, fake_uuid):
     def _create_letter_branding(filename, name, created_by_id):
         return create_letter_branding(
             fake_uuid,
@@ -2813,7 +2818,7 @@ def mock_create_letter_branding(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_email_branding_name_for_alt_text(mocker):
+def mock_get_email_branding_name_for_alt_text(notify_admin, mocker):
     def _get_email_branding_name_for_alt_text(alt_text):
         return alt_text
 
@@ -2824,7 +2829,7 @@ def mock_get_email_branding_name_for_alt_text(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_email_branding(mocker):
+def mock_update_email_branding(notify_admin, mocker):
     def _update_email_branding(branding_id, logo, name, alt_text, text, colour, brand_type, updated_by_id):
         return
 
@@ -2832,7 +2837,7 @@ def mock_update_email_branding(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_guest_list(mocker):
+def mock_get_guest_list(notify_admin, mocker):
     def _get_guest_list(service_id):
         return {"email_addresses": ["test@example.com"], "phone_numbers": ["07900900000"]}
 
@@ -2840,17 +2845,17 @@ def mock_get_guest_list(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_guest_list(mocker):
+def mock_update_guest_list(notify_admin, mocker):
     return mocker.patch("app.service_api_client.update_guest_list")
 
 
 @pytest.fixture(scope="function")
-def mock_reset_failed_login_count(mocker):
+def mock_reset_failed_login_count(notify_admin, mocker):
     return mocker.patch("app.user_api_client.reset_failed_login_count")
 
 
 @pytest.fixture
-def mock_get_notification(mocker):
+def mock_get_notification(notify_admin, mocker):
     def _get_notification(
         service_id,
         notification_id,
@@ -2873,7 +2878,7 @@ def mock_get_notification(mocker):
 
 
 @pytest.fixture
-def mock_send_notification(mocker, fake_uuid):
+def mock_send_notification(notify_admin, mocker, fake_uuid):
     def _send_notification(service_id, *, template_id, recipient, personalisation, sender_id):
         return {"id": fake_uuid}
 
@@ -3159,7 +3164,7 @@ def normalize_spaces(input):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_data_retention(mocker):
+def mock_get_service_data_retention(notify_admin, mocker):
     data = {
         "id": str(sample_uuid()),
         "service_id": str(sample_uuid()),
@@ -3173,23 +3178,23 @@ def mock_get_service_data_retention(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_create_service_data_retention(mocker):
+def mock_create_service_data_retention(notify_admin, mocker):
     return mocker.patch("app.service_api_client.create_service_data_retention")
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_data_retention(mocker):
+def mock_update_service_data_retention(notify_admin, mocker):
     return mocker.patch("app.service_api_client.update_service_data_retention")
 
 
 @pytest.fixture(scope="function")
-def mock_get_free_sms_fragment_limit(mocker):
+def mock_get_free_sms_fragment_limit(notify_admin, mocker):
     sample_limit = 250000
     return mocker.patch("app.billing_api_client.get_free_sms_fragment_limit_for_year", return_value=sample_limit)
 
 
 @pytest.fixture(scope="function")
-def mock_create_or_update_free_sms_fragment_limit(mocker):
+def mock_create_or_update_free_sms_fragment_limit(notify_admin, mocker):
     sample_limit = 250000
     return mocker.patch("app.billing_api_client.create_or_update_free_sms_fragment_limit", return_value=sample_limit)
 
@@ -3240,7 +3245,7 @@ def valid_token(notify_admin, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_orgs_and_services_associated_with_branding_empty(mocker):
+def mock_get_orgs_and_services_associated_with_branding_empty(notify_admin, mocker):
     def _get(email_branding_id):
         return {"data": {"services": [], "organisations": []}}
 
@@ -3248,7 +3253,7 @@ def mock_get_orgs_and_services_associated_with_branding_empty(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_orgs_and_services_associated_with_branding_no_orgs(mocker):
+def mock_get_orgs_and_services_associated_with_branding_no_orgs(notify_admin, mocker):
     def _get(email_branding_id):
         return {
             "data": {
@@ -3261,7 +3266,7 @@ def mock_get_orgs_and_services_associated_with_branding_no_orgs(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_orgs_and_services_associated_with_branding_no_services(mocker):
+def mock_get_orgs_and_services_associated_with_branding_no_services(notify_admin, mocker):
     def _get(email_branding_id):
         return {"data": {"services": [], "organisations": [{"name": "organisation 1", "id": "1234"}]}}
 
@@ -3269,7 +3274,7 @@ def mock_get_orgs_and_services_associated_with_branding_no_services(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_valid_service_inbound_api(mocker):
+def mock_get_valid_service_inbound_api(notify_admin, mocker):
     def _get(service_id, inbound_api_id):
         return {
             "created_at": "2017-12-04T10:52:55.289026Z",
@@ -3284,7 +3289,7 @@ def mock_get_valid_service_inbound_api(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_valid_service_callback_api(mocker):
+def mock_get_valid_service_callback_api(notify_admin, mocker):
     def _get(service_id, callback_api_id):
         return {
             "created_at": "2017-12-04T10:52:55.289026Z",
@@ -3299,7 +3304,7 @@ def mock_get_valid_service_callback_api(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_empty_service_inbound_api(mocker):
+def mock_get_empty_service_inbound_api(notify_admin, mocker):
     return mocker.patch(
         "app.service_api_client.get_service_inbound_api",
         side_effect=lambda service_id, callback_api_id: None,
@@ -3307,7 +3312,7 @@ def mock_get_empty_service_inbound_api(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_empty_service_callback_api(mocker):
+def mock_get_empty_service_callback_api(notify_admin, mocker):
     return mocker.patch(
         "app.service_api_client.get_service_callback_api",
         side_effect=lambda service_id, callback_api_id: None,
@@ -3315,7 +3320,7 @@ def mock_get_empty_service_callback_api(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_create_service_inbound_api(mocker):
+def mock_create_service_inbound_api(notify_admin, mocker):
     def _create_service_inbound_api(service_id, url, bearer_token, user_id):
         return
 
@@ -3323,7 +3328,7 @@ def mock_create_service_inbound_api(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_inbound_api(mocker):
+def mock_update_service_inbound_api(notify_admin, mocker):
     def _update_service_inbound_api(service_id, url, bearer_token, user_id, inbound_api_id):
         return
 
@@ -3331,7 +3336,7 @@ def mock_update_service_inbound_api(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_create_service_callback_api(mocker):
+def mock_create_service_callback_api(notify_admin, mocker):
     def _create_service_callback_api(service_id, url, bearer_token, user_id):
         return
 
@@ -3339,7 +3344,7 @@ def mock_create_service_callback_api(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_callback_api(mocker):
+def mock_update_service_callback_api(notify_admin, mocker):
     def _update_service_callback_api(service_id, url, bearer_token, user_id, callback_api_id):
         return
 
@@ -3352,7 +3357,7 @@ def organisation_one(api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_get_organisations(mocker):
+def mock_get_organisations(notify_admin, mocker):
     def _get_organisations():
         return [
             organisation_json("7aa5d4e9-4385-4488-a489-07812ba13383", "Org 1"),
@@ -3372,7 +3377,7 @@ def mock_get_organisations(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_organisations_with_unusual_domains(mocker):
+def mock_get_organisations_with_unusual_domains(notify_admin, mocker):
     def _get_organisations():
         return [
             organisation_json(
@@ -3391,7 +3396,7 @@ def mock_get_organisations_with_unusual_domains(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_organisation(mocker):
+def mock_get_organisation(notify_admin, mocker):
     def _get_organisation(org_id):
         return organisation_json(
             org_id,
@@ -3406,7 +3411,7 @@ def mock_get_organisation(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_organisation_by_domain(mocker):
+def mock_get_organisation_by_domain(notify_admin, mocker):
     def _get_organisation_by_domain(domain):
         return organisation_json(ORGANISATION_ID)
 
@@ -3417,7 +3422,7 @@ def mock_get_organisation_by_domain(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_organisation_nhs_gp(mocker):
+def mock_get_organisation_nhs_gp(notify_admin, mocker):
     def _get_organisation(domain):
         return organisation_json(ORGANISATION_ID, organisation_type="nhs_gp")
 
@@ -3425,7 +3430,7 @@ def mock_get_organisation_nhs_gp(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_no_organisation_by_domain(mocker):
+def mock_get_no_organisation_by_domain(notify_admin, mocker):
     return mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
         return_value=None,
@@ -3434,8 +3439,8 @@ def mock_get_no_organisation_by_domain(mocker):
 
 @pytest.fixture(scope="function")
 def mock_get_service_organisation(
-    mocker,
     mock_get_organisation,
+    mocker,
 ):
     return mocker.patch(
         "app.models.service.Service.organisation_id",
@@ -3445,7 +3450,7 @@ def mock_get_service_organisation(
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_organisation(mocker):
+def mock_update_service_organisation(notify_admin, mocker):
     def _update_service_organisation(service_id, org_id):
         return
 
@@ -3475,12 +3480,12 @@ def _get_organisation_services(organisation_id):
 
 
 @pytest.fixture(scope="function")
-def mock_get_organisation_services(mocker, api_user_active):
+def mock_get_organisation_services(notify_admin, mocker, api_user_active):
     return mocker.patch("app.organisations_client.get_organisation_services", side_effect=_get_organisation_services)
 
 
 @pytest.fixture(scope="function")
-def mock_notify_users_of_request_to_go_live_for_service(mocker, api_user_active):
+def mock_notify_users_of_request_to_go_live_for_service(notify_admin, mocker, api_user_active):
     def _notify_users_of_request_to_go_live_for_service(service_id):
         return
 
@@ -3547,7 +3552,7 @@ def mock_get_invites_for_organisation(mocker, sample_org_invite):
 
 
 @pytest.fixture(scope="function")
-def mock_check_org_invite_token(mocker, sample_org_invite):
+def mock_check_org_invite_token(notify_admin, mocker, sample_org_invite):
     def _check_org_token(token):
         return sample_org_invite
 
@@ -3555,7 +3560,7 @@ def mock_check_org_invite_token(mocker, sample_org_invite):
 
 
 @pytest.fixture(scope="function")
-def mock_check_org_cancelled_invite_token(mocker, sample_org_invite):
+def mock_check_org_cancelled_invite_token(notify_admin, mocker, sample_org_invite):
     def _check_org_token(token):
         sample_org_invite["status"] = "cancelled"
         return sample_org_invite
@@ -3564,7 +3569,7 @@ def mock_check_org_cancelled_invite_token(mocker, sample_org_invite):
 
 
 @pytest.fixture(scope="function")
-def mock_check_org_accepted_invite_token(mocker, sample_org_invite):
+def mock_check_org_accepted_invite_token(notify_admin, mocker, sample_org_invite):
     sample_org_invite["status"] = "accepted"
 
     def _check_org_token(token):
@@ -3574,7 +3579,7 @@ def mock_check_org_accepted_invite_token(mocker, sample_org_invite):
 
 
 @pytest.fixture(scope="function")
-def mock_accept_org_invite(mocker, sample_org_invite):
+def mock_accept_org_invite(notify_admin, mocker, sample_org_invite):
     def _accept(organisation_id, invite_id):
         return sample_org_invite
 
@@ -3582,7 +3587,7 @@ def mock_accept_org_invite(mocker, sample_org_invite):
 
 
 @pytest.fixture(scope="function")
-def mock_add_user_to_organisation(mocker, organisation_one, api_user_active):
+def mock_add_user_to_organisation(notify_admin, mocker, organisation_one, api_user_active):
     def _add_user(organisation_id, user_id, permissions):
         return api_user_active
 
@@ -3590,7 +3595,7 @@ def mock_add_user_to_organisation(mocker, organisation_one, api_user_active):
 
 
 @pytest.fixture(scope="function")
-def mock_update_organisation(mocker):
+def mock_update_organisation(notify_admin, mocker):
     def _update_org(org, **kwargs):
         return
 
@@ -3598,7 +3603,7 @@ def mock_update_organisation(mocker):
 
 
 @pytest.fixture
-def mock_get_organisations_and_services_for_user(mocker, organisation_one, api_user_active):
+def mock_get_organisations_and_services_for_user(notify_admin, mocker, organisation_one, api_user_active):
     def _get_orgs_and_services(user_id):
         return {"organisations": [], "services": []}
 
@@ -3608,7 +3613,7 @@ def mock_get_organisations_and_services_for_user(mocker, organisation_one, api_u
 
 
 @pytest.fixture
-def mock_get_non_empty_organisations_and_services_for_user(mocker, organisation_one, api_user_active):
+def mock_get_non_empty_organisations_and_services_for_user(notify_admin, mocker, organisation_one, api_user_active):
     def _make_services(name, trial_mode=False):
         return [
             {
@@ -3650,7 +3655,7 @@ def mock_get_non_empty_organisations_and_services_for_user(mocker, organisation_
 
 
 @pytest.fixture
-def mock_get_just_services_for_user(mocker, organisation_one, api_user_active):
+def mock_get_just_services_for_user(notify_admin, mocker, organisation_one, api_user_active):
     def _make_services(name, trial_mode=False):
         return [
             {
@@ -3674,7 +3679,7 @@ def mock_get_just_services_for_user(mocker, organisation_one, api_user_active):
 
 
 @pytest.fixture
-def mock_get_empty_organisations_and_one_service_for_user(mocker, organisation_one, api_user_active):
+def mock_get_empty_organisations_and_one_service_for_user(notify_admin, mocker, organisation_one, api_user_active):
     def _get_orgs_and_services(user_id):
         return {
             "organisations": [],
@@ -3693,7 +3698,7 @@ def mock_get_empty_organisations_and_one_service_for_user(mocker, organisation_o
 
 
 @pytest.fixture
-def mock_create_event(mocker):
+def mock_create_event(notify_admin, mocker):
     """
     This should be used whenever your code is calling `flask_login.login_user`
     """
@@ -3710,22 +3715,22 @@ def url_for_endpoint_with_token(endpoint, token, next=None):
 
 
 @pytest.fixture
-def mock_get_template_folders(mocker):
+def mock_get_template_folders(notify_admin, mocker):
     return mocker.patch("app.template_folder_api_client.get_template_folders", return_value=[])
 
 
 @pytest.fixture
-def mock_move_to_template_folder(mocker):
+def mock_move_to_template_folder(notify_admin, mocker):
     return mocker.patch("app.template_folder_api_client.move_to_folder")
 
 
 @pytest.fixture
-def mock_create_template_folder(mocker):
+def mock_create_template_folder(notify_admin, mocker):
     return mocker.patch("app.template_folder_api_client.create_template_folder", return_value=sample_uuid())
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_and_organisation_counts(mocker):
+def mock_get_service_and_organisation_counts(notify_admin, mocker):
     return mocker.patch(
         "app.status_api_client.get_count_of_live_services_and_organisations",
         return_value={
@@ -3736,7 +3741,7 @@ def mock_get_service_and_organisation_counts(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_history(mocker):
+def mock_get_service_history(notify_admin, mocker):
     return mocker.patch(
         "app.service_api_client.get_service_history",
         return_value={
@@ -3798,7 +3803,7 @@ def mock_get_service_history(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_returned_letter_summary_with_no_returned_letters(mocker):
+def mock_get_returned_letter_summary_with_no_returned_letters(notify_admin, mocker):
     return mocker.patch(
         "app.service_api_client.get_returned_letter_summary",
         return_value=[],
@@ -3838,7 +3843,7 @@ def mock_template_preview(mocker, mock_get_page_counts_for_letter):
 
 
 @pytest.fixture(scope="function")
-def mock_get_returned_letter_statistics_with_no_returned_letters(mocker):
+def mock_get_returned_letter_statistics_with_no_returned_letters(notify_admin, mocker):
     return mocker.patch(
         "app.service_api_client.get_returned_letter_statistics",
         return_value={
@@ -4246,7 +4251,7 @@ def create_template(
 
 
 @pytest.fixture
-def mock_get_invited_user_by_id(mocker, sample_invite):
+def mock_get_invited_user_by_id(notify_admin, mocker, sample_invite):
     def _get(invited_user_id):
         return sample_invite
 
@@ -4257,7 +4262,7 @@ def mock_get_invited_user_by_id(mocker, sample_invite):
 
 
 @pytest.fixture
-def mock_get_invited_org_user_by_id(mocker, sample_org_invite):
+def mock_get_invited_org_user_by_id(notify_admin, mocker, sample_org_invite):
     def _get(invited_org_user_id):
         return sample_org_invite
 
@@ -4268,12 +4273,12 @@ def mock_get_invited_org_user_by_id(mocker, sample_org_invite):
 
 
 @pytest.fixture
-def mock_antivirus_virus_free(mocker):
+def mock_antivirus_virus_free(notify_admin, mocker):
     yield mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
 
 @pytest.fixture
-def mock_antivirus_virus_found(mocker):
+def mock_antivirus_virus_found(notify_admin, mocker):
     yield mocker.patch("app.extensions.antivirus_client.scan", return_value=False)
 
 
@@ -4309,7 +4314,7 @@ def logo_client(notify_admin):
 
 
 @pytest.fixture(scope="function")
-def mock_request_invite_for(mocker):
+def mock_request_invite_for(notify_admin, mocker):
     def _request_invite_for(*, user_to_invite_id, service_id, service_managers_ids, reason):
         return
 
@@ -4346,7 +4351,7 @@ def mock_get_letter_rates(mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_sms_rate(mocker):
+def mock_get_sms_rate(notify_admin, mocker):
     def _get_sms_rate():
         return {
             "rate": 0.0197,

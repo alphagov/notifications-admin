@@ -16,8 +16,8 @@ from tests.conftest import (
 
 
 def test_choose_service_to_join(
-    mocker,
     client_request,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
@@ -62,11 +62,11 @@ def test_cannot_join_service_without_organisation(client_request):
     ),
 )
 def test_cannot_join_service_without_organisation_permission(
-    mocker,
     client_request,
     service_one,
     fake_uuid,
     can_ask_to_join_a_service,
+    mocker,
 ):
     service_one["organisation"] = fake_uuid
     mocker.patch(
@@ -89,10 +89,10 @@ def test_cannot_join_service_without_organisation_permission(
 
 
 def test_cannot_join_service_for_different_organisation(
-    mocker,
     client_request,
     service_one,
     fake_uuid,
+    mocker,
 ):
     service_one["organisation"] = fake_uuid
     mocker.patch(
@@ -112,11 +112,11 @@ def test_cannot_join_service_for_different_organisation(
 
 @freeze_time("2023-02-03 01:00")
 def test_page_lists_team_members_of_service(
-    mocker,
     client_request,
     fake_uuid,
     service_one,
     mock_get_organisation_by_domain,
+    mocker,
 ):
     service_one["organisation"] = ORGANISATION_ID
     mocker.patch(
@@ -185,12 +185,12 @@ def test_page_lists_team_members_of_service(
 
 
 def test_page_redirects_on_post(
-    mocker,
     client_request,
     mock_request_invite_for,
     fake_uuid,
     service_one,
     mock_get_organisation_by_domain,
+    mocker,
 ):
     service_one["organisation"] = ORGANISATION_ID
     mocker.patch(
@@ -237,9 +237,9 @@ def test_page_redirects_on_post(
 
 
 def test_confirmation_page(
-    mocker,
     client_request,
     fake_uuid,
+    mocker,
 ):
     page = client_request.get(
         "main.join_service_requested",

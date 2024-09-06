@@ -1495,7 +1495,6 @@ def test_view_organisation_settings(
     ),
 )
 def test_update_organisation_settings(
-    mocker,
     client_request,
     fake_uuid,
     organisation_one,
@@ -1505,6 +1504,7 @@ def test_update_organisation_settings(
     post_data,
     expected_persisted,
     user,
+    mocker,
 ):
     mocker.patch("app.organisations_client.get_organisation_services", return_value=[])
     client_request.login(user)
@@ -1562,10 +1562,10 @@ def test_update_organisation_sector_sends_service_id_data_to_api_client(
     ),
 )
 def test_view_organisation_domains(
-    mocker,
     client_request,
     fake_uuid,
     user,
+    mocker,
 ):
     client_request.login(user)
 
@@ -1673,11 +1673,11 @@ def test_update_organisation_domains(
 
 
 def test_update_organisation_domains_when_domain_already_exists(
-    mocker,
     client_request,
     fake_uuid,
     organisation_one,
     mock_get_organisation,
+    mocker,
 ):
     user = create_platform_admin_user()
     client_request.login(user)
@@ -1705,9 +1705,9 @@ def test_update_organisation_domains_when_domain_already_exists(
 
 
 def test_update_organisation_domains_with_more_than_just_domain(
-    mocker,
     client_request,
     fake_uuid,
+    mocker,
 ):
     user = create_platform_admin_user()
     client_request.login(user)
@@ -1913,13 +1913,13 @@ def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
 
 
 def test_organisation_settings_links_to_edit_organisation_notes_page(
-    mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
     mock_get_letter_branding_pool,
     organisation_one,
     client_request,
     platform_admin_user,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
@@ -1981,13 +1981,13 @@ def test_update_organisation_notes_errors_when_user_not_platform_admin(
 
 
 def test_organisation_settings_links_to_edit_can_approve_own_go_live_request(
-    mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
     mock_get_letter_branding_pool,
     organisation_one,
     client_request,
     platform_admin_user,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
@@ -1999,13 +1999,13 @@ def test_organisation_settings_links_to_edit_can_approve_own_go_live_request(
 
 
 def test_organisation_settings_links_to_edit_can_ask_to_join_a_service(
-    mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
     mock_get_letter_branding_pool,
     organisation_one,
     client_request,
     platform_admin_user,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
@@ -2024,7 +2024,6 @@ def test_organisation_settings_links_to_edit_can_ask_to_join_a_service(
     ),
 )
 def test_get_can_ask_to_join_a_service(
-    mocker,
     client_request,
     fake_uuid,
     platform_admin_user,
@@ -2032,6 +2031,7 @@ def test_get_can_ask_to_join_a_service(
     expected_checked_value,
     expected_label,
     permission_list,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
@@ -2102,13 +2102,13 @@ def test_add_delete_can_ask_to_join_a_service(
     ),
 )
 def test_get_can_approve_own_go_live_requests(
-    mocker,
     client_request,
     fake_uuid,
     platform_admin_user,
     value_from_api,
     expected_checked_value,
     expected_label,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
@@ -2203,13 +2203,13 @@ def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
 
 
 def test_organisation_settings_links_to_edit_organisation_billing_details_page(
-    mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
     mock_get_letter_branding_pool,
     organisation_one,
     client_request,
     platform_admin_user,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])

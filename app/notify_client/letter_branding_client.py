@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, cache
 
 
@@ -37,4 +44,10 @@ class LetterBrandingClient(NotifyAdminAPIClient):
         return self.get(url=f"/letter-branding/{branding_id}/orgs_and_services")
 
 
-letter_branding_client = LetterBrandingClient()
+_letter_branding_client_context_var: ContextVar[LetterBrandingClient] = ContextVar("letter_branding_client")
+get_letter_branding_client: LazyLocalGetter[LetterBrandingClient] = LazyLocalGetter(
+    _letter_branding_client_context_var,
+    lambda: LetterBrandingClient(current_app),
+)
+memo_resetters.append(lambda: get_letter_branding_client.clear())
+letter_branding_client = LocalProxy(get_letter_branding_client)
