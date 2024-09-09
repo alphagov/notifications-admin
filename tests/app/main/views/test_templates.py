@@ -558,8 +558,12 @@ def test_edit_email_template_should_have_unsubscribe_checkbox(
         template_id=fake_uuid,
     )
     assert page.select_one("form input[type=checkbox]")["name"] == "has_unsubscribe_link"
+    assert normalize_spaces(page.select_one("form label[for=has_unsubscribe_link]").text) == "Add an unsubscribe link"
     assert (
-        normalize_spaces(page.select_one("form label[for=has_unsubscribe_link]").text) == "Allow users to unsubscribe"
+        normalize_spaces(
+            page.select_one(".govuk-checkboxes__item--single-with-hint #has_unsubscribe_link-item-hint").text
+        )
+        == "You will see unsubscribe requests on the dashboard"
     )
 
 
@@ -629,8 +633,12 @@ def test_add_email_template_should_have_unsubscribe_checkbox(
         template_type=template_type,
     )
     assert page.select_one("form input[type=checkbox]")["name"] == "has_unsubscribe_link"
+    assert normalize_spaces(page.select_one("form label[for=has_unsubscribe_link]").text) == "Add an unsubscribe link"
     assert (
-        normalize_spaces(page.select_one("form label[for=has_unsubscribe_link]").text) == "Allow users to unsubscribe"
+        normalize_spaces(
+            page.select_one(".govuk-checkboxes__item--single-with-hint #has_unsubscribe_link-item-hint").text
+        )
+        == "You will see unsubscribe requests on the dashboard"
     )
 
 
