@@ -531,27 +531,16 @@ def test_should_show_page_for_one_template(
         pytest.param("letter", marks=pytest.mark.xfail),
     ),
 )
-@pytest.mark.parametrize(
-    "platform_admin",
-    (
-        True,
-        pytest.param(False, marks=pytest.mark.xfail),
-    ),
-)
 def test_edit_email_template_should_have_unsubscribe_checkbox(
     mocker,
     client_request,
-    platform_admin_user,
     fake_uuid,
     template_type,
-    platform_admin,
 ):
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={"data": create_template(template_id=fake_uuid, template_type=template_type)},
     )
-    if platform_admin:
-        client_request.login(platform_admin_user)
     page = client_request.get(
         ".edit_service_template",
         service_id=SERVICE_ONE_ID,
@@ -611,22 +600,10 @@ def test_edit_email_template_should_update_unsubscribe(
         pytest.param("sms", marks=pytest.mark.xfail()),
     ),
 )
-@pytest.mark.parametrize(
-    "platform_admin",
-    (
-        True,
-        pytest.param(False, marks=pytest.mark.xfail()),
-    ),
-)
 def test_add_email_template_should_have_unsubscribe_checkbox(
-    mocker,
     client_request,
-    platform_admin_user,
     template_type,
-    platform_admin,
 ):
-    if platform_admin:
-        client_request.login(platform_admin_user)
     page = client_request.get(
         ".add_service_template",
         service_id=SERVICE_ONE_ID,
