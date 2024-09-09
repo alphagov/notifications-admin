@@ -1027,7 +1027,7 @@ def test_email_branding_choose_logo_page(mocker, client_request, service_one):
         def hexdigest(self):
             return "abc123"
 
-    mocker.patch("app.asset_fingerprinter.hashlib.md5", return_value=FakeMD5())
+    mocker.patch("notifications_utils.asset_fingerprinter.hashlib.md5", return_value=FakeMD5())
     page = client_request.get(
         "main.email_branding_choose_logo",
         service_id=SERVICE_ONE_ID,
