@@ -12,34 +12,35 @@
 
   <h1 class="heading-large">Unsubscribe links</h1>
 
-  <p class="govuk-body">You must let people opt out of receiving subscription emails.</p>
-  <p class="govuk-body">If recipients report your emails as spam we can stop you from using GOV.UK Notify.</p>
- 
- <p class="govuk-body">Transactional emails do not need to include an unsubscribe link.</p>
-   <p class="govuk-body">The GOV.​UK Service Manual explains the difference between <a class="govuk-link govuk-link--no-visited-state"
-    href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#transactional-messages">transactional and subscription messages</a>.</p>
-
-  <h2 class="govuk-heading-m" id="oneclick">How to add unsubscribe links</h2>
-  <p class="govuk-body">Notify makes it easy to add:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>a one-click unsubscribe button to the email header</li>
-    <li>an unsubscribe link at the bottom of your email</li>
+  <p class="govuk-body">You must let people opt out of receiving subscription emails, otherwise they might report you for sending spam.</p>
+ <p class="govuk-body">With GOV.UK Notify you can:</p>
+<ul class="govuk-list govuk-list--bullet">
+    <li>add an unsubscribe link in your emails</li>
+    <li>get a list of the recipients who request to unsubscribe</li>
   </ul>
+  <p class="govuk-body">It is your responsibility to stop sending emails to anyone who asks to unsubscribe.</p>
+
+ <p class="govuk-body">If you do not, we can stop you from using GOV.UK Notify.</p>
+
+<div class="govuk-inset-text">
+ <p class="govuk-body">Read <p class="govuk-body">the GOV.​UK Service Manual to help decide if your emails are <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#transactional-messages">transactional or subscription messages</a>.</p></div>
 
   <h3 class="heading-small">If you use the Notify website to send emails</h3>
   <ol class="govuk-list govuk-list--number">
     <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
     <li>Add a new email template or choose an existing email template.</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Allow recipients to unsubscribe</b>.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">Add an unsubscribe link</b>.</li>
   </ol>
-  <p class="govuk-body">This will add a button to the email header. Recipients can request to opt out of unwanted emails by clicking on the button.This will also add an unsubscribe link at the bottom of the email.
- </p>
-  <p class="govuk-body">We will report any email unsubscribe requests on the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }}. You can download the report to manage your unsubscribe requests. This report is available for up to 90 days.</p>
+  <p class="govuk-body">Recipients can request to opt out of unwanted emails by clicking on the button. </p>
+  <p class="govuk-body">We will report any email unsubscribe requests on the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }}. You can download the report and will need to remove the recipients from your mailing list. Do this before you send any further emails to these recipients.</p>
+<p class="govuk-body">This report is available for up to 90 days.</p>
 
    <h3 class="heading-small">If you use the Notify API to send emails</h3>
-   <p class="govuk-body">You’ll need a developer on your team to set it up for you.</p> 
-   <p class="govuk-body">To add  one-click unsubscribe, follow the instructions in our <a class="govuk-link govuk-link--no-visited-state"
+<p class="govuk-body">Follow the instructions in our <a class="govuk-link govuk-link--no-visited-state"
     href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API documentation</a>.</p>
+   <p class="govuk-body">You’ll need a developer on your team to set it up for you.</p> 
+   
 
 
   
