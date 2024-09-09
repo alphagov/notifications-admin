@@ -1458,7 +1458,17 @@ class LetterAddressForm(StripWhitespaceForm):
 
 class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
     subject = GovukTextareaField("Subject", validators=[NotifyDataRequired(thing="the subject of the email")])
-    has_unsubscribe_link = GovukCheckboxField("Allow users to unsubscribe")
+    has_unsubscribe_link = GovukCheckboxField(
+        "Add an unsubscribe link",
+        param_extensions={
+            "items": [
+                {
+                    "hint": {"text": "You will see unsubscribe requests on the dashboard"},
+                    "classes": "govuk-checkboxes__item--single-with-hint",
+                }
+            ],
+        },
+    )
 
 
 class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
