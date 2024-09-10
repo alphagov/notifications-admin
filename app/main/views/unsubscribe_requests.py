@@ -93,20 +93,29 @@ def create_unsubscribe_request_report(service_id):
 @main.route("/unsubscribe/<uuid:notification_id>/<string:token>", methods=["GET", "POST"])
 @hide_from_search_engines
 def unsubscribe(notification_id, token):
-    confirmed = False
 
     if request.method == "POST":
-        confirmed = unsubscribe_api_client.unsubscribe(notification_id, token)
-        if not confirmed:
+        if not unsubscribe_api_client.unsubscribe(notification_id, token):
             return render_template("views/unsubscribe-failed.html"), 404
 
-    return render_template(
-        "views/unsubscribe.html",
-        confirmed=confirmed,
-    )
+        return redirect(url_for("main.unsubscribe_confirmed"))
+
+    return render_template("views/unsubscribe.html")
+
+
+@main.route("/unsubscribe/confirmed")
+@hide_from_search_engines
+def unsubscribe_confirmed():
+    return render_template("views/unsubscribe.html", confirmed=True)
 
 
 @main.route("/unsubscribe/example")
 @hide_from_search_engines
 def unsubscribe_example():
     return render_template("views/unsubscribe-example.html")
+
+
+@main.route("/unsubscribe/example/confirmed")
+@hide_from_search_engines
+def unsubscribe_example_confirmed():
+    return render_template("views/unsubscribe.html", confirmed=True)
