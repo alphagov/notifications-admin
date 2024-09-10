@@ -17,17 +17,9 @@
       You have been unsubscribed
     </p>
   {% else %}
-    <div class="js-hidden">
-
-      <form method="post" id="confirm-unsubscription">
-        {{ page_footer('Confirm unsubscription') }}
-      </form>
-
-    </div>
-
-    <script type="text/javascript">
-      document.getElementById("confirm-unsubscription").submit();
-    </script>
+    <form method="post" action="{{ request.url | extract_path_from_url }}" id="confirm-unsubscription">
+      {{ page_footer('Confirm unsubscription') }}
+    </form>
 {% endif %}
 
 {% endblock %}
