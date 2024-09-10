@@ -109,13 +109,16 @@ def unsubscribe_confirmed():
     return render_template("views/unsubscribe.html", confirmed=True)
 
 
-@main.route("/unsubscribe/example")
+@main.route("/unsubscribe/example", methods=["GET", "POST"])
 @hide_from_search_engines
 def unsubscribe_example():
-    return render_template("views/unsubscribe-example.html")
+    if request.method == "POST":
+        return redirect(url_for("main.unsubscribe_example_confirmed"))
+
+    return render_template("views/unsubscribe.html", example=True)
 
 
 @main.route("/unsubscribe/example/confirmed")
 @hide_from_search_engines
 def unsubscribe_example_confirmed():
-    return render_template("views/unsubscribe.html", confirmed=True)
+    return render_template("views/unsubscribe.html", example=True, confirmed=True)

@@ -17,9 +17,25 @@
       You have been unsubscribed
     </p>
   {% else %}
+    <p>
+      Do you want to unsubscribe?
+    </p>
     <form method="post" action="{{ request.url | extract_path_from_url }}" id="confirm-unsubscription">
       {{ page_footer('Confirm unsubscription') }}
     </form>
 {% endif %}
 
 {% endblock %}
+
+{% block footer %}
+
+  {% if example %}
+    <footer>
+      <p>
+        This page is an example, no action has been taken
+      </p>
+    </footer>
+  {% endif %}
+
+{% endblock %}
+
