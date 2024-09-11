@@ -548,10 +548,15 @@ def test_unsubscribe_example_page(client_request):
         "main.unsubscribe_example",
         _test_for_elements_without_class=False,
     )
-    assert normalize_spaces(page.select_one("h1").text) == "Unsubscribe"
-    assert normalize_spaces(page.select_one("p").text) == "Do you want to unsubscribe?"
-    assert normalize_spaces(page.select_one("footer p").text) == "This page is an example, no action has been taken"
+    assert normalize_spaces(page.select_one("h1").text) == "Are you sure you want to unsubscribe?"
+    assert normalize_spaces(page.select_one("p").text) == (
+        "If you want to unsubscribe you will no longer receive these emails."
+    )
     assert page.select_one("form[method=post]")["action"] == "/unsubscribe/example"
+    assert normalize_spaces(page.select_one("form[method=post] button[type=submit]").text) == "Confirm"
+    assert normalize_spaces(page.select_one("footer p").text) == (
+        "This is an example page only with no further action needed."
+    )
 
 
 def test_unsubscribe_example_confirmation_page(client_request, fake_uuid):
@@ -559,9 +564,13 @@ def test_unsubscribe_example_confirmation_page(client_request, fake_uuid):
         "main.unsubscribe_example_confirmed",
         _test_for_elements_without_class=False,
     )
-    assert normalize_spaces(page.select_one("h1").text) == "Unsubscribe"
-    assert normalize_spaces(page.select_one("p").text) == "You have been unsubscribed"
-    assert normalize_spaces(page.select_one("footer p").text) == "This page is an example, no action has been taken"
+    assert normalize_spaces(page.select_one("h1").text) == "We have your request to unsubscribe"
+    assert normalize_spaces(page.select_one("p").text) == (
+        "It can take a few days to unsubscribe you from these emails."
+    )
+    assert normalize_spaces(page.select_one("footer p").text) == (
+        "This is an example page only with no further action needed."
+    )
     assert not page.select_one("form")
 
 
@@ -572,9 +581,9 @@ def test_unsubscribe_landing_page(client_request, fake_uuid):
         token="abc123",
         _test_for_elements_without_class=False,
     )
-    assert normalize_spaces(page.select_one("h1").text) == "Unsubscribe"
+    assert normalize_spaces(page.select_one("h1").text) == "Are you sure you want to unsubscribe?"
     assert page.select_one("form[method=post]")["action"] == f"/unsubscribe/{fake_uuid}/abc123"
-    assert normalize_spaces(page.select_one("form[method=post] button[type=submit]").text) == "Confirm unsubscription"
+    assert normalize_spaces(page.select_one("form[method=post] button[type=submit]").text) == "Confirm"
 
 
 def test_unsubscribe_valid_request(mocker, client_request, fake_uuid):
@@ -594,8 +603,8 @@ def test_unsubscribe_confirmation_page(client_request, fake_uuid):
         "main.unsubscribe_confirmed",
         _test_for_elements_without_class=False,
     )
-    assert normalize_spaces(page.select_one("h1").text) == "Unsubscribe"
-    assert normalize_spaces(page.select_one("p").text) == "You have been unsubscribed"
+    assert normalize_spaces(page.select_one("h1").text) == "We have your request to unsubscribe"
+    assert normalize_spaces(page.select_one("p").text) == "It can take a few days to unsubscribe you from these emails."
     assert not page.select_one("form")
 
 
