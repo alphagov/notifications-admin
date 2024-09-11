@@ -615,5 +615,5 @@ def test_unsubscribe_request_not_found(mocker, client_request, fake_uuid):
 
     mock_post.assert_called_once_with(f"/unsubscribe/{fake_uuid}/abc123", None)
 
-    assert normalize_spaces(page.select_one("h1").text) == "Unsubscribe"
-    assert normalize_spaces(page.select_one("p").text) == "Your request to unsubscribe could not be processed."
+    assert normalize_spaces(page.select_one("h1").text) == "There is a problem"
+    assert normalize_spaces(page.select_one("p").text) == "We could not process your request to unsubscribe."
