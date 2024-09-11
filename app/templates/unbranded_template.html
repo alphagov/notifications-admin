@@ -20,7 +20,7 @@
       box-sizing: border-box;
       max-width: 540px;
       margin: 48px auto;
-      padding: 30px;
+      padding: 30px 30px 20px 30px;
       background: #ffffff;
     }
     footer {
@@ -37,10 +37,27 @@
     p {
       font-size: 20px;
       line-height: 30px;
-      margin: 0 0 12px 0;
+      margin: 0 0 20px 0;
     }
     footer p {
       color: #505a5f;
+    }
+    button {
+      margin: 0 0 20px 0;
+      background: #505a5f;
+      color: #ffffff;
+      font-size: 20px;
+      padding: 12px 20px;
+      border: none;
+      border-bottom: 2px solid #0b0c0c;
+      cursor: pointer;
+    }
+    button:focus {
+      outline: 3px solid #ffdd00;
+    }
+    button:active {
+      background: #ffdd00;
+      color: #0b0c0c;
     }
   </style>
   {% block meta %}
