@@ -153,7 +153,7 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     assert normalize_spaces(add_service_link.text) == "Add a new service"
     assert add_service_link["href"] == url_for("main.add_service")
     assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == ["Live services", "Trial mode services"]
-    assert normalize_spaces(no_live_service[0].text) == "No live service"
+    assert normalize_spaces(no_live_service[0].text) == "No live services"
     assert normalize_spaces(no_live_trial_mode[0].text) == "No trial mode services"
 
 
