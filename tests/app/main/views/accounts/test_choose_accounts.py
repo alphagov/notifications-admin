@@ -82,7 +82,7 @@ def test_choose_account_should_show_choose_accounts_page(
     resp = client_request.get("main.choose_account")
     page = resp.select_one("main#main-content")
 
-    assert normalize_spaces(page.select_one("h1").text) == "Choose organisation or service"
+    assert normalize_spaces(page.select_one("h1").text) == "Your organisations and services"
     org_list_items = page.select("nav ul")[0].select("li")
     service_list_items = page.select("nav ul")[1].select("li")
     trial_services_list_items = page.select("nav ul")[2].select("li")
@@ -143,14 +143,18 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
 ):
     mock_get_orgs_and_services.return_value = {"organisations": [], "services": []}
     page = client_request.get("main.choose_account")
+    no_live_service = page.select("nav ul")[1].select("li")
+    no_live_trial_mode = page.select("nav ul")[2].select("li")
 
     links = page.select("main#main-content a")
     assert len(links) == 1
     add_service_link = links[0]
-    assert normalize_spaces(page.select_one("h1").text) == "Choose service"
+    assert normalize_spaces(page.select_one("h1").text) == "Your services"
     assert normalize_spaces(add_service_link.text) == "Add a new service"
-    assert not page.select("main h2")
     assert add_service_link["href"] == url_for("main.add_service")
+    assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == ["Live services", "Trial mode services"]
+    assert normalize_spaces(no_live_service[0].text) == "No live services"
+    assert normalize_spaces(no_live_trial_mode[0].text) == "No trial mode services"
 
 
 def test_choose_account_should_show_join_service_button(
@@ -172,7 +176,7 @@ def test_choose_account_should_show_join_service_button(
             url_for("main.add_service"),
         ),
         (
-            "Join an existing service",
+            "Join a live service",
             url_for("main.choose_service_to_join"),
         ),
     ]
@@ -185,6 +189,8 @@ def test_choose_account_should_show_join_service_button(
             {"organisations": [], "services": []},
             [
                 "Platform admin",
+                "Live services",
+                "Trial mode services",
             ],
         ),
         (
@@ -263,8 +269,11 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
     (
         (
             {"organisations": [], "services": []},
-            [],
-            "Choose service",
+            [
+                "Live services",
+                "Trial mode services",
+            ],
+            "Your services",
             True,
         ),
         (
@@ -274,7 +283,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 "Live services",
                 "Trial mode services",
             ],
-            "Choose organisation or service",
+            "Your organisations and services",
             False,
         ),
         # no headings as only one thing to show
@@ -289,8 +298,11 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 ],
                 "services": [],
             },
-            [],
-            "Choose organisation",
+            [
+                "Live services",
+                "Trial mode services",
+            ],
+            "Your organisations and services",
             True,
         ),
         # no headings as only one thing to show
@@ -307,7 +319,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 ],
             },
             [],
-            "Choose service",
+            "Your services",
             True,
         ),
         # no headings as only one thing to show
@@ -324,7 +336,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 ],
             },
             [],
-            "Choose service",
+            "Your services",
             True,
         ),
     ),
@@ -346,9 +358,6 @@ def test_choose_account_should_show_organisations_link_for_org_user(
     page = client_request.get("main.choose_account")
 
     assert normalize_spaces(page.select_one("h1").text) == expected_h1
-
-    # check that the h1 is not hidden
-    assert bool(page.select("h1.govuk-visually-hidden")) != is_h1_visible
 
     assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == expected_headings
 
@@ -417,7 +426,7 @@ def test_choose_account_should_not_show_back_to_service_link_if_service_archived
         session["service_id"] = service_one["id"]
     page = client_request.get("main.choose_account")
 
-    assert normalize_spaces(page.select_one("h1").text) == "Choose organisation or service"
+    assert normalize_spaces(page.select_one("h1").text) == "Your organisations and services"
     assert page.select_one(".navigation-service a") is None
 
 

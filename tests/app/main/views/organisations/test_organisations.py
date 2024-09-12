@@ -1299,7 +1299,7 @@ def test_archive_organisation_after_confirmation(
     page = client_request.post("main.archive_organisation", org_id=organisation_one["id"], _follow_redirects=True)
 
     mock_api.assert_called_once_with(url=f"/organisations/{organisation_one['id']}/archive", data=None)
-    assert normalize_spaces(page.select_one("h1").text) == "Choose service"
+    assert normalize_spaces(page.select_one("h1").text) == "Your services"
     assert normalize_spaces(page.select_one(".banner-default-with-tick").text) == "‘Test organisation’ was deleted"
     mock_redis_delete.assert_called_with_args(
         f'organisation-{organisation_one["id"]}-name',

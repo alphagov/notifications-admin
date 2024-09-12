@@ -43,25 +43,45 @@
   <div class="keyline-block"></div>
 {% endmacro %}
 
+{% macro no_service(
+  heading,
+  no_live_service_text
+) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <h2>
+        {{heading}}
+      </h2>
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+        <ul>
+          <li class="browse-list-item">
+            <p class="browse-list-hint">
+              {{no_live_service_text}}
+            </p>
+          </li>
+        </ul>
+    </div>
+  </div>
+  <div class="keyline-block"></div>
+{% endmacro %}
 
-{% if current_user.organisations and current_user.services %}
-  {% set thing_to_choose_between = 'organisation or service' %}
-{% elif current_user.organisations %}
-  {% set thing_to_choose_between = 'organisation' %}
+{% if current_user.organisations %}
+  {% set thing_to_choose_between = 'organisations and services' %}
 {% else %}
-  {% set thing_to_choose_between = 'service' %}
+  {% set thing_to_choose_between = 'services' %}
 {% endif %}
 
 {% block per_page_title %}
-  Choose {{ thing_to_choose_between }}
+  Your {{ thing_to_choose_between }}
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large {% if show_headings %}govuk-visually-hidden{% endif %}">
-    Choose {{ thing_to_choose_between }}
+  <h1 class="heading-large">
+    Your {{ thing_to_choose_between }}
   </h1>
 
-  <nav class="browse-list {% if show_headings %}top-gutter-2-3{% endif %}">
+  <nav class="browse-list">
 
     {% if current_user.platform_admin %}
       <div class="govuk-grid-row">
@@ -106,34 +126,48 @@
       ) }}
     {% endif %}
 
+    {% if not current_user.live_services and not current_user.trial_mode_services %}
+      {% if not current_user.organisations %}
+        <div class="keyline-block"></div>
+      {% endif %}
+      {{ no_service(
+        heading='Live services',
+        no_live_service_text='No live services'
+      ) }}  
+      {{ no_service(
+        heading='Trial mode services',
+        no_live_service_text='No trial mode services'
+      ) }}
+    {% endif %}
+
   </nav>
 
   {% if can_add_service %}
     <div class="js-stick-at-bottom-when-scrolling">
-      {% if show_headings %}
+      {% if (not current_user.live_services and not current_user.trial_mode_services) or show_headings %}
         <div class="govuk-grid-row">
           <div class="govuk-grid-column-one-quarter">
             &nbsp;
           </div>
           <div class="govuk-grid-column-three-quarters">
       {% endif %}
-      {{ govukButton({
-        "element": "a",
-        "text": "Add a new service",
-        "href": url_for('main.add_service'),
-        "classes": "govuk-button--secondary govuk-!-margin-right-3"
-      }) }}
-      {% if current_user.default_organisation.can_ask_to_join_a_service %}
         {{ govukButton({
           "element": "a",
-          "text": "Join an existing service",
-          "href": url_for('main.choose_service_to_join'),
-          "classes": "govuk-button--secondary"
+          "text": "Add a new service",
+          "href": url_for('main.add_service'),
+          "classes": "govuk-button--secondary govuk-!-margin-right-3"
         }) }}
-      {% endif %}
-      {% if show_headings %}
-          </div>
+        {% if current_user.default_organisation.can_ask_to_join_a_service %}
+          {{ govukButton({
+            "element": "a",
+            "text": "Join a live service",
+            "href": url_for('main.choose_service_to_join'),
+            "classes": "govuk-button--secondary"
+          }) }}
+        {% endif %}
+      {% if (not current_user.live_services and not current_user.trial_mode_services) or show_headings %}
         </div>
+          </div>
       {% endif %}
     </div>
   {% endif %}
