@@ -1067,7 +1067,7 @@ def test_invite_user(
     expected_permissions = {"manage_api_keys", "manage_service", "manage_templates", "send_messages", "view_activity"}
 
     app.invite_api_client.create_invite.assert_called_once_with(
-        sample_invite["from_user"], sample_invite["service"], email_address, expected_permissions, "sms_auth", []
+        sample_invite["from_user"], sample_invite["service"], email_address, expected_permissions, "sms_auth", [], False
     )
 
 
@@ -1109,6 +1109,7 @@ def test_invite_user_when_email_address_is_prefilled(
         {"send_messages"},
         "sms_auth",
         [],
+        True,
     )
 
 
@@ -1159,7 +1160,13 @@ def test_invite_user_with_email_auth_service(
     expected_permissions = {"manage_api_keys", "manage_service", "manage_templates", "send_messages", "view_activity"}
 
     app.invite_api_client.create_invite.assert_called_once_with(
-        sample_invite["from_user"], sample_invite["service"], email_address, expected_permissions, auth_type, []
+        sample_invite["from_user"],
+        sample_invite["service"],
+        email_address,
+        expected_permissions,
+        auth_type,
+        [],
+        False,
     )
 
 

@@ -11,7 +11,9 @@ class InviteApiClient(NotifyAdminAPIClient):
 
         self.admin_url = app.config["ADMIN_BASE_URL"]
 
-    def create_invite(self, invite_from_id, service_id, email_address, permissions, auth_type, folder_permissions):
+    def create_invite(
+        self, invite_from_id, service_id, email_address, permissions, auth_type, folder_permissions, is_join_request
+    ):
         data = {
             "service": service_id,
             "email_address": email_address,
@@ -20,6 +22,7 @@ class InviteApiClient(NotifyAdminAPIClient):
             "auth_type": auth_type,
             "invite_link_host": self.admin_url,
             "folder_permissions": folder_permissions,
+            "is_join_request": is_join_request,
         }
         data = _attach_current_user(data)
         resp = self.post(url=f"/service/{service_id}/invite", data=data)

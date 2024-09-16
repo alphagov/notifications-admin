@@ -46,6 +46,8 @@ def invite_user(service_id, user_id=None):
         folder_permissions=[f["id"] for f in current_service.all_template_folders],
     )
 
+    is_join_request = False if user_id is None else True
+
     if user_id:
         user_to_invite = User.from_id(user_id)
         if user_to_invite.belongs_to_service(current_service.id):
@@ -78,6 +80,7 @@ def invite_user(service_id, user_id=None):
             form.permissions,
             form.login_authentication.data,
             form.folder_permissions.data,
+            is_join_request,
         )
 
         flash(f"Invite sent to {invited_user.email_address}", "default_with_tick")

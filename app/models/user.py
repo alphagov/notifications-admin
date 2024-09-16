@@ -489,22 +489,11 @@ class InvitedUser(BaseUser):
 
     @classmethod
     def create(
-        cls,
-        invite_from_id,
-        service_id,
-        email_address,
-        permissions,
-        auth_type,
-        folder_permissions,
+        cls, invite_from_id, service_id, email_address, permissions, auth_type, folder_permissions, is_join_request
     ):
         return cls(
             invite_api_client.create_invite(
-                invite_from_id,
-                service_id,
-                email_address,
-                permissions,
-                auth_type,
-                folder_permissions,
+                invite_from_id, service_id, email_address, permissions, auth_type, folder_permissions, is_join_request
             )
         )
 

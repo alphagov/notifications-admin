@@ -32,7 +32,9 @@ def test_client_creates_invite(
         },
     )
 
-    invite_api_client.create_invite("12345", "67890", "test@example.com", {"send_messages"}, "sms_auth", [fake_uuid])
+    invite_api_client.create_invite(
+        "12345", "67890", "test@example.com", {"send_messages"}, "sms_auth", [fake_uuid], False
+    )
 
     mock_post.assert_called_once_with(
         url="/service/67890/invite",
@@ -45,6 +47,7 @@ def test_client_creates_invite(
             "permissions": "send_emails,send_letters,send_texts",
             "invite_link_host": current_app.config["ADMIN_BASE_URL"],
             "folder_permissions": [fake_uuid],
+            "is_join_request": False,
         },
     )
 
