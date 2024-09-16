@@ -11,3 +11,6 @@ QR_CODE_TOO_LONG = "qr-code-too-long"
 class LetterLanguageOptions(str, enum.Enum):
     english = "english"
     welsh_then_english = "welsh_then_english"
+
+
+MAX_NOTIFICATION_FOR_DOWNLOAD = 250000

@@ -27,6 +27,7 @@ from app import (
     notification_api_client,
     service_api_client,
 )
+from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
 from app.formatters import get_time_left, message_count_noun
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
@@ -182,9 +183,28 @@ def view_job_updates(service_id, job_id):
 @main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>", methods=["GET", "POST"])
 @user_has_permissions()
 def view_notifications(service_id, message_type=None):
+    partials_data = _get_notifications_dashboard_partials_data(service_id, message_type)
+
+    notifications_count = notification_api_client.get_notifications_count_for_service(
+        service_id,
+        message_type,
+        partials_data["service_data_retention_days"],
+    )
+
+    can_download = notifications_count <= MAX_NOTIFICATION_FOR_DOWNLOAD
+    download_link = None
+
+    if can_download:
+        download_link = url_for(
+            ".download_notifications_csv",
+            service_id=current_service.id,
+            message_type=message_type,
+            status=request.args.get("status"),
+        )
+
     return render_template(
         "views/notifications.html",
-        partials=_get_notifications_dashboard_partials_data(service_id, message_type),
+        partials=partials_data,
         message_type=message_type,
         status=request.args.get("status") or "sending,delivered,failed",
         page=request.args.get("page", 1),
@@ -204,12 +224,8 @@ def view_notifications(service_id, message_type=None):
             True: ["reference"],
             False: [],
         }.get(bool(current_service.api_keys)),
-        download_link=url_for(
-            ".download_notifications_csv",
-            service_id=current_service.id,
-            message_type=message_type,
-            status=request.args.get("status"),
-        ),
+        download_link=download_link,
+        can_download=can_download,
     )
 
 

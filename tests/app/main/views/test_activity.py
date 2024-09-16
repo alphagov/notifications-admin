@@ -1,5 +1,6 @@
 import json
 import uuid
+from collections import namedtuple
 from functools import partial
 from urllib.parse import parse_qs, urlparse
 
@@ -99,6 +100,7 @@ def test_can_show_notifications(
     mock_get_service_data_retention,
     mock_has_no_jobs,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     user,
     extra_args,
     expected_update_endpoint,
@@ -131,6 +133,7 @@ def test_can_show_notifications(
             page=page_argument,
             **extra_args,
         )
+
     first_row = page.select_one("tbody tr")
     assert normalize_spaces(first_row.select_one("a.file-list-filename.govuk-link").text) == (
         # Comes from
@@ -202,6 +205,7 @@ def test_can_show_notifications_if_data_retention_not_available(
     mock_get_service_statistics,
     mock_has_no_jobs,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
 ):
     page = client_request.get(
         "main.view_notifications",
@@ -212,11 +216,12 @@ def test_can_show_notifications_if_data_retention_not_available(
 
 
 @pytest.mark.parametrize(
-    "user, query_parameters, expected_download_link",
+    "user, query_parameters, notifications_count,expected_download_link",
     [
         (
             create_active_user_with_permissions(),
             {},
+            100,
             partial(
                 url_for,
                 ".download_notifications_csv",
@@ -226,11 +231,13 @@ def test_can_show_notifications_if_data_retention_not_available(
         (
             create_active_user_with_permissions(),
             {"status": "failed"},
+            100,
             partial(url_for, ".download_notifications_csv", status="failed"),
         ),
         (
             create_active_user_with_permissions(),
             {"message_type": "sms"},
+            100,
             partial(
                 url_for,
                 ".download_notifications_csv",
@@ -240,6 +247,7 @@ def test_can_show_notifications_if_data_retention_not_available(
         (
             create_active_user_view_permissions(),
             {},
+            100,
             partial(
                 url_for,
                 ".download_notifications_csv",
@@ -248,8 +256,23 @@ def test_can_show_notifications_if_data_retention_not_available(
         (
             create_active_caseworking_user(),
             {},
+            100,
             lambda service_id: None,
         ),
+        (
+            create_active_user_with_permissions(),
+            {},
+            300000,  # Above the threshold, should return None
+            lambda service_id: None,
+        ),
+    ],
+    ids=[
+        "Active user - no filters",
+        "Active user - failed status",
+        "Active user - SMS message type",
+        "View permissions user - no filters",
+        "Caseworking user - no download link",
+        "Active user - notifications count above threshold, no download link",
     ],
 )
 def test_link_to_download_notifications(
@@ -259,10 +282,14 @@ def test_link_to_download_notifications(
     mock_get_service_data_retention,
     mock_has_no_jobs,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     user,
     query_parameters,
+    notifications_count,
     expected_download_link,
 ):
+    mock_get_notifications_count_for_service.return_value = notifications_count
+
     client_request.login(user)
     page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID, **query_parameters)
     download_link = page.select_one("a[download=download]")
@@ -309,6 +336,7 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
     service_one,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_notifications_count_for_service,
     mock_get_api_keys,
 ):
     notifications = create_notifications(
@@ -338,6 +366,7 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     letter_status,
 ):
     notifications = create_notifications(
@@ -360,6 +389,7 @@ def test_shows_message_when_no_notifications(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_notifications_with_no_notifications,
+    mock_get_notifications_count_for_service,
     mock_get_no_api_keys,
 ):
     page = client_request.get(
@@ -428,6 +458,7 @@ def test_search_recipient_form(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     initial_query_arguments,
     form_post_data,
     expected_search_box_label,
@@ -475,6 +506,7 @@ def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_ke
     mock_get_notifications,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_notifications_count_for_service,
     message_type,
     expected_search_box_label,
     mock_get_api_keys,
@@ -503,6 +535,7 @@ def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no
     mock_get_notifications,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_notifications_count_for_service,
     message_type,
     expected_search_box_label,
     mock_get_no_api_keys,
@@ -522,6 +555,7 @@ def test_should_show_notifications_for_a_service_with_next_previous(
     mock_get_notifications_with_previous_next,
     mock_get_service_statistics,
     mock_get_service_data_retention,
+    mock_get_notifications_count_for_service,
     mock_get_no_api_keys,
     mocker,
 ):
@@ -551,6 +585,7 @@ def test_doesnt_show_pagination_with_search_term(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     mocker,
 ):
     page = client_request.post(
@@ -617,6 +652,7 @@ def test_html_contains_notification_id(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     mocker,
 ):
     page = client_request.get(
@@ -636,6 +672,7 @@ def test_html_contains_links_for_failed_notifications(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     mocker,
 ):
     notifications = create_notifications(status="technical-failure")
@@ -672,6 +709,7 @@ def test_redacts_templates_that_should_be_redacted(
     mock_get_service_data_retention,
     mock_get_no_api_keys,
     notification_type,
+    mock_get_notifications_count_for_service,
     expected_row_contents,
 ):
     notifications = create_notifications(
@@ -702,6 +740,7 @@ def test_big_numbers_dont_show_for_letters(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     message_type,
     nav_visible,
 ):
@@ -751,6 +790,7 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     message_type,
     status,
     expected_hint_status,
@@ -779,6 +819,7 @@ def test_should_show_address_and_hint_for_letters(
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
     mocker,
     is_precompiled_letter,
     expected_address,
@@ -801,3 +842,59 @@ def test_should_show_address_and_hint_for_letters(
 
     assert page.select_one("a.file-list-filename").text == "Full Name, First address line, postcode"
     assert page.select_one("p.file-list-hint").text.strip() == expected_hint
+
+
+CanDownloadLinkTestCase = namedtuple(
+    "SupportLinkTestCase",
+    ["notifications_count", "can_download", "expected_download_link_present", "expected_support_link_present"],
+)
+
+
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        CanDownloadLinkTestCase(
+            notifications_count=100,
+            can_download=True,
+            expected_download_link_present=True,
+            expected_support_link_present=False,
+        ),
+        CanDownloadLinkTestCase(
+            notifications_count=250001,
+            can_download=False,
+            expected_download_link_present=False,
+            expected_support_link_present=True,
+        ),
+    ],
+    ids=[
+        "Below threshold - Download link present, support link not present",
+        "Above threshold - Download link not present, support link present",
+    ],
+)
+def test_view_notifications_can_download(
+    client_request,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_has_no_jobs,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+    test_case: CanDownloadLinkTestCase,
+):
+    mock_get_notifications_count_for_service.return_value = test_case.notifications_count
+
+    page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID)
+
+    # check download link
+    download_link = page.select_one("a[download=download]")
+    if test_case.expected_download_link_present:
+        assert download_link is not None
+    else:
+        assert download_link is None
+
+    # check support link
+    support_link = page.select_one("a[href*='/support/ask-question-give-feedback']")
+    if test_case.expected_support_link_present:
+        assert support_link is not None
+    else:
+        assert support_link is None

@@ -107,5 +107,15 @@ class NotificationApiClient(NotifyAdminAPIClient):
     def get_notification_count_for_job_id(self, *, service_id, job_id):
         return self.get(url=f"/service/{service_id}/job/{job_id}/notification_count")["count"]
 
+    def get_notifications_count_for_service(self, service_id, template_type, limit_days):
+        params = {
+            "template_type": template_type,
+            "limit_days": limit_days,
+        }
+
+        response = self.get(url=f"/service/{service_id}/notifications/count", params=params)
+
+        return response.get("notifications_sent_count")
+
 
 notification_api_client = NotificationApiClient()

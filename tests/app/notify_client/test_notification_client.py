@@ -1,4 +1,5 @@
 import uuid
+from collections import namedtuple
 
 import pytest
 
@@ -156,3 +157,29 @@ def test_get_notification_count_for_job_id(mocker):
     mock_get.assert_called_once_with(
         url="/service/foo/job/bar/notification_count",
     )
+
+
+NotificationCountTestCase = namedtuple("NotificationCountTestCase", ["template_type", "limit_days", "expected_count"])
+
+
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        NotificationCountTestCase(template_type="sms", limit_days=7, expected_count=42),
+        NotificationCountTestCase(template_type="email", limit_days=30, expected_count=15),
+        NotificationCountTestCase(template_type="letter", limit_days=1, expected_count=0),
+    ],
+)
+def test_get_notifications_count_for_service(mocker, test_case):
+    mock_get = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get")
+    mock_get.return_value = {"notifications_sent_count": test_case.expected_count}
+
+    result = NotificationApiClient().get_notifications_count_for_service(
+        service_id="foo", template_type=test_case.template_type, limit_days=test_case.limit_days
+    )
+
+    mock_get.assert_called_once_with(
+        url="/service/foo/notifications/count",
+        params={"template_type": test_case.template_type, "limit_days": test_case.limit_days},
+    )
+    assert result == test_case.expected_count
