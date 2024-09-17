@@ -61,6 +61,7 @@ class User(BaseUser, UserMixin):
         "receives_new_features_email",
         "state",
         "take_part_in_research",
+        "created_at",
     }
 
     def __init__(self, _dict):
