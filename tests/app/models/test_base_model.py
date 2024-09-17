@@ -91,3 +91,21 @@ def test_dynamic_properties_are_introspectable():
     model = Custom({"foo": None, "bar": None, "baz": None})
 
     assert dir(model)[-3:] == ["bar", "baz", "foo"]
+
+
+def test_attribute_inheritence():
+    class Parent1(JSONModel):
+        foo: str
+
+    class Parent2(JSONModel):
+        bar: str
+
+    class Child(Parent1, Parent2):
+        __sort_attribute__ = "foo"
+        baz: str
+
+    instance = Child({"foo": 1, "bar": 2, "baz": 3})
+
+    assert instance.foo == 1
+    assert instance.bar == 2
+    assert instance.baz == 3

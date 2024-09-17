@@ -37,10 +37,15 @@ class JSONModel(SerialisedModel, SortingAndEqualityMixin):
 
     ALLOWED_PROPERTIES = set()  # This is deprecated
 
+    def __new__(cls, *args, **kwargs):
+        for parent in cls.__mro__:
+            cls.__annotations__ = getattr(parent, "__annotations__", {}) | cls.__annotations__
+        return super().__new__(cls)
+
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}
-        for property in self.__class__.__annotations__:
+        for property in self.__annotations__:
             if property in self._dict:
                 setattr(self, property, self._dict[property])
 
