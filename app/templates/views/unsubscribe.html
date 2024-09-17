@@ -3,31 +3,48 @@
 {% extends "unbranded_template.html" %}
 
 {% block pageTitle %}
-  Unsubscribe
+  {% if confirmed %}
+    We have your request to unsubscribe
+  {% else %}
+    Are you sure you want to unsubscribe?
+  {% endif %}
 {% endblock %}
 
 {% block content %}
 
-  <h1>
-    Unsubscribe
-  </h1>
-
   {% if confirmed %}
+    <h1>
+      We have your request to unsubscribe
+    </h1>
     <p>
-      You have been unsubscribed
+      It can take a few days to unsubscribe you from these emails.
     </p>
   {% else %}
-    <div class="js-hidden">
-
-      <form method="post" id="confirm-unsubscription">
-        {{ page_footer('Confirm unsubscription') }}
-      </form>
-
-    </div>
-
-    <script type="text/javascript">
-      document.getElementById("confirm-unsubscription").submit();
-    </script>
+    <h1>
+      Are you sure you want to unsubscribe?
+    </h1>
+    <p>
+      If you want to unsubscribe you will no longer receive these emails.
+    </p>
+    <form method="post" action="{{ request.url | extract_path_from_url }}" id="confirm-unsubscription">
+      {{ page_footer('Confirm') }}
+    </form>
+    <p>
+      This can take a few days.
+    </p>
 {% endif %}
 
 {% endblock %}
+
+{% block footer %}
+
+  {% if example %}
+    <footer>
+      <p>
+        This is an example page only with no further action needed.
+      </p>
+    </footer>
+  {% endif %}
+
+{% endblock %}
+
