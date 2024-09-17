@@ -1,13 +1,14 @@
+from typing import Any
+
 from app.formatters import format_pennies_as_currency
 from app.models import JSONModel
 from app.notify_client.sms_rate_client import sms_rate_api_client
 
 
 class SMSRate(JSONModel):
-    ALLOWED_PROPERTIES = {
-        "rate",
-        "valid_from",
-    }
+    rate: Any
+    valid_from: Any
+
     __sort_attribute__ = "valid_from"
 
     def __init__(self):

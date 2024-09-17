@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 from flask import abort
 from werkzeug.utils import cached_property
@@ -41,31 +42,29 @@ class Organisation(JSONModel):
         TYPE_OTHER: "Other",
     }
 
-    ALLOWED_PROPERTIES = {
-        "id",
-        "name",
-        "active",
-        "crown",
-        "organisation_type",
-        "letter_branding_id",
-        "email_branding_id",
-        "agreement_signed",
-        "agreement_signed_at",
-        "agreement_signed_by_id",
-        "agreement_signed_version",
-        "agreement_signed_on_behalf_of_name",
-        "agreement_signed_on_behalf_of_email_address",
-        "domains",
-        "request_to_go_live_notes",
-        "count_of_live_services",
-        "billing_contact_email_addresses",
-        "billing_contact_names",
-        "billing_reference",
-        "purchase_order_number",
-        "notes",
-        "can_approve_own_go_live_requests",
-        "permissions",
-    }
+    id: Any
+    name: Any
+    active: Any
+    crown: Any
+    organisation_type: Any
+    letter_branding_id: Any
+    email_branding_id: Any
+    agreement_signed: Any
+    agreement_signed_at: Any
+    agreement_signed_by_id: Any
+    agreement_signed_version: Any
+    agreement_signed_on_behalf_of_name: Any
+    agreement_signed_on_behalf_of_email_address: Any
+    domains: Any
+    request_to_go_live_notes: Any
+    count_of_live_services: Any
+    billing_contact_email_addresses: Any
+    billing_contact_names: Any
+    billing_reference: Any
+    purchase_order_number: Any
+    notes: Any
+    can_approve_own_go_live_requests: Any
+    permissions: Any
 
     __sort_attribute__ = "name"
 

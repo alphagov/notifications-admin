@@ -1,9 +1,15 @@
+from typing import Any
+
 from app.models import JSONModel, ModelList
 from app.notify_client.letter_rate_api_client import letter_rate_api_client
 
 
 class LetterRate(JSONModel):
-    ALLOWED_PROPERTIES = {"sheet_count", "rate", "post_class", "start_date"}
+    sheet_count: Any
+    rate: Any
+    post_class: Any
+    start_date: Any
+
     __sort_attribute__ = "rate"
 
     @property

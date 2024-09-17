@@ -34,10 +34,13 @@ class SortingAndEqualityMixin(ABC):
 
 
 class JSONModel(SerialisedModel, SortingAndEqualityMixin):
+
+    ALLOWED_PROPERTIES = set()  # This is deprecated
+
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}
-        for property in self.ALLOWED_PROPERTIES:
+        for property in self.__class__.__annotations__:
             if property in self._dict:
                 setattr(self, property, self._dict[property])
 

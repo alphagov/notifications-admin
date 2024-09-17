@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from typing import Any
 
 from flask import abort, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user, logout_user
@@ -45,24 +46,22 @@ class BaseUser(JSONModel):
 class User(BaseUser, UserMixin):
     MAX_FAILED_LOGIN_COUNT = 10
 
-    ALLOWED_PROPERTIES = {
-        "can_use_webauthn",
-        "id",
-        "name",
-        "email_address",
-        "auth_type",
-        "current_session_id",
-        "failed_login_count",
-        "email_access_validated_at",
-        "logged_in_at",
-        "mobile_number",
-        "password_changed_at",
-        "permissions",
-        "receives_new_features_email",
-        "state",
-        "take_part_in_research",
-        "created_at",
-    }
+    can_use_webauthn: Any
+    id: Any
+    name: Any
+    email_address: Any
+    auth_type: Any
+    current_session_id: Any
+    failed_login_count: Any
+    email_access_validated_at: Any
+    logged_in_at: Any
+    mobile_number: Any
+    password_changed_at: Any
+    permissions: Any
+    receives_new_features_email: Any
+    state: Any
+    take_part_in_research: Any
+    created_at: Any
 
     def __init__(self, _dict):
         super().__init__(_dict)
@@ -472,16 +471,14 @@ class User(BaseUser, UserMixin):
 
 
 class InvitedUser(BaseUser):
-    ALLOWED_PROPERTIES = {
-        "id",
-        "service",
-        "email_address",
-        "permissions",
-        "status",
-        "created_at",
-        "auth_type",
-        "folder_permissions",
-    }
+    id: Any
+    service: Any
+    email_address: Any
+    permissions: Any
+    status: Any
+    created_at: Any
+    auth_type: Any
+    folder_permissions: Any
 
     def __init__(self, _dict):
         super().__init__(_dict)
@@ -600,14 +597,12 @@ class InvitedUser(BaseUser):
 
 
 class InvitedOrgUser(BaseUser):
-    ALLOWED_PROPERTIES = {
-        "id",
-        "organisation",
-        "email_address",
-        "status",
-        "created_at",
-        "permissions",
-    }
+    id: Any
+    organisation: Any
+    email_address: Any
+    status: Any
+    created_at: Any
+    permissions: Any
 
     def __init__(self, _dict):
         super().__init__(_dict)

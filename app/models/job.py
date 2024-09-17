@@ -1,5 +1,6 @@
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
 
 import pytz
 from notifications_utils.letter_timings import (
@@ -20,18 +21,16 @@ from app.utils.time import is_less_than_days_ago
 
 
 class Job(JSONModel):
-    ALLOWED_PROPERTIES = {
-        "id",
-        "service",
-        "template_name",
-        "template_version",
-        "original_file_name",
-        "created_at",
-        "notification_count",
-        "created_by",
-        "template_type",
-        "recipient",
-    }
+    id: Any
+    service: Any
+    template_name: Any
+    template_version: Any
+    original_file_name: Any
+    created_at: Any
+    notification_count: Any
+    created_by: Any
+    template_type: Any
+    recipient: Any
 
     __sort_attribute__ = "original_file_name"
 

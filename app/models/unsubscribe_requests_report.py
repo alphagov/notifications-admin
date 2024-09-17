@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import abort
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
@@ -8,11 +10,10 @@ from app.utils.time import to_utc_string
 
 
 class UnsubscribeRequestsReport(JSONModel):
-    ALLOWED_PROPERTIES = {
-        "count",
-        "batch_id",
-        "is_a_batched_report",
-    }
+    count: Any
+    batch_id: Any
+    is_a_batched_report: Any
+
     __sort_attribute__ = "earliest_timestamp"
 
     @property

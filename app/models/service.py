@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import abort, current_app
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
@@ -23,32 +25,30 @@ from app.utils.templates import get_template as get_template_as_rich_object
 
 
 class Service(JSONModel):
-    ALLOWED_PROPERTIES = {
-        "active",
-        "billing_contact_email_addresses",
-        "billing_contact_names",
-        "billing_reference",
-        "contact_link",
-        "count_as_live",
-        "custom_email_sender_name",
-        "email_sender_local_part",
-        "go_live_at",
-        "has_active_go_live_request",
-        "id",
-        "inbound_api",
-        "email_message_limit",
-        "sms_message_limit",
-        "letter_message_limit",
-        "rate_limit",
-        "name",
-        "notes",
-        "prefix_sms",
-        "purchase_order_number",
-        "service_callback_api",
-        "volume_email",
-        "volume_sms",
-        "volume_letter",
-    }
+    active: Any
+    billing_contact_email_addresses: Any
+    billing_contact_names: Any
+    billing_reference: Any
+    contact_link: Any
+    count_as_live: Any
+    custom_email_sender_name: Any
+    email_sender_local_part: Any
+    go_live_at: Any
+    has_active_go_live_request: Any
+    id: Any
+    inbound_api: Any
+    email_message_limit: Any
+    sms_message_limit: Any
+    letter_message_limit: Any
+    rate_limit: Any
+    name: Any
+    notes: Any
+    prefix_sms: Any
+    purchase_order_number: Any
+    service_callback_api: Any
+    volume_email: Any
+    volume_sms: Any
+    volume_letter: Any
 
     __sort_attribute__ = "name"
 
