@@ -141,6 +141,7 @@ def feedback(ticket_type):
             org_id=current_service.organisation_id if current_service else None,
             org_type=current_service.organisation_type if current_service else None,
             service_id=current_service.id if current_service else None,
+            user_created_at=get_user_created_at_for_ticket(current_user),
         )
         zendesk_ticket_id = zendesk_client.send_ticket_to_zendesk(ticket)
 
@@ -248,3 +249,10 @@ def get_zendesk_ticket_type(ticket_type):
         return NotifySupportTicket.TYPE_INCIDENT
 
     return NotifySupportTicket.TYPE_QUESTION
+
+
+def get_user_created_at_for_ticket(user) -> datetime | None:
+    if user.is_authenticated:
+        return datetime.strptime(user.created_at, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=pytz.utc)
+
+    return None
