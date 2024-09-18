@@ -4,7 +4,6 @@ from typing import Any
 from flask import abort, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user, logout_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
@@ -144,10 +143,10 @@ class User(BaseUser, UserMixin):
     def update_email_access_validated_at(self):
         self.update(email_access_validated_at=datetime.utcnow().isoformat())
 
-    def password_changed_more_recently_than(self, datetime_string):
+    def password_changed_more_recently_than(self, aware_datetime):
         if not self.password_changed_at:
             return False
-        return self.password_changed_at > utc_string_to_aware_gmt_datetime(datetime_string)
+        return self.password_changed_at > aware_datetime
 
     def set_permissions(self, service_id, permissions, folder_permissions, set_by_id):
         user_api_client.set_user_permissions(

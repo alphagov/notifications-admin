@@ -1,5 +1,3 @@
-import json
-
 from flask import (
     current_app,
     flash,
@@ -14,6 +12,7 @@ from notifications_utils.url_safe_token import check_token
 
 from app.main import main
 from app.main.forms import NewPasswordForm
+from app.models.token import Token
 from app.models.user import User
 from app.utils.login import log_in_user
 
@@ -31,9 +30,9 @@ def new_password(token):
         flash("The link in the email we sent you has expired. Enter your email address to resend.")
         return redirect(url_for(".forgot_password"))
 
-    email_address = json.loads(token_data)["email"]
-    user = User.from_email_address(email_address)
-    if user.password_changed_more_recently_than(json.loads(token_data)["created_at"]):
+    token = Token(token_data)
+    user = User.from_email_address(token.email)
+    if user.password_changed_more_recently_than(token.created_at):
         flash("The link in the email has already been used")
         return redirect(url_for("main.index"))
 
@@ -55,4 +54,4 @@ def new_password(token):
             user.send_verify_code()
             return redirect(url_for("main.two_factor_sms", next=request.args.get("next")))
     else:
-        return render_template("views/new-password.html", token=token, form=form, error_summary_enabled=True)
+        return render_template("views/new-password.html", form=form, error_summary_enabled=True)
