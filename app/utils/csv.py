@@ -72,12 +72,10 @@ def generate_notifications_csv(**kwargs):
             "API key name",
         ]
 
-    kwargs["paginate_by_older_than"] = True
-
     yield ",".join(fieldnames) + "\n"
 
     while True:
-        notifications_batch = notification_api_client.get_notifications_for_service(**kwargs)
+        notifications_batch = notification_api_client.get_notifications_for_service_for_csv(**kwargs)
 
         for notification in notifications_batch["notifications"]:
             if kwargs.get("job_id"):
