@@ -2007,7 +2007,6 @@ def mock_get_notifications(
         include_from_test_key=None,
         to=None,
         include_one_off=None,
-        format_for_csv=None,
     ):
         job = None
         if job_id is not None:

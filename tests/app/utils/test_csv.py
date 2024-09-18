@@ -25,9 +25,7 @@ def _get_notifications_csv(
     page_size=50,
 ):
 
-    def _get(
-        service_id, page=1, job_id=None, template_type=template_type, paginate_by_older_than=True, page_size=page_size
-    ):
+    def _get(service_id, page=1, job_id=None, template_type=template_type, page_size=page_size):
         links = {}
         data = {
             "notifications": [
@@ -66,7 +64,7 @@ def _get_notifications_csv_mock(
     api_user_active,
 ):
     return mocker.patch(
-        "app.notification_api_client.get_notifications_for_service", side_effect=_get_notifications_csv()
+        "app.notification_api_client.get_notifications_for_service_for_csv", side_effect=_get_notifications_csv()
     )
 
 
@@ -99,7 +97,7 @@ def test_generate_notifications_csv_without_job(
     expected_content,
 ):
     mocker.patch(
-        "app.notification_api_client.get_notifications_for_service",
+        "app.notification_api_client.get_notifications_for_service_for_csv",
         side_effect=_get_notifications_csv(
             created_by_name=created_by_name,
             created_by_email_address="sender@email.gov.uk",
@@ -175,7 +173,6 @@ def test_generate_notifications_csv_only_calls_once_if_notifications_batch_small
     list(generate_notifications_csv(service_id="1234", page_size=3))
 
     assert _get_notifications_csv_mock.call_count == 1
-    assert _get_notifications_csv_mock.mock_calls[0][2]["paginate_by_older_than"]
 
 
 @pytest.mark.parametrize("job_id", ["some", None])
@@ -206,7 +203,7 @@ def test_generate_notifications_csv_calls_twice_if_notifications_batch_equals_pa
     response_2 = _get_notifications_csv(rows=3, row_number=8)
 
     mock_get_notifications = mocker.patch(
-        "app.notification_api_client.get_notifications_for_service",
+        "app.notification_api_client.get_notifications_for_service_for_csv",
         side_effect=[
             response_1(service_id),
             response_2(service_id),
@@ -228,11 +225,9 @@ def test_generate_notifications_csv_calls_twice_if_notifications_batch_equals_pa
 
     # mock_calls[0][2] is the kwargs from first call
     assert mock_get_notifications.mock_calls[0][2]["page"] == 1
-    assert mock_get_notifications.mock_calls[0][2]["paginate_by_older_than"]
     assert not mock_get_notifications.mock_calls[0][2].get("older_than")
 
     assert mock_get_notifications.mock_calls[1][2]["page"] == 2
-    assert mock_get_notifications.mock_calls[1][2]["paginate_by_older_than"]
     assert mock_get_notifications.mock_calls[1][2]["older_than"] == sample_uuid()
 
 
