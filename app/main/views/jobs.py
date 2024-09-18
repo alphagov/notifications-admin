@@ -243,13 +243,13 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
         to=search_term,
     )
     url_args = {"message_type": message_type, "status": request.args.get("status")}
+
     prev_page = None
-
-    if "links" in notifications and notifications["links"].get("prev", None):
+    if page > 1:
         prev_page = generate_previous_dict("main.view_notifications", service_id, page, url_args=url_args)
-    next_page = None
 
-    if "links" in notifications and notifications["links"].get("next", None):
+    next_page = None
+    if _should_expect_next_page(len(notifications["notifications"])):
         next_page = generate_next_dict("main.view_notifications", service_id, page, url_args)
 
     return {
@@ -278,6 +278,13 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
             ),
         ),
     }
+
+
+def _should_expect_next_page(number):
+    # default size of a full batch of notifications returned by get_notifications_for_service()
+    page_size = 50
+    # if current page is full, most likely there will be a next page.
+    return number == page_size
 
 
 def get_status_filters(service, message_type, statistics):
@@ -383,7 +390,7 @@ def get_job_partials(job):
         "notifications": render_template(
             "partials/jobs/notifications.html",
             notifications=list(add_preview_of_content_to_notifications(notifications["notifications"])),
-            more_than_one_page=bool(notifications.get("links", {}).get("next")),
+            more_than_one_page=_should_expect_next_page(len(notifications["notifications"])),
             download_link=url_for(
                 "main.view_job_csv", service_id=current_service.id, job_id=job.id, status=request.args.get("status")
             ),
