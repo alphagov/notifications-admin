@@ -1687,10 +1687,10 @@ def mock_get_jobs(mocker, api_user_active, fake_uuid):
                 ("full_of_regret.csv", "2016-01-01 23:09:00.061258", "cancelled", "Template X", 1),
                 ("even_later.csv", "2016-01-01 23:09:00.061258", "scheduled", "Template Y", 1),
                 ("send_me_later.csv", "2016-01-01 11:09:00.061258", "scheduled", "Template Z", 1),
-                ("export 1/1/2016.xls", "", "finished", "Template A", 1),
-                ("all email addresses.xlsx", "", "pending", "Template B", 1),
-                ("applicants.ods", "", "finished", "Template C", 1),
-                ("thisisatest.csv", "", "finished", "Template D", 2),
+                ("export 1/1/2016.xls", None, "finished", "Template A", 1),
+                ("all email addresses.xlsx", None, "pending", "Template B", 1),
+                ("applicants.ods", None, "finished", "Template C", 1),
+                ("thisisatest.csv", None, "finished", "Template D", 2),
             )
         ]
         return {

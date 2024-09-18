@@ -1,4 +1,5 @@
 import pytest
+from dateutil import parser
 from freezegun import freeze_time
 
 from app.utils.time import get_current_financial_year, is_less_than_days_ago, percentage_through_current_financial_year
@@ -14,7 +15,7 @@ from app.utils.time import get_current_financial_year, is_less_than_days_ago, pe
 )
 @freeze_time("2020-02-14T12:00:00")
 def test_is_less_than_days_ago(date_from_db, expected_result):
-    assert is_less_than_days_ago(date_from_db, 90) == expected_result
+    assert is_less_than_days_ago(parser.parse(date_from_db), 90) == expected_result
 
 
 @pytest.mark.parametrize(

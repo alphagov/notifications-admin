@@ -462,7 +462,7 @@ def job_json(
     notifications_sent=1,
     notifications_requested=1,
     job_status="finished",
-    scheduled_for="",
+    scheduled_for=None,
     processing_started=None,
 ):
     if job_id is None:
@@ -495,11 +495,9 @@ def job_json(
             created_by["name"],
             created_by["email_address"],
         ),
+        "processing_started": processing_started,
+        "scheduled_for": scheduled_for,
     }
-    if scheduled_for:
-        data.update(scheduled_for=scheduled_for)
-    if processing_started:
-        data.update(processing_started=processing_started)
     return data
 
 

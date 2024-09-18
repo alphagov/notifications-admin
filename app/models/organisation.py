@@ -1,4 +1,4 @@
-import datetime
+from datetime import date, datetime
 from typing import Any
 
 from flask import abort
@@ -50,7 +50,7 @@ class Organisation(JSONModel):
     letter_branding_id: Any
     email_branding_id: Any
     agreement_signed: bool
-    agreement_signed_at: Any
+    agreement_signed_at: datetime
     agreement_signed_by_id: Any
     agreement_signed_version: str
     agreement_signed_on_behalf_of_name: str
@@ -229,11 +229,11 @@ class Organisation(JSONModel):
     def associate_service(self, service_id):
         organisations_client.update_service_organisation(service_id, self.id)
 
-    def services_and_usage(self, financial_year) -> tuple[dict, datetime.date | None]:
+    def services_and_usage(self, financial_year) -> tuple[dict, date | None]:
         response = organisations_client.get_services_and_usage(self.id, financial_year)
         updated_at = response.get("updated_at")
         if updated_at:
-            updated_at = datetime.datetime.fromisoformat(updated_at)
+            updated_at = datetime.fromisoformat(updated_at)
         return response["services"], updated_at
 
     def can_use_org_user_permission(self, permission: str):

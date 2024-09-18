@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from flask import abort, current_app
@@ -33,7 +34,7 @@ class Service(JSONModel):
     count_as_live: bool
     custom_email_sender_name: str
     email_sender_local_part: str
-    go_live_at: Any
+    go_live_at: datetime
     has_active_go_live_request: bool
     id: Any
     inbound_api: Any

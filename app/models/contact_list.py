@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import partial
 from os import path
 from typing import Any
@@ -21,7 +22,7 @@ from app.utils.templates import get_sample_template
 
 class ContactList(JSONModel):
     id: Any
-    created_at: Any
+    created_at: datetime
     created_by: Any
     has_jobs: bool
     recent_job_count: int

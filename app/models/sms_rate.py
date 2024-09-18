@@ -1,4 +1,4 @@
-from typing import Any
+from datetime import datetime
 
 from app.formatters import format_pennies_as_currency
 from app.models import JSONModel
@@ -7,7 +7,7 @@ from app.notify_client.sms_rate_client import sms_rate_api_client
 
 class SMSRate(JSONModel):
     rate: float
-    valid_from: Any
+    valid_from: datetime
 
     __sort_attribute__ = "valid_from"
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 from app.models import JSONModel, ModelList
@@ -8,7 +9,7 @@ class LetterRate(JSONModel):
     sheet_count: int
     rate: float
     post_class: Any
-    start_date: Any
+    start_date: datetime
 
     __sort_attribute__ = "rate"
 

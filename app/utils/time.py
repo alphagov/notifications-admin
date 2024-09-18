@@ -1,7 +1,6 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytz
-from dateutil import parser
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 
@@ -24,7 +23,7 @@ def percentage_through_current_financial_year():
 
 
 def is_less_than_days_ago(date_from_db, number_of_days):
-    return (datetime.utcnow().astimezone(pytz.utc) - parser.parse(date_from_db)).days < number_of_days
+    return (datetime.now(UTC) - date_from_db).days < number_of_days
 
 
 def to_utc_string(aware_datetime):

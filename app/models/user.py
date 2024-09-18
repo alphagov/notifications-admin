@@ -38,7 +38,7 @@ def _get_org_id_from_view_args():
 class BaseUser(JSONModel):
     id: Any
     email_address: str
-    created_at: Any
+    created_at: datetime
     permissions: Any
 
     __sort_attribute__ = "email_address"
@@ -56,14 +56,14 @@ class User(BaseUser, UserMixin):
     auth_type: Any
     current_session_id: Any
     failed_login_count: int
-    email_access_validated_at: Any
-    logged_in_at: Any
+    email_access_validated_at: datetime
+    logged_in_at: datetime
     mobile_number: str
-    password_changed_at: Any
+    password_changed_at: datetime
     receives_new_features_email: bool
     state: str
     take_part_in_research: bool
-    created_at: Any
+    created_at: datetime
 
     def __init__(self, _dict):
         super().__init__(_dict)
@@ -147,9 +147,7 @@ class User(BaseUser, UserMixin):
     def password_changed_more_recently_than(self, datetime_string):
         if not self.password_changed_at:
             return False
-        return utc_string_to_aware_gmt_datetime(self.password_changed_at) > utc_string_to_aware_gmt_datetime(
-            datetime_string
-        )
+        return self.password_changed_at > utc_string_to_aware_gmt_datetime(datetime_string)
 
     def set_permissions(self, service_id, permissions, folder_permissions, set_by_id):
         user_api_client.set_user_permissions(
@@ -665,6 +663,8 @@ class InvitedOrgUser(BaseUser):
 
 class AnonymousUser(AnonymousUserMixin):
     # set the anonymous user so that if a new browser hits us we don't error http://stackoverflow.com/a/19275188
+
+    created_at = None
 
     def logged_in_elsewhere(self):
         return False

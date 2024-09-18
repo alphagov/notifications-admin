@@ -16,7 +16,6 @@ from app.models.feedback import (
     QUESTION_TICKET_TYPE,
 )
 from app.utils import hide_from_search_engines
-from app.utils.user import get_user_created_at_for_ticket
 
 bank_holidays = BankHolidays(use_cached_holidays=True)
 
@@ -142,7 +141,7 @@ def feedback(ticket_type):
             org_id=current_service.organisation_id if current_service else None,
             org_type=current_service.organisation_type if current_service else None,
             service_id=current_service.id if current_service else None,
-            user_created_at=get_user_created_at_for_ticket(current_user),
+            user_created_at=current_user.created_at,
         )
         zendesk_ticket_id = zendesk_client.send_ticket_to_zendesk(ticket)
 

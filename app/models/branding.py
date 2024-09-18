@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -17,8 +18,8 @@ class Branding(JSONModel):
     id: Any
     name: str
     created_by: Any
-    created_at: Any
-    updated_at: Any
+    created_at: datetime
+    updated_at: datetime
 
     __sort_attribute__ = "name"
 

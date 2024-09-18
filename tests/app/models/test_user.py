@@ -1,10 +1,13 @@
+import datetime
+
 import pytest
 
 from app.models.user import AnonymousUser, InvitedOrgUser, InvitedUser, User
-from tests.conftest import SERVICE_ONE_ID, USER_ONE_ID
+from tests.conftest import SERVICE_ONE_ID, USER_ONE_ID, create_user
 
 
 def test_anonymous_user(notify_admin):
+    assert AnonymousUser().created_at is None
     assert AnonymousUser().is_authenticated is False
     assert AnonymousUser().logged_in_elsewhere() is False
     assert AnonymousUser().default_organisation.name is None
@@ -204,3 +207,19 @@ def test_is_invited_user(client_request, mocker, api_user_active, mock_get_invit
 
     assert User(api_user_active).is_invited_user is False
     assert InvitedUser.from_session().is_invited_user is True
+
+
+@pytest.mark.parametrize(
+    "user_created_at, expected_value",
+    [
+        ("2023-11-07T08:34:54.857402Z", datetime.datetime(2023, 11, 7, 8, 34, 54, 857402, tzinfo=datetime.UTC)),
+        ("2023-11-07T23:34:54.857402Z", datetime.datetime(2023, 11, 7, 23, 34, 54, 857402, tzinfo=datetime.UTC)),
+        ("2023-06-07T23:34:54.857402Z", datetime.datetime(2023, 6, 7, 23, 34, 54, 857402, tzinfo=datetime.UTC)),
+        ("2023-06-07T12:34:54.857402Z", datetime.datetime(2023, 6, 7, 12, 34, 54, 857402, tzinfo=datetime.UTC)),
+    ],
+)
+def test_get_user_created(client_request, user_created_at, expected_value):
+    user_json = create_user(created_at=user_created_at)
+    user = User(user_json)
+
+    assert user.created_at == expected_value

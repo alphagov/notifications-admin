@@ -1,12 +1,15 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from functools import total_ordering
 from typing import Any
 
+import pytz
 from flask import abort
 from notifications_utils.serialised_model import (
     SerialisedModel,
     SerialisedModelCollection,
 )
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 
 @total_ordering
@@ -64,6 +67,10 @@ class JSONModel(SerialisedModel, SortingAndEqualityMixin):
     def coerce_value_to_type(value, type_):
         if type_ is Any or value is None:
             return value
+
+        if issubclass(type_, datetime):
+            return utc_string_to_aware_gmt_datetime(value).astimezone(pytz.utc)
+
         return type_(value)
 
 

@@ -1,7 +1,7 @@
+from datetime import datetime
 from typing import Any
 
 from flask import abort
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app.formatters import format_date_human, format_datetime_human
 from app.models import JSONModel, ModelList
@@ -13,6 +13,10 @@ class UnsubscribeRequestsReport(JSONModel):
     count: int
     batch_id: Any
     is_a_batched_report: bool
+    will_be_archived_at: datetime
+    earliest_timestamp: datetime
+    latest_timestamp: datetime
+    processed_by_service_at: datetime
 
     __sort_attribute__ = "earliest_timestamp"
 
@@ -27,24 +31,6 @@ class UnsubscribeRequestsReport(JSONModel):
     @property
     def completed(self):
         return self.processed_by_service_at is not None
-
-    @property
-    def will_be_archived_at(self):
-        return utc_string_to_aware_gmt_datetime(self._dict["will_be_archived_at"])
-
-    @property
-    def earliest_timestamp(self):
-        return utc_string_to_aware_gmt_datetime(self._dict["earliest_timestamp"])
-
-    @property
-    def latest_timestamp(self):
-        return utc_string_to_aware_gmt_datetime(self._dict["latest_timestamp"])
-
-    @property
-    def processed_by_service_at(self):
-        if not self._dict["processed_by_service_at"]:
-            return None
-        return utc_string_to_aware_gmt_datetime(self._dict["processed_by_service_at"])
 
     @property
     def other_reports(self):
