@@ -2031,7 +2031,6 @@ def mock_get_notifications(
             template=template,
             rows=rows,
             job=job,
-            with_links=True if count_pages is None else count_pages,
             created_by_name="Firstname Lastname",
         )
 
@@ -2054,7 +2053,7 @@ def mock_get_notifications_with_previous_next(mocker):
         include_one_off=None,
         page_size=50,
     ):
-        return notification_json(service_id, rows=50, with_links=True if count_pages is None else count_pages)
+        return notification_json(service_id, rows=50)
 
     return mocker.patch("app.notification_api_client.get_notifications_for_service", side_effect=_get_notifications)
 

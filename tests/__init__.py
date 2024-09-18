@@ -513,7 +513,6 @@ def notification_json(  # noqa: C901
     job_row_number=None,
     created_at=None,
     updated_at=None,
-    with_links=False,
     rows=5,
     personalisation=None,
     template_type=None,
@@ -539,16 +538,8 @@ def notification_json(  # noqa: C901
         updated_at = str((datetime.utcnow() + timedelta(minutes=1)).time())
     if status is None:
         status = "delivered"
-    links = {}
     if template_type == "letter":
         postage = postage or "second"
-
-    if with_links:
-        links = {
-            "prev": f"/service/{service_id}/notifications?page=0",
-            "next": f"/service/{service_id}/notifications?page=1",
-            "last": f"/service/{service_id}/notifications?page=2",
-        }
 
     job_payload = None
     if job:
@@ -580,7 +571,7 @@ def notification_json(  # noqa: C901
         ],
         "total": rows,
         "page_size": 50,
-        "links": links,
+        "links": {},
     }
     return data
 
