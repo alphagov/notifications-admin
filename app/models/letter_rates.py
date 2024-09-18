@@ -5,8 +5,8 @@ from app.notify_client.letter_rate_api_client import letter_rate_api_client
 
 
 class LetterRate(JSONModel):
-    sheet_count: Any
-    rate: Any
+    sheet_count: int
+    rate: float
     post_class: Any
     start_date: Any
 
@@ -14,7 +14,7 @@ class LetterRate(JSONModel):
 
     @property
     def rate_in_pennies(self):
-        return int(round(float(self.rate) * 100))
+        return int(round(self.rate * 100))
 
 
 class LetterRates(ModelList):

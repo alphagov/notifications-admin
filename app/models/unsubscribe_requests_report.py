@@ -10,9 +10,9 @@ from app.utils.time import to_utc_string
 
 
 class UnsubscribeRequestsReport(JSONModel):
-    count: Any
+    count: int
     batch_id: Any
-    is_a_batched_report: Any
+    is_a_batched_report: bool
 
     __sort_attribute__ = "earliest_timestamp"
 

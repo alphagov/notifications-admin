@@ -43,28 +43,28 @@ class Organisation(JSONModel):
     }
 
     id: Any
-    name: Any
-    active: Any
-    crown: Any
+    name: str
+    active: bool
+    crown: bool
     organisation_type: Any
     letter_branding_id: Any
     email_branding_id: Any
-    agreement_signed: Any
+    agreement_signed: bool
     agreement_signed_at: Any
     agreement_signed_by_id: Any
-    agreement_signed_version: Any
-    agreement_signed_on_behalf_of_name: Any
-    agreement_signed_on_behalf_of_email_address: Any
-    domains: Any
-    request_to_go_live_notes: Any
-    count_of_live_services: Any
-    billing_contact_email_addresses: Any
-    billing_contact_names: Any
-    billing_reference: Any
-    purchase_order_number: Any
-    notes: Any
-    can_approve_own_go_live_requests: Any
-    permissions: Any
+    agreement_signed_version: str
+    agreement_signed_on_behalf_of_name: str
+    agreement_signed_on_behalf_of_email_address: str
+    domains: list
+    request_to_go_live_notes: str
+    count_of_live_services: int
+    billing_contact_email_addresses: str
+    billing_contact_names: str
+    billing_reference: str
+    purchase_order_number: str
+    notes: str
+    can_approve_own_go_live_requests: bool
+    permissions: list
 
     __sort_attribute__ = "name"
 

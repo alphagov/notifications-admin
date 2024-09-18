@@ -37,7 +37,7 @@ def _get_org_id_from_view_args():
 
 class BaseUser(JSONModel):
     id: Any
-    email_address: Any
+    email_address: str
     created_at: Any
     permissions: Any
 
@@ -51,18 +51,18 @@ class BaseUser(JSONModel):
 class User(BaseUser, UserMixin):
     MAX_FAILED_LOGIN_COUNT = 10
 
-    can_use_webauthn: Any
+    can_use_webauthn: bool
     name: Any
     auth_type: Any
     current_session_id: Any
-    failed_login_count: Any
+    failed_login_count: int
     email_access_validated_at: Any
     logged_in_at: Any
-    mobile_number: Any
+    mobile_number: str
     password_changed_at: Any
-    receives_new_features_email: Any
-    state: Any
-    take_part_in_research: Any
+    receives_new_features_email: bool
+    state: str
+    take_part_in_research: bool
     created_at: Any
 
     def __init__(self, _dict):
@@ -474,7 +474,7 @@ class User(BaseUser, UserMixin):
 
 class InvitedUser(BaseUser):
     service: Any
-    status: Any
+    status: str
     auth_type: Any
     folder_permissions: Any
 
@@ -596,7 +596,7 @@ class InvitedUser(BaseUser):
 
 class InvitedOrgUser(BaseUser):
     organisation: Any
-    status: Any
+    status: str
 
     def __init__(self, _dict):
         super().__init__(_dict)

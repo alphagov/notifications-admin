@@ -25,30 +25,30 @@ from app.utils.templates import get_template as get_template_as_rich_object
 
 
 class Service(JSONModel):
-    active: Any
-    billing_contact_email_addresses: Any
-    billing_contact_names: Any
-    billing_reference: Any
-    contact_link: Any
-    count_as_live: Any
-    custom_email_sender_name: Any
-    email_sender_local_part: Any
+    active: bool
+    billing_contact_email_addresses: str
+    billing_contact_names: str
+    billing_reference: str
+    contact_link: str
+    count_as_live: bool
+    custom_email_sender_name: str
+    email_sender_local_part: str
     go_live_at: Any
-    has_active_go_live_request: Any
+    has_active_go_live_request: bool
     id: Any
     inbound_api: Any
-    email_message_limit: Any
-    sms_message_limit: Any
-    letter_message_limit: Any
-    rate_limit: Any
-    name: Any
-    notes: Any
-    prefix_sms: Any
-    purchase_order_number: Any
+    email_message_limit: int
+    sms_message_limit: int
+    letter_message_limit: int
+    rate_limit: int
+    name: str
+    notes: str
+    prefix_sms: bool
+    purchase_order_number: str
     service_callback_api: Any
-    volume_email: Any
-    volume_sms: Any
-    volume_letter: Any
+    volume_email: int
+    volume_sms: int
+    volume_letter: int
 
     __sort_attribute__ = "name"
 

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import total_ordering
+from typing import Any
 
 from flask import abort
 from notifications_utils.serialised_model import (
@@ -45,9 +46,10 @@ class JSONModel(SerialisedModel, SortingAndEqualityMixin):
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}
-        for property in self.__annotations__:
+        for property, type_ in self.__annotations__.items():
             if property in self._dict:
-                setattr(self, property, self._dict[property])
+                value = self.coerce_value_to_type(self._dict[property], type_)
+                setattr(self, property, value)
 
     def __bool__(self):
         return self._dict != {}
@@ -57,6 +59,12 @@ class JSONModel(SerialisedModel, SortingAndEqualityMixin):
             return next(thing for thing in things if thing["id"] == str(id))
         except StopIteration:
             abort(404)
+
+    @staticmethod
+    def coerce_value_to_type(value, type_):
+        if type_ is Any or value is None:
+            return value
+        return type_(value)
 
 
 class ModelList(SerialisedModelCollection):

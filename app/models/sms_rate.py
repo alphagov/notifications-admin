@@ -6,7 +6,7 @@ from app.notify_client.sms_rate_client import sms_rate_api_client
 
 
 class SMSRate(JSONModel):
-    rate: Any
+    rate: float
     valid_from: Any
 
     __sort_attribute__ = "valid_from"

@@ -23,11 +23,11 @@ from app.utils.time import is_less_than_days_ago
 class Job(JSONModel):
     id: Any
     service: Any
-    template_name: Any
-    template_version: Any
-    original_file_name: Any
+    template_name: str
+    template_version: int
+    original_file_name: str
     created_at: Any
-    notification_count: Any
+    notification_count: int
     created_by: Any
     template_type: Any
     recipient: Any

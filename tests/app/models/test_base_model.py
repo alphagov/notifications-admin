@@ -90,7 +90,12 @@ def test_dynamic_properties_are_introspectable():
 
     model = Custom({"foo": None, "bar": None, "baz": None})
 
-    assert dir(model)[-3:] == ["bar", "baz", "foo"]
+    for property_name in ["bar", "baz", "foo"]:
+        assert property_name in dir(model)
+
+    assert model.foo is None
+    assert model.bar is None
+    assert model.baz is None
 
 
 def test_attribute_inheritence():
@@ -106,6 +111,6 @@ def test_attribute_inheritence():
 
     instance = Child({"foo": 1, "bar": 2, "baz": 3})
 
-    assert instance.foo == 1
-    assert instance.bar == 2
-    assert instance.baz == 3
+    assert instance.foo == "1"
+    assert instance.bar == "2"
+    assert instance.baz == "3"

@@ -23,11 +23,11 @@ class ContactList(JSONModel):
     id: Any
     created_at: Any
     created_by: Any
-    has_jobs: Any
-    recent_job_count: Any
+    has_jobs: bool
+    recent_job_count: int
     service_id: Any
-    original_file_name: Any
-    row_count: Any
+    original_file_name: str
+    row_count: int
     template_type: Any
 
     __sort_attribute__ = "original_file_name"

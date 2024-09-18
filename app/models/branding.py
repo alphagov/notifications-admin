@@ -15,7 +15,7 @@ from app.notify_client.user_api_client import user_api_client
 
 class Branding(JSONModel):
     id: Any
-    name: Any
+    name: str
     created_by: Any
     created_at: Any
     updated_at: Any
@@ -37,11 +37,11 @@ class Branding(JSONModel):
 
 
 class EmailBranding(Branding):
-    colour: Any
-    logo: Any
-    alt_text: Any
-    text: Any
-    brand_type: Any
+    colour: str
+    logo: str
+    alt_text: str
+    text: str
+    brand_type: str
 
     NHS_ID = "a7dc4e56-660b-4db7-8cff-12c37b12b5ea"
 
@@ -126,7 +126,7 @@ class EmailBranding(Branding):
 
 
 class LetterBranding(Branding):
-    filename: Any
+    filename: str
 
     NHS_ID = "2cd354bb-6b85-eda3-c0ad-6b613150459f"
 
