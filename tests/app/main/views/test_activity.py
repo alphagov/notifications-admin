@@ -175,6 +175,7 @@ def test_can_show_notifications(
         status=expected_api_call,
         template_type=list(extra_args.values()),
         to=expected_to_argument,
+        page_size=50,
     )
 
     json_response = client_request.get_response(

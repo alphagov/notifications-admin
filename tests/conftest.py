@@ -2052,6 +2052,7 @@ def mock_get_notifications_with_previous_next(mocker):
         include_from_test_key=None,
         to=None,
         include_one_off=None,
+        page_size=50,
     ):
         return notification_json(service_id, rows=50, with_links=True if count_pages is None else count_pages)
 
@@ -2072,6 +2073,7 @@ def mock_get_notifications_with_no_notifications(mocker):
         include_from_test_key=None,
         to=None,
         include_one_off=None,
+        page_size=50,
     ):
         return notification_json(service_id, rows=0)
 

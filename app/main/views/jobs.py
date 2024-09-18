@@ -237,6 +237,7 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
     notifications = notification_api_client.get_notifications_for_service(
         service_id=service_id,
         page=page,
+        page_size=50,
         template_type=[message_type] if message_type else [],
         status=filter_args.get("status"),
         limit_days=service_data_retention_days,
@@ -281,7 +282,7 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
 
 
 def _should_expect_next_page(number):
-    # default size of a full batch of notifications returned by get_notifications_for_service()
+    # full page is 50 notifications
     page_size = 50
     # if current page is full, most likely there will be a next page.
     return number == page_size
