@@ -51,14 +51,14 @@ LETTER_VALIDATION_MESSAGES = {
             "You need to change the size or orientation of {invalid_pages}. <br>"
             "Files must meet our "
             '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
-            "letter specification"
+            "letter specification (opens in a new tab)"
             "</a>."
         ),
         "summary": (
             "Validation failed because {invalid_pages} {invalid_pages_are_or_is} not A4 portrait size.<br>"
             "Files must meet our "
             '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}">'
-            "letter specification"
+            "letter specification (opens in a new tab)"
             "</a>."
         ),
     },
@@ -68,14 +68,14 @@ LETTER_VALIDATION_MESSAGES = {
             "You need to edit {invalid_pages}.<br>"
             "Files must meet our "
             '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}">'
-            "letter specification"
+            "letter specification (opens in a new tab)"
             "</a>."
         ),
         "summary": (
             "Validation failed because content is outside the printable area on {invalid_pages}.<br>"
             "Files must meet our "
             '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
-            "letter specification"
+            "letter specification (opens in a new tab)"
             "</a>."
         ),
     },
@@ -106,14 +106,14 @@ LETTER_VALIDATION_MESSAGES = {
             "You need to add a recipient address.<br>"
             "Files must meet our "
             '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
-            "letter specification"
+            "letter specification (opens in a new tab)"
             "</a>."
         ),
         "summary": (
             "Validation failed because the address block is empty.<br>"
             "Files must meet our "
             '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
-            "letter specification"
+            "letter specification (opens in a new tab)"
             "</a>."
         ),
     },
