@@ -62,7 +62,6 @@ class User(BaseUser, UserMixin):
     receives_new_features_email: bool
     state: str
     take_part_in_research: bool
-    created_at: datetime
 
     def __init__(self, _dict):
         super().__init__(_dict)
