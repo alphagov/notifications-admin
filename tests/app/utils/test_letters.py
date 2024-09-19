@@ -98,7 +98,7 @@ def test_get_letter_validation_error_for_unknown_error():
             [2],
             "Your letter is not A4 portrait size",
             "You need to change the size or orientation of page 2. Files must meet our letter specification.",
-            "Validation failed because page 2 is not A4 portrait size.Files must meet our letter specification.",
+            "Validation failed because page 2 is not A4 portrait size.Files must meet our letter specification (opens in a new tab).",
         ),
         (
             "letter-not-a4-portrait-oriented",
@@ -106,11 +106,11 @@ def test_get_letter_validation_error_for_unknown_error():
             "Your letter is not A4 portrait size",
             (
                 "You need to change the size or orientation of pages 2, 3 and 4. "
-                "Files must meet our letter specification."
+                "Files must meet our letter specification (opens in a new tab)."
             ),
             (
                 "Validation failed because pages 2, 3 and 4 are not A4 portrait size."
-                "Files must meet our letter specification."
+                "Files must meet our letter specification (opens in a new tab)."
             ),
         ),
         (
@@ -121,7 +121,7 @@ def test_get_letter_validation_error_for_unknown_error():
             (
                 "Validation failed because content is outside the printable area "
                 "on page 2."
-                "Files must meet our letter specification."
+                "Files must meet our letter specification (opens in a new tab)."
             ),
         ),
         (
@@ -146,7 +146,7 @@ def test_get_letter_validation_error_for_unknown_error():
             [1],
             "The address block is empty",
             "You need to add a recipient address.Files must meet our letter specification.",
-            "Validation failed because the address block is empty.Files must meet our letter specification.",
+            "Validation failed because the address block is empty.Files must meet our letter specification (opens in a new tab).",
         ),
         (
             "not-a-real-uk-postcode",
