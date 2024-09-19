@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 import pytest
 from flask import url_for
@@ -431,7 +431,8 @@ def test_mark_report_as_completed(client_request, mocker, fake_uuid):
             },
         ],
     )
-    mock_batch_report = mocker.patch.object(service_api_client, "process_unsubscribe_request_report")
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
+    mock_post = mocker.patch.object(service_api_client, "post")
     page = client_request.post(
         "main.unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
@@ -441,11 +442,16 @@ def test_mark_report_as_completed(client_request, mocker, fake_uuid):
         },
         _follow_redirects=True,
     )
-    mock_batch_report.assert_called_once_with(
-        SERVICE_ONE_ID,
-        batch_id=fake_uuid,
+    mock_post.assert_called_once_with(
+        f"service/{SERVICE_ONE_ID}/process-unsubscribe-request-report/{fake_uuid}",
         data={"report_has_been_processed": True},
     )
+    assert mock_redis_delete.call_args_list == [
+        call(f"service-{SERVICE_ONE_ID}-unsubscribe-request-reports-summary", raise_exception=True),
+        call(f"service-{SERVICE_ONE_ID}-unsubscribe-request-statistics", raise_exception=True),
+        call(f"service-{SERVICE_ONE_ID}-unsubscribe-request-statistics", raise_exception=True),
+        call(f"service-{SERVICE_ONE_ID}-unsubscribe-request-reports-summary", raise_exception=True),
+    ]
     assert normalize_spaces(page.select_one("main .banner-default-with-tick")) == (
         "Report for yesterday to today marked as completed"
     )
