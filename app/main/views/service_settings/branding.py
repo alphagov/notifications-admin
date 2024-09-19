@@ -29,7 +29,7 @@ from app.utils import service_belongs_to_org_type
 from app.utils.branding import get_email_choices as get_email_branding_choices
 from app.utils.branding import get_letter_choices as get_letter_branding_choices
 from app.utils.branding import letter_filename_for_db_from_logo_key
-from app.utils.user import user_has_permissions
+from app.utils.user import get_user_created_at_for_ticket, user_has_permissions
 
 from .index import THANKS_FOR_BRANDING_REQUEST_MESSAGE
 
@@ -53,6 +53,7 @@ def create_email_branding_zendesk_ticket(detail=None):
         org_type=current_service.organisation_type,
         service_id=current_service.id,
         notify_task_type="notify_task_email_branding",
+        user_created_at=get_user_created_at_for_ticket(current_user),
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 
@@ -216,6 +217,7 @@ def email_branding_enter_government_identity_logo_text(service_id):
             org_type=current_service.organisation_type,
             service_id=current_service.id,
             notify_task_type="notify_task_email_branding_gov",
+            user_created_at=get_user_created_at_for_ticket(current_user),
         )
         zendesk_client.send_ticket_to_zendesk(ticket)
         flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")
@@ -681,6 +683,7 @@ def letter_branding_request(service_id):
             org_type=current_service.organisation_type,
             service_id=current_service.id,
             notify_task_type="notify_task_letter_branding",
+            user_created_at=get_user_created_at_for_ticket(current_user),
         )
         zendesk_client.send_ticket_to_zendesk(ticket)
         flash((THANKS_FOR_BRANDING_REQUEST_MESSAGE), "default")

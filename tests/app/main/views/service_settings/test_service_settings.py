@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlparse
 from uuid import UUID, uuid4
 
 import pytest
+import pytz
 from flask import g, url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
@@ -2044,6 +2045,7 @@ def test_should_redirect_after_request_to_go_live(
         org_type="central",
         service_id=SERVICE_ONE_ID,
         notify_task_type="notify_task_go_live_request",
+        user_created_at=datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
     )
     mock_send_ticket_to_zendesk.assert_called_once()
 
@@ -2147,6 +2149,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         org_type="central",
         service_id=SERVICE_ONE_ID,
         notify_task_type=expected_zendesk_task_type,
+        user_created_at=datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
     )
     mock_send_ticket_to_zendesk.assert_called_once()
 

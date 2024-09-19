@@ -1,9 +1,13 @@
+import datetime
+
 import pytest
 from flask import request
 from werkzeug.exceptions import Forbidden
 
 from app import load_service_before_request
-from app.utils.user import user_has_permissions
+from app.models.user import AnonymousUser, User
+from app.utils.user import get_user_created_at_for_ticket, user_has_permissions
+from tests.conftest import create_user
 
 
 @pytest.mark.parametrize(
@@ -163,3 +167,25 @@ def test_user_with_no_permissions_to_service_goes_to_templates(
 
     load_service_before_request()
     index()
+
+
+def test_get_user_created_at_date_for_ticket_returns_none_for_unauthenticated_user():
+    unauthenticated_user = AnonymousUser()
+
+    assert get_user_created_at_for_ticket(unauthenticated_user) is None
+
+
+@pytest.mark.parametrize(
+    "user_created_at, expected_value",
+    [
+        ("2023-11-07T08:34:54.857402Z", datetime.datetime(2023, 11, 7, 8, 34, 54, 857402, tzinfo=datetime.UTC)),
+        ("2023-11-07T23:34:54.857402Z", datetime.datetime(2023, 11, 7, 23, 34, 54, 857402, tzinfo=datetime.UTC)),
+        ("2023-06-07T23:34:54.857402Z", datetime.datetime(2023, 6, 7, 23, 34, 54, 857402, tzinfo=datetime.UTC)),
+        ("2023-06-07T12:34:54.857402Z", datetime.datetime(2023, 6, 7, 12, 34, 54, 857402, tzinfo=datetime.UTC)),
+    ],
+)
+def test_get_user_created_at_for_ticket(client_request, user_created_at, expected_value):
+    user_json = create_user(created_at=user_created_at)
+    user = User(user_json)
+
+    assert get_user_created_at_for_ticket(user) == expected_value

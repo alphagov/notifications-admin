@@ -12,18 +12,13 @@ from notifications_utils.clients.zendesk.zendesk_client import (
     ZendeskError,
 )
 
-from app.main.views.feedback import (
-    ZENDESK_USER_LOGGED_OUT_NOTE,
-    get_user_created_at_for_ticket,
-    in_business_hours,
-)
+from app.main.views.feedback import ZENDESK_USER_LOGGED_OUT_NOTE, in_business_hours
 from app.models.feedback import (
     GENERAL_TICKET_TYPE,
     PROBLEM_TICKET_TYPE,
     QUESTION_TICKET_TYPE,
 )
-from app.models.user import AnonymousUser, User
-from tests.conftest import SERVICE_ONE_ID, create_user, normalize_spaces, set_config_values
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config_values
 
 
 def no_redirect():
@@ -831,25 +826,3 @@ def test_thanks(
         out_of_hours_emergency=out_of_hours_emergency,
     )
     assert normalize_spaces(page.select_one("main").find("p").text) == message
-
-
-def test_get_user_created_at_date_for_ticket_returns_none_for_unauthenticated_user():
-    unauthenticated_user = AnonymousUser()
-
-    assert get_user_created_at_for_ticket(unauthenticated_user) is None
-
-
-@pytest.mark.parametrize(
-    "user_created_at, expected_value",
-    [
-        ("2023-11-07T08:34:54.857402Z", datetime.datetime(2023, 11, 7, 8, 34, 54, 857402, tzinfo=datetime.UTC)),
-        ("2023-11-07T23:34:54.857402Z", datetime.datetime(2023, 11, 7, 23, 34, 54, 857402, tzinfo=datetime.UTC)),
-        ("2023-06-07T23:34:54.857402Z", datetime.datetime(2023, 6, 7, 23, 34, 54, 857402, tzinfo=datetime.UTC)),
-        ("2023-06-07T12:34:54.857402Z", datetime.datetime(2023, 6, 7, 12, 34, 54, 857402, tzinfo=datetime.UTC)),
-    ],
-)
-def test_get_user_created_at_for_ticket(client_request, user_created_at, expected_value):
-    user_json = create_user(created_at=user_created_at)
-    user = User(user_json)
-
-    assert get_user_created_at_for_ticket(user) == expected_value

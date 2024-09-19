@@ -1,3 +1,4 @@
+import datetime
 from io import BytesIO
 from textwrap import dedent
 from unittest import mock
@@ -5,6 +6,7 @@ from unittest.mock import ANY, PropertyMock
 from urllib.parse import parse_qs, urlparse
 
 import pytest
+import pytz
 from flask import url_for
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
@@ -823,6 +825,7 @@ def test_email_branding_request_submit(
         org_type="nhs_local",
         service_id=SERVICE_ONE_ID,
         notify_task_type="notify_task_email_branding",
+        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
     )
     mock_send_ticket_to_zendesk.assert_called_once()
     assert normalize_spaces(page.select_one(".banner-default").text) == (

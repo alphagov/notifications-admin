@@ -1,6 +1,8 @@
 import os
+from datetime import datetime
 from functools import wraps
 
+import pytz
 from flask import abort, current_app
 from flask_login import current_user, login_required
 
@@ -75,3 +77,10 @@ def normalise_email_address_aliases(email_address):
     local_part = local_part.split("+")[0].replace(".", "")
 
     return f"{local_part}@{domain}".lower()
+
+
+def get_user_created_at_for_ticket(user) -> datetime | None:
+    if user.is_authenticated:
+        return datetime.strptime(user.created_at, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=pytz.utc)
+
+    return None
