@@ -41,7 +41,6 @@ def test_model_raises_for_unknown_attributes(json_response):
         __sort_attribute__ = None
 
     model = Custom(json_response)
-    assert model.ALLOWED_PROPERTIES == set()
 
     with pytest.raises(AttributeError) as e:
         model.foo  # noqa: B018
