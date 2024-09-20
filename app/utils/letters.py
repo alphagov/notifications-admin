@@ -27,6 +27,8 @@ def printing_today_or_tomorrow(created_at):
 
 
 def get_letter_printing_statement(status, created_at, long_form=True):
+    if isinstance(created_at, datetime):
+        created_at = created_at.astimezone(pytz.utc).isoformat()
     created_at_dt = parser.parse(created_at).replace(tzinfo=None)
     if letter_can_be_cancelled(status, created_at_dt):
         decription = "Printing starts" if long_form else "Printing"

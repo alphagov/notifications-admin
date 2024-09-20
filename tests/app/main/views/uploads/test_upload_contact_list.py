@@ -483,7 +483,7 @@ def test_view_jobs_for_contact_list(
     mocker.patch(
         "app.models.contact_list.contact_list_api_client.get_contact_list",
         return_value={
-            "created_at": "2015-12-31 12:12:12",
+            "created_at": "2015-12-31T12:12:12+00:00",
             "created_by": "Test User",
             "id": fake_uuid,
             "original_file_name": "EmergencyContactList.xls",

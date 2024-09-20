@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from flask import current_app, render_template, url_for
 from markupsafe import Markup
@@ -214,11 +215,10 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
 
 
 class LetterAttachment(JSONModel):
-    ALLOWED_PROPERTIES = {
-        "id",
-        "original_filename",
-        "page_count",
-    }
+    id: Any
+    original_filename: Any
+    page_count: Any
+
     __sort_attribute__ = "original_filename"
 
 

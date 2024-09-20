@@ -1,11 +1,15 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from functools import total_ordering
+from typing import Any
 
+import pytz
 from flask import abort
 from notifications_utils.serialised_model import (
     SerialisedModel,
     SerialisedModelCollection,
 )
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 
 @total_ordering
@@ -34,12 +38,21 @@ class SortingAndEqualityMixin(ABC):
 
 
 class JSONModel(SerialisedModel, SortingAndEqualityMixin):
+
+    ALLOWED_PROPERTIES = set()  # This is deprecated
+
+    def __new__(cls, *args, **kwargs):
+        for parent in cls.__mro__:
+            cls.__annotations__ = getattr(parent, "__annotations__", {}) | cls.__annotations__
+        return super().__new__(cls)
+
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}
-        for property in self.ALLOWED_PROPERTIES:
+        for property, type_ in self.__annotations__.items():
             if property in self._dict:
-                setattr(self, property, self._dict[property])
+                value = self.coerce_value_to_type(self._dict[property], type_)
+                setattr(self, property, value)
 
     def __bool__(self):
         return self._dict != {}
@@ -49,6 +62,16 @@ class JSONModel(SerialisedModel, SortingAndEqualityMixin):
             return next(thing for thing in things if thing["id"] == str(id))
         except StopIteration:
             abort(404)
+
+    @staticmethod
+    def coerce_value_to_type(value, type_):
+        if type_ is Any or value is None:
+            return value
+
+        if issubclass(type_, datetime):
+            return utc_string_to_aware_gmt_datetime(value).astimezone(pytz.utc)
+
+        return type_(value)
 
 
 class ModelList(SerialisedModelCollection):

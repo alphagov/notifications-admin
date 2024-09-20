@@ -1,14 +1,21 @@
+from datetime import datetime
+from typing import Any
+
 from app.models import JSONModel, ModelList
 from app.notify_client.letter_rate_api_client import letter_rate_api_client
 
 
 class LetterRate(JSONModel):
-    ALLOWED_PROPERTIES = {"sheet_count", "rate", "post_class", "start_date"}
+    sheet_count: int
+    rate: float
+    post_class: Any
+    start_date: datetime
+
     __sort_attribute__ = "rate"
 
     @property
     def rate_in_pennies(self):
-        return int(round(float(self.rate) * 100))
+        return int(round(self.rate * 100))
 
 
 class LetterRates(ModelList):

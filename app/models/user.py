@@ -1,9 +1,9 @@
 from datetime import UTC, datetime
+from typing import Any
 
 from flask import abort, request, session
 from flask_login import AnonymousUserMixin, UserMixin, login_user, logout_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 from werkzeug.utils import cached_property
 
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
@@ -35,6 +35,11 @@ def _get_org_id_from_view_args():
 
 
 class BaseUser(JSONModel):
+    id: Any
+    email_address: str
+    created_at: datetime
+    permissions: Any
+
     __sort_attribute__ = "email_address"
 
     @property
@@ -45,24 +50,18 @@ class BaseUser(JSONModel):
 class User(BaseUser, UserMixin):
     MAX_FAILED_LOGIN_COUNT = 10
 
-    ALLOWED_PROPERTIES = {
-        "can_use_webauthn",
-        "id",
-        "name",
-        "email_address",
-        "auth_type",
-        "current_session_id",
-        "failed_login_count",
-        "email_access_validated_at",
-        "logged_in_at",
-        "mobile_number",
-        "password_changed_at",
-        "permissions",
-        "receives_new_features_email",
-        "state",
-        "take_part_in_research",
-        "created_at",
-    }
+    can_use_webauthn: bool
+    name: Any
+    auth_type: Any
+    current_session_id: Any
+    failed_login_count: int
+    email_access_validated_at: datetime
+    logged_in_at: datetime
+    mobile_number: str
+    password_changed_at: datetime
+    receives_new_features_email: bool
+    state: str
+    take_part_in_research: bool
 
     def __init__(self, _dict):
         super().__init__(_dict)
@@ -143,12 +142,10 @@ class User(BaseUser, UserMixin):
     def update_email_access_validated_at(self):
         self.update(email_access_validated_at=datetime.utcnow().isoformat())
 
-    def password_changed_more_recently_than(self, datetime_string):
+    def password_changed_more_recently_than(self, aware_datetime):
         if not self.password_changed_at:
             return False
-        return utc_string_to_aware_gmt_datetime(self.password_changed_at) > utc_string_to_aware_gmt_datetime(
-            datetime_string
-        )
+        return self.password_changed_at > aware_datetime
 
     def set_permissions(self, service_id, permissions, folder_permissions, set_by_id):
         user_api_client.set_user_permissions(
@@ -472,16 +469,10 @@ class User(BaseUser, UserMixin):
 
 
 class InvitedUser(BaseUser):
-    ALLOWED_PROPERTIES = {
-        "id",
-        "service",
-        "email_address",
-        "permissions",
-        "status",
-        "created_at",
-        "auth_type",
-        "folder_permissions",
-    }
+    service: Any
+    status: str
+    auth_type: Any
+    folder_permissions: Any
 
     def __init__(self, _dict):
         super().__init__(_dict)
@@ -600,14 +591,8 @@ class InvitedUser(BaseUser):
 
 
 class InvitedOrgUser(BaseUser):
-    ALLOWED_PROPERTIES = {
-        "id",
-        "organisation",
-        "email_address",
-        "status",
-        "created_at",
-        "permissions",
-    }
+    organisation: Any
+    status: str
 
     def __init__(self, _dict):
         super().__init__(_dict)
@@ -676,6 +661,8 @@ class InvitedOrgUser(BaseUser):
 
 class AnonymousUser(AnonymousUserMixin):
     # set the anonymous user so that if a new browser hits us we don't error http://stackoverflow.com/a/19275188
+
+    created_at = None
 
     def logged_in_elsewhere(self):
         return False

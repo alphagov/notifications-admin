@@ -1,4 +1,5 @@
 import base64
+from typing import Any
 
 from fido2 import cbor
 from fido2.cose import UnsupportedKey
@@ -18,15 +19,13 @@ class RegistrationError(Exception):
 
 
 class WebAuthnCredential(JSONModel):
-    ALLOWED_PROPERTIES = {
-        "id",
-        "name",
-        "credential_data",  # contains public key and credential ID for auth
-        "registration_response",  # sent to API for later auditing (not used)
-        "created_at",
-        "updated_at",
-        "logged_in_at",
-    }
+    id: Any
+    name: str
+    credential_data: Any  # contains public key and credential ID for auth
+    registration_response: Any  # sent to API for later auditing (not used)
+    created_at: Any
+    updated_at: Any
+    logged_in_at: Any
 
     __sort_attribute__ = "name"
 

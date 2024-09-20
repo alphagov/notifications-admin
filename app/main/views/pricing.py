@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from flask import current_app, render_template
 from flask_login import current_user
 from notifications_utils.international_billing_rates import INTERNATIONAL_BILLING_RATES
@@ -28,6 +30,7 @@ def guidance_pricing_text_messages():
         ),
         _search_form=SearchByNameForm(),
         navigation_links=pricing_nav(),
+        last_updated=datetime(2024, 3, 28).astimezone(UTC),
     )
 
 

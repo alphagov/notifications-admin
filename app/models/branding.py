@@ -1,4 +1,6 @@
+from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from flask import current_app
 from flask_login import current_user
@@ -13,7 +15,12 @@ from app.notify_client.user_api_client import user_api_client
 
 
 class Branding(JSONModel):
-    ALLOWED_PROPERTIES = {"id", "name"}
+    id: Any
+    name: str
+    created_by: Any
+    created_at: datetime
+    updated_at: datetime
+
     __sort_attribute__ = "name"
 
     def __bool__(self):
@@ -21,7 +28,7 @@ class Branding(JSONModel):
 
     @classmethod
     def with_default_values(cls, **kwargs):
-        return cls({key: None for key in cls.ALLOWED_PROPERTIES} | kwargs)
+        return cls({key: None for key in cls({}).__annotations__} | kwargs)
 
     def name_like(self, name):
         return make_string_safe(name, whitespace="") == make_string_safe(self.name, whitespace="")
@@ -31,16 +38,11 @@ class Branding(JSONModel):
 
 
 class EmailBranding(Branding):
-    ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {
-        "colour",
-        "logo",
-        "alt_text",
-        "text",
-        "brand_type",
-        "created_by",
-        "created_at",
-        "updated_at",
-    }
+    colour: str
+    logo: str
+    alt_text: str
+    text: str
+    brand_type: str
 
     NHS_ID = "a7dc4e56-660b-4db7-8cff-12c37b12b5ea"
 
@@ -125,12 +127,8 @@ class EmailBranding(Branding):
 
 
 class LetterBranding(Branding):
-    ALLOWED_PROPERTIES = Branding.ALLOWED_PROPERTIES | {
-        "filename",
-        "created_by",
-        "created_at",
-        "updated_at",
-    }
+    filename: str
+
     NHS_ID = "2cd354bb-6b85-eda3-c0ad-6b613150459f"
 
     @classmethod

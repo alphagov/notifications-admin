@@ -74,7 +74,6 @@ from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
 from app.utils.user import (
-    get_user_created_at_for_ticket,
     user_has_permissions,
     user_is_gov_user,
     user_is_platform_admin,
@@ -251,7 +250,7 @@ def submit_request_to_go_live(service_id):
         org_type=current_service.organisation_type,
         service_id=current_service.id,
         notify_task_type=notify_task_type,
-        user_created_at=get_user_created_at_for_ticket(current_user),
+        user_created_at=current_user.created_at,
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 

@@ -314,12 +314,11 @@ def redact_mobile_number(mobile_number, spacing=""):
 
 
 def get_time_left(created_at, service_data_retention_days=7):
+    if not isinstance(created_at, datetime):
+        created_at = dateutil.parser.parse(created_at)
     return ago.human(
         (datetime.now(UTC))
-        - (
-            dateutil.parser.parse(created_at).replace(hour=0, minute=0, second=0)
-            + timedelta(days=service_data_retention_days + 1)
-        ),
+        - (created_at.replace(hour=0, minute=0, second=0) + timedelta(days=service_data_retention_days + 1)),
         future_tense="Data available for {}",
         past_tense="Data no longer available",  # No-one should ever see this
         precision=1,

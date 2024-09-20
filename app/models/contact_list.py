@@ -1,5 +1,7 @@
+from datetime import datetime
 from functools import partial
 from os import path
+from typing import Any
 
 from flask import abort, current_app
 from notifications_utils.formatters import strip_all_whitespace
@@ -19,17 +21,15 @@ from app.utils.templates import get_sample_template
 
 
 class ContactList(JSONModel):
-    ALLOWED_PROPERTIES = {
-        "id",
-        "created_at",
-        "created_by",
-        "has_jobs",
-        "recent_job_count",
-        "service_id",
-        "original_file_name",
-        "row_count",
-        "template_type",
-    }
+    id: Any
+    created_at: datetime
+    created_by: Any
+    has_jobs: bool
+    recent_job_count: int
+    service_id: Any
+    original_file_name: str
+    row_count: int
+    template_type: Any
 
     __sort_attribute__ = "original_file_name"
 
