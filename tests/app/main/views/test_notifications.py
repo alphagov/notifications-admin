@@ -396,7 +396,7 @@ def test_notification_page_shows_validation_failed_precompiled_letter(
     error_message = page.select_one("p.notification-status-cancelled").text
     assert normalize_spaces(error_message) == (
         "Validation failed because content is outside the printable area on page 1."
-        "Files must meet our letter specification."
+        "Files must meet our letter specification (opens in a new tab)."
     )
 
     assert not page.select("p.notification-status")

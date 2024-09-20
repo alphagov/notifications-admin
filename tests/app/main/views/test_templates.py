@@ -1367,7 +1367,7 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
     assert page.select_one(".banner-dangerous h1").text == "Your content is outside the printable area"
     assert (
         page.select_one(".banner-dangerous p").text
-        == "You need to edit page 1.Files must meet our letter specification."
+        == "You need to edit page 1.Files must meet our letter specification (opens in a new tab)."
     )
     assert page.select_one("form").attrs["action"] == url_for(
         "main.letter_template_attach_pages", service_id=SERVICE_ONE_ID, template_id=sample_uuid()
