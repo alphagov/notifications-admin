@@ -45,6 +45,14 @@ from app.models.service import Service
             True,
             True,
         ),  # Evri is a user id that will be set in the
+        ("NHSNoReply", False, None, False, False),  # NHSNoReply is allowed
+        (
+            "NHSno Reply",
+            True,
+            "Text message sender ID must match other NHS services - change it to ‘NHSNoReply’",
+            False,
+            False,
+        ),  # NHS-No Reply and variants are not allowed
         pytest.param(
             "'UC'", False, None, False, False, marks=pytest.mark.xfail
         ),  # Apostrophes can cause SMS delivery issues

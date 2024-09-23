@@ -70,6 +70,7 @@ from app.main.validators import (
     IsAUKMobileNumberOrShortCode,
     IsNotAGenericSenderID,
     IsNotAPotentiallyMaliciousSenderID,
+    IsNotLikeNHSNoReply,
     Length,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
@@ -1832,6 +1833,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             IsNotAGenericSenderID(),
             IsNotAPotentiallyMaliciousSenderID(),
             IsAUKMobileNumberOrShortCode(),
+            IsNotLikeNHSNoReply(),
         ],
     )
     is_default = GovukCheckboxField("Make this text message sender ID the default")
