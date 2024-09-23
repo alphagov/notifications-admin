@@ -70,7 +70,11 @@ class UnsubscribeRequestsReport(JSONModel):
     @property
     def latest(self):
         if self.is_first_of_several_reports_on_the_same_day:
-            return format_datetime_human(self.latest_timestamp, date_prefix="", separator="until")
+            return format_datetime_human(
+                self.latest_timestamp,
+                date_prefix="",
+                separator="at" if self.count == 1 else "until",
+            )
 
         if self.starts_on_a_day_another_report_ends or self.ends_on_a_day_another_report_starts:
             return format_datetime_human(self.latest_timestamp, date_prefix="")

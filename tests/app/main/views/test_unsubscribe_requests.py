@@ -91,6 +91,33 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             ],
         ),
         (
+            # Two single requests on the same day
+            [
+                {
+                    "count": 1,
+                    "earliest_timestamp": "2024-01-01T13:18:00+00:00",
+                    "latest_timestamp": "2024-01-01T13:18:00+00:00",
+                    "processed_by_service_at": None,
+                    "batch_id": "af5f5e86-528b-475e-8be1-012988987775",
+                    "is_a_batched_report": True,
+                },
+                {
+                    "count": 1,
+                    "earliest_timestamp": "2024-01-01T12:17:00+00:00",
+                    "latest_timestamp": "2024-01-01T12:17:00+00:00",
+                    "processed_by_service_at": None,
+                    "batch_id": "c2d11916-ee82-419e-99a8-7e38163e756f",
+                    "is_a_batched_report": True,
+                },
+            ],
+            [
+                "Report Status",
+                "1 January at 1:18pm 1 unsubscribe request Downloaded",
+                "1 January at 12:17pm 1 unsubscribe request Downloaded",
+            ],
+            [],
+        ),
+        (
             # Two reports with overlapping days
             [
                 {
