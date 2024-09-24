@@ -114,13 +114,16 @@ def test_can_show_notifications(
     to_argument,
     expected_to_argument,
     mocker,
+    mock_cache_search_query,
 ):
     client_request.login(user)
+    hash_search_query = get_sha512_hashed(to_argument) if to_argument else ""
     if expected_to_argument:
         page = client_request.post(
             "main.view_notifications",
             service_id=SERVICE_ONE_ID,
             status=status_argument,
+            search_query=hash_search_query,
             page=page_argument,
             _data={"to": to_argument},
             _expected_status=200,
@@ -464,10 +467,14 @@ def test_search_recipient_form(
     form_post_data,
     expected_search_box_label,
     expected_search_box_contents,
+    mocker,
 ):
+    search_term = form_post_data.get("to", "")
+    hash_search_query = get_sha512_hashed(search_term) if bool(search_term) else None
     page = client_request.post(
         "main.view_notifications",
         service_id=SERVICE_ONE_ID,
+        search_query=hash_search_query,
         _data=form_post_data,
         _expected_status=200,
         **initial_query_arguments,
@@ -480,7 +487,11 @@ def test_search_recipient_form(
         SERVICE_ONE_ID, initial_query_arguments.get("message_type", "")
     ).rstrip("/")
     query_dict = parse_qs(url.query)
-    assert query_dict == {}
+
+    if hash_search_query:
+        assert query_dict["search_query"] == [hash_search_query]
+    else:
+        assert query_dict == {}
 
     assert page.select_one("label[for=to]").text.strip() == expected_search_box_label
 
@@ -589,12 +600,15 @@ def test_doesnt_show_pagination_with_search_term(
     mock_get_notifications_count_for_service,
     mocker,
 ):
+    to_argument = "test@example.com"
+    hash_search_query = get_sha512_hashed(to_argument)
     page = client_request.post(
         "main.view_notifications",
         service_id=service_one["id"],
         message_type="sms",
+        search_query=hash_search_query,
         _data={
-            "to": "test@example.com",
+            "to": to_argument,
         },
         _expected_status=200,
     )
@@ -622,7 +636,7 @@ STATISTICS = {"sms": {"requested": 6, "failed": 2, "delivered": 1}}
 
 
 def test_get_status_filters_calculates_stats(client_request):
-    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS)
+    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, None)
 
     assert {label: count for label, _option, _link, count in ret} == {
         "total": 6,
@@ -633,16 +647,23 @@ def test_get_status_filters_calculates_stats(client_request):
 
 
 def test_get_status_filters_in_right_order(client_request):
-    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS)
+    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, None)
 
     assert [label for label, _option, _link, _count in ret] == ["total", "sending", "delivered", "failed"]
 
 
 def test_get_status_filters_constructs_links(client_request):
-    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS)
+    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, None)
 
     link = ret[0][2]
     assert link == "/services/foo/notifications/sms?status=sending,delivered,failed"
+
+
+def test_get_status_filters_constructs_search_query(client_request):
+    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, "test_hash")
+
+    link = ret[0][2]
+    assert link == "/services/foo/notifications/sms?status=sending,delivered,failed&search_query=test_hash"
 
 
 def test_html_contains_notification_id(
@@ -996,3 +1017,119 @@ def test_return_when_same_search_term_and_search_query(mocker):
     assert not mock_redis_set.called
     assert cached_search_query_hash == expected_hash
     assert cached_search_term == search_term
+
+
+@pytest.fixture(scope="function")
+def mock_cache_search_query(mocker, to_argument):
+    def _get_cache(search_term, service_id, search_query_hash):
+        if search_query_hash:
+            return search_query_hash, to_argument
+        elif search_term:
+            hash_search_query = get_sha512_hashed(search_term) if bool(search_term) else None
+            return hash_search_query, search_term
+        return "", ""
+
+    return mocker.patch("app.main.views.jobs.cache_search_query", side_effect=_get_cache)
+
+
+@pytest.mark.parametrize(
+    "status_argument, page_argument, to_argument, expected_to_argument",
+    [
+        ("sending", 1, "", ""),
+        ("pending", 3, "+447900900123", "+447900900123"),
+        ("delivered", 4, "test@example.com", "test@example.com"),
+    ],
+)
+def test_with_existing_search_query(
+    client_request,
+    service_one,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+    status_argument,
+    page_argument,
+    to_argument,
+    expected_to_argument,
+    mocker,
+    mock_cache_search_query,
+):
+    client_request.login(create_active_user_view_permissions())
+    hash_search_query = get_sha512_hashed(to_argument) if to_argument else ""
+
+    if expected_to_argument:
+        page = client_request.post(
+            "main.view_notifications",
+            service_id=SERVICE_ONE_ID,
+            status=status_argument,
+            search_query=hash_search_query,
+            page=page_argument,
+            _expected_status=200,
+        )
+    else:
+        page = client_request.get(
+            "main.view_notifications",
+            service_id=SERVICE_ONE_ID,
+            status=status_argument,
+            page=page_argument,
+        )
+
+    mock_cache_search_query.assert_called_with("", SERVICE_ONE_ID, hash_search_query)
+    if expected_to_argument:
+        assert page.select_one("input[id=to]")["value"] == expected_to_argument
+    else:
+        assert "value" not in page.select_one("input[id=to]")
+
+
+@pytest.mark.parametrize(
+    "status_argument, page_argument, to_argument, expected_to_argument",
+    [
+        ("sending", 1, "", ""),
+        ("pending", 3, "+447900900123", "+447900900123"),
+        ("delivered", 4, "test@example.com", "test@example.com"),
+    ],
+)
+def test_search_should_generate_search_query(
+    client_request,
+    service_one,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+    status_argument,
+    page_argument,
+    to_argument,
+    expected_to_argument,
+    mocker,
+    mock_cache_search_query,
+):
+    client_request.login(create_active_user_view_permissions())
+    hash_search_query = get_sha512_hashed(expected_to_argument) if expected_to_argument else ""
+
+    if expected_to_argument:
+        client_request.post(
+            "main.view_notifications",
+            service_id=SERVICE_ONE_ID,
+            status=status_argument,
+            _data={"to": to_argument},
+            page=page_argument,
+            _expected_status=302,
+            _expected_redirect=url_for(
+                "main.view_notifications",
+                service_id=SERVICE_ONE_ID,
+                search_query=hash_search_query,
+            ),
+        )
+    else:
+        client_request.post(
+            "main.view_notifications",
+            service_id=SERVICE_ONE_ID,
+            status=status_argument,
+            _data={"to": to_argument},
+            page=page_argument,
+            _expected_status=200,
+        )
+
+    mock_cache_search_query.assert_called_with(to_argument, SERVICE_ONE_ID, "")

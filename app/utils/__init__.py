@@ -24,7 +24,7 @@ REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
 NOTIFICATION_TYPES = ["sms", "email", "letter"]
 
-SEVEN_DAYS_TTL = int(timedelta(days=28).total_seconds())
+SEVEN_DAYS_TTL = int(timedelta(days=7).total_seconds())
 
 
 def service_has_permission(permission):
