@@ -85,7 +85,7 @@ def test_redirect_to_sign_in_if_logged_in_from_other_browser(
     client_request.get(
         "main.choose_account",
         _expected_status=302,
-        _expected_redirect=url_for("main.sign_in", next="/accounts"),
+        _expected_redirect=url_for("main.sign_in", next="/your-services"),
     )
 
 

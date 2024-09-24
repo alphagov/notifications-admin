@@ -431,5 +431,6 @@
     "/verify",
     "/verify-email/<string:token>",
     "/webauthn/authenticate",
-    "/webauthn/register"
+    "/webauthn/register",
+    "/your-services"
 ]

@@ -18,7 +18,7 @@ def services_or_dashboard():
     raise PermanentRedirect(url_for(".show_accounts_or_dashboard"))
 
 
-@main.route("/accounts")
+@main.route("/your-services")
 @user_is_logged_in
 def choose_account():
     org_count, live_service_count = None, None
