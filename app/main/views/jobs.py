@@ -28,12 +28,13 @@ from app import (
     service_api_client,
 )
 from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
+from app.extensions import redis_client
 from app.formatters import get_time_left, message_count_noun
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
 from app.s3_client.s3_csv_client import s3download
-from app.utils import parse_filter_args, set_status_filters
+from app.utils import SEVEN_DAYS_TTL, get_sha512_hashed, parse_filter_args, set_status_filters
 from app.utils.csv import generate_notifications_csv
 from app.utils.letters import get_letter_printing_statement, printing_today_or_tomorrow
 from app.utils.pagination import (
@@ -177,6 +178,28 @@ def view_job_updates(service_id, job_id):
     job = Job.from_id(job_id, service_id=service_id)
 
     return jsonify(**get_job_partials(job))
+
+
+def make_cache_key(query_hash, service_id):
+    return f"service-{service_id}-notification-search-query-hash-{query_hash}"
+
+
+def cache_search_query(search_term, service_id, search_query_hash):
+    cached_search_term = ""
+
+    if search_query_hash:
+        cached_query = redis_client.get(make_cache_key(search_query_hash, service_id))
+        cached_search_term = bool(cached_query) and cached_query.decode()
+
+    if not cached_search_term:
+        search_query_hash = ""
+
+    if search_term and search_term != cached_search_term:
+        search_query_hash = get_sha512_hashed(search_term)
+        redis_client.set(make_cache_key(search_query_hash, service_id), search_term, ex=SEVEN_DAYS_TTL)
+        cached_search_term = search_term
+
+    return search_query_hash, cached_search_term
 
 
 @main.route("/services/<uuid:service_id>/notifications", methods=["GET", "POST"])

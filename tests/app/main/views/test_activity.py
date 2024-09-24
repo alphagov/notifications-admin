@@ -8,8 +8,9 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.jobs import get_status_filters, get_time_left
+from app.main.views.jobs import cache_search_query, get_status_filters, get_time_left, make_cache_key
 from app.models.service import Service
+from app.utils import SEVEN_DAYS_TTL, get_sha512_hashed
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
@@ -898,3 +899,100 @@ def test_view_notifications_can_download(
         assert support_link is not None
     else:
         assert support_link is None
+
+
+def test_make_cache_key():
+    key = make_cache_key("test1hash123456", "service-test-id-1234")
+    assert key == "service-service-test-id-1234-notification-search-query-hash-test1hash123456"
+
+
+def test_create_cache_when_search_query_does_not_exist(mocker):
+    search_term = "test@example.com"
+    search_query_hash = ""
+    expected_hash = get_sha512_hashed(search_term)
+
+    mock_redis_set = mocker.patch(
+        "app.extensions.RedisClient.set",
+    )
+    mock_redis_get = mocker.patch(
+        "app.extensions.RedisClient.get",
+        return_value=None,
+    )
+
+    cached_search_query_hash, cached_search_term = cache_search_query(search_term, SERVICE_ONE_ID, search_query_hash)
+
+    assert not mock_redis_get.called
+    mock_redis_set.assert_called_once_with(
+        make_cache_key(expected_hash, SERVICE_ONE_ID),
+        search_term,
+        ex=SEVEN_DAYS_TTL,
+    )
+    assert cached_search_query_hash == expected_hash
+    assert cached_search_term == search_term
+
+
+def test_return_when_search_query_exists(mocker):
+    search_term = ""
+    search_query_hash = get_sha512_hashed("1234567")
+    excepted_search_term = "1234567"
+
+    mock_redis_set = mocker.patch(
+        "app.extensions.RedisClient.set",
+    )
+    mock_redis_get = mocker.patch(
+        "app.extensions.RedisClient.get",
+        return_value=b"1234567",
+    )
+
+    cached_search_query_hash, cached_search_term = cache_search_query(search_term, SERVICE_ONE_ID, search_query_hash)
+
+    mock_redis_get.assert_called_once_with(make_cache_key(search_query_hash, SERVICE_ONE_ID))
+    assert not mock_redis_set.called
+    assert cached_search_query_hash == search_query_hash
+    assert cached_search_term == excepted_search_term
+
+
+def test_return_when_different_search_term_and_search_query(mocker):
+    search_term = "test@example.com"
+    search_query_hash = get_sha512_hashed("1234567")
+    expected_hash = get_sha512_hashed(search_term)
+
+    mock_redis_set = mocker.patch(
+        "app.extensions.RedisClient.set",
+    )
+    mock_redis_get = mocker.patch(
+        "app.extensions.RedisClient.get",
+        return_value=b"1234567",
+    )
+
+    cached_search_query_hash, cached_search_term = cache_search_query(search_term, SERVICE_ONE_ID, search_query_hash)
+
+    mock_redis_get.assert_called_once_with(make_cache_key(search_query_hash, SERVICE_ONE_ID))
+    mock_redis_set.assert_called_once_with(
+        make_cache_key(expected_hash, SERVICE_ONE_ID),
+        search_term,
+        ex=SEVEN_DAYS_TTL,
+    )
+    assert cached_search_query_hash == expected_hash
+    assert cached_search_term == search_term
+
+
+def test_return_when_same_search_term_and_search_query(mocker):
+    search_term = "1234567"
+    search_query_hash = get_sha512_hashed("1234567")
+    expected_hash = get_sha512_hashed(search_term)
+
+    mock_redis_set = mocker.patch(
+        "app.extensions.RedisClient.set",
+    )
+    mock_redis_get = mocker.patch(
+        "app.extensions.RedisClient.get",
+        return_value=b"1234567",
+    )
+
+    cached_search_query_hash, cached_search_term = cache_search_query(search_term, SERVICE_ONE_ID, search_query_hash)
+
+    mock_redis_get.assert_called_once_with(make_cache_key(search_query_hash, SERVICE_ONE_ID))
+    assert not mock_redis_set.called
+    assert cached_search_query_hash == expected_hash
+    assert cached_search_term == search_term

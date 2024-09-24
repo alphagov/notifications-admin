@@ -1,3 +1,5 @@
+import hashlib
+from datetime import timedelta
 from functools import wraps
 from itertools import chain
 
@@ -21,6 +23,8 @@ FAILURE_STATUSES = [
 REQUESTED_STATUSES = SENDING_STATUSES + DELIVERED_STATUSES + FAILURE_STATUSES
 
 NOTIFICATION_TYPES = ["sms", "email", "letter"]
+
+SEVEN_DAYS_TTL = int(timedelta(days=28).total_seconds())
 
 
 def service_has_permission(permission):
@@ -162,3 +166,7 @@ def format_provider(provider):
         return provider.title()
 
     return provider.upper()
+
+
+def get_sha512_hashed(str):
+    return hashlib.sha512(str.encode()).hexdigest()
