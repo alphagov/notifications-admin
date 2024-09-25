@@ -470,36 +470,55 @@ def test_search_recipient_form(
     mocker,
 ):
     search_term = form_post_data.get("to", "")
+    message_type = initial_query_arguments.get("message_type", None)
     hash_search_query = get_sha512_hashed(search_term) if bool(search_term) else None
-    page = client_request.post(
-        "main.view_notifications",
-        service_id=SERVICE_ONE_ID,
-        search_query=hash_search_query,
-        _data=form_post_data,
-        _expected_status=200,
-        **initial_query_arguments,
-    )
 
-    assert page.select_one("form")["method"] == "post"
-    action_url = page.select_one("form")["action"]
-    url = urlparse(action_url)
-    assert url.path == "/services/{}/notifications/{}".format(
-        SERVICE_ONE_ID, initial_query_arguments.get("message_type", "")
-    ).rstrip("/")
-    query_dict = parse_qs(url.query)
+    mocker.patch("app.main.views.jobs.cache_search_query", return_value=(hash_search_query, search_term))
 
-    if hash_search_query:
-        assert query_dict["search_query"] == [hash_search_query]
+    if search_term:
+        page = client_request.post(
+            "main.view_notifications",
+            service_id=SERVICE_ONE_ID,
+            _data=form_post_data,
+            search_query=hash_search_query,
+            _expected_status=200,
+            **initial_query_arguments,
+        )
+
+        assert page.select_one("form")["method"] == "post"
+        action_url = page.select_one("form")["action"]
+        url = urlparse(action_url)
+        assert url.path == "/services/{}/notifications/{}".format(
+            SERVICE_ONE_ID, initial_query_arguments.get("message_type", "")
+        ).rstrip("/")
+        query_dict = parse_qs(url.query)
+
+        if hash_search_query:
+            assert query_dict["search_query"] == [hash_search_query]
+        else:
+            assert query_dict == {}
+
+        assert page.select_one("label[for=to]").text.strip() == expected_search_box_label
+
+        recipient_inputs = page.select("input[name=to]")
+        assert len(recipient_inputs) == 2
+
+        for field in recipient_inputs:
+            assert field.get("value") == expected_search_box_contents
     else:
-        assert query_dict == {}
-
-    assert page.select_one("label[for=to]").text.strip() == expected_search_box_label
-
-    recipient_inputs = page.select("input[name=to]")
-    assert len(recipient_inputs) == 2
-
-    for field in recipient_inputs:
-        assert field.get("value") == expected_search_box_contents
+        client_request.post(
+            "main.view_notifications",
+            service_id=SERVICE_ONE_ID,
+            search_query=hash_search_query,
+            _data=form_post_data,
+            _expected_status=302,
+            _expected_redirect=url_for(
+                "main.view_notifications",
+                service_id=SERVICE_ONE_ID,
+                message_type=message_type,
+            ),
+            **initial_query_arguments,
+        )
 
 
 @pytest.mark.parametrize(
@@ -1056,26 +1075,17 @@ def test_with_existing_search_query(
     mock_cache_search_query,
 ):
     client_request.login(create_active_user_view_permissions())
-    hash_search_query = get_sha512_hashed(to_argument) if to_argument else ""
+    hash_search_query = get_sha512_hashed(to_argument) if to_argument else None
 
-    if expected_to_argument:
-        page = client_request.post(
-            "main.view_notifications",
-            service_id=SERVICE_ONE_ID,
-            status=status_argument,
-            search_query=hash_search_query,
-            page=page_argument,
-            _expected_status=200,
-        )
-    else:
-        page = client_request.get(
-            "main.view_notifications",
-            service_id=SERVICE_ONE_ID,
-            status=status_argument,
-            page=page_argument,
-        )
+    mocker.patch("app.main.views.jobs.cache_search_query", return_value=(hash_search_query, to_argument))
 
-    mock_cache_search_query.assert_called_with("", SERVICE_ONE_ID, hash_search_query)
+    page = client_request.get(
+        "main.view_notifications",
+        service_id=SERVICE_ONE_ID,
+        status=status_argument,
+        search_query=hash_search_query,
+        page=page_argument,
+    )
     if expected_to_argument:
         assert page.select_one("input[id=to]")["value"] == expected_to_argument
     else:
@@ -1108,28 +1118,18 @@ def test_search_should_generate_search_query(
     client_request.login(create_active_user_view_permissions())
     hash_search_query = get_sha512_hashed(expected_to_argument) if expected_to_argument else ""
 
-    if expected_to_argument:
-        client_request.post(
+    client_request.post(
+        "main.view_notifications",
+        service_id=SERVICE_ONE_ID,
+        status=status_argument,
+        _data={"to": to_argument},
+        page=page_argument,
+        _expected_status=302,
+        _expected_redirect=url_for(
             "main.view_notifications",
             service_id=SERVICE_ONE_ID,
-            status=status_argument,
-            _data={"to": to_argument},
-            page=page_argument,
-            _expected_status=302,
-            _expected_redirect=url_for(
-                "main.view_notifications",
-                service_id=SERVICE_ONE_ID,
-                search_query=hash_search_query,
-            ),
-        )
-    else:
-        client_request.post(
-            "main.view_notifications",
-            service_id=SERVICE_ONE_ID,
-            status=status_argument,
-            _data={"to": to_argument},
-            page=page_argument,
-            _expected_status=200,
-        )
+            search_query=hash_search_query,
+        ),
+    )
 
     mock_cache_search_query.assert_called_with(to_argument, SERVICE_ONE_ID, "")

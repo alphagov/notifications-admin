@@ -243,7 +243,11 @@ def view_notifications(service_id, message_type=None):
     if request.method == "POST" and not search_term:
         return redirect_to_main_view_notification(current_service, message_type, None)
 
-    if search_query_hash and search_query_hash != cached_search_query_hash:
+    if cached_search_query_hash and search_query_hash != cached_search_query_hash:
+        return redirect_to_main_view_notification(current_service, message_type, cached_search_query_hash)
+
+    if not cached_search_query_hash and search_query_hash:
+        cached_search_query_hash = None
         return redirect_to_main_view_notification(current_service, message_type, cached_search_query_hash)
 
     return render_template(
