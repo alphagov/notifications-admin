@@ -21,7 +21,7 @@
     {% call field() %}
       <a
         class="govuk-link govuk-link--no-visited-state file-list-filename"
-        href="{{ url_for('main.conversation', service_id=current_service.id, notification_id=item.id) }}#n{{ item.id }}"
+        href="{{ url_for('main.conversation', service_id=current_service.id, notification_id=item.id) }}"
       >
         {{ item.user_number | format_phone_number_human_readable }}
       </a>
