@@ -202,6 +202,13 @@ def test_can_show_notifications(
         for view_notification_link in view_notification_links
     )
 
+    if hash_search_query:
+        assert all(
+            parse_qs(urlparse(view_notification_link["href"]).query, keep_blank_values=True)["from_search_query"]
+            == [hash_search_query]
+            for view_notification_link in view_notification_links
+        )
+
 
 def test_can_show_notifications_if_data_retention_not_available(
     client_request,

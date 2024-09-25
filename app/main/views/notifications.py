@@ -139,6 +139,7 @@ def view_notification(service_id, notification_id):  # noqa: C901
             service_id=current_service.id,
             message_type=template.template_type,
             status=request.args.get("from_statuses", "sending,delivered,failed"),
+            search_query=request.args.get("from_search_query", None),
         )
 
     if notification["notification_type"] == "letter":

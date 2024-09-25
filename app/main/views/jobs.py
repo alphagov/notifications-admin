@@ -352,6 +352,7 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
                 "main.view_notification",
                 service_id=current_service.id,
                 from_statuses=request.args.get("status"),
+                from_search_query=request.args.get("search_query"),
             ),
         ),
     }
