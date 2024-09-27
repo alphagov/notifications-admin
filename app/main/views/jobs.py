@@ -1,5 +1,3 @@
-from functools import partial
-
 from flask import (
     Response,
     abort,
@@ -14,31 +12,20 @@ from flask import (
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import RecipientCSV
-from notifications_utils.template import (
-    EmailPreviewTemplate,
-    LetterPreviewTemplate,
-    SMSBodyPreviewTemplate,
-)
 
 from app import (
     current_service,
     format_datetime_short,
     format_thousands,
-    notification_api_client,
-    service_api_client,
 )
 from app.formatters import get_time_left, message_count_noun
 from app.main import json_updates, main
+from app.main.views.dashboard import add_preview_of_content_to_notifications
 from app.models.job import Job
 from app.s3_client.s3_csv_client import s3download
 from app.utils import parse_filter_args, set_status_filters
 from app.utils.csv import generate_notifications_csv
 from app.utils.letters import get_letter_printing_statement, printing_today_or_tomorrow
-from app.utils.pagination import (
-    generate_next_dict,
-    generate_previous_dict,
-    get_page_from_request,
-)
 from app.utils.user import user_has_permissions
 
 
@@ -176,7 +163,6 @@ def view_job_updates(service_id, job_id):
     return jsonify(**get_job_partials(job))
 
 
-
 def _get_job_counts(job):
     job_type = job.template_type
     return [
@@ -265,41 +251,3 @@ def get_job_partials(job):
             letter_print_day=get_letter_printing_statement("created", job.created_at),
         ),
     }
-
-
-def add_preview_of_content_to_notifications(notifications):
-    for notification in notifications:
-        yield dict(preview_of_content=get_preview_of_content(notification), **notification)
-
-
-def get_preview_of_content(notification):
-    if notification["template"].get("redact_personalisation"):
-        notification["personalisation"] = {}
-
-    if notification["template"]["is_precompiled_letter"]:
-        return notification["client_reference"]
-
-    if notification["template"]["template_type"] == "sms":
-        return str(
-            SMSBodyPreviewTemplate(
-                notification["template"],
-                notification["personalisation"],
-            )
-        )
-
-    if notification["template"]["template_type"] == "email":
-        return Markup(
-            EmailPreviewTemplate(
-                notification["template"],
-                notification["personalisation"],
-                redact_missing_personalisation=True,
-            ).subject
-        )
-
-    if notification["template"]["template_type"] == "letter":
-        return Markup(
-            LetterPreviewTemplate(
-                notification["template"],
-                notification["personalisation"],
-            ).subject
-        )

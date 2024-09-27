@@ -5,7 +5,9 @@ from itertools import groupby
 
 from flask import Response, abort, jsonify, render_template, request, session, url_for
 from flask_login import current_user
+from markupsafe import Markup
 from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
+from notifications_utils.template import EmailPreviewTemplate, LetterPreviewTemplate, SMSBodyPreviewTemplate
 from werkzeug.utils import redirect
 
 from app import (
@@ -19,13 +21,14 @@ from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
-from app.main.views.jobs import add_preview_of_content_to_notifications
 from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
-    service_has_permission, parse_filter_args, set_status_filters,
+    parse_filter_args,
+    service_has_permission,
+    set_status_filters,
 )
 from app.utils.csv import Spreadsheet
 from app.utils.pagination import generate_next_dict, generate_previous_dict, get_page_from_request
@@ -255,6 +258,44 @@ def get_status_filters(service, message_type, statistics):
         )
         for key, label, option in filters
     ]
+
+
+def add_preview_of_content_to_notifications(notifications):
+    for notification in notifications:
+        yield dict(preview_of_content=get_preview_of_content(notification), **notification)
+
+
+def get_preview_of_content(notification):
+    if notification["template"].get("redact_personalisation"):
+        notification["personalisation"] = {}
+
+    if notification["template"]["is_precompiled_letter"]:
+        return notification["client_reference"]
+
+    if notification["template"]["template_type"] == "sms":
+        return str(
+            SMSBodyPreviewTemplate(
+                notification["template"],
+                notification["personalisation"],
+            )
+        )
+
+    if notification["template"]["template_type"] == "email":
+        return Markup(
+            EmailPreviewTemplate(
+                notification["template"],
+                notification["personalisation"],
+                redact_missing_personalisation=True,
+            ).subject
+        )
+
+    if notification["template"]["template_type"] == "letter":
+        return Markup(
+            LetterPreviewTemplate(
+                notification["template"],
+                notification["personalisation"],
+            ).subject
+        )
 
 
 @main.route("/services/<uuid:service_id>/usage")
