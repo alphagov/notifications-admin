@@ -20,7 +20,7 @@ from app.extensions import redis_client
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
-from app.models.notification import Notifications
+from app.models.notification import InboundSMSMessages, Notifications
 from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     DELIVERED_STATUSES,
@@ -401,11 +401,11 @@ def inbox_download(service_id):
             ]
             + [
                 [
-                    format_phone_number_human_readable(message["user_number"]),
-                    message["content"].lstrip("=+-@"),
-                    format_datetime_numeric(message["created_at"]),
+                    format_phone_number_human_readable(message.user_number),
+                    message.content.lstrip("=+-@"),
+                    format_datetime_numeric(message.created_at),
                 ]
-                for message in service_api_client.get_inbound_sms(service_id)["data"]
+                for message in InboundSMSMessages(service_id)
             ]
         ).as_csv_data,
         mimetype="text/csv",

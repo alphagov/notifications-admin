@@ -7,7 +7,7 @@ from notifications_utils.template import SMSPreviewTemplate
 from app import current_service, notification_api_client, service_api_client
 from app.main import json_updates, main
 from app.main.forms import SearchByNameForm
-from app.models.notification import Notifications
+from app.models.notification import InboundSMSMessage, InboundSMSMessages, Notifications
 from app.models.template_list import UserTemplateList
 from app.utils.user import user_has_permissions
 
@@ -96,30 +96,29 @@ def get_user_number(service_id, notification_id):
 def get_sms_thread(service_id, user_number):
     for notification in sorted(
         (
-            # Still need to use the `dict` here until we also have a model for inbound messages
-            Notifications(service_id, to=user_number, template_type="sms").items
-            + service_api_client.get_inbound_sms(service_id, user_number=user_number)["data"]
+            Notifications(service_id, to=user_number, template_type="sms")
+            + InboundSMSMessages(service_id, user_number=user_number)
         ),
-        key=lambda notification: notification["created_at"],
+        key=lambda notification: notification.created_at,
     ):
-        is_inbound = "notify_number" in notification
-        redact_personalisation = not is_inbound and notification["template"]["redact_personalisation"]
+        is_inbound = isinstance(notification, InboundSMSMessage)
+        redact_personalisation = not is_inbound and notification.template["redact_personalisation"]
 
         if redact_personalisation:
-            notification["personalisation"] = {}
+            notification.personalisation = {}
 
         yield {
             "inbound": is_inbound,
             "content": SMSPreviewTemplate(
                 {
                     "template_type": "sms",
-                    "content": (notification["content"] if is_inbound else notification["template"]["content"]),
+                    "content": notification.content,
                 },
-                notification.get("personalisation"),
+                notification.personalisation,
                 downgrade_non_sms_characters=(not is_inbound),
                 redact_missing_personalisation=redact_personalisation,
             ),
-            "created_at": notification["created_at"],
-            "status": notification.get("status"),
-            "id": notification["id"],
+            "created_at": notification.created_at,
+            "status": notification.status,
+            "id": notification.id,
         }

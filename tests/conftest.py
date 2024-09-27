@@ -2079,7 +2079,7 @@ def mock_get_inbound_sms(notify_admin, mocker):
         return inbound_sms_json()
 
     return mocker.patch(
-        "app.service_api_client.get_inbound_sms",
+        "app.models.notification.InboundSMSMessages._get_items",
         side_effect=_get_inbound_sms,
     )
 

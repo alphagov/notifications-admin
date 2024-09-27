@@ -459,7 +459,7 @@ def test_download_inbox_strips_formulae(
     mocker,
 ):
     mocker.patch(
-        "app.service_api_client.get_inbound_sms",
+        "app.models.notification.InboundSMSMessages._get_items",
         return_value={
             "has_next": False,
             "data": [

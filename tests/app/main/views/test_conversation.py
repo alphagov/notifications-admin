@@ -202,7 +202,7 @@ def test_view_conversation_with_empty_inbound(
     fake_uuid,
 ):
     mock_get_inbound_sms = mocker.patch(
-        "app.main.views.conversation.service_api_client.get_inbound_sms",
+        "app.models.notification.InboundSMSMessages._get_items",
         return_value={
             "has_next": False,
             "data": [
