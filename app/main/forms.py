@@ -2197,12 +2197,6 @@ class GuestList(StripWhitespaceForm):
     )
 
 
-class DateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("Start date", [validators.optional()], thing="a start date")
-    end_date = GovukDateField("End date", [validators.optional()], thing="an end date")
-    include_from_test_key = GovukCheckboxField("Include test keys")
-
-
 class RequiredDateFilterForm(StripWhitespaceForm):
     start_date = GovukDateField("Start date", thing="a start date")
     end_date = GovukDateField("End date", thing="an end date")

@@ -284,7 +284,7 @@ def test_code_to_extract_decorators_works_with_known_examples():
         ["main.route", "user_has_permissions"],
     ) in list(get_routes_and_decorators(ORGANISATION_ID_ARGUMENT))
     assert (
-        "platform_admin.platform_admin",
+        "platform_admin.platform_admin_search",
         ["main.route", "user_is_platform_admin"],
     ) in list(get_routes_and_decorators())
     assert (

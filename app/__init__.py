@@ -111,7 +111,6 @@ from app.notify_client.performance_dashboard_api_client import (
     performance_dashboard_api_client,
 )
 from app.notify_client.platform_admin_api_client import admin_api_client
-from app.notify_client.platform_stats_api_client import platform_stats_api_client
 from app.notify_client.protected_sender_id_api_client import protected_sender_id_api_client
 from app.notify_client.provider_client import provider_client
 from app.notify_client.service_api_client import service_api_client
@@ -199,7 +198,6 @@ def create_app(application):
         org_invite_api_client,
         organisations_client,
         performance_dashboard_api_client,
-        platform_stats_api_client,
         protected_sender_id_api_client,
         provider_client,
         service_api_client,
