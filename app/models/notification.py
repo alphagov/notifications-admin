@@ -10,6 +10,7 @@ from notifications_utils.template import (
 
 from app.models import JSONModel, ModelList
 from app.notify_client.notification_api_client import notification_api_client
+from app.notify_client.service_api_client import service_api_client
 
 
 class Notification(JSONModel):
@@ -41,6 +42,10 @@ class Notification(JSONModel):
     @property
     def status(self):
         return self._dict["status"]
+
+    @property
+    def content(self):
+        return self.template["content"]
 
     @property
     def preview_of_content(self):
@@ -124,3 +129,24 @@ class APINotifications(Notifications):
             include_one_off=False,
             count_pages=False,
         )
+
+
+class InboundSMSMessage(JSONModel):
+    user_number: str
+    notify_number: str
+    content: str
+    created_at: datetime
+    id: Any
+
+    __sort_attribute__ = "created_at"
+
+    personalisation = None
+    status = None
+
+
+class InboundSMSMessages(ModelList):
+    model = InboundSMSMessage
+    client_method = service_api_client.get_inbound_sms
+
+    def __init__(self, *args, **kwargs):
+        self.items = self.client_method(*args, **kwargs)["data"]
