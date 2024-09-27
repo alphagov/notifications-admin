@@ -176,34 +176,6 @@ def view_job_updates(service_id, job_id):
     return jsonify(**get_job_partials(job))
 
 
-def get_status_filters(service, message_type, statistics):
-    if message_type is None:
-        stats = {
-            key: sum(statistics[message_type][key] for message_type in {"email", "sms", "letter"})
-            for key in {"requested", "delivered", "failed"}
-        }
-    else:
-        stats = statistics[message_type]
-    stats["sending"] = stats["requested"] - stats["delivered"] - stats["failed"]
-
-    filters = [
-        # key, label, option
-        ("requested", "total", "sending,delivered,failed"),
-        ("sending", "sending", "sending"),
-        ("delivered", "delivered", "delivered"),
-        ("failed", "failed", "failed"),
-    ]
-    return [
-        # return list containing label, option, link, count
-        (
-            label,
-            option,
-            url_for("main.view_notifications", service_id=service.id, message_type=message_type, status=option),
-            stats[key],
-        )
-        for key, label, option in filters
-    ]
-
 
 def _get_job_counts(job):
     job_type = job.template_type

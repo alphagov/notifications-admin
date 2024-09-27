@@ -8,7 +8,8 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.jobs import get_status_filters, get_time_left
+from app.main.views.dashboard import get_status_filters
+from app.main.views.jobs import get_time_left
 from app.models.service import Service
 from tests.conftest import (
     SERVICE_ONE_ID,
