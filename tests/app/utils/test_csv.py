@@ -64,7 +64,7 @@ def _get_notifications_csv_mock(
     api_user_active,
 ):
     return mocker.patch(
-        "app.notification_api_client.get_notifications_for_service_for_csv", side_effect=_get_notifications_csv()
+        "app.models.notification.NotificationsForCSV.client_method", side_effect=_get_notifications_csv()
     )
 
 
@@ -97,7 +97,7 @@ def test_generate_notifications_csv_without_job(
     expected_content,
 ):
     mocker.patch(
-        "app.notification_api_client.get_notifications_for_service_for_csv",
+        "app.models.notification.NotificationsForCSV.client_method",
         side_effect=_get_notifications_csv(
             created_by_name=created_by_name,
             created_by_email_address="sender@email.gov.uk",
@@ -203,7 +203,7 @@ def test_generate_notifications_csv_calls_twice_if_notifications_batch_equals_pa
     response_2 = _get_notifications_csv(rows=3, row_number=8)
 
     mock_get_notifications = mocker.patch(
-        "app.notification_api_client.get_notifications_for_service_for_csv",
+        "app.models.notification.NotificationsForCSV.client_method",
         side_effect=[
             response_1(service_id),
             response_2(service_id),

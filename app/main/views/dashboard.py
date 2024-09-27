@@ -5,9 +5,7 @@ from itertools import groupby
 
 from flask import Response, abort, jsonify, render_template, request, session, url_for
 from flask_login import current_user
-from markupsafe import Markup
 from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
-from notifications_utils.template import EmailPreviewTemplate, LetterPreviewTemplate, SMSBodyPreviewTemplate
 from werkzeug.utils import redirect
 
 from app import (
@@ -21,6 +19,7 @@ from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
+from app.models.notification import Notifications
 from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     DELIVERED_STATUSES,
@@ -185,7 +184,7 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
     if message_type is not None:
         service_data_retention_days = current_service.get_days_of_retention(message_type)
 
-    notifications = notification_api_client.get_notifications_for_service(
+    notifications = Notifications(
         service_id=service_id,
         page=page,
         template_type=[message_type] if message_type else [],
@@ -196,11 +195,11 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
     url_args = {"message_type": message_type, "status": request.args.get("status")}
     prev_page = None
 
-    if "links" in notifications and notifications["links"].get("prev", None):
+    if notifications.prev:
         prev_page = generate_previous_dict("main.view_notifications", service_id, page, url_args=url_args)
     next_page = None
 
-    if "links" in notifications and notifications["links"].get("next", None):
+    if notifications.next:
         next_page = generate_next_dict("main.view_notifications", service_id, page, url_args)
 
     return {
@@ -216,7 +215,7 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
         ),
         "notifications": render_template(
             "views/activity/notifications.html",
-            notifications=list(add_preview_of_content_to_notifications(notifications["notifications"])),
+            notifications=notifications,
             limit_days=service_data_retention_days,
             prev_page=prev_page,
             next_page=next_page,
@@ -258,44 +257,6 @@ def get_status_filters(service, message_type, statistics):
         )
         for key, label, option in filters
     ]
-
-
-def add_preview_of_content_to_notifications(notifications):
-    for notification in notifications:
-        yield dict(preview_of_content=get_preview_of_content(notification), **notification)
-
-
-def get_preview_of_content(notification):
-    if notification["template"].get("redact_personalisation"):
-        notification["personalisation"] = {}
-
-    if notification["template"]["is_precompiled_letter"]:
-        return notification["client_reference"]
-
-    if notification["template"]["template_type"] == "sms":
-        return str(
-            SMSBodyPreviewTemplate(
-                notification["template"],
-                notification["personalisation"],
-            )
-        )
-
-    if notification["template"]["template_type"] == "email":
-        return Markup(
-            EmailPreviewTemplate(
-                notification["template"],
-                notification["personalisation"],
-                redact_missing_personalisation=True,
-            ).subject
-        )
-
-    if notification["template"]["template_type"] == "letter":
-        return Markup(
-            LetterPreviewTemplate(
-                notification["template"],
-                notification["personalisation"],
-            ).subject
-        )
 
 
 @main.route("/services/<uuid:service_id>/usage")
