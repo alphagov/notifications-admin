@@ -19,16 +19,17 @@ from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
-from app.main.views.jobs import _get_notifications_dashboard_partials_data
+from app.main.views.jobs import get_status_filters, \
+    add_preview_of_content_to_notifications
 from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
-    service_has_permission,
+    service_has_permission, parse_filter_args, set_status_filters,
 )
 from app.utils.csv import Spreadsheet
-from app.utils.pagination import generate_next_dict, generate_previous_dict
+from app.utils.pagination import generate_next_dict, generate_previous_dict, get_page_from_request
 from app.utils.time import get_current_financial_year
 from app.utils.user import user_has_permissions
 
@@ -159,6 +160,73 @@ def template_usage(service_id):
         ),
         selected_year=year,
     )
+
+
+@json_updates.route("/services/<uuid:service_id>/notifications.json", methods=["GET", "POST"])
+@json_updates.route(
+    "/services/<uuid:service_id>/notifications/<template_type:message_type>.json", methods=["GET", "POST"]
+)
+@user_has_permissions()
+def get_notifications_page_partials_as_json(service_id, message_type=None):
+    return jsonify(_get_notifications_dashboard_partials_data(service_id, message_type))
+
+
+def _get_notifications_dashboard_partials_data(service_id, message_type):
+    page = get_page_from_request()
+    if page is None:
+        abort(404, f"Invalid page argument ({request.args.get('page')}).")
+    filter_args = parse_filter_args(request.args)
+    filter_args["status"] = set_status_filters(filter_args)
+    service_data_retention_days = None
+    search_term = request.form.get("to", "")
+
+    if message_type is not None:
+        service_data_retention_days = current_service.get_days_of_retention(message_type)
+
+    notifications = notification_api_client.get_notifications_for_service(
+        service_id=service_id,
+        page=page,
+        template_type=[message_type] if message_type else [],
+        status=filter_args.get("status"),
+        limit_days=service_data_retention_days,
+        to=search_term,
+    )
+    url_args = {"message_type": message_type, "status": request.args.get("status")}
+    prev_page = None
+
+    if "links" in notifications and notifications["links"].get("prev", None):
+        prev_page = generate_previous_dict("main.view_notifications", service_id, page, url_args=url_args)
+    next_page = None
+
+    if "links" in notifications and notifications["links"].get("next", None):
+        next_page = generate_next_dict("main.view_notifications", service_id, page, url_args)
+
+    return {
+        "service_data_retention_days": service_data_retention_days,
+        "counts": render_template(
+            "views/activity/counts.html",
+            status=request.args.get("status"),
+            status_filters=get_status_filters(
+                current_service,
+                message_type,
+                service_api_client.get_service_statistics(service_id, limit_days=service_data_retention_days),
+            ),
+        ),
+        "notifications": render_template(
+            "views/activity/notifications.html",
+            notifications=list(add_preview_of_content_to_notifications(notifications["notifications"])),
+            limit_days=service_data_retention_days,
+            prev_page=prev_page,
+            next_page=next_page,
+            show_pagination=(not search_term),
+            single_notification_url=partial(
+                url_for,
+                "main.view_notification",
+                service_id=current_service.id,
+                from_statuses=request.args.get("status"),
+            ),
+        ),
+    }
 
 
 @main.route("/services/<uuid:service_id>/usage")
