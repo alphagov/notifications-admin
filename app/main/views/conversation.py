@@ -95,11 +95,8 @@ def get_user_number(service_id, notification_id):
 
 def get_sms_thread(service_id, user_number):
     for notification in sorted(
-        (
-            Notifications(service_id, to=user_number, template_type="sms")
-            + InboundSMSMessages(service_id, user_number=user_number)
-        ),
-        key=lambda notification: notification.created_at,
+        Notifications(service_id, to=user_number, template_type="sms")
+        + InboundSMSMessages(service_id, user_number=user_number)
     ):
         is_inbound = isinstance(notification, InboundSMSMessage)
 
