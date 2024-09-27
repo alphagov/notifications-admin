@@ -12,6 +12,13 @@ from tests import notification_json, single_notification_json
     [
         ({}, {"url": "/service/abcd1234/notifications", "params": {}}),
         ({"page": 99}, {"url": "/service/abcd1234/notifications", "params": {"page": 99}}),
+        (
+            {"page": 99, "paginate_by_older_than": True, "older_than": "5678"},
+            {
+                "url": "/service/abcd1234/notifications",
+                "params": {"page": 99, "paginate_by_older_than": True, "older_than": "5678"},
+            },
+        ),
         ({"include_jobs": False}, {"url": "/service/abcd1234/notifications", "params": {"include_jobs": False}}),
         (
             {"include_from_test_key": True},
