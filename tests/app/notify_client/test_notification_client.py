@@ -66,6 +66,51 @@ def test_client_gets_notifications_for_service_and_job_by_page_posts_for_to(mock
     mock_post.assert_called_once_with(**expected_call)
 
 
+@pytest.mark.parametrize(
+    "arguments,expected_call",
+    [
+        ({}, {"url": "/service/abcd1234/notifications/csv", "params": {}}),
+        ({"page": 99}, {"url": "/service/abcd1234/notifications/csv", "params": {"page": 99}}),
+        (
+            {"job_id": "efgh5678"},
+            {"url": "/service/abcd1234/job/efgh5678/notifications", "params": {"format_for_csv": True}},
+        ),
+        (
+            {"job_id": "efgh5678", "page_size": 10},
+            {
+                "url": "/service/abcd1234/job/efgh5678/notifications",
+                "params": {"page_size": 10, "format_for_csv": True},
+            },
+        ),
+        (
+            {
+                "page": 48,
+                "limit_days": 3,
+                "older_than": "5678",
+                "page_size": 10,
+                "template_type": "sms",
+                "status": "delivered",
+            },
+            {
+                "url": "/service/abcd1234/notifications/csv",
+                "params": {
+                    "page": 48,
+                    "limit_days": 3,
+                    "older_than": "5678",
+                    "page_size": 10,
+                    "template_type": "sms",
+                    "status": "delivered",
+                },
+            },
+        ),
+    ],
+)
+def test_client_gets_notifications_for_service_for_csv(mocker, arguments, expected_call):
+    mock_get = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get")
+    NotificationApiClient().get_notifications_for_service_for_csv("abcd1234", **arguments)
+    mock_get.assert_called_once_with(**expected_call)
+
+
 def test_send_notification(mocker, client_request, active_user_with_permissions):
     mock_post = mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.post")
     NotificationApiClient().send_notification(

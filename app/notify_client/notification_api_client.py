@@ -66,6 +66,7 @@ class NotificationApiClient(NotifyAdminAPIClient):
         kwargs = {"params": params}
 
         if job_id:
+            params["format_for_csv"] = True
             return self.get(url=f"/service/{service_id}/job/{job_id}/notifications", **kwargs)
         else:
             if limit_days is not None:
