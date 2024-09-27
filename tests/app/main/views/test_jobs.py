@@ -304,7 +304,7 @@ def test_should_show_letter_job(
 ):
     notifications = create_notifications(template_type="letter", subject="template subject")
     get_notifications = mocker.patch(
-        "app.notification_api_client.get_notifications_for_service",
+        "app.models.notification.Notifications._get_items",
         return_value=notifications,
     )
 
@@ -360,7 +360,7 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
     mocker,
 ):
     mocker.patch(
-        "app.notification_api_client.get_notifications_for_service",
+        "app.models.notification.Notifications._get_items",
         return_value=create_notifications(template_type="letter", postage="second"),
     )
 
@@ -388,7 +388,7 @@ def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
     mocker,
 ):
     mocker.patch(
-        "app.notification_api_client.get_notifications_for_service",
+        "app.models.notification.Notifications._get_items",
         return_value=create_notifications(template_type="letter", postage="second"),
     )
 
@@ -415,7 +415,7 @@ def test_should_show_letter_job_with_banner_after_sending_after_1730(
     mocker,
 ):
     mocker.patch(
-        "app.notification_api_client.get_notifications_for_service",
+        "app.models.notification.Notifications._get_items",
         return_value=create_notifications(template_type="letter", postage="second"),
     )
 
@@ -579,7 +579,7 @@ def test_should_cancel_letter_job(
     mocker.patch("app.job_api_client.get_job", side_effect=[{"data": job}])
     notifications_json = notification_json(SERVICE_ONE_ID, job=job, status="created", template_type="letter")
     mocker.patch("app.job_api_client.get_job", side_effect=[{"data": job}])
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications_json)
+    mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications_json)
     mocker.patch("app.notification_api_client.get_notification_count_for_job_id", return_value=5)
     mock_cancel = mocker.patch("app.job_api_client.cancel_letter_job", return_value=5)
     client_request.post(
@@ -617,7 +617,7 @@ def test_should_not_show_cancel_link_for_letter_job_if_too_late(
     job = job_json(SERVICE_ONE_ID, active_user_with_permissions, job_id=job_id, created_at=job_created_at)
     notifications_json = notification_json(SERVICE_ONE_ID, job=job, status="created", template_type="letter")
     mocker.patch("app.job_api_client.get_job", side_effect=[{"data": job}])
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications_json)
+    mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications_json)
 
     page = client_request.get("main.view_job", service_id=SERVICE_ONE_ID, job_id=str(job_id))
 
@@ -646,7 +646,7 @@ def test_should_show_cancel_link_for_letter_job(
     notifications_json = notification_json(SERVICE_ONE_ID, job=job, status="created", template_type="letter")
     mocker.patch("app.job_api_client.get_job", side_effect=[{"data": job}])
     mocker.patch(
-        "app.notification_api_client.get_notifications_for_service",
+        "app.models.notification.Notifications._get_items",
         return_value=notifications_json,
     )
 
@@ -683,7 +683,7 @@ def test_dont_cancel_letter_job_when_to_early_to_cancel(
     notifications_json = notification_json(
         SERVICE_ONE_ID, job=job, status="created", template_type="letter", rows=number_of_processed_notifications
     )
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications_json)
+    mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications_json)
     mocker.patch(
         "app.notification_api_client.get_notification_count_for_job_id", return_value=number_of_processed_notifications
     )
@@ -835,7 +835,7 @@ def test_should_show_letter_job_with_first_class_if_notifications_are_first_clas
     mocker,
 ):
     notifications = create_notifications(template_type="letter", postage="first")
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications)
 
     page = client_request.get(
         "main.view_job",

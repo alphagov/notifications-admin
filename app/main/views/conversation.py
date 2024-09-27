@@ -7,6 +7,7 @@ from notifications_utils.template import SMSPreviewTemplate
 from app import current_service, notification_api_client, service_api_client
 from app.main import json_updates, main
 from app.main.forms import SearchByNameForm
+from app.models.notification import Notifications
 from app.models.template_list import UserTemplateList
 from app.utils.user import user_has_permissions
 
@@ -95,9 +96,8 @@ def get_user_number(service_id, notification_id):
 def get_sms_thread(service_id, user_number):
     for notification in sorted(
         (
-            notification_api_client.get_notifications_for_service(service_id, to=user_number, template_type="sms")[
-                "notifications"
-            ]
+            # Still need to use the `dict` here until we also have a model for inbound messages
+            Notifications(service_id, to=user_number, template_type="sms").items
             + service_api_client.get_inbound_sms(service_id, user_number=user_number)["data"]
         ),
         key=lambda notification: notification["created_at"],

@@ -84,7 +84,7 @@ def test_view_conversation(
         personalisation={"name": "Jo"},
         redact_personalisation=outbound_redacted,
     )
-    mock = mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mock = mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications)
 
     page = client_request.get(
         "main.conversation",

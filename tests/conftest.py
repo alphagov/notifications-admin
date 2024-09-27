@@ -2030,7 +2030,7 @@ def mock_get_notifications(
             created_by_name="Firstname Lastname",
         )
 
-    return mocker.patch("app.notification_api_client.get_notifications_for_service", side_effect=_get_notifications)
+    return mocker.patch("app.models.notification.Notifications._get_items", side_effect=_get_notifications)
 
 
 @pytest.fixture(scope="function")
@@ -2050,7 +2050,7 @@ def mock_get_notifications_with_previous_next(notify_admin, mocker):
     ):
         return notification_json(service_id, rows=50, with_links=True if count_pages is None else count_pages)
 
-    return mocker.patch("app.notification_api_client.get_notifications_for_service", side_effect=_get_notifications)
+    return mocker.patch("app.models.notification.Notifications._get_items", side_effect=_get_notifications)
 
 
 @pytest.fixture(scope="function")
@@ -2070,7 +2070,7 @@ def mock_get_notifications_with_no_notifications(notify_admin, mocker):
     ):
         return notification_json(service_id, rows=0)
 
-    return mocker.patch("app.notification_api_client.get_notifications_for_service", side_effect=_get_notifications)
+    return mocker.patch("app.models.notification.Notifications._get_items", side_effect=_get_notifications)
 
 
 @pytest.fixture(scope="function")

@@ -1,6 +1,7 @@
 from notifications_utils.recipients import RecipientCSV
 
 from app.formatters import recipient_count
+from app.models.notification import NotificationsForCSV
 from app.models.spreadsheet import Spreadsheet
 from app.utils.templates import get_sample_template
 
@@ -44,7 +45,6 @@ def get_errors_for_csv(recipients, template_type):
 
 
 def generate_notifications_csv(**kwargs):
-    from app import notification_api_client
     from app.s3_client.s3_csv_client import s3download
 
     if "page" not in kwargs:
@@ -75,45 +75,45 @@ def generate_notifications_csv(**kwargs):
     yield ",".join(fieldnames) + "\n"
 
     while True:
-        notifications_batch = notification_api_client.get_notifications_for_service_for_csv(**kwargs)
+        notifications_batch = NotificationsForCSV(**kwargs)
 
-        for notification in notifications_batch["notifications"]:
+        for notification in notifications_batch:
             if kwargs.get("job_id"):
                 values = (
                     [
-                        notification["row_number"],
+                        notification.row_number,
                     ]
                     + [
-                        original_upload[notification["row_number"] - 1].get(header).data
+                        original_upload[notification.row_number - 1].get(header).data
                         for header in original_column_headers
                     ]
                     + [
-                        notification["template_name"],
-                        notification["template_type"],
-                        notification["job_name"],
-                        notification["status"],
-                        notification["created_at"],
+                        notification.template_name,
+                        notification.template_type,
+                        notification.job_name,
+                        notification.status,
+                        notification.created_at,
                     ]
                 )
             else:
                 values = [
                     # the recipient for precompiled letters is the full address block
-                    notification["recipient"].splitlines()[0].lstrip().rstrip(" ,"),
-                    notification["client_reference"],
-                    notification["template_name"],
-                    notification["template_type"],
-                    notification["created_by_name"] or "",
-                    notification["created_by_email_address"] or "",
-                    notification["job_name"] or "",
-                    notification["status"],
-                    notification["created_at"],
-                    notification["api_key_name"] or "",
+                    notification.recipient.splitlines()[0].lstrip().rstrip(" ,"),
+                    notification.client_reference,
+                    notification.template_name,
+                    notification.template_type,
+                    notification.created_by_name or "",
+                    notification.created_by_email_address or "",
+                    notification.job_name or "",
+                    notification.status,
+                    notification.created_at,
+                    notification.api_key_name or "",
                 ]
             yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
 
-        if len(notifications_batch["notifications"]) == kwargs["page_size"]:
+        if len(notifications_batch) == kwargs["page_size"]:
             kwargs["page"] += 1
-            kwargs["older_than"] = notifications_batch["notifications"][-1]["id"]
+            kwargs["older_than"] = notifications_batch[-1].id
         else:
             return
     raise Exception("Should never reach here")
