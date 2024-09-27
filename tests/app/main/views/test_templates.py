@@ -909,8 +909,8 @@ def test_letter_with_default_branding_has_add_logo_button(
     )
 
     edit_links = page.select(".template-container a")
-    assert edit_links[1]["href"] == expected_link(service_id=SERVICE_ONE_ID)
-    assert edit_links[1].text == expected_link_text
+    assert edit_links[0]["href"] == expected_link(service_id=SERVICE_ONE_ID)
+    assert edit_links[0].text == expected_link_text
 
 
 @pytest.mark.parametrize(
@@ -1813,14 +1813,6 @@ def test_should_be_able_to_view_a_letter_template_with_links(
     assert [(link["href"], normalize_spaces(link.text)) for link in page.select("a[class*=edit-template-link]")] == [
         (
             url_for(
-                "main.set_sender",
-                service_id=SERVICE_ONE_ID,
-                template_id=fake_uuid,
-            ),
-            "Get ready to send a letter using this template",
-        ),
-        (
-            url_for(
                 "main.letter_branding_options",
                 service_id=SERVICE_ONE_ID,
                 from_template=fake_uuid,
@@ -1837,11 +1829,11 @@ def test_should_be_able_to_view_a_letter_template_with_links(
         ),
         (
             url_for(
-                "main.edit_service_template",
+                "main.set_sender",
                 service_id=SERVICE_ONE_ID,
                 template_id=fake_uuid,
             ),
-            "Edit body text",
+            "Get ready to send a letter using this template",
         ),
         (
             url_for(
@@ -1850,6 +1842,14 @@ def test_should_be_able_to_view_a_letter_template_with_links(
                 template_id=fake_uuid,
             ),
             "Change your contact details",
+        ),
+        (
+            url_for(
+                "main.edit_service_template",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+            ),
+            "Edit body text",
         ),
         (
             url_for(
