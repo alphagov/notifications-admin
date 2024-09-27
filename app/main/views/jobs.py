@@ -27,10 +27,8 @@ from app import (
     notification_api_client,
     service_api_client,
 )
-from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
 from app.formatters import get_time_left, message_count_noun
 from app.main import json_updates, main
-from app.main.forms import SearchNotificationsForm
 from app.models.job import Job
 from app.s3_client.s3_csv_client import s3download
 from app.utils import parse_filter_args, set_status_filters
@@ -177,56 +175,6 @@ def view_job_updates(service_id, job_id):
     job = Job.from_id(job_id, service_id=service_id)
 
     return jsonify(**get_job_partials(job))
-
-
-@main.route("/services/<uuid:service_id>/notifications", methods=["GET", "POST"])
-@main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>", methods=["GET", "POST"])
-@user_has_permissions()
-def view_notifications(service_id, message_type=None):
-    partials_data = _get_notifications_dashboard_partials_data(service_id, message_type)
-
-    notifications_count = notification_api_client.get_notifications_count_for_service(
-        service_id,
-        message_type,
-        partials_data["service_data_retention_days"],
-    )
-
-    can_download = notifications_count <= MAX_NOTIFICATION_FOR_DOWNLOAD
-    download_link = None
-
-    if can_download:
-        download_link = url_for(
-            ".download_notifications_csv",
-            service_id=current_service.id,
-            message_type=message_type,
-            status=request.args.get("status"),
-        )
-
-    return render_template(
-        "views/notifications.html",
-        partials=partials_data,
-        message_type=message_type,
-        status=request.args.get("status") or "sending,delivered,failed",
-        page=request.args.get("page", 1),
-        _search_form=SearchNotificationsForm(
-            message_type=message_type,
-            to=request.form.get("to"),
-        ),
-        things_you_can_search_by={
-            "email": ["email address"],
-            "sms": ["phone number"],
-            "letter": ["postal address", "file name"],
-            # We say recipient here because combining all 3 types, plus
-            # reference gets too long for the hint text
-            None: ["recipient"],
-        }.get(message_type)
-        + {
-            True: ["reference"],
-            False: [],
-        }.get(bool(current_service.api_keys)),
-        download_link=download_link,
-        can_download=can_download,
-    )
 
 
 @json_updates.route("/services/<uuid:service_id>/notifications.json", methods=["GET", "POST"])
