@@ -19,8 +19,7 @@ from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
-from app.main.views.jobs import get_status_filters, \
-    add_preview_of_content_to_notifications
+from app.main.views.jobs import add_preview_of_content_to_notifications
 from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     DELIVERED_STATUSES,
@@ -227,6 +226,35 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
             ),
         ),
     }
+
+
+def get_status_filters(service, message_type, statistics):
+    if message_type is None:
+        stats = {
+            key: sum(statistics[message_type][key] for message_type in {"email", "sms", "letter"})
+            for key in {"requested", "delivered", "failed"}
+        }
+    else:
+        stats = statistics[message_type]
+    stats["sending"] = stats["requested"] - stats["delivered"] - stats["failed"]
+
+    filters = [
+        # key, label, option
+        ("requested", "total", "sending,delivered,failed"),
+        ("sending", "sending", "sending"),
+        ("delivered", "delivered", "delivered"),
+        ("failed", "failed", "failed"),
+    ]
+    return [
+        # return list containing label, option, link, count
+        (
+            label,
+            option,
+            url_for("main.view_notifications", service_id=service.id, message_type=message_type, status=option),
+            stats[key],
+        )
+        for key, label, option in filters
+    ]
 
 
 @main.route("/services/<uuid:service_id>/usage")
