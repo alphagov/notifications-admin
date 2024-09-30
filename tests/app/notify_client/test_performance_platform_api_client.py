@@ -7,7 +7,7 @@ from app.notify_client.performance_dashboard_api_client import (
 
 def test_get_aggregate_platform_stats(mocker):
     mocker.patch("app.extensions.RedisClient.get", return_value=None)
-    client = PerformanceDashboardAPIClient()
+    client = PerformanceDashboardAPIClient(mocker.MagicMock())
     mock = mocker.patch.object(client, "get", return_value={})
 
     client.get_performance_dashboard_stats(
@@ -21,7 +21,7 @@ def test_get_aggregate_platform_stats(mocker):
 
 
 def test_sets_value_in_cache(mocker):
-    client = PerformanceDashboardAPIClient()
+    client = PerformanceDashboardAPIClient(mocker.MagicMock())
 
     mock_redis_get = mocker.patch(
         "app.extensions.RedisClient.get",
@@ -52,7 +52,7 @@ def test_sets_value_in_cache(mocker):
 
 
 def test_returns_value_from_cache(mocker):
-    client = PerformanceDashboardAPIClient()
+    client = PerformanceDashboardAPIClient(mocker.MagicMock())
 
     mock_redis_get = mocker.patch(
         "app.extensions.RedisClient.get",

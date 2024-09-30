@@ -2,7 +2,7 @@ from app.notify_client.complaint_api_client import ComplaintApiClient
 
 
 def test_get_all_complaints(mocker):
-    client = ComplaintApiClient()
+    client = ComplaintApiClient(mocker.MagicMock())
 
     mock = mocker.patch("app.notify_client.complaint_api_client.ComplaintApiClient.get")
 
@@ -11,7 +11,7 @@ def test_get_all_complaints(mocker):
 
 
 def test_get_all_complaints_with_a_page_number_specified(mocker):
-    client = ComplaintApiClient()
+    client = ComplaintApiClient(mocker.MagicMock())
 
     mock = mocker.patch("app.notify_client.complaint_api_client.ComplaintApiClient.get")
 
@@ -20,7 +20,7 @@ def test_get_all_complaints_with_a_page_number_specified(mocker):
 
 
 def test_get_complaint_count(mocker):
-    client = ComplaintApiClient()
+    client = ComplaintApiClient(mocker.MagicMock())
     mock = mocker.patch.object(client, "get")
     params_dict = {"start_date": "2018-06-01", "end_date": "2018-06-15"}
 

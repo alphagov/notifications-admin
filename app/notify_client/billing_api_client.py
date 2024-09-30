@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient
 
 
@@ -66,4 +73,10 @@ class BillingAPIClient(NotifyAdminAPIClient):
         )
 
 
-billing_api_client = BillingAPIClient()
+_billing_api_client_context_var: ContextVar[BillingAPIClient] = ContextVar("billing_api_client")
+get_billing_api_client: LazyLocalGetter[BillingAPIClient] = LazyLocalGetter(
+    _billing_api_client_context_var,
+    lambda: BillingAPIClient(current_app),
+)
+memo_resetters.append(lambda: get_billing_api_client.clear())
+billing_api_client = LocalProxy(get_billing_api_client)

@@ -149,13 +149,16 @@ class ContactList(JSONModel):
 
 
 class ContactLists(ModelList):
-    client_method = contact_list_api_client.get_contact_lists
     model = ContactList
     sort_function = partial(
         sorted,
         key=lambda item: item["created_at"],
         reverse=True,
     )
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return contact_list_api_client.get_contact_lists(*args, **kwargs)
 
     def __init__(self, service_id, template_type=None):
         super().__init__(service_id)

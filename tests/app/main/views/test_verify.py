@@ -212,7 +212,6 @@ def test_verify_redirects_to_sign_in_if_not_logged_in(client_request):
 
 
 def test_activate_user_redirects_to_service_dashboard_if_user_already_belongs_to_service(
-    mocker,
     client_request,
     service_one,
     sample_invite,
@@ -220,6 +219,7 @@ def test_activate_user_redirects_to_service_dashboard_if_user_already_belongs_to
     mock_login,
     mock_get_service,
     mock_get_invited_user_by_id,
+    mocker,
 ):
     mocker.patch(
         "app.user_api_client.add_user_to_service",

@@ -12,11 +12,11 @@ from tests.conftest import SERVICE_ONE_ID, url_for_endpoint_with_token
 
 @freeze_time("2021-01-01 11:11:11")
 def test_should_render_new_password_template(
-    mocker,
     notify_admin,
     client_request,
     mock_send_verify_code,
     mock_get_user_by_email_request_password_reset,
+    mocker,
 ):
     client_request.logout()
     user = mock_get_user_by_email_request_password_reset.return_value
@@ -141,7 +141,6 @@ def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_exp
 
 
 def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
-    mocker,
     notify_admin,
     client_request,
     api_user_active,
@@ -150,6 +149,7 @@ def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
     mock_send_verify_code,
     mock_reset_failed_login_count,
     mock_update_user_password,
+    mocker,
 ):
     client_request.logout()
     user = mock_get_user_by_email_request_password_reset.return_value

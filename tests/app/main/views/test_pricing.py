@@ -52,12 +52,12 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     ),
 )
 def test_guidance_pricing_sms(
-    mocker,
     client_request,
     rate,
     expected_paragraph,
     valid_from,
     expected_last_updated,
+    mocker,
 ):
     mocker.patch(
         "app.models.sms_rate.sms_rate_api_client.get_sms_rate",

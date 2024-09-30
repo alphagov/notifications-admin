@@ -52,12 +52,12 @@ def test_begin_register_forbidden_unless_can_use_webauthn(
 
 
 def test_begin_register_returns_encoded_options(
-    mocker,
     platform_admin_user,
     client_request,
     webauthn_dev_server,
+    mocker,
 ):
-    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials.client_method", return_value=[])
+    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items", return_value=[])
 
     client_request.login(platform_admin_user)
     response = client_request.get_response(
@@ -88,7 +88,7 @@ def test_begin_register_includes_existing_credentials(
     mocker,
 ):
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential, webauthn_credential],
     )
 
@@ -106,7 +106,7 @@ def test_begin_register_stores_state_in_session(
     platform_admin_user,
     mocker,
 ):
-    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials.client_method", return_value=[])
+    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items", return_value=[])
 
     client_request.login(platform_admin_user)
     client_request.get_response(
@@ -236,7 +236,7 @@ def test_begin_authentication_returns_encoded_options(
         session["user_details"] = {"id": platform_admin_user["id"]}
 
     get_creds_mock = mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method", return_value=[webauthn_credential]
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items", return_value=[webauthn_credential]
     )
     response = client_request.get_response("main.webauthn_begin_authentication")
 
@@ -259,7 +259,7 @@ def test_begin_authentication_stores_state_in_session(
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": platform_admin_user["id"]}
 
-    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials.client_method", return_value=[webauthn_credential])
+    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items", return_value=[webauthn_credential])
     client_request.get_response("main.webauthn_begin_authentication")
 
     with client_request.session_transaction() as session:
@@ -279,7 +279,7 @@ def test_complete_authentication_checks_credentials(
     _set_up_webauthn_session(platform_admin_user["id"], client_request)
 
     mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
-    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials.client_method", return_value=[webauthn_credential])
+    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items", return_value=[webauthn_credential])
     mocker.patch(
         "app.main.views.webauthn_credentials._complete_webauthn_login_attempt", return_value=Mock(location="/foo")
     )
@@ -306,7 +306,7 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
 
     mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
     # user has no keys in the database
-    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials.client_method", return_value=[])
+    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items", return_value=[])
     mock_verify_webauthn_login = mocker.patch("app.main.views.webauthn_credentials._complete_webauthn_login_attempt")
     mock_unsuccesful_login_api_call = mocker.patch("app.user_api_client.complete_webauthn_login_attempt")
 

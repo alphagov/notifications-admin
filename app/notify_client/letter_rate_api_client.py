@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, cache
 
 
@@ -7,4 +14,10 @@ class LetterRateApiClient(NotifyAdminAPIClient):
         return self.get(url="/letter-rates")
 
 
-letter_rate_api_client = LetterRateApiClient()
+_letter_rate_api_client_context_var: ContextVar[LetterRateApiClient] = ContextVar("letter_rate_api_client")
+get_letter_rate_api_client: LazyLocalGetter[LetterRateApiClient] = LazyLocalGetter(
+    _letter_rate_api_client_context_var,
+    lambda: LetterRateApiClient(current_app),
+)
+memo_resetters.append(lambda: get_letter_rate_api_client.clear())
+letter_rate_api_client = LocalProxy(get_letter_rate_api_client)

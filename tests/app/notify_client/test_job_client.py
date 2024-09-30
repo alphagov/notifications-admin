@@ -17,7 +17,7 @@ def test_client_creates_job_data_correctly(mocker, fake_uuid):
 
     expected_url = f"/service/{service_id}/job"
 
-    client = JobApiClient()
+    client = JobApiClient(mocker.MagicMock())
     mock_post = mocker.patch(
         "app.notify_client.job_api_client.JobApiClient.post",
         return_value={"data": dict(statistics=[], **expected_data)},
@@ -39,7 +39,7 @@ def test_client_schedules_job(mocker, fake_uuid):
 
     when = "2016-08-25T13:04:21.767198"
 
-    JobApiClient().create_job(fake_uuid, 1, scheduled_for=when)
+    JobApiClient(mocker.MagicMock()).create_job(fake_uuid, 1, scheduled_for=when)
 
     assert mock_post.call_args[1]["data"]["scheduled_for"] == when
 
@@ -51,7 +51,7 @@ def test_client_links_job_to_contact_list(mocker, fake_uuid):
 
     mock_post = mocker.patch("app.notify_client.job_api_client.JobApiClient.post")
 
-    JobApiClient().create_job(fake_uuid, 1, contact_list_id=contact_list_id)
+    JobApiClient(mocker.MagicMock()).create_job(fake_uuid, 1, contact_list_id=contact_list_id)
 
     assert mock_post.call_args[1]["data"]["contact_list_id"] == contact_list_id
 
@@ -62,7 +62,7 @@ def test_client_gets_job_by_service_and_job(mocker):
 
     expected_url = f"/service/{service_id}/job/{job_id}"
 
-    client = JobApiClient()
+    client = JobApiClient(mocker.MagicMock())
     mock_get = mocker.patch("app.notify_client.job_api_client.JobApiClient.get")
 
     client.get_job(service_id, job_id)
@@ -73,13 +73,13 @@ def test_client_gets_job_by_service_and_job(mocker):
 def test_client_gets_jobs_with_status_filter(mocker):
     mock_get = mocker.patch("app.notify_client.job_api_client.JobApiClient.get")
 
-    JobApiClient().get_jobs(uuid.uuid4(), statuses=["foo", "bar"])
+    JobApiClient(mocker.MagicMock()).get_jobs(uuid.uuid4(), statuses=["foo", "bar"])
 
     mock_get.assert_called_once_with(url=ANY, params={"page": 1, "statuses": "foo,bar"})
 
 
 def test_client_gets_jobs_with_page_parameter(mocker):
-    client = JobApiClient()
+    client = JobApiClient(mocker.MagicMock())
     mock_get = mocker.patch("app.notify_client.job_api_client.JobApiClient.get")
 
     client.get_jobs("foo", page=2)
@@ -87,7 +87,7 @@ def test_client_gets_jobs_with_page_parameter(mocker):
     mock_get.assert_called_once_with(url=ANY, params={"page": 2})
 
 
-def test_client_parses_job_stats(mocker):
+def test_client_parses_job_stats(mocker, notify_admin):
     service_id = "service_id"
     job_id = "job_id"
     expected_data = {
@@ -133,7 +133,7 @@ def test_client_parses_job_stats(mocker):
     assert result.notifications_failed == 40
 
 
-def test_client_parses_empty_job_stats(mocker):
+def test_client_parses_empty_job_stats(mocker, notify_admin):
     service_id = "service_id"
     job_id = "job_id"
     expected_data = {
@@ -170,7 +170,7 @@ def test_client_parses_empty_job_stats(mocker):
     assert result.notifications_failed == 0
 
 
-def test_client_parses_job_stats_for_service(mocker):
+def test_client_parses_job_stats_for_service(mocker, notify_admin):
     service_id = "service_id"
     job_1_id = "job_id_1"
     job_2_id = "job_id_2"
@@ -252,7 +252,7 @@ def test_client_parses_job_stats_for_service(mocker):
     assert result[1].notifications_failed == 20
 
 
-def test_client_parses_empty_job_stats_for_service(mocker):
+def test_client_parses_empty_job_stats_for_service(mocker, notify_admin):
     service_id = "service_id"
     job_1_id = "job_id_1"
     job_2_id = "job_id_2"
@@ -319,7 +319,7 @@ def test_client_parses_empty_job_stats_for_service(mocker):
 def test_cancel_job(mocker):
     mock_post = mocker.patch("app.notify_client.job_api_client.JobApiClient.post")
 
-    JobApiClient().cancel_job("service_id", "job_id")
+    JobApiClient(mocker.MagicMock()).cancel_job("service_id", "job_id")
 
     mock_post.assert_called_once_with(url="/service/service_id/job/job_id/cancel", data={})
 
@@ -346,7 +346,7 @@ def test_has_jobs_sets_cache(
     mock_get = mocker.patch("app.notify_client.job_api_client.JobApiClient.get", return_value={"data": job_data})
     mock_redis_set = mocker.patch("app.extensions.RedisClient.set")
 
-    JobApiClient().has_jobs(fake_uuid)
+    JobApiClient(mocker.MagicMock()).has_jobs(fake_uuid)
 
     mock_get.assert_called_once_with(url=f"/service/{fake_uuid}/job", params={"page": 1})
     mock_redis_set.assert_called_once_with(
@@ -375,6 +375,6 @@ def test_has_jobs_returns_from_cache(
         return_value=cache_value,
     )
 
-    assert JobApiClient().has_jobs(fake_uuid) is return_value
+    assert JobApiClient(mocker.MagicMock()).has_jobs(fake_uuid) is return_value
     assert not mock_get.called
     mock_redis_get.assert_called_once_with(f"has_jobs-{fake_uuid}")

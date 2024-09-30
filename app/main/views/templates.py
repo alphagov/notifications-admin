@@ -33,6 +33,7 @@ from app import (
     nl2br,
     service_api_client,
     template_folder_api_client,
+    template_preview_client,
     template_statistics_client,
 )
 from app.constants import QR_CODE_TOO_LONG, LetterLanguageOptions
@@ -64,7 +65,6 @@ from app.s3_client.s3_letter_upload_client import (
     upload_letter_attachment_to_s3,
     upload_letter_to_s3,
 )
-from app.template_previews import TemplatePreview
 from app.utils import (
     should_skip_template_page,
 )
@@ -266,8 +266,12 @@ def get_template_nav_items(template_folder_id):
 def view_letter_template_preview(service_id, template_id, filetype):
     template = current_service.get_template(template_id)
 
-    return TemplatePreview.get_preview_for_templated_letter(
-        db_template=template._template, filetype=filetype, values=template.values, page=request.args.get("page")
+    return template_preview_client.get_preview_for_templated_letter(
+        db_template=template._template,
+        filetype=filetype,
+        values=template.values,
+        page=request.args.get("page"),
+        service=current_service,
     )
 
 
@@ -308,10 +312,11 @@ def letter_branding_preview_image(filename=None):
         "is_precompiled_letter": False,
     }
 
-    return TemplatePreview.get_preview_for_templated_letter(
+    return template_preview_client.get_preview_for_templated_letter(
         template,
         filetype="png",
         branding_filename=filename,
+        service=current_service,
     )
 
 
@@ -345,8 +350,12 @@ def view_template_version(service_id, template_id, version):
 def view_letter_template_version_preview(service_id, template_id, version, filetype):
     template = current_service.get_template(template_id, version=version)
 
-    return TemplatePreview.get_preview_for_templated_letter(
-        db_template=template._template, filetype=filetype, values=template.values, page=request.args.get("page")
+    return template_preview_client.get_preview_for_templated_letter(
+        db_template=template._template,
+        filetype=filetype,
+        values=template.values,
+        page=request.args.get("page"),
+        service=current_service,
     )
 
 
@@ -1112,7 +1121,11 @@ def letter_template_attach_pages(service_id, template_id):
 @no_cookie.route("/services/<uuid:service_id>/attachment/<uuid:attachment_id>.png")
 @user_has_permissions(allow_org_user=True)
 def view_letter_attachment_preview(service_id, attachment_id):
-    return TemplatePreview.get_png_for_letter_attachment_page(attachment_id, page=request.args.get("page"))
+    return template_preview_client.get_png_for_letter_attachment_page(
+        attachment_id,
+        service=current_service,
+        page=request.args.get("page"),
+    )
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attach-pages/edit", methods=["GET", "POST"])
@@ -1182,7 +1195,7 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
     file_location = get_transient_letter_file_location(service_id, upload_id)
 
     try:
-        response = TemplatePreview.sanitise_letter(
+        response = template_preview_client.sanitise_letter(
             BytesIO(pdf_file_bytes),
             upload_id=upload_id,
             allow_international_letters=current_service.has_permission("international_letters"),
@@ -1318,9 +1331,9 @@ def view_invalid_letter_attachment_as_preview(service_id, file_id):
     invalid_pages = json.loads(metadata.get("invalid_pages", "[]"))
 
     if metadata.get("message") == "content-outside-printable-area" and page in invalid_pages:
-        return TemplatePreview.get_png_for_invalid_pdf_page(pdf_file, page, is_an_attachment=True)
+        return template_preview_client.get_png_for_invalid_pdf_page(pdf_file, page, is_an_attachment=True)
     else:
-        return TemplatePreview.get_png_for_valid_pdf_page(pdf_file, page)
+        return template_preview_client.get_png_for_valid_pdf_page(pdf_file, page)
 
 
 def _get_page_numbers(page_count):

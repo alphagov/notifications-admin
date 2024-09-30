@@ -180,10 +180,10 @@ def test_user_information_page_shows_archive_link_for_active_users(
 
 
 def test_user_information_page_does_not_show_archive_link_for_inactive_users(
-    mocker,
     client_request,
     platform_admin_user,
     mock_get_organisations_and_services_for_user,
+    mocker,
 ):
     inactive_user_id = uuid.uuid4()
     inactive_user = user_json(id_=inactive_user_id, state="inactive")

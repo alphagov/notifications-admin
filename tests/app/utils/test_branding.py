@@ -75,7 +75,7 @@ def test_get_choices_service_not_assigned_to_org(
     ],
 )
 def test_get_email_choices_service_assigned_to_org(
-    mocker,
+    notify_admin,
     service_one,
     org_type,
     branding_id,
@@ -83,6 +83,7 @@ def test_get_email_choices_service_assigned_to_org(
     mock_get_empty_email_branding_pool,
     mock_get_service_organisation,
     mock_get_email_branding,
+    mocker,
 ):
     service = Service(service_one)
 
@@ -115,13 +116,14 @@ def test_get_email_choices_service_assigned_to_org(
     ],
 )
 def test_get_email_choices_org_has_default_branding(
-    mocker,
+    notify_admin,
     service_one,
     org_type,
     expected_options,
     mock_get_empty_email_branding_pool,
     mock_get_service_organisation,
     mock_get_email_branding,
+    mocker,
 ):
     service = Service(service_one)
 
@@ -156,12 +158,13 @@ def test_get_email_choices_org_has_default_branding(
     ],
 )
 def test_get_email_choices_branding_name_in_use(
-    mocker,
+    notify_admin,
     service_one,
     branding_name,
     expected_options,
     mock_get_empty_email_branding_pool,
     mock_get_service_organisation,
+    mocker,
 ):
     service = Service(service_one)
 
@@ -230,13 +233,14 @@ def test_get_email_choices_branding_name_in_use(
     ),
 )
 def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
-    mocker,
+    notify_admin,
     service_one,
     mock_get_email_branding_pool,
     mock_get_service_organisation,
     mock_get_email_branding,
     branding_pool,
     expected_options,
+    mocker,
 ):
     service = Service(service_one)
 
@@ -249,7 +253,7 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
         return_value="email-branding-1-id",
     )
 
-    mocker.patch("app.models.branding.EmailBrandingPool.client_method", return_value=branding_pool)
+    mocker.patch("app.models.branding.EmailBrandingPool._get_items", return_value=branding_pool)
 
     options = get_email_choices(service)
     assert list(options) == expected_options
@@ -265,13 +269,14 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
     ],
 )
 def test_get_letter_choices_service_assigned_to_org(
-    mocker,
+    notify_admin,
     service_one,
     org_type,
     branding_id,
     expected_options,
     mock_get_service_organisation,
     mock_get_empty_letter_branding_pool,
+    mocker,
 ):
     service = Service(service_one)
 
@@ -289,10 +294,11 @@ def test_get_letter_choices_service_assigned_to_org(
 
 
 def test_get_letter_choices_shows_org_branding_if_org_has_empty_pool(
-    mocker,
+    notify_admin,
     service_one,
     mock_get_service_organisation,
     mock_get_empty_letter_branding_pool,
+    mocker,
 ):
     service = Service(service_one)
 
@@ -329,12 +335,13 @@ def test_get_letter_choices_shows_org_branding_if_org_has_empty_pool(
     ],
 )
 def test_get_letter_choices_shows_nhs_branding_for_nhs_services(
-    mocker,
+    notify_admin,
     service_one,
     branding_name,
     expected_options,
     mock_get_service_organisation,
     mock_get_empty_letter_branding_pool,
+    mocker,
 ):
     service = Service(service_one)
 
@@ -353,10 +360,11 @@ def test_get_letter_choices_shows_nhs_branding_for_nhs_services(
 
 
 def test_current_letter_branding_is_not_displayed_in_letter_branding_pool_options(
-    mocker,
+    notify_admin,
     service_one,
     mock_get_letter_branding_pool,
     mock_get_service_organisation,
+    mocker,
 ):
     service = Service(service_one)
 
@@ -386,7 +394,7 @@ def test_current_letter_branding_is_not_displayed_in_letter_branding_pool_option
     expected_options = [
         ("letter-branding-2-id", "Letter branding name 2"),
     ]
-    mocker.patch("app.models.branding.LetterBrandingPool.client_method", return_value=branding_pool)
+    mocker.patch("app.models.branding.LetterBrandingPool._get_items", return_value=branding_pool)
 
     options = get_letter_choices(service)
     assert list(options) == expected_options

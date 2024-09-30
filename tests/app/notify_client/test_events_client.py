@@ -7,7 +7,7 @@ def test_events_client_calls_correct_api_endpoint(mocker):
     event_data = {"does_not": "matter"}
     expected_data = {"event_type": event_type, "data": event_data}
 
-    client = EventsApiClient()
+    client = EventsApiClient(mocker.MagicMock())
 
     mock_post = mocker.patch("app.notify_client.events_api_client.EventsApiClient.post")
 

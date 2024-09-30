@@ -56,11 +56,11 @@ class JSONModel(SerialisedModel, SortingAndEqualityMixin):
 class ModelList(SerialisedModelCollection):
     @property
     @abstractmethod
-    def client_method(self):
+    def _get_items(self):
         pass
 
     def __init__(self, *args):
-        self.items = self.client_method(*args)
+        self.items = self._get_items(*args)
 
 
 class PaginatedModelList(ModelList):
@@ -71,7 +71,7 @@ class PaginatedModelList(ModelList):
             self.current_page = int(page)
         except TypeError:
             self.current_page = 1
-        response = self.client_method(
+        response = self._get_items(
             *args,
             **kwargs,
             page=self.current_page,

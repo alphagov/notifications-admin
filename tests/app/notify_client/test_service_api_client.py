@@ -19,7 +19,7 @@ def test_client_posts_archived_true_when_deleting_template(mocker):
     expected_data = {"archived": True, "created_by": "1"}
     expected_url = f"/service/{SERVICE_ONE_ID}/template/{FAKE_TEMPLATE_ID}"
 
-    client = ServiceAPIClient()
+    client = ServiceAPIClient(mocker.MagicMock())
     mock_post = mocker.patch("app.notify_client.service_api_client.ServiceAPIClient.post")
     mocker.patch(
         "app.notify_client.service_api_client.ServiceAPIClient.get",
@@ -32,7 +32,7 @@ def test_client_posts_archived_true_when_deleting_template(mocker):
 
 
 def test_client_gets_service(mocker):
-    client = ServiceAPIClient()
+    client = ServiceAPIClient(mocker.MagicMock())
     mock_get = mocker.patch.object(client, "get", return_value={})
 
     client.get_service("foo")
@@ -41,7 +41,7 @@ def test_client_gets_service(mocker):
 
 @pytest.mark.parametrize("limit_days", [None, 30])
 def test_client_gets_service_statistics(mocker, limit_days):
-    client = ServiceAPIClient()
+    client = ServiceAPIClient(mocker.MagicMock())
     mock_get = mocker.patch.object(client, "get", return_value={"data": {"a": "b"}})
 
     ret = client.get_service_statistics("foo", limit_days)
@@ -53,7 +53,7 @@ def test_client_gets_service_statistics(mocker, limit_days):
 def test_client_only_updates_allowed_attributes(mocker):
     mocker.patch("app.notify_client.current_user", id="1")
     with pytest.raises(TypeError) as error:
-        ServiceAPIClient().update_service("service_id", foo="bar")
+        ServiceAPIClient(mocker.MagicMock()).update_service("service_id", foo="bar")
     assert str(error.value) == "Not allowed to update service attributes: foo"
 
 
@@ -62,7 +62,7 @@ def test_client_creates_service_with_correct_data(
     active_user_with_permissions,
     fake_uuid,
 ):
-    client = ServiceAPIClient()
+    client = ServiceAPIClient(mocker.MagicMock())
     mock_post = mocker.patch.object(client, "post", return_value={"data": {"id": None}})
     mocker.patch("app.notify_client.current_user", id="123")
 
@@ -97,7 +97,7 @@ def test_client_creates_service_with_correct_data(
 def test_get_precompiled_template(mocker):
     mock_redis_set = mocker.patch("app.extensions.RedisClient.set")
 
-    client = ServiceAPIClient()
+    client = ServiceAPIClient(mocker.MagicMock())
     mock_get = mocker.patch.object(client, "get", return_value={"data": "foo"})
 
     client.get_precompiled_template(SERVICE_ONE_ID)
@@ -162,7 +162,7 @@ def test_client_returns_count_of_service_templates(
 
 @pytest.mark.parametrize(
     (
-        "client_method,"
+        "method,"
         "extra_args,"
         "expected_cache_get_calls,"
         "cache_value,"
@@ -172,7 +172,7 @@ def test_client_returns_count_of_service_templates(
     ),
     [
         (
-            service_api_client.get_service,
+            "get_service",
             [SERVICE_ONE_ID],
             [call(f"service-{SERVICE_ONE_ID}")],
             b'{"data_from": "cache"}',
@@ -181,7 +181,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "cache"},
         ),
         (
-            service_api_client.get_service,
+            "get_service",
             [SERVICE_ONE_ID],
             [call(f"service-{SERVICE_ONE_ID}")],
             None,
@@ -196,7 +196,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "api"},
         ),
         (
-            service_api_client.get_service_template,
+            "get_service_template",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             [call(f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}-version-None")],
             b'{"data_from": "cache"}',
@@ -205,7 +205,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "cache"},
         ),
         (
-            service_api_client.get_service_template,
+            "get_service_template",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             [
                 call(f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}-version-None"),
@@ -222,7 +222,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "api"},
         ),
         (
-            service_api_client.get_service_template,
+            "get_service_template",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, 1],
             [call(f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}-version-1")],
             b'{"data_from": "cache"}',
@@ -231,7 +231,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "cache"},
         ),
         (
-            service_api_client.get_service_template,
+            "get_service_template",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID, 1],
             [
                 call(f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}-version-1"),
@@ -248,7 +248,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "api"},
         ),
         (
-            service_api_client.get_service_templates,
+            "get_service_templates",
             [SERVICE_ONE_ID],
             [call(f"service-{SERVICE_ONE_ID}-templates")],
             b'{"data_from": "cache"}',
@@ -257,7 +257,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "cache"},
         ),
         (
-            service_api_client.get_service_templates,
+            "get_service_templates",
             [SERVICE_ONE_ID],
             [call(f"service-{SERVICE_ONE_ID}-templates")],
             None,
@@ -272,7 +272,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "api"},
         ),
         (
-            service_api_client.get_service_template_versions,
+            "get_service_template_versions",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             [call(f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}-versions")],
             b'{"data_from": "cache"}',
@@ -281,7 +281,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "cache"},
         ),
         (
-            service_api_client.get_service_template_versions,
+            "get_service_template_versions",
             [SERVICE_ONE_ID, FAKE_TEMPLATE_ID],
             [
                 call(f"service-{SERVICE_ONE_ID}-template-{FAKE_TEMPLATE_ID}-versions"),
@@ -298,7 +298,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "api"},
         ),
         (
-            service_api_client.get_returned_letter_summary,
+            "get_returned_letter_summary",
             [SERVICE_ONE_ID],
             [call(f"service-{SERVICE_ONE_ID}-returned-letters-summary")],
             None,
@@ -313,7 +313,7 @@ def test_client_returns_count_of_service_templates(
             {"data_from": "api"},
         ),
         (
-            service_api_client.get_returned_letter_statistics,
+            "get_returned_letter_statistics",
             [SERVICE_ONE_ID],
             [call(f"service-{SERVICE_ONE_ID}-returned-letters-statistics")],
             None,
@@ -331,7 +331,8 @@ def test_client_returns_count_of_service_templates(
 )
 def test_returns_value_from_cache(
     mocker,
-    client_method,
+    notify_admin,
+    method,
     extra_args,
     expected_cache_get_calls,
     cache_value,
@@ -351,36 +352,45 @@ def test_returns_value_from_cache(
         "app.extensions.RedisClient.set",
     )
 
-    assert client_method(*extra_args) == expected_return_value
+    assert getattr(service_api_client, method)(*extra_args) == expected_return_value
 
     assert mock_redis_get.call_args_list == expected_cache_get_calls
     assert mock_api_get.call_args_list == expected_api_calls
     assert mock_redis_set.call_args_list == expected_cache_set_calls
 
 
+# feeding LocalProxys that need an app context into pytest's parametrization system
+# leads to bad things
+_clients_by_name = {
+    "user": user_api_client,
+    "service": service_api_client,
+    "invite": invite_api_client,
+}
+
+
 @pytest.mark.parametrize(
-    "client, method, extra_args, extra_kwargs",
+    "client_name, method, extra_args, extra_kwargs",
     [
-        (service_api_client, "update_service", [SERVICE_ONE_ID], {"name": "foo"}),
-        (service_api_client, "update_service_with_properties", [SERVICE_ONE_ID], {"properties": {}}),
-        (service_api_client, "archive_service", [SERVICE_ONE_ID, []], {}),
-        (service_api_client, "remove_user_from_service", [SERVICE_ONE_ID, ""], {}),
-        (service_api_client, "update_guest_list", [SERVICE_ONE_ID, {}], {}),
-        (service_api_client, "create_service_inbound_api", [SERVICE_ONE_ID] + [""] * 3, {}),
-        (service_api_client, "update_service_inbound_api", [SERVICE_ONE_ID] + [""] * 4, {}),
-        (service_api_client, "add_reply_to_email_address", [SERVICE_ONE_ID, ""], {}),
-        (service_api_client, "update_reply_to_email_address", [SERVICE_ONE_ID] + [""] * 2, {}),
-        (service_api_client, "delete_reply_to_email_address", [SERVICE_ONE_ID, ""], {}),
-        (service_api_client, "add_letter_contact", [SERVICE_ONE_ID, ""], {}),
-        (service_api_client, "update_letter_contact", [SERVICE_ONE_ID] + [""] * 2, {}),
-        (service_api_client, "delete_letter_contact", [SERVICE_ONE_ID, ""], {}),
-        (service_api_client, "add_sms_sender", [SERVICE_ONE_ID, ""], {}),
-        (service_api_client, "update_sms_sender", [SERVICE_ONE_ID] + [""] * 2, {}),
-        (service_api_client, "delete_sms_sender", [SERVICE_ONE_ID, ""], {}),
-        (service_api_client, "update_service_callback_api", [SERVICE_ONE_ID] + [""] * 4, {}),
-        (service_api_client, "create_service_callback_api", [SERVICE_ONE_ID] + [""] * 3, {}),
-        (user_api_client, "add_user_to_service", [SERVICE_ONE_ID, uuid4(), [], []], {}),
-        (invite_api_client, "accept_invite", [SERVICE_ONE_ID, uuid4()], {}),
+        ("service", "update_service", [SERVICE_ONE_ID], {"name": "foo"}),
+        ("service", "update_service_with_properties", [SERVICE_ONE_ID], {"properties": {}}),
+        ("service", "archive_service", [SERVICE_ONE_ID, []], {}),
+        ("service", "remove_user_from_service", [SERVICE_ONE_ID, ""], {}),
+        ("service", "update_guest_list", [SERVICE_ONE_ID, {}], {}),
+        ("service", "create_service_inbound_api", [SERVICE_ONE_ID] + [""] * 3, {}),
+        ("service", "update_service_inbound_api", [SERVICE_ONE_ID] + [""] * 4, {}),
+        ("service", "add_reply_to_email_address", [SERVICE_ONE_ID, ""], {}),
+        ("service", "update_reply_to_email_address", [SERVICE_ONE_ID] + [""] * 2, {}),
+        ("service", "delete_reply_to_email_address", [SERVICE_ONE_ID, ""], {}),
+        ("service", "add_letter_contact", [SERVICE_ONE_ID, ""], {}),
+        ("service", "update_letter_contact", [SERVICE_ONE_ID] + [""] * 2, {}),
+        ("service", "delete_letter_contact", [SERVICE_ONE_ID, ""], {}),
+        ("service", "add_sms_sender", [SERVICE_ONE_ID, ""], {}),
+        ("service", "update_sms_sender", [SERVICE_ONE_ID] + [""] * 2, {}),
+        ("service", "delete_sms_sender", [SERVICE_ONE_ID, ""], {}),
+        ("service", "update_service_callback_api", [SERVICE_ONE_ID] + [""] * 4, {}),
+        ("service", "create_service_callback_api", [SERVICE_ONE_ID] + [""] * 3, {}),
+        ("user", "add_user_to_service", [SERVICE_ONE_ID, uuid4(), [], []], {}),
+        ("invite", "accept_invite", [SERVICE_ONE_ID, uuid4()], {}),
     ],
 )
 def test_deletes_service_cache(
@@ -388,7 +398,7 @@ def test_deletes_service_cache(
     mock_get_user,
     mock_get_service_templates,
     mocker,
-    client,
+    client_name,
     method,
     extra_args,
     extra_kwargs,
@@ -397,7 +407,7 @@ def test_deletes_service_cache(
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
     mock_request = mocker.patch("notifications_python_client.base.BaseAPIClient.request")
 
-    getattr(client, method)(*extra_args, **extra_kwargs)
+    getattr(_clients_by_name[client_name], method)(*extra_args, **extra_kwargs)
 
     mock_redis_delete.assert_called_with_subset_of_args(f"service-{SERVICE_ONE_ID}")
     assert len(mock_request.call_args_list) == 1
@@ -485,7 +495,11 @@ def test_deletes_caches_when_modifying_templates(
     mock_redis_delete_by_pattern.assert_called_with_args(*expected_cache_deletes_by_pattern)
 
 
-def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_templates):
+def test_deletes_cached_users_when_archiving_service(
+    notify_admin,
+    mock_get_service_templates,
+    mocker,
+):
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
     mock_redis_delete_by_pattern = mocker.patch(
         "app.extensions.RedisClient.delete_by_pattern", new_callable=RedisClientMock
@@ -500,7 +514,7 @@ def test_deletes_cached_users_when_archiving_service(mocker, mock_get_service_te
 
 
 def test_client_gets_guest_list(mocker):
-    client = ServiceAPIClient()
+    client = ServiceAPIClient(mocker.MagicMock())
     mock_get = mocker.patch.object(client, "get", return_value=["a", "b", "c"])
 
     response = client.get_guest_list("foo")
@@ -512,7 +526,7 @@ def test_client_gets_guest_list(mocker):
 
 
 def test_client_updates_guest_list(mocker):
-    client = ServiceAPIClient()
+    client = ServiceAPIClient(mocker.MagicMock())
     mock_put = mocker.patch.object(client, "put")
 
     client.update_guest_list("foo", data=["a", "b", "c"])
@@ -540,7 +554,7 @@ def test_client_deletes_service_template_cache_when_service_is_updated(notify_ad
 def test_client_updates_service_with_allowed_attributes(
     mocker,
 ):
-    client = ServiceAPIClient()
+    client = ServiceAPIClient(mocker.MagicMock())
     mock_post = mocker.patch.object(client, "post", return_value={"data": {"id": None}})
     mocker.patch("app.notify_client.current_user", id="123")
 
@@ -587,8 +601,8 @@ def test_client_updates_service_with_allowed_attributes(
         ({"other": "blah"}, None),
     ),
 )
-def test_client_parsing_service_name_errors(err_data, expected_message):
-    client = ServiceAPIClient()
+def test_client_parsing_service_name_errors(err_data, expected_message, mocker):
+    client = ServiceAPIClient(mocker.MagicMock())
     error = Mock()
     error.message = err_data
 

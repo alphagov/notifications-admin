@@ -70,7 +70,10 @@ class WebAuthnCredential(JSONModel):
 
 class WebAuthnCredentials(ModelList):
     model = WebAuthnCredential
-    client_method = user_api_client.get_webauthn_credentials_for_user
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return user_api_client.get_webauthn_credentials_for_user(*args, **kwargs)
 
     @property
     def as_cbor(self):

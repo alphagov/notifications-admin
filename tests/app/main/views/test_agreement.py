@@ -326,12 +326,12 @@ def test_accept_agreement_page_populates(
     ),
 )
 def test_accept_agreement_page_validates(
-    mocker,
     client_request,
     mock_get_service_organisation,
     mock_get_organisations,
     data,
     expected_errors,
+    mocker,
 ):
     page = client_request.post(
         "main.service_accept_agreement",
@@ -395,12 +395,12 @@ def test_accept_agreement_page_validates(
     ),
 )
 def test_accept_agreement_page_persists(
-    mocker,
     client_request,
     mock_get_service_organisation,
     mock_update_organisation,
     data,
     expected_persisted,
+    mocker,
 ):
     client_request.post(
         "main.service_accept_agreement",

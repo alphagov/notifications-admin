@@ -359,12 +359,12 @@ def test_should_show_letter_job(
 
 @freeze_time("2016-01-01 11:09:00")
 def test_should_show_letter_job_with_banner_after_sending_before_1730(
-    mocker,
     client_request,
     mock_get_service_letter_template,
     mock_get_letter_job,
     mock_get_service_data_retention,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.notification_api_client.get_notifications_for_service",
@@ -387,12 +387,12 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
 
 @freeze_time("2016-01-01 11:09:00")
 def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
-    mocker,
     client_request,
     mock_get_service_letter_template,
     mock_get_letter_job_in_progress,
     mock_get_service_data_retention,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.notification_api_client.get_notifications_for_service",
@@ -414,12 +414,12 @@ def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
 
 @freeze_time("2016-01-01 18:09:00")
 def test_should_show_letter_job_with_banner_after_sending_after_1730(
-    mocker,
     client_request,
     mock_get_service_letter_template,
     mock_get_letter_job,
     mock_get_service_data_retention,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.notification_api_client.get_notifications_for_service",
@@ -441,13 +441,13 @@ def test_should_show_letter_job_with_banner_after_sending_after_1730(
 
 @freeze_time("2016-01-01T00:00:00.061258")
 def test_should_show_scheduled_job(
-    mocker,
     client_request,
     mock_get_service_template,
     mock_get_scheduled_job,
     mock_get_service_data_retention,
     mock_get_notifications,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.main.views.jobs.s3download",
@@ -501,10 +501,10 @@ def test_should_show_scheduled_job(
 
 
 def test_should_download_scheduled_job(
-    mocker,
     client_request,
     mock_get_scheduled_job,
     fake_uuid,
+    mocker,
 ):
     original_file_contents = "phone number,name\n+447700900986,John\n+447700900986,Smith\n"
     mocker.patch(
@@ -521,12 +521,12 @@ def test_should_download_scheduled_job(
 
 
 def test_should_not_download_unscheduled_job(
-    mocker,
     client_request,
     mock_get_job,
     mock_get_service_data_retention,
     mock_get_notifications,
     fake_uuid,
+    mocker,
 ):
     client_request.get(
         "main.view_job_original_file_csv",
