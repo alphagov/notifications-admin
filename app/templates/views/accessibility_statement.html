@@ -47,6 +47,16 @@
     We know some parts of this website are not fully accessible:
   </p>
   <ul class="govuk-list govuk-list--bullet">
+    <li>the textbox for entering a reason to reject a go-live request can't be easily accessed by voice activation users</li>
+    <li>the skiplink on guidance pages doesn't bypass the side navigation</li>
+    <li>the 'sticky' footer on the templates page sometimes overlaps focused links or checkboxes</li>
+    <li>the visual design of the service navigation doesn't work on smaller screens or at high zoom</li>
+    <li>some content on the inbox page requires scrolling to see all of it</li>
+    <li>the visual design of the letter template page doesn't work on smaller screens or at high zoom</li>
+    <li>the page for adding a reply-to email address doesn't update screen reader users on its progress</li>
+    <li>links in text messages on the conversation pages don't have enough contrast with their background</li>
+    <li>errors from starting a new template aren't focused when they appear</li>
+    <li>errors from uploading PDFs aren't focused when they appear</li>
     <li>if a team adds template folders, screen readers may announce the page heading in a confusing way</li>
     <li>screen reader users may find it hard to expand or collapse groups of checkboxes</li>
     <li>the Notify status page has several accessibility issues</li>
@@ -94,6 +104,39 @@
 
   <h2 class="heading-medium" id="non-accessible-content">Non-accessible content</h2>
 
+  <h3 class="heading-small" id="non-compliance">Non compliance with the accessibility regulations</h3>
+
+  <p class="govuk-body">
+    The following content on the Notify website is not compliant with the WCAG version 2.2 AA standard:
+  </p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>
+      The textbox for the reason to reject a go-live request is labelled differently in the visual interface to its HTML. This stops users of voice activation software using it and breaks <a href="https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html">success criterion 2.5.3: Label in name</a>.
+    </li>
+    <li>
+      The skiplink on Notify's guidance pages, for example <a href="https://www.notifications.service.gov.uk/using-notify">Using Notify</a>, doesn't bypass the side navigation. This means it takes keyboard-only users more time and effort to go straight to the content and breaks <a href="https://www.w3.org/WAI/WCAG22/Understanding/bypass-blocks.html">success criterion 2.4.1: bypass blocks</a>.
+    </li>
+    <li>
+      The footer containing the 'New template' and 'New Folder' buttons on the templates page sometimes obscures links or checkboxes in the page when they are tabbed to. This means keyboard-only users can lose sight of what is currently in focus and breaks <a href="https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html">success criterion 2.4.11: focus obscured (minimum)</a>.
+    </li>
+    <li>
+      The navigation showing your current organisation and service has visual problems on smaller screens. This makes it hard to use on mobile devices or at levels of zoom at 400% on a 1280 pixel screen and breaks <a href="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">success criterion 1.4.10: Reflow</a>.
+    </li>
+    <li>
+      Content on the inbox page needs horizontal scrolling on smaller screens. This makes it harder to access on mobile devices or at levels of zoom at 400% on a 1280 pixel screen and breaks <a href="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">success criterion 1.4.10: Reflow</a>.
+    </li>
+    <li>
+      The design of the letter template page doesn't work on smaller screens. This makes it harder to access on mobile devices or at levels of zoom at 400% on a 1280 pixel screen and breaks <a href="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">success criterion 1.4.10: Reflow</a>.
+    </li>
+    <li>
+      The page for adding a reply-to email address gives progress updates that are only communicated visually. This is confusing for screen reader users and breaks <a href="https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html">success criterion 4.1.3: Status messages</a>.
+    </li>
+    <li>
+      Links in the text messages shown on the conversation page don't have enough contrast with their background. This makes them harder to read for low vision users and breaks <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html">success criterion 1.4.3: Contrast (minimum)</a>.
+    </li>
+  </ol>
+
   <h3 class="heading-small" id="problems-with-using-the-interface">Problems with using the interface</h3>
 
   <ol class="govuk-list govuk-list--number">
@@ -102,6 +145,12 @@
     </li>
     <li>
       Expanding and collapsing groups of checkboxes using a screen reader can be confusing.
+    </li>
+    <li>
+      If you don't choose a template type when starting a new template, the banner that tells you that isn't focused. This is confusing for keyboard-only users and isn't consistent with how this is done elsewhere on Notify.
+    </li>
+    <li>
+      The banner that tells you about errors in PDFs you upload isn't focused when it appears. This is confusing for keyboard-only users and isn't consistent with how this is done elsewhere on Notify.
     </li>
   </ol>
 
