@@ -8,28 +8,22 @@ class NotificationApiClient(NotifyAdminAPIClient):
         job_id=None,
         template_type=None,
         status=None,
-        paginate_by_older_than=None,
-        older_than=None,
         page=None,
         page_size=None,
         count_pages=None,
         limit_days=None,
         include_jobs=None,
         include_from_test_key=None,
-        format_for_csv=None,
         to=None,
         include_one_off=None,
     ):
         params = {
-            "paginate_by_older_than": paginate_by_older_than,
-            "older_than": older_than,
             "page": page,
             "page_size": page_size,
             "template_type": template_type,
             "status": status,
             "include_jobs": include_jobs,
             "include_from_test_key": include_from_test_key,
-            "format_for_csv": format_for_csv,
             "to": to,
             "include_one_off": include_one_off,
             "count_pages": count_pages,
@@ -48,6 +42,36 @@ class NotificationApiClient(NotifyAdminAPIClient):
             if limit_days is not None:
                 params["limit_days"] = limit_days
             return method(url=f"/service/{service_id}/notifications", **kwargs)
+
+    def get_notifications_for_service_for_csv(
+        self,
+        service_id,
+        job_id=None,
+        template_type=None,
+        status=None,
+        older_than=None,
+        page=None,
+        page_size=None,
+        limit_days=None,
+    ):
+        params = {
+            "older_than": older_than,
+            "page": page,
+            "page_size": page_size,
+            "template_type": template_type,
+            "status": status,
+        }
+
+        params = {k: v for k, v in params.items() if v is not None}
+        kwargs = {"params": params}
+
+        if job_id:
+            params["format_for_csv"] = True
+            return self.get(url=f"/service/{service_id}/job/{job_id}/notifications", **kwargs)
+        else:
+            if limit_days is not None:
+                params["limit_days"] = limit_days
+            return self.get(url=f"/service/{service_id}/notifications/csv", **kwargs)
 
     def send_notification(self, service_id, *, template_id, recipient, personalisation, sender_id):
         data = {
