@@ -384,3 +384,10 @@ def test_trial_mode_sending_limits(client_request):
         "send 50 text messages per day",
         "create letter templates, but not send them",
     ]
+
+
+def test_GET_guidance_api_documentation_section(client_request):
+    page = client_request.get("main.guidance_api_documentation_section")
+
+    assert page.select_one("h1").text == "Send a link to an API docs section"
+    assert page.select_one("input", attrs={"type": "text"})["name"] == "url"

@@ -2280,6 +2280,19 @@ class CallbackForm(StripWhitespaceForm):
         return super().validate(*args, **kwargs) or self.url.data == ""
 
 
+class UrlForm(StripWhitespaceForm):
+    url = GovukTextInputField(
+        "URL",
+        validators=[
+            DataRequired(message="Cannot be empty"),
+            Regexp(regex="^https.*", message="Must be a valid https URL"),
+        ],
+    )
+
+    def validate(self, *args, **kwargs):
+        return super().validate(*args, **kwargs) or self.url.data == ""
+
+
 class SMSPrefixForm(StripWhitespaceForm):
     enabled = OnOffField("")  # label is assigned on instantiation
 

@@ -15,7 +15,7 @@ from notifications_utils.template import HTMLEmailTemplate
 from app import status_api_client
 from app.formatters import message_count
 from app.main import main
-from app.main.forms import FieldWithNoneOption
+from app.main.forms import FieldWithNoneOption, UrlForm
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
@@ -156,6 +156,17 @@ def guidance_api_documentation():
     return render_template(
         "views/guidance/using-notify/api-documentation.html",
         navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/api-documentation/section")
+def guidance_api_documentation_section():
+
+    form = UrlForm()
+    return render_template(
+        "views/guidance/using-notify/api-documentation-section.html",
+        navigation_links=using_notify_nav(),
+        form=form,
     )
 
 
