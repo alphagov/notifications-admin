@@ -402,3 +402,31 @@ def test_POST_guidance_api_documentation_section(client_request):
             section_tag="send-a-file-by-email",
         ),
     )
+
+
+@pytest.mark.parametrize(
+    "url, expected_error_message",
+    [
+        ["", "Cannot be empty"],  # empty string
+        [
+            "https://docs.notifications.service.gov.uk/python.html",
+            "Must be a valid https URL, pointing to a section within the GOV.UK Notify API docs.",
+        ],  # no section
+        [
+            "https://docs.payments.service.gov.uk/making_payments/#creating-a-payment",
+            "Must be a valid https URL, pointing to a section within the GOV.UK Notify API docs.",
+        ],  # URL is notfor Notify's docs
+        [
+            "http://docs.notifications.service.gov.uk/python.html#send-a-file-by-email",
+            "Must be a valid https URL",
+        ],  # http instead of https
+    ],
+)
+def test_POST_guidance_api_documentation_section_with_incorrect_url(client_request, url, expected_error_message):
+    page = client_request.post(
+        "main.guidance_api_documentation_section",
+        _data={"url": url},
+        _expected_status=200,
+    )
+
+    assert expected_error_message in page.select_one(".govuk-error-message").text

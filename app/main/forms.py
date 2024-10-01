@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from functools import partial
 from itertools import chain
 from numbers import Number
+from urllib.parse import urlparse
 
 import pytz
 from flask import request
@@ -2290,7 +2291,16 @@ class UrlForm(StripWhitespaceForm):
     )
 
     def validate(self, *args, **kwargs):
-        return super().validate(*args, **kwargs) or self.url.data == ""
+        self.url.validators.append(self.check_url)
+        return super().validate(*args, **kwargs)
+
+    def check_url(self, *args, **kwargs):
+        parsed_url = urlparse(self.url.data)
+
+        if parsed_url.hostname == "docs.notifications.service.gov.uk" and parsed_url.fragment:
+            return parsed_url
+        else:
+            raise ValidationError("Must be a valid https URL, pointing to a section within the GOV.UK Notify API docs.")
 
 
 class SMSPrefixForm(StripWhitespaceForm):
