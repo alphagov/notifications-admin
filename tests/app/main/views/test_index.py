@@ -391,3 +391,14 @@ def test_GET_guidance_api_documentation_section(client_request):
 
     assert page.select_one("h1").text == "Send a link to an API docs section"
     assert page.select_one("input", attrs={"type": "text"})["name"] == "url"
+
+
+def test_POST_guidance_api_documentation_section(client_request):
+    client_request.post(
+        "main.guidance_api_documentation_section",
+        _data={"url": "https://docs.notifications.service.gov.uk/python.html#send-a-file-by-email"},
+        _expected_redirect=url_for(
+            "main.guidance_api_documentation_choose",
+            section_tag="send-a-file-by-email",
+        ),
+    )

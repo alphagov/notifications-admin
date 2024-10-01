@@ -159,15 +159,25 @@ def guidance_api_documentation():
     )
 
 
-@main.route("/using-notify/api-documentation/section")
+@main.route("/using-notify/api-documentation/section", methods=["GET", "POST"])
 def guidance_api_documentation_section():
 
     form = UrlForm()
+
+    if form.validate_on_submit():
+        section_tag = form.url.data.split("#")[-1]
+        return redirect(url_for(".guidance_api_documentation_choose", section_tag=section_tag))
+
     return render_template(
         "views/guidance/using-notify/api-documentation-section.html",
         navigation_links=using_notify_nav(),
         form=form,
     )
+
+
+@main.route("/using-notify/api-documentation/choose")
+def guidance_api_documentation_choose():
+    pass
 
 
 @main.route("/using-notify/attach-pages")
