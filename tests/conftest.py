@@ -1205,15 +1205,6 @@ def platform_admin_user(fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def platform_admin_user_no_service_permissions():
-    """
-    this fixture is for situations where we want to test that platform admin can access
-    an endpoint even though they have no explicit permissions for that service.
-    """
-    return create_platform_admin_user()
-
-
-@pytest.fixture(scope="function")
 def api_user_active():
     return create_api_user_active()
 
@@ -2745,14 +2736,6 @@ def mock_get_email_branding(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_email_branding_with_govuk_brand_type(mocker, fake_uuid):
-    def _get_email_branding(id):
-        return create_email_branding(fake_uuid, {"brand_type": "govuk"})
-
-    return mocker.patch("app.email_branding_client.get_email_branding", side_effect=_get_email_branding)
-
-
-@pytest.fixture(scope="function")
 def mock_get_email_branding_with_both_brand_type(mocker, fake_uuid):
     def _get_email_branding(id):
         return create_email_branding(fake_uuid, {"brand_type": "both"})
@@ -3886,21 +3869,6 @@ def create_active_caseworking_user(with_unique_id=False):
             ]
         },
         services=[SERVICE_ONE_ID],
-    )
-
-
-def create_active_user_no_api_key_permission(with_unique_id=False):
-    return create_service_one_user(
-        id=str(uuid4()) if with_unique_id else sample_uuid(),
-        name="Test User With Permissions",
-        permissions={
-            SERVICE_ONE_ID: [
-                "manage_templates",
-                "manage_settings",
-                "manage_users",
-                "view_activity",
-            ]
-        },
     )
 
 
