@@ -362,7 +362,6 @@ def test_returns_value_from_cache(
     "client, method, extra_args, extra_kwargs",
     [
         (service_api_client, "update_service", [SERVICE_ONE_ID], {"name": "foo"}),
-        (service_api_client, "update_service_with_properties", [SERVICE_ONE_ID], {"properties": {}}),
         (service_api_client, "archive_service", [SERVICE_ONE_ID, []], {}),
         (service_api_client, "remove_user_from_service", [SERVICE_ONE_ID, ""], {}),
         (service_api_client, "update_guest_list", [SERVICE_ONE_ID, {}], {}),
