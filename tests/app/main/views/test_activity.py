@@ -8,7 +8,8 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.jobs import cache_search_query, get_status_filters, get_time_left, make_cache_key
+from app.main.views.dashboard import cache_search_query, get_status_filters, make_cache_key
+from app.main.views.jobs import get_time_left
 from app.models.service import Service
 from app.utils import SEVEN_DAYS_TTL, get_sha512_hashed
 from tests.conftest import (
@@ -480,7 +481,7 @@ def test_search_recipient_form(
     message_type = initial_query_arguments.get("message_type", None)
     hash_search_query = get_sha512_hashed(search_term) if bool(search_term) else None
 
-    mocker.patch("app.main.views.jobs.cache_search_query", return_value=(hash_search_query, search_term))
+    mocker.patch("app.main.views.dashboard.cache_search_query", return_value=(hash_search_query, search_term))
 
     if search_term:
         page = client_request.post(
@@ -1055,7 +1056,7 @@ def mock_cache_search_query(mocker, to_argument):
             return hash_search_query, search_term
         return "", ""
 
-    return mocker.patch("app.main.views.jobs.cache_search_query", side_effect=_get_cache)
+    return mocker.patch("app.main.views.dashboard.cache_search_query", side_effect=_get_cache)
 
 
 @pytest.mark.parametrize(
@@ -1084,7 +1085,7 @@ def test_with_existing_search_query(
     client_request.login(create_active_user_view_permissions())
     hash_search_query = get_sha512_hashed(to_argument) if to_argument else None
 
-    mocker.patch("app.main.views.jobs.cache_search_query", return_value=(hash_search_query, to_argument))
+    mocker.patch("app.main.views.dashboard.cache_search_query", return_value=(hash_search_query, to_argument))
 
     page = client_request.get(
         "main.view_notifications",

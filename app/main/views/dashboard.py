@@ -5,26 +5,36 @@ from itertools import groupby
 
 from flask import Response, abort, jsonify, render_template, request, session, url_for
 from flask_login import current_user
+from markupsafe import Markup
 from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
+from notifications_utils.template import EmailPreviewTemplate, LetterPreviewTemplate, SMSBodyPreviewTemplate
 from werkzeug.utils import redirect
 
 from app import (
     billing_api_client,
     current_service,
+    notification_api_client,
     service_api_client,
     template_statistics_client,
 )
+from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
+from app.extensions import redis_client
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import json_updates, main
+from app.main.forms import SearchNotificationsForm
 from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
+    SEVEN_DAYS_TTL,
+    get_sha512_hashed,
+    parse_filter_args,
     service_has_permission,
+    set_status_filters,
 )
 from app.utils.csv import Spreadsheet
-from app.utils.pagination import generate_next_dict, generate_previous_dict
+from app.utils.pagination import generate_next_dict, generate_previous_dict, get_page_from_request
 from app.utils.time import get_current_financial_year
 from app.utils.user import user_has_permissions
 
@@ -56,6 +66,104 @@ def service_dashboard(service_id):
 @user_has_permissions("view_activity")
 def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials(service_id))
+
+
+def make_cache_key(query_hash, service_id):
+    return f"service-{service_id}-notification-search-query-hash-{query_hash}"
+
+
+def cache_search_query(search_term, service_id, search_query_hash):
+    cached_search_term = ""
+
+    if search_query_hash:
+        cached_query = redis_client.get(make_cache_key(search_query_hash, service_id))
+        cached_search_term = bool(cached_query) and cached_query.decode()
+
+    if not cached_search_term:
+        search_query_hash = ""
+
+    if search_term and search_term != cached_search_term:
+        search_query_hash = get_sha512_hashed(search_term)
+        redis_client.set(make_cache_key(search_query_hash, service_id), search_term, ex=SEVEN_DAYS_TTL)
+        cached_search_term = search_term
+
+    return search_query_hash, cached_search_term
+
+
+def redirect_to_main_view_notification(current_service, message_type, search_query):
+    return redirect(
+        url_for(
+            "main.view_notifications",
+            service_id=current_service.id,
+            message_type=message_type,
+            search_query=search_query or None,
+        )
+    )
+
+
+@main.route("/services/<uuid:service_id>/notifications", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>", methods=["GET", "POST"])
+@user_has_permissions()
+def view_notifications(service_id, message_type=None):
+    partials_data = _get_notifications_dashboard_partials_data(service_id, message_type)
+
+    notifications_count = notification_api_client.get_notifications_count_for_service(
+        service_id,
+        message_type,
+        partials_data["service_data_retention_days"],
+    )
+
+    can_download = notifications_count <= MAX_NOTIFICATION_FOR_DOWNLOAD
+    download_link = None
+
+    if can_download:
+        download_link = url_for(
+            ".download_notifications_csv",
+            service_id=current_service.id,
+            message_type=message_type,
+            status=request.args.get("status"),
+        )
+
+    search_term = request.form.get("to", "")
+    search_query_hash = request.args.get("search_query", "")
+    cached_search_query_hash, cached_search_term = cache_search_query(search_term, service_id, search_query_hash)
+
+    if request.method == "POST" and not search_term:
+        return redirect_to_main_view_notification(current_service, message_type, None)
+
+    if cached_search_query_hash and search_query_hash != cached_search_query_hash:
+        return redirect_to_main_view_notification(current_service, message_type, cached_search_query_hash)
+
+    if not cached_search_query_hash and search_query_hash:
+        cached_search_query_hash = None
+        return redirect_to_main_view_notification(current_service, message_type, cached_search_query_hash)
+
+    return render_template(
+        "views/notifications.html",
+        partials=partials_data,
+        message_type=message_type,
+        status=request.args.get("status") or "sending,delivered,failed",
+        page=request.args.get("page", 1),
+        search_query=cached_search_query_hash or None,
+        _search_form=SearchNotificationsForm(
+            message_type=message_type,
+            to=cached_search_term or request.form.get("to"),
+        ),
+        things_you_can_search_by={
+            "email": ["email address"],
+            "sms": ["phone number"],
+            "letter": ["postal address", "file name"],
+            # We say recipient here because combining all 3 types, plus
+            # reference gets too long for the hint text
+            None: ["recipient"],
+        }.get(message_type)
+        + {
+            True: ["reference"],
+            False: [],
+        }.get(bool(current_service.api_keys)),
+        download_link=download_link,
+        can_download=can_download,
+    )
 
 
 @main.route("/services/<uuid:service_id>/template-activity")
@@ -105,6 +213,159 @@ def template_usage(service_id):
         ),
         selected_year=year,
     )
+
+
+@json_updates.route("/services/<uuid:service_id>/notifications.json", methods=["GET", "POST"])
+@json_updates.route(
+    "/services/<uuid:service_id>/notifications/<template_type:message_type>.json", methods=["GET", "POST"]
+)
+@user_has_permissions()
+def get_notifications_page_partials_as_json(service_id, message_type=None):
+    return jsonify(_get_notifications_dashboard_partials_data(service_id, message_type))
+
+
+def _get_notifications_dashboard_partials_data(service_id, message_type):
+    page = get_page_from_request()
+    if page is None:
+        abort(404, f"Invalid page argument ({request.args.get('page')}).")
+    filter_args = parse_filter_args(request.args)
+    filter_args["status"] = set_status_filters(filter_args)
+    service_data_retention_days = None
+    search_term = request.form.get("to", "")
+
+    search_query_hash = request.args.get("search_query", "")
+    cached_search_query_hash, cached_search_term = cache_search_query(search_term, service_id, search_query_hash)
+
+    if request.method == "POST" and not search_term:
+        cached_search_query_hash = ""
+
+    if message_type is not None:
+        service_data_retention_days = current_service.get_days_of_retention(message_type)
+
+    notifications = notification_api_client.get_notifications_for_service(
+        service_id=service_id,
+        page=page,
+        template_type=[message_type] if message_type else [],
+        status=filter_args.get("status"),
+        limit_days=service_data_retention_days,
+        to=cached_search_term or search_term,
+    )
+    url_args = {
+        "message_type": message_type,
+        "status": request.args.get("status"),
+        "search_query": request.args.get("search_query"),
+    }
+    prev_page = None
+
+    if "links" in notifications and notifications["links"].get("prev", None):
+        prev_page = generate_previous_dict("main.view_notifications", service_id, page, url_args=url_args)
+    next_page = None
+
+    if "links" in notifications and notifications["links"].get("next", None):
+        next_page = generate_next_dict("main.view_notifications", service_id, page, url_args)
+
+    return {
+        "service_data_retention_days": service_data_retention_days,
+        "counts": render_template(
+            "views/activity/counts.html",
+            status=request.args.get("status"),
+            status_filters=get_status_filters(
+                current_service,
+                message_type,
+                service_api_client.get_service_statistics(service_id, limit_days=service_data_retention_days),
+                search_query=cached_search_query_hash or None,
+            ),
+        ),
+        "notifications": render_template(
+            "views/activity/notifications.html",
+            notifications=list(add_preview_of_content_to_notifications(notifications["notifications"])),
+            limit_days=service_data_retention_days,
+            prev_page=prev_page,
+            next_page=next_page,
+            search_query=cached_search_query_hash or None,
+            show_pagination=(not search_term),
+            single_notification_url=partial(
+                url_for,
+                "main.view_notification",
+                service_id=current_service.id,
+                from_statuses=request.args.get("status"),
+                from_search_query=request.args.get("search_query"),
+            ),
+        ),
+    }
+
+
+def get_status_filters(service, message_type, statistics, search_query):
+    if message_type is None:
+        stats = {
+            key: sum(statistics[message_type][key] for message_type in {"email", "sms", "letter"})
+            for key in {"requested", "delivered", "failed"}
+        }
+    else:
+        stats = statistics[message_type]
+    stats["sending"] = stats["requested"] - stats["delivered"] - stats["failed"]
+
+    filters = [
+        # key, label, option
+        ("requested", "total", "sending,delivered,failed"),
+        ("sending", "sending", "sending"),
+        ("delivered", "delivered", "delivered"),
+        ("failed", "failed", "failed"),
+    ]
+    return [
+        # return list containing label, option, link, count
+        (
+            label,
+            option,
+            url_for(
+                "main.view_notifications",
+                service_id=service.id,
+                message_type=message_type,
+                status=option,
+                search_query=search_query,
+            ),
+            stats[key],
+        )
+        for key, label, option in filters
+    ]
+
+
+def add_preview_of_content_to_notifications(notifications):
+    for notification in notifications:
+        yield dict(preview_of_content=get_preview_of_content(notification), **notification)
+
+
+def get_preview_of_content(notification):
+    if notification["template"].get("redact_personalisation"):
+        notification["personalisation"] = {}
+
+    if notification["template"]["is_precompiled_letter"]:
+        return notification["client_reference"]
+
+    if notification["template"]["template_type"] == "sms":
+        return str(
+            SMSBodyPreviewTemplate(
+                notification["template"],
+                notification["personalisation"],
+            )
+        )
+
+    if notification["template"]["template_type"] == "email":
+        return Markup(
+            EmailPreviewTemplate(
+                notification["template"],
+                notification["personalisation"],
+                redact_missing_personalisation=True,
+            ).subject
+        )
+
+    if notification["template"]["template_type"] == "letter":
+        return Markup(
+            LetterPreviewTemplate(
+                notification["template"],
+                notification["personalisation"],
+            ).subject
+        )
 
 
 @main.route("/services/<uuid:service_id>/usage")

@@ -1,10 +1,5 @@
 {% if template.include_letter_edit_ui_overlay %}
 <div class="template-container template-container--with-attach-pages-button">
-  {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not template.too_many_pages %}
-    <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-get-ready-to-send">
-      Get ready to send<span class="govuk-visually-hidden"> a letter using this template</span>
-    </a>
-  {% endif %}
   {% if current_user.has_permissions('manage_service') %}
     {% if not current_service.letter_branding_id %}
       <a href="{{ url_for(".letter_branding_options", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-branding">Add logo</a>
@@ -12,15 +7,26 @@
   {% endif %}
   {% if current_user.has_permissions('manage_templates') %}
     <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-postage">Change postage</a>
-    {% if template.welsh_page_count %}
-      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id, language='welsh') }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> Welsh body text</span></a>
-    {% else %}
-      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> body text</span></a>
-    {% endif %}
+  {% endif %}
+  {#
+    we break the permissions block here to to be able to add the get ready to send button,
+    so that it appears in a more logical keyboard tab order
+  #}
+  {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not template.too_many_pages %}
+    <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-get-ready-to-send">
+      Get ready to send<span class="govuk-visually-hidden"> a letter using this template</span>
+    </a>
+  {% endif %}
+  {% if current_user.has_permissions('manage_templates') %}
     {% if current_service.count_letter_contact_details %}
       <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Change your contact details</a>
     {% else %}
       <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Add your contact details</a>
+    {% endif %}
+    {% if template.welsh_page_count %}
+      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id, language='welsh') }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> Welsh body text</span></a>
+    {% else %}
+      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> body text</span></a>
     {% endif %}
   {% endif %}
 {% endif %}
