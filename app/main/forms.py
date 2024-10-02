@@ -2858,7 +2858,7 @@ class UniqueServiceForm(StripWhitespaceForm):
 
 
 class ServiceGoLiveDecisionForm(OnOffSettingForm):
-    rejection_reason = GovukTextareaField("Rejection reason")
+    rejection_reason = GovukTextareaField("Enter the reason for your decision")
 
     def validate(self, *args, **kwargs):
         if self.enabled.data is False:
