@@ -3344,20 +3344,10 @@ def test_check_messages_shows_trial_mode_error_for_letters(
         assert page.select_one("th.table-field a").text == "3"
 
 
-@pytest.mark.parametrize(
-    "number_of_rows, expected_error_message",
-    [
-        (1, "This letter is"),
-        (11, "These letters are"),  # TODO: Pluralise too many pages error message for multiple letters
-    ],
-)
+@pytest.mark.parametrize("number_of_rows", [1, 11])
 def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
     client_request,
-    api_user_active,
     mock_get_service_letter_template,
-    mock_has_permissions,
-    mock_get_users_by_service,
-    mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
     mock_s3_get_metadata,
@@ -3366,7 +3356,6 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
     mocker,
     mock_get_live_service,
     number_of_rows,
-    expected_error_message,
 ):
     mocker.patch(
         "app.main.views.send.s3download",
