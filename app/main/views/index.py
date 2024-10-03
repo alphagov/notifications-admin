@@ -177,7 +177,7 @@ def guidance_api_documentation_section():
 
 @main.route("/using-notify/api-documentation/section/choose-docs")
 def guidance_api_documentation_section_choose_docs():
-    form = ChooseDocsForm()
+    form = ChooseDocsForm(section_tag=request.args.get("section_tag"))
     return render_template(
         "views/guidance/using-notify/api-documentation-section-choose-docs.html",
         navigation_links=using_notify_nav(),

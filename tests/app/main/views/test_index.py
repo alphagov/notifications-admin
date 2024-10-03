@@ -454,3 +454,8 @@ def test_GET_guidance_api_documentation_section_choose_docs(client_request):
     assert ["python", "ruby", "java", "node", "net", "php", "rest-api", "rest-api"] == [
         radio["value"] for radio in page.select("input[type=radio]")
     ]
+    form = page.select_one("form")
+    assert form["action"] == url_for(
+        "main.guidance_api_documentation_section_choose_docs",
+        section_tag="send-a-file-by-email",
+    )

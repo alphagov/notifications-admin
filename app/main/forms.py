@@ -2304,6 +2304,10 @@ class UrlForm(StripWhitespaceForm):
 
 
 class ChooseDocsForm(StripWhitespaceForm):
+
+    def __init__(self, section_tag):
+        super().__init__(section_tag=section_tag)
+
     docs_version = GovukRadiosField(
         "Which version of the docs would you like to view?",
         choices=[
@@ -2318,6 +2322,7 @@ class ChooseDocsForm(StripWhitespaceForm):
         ],
         thing="a language version of GOV.UK Notify's API docs",
     )
+    section_tag = HiddenField("section tag")
 
 
 class SMSPrefixForm(StripWhitespaceForm):
