@@ -2303,6 +2303,23 @@ class UrlForm(StripWhitespaceForm):
             raise ValidationError("Must be a valid https URL, pointing to a section within the GOV.UK Notify API docs.")
 
 
+class ChooseDocsForm(StripWhitespaceForm):
+    docs_version = GovukRadiosField(
+        "Which version of the docs would you like to view?",
+        choices=[
+            ("python", "Python"),
+            ("ruby", "Ruby"),
+            ("java", "Java"),
+            ("node", "Node JS"),
+            ("net", ".Net"),
+            ("php", "PHP"),
+            ("rest-api", "Rest API"),
+            ("rest-api", "Any is fine"),
+        ],
+        thing="a language version of GOV.UK Notify's API docs",
+    )
+
+
 class SMSPrefixForm(StripWhitespaceForm):
     enabled = OnOffField("")  # label is assigned on instantiation
 

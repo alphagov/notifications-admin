@@ -386,6 +386,20 @@ def test_trial_mode_sending_limits(client_request):
     ]
 
 
+def test_guidance_api_documentation_links_to_section_flow_for_platform_admins(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get("main.guidance_api_documentation")
+
+    assert len(page.select('a[href^="{link}"]'.format(link=url_for(".guidance_api_documentation_section")))) == 1
+
+
+def test_guidance_api_documentation_does_not_link_to_section_flow_for_non_platform_admins(client_request):
+    page = client_request.get("main.guidance_api_documentation")
+
+    assert len(page.select('a[href^="{link}"]'.format(link=url_for(".guidance_api_documentation_section")))) == 0
+
+
 def test_GET_guidance_api_documentation_section(client_request):
     page = client_request.get("main.guidance_api_documentation_section")
 
@@ -398,7 +412,7 @@ def test_POST_guidance_api_documentation_section(client_request):
         "main.guidance_api_documentation_section",
         _data={"url": "https://docs.notifications.service.gov.uk/python.html#send-a-file-by-email"},
         _expected_redirect=url_for(
-            "main.guidance_api_documentation_choose",
+            "main.guidance_api_documentation_section_choose_docs",
             section_tag="send-a-file-by-email",
         ),
     )
@@ -430,3 +444,13 @@ def test_POST_guidance_api_documentation_section_with_incorrect_url(client_reque
     )
 
     assert expected_error_message in page.select_one(".govuk-error-message").text
+
+
+def test_GET_guidance_api_documentation_section_choose_docs(client_request):
+    page = client_request.get("main.guidance_api_documentation_section_choose_docs", section_tag="send-a-file-by-email")
+
+    assert page.select_one("h1").text == "You have been sent a link to GOV.UK Notify API documentation"
+
+    assert ["python", "ruby", "java", "node", "net", "php", "rest-api", "rest-api"] == [
+        radio["value"] for radio in page.select("input[type=radio]")
+    ]
