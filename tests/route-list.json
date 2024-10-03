@@ -379,6 +379,8 @@
     "/users/<uuid:user_id>/change_auth",
     "/using-notify",
     "/using-notify/api-documentation",
+    "/using-notify/api-documentation/section",
+    "/using-notify/api-documentation/section/choose-docs",
     "/using-notify/attach-pages",
     "/using-notify/bulk-sending",
     "/using-notify/data-retention-period",
