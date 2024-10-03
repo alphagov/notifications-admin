@@ -459,3 +459,11 @@ def test_GET_guidance_api_documentation_section_choose_docs(client_request):
         "main.guidance_api_documentation_section_choose_docs",
         section_tag="send-a-file-by-email",
     )
+
+
+def test_POST_guidance_api_documentation_section_choose_docs(client_request):
+    client_request.post(
+        "main.guidance_api_documentation_section_choose_docs",
+        _data={"docs_version": "python", "section_tag": "send-a-file-by-email"},
+        _expected_redirect="https://docs.notifications.service.gov.uk/python.html#send-a-file-by-email",
+    )

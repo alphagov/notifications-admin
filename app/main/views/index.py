@@ -175,9 +175,16 @@ def guidance_api_documentation_section():
     )
 
 
-@main.route("/using-notify/api-documentation/section/choose-docs")
+@main.route("/using-notify/api-documentation/section/choose-docs", methods=["GET", "POST"])
 def guidance_api_documentation_section_choose_docs():
     form = ChooseDocsForm(section_tag=request.args.get("section_tag"))
+
+    if form.validate_on_submit():
+        redirect_url = (
+            f"https://docs.notifications.service.gov.uk/{form.docs_version.data}.html#{form.section_tag.data}"
+        )
+        return redirect(redirect_url)
+
     return render_template(
         "views/guidance/using-notify/api-documentation-section-choose-docs.html",
         navigation_links=using_notify_nav(),
