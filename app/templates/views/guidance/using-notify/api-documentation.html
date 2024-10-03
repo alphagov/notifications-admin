@@ -10,6 +10,16 @@
 {% block content_column_content %}
 
   <h1 class="heading-large">Documentation</h1>
+
+    {% if current_user.platform_admin %}
+      <a href="{{ url_for(".guidance_api_documentation_section") }}"
+        class="govuk-link govuk-link--no-visited-state"
+        target="_blank" rel="noopener">
+        Send a link to docs section
+      </a>
+      <p></p>
+    {% endif %}
+
     <p class="govuk-body">This documentation is for developers who want to integrate the GOV.UK Notify API with a web application or back office system.</p>
   <h2 class="heading-medium" id="client-libraries">Client libraries</h2>
     <p class="govuk-body">Links to documentation open in a new tab.</p>
