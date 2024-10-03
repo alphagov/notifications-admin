@@ -31,8 +31,13 @@
             "items": [
               {"disabled": cannot_approve},
               {
-                "hint": {"html": "Notify will share this with the person that made the request."},
-                "conditional": { "html": form.rejection_reason(param_extensions={ "hint": None }) }
+                "conditional": {
+                  "html": form.rejection_reason(param_extensions={
+                    "hint": {
+                      "text": "Notify will share this with the person that made the request."
+                    }
+                  })
+                }
               },
             ]
           }) }}
