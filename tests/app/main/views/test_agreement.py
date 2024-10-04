@@ -78,9 +78,7 @@ class MockS3Object:
 def test_show_agreement_page(
     client_request,
     mocker,
-    fake_uuid,
     mock_get_service_organisation,
-    mock_has_jobs,
     agreement_signed,
     crown,
     expected_back_link,
@@ -111,9 +109,6 @@ def test_show_agreement_page(
 )
 def test_unknown_gps_and_trusts_are_redirected(
     client_request,
-    mocker,
-    fake_uuid,
-    mock_has_jobs,
     service_one,
     org_type,
     expected_endpoint,
@@ -186,9 +181,7 @@ def test_download_service_agreement(
 
 def test_show_accept_agreement_page(
     client_request,
-    mocker,
     mock_get_service_organisation,
-    mock_get_organisation,
 ):
     page = client_request.get("main.service_accept_agreement", service_id=SERVICE_ONE_ID)
 
@@ -326,7 +319,6 @@ def test_accept_agreement_page_populates(
     ),
 )
 def test_accept_agreement_page_validates(
-    mocker,
     client_request,
     mock_get_service_organisation,
     mock_get_organisations,
@@ -395,7 +387,6 @@ def test_accept_agreement_page_validates(
     ),
 )
 def test_accept_agreement_page_persists(
-    mocker,
     client_request,
     mock_get_service_organisation,
     mock_update_organisation,

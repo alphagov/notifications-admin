@@ -4,7 +4,6 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 def test_set_inbound_sms_sets_a_number_for_service(
     client_request,
     multiple_available_inbound_numbers,
-    fake_uuid,
     mock_no_inbound_number_for_service,
     mocker,
 ):
@@ -28,7 +27,7 @@ def test_set_inbound_sms_sets_a_number_for_service(
 
 
 def test_set_inbound_sms_when_no_available_inbound_numbers(
-    client_request, service_one, no_available_inbound_numbers, mock_no_inbound_number_for_service, mocker
+    client_request, service_one, no_available_inbound_numbers, mock_no_inbound_number_for_service
 ):
     page = client_request.get("main.service_set_inbound_number", service_id=service_one["id"])
 

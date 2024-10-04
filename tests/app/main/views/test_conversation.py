@@ -171,7 +171,6 @@ def test_view_conversation_updates(
     client_request,
     mocker,
     fake_uuid,
-    mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
 ):
     mocker.patch(
@@ -197,7 +196,6 @@ def test_view_conversation_updates(
 def test_view_conversation_with_empty_inbound(
     client_request,
     mocker,
-    api_user_active,
     mock_get_inbound_sms_by_id_with_no_messages,
     mock_get_notification,
     mock_get_notifications_with_no_notifications,
@@ -260,7 +258,6 @@ def test_conversation_reply_shows_link_to_add_templates_if_service_has_no_templa
     fake_uuid,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_template_folders,
-    active_user_with_permissions,
 ):
     page = client_request.get(
         "main.conversation_reply",

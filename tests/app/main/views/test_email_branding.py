@@ -747,7 +747,6 @@ def test_temp_logo_is_shown_after_uploading_logo(
     client_request,
     platform_admin_user,
     mocker,
-    fake_uuid,
 ):
     mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo", return_value="email/test.png")
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
@@ -764,7 +763,7 @@ def test_temp_logo_is_shown_after_uploading_logo(
 
 
 def test_logo_persisted_when_organisation_saved(
-    client_request, platform_admin_user, mock_create_email_branding, mocker, fake_uuid
+    client_request, platform_admin_user, mock_create_email_branding, mocker
 ):
     mock_save_temporary = mocker.patch("app.main.views.email_branding.logo_client.save_temporary_logo")
     mock_save_permanent = mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo")

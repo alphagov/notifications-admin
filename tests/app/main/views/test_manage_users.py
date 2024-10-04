@@ -126,7 +126,6 @@ def test_should_show_overview_page(
     mocker,
     mock_get_invites_for_service,
     mock_get_template_folders,
-    mock_has_no_jobs,
     service_one,
     user,
     expected_self_text,
@@ -213,7 +212,6 @@ def test_should_show_live_search_if_more_than_7_users(
     mocker,
     mock_get_invites_for_service,
     mock_get_template_folders,
-    mock_has_no_jobs,
     active_user_with_permissions,
     active_user_view_permissions,
     number_of_users,
@@ -590,7 +588,6 @@ def test_should_not_show_page_for_non_team_member(
 )
 def test_edit_user_permissions(
     client_request,
-    mocker,
     mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_set_user_permissions,
@@ -617,7 +614,6 @@ def test_edit_user_permissions(
 
 def test_edit_user_folder_permissions(
     client_request,
-    mocker,
     service_one,
     mock_get_users_by_service,
     mock_get_invites_for_service,
@@ -710,7 +706,6 @@ def test_cant_edit_user_folder_permissions_for_platform_admin_users(
 
 def test_cant_edit_non_member_user_permissions(
     client_request,
-    mocker,
     mock_get_users_by_service,
     mock_set_user_permissions,
 ):
@@ -875,7 +870,6 @@ def test_should_show_page_for_inviting_user_with_email_prefilled(
     active_user_with_permissions,
     active_user_with_permission_to_other_service,
     mock_get_organisation_by_domain,
-    mock_get_organisation,
     mock_get_invites_for_service,
 ):
     service_one["organisation"] = ORGANISATION_ID
@@ -1167,7 +1161,6 @@ def test_cancel_invited_user_cancels_user_invitations(
     client_request,
     mock_get_invites_for_service,
     sample_invite,
-    active_user_with_permissions,
     mock_get_users_by_service,
     mock_get_template_folders,
     mocker,
@@ -1276,7 +1269,6 @@ def test_manage_users_does_not_show_accepted_invite(
 
 def test_user_cant_invite_themselves(
     client_request,
-    mocker,
     active_user_with_permissions,
     mock_create_invite,
     mock_get_template_folders,
@@ -1303,8 +1295,6 @@ def test_no_permission_manage_users_page(
     mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_get_template_folders,
-    api_user_active,
-    mocker,
 ):
     resp_text = client_request.get("main.manage_users", service_id=service_one["id"])
     assert url_for(".invite_user", service_id=service_one["id"]) not in resp_text
@@ -1352,7 +1342,6 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_has_no_folders(
     mock_get_template_folders,
     mock_get_users_by_service,
     mock_get_invites_for_service,
-    api_user_active,
 ):
     service_one["permissions"] = ["edit_folder_permissions"]
     mock_get_template_folders.return_value = []
@@ -1412,6 +1401,8 @@ def test_can_invite_user_as_platform_admin(
     mocker,
 ):
     mocker.patch("app.models.user.Users.client_method", return_value=[active_user_with_permissions])
+
+    client_request.login(platform_admin_user)
 
     page = client_request.get(
         "main.manage_users",
@@ -1494,7 +1485,6 @@ def test_edit_user_email_can_change_any_email_address_to_a_gov_email_address(
     active_user_with_permissions,
     mock_get_user_by_email_not_found,
     mock_get_users_by_service,
-    mock_update_user_attribute,
     mock_get_organisations,
     original_email_address,
 ):
@@ -1519,7 +1509,6 @@ def test_edit_user_email_can_change_a_non_gov_email_address_to_another_non_gov_e
     active_user_with_permissions,
     mock_get_user_by_email_not_found,
     mock_get_users_by_service,
-    mock_update_user_attribute,
     mock_get_organisations,
 ):
     active_user_with_permissions["email_address"] = "old@example.com"
@@ -1543,7 +1532,6 @@ def test_edit_user_email_cannot_change_a_gov_email_address_to_a_non_gov_email_ad
     active_user_with_permissions,
     mock_get_user_by_email_not_found,
     mock_get_users_by_service,
-    mock_update_user_attribute,
     mock_get_organisations,
 ):
     page = client_request.post(
@@ -1673,7 +1661,6 @@ def test_edit_user_permissions_page_displays_redacted_mobile_number_and_change_l
     mock_get_users_by_service,
     mock_get_template_folders,
     service_one,
-    mocker,
 ):
     page = client_request.get(
         "main.edit_user_permissions",
@@ -1705,7 +1692,7 @@ def test_edit_user_permissions_with_delete_query_shows_banner(
 
 
 def test_edit_user_mobile_number_page(
-    client_request, active_user_with_permissions, mock_get_users_by_service, service_one, mocker
+    client_request, active_user_with_permissions, mock_get_users_by_service, service_one
 ):
     page = client_request.get(
         "main.edit_user_mobile_number",
@@ -1745,8 +1732,6 @@ def test_edit_user_mobile_number_redirects_to_manage_users_if_number_not_changed
     active_user_with_permissions,
     mock_get_users_by_service,
     service_one,
-    mocker,
-    mock_get_user,
 ):
     client_request.post(
         "main.edit_user_mobile_number",
@@ -1766,8 +1751,6 @@ def test_confirm_edit_user_mobile_number_page(
     active_user_with_permissions,
     mock_get_users_by_service,
     service_one,
-    mocker,
-    mock_get_user,
 ):
     new_number = "07554080636"
     with client_request.session_transaction() as session:
@@ -1793,8 +1776,6 @@ def test_confirm_edit_user_mobile_number_page_redirects_if_session_empty(
     active_user_with_permissions,
     mock_get_users_by_service,
     service_one,
-    mocker,
-    mock_get_user,
 ):
     page = client_request.get(
         "main.confirm_edit_user_mobile_number",

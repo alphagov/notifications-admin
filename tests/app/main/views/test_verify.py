@@ -41,11 +41,7 @@ def test_should_redirect_to_add_service_when_sms_code_is_correct(
     client_request,
     api_user_active,
     mocker,
-    mock_update_user_attribute,
     mock_check_verify_code,
-    mock_create_event,
-    fake_uuid,
-    mock_get_organisation_by_domain,
     can_ask_to_join_a_service,
     expected_redirect,
     extra_args,
@@ -80,8 +76,6 @@ def test_should_activate_user_after_verify(
     mocker,
     api_user_pending,
     mock_send_verify_code,
-    mock_check_verify_code,
-    mock_create_event,
     mock_activate_user,
     mock_get_organisation_by_domain,
 ):
@@ -172,7 +166,6 @@ def test_verify_email_doesnt_verify_sms_if_user_on_email_auth(
 def test_verify_email_redirects_to_email_sent_if_token_expired(
     client_request,
     mocker,
-    api_user_pending,
 ):
     client_request.logout()
     mocker.patch("app.main.views.verify.check_token", side_effect=SignatureExpired("expired"))
@@ -188,9 +181,7 @@ def test_verify_email_redirects_to_sign_in_if_user_active(
     client_request,
     mocker,
     api_user_active,
-    mock_get_user,
     mock_send_verify_code,
-    mock_check_verify_code,
 ):
     client_request.logout()
     token_data = {"user_id": api_user_active["id"], "secret_code": 12345}
@@ -217,8 +208,6 @@ def test_activate_user_redirects_to_service_dashboard_if_user_already_belongs_to
     service_one,
     sample_invite,
     api_user_active,
-    mock_login,
-    mock_get_service,
     mock_get_invited_user_by_id,
 ):
     mocker.patch(

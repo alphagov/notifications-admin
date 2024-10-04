@@ -15,7 +15,6 @@ letters_urls = [
 def test_letters_access_restricted(
     client_request,
     platform_admin_user,
-    mocker,
     permissions,
     response_code,
     mock_get_service_letter_template,
@@ -35,7 +34,6 @@ def test_letters_access_restricted(
 def test_letters_lets_in_without_permission(
     client_request,
     mocker,
-    mock_login,
     mock_has_permissions,
     api_user_active,
     mock_get_service_letter_template,
@@ -61,7 +59,6 @@ def test_letters_lets_in_without_permission(
 def test_given_option_to_add_letters_if_allowed(
     client_request,
     service_one,
-    mocker,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_get_organisations_and_services_for_user,

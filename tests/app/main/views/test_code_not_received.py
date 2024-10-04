@@ -6,7 +6,6 @@ from tests.conftest import SERVICE_ONE_ID
 
 def test_should_render_email_verification_resend_show_email_address_and_resend_verify_email(
     client_request,
-    mocker,
     api_user_active,
     mock_get_user_by_email,
     mock_send_verify_email,
@@ -51,7 +50,6 @@ def test_should_render_correct_resend_template_for_pending_user(
     client_request,
     mocker,
     api_user_pending,
-    mock_send_verify_code,
 ):
     client_request.logout()
     mocker.patch("app.user_api_client.get_user_by_email", return_value=api_user_pending)

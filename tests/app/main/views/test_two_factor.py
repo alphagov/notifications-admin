@@ -40,7 +40,7 @@ def test_two_factor_email_sent_page(client_request, email_resent, page_title, re
         f"/services/{SERVICE_ONE_ID}/templates",
     ],
 )
-def test_should_render_two_factor_page(client_request, api_user_active, mock_get_user_by_email, mocker, redirect_url):
+def test_should_render_two_factor_page(client_request, api_user_active, mocker, redirect_url):
     client_request.logout()
     # TODO this lives here until we work out how to
     # reassign the session after it is lost mid register process
@@ -62,9 +62,6 @@ def test_should_render_two_factor_page(client_request, api_user_active, mock_get
 def test_should_login_user_and_should_redirect_to_next_url(
     client_request,
     api_user_active,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_check_verify_code,
     mock_create_event,
     mock_email_validated_recently,
 ):
@@ -87,9 +84,6 @@ def test_should_login_user_and_should_redirect_to_next_url(
 def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate_email(
     client_request,
     api_user_active,
-    mock_get_user,
-    mock_check_verify_code,
-    mock_create_event,
     mock_send_verify_code,
     mocker,
 ):
@@ -112,11 +106,6 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
 def test_should_login_user_and_not_redirect_to_external_url(
     client_request,
     api_user_active,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_check_verify_code,
-    mock_get_services_with_one_service,
-    mock_create_event,
     mock_email_validated_recently,
 ):
     client_request.logout()
@@ -142,10 +131,6 @@ def test_should_login_user_and_not_redirect_to_external_url(
 def test_should_login_user_and_redirect_to_show_accounts(
     client_request,
     api_user_active,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_check_verify_code,
-    mock_create_event,
     mock_email_validated_recently,
     platform_admin,
 ):
@@ -163,7 +148,7 @@ def test_should_login_user_and_redirect_to_show_accounts(
 
 
 def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(
-    client_request, api_user_active, mock_get_user_by_email, mock_check_verify_code_code_not_found, mocker
+    client_request, api_user_active, mock_check_verify_code_code_not_found, mocker
 ):
     client_request.logout()
 
@@ -182,11 +167,8 @@ def test_should_return_200_with_sms_code_error_when_sms_code_is_wrong(
 def test_should_login_user_when_multiple_valid_codes_exist(
     client_request,
     api_user_active,
-    mock_get_user,
-    mock_get_user_by_email,
     mock_check_verify_code,
     mock_get_services_with_one_service,
-    mock_create_event,
     mock_email_validated_recently,
 ):
     client_request.logout()
@@ -204,11 +186,7 @@ def test_should_login_user_when_multiple_valid_codes_exist(
 def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
     client_request,
     api_user_active,
-    mock_get_user,
-    mock_check_verify_code,
-    mock_get_services_with_one_service,
     mock_update_user_password,
-    mock_create_event,
     mock_email_validated_recently,
 ):
     client_request.logout()
@@ -385,7 +363,7 @@ def test_valid_two_factor_email_link_logs_in_user(
     ],
 )
 def test_two_factor_email_link_has_expired(
-    notify_admin, valid_token, client_request, mock_send_verify_code, fake_uuid, redirect_url
+    notify_admin, valid_token, client_request, mock_send_verify_code, redirect_url
 ):
     client_request.logout()
 

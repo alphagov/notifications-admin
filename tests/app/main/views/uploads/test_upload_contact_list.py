@@ -215,7 +215,6 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
     client_request,
     mocker,
     mock_s3_upload,
-    mock_get_job_doesnt_exist,
     mock_get_users_by_service,
     fake_uuid,
 ):
@@ -261,8 +260,6 @@ def test_upload_csv_file_sanitises_and_truncates_file_name_in_metadata(
     client_request,
     mocker,
     mock_s3_upload,
-    mock_get_job_doesnt_exist,
-    mock_get_users_by_service,
     fake_uuid,
 ):
     mocker.patch("app.models.contact_list.s3upload", return_value=fake_uuid)
@@ -285,9 +282,7 @@ def test_upload_csv_file_sanitises_and_truncates_file_name_in_metadata(
     assert mock_set_metadata.call_args_list[0][1]["original_file_name"].startswith("?")
 
 
-def test_upload_csv_shows_trial_mode_error(
-    client_request, mock_get_users_by_service, mock_get_job_doesnt_exist, fake_uuid, mocker
-):
+def test_upload_csv_shows_trial_mode_error(client_request, mock_get_users_by_service, fake_uuid, mocker):
     mocker.patch("app.models.contact_list.s3upload", return_value=fake_uuid)
     mocker.patch("app.models.contact_list.s3download", return_value=("phone number\n07900900321"))  # Not in team
     mocker.patch("app.models.contact_list.get_csv_metadata", return_value={"original_file_name": "invalid.csv"})
@@ -305,9 +300,7 @@ def test_upload_csv_shows_trial_mode_error(
     assert page.select_one(".banner-dangerous a")["href"] == url_for("main.guidance_trial_mode")
 
 
-def test_upload_csv_shows_ok_page(
-    client_request, mock_get_live_service, mock_get_users_by_service, mock_get_job_doesnt_exist, fake_uuid, mocker
-):
+def test_upload_csv_shows_ok_page(client_request, mock_get_live_service, fake_uuid, mocker):
     mocker.patch(
         "app.models.contact_list.s3download", return_value="\n".join(["email address"] + ["test@example.com"] * 51)
     )
@@ -524,7 +517,6 @@ def test_view_jobs_for_contact_list(
 def test_view_contact_list_404s_for_non_existing_list(
     client_request,
     mock_get_no_contact_list,
-    fake_uuid,
 ):
     client_request.get(
         "main.contact_list",

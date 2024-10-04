@@ -10,10 +10,6 @@ from tests.conftest import SERVICE_ONE_ID, create_notifications, normalize_space
 
 def test_should_show_api_page(
     client_request,
-    mock_login,
-    api_user_active,
-    mock_get_service,
-    mock_has_permissions,
     mock_get_notifications,
     mock_get_service_data_retention,
 ):
@@ -30,9 +26,6 @@ def test_should_show_api_page(
 
 def test_should_show_api_page_with_lots_of_notifications(
     client_request,
-    mock_login,
-    api_user_active,
-    mock_get_service,
     mock_has_permissions,
     mock_get_notifications_with_previous_next,
     mock_get_service_data_retention,
@@ -52,7 +45,6 @@ def test_should_show_api_page_with_no_notifications(
     mock_login,
     api_user_active,
     mock_get_service,
-    mock_has_permissions,
     mock_get_notifications_with_no_notifications,
     mock_get_service_data_retention,
 ):
@@ -67,10 +59,6 @@ def test_should_show_api_page_with_no_notifications(
 @pytest.mark.parametrize("has_data_retention_defined, expected_data_retention", [(True, 10), (False, 7)])
 def test_should_show_service_retention_on_api_page_with_no_notifications(
     client_request,
-    mock_login,
-    api_user_active,
-    mock_get_service,
-    mock_has_permissions,
     mock_get_notifications_with_no_notifications,
     mocker,
     has_data_retention_defined,
@@ -110,10 +98,6 @@ def test_should_show_service_retention_on_api_page_with_no_notifications(
 @pytest.mark.parametrize("has_data_retention_defined, expected_data_retention", [(True, 30), (False, 7)])
 def test_should_show_service_retention_on_api_page_with_lots_of_notifications(
     client_request,
-    mock_login,
-    api_user_active,
-    mock_get_service,
-    mock_has_permissions,
     mock_get_notifications_with_previous_next,
     mock_get_service_data_retention,
     mocker,
@@ -155,10 +139,6 @@ def test_should_show_service_retention_on_api_page_with_lots_of_notifications(
 
 def test_should_not_show_service_retention_on_api_page_with_no_notifications_if_inconsistent_retention(
     client_request,
-    mock_login,
-    api_user_active,
-    mock_get_service,
-    mock_has_permissions,
     mock_get_notifications_with_no_notifications,
     mocker,
 ):
@@ -180,10 +160,6 @@ def test_should_not_show_service_retention_on_api_page_with_no_notifications_if_
 
 def test_should_not_show_service_retention_on_api_page_with_lots_of_notifications_if_inconsistent_retention(
     client_request,
-    mock_login,
-    api_user_active,
-    mock_get_service,
-    mock_has_permissions,
     mock_get_notifications_with_previous_next,
     mock_get_service_data_retention,
     mocker,
@@ -323,7 +299,6 @@ def test_should_show_empty_api_keys_page(
     api_user_active,
     mock_login,
     mock_get_no_api_keys,
-    mock_get_service,
     mock_has_permissions,
 ):
     client_request.login(api_user_active)
@@ -392,7 +367,6 @@ def test_should_show_api_keys_page(
 def test_should_show_create_api_key_page(
     client_request,
     mocker,
-    api_user_active,
     mock_get_api_keys,
     restricted,
     can_send_letters,
@@ -419,7 +393,6 @@ def test_should_show_create_api_key_page(
 def test_should_create_api_key_with_type_normal(
     client_request,
     api_user_active,
-    mock_login,
     mock_get_api_keys,
     mock_get_live_service,
     mock_has_permissions,
@@ -448,12 +421,9 @@ def test_should_create_api_key_with_type_normal(
 
 def test_cant_create_normal_api_key_in_trial_mode(
     client_request,
-    api_user_active,
-    mock_login,
     mock_get_api_keys,
     mock_get_service,
     mock_has_permissions,
-    fake_uuid,
     mocker,
 ):
     mock_post = mocker.patch("app.notify_client.api_key_api_client.ApiKeyApiClient.post")
@@ -502,12 +472,8 @@ def test_should_404_for_api_key_that_doesnt_exist(
 
 def test_should_redirect_after_revoking_api_key(
     client_request,
-    api_user_active,
-    mock_login,
     mock_revoke_api_key,
     mock_get_api_keys,
-    mock_get_service,
-    mock_has_permissions,
     fake_uuid,
 ):
     client_request.post(
@@ -574,10 +540,6 @@ def test_route_invalid_permissions(
 
 def test_should_show_guestlist_page(
     client_request,
-    mock_login,
-    api_user_active,
-    mock_get_service,
-    mock_has_permissions,
     mock_get_guest_list,
 ):
     page = client_request.get(
@@ -653,9 +615,7 @@ def test_should_validate_guestlist_items(
         ("https://test.com", "123456789", "The bearer token must be at least 10 characters long"),
     ],
 )
-def test_callback_forms_validation(
-    client_request, service_one, mock_get_valid_service_callback_api, endpoint, url, bearer_token, expected_errors
-):
+def test_callback_forms_validation(client_request, service_one, endpoint, url, bearer_token, expected_errors):
     if endpoint == "main.received_text_messages_callback":
         service_one["permissions"] = ["inbound_sms"]
 
@@ -719,24 +679,11 @@ def test_callback_forms_can_be_cleared(
 
 
 @pytest.mark.parametrize("bearer_token", ["", "some-bearer-token"])
-@pytest.mark.parametrize(
-    "endpoint, expected_delete_url",
-    [
-        (
-            "main.delivery_status_callback",
-            "/service/{}/delivery-receipt-api/{}",
-        ),
-        (
-            "main.received_text_messages_callback",
-            "/service/{}/inbound-api/{}",
-        ),
-    ],
-)
+@pytest.mark.parametrize("endpoint", ["main.delivery_status_callback", "main.received_text_messages_callback"])
 def test_callback_forms_can_be_cleared_when_callback_and_inbound_apis_are_empty(
     client_request,
     service_one,
     endpoint,
-    expected_delete_url,
     bearer_token,
     mocker,
     mock_get_empty_service_callback_api,
@@ -772,7 +719,6 @@ def test_callback_forms_can_be_cleared_when_callback_and_inbound_apis_are_empty(
 def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_inbound_sms(
     client_request,
     service_one,
-    mocker,
     mock_get_notifications,
     mock_get_service_data_retention,
     has_inbound_sms,
@@ -790,7 +736,7 @@ def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_in
 
 
 def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_sms(
-    client_request, service_one, mocker, mock_get_valid_service_callback_api
+    client_request, service_one, mock_get_valid_service_callback_api
 ):
     page = client_request.get(
         "main.api_callbacks",
@@ -809,7 +755,7 @@ def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_s
     ],
 )
 def test_back_link_directs_to_api_integration_from_delivery_callback_if_no_inbound_sms(
-    client_request, service_one, mocker, has_inbound_sms, expected_link
+    client_request, service_one, has_inbound_sms, expected_link
 ):
     if has_inbound_sms:
         service_one["permissions"] = ["inbound_sms"]
@@ -833,7 +779,6 @@ def test_back_link_directs_to_api_integration_from_delivery_callback_if_no_inbou
 def test_create_delivery_status_and_receive_text_message_callbacks(
     client_request,
     service_one,
-    mocker,
     mock_get_notifications,
     mock_create_service_inbound_api,
     mock_create_service_callback_api,

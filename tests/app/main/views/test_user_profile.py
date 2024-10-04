@@ -114,7 +114,6 @@ def test_should_show_email_page(
 
 def test_should_redirect_after_email_change(
     client_request,
-    mock_login,
     mock_email_is_not_already_in_use,
 ):
     client_request.post(
@@ -247,9 +246,7 @@ def test_change_your_mobile_number_page_shows_delete_link_if_user_on_email_auth(
     assert "Delete your number" in page.text
 
 
-def test_change_your_mobile_number_page_doesnt_show_delete_link_if_user_has_no_mobile_number(
-    client_request, api_user_active_email_auth, mocker
-):
+def test_change_your_mobile_number_page_doesnt_show_delete_link_if_user_has_no_mobile_number(client_request, mocker):
     user = create_user(id=fake_uuid, auth_type="email_auth", mobile_number=None)
     mocker.patch("app.user_api_client.get_user", return_value=user)
     page = client_request.get("main.user_profile_mobile_number")

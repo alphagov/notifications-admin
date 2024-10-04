@@ -15,7 +15,6 @@ def test_should_render_new_password_template(
     mocker,
     notify_admin,
     client_request,
-    mock_send_verify_code,
     mock_get_user_by_email_request_password_reset,
 ):
     client_request.logout()
@@ -59,7 +58,6 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(
     notify_admin,
     client_request,
     mock_get_user_by_email_request_password_reset,
-    mock_login,
     mock_send_verify_code,
     mock_reset_failed_login_count,
     redirect_url,
@@ -111,7 +109,6 @@ def test_should_redirect_index_if_user_has_already_changed_password(
     notify_admin,
     client_request,
     mock_get_user_by_email_user_changed_password,
-    mock_login,
     mock_send_verify_code,
     mock_reset_failed_login_count,
 ):
@@ -128,7 +125,7 @@ def test_should_redirect_index_if_user_has_already_changed_password(
 
 
 def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_expired(
-    notify_admin, client_request, mock_login, mocker
+    notify_admin, client_request, mocker
 ):
     client_request.logout()
     mocker.patch("app.main.views.new_password.check_token", side_effect=SignatureExpired("expired"))
@@ -146,7 +143,6 @@ def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
     client_request,
     api_user_active,
     mock_get_user_by_email_request_password_reset,
-    mock_login,
     mock_send_verify_code,
     mock_reset_failed_login_count,
     mock_update_user_password,

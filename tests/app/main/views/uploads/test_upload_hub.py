@@ -139,7 +139,6 @@ def test_get_upload_hub_page(
 
 @freeze_time("2020-02-02 14:00")
 def test_get_uploaded_letters(
-    mocker,
     client_request,
     service_one,
     mock_get_uploaded_letters,
@@ -193,7 +192,6 @@ def test_get_uploaded_letters(
 
 @freeze_time("2020-02-02 14:00")
 def test_get_empty_uploaded_letters_page(
-    mocker,
     client_request,
     service_one,
     mock_get_no_uploaded_letters,
@@ -208,7 +206,6 @@ def test_get_empty_uploaded_letters_page(
 
 @freeze_time("2020-02-02")
 def test_get_uploaded_letters_passes_through_page_argument(
-    mocker,
     client_request,
     service_one,
     mock_get_uploaded_letters,
@@ -227,7 +224,6 @@ def test_get_uploaded_letters_passes_through_page_argument(
 
 
 def test_get_uploaded_letters_404s_for_bad_page_arguments(
-    mocker,
     client_request,
 ):
     client_request.get(
@@ -240,7 +236,6 @@ def test_get_uploaded_letters_404s_for_bad_page_arguments(
 
 
 def test_get_uploaded_letters_404s_for_invalid_date(
-    mocker,
     client_request,
 ):
     client_request.get(
@@ -260,7 +255,6 @@ def test_get_uploaded_letters_404s_for_invalid_date(
 )
 @freeze_time("2012-12-12 12:12")
 def test_uploads_page_shows_scheduled_jobs(
-    mocker,
     client_request,
     mock_get_no_uploads,
     mock_get_jobs,
@@ -280,7 +274,6 @@ def test_uploads_page_shows_scheduled_jobs(
 
 @freeze_time("2020-03-15")
 def test_uploads_page_shows_contact_lists_first(
-    mocker,
     client_request,
     mock_get_no_uploads,
     mock_get_jobs,
@@ -306,7 +299,6 @@ def test_uploads_page_shows_contact_lists_first(
 
 def test_get_uploads_shows_pagination(
     client_request,
-    active_user_with_permissions,
     mock_get_jobs,
     mock_get_uploads,
     mock_get_no_contact_lists,

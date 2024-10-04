@@ -502,8 +502,6 @@ def test_search_recipient_form(
 )
 def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_keys(
     client_request,
-    mocker,
-    fake_uuid,
     mock_get_notifications,
     mock_get_service_statistics,
     mock_get_service_data_retention,
@@ -531,8 +529,6 @@ def test_api_users_are_told_they_can_search_by_reference_when_service_has_api_ke
 )
 def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no_api_keys(
     client_request,
-    mocker,
-    fake_uuid,
     mock_get_notifications,
     mock_get_service_statistics,
     mock_get_service_data_retention,
@@ -552,13 +548,11 @@ def test_api_users_are_not_told_they_can_search_by_reference_when_service_has_no
 def test_should_show_notifications_for_a_service_with_next_previous(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_notifications_with_previous_next,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_notifications_count_for_service,
     mock_get_no_api_keys,
-    mocker,
 ):
     page = client_request.get("main.view_notifications", service_id=service_one["id"], message_type="sms", page=2)
 
@@ -581,13 +575,11 @@ def test_should_show_notifications_for_a_service_with_next_previous(
 def test_doesnt_show_pagination_with_search_term(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_notifications_with_previous_next,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
     mock_get_notifications_count_for_service,
-    mocker,
 ):
     page = client_request.post(
         "main.view_notifications",
@@ -648,13 +640,11 @@ def test_get_status_filters_constructs_links(client_request):
 def test_html_contains_notification_id(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_notifications,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_no_api_keys,
     mock_get_notifications_count_for_service,
-    mocker,
 ):
     page = client_request.get(
         "main.view_notifications",

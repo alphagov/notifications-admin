@@ -160,13 +160,11 @@ def test_should_show_page_for_choosing_a_template(
     client_request,
     mock_get_service_templates,
     mock_get_template_folders,
-    mock_has_no_jobs,
     mock_get_no_api_keys,
     extra_args,
     expected_nav_links,
     expected_templates,
     service_one,
-    mocker,
     user,
     expected_page_title,
 ):
@@ -619,7 +617,6 @@ def test_edit_email_template_should_update_unsubscribe(
     ),
 )
 def test_add_email_template_should_have_unsubscribe_checkbox(
-    mocker,
     client_request,
     platform_admin_user,
     template_type,
@@ -643,7 +640,6 @@ def test_add_email_template_should_have_unsubscribe_checkbox(
 
 
 def test_add_email_template_should_add_unsubscribe(
-    mocker,
     client_request,
     platform_admin_user,
     mock_create_service_template,
@@ -701,7 +697,6 @@ def test_GET_edit_service_template_for_welsh_letter(
 
 def test_caseworker_redirected_to_set_sender_for_one_off(
     client_request,
-    mock_get_service_templates,
     mock_get_service_template,
     fake_uuid,
     active_caseworking_user,
@@ -747,10 +742,8 @@ def test_caseworker_sees_template_page_if_template_is_deleted(
 
 def test_user_with_only_send_and_view_redirected_to_set_sender_for_one_off(
     client_request,
-    mock_get_service_templates,
     mock_get_service_template,
     active_user_with_permissions,
-    mocker,
     fake_uuid,
 ):
     active_user_with_permissions["permissions"][SERVICE_ONE_ID] = [
@@ -788,8 +781,6 @@ def test_user_with_only_send_and_view_redirected_to_set_sender_for_one_off(
 )
 def test_letter_page_has_rename_link(
     client_request,
-    mock_get_service_templates,
-    mock_get_template_folders,
     mock_get_service_letter_template,
     single_letter_contact_block,
     active_user_with_permissions,
@@ -836,13 +827,9 @@ def test_letter_page_has_rename_link(
 )
 def test_user_with_only_send_and_view_sees_letter_page(
     client_request,
-    mock_get_service_templates,
-    mock_get_template_folders,
     mock_get_service_letter_template,
     single_letter_contact_block,
-    mock_has_jobs,
     active_user_with_permissions,
-    mocker,
     fake_uuid,
     permissions,
     mock_get_page_counts_for_letter,
@@ -881,11 +868,8 @@ def test_user_with_only_send_and_view_sees_letter_page(
     (True, pytest.mark.xfail(False)),
 )
 def test_letter_with_default_branding_has_add_logo_button(
-    mocker,
-    fake_uuid,
     client_request,
     service_one,
-    mock_get_template_folders,
     mock_get_service_letter_template,
     single_letter_contact_block,
     letter_branding,
@@ -923,10 +907,8 @@ def test_letter_with_default_branding_has_add_logo_button(
 def test_view_letter_template_displays_postage(
     client_request,
     service_one,
-    mock_get_service_templates,
     mock_get_template_folders,
     single_letter_contact_block,
-    mock_has_jobs,
     active_user_with_permissions,
     mocker,
     fake_uuid,
@@ -953,7 +935,6 @@ def test_view_letter_template_displays_postage(
 def test_view_non_letter_template_does_not_display_postage(
     client_request,
     mock_get_service_template,
-    mock_get_template_folders,
     fake_uuid,
 ):
     page = client_request.get(
@@ -968,10 +949,7 @@ def test_view_non_letter_template_does_not_display_postage(
 def test_view_letter_template_does_not_display_send_button_if_template_over_10_pages_long(
     client_request,
     service_one,
-    mock_get_service_templates,
-    mock_get_template_folders,
     single_letter_contact_block,
-    mock_has_jobs,
     active_user_with_permissions,
     mocker,
     fake_uuid,
@@ -997,10 +975,7 @@ def test_view_letter_template_does_not_display_send_button_if_template_over_10_p
 def test_view_letter_template_displays_change_language_button(
     client_request,
     service_one,
-    mock_get_service_templates,
-    mock_get_template_folders,
     single_letter_contact_block,
-    mock_has_jobs,
     active_user_with_permissions,
     mocker,
     fake_uuid,
@@ -1028,7 +1003,7 @@ def test_view_letter_template_displays_change_language_button(
 
 
 def test_GET_letter_template_change_language(
-    client_request, service_one, fake_uuid, mocker, mock_get_service_letter_template, active_user_with_permissions
+    client_request, service_one, fake_uuid, mock_get_service_letter_template, active_user_with_permissions
 ):
     client_request.login(active_user_with_permissions)
     page = client_request.get(
@@ -1519,9 +1494,7 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
     client_request,
     fake_uuid,
     service_one,
-    active_user_with_permissions,
     mock_get_service_letter_template_with_attachment,
-    mock_get_template_folders,
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
@@ -1661,7 +1634,6 @@ def test_get_delete_letter_attachment_shows_confirmation(
     client_request,
     service_one,
     mocker,
-    active_user_with_permissions,
 ):
     mock_flash = mocker.patch("app.main.views.templates.flash")
     mocker.patch("app.letter_attachment_client.archive_letter_attachment")
@@ -1697,7 +1669,6 @@ def test_edit_letter_template_postage_page_404s_if_template_is_not_a_letter(
     service_one,
     mock_get_service_template,
     active_user_with_permissions,
-    mocker,
     fake_uuid,
 ):
     client_request.login(active_user_with_permissions)
@@ -1755,7 +1726,6 @@ def test_edit_letter_templates_postage_updates_postage(
 def test_should_be_able_to_view_a_template_with_links(
     client_request,
     mock_get_service_template,
-    mock_get_template_folders,
     active_user_with_permissions,
     single_letter_contact_block,
     fake_uuid,
@@ -1794,11 +1764,8 @@ def test_should_be_able_to_view_a_template_with_links(
 
 
 def test_should_be_able_to_view_a_letter_template_with_links(
-    mocker,
     client_request,
     mock_get_service_letter_template,
-    mock_get_template_folders,
-    active_user_with_permissions,
     single_letter_contact_block,
     fake_uuid,
     mock_get_page_counts_for_letter,
@@ -1865,8 +1832,6 @@ def test_should_be_able_to_view_a_letter_template_with_links(
 def test_should_not_be_able_to_view_edit_links_for_an_archived_letter_template(
     mocker,
     client_request,
-    mock_get_template_folders,
-    active_user_with_permissions,
     single_letter_contact_block,
     fake_uuid,
     mock_get_page_counts_for_letter,
@@ -1932,8 +1897,6 @@ def test_should_be_able_to_view_a_letter_template_with_bilingual_content(
     client_request,
     service_one,
     mock_get_service_letter_template_welsh_language,
-    mock_get_template_folders,
-    active_user_with_permissions,
     single_letter_contact_block,
     fake_uuid,
 ):
@@ -1995,7 +1958,6 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
     mocker,
     service_one,
     single_letter_contact_block,
-    mock_get_template_folders,
     fake_uuid,
 ):
     msg = "here:\tare some “fancy quotes” and zero\u200Bwidth\u200Bspaces"
@@ -2040,7 +2002,6 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
 def test_should_let_letter_contact_block_be_changed_for_the_template(
     mocker,
     mock_get_service_letter_template,
-    mock_get_template_folders,
     client_request,
     service_one,
     fake_uuid,
@@ -2064,7 +2025,7 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
 
 @pytest.mark.parametrize("prefix_sms", [True, pytest.param(False, marks=pytest.mark.xfail())])
 def test_should_show_message_with_prefix_hint_if_enabled_for_service(
-    client_request, mocker, mock_get_service_template, mock_get_users_by_service, service_one, fake_uuid, prefix_sms
+    client_request, mock_get_service_template, service_one, fake_uuid, prefix_sms
 ):
     service_one["prefix_sms"] = prefix_sms
 
@@ -2112,9 +2073,7 @@ def test_should_show_preview_letter_templates(
         assert mocked_preview.call_args[1]["page"] is None
 
 
-def test_should_show_preview_letter_attachment(
-    client_request, mock_get_service_email_template, service_one, fake_uuid, mocker
-):
+def test_should_show_preview_letter_attachment(client_request, service_one, fake_uuid, mocker):
     mocked_preview = mocker.patch(
         "app.main.views.templates.TemplatePreview.get_png_for_letter_attachment_page", return_value="foo"
     )
@@ -2569,7 +2528,6 @@ def test_choose_a_template_to_copy_from_folder_within_service(
 )
 def test_copy_template_page_renders_preview(
     mocker,
-    api_user_active,
     client_request,
     active_user_with_permission_to_two_services,
     multiple_sms_senders,
@@ -2944,7 +2902,6 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     service_permissions,
     data,
     expected_error,
-    fake_uuid,
 ):
     service_one["permissions"] = service_permissions
     page = client_request.post(
@@ -2974,7 +2931,6 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
 def test_should_not_allow_creation_of_a_template_without_correct_permission(
     client_request,
     service_one,
-    mocker,
     method,
     type_of_template,
     expected_status,
@@ -3223,7 +3179,6 @@ def test_should_show_interstitial_when_making_breaking_change_to_sms_template(
     client_request,
     service_one,
     mock_update_service_template,
-    mock_get_user_by_email,
     mock_get_api_keys,
     fake_uuid,
     mocker,
@@ -3304,8 +3259,6 @@ def test_should_show_interstitial_when_making_breaking_change_to_sms_template(
 def test_should_show_interstitial_when_making_breaking_change(
     client_request,
     service_one,
-    mock_update_service_template,
-    mock_get_user_by_email,
     mock_get_api_keys,
     fake_uuid,
     mocker,
@@ -3374,7 +3327,6 @@ def test_confirm_breaking_change_on_letter_template_saves_correct_language_conte
     client_request,
     service_one,
     mock_update_service_template,
-    mock_get_user_by_email,
     mock_get_api_keys,
     fake_uuid,
     mocker,
@@ -3465,9 +3417,7 @@ def test_removing_placeholders_is_not_a_breaking_change(
 
 def test_should_not_create_too_big_template(
     client_request,
-    mock_get_service_template,
     mock_create_service_template_content_too_big,
-    fake_uuid,
 ):
     page = client_request.post(
         ".add_service_template",
@@ -3538,7 +3488,6 @@ def test_should_redirect_when_saving_a_template_email(
     client_request,
     mock_get_service_email_template,
     mock_update_service_template,
-    mock_get_user_by_email,
     fake_uuid,
 ):
     name = "new name"
@@ -3578,7 +3527,6 @@ def test_should_redirect_when_saving_a_template_letter(
     mock_get_service_letter_template,
     mock_get_page_counts_for_letter,
     mock_update_service_template,
-    mock_get_user_by_email,
     fake_uuid,
     service_one,
 ):
@@ -3649,7 +3597,6 @@ def test_update_template_for_welsh_language_content(
     client_request,
     mock_update_service_template,
     mock_get_page_counts_for_letter,
-    mock_get_user_by_email,
     fake_uuid,
     service_one,
     language,
@@ -3693,7 +3640,6 @@ def test_update_template_for_english_content_in_welsh_letter(
     client_request,
     mock_update_service_template,
     mock_get_service_letter_template_welsh_language,
-    mock_get_user_by_email,
     fake_uuid,
     service_one,
 ):
@@ -3735,7 +3681,6 @@ def test_cannot_edit_welsh_content_for_email_or_sms_templates(
     client_request,
     mock_fixturename,
     mock_update_service_template,
-    mock_get_user_by_email,
     fake_uuid,
 ):
     # Load fixture to mock get email/sms template
@@ -3885,10 +3830,6 @@ def test_should_show_page_for_a_deleted_template(
     client_request,
     mock_get_template_folders,
     mock_get_deleted_template,
-    single_letter_contact_block,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_has_permissions,
     fake_uuid,
 ):
     template_id = fake_uuid
@@ -4138,9 +4079,7 @@ def test_should_show_message_before_redacting_template(
 def test_should_show_redact_template(
     client_request,
     mock_get_service_template,
-    mock_get_template_folders,
     mock_redact_template,
-    single_letter_contact_block,
     service_one,
     fake_uuid,
 ):
@@ -4162,7 +4101,6 @@ def test_should_show_hint_once_template_redacted(
     client_request,
     mocker,
     service_one,
-    mock_get_template_folders,
     fake_uuid,
 ):
     template = create_template(template_type="email", content="hi ((name))", redact_personalisation=True)
@@ -4180,10 +4118,8 @@ def test_should_show_hint_once_template_redacted(
 
 def test_should_not_show_redaction_stuff_for_letters(
     client_request,
-    mocker,
     fake_uuid,
     mock_get_service_letter_template,
-    mock_get_template_folders,
     single_letter_contact_block,
     mock_get_page_counts_for_letter,
 ):
@@ -4446,7 +4382,6 @@ def test_content_count_json_endpoint_for_unsupported_template_types(
 def test_letter_attachment_preview_image_shows_overlay_when_content_outside_printable_area(
     mocker,
     client_request,
-    mock_get_service,
     fake_uuid,
     invalid_pages,
     page_requested,

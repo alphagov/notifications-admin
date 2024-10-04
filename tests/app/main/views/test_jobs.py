@@ -80,7 +80,6 @@ def test_should_show_page_for_one_job(
     client_request,
     mock_get_service_template,
     mock_get_job,
-    mocker,
     mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -88,6 +87,7 @@ def test_should_show_page_for_one_job(
     expected_api_call,
     user,
 ):
+    client_request.login(user)
     page = client_request.get("main.view_job", service_id=SERVICE_ONE_ID, job_id=fake_uuid, status=status_argument)
 
     assert page.select_one("h1").text.strip() == "thisisatest.csv"
@@ -127,10 +127,8 @@ def test_should_show_page_for_one_job(
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_should_show_page_for_one_job_with_flexible_data_retention(
     client_request,
-    active_user_with_permissions,
     mock_get_service_template,
     mock_get_job,
-    mocker,
     mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -163,10 +161,8 @@ def test_get_jobs_should_tell_user_if_more_than_one_page(
 def test_should_show_job_in_progress(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_service_template,
     mock_get_job_in_progress,
-    mocker,
     mock_get_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -187,10 +183,8 @@ def test_should_show_job_in_progress(
 def test_should_show_job_without_notifications(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_service_template,
     mock_get_job_in_progress,
-    mocker,
     mock_get_notifications_with_no_notifications,
     mock_get_service_data_retention,
     fake_uuid,
@@ -212,7 +206,6 @@ def test_should_show_job_without_notifications(
 def test_should_show_job_with_sending_limit_exceeded_status(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_service_template,
     mock_get_job_with_sending_limits_exceeded,
     mock_get_notifications_with_no_notifications,
@@ -521,7 +514,6 @@ def test_should_download_scheduled_job(
 
 
 def test_should_not_download_unscheduled_job(
-    mocker,
     client_request,
     mock_get_job,
     mock_get_service_data_retention,
@@ -560,7 +552,6 @@ def test_should_cancel_job(
 
 def test_should_not_show_cancelled_job(
     client_request,
-    active_user_with_permissions,
     mock_get_cancelled_job,
     fake_uuid,
 ):
@@ -713,12 +704,10 @@ def test_dont_cancel_letter_job_when_to_early_to_cancel(
 def test_should_show_updates_for_one_job_as_json(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_notifications,
     mock_get_service_template,
     mock_get_job,
     mock_get_service_data_retention,
-    mocker,
     fake_uuid,
 ):
     response = client_request.get_response(
@@ -743,7 +732,6 @@ def test_should_show_updates_for_one_job_as_json(
 def test_should_show_updates_for_scheduled_job_as_json(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_notifications,
     mock_get_service_template,
     mock_get_service_data_retention,
@@ -785,7 +773,6 @@ def test_should_show_updates_for_scheduled_job_as_json(
 def test_should_show_updates_for_upcoming_scheduled_job_as_json(
     client_request,
     service_one,
-    active_user_with_permissions,
     mock_get_notifications,
     mock_get_service_template,
     mock_get_service_data_retention,
