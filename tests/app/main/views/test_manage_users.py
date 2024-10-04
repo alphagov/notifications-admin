@@ -1859,3 +1859,161 @@ def test_confirm_edit_user_mobile_number_doesnt_change_user_mobile_for_non_team_
         user_id=USER_ONE_ID,
         _expected_status=404,
     )
+
+
+def test_manage_users_page_loads_without_filters(
+    client_request,
+    mocker,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    service_one,
+    active_user_view_permissions,
+):
+    current_user = create_active_user_with_permissions()
+    other_user = copy.deepcopy(active_user_view_permissions)
+    other_user["email_address"] = "zzzzzzz@example.gov.uk"
+    other_user["name"] = "ZZZZZZZZ"
+    other_user["id"] = "zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz"
+
+    mock_get_users = mocker.patch(
+        "app.models.user.Users.client_method",
+        return_value=[
+            current_user,
+            other_user,
+        ],
+    )
+
+    client_request.login(current_user)
+    page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one("h1").text) == "Team members"
+    assert normalize_spaces(page.select(".user-list-item")[0].text) == (
+        "Test User (you) "
+        "Can See dashboard "
+        "Can Send messages "
+        "Can Add and edit templates "
+        "Can Manage settings, team and usage "
+        "Can Manage API integration"
+    )
+    mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "filter_permissions",
+    [
+        (["manage_service"]),
+        (["manage_service", "manage_api_keys"]),
+    ],
+)
+def test_manage_users_filters_by_permissions(
+    client_request,
+    mocker,
+    filter_permissions,
+    mock_get_invites_without_permissions,
+    mock_get_template_folders,
+    active_user_with_permissions,
+):
+    sixth_user = create_active_user_empty_permissions()
+    seventh_user = create_active_user_empty_permissions()
+
+    active_user_with_permissions["platform_admin"] = True
+
+    mock_get_users = mocker.patch(
+        "app.models.user.Users.client_method",
+        return_value=[
+            sixth_user,
+            seventh_user,
+            active_user_with_permissions,
+        ],
+    )
+
+    client_request.login(active_user_with_permissions)
+    page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID, permissions=filter_permissions)
+
+    user_list_items = page.select(".user-list-item")
+
+    assert len(user_list_items) == 1
+
+    mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "filter_permissions, expected_user_count",
+    [
+        (["manage_service"], 3),
+        (["manage_service", "manage_api_keys"], 2),
+    ],
+)
+def test_manage_users_filters_by_permissions_match_all(
+    client_request,
+    mocker,
+    filter_permissions,
+    expected_user_count,
+    mock_get_invites_without_permissions,
+    mock_get_template_folders,
+    active_user_with_permissions,
+):
+    sixth_user = create_active_user_empty_permissions()
+    sixth_user["permissions"] = {
+        SERVICE_ONE_ID: [
+            "manage_service",
+        ]
+    }
+    seventh_user = create_active_user_empty_permissions()
+    seventh_user["permissions"] = {SERVICE_ONE_ID: ["manage_service", "manage_api_keys"]}
+
+    active_user_with_permissions["platform_admin"] = True
+
+    mock_get_users = mocker.patch(
+        "app.models.user.Users.client_method",
+        return_value=[
+            sixth_user,
+            seventh_user,
+            active_user_with_permissions,
+        ],
+    )
+
+    client_request.login(active_user_with_permissions)
+    page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID, permissions=filter_permissions)
+
+    user_list_items = page.select(".user-list-item")
+
+    assert len(user_list_items) == expected_user_count
+
+    mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "platform_admin, filters_visible",
+    [(True, True), (False, False)],  # Platform admin: should see filters  # Not platform admin: should not see filters
+)
+def test_manage_users_page_shows_filters_based_on_platform_admin(
+    client_request,
+    mocker,
+    mock_get_invites_without_permissions,
+    mock_get_template_folders,
+    active_user_with_permissions,
+    platform_admin,
+    filters_visible,
+):
+    sixth_user = create_active_user_empty_permissions()
+    seventh_user = create_active_user_empty_permissions()
+
+    active_user_with_permissions["platform_admin"] = platform_admin
+    mock_get_users = mocker.patch(
+        "app.models.user.Users.client_method",
+        return_value=[active_user_with_permissions, sixth_user, seventh_user],
+    )
+
+    client_request.login(active_user_with_permissions)
+    page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
+
+    apply_filters_button = page.select_one("button.govuk-button")
+
+    if filters_visible:
+        assert apply_filters_button is not None, "Expected 'Apply Filters' button for platform admin"
+        assert apply_filters_button.text.strip() == "Apply Filters"
+    else:
+        assert apply_filters_button is None, "Did not expect 'Apply Filters' button for non-platform admin"
+
+    mock_get_users.assert_called_once_with(SERVICE_ONE_ID)

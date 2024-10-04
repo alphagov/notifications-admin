@@ -2223,6 +2223,12 @@ class SearchByNameForm(StripWhitespaceForm):
 class SearchUsersForm(StripWhitespaceForm):
     search = GovukSearchField("Search by name or email address")
 
+    permissions_field = GovukCheckboxesField(
+        "Permissions",
+        filters=[partial(filter_by_permissions, permissions=permission_options)],
+        choices=list(permission_options),
+    )
+
 
 class SearchNotificationsForm(StripWhitespaceForm):
     to = GovukSearchField()

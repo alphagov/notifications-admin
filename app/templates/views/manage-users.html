@@ -2,6 +2,8 @@
 {% from "components/tick-cross.html" import tick_cross %}
 {% from "components/live-search.html" import live_search %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/checkboxes/macro.html" import govukCheckboxes %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% block service_page_title %}
   Team members
@@ -17,6 +19,31 @@
     <div data-notify-module="autofocus">
       {{ live_search(target_selector='.user-list-item', show=True, form=form) }}
     </div>
+
+    {% if current_user.platform_admin %}
+        {% set details_content %}
+            <form method="GET" action="{{ url_for('main.manage_users', service_id=current_service.id) }}">
+                <h2 class="heading-small">Permissions</h2>
+                {{ govukCheckboxes({
+                    'idPrefix': 'permissions',
+                    'name': 'permissions',
+                    'items': [
+                      { 'value': 'manage_service', 'text': 'Manage settings, team and usage' },
+                      { 'value': 'manage_api_keys', 'text': 'Manage API integration' },
+                    ]
+                  }) }}
+                <br>
+                {{ govukButton({ "text": "Apply Filters" }) }}
+            </form>
+        {% endset %}
+
+        {{ govukDetails({
+            "summaryText": "Apply Filters",
+            "html": details_content,
+            "open": form.errors | convert_to_boolean
+          }) }}
+
+    {% endif %}
   {% endif %}
 
   <div class="user-list">
