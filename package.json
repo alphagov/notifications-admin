@@ -9,8 +9,8 @@
     "test": "gulp lint && node --experimental-vm-modules node_modules/.bin/jest tests/javascripts",
     "test-watch": "jest --watch tests/javascripts",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand $npm_config_test",
-    "build": "gulp",
-    "watch": "gulp watch",
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
     "audit": "better-npm-audit audit --production --level high"
   },
   "repository": {
