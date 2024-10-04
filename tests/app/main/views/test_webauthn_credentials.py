@@ -334,7 +334,6 @@ def test_complete_authentication_clears_session(
     webauthn_credential,
     webauthn_dev_server,
     webauthn_authentication_post_data,
-    mock_create_event,
     platform_admin_user,
 ):
     client_request.logout()
@@ -434,7 +433,6 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
 def test_verify_webauthn_login_passes_webauthn_credential_id_to_api(
     client_request,
     mocker,
-    mock_create_event,
     platform_admin_user,
 ):
     client_request.logout()

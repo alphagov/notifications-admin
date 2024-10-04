@@ -42,7 +42,6 @@ from wtforms import (
 )
 from wtforms import RadioField as WTFormsRadioField
 from wtforms.validators import (
-    UUID,
     DataRequired,
     InputRequired,
     NumberRange,
@@ -495,10 +494,6 @@ class NestedFieldMixin:
         return render_govuk_frontend_macro(self.govuk_frontend_component_name, params=params)
 
 
-class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
-    pass
-
-
 class NestedCheckboxesField(SelectMultipleField, NestedFieldMixin):
     NONE_OPTION_VALUE = None
 
@@ -811,13 +806,6 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
         }
 
 
-class OptionalGovukRadiosField(GovukRadiosField):
-    def pre_validate(self, form):
-        if self.data is None:
-            return
-        super().pre_validate(form)
-
-
 class OnOffField(GovukRadiosField):
     def __init__(self, label, choices=None, choices_for_error_message=None, *args, **kwargs):
         choices = choices or [
@@ -868,7 +856,6 @@ class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
     govuk_frontend_component_name = "nested-radios"
     param_extensions = {"formGroup": {"classes": "govuk-form-group--nested-radio"}}
 
-    # TODO: blurb to explain this
     def render_children(self, name, label, options):
         params = {
             "name": name,
@@ -2828,13 +2815,6 @@ class SetEmailAuthForUsersForm(StripWhitespaceForm):
             )
 
     users = GovukCheckboxesField("Choose who can sign in using an email link")
-
-
-class FindByUuidForm(StripWhitespaceForm):
-    search = GovukSearchField(
-        "Find anything by UUID",
-        validators=[DataRequired("Cannot be empty"), UUID("Enter a valid UUID")],
-    )
 
 
 class PlatformAdminSearchForm(StripWhitespaceForm):

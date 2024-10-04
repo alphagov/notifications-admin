@@ -673,7 +673,6 @@ def test_email_branding_govuk_submit(
 
 
 def test_email_branding_nhs_submit(
-    mocker,
     client_request,
     service_one,
     organisation_one,
@@ -1716,19 +1715,10 @@ def test_email_branding_choose_banner_type_page(
         "school_or_college",
     ),
 )
-@pytest.mark.parametrize(
-    "pool_contents",
-    (
-        ".email_branding_options",
-        create_email_branding_pool(),
-    ),
-)
 def test_email_branding_choose_banner_type_page_when_no_organisation(
     client_request,
-    mocker,
     service_one,
     organisation_type,
-    pool_contents,
 ):
     service_one["organisation_type"] = organisation_type
     service_one["organisation"] = None

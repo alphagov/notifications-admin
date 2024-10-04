@@ -138,7 +138,6 @@ class LetterBranding(Branding):
         name,
         filename,
     ):
-        # TODO: rename temp to non-temp and clean up temp files
         new_letter_branding = letter_branding_client.create_letter_branding(
             name=name,
             filename=filename,

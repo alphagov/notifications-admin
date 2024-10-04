@@ -63,12 +63,7 @@ def test_view_template_version(
 def test_view_template_versions(
     client_request,
     api_user_active,
-    mock_login,
-    mock_get_service,
     mock_get_template_versions,
-    mock_get_service_template,
-    mock_get_user,
-    mock_get_user_by_email,
     mock_has_permissions,
     fake_uuid,
 ):
@@ -90,11 +85,6 @@ def test_view_template_versions_pages(
     client_request,
     api_user_active,
     mocker,
-    mock_login,
-    mock_get_service,
-    mock_get_service_template,
-    mock_get_user,
-    mock_get_user_by_email,
     mock_has_permissions,
     fake_uuid,
 ):

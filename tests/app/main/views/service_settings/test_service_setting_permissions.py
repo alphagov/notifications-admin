@@ -27,10 +27,8 @@ def get_service_settings_page(
 
 
 def test_service_set_permission_requires_platform_admin(
-    mocker,
     client_request,
     service_one,
-    mock_get_inbound_number_for_service,
 ):
     client_request.post(
         "main.service_set_permission",
@@ -112,7 +110,6 @@ def test_service_set_permission(
     platform_admin_user,
     service_one,
     mock_get_inbound_number_for_service,
-    mock_update_service_organisation,
     permission,
     initial_permissions,
     form_data,

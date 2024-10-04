@@ -59,7 +59,6 @@ def test_client_only_updates_allowed_attributes(mocker):
 
 def test_client_creates_service_with_correct_data(
     mocker,
-    active_user_with_permissions,
     fake_uuid,
 ):
     client = ServiceAPIClient()
@@ -362,7 +361,6 @@ def test_returns_value_from_cache(
     "client, method, extra_args, extra_kwargs",
     [
         (service_api_client, "update_service", [SERVICE_ONE_ID], {"name": "foo"}),
-        (service_api_client, "update_service_with_properties", [SERVICE_ONE_ID], {"properties": {}}),
         (service_api_client, "archive_service", [SERVICE_ONE_ID, []], {}),
         (service_api_client, "remove_user_from_service", [SERVICE_ONE_ID, ""], {}),
         (service_api_client, "update_guest_list", [SERVICE_ONE_ID, {}], {}),
@@ -385,8 +383,6 @@ def test_returns_value_from_cache(
 )
 def test_deletes_service_cache(
     notify_admin,
-    mock_get_user,
-    mock_get_service_templates,
     mocker,
     client,
     method,
@@ -462,7 +458,6 @@ def test_deletes_service_cache(
 )
 def test_deletes_caches_when_modifying_templates(
     notify_admin,
-    mock_get_user,
     mocker,
     method,
     extra_args,

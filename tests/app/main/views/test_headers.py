@@ -1,6 +1,5 @@
 def test_owasp_useful_headers_set(
     client_request,
-    mocker,
     mock_get_service_and_organisation_counts,
     mock_get_letter_rates,
     mock_get_sms_rate,

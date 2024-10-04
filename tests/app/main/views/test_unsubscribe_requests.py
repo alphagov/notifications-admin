@@ -604,7 +604,7 @@ def test_unsubscribe_valid_request(mocker, client_request, fake_uuid):
     mock_unsubscribe.assert_called_once_with(fake_uuid, "abc123")
 
 
-def test_unsubscribe_confirmation_page(client_request, fake_uuid):
+def test_unsubscribe_confirmation_page(client_request):
     page = client_request.get(
         "main.unsubscribe_confirmed",
         _test_for_elements_without_class=False,

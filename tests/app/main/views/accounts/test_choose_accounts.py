@@ -265,7 +265,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
 
 
 @pytest.mark.parametrize(
-    "orgs_and_services, expected_headings, expected_h1, is_h1_visible",
+    "orgs_and_services, expected_headings, expected_h1",
     (
         (
             {"organisations": [], "services": []},
@@ -274,7 +274,6 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 "Trial mode services",
             ],
             "Your services",
-            True,
         ),
         (
             SAMPLE_DATA,
@@ -284,7 +283,6 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 "Trial mode services",
             ],
             "Your organisations and services",
-            False,
         ),
         # no headings as only one thing to show
         (
@@ -303,7 +301,6 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
                 "Trial mode services",
             ],
             "Your organisations and services",
-            True,
         ),
         # no headings as only one thing to show
         (
@@ -320,7 +317,6 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
             },
             [],
             "Your services",
-            True,
         ),
         # no headings as only one thing to show
         (
@@ -337,7 +333,6 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
             },
             [],
             "Your services",
-            True,
         ),
     ),
 )
@@ -351,7 +346,6 @@ def test_choose_account_should_show_organisations_link_for_org_user(
     orgs_and_services,
     expected_headings,
     expected_h1,
-    is_h1_visible,
 ):
     mock_get_orgs_and_services.return_value = orgs_and_services
 

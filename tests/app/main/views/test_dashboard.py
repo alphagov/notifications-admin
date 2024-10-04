@@ -188,7 +188,6 @@ def test_get_started_is_hidden_once_templates_exist(
 
 def test_inbound_messages_not_visible_to_service_without_permissions(
     client_request,
-    mocker,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
@@ -213,7 +212,6 @@ def test_inbound_messages_not_visible_to_service_without_permissions(
 
 def test_inbound_messages_shows_count_of_messages_when_there_are_messages(
     client_request,
-    mocker,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
@@ -238,7 +236,6 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_messages(
 
 def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
     client_request,
-    mocker,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_get_jobs,
@@ -485,7 +482,6 @@ def test_download_inbox_strips_formulae(
 
 def test_returned_letters_not_visible_if_service_has_no_returned_letters(
     client_request,
-    mocker,
     service_one,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,

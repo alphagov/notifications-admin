@@ -473,9 +473,7 @@ ids, params = zip(
 )
 def test_redirects_to_triage(
     client_request,
-    api_user_active,
     mocker,
-    mock_get_user,
     ticket_type,
     is_in_business_hours,
     logged_in,
@@ -674,7 +672,6 @@ def test_should_be_shown_the_bat_email(
     client_request,
     active_user_with_permissions,
     mocker,
-    service_one,
     mock_get_non_empty_organisations_and_services_for_user,
     is_in_business_hours,
     severe,
@@ -732,7 +729,6 @@ def test_should_be_shown_the_bat_email_for_general_questions(
     client_request,
     active_user_with_permissions,
     mocker,
-    service_one,
     mock_get_non_empty_organisations_and_services_for_user,
     severe,
     expected_status_code,
@@ -763,7 +759,6 @@ def test_should_be_shown_the_bat_email_for_general_questions(
 def test_bat_email_page(
     client_request,
     active_user_with_permissions,
-    service_one,
 ):
     bat_phone_page = "main.bat_phone"
 
@@ -814,8 +809,6 @@ def test_bat_email_page(
 def test_thanks(
     client_request,
     mocker,
-    api_user_active,
-    mock_get_user,
     out_of_hours_emergency,
     out_of_hours,
     message,
