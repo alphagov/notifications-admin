@@ -27,7 +27,6 @@ class Notification(JSONModel):
     job_row_number: int
     service: Any
     template_version: int
-    personalisation: dict
     postage: str
     notification_type: str
     reply_to_text: str
@@ -48,10 +47,17 @@ class Notification(JSONModel):
         return self.template["content"]
 
     @property
-    def preview_of_content(self):
-        if self.template.get("redact_personalisation"):
-            self.personalisation = {}
+    def redact_personalisation(self):
+        return self.template.get("redact_personalisation")
 
+    @property
+    def personalisation(self):
+        if self.redact_personalisation:
+            return {}
+        return self._dict["personalisation"]
+
+    @property
+    def preview_of_content(self):
         if self.template["is_precompiled_letter"]:
             return self.client_reference
 
@@ -147,6 +153,7 @@ class InboundSMSMessage(JSONModel):
     __sort_attribute__ = "created_at"
 
     personalisation = None
+    redact_personalisation = False
     status = None
 
 
