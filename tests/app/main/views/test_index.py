@@ -87,6 +87,7 @@ def test_hiding_pages_from_search_engines(
 @pytest.mark.parametrize(
     "view",
     [
+        "accessibility_statement",
         "cookies",
         "guidance_api_documentation",
         "guidance_billing_details",
