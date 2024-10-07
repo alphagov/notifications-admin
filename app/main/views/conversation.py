@@ -102,10 +102,6 @@ def get_sms_thread(service_id, user_number):
         key=lambda notification: notification.created_at,
     ):
         is_inbound = isinstance(notification, InboundSMSMessage)
-        redact_personalisation = not is_inbound and notification.template["redact_personalisation"]
-
-        if redact_personalisation:
-            notification.personalisation = {}
 
         yield {
             "inbound": is_inbound,
@@ -116,7 +112,7 @@ def get_sms_thread(service_id, user_number):
                 },
                 notification.personalisation,
                 downgrade_non_sms_characters=(not is_inbound),
-                redact_missing_personalisation=redact_personalisation,
+                redact_missing_personalisation=notification.redact_personalisation,
             ),
             "created_at": notification.created_at,
             "status": notification.status,
