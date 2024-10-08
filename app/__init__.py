@@ -23,6 +23,7 @@ from gds_metrics import GDSMetrics
 from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging, request_helper
+from notifications_utils.asset_fingerprinter import asset_fingerprinter
 from notifications_utils.formatters import (
     formatted_list,
     get_lines_with_normalised_whitespace,
@@ -35,7 +36,6 @@ from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
 from app import proxy_fix, webauthn_server
-from app.asset_fingerprinter import asset_fingerprinter
 from app.commands import setup_commands
 from app.config import Config, configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
