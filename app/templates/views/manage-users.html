@@ -75,6 +75,16 @@
               {% endif %}
               </span>
             </h2>
+
+            <br>
+              {% if user.logged_in_at %}
+                  <p class="govuk-body">Last logged in
+                      <time class="timeago" datetime="{{ user.logged_in_at }}">
+                          {{ user.logged_in_at|format_delta }}
+                      </time>
+                  </p>
+              {% endif %}
+
             <ul class="tick-cross__list">
               {% for permission, label in permissions %}
                 {{ tick_cross(
