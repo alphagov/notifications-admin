@@ -216,8 +216,6 @@ def test_unsubscribe_request_reports_summary(
     expected_rows,
     expected_grey_text_statuses,
 ):
-    for r in test_data:
-        print(r)
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
