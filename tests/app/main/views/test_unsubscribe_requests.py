@@ -26,21 +26,18 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     earliest_timestamp="2024-06-22T11:00:00+00:00",
                     latest_timestamp="2024-06-22T13:17:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
-                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=34,
                     earliest_timestamp="2024-06-22T10:00:00+00:00",
                     latest_timestamp="2024-06-22T11:00:00+00:00",
                     batch_id="5e2b05ef-7552-49ef-a77f-96d46ab2b9bb",
-                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=200,
                     earliest_timestamp="2024-06-15T18:00:00+00:00",
                     latest_timestamp="2024-06-21T08:00:00+00:00",
                     batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
-                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=321,
@@ -48,7 +45,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     latest_timestamp="2024-01-14T00:00:00+00:00",
                     processed_by_service_at="2024-06-10T00:00:00+00:00",
                     batch_id="e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
-                    is_a_batched_report=True,
                 ),
             ],
             [
@@ -72,7 +68,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     earliest_timestamp="2020-01-01T10:00:00+00:00",
                     latest_timestamp="2024-06-01T12:17:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
-                    is_a_batched_report=True,
                 ),
             ],
             [
@@ -89,14 +84,12 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     earliest_timestamp="2024-01-01T13:18:00+00:00",
                     latest_timestamp="2024-01-01T13:18:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
-                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=1,
                     earliest_timestamp="2024-01-01T12:17:00+00:00",
                     latest_timestamp="2024-01-01T12:17:00+00:00",
                     batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
-                    is_a_batched_report=True,
                 ),
             ],
             [
@@ -115,7 +108,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     latest_timestamp="2024-05-01T13:17:00+00:00",
                     processed_by_service_at="2024-06-22T13:14:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
-                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=12345678,
@@ -123,7 +115,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     latest_timestamp="2024-05-01T09:00:00+00:00",
                     processed_by_service_at="2024-06-22T13:14:00+00:00",
                     batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
-                    is_a_batched_report=True,
                 ),
             ],
             [
@@ -141,21 +132,18 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     earliest_timestamp="2024-06-22T11:00:00+00:00",
                     latest_timestamp="2024-06-22T13:17:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
-                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=4567,
                     earliest_timestamp="2024-06-21T11:00:00+00:00",
                     latest_timestamp="2024-06-21T13:17:00+00:00",
                     batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
-                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=7890,
                     earliest_timestamp="2024-06-20T11:00:00+00:00",
                     latest_timestamp="2024-06-20T13:17:00+00:00",
                     batch_id="e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
-                    is_a_batched_report=True,
                 ),
             ],
             [
@@ -174,21 +162,18 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     earliest_timestamp="2024-06-01T22:22:00+00:00",
                     latest_timestamp="2024-06-01T23:00:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
-                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=4567,
                     earliest_timestamp="2024-06-01T13:17:00+00:00",
                     latest_timestamp="2024-06-01T13:18:00+00:00",
                     batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
-                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=7890,
                     earliest_timestamp="2024-06-01T08:00:00+00:00",
                     latest_timestamp="2024-06-01T11:00:00+00:00",
                     batch_id="e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
-                    is_a_batched_report=True,
                 ),
             ],
             [
@@ -239,7 +224,6 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
             earliest_timestamp="2024-06-15",
             latest_timestamp="2024-06-21",
             batch_id="a8a526f9-84be-44a6-b751-62c95c4b9329",
-            is_a_batched_report=True,
             will_be_archived_at="2024-06-29 23:59",
         ),
     ]
@@ -319,7 +303,6 @@ def test_unsubscribe_request_report_for_processed_batched_reports(client_request
             latest_timestamp="2023-06-14",
             processed_by_service_at="2024-06-10",
             batch_id="e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
-            is_a_batched_report=True,
             will_be_archived_at="2024-01-08 23:00",
         ),
     ]
@@ -361,7 +344,6 @@ def test_unsubscribe_request_report_with_forced_download(
                 earliest_timestamp="2023-06-8",
                 latest_timestamp="2023-06-14",
                 batch_id=fake_uuid,
-                is_a_batched_report=True,
                 will_be_archived_at="2024-01-08 23:00",
             ),
         ],
@@ -428,7 +410,6 @@ def test_mark_report_as_completed(client_request, mocker, fake_uuid):
                 earliest_timestamp="2024-08-06",
                 latest_timestamp="2024-08-07",
                 batch_id=fake_uuid,
-                is_a_batched_report=True,
             ),
         ],
     )
