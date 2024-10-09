@@ -16,45 +16,40 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
         (
             # A mixture of reports from different dates
             [
-                create_unsubscribe_request_report(**{
-                    "service_id": SERVICE_ONE_ID,
-                    "count": 1,
-                    "earliest_timestamp": "2024-06-22T15:00:00+00:00",
-                    "latest_timestamp": "2024-06-22T15:00:00+00:00",
-                    "batch_id": "1629dada-9777-4d0a-aa5a-a8b6e3c7ff7b",
-                }),
-                create_unsubscribe_request_report(**{
-                    "service_id": SERVICE_ONE_ID,
-                    "count": 1,
-                    "earliest_timestamp": "2024-06-22T11:00:00+00:00",
-                    "latest_timestamp": "2024-06-22T13:17:00+00:00",
-                    "batch_id": "af5f5e86-528b-475e-8be1-012988987775",
-                }),
-                create_unsubscribe_request_report(**{
-                    "service_id": SERVICE_ONE_ID,
-                    "count": 34,
-                    "earliest_timestamp": "2024-06-22T10:00:00+00:00",
-                    "latest_timestamp": "2024-06-22T11:00:00+00:00",
-                    "batch_id": "5e2b05ef-7552-49ef-a77f-96d46ab2b9bb",
-                    "is_a_batched_report": True,
-                }),
-                create_unsubscribe_request_report(**{
-                    "service_id": SERVICE_ONE_ID,
-                    "count": 200,
-                    "earliest_timestamp": "2024-06-15T18:00:00+00:00",
-                    "latest_timestamp": "2024-06-21T08:00:00+00:00",
-                    "batch_id": "c2d11916-ee82-419e-99a8-7e38163e756f",
-                    "is_a_batched_report": True,
-                }),
-                create_unsubscribe_request_report(**{
-                    "service_id": SERVICE_ONE_ID,
-                    "count": 321,
-                    "earliest_timestamp": "2023-12-8T00:00:00+00:00",
-                    "latest_timestamp": "2024-01-14T00:00:00+00:00",
-                    "processed_by_service_at": "2024-06-10T00:00:00+00:00",
-                    "batch_id": "e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
-                    "is_a_batched_report": True,
-                }),
+                create_unsubscribe_request_report(
+                    count=1,
+                    earliest_timestamp="2024-06-22T15:00:00+00:00",
+                    latest_timestamp="2024-06-22T15:00:00+00:00",
+                    batch_id="1629dada-9777-4d0a-aa5a-a8b6e3c7ff7b",
+                ),
+                create_unsubscribe_request_report(
+                    count=1,
+                    earliest_timestamp="2024-06-22T11:00:00+00:00",
+                    latest_timestamp="2024-06-22T13:17:00+00:00",
+                    batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                ),
+                create_unsubscribe_request_report(
+                    count=34,
+                    earliest_timestamp="2024-06-22T10:00:00+00:00",
+                    latest_timestamp="2024-06-22T11:00:00+00:00",
+                    batch_id="5e2b05ef-7552-49ef-a77f-96d46ab2b9bb",
+                    is_a_batched_report=True,
+                ),
+                create_unsubscribe_request_report(
+                    count=200,
+                    earliest_timestamp="2024-06-15T18:00:00+00:00",
+                    latest_timestamp="2024-06-21T08:00:00+00:00",
+                    batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
+                    is_a_batched_report=True,
+                ),
+                create_unsubscribe_request_report(
+                    count=321,
+                    earliest_timestamp="2023-12-8T00:00:00+00:00",
+                    latest_timestamp="2024-01-14T00:00:00+00:00",
+                    processed_by_service_at="2024-06-10T00:00:00+00:00",
+                    batch_id="e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
+                    is_a_batched_report=True,
+                ),
             ],
             [
                 "Report Status",
@@ -72,13 +67,13 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
         (
             # A single report spanning a long time period
             [
-                create_unsubscribe_request_report(**{
-                    "service_id": SERVICE_ONE_ID,
-                    "count": 1,
-                    "earliest_timestamp": "2020-01-01T10:00:00+00:00",
-                    "latest_timestamp": "2024-06-01T12:17:00+00:00",
-                    "batch_id": "af5f5e86-528b-475e-8be1-012988987775",
-                }),
+                create_unsubscribe_request_report(
+                    service_id=SERVICE_ONE_ID,
+                    count=1,
+                    earliest_timestamp="2020-01-01T10:00:00+00:00",
+                    latest_timestamp="2024-06-01T12:17:00+00:00",
+                    batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                ),
             ],
             [
                 "Report Status",
@@ -91,20 +86,20 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
         (
             # Two single requests on the same day
             [
-                create_unsubscribe_request_report(**{
-                    "count": 1,
-                    "earliest_timestamp": "2024-01-01T13:18:00+00:00",
-                    "latest_timestamp": "2024-01-01T13:18:00+00:00",
-                    "batch_id": "af5f5e86-528b-475e-8be1-012988987775",
-                    "is_a_batched_report": True,
-                }),
-                create_unsubscribe_request_report(**{
-                    "count": 1,
-                    "earliest_timestamp": "2024-01-01T12:17:00+00:00",
-                    "latest_timestamp": "2024-01-01T12:17:00+00:00",
-                    "batch_id": "c2d11916-ee82-419e-99a8-7e38163e756f",
-                    "is_a_batched_report": True,
-                }),
+                create_unsubscribe_request_report(
+                    count=1,
+                    earliest_timestamp="2024-01-01T13:18:00+00:00",
+                    latest_timestamp="2024-01-01T13:18:00+00:00",
+                    batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                    is_a_batched_report=True,
+                ),
+                create_unsubscribe_request_report(
+                    count=1,
+                    earliest_timestamp="2024-01-01T12:17:00+00:00",
+                    latest_timestamp="2024-01-01T12:17:00+00:00",
+                    batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
+                    is_a_batched_report=True,
+                ),
             ],
             [
                 "Report Status",
@@ -116,22 +111,22 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
         (
             # Two reports with overlapping days
             [
-                create_unsubscribe_request_report(**{
-                    "count": 1,
-                    "earliest_timestamp": "2024-05-01T11:00:00+00:00",
-                    "latest_timestamp": "2024-05-01T13:17:00+00:00",
-                    "processed_by_service_at": "2024-06-22T13:14:00+00:00",
-                    "batch_id": "af5f5e86-528b-475e-8be1-012988987775",
-                    "is_a_batched_report": True,
-                }),
-                create_unsubscribe_request_report(**{
-                    "count": 12345678,
-                    "earliest_timestamp": "2024-04-30T03:00:00+00:00",
-                    "latest_timestamp": "2024-05-01T09:00:00+00:00",
-                    "processed_by_service_at": "2024-06-22T13:14:00+00:00",
-                    "batch_id": "c2d11916-ee82-419e-99a8-7e38163e756f",
-                    "is_a_batched_report": True,
-                }),
+                create_unsubscribe_request_report(
+                    count=1,
+                    earliest_timestamp="2024-05-01T11:00:00+00:00",
+                    latest_timestamp="2024-05-01T13:17:00+00:00",
+                    processed_by_service_at="2024-06-22T13:14:00+00:00",
+                    batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                    is_a_batched_report=True,
+                ),
+                create_unsubscribe_request_report(
+                    count=12345678,
+                    earliest_timestamp="2024-04-30T03:00:00+00:00",
+                    latest_timestamp="2024-05-01T09:00:00+00:00",
+                    processed_by_service_at="2024-06-22T13:14:00+00:00",
+                    batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
+                    is_a_batched_report=True,
+                ),
             ],
             [
                 "Report Status",
@@ -143,27 +138,27 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
         (
             # Three reports on independent, consecutive days
             [
-                create_unsubscribe_request_report(**{
-                    "count": 1234,
-                    "earliest_timestamp": "2024-06-22T11:00:00+00:00",
-                    "latest_timestamp": "2024-06-22T13:17:00+00:00",
-                    "batch_id": "af5f5e86-528b-475e-8be1-012988987775",
-                    "is_a_batched_report": True,
-                }),
-                create_unsubscribe_request_report(**{
-                    "count": 4567,
-                    "earliest_timestamp": "2024-06-21T11:00:00+00:00",
-                    "latest_timestamp": "2024-06-21T13:17:00+00:00",
-                    "batch_id": "c2d11916-ee82-419e-99a8-7e38163e756f",
-                    "is_a_batched_report": True,
-                }),
-                create_unsubscribe_request_report(**{
-                    "count": 7890,
-                    "earliest_timestamp": "2024-06-20T11:00:00+00:00",
-                    "latest_timestamp": "2024-06-20T13:17:00+00:00",
-                    "batch_id": "e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
-                    "is_a_batched_report": True,
-                }),
+                create_unsubscribe_request_report(
+                    count=1234,
+                    earliest_timestamp="2024-06-22T11:00:00+00:00",
+                    latest_timestamp="2024-06-22T13:17:00+00:00",
+                    batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                    is_a_batched_report=True,
+                ),
+                create_unsubscribe_request_report(
+                    count=4567,
+                    earliest_timestamp="2024-06-21T11:00:00+00:00",
+                    latest_timestamp="2024-06-21T13:17:00+00:00",
+                    batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
+                    is_a_batched_report=True,
+                ),
+                create_unsubscribe_request_report(
+                    count=7890,
+                    earliest_timestamp="2024-06-20T11:00:00+00:00",
+                    latest_timestamp="2024-06-20T13:17:00+00:00",
+                    batch_id="e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
+                    is_a_batched_report=True,
+                ),
             ],
             [
                 "Report Status",
@@ -176,27 +171,27 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
         (
             # Three reports on the same day
             [
-                create_unsubscribe_request_report(**{
-                    "count": 1234,
-                    "earliest_timestamp": "2024-06-01T22:22:00+00:00",
-                    "latest_timestamp": "2024-06-01T23:00:00+00:00",
-                    "batch_id": "af5f5e86-528b-475e-8be1-012988987775",
-                    "is_a_batched_report": True,
-                }),
-                create_unsubscribe_request_report(**{
-                    "count": 4567,
-                    "earliest_timestamp": "2024-06-01T13:17:00+00:00",
-                    "latest_timestamp": "2024-06-01T13:18:00+00:00",
-                    "batch_id": "c2d11916-ee82-419e-99a8-7e38163e756f",
-                    "is_a_batched_report": True,
-                }),
-                create_unsubscribe_request_report(**{
-                    "count": 7890,
-                    "earliest_timestamp": "2024-06-01T08:00:00+00:00",
-                    "latest_timestamp": "2024-06-01T11:00:00+00:00",
-                    "batch_id": "e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
-                    "is_a_batched_report": True,
-                }),
+                create_unsubscribe_request_report(
+                    count=1234,
+                    earliest_timestamp="2024-06-01T22:22:00+00:00",
+                    latest_timestamp="2024-06-01T23:00:00+00:00",
+                    batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                    is_a_batched_report=True,
+                ),
+                create_unsubscribe_request_report(
+                    count=4567,
+                    earliest_timestamp="2024-06-01T13:17:00+00:00",
+                    latest_timestamp="2024-06-01T13:18:00+00:00",
+                    batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
+                    is_a_batched_report=True,
+                ),
+                create_unsubscribe_request_report(
+                    count=7890,
+                    earliest_timestamp="2024-06-01T08:00:00+00:00",
+                    latest_timestamp="2024-06-01T11:00:00+00:00",
+                    batch_id="e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
+                    is_a_batched_report=True,
+                ),
             ],
             [
                 "Report Status",
@@ -241,14 +236,14 @@ def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocke
 @freeze_time("2024-06-22 12:00")
 def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_request, mocker):
     test_data = [
-        create_unsubscribe_request_report(**{
-            "count": 200,
-            "earliest_timestamp": "2024-06-15",
-            "latest_timestamp": "2024-06-21",
-            "batch_id": "a8a526f9-84be-44a6-b751-62c95c4b9329",
-            "is_a_batched_report": True,
-            "will_be_archived_at": "2024-06-29 23:59",
-        }),
+        create_unsubscribe_request_report(
+            count=200,
+            earliest_timestamp="2024-06-15",
+            latest_timestamp="2024-06-21",
+            batch_id="a8a526f9-84be-44a6-b751-62c95c4b9329",
+            is_a_batched_report=True,
+            will_be_archived_at="2024-06-29 23:59",
+        ),
     ]
 
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
@@ -281,11 +276,11 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
 @freeze_time("2024-07-02")
 def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker):
     test_data = [
-        create_unsubscribe_request_report(**{
-            "count": 34,
-            "earliest_timestamp": "2024-06-22 10:00",
-            "latest_timestamp": "2024-07-01 12:00",
-        }),
+        create_unsubscribe_request_report(
+            count=34,
+            earliest_timestamp="2024-06-22 10:00",
+            latest_timestamp="2024-07-01 12:00",
+        ),
     ]
 
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
@@ -320,15 +315,15 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
 @freeze_time("2024-01-01")
 def test_unsubscribe_request_report_for_processed_batched_reports(client_request, mocker):
     test_data = [
-        create_unsubscribe_request_report(**{
-            "count": 321,
-            "earliest_timestamp": "2023-06-8",
-            "latest_timestamp": "2023-06-14",
-            "processed_by_service_at": "2024-06-10",
-            "batch_id": "e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
-            "is_a_batched_report": True,
-            "will_be_archived_at": "2024-01-08 23:00",
-        }),
+        create_unsubscribe_request_report(
+            count=321,
+            earliest_timestamp="2023-06-8",
+            latest_timestamp="2023-06-14",
+            processed_by_service_at="2024-06-10",
+            batch_id="e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
+            is_a_batched_report=True,
+            will_be_archived_at="2024-01-08 23:00",
+        ),
     ]
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=test_data)
     page = client_request.get(
@@ -363,14 +358,14 @@ def test_unsubscribe_request_report_with_forced_download(
         UnsubscribeRequestsReports,
         "client_method",
         return_value=[
-            create_unsubscribe_request_report(**{
-                "count": 321,
-                "earliest_timestamp": "2023-06-8",
-                "latest_timestamp": "2023-06-14",
-                "batch_id": fake_uuid,
-                "is_a_batched_report": True,
-                "will_be_archived_at": "2024-01-08 23:00",
-            }),
+            create_unsubscribe_request_report(
+                count=321,
+                earliest_timestamp="2023-06-8",
+                latest_timestamp="2023-06-14",
+                batch_id=fake_uuid,
+                is_a_batched_report=True,
+                will_be_archived_at="2024-01-08 23:00",
+            ),
         ],
     )
     page = client_request.get(
@@ -395,11 +390,11 @@ def test_cannot_force_download_for_unbatched_unsubscribe_request_report(
         UnsubscribeRequestsReports,
         "client_method",
         return_value=[
-            create_unsubscribe_request_report(**{
-                "count": 321,
-                "earliest_timestamp": "2023-06-8",
-                "latest_timestamp": "2023-06-14",
-            }),
+            create_unsubscribe_request_report(
+                count=321,
+                earliest_timestamp="2023-06-8",
+                latest_timestamp="2023-06-14",
+            ),
         ],
     )
     page = client_request.get(
@@ -430,13 +425,13 @@ def test_mark_report_as_completed(client_request, mocker, fake_uuid):
         UnsubscribeRequestsReports,
         "client_method",
         return_value=[
-            create_unsubscribe_request_report(**{
-                "count": 321,
-                "earliest_timestamp": "2024-08-06",
-                "latest_timestamp": "2024-08-07",
-                "batch_id": fake_uuid,
-                "is_a_batched_report": True,
-            }),
+            create_unsubscribe_request_report(
+                count=321,
+                earliest_timestamp="2024-08-06",
+                latest_timestamp="2024-08-07",
+                batch_id=fake_uuid,
+                is_a_batched_report=True,
+            ),
         ],
     )
     mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete")
@@ -481,11 +476,11 @@ def test_download_unsubscribe_request_report_redirects_to_batch_unsubscribe_requ
 
 def test_create_unsubscribe_request_report_creates_batched_report(client_request, mocker):
     summary_data = [
-        create_unsubscribe_request_report(**{
-            "count": 34,
-            "earliest_timestamp": "2024-07-18T16:32:28.000000Z",
-            "latest_timestamp": "2024-07-20T19:22:11.000000Z",
-        }),
+        create_unsubscribe_request_report(
+            count=34,
+            earliest_timestamp="2024-07-18T16:32:28.000000Z",
+            latest_timestamp="2024-07-20T19:22:11.000000Z",
+        ),
     ]
     test_batch_id = "daaa3f82-faf0-4199-82da-15ec6aa8abe8"
     mocker.patch.object(UnsubscribeRequestsReports, "client_method", return_value=summary_data)
