@@ -36,11 +36,7 @@
               "classes": "govuk-textarea-highlight",
             }
           }) }}
-
-          {% if current_user.platform_admin %}
-            {{ form.has_unsubscribe_link }}
-          {% endif %}
-
+          {{ form.has_unsubscribe_link }}
           {{ form.template_content(param_extensions={
             "classes": "govuk-!-width-full govuk-textarea-highlight__textbox",
             "attributes": {
