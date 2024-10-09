@@ -4231,7 +4231,7 @@ def create_unsubscribe_request_report(
     processed_by_service_at=None,
     batch_id=None,
     will_be_archived_at=None,
-    count,
+    count=1,
     earliest_timestamp,
     latest_timestamp,
 ):
