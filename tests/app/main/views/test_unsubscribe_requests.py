@@ -20,13 +20,13 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     count=1,
                     earliest_timestamp="2024-06-22T15:00:00+00:00",
                     latest_timestamp="2024-06-22T15:00:00+00:00",
-                    batch_id="1629dada-9777-4d0a-aa5a-a8b6e3c7ff7b",
                 ),
                 create_unsubscribe_request_report(
                     count=1,
                     earliest_timestamp="2024-06-22T11:00:00+00:00",
                     latest_timestamp="2024-06-22T13:17:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=34,
@@ -54,13 +54,12 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
             [
                 "Report Status",
                 "Today at 4:00pm 1 unsubscribe request Not downloaded",
-                "Today from midday to 2:17pm 1 unsubscribe request Not downloaded",
+                "Today from midday to 2:17pm 1 unsubscribe request Downloaded",
                 "Today until midday 34 unsubscribe requests Downloaded",
                 "15 June to yesterday 200 unsubscribe requests Downloaded",
                 "7 December 2023 to 13 January 321 unsubscribe requests Completed",
             ],
             [
-                "Not downloaded",
                 "Not downloaded",
             ],
         ),
@@ -73,15 +72,14 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     earliest_timestamp="2020-01-01T10:00:00+00:00",
                     latest_timestamp="2024-06-01T12:17:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                    is_a_batched_report=True,
                 ),
             ],
             [
                 "Report Status",
-                "1 January 2020 to 1 June 1 unsubscribe request Not downloaded",
+                "1 January 2020 to 1 June 1 unsubscribe request Downloaded",
             ],
-            [
-                "Not downloaded",
-            ],
+            [],
         ),
         (
             # Two single requests on the same day
