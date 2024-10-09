@@ -20,13 +20,13 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     count=1,
                     earliest_timestamp="2024-06-22T15:00:00+00:00",
                     latest_timestamp="2024-06-22T15:00:00+00:00",
-                    batch_id="1629dada-9777-4d0a-aa5a-a8b6e3c7ff7b",
                 ),
                 create_unsubscribe_request_report(
                     count=1,
                     earliest_timestamp="2024-06-22T11:00:00+00:00",
                     latest_timestamp="2024-06-22T13:17:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                    is_a_batched_report=True,
                 ),
                 create_unsubscribe_request_report(
                     count=34,
@@ -61,7 +61,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
             ],
             [
                 "Not downloaded",
-                "Not downloaded",
             ],
         ),
         (
@@ -73,15 +72,14 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                     earliest_timestamp="2020-01-01T10:00:00+00:00",
                     latest_timestamp="2024-06-01T12:17:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
+                    is_a_batched_report=True,
                 ),
             ],
             [
                 "Report Status",
-                "1 January 2020 to 1 June 1 unsubscribe request Not downloaded",
+                "1 January 2020 to 1 June 1 unsubscribe request Downloaded",
             ],
-            [
-                "Not downloaded",
-            ],
+            [],
         ),
         (
             # Two single requests on the same day
@@ -321,6 +319,7 @@ def test_unsubscribe_request_report_for_processed_batched_reports(client_request
             latest_timestamp="2023-06-14",
             processed_by_service_at="2024-06-10",
             batch_id="e5aed7fe-b649-43b0-9c2b-1cdeb315f724",
+            is_a_batched_report=True,
             will_be_archived_at="2024-01-08 23:00",
         ),
     ]
