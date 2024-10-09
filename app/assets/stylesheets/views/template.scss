@@ -28,65 +28,79 @@
 
 %edit-template-link,
 .edit-template-link {
-  position: absolute;
-  z-index: 10000;
+  @include govuk-media-query($until: tablet) {
+    margin-bottom: govuk-spacing(2);
+  }
+  @include govuk-media-query($from: tablet) {
+    position: absolute;
+    z-index: 10000;
+  }
 }
 
 .edit-template-link-letter-contact {
   @extend %edit-template-link;
 
-  @include scalable-top(285);
-  // position underneath contact block
-  left: 61.3%;
-
-  &:active {
+  @include govuk-media-query($from: tablet) {
     @include scalable-top(285);
-    margin-top: -2px;
+    // position underneath contact block
+    left: 61.3%;
+
+    &:active {
+      @include scalable-top(285);
+      margin-top: -2px;
+    }
   }
 }
 
 .edit-template-link-letter-address {
   @extend %edit-template-link;
-  top: 14.65%; // align bottom edge to bottom of address
-  left: -5px;
+  @include govuk-media-query($from: tablet) {
+    top: 14.65%; // align bottom edge to bottom of address
+    left: -5px;
 
-  &:active {
-    margin-top: -2px;
-    top: 14.65%;
+    &:active {
+      margin-top: -2px;
+      top: 14.65%;
+    }
   }
-
 }
 
 .edit-template-link-letter-body {
   @extend %edit-template-link;
-  @include scalable-top(393);
-  left: -20px;
-
-  &:active {
+  @include govuk-media-query($from: tablet) {
     @include scalable-top(393);
-    margin-top: -2px;
+    left: -20px;
+
+    &:active {
+      @include scalable-top(393);
+      margin-top: -2px;
+    }
   }
 }
 
 .edit-template-link-letter-postage {
   @extend %edit-template-link;
-  @include scalable-top(51);
-  left: 61.3%; // Aligns left edge to ‘Change sender address’ button
-
-  &:active {
+  @include govuk-media-query($from: tablet) {
     @include scalable-top(51);
-    margin-top: -2px;
+    left: 61.3%; // Aligns left edge to ‘Change sender address’ button
+
+    &:active {
+      @include scalable-top(51);
+      margin-top: -2px;
+    }
   }
 }
 
 .edit-template-link-letter-branding {
   @extend %edit-template-link;
-  @include scalable-top(51);
-  left: 51px; // Aligns to left of logo area
-
-  &:active {
+  @include govuk-media-query($from: tablet) {
     @include scalable-top(51);
-    margin-top: -2px;
+    left: 51px; // Aligns to left of logo area
+
+    &:active {
+      @include scalable-top(51);
+      margin-top: -2px;
+    }
   }
 }
 
@@ -96,12 +110,14 @@
 
 .edit-template-link-get-ready-to-send {
   @extend %edit-template-link;
-  @include scalable-top(234);
-  left: 51px; // Aligns to left of logo area
-
-  &:active {
+  @include govuk-media-query($from: tablet) {
     @include scalable-top(234);
-    margin-top: -2px;
+    left: 51px; // Aligns to left of logo area
+
+    &:active {
+      @include scalable-top(234);
+      margin-top: -2px;
+    }
   }
 }
 
