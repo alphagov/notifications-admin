@@ -14,7 +14,6 @@ from app import (
     letter_jobs_client,
     notification_api_client,
     organisations_client,
-    platform_stats_api_client,
     service_api_client,
     user_api_client,
 )
@@ -25,7 +24,6 @@ from app.main.forms import (
     AdminClearCacheForm,
     AdminReturnedLettersForm,
     BillingReportDateFilterForm,
-    DateFilterForm,
     PlatformAdminSearchForm,
     RequiredDateFilterForm,
 )
@@ -78,29 +76,6 @@ def platform_admin_search():
         users=users,
         services=services,
         organisations=organisations,
-        error_summary_enabled=True,
-    )
-
-
-@main.route("/platform-admin/summary")
-@user_is_platform_admin
-def platform_admin():
-    form = DateFilterForm(request.args, meta={"csrf": False})
-    api_args = {}
-
-    form.validate()
-
-    if form.start_date.data:
-        api_args["start_date"] = form.start_date.data
-        api_args["end_date"] = form.end_date.data or datetime.utcnow().date()
-
-    platform_stats = platform_stats_api_client.get_aggregate_platform_stats(api_args)
-    number_of_complaints = complaint_api_client.get_complaint_count(api_args)
-
-    return render_template(
-        "views/platform-admin/index.html",
-        form=form,
-        global_stats=make_columns(platform_stats, number_of_complaints),
         error_summary_enabled=True,
     )
 
@@ -168,50 +143,6 @@ def make_columns(global_stats, complaints_number):
             "test_data": {"number": global_stats["letter"]["test-key"], "label": "test letters"},
         },
     ]
-
-
-@main.route("/platform-admin/live-services", endpoint="live_services")
-@main.route("/platform-admin/trial-services", endpoint="trial_services")
-@user_is_platform_admin
-def platform_admin_services():
-    form = DateFilterForm(request.args, meta={"csrf": False})
-    if all(
-        (
-            request.args.get("include_from_test_key") is None,
-            request.args.get("start_date") is None,
-            request.args.get("end_date") is None,
-        )
-    ):
-        # Default to True if the user hasn’t done any filtering,
-        # otherwise respect their choice
-        form.include_from_test_key.data = True
-
-    include_from_test_key = form.include_from_test_key.data
-    api_args = {
-        "detailed": True,
-        "only_active": False,  # specifically DO get inactive services
-        "include_from_test_key": include_from_test_key,
-    }
-
-    if form.validate():
-        if form.start_date.data:
-            api_args["start_date"] = form.start_date.data
-            api_args["end_date"] = form.end_date.data or datetime.utcnow().date()
-
-    services = filter_and_sort_services(
-        service_api_client.get_services(api_args)["data"],
-        trial_mode_services=request.endpoint == "main.trial_services",
-    )
-
-    return render_template(
-        "views/platform-admin/services.html",
-        include_from_test_key=include_from_test_key,
-        form=form,
-        services=list(format_stats_by_service(services)),
-        page_title=f"{'Trial mode' if request.endpoint == 'main.trial_services' else 'Live'} services",
-        global_stats=create_global_stats(services),
-        error_summary_enabled=True,
-    )
 
 
 @main.route("/platform-admin/reports")

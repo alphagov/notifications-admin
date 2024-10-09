@@ -106,7 +106,6 @@ class HeaderNavigation(Navigation):
             "edit_sms_provider_ratio",
             "email_branding",
             "letter_branding",
-            "live_services",
             "live_services_csv",
             "notifications_sent_by_service",
             "get_billing_report",
@@ -115,7 +114,6 @@ class HeaderNavigation(Navigation):
             "get_daily_sms_provider_volumes",
             "get_volumes_by_service",
             "organisations",
-            "platform_admin",
             "platform_admin_list_complaints",
             "platform_admin_reports",
             "platform_admin_returned_letters",
@@ -125,7 +123,6 @@ class HeaderNavigation(Navigation):
             "platform_admin_create_email_branding",
             "platform_admin_update_email_branding",
             "platform_admin_view_email_branding",
-            "trial_services",
             "update_letter_branding",
             "user_information",
             "view_provider",
@@ -412,15 +409,6 @@ class PlatformAdminNavigation(Navigation):
     mapping = {
         "search": {
             "platform_admin_search",
-        },
-        "summary": {
-            "platform_admin",
-        },
-        "live-services": {
-            "live_services",
-        },
-        "trial-mode-services": {
-            "trial_services",
         },
         "organisations": {
             "organisations",
