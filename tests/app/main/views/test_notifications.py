@@ -161,6 +161,12 @@ def test_notification_status_page_respects_redaction(
             partial(url_for, "main.view_notifications", message_type="sms", status="failed"),
         ),
         (
+            {"from_statuses": "failed", "from_search_query": "test-hash-1234"},
+            partial(
+                url_for, "main.view_notifications", message_type="sms", status="failed", search_query="test-hash-1234"
+            ),
+        ),
+        (
             {"from_job": "job_id"},
             partial(url_for, "main.view_job", job_id="job_id"),
         ),
