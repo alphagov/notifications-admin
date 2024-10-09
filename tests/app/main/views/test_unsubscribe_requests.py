@@ -17,12 +17,10 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
             # A mixture of reports from different dates
             [
                 create_unsubscribe_request_report(
-                    count=1,
                     earliest_timestamp="2024-06-22T15:00:00+00:00",
                     latest_timestamp="2024-06-22T15:00:00+00:00",
                 ),
                 create_unsubscribe_request_report(
-                    count=1,
                     earliest_timestamp="2024-06-22T11:00:00+00:00",
                     latest_timestamp="2024-06-22T13:17:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
@@ -64,7 +62,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
             [
                 create_unsubscribe_request_report(
                     service_id=SERVICE_ONE_ID,
-                    count=1,
                     earliest_timestamp="2020-01-01T10:00:00+00:00",
                     latest_timestamp="2024-06-01T12:17:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
@@ -80,13 +77,11 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
             # Two single requests on the same day
             [
                 create_unsubscribe_request_report(
-                    count=1,
                     earliest_timestamp="2024-01-01T13:18:00+00:00",
                     latest_timestamp="2024-01-01T13:18:00+00:00",
                     batch_id="af5f5e86-528b-475e-8be1-012988987775",
                 ),
                 create_unsubscribe_request_report(
-                    count=1,
                     earliest_timestamp="2024-01-01T12:17:00+00:00",
                     latest_timestamp="2024-01-01T12:17:00+00:00",
                     batch_id="c2d11916-ee82-419e-99a8-7e38163e756f",
@@ -103,7 +98,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
             # Two reports with overlapping days
             [
                 create_unsubscribe_request_report(
-                    count=1,
                     earliest_timestamp="2024-05-01T11:00:00+00:00",
                     latest_timestamp="2024-05-01T13:17:00+00:00",
                     processed_by_service_at="2024-06-22T13:14:00+00:00",
