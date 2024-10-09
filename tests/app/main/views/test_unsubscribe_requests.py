@@ -17,6 +17,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             # A mixture of reports from different dates
             [
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 1,
                     "earliest_timestamp": "2024-06-22T15:00:00+00:00",
                     "latest_timestamp": "2024-06-22T15:00:00+00:00",
@@ -25,6 +26,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": False,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 1,
                     "earliest_timestamp": "2024-06-22T11:00:00+00:00",
                     "latest_timestamp": "2024-06-22T13:17:00+00:00",
@@ -33,6 +35,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": False,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 34,
                     "earliest_timestamp": "2024-06-22T10:00:00+00:00",
                     "latest_timestamp": "2024-06-22T11:00:00+00:00",
@@ -41,6 +44,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": True,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 200,
                     "earliest_timestamp": "2024-06-15T18:00:00+00:00",
                     "latest_timestamp": "2024-06-21T08:00:00+00:00",
@@ -49,6 +53,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": True,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 321,
                     "earliest_timestamp": "2023-12-8T00:00:00+00:00",
                     "latest_timestamp": "2024-01-14T00:00:00+00:00",
@@ -74,6 +79,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             # A single report spanning a long time period
             [
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 1,
                     "earliest_timestamp": "2020-01-01T10:00:00+00:00",
                     "latest_timestamp": "2024-06-01T12:17:00+00:00",
@@ -94,6 +100,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             # Two single requests on the same day
             [
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 1,
                     "earliest_timestamp": "2024-01-01T13:18:00+00:00",
                     "latest_timestamp": "2024-01-01T13:18:00+00:00",
@@ -102,6 +109,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": True,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 1,
                     "earliest_timestamp": "2024-01-01T12:17:00+00:00",
                     "latest_timestamp": "2024-01-01T12:17:00+00:00",
@@ -121,6 +129,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             # Two reports with overlapping days
             [
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 1,
                     "earliest_timestamp": "2024-05-01T11:00:00+00:00",
                     "latest_timestamp": "2024-05-01T13:17:00+00:00",
@@ -129,6 +138,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": True,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 12345678,
                     "earliest_timestamp": "2024-04-30T03:00:00+00:00",
                     "latest_timestamp": "2024-05-01T09:00:00+00:00",
@@ -148,6 +158,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             # Three reports on independent, consecutive days
             [
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 1234,
                     "earliest_timestamp": "2024-06-22T11:00:00+00:00",
                     "latest_timestamp": "2024-06-22T13:17:00+00:00",
@@ -156,6 +167,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": True,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 4567,
                     "earliest_timestamp": "2024-06-21T11:00:00+00:00",
                     "latest_timestamp": "2024-06-21T13:17:00+00:00",
@@ -164,6 +176,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": True,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 7890,
                     "earliest_timestamp": "2024-06-20T11:00:00+00:00",
                     "latest_timestamp": "2024-06-20T13:17:00+00:00",
@@ -184,6 +197,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             # Three reports on the same day
             [
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 1234,
                     "earliest_timestamp": "2024-06-01T22:22:00+00:00",
                     "latest_timestamp": "2024-06-01T23:00:00+00:00",
@@ -192,6 +206,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": True,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 4567,
                     "earliest_timestamp": "2024-06-01T13:17:00+00:00",
                     "latest_timestamp": "2024-06-01T13:18:00+00:00",
@@ -200,6 +215,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                     "is_a_batched_report": True,
                 },
                 {
+                    "service_id": SERVICE_ONE_ID,
                     "count": 7890,
                     "earliest_timestamp": "2024-06-01T08:00:00+00:00",
                     "latest_timestamp": "2024-06-01T11:00:00+00:00",
@@ -252,6 +268,7 @@ def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocke
 def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_request, mocker):
     test_data = [
         {
+            "service_id": SERVICE_ONE_ID,
             "count": 200,
             "earliest_timestamp": "2024-06-15",
             "latest_timestamp": "2024-06-21",
@@ -293,6 +310,7 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
 def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker):
     test_data = [
         {
+            "service_id": SERVICE_ONE_ID,
             "count": 34,
             "earliest_timestamp": "2024-06-22 10:00",
             "latest_timestamp": "2024-07-01 12:00",
@@ -335,6 +353,7 @@ def test_unsubscribe_request_report_for_unbatched_reports(client_request, mocker
 def test_unsubscribe_request_report_for_processed_batched_reports(client_request, mocker):
     test_data = [
         {
+            "service_id": SERVICE_ONE_ID,
             "count": 321,
             "earliest_timestamp": "2023-06-8",
             "latest_timestamp": "2023-06-14",
@@ -378,6 +397,7 @@ def test_unsubscribe_request_report_with_forced_download(
         "client_method",
         return_value=[
             {
+                "service_id": SERVICE_ONE_ID,
                 "count": 321,
                 "earliest_timestamp": "2023-06-8",
                 "latest_timestamp": "2023-06-14",
@@ -411,6 +431,7 @@ def test_cannot_force_download_for_unbatched_unsubscribe_request_report(
         "client_method",
         return_value=[
             {
+                "service_id": SERVICE_ONE_ID,
                 "count": 321,
                 "earliest_timestamp": "2023-06-8",
                 "latest_timestamp": "2023-06-14",
@@ -449,6 +470,7 @@ def test_mark_report_as_completed(client_request, mocker, fake_uuid):
         "client_method",
         return_value=[
             {
+                "service_id": SERVICE_ONE_ID,
                 "count": 321,
                 "earliest_timestamp": "2024-08-06",
                 "latest_timestamp": "2024-08-07",
@@ -501,6 +523,7 @@ def test_download_unsubscribe_request_report_redirects_to_batch_unsubscribe_requ
 def test_create_unsubscribe_request_report_creates_batched_report(client_request, mocker):
     summary_data = [
         {
+            "service_id": SERVICE_ONE_ID,
             "count": 34,
             "earliest_timestamp": "2024-07-18T16:32:28.000000Z",
             "latest_timestamp": "2024-07-20T19:22:11.000000Z",
