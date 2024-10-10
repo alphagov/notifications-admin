@@ -176,7 +176,7 @@
     "/services/<uuid:service_id>/jobs/<uuid:job_id>.json",
     "/services/<uuid:service_id>/jobs/<uuid:job_id>/cancel",
     "/services/<uuid:service_id>/jobs/<uuid:job_id>/original.csv",
-    "/services/<uuid:service_id>/join-request/<uuid:request_id>",
+    "/services/<uuid:service_id>/join-request/<uuid:request_id>/approve",
     "/services/<uuid:service_id>/make-service-live",
     "/services/<uuid:service_id>/make-service-live/contact-user",
     "/services/<uuid:service_id>/make-service-live/decision",
