@@ -1,0 +1,21 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  {{ '{} wants to join your service'.format(requester.name) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('{} wants to join your service'.format(requester.name)) }}
+
+  {% call form_wrapper() %}
+    {{ form.join_service_approval_request }}
+
+    {{ page_footer('Confirm') }}
+
+  {% endcall %}
+
+{% endblock %}

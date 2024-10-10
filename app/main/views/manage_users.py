@@ -15,9 +15,11 @@ from app.main.forms import (
     ChangeMobileNumberForm,
     ChangeNonGovEmailForm,
     InviteUserForm,
+    JoinServiceRequestApproveForm,
     PermissionsForm,
     SearchUsersForm,
 )
+from app.models.service import ServiceJoinRequest
 from app.models.user import InvitedUser, User
 from app.utils.user import is_gov_user, user_has_permissions
 from app.utils.user_permissions import permission_options
@@ -88,6 +90,23 @@ def invite_user(service_id, user_id=None):
         form=form,
         mobile_number=True,
         user_to_invite=user_to_invite,
+        error_summary_enabled=True,
+    )
+
+
+@main.route("/services/<uuid:service_id>/join-request/<uuid:request_id>/approve", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_join_request_manage(service_id, request_id):
+    form = JoinServiceRequestApproveForm()
+
+    service_join_request = ServiceJoinRequest.from_id(request_id)
+    requested_by = service_join_request.requester
+
+    return render_template(
+        "views/join-service-request-approver.html",
+        form=form,
+        mobile_number=True,
+        requester=requested_by,
         error_summary_enabled=True,
     )
 

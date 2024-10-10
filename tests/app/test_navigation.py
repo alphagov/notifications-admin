@@ -170,6 +170,7 @@ EXCLUDED_ENDPOINTS = set(
             "index",
             "invite_org_user",
             "invite_user",
+            "service_join_request_manage",
             "json_updates.conversation_updates",
             "json_updates.get_notifications_page_partials_as_json",
             "json_updates.inbox_updates",

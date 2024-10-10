@@ -1,5 +1,6 @@
 import copy
 import uuid
+from datetime import datetime
 
 import pytest
 from flask import url_for
@@ -1859,3 +1860,57 @@ def test_confirm_edit_user_mobile_number_doesnt_change_user_mobile_for_non_team_
         user_id=USER_ONE_ID,
         _expected_status=404,
     )
+
+
+def service_join_request_get_data(
+    requester_id, status, mock_requester, status_changed_by, mock_contacted_service_users
+):
+    return {
+        "service_join_request_id": requester_id,
+        "requester": {"id": mock_requester.get("id"), "name": mock_requester.get("name"), "belongs_to_service": []},
+        "service_id": SERVICE_ONE_ID,
+        "created_at": datetime.utcnow(),
+        "status": status,
+        "status_changed_at": datetime.utcnow(),
+        "status_changed_by": (
+            {"id": status_changed_by.get("id"), "name": status_changed_by.get("name"), "belongs_to_service": []}
+            if status_changed_by
+            else None
+        ),
+        "reason": "",
+        "contacted_service_users": mock_contacted_service_users,
+    }
+
+
+@pytest.fixture(scope="function")
+def mock_get_service_join_request_pending(mocker):
+    mock_requester = create_active_user_empty_permissions(True)
+    mock_service_user = create_active_user_with_permissions(True)
+    mocker.patch("app.notify_client.current_user", side_effect=mock_service_user)
+
+    def _get(requester_id):
+        mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
+        return service_join_request_get_data(
+            requester_id, "pending", mock_requester, None, mock_contacted_service_users
+        )
+
+    return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
+
+
+def test_service_join_request_pending(
+    client_request,
+    mock_get_service_join_request_pending,
+):
+    page = client_request.get(
+        "main.service_join_request_manage",
+        service_id=SERVICE_ONE_ID,
+        request_id=sample_uuid(),
+    )
+    assert "Test User With Empty Permissions wants to join your service" in page.text.strip()
+    assert "Test User With Empty Permissions wants to join your service" in page.select_one("h1").text.strip()
+
+    radio_buttons = page.select("input[name=join_service_approval_request]")
+    values = {button["value"] for button in radio_buttons}
+    assert values == {"rejected", "approved"}
+
+    assert normalize_spaces(page.select("form button")[0].text) == "Confirm"
