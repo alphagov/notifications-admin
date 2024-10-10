@@ -101,6 +101,17 @@ def service_join_request_manage(service_id, request_id):
 
     service_join_request = ServiceJoinRequest.from_id(request_id)
     requested_by = service_join_request.requester
+    request_changed_by = service_join_request.status_changed_by
+    requested_service = service_api_client.get_service(service_join_request.service_id)
+
+    if service_join_request.is_approved:
+        return render_template(
+            "views/service-join-request-already-approved.html",
+            approved_by=request_changed_by,
+            requested_by=requested_by,
+            approved_at=service_join_request.created_at,
+            requested_service=requested_service,
+        )
 
     return render_template(
         "views/join-service-request-approver.html",
