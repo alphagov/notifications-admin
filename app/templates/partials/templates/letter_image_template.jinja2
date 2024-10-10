@@ -24,9 +24,9 @@
       <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Add your contact details</a>
     {% endif %}
     {% if template.welsh_page_count %}
-      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id, language='welsh') }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> Welsh body text</span></a>
+      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id, language='welsh') }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="visually-hidden-on-tablet-and-up"> Welsh body text</span></a>
     {% else %}
-      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> body text</span></a>
+      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="visually-hidden-on-tablet-and-up"> body text</span></a>
     {% endif %}
   {% endif %}
 {% endif %}
@@ -41,7 +41,7 @@
     {% if template.welsh_page_count and page_number == first_page_of_english %}
       <div id="first-page-of-english-in-bilingual-letter"></div>
       {% if template.include_letter_edit_ui_overlay  %}
-        <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="govuk-visually-hidden"> English body text</span></a>
+        <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="visually-hidden-on-tablet-and-up"> English body text</span></a>
       {% endif %}
     {% endif %}
     {% if page_number == first_page_of_attachment %}
