@@ -34,6 +34,9 @@
   @include govuk-media-query($from: tablet) {
     position: absolute;
     z-index: 10000;
+    .visually-hidden-on-tablet-and-up {
+      @include govuk-visually-hidden($important: false);
+    }
   }
 }
 
