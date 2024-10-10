@@ -49,6 +49,14 @@ $iso-paper-ratio: 141.42135624%;
     $fold-height: 124px;
     $envelope-colour: #C4B186;
 
+    // adjust the postage size on mobile
+    // take existing variable and resixe by 33%
+    @include govuk-media-query($until: tablet) {
+      width: ($fold-height * ($art-width / $art-height) / 1.3) ;
+      height: $fold-height / 1.3;
+      background-size: ($fold-height * ($art-width / $art-height) / 1.3);
+    }
+
     position: absolute;
     top: 0;
     right: 0;
