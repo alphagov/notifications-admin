@@ -1884,51 +1884,50 @@ def service_join_request_get_data(
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_join_request_pending(mocker):
-    mock_requester = create_active_user_empty_permissions(True)
-    mock_service_user = create_active_user_with_permissions(True)
+def mock_get_service_join_request_status_data(mocker, mock_requester, mock_service_user, status):
     mocker.patch("app.notify_client.current_user", side_effect=mock_service_user)
 
     def _get(requester_id):
         mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
         return service_join_request_get_data(
+            requester_id, status, mock_requester, mock_service_user, mock_contacted_service_users
+        )
+
+    return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
+def mock_get_service_join_request_user_already_joined(mocker):
+    mock_requester = create_active_user_empty_permissions(True)
+    mock_service_user = create_active_user_with_permissions(True)
+
+    def _get(requester_id):
+        mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
+        mock_request_data = service_join_request_get_data(
             requester_id, "pending", mock_requester, None, mock_contacted_service_users
         )
+        mock_request_data["requester"]["belongs_to_service"] = [SERVICE_ONE_ID]
+        return mock_request_data
 
     return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
 
 
-@pytest.fixture(scope="function")
-def mock_get_service_join_request_approved(mocker):
-    mock_requester = create_active_user_empty_permissions(True)
-    mock_service_user = create_active_user_with_permissions(True)
-
-    def _get(requester_id):
-        mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
-        return service_join_request_get_data(
-            requester_id, "approved", mock_requester, mock_service_user, mock_contacted_service_users
-        )
-
-    return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
-
-
-@pytest.fixture(scope="function")
-def mock_get_service_join_request_rejected(mocker):
-    mock_requester = create_active_user_empty_permissions(True)
-    mock_service_user = create_active_user_with_permissions(True)
-
-    def _get(requester_id):
-        mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
-        return service_join_request_get_data(
-            requester_id, "rejected", mock_requester, mock_service_user, mock_contacted_service_users
-        )
-
-    return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
-
-
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [
+        (
+            create_active_user_empty_permissions(True),
+            create_active_user_with_permissions(True),
+            "pending",
+        ),
+    ],
+)
 def test_service_join_request_pending(
     client_request,
-    mock_get_service_join_request_pending,
+    mock_requester,
+    mock_service_user,
+    status,
+    mock_get_service_join_request_status_data,
 ):
     page = client_request.get(
         "main.service_join_request_manage",
@@ -1945,9 +1944,22 @@ def test_service_join_request_pending(
     assert normalize_spaces(page.select("form button")[0].text) == "Confirm"
 
 
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [
+        (
+            create_active_user_empty_permissions(True),
+            create_active_user_with_permissions(True),
+            "approved",
+        ),
+    ],
+)
 def test_service_join_request_approved(
     client_request,
-    mock_get_service_join_request_approved,
+    mock_requester,
+    mock_service_user,
+    status,
+    mock_get_service_join_request_status_data,
 ):
     page = client_request.get(
         "main.service_join_request_manage",
@@ -1961,9 +1973,22 @@ def test_service_join_request_approved(
     assert f"Test User approved their request on { today_date }" in page.select_one("p").text.strip()
 
 
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [
+        (
+            create_active_user_empty_permissions(True),
+            create_active_user_with_permissions(True),
+            "rejected",
+        ),
+    ],
+)
 def test_service_join_request_rejected(
     client_request,
-    mock_get_service_join_request_rejected,
+    mock_requester,
+    mock_service_user,
+    status,
+    mock_get_service_join_request_status_data,
 ):
     page = client_request.get(
         "main.service_join_request_manage",
@@ -1975,3 +2000,17 @@ def test_service_join_request_rejected(
 
     today_date = format_date_short(datetime.utcnow())
     assert f"Test User already refused their request on { today_date }" in page.select_one("p").text.strip()
+
+
+def test_service_join_request_already_joined(
+    client_request,
+    mock_get_service_join_request_user_already_joined,
+):
+    page = client_request.get(
+        "main.service_join_request_manage",
+        service_id=SERVICE_ONE_ID,
+        request_id=sample_uuid(),
+    )
+    assert "This person is already a team member" in page.text.strip()
+    assert "This person is already a team member" in page.select_one("h1").text.strip()
+    assert "Test User With Empty Permissions is already member of 'service one'" in page.select_one("p").text.strip()
