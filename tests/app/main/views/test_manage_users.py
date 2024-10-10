@@ -1912,6 +1912,20 @@ def mock_get_service_join_request_approved(mocker):
     return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
 
 
+@pytest.fixture(scope="function")
+def mock_get_service_join_request_rejected(mocker):
+    mock_requester = create_active_user_empty_permissions(True)
+    mock_service_user = create_active_user_with_permissions(True)
+
+    def _get(requester_id):
+        mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
+        return service_join_request_get_data(
+            requester_id, "rejected", mock_requester, mock_service_user, mock_contacted_service_users
+        )
+
+    return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
+
+
 def test_service_join_request_pending(
     client_request,
     mock_get_service_join_request_pending,
@@ -1946,3 +1960,18 @@ def test_service_join_request_approved(
     today_date = format_date_short(datetime.utcnow())
     assert f"Test User approved their request on { today_date }" in page.select_one("p").text.strip()
 
+
+def test_service_join_request_rejected(
+    client_request,
+    mock_get_service_join_request_rejected,
+):
+    page = client_request.get(
+        "main.service_join_request_manage",
+        service_id=SERVICE_ONE_ID,
+        request_id=sample_uuid(),
+    )
+    assert "You cannot let Test User With Empty Permissions join your service" in page.text.strip()
+    assert "You cannot let Test User With Empty Permissions join your service" in page.select_one("h1").text.strip()
+
+    today_date = format_date_short(datetime.utcnow())
+    assert f"Test User already refused their request on { today_date }" in page.select_one("p").text.strip()
