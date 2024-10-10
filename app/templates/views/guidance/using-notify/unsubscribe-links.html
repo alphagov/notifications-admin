@@ -1,4 +1,5 @@
 {% extends "content_template.html" %}
+{% from "components/service-link.html" import service_link %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -11,32 +12,37 @@
 
   <h1 class="heading-large">Unsubscribe links</h1>
 
-  <p class="govuk-body">You must let people opt out of receiving subscription emails.</p>
-  <p class="govuk-body">If you do not, recipients can report your emails as spam. If this happens we may stop you from using GOV.UK Notify.</p>
-  <p class="govuk-body">Transactional emails do not need to include an unsubscribe link.</p>
-   <p class="govuk-body">The GOV.​UK Service Manual explains the difference between <a class="govuk-link govuk-link--no-visited-state"
-    href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#transactional-messages">transactional and subscription messages</a>.</p>
+  <p class="govuk-body">You must let people opt out of receiving subscription emails, otherwise they might report you for sending spam.</p>
+ <p class="govuk-body">With GOV.UK Notify you can:</p>
+<ul class="govuk-list govuk-list--bullet">
+    <li>add an unsubscribe link in your emails</li>
+    <li>get a list of the recipients who request to unsubscribe</li>
+  </ul>
+  <p class="govuk-body">It is your responsibility to stop sending emails to anyone who asks to unsubscribe.</p>
 
-  <p class="govuk-body">There are 2 ways to let recipients opt out:</p>
+ <p class="govuk-body">If you do not, we can stop you from using GOV.UK Notify.</p>
+
+<div class="govuk-inset-text">
+ <p class="govuk-body">Read the GOV.​UK Service Manual to help decide if your emails are <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#transactional-messages">transactional or subscription messages</a>.</p></div>
+
+  <h2 class="govuk-heading-m">How to add an unsubscribe link</h2>
   <ol class="govuk-list govuk-list--number">
-    <li>Add an unsubscribe link to the body of your email.</li>
-    <li>Add one-click unsubscribe to the email header.</li>
+    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
+    <li>Add a new email template or choose an existing email template.</li>
+    <li>Select the <b class="govuk-!-font-weight-bold">Add an unsubscribe link</b> checkbox.</li>
   </ol>
+  <p class="govuk-body">Recipients can request to opt out of unwanted emails by clicking on the unsubscribe link. </p>
+  <p class="govuk-body">We will report any email unsubscribe requests on the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }}.</p>
+<p class="govuk-body">You should download the report and remove the recipients from your mailing list. Do this before you send any more emails to these recipients.</p>
+<p class="govuk-body">This report is available for up to 90 days.</p>
 
-  <h2 class="heading-medium">Add an unsubscribe link to the email body</h2>
-
-  <p class="govuk-body">GOV.UK Notify uses Markdown to format links.</p>
-  <p class="govuk-body">To add an unsubscribe link to the body of your email, use square brackets around the link text and round brackets around the URL. Make sure there are no spaces between the brackets or the link will not work.</p>
-  <p class="govuk-body">Use this example if you have a webpage for users to manage their email subscriptions:</p>
-
-  <pre class="formatting-example"><code class="lang-md">[Unsubscribe](https://www.example.gov.uk/unsubscribe)</code></pre>
-  
-  <p class="govuk-body">If you do not have your own webpage, you can add a ‘mailto’ link to let users send an email to your team instead. For example:</p>  
-  <pre class="formatting-example"><code class="lang-md">[Unsubscribe](mailto:example@gov.uk?subject=unsubscribe)</code></pre>
-  <p class="govuk-body">The email address should be a shared inbox managed by your team, not your own email address.</p>
-
-  <h2 class="heading-medium">Add one-click unsubscribe to the email header</h2>
-  <p class="govuk-body">This is currently an API-only feature. You’ll need a developer on your team to set it up for you.</p>
-  <p class="govuk-body">To add one-click unsubscribe, follow the instructions in our <a class="govuk-link govuk-link--no-visited-state"
+   <h3 class="govuk-heading-m">If you want to add a custom unsubscribe link</h3>
+<p class="govuk-body">This is an API only feature. Follow the instructions in our <a class="govuk-link govuk-link--no-visited-state"
     href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API documentation</a>.</p>
+   <p class="govuk-body">You’ll need a developer on your team to set it up for you.</p> 
+   
+
+
+  
 {% endblock %}
