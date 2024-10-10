@@ -1018,6 +1018,18 @@ class PermissionsForm(StripWhitespaceForm):
         return form
 
 
+class JoinServiceRequestApproveForm(StripWhitespaceForm):
+    join_service_approval_request = GovukRadiosField(
+        "",
+        choices=[
+            ("approved", "Yes"),
+            ("rejected", "No"),
+        ],
+        thing="a sign-in method",
+        param_extensions={"fieldset": {"legend": {"classes": ""}}},
+    )
+
+
 class OrganisationUserPermissionsForm(StripWhitespaceForm):
     permissions_field = GovukCheckboxesField(
         "Permissions",

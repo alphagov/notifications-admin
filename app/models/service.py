@@ -638,3 +638,34 @@ class Service(JSONModel):
 
 class Services(SerialisedModelCollection):
     model = Service
+
+
+class ServiceJoinRequest(JSONModel):
+    service_join_request_id: Any
+    requester: Any
+    service_id: Any
+    created_at: datetime
+    status_changed_at: datetime
+    status_changed_by: Any
+    reason: str
+    status: str
+    contacted_service_users: list[str]
+    requested_service: Any
+
+    __sort_attribute__ = "id"
+
+    @property
+    def is_pending(self):
+        return self.status == "pending"
+
+    @property
+    def is_approved(self):
+        return self.status == "approved"
+
+    @property
+    def is_rejected(self):
+        return self.status == "rejected"
+
+    @classmethod
+    def from_id(cls, request_id):
+        return cls(service_api_client.get_service_join_requests(request_id))
