@@ -104,6 +104,9 @@ def service_join_request_manage(service_id, request_id):
     request_changed_by = service_join_request.status_changed_by
     requested_service = service_api_client.get_service(service_join_request.service_id)
 
+    if current_user.id not in service_join_request.contacted_service_users:
+        abort(403)
+
     if service_join_request.is_approved:
         return render_template(
             "views/service-join-request-already-approved.html",
