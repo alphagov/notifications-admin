@@ -112,7 +112,7 @@ def service_join_request_manage(service_id, request_id):
             "views/service-join-request-already-approved.html",
             approved_by=request_changed_by,
             requested_by=requested_by,
-            approved_at=service_join_request.created_at,
+            approved_at=service_join_request.status_changed_at,
             requested_service=requested_service,
         )
     if service_join_request.is_rejected:
@@ -120,13 +120,17 @@ def service_join_request_manage(service_id, request_id):
             "views/service-join-request-rejected.html",
             rejected_by=request_changed_by,
             requested_by=requested_by,
-            rejected_at=service_join_request.created_at,
+            rejected_at=service_join_request.status_changed_at,
         )
     if service_id in requested_by["belongs_to_service"]:
         return render_template(
             "views/service-join-request-user-already-joined.html",
             user_to_invite=requested_by,
         )
+
+    # if form.validate_on_submit():
+    # (form.join_service_approval_request.data)
+    # Once permissions/reject template created, redirect from here
 
     return render_template(
         "views/join-service-request-approver.html",
