@@ -1897,6 +1897,20 @@ def mock_get_service_join_request_status_data(mocker, mock_requester, mock_servi
 
 
 @pytest.fixture(scope="function")
+def mock_get_service_join_request_not_logged_in_user(mocker):
+    mock_requester = create_active_user_empty_permissions(True)
+    mock_service_user = create_active_user_with_permissions(True)
+
+    def _get(requester_id):
+        mock_contacted_service_users = [mock_service_user["id"]]
+        return service_join_request_get_data(
+            requester_id, "rejected", mock_requester, mock_service_user, mock_contacted_service_users
+        )
+
+    return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
 def mock_get_service_join_request_user_already_joined(mocker):
     mock_requester = create_active_user_empty_permissions(True)
     mock_service_user = create_active_user_with_permissions(True)
@@ -2014,3 +2028,15 @@ def test_service_join_request_already_joined(
     assert "This person is already a team member" in page.text.strip()
     assert "This person is already a team member" in page.select_one("h1").text.strip()
     assert "Test User With Empty Permissions is already member of 'service one'" in page.select_one("p").text.strip()
+
+
+def test_service_join_request_should_return_403_when_approver_is_not_logged_in_user(
+    client_request,
+    mock_get_service_join_request_not_logged_in_user,
+):
+    client_request.get(
+        "main.service_join_request_manage",
+        service_id=SERVICE_ONE_ID,
+        request_id=sample_uuid(),
+        _expected_status=403,
+    )
