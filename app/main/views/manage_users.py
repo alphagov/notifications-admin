@@ -119,6 +119,11 @@ def service_join_request_manage(service_id, request_id):
             requested_by=requested_by,
             rejected_at=service_join_request.created_at,
         )
+    if service_id in requested_by["belongs_to_service"]:
+        return render_template(
+            "views/service-join-request-user-already-joined.html",
+            user_to_invite=requested_by,
+        )
 
     return render_template(
         "views/join-service-request-approver.html",
