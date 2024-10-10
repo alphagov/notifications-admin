@@ -24,7 +24,13 @@ class SortingAndEqualityMixin(ABC):
         return f"{self.__class__.__name__}(<{self.id}>)"
 
     def __lt__(self, other):
-        return (getattr(self, self.__sort_attribute__).lower()) < (getattr(other, self.__sort_attribute__).lower())
+        self_attr = getattr(self, self.__sort_attribute__)
+        other_attr = getattr(other, self.__sort_attribute__)
+
+        if isinstance(self_attr, str) and isinstance(other_attr, str):
+            return self_attr.lower() < other_attr.lower()
+
+        return self_attr < other_attr
 
     def __eq__(self, other):
         return self.id == other.id

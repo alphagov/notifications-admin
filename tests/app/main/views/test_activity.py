@@ -357,7 +357,7 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
         is_precompiled_letter=True,
         client_reference="client reference",
     )
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications.client_method", return_value=notifications)
 
     page = client_request.get(
         "main.view_notifications",
@@ -384,7 +384,7 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     notifications = create_notifications(
         template_type="letter", status=letter_status, is_precompiled_letter=True, client_reference="ref"
     )
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications.client_method", return_value=notifications)
 
     page = client_request.get(
         "main.view_notifications",
@@ -715,7 +715,7 @@ def test_html_contains_links_for_failed_notifications(
     mocker,
 ):
     notifications = create_notifications(status="technical-failure")
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications.client_method", return_value=notifications)
 
     response = client_request.get(
         "main.view_notifications", service_id=SERVICE_ONE_ID, message_type="sms", status="sending%2Cdelivered%2Cfailed"
@@ -759,7 +759,7 @@ def test_redacts_templates_that_should_be_redacted(
         redact_personalisation=True,
         template_type=notification_type,
     )
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications.client_method", return_value=notifications)
 
     page = client_request.get(
         "main.view_notifications",
@@ -837,7 +837,7 @@ def test_sending_status_hint_displays_correctly_on_notifications_page(
     mocker,
 ):
     notifications = create_notifications(template_type=message_type, status=status)
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications.client_method", return_value=notifications)
 
     page = client_request.get("main.view_notifications", service_id=service_one["id"], message_type=message_type)
 
@@ -871,7 +871,7 @@ def test_should_show_address_and_hint_for_letters(
         client_reference=expected_hint,
         to=expected_address,
     )
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications.client_method", return_value=notifications)
 
     page = client_request.get(
         "main.view_notifications",
