@@ -112,6 +112,13 @@ def service_join_request_manage(service_id, request_id):
             approved_at=service_join_request.created_at,
             requested_service=requested_service,
         )
+    if service_join_request.is_rejected:
+        return render_template(
+            "views/service-join-request-rejected.html",
+            rejected_by=request_changed_by,
+            requested_by=requested_by,
+            rejected_at=service_join_request.created_at,
+        )
 
     return render_template(
         "views/join-service-request-approver.html",
