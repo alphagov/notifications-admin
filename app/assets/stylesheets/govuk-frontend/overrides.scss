@@ -3,6 +3,12 @@
 $notify-secondary-button-colour: govuk-shade(govuk-colour("light-grey"), 7%);
 $notify-secondary-button-hover-colour: govuk-shade(govuk-colour("light-grey"), 18%);
 
+// adjusted link colour on grey to satisfy WCAG criterion
+// on govuk-shade(govuk-colour("light-grey"), 7%) this 
+// now has a contrast ratio of 5.67
+// this HEX is lighter than $govuk-link-hover-colour
+$link-colour-on-grey-background: #1852ab;
+
 // Additional padding-bottom override, following the GOV.UK Frontend spacing scale:
 // https://design-system.service.gov.uk/styles/spacing/#the-responsive-spacing-scale
 .govuk-\!-padding-bottom-12 {

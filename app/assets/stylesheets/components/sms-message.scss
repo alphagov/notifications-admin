@@ -44,6 +44,10 @@ $tail-angle: 20deg;
       transform: rotate(-$tail-angle);
     }
 
+    .govuk-link {
+      color: $link-colour-on-grey-background;
+    }
+
   }
 
 }
