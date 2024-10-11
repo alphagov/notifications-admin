@@ -124,6 +124,12 @@
   }
 }
 
+.edit-template-link-attachment {
+  @include govuk-media-query($until: tablet) {
+    margin-bottom: govuk-spacing(2);
+  }
+}
+
 .template-content-count {
   @include govuk-font(19, $tabular: true);
   color: $govuk-secondary-text-colour;
