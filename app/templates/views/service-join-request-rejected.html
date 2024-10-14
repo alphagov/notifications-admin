@@ -10,7 +10,7 @@
   {{ page_header('You cannot let {} join your service'.format(requested_by.name)) }}
 
   <p class="govuk-body">
-    {{ rejected_by.name }} already refused their request on {{ rejected_at|format_date_short }}.
+    {{ rejected_by.name }} already refused this request on {{ rejected_at|format_date_short }}.
   </p>
 
   <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_account') }}">Back to your services</a>
