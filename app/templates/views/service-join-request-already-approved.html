@@ -10,7 +10,7 @@
   {{ page_header('{} has already joined your service'.format(requested_by.name)) }}
 
   <p class="govuk-body">
-    {{ approved_by.name }} approved their request on {{ approved_at|format_date_short }}.
+    {{ approved_by.name }} approved this request on {{ approved_at|format_date_short }}.
   </p>
 
   <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_account') }}">Back to your services</a>

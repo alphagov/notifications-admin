@@ -19,7 +19,7 @@ from app.main.forms import (
     PermissionsForm,
     SearchUsersForm,
 )
-from app.models.service import ServiceJoinRequest
+from app.models.service import Service, ServiceJoinRequest
 from app.models.user import InvitedUser, User
 from app.utils.user import is_gov_user, user_has_permissions
 from app.utils.user_permissions import permission_options
@@ -96,13 +96,13 @@ def invite_user(service_id, user_id=None):
 
 @main.route("/services/<uuid:service_id>/join-request/<uuid:request_id>/approve", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
-def service_join_request_manage(service_id, request_id):
+def service_join_request_approve(service_id, request_id):
     form = JoinServiceRequestApproveForm()
 
     service_join_request = ServiceJoinRequest.from_id(request_id)
     requested_by = service_join_request.requester
     request_changed_by = service_join_request.status_changed_by
-    requested_service = service_api_client.get_service(service_join_request.service_id)
+    requested_service = Service.from_id(service_join_request.service_id)
 
     if current_user.id not in service_join_request.contacted_service_users:
         abort(403)
@@ -129,14 +129,14 @@ def service_join_request_manage(service_id, request_id):
         )
 
     # if form.validate_on_submit():
-    # (form.join_service_approval_request.data)
+    # (form.join_service_approve_request.data)
     # Once permissions/reject template created, redirect from here
 
     return render_template(
         "views/join-service-request-approver.html",
         form=form,
-        mobile_number=True,
         requester=requested_by,
+        requested_service=requested_service,
         error_summary_enabled=True,
     )
 

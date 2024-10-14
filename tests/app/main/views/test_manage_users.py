@@ -1863,11 +1863,9 @@ def test_confirm_edit_user_mobile_number_doesnt_change_user_mobile_for_non_team_
     )
 
 
-def service_join_request_get_data(
-    requester_id, status, mock_requester, status_changed_by, mock_contacted_service_users
-):
+def service_join_request_get_data(request_id, status, mock_requester, status_changed_by, mock_contacted_service_users):
     return {
-        "service_join_request_id": requester_id,
+        "service_join_request_id": request_id,
         "requester": {"id": mock_requester.get("id"), "name": mock_requester.get("name"), "belongs_to_service": []},
         "service_id": SERVICE_ONE_ID,
         "created_at": datetime.utcnow(),
@@ -1887,10 +1885,10 @@ def service_join_request_get_data(
 def mock_get_service_join_request_status_data(mocker, mock_requester, mock_service_user, status):
     mocker.patch("app.notify_client.current_user", side_effect=mock_service_user)
 
-    def _get(requester_id):
+    def _get(request_id):
         mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
         return service_join_request_get_data(
-            requester_id, status, mock_requester, mock_service_user, mock_contacted_service_users
+            request_id, status, mock_requester, mock_service_user, mock_contacted_service_users
         )
 
     return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
@@ -1901,10 +1899,10 @@ def mock_get_service_join_request_not_logged_in_user(mocker):
     mock_requester = create_active_user_empty_permissions(True)
     mock_service_user = create_active_user_with_permissions(True)
 
-    def _get(requester_id):
+    def _get(request_id):
         mock_contacted_service_users = [mock_service_user["id"]]
         return service_join_request_get_data(
-            requester_id, "rejected", mock_requester, mock_service_user, mock_contacted_service_users
+            request_id, "rejected", mock_requester, mock_service_user, mock_contacted_service_users
         )
 
     return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
@@ -1915,10 +1913,10 @@ def mock_get_service_join_request_user_already_joined(mocker):
     mock_requester = create_active_user_empty_permissions(True)
     mock_service_user = create_active_user_with_permissions(True)
 
-    def _get(requester_id):
+    def _get(request_id):
         mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
         mock_request_data = service_join_request_get_data(
-            requester_id, "pending", mock_requester, None, mock_contacted_service_users
+            request_id, "pending", mock_requester, None, mock_contacted_service_users
         )
         mock_request_data["requester"]["belongs_to_service"] = [SERVICE_ONE_ID]
         return mock_request_data
@@ -1940,22 +1938,28 @@ def test_service_join_request_pending(
     client_request,
     mock_requester,
     mock_service_user,
+    service_one,
     status,
     mock_get_service_join_request_status_data,
 ):
     page = client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
     )
-    assert "Test User With Empty Permissions wants to join your service" in page.text.strip()
-    assert "Test User With Empty Permissions wants to join your service" in page.select_one("h1").text.strip()
+    assert f"{mock_requester['name']} wants to join your service" in page.text.strip()
+    assert f"{mock_requester['name']} wants to join your service" in page.select_one("h1").text.strip()
+    assert (
+        f"Do you want to let {mock_requester['name']} join ‘{service_one['name']}’?"
+        in page.select_one("legend").text.strip()
+    )
 
-    radio_buttons = page.select("input[name=join_service_approval_request]")
+    radio_buttons = page.select("input[name=join_service_approve_request]")
     values = {button["value"] for button in radio_buttons}
-    assert values == {"rejected", "approved"}
 
-    assert normalize_spaces(page.select("form button")[0].text) == "Confirm"
+    assert values == {"approved", "rejected"}
+
+    assert normalize_spaces(page.select("form button")[0].text) == "Continue"
 
 
 @pytest.mark.parametrize(
@@ -1976,15 +1980,15 @@ def test_service_join_request_approved(
     mock_get_service_join_request_status_data,
 ):
     page = client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
     )
-    assert "Test User With Empty Permissions has already joined your service" in page.text.strip()
-    assert "Test User With Empty Permissions has already joined your service" in page.select_one("h1").text.strip()
+    assert f"{mock_requester['name']} has already joined your service" in page.text.strip()
+    assert f"{mock_requester['name']} has already joined your service" in page.select_one("h1").text.strip()
 
     today_date = format_date_short(datetime.utcnow())
-    assert f"Test User approved their request on { today_date }" in page.select_one("p").text.strip()
+    assert f"{mock_service_user['name']} approved this request on { today_date }" in page.select_one("p").text.strip()
 
 
 @pytest.mark.parametrize(
@@ -2005,15 +2009,18 @@ def test_service_join_request_rejected(
     mock_get_service_join_request_status_data,
 ):
     page = client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
     )
-    assert "You cannot let Test User With Empty Permissions join your service" in page.text.strip()
-    assert "You cannot let Test User With Empty Permissions join your service" in page.select_one("h1").text.strip()
+    assert f"{mock_requester['name']} join your service" in page.text.strip()
+    assert f"{mock_requester['name']} join your service" in page.select_one("h1").text.strip()
 
     today_date = format_date_short(datetime.utcnow())
-    assert f"Test User already refused their request on { today_date }" in page.select_one("p").text.strip()
+    assert (
+        f"{mock_service_user['name']} already refused this request on { today_date }"
+        in page.select_one("p").text.strip()
+    )
 
 
 def test_service_join_request_already_joined(
@@ -2021,13 +2028,13 @@ def test_service_join_request_already_joined(
     mock_get_service_join_request_user_already_joined,
 ):
     page = client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
     )
     assert "This person is already a team member" in page.text.strip()
     assert "This person is already a team member" in page.select_one("h1").text.strip()
-    assert "Test User With Empty Permissions is already member of 'service one'" in page.select_one("p").text.strip()
+    assert "Test User With Empty Permissions is already member of ‘service one‘" in page.select_one("p").text.strip()
 
 
 def test_service_join_request_should_return_403_when_approver_is_not_logged_in_user(
@@ -2035,7 +2042,7 @@ def test_service_join_request_should_return_403_when_approver_is_not_logged_in_u
     mock_get_service_join_request_not_logged_in_user,
 ):
     client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
         _expected_status=403,
