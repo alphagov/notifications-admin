@@ -12,7 +12,7 @@ const paths = {
   govuk_frontend: 'node_modules/govuk-frontend/dist/'
 };
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isDevelopment = Boolean(process.env.NOTIFY_ENVIRONMENT === 'development')
 
 export default [
   // ESM compilation and copy static assets
@@ -22,11 +22,11 @@ export default [
       dir: paths.dist + 'javascripts/',
       entryFileNames: 'all-esm.mjs',
       format: 'es',
-      sourcemap: isProduction ? false : 'inline'
+      sourcemap: true
     },
     plugins: [
       nodeResolve(),
-      isProduction && terser(),
+      terser(),
       // copy images, error pages and govuk-frontend static assets
       copy({
         targets: [
@@ -58,12 +58,12 @@ export default [
             paths.npm
           ],
         },
-        minimize: isProduction,
+        minimize: true,
         url: false,
-        sourceMap: isProduction ? false: "inline",
+        sourceMap: true,
         plugins:[
           // Rewrite /static prefix for URLs in CSS files for production
-          isProduction && postCSSReplace({
+          !isDevelopment && postCSSReplace({
             pattern: /\/static\//g,
             data: {
               replaceAll: '/'
@@ -113,7 +113,7 @@ export default [
     ],
     output: {
       dir: paths.dist + 'javascripts/',
-      sourcemap: isProduction ? false : 'inline'
+      sourcemap: true
     },
     moduleContext: {
       './node_modules/jquery/dist/jquery.min.js': 'window',
@@ -124,7 +124,7 @@ export default [
       multi({
         entryFileName: 'all.js'
       }),
-      isProduction && terser({
+      terser({
         ecma: '5',
         mangle: {
           reserved: ["Hogan"]
