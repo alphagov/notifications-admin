@@ -12,9 +12,12 @@
   {{ page_header('{} wants to join your service'.format(requester.name)) }}
 
   {% call form_wrapper() %}
-    {{ form.join_service_approval_request }}
+    <p class="bottom-gutter">
+      {{ "Do you want to let {} join ‘{}’?".format(requester.name, requested_service.name)}}
+    </p>
+    {{ form.join_service_approve_request }}
 
-    {{ page_footer('Confirm') }}
+    {{ page_footer('Continue') }}
 
   {% endcall %}
 

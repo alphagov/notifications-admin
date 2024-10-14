@@ -1940,22 +1940,28 @@ def test_service_join_request_pending(
     client_request,
     mock_requester,
     mock_service_user,
+    service_one,
     status,
     mock_get_service_join_request_status_data,
 ):
     page = client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
     )
-    assert "Test User With Empty Permissions wants to join your service" in page.text.strip()
-    assert "Test User With Empty Permissions wants to join your service" in page.select_one("h1").text.strip()
+    assert f"{mock_requester['name']} wants to join your service" in page.text.strip()
+    assert f"{mock_requester['name']} wants to join your service" in page.select_one("h1").text.strip()
+    assert (
+        f"Do you want to let {mock_requester['name']} join ‘{service_one['name']}’?"
+        in page.select_one("p").text.strip()
+    )
 
-    radio_buttons = page.select("input[name=join_service_approval_request]")
+    radio_buttons = page.select("input[name=join_service_approve_request]")
     values = {button["value"] for button in radio_buttons}
-    assert values == {"rejected", "approved"}
 
-    assert normalize_spaces(page.select("form button")[0].text) == "Confirm"
+    assert values == {"approved", "rejected"}
+
+    assert normalize_spaces(page.select("form button")[0].text) == "Continue"
 
 
 @pytest.mark.parametrize(
@@ -1976,15 +1982,15 @@ def test_service_join_request_approved(
     mock_get_service_join_request_status_data,
 ):
     page = client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
     )
-    assert "Test User With Empty Permissions has already joined your service" in page.text.strip()
-    assert "Test User With Empty Permissions has already joined your service" in page.select_one("h1").text.strip()
+    assert f"{mock_requester['name']} has already joined your service" in page.text.strip()
+    assert f"{mock_requester['name']} has already joined your service" in page.select_one("h1").text.strip()
 
     today_date = format_date_short(datetime.utcnow())
-    assert f"Test User approved their request on { today_date }" in page.select_one("p").text.strip()
+    assert f"{mock_service_user['name']} approved this request on { today_date }" in page.select_one("p").text.strip()
 
 
 @pytest.mark.parametrize(
@@ -2005,15 +2011,18 @@ def test_service_join_request_rejected(
     mock_get_service_join_request_status_data,
 ):
     page = client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
     )
-    assert "You cannot let Test User With Empty Permissions join your service" in page.text.strip()
-    assert "You cannot let Test User With Empty Permissions join your service" in page.select_one("h1").text.strip()
+    assert f"{mock_requester['name']} join your service" in page.text.strip()
+    assert f"{mock_requester['name']} join your service" in page.select_one("h1").text.strip()
 
     today_date = format_date_short(datetime.utcnow())
-    assert f"Test User already refused their request on { today_date }" in page.select_one("p").text.strip()
+    assert (
+        f"{mock_service_user['name']} already refused this request on { today_date }"
+        in page.select_one("p").text.strip()
+    )
 
 
 def test_service_join_request_already_joined(
@@ -2021,7 +2030,7 @@ def test_service_join_request_already_joined(
     mock_get_service_join_request_user_already_joined,
 ):
     page = client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
     )
@@ -2035,7 +2044,7 @@ def test_service_join_request_should_return_403_when_approver_is_not_logged_in_u
     mock_get_service_join_request_not_logged_in_user,
 ):
     client_request.get(
-        "main.service_join_request_manage",
+        "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
         request_id=sample_uuid(),
         _expected_status=403,
