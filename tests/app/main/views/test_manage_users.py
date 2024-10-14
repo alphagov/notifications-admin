@@ -2034,7 +2034,7 @@ def test_service_join_request_already_joined(
     )
     assert "This person is already a team member" in page.text.strip()
     assert "This person is already a team member" in page.select_one("h1").text.strip()
-    assert "Test User With Empty Permissions is already member of ‘service one‘" in page.select_one("p").text.strip()
+    assert "Test User With Empty Permissions is already member of ‘service one‘." in page.select_one("p").text.strip()
 
 
 def test_service_join_request_should_return_403_when_approver_is_not_logged_in_user(
