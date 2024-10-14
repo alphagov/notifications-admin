@@ -1659,7 +1659,13 @@ def test_should_filter_templates_folder_page_based_on_user_permissions(
         },
     )
 
-    page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID, _test_page_title=False, **extra_args)
+    page = client_request.get(
+        "main.choose_template",
+        service_id=SERVICE_ONE_ID,
+        _test_page_title=False,
+        _test_for_non_smart_quotes=False,
+        **extra_args,
+    )
 
     displayed_page_items = page.select(".template-list-item:not(.template-list-item-hidden-by-default)")
     assert [
