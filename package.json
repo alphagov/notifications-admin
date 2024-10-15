@@ -36,7 +36,7 @@
     "babel-jest": "^29.0.1",
     "better-npm-audit": "3.7.3",
     "del": "<7.0.0",
-    "gulp": "4.0.2",
+    "gulp": "5.0.0",
     "gulp-add-src": "1.0.0",
     "gulp-babel": "8.0.0",
     "gulp-better-rollup": "4.0.1",
