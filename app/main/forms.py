@@ -1256,8 +1256,8 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
             ],
             default="",
         ),
-        min_entries=20,
-        max_entries=20,
+        min_entries=30,
+        max_entries=30,
         label="Domain names",
         thing="domain name",
     )
