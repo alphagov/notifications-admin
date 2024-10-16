@@ -2833,7 +2833,7 @@ def test_service_add_reply_to_email_address_without_verification_for_platform_ad
     mock_update.assert_called_once_with(SERVICE_ONE_ID, email_address="test@example.gov.uk", is_default=True)
 
 
-@pytest.mark.parametrize("is_default,replace,expected_header", [(True, "&replace=123", "Change"), (False, "", "Add")])
+@pytest.mark.parametrize("is_default,replace", [(True, "&replace=123"), (False, "")])
 @pytest.mark.parametrize(
     "status,expected_failure,expected_success",
     [
@@ -2853,7 +2853,6 @@ def test_service_verify_reply_to_address(
     expected_success,
     is_default,
     replace,
-    expected_header,
 ):
     notification = {
         "id": fake_uuid,
@@ -2874,7 +2873,7 @@ def test_service_verify_reply_to_address(
         notification_id=notification["id"],
         _optional_args=f"?is_default={is_default}{replace}",
     )
-    assert page.select_one("h1").text == f"{expected_header} email reply-to address"
+    assert page.select_one("h1").text == "Checking email reply-to address"
     back_link = page.select_one(".govuk-back-link")
     assert back_link.text.strip() == "Back"
     if replace:

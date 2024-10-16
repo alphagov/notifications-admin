@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  {{ verb }} email reply-to address
+  Checking email reply-to address
 {% endblock %}
 
 {% block backLink %}
@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header('{} email reply-to address'.format(verb)) }}
+  {{ page_header('Checking email reply-to address') }}
   {{ ajax_block(
       partials,
       url_for('json_updates.service_verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace),
