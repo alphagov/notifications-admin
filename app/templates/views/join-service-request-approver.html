@@ -12,11 +12,13 @@
   {{ page_header('{} wants to join your service'.format(requester.name)) }}
 
   {% call form_wrapper() %}
-    <p class="bottom-gutter">
-      {{ "Do you want to let {} join ‘{}’?".format(requester.name, requested_service.name)}}
-    </p>
-    {{ form.join_service_approve_request }}
-
+    {{ form.join_service_approve_request(param_extensions={
+      "fieldset": {
+        "legend": {
+          "text": "Do you want to let {} join ‘{}’?".format(requester.name, requested_service.name),
+        },
+      },
+    }) }}
     {{ page_footer('Continue') }}
 
   {% endcall %}
