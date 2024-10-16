@@ -4,12 +4,12 @@
 {% set navigation_label_prefix = 'Using Notify' %}
 
 {% block per_page_title %}
-  Documentation
+  API documentation
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Documentation</h1>
+  <h1 class="heading-large">API documentation</h1>
 
     {% if current_user.platform_admin %}
       <a href="{{ url_for(".guidance_api_documentation_section") }}"
