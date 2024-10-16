@@ -534,6 +534,19 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
     )
 
 
+def test_create_unsubscribe_request_report_blocks_platform_admin(
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+):
+    client_request.login(platform_admin_user)
+    client_request.get(
+        "main.create_unsubscribe_request_report",
+        service_id=fake_uuid,
+        _expected_status=403,
+    )
+
+
 def test_download_unsubscribe_request_report(client_request, mocker):
     report_data = {
         "batch_id": "3d466625-6ea4-414f-ac48-add30d895c43",
