@@ -20,7 +20,6 @@ from app import (
 )
 from app.formatters import get_time_left, message_count_noun
 from app.main import json_updates, main
-from app.main.views.dashboard import add_preview_of_content_to_notifications
 from app.models.job import Job
 from app.s3_client.s3_csv_client import s3download
 from app.utils import parse_filter_args, set_status_filters
@@ -228,7 +227,7 @@ def get_job_partials(job):
             "partials/count.html",
             counts=_get_job_counts(job),
             status=filter_args["status"],
-            notifications_deleted=(job.status == "finished" and not notifications["notifications"]),
+            notifications_deleted=(job.status == "finished" and not notifications),
         )
     service_data_retention_days = current_service.get_days_of_retention(job.template_type)
 
@@ -236,8 +235,8 @@ def get_job_partials(job):
         "counts": counts,
         "notifications": render_template(
             "partials/jobs/notifications.html",
-            notifications=list(add_preview_of_content_to_notifications(notifications["notifications"])),
-            more_than_one_page=bool(notifications.get("links", {}).get("next")),
+            notifications=notifications,
+            more_than_one_page=notifications.next,
             download_link=url_for(
                 "main.view_job_csv", service_id=current_service.id, job_id=job.id, status=request.args.get("status")
             ),
