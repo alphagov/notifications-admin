@@ -8,14 +8,14 @@
 
   &-service-name,
   &-organisation-link {
-    display: inline-block;
-    overflow: hidden;
-    // aligning to the baseline with overflow: hidden adds to the parent's height
-    // aligning to the top doesn't
-    // see: https://stackoverflow.com/questions/23529369/why-does-x-overflowhidden-cause-extra-space-below#answer-51088033
-    vertical-align: top;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    // display: inline-block;
+    // overflow: hidden;
+    // // aligning to the baseline with overflow: hidden adds to the parent's height
+    // // aligning to the top doesn't
+    // // see: https://stackoverflow.com/questions/23529369/why-does-x-overflowhidden-cause-extra-space-below#answer-51088033
+    // vertical-align: top;
+    // white-space: nowrap;
+    // text-overflow: ellipsis;
   }
 
   &-service-type {
@@ -54,25 +54,28 @@
     border-bottom: 1px solid $govuk-border-colour;
     margin: 0 0 10px;
     position: relative;
+    display: flex;
+    column-gap: govuk-spacing(1);
 
     &-name {
 
       padding: $padding-top 0 $padding-bottom 0;
-      max-width: 50%;
+      // max-width: 50%;
 
     }
 
     &-switch {
 
       text-align: right;
-      position: absolute;
-      top: 0;
-      right: 0;
+      // position: absolute;
+      // top: 0;
+      // right: 0;
+      margin-left: auto;
       padding: $padding-top 0 $padding-bottom govuk-spacing(3);
 
-      &:focus {
-        padding: $padding-top 0px $padding-bottom + 1px govuk-spacing(3) + 10;
-      }
+      // &:focus {
+      //   padding: $padding-top 0px $padding-bottom + 1px govuk-spacing(3) + 10;
+      // }
 
     }
 
@@ -87,18 +90,19 @@
 
   &-organisation-link {
 
-    max-width: 25%;
+    // max-width: 25%;
     padding: $padding-top 20px $padding-bottom 0;
     margin-right: 3px;
     box-sizing: border-box;
     position: relative;
+    flex-basis: 25%;
 
     &:before {
       content: "";
       display: block;
       position: absolute;
-      top: 4px;
-      bottom: 1px;
+      top: 20px;
+      // bottom: 1px;
       right: 5px;
       width: 7px;
       height: 7px;
@@ -109,6 +113,9 @@
       border: solid;
       border-width: 1px 1px 0 0;
       border-color: $govuk-secondary-text-colour;
+      @include govuk-media-query($from: tablet) {
+        top: 23px;
+      }
     }
 
     &:focus:before {
