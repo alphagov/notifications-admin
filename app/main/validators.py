@@ -197,6 +197,18 @@ class IsNotAGenericSenderID:
             raise ValidationError(self.message)
 
 
+class IsNotLikeNHSNoReply:
+
+    def __call__(self, form, field):
+        lower_cased_data = field.data.lower()
+        if (
+            field.data
+            and ("nhs" in lower_cased_data and "no" in lower_cased_data and "reply" in lower_cased_data)
+            and field.data != "NHSNoReply"
+        ):
+            raise ValidationError("Text message sender ID must match other NHS services - change it to ‘NHSNoReply’")
+
+
 def create_phishing_senderid_zendesk_ticket(senderID=None):
     ticket_message = render_template(
         "support-tickets/phishing-senderid.txt",
