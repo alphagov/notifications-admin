@@ -15,9 +15,11 @@ from app.main.forms import (
     ChangeMobileNumberForm,
     ChangeNonGovEmailForm,
     InviteUserForm,
+    JoinServiceRequestApproveForm,
     PermissionsForm,
     SearchUsersForm,
 )
+from app.models.service import Service, ServiceJoinRequest
 from app.models.user import InvitedUser, User
 from app.utils.user import is_gov_user, user_has_permissions
 from app.utils.user_permissions import permission_options
@@ -88,6 +90,53 @@ def invite_user(service_id, user_id=None):
         form=form,
         mobile_number=True,
         user_to_invite=user_to_invite,
+        error_summary_enabled=True,
+    )
+
+
+@main.route("/services/<uuid:service_id>/join-request/<uuid:request_id>/approve", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_join_request_approve(service_id, request_id):
+    form = JoinServiceRequestApproveForm()
+
+    service_join_request = ServiceJoinRequest.from_id(request_id)
+    requested_by = service_join_request.requester
+    request_changed_by = service_join_request.status_changed_by
+    requested_service = Service.from_id(service_join_request.service_id)
+
+    if current_user.id not in service_join_request.contacted_service_users:
+        abort(403)
+
+    if service_join_request.is_approved:
+        return render_template(
+            "views/service-join-request-already-approved.html",
+            approved_by=request_changed_by,
+            requested_by=requested_by,
+            approved_at=service_join_request.status_changed_at,
+            requested_service=requested_service,
+        )
+    if service_join_request.is_rejected:
+        return render_template(
+            "views/service-join-request-rejected.html",
+            rejected_by=request_changed_by,
+            requested_by=requested_by,
+            rejected_at=service_join_request.status_changed_at,
+        )
+    if service_id in requested_by["belongs_to_service"]:
+        return render_template(
+            "views/service-join-request-user-already-joined.html",
+            user_to_invite=requested_by,
+        )
+
+    # if form.validate_on_submit():
+    # (form.join_service_approve_request.data)
+    # Once permissions/reject template created, redirect from here
+
+    return render_template(
+        "views/join-service-request-approver.html",
+        form=form,
+        requester=requested_by,
+        requested_service=requested_service,
         error_summary_enabled=True,
     )
 
