@@ -6,12 +6,13 @@
     "node": ">=10.15.3"
   },
   "scripts": {
-    "test": "gulp lint && node --experimental-vm-modules node_modules/.bin/jest tests/javascripts",
+    "test": "npm run lint:scss && node --experimental-vm-modules node_modules/.bin/jest tests/javascripts",
     "test-watch": "jest --watch tests/javascripts",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand $npm_config_test",
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "audit": "better-npm-audit audit --production --level high"
+    "audit": "better-npm-audit audit --production --level high",
+    "lint:scss": "stylelint \"**/*.scss\""
   },
   "repository": {
     "type": "git",
@@ -45,7 +46,10 @@
     "rollup": "4.24.0",
     "rollup-plugin-copy": "3.5.0",
     "rollup-plugin-styler": "1.8.0",
-    "sass": "1.32.7"
+    "sass": "1.32.7",
+    "stylelint": "16.9.0",
+    "stylelint-config-gds": "2.0.0",
+    "stylelint-config-standard-scss": "13.1.0"
   },
   "overrides": {
     "minimist": "1.2.6",
