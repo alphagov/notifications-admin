@@ -23,6 +23,7 @@
     this._classesTo$ElsMap = {};
   };
   ClassesPersister.prototype.addClassName = function (className) {
+    // if the class name is not in the array, then add it
     if (this._classNames.indexOf(className) === -1) {
       this._classNames.push(className);
     }
@@ -63,6 +64,7 @@
       $contents.get(0),
       $(response[key]).get(0)
     );
+    $(document).trigger("updateContent.onafterupdate", [$contents.get(0)]);
     classesPersister.replace();
   };
 
