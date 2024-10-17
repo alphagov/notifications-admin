@@ -63,6 +63,7 @@
       $contents.get(0),
       $(response[key]).get(0)
     );
+    $(document).trigger("updateContent.onafterupdate", [$contents.get(0)]);
     classesPersister.replace();
   };
 
