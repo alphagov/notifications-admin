@@ -1,0 +1,39 @@
+<div class="email-message">
+  <table class="email-message-meta">
+    <tbody>
+      {% if show_recipient %}
+        {% if from_name %}
+          <tr>
+            <th scope="row">From</th>
+            <td>
+              {{ from_name }}
+            </td>
+          </tr>
+        {% endif %}
+        {% if reply_to %}
+          <tr>
+            <th scope="row">Reply&nbsp;to</th>
+            <td>
+              {{ reply_to }}
+            </td>
+          </tr>
+        {% endif %}
+        <tr>
+          <th scope="row">To</th>
+          <td>
+            {{ recipient }}
+          </td>
+        </tr>
+      {% endif %}
+      <tr class="email-message-meta">
+        <th scope="row">Subject</th>
+        <td>
+          {{ subject }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="email-message-body">
+    {{ body }}
+  </div>
+</div>

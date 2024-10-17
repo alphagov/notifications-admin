@@ -8,7 +8,7 @@ from notifications_utils.template import SubjectMixin, Template
 from ordered_set import OrderedSet
 
 from app import load_service_before_request
-from app.utils.templates import TemplatedLetterImageTemplate, get_sample_template
+from app.utils.templates import EmailPreviewTemplate, TemplatedLetterImageTemplate, get_sample_template
 from tests import template_json
 from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_counts_for_letter
 
@@ -495,67 +495,151 @@ def test_letter_image_renderer_knows_if_letter_is_too_long(
     assert template.max_sheet_count == 5
 
 
+def test_subject_line_gets_applied_to_email_preview_template():
+    assert issubclass(EmailPreviewTemplate, SubjectMixin)
+
+
 def test_subject_line_gets_applied_to_correct_template_types():
-    assert issubclass(TemplatedLetterImageTemplate, SubjectMixin)
+    for cls in [
+        EmailPreviewTemplate,
+        TemplatedLetterImageTemplate,
+    ]:
+        assert issubclass(cls, SubjectMixin)
 
 
-def test_subject_line_gets_replaced():
-    template = TemplatedLetterImageTemplate(
-        {"service": SERVICE_ONE_ID, "content": "", "template_type": "letter", "subject": "((name))"},
-        image_url="http://example.com",
+@pytest.mark.parametrize(
+    "template_class, template_type, extra_args",
+    (
+        (EmailPreviewTemplate, "email", {}),
+        (
+            TemplatedLetterImageTemplate,
+            "letter",
+            {"image_url": "http://example.com"},
+        ),
+    ),
+)
+def test_subject_line_gets_replaced(
+    template_class,
+    template_type,
+    extra_args,
+):
+    template = template_class(
+        {"service": SERVICE_ONE_ID, "content": "", "template_type": template_type, "subject": "((name))"},
+        **extra_args,
     )
     assert template.subject == Markup("<span class='placeholder'>&#40;&#40;name&#41;&#41;</span>")
     template.values = {"name": "Jo"}
     assert template.subject == "Jo"
 
 
+@pytest.mark.parametrize(
+    "template_class, template_type, extra_args, expected_field_calls",
+    [
+        (
+            EmailPreviewTemplate,
+            "email",
+            {},
+            [
+                mock.call("content", {}, html="escape", markdown_lists=True, redact_missing_personalisation=False),
+                mock.call("subject", {}, html="escape", redact_missing_personalisation=False),
+                mock.call("((email address))", {}, with_brackets=False),
+            ],
+        ),
+        (
+            EmailPreviewTemplate,
+            "email",
+            {"redact_missing_personalisation": True},
+            [
+                mock.call("content", {}, html="escape", markdown_lists=True, redact_missing_personalisation=True),
+                mock.call("subject", {}, html="escape", redact_missing_personalisation=True),
+                mock.call("((email address))", {}, with_brackets=False),
+            ],
+        ),
+        (
+            TemplatedLetterImageTemplate,
+            "letter",
+            {"image_url": "http://example.com", "contact_block": "www.gov.uk"},
+            [
+                mock.call(
+                    (
+                        "((address line 1))\n"
+                        "((address line 2))\n"
+                        "((address line 3))\n"
+                        "((address line 4))\n"
+                        "((address line 5))\n"
+                        "((address line 6))\n"
+                        "((address line 7))"
+                    ),
+                    {},
+                    with_brackets=False,
+                    html="escape",
+                ),
+                mock.call("www.gov.uk", {}, html="escape", redact_missing_personalisation=False),
+                mock.call("subject", {}, html="escape", redact_missing_personalisation=False),
+                mock.call("content", {}, html="escape", markdown_lists=True, redact_missing_personalisation=False),
+            ],
+        ),
+    ],
+)
 @mock.patch("notifications_utils.template.Field.__init__", return_value=None)
 @mock.patch("notifications_utils.template.Field.__str__", return_value="1\n2\n3\n4\n5\n6\n7\n8")
 def test_templates_handle_html_and_redacting(
     mock_field_str,
     mock_field_init,
+    template_class,
+    template_type,
+    extra_args,
+    expected_field_calls,
 ):
     assert str(
-        TemplatedLetterImageTemplate(
-            {"service": SERVICE_ONE_ID, "content": "content", "subject": "subject", "template_type": "letter"},
-            image_url="http://example.com",
-            contact_block="www.gov.uk",
+        template_class(
+            {"service": SERVICE_ONE_ID, "content": "content", "subject": "subject", "template_type": template_type},
+            **extra_args,
         )
     )
-    assert mock_field_init.call_args_list == [
-        mock.call(
-            (
-                "((address line 1))\n"
-                "((address line 2))\n"
-                "((address line 3))\n"
-                "((address line 4))\n"
-                "((address line 5))\n"
-                "((address line 6))\n"
-                "((address line 7))"
+    assert mock_field_init.call_args_list == expected_field_calls
+
+
+@pytest.mark.parametrize(
+    "template_instance, expected_placeholders",
+    [
+        (
+            EmailPreviewTemplate(
+                {"content": "((content))", "subject": "((subject))", "template_type": "email"},
             ),
-            {},
-            with_brackets=False,
-            html="escape",
+            ["subject", "content"],
         ),
-        mock.call("www.gov.uk", {}, html="escape", redact_missing_personalisation=False),
-        mock.call("subject", {}, html="escape", redact_missing_personalisation=False),
-        mock.call("content", {}, html="escape", markdown_lists=True, redact_missing_personalisation=False),
-    ]
+        (
+            TemplatedLetterImageTemplate(
+                {
+                    "service": SERVICE_ONE_ID,
+                    "content": "((content))",
+                    "subject": "((subject))",
+                    "template_type": "letter",
+                },
+                contact_block="((contact_block))",
+                image_url="http://example.com",
+            ),
+            ["contact_block", "subject", "content"],
+        ),
+    ],
+)
+def test_templates_extract_placeholders(
+    template_instance,
+    expected_placeholders,
+):
+    assert template_instance.placeholders == OrderedSet(expected_placeholders)
 
 
-def test_templates_extract_placeholders():
-    assert TemplatedLetterImageTemplate(
-        {"service": SERVICE_ONE_ID, "content": "((content))", "subject": "((subject))", "template_type": "letter"},
-        contact_block="((contact_block))",
-        image_url="http://example.com",
-    ).placeholders == OrderedSet(["contact_block", "subject", "content"])
-
-
-def test_message_too_long_limit_bigger_or_nonexistent_for_non_sms_templates():
+@pytest.mark.parametrize(
+    "template_class, template_type, kwargs",
+    [(EmailPreviewTemplate, "email", {}), (TemplatedLetterImageTemplate, "letter", {"image_url": "foo"})],
+)
+def test_message_too_long_limit_bigger_or_nonexistent_for_non_sms_templates(template_class, template_type, kwargs):
     body = "a" * 1000
-    template = TemplatedLetterImageTemplate(
-        {"service": SERVICE_ONE_ID, "content": body, "subject": "foo", "template_type": "letter"},
-        image_url="foo",
+    template = template_class(
+        {"service": SERVICE_ONE_ID, "content": body, "subject": "foo", "template_type": template_type},
+        **kwargs,
     )
     assert template.is_message_too_long() is False
 
@@ -686,3 +770,329 @@ class TestTemplatedLetterImageTemplate:
         )
 
         assert t.first_attachment_page == expected_value
+
+
+@pytest.mark.parametrize(
+    "url, url_with_entities_replaced",
+    [
+        ("http://example.com", "http://example.com"),
+        ("http://www.gov.uk/", "http://www.gov.uk/"),
+        ("https://www.gov.uk/", "https://www.gov.uk/"),
+        ("http://service.gov.uk", "http://service.gov.uk"),
+        (
+            "http://service.gov.uk/blah.ext?q=a%20b%20c&order=desc#fragment",
+            "http://service.gov.uk/blah.ext?q=a%20b%20c&amp;order=desc#fragment",
+        ),
+        pytest.param("example.com", "example.com", marks=pytest.mark.xfail),
+        pytest.param("www.example.com", "www.example.com", marks=pytest.mark.xfail),
+        pytest.param(
+            "http://service.gov.uk/blah.ext?q=one two three",
+            "http://service.gov.uk/blah.ext?q=one two three",
+            marks=pytest.mark.xfail,
+        ),
+        pytest.param("ftp://example.com", "ftp://example.com", marks=pytest.mark.xfail),
+        pytest.param("mailto:test@example.com", "mailto:test@example.com", marks=pytest.mark.xfail),
+    ],
+)
+def test_email_preview_template_makes_links_out_of_URLs(url, url_with_entities_replaced):
+    assert (
+        f'<a style="word-wrap: break-word; color: #1D70B8;" href="{url_with_entities_replaced}">'
+        f"{url_with_entities_replaced}"
+        "</a>"
+    ) in str(EmailPreviewTemplate({"content": url, "subject": "", "template_type": "email"}))
+
+
+@pytest.mark.parametrize(
+    "content, values, expected_count",
+    [
+        ("Content with ((placeholder))", {"placeholder": "something extra"}, 28),
+        ("Content with ((placeholder))", {"placeholder": ""}, 12),
+        ("Just content", {}, 12),
+        ("((placeholder))  ", {"placeholder": "  "}, 0),
+        ("  ", {}, 0),
+    ],
+)
+def test_character_count_for_email_preview_template(
+    content,
+    values,
+    expected_count,
+):
+    template = EmailPreviewTemplate(
+        {
+            "content": content,
+            "subject": "Hi",
+            "template_type": "email",
+        },
+    )
+    template.values = values
+    assert template.content_count == expected_count
+
+
+@mock.patch("notifications_utils.template.remove_whitespace_before_punctuation", side_effect=lambda x: x)
+def test_email_preview_template_removes_whitespace_before_punctuation(mock_remove_whitespace):
+    expected_remove_whitespace_calls = [
+        mock.call('<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">content</p>'),
+        mock.call(Markup("subject")),
+        mock.call(Markup("subject")),
+        mock.call(Markup("subject")),
+    ]
+
+    template = EmailPreviewTemplate({"content": "content", "subject": "subject", "template_type": "email"})
+
+    assert str(template)
+
+    if hasattr(template, "subject"):
+        assert template.subject
+
+    assert mock_remove_whitespace.call_args_list == expected_remove_whitespace_calls
+
+
+@pytest.mark.parametrize(
+    "expected_calls",
+    [
+        [
+            mock.call(
+                # fmt: off
+                    '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">'
+                    'content'
+                    '</p>'
+                # fmt: on
+            ),
+            mock.call(Markup("subject")),
+        ],
+    ],
+)
+@mock.patch("notifications_utils.template.make_quotes_smart", side_effect=lambda x: x)
+@mock.patch("notifications_utils.template.replace_hyphens_with_en_dashes", side_effect=lambda x: x)
+def test_email_preview_template_makes_quotes_smart_and_dashes_en(
+    mock_en_dash_replacement,
+    mock_smart_quotes,
+    expected_calls,
+):
+    template = EmailPreviewTemplate({"content": "content", "subject": "subject", "template_type": "email"})
+
+    assert str(template)
+
+    if hasattr(template, "subject"):
+        assert template.subject
+
+    mock_smart_quotes.assert_has_calls(expected_calls)
+    mock_en_dash_replacement.assert_has_calls(expected_calls)
+
+
+@pytest.mark.parametrize(
+    "content",
+    (
+        "first.o'last@example.com",
+        "first.o’last@example.com",
+    ),
+)
+def test_no_smart_quotes_in_email_addresses_in_email_preview_template(content):
+    template = EmailPreviewTemplate(
+        {
+            "content": content,
+            "subject": content,
+            "template_type": "email",
+        }
+    )
+    assert "first.o'last@example.com" in str(template)
+    assert template.subject == "first.o'last@example.com"
+
+
+@pytest.mark.parametrize(
+    "extra_args",
+    [
+        {"from_name": "Example service"},
+        pytest.param({}, marks=pytest.mark.xfail),
+    ],
+)
+def test_email_preview_shows_from_name(extra_args):
+    template = EmailPreviewTemplate(
+        {"content": "content", "subject": "subject", "template_type": "email"}, **extra_args
+    )
+    assert '<th scope="row">From</th>' in str(template)
+    assert "Example service" in str(template)
+
+
+def test_email_preview_escapes_html_in_from_name():
+    template = EmailPreviewTemplate(
+        {"content": "content", "subject": "subject", "template_type": "email"}, from_name='<script>alert("")</script>'
+    )
+    assert "<script>" not in str(template)
+    assert '&lt;script&gt;alert("")&lt;/script&gt;' in str(template)
+
+
+@pytest.mark.parametrize(
+    "extra_args",
+    [
+        {"reply_to": "test@example.com"},
+        pytest.param({}, marks=pytest.mark.xfail),
+    ],
+)
+def test_email_preview_shows_reply_to_address(extra_args):
+    template = EmailPreviewTemplate(
+        {"content": "content", "subject": "subject", "template_type": "email"}, **extra_args
+    )
+    assert '<th scope="row">Reply&nbsp;to</th>' in str(template)
+    assert "test@example.com" in str(template)
+
+
+@pytest.mark.parametrize(
+    "template_values, expected_content",
+    [
+        ({}, "<span class='placeholder-no-brackets'>email address</span>"),
+        ({"email address": "test@example.com"}, "test@example.com"),
+    ],
+)
+def test_email_preview_shows_recipient_address(
+    template_values,
+    expected_content,
+):
+    template = EmailPreviewTemplate(
+        {"content": "content", "subject": "subject", "template_type": "email"},
+        template_values,
+    )
+    assert expected_content in str(template)
+
+
+def test_content_size_in_bytes_with_email_preview_message():
+    # Message being a Markup objects adds 81 bytes overhead, so it's 100 bytes for 100 x 'b' and 81 bytes overhead
+    body = "b" * 100
+    template = EmailPreviewTemplate({"content": body, "subject": "foo", "template_type": "email"})
+    assert template.content_size_in_bytes == 100
+
+
+def test_message_too_long_for_a_too_big_email_preview_message():
+    # Message being a Markup objects adds 81 bytes overhead, taking our message over the limit
+    body = "b" * 2000001
+    template = EmailPreviewTemplate({"content": body, "subject": "foo", "template_type": "email"})
+    assert template.is_message_too_long() is True
+
+
+def test_message_too_long_with_an_email_preview_message_within_limits():
+    body = "b" * 1999999
+    template = EmailPreviewTemplate({"content": body, "subject": "foo", "template_type": "email"})
+    assert template.is_message_too_long() is False
+
+
+@pytest.mark.parametrize(
+    "subject",
+    [
+        " no break ",
+        " no\tbreak ",
+        "\tno break\t",
+        "no \r\nbreak",
+        "no \nbreak",
+        "no \rbreak",
+        "\rno break\n",
+    ],
+)
+def test_whitespace_in_email_preview_message_subject(subject):
+    template_instance = EmailPreviewTemplate({"content": "foo", "subject": subject, "template_type": "email"})
+    assert template_instance.subject == "no break"
+
+
+def test_whitespace_in_email_preview_message_subject_placeholders():
+    assert (
+        EmailPreviewTemplate(
+            {"content": "", "subject": "\u200c Your tax   ((status))", "template_type": "email"},
+            values={"status": " is\ndue "},
+        ).subject
+        == "Your tax is due"
+    )
+
+
+@pytest.mark.parametrize(
+    "template_data, expect_content",
+    (
+        (
+            {"template_type": "email", "subject": "foo", "content": "[Example](((var)))"},
+            (
+                '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; '
+                'color: #0B0C0C;">'
+                '<a style="word-wrap: break-word; color: #1D70B8;" '
+                "href=\"<span class='placeholder'>&#40;&#40;var&#41;&#41;</span>\">"
+                "Example"
+                "</a>"
+                "</p>"
+            ),
+        ),
+        (
+            {"template_type": "email", "subject": "foo", "content": "[Example](https://blah.blah/?query=((var)))"},
+            (
+                '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; '
+                'color: #0B0C0C;">'
+                '<a style="word-wrap: break-word; color: #1D70B8;" '
+                "href=\"https://blah.blah/?query=<span class='placeholder'>&#40;&#40;var&#41;&#41;</span>\">"
+                "Example"
+                "</a>"
+                "</p>"
+            ),
+        ),
+        (
+            {"template_type": "email", "subject": "foo", "content": "[Example](pre((var))post)"},
+            (
+                '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; '
+                'color: #0B0C0C;">'
+                '<a style="word-wrap: break-word; color: #1D70B8;" '
+                "href=\"pre<span class='placeholder'>&#40;&#40;var&#41;&#41;</span>post\">"
+                "Example"
+                "</a>"
+                "</p>"
+            ),
+        ),
+    ),
+)
+def test_links_with_personalisation_in_email_preview_message(template_data, expect_content):
+    assert expect_content in str(EmailPreviewTemplate(template_data))
+
+
+def test_unsubscribe_link_is_rendered():
+    expected_content = (
+        '<hr style="border: 0; height: 1px; background: #B1B4B6; Margin: 30px 0 30px 0;">'
+        '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">'
+        '<a style="word-wrap: break-word; color: #1D70B8;" href="https://www.example.com">'
+        "Unsubscribe from these emails"
+        "</a>"
+        "</p>\n"
+    )
+
+    assert expected_content in (
+        str(
+            EmailPreviewTemplate(
+                {"content": "Hello world", "subject": "subject", "template_type": "email"},
+                {},
+                unsubscribe_link="https://www.example.com",
+            )
+        )
+    )
+    assert expected_content not in (
+        str(
+            EmailPreviewTemplate(
+                {"content": "Hello world", "subject": "subject", "template_type": "email"},
+                {},
+            )
+        )
+    )
+
+
+@mock.patch("notifications_utils.template.make_quotes_smart", side_effect=lambda x: x)
+@mock.patch("notifications_utils.template.replace_hyphens_with_en_dashes", side_effect=lambda x: x)
+def test_templates_make_quotes_smart_and_dashes_en(
+    mock_en_dash_replacement,
+    mock_smart_quotes,
+):
+    expected_calls = [
+        mock.call('<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">content</p>'),
+        mock.call(Markup("subject")),
+    ]
+
+    template = EmailPreviewTemplate({"content": "content", "subject": "subject", "template_type": "email"})
+
+    assert str(template)
+
+    if hasattr(template, "subject"):
+        assert template.subject
+
+    mock_smart_quotes.assert_has_calls(expected_calls)
+    mock_en_dash_replacement.assert_has_calls(expected_calls)

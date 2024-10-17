@@ -4,11 +4,14 @@ from typing import Any
 from flask import current_app, render_template, url_for
 from markupsafe import Markup
 from notifications_utils.countries import Postage
-from notifications_utils.formatters import formatted_list
+from notifications_utils.field import Field
+from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
+from notifications_utils.take import Take
 from notifications_utils.template import (
+    BaseEmailTemplate,
     BaseLetterTemplate,
-    EmailPreviewTemplate,
     SMSPreviewTemplate,
+    do_nice_typography,
 )
 
 from app.extensions import redis_client
@@ -220,6 +223,57 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
             "first_page_of_attachment": self.first_attachment_page,
             "first_page_of_english": self.first_english_page,
         }
+
+
+class EmailPreviewTemplate(BaseEmailTemplate):
+
+    def __init__(
+        self,
+        template,
+        values=None,
+        from_name=None,
+        reply_to=None,
+        show_recipient=True,
+        redact_missing_personalisation=False,
+        **kwargs,
+    ):
+        super().__init__(template, values, redact_missing_personalisation=redact_missing_personalisation, **kwargs)
+        self.from_name = from_name
+        self.reply_to = reply_to
+        self.show_recipient = show_recipient
+
+    def __str__(self):
+        return Markup(
+            self.jinja_template.render(
+                {
+                    "body": self.html_body,
+                    "subject": self.subject,
+                    "from_name": escape_html(self.from_name),
+                    "reply_to": self.reply_to,
+                    "recipient": Field("((email address))", self.values, with_brackets=False),
+                    "show_recipient": self.show_recipient,
+                }
+            )
+        )
+
+    @property
+    def jinja_template(self):
+        return current_app.jinja_env.get_template("partials/templates/email_preview_template.jinja2")
+
+    @property
+    def subject(self):
+        return (
+            Take(
+                Field(
+                    self._subject,
+                    self.values,
+                    html="escape",
+                    redact_missing_personalisation=self.redact_missing_personalisation,
+                )
+            )
+            .then(do_nice_typography)
+            .then(normalise_whitespace)
+        )
 
 
 class LetterAttachment(JSONModel):
