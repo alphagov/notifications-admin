@@ -2928,6 +2928,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             _test_page_title=True,
             _test_for_elements_without_class=True,
             _test_forms_have_an_action_set=True,
+            _test_for_non_smart_quotes=True,
             _optional_args="",
             **endpoint_kwargs,
         ):
@@ -2939,6 +2940,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
                 _test_page_title=_test_page_title,
                 _test_for_elements_without_class=_test_for_elements_without_class,
                 _test_forms_have_an_action_set=_test_forms_have_an_action_set,
+                _test_for_non_smart_quotes=_test_for_non_smart_quotes,
             )
 
         @staticmethod
@@ -2950,6 +2952,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             _test_page_title=True,
             _test_for_elements_without_class=True,
             _test_forms_have_an_action_set=True,
+            _test_for_non_smart_quotes=True,
             **endpoint_kwargs,
         ):
             from flask.templating import _render
@@ -2995,6 +2998,9 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
 
             if _test_forms_have_an_action_set and _expected_status not in (301, 302):
                 ClientRequest.test_forms_have_an_action_set(page)
+
+            if _test_for_non_smart_quotes:
+                ClientRequest.test_for_non_smart_quotes(page)
 
             return page
 
@@ -3130,6 +3136,13 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             ), (  # forms hidden when js is enabled, or by default are exempt
                 "Forms that POST need an action set, even if posting to the same page"
             )
+
+        @staticmethod
+        def test_for_non_smart_quotes(page):
+            for el in page.select("h1, h2, h3, h4, h5, h6, p, li"):
+                assert not (
+                    "'" in el.text or '"' in el.text
+                ), f"Non-smart quote or apostrophe found in <{el.name}>: {normalize_spaces(el.text)}"
 
     return ClientRequest
 
