@@ -3,7 +3,7 @@ from typing import Any
 
 from flask import abort
 
-from app.formatters import format_date_human, format_datetime_human
+from app.formatters import format_date_human, format_time, get_human_day
 from app.models import JSONModel, ModelList
 from app.notify_client.service_api_client import service_api_client
 from app.utils.time import to_utc_string
@@ -63,30 +63,33 @@ class UnsubscribeRequestsReport(JSONModel):
             return self.latest
 
         if self.starts_on_a_day_another_report_ends:
-            return format_datetime_human(self.earliest_timestamp, date_prefix="")
+            return (get_human_day(self.earliest_timestamp), " at ", format_time(self.earliest_timestamp))
 
-        return format_date_human(self.earliest_timestamp)
+        return (format_date_human(self.earliest_timestamp), "", "")
 
     @property
     def latest(self):
         if self.is_first_of_several_reports_on_the_same_day:
-            return format_datetime_human(
-                self.latest_timestamp,
-                date_prefix="",
-                separator="at" if self.count == 1 else "until",
+            return (
+                get_human_day(self.latest_timestamp),
+                " at " if self.count == 1 else " until ",
+                format_time(self.latest_timestamp),
             )
 
         if self.starts_on_a_day_another_report_ends or self.ends_on_a_day_another_report_starts:
-            return format_datetime_human(self.latest_timestamp, date_prefix="")
+            return (get_human_day(self.latest_timestamp), " at ", format_time(self.latest_timestamp))
 
-        return format_date_human(self.latest_timestamp)
+        return (format_date_human(self.latest_timestamp), "", "")
 
     @property
     def title(self):
         if self.earliest == self.latest:
-            return self.latest
+            return "".join(self.latest)
 
-        return f"{self.earliest} to {self.latest}"
+        if self.earliest[0] == self.latest[0]:
+            return f"{self.earliest[0]} from {self.earliest[-1]} to {self.latest[-1]}"
+
+        return "".join(self.earliest + (" to ",) + self.latest)
 
 
 class UnsubscribeRequestsReports(ModelList):

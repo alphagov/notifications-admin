@@ -60,7 +60,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             [
                 "Report Status",
                 "Today at 4:00pm 1 unsubscribe request Not downloaded",
-                "Today at midday to today at 2:17pm 1 unsubscribe request Not downloaded",
+                "Today from midday to 2:17pm 1 unsubscribe request Not downloaded",
                 "Today until midday 34 unsubscribe requests Downloaded",
                 "15 June to yesterday 200 unsubscribe requests Downloaded",
                 "7 December 2023 to 13 January 321 unsubscribe requests Completed",
@@ -139,7 +139,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             ],
             [
                 "Report Status",
-                "1 May at midday to 1 May at 2:17pm 1 unsubscribe request Completed",
+                "1 May from midday to 2:17pm 1 unsubscribe request Completed",
                 "30 April to 1 May at 10:00am 12,345,678 unsubscribe requests Completed",
             ],
             [],
@@ -210,8 +210,8 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             ],
             [
                 "Report Status",
-                "1 June at 11:22pm to 1 June at midnight 1,234 unsubscribe requests Downloaded",
-                "1 June at 2:17pm to 1 June at 2:18pm 4,567 unsubscribe requests Downloaded",
+                "1 June from 11:22pm to midnight 1,234 unsubscribe requests Downloaded",
+                "1 June from 2:17pm to 2:18pm 4,567 unsubscribe requests Downloaded",
                 "1 June until midday 7,890 unsubscribe requests Downloaded",
             ],
             [],
