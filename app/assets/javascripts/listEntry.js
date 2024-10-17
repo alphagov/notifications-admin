@@ -27,7 +27,7 @@
     this.bindEvents();
   };
   ListEntry.optionalAttributes = ['aria-describedby'];
-  ListEntry.prototype.entryTemplate = Hogan.compile(
+  ListEntry.prototype.entryTemplate = window.Hogan.compile(
     '<div class="list-entry">' +
       '<div class="govuk-form-group{{#error}} govuk-form-group--error{{/error}}">' +
         '<label for="{{{id}}}" class="govuk-label govuk-input--numbered__label{{#error}} govuk-input--numbered__label--error{{/error}}">' +
@@ -54,12 +54,12 @@
       '</div>' +
     '</div>'
   );
-  ListEntry.prototype.addButtonTemplate = Hogan.compile(
+  ListEntry.prototype.addButtonTemplate = window.Hogan.compile(
     '<button type="button" class="govuk-button govuk-button--secondary input-list__button--add">Add another {{listItemName}} ({{entriesLeft}} remaining)</button>'
   );
   ListEntry.prototype.getSharedAttributes = function () {
     var $inputs = this.$wrapper.find('input'),
-        attributeTemplate = Hogan.compile(' {{name}}="{{value}}"'),
+        attributeTemplate = window.Hogan.compile(' {{name}}="{{value}}"'),
         protectedAttributes = ['id', 'name', 'value', 'class', 'aria-describedby'],
         attributes = [],
         attrIdx,
