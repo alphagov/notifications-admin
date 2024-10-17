@@ -669,6 +669,37 @@ describe('Update content', () => {
 
   });
 
+  test('After any updates it should fire the updateContent.onafterupdate event', () => {
+
+    function getPartial() {
+        return `<div class="ajax-block-container">
+                  <p>12 Emails</p>
+                </div>`;
+    };
+
+    document.body.innerHTML = getInitialHTMLString(getPartial());
+
+    // spy on event we want to track
+    const eventSpy = jest.fn()
+    $(document).on('updateContent.onafterupdate', eventSpy);
+
+    // make a response with no changes
+    responseObj[updateKey] = getPartial();
+
+    // start the module
+    window.GOVUK.notifyModules.start();
+
+    // move to the time the first request is fired
+    jest.advanceTimersByTime(2000);
+
+    // simulate a 200 response
+    jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
+    serverResponse.complete();
+
+    expect(eventSpy).toHaveBeenCalled();
+
+  });
+
   afterEach(() => {
 
     document.body.innerHTML = '';
