@@ -9,11 +9,12 @@
     "test": "npm run lint:scss && npm run lint:js && node --experimental-vm-modules node_modules/.bin/jest tests/javascripts",
     "test-watch": "jest --watch tests/javascripts",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand $npm_config_test",
-    "build": "rollup -c",
+    "build": "npm run clean && rollup -c",
     "watch": "rollup -c -w",
     "audit": "better-npm-audit audit --production --level high",
     "lint:scss": "stylelint \"**/*.scss\"",
-    "lint:js": "eslint"
+    "lint:js": "eslint",
+    "clean": "del-cli app/static/*"
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,7 @@
     "@rollup/plugin-terser": "0.4.4",
     "babel-jest": "^29.0.1",
     "better-npm-audit": "3.7.3",
+    "del-cli": "5.1.0",
     "eslint": "9.11.1",
     "eslint-plugin-jest": "28.8.3",
     "globals": "15.10.0",
