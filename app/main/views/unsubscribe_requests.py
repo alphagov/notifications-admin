@@ -79,7 +79,7 @@ def download_unsubscribe_request_report(service_id, batch_id=None):
 @main.route("/services/<uuid:service_id>/unsubscribe-requests/reports/batch-report")
 @user_has_permissions("view_activity", restrict_admin_usage=True)
 def create_unsubscribe_request_report(service_id):
-    created_report_id = current_service.unsubscribe_request_reports_summary.batch_unbatched(service_id)
+    created_report_id = current_service.unsubscribe_request_reports_summary.batch_unbatched()
     return redirect(
         url_for(
             "main.unsubscribe_request_report",

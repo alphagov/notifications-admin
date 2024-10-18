@@ -10,6 +10,7 @@ from app.utils.time import to_utc_string
 
 
 class UnsubscribeRequestsReport(JSONModel):
+    service_id: Any
     count: int
     batch_id: Any
     is_a_batched_report: bool
@@ -113,10 +114,10 @@ class UnsubscribeRequestsReports(ModelList):
                 return report
         abort(404)
 
-    def batch_unbatched(self, service_id):
+    def batch_unbatched(self):
         unbatched = self.get_unbatched_report()
         created = service_api_client.create_unsubscribe_request_report(
-            service_id,
+            unbatched.service_id,
             {
                 "count": unbatched.count,
                 "earliest_timestamp": to_utc_string(unbatched.earliest_timestamp),
