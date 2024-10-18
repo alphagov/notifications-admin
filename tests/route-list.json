@@ -11,6 +11,7 @@
     "/agreement/<agreement_type:variant>",
     "/agreement/<agreement_type:variant>.pdf",
     "/callbacks",
+    "/choose-a-service",
     "/choose-service-to-join",
     "/cookies",
     "/delivery-and-failure",

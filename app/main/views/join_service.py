@@ -7,7 +7,7 @@ from app.models.service import Service
 from app.utils.user import user_is_gov_user, user_is_logged_in
 
 
-@main.route("/choose-service-to-join", methods=["GET", "POST"])
+@main.route("/choose-a-service", methods=["GET", "POST"])
 @user_is_logged_in
 @user_is_gov_user
 def choose_service_to_join():
@@ -15,7 +15,7 @@ def choose_service_to_join():
         abort(403)
 
     return render_template(
-        "views/choose-service-to-join.html",
+        "views/choose-a-service.html",
         _search_form=SearchByNameForm(),
     )
 
