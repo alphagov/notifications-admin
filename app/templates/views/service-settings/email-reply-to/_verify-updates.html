@@ -1,10 +1,12 @@
 {% from "components/banner.html" import banner, banner_wrapper %}
+{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 <div class="ajax-block-container">
   {% if verification_status == "pending" %}
+    {{ page_header('Checking email reply-to address') }}
     <p class="govuk-body">
       We’re checking that ‘{{ reply_to_email_address }}’ is a real email address.
     </p>
@@ -17,6 +19,8 @@
     </p>
   {% elif verification_status == "success" %}
     {{ banner("‘{}’ is ready to use".format(reply_to_email_address), type='default', with_tick=True) }}
+
+    {{ page_header('Checking email reply-to address') }}
     <div class="js-stick-at-bottom-when-scrolling">
       {{ govukButton({
         "element": "a",
@@ -38,6 +42,7 @@
         </p>
       {% endcall %}
     </div>
+    {{ page_header('Checking email reply-to address') }}
     {% if replace %}
       {% set form_url = url_for('main.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
     {% else %}
