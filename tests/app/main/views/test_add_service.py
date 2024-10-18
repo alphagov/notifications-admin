@@ -17,7 +17,7 @@ def test_non_gov_user_cannot_see_add_service_button(
     mock_get_organisations_and_services_for_user,
 ):
     client_request.login(api_nongov_user_active)
-    page = client_request.get("main.choose_account")
+    page = client_request.get("main.your_services")
     assert "Add a new service" not in page.text
 
 

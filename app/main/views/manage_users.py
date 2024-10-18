@@ -192,7 +192,7 @@ def service_join_request_choose_permissions(service_id, request_id):
             status_changed_by_id=current_user.id,
             permissions=translate_permissions_from_ui_to_db(form.join_service_request_choose_permissions_field.data),
         )
-        return redirect(url_for("main.choose_account"))
+        return redirect(url_for("main.your_services"))
 
     return render_template(
         "views/join-service-request-choose-permissions.html",

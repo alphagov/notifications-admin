@@ -2308,7 +2308,7 @@ def test_service_join_request_choose_permissions_on_save(
             "join_service_request_choose_permissions_field": selected_permissions,
         },
         _expected_status=302,
-        _expected_redirect=url_for("main.choose_account"),
+        _expected_redirect=url_for("main.your_services"),
     )
 
     mock_update_service_join_requests.assert_called_once_with(

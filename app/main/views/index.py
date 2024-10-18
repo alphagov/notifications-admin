@@ -28,7 +28,7 @@ main.register_blueprint(redirects)
 @main.route("/")
 def index():
     if current_user and current_user.is_authenticated:
-        return redirect(url_for("main.choose_account"))
+        return redirect(url_for("main.your_services"))
 
     return render_template(
         "views/signedout.html",
@@ -366,7 +366,7 @@ def historical_redirects(new_endpoint, **kwargs):
 
 
 REDIRECTS = {
-    "/accounts": "main.choose_account",
+    "/accounts": "main.your_services",
     "/callbacks": "main.guidance_api_documentation",
     "/delivery-and-failure": "main.guidance_message_status",
     "/documentation": "main.guidance_api_documentation",

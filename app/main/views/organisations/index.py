@@ -549,7 +549,7 @@ def archive_organisation(org_id):
                 raise e
 
         flash(f"‘{current_organisation.name}’ was deleted", "default_with_tick")
-        return redirect(url_for(".choose_account"))
+        return redirect(url_for(".your_services"))
 
     flash(
         f"Are you sure you want to delete ‘{current_organisation.name}’? There’s no way to undo this.",

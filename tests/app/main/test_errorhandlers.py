@@ -145,7 +145,7 @@ def test_api_error_response_logging(
 
     with caplog.at_level(logging.WARNING):
         client_request.get(
-            ".choose_account", _expected_status=500, _test_page_title=False, _test_for_elements_without_class=False
+            ".your_services", _expected_status=500, _test_page_title=False, _test_for_elements_without_class=False
         )
 
     assert (

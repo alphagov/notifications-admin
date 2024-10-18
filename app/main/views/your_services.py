@@ -10,7 +10,7 @@ from app.utils.user import user_is_logged_in
 
 @main.route("/services")
 def choose_service():
-    raise PermanentRedirect(url_for(".choose_account"))
+    raise PermanentRedirect(url_for(".your_services"))
 
 
 @main.route("/services-or-dashboard")
@@ -20,7 +20,7 @@ def services_or_dashboard():
 
 @main.route("/your-services")
 @user_is_logged_in
-def choose_account():
+def your_services():
     org_count, live_service_count = None, None
     if current_user.platform_admin:
         org_count, live_service_count = (
@@ -38,7 +38,7 @@ def choose_account():
         >= 2
     )
     return render_template(
-        "views/choose-account.html",
+        "views/your-services.html",
         can_add_service=current_user.is_gov_user,
         org_count=org_count,
         live_service_count=live_service_count,
@@ -65,4 +65,4 @@ def show_accounts_or_dashboard():
     if len(current_user.organisation_ids) == 1 and not current_user.trial_mode_services:
         return redirect(url_for(".organisation_dashboard", org_id=current_user.organisation_ids[0]))
 
-    return redirect(url_for(".choose_account"))
+    return redirect(url_for(".your_services"))

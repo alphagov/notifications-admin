@@ -52,7 +52,7 @@ EXCLUDED_ENDPOINTS = set(
             "check_messages",
             "check_notification",
             "check_tour_notification",
-            "choose_account",
+            "your_services",
             "choose_from_contact_list",
             "choose_service",
             "choose_service_to_join",

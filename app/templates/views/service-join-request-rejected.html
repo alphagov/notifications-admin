@@ -13,6 +13,6 @@
     {{ rejected_by.name }} already refused this request on {{ rejected_at|format_date_short }}.
   </p>
 
-  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_account') }}">Back to your services</a>
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Back to your services</a>
 
 {% endblock %}
