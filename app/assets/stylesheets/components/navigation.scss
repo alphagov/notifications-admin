@@ -9,13 +9,7 @@
   &-service-name,
   &-organisation-link {
     display: inline-block;
-    overflow: hidden;
-    // aligning to the baseline with overflow: hidden adds to the parent's height
-    // aligning to the top doesn't
-    // see: https://stackoverflow.com/questions/23529369/why-does-x-overflowhidden-cause-extra-space-below#answer-51088033
     vertical-align: top;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
 
   &-service-type {
