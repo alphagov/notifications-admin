@@ -57,6 +57,7 @@
     &-name {
 
       padding: $padding-top 0 $padding-bottom govuk-spacing(3);
+      margin-left: govuk-spacing(2);
       position: relative;
 
       &:before {
@@ -104,8 +105,7 @@
 
   &-organisation-link {
 
-    padding: $padding-top 20px $padding-bottom 0;
-    margin-right: 3px;
+    padding: $padding-top 0 $padding-bottom 0;
     box-sizing: border-box;
 
     &:focus:before {
