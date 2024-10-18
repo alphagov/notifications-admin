@@ -23,15 +23,26 @@ from app.utils.user import is_gov_user, user_has_permissions
 from app.utils.user_permissions import permission_options
 
 
-@main.route("/services/<uuid:service_id>/users")
+@main.route("/services/<uuid:service_id>/users", methods=["GET"])
 @user_has_permissions(allow_org_user=True)
 def manage_users(service_id):
+    form = SearchUsersForm(request.args)
+    users = current_service.team_members
+    permission_filters = request.args.getlist("permissions")
+
+    if permission_filters:
+        users = [
+            user
+            for user in users
+            if all(user.has_permission_for_service(service_id, perm) for perm in permission_filters)
+        ]
+
     return render_template(
         "views/manage-users.html",
-        users=current_service.team_members,
+        users=users,
         current_user=current_user,
-        show_search_box=(len(current_service.team_members) > 7),
-        form=SearchUsersForm(),
+        show_search_box=(len(users) > 7),
+        form=form,
         permissions=permission_options,
     )
 
