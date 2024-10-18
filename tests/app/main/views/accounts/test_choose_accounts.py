@@ -122,7 +122,7 @@ def test_choose_account_should_show_choose_accounts_page(
     assert service_list_items[4].a.text == "service two (org 2)"
     assert service_list_items[4].a["href"] == url_for(".service_dashboard", service_id="67890")
 
-    assert normalize_spaces(headings[2].text) == "Trial mode services"
+    assert normalize_spaces(headings[2].text) == "Trial services"
 
     # trial services
     assert len(trial_services_list_items) == 3
@@ -152,9 +152,9 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     assert normalize_spaces(page.select_one("h1").text) == "Your services"
     assert normalize_spaces(add_service_link.text) == "Add a new service"
     assert add_service_link["href"] == url_for("main.add_service")
-    assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == ["Live services", "Trial mode services"]
+    assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == ["Live services", "Trial services"]
     assert normalize_spaces(no_live_service[0].text) == "No live services"
-    assert normalize_spaces(no_live_trial_mode[0].text) == "No trial mode services"
+    assert normalize_spaces(no_live_trial_mode[0].text) == "No trial services"
 
 
 def test_choose_account_should_show_join_service_button(
@@ -190,7 +190,7 @@ def test_choose_account_should_show_join_service_button(
             [
                 "Platform admin",
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
         ),
         (
@@ -199,7 +199,7 @@ def test_choose_account_should_show_join_service_button(
                 "Platform admin",
                 "Organisations",
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
         ),
         (
@@ -233,7 +233,7 @@ def test_choose_account_should_show_join_service_button(
             },
             [
                 "Platform admin",
-                "Trial mode services",
+                "Trial services",
             ],
         ),
     ),
@@ -271,7 +271,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
             {"organisations": [], "services": []},
             [
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
             "Your services",
         ),
@@ -280,7 +280,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
             [
                 "Organisations",
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
             "Your organisations and services",
         ),
@@ -298,7 +298,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
             },
             [
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
             "Your organisations and services",
         ),
