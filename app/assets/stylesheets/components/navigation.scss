@@ -48,6 +48,11 @@
     border-bottom: 1px solid $govuk-border-colour;
     margin: 0 0 10px;
     position: relative;
+    display: flex;
+
+    &__org_and_service_container {
+      flex-basis: 75%;
+    }
 
     &-name {
 
@@ -58,9 +63,7 @@
     &-switch {
 
       text-align: right;
-      position: absolute;
-      top: 0;
-      right: 0;
+      margin-left: auto;
       padding: $padding-top 0 $padding-bottom govuk-spacing(3);
 
       &:focus {
