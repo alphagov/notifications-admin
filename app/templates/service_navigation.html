@@ -9,7 +9,7 @@
 
 {% macro service_navigation(user, service) %}
 <div class="navigation-service">
-  <div class="navigation-service__org_and_service_container">
+  <div class="navigation-service__container">
     {% if service.organisation_id %}
       {% if user.platform_admin or
         (user.belongs_to_organisation(service.organisation_id) and service.live) %}
