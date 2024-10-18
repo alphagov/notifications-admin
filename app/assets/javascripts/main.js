@@ -12,20 +12,6 @@ if (document.body.classList.contains('govuk-frontend-supported')) {
 
   $(() => $('.error-message, .govuk-error-message').eq(0).parent('label').next('input').trigger('focus'));
 
-  function focusBanner ($bannerEl) {
-    if ($bannerEl.length === 0) { return }
-
-    $bannerEl.attr('tabindex', '-1');
-    $bannerEl.on('blur', () => $(this).removeAttr('tabindex'));
-    $bannerEl.trigger('focus');
-  };
-
-  $(() => focusBanner($('.banner-dangerous')))
-
-  $(document).on("updateContent.onafterupdate", function(evt, el) {
-    focusBanner($(".banner-dangerous, .banner-default-with-tick", el));
-  });
-
   $(() => $('.govuk-header__container').on('click', function() {
     $(this).css('border-color', '#1d70b8');
   }));
