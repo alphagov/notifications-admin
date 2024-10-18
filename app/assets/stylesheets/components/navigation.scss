@@ -56,7 +56,28 @@
 
     &-name {
 
-      padding: $padding-top 0 $padding-bottom 0;
+      padding: $padding-top 0 $padding-bottom govuk-spacing(3);
+      position: relative;
+
+      &:before {
+        content: "";
+        display: block;
+        position: absolute;
+        top:  $padding-top + 4px;
+        left: -3px;
+        width: 7px;
+        height: 7px;
+        margin: auto 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+        border: solid;
+        border-width: 1px 1px 0 0;
+        border-color: $govuk-secondary-text-colour;
+        @include govuk-media-query($from: tablet) {
+          top: $padding-top + 8px;
+        }
+      }
 
     }
 
@@ -86,25 +107,6 @@
     padding: $padding-top 20px $padding-bottom 0;
     margin-right: 3px;
     box-sizing: border-box;
-    position: relative;
-
-    &:before {
-      content: "";
-      display: block;
-      position: absolute;
-      top: 4px;
-      bottom: 1px;
-      right: 5px;
-      width: 7px;
-      height: 7px;
-      margin: auto 0;
-      -webkit-transform: rotate(45deg);
-      -ms-transform: rotate(45deg);
-      transform: rotate(45deg);
-      border: solid;
-      border-width: 1px 1px 0 0;
-      border-color: $govuk-secondary-text-colour;
-    }
 
     &:focus:before {
       border-color: $govuk-focus-text-colour;
