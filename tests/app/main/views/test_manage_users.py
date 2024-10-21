@@ -1981,6 +1981,12 @@ def test_service_join_request_pending(
             create_active_user_with_permissions(True),
             SERVICE_JOIN_REQUEST_APPROVED,
         ),
+        (
+            "main.service_join_request_set_permissions",
+            create_active_user_empty_permissions(True),
+            create_active_user_with_permissions(True),
+            SERVICE_JOIN_REQUEST_APPROVED,
+        ),
     ],
 )
 def test_service_join_request_approved(
@@ -2008,6 +2014,12 @@ def test_service_join_request_approved(
     [
         (
             "main.service_join_request_approve",
+            create_active_user_empty_permissions(True),
+            create_active_user_with_permissions(True),
+            SERVICE_JOIN_REQUEST_REJECTED,
+        ),
+        (
+            "main.service_join_request_set_permissions",
             create_active_user_empty_permissions(True),
             create_active_user_with_permissions(True),
             SERVICE_JOIN_REQUEST_REJECTED,
@@ -2044,6 +2056,10 @@ def test_service_join_request_rejected(
             "main.service_join_request_approve",
             SERVICE_ONE_ID,
         ),
+        (
+            "main.service_join_request_set_permissions",
+            SERVICE_ONE_ID,
+        ),
     ],
 )
 def test_service_join_request_already_joined(
@@ -2069,6 +2085,10 @@ def test_service_join_request_already_joined(
             "main.service_join_request_approve",
             SERVICE_ONE_ID,
         ),
+        (
+            "main.service_join_request_set_permissions",
+            SERVICE_ONE_ID,
+        ),
     ],
 )
 def test_service_join_request_should_return_403_when_approver_is_not_logged_in_user(
@@ -2082,6 +2102,42 @@ def test_service_join_request_should_return_403_when_approver_is_not_logged_in_u
         service_id=service_one_id,
         request_id=sample_uuid(),
         _expected_status=403,
+    )
+
+
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [
+        (
+            create_active_user_empty_permissions(True),
+            create_active_user_with_permissions(True),
+            "pending",
+        ),
+    ],
+)
+def test_service_join_request_redirects_to_set_permissions_on_approve(
+    client_request,
+    mock_requester,
+    mock_service_user,
+    service_one,
+    status,
+    mock_get_service_join_request_status_data,
+):
+    request_id = sample_uuid()
+    client_request.post(
+        "main.service_join_request_approve",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+        _data={
+            "join_service_approve_request": SERVICE_JOIN_REQUEST_APPROVED,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.service_join_request_set_permissions",
+            service_id=SERVICE_ONE_ID,
+            request_id=request_id,
+            requester_id=mock_requester["id"],
+        ),
     )
 
 
@@ -2133,3 +2189,80 @@ def test_service_join_request_shows_rejected_on_reject(
     )
     assert mock_update_service_join_requests.called
 
+
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [(create_active_user_empty_permissions(True), create_active_user_with_permissions(True), "pending")],
+)
+def test_service_join_request_set_permissions(
+    client_request,
+    mock_requester,
+    mock_service_user,
+    service_one,
+    status,
+    mock_get_service_join_request_status_data,
+):
+    request_id = sample_uuid()
+
+    page = client_request.get(
+        "main.service_join_request_set_permissions",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+        requester_id=mock_requester["id"],
+    )
+
+    assert f"Choose permissions for {mock_requester['name']}" in page.text.strip()
+    assert f"Choose permissions for {mock_requester['name']}" in page.select_one("h1").text.strip()
+    assert f"{mock_requester['email_address']}" in page.select_one("p").text.strip()
+
+    permission_checkboxes = page.select("input[type=checkbox]")
+    for idx in range(len(permission_checkboxes)):
+        assert permission_checkboxes[idx]["name"] == "join_service_request_set_permissions_field"
+    assert permission_checkboxes[0]["value"] == "view_activity"
+    assert permission_checkboxes[1]["value"] == "send_messages"
+    assert permission_checkboxes[2]["value"] == "manage_templates"
+    assert permission_checkboxes[3]["value"] == "manage_service"
+    assert permission_checkboxes[4]["value"] == "manage_api_keys"
+
+    assert normalize_spaces(page.select("form button")[0].text) == "Save"
+
+
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [(create_active_user_empty_permissions(True), create_active_user_with_permissions(True), "pending")],
+)
+def test_service_join_request_set_permissions_on_save(
+    mocker,
+    client_request,
+    mock_requester,
+    mock_service_user,
+    service_one,
+    status,
+    mock_get_service_join_request_status_data,
+):
+    request_id = sample_uuid()
+    selected_permissions = ["send_messages", "view_activity", "manage_service"]
+    mock_update_service_join_requests = mocker.patch(
+        "app.service_api_client.update_service_join_requests",
+        return_value={},
+    )
+
+    client_request.post(
+        "main.service_join_request_set_permissions",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+        requester_id=mock_requester["id"],
+        _data={
+            "join_service_request_set_permissions_field": selected_permissions,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for("main.choose_account"),
+    )
+
+    mock_update_service_join_requests.assert_called_once_with(
+        request_id,
+        permissions=translate_permissions_from_ui_to_db(selected_permissions),
+        status=SERVICE_JOIN_REQUEST_APPROVED,
+        status_changed_by=current_user.id,
+    )
+    assert mock_update_service_join_requests.called
