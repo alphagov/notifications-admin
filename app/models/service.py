@@ -21,7 +21,14 @@ from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.utils import get_default_sms_sender
-from app.utils.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
+from app.utils.constants import (
+    SERVICE_JOIN_REQUEST_APPROVED,
+    SERVICE_JOIN_REQUEST_CANCELLED,
+    SERVICE_JOIN_REQUEST_PENDING,
+    SERVICE_JOIN_REQUEST_REJECTED,
+    SIGN_IN_METHOD_TEXT,
+    SIGN_IN_METHOD_TEXT_OR_EMAIL,
+)
 from app.utils.templates import get_template as get_template_as_rich_object
 
 
@@ -651,21 +658,29 @@ class ServiceJoinRequest(JSONModel):
     status: str
     contacted_service_users: list[str]
     requested_service: Any
+    permissions: list[str]
 
     __sort_attribute__ = "id"
 
     @property
     def is_pending(self):
-        return self.status == "pending"
+        return self.status == SERVICE_JOIN_REQUEST_PENDING
 
     @property
     def is_approved(self):
-        return self.status == "approved"
+        return self.status == SERVICE_JOIN_REQUEST_APPROVED
 
     @property
     def is_rejected(self):
-        return self.status == "rejected"
+        return self.status == SERVICE_JOIN_REQUEST_REJECTED
+
+    @property
+    def is_cancelled(self):
+        return self.status == SERVICE_JOIN_REQUEST_CANCELLED
 
     @classmethod
     def from_id(cls, request_id):
         return cls(service_api_client.get_service_join_requests(request_id))
+
+    def update(self, **kwargs):
+        return service_api_client.update_service_join_requests(self.service_join_request_id, **kwargs)
