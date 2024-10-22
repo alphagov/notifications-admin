@@ -538,5 +538,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
         return None
 
+    def get_service_join_requests(self, request_id):
+        return self.get(f"/service/service-join-request/{request_id}")
+
 
 service_api_client = ServiceAPIClient()
