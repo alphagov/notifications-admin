@@ -648,7 +648,7 @@ class Services(SerialisedModelCollection):
 
 
 class ServiceJoinRequest(JSONModel):
-    service_join_request_id: Any
+    id: Any
     requester: Any
     service_id: Any
     created_at: datetime
@@ -683,4 +683,4 @@ class ServiceJoinRequest(JSONModel):
         return cls(service_api_client.get_service_join_requests(request_id))
 
     def update(self, **kwargs):
-        return service_api_client.update_service_join_requests(self.service_join_request_id, **kwargs)
+        return service_api_client.update_service_join_requests(self.id, self.requester["id"], **kwargs)

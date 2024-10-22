@@ -102,6 +102,12 @@ def validate_service_join_request(service_id, request_id):
     request_changed_by = service_join_request.status_changed_by
     requested_service = Service.from_id(service_join_request.service_id)
 
+    if not requested_service.organisation.can_ask_to_join_a_service:
+        abort(403)
+
+    if requested_service.organisation != current_user.default_organisation:
+        abort(403)
+
     if current_user.id not in service_join_request.contacted_service_users:
         abort(403)
 
@@ -146,13 +152,12 @@ def service_join_request_approve(service_id, request_id):
                     "main.service_join_request_set_permissions",
                     service_id=service_id,
                     request_id=request_id,
-                    requester_id=requested_by["id"],
                 )
             )
         if form.join_service_approve_request.data == SERVICE_JOIN_REQUEST_REJECTED:
             service_join_request.update(
                 status=SERVICE_JOIN_REQUEST_REJECTED,
-                status_changed_by=current_user.id,
+                status_changed_by_id=current_user.id,
             )
             return render_template(
                 "views/join-service-request-rejected.html",
@@ -164,9 +169,38 @@ def service_join_request_approve(service_id, request_id):
     return render_template(
         "views/join-service-request-approver.html",
         form=form,
-        mobile_number=True,
         requester=requested_by,
         requested_service=requested_service,
+        error_summary_enabled=True,
+        service_id=service_id,
+        request_id=request_id,
+    )
+
+
+@main.route("/services/<uuid:service_id>/join-request/<uuid:request_id>/set-permissions", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_join_request_set_permissions(service_id, request_id):
+    is_redirect = validate_service_join_request(service_id, request_id)
+    if is_redirect:
+        return is_redirect
+
+    form = JoinServiceRequestSetPermissionsForm()
+    service_join_request = ServiceJoinRequest.from_id(request_id)
+    requested_by = service_join_request.requester
+
+    if form.validate_on_submit():
+        service_join_request.update(
+            status=SERVICE_JOIN_REQUEST_APPROVED,
+            status_changed_by_id=current_user.id,
+            permissions=translate_permissions_from_ui_to_db(form.join_service_request_set_permissions_field.data),
+        )
+        return redirect(url_for("main.choose_account"))
+
+    return render_template(
+        "views/join-service-request-set-permissions.html",
+        form=form,
+        request_id=request_id,
+        requester=requested_by,
         error_summary_enabled=True,
     )
 
