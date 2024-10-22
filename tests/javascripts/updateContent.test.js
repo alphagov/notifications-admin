@@ -366,10 +366,13 @@ describe('Update content', () => {
 
     });
 
-    test("If the response contains no changes, the DOM should stay the same", () => {
+    test("If the response contains no changes, the DOM should stay the same and no update event should fire", () => {
 
       // send the done callback a response with updates included
       responseObj[updateKey] = getPartial(partialData);
+
+      const updateEventCallbackSpy = jest.fn();
+      $(document).on('updateContent.onafterupdate', updateEventCallbackSpy);
 
       // start the module
       window.GOVUK.notifyModules.start();
@@ -383,10 +386,13 @@ describe('Update content', () => {
 
       // check a sample DOM node is unchanged
       expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("0");
-
+      expect(updateEventCallbackSpy).not.toHaveBeenCalled()
     });
 
-    test("If the response contains changes, it should update the DOM with them", () => {
+    test("If the response contains changes, it should update the DOM with them and fire an update event", () => {
+
+      const updateEventCallbackSpy = jest.fn();
+      $(document).on('updateContent.onafterupdate', updateEventCallbackSpy);
 
       partialData[0].count = 1;
 
@@ -405,6 +411,9 @@ describe('Update content', () => {
 
       // check the right DOM node is updated
       expect(document.querySelectorAll('.big-number-number')[0].textContent.trim()).toEqual("1");
+      // check the event was triggered with the updated DOM node (the 2nd argument, after the event object)
+      expect(updateEventCallbackSpy).toHaveBeenCalled();
+      expect(updateEventCallbackSpy.mock.calls[0][1]).toEqual(document.querySelector('.ajax-block-container'));
 
     });
 
@@ -666,37 +675,6 @@ describe('Update content', () => {
       expect(partialsInPage[1].querySelectorAll('.file-list h2')[0].classList.contains('js-child-has-focus')).toBe(false);
 
     });
-
-  });
-
-  test('After any updates it should fire the updateContent.onafterupdate event', () => {
-
-    function getPartial() {
-        return `<div class="ajax-block-container">
-                  <p>12 Emails</p>
-                </div>`;
-    };
-
-    document.body.innerHTML = getInitialHTMLString(getPartial());
-
-    // spy on event we want to track
-    const eventSpy = jest.fn()
-    $(document).on('updateContent.onafterupdate', eventSpy);
-
-    // make a response with no changes
-    responseObj[updateKey] = getPartial();
-
-    // start the module
-    window.GOVUK.notifyModules.start();
-
-    // move to the time the first request is fired
-    jest.advanceTimersByTime(2000);
-
-    // simulate a 200 response
-    jest.advanceTimersByTime(serverResponse.responseTimeInMilliseconds);
-    serverResponse.complete();
-
-    expect(eventSpy).toHaveBeenCalled();
 
   });
 
