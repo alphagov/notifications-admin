@@ -11,6 +11,7 @@ from app.formatters import format_date_short
 from app.utils.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import translate_permissions_from_ui_to_db
+from tests import organisation_json
 from tests.conftest import (
     ORGANISATION_ID,
     ORGANISATION_TWO_ID,
@@ -1849,7 +1850,7 @@ def test_confirm_edit_user_mobile_number_doesnt_change_user_mobile_for_non_team_
 
 def service_join_request_get_data(request_id, status, mock_requester, status_changed_by, mock_contacted_service_users):
     return {
-        "service_join_request_id": request_id,
+        "id": request_id,
         "requester": {
             "id": mock_requester.get("id"),
             "name": mock_requester.get("name"),
@@ -1924,13 +1925,21 @@ def mock_get_service_join_request_user_already_joined(mocker):
     ],
 )
 def test_service_join_request_pending(
+    mocker,
     client_request,
     mock_requester,
     mock_service_user,
+    mock_get_organisation_by_domain,
     service_one,
     status,
     mock_get_service_join_request_status_data,
 ):
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
     page = client_request.get(
         "main.service_join_request_approve",
         service_id=SERVICE_ONE_ID,
@@ -1969,13 +1978,22 @@ def test_service_join_request_pending(
     ],
 )
 def test_service_join_request_approved(
+    mocker,
     endpoint,
     client_request,
     mock_requester,
     mock_service_user,
+    service_one,
+    mock_get_organisation_by_domain,
     status,
     mock_get_service_join_request_status_data,
 ):
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
     page = client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,
@@ -2006,13 +2024,22 @@ def test_service_join_request_approved(
     ],
 )
 def test_service_join_request_rejected(
+    mocker,
     endpoint,
     client_request,
     mock_requester,
     mock_service_user,
+    service_one,
+    mock_get_organisation_by_domain,
     status,
     mock_get_service_join_request_status_data,
 ):
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
     page = client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,
@@ -2042,11 +2069,20 @@ def test_service_join_request_rejected(
     ],
 )
 def test_service_join_request_already_joined(
+    mocker,
     endpoint,
     service_one_id,
     client_request,
+    service_one,
+    mock_get_organisation_by_domain,
     mock_get_service_join_request_user_already_joined,
 ):
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
     page = client_request.get(
         endpoint,
         service_id=service_one_id,
@@ -2054,7 +2090,7 @@ def test_service_join_request_already_joined(
     )
     assert "This person is already a team member" in page.text.strip()
     assert "This person is already a team member" in page.select_one("h1").text.strip()
-    assert "Test User With Empty Permissions is already member of ‘service one‘." in page.select_one("p").text.strip()
+    assert "Test User With Empty Permissions is already member of ‘service one’." in page.select_one("p").text.strip()
 
 
 @pytest.mark.parametrize(
@@ -2071,11 +2107,20 @@ def test_service_join_request_already_joined(
     ],
 )
 def test_service_join_request_should_return_403_when_approver_is_not_logged_in_user(
+    mocker,
     endpoint,
     client_request,
     service_one_id,
+    service_one,
+    mock_get_organisation_by_domain,
     mock_get_service_join_request_not_logged_in_user,
 ):
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
     client_request.get(
         endpoint,
         service_id=service_one_id,
@@ -2095,13 +2140,21 @@ def test_service_join_request_should_return_403_when_approver_is_not_logged_in_u
     ],
 )
 def test_service_join_request_redirects_to_set_permissions_on_approve(
+    mocker,
     client_request,
     mock_requester,
     mock_service_user,
     service_one,
+    mock_get_organisation_by_domain,
     status,
     mock_get_service_join_request_status_data,
 ):
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
     request_id = sample_uuid()
     client_request.post(
         "main.service_join_request_approve",
@@ -2115,7 +2168,6 @@ def test_service_join_request_redirects_to_set_permissions_on_approve(
             "main.service_join_request_set_permissions",
             service_id=SERVICE_ONE_ID,
             request_id=request_id,
-            requester_id=mock_requester["id"],
         ),
     )
 
@@ -2130,18 +2182,25 @@ def test_service_join_request_redirects_to_set_permissions_on_approve(
         ),
     ],
 )
-def test_service_join_request_shows_rejected_on_reject(
+def test_service_join_request_shows_rejected_message_on_reject(
     mocker,
     client_request,
     mock_requester,
     mock_service_user,
     service_one,
+    mock_get_organisation_by_domain,
     mock_get_service_join_request_status_data,
 ):
     request_id = sample_uuid()
     mock_update_service_join_requests = mocker.patch(
         "app.service_api_client.update_service_join_requests",
         return_value={},
+    )
+
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
     )
 
     page = client_request.post(
@@ -2164,7 +2223,7 @@ def test_service_join_request_shows_rejected_on_reject(
     mock_update_service_join_requests.assert_called_once_with(
         request_id,
         status=SERVICE_JOIN_REQUEST_REJECTED,
-        status_changed_by=current_user.id,
+        status_changed_by_id=current_user.id,
     )
     assert mock_update_service_join_requests.called
 
@@ -2174,20 +2233,27 @@ def test_service_join_request_shows_rejected_on_reject(
     [(create_active_user_empty_permissions(True), create_active_user_with_permissions(True), "pending")],
 )
 def test_service_join_request_set_permissions(
+    mocker,
     client_request,
     mock_requester,
     mock_service_user,
     service_one,
+    mock_get_organisation_by_domain,
     status,
     mock_get_service_join_request_status_data,
 ):
     request_id = sample_uuid()
 
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
     page = client_request.get(
         "main.service_join_request_set_permissions",
         service_id=SERVICE_ONE_ID,
         request_id=request_id,
-        requester_id=mock_requester["id"],
     )
 
     assert f"Choose permissions for {mock_requester['name']}" in page.text.strip()
@@ -2216,6 +2282,7 @@ def test_service_join_request_set_permissions_on_save(
     mock_requester,
     mock_service_user,
     service_one,
+    mock_get_organisation_by_domain,
     status,
     mock_get_service_join_request_status_data,
 ):
@@ -2226,11 +2293,16 @@ def test_service_join_request_set_permissions_on_save(
         return_value={},
     )
 
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
     client_request.post(
         "main.service_join_request_set_permissions",
         service_id=SERVICE_ONE_ID,
         request_id=request_id,
-        requester_id=mock_requester["id"],
         _data={
             "join_service_request_set_permissions_field": selected_permissions,
         },
@@ -2242,6 +2314,6 @@ def test_service_join_request_set_permissions_on_save(
         request_id,
         permissions=translate_permissions_from_ui_to_db(selected_permissions),
         status=SERVICE_JOIN_REQUEST_APPROVED,
-        status_changed_by=current_user.id,
+        status_changed_by_id=current_user.id,
     )
     assert mock_update_service_join_requests.called

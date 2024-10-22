@@ -10,7 +10,7 @@
   {{ page_header('Tell {} you have refused their request'.format(requester.name)) }}
 
   <p class="govuk-body">
-    To let {{ requester.name }} know that they cannot join your service, email them directly at {{ requester.email_address }}.
+    To let {{ requester.name }} know that they cannot join your service, email them directly at {{ requester.email_address }}
   </p>
 
   <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_account') }}">Back to your services</a>
