@@ -113,7 +113,6 @@ def test_returns_value_from_cache(
 
 def test_deletes_domain_cache(
     notify_admin,
-    mock_get_user,
     mocker,
     fake_uuid,
 ):

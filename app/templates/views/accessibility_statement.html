@@ -12,8 +12,8 @@
   {{ content_metadata(
     data={
       "Published": "23 September 2020",
-      "Last updated": "15 August 2024",
-      "Next review due": "15 November 2024"
+      "Last updated": "7 October 2024",
+      "Next review due": "7 December 2024"
     }
     ) }}
     {# Last non-functional changes: 4 June 2024 #}
@@ -26,15 +26,14 @@
     This website is run by the GOV.UK Notify team at the Government Digital Service (GDS). It is designed to be used by as many people as possible. You should be able to:
   </p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>change colours, contrast levels and fonts</li>
-    <li>zoom in up to 300% without the text spilling off the screen</li>
-    <li>navigate most of the website using just a keyboard</li>
-    <li>navigate most of the website using speech recognition software</li>
+    <li>change colours, contrast levels and fonts using browser or device settings</li>
+    <li>zoom in up to 400% without the text spilling off the screen</li>
+    <li>navigate most of the website using a keyboard or speech recognition software</li>
     <li>listen to most of the website using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)</li>
   </ul>
 
   <p class="govuk-body">
-    The text should be clear and simple to understand.
+    We’ve also made the website text as simple as possible to understand.
   </p>
 
   <p class="govuk-body">
@@ -47,7 +46,15 @@
     We know some parts of this website are not fully accessible:
   </p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>if a team adds template folders, screen readers may announce the page heading in a confusing way</li>
+    <li>the footer with buttons in, on the templates page, sometimes overlaps focused links or checkboxes</li>
+    <li>the visual design of the organisation and service breadcrumb does not work on smaller screens or at high zoom</li>
+    <li>you have to scroll to see all of the content on the inbox page</li>
+    <li>the visual design of the letter template page does not work on smaller screens or at high zoom</li>
+    <li>the page for adding a reply-to email address does not update screen reader users on its progress</li>
+    <li>links in text messages on the conversation pages do not have enough contrast with their background</li>
+    <li>errors from starting a new template are not focused when they appear</li>
+    <li>errors from uploading PDFs are not focused when they appear</li>
+    <li>pages for template folders may be announced in a confusing way by screen readers</li>
     <li>screen reader users may find it hard to expand or collapse groups of checkboxes</li>
     <li>the Notify status page has several accessibility issues</li>
   </ul>
@@ -75,33 +82,68 @@
   <h2 class="heading-medium" id="enforcement-procedure">Enforcement procedure</h2>
 
   <p class="govuk-body">
-    The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’). If you’re not happy with how we respond to your complaint, contact the Equality Advisory and Support Service (EASS).
-  </p>
-
-  <p class="govuk-body">
-    Find out how to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">contact the GOV.UK Notify team</a>.
+    The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’). If you’re not happy with how we respond to your complaint, <a class="govuk-link govuk-link--no-visited-state" href="https://www.equalityadvisoryservice.com/">contact the Equality Advisory and Support Service (EASS)</a>.
   </p>
 
   <h2 class="heading-medium" id="technical-information">Technical information about this website’s accessibility</h2>
 
   <p class="govuk-body">
-    GDS is committed to making its website accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.
+    GDS is committed to making its websites accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.
+  </p>
+
+  <h2 class="heading-medium" id="non-accessible-content">Compliance status</h2>
+
+  <p class="govuk-body">
+    We have tested the Notify website against the Web Content Accessibility Guidelines (WCAG) 2.2 AA standard.
   </p>
 
   <p class="govuk-body">
-    GOV.UK Notify is partially compliant with the Web Content Accessibility Guidelines (WCAG) version 2.1 AA standard, due to the non-compliances listed below.
+    This website is partially compliant with the Web Content Accessibility Guidelines version 2.2 AA standard, due to the non-compliances listed below.
   </p>
 
   <h2 class="heading-medium" id="non-accessible-content">Non-accessible content</h2>
+
+  <h3 class="heading-small" id="non-compliance">Non-compliance with the accessibility regulations</h3>
+
+  <p class="govuk-body">
+    The following content on the Notify website is not compliant with the WCAG version 2.2 AA standard:
+  </p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>
+      The footer containing the ‘New template’ and ‘New Folder’ buttons on the templates page sometimes obscures links or checkboxes in the page when they are tabbed to. This means keyboard-only users can lose sight of what is currently in focus and breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html">success criterion 2.4.11: focus obscured (minimum)</a>.
+    </li>
+    <li>
+      The navigation showing your current organisation and service has visual problems on smaller screens. This makes it hard to use on mobile devices or at 400% zoom on a 1280 pixel screen and breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">success criterion 1.4.10: Reflow</a>.
+    </li>
+    <li>
+      Content on the inbox page needs horizontal scrolling on smaller screens. This makes it harder to access on mobile devices or at 400% zoom on a 1280 pixel screen and breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">success criterion 1.4.10: Reflow</a>.
+    </li>
+    <li>
+      The design of the letter template page does not work on smaller screens. This makes it harder to access on mobile devices or at 400% zoom on a 1280 pixel screen and breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">success criterion 1.4.10: Reflow</a>.
+    </li>
+    <li>
+      The page for adding a reply-to email address gives progress updates that are only communicated visually. This is confusing for screen reader users and breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html">success criterion 4.1.3: Status messages</a>.
+    </li>
+    <li>
+      Links in the text messages shown on the conversation page do not have enough contrast with their background. This makes them harder to read for low vision users and breaks <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html">success criterion 1.4.3: Contrast (minimum)</a>.
+    </li>
+  </ol>
 
   <h3 class="heading-small" id="problems-with-using-the-interface">Problems with using the interface</h3>
 
   <ol class="govuk-list govuk-list--number">
     <li>
-      The JAWS screen reader announces template folder page headings as multiple sentences. We are investigating this issue.
+      Page headings on pages for folders can be confusing when using a screen reader. We are investigating this issue.
     </li>
     <li>
       Expanding and collapsing groups of checkboxes using a screen reader can be confusing.
+    </li>
+    <li>
+      If you do not choose a template type when starting a new template, the banner that tells you that is not focused. This is confusing for keyboard-only users and is not consistent with how this is done elsewhere on Notify.
+    </li>
+    <li>
+      The banner that tells you about errors in PDFs you upload is not focused when it appears. This is confusing for keyboard-only users and is not consistent with how this is done elsewhere on Notify.
     </li>
   </ol>
 
@@ -122,7 +164,7 @@
   </h3>
 
   <p class="govuk-body">
-    The following content on the <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk/">Notify status page</a> is not compliant with the WCAG version 2.1 AA standard:
+    The following content on the <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk/">Notify status page</a> is not compliant with the WCAG version 2.2 AA standard:
   </p>
 
   <ul class="govuk-list govuk-list--bullet">
@@ -137,6 +179,9 @@
     How we tested this service
   </h2>
 
+  <p class="govuk-body">
+    We revised what makes up the common tasks GOV.UK Notify users need to complete and tested them against WCAG 2.2 in September 2024. We are now in the process of fixing all issues identified by this testing. All tests were carried out by the Digital Accessibility Centre.
+  </p>
   <p class="govuk-body">
     The parts of the website used to add <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_email_branding') }}">email branding</a> or <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_letter_branding') }}">letter branding</a> were tested on 9 October 2023. The button for copying text in the page to your clipboard and the component for choosing the day and time to send notifications were also tested as part of this.
   </p>

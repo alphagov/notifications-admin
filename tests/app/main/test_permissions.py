@@ -198,14 +198,9 @@ def test_service_user_without_manage_service_permission_can_see_usage_page_when_
     client_request,
     mocker,
     active_caseworking_user,
-    mock_has_no_jobs,
     mock_get_annual_usage_for_service,
     mock_get_monthly_usage_for_service,
     mock_get_free_sms_fragment_limit,
-    mock_get_service,
-    mock_get_invites_for_service,
-    mock_get_users_by_service,
-    mock_get_organisation,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_get_api_keys,
@@ -284,7 +279,7 @@ def test_code_to_extract_decorators_works_with_known_examples():
         ["main.route", "user_has_permissions"],
     ) in list(get_routes_and_decorators(ORGANISATION_ID_ARGUMENT))
     assert (
-        "platform_admin.platform_admin",
+        "platform_admin.platform_admin_search",
         ["main.route", "user_is_platform_admin"],
     ) in list(get_routes_and_decorators())
     assert (

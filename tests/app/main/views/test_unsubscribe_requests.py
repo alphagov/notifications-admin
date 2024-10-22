@@ -60,7 +60,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             [
                 "Report Status",
                 "Today at 4:00pm 1 unsubscribe request Not downloaded",
-                "Today at midday to today at 2:17pm 1 unsubscribe request Not downloaded",
+                "Today from midday to 2:17pm 1 unsubscribe request Not downloaded",
                 "Today until midday 34 unsubscribe requests Downloaded",
                 "15 June to yesterday 200 unsubscribe requests Downloaded",
                 "7 December 2023 to 13 January 321 unsubscribe requests Completed",
@@ -91,6 +91,33 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             ],
         ),
         (
+            # Two single requests on the same day
+            [
+                {
+                    "count": 1,
+                    "earliest_timestamp": "2024-01-01T13:18:00+00:00",
+                    "latest_timestamp": "2024-01-01T13:18:00+00:00",
+                    "processed_by_service_at": None,
+                    "batch_id": "af5f5e86-528b-475e-8be1-012988987775",
+                    "is_a_batched_report": True,
+                },
+                {
+                    "count": 1,
+                    "earliest_timestamp": "2024-01-01T12:17:00+00:00",
+                    "latest_timestamp": "2024-01-01T12:17:00+00:00",
+                    "processed_by_service_at": None,
+                    "batch_id": "c2d11916-ee82-419e-99a8-7e38163e756f",
+                    "is_a_batched_report": True,
+                },
+            ],
+            [
+                "Report Status",
+                "1 January at 1:18pm 1 unsubscribe request Downloaded",
+                "1 January at 12:17pm 1 unsubscribe request Downloaded",
+            ],
+            [],
+        ),
+        (
             # Two reports with overlapping days
             [
                 {
@@ -112,7 +139,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             ],
             [
                 "Report Status",
-                "1 May at midday to 1 May at 2:17pm 1 unsubscribe request Completed",
+                "1 May from midday to 2:17pm 1 unsubscribe request Completed",
                 "30 April to 1 May at 10:00am 12,345,678 unsubscribe requests Completed",
             ],
             [],
@@ -183,8 +210,8 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             ],
             [
                 "Report Status",
-                "1 June at 11:22pm to 1 June at midnight 1,234 unsubscribe requests Downloaded",
-                "1 June at 2:17pm to 1 June at 2:18pm 4,567 unsubscribe requests Downloaded",
+                "1 June from 11:22pm to midnight 1,234 unsubscribe requests Downloaded",
+                "1 June from 2:17pm to 2:18pm 4,567 unsubscribe requests Downloaded",
                 "1 June until midday 7,890 unsubscribe requests Downloaded",
             ],
             [],
@@ -507,6 +534,19 @@ def test_create_unsubscribe_request_report_creates_batched_report(client_request
     )
 
 
+def test_create_unsubscribe_request_report_blocks_platform_admin(
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+):
+    client_request.login(platform_admin_user)
+    client_request.get(
+        "main.create_unsubscribe_request_report",
+        service_id=fake_uuid,
+        _expected_status=403,
+    )
+
+
 def test_download_unsubscribe_request_report(client_request, mocker):
     report_data = {
         "batch_id": "3d466625-6ea4-414f-ac48-add30d895c43",
@@ -604,7 +644,7 @@ def test_unsubscribe_valid_request(mocker, client_request, fake_uuid):
     mock_unsubscribe.assert_called_once_with(fake_uuid, "abc123")
 
 
-def test_unsubscribe_confirmation_page(client_request, fake_uuid):
+def test_unsubscribe_confirmation_page(client_request):
     page = client_request.get(
         "main.unsubscribe_confirmed",
         _test_for_elements_without_class=False,
@@ -631,4 +671,7 @@ def test_unsubscribe_request_not_found(mocker, client_request, fake_uuid):
     mock_post.assert_called_once_with(f"/unsubscribe/{fake_uuid}/abc123", None)
 
     assert normalize_spaces(page.select_one("h1").text) == "There is a problem"
-    assert normalize_spaces(page.select_one("p").text) == "We could not process your request to unsubscribe."
+    assert [normalize_spaces(p.text) for p in page.select("p")] == [
+        "We could not unsubscribe you from these emails.",
+        "If you pasted the web address from an email, check you copied the entire address.",
+    ]

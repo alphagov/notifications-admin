@@ -1205,15 +1205,6 @@ def platform_admin_user(fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def platform_admin_user_no_service_permissions():
-    """
-    this fixture is for situations where we want to test that platform admin can access
-    an endpoint even though they have no explicit permissions for that service.
-    """
-    return create_platform_admin_user()
-
-
-@pytest.fixture(scope="function")
 def api_user_active():
     return create_api_user_active()
 
@@ -2745,14 +2736,6 @@ def mock_get_email_branding(mocker, fake_uuid):
 
 
 @pytest.fixture(scope="function")
-def mock_get_email_branding_with_govuk_brand_type(mocker, fake_uuid):
-    def _get_email_branding(id):
-        return create_email_branding(fake_uuid, {"brand_type": "govuk"})
-
-    return mocker.patch("app.email_branding_client.get_email_branding", side_effect=_get_email_branding)
-
-
-@pytest.fixture(scope="function")
 def mock_get_email_branding_with_both_brand_type(mocker, fake_uuid):
     def _get_email_branding(id):
         return create_email_branding(fake_uuid, {"brand_type": "both"})
@@ -2945,6 +2928,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             _test_page_title=True,
             _test_for_elements_without_class=True,
             _test_forms_have_an_action_set=True,
+            _test_for_non_smart_quotes=True,
             _optional_args="",
             **endpoint_kwargs,
         ):
@@ -2956,6 +2940,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
                 _test_page_title=_test_page_title,
                 _test_for_elements_without_class=_test_for_elements_without_class,
                 _test_forms_have_an_action_set=_test_forms_have_an_action_set,
+                _test_for_non_smart_quotes=_test_for_non_smart_quotes,
             )
 
         @staticmethod
@@ -2967,6 +2952,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             _test_page_title=True,
             _test_for_elements_without_class=True,
             _test_forms_have_an_action_set=True,
+            _test_for_non_smart_quotes=True,
             **endpoint_kwargs,
         ):
             from flask.templating import _render
@@ -3012,6 +2998,9 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
 
             if _test_forms_have_an_action_set and _expected_status not in (301, 302):
                 ClientRequest.test_forms_have_an_action_set(page)
+
+            if _test_for_non_smart_quotes:
+                ClientRequest.test_for_non_smart_quotes(page)
 
             return page
 
@@ -3147,6 +3136,13 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             ), (  # forms hidden when js is enabled, or by default are exempt
                 "Forms that POST need an action set, even if posting to the same page"
             )
+
+        @staticmethod
+        def test_for_non_smart_quotes(page):
+            for el in page.select("h1, h2, h3, h4, h5, h6, p, li"):
+                assert not (
+                    "'" in el.text or '"' in el.text
+                ), f"Non-smart quote or apostrophe found in <{el.name}>: {normalize_spaces(el.text)}"
 
     return ClientRequest
 
@@ -3886,21 +3882,6 @@ def create_active_caseworking_user(with_unique_id=False):
             ]
         },
         services=[SERVICE_ONE_ID],
-    )
-
-
-def create_active_user_no_api_key_permission(with_unique_id=False):
-    return create_service_one_user(
-        id=str(uuid4()) if with_unique_id else sample_uuid(),
-        name="Test User With Permissions",
-        permissions={
-            SERVICE_ONE_ID: [
-                "manage_templates",
-                "manage_settings",
-                "manage_users",
-                "view_activity",
-            ]
-        },
     )
 
 

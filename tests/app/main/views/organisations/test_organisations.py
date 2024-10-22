@@ -347,7 +347,6 @@ def test_add_organisation_from_gp_service_when_that_org_name_already_exists(
     client_request,
     mocker,
     service_one,
-    mock_update_service_organisation,
 ):
     service_one["organisation_type"] = "nhs_gp"
     mocker.patch(
@@ -394,7 +393,6 @@ def test_add_organisation_from_gp_service_when_that_org_name_already_exists(
 )
 def test_validation_of_gps_creating_organisations(
     client_request,
-    mocker,
     service_one,
     data,
     expected_error,
@@ -449,7 +447,6 @@ def test_organisation_services_shows_live_services_and_usage(
     mock_get_organisation,
     mocker,
     active_user_with_permissions,
-    fake_uuid,
 ):
     mock = mocker.patch(
         "app.organisations_client.get_services_and_usage",
@@ -519,7 +516,6 @@ def test_organisation_services_shows_live_services_and_usage_with_count_of_1(
     mock_get_organisation,
     mocker,
     active_user_with_permissions,
-    fake_uuid,
 ):
     mocker.patch(
         "app.organisations_client.get_services_and_usage",
@@ -591,7 +587,6 @@ def test_organisation_services_shows_usage_in_correct_font_size(
     mock_get_organisation,
     mocker,
     active_user_with_permissions,
-    fake_uuid,
     service_usage,
     expected_css_class,
 ):
@@ -634,8 +629,6 @@ def test_organisation_services_filters_by_financial_year(
     client_request,
     mock_get_organisation,
     mocker,
-    active_user_with_permissions,
-    fake_uuid,
     financial_year,
     expected_selected,
 ):
@@ -660,7 +653,6 @@ def test_organisation_services_shows_search_bar(
     mock_get_organisation,
     mocker,
     active_user_with_permissions,
-    fake_uuid,
 ):
     mocker.patch(
         "app.organisations_client.get_services_and_usage",
@@ -708,7 +700,6 @@ def test_organisation_services_hides_search_bar_for_7_or_fewer_services(
     mock_get_organisation,
     mocker,
     active_user_with_permissions,
-    fake_uuid,
 ):
     mocker.patch(
         "app.organisations_client.get_services_and_usage",
@@ -745,7 +736,6 @@ def test_organisation_services_links_to_downloadable_report(
     mock_get_organisation,
     mocker,
     active_user_with_permissions,
-    fake_uuid,
 ):
     mocker.patch(
         "app.organisations_client.get_services_and_usage",
@@ -783,7 +773,6 @@ def test_download_organisation_usage_report(
     mock_get_organisation,
     mocker,
     active_user_with_permissions,
-    fake_uuid,
 ):
     mocker.patch(
         "app.organisations_client.get_services_and_usage",
@@ -833,7 +822,6 @@ def test_organisation_trial_mode_services_shows_all_non_live_services(
     platform_admin_user,
     mock_get_organisation,
     mocker,
-    fake_uuid,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation_services",
@@ -1404,7 +1392,6 @@ def test_archive_organisation_does_not_allow_orgs_with_team_members_or_services_
 )
 def test_view_organisation_settings(
     client_request,
-    fake_uuid,
     organisation_one,
     mock_get_organisation,
     endpoint,
@@ -1497,7 +1484,6 @@ def test_view_organisation_settings(
 def test_update_organisation_settings(
     mocker,
     client_request,
-    fake_uuid,
     organisation_one,
     mock_get_organisation,
     mock_update_organisation,
@@ -1564,7 +1550,6 @@ def test_update_organisation_sector_sends_service_id_data_to_api_client(
 def test_view_organisation_domains(
     mocker,
     client_request,
-    fake_uuid,
     user,
 ):
     client_request.login(user)
@@ -1586,6 +1571,16 @@ def test_view_organisation_domains(
     assert [textbox.get("value") for textbox in page.select("input[type=text]")] == [
         "example.gov.uk",
         "test.example.gov.uk",
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
         None,
         None,
         None,
@@ -1645,7 +1640,6 @@ def test_view_organisation_domains(
 )
 def test_update_organisation_domains(
     client_request,
-    fake_uuid,
     organisation_one,
     mock_get_organisation,
     mock_update_organisation,
@@ -1675,7 +1669,6 @@ def test_update_organisation_domains(
 def test_update_organisation_domains_when_domain_already_exists(
     mocker,
     client_request,
-    fake_uuid,
     organisation_one,
     mock_get_organisation,
 ):
@@ -1707,7 +1700,6 @@ def test_update_organisation_domains_when_domain_already_exists(
 def test_update_organisation_domains_with_more_than_just_domain(
     mocker,
     client_request,
-    fake_uuid,
 ):
     user = create_platform_admin_user()
     client_request.login(user)
@@ -1913,7 +1905,6 @@ def test_post_edit_organisation_go_live_notes_updates_go_live_notes(
 
 
 def test_organisation_settings_links_to_edit_organisation_notes_page(
-    mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
     mock_get_letter_branding_pool,
@@ -1981,7 +1972,6 @@ def test_update_organisation_notes_errors_when_user_not_platform_admin(
 
 
 def test_organisation_settings_links_to_edit_can_approve_own_go_live_request(
-    mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
     mock_get_letter_branding_pool,
@@ -1999,7 +1989,6 @@ def test_organisation_settings_links_to_edit_can_approve_own_go_live_request(
 
 
 def test_organisation_settings_links_to_edit_can_ask_to_join_a_service(
-    mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
     mock_get_letter_branding_pool,
@@ -2203,7 +2192,6 @@ def test_update_organisation_notes_doesnt_call_api_when_notes_dont_change(
 
 
 def test_organisation_settings_links_to_edit_organisation_billing_details_page(
-    mocker,
     mock_get_organisation,
     mock_get_email_branding_pool,
     mock_get_letter_branding_pool,

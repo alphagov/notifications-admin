@@ -103,7 +103,11 @@ class ValidPhoneNumber:
         try:
             if field.data:
                 if self.allow_sms_to_uk_landlines:
-                    PhoneNumber(field.data, allow_international=self.allow_international_sms)
+                    number = PhoneNumber(field.data)
+                    number.validate(
+                        allow_international_number=self.allow_international_sms,
+                        allow_uk_landline=self.allow_sms_to_uk_landlines,
+                    )
                 else:
                     validate_phone_number(field.data, international=self.allow_international_sms)
         except InvalidPhoneError as e:
@@ -191,6 +195,18 @@ class IsNotAGenericSenderID:
     def __call__(self, form, field):
         if field.data and field.data.lower() in self.generic_sender_ids:
             raise ValidationError(self.message)
+
+
+class IsNotLikeNHSNoReply:
+
+    def __call__(self, form, field):
+        lower_cased_data = field.data.lower()
+        if (
+            field.data
+            and ("nhs" in lower_cased_data and "no" in lower_cased_data and "reply" in lower_cased_data)
+            and field.data != "NHSNoReply"
+        ):
+            raise ValidationError("Text message sender ID must match other NHS services - change it to ‘NHSNoReply’")
 
 
 def create_phishing_senderid_zendesk_ticket(senderID=None):

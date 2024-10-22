@@ -18,6 +18,7 @@ from app import (
     template_statistics_client,
 )
 from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
+from app.extensions import redis_client
 from app.formatters import format_date_numeric, format_datetime_numeric
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
@@ -26,6 +27,8 @@ from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
     REQUESTED_STATUSES,
+    SEVEN_DAYS_TTL,
+    get_sha512_hashed,
     parse_filter_args,
     service_has_permission,
     set_status_filters,
@@ -65,6 +68,39 @@ def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials(service_id))
 
 
+def make_cache_key(query_hash, service_id):
+    return f"service-{service_id}-notification-search-query-hash-{query_hash}"
+
+
+def cache_search_query(search_term, service_id, search_query_hash):
+    cached_search_term = ""
+
+    if search_query_hash:
+        cached_query = redis_client.get(make_cache_key(search_query_hash, service_id))
+        cached_search_term = bool(cached_query) and cached_query.decode()
+
+    if not cached_search_term:
+        search_query_hash = ""
+
+    if search_term and search_term != cached_search_term:
+        search_query_hash = get_sha512_hashed(search_term)
+        redis_client.set(make_cache_key(search_query_hash, service_id), search_term, ex=SEVEN_DAYS_TTL)
+        cached_search_term = search_term
+
+    return search_query_hash, cached_search_term
+
+
+def redirect_to_main_view_notification(current_service, message_type, search_query):
+    return redirect(
+        url_for(
+            "main.view_notifications",
+            service_id=current_service.id,
+            message_type=message_type,
+            search_query=search_query or None,
+        )
+    )
+
+
 @main.route("/services/<uuid:service_id>/notifications", methods=["GET", "POST"])
 @main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>", methods=["GET", "POST"])
 @user_has_permissions()
@@ -88,15 +124,30 @@ def view_notifications(service_id, message_type=None):
             status=request.args.get("status"),
         )
 
+    search_term = request.form.get("to", "")
+    search_query_hash = request.args.get("search_query", "")
+    cached_search_query_hash, cached_search_term = cache_search_query(search_term, service_id, search_query_hash)
+
+    if request.method == "POST" and not search_term:
+        return redirect_to_main_view_notification(current_service, message_type, None)
+
+    if cached_search_query_hash and search_query_hash != cached_search_query_hash:
+        return redirect_to_main_view_notification(current_service, message_type, cached_search_query_hash)
+
+    if not cached_search_query_hash and search_query_hash:
+        cached_search_query_hash = None
+        return redirect_to_main_view_notification(current_service, message_type, cached_search_query_hash)
+
     return render_template(
         "views/notifications.html",
         partials=partials_data,
         message_type=message_type,
         status=request.args.get("status") or "sending,delivered,failed",
         page=request.args.get("page", 1),
+        search_query=cached_search_query_hash or None,
         _search_form=SearchNotificationsForm(
             message_type=message_type,
-            to=request.form.get("to"),
+            to=cached_search_term or request.form.get("to"),
         ),
         things_you_can_search_by={
             "email": ["email address"],
@@ -182,6 +233,12 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
     service_data_retention_days = None
     search_term = request.form.get("to", "")
 
+    search_query_hash = request.args.get("search_query", "")
+    cached_search_query_hash, cached_search_term = cache_search_query(search_term, service_id, search_query_hash)
+
+    if request.method == "POST" and not search_term:
+        cached_search_query_hash = ""
+
     if message_type is not None:
         service_data_retention_days = current_service.get_days_of_retention(message_type)
 
@@ -191,9 +248,13 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
         template_type=[message_type] if message_type else [],
         status=filter_args.get("status"),
         limit_days=service_data_retention_days,
-        to=search_term,
+        to=cached_search_term or search_term,
     )
-    url_args = {"message_type": message_type, "status": request.args.get("status")}
+    url_args = {
+        "message_type": message_type,
+        "status": request.args.get("status"),
+        "search_query": request.args.get("search_query"),
+    }
     prev_page = None
 
     if "links" in notifications and notifications["links"].get("prev", None):
@@ -212,6 +273,7 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
                 current_service,
                 message_type,
                 service_api_client.get_service_statistics(service_id, limit_days=service_data_retention_days),
+                search_query=cached_search_query_hash or None,
             ),
         ),
         "notifications": render_template(
@@ -220,18 +282,20 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
             limit_days=service_data_retention_days,
             prev_page=prev_page,
             next_page=next_page,
+            search_query=cached_search_query_hash or None,
             show_pagination=(not search_term),
             single_notification_url=partial(
                 url_for,
                 "main.view_notification",
                 service_id=current_service.id,
                 from_statuses=request.args.get("status"),
+                from_search_query=request.args.get("search_query"),
             ),
         ),
     }
 
 
-def get_status_filters(service, message_type, statistics):
+def get_status_filters(service, message_type, statistics, search_query):
     if message_type is None:
         stats = {
             key: sum(statistics[message_type][key] for message_type in {"email", "sms", "letter"})
@@ -253,7 +317,13 @@ def get_status_filters(service, message_type, statistics):
         (
             label,
             option,
-            url_for("main.view_notifications", service_id=service.id, message_type=message_type, status=option),
+            url_for(
+                "main.view_notifications",
+                service_id=service.id,
+                message_type=message_type,
+                status=option,
+                search_query=search_query,
+            ),
             stats[key],
         )
         for key, label, option in filters

@@ -292,10 +292,6 @@ def format_list_items(items, format_string, *args, **kwargs):
     return [format_string.format(*args, item=item, **kwargs) for item in items]
 
 
-def linkable_name(value):
-    return urllib.parse.quote_plus(value)
-
-
 def format_thousands(value):
     if isinstance(value, Number):
         return f"{value:,.0f}"

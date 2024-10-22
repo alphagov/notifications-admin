@@ -23,6 +23,8 @@ from gds_metrics import GDSMetrics
 from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
 from notifications_utils import logging, request_helper
+from notifications_utils.asset_fingerprinter import asset_fingerprinter
+from notifications_utils.eventlet import EventletTimeout
 from notifications_utils.formatters import (
     formatted_list,
     get_lines_with_normalised_whitespace,
@@ -35,7 +37,6 @@ from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
 from app import proxy_fix, webauthn_server
-from app.asset_fingerprinter import asset_fingerprinter
 from app.commands import setup_commands
 from app.config import Config, configs
 from app.extensions import antivirus_client, redis_client, zendesk_client
@@ -69,7 +70,6 @@ from app.formatters import (
     format_time,
     format_yes_no,
     iteration_count,
-    linkable_name,
     message_count,
     message_count_label,
     message_count_noun,
@@ -111,7 +111,6 @@ from app.notify_client.performance_dashboard_api_client import (
     performance_dashboard_api_client,
 )
 from app.notify_client.platform_admin_api_client import admin_api_client
-from app.notify_client.platform_stats_api_client import platform_stats_api_client
 from app.notify_client.protected_sender_id_api_client import protected_sender_id_api_client
 from app.notify_client.provider_client import provider_client
 from app.notify_client.service_api_client import service_api_client
@@ -199,7 +198,6 @@ def create_app(application):
         org_invite_api_client,
         organisations_client,
         performance_dashboard_api_client,
-        platform_stats_api_client,
         protected_sender_id_api_client,
         provider_client,
         service_api_client,
@@ -498,6 +496,11 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             raise error
         return _error_response(500)
 
+    @application.errorhandler(EventletTimeout)
+    def eventlet_timeout(error):
+        application.logger.exception(error)
+        return _error_response(504, error_page_template=500)
+
 
 def setup_blueprints(application):
     """
@@ -545,7 +548,6 @@ def add_template_filters(application):
         format_datetime_short,
         format_time,
         valid_phone_number,
-        linkable_name,
         format_pennies_as_currency,
         format_date,
         format_date_human,

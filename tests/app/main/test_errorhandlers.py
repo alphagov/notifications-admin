@@ -127,8 +127,6 @@ def test_405_returns_something_went_wrong_page(client_request, mocker):
 
 
 def test_api_error_response_logging(
-    mocker,
-    fake_uuid,
     requests_mock,
     client_request,
     caplog,

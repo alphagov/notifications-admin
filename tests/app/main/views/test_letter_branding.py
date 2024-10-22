@@ -336,7 +336,7 @@ def test_update_letter_branding_shows_database_errors_on_name_field(
 
 
 def test_update_letter_branding_with_new_file_and_new_details(
-    mocker, client_request, platform_admin_user, mock_get_all_letter_branding, mock_get_letter_branding_by_id, fake_uuid
+    mocker, client_request, platform_admin_user, mock_get_letter_branding_by_id, fake_uuid
 ):
     mock_save_temporary = mocker.patch("app.main.views.letter_branding.logo_client.save_temporary_logo")
     mock_save_permanent = mocker.patch(
@@ -452,7 +452,7 @@ def test_create_letter_branding_when_uploading_valid_file(mocker, client_request
     ),
 )
 def test_create_letter_branding_calls_antivirus_scan(
-    mocker, client_request, platform_admin_user, fake_uuid, scan_result, expected_status_code
+    mocker, client_request, platform_admin_user, scan_result, expected_status_code
 ):
     mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=scan_result)
     mock_save_temporary = mocker.patch(
@@ -541,7 +541,7 @@ def test_create_letter_branding_when_uploading_invalid_file(
     assert page.select_one(".error-message").text.strip() == "The logo must be an SVG file"
 
 
-def test_create_new_letter_branding_shows_preview_of_logo(client_request, platform_admin_user, fake_uuid, logo_client):
+def test_create_new_letter_branding_shows_preview_of_logo(client_request, platform_admin_user, logo_client):
     temp_logo = logo_client.get_logo_key("temp.svg", logo_type="letter")
 
     client_request.login(platform_admin_user)
@@ -597,9 +597,7 @@ def test_create_letter_branding_persists_logo_when_all_data_is_valid(
     ]
 
 
-def test_create_letter_branding_shows_form_errors_on_name_field(
-    client_request, platform_admin_user, fake_uuid, logo_client
-):
+def test_create_letter_branding_shows_form_errors_on_name_field(client_request, platform_admin_user, logo_client):
     temp_logo = logo_client.get_logo_key("test.svg", logo_type="letter")
 
     client_request.login(platform_admin_user)

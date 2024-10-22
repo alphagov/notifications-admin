@@ -16,7 +16,6 @@ def test_should_render_forgot_password(client_request):
 @pytest.mark.parametrize("email_address", ["test@user.gov.uk", "someuser@notgovernment.com"])
 def test_should_redirect_to_password_reset_sent_for_valid_email(
     client_request,
-    fake_uuid,
     email_address,
     mocker,
 ):
@@ -34,7 +33,6 @@ def test_should_redirect_to_password_reset_sent_for_valid_email(
 
 def test_forgot_password_sends_next_link_with_reset_password_email_request(
     client_request,
-    fake_uuid,
     mocker,
 ):
     client_request.logout()

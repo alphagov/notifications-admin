@@ -133,7 +133,6 @@ def test_process_sms_auth_sign_in_return_2fa_template(
     client_request,
     api_user_active,
     mock_send_verify_code,
-    mock_get_user,
     mock_get_user_by_email,
     mock_verify_password,
     email_address,

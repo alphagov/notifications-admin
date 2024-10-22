@@ -485,9 +485,7 @@ def test_POST_letter_branding_upload_branding_scans_for_viruses(client_request, 
     assert normalize_spaces(page.select_one(".error-message").text) == "This file contains a virus"
 
 
-def test_POST_letter_branding_upload_branding_redirects_on_success(
-    client_request, mock_antivirus_virus_free, fake_uuid, mocker
-):
+def test_POST_letter_branding_upload_branding_redirects_on_success(client_request, mock_antivirus_virus_free, mocker):
     mock_save_temporary = mocker.patch(
         "app.main.views.service_settings.branding.logo_client.save_temporary_logo",
         return_value="temporary.svg",
@@ -575,7 +573,6 @@ def test_POST_letter_branding_set_name_creates_branding_adds_to_pool_and_redirec
     service_one,
     mock_create_letter_branding,
     mock_get_organisation,
-    active_user_with_permissions,
     mock_update_service,
     fake_uuid,
     mocker,
@@ -635,7 +632,6 @@ def test_POST_letter_branding_set_name_creates_branding_and_redirects_if_service
     service_one,
     mock_create_letter_branding,
     mock_get_organisation,
-    active_user_with_permissions,
     mock_update_service,
     fake_uuid,
     mocker,

@@ -891,7 +891,6 @@ def test_should_check_for_reply_to_on_go_live(
     client_request,
     mocker,
     service_one,
-    fake_uuid,
     single_sms_sender,
     volume_email,
     count_of_email_templates,
@@ -948,7 +947,6 @@ def test_should_check_for_sending_things_right(
     client_request,
     mocker,
     service_one,
-    fake_uuid,
     single_sms_sender,
     count_of_users_with_manage_service,
     count_of_invites_with_manage_service,
@@ -1231,8 +1229,6 @@ def test_should_check_for_sms_sender_on_go_live(
     client_request,
     service_one,
     mocker,
-    mock_get_organisation,
-    mock_get_invites_for_service,
     organisation_type,
     count_of_sms_templates,
     sms_senders,
@@ -1292,7 +1288,6 @@ def test_should_check_for_mou_on_request_to_go_live(
     service_one,
     mocker,
     agreement_signed,
-    mock_get_invites_for_service,
     mock_get_service_organisation,
     expected_item,
 ):
@@ -1389,7 +1384,6 @@ def test_gp_without_organisation_is_shown_agreement_step(
 def test_non_gov_user_is_told_they_cant_go_live(
     client_request,
     api_nongov_user_active,
-    mock_get_invites_for_service,
     mocker,
     mock_get_organisations,
     mock_get_organisation,
@@ -2003,10 +1997,8 @@ def test_should_redirect_after_request_to_go_live(
     mock_get_organisations_and_services_for_user,
     single_sms_sender,
     mock_get_service_settings_page_common,
-    mock_get_service_templates,
     mock_get_users_by_service,
     mock_update_service,
-    mock_get_invites_without_manage_permission,
 ):
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
@@ -2158,17 +2150,13 @@ def test_request_to_go_live_displays_mou_signatories(
     client_request,
     mocker,
     fake_uuid,
-    active_user_with_permissions,
     single_reply_to_email_address,
     single_letter_contact_block,
     mock_get_organisations_and_services_for_user,
     single_sms_sender,
     mock_get_service_organisation,
     mock_get_service_settings_page_common,
-    mock_get_service_templates,
-    mock_get_users_by_service,
     mock_update_service,
-    mock_get_invites_without_manage_permission,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
@@ -2625,7 +2613,6 @@ def test_default_option_shows_for_default_sender(
 
 def test_remove_default_from_default_letter_contact_block(
     client_request,
-    mocker,
     multiple_letter_contact_blocks,
     mock_update_letter_contact,
 ):
@@ -3054,18 +3041,17 @@ def test_default_box_doesnt_show_on_first_letter_sender(contact_blocks, mocker, 
 
 
 @pytest.mark.parametrize(
-    "reply_to_address, data, api_default_args",
+    "reply_to_address, data",
     [
-        (create_reply_to_email_address(is_default=True), {"is_default": "y"}, True),
-        (create_reply_to_email_address(is_default=True), {}, True),
-        (create_reply_to_email_address(is_default=False), {}, False),
-        (create_reply_to_email_address(is_default=False), {"is_default": "y"}, True),
+        (create_reply_to_email_address(is_default=True), {"is_default": "y"}),
+        (create_reply_to_email_address(is_default=True), {}),
+        (create_reply_to_email_address(is_default=False), {}),
+        (create_reply_to_email_address(is_default=False), {"is_default": "y"}),
     ],
 )
 def test_edit_reply_to_email_address_sends_verification_notification_if_address_is_changed(
     reply_to_address,
     data,
-    api_default_args,
     mocker,
     fake_uuid,
     client_request,
@@ -3183,7 +3169,6 @@ def test_shows_delete_link_for_get_request_for_edit_email_reply_to_address(
     mocker,
     reply_to_address,
     default_choice_and_delete_link_expected,
-    fake_uuid,
     client_request,
 ):
     mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
@@ -3229,7 +3214,6 @@ def test_shows_delete_link_for_error_on_post_request_for_edit_email_reply_to_add
     reply_to_address,
     default_choice_and_delete_link_expected,
     default_checkbox_checked,
-    fake_uuid,
     client_request,
 ):
     mocker.patch("app.service_api_client.get_reply_to_email_address", return_value=reply_to_address)
@@ -3502,7 +3486,6 @@ def test_shows_delete_link_for_sms_sender(
     sms_sender,
     expected_link_text,
     partial_href,
-    fake_uuid,
     client_request,
 ):
     mocker.patch("app.service_api_client.get_sms_sender", return_value=sms_sender)
@@ -4012,7 +3995,6 @@ def test_should_set_branding_for_service_with_no_organisation(
     platform_admin_user,
     service_one,
     mock_update_service,
-    mock_update_organisation,
     single_reply_to_email_address,
     single_sms_sender,
     mock_get_free_sms_fragment_limit,
@@ -4673,7 +4655,6 @@ def test_switch_service_channels_on_and_off(
 def test_show_international_sms_and_letters_as_radio_button(
     client_request,
     service_one,
-    mocker,
     permission,
     permissions,
     expected_checked,
@@ -4971,7 +4952,6 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
     ],
 )
 def test_send_files_by_email_contact_details_does_not_update_invalid_contact_details(
-    mocker,
     client_request,
     service_one,
     contact_details_type,
@@ -5745,7 +5725,6 @@ def test_service_settings_links_to_branding_request_page_for_emails(
 
 
 def test_service_settings_links_to_branding_options_page_for_letters(
-    mocker,
     service_one,
     client_request,
     no_reply_to_email_addresses,
@@ -5878,7 +5857,6 @@ def test_update_service_data_retention_populates_form(
 
 
 def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
-    mocker,
     service_one,
     client_request,
     platform_admin_user,
@@ -5925,7 +5903,6 @@ def test_update_service_notes(client_request, platform_admin_user, service_one, 
 
 
 def test_service_settings_links_to_edit_service_billing_details_page_for_platform_admins(
-    mocker,
     service_one,
     client_request,
     platform_admin_user,

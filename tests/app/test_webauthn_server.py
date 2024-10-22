@@ -21,7 +21,6 @@ def test_server_origin_verification(app_with_mock_config, environment, allowed):
 
 def test_server_relying_party_id(
     app_with_mock_config,
-    mocker,
 ):
     webauthn_server.init_app(app_with_mock_config)
     assert app_with_mock_config.webauthn_server.rp.id == "www.notify.works"

@@ -307,7 +307,6 @@ def test_complete_webauthn_login_attempt_raises_on_api_error(fake_uuid, mocker):
 
 def test_reset_password(
     mocker,
-    fake_uuid,
 ):
     mock_post = mocker.patch("app.notify_client.user_api_client.UserApiClient.post")
 

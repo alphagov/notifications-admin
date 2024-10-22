@@ -9,7 +9,6 @@ def test_client_creates_invite(
     notify_admin,
     mocker,
     fake_uuid,
-    sample_invite,
 ):
     mocker.patch("app.notify_client.current_user")
 
@@ -52,7 +51,6 @@ def test_client_creates_invite(
 def test_client_update_invite(
     notify_admin,
     mocker,
-    fake_uuid,
     sample_invite,
 ):
     mocker.patch("app.notify_client.current_user")

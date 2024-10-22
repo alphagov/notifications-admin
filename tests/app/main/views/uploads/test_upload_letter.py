@@ -647,7 +647,6 @@ def test_uploaded_letter_preview_redirects_if_file_not_in_s3(mocker, client_requ
 def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printable_area_on_a_page(
     mocker,
     client_request,
-    mock_get_service,
     fake_uuid,
     invalid_pages,
     page_requested,
@@ -698,7 +697,6 @@ def test_uploaded_letter_preview_image_shows_overlay_when_content_outside_printa
 def test_uploaded_letter_preview_image_does_not_show_overlay_if_no_content_outside_printable_area(
     mocker,
     client_request,
-    mock_get_service,
     metadata,
     fake_uuid,
 ):

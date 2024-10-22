@@ -42,7 +42,6 @@ from wtforms import (
 )
 from wtforms import RadioField as WTFormsRadioField
 from wtforms.validators import (
-    UUID,
     DataRequired,
     InputRequired,
     NumberRange,
@@ -70,6 +69,7 @@ from app.main.validators import (
     IsAUKMobileNumberOrShortCode,
     IsNotAGenericSenderID,
     IsNotAPotentiallyMaliciousSenderID,
+    IsNotLikeNHSNoReply,
     Length,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
@@ -500,10 +500,6 @@ class NestedFieldMixin:
         return render_govuk_frontend_macro(self.govuk_frontend_component_name, params=params)
 
 
-class NestedRadioField(RadioFieldWithNoneOption, NestedFieldMixin):
-    pass
-
-
 class NestedCheckboxesField(SelectMultipleField, NestedFieldMixin):
     NONE_OPTION_VALUE = None
 
@@ -816,13 +812,6 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
         }
 
 
-class OptionalGovukRadiosField(GovukRadiosField):
-    def pre_validate(self, form):
-        if self.data is None:
-            return
-        super().pre_validate(form)
-
-
 class OnOffField(GovukRadiosField):
     def __init__(self, label, choices=None, choices_for_error_message=None, *args, **kwargs):
         choices = choices or [
@@ -873,7 +862,6 @@ class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
     govuk_frontend_component_name = "nested-radios"
     param_extensions = {"formGroup": {"classes": "govuk-form-group--nested-radio"}}
 
-    # TODO: blurb to explain this
     def render_children(self, name, label, options):
         params = {
             "name": name,
@@ -1045,6 +1033,7 @@ class JoinServiceRequestApproveForm(StripWhitespaceForm):
         ],
         thing="an option",
         param_extensions={"fieldset": {"legend": {"classes": ""}}},
+        default="approved",
         default=SERVICE_JOIN_REQUEST_APPROVED,
     )
 
@@ -1296,8 +1285,8 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
             ],
             default="",
         ),
-        min_entries=20,
-        max_entries=20,
+        min_entries=30,
+        max_entries=30,
         label="Domain names",
         thing="domain name",
     )
@@ -1859,6 +1848,7 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
             IsNotAGenericSenderID(),
             IsNotAPotentiallyMaliciousSenderID(),
             IsAUKMobileNumberOrShortCode(),
+            IsNotLikeNHSNoReply(),
         ],
     )
     is_default = GovukCheckboxField("Make this text message sender ID the default")
@@ -2222,12 +2212,6 @@ class GuestList(StripWhitespaceForm):
         label="Mobile numbers",
         thing="mobile number",
     )
-
-
-class DateFilterForm(StripWhitespaceForm):
-    start_date = GovukDateField("Start date", [validators.optional()], thing="a start date")
-    end_date = GovukDateField("End date", [validators.optional()], thing="an end date")
-    include_from_test_key = GovukCheckboxField("Include test keys")
 
 
 class RequiredDateFilterForm(StripWhitespaceForm):
@@ -2857,13 +2841,6 @@ class SetEmailAuthForUsersForm(StripWhitespaceForm):
     users = GovukCheckboxesField("Choose who can sign in using an email link")
 
 
-class FindByUuidForm(StripWhitespaceForm):
-    search = GovukSearchField(
-        "Find anything by UUID",
-        validators=[DataRequired("Cannot be empty"), UUID("Enter a valid UUID")],
-    )
-
-
 class PlatformAdminSearchForm(StripWhitespaceForm):
     search = GovukSearchField(
         "Search",
@@ -2885,7 +2862,7 @@ class UniqueServiceForm(StripWhitespaceForm):
 
 
 class ServiceGoLiveDecisionForm(OnOffSettingForm):
-    rejection_reason = GovukTextareaField("Rejection reason")
+    rejection_reason = GovukTextareaField("Enter the reason for your decision")
 
     def validate(self, *args, **kwargs):
         if self.enabled.data is False:

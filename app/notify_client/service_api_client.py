@@ -149,10 +149,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             count_as_live=count_as_live,
         )
 
-    # This method is not cached because it calls through to one which is
-    def update_service_with_properties(self, service_id, properties):
-        return self.update_service(service_id, **properties)
-
     @cache.delete("service-{service_id}")
     @cache.delete_by_pattern("service-{service_id}-template*")
     def archive_service(self, service_id, cached_service_user_ids):

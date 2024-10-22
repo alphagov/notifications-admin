@@ -117,7 +117,6 @@ def test_get_org_member_make_service_live_start(
 
 
 def test_make_service_live_start_with_no_organisation(
-    mocker,
     client_request,
     service_one,
 ):
@@ -132,7 +131,6 @@ def test_make_service_live_start_with_no_organisation(
 
 
 def test_make_service_live_start_with_no_organisation_platform_admin(
-    mocker,
     client_request,
     service_one,
     platform_admin_user,

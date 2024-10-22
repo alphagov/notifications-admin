@@ -114,7 +114,6 @@ def test_cannot_join_service_for_different_organisation(
 def test_page_lists_team_members_of_service(
     mocker,
     client_request,
-    fake_uuid,
     service_one,
     mock_get_organisation_by_domain,
 ):
@@ -188,7 +187,6 @@ def test_page_redirects_on_post(
     mocker,
     client_request,
     mock_request_invite_for,
-    fake_uuid,
     service_one,
     mock_get_organisation_by_domain,
 ):
@@ -237,9 +235,7 @@ def test_page_redirects_on_post(
 
 
 def test_confirmation_page(
-    mocker,
     client_request,
-    fake_uuid,
 ):
     page = client_request.get(
         "main.join_service_requested",

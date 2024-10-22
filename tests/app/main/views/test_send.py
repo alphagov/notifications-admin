@@ -316,7 +316,6 @@ def test_example_spreadsheet(
 def test_example_spreadsheet_for_letters(
     client_request,
     service_one,
-    mocker,
     mock_get_service_letter_template_with_placeholders,
     fake_uuid,
     mock_get_page_counts_for_letter,
@@ -358,7 +357,6 @@ def test_upload_files_in_different_formats(
     expected_status,
     client_request,
     service_one,
-    mocker,
     mock_get_service_template,
     mock_s3_set_metadata,
     mock_s3_upload,
@@ -400,12 +398,10 @@ def test_upload_files_in_different_formats(
 def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
     client_request,
     service_one,
-    mocker,
     mock_get_service_template_with_placeholders,
     mock_s3_set_metadata,
     mock_s3_get_metadata,
     mock_s3_upload,
-    mock_s3_download,
     mock_get_job_doesnt_exist,
     fake_uuid,
 ):
@@ -913,7 +909,6 @@ def test_upload_csv_file_with_missing_columns_shows_error(
 
 def test_upload_csv_invalid_extension(
     client_request,
-    mock_login,
     service_one,
     mock_get_service_template,
     fake_uuid,
@@ -932,7 +927,6 @@ def test_upload_csv_invalid_extension(
 
 def test_upload_csv_size_too_big(
     client_request,
-    mock_login,
     service_one,
     mock_get_service_template,
     fake_uuid,
@@ -1750,7 +1744,6 @@ def test_send_one_off_redirects_to_end_if_step_out_of_bounds(
     mock_has_no_jobs,
     mock_get_service_template_with_placeholders,
     fake_uuid,
-    mocker,
     user,
 ):
     client_request.login(user)
@@ -2080,7 +2073,6 @@ def test_send_one_off_letter_qr_code_placeholder_too_big(
 
 def test_send_one_off_populates_field_from_session(
     client_request,
-    mocker,
     service_one,
     mock_login,
     mock_get_service,
@@ -2104,7 +2096,6 @@ def test_send_one_off_populates_field_from_session(
 
 def test_send_one_off_back_link_populates_address_textarea(
     client_request,
-    mocker,
     mock_get_service_letter_template,
     mock_template_preview,
     fake_uuid,
@@ -2220,7 +2211,6 @@ def test_send_one_off_letter_copes_with_placeholder_from_address_block(
 def test_send_one_off_letter_shows_international_postage(
     client_request,
     service_one,
-    mocker,
     fake_uuid,
     mock_get_service_letter_template_with_placeholders,
     mock_template_preview,
@@ -2577,10 +2567,6 @@ def test_send_one_off_letter_address_goes_to_next_placeholder(client_request, mo
 
 def test_download_example_csv(
     client_request,
-    mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
     mock_get_service_template_with_placeholders_same_as_recipient,
     mock_has_permissions,
     fake_uuid,
@@ -2598,9 +2584,6 @@ def test_download_example_csv(
 def test_download_example_csv_for_letter_template(
     client_request,
     mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
     mock_get_service_template_with_placeholders_same_as_recipient,
     mock_has_permissions,
     fake_uuid,
@@ -2692,7 +2675,6 @@ def test_upload_csvfile_with_valid_phone_shows_all_numbers(
 )
 def test_upload_csvfile_with_international_validates(
     mocker,
-    api_user_active,
     client_request,
     mock_get_service_template,
     mock_s3_set_metadata,
@@ -2739,7 +2721,6 @@ def test_upload_csvfile_with_international_validates(
 )
 def test_upload_csvfile_with_sms_to_landline_validates(
     mocker,
-    api_user_active,
     client_request,
     mock_get_service_template,
     mock_s3_set_metadata,
@@ -2778,7 +2759,6 @@ def test_upload_csvfile_with_sms_to_landline_validates(
 
 def test_job_from_contact_list_knows_where_its_come_from(
     client_request,
-    mocker,
     service_one,
     mock_get_service_template,
     mock_s3_download,
@@ -2802,7 +2782,6 @@ def test_job_from_contact_list_knows_where_its_come_from(
 
 def test_test_message_can_only_be_sent_now(
     client_request,
-    mocker,
     service_one,
     mock_get_service_template,
     mock_s3_download,
@@ -3344,20 +3323,10 @@ def test_check_messages_shows_trial_mode_error_for_letters(
         assert page.select_one("th.table-field a").text == "3"
 
 
-@pytest.mark.parametrize(
-    "number_of_rows, expected_error_message",
-    [
-        (1, "This letter is"),
-        (11, "These letters are"),  # TODO: Pluralise too many pages error message for multiple letters
-    ],
-)
+@pytest.mark.parametrize("number_of_rows", [1, 11])
 def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
     client_request,
-    api_user_active,
     mock_get_service_letter_template,
-    mock_has_permissions,
-    mock_get_users_by_service,
-    mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
     mock_s3_get_metadata,
@@ -3366,7 +3335,6 @@ def test_check_messages_does_not_allow_to_send_letter_longer_than_10_pages(
     mocker,
     mock_get_live_service,
     number_of_rows,
-    expected_error_message,
 ):
     mocker.patch(
         "app.main.views.send.s3download",
@@ -3672,11 +3640,9 @@ def test_letters_from_csv_files_dont_have_download_link(
 def test_one_off_letters_have_download_link(
     client_request,
     mocker,
-    api_user_active,
     mock_get_service_letter_template,
     mock_has_permissions,
     fake_uuid,
-    mock_get_users_by_service,
     mock_get_service_statistics,
     restricted,
     service_one,
@@ -3717,9 +3683,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
     mocker,
     mock_get_service,
     mock_get_service_letter_template,
-    mock_has_permissions,
     fake_uuid,
-    mock_get_users_by_service,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_s3_set_metadata,
@@ -3757,7 +3721,6 @@ def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(
     mocker,
     mock_get_live_service,
     mock_get_service_letter_template,
-    mock_has_permissions,
     fake_uuid,
     mock_get_users_by_service,
     mock_get_service_statistics,
@@ -3791,7 +3754,6 @@ def test_check_messages_shows_over_max_row_error(
     client_request,
     mock_get_users_by_service,
     mock_get_service_template_with_placeholders,
-    mock_has_permissions,
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
@@ -4432,7 +4394,7 @@ def test_send_from_contact_list(
 
 
 def test_send_to_myself_sets_placeholder_and_redirects_for_email(
-    mocker, client_request, fake_uuid, mock_get_service_email_template
+    client_request, fake_uuid, mock_get_service_email_template
 ):
     with client_request.session_transaction() as session:
         session["recipient"] = None
@@ -4455,9 +4417,7 @@ def test_send_to_myself_sets_placeholder_and_redirects_for_email(
         assert session["placeholders"] == {"email address": "test@user.gov.uk"}
 
 
-def test_send_to_myself_sets_placeholder_and_redirects_for_sms(
-    mocker, client_request, fake_uuid, mock_get_service_template
-):
+def test_send_to_myself_sets_placeholder_and_redirects_for_sms(client_request, fake_uuid, mock_get_service_template):
     with client_request.session_transaction() as session:
         session["recipient"] = None
         session["placeholders"] = {}

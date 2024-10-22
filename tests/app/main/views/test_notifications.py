@@ -57,9 +57,7 @@ from tests.conftest import (
 @freeze_time("2016-01-01 11:09:00.061258")
 def test_notification_status_page_shows_details(
     client_request,
-    active_user_with_permissions,
     mocker,
-    mock_has_no_jobs,
     service_one,
     fake_uuid,
     user,
@@ -101,7 +99,6 @@ def test_notification_status_page_shows_details(
 def test_notification_status_page_formats_email_and_sms_status_correctly(
     client_request,
     mocker,
-    mock_has_no_jobs,
     service_one,
     fake_uuid,
     active_user_with_permissions,
@@ -164,6 +161,12 @@ def test_notification_status_page_respects_redaction(
             partial(url_for, "main.view_notifications", message_type="sms", status="failed"),
         ),
         (
+            {"from_statuses": "failed", "from_search_query": "test-hash-1234"},
+            partial(
+                url_for, "main.view_notifications", message_type="sms", status="failed", search_query="test-hash-1234"
+            ),
+        ),
+        (
             {"from_job": "job_id"},
             partial(url_for, "main.view_job", job_id="job_id"),
         ),
@@ -187,7 +190,6 @@ def test_notification_status_page_respects_redaction(
 )
 def test_notification_status_shows_expected_back_link(
     client_request,
-    mocker,
     mock_get_notification,
     fake_uuid,
     extra_args,

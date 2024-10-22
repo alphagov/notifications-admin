@@ -35,13 +35,7 @@ def test_non_logged_in_user_can_see_homepage(
     assert page.select_one("#whos-using-notify a")["href"] == url_for("main.performance")
 
 
-def test_logged_in_user_redirects_to_choose_account(
-    client_request,
-    api_user_active,
-    mock_get_user,
-    mock_get_user_by_email,
-    mock_login,
-):
+def test_logged_in_user_redirects_to_choose_account(client_request):
     client_request.get(
         "main.index",
         _expected_redirect=url_for("main.choose_account"),
@@ -93,6 +87,7 @@ def test_hiding_pages_from_search_engines(
 @pytest.mark.parametrize(
     "view",
     [
+        "accessibility_statement",
         "cookies",
         "guidance_api_documentation",
         "guidance_billing_details",
@@ -123,7 +118,6 @@ def test_hiding_pages_from_search_engines(
 )
 def test_static_pages(
     client_request,
-    mock_get_organisation_by_domain,
     mock_get_letter_rates,
     mock_get_sms_rate,
     view,
@@ -289,7 +283,6 @@ def test_email_branding_preview(
 
 def test_email_branding_preview_allows_custom_page_title(
     client_request,
-    mock_get_email_branding,
 ):
     page = client_request.get(
         "main.email_template",

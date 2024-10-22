@@ -55,7 +55,6 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     mock_get_user_by_email_not_found,
     mock_email_is_not_already_in_use,
     mock_send_verify_email,
-    mock_login,
     phone_number_to_register_with,
     password,
 ):
@@ -99,9 +98,6 @@ def test_register_continue_handles_missing_session_sensibly(
 
 def test_process_register_returns_200_when_mobile_number_is_invalid(
     client_request,
-    mock_send_verify_code,
-    mock_get_user_by_email_not_found,
-    mock_login,
 ):
     client_request.logout()
     page = client_request.post(
@@ -156,7 +152,6 @@ def test_should_add_user_details_to_session(
     mock_get_organisations_with_unusual_domains,
     mock_email_is_not_already_in_use,
     mock_send_verify_email,
-    mock_login,
     email_address,
 ):
     client_request.logout()
@@ -176,7 +171,6 @@ def test_should_add_user_details_to_session(
 def test_should_return_200_if_password_is_on_list_of_commonly_used_passwords(
     client_request,
     mock_get_user_by_email,
-    mock_login,
 ):
     client_request.logout()
     page = client_request.post(
@@ -215,32 +209,32 @@ def test_register_with_existing_email_sends_emails(
 
 
 @pytest.mark.parametrize(
-    "email_address, expected_value",
+    "email_address, expected_value, extra_args",
     [
-        ("first.last@example.com", "First Last"),
-        ("first.middle.last@example.com", "First Middle Last"),
-        ("first.m.last@example.com", "First Last"),
-        ("first.last-last@example.com", "First Last-Last"),
-        ("first.o'last@example.com", "First O’Last"),
-        ("first.last+testing@example.com", "First Last"),
-        ("first.last+testing+testing@example.com", "First Last"),
-        ("first.last6@example.com", "First Last"),
-        ("first.last.212@example.com", "First Last"),
-        ("first.2.last@example.com", "First Last"),
-        ("first.2b.last@example.com", "First Last"),
-        ("first.1.2.3.last@example.com", "First Last"),
-        ("first.last.1.2.3@example.com", "First Last"),
+        ("first.last@example.com", "First Last", {}),
+        ("first.middle.last@example.com", "First Middle Last", {}),
+        ("first.m.last@example.com", "First Last", {}),
+        ("first.last-last@example.com", "First Last-Last", {}),
+        ("first.o'last@example.com", "First O’Last", {"_test_for_non_smart_quotes": False}),
+        ("first.last+testing@example.com", "First Last", {}),
+        ("first.last+testing+testing@example.com", "First Last", {}),
+        ("first.last6@example.com", "First Last", {}),
+        ("first.last.212@example.com", "First Last", {}),
+        ("first.2.last@example.com", "First Last", {}),
+        ("first.2b.last@example.com", "First Last", {}),
+        ("first.1.2.3.last@example.com", "First Last", {}),
+        ("first.last.1.2.3@example.com", "First Last", {}),
         # Instances where we can’t make a good-enough guess:
-        ("example123@example.com", None),
-        ("f.last@example.com", None),
-        ("f.m.last@example.com", None),
+        ("example123@example.com", None, {}),
+        ("f.last@example.com", None, {}),
+        ("f.m.last@example.com", None, {}),
     ],
 )
 def test_shows_name_on_registration_page_from_invite(
     client_request,
-    fake_uuid,
     email_address,
     expected_value,
+    extra_args,
     sample_invite,
     mock_get_invited_user_by_id,
 ):
@@ -248,13 +242,15 @@ def test_shows_name_on_registration_page_from_invite(
     with client_request.session_transaction() as session:
         session["invited_user_id"] = sample_invite
 
-    page = client_request.get("main.register_from_invite")
+    page = client_request.get(
+        "main.register_from_invite",
+        **extra_args,
+    )
     assert page.select_one("input[name=name]").get("value") == expected_value
 
 
 def test_shows_hidden_email_address_on_registration_page_from_invite(
     client_request,
-    fake_uuid,
     sample_invite,
     mock_get_invited_user_by_id,
 ):
@@ -291,7 +287,6 @@ def test_shows_hidden_email_address_on_registration_page_from_invite(
 )
 def test_register_from_invite(
     client_request,
-    fake_uuid,
     mock_email_is_not_already_in_use,
     mock_register_user,
     mock_send_verify_code,
@@ -312,7 +307,7 @@ def test_register_from_invite(
             service=sample_invite["service"],
             password="somreallyhardthingtoguess",
             auth_type="sms_auth",
-            **extra_data
+            **extra_data,
         ),
         _expected_redirect=url_for("main.verify"),
     )
@@ -358,7 +353,6 @@ def test_register_from_email_auth_invite(
     sample_invite,
     mock_email_is_not_already_in_use,
     mock_register_user,
-    mock_get_user,
     mock_send_verify_email,
     mock_send_verify_code,
     mock_accept_invite,
@@ -434,11 +428,9 @@ def test_can_register_email_auth_without_phone_number(
     mock_register_user,
     mock_get_user,
     mock_send_verify_email,
-    mock_send_verify_code,
     mock_accept_invite,
     mock_create_event,
     mock_add_user_to_service,
-    mock_get_service,
     mock_get_invited_user_by_id,
 ):
     client_request.logout()
@@ -471,7 +463,6 @@ def test_cannot_register_with_sms_auth_and_missing_mobile_number(
     client_request,
     mock_send_verify_code,
     mock_get_user_by_email_not_found,
-    mock_login,
 ):
     client_request.logout()
     page = client_request.post(

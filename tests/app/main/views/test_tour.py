@@ -572,10 +572,6 @@ def test_shows_link_to_end_tour(
 
 def test_go_to_dashboard_after_tour_link(
     client_request,
-    mocker,
-    api_user_active,
-    mock_login,
-    mock_get_service,
     mock_has_permissions,
     mock_delete_service_template,
     fake_uuid,

@@ -353,7 +353,6 @@ def test_org_user_registers_with_email_already_in_use(
     sample_org_invite,
     mock_get_user_by_email,
     mock_accept_org_invite,
-    mock_add_user_to_organisation,
     mock_send_already_registered_email,
     mock_register_user,
     mock_get_invited_org_user_by_id,
@@ -386,7 +385,6 @@ def test_org_user_registration(
     mock_register_user,
     mock_send_verify_code,
     mock_get_user_by_email,
-    mock_send_verify_email,
     mock_accept_org_invite,
     mock_add_user_to_organisation,
     mock_get_invited_org_user_by_id,
@@ -422,10 +420,6 @@ def test_org_user_registration(
 def test_verified_org_user_redirects_to_dashboard(
     client_request,
     sample_org_invite,
-    mock_check_verify_code,
-    mock_get_user,
-    mock_activate_user,
-    mock_login,
 ):
     client_request.logout()
     invited_org_user = InvitedOrgUser(sample_org_invite)
@@ -479,7 +473,6 @@ class TestEditOrganisationUser:
         self,
         client_request,
         mock_get_organisation,
-        mock_get_invites_for_organisation,
         platform_admin_user,
         _other_user,
         _get_user_fn,
@@ -506,7 +499,6 @@ class TestEditOrganisationUser:
     def test_set_permissions(
         self,
         client_request,
-        mock_get_invites_for_organisation,
         platform_admin_user,
         _other_user,
         _get_user_fn,
@@ -556,7 +548,6 @@ class TestEditOrganisationUser:
         self,
         client_request,
         mock_get_organisation,
-        mock_get_invites_for_organisation,
         platform_admin_user,
         _other_user,
         _get_user_fn,
