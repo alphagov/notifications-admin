@@ -9,13 +9,15 @@
 
 {% macro service_navigation(user, service) %}
 <div class="navigation-service">
-  {% if service.organisation_id %}
-    {% if user.platform_admin or
-      (user.belongs_to_organisation(service.organisation_id) and service.live) %}
-      <a href="{{ url_for('main.organisation_dashboard', org_id=service.organisation_id) }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-organisation-link">{{ service.organisation_name }}</a>
+  <div class="navigation-service__container">
+    {% if service.organisation_id %}
+      {% if user.platform_admin or
+        (user.belongs_to_organisation(service.organisation_id) and service.live) %}
+        <a href="{{ url_for('main.organisation_dashboard', org_id=service.organisation_id) }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-organisation-link">{{ service.organisation_name }}</a>
+      {% endif %}
     {% endif %}
-  {% endif %}
-  {{ navigation_service_name(service) }}
+    {{ navigation_service_name(service) }}
+  </div>
   <a href="{{ url_for('main.choose_account') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-switch">Switch service</a>
 </div>
 {% endmacro %}
