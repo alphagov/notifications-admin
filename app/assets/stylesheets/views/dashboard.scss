@@ -95,6 +95,7 @@
   &-filename {
     @include govuk-font(19, $weight: bold);
     display: block;
+    word-break: break-all;
     padding-bottom: 30px;
     padding-top: 10px;
     margin-bottom: -30px;
@@ -127,6 +128,7 @@
     display: block;
     color: $govuk-secondary-text-colour;
     max-width: 580px;
+    word-break: break-all;
   }
 
   &-hint-large {
