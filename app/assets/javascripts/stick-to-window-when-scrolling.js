@@ -68,6 +68,7 @@
   };
   ScrollArea.prototype.scrollToRevealElement = function ($el) {
     var nodeName = $el.get(0).nodeName.toLowerCase();
+    var nodeType =  $el.get(0).getAttribute('type');
     var endOfFurthestEl = focusOverlap.endOfFurthestEl(this._els, this.edge);
     var isInSticky = function () {
       return $el.closest(this.selector).length > 0;
@@ -78,7 +79,13 @@
     // if textarea is focused, we care about checking the caret, not the whole element
     if (nodeName === 'textarea') {
       focused = this.getFocusedDetails.forCaret($el);
-    } else {
+    }
+    // if checkbox or radio are focused we take the parent element
+    // and adjust for all of its height
+    else if (nodeType === 'checkbox' || nodeType === 'radio') {
+      focused = this.getFocusedDetails.forElement($el.parent());
+    }
+    else {
       if (isInSticky()) { return; }
       focused = this.getFocusedDetails.forElement($el);
     }
