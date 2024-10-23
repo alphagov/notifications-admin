@@ -22,12 +22,15 @@
 {% block maincolumn_content %}
 
   {{ page_header(page_title) }}
-  {% if not message_type == "letter" %}
+
+  {# the blue pills only show for sms and email #}
+  {% if message_type != "letter" %}
 
     {{ ajax_block(
       partials,
-      url_for('json_updates.get_notifications_page_partials_as_json', service_id=current_service.id, message_type=message_type, status=status, search_query=search_query),
-      'counts'
+      url_for('json_updates.get_notifications_page_partials_as_json', service_id=current_service.id, message_type=message_type, status=status, page=page, search_query=search_query),
+      'counts',
+      form='search-form'
     ) }}
 
   {% endif %}

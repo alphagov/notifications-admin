@@ -1130,3 +1130,37 @@ def test_search_should_generate_search_query(
     )
 
     mock_cache_search_query.assert_called_with(to_argument, SERVICE_ONE_ID, "")
+
+
+def test_ajax_blocks_have_same_resource(
+    client_request,
+    service_one,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+):
+    page = client_request.get(
+        "main.view_notifications",
+        service_id=service_one["id"],
+        message_type="sms",
+        status="",
+    )
+
+    ajax_blocks = page.select("[data-notify-module=update-content]")
+
+    assert len(ajax_blocks) == 2
+    for block in ajax_blocks:
+        assert block["data-resource"] == url_for(
+            "json_updates.get_notifications_page_partials_as_json",
+            service_id=service_one["id"],
+            message_type="sms",
+            # we manually define the statuses even though they're implicit in the initial html GET
+            status="sending,delivered,failed",
+            page=1,
+            search_query=None,
+        )
+        # ensure both ajax blocks have a data-form, so that they both issue the same POST request to the json endpoint
+        assert block["data-form"] == "search-form"
+    assert {block["data-key"] for block in ajax_blocks} == {"counts", "notifications"}
