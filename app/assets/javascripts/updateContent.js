@@ -58,12 +58,29 @@
   };
 
   var getRenderer = ($contents, key, classesPersister) => response => {
+    var contents = $contents.get(0);
+    var contentHasUpdated = false;
     classesPersister.remove();
     window.Morphdom(
-      $contents.get(0),
-      $(response[key]).get(0)
+      contents,
+      $(response[key]).get(0),
+      {
+        onBeforeElUpdated: function(fromEl, toEl) {
+          // spec - https://dom.spec.whatwg.org/#concept-node-equals
+          if (fromEl.isEqualNode(toEl)) {
+            return false;
+          } else if (fromEl === contents) { // if root node is different, updates will apply
+            contentHasUpdated = true;
+          }
+
+          return true;
+        }
+      }
     );
     classesPersister.replace();
+    if (contentHasUpdated === true) {
+      $(document).trigger("updateContent.onafterupdate", [contents]);
+    }
   };
 
   var getQueue = resource => (

@@ -12,6 +12,10 @@
   clear: both;
   border: 5px solid $govuk-success-colour;
 
+  &:focus {
+    outline: 3px solid $govuk-focus-colour;
+  }
+
   &-title {
     @include govuk-font(24, $weight: bold);
   }
@@ -57,10 +61,6 @@
   border: 5px solid $govuk-error-colour;
   margin: 15px 0;
   text-align: left;
-
-  &:focus {
-    outline: 3px solid $govuk-focus-colour;
-  }
 
   .list {
     margin-bottom: 0;

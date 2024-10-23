@@ -12,8 +12,6 @@ if (document.body.classList.contains('govuk-frontend-supported')) {
 
   $(() => $('.error-message, .govuk-error-message').eq(0).parent('label').next('input').trigger('focus'));
 
-  $(() => $('.banner-dangerous').eq(0).trigger('focus'));
-
   $(() => $('.govuk-header__container').on('click', function() {
     $(this).css('border-color', '#1d70b8');
   }));
