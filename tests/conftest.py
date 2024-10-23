@@ -4228,6 +4228,28 @@ def create_template(
     )
 
 
+def create_unsubscribe_request_report(
+    *,
+    service_id=SERVICE_ONE_ID,
+    processed_by_service_at=None,
+    batch_id=None,
+    will_be_archived_at=None,
+    count=1,
+    earliest_timestamp,
+    latest_timestamp,
+):
+    return {
+        "service_id": service_id,
+        "count": count,
+        "earliest_timestamp": earliest_timestamp,
+        "latest_timestamp": latest_timestamp,
+        "processed_by_service_at": processed_by_service_at,
+        "batch_id": batch_id,
+        "is_a_batched_report": bool(batch_id),
+        "will_be_archived_at": will_be_archived_at,
+    }
+
+
 @pytest.fixture
 def mock_get_invited_user_by_id(notify_admin, mocker, sample_invite):
     def _get(invited_user_id):
