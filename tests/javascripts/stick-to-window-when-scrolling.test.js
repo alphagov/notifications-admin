@@ -356,23 +356,11 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         const inputFormBottom = getScreenItemBottomPosition(inputForm);
 
-        inputForm.insertAdjacentHTML('afterEnd', 
-          `<div class="govuk-checkboxes__item">
-            <input class="govuk-checkboxes__input" id="id" name="confirm" type="checkbox" value="yes">
-            <label class="govuk-label govuk-checkboxes__label" for="id">Yes</label>
-          </div>`
-        );
+        inputForm.insertAdjacentHTML('afterEnd', '<input type="checkbox" name="confirm" value="yes" />');
         checkbox = document.querySelector('input[type=checkbox]');
 
         screenMock.mockPositionAndDimension('checkbox', checkbox, {
           offsetHeight: 50, // 118px smaller than the sticky
-          offsetWidth: 727,
-          offsetTop: inputFormBottom
-        });
-
-        // also mock offeset for the parent containing element div
-        screenMock.mockPositionAndDimension('checkboxParent', checkbox.parentNode, {
-          offsetHeight: 50,
           offsetWidth: 727,
           offsetTop: inputFormBottom
         });
@@ -1101,12 +1089,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         const contentBottom = getScreenItemBottomPosition(content);
 
-        content.insertAdjacentHTML('afterEnd', 
-          `<div class="govuk-checkboxes__item">
-            <input class="govuk-checkboxes__input" id="id" name="confirm" type="checkbox" value="yes">
-            <label class="govuk-label govuk-checkboxes__label" for="id">Yes</label>
-          </div>`
-        );
+        content.insertAdjacentHTML('afterEnd', '<input type="checkbox" name="confirm" value="yes" />');
         checkbox = document.querySelector('input[type=checkbox]');
 
         screenMock.mockPositionAndDimension('checkbox', checkbox, {
@@ -1115,7 +1098,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
           offsetTop: contentBottom
         });
 
-        checkboxBottom = getScreenItemBottomPosition(checkbox.parentNode);
+        checkboxBottom = getScreenItemBottomPosition(checkbox);
 
         // move the sticky over the checkbox. It's 50px high so this position will cause it to overlap.
         screenMock.scrollTo((checkboxBottom - windowHeight) + 5);
